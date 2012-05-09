@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -19,7 +22,13 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage warmBack = getInput().getImages().getIr();
 		FlexibleImage coldRef = getInput().getMasks().getIr();
 		if (warmBack != null && coldRef != null) {
-			double warmBackground = warmBack.getIO().intensitySumOfChannel(false, false, false, false) / warmBack.getIO().countFilledPixels();
+			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
+			warmBack.getIO().intensitySumOfChannel(false, false, false, false, warmBackgroundValues);
+			Collections.sort(warmBackgroundValues);
+			double sum = 0;
+			for (int i = warmBackgroundValues.size() / 2; i < warmBackgroundValues.size(); i++)
+				sum += warmBackgroundValues.get(i);
+			double warmBackground = sum / (warmBackgroundValues.size() / 2);
 			int[] res = coldRef.copy().getAs1A();
 			for (int i = 0; i < res.length; i++)
 				res[i] = IAPservice.getIRintensityDifferenceColor(

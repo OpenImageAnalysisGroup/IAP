@@ -2864,11 +2864,17 @@ public class ImageOperation {
 	/**
 	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
 	 * If red, green and blue are false, special IR temperature calculations are performed.
-	 * 
-	 * @param b
-	 * @return
 	 */
 	public double intensitySumOfChannel(boolean performGrayScale, boolean red, boolean green, boolean blue) {
+		return intensitySumOfChannel(performGrayScale, red, green, blue, null);
+	}
+	
+	/**
+	 * The sum of the intensities of non-background pixels will be calculated. The intensity (0..1) of the red channel is analyzed.
+	 * If red, green and blue are false, special IR temperature calculations are performed.
+	 */
+	public double intensitySumOfChannel(boolean performGrayScale, boolean red, boolean green, boolean blue,
+			ArrayList<java.lang.Double> optValues) {
 		double res = 0;
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int[] img2d = getImageAs1array();
@@ -2883,24 +2889,34 @@ public class ImageOperation {
 		for (int c : img2d) {
 			if (c != background) {
 				int cg = grayScaledIfNeeded[idx];
+				double vR = java.lang.Double.NaN;
+				double vG = java.lang.Double.NaN;
+				double vB = java.lang.Double.NaN;
 				if (red) {
 					double rf = ((cg & 0xff0000) >> 16) / 255.0; // B 0..1
-					res += rf;
+					vR = rf;
 				}
 				if (green) {
 					double gf = ((cg & 0x00ff00) >> 8) / 255.0; // B 0..1
-					res += gf;
+					vG = gf;
 				}
 				if (blue) {
 					double bf = ((cg & 0x0000ff)) / 255.0; // B 0..1
-					res += bf;
+					vB = bf;
 				}
 				if (!red && !green && !blue) {
 					// 7-edge-color-cube calcutation
 					int rf = ((cg & 0xff0000) >> 16);
 					int gf = ((cg & 0x00ff00) >> 8);
 					int bf = ((cg & 0x0000ff));
-					res += IAPservice.getIRintenstityFromRGB(rf, gf, bf);
+					vR = IAPservice.getIRintenstityFromRGB(rf, gf, bf);
+				}
+				for (double v : new double[] { vR, vG, vB }) {
+					if (!java.lang.Double.isNaN(v)) {
+						res += v;
+						if (optValues != null)
+							optValues.add(v);
+					}
 				}
 			}
 			idx++;
