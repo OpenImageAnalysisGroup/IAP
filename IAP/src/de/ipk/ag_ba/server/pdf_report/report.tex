@@ -1108,7 +1108,7 @@ of the group image analysis.
 \checkFileNoReset{side_nir_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{side_nir_normalized_histogram_bin_stackedOverallImage.tex}{}{}
-\checkFileNoReset{top_nir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_nir_normalized_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{side_nir_intensity_average__relative_nboxplot.pdf}{}{}
 \checkFileNoReset{top_nir_intensity_average__relative___pix_nboxplot.pdf}{}{}
 
@@ -1231,6 +1231,57 @@ of the group image analysis.
 % 			}{}
 % 		}{}
 % 	}
+
+\resetBoolean
+\checkFileNoReset{side_ir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_ir_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_ir_intensity_averagenboxplot.pdf}{}{}
+\checkFileNoReset{side_ir_intensity_averagenboxplot.pdf}{}{}
+
+\ifthenelse{\boolean{isFile1}}{
+
+	\resetClear
+	\clearpage
+	\section{Infrared intensity}
+	\begin{itemize}
+	\item Average intensity of infrared (IR)
+	\item Represents the heat of the plant
+	\end{itemize}
+	
+	\checkFile{side_ir_intensity_averagenboxplot.pdf}{top_ir_intensity_averagenboxplot.pdf}{}
+	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+		\ownClearPage
+		\subsection{Average infrared intensity}
+		
+		\ifthenelse{\boolean{isFile1}}{	
+			Average IR intensity for side view:
+			\loadImage{side_ir_intensity_averagenboxplot.pdf}
+		}{}
+		\ifthenelse{\boolean{isFile2}}{
+			Average IR intensity for top view:
+			\loadImage{top_ir_intensity_averagenboxplot.pdf}
+		}{}
+	}{}
+	
+	
+	\resetBoolean
+	\checkFileNoReset{side_ir_histogram_bin_stackedOverallImage.tex}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+		
+		\ownClearPage
+		\subsection{Intensity histogram side view}
+		\loadTex{side_ir_histogram_bin_stackedOverallImage}
+	}{}
+	
+	\resetBoolean
+	\checkFileNoReset{top_ir_histogram_bin_stackedOverallImage.tex}{}{}
+	\ifthenelse{\boolean{isFile1}}{
+		
+		\ownClearPage
+		\subsection{Intensity histogram top view}
+		\loadTex{top_ir_histogram_bin_stackedOverallImage}
+	}{}
+}{}
 
 
 \resetBoolean
