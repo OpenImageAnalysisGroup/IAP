@@ -115,7 +115,7 @@ public class PdfCreator {
 								try {
 									while ((response = ls_in.readLine()) != null) {
 										output.put(System.nanoTime(), "INFO:  " + response);
-										System.out.println("INFO:  " + response);
+										System.out.println(response);
 										if (optStatus != null && response != null && response.trim().length() > 0)
 											optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 										if (optStatus != null && response != null && response.trim().length() > 0)
@@ -143,7 +143,7 @@ public class PdfCreator {
 								try {
 									while ((response = ls_in2.readLine()) != null) {
 										output.put(System.nanoTime(), "ERROR: " + response);
-										System.out.println("ERROR: " + response);
+										System.err.println(response);
 										if (optStatus != null && response != null && response.trim().length() > 0)
 											optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 										if (optStatus != null && response != null && response.trim().length() > 0)
