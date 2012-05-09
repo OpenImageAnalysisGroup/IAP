@@ -1246,7 +1246,7 @@ normalizeToHundredPercent =  function(whichRows, overallResult) {
 
 renameYForSubsection <- function(label) {
 	
-	label <- gsub("%","percent", label)
+	label <- gsub("\\\\% ","percent", label)
 	label <- gsub("\\^2","$^2$", label)
 	
 	return(label)
@@ -2705,7 +2705,7 @@ initRfunction <- function(DEBUG = FALSE) {
 	}
 	
 	#"psych",
-	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb") #, "mvoutlier")
+	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb", "methods") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, TRUE, TRUE, FALSE)
 }
 
