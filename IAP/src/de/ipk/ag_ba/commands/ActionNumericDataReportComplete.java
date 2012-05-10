@@ -365,6 +365,13 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	private boolean filterOut(ArrayList<ThreadSafeOptions> toggles, SnapshotDataIAP s) {
 		if (toggles == null)
 			return false;
+		boolean filterByTime = false;
+		if (filterByTime) {
+			if (s.getDay() < 10)
+				return true;
+			if (s.getDay() > 35)
+				return true;
+		}
 		for (ThreadSafeOptions t : toggles) {
 			if (match(t, s))
 				return true;
