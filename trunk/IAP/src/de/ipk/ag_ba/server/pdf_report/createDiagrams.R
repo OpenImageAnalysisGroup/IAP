@@ -1236,7 +1236,7 @@ setColor <- function(overallList) {
 	overallList$color_box = setColorList("boxplot", overallList$boxDes, overallList$overallResult_boxDes, overallList$isGray)
 	overallList$color_boxStack = setColorList("boxplotStacked", overallList$boxStackDes, overallList$overallResult_boxStackDes, overallList$isGray)
 	overallList$color_spider = setColorList("spiderplot", overallList$boxSpiderDes, overallList$overallResult_boxSpiderDes, overallList$isGray)
-	overallList$color_violin = setColorList("violinplot", overallList$violinBoxDes, overallList$overallResult_violinBoxDes, overallList$isGray)
+	#overallList$color_violin = setColorList("violinplot", overallList$violinBoxDes, overallList$overallResult_violinBoxDes, overallList$isGray)
 	return(overallList)
 }
 
@@ -1460,61 +1460,77 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
+newTreatmentNameFunction <- function(seq, n) {
+	if(nchar(n) > 14) {
+		newTreatmentName <- paste(seq, ".) ", substr(n,1,10), " ...", sep="")
+	} else {
+		newTreatmentName <- paste(seq, ".) ", n, sep="")
+	}
+	return(newTreatmentName)
+}
+
+
 renameOfTheTreatments <- function(overallList) {
 	overallList$debug %debug% "renameOfTheTreatments()"
 	
-	seq <- 0;
-	newTreatmentName <- character()
-	columnName <- c("Short name", "Full Name")
+	if(!overallList$appendix) {
+		
+		newTreatmentName <- character()
+		columnName <- c("Short name", "Full Name")
+		
+		if(overallList$filterTreatment[1] != "none") {
+			seq <- 0;
+			FileName <- "conditionsFirstFilter"
+			writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
+			for(n in overallList$filterTreatment) {
+				seq <- seq+1
+				overallList$filterTreatmentRename[[n]] <- newTreatmentNameFunction(seq, n)
+				writeLatexTable(FileName, value=c(newTreatmentName,n))
+			}
+			writeLatexTable(FileName)
+		}
 	
-	if(overallList$filterTreatment[1] != "none") {
-		FileName <- "conditionsFirstFilter"
-		writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
-		for(n in overallList$filterTreatment) {
-			seq <- seq+1
-			if(nchar(n) > 10) {
-				newTreatmentName <- paste(seq, ". ", substr(n,1,10), " ...", sep="")
-			} else {
-				newTreatmentName <- paste(seq, ". ", n, sep="")
+		if(overallList$filterSecondTreatment[1] != "none") {
+			seq <- 1
+			FileName <- "conditionsSecondFilter"
+			writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
+			for(n in overallList$filterSecondTreatment) {
+				seq <- seq+1
+				overallList$secondFilterTreatmentRename[[n]] <- newTreatmentNameFunction(letters[seq], n)
+				writeLatexTable(FileName, value=c(newTreatmentName,n))
 			}
-			overallList$filterTreatmentRename[[n]] <- newTreatmentName
-			writeLatexTable(FileName, value=c(newTreatmentName,n))
+			writeLatexTable(FileName)
 		}
-		writeLatexTable(FileName)
-	}
-
-	if(overallList$filterSecondTreatment[1] != "none") {
-		FileName <- "conditionsSecondFilter"
-		writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
-		for(n in overallList$filterSecondTreatment) {
-			seq <- seq+1
-			if(nchar(n) > 10) {
-				newTreatmentName <- paste(seq, ". ", substr(n,1,10), " ...", sep="")
-			} else {
-				newTreatmentName <- paste(seq, ". ", n, sep="")
-			}
-			overallList$secondFilterTreatmentRename[[n]] <- newTreatmentName
-			writeLatexTable(FileName, value=c(newTreatmentName,n))
-		}
-		writeLatexTable(FileName)
 	}
 	return(overallList)
 }
 
-replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment=FALSE) {
+replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment=FALSE, onlySecondTreatment=FALSE) {
+##########
+#columnWhichShouldReplace <- overallResult$name
+#onlyFirstTreatment <- FALSE
+#onlyFirstTreatment <- FALSE
+#onlySecondTreatment <- TRUE
+##########
+	
+	
 	overallList$debug %debug% "replaceTreatmentNames()"
 	
 	columnWhichShouldReplace <- as.character(columnWhichShouldReplace)
 	
-	if(overallList$filterSecondTreatment[1] != "none" & !onlyFirstTreatment) {
+	if(overallList$filterSecondTreatment[1] != "none" & !onlyFirstTreatment & !onlySecondTreatment) {
 		for(n in overallList$filterTreatment) {
 			for(k in overallList$filterSecondTreatment) {
 				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
 			}
 		} 
-	} else if(overallList$filterTreatment[1] != "none") {
+	} else if(overallList$filterTreatment[1] != "none" & onlyFirstTreatment) {
 		for(n in overallList$filterTreatment) {
 			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterTreatmentRename[[n]])
+		}
+	} else if(overallList$filterSecondTreatment[1] != "none" & onlySecondTreatment) {
+		for(n in overallList$filterSecondTreatment) {
+			columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$secondFilterTreatmentRename[[n]])
 		}
 	}
 	#ownCat(unique(columnWhichShouldReplace))
@@ -2406,98 +2422,94 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 #imagesIndex <- "1"
 #isOnlyOneValue <- FALSE
 	#############	
-
 	
-#		df <- data.frame(created=rep.int(1,10), score=rep.int(1,10))
-#		df$created[1:10] <- c(1,2,3,4,5,6,7,8,9,10)
-#		df$score[1:10] <- c(5,10,12,14,18,-5,-3,14,20,25)
-#		#df$ownCategory[1:10] <- c("positive","positive","positive","positive","positive","negative","negative","positive","positive","positive")
-#		
-#		
-#		# Interpolate data
-#		lin_interp = function(x, y, length.out=100) {
-#			approx(x, y, xout=seq(min(x), max(x), length.out=length.out))$y
-#		}
-#		created.interp = lin_interp(df$created, df$created)
-#		score.interp   = lin_interp(df$created, df$score)
-#		df.interp = data.frame(created=created.interp, score=score.interp)
-#		
-#	# Make a grouping variable for each pos/neg segment
-#		ownCat.rle = rle(df.interp$score < 0)
-#		df.interp$group = rep.int(1:length(ownCat.rle$lengths), times=ownCat.rle$lengths)
-#		
-## Plot
-#		ggplot(data = df.interp, aes(x = created, y = score, fill=score>0, group=group)) + geom_area() + scale_fill_manual(values = c('red', 'green'))
 	
-
 	
-overallList$debug %debug% "makeViolinPlotDiagram()"	
-if ("primaerTreatment" %in% colnames(overallResult)) {
-	overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
-} else {
-	overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
-}
-
-tempOverallResult =  overallResult	
-
-for (imagesIndex in names(overallDescriptor)) {
-	if (!is.na(overallDescriptor[[imagesIndex]])) {
-		ylabelForAppendix <- ""
-		createOuputOverview("violin plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
-		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
-		overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-		overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
-		overallResult <- reownCategorized(overallResult)
-		color <- setColorDependentOfGroup(overallResult)
-		overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
-		
-		if (length(overallResult[, 1]) > 0) {
-							
-				plot <-	ggplot(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group)) +				
-						geom_ribbon(aes(ymin=-mean, ymax=mean)) +						
-						scale_fill_manual(values = color) +
-						guides(fill=FALSE) +
-						coord_flip()+
-						scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) +					
-						ylab(overallDesName[[imagesIndex]])			+	
-						#scale_fill_manual(values = overallColor[[imagesIndex]]) +
-						#scale_colour_manual(values= overallColor[[imagesIndex]]) +
-						theme_bw() +
-						opts(axis.title.x = theme_text(face="bold", size=11), 
-								axis.title.y = theme_text(face="bold", size=11, angle=90), 
-								#panel.grid.major = theme_blank(), # switch off major gridlines
-								#panel.grid.minor = theme_blank(), # switch off minor gridlines
-								legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
-								legend.title = theme_blank(), # switch off the legend title						
-								#legend.key.size = unit(1.5, "lines"), 
-								legend.key = theme_blank(), # switch off the rectangle around symbols in the legend
-								panel.border = theme_rect(colour="Grey", size=0.1)
-						)
+	overallList$debug %debug% "makeViolinPlotDiagram()"	
+	
+	if ("primaerTreatment" %in% colnames(overallResult)) {
+		overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
+	} else {
+		overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
+	}
+	
+	tempOverallResult =  overallResult	
+	
+	for (imagesIndex in names(overallDescriptor)) {
+		if (!is.na(overallDescriptor[[imagesIndex]])) {
+			createOuputOverview("violin plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
+			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+			
+			if("primaerTreatment" %in% colnames(overallResult)) {
 				
-				if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
-					plot = plot + opts(legend.text = theme_text(size=6), 
-							legend.key.size = unit(0.7, "lines")
-					)
-				} else if(length(overallColor[[imagesIndex]]) >= 31) {
-					plot = plot + opts(legend.text = theme_text(size=4), 
-							legend.key.size = unit(0.4, "lines")
-					)
-				} else {
-					plot = plot + opts(legend.text = theme_text(size=11))
-				}
+				for (value in unique(as.character(overallResult$primaerTreatment))) { 
+					title = overallList$filterTreatmentRename[[value]]			
+					booleanVector = getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = value))
+					plotThisValues = overallResult[booleanVector, ]
+					plotThisValues$name <- factor(substr(plotThisValues$name,nchar(value)+2, nchar(as.character(plotThisValues$name))))
+					plotViolinPlotDiagram(plotThisValues, overallDesName, overallFileName, overallList, imagesIndex, title)
+				}	 
 				
-				plot = plot + facet_wrap(~ name)
-			#	ownCat(plot)
-
-#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-#					plot = plot + facet_wrap(~ primaerTreatment)
-#				} else {
-#					plot = plot + facet_wrap(~ name)
-#				} 
-
-				writeTheData(overallList, plot, overallFileName[imagesIndex], diagramTypSave, isAppendix=overallList$appendix, subSectionTitel=ylabelForAppendix, subsectionDepth=1)
+			} else {
+					plotViolinPlotDiagram(overallResult, overallDesName, overallFileName, overallList, imagesIndex)
 			}
 		}
+	}
+	
+}
+
+reorderThePlotOrder <- function(overallResult) {
+	groupedOverallResult <- data.table(overallResult)
+	sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), sum, na.rm=TRUE), by=c(name)])
+	sumVector$c <- levels(overallResult$name)
+	
+	for(n in levels(overallResult$name)) {
+		overallResult$name <- replace(as.character(overallResult$name), overallResult$name==n, paste(sumVector[sumVector$c==n,]$c, " (", round(sumVector[sumVector$c==n,]$V1, digits=1), ")", sep=""))
+		sumVector[sumVector$c==n,]$c <- paste(sumVector[sumVector$c==n,]$c, " (", round(sumVector[sumVector$c==n,]$V1, digits=1), ")", sep="")
+	}
+	
+	return(factor(overallResult$name, levels = sumVector[order(sumVector$V1),]$c))
+}
+
+
+plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName, overallList, imagesIndex, title="", diagramTypSave="violinplot") {
+########
+#overallResult <- plotThisValues	
+########
+	overallResult <- reownCategorized(overallResult)
+	color <- setColorDependentOfGroup(overallResult)
+	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name,onlySecondTreatment = TRUE)
+	overallResult$name <- reorderThePlotOrder(overallResult)
+		
+	if (length(overallResult[, 1]) > 0) {
+						
+		plot <-	ggplot(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group)) +				
+				geom_ribbon(aes(ymin=-mean, ymax=mean)) +						
+				scale_fill_manual(values = color) +
+				guides(fill=FALSE) +
+				coord_flip()+
+				scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) +					
+				ylab(overallDesName[[imagesIndex]])			+	
+				#scale_fill_manual(values = overallColor[[imagesIndex]]) +
+				#scale_colour_manual(values= overallColor[[imagesIndex]]) +
+				theme_bw() +
+				opts(axis.title.x = theme_text(face="bold", size=11), 
+						axis.title.y = theme_text(face="bold", size=11, angle=90), 
+						#panel.grid.major = theme_blank(), # switch off major gridlines
+						#panel.grid.minor = theme_blank(), # switch off minor gridlines
+						legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
+						legend.title = theme_blank(), # switch off the legend title						
+						#legend.key.size = unit(1.5, "lines"), 
+						legend.key = theme_blank(), # switch off the rectangle around symbols in the legend
+						panel.border = theme_rect(colour="Grey", size=0.1)
+				)
+		if (title != "") {
+			plot = plot + opts(title = title)
+		}
+		
+		plot = plot + facet_wrap(~ name, ncol=5)
+		writeTheData(overallList, plot, overallFileName[imagesIndex], diagramTypSave, writeLatexFileFirstValue= paste(overallFileName[imagesIndex], "violinOverallImage", sep=""), writeLatexFileSecondValue= paste(overallFileName[imagesIndex],diagramTypSave,sep=""), makeOverallImage=TRUE, subSectionTitel = overallDesName[[imagesIndex]], subsectionDepth=2)
 	}
 }
 
@@ -2553,6 +2565,7 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
 	if(!calculateNothing) {			
+
 			if (sum(!is.na(overallList$nBoxDes)) > 0) {
 				if (overallList$debug) {ownCat("nBoxplot...")}
 				makeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
@@ -2580,7 +2593,7 @@ makeDiagrams <- function(overallList) {
 			} else {
 				ownCat("All values for stacked Boxplot are 'NA'...")
 			}
-			
+
 			if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 				if (overallList$debug) {ownCat("Violin plot...")}
 				makeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
@@ -3034,8 +3047,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		treatment <- "Treatment"
 		filterTreatment <- "dry / normal"
 		
-		secondTreatment <- "none"
-		filterSecondTreatment <- "none"
+		secondTreatment <- "Species"
+		filterSecondTreatment <- "Athletico$Weisse Zarin"
 		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
 
@@ -3306,7 +3319,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		violinBoxDes <- descriptorSet_violinBox
 		violinBoxDesName <- descriptorSetName_violinBox
 		
-		appendix <- TRUE
+		appendix <- FALSE
 		if (appendix) {
 			blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 			descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
@@ -3456,5 +3469,5 @@ calculateNothing <- FALSE
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
-startOptions("report", FALSE)
+startOptions("report", TRUE)
 rm(list=ls(all=TRUE))

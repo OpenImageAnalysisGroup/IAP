@@ -407,14 +407,15 @@ of the group image analysis.
 \checkFileNoReset{mark1_y__percent_nboxplot.pdf}{}{}
 \checkFileNoReset{mark2_y__percent_nboxplot.pdf}{}{}
 \checkFileNoReset{mark3_y__percent_nboxplot.pdf}{}{}
-\checkFileNoReset{side_area_norm__mm2_violinplot.pdf}{}{}
-\checkFileNoReset{top_area_norm__mm2_violinplot.pdf}{}{}
-\checkFileNoReset{side_fluo_intensity_average__relative_violinplot.pdf}{}{}
-\checkFileNoReset{side_nir_intensity_average__relative_violinplot.pdf}{}{}
-\checkFileNoReset{side_width_norm__mm_violinplot.pdf}{}{}
-\checkFileNoReset{side_height_norm__mm_violinplot.pdf}{}{}
-\checkFileNoReset{side_vis_hue_averageviolinplot.pdf}{}{}
-\checkFileNoReset{top_vis_hue_averageviolinplot.pdf}{}{}
+
+\checkFileNoReset{side_area_norm__mm2_violinOverallImage.tex}{}{}
+\checkFileNoReset{top_area_norm__mm2_violinOverallImage.tex}{}{}
+\checkFileNoReset{side_fluo_intensity_average__relative_violinOverallImage.tex}{}{}
+\checkFileNoReset{side_nir_intensity_average__relative_violinOverallImage.tex}{}{}
+\checkFileNoReset{side_width_norm__mm_violinOverallImage.tex}{}{}
+\checkFileNoReset{side_height_norm__mm_violinOverallImage.tex}{}{}
+\checkFileNoReset{side_vis_hue_averageviolinOverallImage.tex}{}{}
+\checkFileNoReset{top_vis_hue_averageviolinOverallImage.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -474,51 +475,51 @@ of the group image analysis.
 	}{}
 	
 	\resetBoolean
-	\checkFileNoReset{side_area_norm__mm2_violinplot.pdf}{}{}
-	\checkFileNoReset{top_area_norm__mm2_violinplot.pdf}{}{}
-	\checkFileNoReset{side_fluo_intensity_average__relative_violinplot.pdf}{}{}
-	\checkFileNoReset{side_nir_intensity_average__relative_violinplot.pdf}{}{}
-	\checkFileNoReset{side_width_norm__mm_violinplot.pdf}{}{}
-	\checkFileNoReset{side_height_norm__mm_violinplot.pdf}{}{}
-	\checkFileNoReset{side_vis_hue_averageviolinplot.pdf}{}{}
-	\checkFileNoReset{top_vis_hue_averageviolinplot.pdf}{}{}
+	\checkFileNoReset{side_area_norm__mm2_violinOverallImage.tex}{}{}
+	\checkFileNoReset{top_area_norm__mm2_violinOverallImage.tex}{}{}
+	\checkFileNoReset{side_fluo_intensity_average__relative_violinOverallImage.tex}{}{}
+	\checkFileNoReset{side_nir_intensity_average__relative_violinOverallImage.tex}{}{}
+	\checkFileNoReset{side_width_norm__mm_violinOverallImage.tex}{}{}
+	\checkFileNoReset{side_height_norm__mm_violinOverallImage.tex}{}{}
+	\checkFileNoReset{side_vis_hue_averageviolinOverallImage.tex}{}{}
+	\checkFileNoReset{top_vis_hue_averageviolinOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 		\ownClearPage
 		\subsection{Stress ratio}
 		
-		\checkFile{side_area_norm__mm2_violinplot.pdf}{top_area_norm__mm2_violinplot.pdf}{side_fluo_intensity_average__relative_violinplot.pdf}
+		\checkFile{side_area_norm__mm2_violinOverallImage.tex}{top_area_norm__mm2_violinOverallImage.tex}{side_fluo_intensity_average__relative_violinOverallImage.tex}
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_area_norm__mm2_violinplot.pdf}
+			\loadTex{side_area_norm__mm2_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{top_area_norm__mm2_violinplot.pdf}
+			\loadTex{top_area_norm__mm2_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile3}}{
-			\loadImage{side_fluo_intensity_average__relative_violinplot.pdf}
+			\loadTex{side_fluo_intensity_average__relative_violinOverallImage}
 		}{}
 	
-		\checkFile{side_nir_intensity_average__relative_violinplot.pdf}{side_width_norm__mm_violinplot.pdf}{side_height_norm__mm_violinplot.pdf}
+		\checkFile{side_nir_intensity_average__relative_violinOverallImage.tex}{side_width_norm__mm_violinOverallImage.tex}{side_height_norm__mm_violinOverallImage.tex}
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_nir_intensity_average__relative_violinplot.pdf}
+			\loadTex{side_nir_intensity_average__relative_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{side_width_norm__mm_violinplot.pdf}
+			\loadTex{side_width_norm__mm_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile3}}{
-			\loadImage{side_height_norm__mm_violinplot.pdf}
+			\loadTex{side_height_norm__mm_violinOverallImage}
 		}{}
 	
-		\checkFile{side_vis_hue_averageviolinplot.pdf}{top_vis_hue_averageviolinplot.pdf}{}
+		\checkFile{side_vis_hue_averageviolinOverallImage.tex}{top_vis_hue_averageviolinOverallImage.tex}{}
 		\ifthenelse{\boolean{isFile1}}{
-			\loadImage{side_vis_hue_averageviolinplot.pdf}
+			\loadTex{side_vis_hue_averageviolinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile2}}{
-			\loadImage{top_vis_hue_averageviolinplot.pdf}
+			\loadTex{top_vis_hue_averageviolinOverallImage}
 		}{}
 	}{}			
 }{}
