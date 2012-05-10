@@ -100,10 +100,13 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			for (String db : listOfDatabases) {
 				idx++;
 				status.setCurrentStatusValueFine(idx / (double) max * 100d);
+				if (!LemnaTecDataExchange.known(db))
+					continue;
 				status.setCurrentStatusText1(n + " experiments");
 				try {
 					if (!experimentMap.containsKey(db)) {
-						Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(login, db, null);
+						Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().
+								getExperimentsInDatabase(login, db, status);
 						n += res.size();
 						experimentMap.put(db, res);
 					}
