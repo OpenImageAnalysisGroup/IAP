@@ -138,7 +138,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
 		// System.out.println("GET EXP LIST LT");
-		String sqlText = "SELECT distinct(measurement_label) FROM snapshot ORDER BY measurement_label";
+		String sqlText = "SELECT distinct(measurement_label) FROM snapshot"; // ORDER BY measurement_label
 		
 		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		if (optStatus != null)
@@ -194,11 +194,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			rs.close();
 			ps.close();
 			
-			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Determine time stamps");
-			
 			sqlText = "" +
-					"SELECT min(time_stamp), max(time_stamp), count(*) " +
+					"SELECT min(time_stamp), max(time_stamp) " + // , count(*)
 					"FROM snapshot " + // ,tiled_image " +
 					"WHERE measurement_label=?";// ; AND tiled_image.snapshot_id=snapshot.id";
 			ps = connection.prepareStatement(sqlText);
@@ -206,6 +203,9 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				if (ehi.getExperimentName() == null)
 					continue;
 				ps.setString(1, ehi.getExperimentName());
+				if (optStatus != null)
+					optStatus.setCurrentStatusText2("Determine time stamps (" + ehi.getExperimentName() + ")");
+				
 				rs = ps.executeQuery();
 				while (rs.next()) {
 					Timestamp min = rs.getTimestamp(1);
@@ -232,17 +232,17 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			sqlText = "SELECT "
 					+ "	count(*) "
 					+ "FROM "
-					+ "	snapshot, tiled_image, tile, image_file_table "
+					+ "	snapshot, tiled_image "
 					+ "WHERE "
 					+ "	snapshot.measurement_label = ? and "
-					+ "	snapshot.id = tiled_image.snapshot_id and "
-					+ "	tiled_image.id = tile.tiled_image_id and "
-					+ "	tile.image_oid = image_file_table.id";
+					+ "	snapshot.id = tiled_image.snapshot_id";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
 				if (ehi.getExperimentName() == null)
 					continue;
 				ps.setString(1, ehi.getExperimentName());
+				if (optStatus != null)
+					optStatus.setCurrentStatusText2("Determine image count (" + ehi.getExperimentName() + ")");
 				rs = ps.executeQuery();
 				while (rs.next()) {
 					ehi.setNumberOfFiles(rs.getInt(1));
@@ -252,9 +252,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			}
 			
 			HashMap<ExperimentHeaderInterface, HashSet<String>> people = new HashMap<ExperimentHeaderInterface, HashSet<String>>();
-			
-			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Determine user names (import_data)");
 			
 			ArrayList<String> names = new ArrayList<String>();
 			try {
@@ -267,6 +264,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						if (!people.containsKey(ehi))
 							people.put(ehi, new HashSet<String>());
 						ps.setString(1, ehi.getExperimentName());
+						if (optStatus != null)
+							optStatus.setCurrentStatusText2("Determine user names (" + ehi.getExperimentName() + ")");
 						rs = ps.executeQuery();
 						names.clear();
 						while (rs.next()) {
@@ -289,15 +288,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				}
 			}
 			
-			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Determine user names (snapshot)");
-			
 			sqlText = "SELECT distinct(creator) FROM snapshot WHERE measurement_label=?";
 			ps = connection.prepareStatement(sqlText);
 			for (ExperimentHeaderInterface ehi : result) {
 				if (!people.containsKey(ehi))
 					people.put(ehi, new HashSet<String>());
 				ps.setString(1, ehi.getExperimentName());
+				if (optStatus != null)
+					optStatus.setCurrentStatusText2("Determine user names (" + ehi.getExperimentName() + ")");
 				rs = ps.executeQuery();
 				names.clear();
 				while (rs.next()) {
