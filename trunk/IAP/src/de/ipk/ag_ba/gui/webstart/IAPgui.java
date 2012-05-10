@@ -141,6 +141,7 @@ public class IAPgui {
 				+ "<br>"
 				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
 				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
+				"<small><font color='gray'>IAP Image Analysis - Pipeline-Version: " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + "</font></small><br><br>" +
 				new LogService().getLatestNews(5,
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",

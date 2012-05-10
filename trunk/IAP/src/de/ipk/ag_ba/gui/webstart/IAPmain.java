@@ -95,6 +95,7 @@ public class IAPmain extends JApplet {
 		jf.add("Center", new IAPmain().getContentPane());
 		jf.pack();
 		jf.setVisible(true);
+		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	public IAPmain() {
