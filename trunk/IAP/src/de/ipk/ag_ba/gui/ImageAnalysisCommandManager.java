@@ -15,7 +15,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionFileManager;
-import de.ipk.ag_ba.commands.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.ActionNumericDataReportComplete;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
@@ -63,7 +62,7 @@ public class ImageAnalysisCommandManager {
 		
 		actions.add(new NavigationButton(defaultAction, guiSetting));
 		
-		actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
+		// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		
 		actions.add(new NavigationButton(new ActionCopyToClipboard(m, experimentReference), guiSetting));
 		
