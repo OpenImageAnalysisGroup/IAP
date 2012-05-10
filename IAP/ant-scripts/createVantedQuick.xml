@@ -27,6 +27,7 @@
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-collections-3.1.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/activation.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/axis.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xbean.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-awt-util.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-bridge.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-css.jar"/>
