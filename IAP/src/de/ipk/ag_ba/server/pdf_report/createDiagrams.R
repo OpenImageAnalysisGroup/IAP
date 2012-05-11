@@ -1331,8 +1331,6 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 		latexText <- paste(latexText,"\\hline \\hline \\endlastfoot", sep=" ")
 		
 	} else if(length(value) > 0){
-		print(value)
-		print("#####")
 		if(!is.null(value)) {
 			for(n in 1:length(value)) {
 				latexText <- paste(latexText, parseString2Latex(renameFilterOutput(as.character(value[n]))))
@@ -1487,9 +1485,9 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 }
 
 newTreatmentNameFunction <- function(seq, n) {
-
-	if(nchar(n) > 14) {
-		newTreatmentName <- paste(seq, ".) ", substr(n,1,10), " ...", sep="")
+	numberCharAfterSeparate <- 8
+	if(nchar(n) > (numberCharAfterSeparate+4)) {
+		newTreatmentName <- paste(seq, ".) ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
 	} else {
 		newTreatmentName <- paste(seq, ".) ", n, sep="")
 	}
@@ -1518,7 +1516,7 @@ renameOfTheTreatments <- function(overallList) {
 		}
 	
 		if(overallList$filterSecondTreatment[1] != "none") {
-			seq <- 1
+			seq <- 0
 			FileName <- "conditionsSecondFilter"
 			writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
 			for(n in overallList$filterSecondTreatment) {
@@ -2145,15 +2143,9 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$name))	
 					plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
 					
-					
-#	print(unique(overallResult$name))
-#	print(nRowCrowList)
-					
 					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))	
 					plot <-  plot + guides(shape=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T))
 					
-#	print(unique(overallResult$hist))
-#	print(nRowCrowList)
 				
 #				if (numberOfHist > 3 & numberOfHist < 10) {
 #					plot = plot + opts(legend.text = theme_text(size=6), 
@@ -2208,8 +2200,6 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 calculateLegendRowAndColNumber <- function(legendText) {
 	
 	maxLengthOfSet <- max(nchar(as.character(legendText)))
-############################	
-	print(maxLengthOfSet)
 	if(maxLengthOfSet >= 75) {
 		return(list(nrow=length(legendText), ncol=NULL))
 	} else if (maxLengthOfSet >= 25 & maxLengthOfSet < 75) {
@@ -2282,8 +2272,7 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 			if(sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
 				
 				nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))
-#	print(unique(overallResult$hist))
-#	print(nRowCrowList)
+
 				plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
 			}
 				
