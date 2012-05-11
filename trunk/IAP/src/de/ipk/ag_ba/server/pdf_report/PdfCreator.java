@@ -239,7 +239,8 @@ public class PdfCreator {
 		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysis.getCurrentTime(experiment.getStartDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysis.getCurrentTime(experiment.getImportDate().getTime())));
 		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
-		c = StringManipulationTools.stringReplace(c, "--Outliers--", safe(experiment.getHeader().getGlobalOutlierInfo()));
+		c = StringManipulationTools.stringReplace(c, "--Outliers--", safe(experiment.getHeader().getGlobalOutlierInfo() != null ? experiment.getHeader()
+				.getGlobalOutlierInfo() : ""));
 		
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
 		
