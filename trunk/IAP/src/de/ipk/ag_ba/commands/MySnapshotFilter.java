@@ -57,6 +57,10 @@ public class MySnapshotFilter implements SnapshotFilter {
 										else
 											if (o.contains("<") && s.getDay() < day)
 												return true;
+											else
+												if (o.contains("=") && s.getDay() == day)
+													return true;
+							
 						}
 				idx++;
 			}
