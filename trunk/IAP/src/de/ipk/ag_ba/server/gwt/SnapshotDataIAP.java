@@ -431,7 +431,7 @@ public class SnapshotDataIAP {
 					+ replaceNull(s.getTreatment()) + separator
 					+ replaceNull(s.getSequence()) + separator
 					+ s.getTimePoint() + separator + new Date(s.getSnapshotTime()).toString() + separator
-					+ getNumbersFromString(s.getTimePoint())
+					+ StringManipulationTools.getNumbersFromString(s.getTimePoint())
 					+ separator + weightBeforeWatering + separator + sumBA + separator
 					+ waterWeight + separator + waterAmount
 					+ separator + s.getRgbUrlCnt() + separator + s.getFluoUrlCnt()
@@ -471,7 +471,7 @@ public class SnapshotDataIAP {
 						+ replaceNull(s.getSequence()) + separator
 						+ s.getTimePoint() + separator +
 						new Date(s.getSnapshotTime() != null ? s.getSnapshotTime() : 0).toString() + separator
-						+ getNumbersFromString(s.getTimePoint()) + separator
+						+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
 						+ weightBeforeWatering + separator
 						+ sumBA + separator
 						+ waterWeight + separator
@@ -581,21 +581,6 @@ public class SnapshotDataIAP {
 		return sequence;
 	}
 	
-	final static String[] numbers = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-	
-	public static String getNumbersFromString(String s) {
-		StringBuilder res = new StringBuilder();
-		for (Character c : s.toCharArray()) {
-			for (String n : numbers) {
-				if (n.equals(c + "")) {
-					res.append(n);
-					break;
-				}
-			}
-		}
-		return res.toString();
-	}
-	
 	public void storeAngleValue(int idx, Double position, double value) {
 		if (position == null)
 			position = 0d;
@@ -623,7 +608,7 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getSequence()));
 			row.add(new DateDoubleString(s.getTimePoint()));
 			row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
-			row.add(new DateDoubleString(Double.parseDouble(getNumbersFromString(s.getTimePoint()))));
+			row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
 			row.add(new DateDoubleString(s.getWeightBefore()));
 			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 			row.add(new DateDoubleString(s.getWeightOfWatering()));
@@ -647,7 +632,7 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getSequence()));
 				row.add(new DateDoubleString(s.getTimePoint()));
 				row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
-				row.add(new DateDoubleString(Double.parseDouble(getNumbersFromString(s.getTimePoint()))));
+				row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
 				row.add(new DateDoubleString(s.getWeightBefore()));
 				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 				row.add(new DateDoubleString(s.getWeightOfWatering()));
