@@ -254,8 +254,8 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setSizekb(map.get("sizekb") != null ? ((Long) map.get("sizekb")) : 0);
 		if (map.get("origin") != null && map.get("origin") instanceof String)
 			setOriginDbId((String) map.get("origin"));
-		if (map.get("outlier") != null && map.get("outlier") instanceof String)
-			setGlobalOutlierInfo((String) map.get("outlier"));
+		if (map.get("outliers") != null && map.get("outliers") instanceof String)
+			setGlobalOutlierInfo((String) map.get("outliers"));
 	}
 	
 	public ExperimentHeader(String experimentname) {

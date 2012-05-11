@@ -13,7 +13,7 @@ public class ExperimentCalculationService {
 		this.experiment = experiment;
 	}
 	
-	public ExperimentInterface ratioDataset(String treatmentReference, ConditionFilter cf) {
+	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf) {
 		Experiment res = new Experiment();
 		res.setHeader(experiment.getHeader().clone());
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
@@ -22,14 +22,24 @@ public class ExperimentCalculationService {
 				ci.setExperimentHeader(experiment.getHeader());
 				if (cf.filterConditionOut(ci))
 					continue;
-				boolean reference = ci.getTreatment() != null && ci.getTreatment().contains(treatmentReference);
+				boolean reference = false;
+				for (String t : treatmentReference) {
+					boolean v = ci.getTreatment() != null && ci.getTreatment().contains(t);
+					if (v)
+						reference = true;
+				}
 				if (reference) {
 					// nothing to do here
 				} else {
 					// search for reference
 					ConditionInterface ciRef = null;
 					for (ConditionInterface ciPotentialRef : si) {
-						boolean ref = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains(treatmentReference);
+						boolean ref = false;
+						for (String t : treatmentReference) {
+							boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains(t);
+							if (v)
+								ref = true;
+						}
 						if (ref) {
 							boolean speciesOK = (ci.getSpecies() + "").equals(ciPotentialRef.getSpecies() + "");
 							boolean genotypeOK = (ci.getGenotype() + "").equals(ciPotentialRef.getGenotype() + "");

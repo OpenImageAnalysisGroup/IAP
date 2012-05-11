@@ -624,9 +624,12 @@ public class IAPservice {
 							time = (long) s.getTime();
 						// continue;
 						
+						boolean addSN = false;
+						
 						if (!timestampe2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
 							timestampe2snapshot.put(time, ns);
+							addSN = true;
 						}
 						
 						SnapshotDataIAP sn = timestampe2snapshot.get(time);
@@ -790,7 +793,7 @@ public class IAPservice {
 							}
 						}
 						
-						if (!timestampe2snapshot.containsKey(time)) {
+						if (addSN) {
 							if (optSnapshotFilter == null)
 								result.add(sn);
 							else

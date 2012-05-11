@@ -15,8 +15,8 @@ rem del /s report.aux
 rem del /s report.out
 rem del /s report.toc
 
- pdflatex report.tex
- pdflatex report.tex
- pdflatex report.tex
+ pdflatex report.tex -interaction batchmode
+ pdflatex report.tex -interaction batchmode
+ pdflatex report.tex -interaction batchmode
 
 rem cmd
