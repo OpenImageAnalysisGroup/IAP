@@ -268,6 +268,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
+		outliers.setToolTipText("Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs.");
 		sequence = new JTextField(experimentHeader.getSequence());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);

@@ -15,7 +15,7 @@ public class MySnapshotFilter implements SnapshotFilter {
 	
 	public MySnapshotFilter(ArrayList<ThreadSafeOptions> toggles, String globalOutlierList) {
 		this.toggles = toggles;
-		this.globalOutlierArr = globalOutlierList != null ? globalOutlierList.split(",") : new String[] {};
+		this.globalOutlierArr = globalOutlierList != null ? StringManipulationTools.stringReplace(globalOutlierList, " ", "").split("//") : new String[] {};
 		this.globalOutlierDays = new int[globalOutlierArr.length];
 		int idx = 0;
 		for (String o : globalOutlierArr) {

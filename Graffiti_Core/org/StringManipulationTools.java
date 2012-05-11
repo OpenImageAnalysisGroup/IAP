@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 /**
@@ -787,5 +788,14 @@ public class StringManipulationTools implements HelperClass {
 	
 	public static String getStringList(Set<Integer> times, String div) {
 		return getStringList(times.toArray(new Integer[] {}), div);
+	}
+	
+	public static String getMergedStringItems(String list1, String list2, String split) {
+		TreeSet<String> res = new TreeSet<String>();
+		for (String s : list1.split(split))
+			res.add(s);
+		for (String s : list2.split(split))
+			res.add(s);
+		return getStringList(res, " " + split + " ");
 	}
 }

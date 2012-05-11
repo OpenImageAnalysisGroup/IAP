@@ -432,9 +432,9 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 		System.out.println();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Command requires specification of an output file name.");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: If no path is specified, the file will be placed in the current directory.");
-		System.out.println(SystemAnalysis.getCurrentTime() + ">READY: PLEASE ENTER FILENAME (ENTER NOTHING TO CANCEL OPERATION):");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">READY: PLEASE ENTER FILENAME INCL. SUFFIX '.xlsx' (OR . TO CANCEL OPERATION):");
 		String fileName = SystemAnalysis.getCommandLineInput();
-		if (fileName == null || fileName.trim().isEmpty())
+		if (fileName == null || fileName.trim().isEmpty() || fileName.equals("."))
 			return false;
 		else {
 			File f = new File(fileName);

@@ -9,7 +9,6 @@ package de.ipk.ag_ba.mongo;
 
 import info.StopWatch;
 
-import  de.ipk.ag_ba.gui.webstart.IAPmain;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +71,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -388,19 +388,20 @@ public class MongoDB {
 			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setBval(0, true);
-		Thread loadGen = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (tso.getBval(0, true)) {
-					double v = Math.random();
-					v = Math.sin(v);
-					tso.setDouble(v);
+		if (IAPservice.isGridBatchExecutionModeActive()) {
+			Thread loadGen = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					while (tso.getBval(0, true)) {
+						double v = Math.random();
+						v = Math.sin(v);
+						tso.setDouble(v);
+					}
 				}
-			}
-		});
-		loadGen.setPriority(Thread.MIN_PRIORITY);
-		if (IAPservice.isGridBatchExecutionModeActive())
+			});
+			loadGen.setPriority(Thread.MIN_PRIORITY);
 			loadGen.start();
+		}
 		
 		try {
 			storeExperimentInnerCall(experiment, db, status, keepDataLinksToDataSource_safe_space);
@@ -413,8 +414,23 @@ public class MongoDB {
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
+		for (ExperimentHeaderInterface ehi : getExperimentList(null)) {
+			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
+					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				if (ehi.getGlobalOutlierInfo() != null && !ehi.getGlobalOutlierInfo().isEmpty()) {
+					String outliers = StringManipulationTools.getMergedStringItems(
+							experiment.getHeader().getGlobalOutlierInfo(),
+							ehi.getGlobalOutlierInfo(),
+							"//");
+					experiment.getHeader().setGlobalOutlierInfo(outliers);
+				}
+				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
+			}
+		}
+		
 		System.out.println(">>> " + SystemAnalysis.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
+		System.out.println("DB-ORIGIN       : " + experiment.getHeader().getOriginDbId());
 		System.out.println("DB-ID           : " + experiment.getHeader().getDatabaseId());
 		System.out.println("DB              : " + experiment.getHeader().getDatabase());
 		System.out.println("Exp.type        : " + experiment.getHeader().getExperimentType());
