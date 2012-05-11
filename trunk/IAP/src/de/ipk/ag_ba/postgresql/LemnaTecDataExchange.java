@@ -1054,6 +1054,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		String seq = experiment.getSequence();
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		experiment.getHeader().setSequence(seq);
+		
+		experiment.getHeader().setDatabaseId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+		experiment.getHeader().setOriginDbId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+		
 		if (seq != null && seq.contains("SeedDate")) {
 			String[] values = seq.split(";");
 			seedDateLookupLoop: for (String v : values) {

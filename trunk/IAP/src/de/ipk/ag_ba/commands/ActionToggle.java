@@ -36,7 +36,7 @@ public class ActionToggle extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (SystemAnalysis.isHeadless())
-			return (option.getBval(0, true) ? "Include " : "Exclude ") + pretty(setting);
+			return (option.getBval(0, true) ? "(#) " : "(_) ") + pretty(setting);
 		else
 			return pretty(setting);
 	}
