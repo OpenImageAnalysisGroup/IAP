@@ -361,6 +361,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public static String replaceBadChars(String title) {
+		title = StringManipulationTools.removeHTMLtags(title).trim();
 		return StringManipulationTools.stringReplace(title, ".", "_");
 	}
 	

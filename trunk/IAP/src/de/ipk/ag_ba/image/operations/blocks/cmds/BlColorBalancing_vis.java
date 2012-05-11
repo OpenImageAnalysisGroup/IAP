@@ -40,7 +40,7 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -30, 50);
+			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -10, 50);
 		else
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", false);
@@ -76,6 +76,13 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 				int scanHeight = (right - left) / 4;
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.01); // - scanHeight / 2
+				
+				boolean useOnlyRightSide = true;
+				if (useOnlyRightSide) {
+					scanWidth /= 2;
+					left += scanWidth * 2.5;
+					scanWidth /= 2;
+				}
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
 				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);

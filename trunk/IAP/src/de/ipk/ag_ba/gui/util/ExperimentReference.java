@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.gui.util;
 
+import info.StopWatch;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ExperimentReference {
 	
 	private final String experimentName;
-	public ExperimentInterface experiment;
+	private ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
 	public MongoDB m;
 	
@@ -101,7 +103,22 @@ public class ExperimentReference {
 			knownExperimentLoaders.add(loader);
 	}
 	
-	public synchronized ExperimentInterface getData(MongoDB m,
+	public ExperimentInterface getExperiment() {
+		if (isLoading) {
+			try {
+				StopWatch s = new StopWatch("Wait for data loading...", true);
+				do {
+					Thread.sleep(50);
+				} while (isLoading);
+				s.printTime();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return experiment;
+	}
+	
+	public ExperimentInterface getData(MongoDB m,
 			boolean interactiveGetExperimentSize,
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		if (experiment != null)
@@ -155,5 +172,56 @@ public class ExperimentReference {
 	
 	public ExperimentInterface getData(BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		return getData(m, status != null, status);
+	}
+	
+	private boolean isLoading = false;
+	private BackgroundTaskStatusProviderSupportingExternalCall loaderStatus = null;
+	
+	public void loadDataInBackground(final BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
+		if (experiment != null)
+			return;
+		synchronized (todoOnceDataIsAvailable) {
+			isLoading = true;
+			loaderStatus = status;
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						experiment = getData(status);
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						isLoading = false;
+						loaderStatus = null;
+						synchronized (todoOnceDataIsAvailable) {
+							for (Runnable r : todoOnceDataIsAvailable) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+							todoOnceDataIsAvailable.clear();
+						}
+					}
+				}
+			}, "Load experiment " + header.getExperimentName());
+			t.start();
+		}
+	}
+	
+	private final ArrayList<Runnable> todoOnceDataIsAvailable = new ArrayList<Runnable>();
+	
+	public synchronized void runAsDataBecomesAvailable(Runnable r) {
+		synchronized (todoOnceDataIsAvailable) {
+			if (isLoading) {
+				todoOnceDataIsAvailable.add(r);
+			} else
+				r.run();
+		}
+	}
+	
+	public ExperimentInterface getExperimentPeek() {
+		return experiment;
 	}
 }

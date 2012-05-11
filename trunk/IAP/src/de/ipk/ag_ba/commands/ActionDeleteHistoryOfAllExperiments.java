@@ -54,7 +54,7 @@ public class ActionDeleteHistoryOfAllExperiments extends AbstractNavigationActio
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("<h1>Removed non-current experiments with a newer version available:</h1>"
+		return new MainPanelComponent("<h1>Removed non-current experiments with available a newer version:</h1>"
 				+ StringManipulationTools.getStringList(history, "<br>"));
 	}
 	

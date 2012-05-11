@@ -106,7 +106,8 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,
 					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions, res, res.getHeader(), false,
+			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions,
+					new ExperimentReference(res), res.getHeader(), false,
 					src.getGUIsetting(), m);
 			// TODO: create show with VANTED action with these action commands:
 			// AIPmain.showVANTED();

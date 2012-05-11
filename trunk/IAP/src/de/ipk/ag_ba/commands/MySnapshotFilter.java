@@ -34,41 +34,47 @@ public class MySnapshotFilter implements SnapshotFilter {
 		if (toggles == null)
 			return false;
 		
+		if (filterOut(s.getPlantId(), s.getDay()))
+			return true;
+		
+		for (ThreadSafeOptions t : toggles) {
+			if (match(t, s))
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean filterOut(String plantId, Integer d) {
 		if (globalOutlierArr.length > 0) {
 			int idx = 0;
 			for (String o : globalOutlierArr) {
-				if (s.getPlantId() != null && s.getPlantId().equals(o))
+				if (plantId != null && plantId.equals(o))
 					return true;
 				else
-					if (s.getTimePoint() != null && s.getTimePoint().equals(o))
+					if (d != null && d.equals(o))
 						return true;
 					else
-						if (s.getDay() != null) {
+						if (d != null) {
 							int day = globalOutlierDays[idx];
 							if (day < Integer.MAX_VALUE)
-								if (o.contains(">=") && s.getDay() >= day)
+								if (o.contains(">=") && d >= day)
 									return true;
 								else
-									if (o.contains(">") && s.getDay() > day)
+									if (o.contains(">") && d > day)
 										return true;
 									else
-										if (o.contains("<=") && s.getDay() <= day)
+										if (o.contains("<=") && d <= day)
 											return true;
 										else
-											if (o.contains("<") && s.getDay() < day)
+											if (o.contains("<") && d < day)
 												return true;
 											else
-												if (o.contains("=") && s.getDay() == day)
+												if (o.contains("=") && d == day)
 													return true;
 							
 						}
 				idx++;
 			}
-		}
-		
-		for (ThreadSafeOptions t : toggles) {
-			if (match(t, s))
-				return true;
 		}
 		return false;
 	}

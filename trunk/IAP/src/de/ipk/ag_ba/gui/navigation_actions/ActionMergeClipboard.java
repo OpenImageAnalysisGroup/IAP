@@ -131,7 +131,9 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		// res.add(new NavigationButton(new ActionCopyToMongo(null, new ExperimentReference(experimentResult)),
 		// "Save Result", "img/ext/user-desktop.png", guiSetting));
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
+		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+				new ExperimentReference(experimentResult),
+				experimentResult.getHeader(),
 				false, guiSetting, null);
 		return res;
 	}

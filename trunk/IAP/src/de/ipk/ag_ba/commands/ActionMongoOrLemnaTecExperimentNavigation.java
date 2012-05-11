@@ -35,6 +35,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	private final String tt;
 	private String displayName;
 	private ExperimentReference experimentReference;
+	private boolean requestTitleUpdates = true;
 	
 	public ActionMongoOrLemnaTecExperimentNavigation(
 			ExperimentReference exp) {
@@ -80,7 +81,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 					|| header.getDatabaseId().startsWith("lemnatec:");
 			getDefaultActions(
 					actions,
-					experimentReference.experiment,
+					experimentReference,
 					header,
 					imageAnalysis,
 					src.getGUIsetting(), experimentReference.m);
@@ -114,13 +115,13 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	}
 	
 	public static void getDefaultActions(ArrayList<NavigationButton> actions,
-			ExperimentInterface experiment, ExperimentHeaderInterface header,
+			ExperimentReference experiment, ExperimentHeaderInterface header,
 			boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
 		if (experiment == null)
 			return;
 		try {
 			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(
-					m, new ExperimentReference(experiment), imageAnalysis,
+					m, experiment, imageAnalysis,
 					guiSetting))
 				actions.add(ne);
 		} catch (Exception e) {
@@ -129,7 +130,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		if (imageAnalysis)
 			for (NavigationButton ne : Other
 					.getProcessExperimentDataWithVantedEntities(m,
-							new ExperimentReference(experiment), guiSetting)) {
+							experiment, guiSetting)) {
 				if (ne.getTitle().contains("Put data")) {
 					ne.setTitle("Show in IAP-Data-Navigator");
 					actions.add(ne);
@@ -150,10 +151,16 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	public void performActionCalculateResults(NavigationButton src)
 			throws Exception {
 		this.src = src;
-		if (experimentReference.experiment == null) {
-			ExperimentInterface ei = experimentReference.getData(status);
-			experimentReference.experiment = ei;
-		}
+		requestTitleUpdates = true;
+		status.setCurrentStatusValue(0);
+		experimentReference.loadDataInBackground(status);
+		experimentReference.runAsDataBecomesAvailable(new Runnable() {
+			@Override
+			public void run() {
+				status.setCurrentStatusValue(100);
+				ActionMongoOrLemnaTecExperimentNavigation.this.requestTitleUpdates = false;
+			}
+		});
 	}
 	
 	@Override
@@ -225,17 +232,12 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-		ip.setExperimentInfo(
-				experimentReference.m,
-				experimentReference.getHeader(),
-				true,
-				experimentReference.experiment);
+		MyExperimentInfoPanel ip = new MyExperimentInfoPanel(true, experimentReference);
 		return new MainPanelComponent(ip, true);
 	}
 	
 	public ExperimentInterface getExperimentReference() {
-		return experimentReference.experiment;
+		return experimentReference.getExperiment();
 	}
 	
 	public void setLogin(String domainUser) {
@@ -249,11 +251,16 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public void setExperimenData(ExperimentInterface doc) {
 		experimentReference = new ExperimentReference(doc.getHeader());
-		experimentReference.experiment = doc;
+		experimentReference.setExperimentData(doc);
 	}
 	
 	@Override
 	public void run() {
 		// empty
+	}
+	
+	@Override
+	public boolean requestTitleUpdates() {
+		return requestTitleUpdates;
 	}
 }

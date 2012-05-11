@@ -16,6 +16,7 @@ import de.ipk.ag_ba.commands.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.commands.MySnapshotFilter;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -94,6 +95,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
+			MySnapshotFilter sf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), experiment.getHeader().getGlobalOutlierInfo());
+			
 			for (SubstanceInterface m : experimentToBeAnalysed) {
 				Substance3D m3 = (Substance3D) m;
 				for (ConditionInterface s : m3) {
@@ -101,11 +104,16 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					for (SampleInterface sd : s3) {
 						Sample3D sd3 = (Sample3D) sd;
 						boolean containsAnOutlier = false;
+						
 						outlierSearch: for (NumericMeasurementInterface nmi : sd3) {
 							if (nmi instanceof ImageData) {
 								ImageData id = (ImageData) nmi;
 								String o = id.getAnnotationField("outlier");
 								if (o != null && o.equals("1")) {
+									containsAnOutlier = true;
+									break outlierSearch;
+								}
+								if (sf.filterOut(id.getQualityAnnotation(), sd3.getTime())) {
 									containsAnOutlier = true;
 									break outlierSearch;
 								}
@@ -260,7 +268,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
 				"Save Result", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); // PoweredMongoDBgreen.png"));
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
+		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);
 		return res;
 	}
