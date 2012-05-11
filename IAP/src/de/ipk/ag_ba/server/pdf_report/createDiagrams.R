@@ -11,8 +11,10 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 "%break%" <- function(typOfBreak, breakValue) {
+	# 0 %break% 1 --> stopp the code
+	# 1 %break% 10 --> stopp the code for 10 sec
 	if(typOfBreak == 0) {
-		stop(call. = FALSE)
+		stop("The code stopps manual by the \"break\" function", call. = FALSE)
 	} else {
 		ownCat(paste("Script will stopped for ",breakValue, " sec!", sep=""))
 		
@@ -1288,26 +1290,49 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 	latexText <- ""
 
 	if(length(columnName) > 0) {
-		latexText <- "\\begin{tabular}{|"
+		#latexText <- "\\begin{tabular}{|"
+		latexText <- "\\begin{longtable}{|"
 		
 		for(n in 1:length(columnName)) {
 			latexText <- paste(latexText, "p{",columnWidth[n],"}|", sep="")
 		}
-		latexText <- paste(latexText, "}", " \\hline ", sep="")
+		latexText <- paste(latexText, "}", sep="")
 		
-		for(n in 1:length(columnName)) {
-			latexText <- paste(latexText, "{\\textbf{",
-					parseString2Latex(renameFilterOutput(as.character(columnName[n]))),
-				"}}", sep="")
-			if(n != length(columnName)) {
-				latexText <- paste(latexText, "& ", sep=" ")
+		#This is the header for the first page of the table... --> endfirsthead
+		#This is the header for the remaining page(s) of the table... --> endhead
+		for(n in 1:2) {
+			
+			latexText <- paste(latexText, " \\hline ", sep="")
+			for(n in 1:length(columnName)) {
+				latexText <- paste(latexText, "{\\textbf{",
+						parseString2Latex(renameFilterOutput(as.character(columnName[n]))),
+					"}}", sep="")
+				if(n != length(columnName)) {
+					latexText <- paste(latexText, "& ", sep=" ")
+				}
+			}
+			latexText <- paste(latexText,
+								"\\tabularnewline",
+								"\\hline",
+								"\\hline", sep=" ")
+			if(n == 1) {
+				latexText <- paste(latexText, "\\endfirsthead", sep=" ")
+			} else {
+				latexText <- paste(latexText, "\\endhead", sep=" ")
 			}
 		}
-		latexText <- paste(latexText,
-							"\\tabularnewline",
-							"\\hline",
-							"\\hline", sep=" ")
+		
+		#This is the footer for all pages except the last page of the table...		
+		latexText <- paste(latexText, "\\multicolumn{", length(columnName), "}{l}{{Continued on Next Page\\ldots}} ",
+							"\\tabularnewline ",
+							"\\endfoot ", sep="")
+		
+		#This is the footer for the last page of the table...
+		latexText <- paste(latexText,"\\hline \\hline \\endlastfoot", sep=" ")
+		
 	} else if(length(value) > 0){
+		print(value)
+		print("#####")
 		if(!is.null(value)) {
 			for(n in 1:length(value)) {
 				latexText <- paste(latexText, parseString2Latex(renameFilterOutput(as.character(value[n]))))
@@ -1315,13 +1340,14 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 					latexText <- paste(latexText, " &", sep="")
 				}
 			}
-			latexText <- paste(latexText, "\\tabularnewline")
+			latexText <- paste(latexText, "\\tabularnewline \\hline")
 		}
 	} else {
 		latexText <- paste(latexText, 
-						"\\hline",
-						"\\hline",
-						"\\end{tabular}", sep=" ")
+#						"\\hline",
+#						"\\hline",
+#						"\\end{tabular}", sep=" ")
+						"\\end{longtable}", sep=" ")
 	}
 	
 	if(latexText != "") {
@@ -1461,6 +1487,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 }
 
 newTreatmentNameFunction <- function(seq, n) {
+
 	if(nchar(n) > 14) {
 		newTreatmentName <- paste(seq, ".) ", substr(n,1,10), " ...", sep="")
 	} else {
@@ -1475,7 +1502,7 @@ renameOfTheTreatments <- function(overallList) {
 	
 	if(!overallList$appendix) {
 		
-		newTreatmentName <- character()
+		#newTreatmentName <- character()
 		columnName <- c("Short name", "Full Name")
 		
 		if(overallList$filterTreatment[1] != "none") {
@@ -1485,7 +1512,7 @@ renameOfTheTreatments <- function(overallList) {
 			for(n in overallList$filterTreatment) {
 				seq <- seq+1
 				overallList$filterTreatmentRename[[n]] <- newTreatmentNameFunction(seq, n)
-				writeLatexTable(FileName, value=c(newTreatmentName,n))
+				writeLatexTable(FileName, value=c(overallList$filterTreatmentRename[[n]],n))
 			}
 			writeLatexTable(FileName)
 		}
@@ -1497,11 +1524,12 @@ renameOfTheTreatments <- function(overallList) {
 			for(n in overallList$filterSecondTreatment) {
 				seq <- seq+1
 				overallList$secondFilterTreatmentRename[[n]] <- newTreatmentNameFunction(letters[seq], n)
-				writeLatexTable(FileName, value=c(newTreatmentName,n))
+				writeLatexTable(FileName, value=c(overallList$secondFilterTreatmentRename[[n]],n))
 			}
 			writeLatexTable(FileName)
 		}
 	}
+
 	return(overallList)
 }
 
@@ -2117,8 +2145,15 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$name))	
 					plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
 					
+					
+#	print(unique(overallResult$name))
+#	print(nRowCrowList)
+					
 					nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))	
 					plot <-  plot + guides(shape=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T))
+					
+#	print(unique(overallResult$hist))
+#	print(nRowCrowList)
 				
 #				if (numberOfHist > 3 & numberOfHist < 10) {
 #					plot = plot + opts(legend.text = theme_text(size=6), 
@@ -2173,6 +2208,8 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 calculateLegendRowAndColNumber <- function(legendText) {
 	
 	maxLengthOfSet <- max(nchar(as.character(legendText)))
+############################	
+	print(maxLengthOfSet)
 	if(maxLengthOfSet >= 75) {
 		return(list(nrow=length(legendText), ncol=NULL))
 	} else if (maxLengthOfSet >= 25 & maxLengthOfSet < 75) {
@@ -2244,9 +2281,12 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 			
 			if(sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
 				
-				nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$name))				
+				nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))
+#	print(unique(overallResult$hist))
+#	print(nRowCrowList)
 				plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
 			}
+				
 			
 #			if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
 #				size <- 6
@@ -2315,7 +2355,6 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
 			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
 			
-			
 			if (length(overallResult[, 1]) > 0) {
 				if (isOnlyOneValue) {
 					plot = ggplot(data=overallResult, aes(x=name, y=mean))
@@ -2323,35 +2362,28 @@ makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overa
 					plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
 				}
 				
+				maxMean <- max(overallResult$mean)
+				maxSe <- max(overallResult$se)
+				
 				plot = plot + 						
 						geom_bar(stat="identity", aes(fill=name), colour="Grey", size=0.1) +
 						geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
 						#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
 						ylab(overallDesName[[imagesIndex]]) +
-						coord_cartesian(ylim=c(0, max(overallResult$mean + overallResult$se + 10, na.rm=TRUE))) +
+						coord_cartesian(ylim=c(0, maxMean + maxSe + (110*maxMean)/100)) +
 						xlab(overallList$xAxisName) +
 						scale_fill_manual(values = overallColor[[imagesIndex]]) +
 						theme_bw() +
 						opts(legend.position="none", 
-								plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 								axis.title.x = theme_text(face="bold", size=11), 
 								axis.title.y = theme_text(face="bold", size=11, angle=90), 
+								axis.text.x = theme_text(angle=90),
 								panel.grid.minor = theme_blank(), 
 								panel.border = theme_rect(colour="Grey", size=0.1)
 						)
 				
-				if (length(overallColor[[imagesIndex]]) > 10) {
-					plot = plot + opts(axis.text.x = theme_text(size=6, angle=90))
-				}
-				#ownCat(plot)
-				
-				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)
-	
-#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave)
-#
-#				if (overallList$appendix) {
-#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], diagramTypSave)
-#				}	
+				writeTheData(overallList, plot, overallFileName[[imagesIndex]], diagramTypSave, title, makeOverallImage, isAppendix=overallList$appendix)										
 			}
 		}
 	}
