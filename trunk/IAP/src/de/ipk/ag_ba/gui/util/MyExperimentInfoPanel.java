@@ -66,6 +66,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	JDateChooser expStart;
 	JDateChooser expEnd;
 	JTextField remark;
+	JTextField outliers;
 	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
@@ -129,6 +130,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
+			JTextField outliers,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
@@ -149,6 +151,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		expEnd.setEnabled(enabled);
 		sequence.setEnabled(enabled);
 		remark.setEnabled(enabled);
+		outliers.setEnabled(enabled);
 	}
 	
 	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
@@ -264,6 +267,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		expStart = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getStartdate() : new Date(0l));
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
+		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
 		sequence = new JTextField(experimentHeader.getSequence());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
@@ -280,6 +284,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
 		fp.addGuiComponentRow(new JLabel("Sequence"), sequence, false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
+		fp.addGuiComponentRow(new JLabel("Outliers"), outliers, false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
 		if (optExperiment != null)
@@ -310,7 +315,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers, editB,
 						saveB, editPossible, true);
 				
 				saveB.setText("Save Changes");
@@ -327,6 +332,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					expEnd.setDate(experimentHeader.getImportdate());
 					sequence.setText(experimentHeader.getSequence());
 					remark.setText(experimentHeader.getRemark());
+					outliers.setText(experimentHeader.getGlobalOutlierInfo());
 				}
 			}
 		});
@@ -345,6 +351,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					experimentHeader.setImportdate(expEnd.getDate());
 					experimentHeader.setSequence(sequence.getText());
 					experimentHeader.setRemark(remark.getText());
+					experimentHeader.setGlobalOutlierInfo(outliers.getText());
 					experimentHeader.setCoordinator(coordinator.getText());
 					if (saveAction != null) {
 						if (saveAction != null)
@@ -376,12 +383,12 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers, editB,
 						saveB, editPossibleBBB, false);
 			}
 		});
 		
-		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark,
+		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers,
 				editB, saveB, editPossible, true);
 		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(

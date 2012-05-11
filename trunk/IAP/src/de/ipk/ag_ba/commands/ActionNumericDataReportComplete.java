@@ -180,6 +180,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
+			SnapshotFilter snFilter = new MySnapshotFilter(toggles, experiment.getHeader().getGlobalOutlierInfo());
 			
 			boolean ratio = false;
 			for (ThreadSafeOptions tso : divideDatasetBy) {
@@ -210,7 +211,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
-						exportIndividualAngles);
+						exportIndividualAngles, snFilter);
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
@@ -222,7 +223,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				csv.append(csvHeader + indexHeader.toString() + "\r\n");
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles);
+						null, experiment, null, false, exportIndividualAngles, snFilter);
 				csv.append(csvHeader);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() +
@@ -240,6 +241,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			}
 			
 			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
+			
 			if (xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2("Create XLSX");
@@ -253,8 +255,6 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				Runtime r = Runtime.getRuntime();
 				while (!todo.isEmpty()) {
 					SnapshotDataIAP s = todo.poll();
-					if (filterOut(toggles, s))
-						continue;
 					if (status != null)
 						status.setCurrentStatusText1("Rows remaining: " + todo.size());
 					if (status != null)
@@ -288,15 +288,11 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (exportIndividualAngles) {
 				if (!xlsx)
 					for (SnapshotDataIAP s : snapshots) {
-						if (filterOut(toggles, s))
-							continue;
 						boolean germanLanguage = false;
 						csv.append(s.getCSVvalue(germanLanguage, separator));
 					}
 			} else {
 				for (SnapshotDataIAP s : snapshots) {
-					if (filterOut(toggles, s))
-						continue;
 					boolean germanLanguage = false;
 					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
@@ -362,23 +358,6 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		}
 	}
 	
-	private boolean filterOut(ArrayList<ThreadSafeOptions> toggles, SnapshotDataIAP s) {
-		if (toggles == null)
-			return false;
-		boolean filterByTime = false;
-		if (filterByTime) {
-			if (s.getDay() < 10)
-				return true;
-			if (s.getDay() > 35)
-				return true;
-		}
-		for (ThreadSafeOptions t : toggles) {
-			if (match(t, s))
-				return true;
-		}
-		return false;
-	}
-	
 	@Override
 	public boolean filterConditionOut(ConditionInterface s) {
 		if (toggles == null)
@@ -397,42 +376,6 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			res += "<br>Last output:<br>" + StringManipulationTools.getStringList(lastOutput, "<br>");
 		}
 		return res;
-	}
-	
-	private boolean match(ThreadSafeOptions t, SnapshotDataIAP s) {
-		if (t.getBval(0, true))
-			return false;
-		// filter is active, check if snapshot matches criteria
-		// e.g. tso.setParam(0, setting); // Condition, Species, Genotype, Variety, Treatment
-		// e.g. tso.setParam(1, c);
-		
-		String field = (String) t.getParam(0, "");
-		String content = (String) t.getParam(1, "");
-		String value = null;
-		if (field.equals("Condition"))
-			value = s.getCondition();
-		else
-			if (field.equals("Species"))
-				value = s.getSpecies();
-			else
-				if (field.equals("Genotype"))
-					value = s.getGenotype();
-				else
-					if (field.equals("Variety"))
-						value = s.getVariety();
-					else
-						if (field.equals("Growth condition"))
-							value = s.getGrowthCondition();
-						else
-							if (field.equals("Treatment"))
-								value = s.getTreatment();
-		if (value == null)
-			value = "(not specified)";
-		else
-			if (value.isEmpty())
-				value = "(not specified)";
-		
-		return value.equals(content);
 	}
 	
 	private boolean matchCondition(ThreadSafeOptions t, ConditionInterface s) {
