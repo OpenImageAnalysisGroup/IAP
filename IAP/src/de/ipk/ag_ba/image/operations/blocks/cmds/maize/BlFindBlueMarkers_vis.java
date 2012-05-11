@@ -32,7 +32,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
 		
 		FlexibleImage vis = getInput().getMasks().getVis();
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null) {
+		if ((options.getCameraPosition() == CameraPosition.SIDE || options.isHighResMaize()) && vis != null) {
 			numericResult = getMarkers(vis);
 			
 			int w = vis.getWidth();

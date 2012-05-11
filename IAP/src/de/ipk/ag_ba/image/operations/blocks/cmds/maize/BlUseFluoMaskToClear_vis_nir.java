@@ -37,10 +37,11 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 				// apply enlarged FLUO mask to vis
 				ImageOperation vis = getInput().getMasks().getVis().copy().getIO().print("VISSSS", debug);
 				FlexibleImage mask = getInput().getMasks().getFluo().copy().getIO()
-						.blur(options.isMaize() ? 25 : ((options.isBarley() && !options.isBarleyInBarleySystem()) ? 10 : 30)).
+						.blur(options.isMaize() ? 25 : ((options.isBarley() && !options.isBarleyInBarleySystem()) ? 30 : 30)).
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred fluo mask", debug).getImage();
-				if (options.isBarley() && !options.isBarleyInBarleySystem())
-					mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();
+				// if (options.isBarley() && !options.isBarleyInBarleySystem()) {
+				// mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();
+				// }
 				getInput().getMasks().getVis().copy().getIO().or(
 						mask).print("OR operation", debug);
 				return vis.applyMask_ResizeMaskIfNeeded(

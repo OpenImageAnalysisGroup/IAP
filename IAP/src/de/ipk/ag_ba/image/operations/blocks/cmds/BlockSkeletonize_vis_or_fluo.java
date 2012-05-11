@@ -134,9 +134,9 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					}
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = fluo.copy().getIO().filterRGB(150, 255, 255)
+				FlexibleImage viswork = fluo.copy().getIO()// .filterRGB(150, 255, 255)
 						.erode(1)
-						.dilate(3)
+						// .dilate(3)
 						.blur(2)
 						.getImage().print("fluo", debug);
 				

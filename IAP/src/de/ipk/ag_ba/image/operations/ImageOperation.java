@@ -127,6 +127,12 @@ public class ImageOperation {
 						ImageOperation.BACKGROUND_COLORint);
 	}
 	
+	public ImageOperation translate(double x, double y, int foreground) {
+		image.getProcessor().translate(x, y);
+		return new ImageOperation(getImage())
+				.replaceColors(Color.BLACK.getRGB(), foreground);
+	}
+	
 	public ImageOperation replaceColors(int search, int replace) {
 		int[] source = getImageAs1array();
 		int[] target = new int[source.length];
@@ -4005,7 +4011,7 @@ public class ImageOperation {
 	}
 	
 	/**
-	 * @return The combine image (a and b where a pixels are background).
+	 * @return The combined image (a and b where a pixels are background).
 	 */
 	public ImageOperation or(FlexibleImage b) {
 		if (b == null)
@@ -4025,6 +4031,29 @@ public class ImageOperation {
 						aa[x][y] = aa[x][y];// | ba[x][y];
 					}
 				}
+			}
+		return new FlexibleImage(aa).getIO();
+	}
+	
+	/**
+	 * @return The combined image (a and b where a pixels are background).
+	 */
+	public ImageOperation and(FlexibleImage b) {
+		if (b == null)
+			return this;
+		int[][] aa = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] ba = b.resize(w, h).getAs2A();
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int apixel = aa[x][y];
+				int bpixel = ba[x][y];
+				
+				if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
+					aa[x][y] = aa[x][y];
+				} else
+					aa[x][y] = BACKGROUND_COLORint;
 			}
 		return new FlexibleImage(aa).getIO();
 	}

@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -16,8 +15,8 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		FlexibleImage nir = getInput().getImages().getNir();
 		if (nir == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.TOP)
-			return nir;
+		// if (options.getCameraPosition() == CameraPosition.TOP)
+		// return nir;
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
 			return nir.getIO().imageBalancing(180, pix).getImage();
@@ -32,8 +31,8 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		FlexibleImage nir = getInput().getMasks().getNir();
 		if (nir == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.TOP)
-			return nir;
+		// if (options.getCameraPosition() == CameraPosition.TOP)
+		// return nir;
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
 			// double[] pix = getProbablyWhitePixels(nir.getIO().copy().invert().getImage());

@@ -71,6 +71,30 @@ public class MyExperimentInfoPanel extends JPanel {
 	
 	private RunnableWithExperimentInfo saveAction;
 	
+	public MyExperimentInfoPanel() {
+		// empty
+	}
+	
+	public MyExperimentInfoPanel(final boolean startEnabled, final ExperimentReference experimentReference) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+					@Override
+					public void run() {
+						if (MyExperimentInfoPanel.this.isVisible())
+							setExperimentInfo(
+									experimentReference.m,
+									experimentReference.getHeader(),
+									startEnabled,
+									experimentReference.getExperiment());
+					}
+				});
+			}
+		};
+		experimentReference.runAsDataBecomesAvailable(r);
+	}
+	
 	/**
 	 * @param experiment
 	 * @return

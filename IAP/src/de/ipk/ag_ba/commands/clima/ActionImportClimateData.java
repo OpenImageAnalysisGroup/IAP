@@ -15,6 +15,7 @@ import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -304,7 +305,8 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 		
 		MongoDB m = null;
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res, experimentResult, experimentResult.getHeader(),
+		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);
 		return res;
 	}

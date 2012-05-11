@@ -473,7 +473,7 @@ public class NavigationButton implements StyleAware {
 					srcNavGraphicslEntity.setProcessing(false);
 					if (n1 != null)
 						n1.setText(srcNavGraphicslEntity.getTitle());
-					srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
+					// srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
 				} else
 					na.setParameters(res);
 			}
@@ -611,7 +611,7 @@ public class NavigationButton implements StyleAware {
 							srcNavGraphicslEntity.setProcessing(false);
 							if (n1 != null)
 								n1.setText(srcNavGraphicslEntity.getTitle());
-							srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
+							// srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(100);
 						}
 					}
 				}, srcNavGraphicslEntity.getAction().getStatusProvider());

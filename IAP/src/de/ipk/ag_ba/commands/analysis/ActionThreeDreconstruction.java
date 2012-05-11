@@ -134,8 +134,10 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(
 					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions, statisticsResult, statisticsResult
-					.getHeader(), false, src.getGUIsetting(), m);
+			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions,
+					new ExperimentReference(statisticsResult),
+					statisticsResult
+							.getHeader(), false, src.getGUIsetting(), m);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;

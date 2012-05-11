@@ -189,9 +189,11 @@ public class IAPgui {
 		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
 		
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
-			knownEntities.put(ne.getTitle(), ne);
+			knownEntities.put(MyNavigationPanel.replaceBadChars(ne.getTitle()), ne);
 			if (ne.getTitle().contains("(")) {
-				knownEntities.put(MyNavigationPanel.replaceBadChars(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim()), ne);
+				String t = MyNavigationPanel.replaceBadChars(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim());
+				System.out.println(t);
+				knownEntities.put(t, ne);
 			}
 		}
 		String thisTarget = target.split("\\.", 2)[0];
@@ -202,6 +204,8 @@ public class IAPgui {
 			if (button == null && thisTarget.contains("(")) {
 				button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
 			}
+			if (button == null)
+				System.out.println("Upcoming problem...");
 			if (button != null) {
 				Runnable rrr = new Runnable() {
 					@Override

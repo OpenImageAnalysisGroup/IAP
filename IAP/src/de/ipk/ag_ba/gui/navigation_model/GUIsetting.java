@@ -54,9 +54,9 @@ public class GUIsetting {
 	
 	public boolean isInClipboard(ExperimentReference experimentReference) {
 		boolean found = clipboardExperiments.contains(experimentReference);
-		if (!found && experimentReference.experiment != null) {
+		if (!found && experimentReference.getExperimentPeek() != null) {
 			for (ExperimentReference er : clipboardExperiments) {
-				if (er.experiment == experimentReference.experiment)
+				if (er.getExperimentPeek() == experimentReference.getExperimentPeek())
 					return true;
 			}
 		}
@@ -83,7 +83,8 @@ public class GUIsetting {
 		clipboardExperimentDatabaseIds.remove(experimentReference.getHeader().getDatabaseId());
 		ArrayList<ExperimentReference> toBeRemoved = new ArrayList<ExperimentReference>();
 		for (ExperimentReference er : clipboardExperiments) {
-			if (er.getHeader().getDatabaseId().equals(del) || er == experimentReference || er.experiment == experimentReference.experiment)
+			if (er.getHeader().getDatabaseId().equals(del) || er == experimentReference ||
+					er.getExperiment() == experimentReference.getExperiment())
 				toBeRemoved.add(er);
 		}
 		for (ExperimentReference d : toBeRemoved)

@@ -129,7 +129,27 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 							new int[] {}, new int[] {},
 							new int[] {}, new int[] {},
 							0, 1).dilate(20).
-							print("removed blue markers at side", debug).getImage();
+							print("removed blue markers from side view", debug).getImage();
+					
+					toBeFiltered = toBeFiltered.getIO().getCanvas().
+							fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
+									options.getBackground()).getImage().print("cleared blue", debug);
+					
+					if (fis != null)
+						fis.addImage("step 5", toBeFiltered.copy());
+					result = result.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				} else {
+					double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.98d;
+					toBeFiltered = result.getIO().hq_thresholdLAB_multi_color_or_and_not(
+							new int[] { 0 }, new int[] { 155 },
+							new int[] { 107 - 5 }, new int[] { 127 + 5 },
+							new int[] { 70 - 5 }, new int[] { 118 },
+							options.getBackground(), Integer.MAX_VALUE, false,
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							0, 1).dilate(20).
+							print("removed blue markers from top view", debug).getImage();
 					
 					toBeFiltered = toBeFiltered.getIO().getCanvas().
 							fillRect((int) (w * 0.2), 0, (int) (w * 0.6), (int) (h * hhhh),
@@ -202,7 +222,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 							.getIO()
 							.hq_thresholdLAB_multi_color_or_and_not(
 									// noise colors
-									new int[] { 215 - 5, 225, -1, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,
+									new int[] { 115 - 5, 225, -1, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,
 											50 - 5,
 											146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5, 135 - 5,
 											80 - 5,
@@ -211,7 +231,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 											50 + 5,
 											146 + 5, 185 + 5, 155 + 5, 155 + 5, 199 + 5, 161 + 5, 172 + 5, 126 + 5, 168 + 5, 110 + 5, 161 + 5, 135 + 5,
 											255, 190 + 5, 255 },
-									new int[] { 120 - 5, 120 - 5, 127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15, 120 - 5, 123 - 5, 124 - 5, 121 - 4, 126 - 5, 117 - 5,
+									new int[] { 105 - 5, 120 - 5, 127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15, 120 - 5, 123 - 5, 124 - 5, 121 - 4, 126 - 5, 117 - 5,
 											120 - 5,
 											138 - 5, 125 - 5, 113 - 5, 121 - 5, 118 - 5, 116 - 5, 128 - 5, 120 - 5, 130 - 5, 121 - 5, 137 - 10, 122 - 5, 127 - 5,
 											110 - 5, 115 - 5, 118 - 5 },
@@ -223,7 +243,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 											106 - 5,
 											96 - 5, 100 - 5, 116 - 5, 109 - 5, 119 - 5, 116 - 5, 107 - 5, 110 - 5, 131 - 5, 105 - 5, 118 - 10, 103 - 5, 99 - 5,
 											90 - 5, 90 - 5, 80 - 5 },
-									new int[] { 125, 122 + 5, 144 + 5, 124 + 10, 117 + 5, 114 + 4, 100 + 8, 120 + 5, 118 + 5, 126 + 5, 123 + 4, 128 + 5, 123 + 5,
+									new int[] { 145, 122 + 5, 144 + 5, 124 + 10, 117 + 5, 114 + 4, 100 + 8, 120 + 5, 118 + 5, 126 + 5, 123 + 4, 128 + 5, 123 + 5,
 											113 + 5,
 											96 + 5, 100 + 5, 120 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5,
 											110 + 5, 149 + 5, 102 + 5 },
