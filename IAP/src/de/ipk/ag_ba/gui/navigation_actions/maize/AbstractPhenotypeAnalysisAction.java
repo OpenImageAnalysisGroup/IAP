@@ -297,9 +297,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	
 	protected abstract HashSet<ImageConfiguration> getValidImageTypes();
 	
-	private SnapshotFilter filter;
+	private SampleFilter filter;
 	
-	public void setFilter(SnapshotFilter filter) {
+	public void setFilter(SampleFilter filter) {
 		this.filter = filter;
 	}
 	

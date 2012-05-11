@@ -65,6 +65,7 @@ import org.graffiti.session.EditorSession;
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.commands.SnapshotFilter;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -528,7 +529,7 @@ public class IAPservice {
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
 			boolean prepareTransportToBrowser,
-			boolean storeAllAngleValues) {
+			boolean storeAllAngleValues, SnapshotFilter optSnapshotFilter) {
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
@@ -626,7 +627,6 @@ public class IAPservice {
 						if (!timestampe2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
 							timestampe2snapshot.put(time, ns);
-							result.add(ns);
 						}
 						
 						SnapshotDataIAP sn = timestampe2snapshot.get(time);
@@ -788,6 +788,14 @@ public class IAPservice {
 									sn.storeValue(idx, (double) imageCount);
 								}
 							}
+						}
+						
+						if (!timestampe2snapshot.containsKey(time)) {
+							if (optSnapshotFilter == null)
+								result.add(sn);
+							else
+								if (!optSnapshotFilter.filterOut(sn))
+									result.add(sn);
 						}
 					}
 				}
