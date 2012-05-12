@@ -45,7 +45,7 @@ public enum PropertyNames {
 	// }
 	//
 	
-	public static PropertyNames getPropertyName(int i) {
+	public static PropertyNames getMarkerPropertyNameFromIndex(int i) {
 		
 		switch (i) {
 			case 1:
