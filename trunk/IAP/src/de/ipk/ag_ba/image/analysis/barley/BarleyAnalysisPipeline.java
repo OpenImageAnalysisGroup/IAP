@@ -33,6 +33,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefCom
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseFluoMaskToClear_vis_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
@@ -67,6 +68,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlMedianFilter_fluo.class);
 		p.add(BlMedianFilter_fluo.class);
+		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
 		p.add(BlLabFilter_vis.class);
 		p.add(BlMedianFilter_vis.class);
 		p.add(BlIntensityConversion_fluo.class);

@@ -1775,6 +1775,8 @@ public class MongoDB {
 					try {
 						hostName = SystemAnalysisExt.getHostName();
 						DBCollection collection = db.getCollection("schedule");
+						if (ensureIndex)
+							collection.ensureIndex("release");
 						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;
 						int addCnt = 0;
