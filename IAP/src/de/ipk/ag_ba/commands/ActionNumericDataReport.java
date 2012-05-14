@@ -46,7 +46,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		return new ArrayList<NavigationButton>();
 	}
 	
 	@Override

@@ -65,7 +65,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
-				new ActionNumericDataReportComplete(
+				new ActionNumericDataReportSetupInterestingProperties(
 						m, experimentReference, false, toggles, false, togglesForReport), src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)

@@ -21,6 +21,7 @@ import org.bson.types.ObjectId;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -47,8 +48,6 @@ public class TaskDescription {
 	private ExperimentReference experimentInput;
 	
 	private final String systemIP;
-	
-	private boolean autoClose;
 	
 	public static String getTaskDescriptionText(String hostIPs, String task, String params, String startTime) {
 		return task + "$" + params + "$" + startTime;
@@ -257,7 +256,7 @@ public class TaskDescription {
 					e.printStackTrace();
 				}
 				finishedComplete = true;
-				if (autoClose) {
+				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 					System.out.println("> Cluster Execution Mode is active // FINISHED COMPUTE TASK");
 					System.out.println("> SYSTEM.EXIT");
 					System.exit(0);
@@ -283,7 +282,4 @@ public class TaskDescription {
 		return cmd;
 	}
 	
-	public void setSystemExitAfterCompletion(boolean autoClose) {
-		this.autoClose = autoClose;
-	}
 }

@@ -30,6 +30,7 @@ import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -90,25 +91,25 @@ public class CloudComputingService {
 	
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
-		int l =            "***************************************************".length();
+		int l = "***************************************************".length();
 		System.out.println("***************************************************");
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*IAP - Integrated Analysis Platform*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*--  Systems Biology Cloud Computing --*", l));
-		System.out.println(fillLen("*-- "+IAPmain.RELEASE_IAP_IMAGE_ANALYSIS+" --*", l));
+		System.out.println(fillLen("*-- " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + " --*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*(c) 2010-2012 IPK, Group Image Analysis*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
 		System.out.println(fillLen("**", l));
-		System.out.println(fillLenLA("*  PI: Dr. Christian Klukas  *",".",l,2));
-		System.out.println(fillLenLA("*  Dr. Alexander Entzian  *",".",l,2));
-		System.out.println(fillLenLA("*  Jean-Michel Pape  *",".",l,2));
+		System.out.println(fillLenLA("*  PI: Dr. Christian Klukas  *", ".", l, 2));
+		System.out.println(fillLenLA("*  Dr. Alexander Entzian  *", ".", l, 2));
+		System.out.println(fillLenLA("*  Jean-Michel Pape  *", ".", l, 2));
 		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
 		SystemAnalysis.simulateHeadless = true;
-		boolean clusterExecutionMode = false;
+		IAPmain.setRunMode(IAPrunMode.CLOUD_HOST);
 		{
 			for (MongoDB m : MongoDB.getMongos()) {
 				CloudComputingService cc = CloudComputingService.getInstance(m);
@@ -141,7 +142,7 @@ public class CloudComputingService {
 				if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
 						(args.length > 1 && args[1].startsWith("close"))) {
 					System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
-					clusterExecutionMode = true;
+					IAPmain.setRunMode(IAPrunMode.CLOUD_HOST_BATCH_MODE);
 				} else
 					if (args.length > 0 && args[0].toLowerCase().contains("full")) {
 						System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
@@ -277,34 +278,29 @@ public class CloudComputingService {
 				ResourceIOManager.registerIOHandler(handler);
 			
 			CloudComputingService cc = CloudComputingService.getInstance(m);
-			cc.setClusterExecutionModeSingleTaskAndExit(clusterExecutionMode);
 			cc.switchStatus(m);
 			System.out.println(SystemAnalysis.getCurrentTime() + ">START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
 		}
 	}
 	
 	private static String fillLen(String string, int len) {
-		while (string.length()<len) {
-			string = string.substring(0, 1)+" "+string.substring(1);
-			if (string.length()<len)
-				string = string.substring(0, string.length()-1)+" "+string.substring(string.length()-1, string.length());
+		while (string.length() < len) {
+			string = string.substring(0, 1) + " " + string.substring(1);
+			if (string.length() < len)
+				string = string.substring(0, string.length() - 1) + " " + string.substring(string.length() - 1, string.length());
 		}
 		return string;
 	}
 	
 	private static String fillLenLA(String string, String fill, int len, int retainLeft) {
-		while (string.length()<len) {
-			string = string.substring(0, string.length()-retainLeft)+fill+string.substring(string.length()-retainLeft, string.length());
+		while (string.length() < len) {
+			string = string.substring(0, string.length() - retainLeft) + fill + string.substring(string.length() - retainLeft, string.length());
 		}
 		return string;
 	}
-
+	
 	public void setEnableCalculations(boolean enableCloudComputing) {
 		cloudTaskManager.setDisableProcess(!enableCloudComputing);
-	}
-	
-	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
-		cloudTaskManager.setClusterExecutionModeSingleTaskAndExit(autoClose);
 	}
 	
 	private static void merge(MongoDB m) {

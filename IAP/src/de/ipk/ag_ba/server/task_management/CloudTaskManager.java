@@ -194,7 +194,6 @@ public class CloudTaskManager {
 							try {
 								if (td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS)) {
 									runningTasks.add(td);
-									td.setSystemExitAfterCompletion(autoClose);
 									final TaskDescription tdf = td;
 									Runnable r = new Runnable() {
 										@Override

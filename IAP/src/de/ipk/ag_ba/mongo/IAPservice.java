@@ -497,6 +497,7 @@ public class IAPservice {
 	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
 	private static Boolean mainMongoDBreachable = null;
 	private static boolean autoClose;
+	private static HashMap<String, String> niceNames = initNiceNames();
 	
 	public static float[] getCubeRoots(float lo, float up, int n) {
 		StopWatch s = new StopWatch("INFO: cube_roots", false);
@@ -507,6 +508,28 @@ public class IAPservice {
 			res[i] = (float) Math.pow(x, sq);
 		}
 		s.printTime(1000);
+		return res;
+	}
+	
+	private static HashMap<String, String> initNiceNames() {
+		HashMap<String, String> res = new HashMap<String, String>();
+		res.put("weight_before", "Weight before watering");
+		res.put("water_weight", "Water weight");
+		res.put("side.height.norm", "Height (normalized)");
+		res.put("side.height", "Height");
+		res.put("side.area.norm", "Side Area (normalized)");
+		res.put("side.area", "Side Area");
+		res.put("side.fluo.intensity.average", "Fluo intensity (side)");
+		res.put("side.nir.intensity.average", "NIR intensity (side)");
+		res.put("top.fluo.intensity.average", "Fluo intensity (top)");
+		res.put("top.nir.intensity.average", "NIR intensity (top)");
+		res.put("side.vis.hue.average", "Average hue (side)");
+		res.put("top.vis.hue.average", "Average hue (top)");
+		res.put("side.width.norm", "Width (normalized)");
+		res.put("side.width", "Width");
+		res.put("top.area.norm", "Top area (noramlized)");
+		res.put("top.area", "Top area");
+		res.put("volume.fluo.iap", "Digital biomass (fluo)");
 		return res;
 	}
 	
@@ -1180,5 +1203,9 @@ public class IAPservice {
 				return new Color(255, 255, 255).getRGB();
 			}
 		}
+	}
+	
+	public static String getNiceNameForPhenotypicProperty(String substanceName) {
+		return niceNames.get(substanceName);
 	}
 }
