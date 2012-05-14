@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -33,6 +34,7 @@ import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
+import de.ipk.ag_ba.server.pdf_report.clustering.DatasetFormatForClustering;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -82,6 +84,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
+		boolean clustering = false;
 		for (ThreadSafeOptions tso : divideDatasetBy2) {
 			String s = (String) tso.getParam(0, "");
 			if (tso.getBval(0, false)) {
@@ -91,7 +94,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					if (s.equals("Ratio"))
 						ratio = true;
 					else
-						res.add(s);
+						if (s.equals("Clustering"))
+							clustering = true;
+						else
+							res.add(s);
 			}
 		}
 		while (res.size() < 2)
@@ -103,6 +109,10 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		else
 			res.add("FALSE");
 		if (ratio)
+			res.add("TRUE");
+		else
+			res.add("FALSE");
+		if (clustering)
 			res.add("TRUE");
 		else
 			res.add("FALSE");
@@ -183,10 +193,13 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			SnapshotFilter snFilter = new MySnapshotFilter(toggles, experiment.getHeader().getGlobalOutlierInfo());
 			
 			boolean ratio = false;
+			boolean clustering = false;
 			for (ThreadSafeOptions tso : divideDatasetBy) {
 				System.out.println("TOGGLE: " + tso.getParam(0, "") + ":" + tso.getBval(0, false));
 				if (((String) tso.getParam(0, "")).equals("Ratio"))
 					ratio = tso.getBval(0, false);
+				if (((String) tso.getParam(0, "")).equals("Clustering"))
+					clustering = tso.getBval(0, false);
 			}
 			ConditionFilter cf = this;
 			if (ratio) {
@@ -202,6 +215,9 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			
 			ArrayList<SnapshotDataIAP> snapshots;
 			StringBuilder csv = new StringBuilder();
+			HashMap<Integer, HashMap<Integer, Object>> row2col2value = new HashMap<Integer, HashMap<Integer, Object>>();
+			if (!clustering)
+				row2col2value = null;
 			boolean water = false;
 			String csvHeader = getCSVheader();
 			if (status != null)
@@ -221,10 +237,14 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
 				csv.append(csvHeader + indexHeader.toString() + "\r\n");
+				if (row2col2value != null)
+					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, null, false, exportIndividualAngles, snFilter);
 				csv.append(csvHeader);
+				if (row2col2value != null)
+					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
@@ -253,14 +273,22 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (exportIndividualAngles) {
 				if (!xlsx) {
 					boolean germanLanguage = false;
+					int row = 1; // header is added before at row 0
 					for (SnapshotDataIAP s : snapshots) {
-						csv.append(s.getCSVvalue(germanLanguage, separator));
+						String rowContent = s.getCSVvalue(germanLanguage, separator);
+						csv.append(rowContent);
+						if (row2col2value != null)
+							row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
 					}
 				}
 			} else {
 				boolean germanLanguage = false;
+				int row = 1; // header is added before at row 0
 				for (SnapshotDataIAP s : snapshots) {
-					csv.append(s.getCSVvalue(germanLanguage, separator));
+					String rowContent = s.getCSVvalue(germanLanguage, separator);
+					csv.append(rowContent);
+					if (row2col2value != null)
+						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
 				}
 			}
 			if (xlsx) {
@@ -284,8 +312,31 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					status.setCurrentStatusText2("Save CSV file");
 				p.prepareTempDirectory();
 				p.saveReportToFile(csvFileContent, xlsx);
+				if (clustering) {
+					DatasetFormatForClustering transform = new DatasetFormatForClustering();
+					HashSet<Integer> singleFactorCol = findGroupingColumns(csvHeader);
+					HashSet<Integer> otherFactorCols = findGroupingColumns(csvHeader, new String[] { "Day (Int)" }); // e.g. "Plant ID"
+					// if (singleFactorCol.isEmpty() && !otherFactorCols.isEmpty()) {
+					// Integer e = otherFactorCols.iterator().next();
+					// singleFactorCol.add(e);
+					// otherFactorCols.remove(e);
+					// }
+					HashSet<Integer> valueCols = findGroupingColumns(csvHeader, new String[] { "Water (weight-diff)" }); // columns with relevant property values,
+																																							// e.g. height, width, ...
+					HashMap<Integer, HashMap<Integer, Object>> transformed =
+							transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
+									otherFactorCols, valueCols);
+					p.saveClusterDataToFile(DatasetFormatForClustering.print(transformed, separator), xlsx);
+				}
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
+			}
+			
+			if (clustering) {
+				if (status != null)
+					status.setCurrentStatusText2("Create input for clustering");
+				if (status != null)
+					status.setCurrentStatusText2("Clustering input created");
 			}
 			
 			// p.saveScripts(new String[] {
@@ -298,6 +349,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			if (!xlsx)
 				p.saveScripts(new String[] {
 						"createDiagrams.R",
+						"calculateClusters.r",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"report.tex",
@@ -323,7 +375,64 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 			}
 		}
 	}
-
+	
+	private HashSet<Integer> findGroupingColumns(String csvHeader) {
+		HashSet<Integer> res = new HashSet<Integer>();
+		int col = 0;
+		for (String colValue : csvHeader.split(separator)) {
+			for (ThreadSafeOptions tso : divideDatasetBy) {
+				String s = (String) tso.getParam(0, "");
+				if (!s.equals(colValue)) {
+					continue;
+				} else
+					System.out.println("Check Col Value = " + colValue);
+				
+				if (tso.getBval(0, false)) {
+					System.out.println("S = " + s + " TRUE");
+					if (s.equals("Appendix"))
+						;
+					else
+						if (s.equals("Ratio"))
+							;
+						else
+							if (s.equals("Clustering"))
+								;
+							else
+								res.add(col);
+				} else
+					System.out.println("S = " + s + " FALSE");
+				
+			}
+			col++;
+		}
+		return res;
+	}
+	
+	private HashSet<Integer> findGroupingColumns(String csvHeader, String[] interestingValueColumns) {
+		HashSet<Integer> res = new HashSet<Integer>();
+		int col = 0;
+		for (String colValue : csvHeader.split(separator)) {
+			for (String s : interestingValueColumns) {
+				if (!s.equals(colValue))
+					continue;
+				res.add(col);
+			}
+			col++;
+		}
+		return res;
+	}
+	
+	private HashMap<Integer, Object> getColumnValues(String[] value) {
+		HashMap<Integer, Object> res = new HashMap<Integer, Object>();
+		int idx = 0;
+		for (String v : value) {
+			if (v != null && !v.trim().isEmpty())
+				res.put(idx, v);
+			idx++;
+		}
+		return res;
+	}
+	
 	private ArrayList<SnapshotDataIAP> setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet) {
 		if (status != null)
 			status.setCurrentStatusText2("Fill workbook");

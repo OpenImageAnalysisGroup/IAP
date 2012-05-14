@@ -67,8 +67,20 @@ public class PdfCreator {
 		fos.close();
 	}
 	
+	public void saveClusterDataToFile(byte[] result, boolean xlsx) throws IOException {
+		File report = getTargetFileClustering(xlsx);
+		FileOutputStream fos = new FileOutputStream(report);
+		fos.write(result);
+		fos.close();
+	}
+	
 	public File getTargetFile(boolean xlsx) {
 		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
+		return report;
+	}
+	
+	public File getTargetFileClustering(boolean xlsx) {
+		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report.clustering." + (xlsx ? "xlsx" : "csv"));
 		return report;
 	}
 	

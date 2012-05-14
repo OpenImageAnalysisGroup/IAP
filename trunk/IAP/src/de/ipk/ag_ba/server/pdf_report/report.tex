@@ -275,11 +275,9 @@ of the group image analysis.
 \checkFileNoReset{conditionsFirstFilter.tex}{}{}
 \checkFileNoReset{conditionsSecondFilter.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
-	\subsection{Experiment factor groups}
-	
+	\subsection{Grouping of selected experiment factors}
 	\checkFile{conditionsFirstFilter.tex}{conditionsSecondFilter.tex}{}
 	\ifthenelse{\boolean{isFile1} \and \boolean{isFile2}}{
-	
 		\subsubsection{Primary filter}
 		\begin{center}
 		\loadTex{conditionsFirstFilter}
@@ -401,6 +399,26 @@ of the group image analysis.
 		\loadImage{Water__weight_diff_nboxplot.pdf}
 	}{}
 }{}
+
+\resetBoolean
+\checkFileNoReset{clusters.pdf}{}{}
+\ifthenelse{\boolean{isFile1}}{
+	\clearpage
+	\section{\noindent Clustering of data}
+		
+	\checkFile{clusters.pdf}{clusters.pdf}{}
+	\ifthenelse{\boolean{isFile1}}{
+		\subsection{Clustering based on watering data}
+		\begin{itemize}
+		\item The clustering is based on the similarity of the watering data for the different conditions over time.
+		\item For the bootstrapping, the option n is 100.
+		\end{itemize}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadImage{clusters.pdf}
+		}{}
+	}{}
+}{}
+
 
 \resetBoolean
 \checkFileNoReset{side_height__px__side_width__px__side_area__px__top_area__px__side_fluspiderOverallImage.tex}{}{}
