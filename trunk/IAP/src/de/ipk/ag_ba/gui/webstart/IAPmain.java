@@ -20,7 +20,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.RepaintManager;
 
 import org.ApplicationStatus;
 import org.ErrorMsg;
@@ -90,7 +89,14 @@ public class IAPmain extends JApplet {
 	
 	static boolean myClassKnown = false;
 	
+	@Override
+	public void init() {
+		super.init();
+		setRunMode(IAPrunMode.SWING_APPLET);
+	}
+	
 	public static void main(String[] args) {
+		setRunMode(IAPrunMode.SWING_MAIN);
 		JFrame jf = new JFrame("IAP Main");
 		jf.add("Center", new IAPmain().getContentPane());
 		jf.pack();
@@ -99,7 +105,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	public IAPmain() {
-		System.out.println("Initialize IAP applet start...");
+		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		ReleaseInfo.setRunningAsApplet(this);
 		
 		setupLogger();
@@ -107,8 +113,6 @@ public class IAPmain extends JApplet {
 		registerIOhandlers();
 		
 		GravistoMainHelper.setLookAndFeel();
-		
-		checkServerMode();
 		
 		// construct and open the editor's main frame
 		GravistoPreferences prefs = GravistoPreferences.userNodeForPackage(IAPmain.class);
@@ -157,15 +161,6 @@ public class IAPmain extends JApplet {
 			pkgLogger.setLevel(Level.ERROR);
 			pkgLogger.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
 		}
-	}
-	
-	private void checkServerMode() {
-		boolean serverMode = true;
-		
-		if (!serverMode)
-			return;
-		
-		RepaintManager.setCurrentManager(new RemotingRepaintManager());
 	}
 	
 	private void registerIOhandlers() {
@@ -430,11 +425,21 @@ public class IAPmain extends JApplet {
 	
 	private static ImageJ ij = null;
 	
+	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;
+	
 	public static void showImageJ() {
 		if (SystemAnalysis.isHeadless())
 			return;
 		if (ij == null || !ij.isShowing())
 			ij = new ImageJ();
+	}
+	
+	public static IAPrunMode getRunMode() {
+		return currentGuiMode;
+	}
+	
+	public static void setRunMode(IAPrunMode currentGuiMode) {
+		IAPmain.currentGuiMode = currentGuiMode;
 	}
 }
 

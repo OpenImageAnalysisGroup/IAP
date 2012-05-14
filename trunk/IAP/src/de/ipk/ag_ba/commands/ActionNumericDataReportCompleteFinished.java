@@ -42,7 +42,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportComplete extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
+public class ActionNumericDataReportCompleteFinished extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -58,7 +58,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 	private ArrayList<ThreadSafeOptions> toggles;
 	private final ArrayList<ThreadSafeOptions> divideDatasetBy;
 	
-	public ActionNumericDataReportComplete(String tooltip,
+	public ActionNumericDataReportCompleteFinished(String tooltip,
 			boolean exportIndividualAngles,
 			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
 		super(tooltip);
@@ -67,7 +67,7 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportComplete(MongoDB m, ExperimentReference experimentReference,
+	public ActionNumericDataReportCompleteFinished(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles) {
 		this("Create report" +
