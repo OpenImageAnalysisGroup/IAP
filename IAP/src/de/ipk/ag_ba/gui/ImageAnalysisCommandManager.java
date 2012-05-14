@@ -210,8 +210,16 @@ public class ImageAnalysisCommandManager {
 				tsoCalculateRatio.setParam(0, "Ratio");
 				tsoCalculateRatio.setBval(0, false);
 				toggles.add(tsoCalculateRatio);
-				actions.add(new NavigationButton(new ActionToggle("Îf selected, the condition with highest value sum will be a reference",
+				actions.add(new NavigationButton(new ActionToggle("If selected, the condition with highest value sum will be a reference",
 						"Calculate Stress-Reaction?", tsoCalculateRatio),
+						src.getGUIsetting()));
+				
+				ThreadSafeOptions tsoCalculateClustering = new ThreadSafeOptions();
+				tsoCalculateClustering.setParam(0, "Clustering");
+				tsoCalculateClustering.setBval(0, false);
+				toggles.add(tsoCalculateClustering);
+				actions.add(new NavigationButton(new ActionToggle("If selected, the data set will be clustered according to their similarity",
+						"Calculate Clustering?", tsoCalculateClustering),
 						src.getGUIsetting()));
 				
 				for (String c : new String[] {
