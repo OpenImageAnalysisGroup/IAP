@@ -946,15 +946,18 @@ public class GravistoService implements HelperClass {
 	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {
 		String id = class1.getCanonicalName() + ";" + name + ";" + w + ";" + h;
-		if (cachedIcons.containsKey(id))
-			return cachedIcons.get(id);
+		if (cachedIcons.containsKey(id) && cachedIcons.get(id) != null)
+			return new ImageIcon(cachedIcons.get(id).getImage());
 		ImageIcon result = null;
 		URL url = getResource(class1, name);
 		if (url == null)
 			result = null;
 		else
 			result = new ImageIcon(GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h));
-		cachedIcons.put(id, result);
+		if (result != null)
+			cachedIcons.put(id, result);
+		else
+			System.out.println("Could not load icon " + name);
 		return result;
 	}
 	

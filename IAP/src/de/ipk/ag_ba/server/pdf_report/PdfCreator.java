@@ -60,14 +60,14 @@ public class PdfCreator {
 		output.put(System.nanoTime(), "INFO: Temp directory existing?: " + tempDirectory.canRead());
 	}
 	
-	public void saveReportCSV(byte[] result, boolean xlsx) throws IOException {
-		File report = getSaveFile(xlsx);
+	public void saveReportToFile(byte[] result, boolean xlsx) throws IOException {
+		File report = getTargetFile(xlsx);
 		FileOutputStream fos = new FileOutputStream(report);
 		fos.write(result);
 		fos.close();
 	}
 	
-	public File getSaveFile(boolean xlsx) {
+	public File getTargetFile(boolean xlsx) {
 		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
 		return report;
 	}
@@ -75,7 +75,7 @@ public class PdfCreator {
 	public void executeRstat(final String[] parameter, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput) throws IOException {
 		this.lastOutput = lastOutput;
-		readAndModify("report.tex", exp);
+		readAndModifyLaTexFile("report.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
 		if (AttributeHelper.windowsRunning())
@@ -83,8 +83,8 @@ public class PdfCreator {
 		else {
 			new File(name).setExecutable(true);
 		}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name + ", WITH PARAMETER (" + StringManipulationTools.getStringList(parameter, " / ")
-				+ ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name +
+				", WITH PARAMETERS: " + StringManipulationTools.getStringList(parameter, " / "));
 		
 		final String nameF = name;
 		
@@ -220,7 +220,7 @@ public class PdfCreator {
 	 *           file name
 	 * @throws IOException
 	 */
-	private void readAndModify(String fn, ExperimentInterface experiment) throws IOException {
+	private void readAndModifyLaTexFile(String fn, ExperimentInterface experiment) throws IOException {
 		
 		File fff = new File(tempDirectory.getAbsolutePath() + File.separator + fn);
 		String c = TextFile.read(fff);

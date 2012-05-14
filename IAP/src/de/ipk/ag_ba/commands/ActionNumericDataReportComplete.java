@@ -246,65 +246,31 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				if (status != null)
 					status.setCurrentStatusText2("Create XLSX");
 				experiment = null;
-				if (status != null)
-					status.setCurrentStatusText2("Fill workbook");
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
-				Queue<SnapshotDataIAP> todo = new LinkedList<SnapshotDataIAP>(snapshots);
-				snapshots = null;
-				int rowNum = 1;
-				Runtime r = Runtime.getRuntime();
-				while (!todo.isEmpty()) {
-					SnapshotDataIAP s = todo.poll();
-					if (status != null)
-						status.setCurrentStatusText1("Rows remaining: " + todo.size());
-					if (status != null)
-						status.setCurrentStatusText2("Memory status: "
-								+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-								+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + todo.size() + " "
-							+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-							+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
-					for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
-						Row row = sheet.createRow(rowNum++);
-						int colNum = 0;
-						for (DateDoubleString o : valueRow) {
-							if (o.getString() != null && !o.getString().isEmpty())
-								row.createCell(colNum++).setCellValue(o.getString());
-							else
-								if (o.getDouble() != null)
-									row.createCell(colNum++).setCellValue(o.getDouble());
-								else
-									if (o.getDate() != null)
-										row.createCell(colNum++).setCellValue(o.getDate());
-									else
-										colNum++;
-						}
-					}
-				}
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
+				snapshots = setExcelSheetValues(snapshots, sheet);
 			} else
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
 			if (exportIndividualAngles) {
-				if (!xlsx)
+				if (!xlsx) {
+					boolean germanLanguage = false;
 					for (SnapshotDataIAP s : snapshots) {
-						boolean germanLanguage = false;
 						csv.append(s.getCSVvalue(germanLanguage, separator));
 					}
+				}
 			} else {
+				boolean germanLanguage = false;
 				for (SnapshotDataIAP s : snapshots) {
-					boolean germanLanguage = false;
 					csv.append(s.getCSVvalue(germanLanguage, separator));
 				}
 			}
 			if (xlsx) {
 				csv = null;
 				if (status != null)
-					status.setCurrentStatusText2("Save to XLSX file");
+					status.setCurrentStatusText2("Save XLSX file");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
 				p.prepareTempDirectory();
 				if (targetDirectoryOrTargetFile == null)
-					wb.write(new FileOutputStream(p.getSaveFile(xlsx), xlsx));
+					wb.write(new FileOutputStream(p.getTargetFile(xlsx), xlsx));
 				else
 					wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
@@ -312,12 +278,12 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 					status.setCurrentStatusText2("File saved");
 			}
 			else {
-				byte[] result = csv.toString().getBytes();
+				byte[] csvFileContent = csv.toString().getBytes();
 				csv = null;
 				if (status != null)
-					status.setCurrentStatusText2("Save to CSV file");
+					status.setCurrentStatusText2("Save CSV file");
 				p.prepareTempDirectory();
-				p.saveReportCSV(result, xlsx);
+				p.saveReportToFile(csvFileContent, xlsx);
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
 			}
@@ -356,6 +322,46 @@ public class ActionNumericDataReportComplete extends AbstractNavigationAction im
 				p.openTargetDirectory();
 			}
 		}
+	}
+
+	private ArrayList<SnapshotDataIAP> setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet) {
+		if (status != null)
+			status.setCurrentStatusText2("Fill workbook");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
+		Queue<SnapshotDataIAP> todo = new LinkedList<SnapshotDataIAP>(snapshots);
+		snapshots = null;
+		int rowNum = 1;
+		Runtime r = Runtime.getRuntime();
+		while (!todo.isEmpty()) {
+			SnapshotDataIAP s = todo.poll();
+			if (status != null)
+				status.setCurrentStatusText1("Rows remaining: " + todo.size());
+			if (status != null)
+				status.setCurrentStatusText2("Memory status: "
+						+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + todo.size() + " "
+					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
+				Row row = sheet.createRow(rowNum++);
+				int colNum = 0;
+				for (DateDoubleString o : valueRow) {
+					if (o.getString() != null && !o.getString().isEmpty())
+						row.createCell(colNum++).setCellValue(o.getString());
+					else
+						if (o.getDouble() != null)
+							row.createCell(colNum++).setCellValue(o.getDouble());
+						else
+							if (o.getDate() != null)
+								row.createCell(colNum++).setCellValue(o.getDate());
+							else
+								colNum++;
+				}
+			}
+		}
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
+		return snapshots;
 	}
 	
 	@Override
