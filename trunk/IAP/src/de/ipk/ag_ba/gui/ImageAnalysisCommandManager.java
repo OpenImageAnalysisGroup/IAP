@@ -16,7 +16,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
-import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
+import de.ipk.ag_ba.commands.ActionNumericDataReportSetupMainPropertiesStep1;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
@@ -197,7 +197,7 @@ public class ImageAnalysisCommandManager {
 				// guiSetting));
 				actions.add(
 						new NavigationButton(
-								new ActionNumericDataReportSetup(m, experimentReference, false, false,
+								new ActionNumericDataReportSetupMainPropertiesStep1(m, experimentReference, false, false,
 										toggles),
 								guiSetting));
 				

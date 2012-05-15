@@ -85,7 +85,7 @@ public class PdfCreator {
 	}
 	
 	public void executeRstat(final String[] parameter, ExperimentInterface exp,
-			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput) throws IOException {
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
 		this.lastOutput = lastOutput;
 		readAndModifyLaTexFile("report.tex", exp);
 		
@@ -207,7 +207,7 @@ public class PdfCreator {
 			while (!tso.getBval(0, false)) {
 				Thread.sleep(20);
 				long now = System.currentTimeMillis();
-				if (now - start > 1000 * 60 * 30 && myRef.getObject() != null) {
+				if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
 					output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
 							"Report generation took more than " +
 							"30 minutes and has therefore been canceled.");

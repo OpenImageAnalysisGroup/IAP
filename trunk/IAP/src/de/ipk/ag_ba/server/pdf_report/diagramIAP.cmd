@@ -2,7 +2,9 @@
 cd $(dirname $0)
 echo "Current directory: $(pwd)"
 
-Rscript createDiagrams.r report.csv pdf ${3} ${1} ${2}
+if -a report.clustering.csv; then Rscript calculateClusters.r ${6}; fi
+
+Rscript createDiagrams.r report.csv pdf ${3} ${4} ${1} ${2} ${5}
 
 echo "Create PDF..."
 /usr/bin/pdflatex report.tex
