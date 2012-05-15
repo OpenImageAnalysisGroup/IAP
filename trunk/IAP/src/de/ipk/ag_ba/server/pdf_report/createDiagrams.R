@@ -1,4 +1,4 @@
-s# Author: Entzian, Klukas
+# Author: Entzian, Klukas
 ###############################################################################
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
@@ -1728,12 +1728,12 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 							)
 					
 					if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
-						plot = plot + opts(legend.text = theme_text(size=6), 
-											legend.key.size = unit(0.7, "lines")
+						plot = plot + opts(legend.text = theme_text(size=6)
+											#,legend.key.size = unit(0.7, "lines")
 											)
 					} else if(length(overallColor[[imagesIndex]]) >= 31) {
-						plot = plot + opts(legend.text = theme_text(size=4), 
-											legend.key.size = unit(0.4, "lines")
+						plot = plot + opts(legend.text = theme_text(size=4)
+											#,legend.key.size = unit(0.4, "lines")
 						)
 					} else {
 						plot = plot + opts(legend.text = theme_text(size=11))
