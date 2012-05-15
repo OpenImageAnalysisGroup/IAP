@@ -26,6 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ActionNumericDataReportSetupInterestingProperties extends AbstractNavigationAction {
 	
+	private static boolean clustering;
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
@@ -38,8 +39,11 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	private ArrayList<ThreadSafeOptions> toggles;
 	private final ArrayList<ThreadSafeOptions> divideDatasetBy;
 	
+	private boolean executed = false;
+	
 	private final ArrayList<NavigationButton> settingInterestingProperties = new ArrayList<NavigationButton>();
 	private final ArrayList<ThreadSafeOptions> togglesForInterestingProperties = new ArrayList<ThreadSafeOptions>();
+	private boolean createPDFmode;
 	
 	public ActionNumericDataReportSetupInterestingProperties(String tooltip,
 			boolean exportIndividualAngles,
@@ -52,7 +56,7 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	
 	public ActionNumericDataReportSetupInterestingProperties(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
-			ArrayList<ThreadSafeOptions> toggles) {
+			ArrayList<ThreadSafeOptions> toggles, boolean finalStep) {
 		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy), ", ") + ")"),
@@ -61,13 +65,13 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 		this.m = m;
 		this.experimentReference = experimentReference;
 		this.toggles = toggles;
+		this.createPDFmode = finalStep;
 	}
 	
 	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
-		boolean clustering = false;
 		for (ThreadSafeOptions tso : divideDatasetBy2) {
 			String s = (String) tso.getParam(0, "");
 			if (tso.getBval(0, false)) {
@@ -107,8 +111,9 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
-				new ActionNumericDataReportSetupInterestingProperties(
-						m, experimentReference, false, toggles, false, togglesForInterestingProperties), src.getGUIsetting()));
+				new ActionNumericDataReportCompleteFinished(
+						m, experimentReference, false, toggles, false, togglesForInterestingProperties),
+				src.getGUIsetting()));
 		
 		for (NavigationButton s : settingInterestingProperties)
 			actions.add(s);
@@ -130,6 +135,16 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	
 	@Override
 	public String getDefaultTitle() {
+		if (!createPDFmode) {
+			if (executed)
+				return "Filter definition";
+			if (toggles.size() > 0)
+				return "<html><center>If desired, filter<br>" +
+						"experiment factors out --&gt;<br>(click here to continue)";
+			else
+				return "<html><center>No factor selected,<br>" +
+						"overall average will be plotted<br>(click here to continue)";
+		}
 		String add = "";
 		boolean foundTrue = false;
 		if (toggles == null || toggles.size() == 0)
@@ -160,14 +175,16 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (arr[2].equals("TRUE"))
-				return "<html><center>Create PDF with Appendix<br>(all diagrams)" + add;
+				return "<html><center>Specify overview propeties --&gt;" + (clustering ? "<br>(used for clustering)" : "") + add + "<br>(report with appendix)";
 			else
-				return "Create short PDF" + add;
+				return "<html><center>Specify overview properties --&gt;" + (clustering ? "<br>(used for clustering)" : "") + add + "<br>(click here to continue)";
 		}
 	}
 	
 	@Override
 	public String getDefaultImage() {
+		if (!createPDFmode)
+			return "img/ext/gpl2/Gnome-Text-X-Script-64.png";
 		if (exportIndividualAngles)
 			return IAPimages.getDownloadIcon();
 		else
@@ -177,6 +194,7 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		executed = true;
 		settingInterestingProperties.clear();
 		Experiment a = ((Experiment) experimentReference.getExperiment());
 		TreeMap<String, NavigationButton> toBeAdded = new TreeMap<String, NavigationButton>();
