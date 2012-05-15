@@ -16,7 +16,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
-import de.ipk.ag_ba.commands.ActionNumericDataReportSetupInterestingProperties;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetup;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.ActionToggle;
@@ -186,11 +185,11 @@ public class ImageAnalysisCommandManager {
 				
 				ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
 				
-				actions.add(new NavigationButton(new ActionNumericDataReportSetupInterestingProperties(
-						m, experimentReference, true,
-						toggles,
-						true, null),
-						guiSetting));
+				// actions.add(new NavigationButton(new ActionNumericDataReportSetupInterestingProperties(
+				// m, experimentReference, true,
+				// toggles,
+				// true, null, false),
+				// guiSetting));
 				// actions.add(new NavigationButton(new ActionNumericDataReportComplete(
 				// m, experimentReference, false,
 				// toggles,

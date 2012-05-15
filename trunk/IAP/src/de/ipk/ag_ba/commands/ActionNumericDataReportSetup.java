@@ -66,7 +66,8 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportSetupInterestingProperties(
-						m, experimentReference, false, toggles, false, togglesForReport), src.getGUIsetting()));
+						m, experimentReference, false, toggles, false, togglesForReport, false),
+				src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
 			actions.add(s);
@@ -96,7 +97,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		} else {
 			ArrayList<String> settings = new ArrayList<String>();
 			ArrayList<ThreadSafeOptions> settingsTsos = new ArrayList<ThreadSafeOptions>();
-			boolean appendix = false;
+			boolean appendix = false, clustering = false, ratio = false;
 			
 			Collections.sort(toggles, new Comparator<ThreadSafeOptions>() {
 				@Override
@@ -108,17 +109,23 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 			for (ThreadSafeOptions tso : toggles) {
 				if (((String) tso.getParam(0, "")).equals("Appendix"))
 					appendix = tso.getBval(0, false);
-				else {
-					if (tso.getBval(0, false)) {
-						// if (settings.size() >= 2) {
-						// settingsTsos.get(0).setBval(0, false);
-						// settingsTsos.remove(0);
-						// settings.remove(0);
-						// }
-						settings.add((String) tso.getParam(0, ""));
-						settingsTsos.add(tso);
-					}
-				}
+				else
+					if (((String) tso.getParam(0, "")).equals("Ratio"))
+						ratio = tso.getBval(0, false);
+					else
+						if (((String) tso.getParam(0, "")).equals("Clustering"))
+							clustering = tso.getBval(0, false);
+						else {
+							if (tso.getBval(0, false)) {
+								// if (settings.size() >= 2) {
+								// settingsTsos.get(0).setBval(0, false);
+								// settingsTsos.remove(0);
+								// settings.remove(0);
+								// }
+								settings.add((String) tso.getParam(0, ""));
+								settingsTsos.add(tso);
+							}
+						}
 			}
 			if (executed)
 				return "<html>Group definition:<br>" +
@@ -127,7 +134,8 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 								: "no (overall average)")
 						+ "";
 			else
-				return "<html><center>About to create a<br>" + (appendix ? "full " : "short ") + "report<br>"
+				return "<html><center>About to create a<br>" + (appendix ? "full " : "short ") + "report" + (clustering ? " with clustering" : "") + "<br>"
+						+ (ratio ? "(stress-response-report)<br>" : "")
 						+ (exportIndividualAngles ? " (side angles)" :
 								(settings.size() > 0 ?
 										"- divided by " + StringManipulationTools.getStringList(settings, "<br>and ") + " -"
