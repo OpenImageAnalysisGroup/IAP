@@ -357,6 +357,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						if (tso.getBval(0, true)) {
 							String colHeader = (String) tso.getParam(0, "");
 							String colNiceName = (String) tso.getParam(1, "");
+							if (colHeader.equals("water_weight"))
+								colHeader = "Water (weight-diff)";
+							if (colHeader.equals("weight_before"))
+								colHeader = "Weight A (g)";
 							clusteringProperties.add(colHeader);
 						}
 					}
@@ -364,10 +368,13 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					// columns with relevant property values, e.g. height, width, ...
 					HashSet<Integer> valueCols = findGroupingColumns(csvHeader + indexHeader.toString(),
 							clusteringProperties.toArray(new String[] {}));
-					HashMap<Integer, HashMap<Integer, Object>> transformed =
-							transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
-									otherFactorCols, valueCols);
-					p.saveClusterDataToFile(DatasetFormatForClustering.print(transformed, separator), xlsx);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">CLUSTERING-VALUE-COLS: " + StringManipulationTools.getStringList(valueCols, ", "));
+					if (valueCols.size() > 0) {
+						HashMap<Integer, HashMap<Integer, Object>> transformed =
+								transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
+										otherFactorCols, valueCols);
+						p.saveClusterDataToFile(DatasetFormatForClustering.print(transformed, separator), xlsx);
+					}
 				}
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
