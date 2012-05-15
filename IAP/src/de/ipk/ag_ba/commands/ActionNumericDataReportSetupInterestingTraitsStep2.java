@@ -13,9 +13,11 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -24,9 +26,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportSetupInterestingProperties extends AbstractNavigationAction {
+public class ActionNumericDataReportSetupInterestingTraitsStep2 extends AbstractNavigationAction {
 	
-	private static boolean clustering;
+	private boolean clustering;
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
@@ -45,7 +47,7 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	private final ArrayList<ThreadSafeOptions> togglesForInterestingProperties = new ArrayList<ThreadSafeOptions>();
 	private boolean createPDFmode;
 	
-	public ActionNumericDataReportSetupInterestingProperties(String tooltip,
+	public ActionNumericDataReportSetupInterestingTraitsStep2(String tooltip,
 			boolean exportIndividualAngles,
 			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
 		super(tooltip);
@@ -54,12 +56,12 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportSetupInterestingProperties(MongoDB m, ExperimentReference experimentReference,
+	public ActionNumericDataReportSetupInterestingTraitsStep2(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles, boolean finalStep) {
 		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy), ", ") + ")"),
+						: " PDF"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
@@ -68,7 +70,7 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 		this.createPDFmode = finalStep;
 	}
 	
-	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
+	private String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
@@ -109,11 +111,113 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
+		final ThreadSafeOptions tsoBootstrapN = new ThreadSafeOptions();
+		tsoBootstrapN.setInt(100);
+		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinished(
-						m, experimentReference, false, toggles, false, togglesForInterestingProperties),
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m, experimentReference, false, divideDatasetBy, false, toggles,
+						togglesForInterestingProperties, tsoBootstrapN),
 				src.getGUIsetting()));
+		
+		if (togglesForInterestingProperties.size() > 0)
+			if (clustering)
+				actions.add(new NavigationButton(new AbstractNavigationAction("Bootstrapping N") {
+					
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						int n = tsoBootstrapN.getInt();
+						if (n == 100)
+							n = 1000;
+						else
+							if (n == 1000)
+								n = 10000;
+							else
+								if (n == 10000)
+									n = 100;
+						tsoBootstrapN.setInt(n);
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+						return null;
+					}
+					
+					@Override
+					public boolean requestTitleUpdates() {
+						return true;
+					}
+					
+					@Override
+					public boolean getProvidesActions() {
+						return false;
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "<html><center>Bootstrapping-N<br>" + tsoBootstrapN.getInt();
+					}
+					
+					@Override
+					public NavigationImage getImageIconInactive() {
+						return getImageIconActive();
+					}
+					
+					@Override
+					public NavigationImage getImageIconActive() {
+						int n = tsoBootstrapN.getInt();
+						if (n == 10000)
+							return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-High-64.png");
+						if (n == 1000)
+							return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-Medium-64.png");
+						return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-Low-64.png");
+					}
+					
+					@Override
+					public String getDefaultNavigationImage() {
+						int n = tsoBootstrapN.getInt();
+						if (n == 10000)
+							return "img/ext/gpl2/Gnome-Security-High-64.png";
+						if (n == 1000)
+							return "img/ext/gpl2/Gnome-Security-Medium-64.png";
+						return "img/ext/gpl2/Gnome-Security-Low-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return null;
+					}
+				}, src.getGUIsetting()));
+		
+		actions.add(new NavigationButton(new AbstractNavigationAction("Toggle all settings") {
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				for (ThreadSafeOptions tso : togglesForInterestingProperties) {
+					tso.setBval(0, !tso.getBval(0, true));
+				}
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return "<html><center>Toggle<br>settings";
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/ext/gpl2/gtcf.png";
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				return null;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return null;
+			}
+		}, src.getGUIsetting()));
 		
 		for (NavigationButton s : settingInterestingProperties)
 			actions.add(s);
@@ -206,11 +310,12 @@ public class ActionNumericDataReportSetupInterestingProperties extends AbstractN
 			
 			ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setParam(0, setting);
-			tso.setParam(0, niceName);
+			tso.setParam(1, niceName);
 			togglesForInterestingProperties.add(tso);
 			
 			toBeAdded.put(niceName, new NavigationButton(
-					new ActionToggle("Include " + niceName + "?", niceName, tso),
+					new ActionToggle("Include " + niceName + " ("
+							+ setting + ")?", niceName, tso),
 					src.getGUIsetting()));
 			
 		}

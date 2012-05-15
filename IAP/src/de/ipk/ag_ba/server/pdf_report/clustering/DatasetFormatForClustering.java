@@ -210,7 +210,7 @@ public class DatasetFormatForClustering {
 				// }
 			}
 			System.out.println();
-			s.append("\n");
+			s.append("\r\n");
 		}
 		return s.toString().getBytes();
 	}

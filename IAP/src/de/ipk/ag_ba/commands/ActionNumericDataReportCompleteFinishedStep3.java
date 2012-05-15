@@ -42,7 +42,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportCompleteFinished extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
+public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -55,10 +55,13 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 	private final boolean xlsx;
 	
 	private File targetDirectoryOrTargetFile = null;
-	private ArrayList<ThreadSafeOptions> toggles;
+	private ArrayList<ThreadSafeOptions> togglesFiltering;
 	private final ArrayList<ThreadSafeOptions> divideDatasetBy;
+	private boolean clustering;
+	private ArrayList<ThreadSafeOptions> togglesInterestingProperties;
+	private ThreadSafeOptions tsoBootstrapN;
 	
-	public ActionNumericDataReportCompleteFinished(String tooltip,
+	public ActionNumericDataReportCompleteFinishedStep3(String tooltip,
 			boolean exportIndividualAngles,
 			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
 		super(tooltip);
@@ -67,20 +70,29 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportCompleteFinished(MongoDB m, ExperimentReference experimentReference,
+	public ActionNumericDataReportCompleteFinishedStep3(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
-			ArrayList<ThreadSafeOptions> toggles) {
+			ArrayList<ThreadSafeOptions> togglesFiltering, ArrayList<ThreadSafeOptions> togglesInterestingProperties, ThreadSafeOptions tsoBootstrapN) {
 		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy), ", ") + ")"),
+						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), ", ") + ")"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
 		this.experimentReference = experimentReference;
-		this.toggles = toggles;
+		this.togglesFiltering = togglesFiltering;
+		this.togglesInterestingProperties = togglesInterestingProperties;
+		this.tsoBootstrapN = tsoBootstrapN;
+		for (ThreadSafeOptions tso : divideDatasetBy) {
+			String s = (String) tso.getParam(0, "");
+			if (tso.getBval(0, false)) {
+				if (s.equals("Clustering"))
+					clustering = true;
+			}
+		}
 	}
 	
-	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2) {
+	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int n) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
@@ -117,6 +129,8 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 		else
 			res.add("FALSE");
 		
+		res.add(n + "");
+		
 		return res.toArray(new String[] {});
 	}
 	
@@ -141,24 +155,42 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 	public String getDefaultTitle() {
 		String add = "";
 		boolean foundTrue = false;
-		if (toggles == null || toggles.size() == 0)
+		if (togglesFiltering == null || togglesFiltering.size() == 0)
 			foundTrue = true;
 		else
-			for (ThreadSafeOptions tso : toggles) {
+			for (ThreadSafeOptions tso : togglesFiltering) {
 				if (tso.getBval(0, true))
 					foundTrue = true;
 			}
-		if (!foundTrue)
+		
+		boolean foundTrueIP = false;
+		if (togglesInterestingProperties == null || togglesInterestingProperties.size() == 0)
+			foundTrueIP = true;
+		else
+			for (ThreadSafeOptions tso : togglesInterestingProperties) {
+				if (tso.getBval(0, true))
+					foundTrueIP = true;
+			}
+		
+		if (!foundTrue && togglesFiltering.size() > 0) {
 			add = "<br>[NO INPUT]";
+		} else {
+			if (!foundTrueIP) {
+				if (clustering)
+					add = "<br>[NO OVERVIEW AND CLUSTERING]";
+				else
+					add = "<br>[NO PROPERTY OVERVIEW]";
+			}
+		}
 		if (exportIndividualAngles)
 			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table" + add;
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
 							StringManipulationTools.getStringList(
-									getArrayFrom(divideDatasetBy), ", ") + ")") + add;
+									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), ", ") + ")") + add;
 		} else {
-			String[] arr = getArrayFrom(divideDatasetBy);
+			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt());
 			String filter = StringManipulationTools.getStringList(
 					arr, ", ");
 			if (filter.endsWith(", TRUE"))
@@ -169,9 +201,11 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (arr[2].equals("TRUE"))
-				return "<html><center>Create PDF with Appendix<br>(all diagrams)" + add;
+				return "<html><center>Specify overview" + (clustering ? "/<br>clustering " : "<br>") + "" +
+						"properties --&gt;<br>Click here for full report PDF" + add;
 			else
-				return "Create short PDF" + add;
+				return "Specify overview" + (clustering ? "/<br>clustering " : "") + "" +
+						"properties --&gt;<br>Click here to create short PDF" + add;
 		}
 	}
 	
@@ -190,7 +224,7 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
-			SnapshotFilter snFilter = new MySnapshotFilter(toggles, experiment.getHeader().getGlobalOutlierInfo());
+			SnapshotFilter snFilter = new MySnapshotFilter(togglesFiltering, experiment.getHeader().getGlobalOutlierInfo());
 			
 			boolean ratio = false;
 			boolean clustering = false;
@@ -223,6 +257,7 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 			if (status != null)
 				status.setCurrentStatusText2("Create snapshots");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
+			StringBuilder indexHeader = new StringBuilder();
 			if (!water) {
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
@@ -231,7 +266,6 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
-				StringBuilder indexHeader = new StringBuilder();
 				for (String val : cola.values())
 					indexHeader.append(separator + val);
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
@@ -316,13 +350,20 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 					DatasetFormatForClustering transform = new DatasetFormatForClustering();
 					HashSet<Integer> singleFactorCol = findGroupingColumns(csvHeader);
 					HashSet<Integer> otherFactorCols = findGroupingColumns(csvHeader, new String[] { "Day (Int)" }); // e.g. "Plant ID"
-					// if (singleFactorCol.isEmpty() && !otherFactorCols.isEmpty()) {
-					// Integer e = otherFactorCols.iterator().next();
-					// singleFactorCol.add(e);
-					// otherFactorCols.remove(e);
-					// }
-					HashSet<Integer> valueCols = findGroupingColumns(csvHeader, new String[] { "Water (weight-diff)" }); // columns with relevant property values,
-																																							// e.g. height, width, ...
+					
+					ArrayList<String> clusteringProperties = new ArrayList<String>();
+					
+					for (ThreadSafeOptions tso : togglesInterestingProperties) {
+						if (tso.getBval(0, true)) {
+							String colHeader = (String) tso.getParam(0, "");
+							String colNiceName = (String) tso.getParam(1, "");
+							clusteringProperties.add(colHeader);
+						}
+					}
+					
+					// columns with relevant property values, e.g. height, width, ...
+					HashSet<Integer> valueCols = findGroupingColumns(csvHeader + indexHeader.toString(),
+							clusteringProperties.toArray(new String[] {}));
 					HashMap<Integer, HashMap<Integer, Object>> transformed =
 							transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
 									otherFactorCols, valueCols);
@@ -359,7 +400,12 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 			if (!exportIndividualAngles && !xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2("Generate report images and PDF");
-				p.executeRstat(getArrayFrom(divideDatasetBy), experiment, status, lastOutput);
+				int timeoutMinutes = 30;
+				if (tsoBootstrapN.getInt() > 100)
+					timeoutMinutes = 60 * 12; // 12 h
+				if (tsoBootstrapN.getInt() > 100)
+					timeoutMinutes = 60 * 24 * 7; // 7*24h
+				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), experiment, status, lastOutput, timeoutMinutes);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
 				if (ok)
@@ -409,6 +455,7 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 	}
 	
 	private HashSet<Integer> findGroupingColumns(String csvHeader, String[] interestingValueColumns) {
+		System.out.println(csvHeader);
 		HashSet<Integer> res = new HashSet<Integer>();
 		int col = 0;
 		for (String colValue : csvHeader.split(separator)) {
@@ -475,9 +522,9 @@ public class ActionNumericDataReportCompleteFinished extends AbstractNavigationA
 	
 	@Override
 	public boolean filterConditionOut(ConditionInterface s) {
-		if (toggles == null)
+		if (togglesFiltering == null)
 			return false;
-		for (ThreadSafeOptions t : toggles) {
+		for (ThreadSafeOptions t : togglesFiltering) {
 			if (matchCondition(t, s))
 				return true;
 		}

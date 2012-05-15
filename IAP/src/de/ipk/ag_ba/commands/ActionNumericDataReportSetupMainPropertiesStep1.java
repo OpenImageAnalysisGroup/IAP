@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportSetup extends AbstractNavigationAction implements SpecialCommandLineSupport {
+public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
@@ -41,7 +41,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	private final ArrayList<ThreadSafeOptions> toggles;
 	private ArrayList<ThreadSafeOptions> togglesForReport;
 	
-	public ActionNumericDataReportSetup(String tooltip, boolean exportIndividualAngles,
+	public ActionNumericDataReportSetupMainPropertiesStep1(String tooltip, boolean exportIndividualAngles,
 			boolean xlsx, ArrayList<ThreadSafeOptions> toggles) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
@@ -49,7 +49,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 		this.toggles = toggles;
 	}
 	
-	public ActionNumericDataReportSetup(MongoDB m,
+	public ActionNumericDataReportSetupMainPropertiesStep1(MongoDB m,
 			ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles) {
 		this("Specify report options" +
@@ -65,7 +65,7 @@ public class ActionNumericDataReportSetup extends AbstractNavigationAction imple
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
-				new ActionNumericDataReportSetupInterestingProperties(
+				new ActionNumericDataReportSetupInterestingTraitsStep2(
 						m, experimentReference, false, toggles, false, togglesForReport, false),
 				src.getGUIsetting()));
 		

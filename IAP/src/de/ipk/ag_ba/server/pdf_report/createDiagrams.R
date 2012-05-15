@@ -1,4 +1,4 @@
-# Author: Entzian, Klukas
+s# Author: Entzian, Klukas
 ###############################################################################
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {

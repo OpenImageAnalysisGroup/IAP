@@ -1128,6 +1128,7 @@ public class IAPservice {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static Date fixSetToday(Date ddd) {
 		int h = ddd.getHours();
 		int m = ddd.getMinutes();
