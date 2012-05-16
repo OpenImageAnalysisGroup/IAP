@@ -41,6 +41,31 @@ public enum IAPwebcam {
 		return new FlexibleImage(img);
 	}
 	
+	public FlexibleImage getSnapshotLR() throws Exception {
+		InputStream is = getSnapshotJPGdataLR();
+		BufferedImage img = ImageIO.read(is);
+		return new FlexibleImage(img);
+	}
+	
+	public InputStream getSnapshotJPGdataLR() throws Exception {
+		String imageSrc = null;
+		if (this == MAIZE)
+			imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
+		if (this == BARLEY)
+			imageSrc = "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" + System.currentTimeMillis();
+		
+		InputStream is;
+		if (imageSrc.contains("@")) {
+			String userPass = imageSrc.split("@")[0];
+			String urlStr = imageSrc.split("@")[1];
+			String user = userPass.split(":")[0];
+			String pass = userPass.split(":")[1];
+			is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
+		} else
+			is = new IOurl(imageSrc).getInputStream();
+		return is;
+	}
+	
 	public InputStream getSnapshotJPGdata() throws Exception {
 		String imageSrc = null;
 		if (this == MAIZE)
@@ -58,6 +83,10 @@ public enum IAPwebcam {
 		} else
 			is = new IOurl(imageSrc).getInputStream();
 		return is;
+	}
+	
+	public boolean hasVideoStream() {
+		return this == BARLEY;
 	}
 	
 }

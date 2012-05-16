@@ -6,10 +6,13 @@ import org.AttributeHelper;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractUrlNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.mongo.IAPwebcam;
 
 /**
  * @author klukas
@@ -29,16 +32,30 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	}
 	
 	@Override
+	public boolean requestTitleUpdates() {
+		return super.requestTitleUpdates();
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		if (!IAPmain.getRunMode().isSwing())
+			return super.getDefaultTitle();
+		else
+			return "<html><center>CCTV (Maize)<br>" + status.getCurrentStatusMessage1();
+	}
+	
+	@Override
 	public String getURL() {
 		if (SystemAnalysis.isHeadless())
 			return "file:///home/view/view/view.jpg";
-		else  
+		else
 			return "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
-		AttributeHelper.showInBrowser(getURL());
+		if (!IAPmain.getRunMode().isSwing())
+			AttributeHelper.showInBrowser(getURL());
 	}
 	
 	@Override
@@ -49,6 +66,12 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	@Override
 	public String getDefaultTooltip() {
 		return "Show Camera Snapshots";
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		return new MainPanelComponent(new PictureViewer(IAPwebcam.MAIZE,
+				getURL(), getStatusProvider()));
 	}
 	
 	@Override
