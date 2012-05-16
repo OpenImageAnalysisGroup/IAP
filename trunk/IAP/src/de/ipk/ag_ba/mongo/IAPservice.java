@@ -18,6 +18,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -61,6 +62,11 @@ import org.graffiti.plugin.view.GraphElementComponent;
 import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -946,7 +952,7 @@ public class IAPservice {
 		resultReceiver.setExperimenData(experiment);
 	}
 	
-	public static void monitorWeightData() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
+	public static void monitorExperimentDataProgress() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
 		host = host.substring(0, host.indexOf("_"));
@@ -987,7 +993,13 @@ public class IAPservice {
 		} else
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
+		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
 		while (true) {
+			boolean createVideo = true;
+			if (createVideo) {
+				storeImages(cam2lastSnapshot);
+			}
+			
 			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
 			TextFile config = new TextFile(experimentListFileName);
 			for (String c : config)
@@ -1129,6 +1141,42 @@ public class IAPservice {
 				Thread.sleep(wait * 60 * 1000);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
+		}
+	}
+	
+	private static void storeImages(HashMap<IAPwebcam, Long> cam2lastSnapshot) {
+		if (!cam2lastSnapshot.containsKey(IAPwebcam.BARLEY))
+			cam2lastSnapshot.put(IAPwebcam.BARLEY, 0l);
+		if (!cam2lastSnapshot.containsKey(IAPwebcam.MAIZE))
+			cam2lastSnapshot.put(IAPwebcam.MAIZE, 0l);
+		long t = System.currentTimeMillis();
+		for (final IAPwebcam cam : cam2lastSnapshot.keySet()) {
+			try {
+				// every hour
+				if (t - cam2lastSnapshot.get(cam) > 1000 * 60 * 60) {
+					final InputStream inp = cam.getSnapshotJPGdata();
+					MongoDB mm = MongoDB.getDefaultCloud();
+					mm.processDB(new RunnableOnDB() {
+						private DB db;
+						
+						@Override
+						public void run() {
+							GridFS gridfs_webcam_files = new GridFS(db, "fs_webcam_" + cam.toString());
+							GridFSInputFile inputFile = gridfs_webcam_files.createFile(inp, cam.getFileName());
+							inputFile.setMetaData(new BasicDBObject("time", System.currentTimeMillis()));
+							inputFile.save();
+							System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED WEBCAM SNAPSHOT FROM " + cam + " IN DB " + db.getName());
+						}
+						
+						@Override
+						public void setDB(DB db) {
+							this.db = db;
+						}
+					});
+				}
+			} catch (Exception e) {
+				System.err.println(SystemAnalysis.getCurrentTime() + ">COULD NOT SAVE VIDEO SNAPSHOT: " + e.getMessage());
+			}
 		}
 	}
 	

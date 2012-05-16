@@ -977,7 +977,6 @@ public class MongoDB {
 	public DatabaseStorageResult saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
-		
 		return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
 	}
 	

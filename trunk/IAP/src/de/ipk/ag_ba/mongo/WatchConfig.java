@@ -42,6 +42,7 @@ public class WatchConfig {
 		return label;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private long start(int h_off, int m_off) {
 		Date now = new Date();
 		now.setHours(h_off);
