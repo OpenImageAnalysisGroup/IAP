@@ -137,9 +137,9 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
 			
-			result.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+			result.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
 			
-			result.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
+			result.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
 			status.setCurrentStatusValueFine(100d);
 			status.setCurrentStatusText1("Found " + n + " experiments");
 			

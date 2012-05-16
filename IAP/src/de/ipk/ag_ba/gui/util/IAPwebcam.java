@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.mongo;
+package de.ipk.ag_ba.gui.util;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -9,6 +9,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.mongo.HttpBasicAuth;
 
 public enum IAPwebcam {
 	

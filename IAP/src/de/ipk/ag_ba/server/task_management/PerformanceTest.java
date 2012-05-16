@@ -11,6 +11,7 @@ import org.ReleaseInfo;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
@@ -22,7 +23,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.server.task_management.PerformanceTestImages.ImageNames;
 
 public class PerformanceTest {

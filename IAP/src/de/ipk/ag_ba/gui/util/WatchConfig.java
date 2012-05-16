@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.mongo;
+package de.ipk.ag_ba.gui.util;
 
 import java.util.Date;
 

@@ -11,7 +11,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.MarkComponent;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.mongo.IAPwebcam;
+import de.ipk.ag_ba.gui.util.IAPwebcam;
 import de.ipk_gatersleben.ag_nw.graffiti.JLabelHTMLlink;
 
 public class PictureViewer extends JPanel implements HierarchyListener {

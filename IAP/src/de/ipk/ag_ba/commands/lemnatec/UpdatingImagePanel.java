@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.mongo.IAPwebcam;
+import de.ipk.ag_ba.gui.util.IAPwebcam;
 
 public class UpdatingImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;

@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.mongo;
+package de.ipk.ag_ba.gui.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import org.AttributeHelper;
 import org.ReleaseInfo;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.mongo.HttpBasicAuth;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class IAPmail {

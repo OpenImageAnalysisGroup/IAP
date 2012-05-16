@@ -6,7 +6,7 @@ import de.ipk.ag_ba.commands.lemnatec.ActionLemnaTecNavigation;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.mongo.IAPservice;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**

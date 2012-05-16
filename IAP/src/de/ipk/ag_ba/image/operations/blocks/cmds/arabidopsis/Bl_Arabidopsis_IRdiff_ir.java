@@ -3,10 +3,10 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.mongo.IAPservice;
 
 /**
  * Create a simulated, dummy reference image (in case the reference image is NULL).

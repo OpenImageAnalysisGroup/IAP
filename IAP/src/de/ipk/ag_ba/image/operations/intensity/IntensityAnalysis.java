@@ -4,10 +4,10 @@ import ij.measure.ResultsTable;
 
 import java.awt.Color;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
-import de.ipk.ag_ba.mongo.IAPservice;
 
 public class IntensityAnalysis {
 	
