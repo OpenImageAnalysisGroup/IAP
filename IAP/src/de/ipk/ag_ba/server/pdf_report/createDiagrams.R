@@ -305,17 +305,16 @@ changeWhenTreatmentNoneAndSecondTreatmentNotNone <- function(listOfTreat, listOf
 
 checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug) {
 	debug %debug% "Start of checkOfTreatments()"
-	ownCat(args[5])
-	
-	ownCat(args[6])
-	
+#	ownCat(args[5])
+#	ownCat(args[6])
+
 	treatment = treatment %exists% args[5]
 	secondTreatment = secondTreatment %exists% args[6]
 	secondTreatment = treatment %checkEqual% secondTreatment
 	
 	listOfTreat = list(treatment=treatment, secondTreatment=secondTreatment)
 	listOfFilterTreat = list(filterTreatment=filterTreatment, filterSecondTreatment=filterSecondTreatment)	## wird erstmal noch nichts weiter mit gemacht! nur geswapt falls notwendig
-
+	
 	if(treatment == "none" & secondTreatment == "none") {
 		listOfTreat$treatment = "noneTreatment"
 		listOfTreatAndFilterTreat <- list(listOfTreat, listOfFilterTreat)
@@ -748,6 +747,12 @@ preprocessingOfSecondTreatment <- function(overallList) {
 
 		if (overallList$secondTreatment != "none" & (overallList$secondTreatment %checkIfDescriptorExists% overallList$iniDataSet)) {
 			overallList$filterSecondTreatment = getSingelFilter(overallList$filterSecondTreatment, overallList$secondTreatment, overallList$iniDataSet)
+			
+			if(length(overallList$filterSecondTreatment) == 1) {
+				overallList$secondTreatment = "none"
+				overallList$filterSecondTreatment = "none"
+				ownCat("Set 'filterSecondTreatment' and 'secondTreatment' to 'none' because only one filter is there!")
+			}
 			
 		} else {
 			overallList$secondTreatment = "none"
@@ -3069,7 +3074,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		filterTreatment <- "dry / normal"
 		
 		secondTreatment <- "Species"
-		filterSecondTreatment <- "Athletico$Weisse Zarin"
+		filterSecondTreatment  <- "none"
+		#filterSecondTreatment <- "Athletico$Weisse Zarin"
 		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
 
@@ -3233,8 +3239,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			"top area (px)"
 	)	
 	
-	boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-	
+	#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
+	boxOptions= NULL
 	
 	#violinplot
 	descriptorSet_violinBox = c(
@@ -3358,7 +3364,15 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			descriptorSet_violinBox = NULL
 		}
 		
+		listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug)
+		treatment = listOfTreatAndFilterTreat[[1]][[1]]
+		secondTreatment = listOfTreatAndFilterTreat[[1]][[2]]
+		filterTreatment = listOfTreatAndFilterTreat[[2]][[1]]
+		filterSecondTreatment = listOfTreatAndFilterTreat[[2]][[2]]
 		
+		if(treatment == "noneTreatment") {
+			workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
+		}
 		
 		
 		isRatio <- TRUE
