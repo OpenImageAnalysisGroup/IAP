@@ -9,13 +9,15 @@ import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 
 public class WebCamHandler extends AbstractResourceIOHandler {
 	
+	public static final String PREFIX = "webcam";
+	
 	public WebCamHandler() {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">WebCamHandler (I/O Module) has been loaded.");
 	}
 	
 	@Override
 	public String getPrefix() {
-		return "webcam";
+		return PREFIX;
 	}
 	
 	@Override
