@@ -132,7 +132,7 @@ public class CloudComputingService {
 					(args.length > 1 && args[1].startsWith("watch"))) {
 				System.out.println(": watch - monitoring the experiment data progress");
 				try {
-					IAPservice.monitorWeightData();
+					IAPservice.monitorExperimentDataProgress();
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
