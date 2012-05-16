@@ -128,14 +128,17 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 						int n = tsoBootstrapN.getInt();
-						if (n == 100)
-							n = 1000;
+						if (n == 0)
+							n = 100;
 						else
-							if (n == 1000)
-								n = 10000;
+							if (n == 100)
+								n = 1000;
 							else
-								if (n == 10000)
-									n = 100;
+								if (n == 1000)
+									n = 10000;
+								else
+									if (n == 10000)
+										n = 0;
 						tsoBootstrapN.setInt(n);
 					}
 					
@@ -156,7 +159,11 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 					
 					@Override
 					public String getDefaultTitle() {
-						return "<html><center>Bootstrapping-N<br>" + tsoBootstrapN.getInt();
+						int n = tsoBootstrapN.getInt();
+						if (n > 0)
+							return "<html><center>Bootstrapping-N<br>" + tsoBootstrapN.getInt() + ", using pvclust";
+						else
+							return "<html><center>No Bootstrapping,<br>using hclust";
 					}
 					
 					@Override
@@ -171,7 +178,9 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 							return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-High-64.png");
 						if (n == 1000)
 							return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-Medium-64.png");
-						return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-Low-64.png");
+						if (n == 100)
+							return IAPmain.loadIcon("img/ext/gpl2/Gnome-Security-Low-64.png");
+						return IAPmain.loadIcon("img/ext/gpl2/gtcd.png");
 					}
 					
 					@Override
@@ -181,7 +190,9 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 							return "img/ext/gpl2/Gnome-Security-High-64.png";
 						if (n == 1000)
 							return "img/ext/gpl2/Gnome-Security-Medium-64.png";
-						return "img/ext/gpl2/Gnome-Security-Low-64.png";
+						if (n == 100)
+							return "img/ext/gpl2/Gnome-Security-Low-64.png";
+						return "img/ext/gpl2/gtcd.png";
 					}
 					
 					@Override

@@ -965,7 +965,7 @@ public class IAPservice {
 					el.addAll(lde.getExperimentsInDatabase(null, database));
 				} catch (Exception e) {
 					if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
+						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Can't process DB " + database + ": " + e.getMessage());
 				}
 			}
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
@@ -999,6 +999,7 @@ public class IAPservice {
 				if (wc.getLastMinutes() < smallestTimeFrame)
 					smallestTimeFrame = wc.getLastMinutes();
 			boolean foundSomeError = false;
+			ArrayList<String> errorMessages = new ArrayList<String>();
 			if (smallestTimeFrame == Integer.MAX_VALUE) {
 				AttributeHelper.showInBrowser(experimentListFileName);
 			} else {
@@ -1064,6 +1065,8 @@ public class IAPservice {
 								if ((m1 || m2) && m3) {
 									// WARN
 									foundSomeError = true;
+									errorMessages.add(SystemAnalysis.getCurrentTimeInclSec() + ">NO CURRENT DATA FOR EXPERIMENT " + ehi.getExperimentName()
+											+ ", LAST DATA FROM " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()));
 									if (!outOfDateExperiments.contains(ehi.getExperimentName())) {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
 												+ ehi.getExperimentName()
@@ -1119,9 +1122,10 @@ public class IAPservice {
 				int wait = smallestTimeFrame < 10 ? smallestTimeFrame : 15;
 				if (wait < 1)
 					wait = 1;
-				System.out
-						.println(SystemAnalysis.getCurrentTimeInclSec()
-								+ ">SLEEP " + wait + " minutes... (WILL CHECK FOR RECOVERY)");
+				for (String e : errorMessages)
+					System.out.println(e);
+				System.out.println(SystemAnalysis.getCurrentTimeInclSec()
+						+ ">SLEEP " + wait + " minutes... (WILL CHECK FOR RECOVERY)");
 				Thread.sleep(wait * 60 * 1000);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
