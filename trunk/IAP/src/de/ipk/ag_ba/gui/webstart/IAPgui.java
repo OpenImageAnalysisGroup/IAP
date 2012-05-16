@@ -136,12 +136,12 @@ public class IAPgui {
 				+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
 				+ "developed by the IPK research group Image Analysis.<br>"
 				+ "<br>"
-				+ "This information system is in alpha-stage. "
-				+ "It may not work reliable, only a small subset of future functions are implemented.<br>"
+				+ "This information system is in beta-stage. "
+				+ "Some features may not work reliable.<br>"
 				+ "<br>"
 				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
 				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
-				"<small><font color='gray'>IAP Image Analysis - Pipeline-Version: " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + "</font></small><br><br>" +
+				"IAP Image Analysis - Pipeline-Version: " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + "<br><br>" +
 				new LogService().getLatestNews(5,
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",
