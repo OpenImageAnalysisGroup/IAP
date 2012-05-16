@@ -21,8 +21,8 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCam;
-import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCam2;
+import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamBarleyGH;
+import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamMaizeGH;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -30,8 +30,8 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
@@ -209,9 +209,9 @@ public class Other {
 				resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
 				
 				if (includeLemnaTecStatus) {
-					resultNavigationButtons.add(ActionLemnaCam2.getLemnaCamButton(src.getGUIsetting()));
+					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
 					
-					resultNavigationButtons.add(ActionLemnaCam.getLemnaCamButton(src.getGUIsetting()));
+					resultNavigationButtons.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
 					// if (!IAPservice.isReachable("http://lemnacam.ipk-gatersleben.de"))
 					// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 					

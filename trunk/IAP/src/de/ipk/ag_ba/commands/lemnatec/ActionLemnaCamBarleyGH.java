@@ -10,15 +10,15 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.IAPwebcam;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.IAPwebcam;
 
 /**
  * @author klukas
  */
-public final class ActionLemnaCam extends AbstractUrlNavigationAction {
+public final class ActionLemnaCamBarleyGH extends AbstractUrlNavigationAction {
 	
-	public ActionLemnaCam() {
+	public ActionLemnaCamBarleyGH() {
 		super("Show Barley Greenhouse");
 	}
 	
@@ -27,7 +27,7 @@ public final class ActionLemnaCam extends AbstractUrlNavigationAction {
 	 * @return
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
-		NavigationAction navigationAction = new ActionLemnaCam();
+		NavigationAction navigationAction = new ActionLemnaCamBarleyGH();
 		NavigationButton res = new NavigationButton(navigationAction, "CCTV (Barley)",
 				IAPimages.getWebCam(),
 				guiSetting);
@@ -65,9 +65,12 @@ public final class ActionLemnaCam extends AbstractUrlNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(
-				new PictureViewer(IAPwebcam.BARLEY,
-						getURL(), getStatusProvider()));
+		if (IAPmain.getRunMode().isSwing())
+			return new MainPanelComponent(
+					new PictureViewer(IAPwebcam.BARLEY,
+							getURL(), getStatusProvider()));
+		else
+			return null;
 	}
 	
 	@Override

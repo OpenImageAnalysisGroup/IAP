@@ -11,20 +11,20 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.IAPwebcam;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.IAPwebcam;
 
 /**
  * @author klukas
  */
-public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
+public final class ActionLemnaCamMaizeGH extends AbstractUrlNavigationAction {
 	
-	public ActionLemnaCam2() {
+	public ActionLemnaCamMaizeGH() {
 		super("Show Maize Greenhouse");
 	}
 	
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
-		NavigationAction navigationAction = new ActionLemnaCam2();
+		NavigationAction navigationAction = new ActionLemnaCamMaizeGH();
 		NavigationButton res = new NavigationButton(navigationAction, "CCTV (Maize)",
 				IAPimages.getWebCam2(),
 				guiSetting);
@@ -70,8 +70,11 @@ public final class ActionLemnaCam2 extends AbstractUrlNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(new PictureViewer(IAPwebcam.MAIZE,
-				getURL(), getStatusProvider()));
+		if (IAPmain.getRunMode().isSwing())
+			return new MainPanelComponent(new PictureViewer(IAPwebcam.MAIZE,
+					getURL(), getStatusProvider()));
+		else
+			return null;
 	}
 	
 	@Override

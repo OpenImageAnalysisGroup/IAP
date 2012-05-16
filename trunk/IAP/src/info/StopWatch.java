@@ -7,7 +7,7 @@
 
 package info;
 
-import de.ipk.ag_ba.mongo.IAPservice;
+import de.ipk.ag_ba.gui.util.IAPservice;
 
 /**
  * This convenience class makes it easy to stop times.

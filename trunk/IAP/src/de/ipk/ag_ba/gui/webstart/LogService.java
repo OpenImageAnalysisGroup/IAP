@@ -4,7 +4,7 @@ import java.util.Stack;
 
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.mongo.IAPservice;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {

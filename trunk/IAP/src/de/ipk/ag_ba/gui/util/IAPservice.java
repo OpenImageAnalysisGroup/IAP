@@ -5,7 +5,7 @@
  * Created on Dec 11, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.mongo;
+package de.ipk.ag_ba.gui.util;
 
 import info.StopWatch;
 
@@ -77,9 +77,10 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;

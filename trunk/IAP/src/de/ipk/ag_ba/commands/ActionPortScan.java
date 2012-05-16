@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.mongo.IAPservice;
+import de.ipk.ag_ba.gui.util.IAPservice;
 
 /**
  * @author klukas
