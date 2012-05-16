@@ -112,7 +112,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		final ThreadSafeOptions tsoBootstrapN = new ThreadSafeOptions();
-		tsoBootstrapN.setInt(100);
+		tsoBootstrapN.setInt(0);
 		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
@@ -120,6 +120,9 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 						m, experimentReference, false, divideDatasetBy, false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN),
 				src.getGUIsetting()));
+		
+		// init clustering variable
+		getArrayFrom(divideDatasetBy);
 		
 		if (togglesForInterestingProperties.size() > 0)
 			if (clustering)
@@ -313,10 +316,20 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		settingInterestingProperties.clear();
 		Experiment a = ((Experiment) experimentReference.getExperiment());
 		TreeMap<String, NavigationButton> toBeAdded = new TreeMap<String, NavigationButton>();
+		ArrayList<String> normalized = new ArrayList<String>();
 		for (SubstanceInterface si : a) {
-			String setting = si.getName();
+			String setting = si.iterator().next().iterator().next().getSubstanceNameWithUnit();
+			String niceName = IAPservice.getNiceNameForPhenotypicProperty(setting);
+			if (niceName != null && niceName.contains("(normalized)")) {
+				normalized.add(niceName);
+			}
+		}
+		for (SubstanceInterface si : a) {
+			String setting = si.iterator().next().iterator().next().getSubstanceNameWithUnit();
 			String niceName = IAPservice.getNiceNameForPhenotypicProperty(setting);
 			if (niceName == null)
+				continue;
+			if (normalized.contains(niceName + " (normalized)"))
 				continue;
 			
 			ThreadSafeOptions tso = new ThreadSafeOptions();

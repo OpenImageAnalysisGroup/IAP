@@ -519,23 +519,23 @@ public class IAPservice {
 	
 	private static HashMap<String, String> initNiceNames() {
 		HashMap<String, String> res = new HashMap<String, String>();
-		res.put("weight_before", "Weight before watering");
-		res.put("water_weight", "Water weight");
-		res.put("side.height.norm", "Height (normalized)");
-		res.put("side.height", "Height");
-		res.put("side.area.norm", "Side Area (normalized)");
-		res.put("side.area", "Side Area");
-		res.put("side.fluo.intensity.average", "Fluo intensity (side)");
-		res.put("side.nir.intensity.average", "NIR intensity (side)");
-		res.put("top.fluo.intensity.average", "Fluo intensity (top)");
-		res.put("top.nir.intensity.average", "NIR intensity (top)");
-		res.put("side.vis.hue.average", "Average hue (side)");
-		res.put("top.vis.hue.average", "Average hue (top)");
-		res.put("side.width.norm", "Width (normalized)");
-		res.put("side.width", "Width");
-		res.put("top.area.norm", "Top area (noramlized)");
-		res.put("top.area", "Top area");
-		res.put("volume.fluo.iap", "Digital biomass (fluo)");
+		res.put("weight_before (g)", "Weight before watering");
+		res.put("water_weight (g)", "Water weight");
+		res.put("side.height.norm (mm)", "Height (normalized)");
+		res.put("side.height (px)", "Height");
+		res.put("side.area.norm (mm^2)", "Side Area (normalized)");
+		res.put("side.area (px)", "Side Area");
+		res.put("side.fluo.intensity.average (relative)", "Fluo intensity (side)");
+		res.put("side.nir.intensity.average (relative)", "NIR intensity (side)");
+		res.put("top.fluo.intensity.average (relative)", "Fluo intensity (top)");
+		res.put("top.nir.intensity.average (relative)", "NIR intensity (top)");
+		res.put("side.vis.hue.average (relative)", "Average hue (side)");
+		res.put("top.vis.hue.average (relative)", "Average hue (top)");
+		res.put("side.width.norm (mm)", "Width (normalized)");
+		res.put("side.width (px)", "Width");
+		res.put("top.area.norm", "Top area (normalized)");
+		res.put("top.area (px)", "Top area");
+		res.put("volume.fluo.iap (px^3)", "Digital biomass (fluo)");
 		return res;
 	}
 	
