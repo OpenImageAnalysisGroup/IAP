@@ -21,14 +21,16 @@ public class PictureViewer extends JPanel implements HierarchyListener {
 	
 	public PictureViewer(final IAPwebcam webcam, String url,
 			final BackgroundTaskStatusProviderSupportingExternalCall status) {
-		setLayout(TableLayout.getLayout(660, 800));
+		setLayout(TableLayout.getLayout(650, 800));
 		final UpdatingImagePanel view = new UpdatingImagePanel(webcam, status);
 		final MarkComponent mark = new MarkComponent(view, true, 640, false, 480);
-		mark.setMarkColor2();
+		boolean markBothsides = false;
+		if (markBothsides)
+			mark.setMarkColor2(null);
 		add(	
 				
 				TableLayout.getSplitVertical(
-						new JLabelHTMLlink("<html><br>--&nbsp;&gt;" +
+						new JLabelHTMLlink("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&gt;" +
 								"Click here, to load " + (webcam.hasVideoStream() ? "video" : "image") + " in web-browser" +
 								"<br>&nbsp;<br>", url, "Open " + url),
 						mark,

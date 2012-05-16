@@ -247,7 +247,7 @@ public class MarkComponent extends JComponent {
 		}
 	}
 	
-	public void setMarkColor2() {
-		selColBB = selCol;
+	public void setMarkColor2(Color c) {
+		selColBB = c;
 	}
 }
