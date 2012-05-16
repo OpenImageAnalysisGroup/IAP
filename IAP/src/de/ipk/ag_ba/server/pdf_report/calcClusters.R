@@ -13,12 +13,11 @@ if (n>0) {
 	pdf("clusters.pdf")
 #[2:length(mydata)]
 	plot(result)
+	pvrect(result, alpha=0.95)
 	dev.off()
 } else {
-	print(mydata)
 	result <- hclust(d=dist(t(mydata)), method="ward")
 	pdf("clusters.pdf")
 	plot(result)
-	pvrect(result, alpha=0.95)
 	dev.off()
 }

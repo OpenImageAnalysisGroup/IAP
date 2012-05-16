@@ -397,7 +397,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (!xlsx)
 				p.saveScripts(new String[] {
 						"createDiagrams.R",
-						"calculateClusters.r",
+						"calcClusters.R",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"report.tex",
