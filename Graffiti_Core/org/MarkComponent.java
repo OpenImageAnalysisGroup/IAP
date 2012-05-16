@@ -75,6 +75,7 @@ public class MarkComponent extends JComponent {
 		setMark(true);
 		final MarkComponent thisM = this;
 		final Timer t = new Timer(50, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!thisM.isVisible()) {
 					thisM.intensity = 1;
@@ -92,6 +93,7 @@ public class MarkComponent extends JComponent {
 		});
 		t.start();
 		Timer t2 = new Timer(animationtime, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				t.stop();
 				intensity = 1;
@@ -146,6 +148,7 @@ public class MarkComponent extends JComponent {
 				bb2.repaint();
 			} else {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						b1.repaint();
 						b2.repaint();
@@ -165,6 +168,7 @@ public class MarkComponent extends JComponent {
 	
 	public void setMark(final boolean markedReq) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				if (marked == markedReq)
 					return;
@@ -208,9 +212,11 @@ public class MarkComponent extends JComponent {
 	
 	private static ActionListener getUpdateCommand(final ArrayList<MarkComponent> mcs, final int ti, final MarkComponent jump, final MarkComponent... mark) {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				invokePending = true;
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						if (!invokePending)
 							return;
@@ -231,13 +237,17 @@ public class MarkComponent extends JComponent {
 	}
 	
 	protected static void markComponent(
-						MarkComponent markThis,
-						MarkComponent... allMarks) {
+			MarkComponent markThis,
+			MarkComponent... allMarks) {
 		for (MarkComponent mc : allMarks) {
 			if (mc != markThis)
 				mc.setMark(false);
 			else
 				mc.setMark(true);
 		}
+	}
+	
+	public void setMarkColor2() {
+		selColBB = selCol;
 	}
 }

@@ -43,12 +43,16 @@ public class UpdatingImagePanel extends JPanel {
 			while (s.length() < n)
 				s.append("#");
 			n++;
-			if (n >= 3)
+			if (n >= 1)
 				n = 0;
 			s.append("-");
-			status.setCurrentStatusText1(s + "");
+			boolean doIt = false;
+			if (doIt)
+				status.setCurrentStatusText1(s + "");
 			img = webcam.getSnapshotLR().getAsBufferedImage();
-			status.setCurrentStatusText1(s.substring(0, s.length() - 1) + "#");
+			if (doIt)
+				status.setCurrentStatusText1(s.substring(0, s.length() - 1) + "#");
+			
 			image = img;
 			repaint();
 		} catch (Exception e) {

@@ -2,7 +2,7 @@
 cd $(dirname $0)
 echo "Current directory: $(pwd)"
 
-if -a report.clustering.csv; then Rscript calculateClusters.r ${6}; fi
+if -a report.clustering.csv; then Rscript calcClusters.r ${6}; fi
 
 Rscript createDiagrams.r report.csv pdf ${3} ${4} ${1} ${2} ${5}
 

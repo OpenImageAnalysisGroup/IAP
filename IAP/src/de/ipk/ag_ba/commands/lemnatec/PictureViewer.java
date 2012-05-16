@@ -8,6 +8,7 @@ import java.awt.event.HierarchyListener;
 import javax.swing.JPanel;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.MarkComponent;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.mongo.IAPwebcam;
@@ -20,21 +21,28 @@ public class PictureViewer extends JPanel implements HierarchyListener {
 	
 	public PictureViewer(final IAPwebcam webcam, String url,
 			final BackgroundTaskStatusProviderSupportingExternalCall status) {
-		setLayout(TableLayout.getLayout(640, 800));
+		setLayout(TableLayout.getLayout(660, 800));
 		final UpdatingImagePanel view = new UpdatingImagePanel(webcam, status);
-		add(TableLayout.getSplitVertical(
-				new JLabelHTMLlink("<html><br>--&nbsp;&gt;" +
-						"Click here, to load " + (webcam.hasVideoStream() ? "video" : "image") + " in web-browser" +
-						"<br>&nbsp;<br>", url, "Open " + url),
-				view,
-				TableLayout.PREFERRED, TableLayout.FILL), "0,0");
+		final MarkComponent mark = new MarkComponent(view, true, 640, false, 480);
+		mark.setMarkColor2();
+		add(	
+				
+				TableLayout.getSplitVertical(
+						new JLabelHTMLlink("<html><br>--&nbsp;&gt;" +
+								"Click here, to load " + (webcam.hasVideoStream() ? "video" : "image") + " in web-browser" +
+								"<br>&nbsp;<br>", url, "Open " + url),
+						mark,
+						TableLayout.PREFERRED, TableLayout.FILL)
+				, "0,0");
 		
 		final Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					do {
+						mark.setMark(true);
 						view.refresh();
+						mark.setMark(false);
 						Thread.sleep(1000);
 					} while (tso.getBval(0, true));
 					status.setCurrentStatusText1("connection closed");

@@ -10,7 +10,7 @@ echo Ratio?       : %4
 echo Clustering?  : %5
 echo Bootstrap-n? : %6
 
-IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calculateClusters.r %6
+IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6
 
 Rscript --encoding=UTF-8 createDiagrams.R report.csv pdf %3 %4 %1 %2 %5
 
