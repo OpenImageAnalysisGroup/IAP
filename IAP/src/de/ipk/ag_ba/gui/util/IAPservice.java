@@ -1086,8 +1086,8 @@ public class IAPservice {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
 												+ ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										if (System.currentTimeMillis() - startTime < 5 * 60 * 1000)
-											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 5 MINUTES OF START NO MAIL WILL BE SEND");
+										if (System.currentTimeMillis() - startTime < 15 * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 15 MINUTES OF START NO MAIL WILL BE SEND");
 										else
 											m.sendEmail(
 													wc.getMails(),
@@ -1108,8 +1108,8 @@ public class IAPservice {
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										if (System.currentTimeMillis() - startTime < 5 * 60 * 1000)
-											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 5 MINUTES OF START NO MAIL WILL BE SEND");
+										if (System.currentTimeMillis() - startTime < 15 * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 15 MINUTES OF START NO MAIL WILL BE SEND");
 										else
 											m.sendEmail(
 													wc.getMails(),
@@ -1142,7 +1142,7 @@ public class IAPservice {
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SLEEP " + smallestTimeFrame + " minutes... (ALL OK)");
 				Thread.sleep(smallestTimeFrame * 60 * 1000);
 			} else {
-				int wait = smallestTimeFrame < 10 ? smallestTimeFrame : 15;
+				int wait = smallestTimeFrame;
 				if (wait < 1)
 					wait = 1;
 				for (String e : errorMessages)
@@ -1153,10 +1153,17 @@ public class IAPservice {
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
 			@SuppressWarnings("deprecation")
+			int seconds = new Date().getSeconds();
+			int sec = 60 - seconds % 60;
+			if (sec > 0) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">NEED TO WAIT ANOTHER " + sec + " SECONDS, TO BE ON THE WHOLE MINUTE");
+				Thread.sleep(sec * 1000);
+			}
+			@SuppressWarnings("deprecation")
 			int minutes = new Date().getMinutes();
-			int wait = minutes % 15;
+			int wait = 15 - minutes % 15;
 			if (wait > 0) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">NEED TO WAIT ANOTHER " + wait + " MINUTES, TO BE ON PROPER TIME SCHEDULE (0,15,45)");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">NEED TO WAIT ANOTHER " + wait + " MINUTES, TO BE ON PROPER TIME SCHEDULE (0,15,30,45)");
 				Thread.sleep(wait * 60 * 1000);
 			}
 		}
@@ -1170,8 +1177,8 @@ public class IAPservice {
 		long t = System.currentTimeMillis();
 		for (final IAPwebcam cam : cam2lastSnapshot.keySet()) {
 			try {
-				// every hour
-				if (t - cam2lastSnapshot.get(cam) > 1000 * 60 * 30) {
+				// at most every 5 minutes
+				if (t - cam2lastSnapshot.get(cam) >= 1000 * 60 * 5) {
 					final InputStream inp = cam.getSnapshotJPGdata();
 					MongoDB mm = MongoDB.getDefaultCloud();
 					mm.processDB(new RunnableOnDB() {
