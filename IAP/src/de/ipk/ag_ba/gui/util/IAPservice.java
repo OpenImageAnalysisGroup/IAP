@@ -954,6 +954,7 @@ public class IAPservice {
 	}
 	
 	public static void monitorExperimentDataProgress() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
+		System.out.println(SystemAnalysis.getCurrentTime() + ">START OBSERVING EXPERIMENT PROGRESS...");
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
 		host = host.substring(0, host.indexOf("_"));
@@ -995,6 +996,7 @@ public class IAPservice {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
+		long startTime = System.currentTimeMillis();
 		while (true) {
 			boolean createVideo = true;
 			if (createVideo) {
@@ -1084,18 +1086,21 @@ public class IAPservice {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
 												+ ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										m.sendEmail(
-												wc.getMails(),
-												"INFO: " +
-														ehi.getExperimentName()
-														+ " STATUS CHANGE",
-												"WARNING: " + ehi.getExperimentName()
-														+ " shows no further progress " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
-														+ host + "\n\n" +
-														"No new data found for experiment " + ehi.getExperimentName()
-														+ ".\n\n\nExperiment details:\n\n" +
-														StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-												imageSrc, fileName);
+										if (System.currentTimeMillis() - startTime < 5 * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 5 MINUTES OF START NO MAIL WILL BE SEND");
+										else
+											m.sendEmail(
+													wc.getMails(),
+													"INFO: " +
+															ehi.getExperimentName()
+															+ " STATUS CHANGE",
+													"WARNING: " + ehi.getExperimentName()
+															+ " shows no further progress " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+															+ host + "\n\n" +
+															"No new data found for experiment " + ehi.getExperimentName()
+															+ ".\n\n\nExperiment details:\n\n" +
+															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
+													imageSrc, fileName);
 									}
 									outOfDateExperiments.add(ehi.getExperimentName());
 								} else {
@@ -1103,17 +1108,20 @@ public class IAPservice {
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										m.sendEmail(
-												wc.getMails(),
-												"INFO: " + ehi.getExperimentName()
-														+ " STATUS CHANGE",
-												"INFO: " + ehi.getExperimentName()
-														+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
-														+ host + "\n\n" +
-														"After error condition new data has been found for experiment " + ehi.getExperimentName()
-														+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
-														StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-												imageSrc, fileName);
+										if (System.currentTimeMillis() - startTime < 5 * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 5 MINUTES OF START NO MAIL WILL BE SEND");
+										else
+											m.sendEmail(
+													wc.getMails(),
+													"INFO: " + ehi.getExperimentName()
+															+ " STATUS CHANGE",
+													"INFO: " + ehi.getExperimentName()
+															+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
+															+ host + "\n\n" +
+															"After error condition new data has been found for experiment " + ehi.getExperimentName()
+															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
+															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
+													imageSrc, fileName);
 										
 									}
 									outOfDateExperiments.remove(ehi.getExperimentName());
@@ -1123,6 +1131,8 @@ public class IAPservice {
 					}
 				}
 			}
+			smallestTimeFrame = 10;
+			
 			if (smallestTimeFrame > 24 * 60) {
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">UPDATE TIME UNDEFINED, QUITTING");
 				return;
@@ -1142,10 +1152,17 @@ public class IAPservice {
 				Thread.sleep(wait * 60 * 1000);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">SLEEP FINISHED");
+			@SuppressWarnings("deprecation")
+			int minutes = new Date().getMinutes();
+			int wait = minutes % 15;
+			if (wait > 0) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">NEED TO WAIT ANOTHER " + wait + " MINUTES, TO BE ON PROPER TIME SCHEDULE (0,15,45)");
+				Thread.sleep(wait * 60 * 1000);
+			}
 		}
 	}
 	
-	private static void storeImages(HashMap<IAPwebcam, Long> cam2lastSnapshot) {
+	private static void storeImages(final HashMap<IAPwebcam, Long> cam2lastSnapshot) {
 		if (!cam2lastSnapshot.containsKey(IAPwebcam.BARLEY))
 			cam2lastSnapshot.put(IAPwebcam.BARLEY, 0l);
 		if (!cam2lastSnapshot.containsKey(IAPwebcam.MAIZE))
@@ -1154,7 +1171,7 @@ public class IAPservice {
 		for (final IAPwebcam cam : cam2lastSnapshot.keySet()) {
 			try {
 				// every hour
-				if (t - cam2lastSnapshot.get(cam) > 1000 * 60 * 60) {
+				if (t - cam2lastSnapshot.get(cam) > 1000 * 60 * 30) {
 					final InputStream inp = cam.getSnapshotJPGdata();
 					MongoDB mm = MongoDB.getDefaultCloud();
 					mm.processDB(new RunnableOnDB() {
@@ -1167,6 +1184,7 @@ public class IAPservice {
 							inputFile.setMetaData(new BasicDBObject("time", System.currentTimeMillis()));
 							inputFile.save();
 							System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED WEBCAM SNAPSHOT FROM " + cam + " IN DB " + db.getName());
+							cam2lastSnapshot.put(cam, System.currentTimeMillis());
 						}
 						
 						@Override
