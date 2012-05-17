@@ -4,7 +4,7 @@
 ##################################
 
 library(pvclust)
-mydata <- read.csv('report.clustering.csv', sep=';', row.names="UniID")
+mydata <- read.csv('report.clustering.csv', sep=';', row.names="UniID", header=TRUE)
 commandArgs(TRUE)[1] -> n
 cat(c("Calculate clustering for",(length(mydata)),"groups. Using bootstrap N =",n,"...\n"))
 
