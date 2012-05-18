@@ -1036,6 +1036,7 @@ public class IAPservice {
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
 				for (String database : dbs_toBeChecked) {
 					try {
+						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB " + database + "...");
 						el.addAll(lde.getExperimentsInDatabase(null, database));
 					} catch (Exception e) {
 						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))

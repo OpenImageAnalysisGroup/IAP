@@ -50,7 +50,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 								options.getIntSetting(Setting.abDiff_VIS_SIDE) * 0.5,
 								back, true).
 						// protect blue: (will be removed later)
-						or(visMsk.copy().getIO().filterByHSV(0.02, 0.62).getImage()).
+						or(visMsk.copy().getIO().filterRemainHSV(0.02, 0.62).getImage()).
 						border(2).getImage(); //
 				return getInput().getImages().getVis().getIO().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.print("CLEAR RESULT", false).getImage();
@@ -62,13 +62,13 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				FlexibleImage cleared = new ImageOperation(visX)
 						// .blur(3).printImage("median", false)
 						.compare()
-						.compareImages("vis", getInput().getMasks().getVis().getIO().blur(3).print("medianb", debug).getImage(),
-								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
-								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.5d,
-								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.5d,
+						.compareImages("vis", getInput().getMasks().getVis().getIO().blur(2).print("medianb", debug).getImage(),
+								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.2d,
+								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.2d,
+								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.2d,
 								back, false).
 						// protect blue: (will be removed later)
-						or(visX.copy().getIO().filterByHSV(0.02, 0.62).getImage()).
+						or(visX.copy().getIO().filterRemainHSV(0.02, 0.62).getImage()).
 						// .dilate().dilate().dilate()
 						border(1).
 						getImage();

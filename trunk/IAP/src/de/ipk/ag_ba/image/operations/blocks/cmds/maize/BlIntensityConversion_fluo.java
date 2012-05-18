@@ -7,6 +7,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 
 public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -26,8 +27,24 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		double min = 200;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 210;
-		if (options.isBarleyInBarleySystem())
+		if (options.isBarleyInBarleySystem()) {
 			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 190;
+			
+			boolean isOldBarley = false;
+			if (options.isBarleyInBarleySystem()) {
+				try {
+					String db = getInput().getImages().getFluoInfo().getParentSample().getParentCondition().getExperimentDatabaseId();
+					if (!LemnaTecDataExchange.known(db))
+						isOldBarley = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (isOldBarley && options.getCameraPosition() == CameraPosition.TOP)
+				min = 200;
+			if (isOldBarley && options.getCameraPosition() == CameraPosition.SIDE)
+				min = 240;
+		}
 		if (options.isArabidopsis())
 			min = 220;
 		if (options.isBarley() && !options.isBarleyInBarleySystem())

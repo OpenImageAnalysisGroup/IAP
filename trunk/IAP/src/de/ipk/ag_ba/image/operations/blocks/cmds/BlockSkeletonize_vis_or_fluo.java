@@ -182,11 +182,13 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 			fis.print("CHECK THIS");
 		}
 		
-		HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-		int bloomLimbCount = knownBloompoints.size();
-		skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
-		skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-		
+		int bloomLimbCount = 0;
+		if (options.isMaize()) {
+			HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
+			bloomLimbCount = knownBloompoints.size();
+			skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
+			skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
+		}
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {

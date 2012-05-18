@@ -69,7 +69,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTable rt;
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255);
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
@@ -995,8 +995,8 @@ public class ImageOperation {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 	}
 	
-	public void fillRect(int leftX, int leftY, int width, int heigh) {
-		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
+	public void fillRect(int leftX, int topY, int width, int height) {
+		image.getProcessor().fill(new Roi(leftX, topY, width, height));
 	}
 	
 	/**
@@ -1235,7 +1235,7 @@ public class ImageOperation {
 	
 	public ImageOperation print(String title, boolean doIt) {
 		if (doIt)
-			new FlexibleImage(image).copy().print(title);
+			new FlexibleImage(image).print(title);
 		return this;
 	}
 	
@@ -1706,7 +1706,7 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
-	public ImageOperation filterByHSV(double maxDist, double clearColorHUE) {
+	public ImageOperation filterRemainHSV(double maxDist, double clearColorHUE) {
 		
 		double t = clearColorHUE;
 		float[] hsb = new float[3];
@@ -1723,6 +1723,56 @@ public class ImageOperation {
 			Color.RGBtoHSB(r, g, b, hsb);
 			
 			if (Math.abs(hsb[0] - t) > maxDist)
+				pixels[index] = BACKGROUND_COLORint;
+			else
+				pixels[index] = rgb;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
+	public ImageOperation filterRemoveHSV(double maxDist, double clearColorHUE) {
+		
+		double t = clearColorHUE;
+		float[] hsb = new float[3];
+		int r, g, b, rgb;
+		
+		int[] pixels = getImageAs1array();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (Math.abs(hsb[0] - t) <= maxDist)
+				pixels[index] = BACKGROUND_COLORint;
+			else
+				pixels[index] = rgb;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
+	public ImageOperation filterRemoveHSV(double maxDist, double clearColorHUE, double maxLightness) {
+		
+		double t = clearColorHUE;
+		float[] hsb = new float[3];
+		int r, g, b, rgb;
+		
+		int[] pixels = getImageAs1array();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (Math.abs(hsb[0] - t) <= maxDist && hsb[2] < maxLightness)
 				pixels[index] = BACKGROUND_COLORint;
 			else
 				pixels[index] = rgb;
@@ -2619,15 +2669,19 @@ public class ImageOperation {
 		return new ImageOperation(bi);
 	}
 	
-	public ArrayList<MarkerPair> searchBlueMarkers(double options, CameraPosition typ, boolean maize) {
+	public ImageOperation searchBlueMarkers(
+			ArrayList<MarkerPair> result,
+			double options, CameraPosition typ, boolean maize,
+			boolean clearBlueMarkers) {
 		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize);
 		
 		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint);
 		
-		ArrayList<MarkerPair> mergedCoordinates = bmf
-				.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
+		ArrayList<MarkerPair> mergedCoordinates = bmf.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
 		
-		return mergedCoordinates;
+		result.addAll(mergedCoordinates);
+		
+		return bmf.getClearedImage();
 	}
 	
 	public MainAxisCalculationResult calculateTopMainAxis(Vector2d centroid, int step, int background) {

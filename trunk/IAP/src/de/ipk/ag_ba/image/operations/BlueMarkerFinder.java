@@ -17,12 +17,15 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlueMarkerFinder {
 	
+	boolean debug = false;
+	
 	private final FlexibleImage input;
 	private ResultsTable resultTable;
 	private final double scale;
 	private final CameraPosition typ;
 	private final boolean maize;
 	private final int inputImageWidth;
+	private ImageOperation markerPositionsImage;
 	
 	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ, boolean maize) {
 		this.input = image;
@@ -35,44 +38,40 @@ public class BlueMarkerFinder {
 	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
 		double scaleFactor = scale;
-		boolean debug = false;
-		if (debug)
-			resultTable = io1
-					// .thresholdLAB(0, 255, 0, 200, 10, 120, PhenotypeAnalysisTask.BACKGROUND_COLORint).printImage("nach lab")
-					.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ,
-							maize).print("nach lab")
-					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
-					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
-					.print("nach opening")
-					.convert2Grayscale().print("nach gray")
-					// .medianFilter8Bit().printImage("nach8bit")
-					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).print("nach thresh")
-					// .findMax(10.0, MaximumFinder.SINGLE_POINTS).print("Single Point Search")
-					.findMax(10.0, MaximumFinder.LIST).print("MARKIERT GROESSER (a)").opening(10, 0).print("MARKIERT GROESSER")
-					.getResultsTable();
-		else
-			resultTable = io1
-					.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize)
-					.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
-					.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
-					.convert2Grayscale()
-					// .medianFilter8Bit()
-					.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB())
-					// .findMax(10.0, MaximumFinder.SINGLE_POINTS)
-					.findMax(10.0, MaximumFinder.LIST)
-					.getResultsTable();
+		int w = io1.getImage().getWidth();
+		int h = io1.getImage().getHeight();
+		io1 = io1.getCanvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, ImageOperation.BACKGROUND_COLORint).getImage()
+				.getIO();
+		
+		markerPositionsImage = io1
+				.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).print("nach lab", debug)
+				.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
+				.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
+				.print("nach opening", debug)
+				.convert2Grayscale().print("nach gray", debug)
+				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).print("nach thresh", debug);
+		
+		io1.print("Input für Marker Search", debug);
+		
+		io1.print("Input für Marker Search", debug);
+		
+		resultTable = markerPositionsImage
+				.findMax(10.0, MaximumFinder.LIST).print("MARKIERT GROESSER (a)", debug).opening(10, 0).print("MARKIERT GROESSER", debug)
+				.getResultsTable();
+		
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
 		
-		for (int i = 0; i < resultTable.getCounter(); i++) {
-			int x = (int) resultTable.getValueAsDouble(0, i);
-			int y = (int) resultTable.getValueAsDouble(1, i);
-			
-			Vector2d temp = new Vector2d(x, y);
-			result.add(temp);
-		}
+		if (resultTable != null)
+			for (int i = 0; i < resultTable.getCounter(); i++) {
+				int x = (int) resultTable.getValueAsDouble(0, i);
+				int y = (int) resultTable.getValueAsDouble(1, i);
+				
+				Vector2d temp = new Vector2d(x, y);
+				result.add(temp);
+			}
 		
 		return result;
 	}
@@ -254,8 +253,6 @@ public class BlueMarkerFinder {
 	public ArrayList<Vector2d> searchRight(ArrayList<Vector2d> coordinates,
 			double xLimit) {
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
-		double minX = getMaxX(coordinates);
-		
 		for (int index = 0; index < coordinates.size(); index++) {
 			if (coordinates.get(index).x > xLimit) {
 				result.add(coordinates.get(index));
@@ -264,40 +261,18 @@ public class BlueMarkerFinder {
 		return result;
 	}
 	
-	private double getMaxX(ArrayList<Vector2d> coordinates) {
-		double result = coordinates.get(0).x;
-		
-		for (int index = 0; index < coordinates.size(); index++) {
-			if (coordinates.get(index).x > result) {
-				result = coordinates.get(index).x;
-			}
-		}
-		return result;
-	}
-	
 	private ArrayList<Vector2d> searchLeft(ArrayList<Vector2d> coordinates,
 			double xLimit) {
-		
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
-		
 		for (int index = 0; index < coordinates.size(); index++) {
 			if (coordinates.get(index).x < xLimit) {
 				result.add(coordinates.get(index));
 			}
 		}
-		
 		return result;
 	}
 	
-	private double getMinX(ArrayList<Vector2d> coordinates) {
-		
-		double result = coordinates.get(0).x;
-		
-		for (int index = 0; index < coordinates.size(); index++) {
-			if (coordinates.get(index).x < result) {
-				result = coordinates.get(index).x;
-			}
-		}
-		return result;
+	public ImageOperation getClearedImage() {
+		return markerPositionsImage;
 	}
 }
