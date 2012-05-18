@@ -32,7 +32,7 @@ public class FlexibleMaskAndImageSet {
 	}
 	
 	public void print(String title) {
-		print(title, 1024);
+		print(title, 1680);
 	}
 	
 	public void print(String title, int width) {

@@ -2018,7 +2018,7 @@ public class ImageOperation {
 	/**
 	 * @author klukas
 	 */
-	public ImageOperation hq_thresholdLAB(
+	public ImageOperation filterRemoveLAB(
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
 			int lowerValueOfB, int upperValueOfB,

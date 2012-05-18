@@ -39,16 +39,21 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 			int a1 = 15;
 			int a2 = 10;
 			int b1 = 15;
-			int b2 = 3;
+			int b2 = 4;
 			// very light yellow and green
-			vis = vis.hq_thresholdLAB(240, 255, 110, 120, 125, 135, options.getBackground(), true).print("LIGHT BACKGROUND", debug);
+			vis = vis.filterRemoveLAB(240, 255, 110, 120, 125, 135, options.getBackground(), true).print("LIGHT BACKGROUND", debug);
+			// gray pot remainings
+			if (options.isBarleyInBarleySystem())
+				vis = vis.filterRemoveLAB(180, 220, 118, 120, 126, 128, options.getBackground(), true).print("LIGHT WHITE POT", debug);
 			if (options.isHighResMaize()) // black pot
-				vis = vis.hq_thresholdLAB(0, 150, m - a1, m + a2, 100, 133, options.getBackground(), true).print("BLACK POT", debug);
-			vis = vis.hq_thresholdLAB(170, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), true);
+				vis = vis.filterRemoveLAB(0, 150, m - a1, m + a2, 100, 133, options.getBackground(), true).print("BLACK POT", debug);
+			if (debug)
+				vis.filterRemoveLAB(150, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), false).print("OAEA");
+			vis = vis.filterRemoveLAB(170, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), true);
 			// if (isOldBarley)
 			// vis = vis.filterRemoveHSV(0.017, 0.09).print("FILTERED GRAY STICKS 0", debug); // filter out gray/silver old sticks
-			// if (isOldBarley)
-			vis = vis.filterRemoveHSV(0.005, 0.125, 0.5).print("FILTERED GRAY STICKS 1", debug); // filter out gray/silver old sticks
+			if (isOldBarley)
+				vis = vis.filterRemoveHSV(0.005, 0.125, 0.5).print("FILTERED GRAY STICKS 1", debug); // filter out gray/silver old sticks
 			// if (isOldBarley)
 			// vis = vis.filterRemoveHSV(0.017, 0.167).print("FILTERED GRAY STICKS 2", debug); // filter out gray/silver old sticks
 			if (isOldBarley) // from 0.37
