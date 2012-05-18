@@ -64,7 +64,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 					offB2 = 0;
 				}
 				int upperLimit = 255;
-				toBeFiltered = result.copy().getIO().hq_thresholdLAB(
+				toBeFiltered = result.copy().getIO().filterRemoveLAB(
 						lowerLimit, upperLimit,
 						120 - an, 120 + an,
 						120 - offB, 120 + 2 * bn + offB2,

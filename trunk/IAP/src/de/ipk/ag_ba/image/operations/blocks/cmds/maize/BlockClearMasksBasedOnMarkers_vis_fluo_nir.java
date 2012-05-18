@@ -47,7 +47,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			
 			if (options.isBarleyInBarleySystem()) {
-				double temp = 0.01;
+				double temp = 0.001;
 				
 				int cy = (int) (input.getHeight() - temp * getInput().getImages().getVis().getHeight());
 				result = new ImageOperation(input).clearImageBottom(
@@ -114,37 +114,38 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		FlexibleImage input = getInput().getMasks().getFluo();
 		FlexibleImage result = input;
 		boolean fluoCutPosSet = false;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
-			
-			if (hasThreeVerticalMarkerPositionsVisible) {
-				if (markerPosLeftY != null) {
-					double temp = markerPosLeftY.getValue();
-					if (temp > 0.55) {
-						int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
-						result = new ImageOperation(input).clearImageBottom(
-								cy, options.getBackground()).getImage();
-						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
-						fluoCutPosSet = true;
-						return result;
+		if (!options.isBarleyInBarleySystem())
+			if (options.getCameraPosition() == CameraPosition.SIDE) {
+				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+				
+				if (hasThreeVerticalMarkerPositionsVisible) {
+					if (markerPosLeftY != null) {
+						double temp = markerPosLeftY.getValue();
+						if (temp > 0.55) {
+							int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor); // - 18
+							result = new ImageOperation(input).clearImageBottom(
+									cy, options.getBackground()).getImage();
+							getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+							fluoCutPosSet = true;
+							return result;
+						}
+						return input;
 					}
-					return input;
-				}
-				if (markerPosLeftY == null && markerPosRightY != null) {
-					double temp = markerPosRightY.getValue();
-					if (temp > 0.55) {
-						int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor) - 18;
-						result = new ImageOperation(input).clearImageBottom(
-								cy, options.getBackground()).getImage();
-						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
-						fluoCutPosSet = true;
-						return result;
+					if (markerPosLeftY == null && markerPosRightY != null) {
+						double temp = markerPosRightY.getValue();
+						if (temp > 0.55) {
+							int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor); // - 18
+							result = new ImageOperation(input).clearImageBottom(
+									cy, options.getBackground()).getImage();
+							getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+							fluoCutPosSet = true;
+							return result;
+						}
 					}
 				}
+				int width = getInput().getMasks().getFluo().getWidth();
+				result = clearSides(result, width, 10);
 			}
-			int width = getInput().getMasks().getFluo().getWidth();
-			result = clearSides(result, width, 10);
-		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isBarley() && options.isHighResMaize()) {
 				int width = getInput().getMasks().getFluo().getWidth();
@@ -156,7 +157,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		// default
 		double temp = 0.05;
 		if (options.isBarleyInBarleySystem())
-			temp = 0.01;
+			temp = 0.001;
 		
 		int cy = (int) (input.getHeight() - temp * getInput().getImages().getFluo().getHeight());
 		result = new ImageOperation(input).clearImageBottom(
@@ -176,7 +177,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			result = cutNir(input);
 			double temp = 0.05;
 			if (options.isBarleyInBarleySystem())
-				temp = 0.01;
+				temp = 0.001;
 			int cy = (int) (input.getHeight() - temp * input.getHeight());
 			result = new ImageOperation(input).clearImageBottom(
 					cy, new Color(180, 180, 180).getRGB()).getImage();
