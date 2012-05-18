@@ -5,13 +5,13 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
  * @author pape, klukas
@@ -20,6 +20,10 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
+	ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
+	
+	FlexibleImage markerMask = null;
+	
 	@Override
 	protected boolean isChangingImages() {
 		return true;
@@ -27,10 +31,13 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
+		numericResult.clear();
 		FlexibleImage vis = getInput().getMasks().getVis();
-		if ((options.getCameraPosition() == CameraPosition.SIDE || options.isHighResMaize()) && vis != null) {
-			numericResult = getMarkers(vis);
+		if (vis == null)
+			vis = getInput().getImages().getVis();
+		
+		if (vis != null) {
+			markerMask = getMarkers(vis.copy(), numericResult);
 			
 			int w = vis.getWidth();
 			int h = vis.getHeight();
@@ -54,13 +61,14 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 				if (n >= 3)
 					break;
 			}
-			if (numericResult != null) {
+			if (!numericResult.isEmpty()) {
 				calculateDistanceBetweenMarkers(numericResult, w);
 			}
-			if (debug)
-				return new ImageOperation(vis).drawMarkers(numericResult).getImage();
 		}
-		return getInput().getMasks().getVis();
+		if (getInput().getMasks().getVis() != null)
+			return vis;
+		else
+			return null;
 	}
 	
 	// distances vertical
@@ -114,9 +122,20 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		return max;
 	}
 	
-	private ArrayList<MarkerPair> getMarkers(FlexibleImage image) {
+	private FlexibleImage getMarkers(FlexibleImage image, ArrayList<MarkerPair> result) {
 		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
-		return image.getIO().searchBlueMarkers(s * s / 1.2, options.getCameraPosition(), options.isMaize());
+		ImageOperation io = image.getIO().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), options.isMaize(), true);
+		return io != null ? io.getImage() : null;
 	}
 	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		if (debug)
+			new ImageOperation(processedImages.getVis()).drawMarkers(numericResult).print("Marker Positions", debug);
+		if (markerMask != null && processedImages.getVis() != null)
+			processedImages.setVis(processedImages.getVis().getIO().and(markerMask).getImage());
+		if (markerMask != null && processedMasks.getVis() != null)
+			processedMasks.setVis(processedMasks.getVis().getIO().and(markerMask).getImage());
+	}
 }

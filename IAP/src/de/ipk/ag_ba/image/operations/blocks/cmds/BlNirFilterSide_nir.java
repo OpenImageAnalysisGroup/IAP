@@ -23,7 +23,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		if (nirImage != null && nirMask != null) {
 			if (options.isMaize())
 				nirMask = nirImage.getIO().print("ADAPT IN", debug).
-						adaptiveThresholdForGrayscaleImage(50, average,
+						adaptiveThresholdForGrayscaleImage(150, average,
 								options.getBackground(), 0.10).getImage().print("ADAPT OUT", debug);
 			else {
 				double f = 0.08;

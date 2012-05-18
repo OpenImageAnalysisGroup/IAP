@@ -43,7 +43,7 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 		} else {
 			if (options.isMaize()) {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 2,
+						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 1,
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				
 			} else {

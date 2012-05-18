@@ -17,6 +17,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
@@ -63,6 +64,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
 		p.add(BlLabFilter_vis.class);
+		p.add(BlockClosing_vis.class);
 		// "beforeBloomEnhancement" image is saved in the following block
 		// p.add(BlockClosingForMaizeBloom_vis_stores_image.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class);

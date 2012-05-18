@@ -20,6 +20,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -36,6 +37,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	private String displayName;
 	private ExperimentReference experimentReference;
 	private boolean requestTitleUpdates = true;
+	private boolean oldAnalysis;
 	
 	public ActionMongoOrLemnaTecExperimentNavigation(
 			ExperimentReference exp) {
@@ -53,6 +55,12 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 				+ "</td></tr>" + "<tr><td>Remark</td><td>" + StringManipulationTools.stringReplace(exp.getHeader().getRemark(), " // ", "<br>")
 				+ "</td></tr>";
 		
+		if (exp.getHeader().getRemark() != null && exp.getHeader().getRemark().contains("IAP image analysis")) {
+			if (exp.getHeader().getExperimentType() != null && exp.getHeader().getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString())) {
+				if (!exp.getHeader().getRemark().contains(IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))
+					oldAnalysis = true;
+			}
+		}
 		this.experimentReference = exp;
 	}
 	
@@ -165,6 +173,8 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	
 	@Override
 	public String getDefaultImage() {
+		if (oldAnalysis)
+			return "img/ext/gpl2/Gnome-Window-Close-48.png";
 		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (header.getDatabaseId() != null
 				&& header.getDatabaseId().contains("APH_"))
@@ -225,9 +235,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	public String getDefaultTitle() {
 		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (displayName != null)
-			return displayName;
+			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "");
 		else
-			return "" + header.getExperimentName();
+			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "");
 	}
 	
 	@Override

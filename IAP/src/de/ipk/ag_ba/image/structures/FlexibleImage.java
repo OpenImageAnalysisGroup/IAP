@@ -10,6 +10,7 @@ package de.ipk.ag_ba.image.structures;
 import ij.ImagePlus;
 import ij.process.ColorProcessor;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -173,7 +174,9 @@ public class FlexibleImage {
 	
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
-			PrintImage.printImage(copy().image, title);
+			PrintImage.printImage(
+					copy().getIO().replaceColors(ImageOperation.BACKGROUND_COLORint, new Color(155, 155, 155).getRGB()).getImage().image,
+					title);
 			IAPmain.showImageJ();
 		}
 		return this;
