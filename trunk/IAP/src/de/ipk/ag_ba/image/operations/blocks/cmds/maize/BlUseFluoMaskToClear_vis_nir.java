@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	protected void prepare() {

@@ -17,7 +17,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlCreateDummyReferenceIfNeeded_
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlLabFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
@@ -72,7 +71,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlLabFilter_vis.class);
 		p.add(BlockClosing_vis.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
-		p.add(BlMedianFilter_vis.class);
+		// p.add(BlMedianFilter_vis.class);
 		p.add(BlIntensityConversion_fluo.class);
 		p.add(BlockClearNirPot_nir.class);
 		p.add(BlMedianFilter_fluo.class);
@@ -165,7 +164,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddDoubleSetting(
 				Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS,
-				cut * 0.2);
+				cut * 0.1);
 		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
 		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
 		

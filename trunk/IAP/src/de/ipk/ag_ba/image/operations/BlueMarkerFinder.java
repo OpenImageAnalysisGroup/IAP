@@ -48,7 +48,7 @@ public class BlueMarkerFinder {
 				.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 				.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
 				.print("nach opening", debug)
-				.convert2Grayscale().print("nach gray", debug)
+				.grayscale().print("nach gray", debug)
 				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).print("nach thresh", debug);
 		
 		io1.print("Input für Marker Search", debug);

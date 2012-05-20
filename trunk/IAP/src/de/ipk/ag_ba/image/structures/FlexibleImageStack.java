@@ -30,6 +30,7 @@ public class FlexibleImageStack {
 	private int h;
 	
 	public void addImage(String label, FlexibleImage image) {
+		image = image.copy();
 		if (!sizeKnown) {
 			sizeKnown = true;
 			this.w = image.getWidth();

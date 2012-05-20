@@ -448,13 +448,13 @@ public class MyExperimentInfoPanel extends JPanel {
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
 				@Override
 				public int compare(MatchInfo o1, MatchInfo o2) {
-					if (o1.getComparisonValue() == null)
-						return -1;
-					else
-						if (o2.getComparisonValue() == null)
-							return 1;
-						else
-							return o2.getComparisonValue().compareTo(o1.getComparisonValue());
+					Double d1 = o1.getComparisonValue();
+					Double d2 = o2.getComparisonValue();
+					if (d1 == null)
+						d1 = 0d;
+					if (d2 == null)
+						d2 = 0d;
+					return d2.compareTo(d1);
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
@@ -473,13 +473,13 @@ public class MyExperimentInfoPanel extends JPanel {
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
 				@Override
 				public int compare(MatchInfo o1, MatchInfo o2) {
-					if (o1.getComparisonValue() == null)
-						return -1;
-					else
-						if (o2.getComparisonValue() == null)
-							return 1;
-						else
-							return o2.getComparisonValue().compareTo(o1.getComparisonValue());
+					Double d1 = o1.getComparisonValue();
+					Double d2 = o2.getComparisonValue();
+					if (d1 == null)
+						d1 = 0d;
+					if (d2 == null)
+						d2 = 0d;
+					return d2.compareTo(d1);
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
