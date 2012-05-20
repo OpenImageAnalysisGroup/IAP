@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -15,6 +16,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -97,8 +99,16 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
-			if (!time2summaryResult.containsKey(time))
+			if (!time2summaryResult.containsKey(time)) {
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+			}
+			TreeSet<Integer> allTrays = new TreeSet<Integer>();
+			for (String key : allResultsForSnapshot.keySet()) {
+				allTrays.addAll(allResultsForSnapshot.get(key).keySet());
+			}
+			if (time2summaryResult.get(time).isEmpty())
+				for (Integer knownTray : allTrays)
+					time2summaryResult.get(time).put(knownTray, new BlockResults());
 			for (Integer tray : time2summaryResult.get(time).keySet()) {
 				BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 				

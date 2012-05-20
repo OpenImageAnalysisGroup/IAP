@@ -2447,13 +2447,16 @@ public class ImageOperation {
 	}
 	
 	/**
+	 * Warning: makes something strange, does not create a RGB gray scale image.
+	 * 
 	 * @return 8Bit grayscale image
 	 */
-	public ImageOperation convert2Grayscale() {
-		ij.process.ImageConverter co = new ij.process.ImageConverter(image);
+	public ImageOperation grayscale() {
+		ImagePlus img = image.duplicate();
+		ij.process.ImageConverter co = new ij.process.ImageConverter(img);
 		co.convertToGray8();
 		
-		return new ImageOperation(getImage());
+		return new ImageOperation(img);
 	}
 	
 	/**
@@ -2941,7 +2944,7 @@ public class ImageOperation {
 		
 		int[] grayScaledIfNeeded;
 		if (performGrayScale)
-			grayScaledIfNeeded = convert2Grayscale().getImageAs1array();
+			grayScaledIfNeeded = grayscale().getImageAs1array();
 		else
 			grayScaledIfNeeded = img2d;
 		
@@ -3619,7 +3622,7 @@ public class ImageOperation {
 		return new ImageOperation(inp).print("orig").subtractImages(blured, "").print("sub");
 	}
 	
-	public ImageOperation unsharpenMask(float weight, double sigma) {
+	public ImageOperation unsharpenMask() {
 		UnsharpMask um = new UnsharpMask();
 		
 		float[] channelR = getImage().getFloatChannel(Channel.R);
