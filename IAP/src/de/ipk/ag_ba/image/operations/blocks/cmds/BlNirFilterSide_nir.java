@@ -17,7 +17,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage nirImage = getInput().getImages().getNir();
 		FlexibleImage nirMask = getInput().getMasks().getNir();
-		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP ? nirMask.copy() : null;
+		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = 180;
 		// if (options.getCameraPosition() == CameraPosition.SIDE) {
 		if (nirImage != null && nirMask != null) {
