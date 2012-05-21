@@ -2,6 +2,8 @@
 ###############################################################################
 
 
+doCluster <- TRUE
+
 source("inc.R")
 
 parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
@@ -29,11 +31,14 @@ parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor,
 			ownCat("... could not create the cluster")
 		} )
 		
+	if (!doCluster)
+		cluster <- NULL
+		
 	for (imagesIndex in names(overallDescriptor)) {	
 		if(!is.null(cluster)) {
-			clusterCall(cluster, makeLinearDiagram, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex=imagesIndex, tempOverallResult=tempOverallResult)
+			clusterCall(cluster, makeLinearDiagram, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex=imagesIndex, tempOverallResult=tempOverallResult, doCluster)
 		} else {
-			makeLinearDiagram(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex=imagesIndex, tempOverallResult=tempOverallResult)
+			makeLinearDiagram(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex=imagesIndex, tempOverallResult=tempOverallResult, doCluster)
 		}
 	}
 	stopCluster(cluster)
@@ -51,15 +56,17 @@ parMakeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overa
 			ownCat("... could not create the cluster")
 		} )
 
+	if (!doCluster)
+		cluster <- NULL
 
 	for (imagesIndex in names(overallDescriptor)) {
 		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
 		if (length(overallResult[, 1]) > 0) {
 			if(!is.null(cluster)) {
-				clusterCall(cluster, PreWorkForMakeBigOverallImage, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
+				clusterCall(cluster, PreWorkForMakeBigOverallImage, overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, doCluster)
 			} else {
-				PreWorkForMakeBigOverallImage(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
+				PreWorkForMakeBigOverallImage(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, doCluster)
 			}
 		}
 	}
@@ -68,9 +75,11 @@ parMakeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overa
 }	
 
 
-makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex, tempOverallResult) {
+makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex, tempOverallResult, doCluster) {
 
-		source("inc.R")	
+		
+		if (doCluster)
+			source("inc.R")	
 
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
 			ylabelForAppendix <- ""
@@ -199,9 +208,10 @@ makeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 
 }
 
-PreWorkForMakeBigOverallImage <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex) {
+PreWorkForMakeBigOverallImage <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex, doCluster) {
 
-	source("inc.R")
+	if (doCluster)
+		source("inc.R")
 
 	overallList$debug %debug% "PreWorkForMakeBigOverallImage()"	
 		
