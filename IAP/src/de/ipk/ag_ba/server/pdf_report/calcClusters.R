@@ -9,7 +9,9 @@ commandArgs(TRUE)[1] -> n
 cat(c("Calculate clustering for",(length(mydata)),"groups. Using bootstrap N =",n,"...\n"))
 
 if (n>0) {
-	result <- pvclust(data.frame(mydata), nboot=n, method.hclust="ward")
+	library(snow)
+	cl <- makeCluster(6) 
+	result <- parPvclust(cl=cl, data=data.frame(mydata), nboot=n, method.hclust="ward")
 	pdf("clusters.pdf")
 #[2:length(mydata)]
 	plot(result)
