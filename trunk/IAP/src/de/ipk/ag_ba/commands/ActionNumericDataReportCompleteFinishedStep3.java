@@ -396,6 +396,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			// });
 			if (!xlsx)
 				p.saveScripts(new String[] {
+						"inc.R",
 						"createDiagrams.R",
 						"calcClusters.R",
 						"diagramIAP.cmd",

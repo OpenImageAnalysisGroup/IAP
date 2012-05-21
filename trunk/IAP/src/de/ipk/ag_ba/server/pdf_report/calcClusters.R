@@ -8,10 +8,19 @@ mydata <- read.csv('report.clustering.csv', sep=';', row.names="UniID", header=T
 commandArgs(TRUE)[1] -> n
 cat(c("Calculate clustering for",(length(mydata)),"groups. Using bootstrap N =",n,"...\n"))
 
+result <- NULL
+
 if (n>0) {
-	library(snow)
-	cl <- makeCluster(6) 
-	result <- parPvclust(cl=cl, data=data.frame(mydata), nboot=n, method.hclust="ward")
+	tryCatch( 
+	library(snow);
+	cl <- makeCluster(6); 
+	result <- parPvclust(cl=cl, data=data.frame(mydata), nboot=n, method.hclust="ward");
+,	error = function(e) {
+		cat("Could not create compute cluster!\n")
+	result <- pvclust(data=data.frame(mydata), nboot=n, method.hclust="ward");
+		} )
+	
+
 	pdf("clusters.pdf")
 #[2:length(mydata)]
 	plot(result)
