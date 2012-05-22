@@ -82,13 +82,13 @@ public class BlockPipeline {
 		// and place the section in the middle of the image for further processing
 		int executionTrayCount = 1;
 		
-		ImageData abc = input.getImages().getVisInfo();
+		ImageData abc = input.images().getVisInfo();
 		if (abc == null)
-			abc = input.getImages().getFluoInfo();
+			abc = input.images().getFluoInfo();
 		if (abc == null)
-			abc = input.getImages().getNirInfo();
+			abc = input.images().getNirInfo();
 		if (abc == null)
-			abc = input.getImages().getIrInfo();
+			abc = input.images().getIrInfo();
 		if (abc != null && options.getCameraPosition() == CameraPosition.TOP) {
 			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
 			String t = abc.getParentSample().getParentCondition().getTreatment();
@@ -181,16 +181,16 @@ public class BlockPipeline {
 				// options.getTrayIdx()));
 				try {
 					TreeSet<Integer> times = new TreeSet<Integer>();
-					input.getImages().getVisInfo().getParentSample().getParentCondition().getTimes(times);
+					input.images().getVisInfo().getParentSample().getParentCondition().getTimes(times);
 					String timeInfo = "|" + StringManipulationTools.getStringList(times, "|") + "|.";
 					timeInfo = StringManipulationTools.stringReplace(timeInfo,
-							"|" + input.getImages().getVisInfo().getParentSample().getTime() + "|",
-							"|&gt;<b>" + input.getImages().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
+							"|" + input.images().getVisInfo().getParentSample().getTime() + "|",
+							"|&gt;<b>" + input.images().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
 					timeInfo = "</b>" + timeInfo.substring(1, timeInfo.length() - 2) + "<b>";
 					timeInfo = StringManipulationTools.stringReplace(timeInfo, "|", " ");
 					timeInfo = timeInfo.trim();
 					String p = timeInfo + " </b>(" +
-							input.getImages().getVisInfo().getQualityAnnotation() +
+							input.images().getVisInfo().getQualityAnnotation() +
 							(options.getTrayCnt() > 1 ?
 									", tray " + (options.getTrayIdx() + 1) + "/" + options.getTrayCnt() + ")<b>"
 									: ")<b>");

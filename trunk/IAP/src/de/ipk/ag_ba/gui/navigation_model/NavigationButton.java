@@ -627,8 +627,8 @@ public class NavigationButton implements StyleAware {
 		
 		int imgS = 48;
 		
-		if (style == ButtonDrawStyle.COMPACT_LIST)
-			if (target == PanelTarget.NAVIGATION)
+		if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
+			if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
 				imgS = 25;// 32;
 			else
 				imgS = 48;
@@ -662,6 +662,7 @@ public class NavigationButton implements StyleAware {
 		switch (style) {
 			case FLAT:
 			case COMPACT_LIST:
+			case COMPACT_LIST_2:
 				n1.setBorderPainted(false);
 				n1.setContentAreaFilled(false);
 				int d = 1;
@@ -770,6 +771,11 @@ public class NavigationButton implements StyleAware {
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
 		} else {
 			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 12));
+		}
+		if (style == ButtonDrawStyle.COMPACT_LIST_2) {
+			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
+			n1.setHorizontalTextPosition(SwingConstants.CENTER);
+			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 11));
 		}
 		n.setExecution(new Runnable() {
 			@Override

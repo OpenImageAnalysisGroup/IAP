@@ -15,11 +15,11 @@ public class FlexibleMaskAndImageSet {
 		setMasks(masks);
 	}
 	
-	public FlexibleImageSet getImages() {
+	public FlexibleImageSet images() {
 		return images;
 	}
 	
-	public FlexibleImageSet getMasks() {
+	public FlexibleImageSet masks() {
 		return masks;
 	}
 	
@@ -70,9 +70,9 @@ public class FlexibleMaskAndImageSet {
 		
 		resizedImages = resizedImages.resize(s, s, s, s);
 		
-		int[][] imgVis = resizedImages.getVis() != null ? resizedImages.getVis().getAs2A() : null;
-		int[][] imgFluo = resizedImages.getFluo() != null ? resizedImages.getFluo().getAs2A() : null;
-		int[][] imgNir = resizedImages.getNir() != null ? resizedImages.getNir().getAs2A() : null;
+		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : null;
+		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : null;
+		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : null;
 		int[][] imgIr = resizedImages.getIr() != null ? resizedImages.getIr().getAs2A() : null;
 		
 		ImageOperation io = new ImageOperation(image);
@@ -95,9 +95,9 @@ public class FlexibleMaskAndImageSet {
 			
 			resizedMasks = resizedMasks.resize(s, s, s, s);
 			
-			int[][] imgVisMask = resizedMasks.getVis() != null ? resizedMasks.getVis().getAs2A() : null;
-			int[][] imgFluoMask = resizedMasks.getFluo() != null ? resizedMasks.getFluo().getAs2A() : null;
-			int[][] imgNirMask = resizedMasks.getNir() != null ? resizedMasks.getNir().getAs2A() : null;
+			int[][] imgVisMask = resizedMasks.vis() != null ? resizedMasks.vis().getAs2A() : null;
+			int[][] imgFluoMask = resizedMasks.fluo() != null ? resizedMasks.fluo().getAs2A() : null;
+			int[][] imgNirMask = resizedMasks.nir() != null ? resizedMasks.nir().getAs2A() : null;
 			int[][] imgIrMask = resizedMasks.getIr() != null ? resizedMasks.getIr().getAs2A() : null;
 			
 			if (imgVisMask != null)
@@ -113,7 +113,7 @@ public class FlexibleMaskAndImageSet {
 	}
 	
 	public FlexibleMaskAndImageSet resize(double a, double b, double c, double d) {
-		return new FlexibleMaskAndImageSet(getImages().resize(a, b, c, d), getMasks().resize(a, b, c, d));
+		return new FlexibleMaskAndImageSet(images().resize(a, b, c, d), masks().resize(a, b, c, d));
 	}
 	
 	/**
@@ -123,21 +123,21 @@ public class FlexibleMaskAndImageSet {
 	 */
 	public void save(String fileName) throws FileNotFoundException {
 		FlexibleImageStack fis = new FlexibleImageStack();
-		if (images.getVis() != null)
-			fis.addImage("vis", images.getVis());
-		if (masks.getVis() != null)
-			fis.addImage("vis mask", masks.getVis());
-		if (images.getFluo() != null)
-			fis.addImage("fluo", images.getFluo());
-		if (masks.getFluo() != null)
-			fis.addImage("fluo mask", masks.getFluo());
-		if (images.getNir() != null)
-			fis.addImage("nir", images.getNir());
-		if (masks.getNir() != null)
-			fis.addImage("nir mask", masks.getNir());
-		if (images.getNir() != null)
+		if (images.vis() != null)
+			fis.addImage("vis", images.vis());
+		if (masks.vis() != null)
+			fis.addImage("vis mask", masks.vis());
+		if (images.fluo() != null)
+			fis.addImage("fluo", images.fluo());
+		if (masks.fluo() != null)
+			fis.addImage("fluo mask", masks.fluo());
+		if (images.nir() != null)
+			fis.addImage("nir", images.nir());
+		if (masks.nir() != null)
+			fis.addImage("nir mask", masks.nir());
+		if (images.nir() != null)
 			fis.addImage("ir", images.getIr());
-		if (masks.getNir() != null)
+		if (masks.nir() != null)
 			fis.addImage("ir mask", masks.getIr());
 		
 		fis.saveAsLayeredTif(new File(fileName));
@@ -148,15 +148,15 @@ public class FlexibleMaskAndImageSet {
 		StringBuilder res = new StringBuilder();
 		res.append("[");
 		if (images != null) {
-			if (images.getVis() != null)
+			if (images.vis() != null)
 				res.append("VIS:1,");
 			else
 				res.append("VIS:NULL,");
-			if (images.getFluo() != null)
+			if (images.fluo() != null)
 				res.append("FLU:1,");
 			else
 				res.append("FLU:NULL,");
-			if (images.getNir() != null)
+			if (images.nir() != null)
 				res.append("NIR:1,");
 			else
 				res.append("NIR:NULL,");
@@ -167,15 +167,15 @@ public class FlexibleMaskAndImageSet {
 		} else
 			res.append("NULL/");
 		if (masks != null) {
-			if (masks.getVis() != null)
+			if (masks.vis() != null)
 				res.append("VIS-R:1,");
 			else
 				res.append("VIS-R:NULL,");
-			if (masks.getFluo() != null)
+			if (masks.fluo() != null)
 				res.append("FLU-R:1,");
 			else
 				res.append("FLU-R:NULL,");
-			if (masks.getNir() != null)
+			if (masks.nir() != null)
 				res.append("NIR:1,");
 			else
 				res.append("NIR:NULL,");
@@ -192,21 +192,21 @@ public class FlexibleMaskAndImageSet {
 	public int getImageCount() {
 		int res = 0;
 		if (images != null) {
-			if (images.getVis() != null)
+			if (images.vis() != null)
 				res++;
-			if (images.getFluo() != null)
+			if (images.fluo() != null)
 				res++;
-			if (images.getNir() != null)
+			if (images.nir() != null)
 				res++;
 			if (images.getIr() != null)
 				res++;
 		}
 		if (masks != null) {
-			if (masks.getVis() != null)
+			if (masks.vis() != null)
 				res++;
-			if (masks.getFluo() != null)
+			if (masks.fluo() != null)
 				res++;
-			if (masks.getNir() != null)
+			if (masks.nir() != null)
 				res++;
 			if (masks.getIr() != null)
 				res++;

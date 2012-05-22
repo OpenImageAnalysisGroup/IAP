@@ -22,7 +22,7 @@ public class BlockCountMaximas extends AbstractSnapshotAnalysisBlockFIS {
 		// ImageOperation res = new ImageOperation(getInput().getMasks().getVis()).findMax(options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE),
 		// options.getIntSetting(Setting.FIND_MAXIMUM_TYP));
 		
-		ImageOperation res = new ImageOperation(getInput().getMasks().getVis()).findMax(options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE),
+		ImageOperation res = new ImageOperation(input().masks().vis()).findMax(options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE),
 				MaximumFinder.COUNT);
 		ResultsTable numericResult = res.getResultsTable();
 		

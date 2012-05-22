@@ -1,8 +1,10 @@
 package de.ipk.ag_ba.image.operations;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
@@ -228,6 +230,72 @@ public class ImageCanvas {
 	
 	public ImageCanvas drawLine(Point p1, Point p2, int color, double alpha, int size) {
 		return drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y, color, alpha, size);
+	}
+	
+	public ImageOperation io() {
+		return new ImageOperation(getImage());
+	}
+	
+	public ImageCanvas drawSideHistogram(ArrayList<Double> corrs, boolean doIt) {
+		return drawSideHistogram(corrs, doIt, 0.05d);
+	}
+	
+	public ImageCanvas drawSideHistogram() {
+		int[][] img = getImage().getAs2A();
+		int h = img[0].length;
+		int w = img.length;
+		ArrayList<Double> values = io().calculateVerticalPattern();
+		
+		int maxW = (int) (w * 0.15d);
+		for (int y = 0; y < h; y++)
+			values.set(y, values.get(y) * maxW);
+		int color = Color.BLUE.getRGB();
+		double alpha = 0.5;
+		int size = 1;
+		for (int y = 0; y < h; y++)
+			if (values.get(y) > 0)
+				drawLine((int) (w - values.get(y)), y, w - 1, y, color, alpha, size);
+		
+		return this;
+	}
+	
+	public ImageCanvas drawSideHistogram(ArrayList<Double> corrs, boolean doIt, double widthPercent) {
+		if (!doIt)
+			return this;
+		
+		int[][] img = getImage().getAs2A();
+		int h = img[0].length;
+		int w = img.length;
+		ArrayList<Double> values = new ArrayList<Double>(h);
+		for (int y = 0; y < h; y++)
+			values.add(0d);
+		int maxW = (int) (w * widthPercent);
+		for (int y = 0; y < h; y++) {
+			try {
+				values.set(y, corrs.get(y - h / 2 + corrs.size() / 2) * maxW + maxW);
+			} catch (Exception e) {
+				// empty
+			}
+		}
+		int color = Color.BLUE.getRGB();
+		double alpha = 0.5;
+		int size = 1;
+		for (int y = 0; y < h; y++)
+			if (values.get(y) != null && values.get(y) > 0) {
+				drawLine((int) (w - values.get(y)) - 1, y, w - 2, y, color, alpha, size);
+			}
+		
+		return this;
+	}
+	
+	public ImageCanvas drawTopHistogram(ArrayList<Double> corrs, boolean doIt) {
+		if (!doIt)
+			return this;
+		
+		ImageCanvas ic = getImage().io().rotate90().canvas().drawSideHistogram(corrs, doIt, 0.025)
+				.getImage().io().rotate90().canvas();
+		
+		return ic;
 	}
 	
 }

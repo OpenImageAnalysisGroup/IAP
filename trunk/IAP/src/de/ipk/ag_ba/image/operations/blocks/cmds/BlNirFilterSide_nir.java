@@ -15,14 +15,14 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		FlexibleImage nirImage = getInput().getImages().getNir();
-		FlexibleImage nirMask = getInput().getMasks().getNir();
+		FlexibleImage nirImage = input().images().nir();
+		FlexibleImage nirMask = input().masks().nir();
 		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = 180;
 		// if (options.getCameraPosition() == CameraPosition.SIDE) {
 		if (nirImage != null && nirMask != null) {
 			if (options.isMaize())
-				nirMask = nirImage.getIO().print("ADAPT IN", debug).
+				nirMask = nirImage.io().print("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(150, average,
 								options.getBackground(), 0.10).getImage().print("ADAPT OUT", debug);
 			else {
@@ -35,14 +35,14 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 						f = 0.11;
 						regionSize = 70;
 					}
-				nirMask = nirImage.getIO().print("ADAPT IN", debug).
+				nirMask = nirImage.io().print("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(regionSize, average,
 								options.getBackground(), f).getImage().print("ADAPT OUT", debug);
 			}
-			getInput().getMasks().setNir(nirMask);
+			input().masks().setNir(nirMask);
 			boolean useNirSkeleton = true;
 			if (useNirSkeleton) {
-				FlexibleImage sk = nirMask.getIO().skeletonize().getImage();
+				FlexibleImage sk = nirMask.io().skeletonize().getImage();
 				if (sk != null) {
 					if (debug) {
 						FlexibleImage skelMap = mapOriginalOnSkel(sk, nirMask, options.getBackground()).
@@ -54,7 +54,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		// }
 		if (origNirMask != null) {
-			nirMask = nirMask.getIO().and(origNirMask).getImage();
+			nirMask = nirMask.io().and(origNirMask).getImage();
 		}
 		return nirMask;
 	}

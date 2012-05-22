@@ -11,9 +11,9 @@ public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null)
 			return null;
-		return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
+		return closing(input().masks().vis(), input().images().vis());
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
@@ -59,6 +59,6 @@ public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		} while (cnt < closingRepeat);
 		// op.print("MASKKKK");
 		
-		return flImage.getIO().and(op.getImage()).getImage();
+		return flImage.io().and(op.getImage()).getImage();
 	}
 }

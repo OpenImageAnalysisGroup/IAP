@@ -46,7 +46,7 @@ public class BlCalcWidthAndHeight_vis extends
 		
 		boolean useFluo = false;// options.isMaize();
 		
-		FlexibleImage visRes = getInput().getMasks().getVis();
+		FlexibleImage visRes = input().masks().vis();
 		
 		int vertYsoilLevel = -1;
 		
@@ -77,19 +77,19 @@ public class BlCalcWidthAndHeight_vis extends
 			}
 		final int vertYsoilLevelF = vertYsoilLevel;
 		
-		FlexibleImage img = useFluo ? getInput().getMasks().getFluo()
-				: getInput().getMasks().getVis();
+		FlexibleImage img = useFluo ? input().masks().fluo()
+				: input().masks().vis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
 					background, vertYsoilLevel);
 			
-			double resf = useFluo ? (double) getInput().getMasks().getVis()
+			double resf = useFluo ? (double) input().masks().vis()
 					.getWidth()
 					/ (double) img.getWidth()
-					* (getInput().getImages().getFluo().getWidth() / (double) getInput()
-							.getImages().getFluo().getHeight())
-					/ (getInput().getImages().getVis().getWidth() / (double) getInput()
-							.getImages().getVis().getHeight())
+					* (input().images().fluo().getWidth() / (double) input()
+							.images().fluo().getHeight())
+					/ (input().images().vis().getWidth() / (double) input()
+							.images().vis().getHeight())
 					: 1.0;
 			
 			// double resfww = useFluo ? (double) getInput().getMasks().getVis()
@@ -111,8 +111,8 @@ public class BlCalcWidthAndHeight_vis extends
 											FlexibleImage visRes) {
 										if (vertYsoilLevelF > 0)
 											visRes = visRes
-													.getIO()
-													.getCanvas()
+													.io()
+													.canvas()
 													.fillRect(
 															values.x
 																	/ 2
@@ -130,8 +130,8 @@ public class BlCalcWidthAndHeight_vis extends
 													.print("DEBUG", debug);
 										else {
 											visRes = visRes
-													.getIO()
-													.getCanvas()
+													.io()
+													.canvas()
 													.fillRect(
 															values.x
 																	/ 2
@@ -145,8 +145,8 @@ public class BlCalcWidthAndHeight_vis extends
 													.getImage()
 													.print("DEBUG", debug);
 											visRes = visRes
-													.getIO()
-													.getCanvas()
+													.io()
+													.canvas()
 													.fillRect(
 															values.x
 																	/ 2

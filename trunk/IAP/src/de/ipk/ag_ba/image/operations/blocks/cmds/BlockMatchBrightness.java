@@ -8,7 +8,7 @@ public class BlockMatchBrightness extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		return match(getInput().getImages().getVis(), getInput().getMasks().getVis());
+		return match(input().images().vis(), input().masks().vis());
 	}
 	
 	private FlexibleImage match(FlexibleImage img, FlexibleImage mask) {
@@ -51,11 +51,11 @@ public class BlockMatchBrightness extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		return match(getInput().getImages().getFluo(), getInput().getMasks().getFluo());
+		return match(input().images().fluo(), input().masks().fluo());
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		return match(getInput().getImages().getNir(), getInput().getMasks().getNir());
+		return match(input().images().nir(), input().masks().nir());
 	}
 }

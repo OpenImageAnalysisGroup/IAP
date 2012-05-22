@@ -12,20 +12,20 @@ public class BlockApplyMasksToImages extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		return new ImageOperation(getInput().getImages().getVis()).applyMask_ResizeMaskIfNeeded(
-				getInput().getMasks().getVis(), options.getBackground()).getImage();
+		return new ImageOperation(input().images().vis()).applyMask_ResizeMaskIfNeeded(
+				input().masks().vis(), options.getBackground()).getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		return new ImageOperation(getInput().getImages().getFluo()).applyMask_ResizeMaskIfNeeded(
-				getInput().getMasks().getFluo(), options.getBackground()).getImage();
+		return new ImageOperation(input().images().fluo()).applyMask_ResizeMaskIfNeeded(
+				input().masks().fluo(), options.getBackground()).getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		return new ImageOperation(getInput().getImages().getNir()).applyMask_ResizeMaskIfNeeded(
-				getInput().getMasks().getNir(), options.getBackground()).getImage();
+		return new ImageOperation(input().images().nir()).applyMask_ResizeMaskIfNeeded(
+				input().masks().nir(), options.getBackground()).getImage();
 	}
 	
 }

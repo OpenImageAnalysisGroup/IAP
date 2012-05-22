@@ -21,8 +21,8 @@ public class BlockLabFilterVis extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		
 		return labFilter(
-				getInput().getMasks().getVis(),
-				getInput().getImages().getVis(),
+				input().masks().vis(),
+				input().images().vis(),
 					options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 					options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MIN_A_VALUE_VIS),

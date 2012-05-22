@@ -14,10 +14,10 @@ public class BlockTransferImageSet extends AbstractImageAnalysisBlockFIS {
 	private FlexibleMaskAndImageSet transferMaskToImageSet(boolean overlay) {
 		if (overlay)
 			return new FlexibleMaskAndImageSet(
-					getInput().getImages().invert().draw(getInput().getMasks(), options.getBackground()), null);
+					input().images().invert().draw(input().masks(), options.getBackground()), null);
 		else
 			return new FlexibleMaskAndImageSet(
-					getInput().getMasks(), null);
+					input().masks(), null);
 		
 	}
 }

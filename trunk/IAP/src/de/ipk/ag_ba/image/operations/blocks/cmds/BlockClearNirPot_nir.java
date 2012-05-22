@@ -15,7 +15,7 @@ public class BlockClearNirPot_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		FlexibleImage nir = getInput().getImages().getNir();
+		FlexibleImage nir = input().images().nir();
 		
 		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10 || options.isBarleyInBarleySystem())
 			return nir;

@@ -6,7 +6,7 @@ public class BlockRemoveLevitatingObjects_vis extends BlockRemoveLevitatingObjec
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return getInput().getMasks().getFluo();
+		return input().masks().fluo();
 	}
 	
 }

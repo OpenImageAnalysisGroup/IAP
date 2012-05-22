@@ -12,23 +12,23 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		FlexibleImage nir = getInput().getImages().getNir();
+		FlexibleImage nir = input().images().nir();
 		if (nir == null)
 			return null;
 		// if (options.getCameraPosition() == CameraPosition.TOP)
 		// return nir;
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.getIO().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(180, pix).getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.getIO().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(180, pix).getImage();
 		}
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		FlexibleImage nir = getInput().getMasks().getNir();
+		FlexibleImage nir = input().masks().nir();
 		if (nir == null)
 			return null;
 		// if (options.getCameraPosition() == CameraPosition.TOP)
@@ -36,10 +36,10 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
 			// double[] pix = getProbablyWhitePixels(nir.getIO().copy().invert().getImage());
-			return nir.getIO().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(180, pix).getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.getIO().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(180, pix).getImage();
 		}
 	}
 	

@@ -18,7 +18,7 @@ public abstract class BlockPostProcessEdgeErodeOnFluo extends AbstractSnapshotAn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return BlockPostProcessEdgeErode.postProcessResultImage(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options,
+		return BlockPostProcessEdgeErode.postProcessResultImage(input().images().fluo(), input().masks().fluo(), options,
 				options.getCameraPosition(), ImageTyp.FLUO, enlarge);
 	}
 	

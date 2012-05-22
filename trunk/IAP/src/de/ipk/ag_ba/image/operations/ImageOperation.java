@@ -41,9 +41,8 @@ import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.Vector2i;
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.analysis.SplineInterpolator;
-import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -123,17 +122,17 @@ public class ImageOperation {
 	public ImageOperation translate(double x, double y) {
 		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage())
-				.replaceColors(Color.BLACK.getRGB(),
+				.replaceColor(0,// Color.BLACK.getRGB(),
 						ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation translate(double x, double y, int foreground) {
 		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage())
-				.replaceColors(Color.BLACK.getRGB(), foreground);
+				.replaceColor(Color.BLACK.getRGB(), foreground);
 	}
 	
-	public ImageOperation replaceColors(int search, int replace) {
+	public ImageOperation replaceColor(int search, int replace) {
 		int[] source = getImageAs1array();
 		int[] target = new int[source.length];
 		
@@ -197,7 +196,7 @@ public class ImageOperation {
 	public ImageOperation rotate(double degree) {
 		image.getProcessor().rotate(degree);
 		return new ImageOperation(getImage())
-				.replaceColors(Color.BLACK.getRGB(),
+				.replaceColor(Color.BLACK.getRGB(),
 						ImageOperation.BACKGROUND_COLORint);
 	}
 	
@@ -209,7 +208,7 @@ public class ImageOperation {
 	public ImageOperation scale(double xScale, double yScale) {
 		image.getProcessor().scale(xScale, yScale);
 		return new ImageOperation(getImage())
-				.replaceColors(Color.BLACK.getRGB(),
+				.replaceColor(Color.BLACK.getRGB(),
 						ImageOperation.BACKGROUND_COLORint);
 	}
 	
@@ -2064,7 +2063,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new FlexibleImage(width, height, resultImage).getIO();
+		return new FlexibleImage(width, height, resultImage).io();
 	}
 	
 	public ImageOperation hq_thresholdLAB_multi_color_or_and_not(
@@ -2120,7 +2119,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new FlexibleImage(w, h, resultImage).getIO();
+		return new FlexibleImage(w, h, resultImage).io();
 	}
 	
 	private boolean hq_anyMatch(int Li, int ai, int bi,
@@ -3220,7 +3219,7 @@ public class ImageOperation {
 		FlexibleImage marked = null;
 		ImageCanvas canvas = null;
 		if (debug) {
-			canvas = new ImageOperation(image).copy().getCanvas();
+			canvas = new ImageOperation(image).copy().canvas();
 			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
 		}
 		// sums of RGB
@@ -3402,13 +3401,13 @@ public class ImageOperation {
 		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
 		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
 		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
-		return new FlexibleImage(r, g, b).getIO();
+		return new FlexibleImage(r, g, b).io();
 	}
 	
 	/**
 	 * @return A gray image composed from the R channel.
 	 */
-	private ImageOperation getR() {
+	public ImageOperation getR() {
 		int[] img = copy().getImageAs1array();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
@@ -3422,13 +3421,13 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+		return new FlexibleImage(getWidth(), getHeight(), img).io();
 	}
 	
 	/**
 	 * @return A gray image composed from the G channel.
 	 */
-	private ImageOperation getG() {
+	public ImageOperation getG() {
 		int[] img = copy().getImageAs1array();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
@@ -3442,13 +3441,13 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+		return new FlexibleImage(getWidth(), getHeight(), img).io();
 	}
 	
 	/**
 	 * @return A gray image composed from the B channel.
 	 */
-	private ImageOperation getB() {
+	public ImageOperation getB() {
 		int[] img = copy().getImageAs1array();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
@@ -3462,7 +3461,7 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).getIO();
+		return new FlexibleImage(getWidth(), getHeight(), img).io();
 	}
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d) {
@@ -3494,7 +3493,7 @@ public class ImageOperation {
 		indexArray[0] = 0;
 		
 		SplineInterpolator spline = new SplineInterpolator();
-		UnivariateRealFunction func = spline.interpolate(indexArray, calibrationCurveFromTopLeftToCenter);
+		PolynomialSplineFunction func = spline.interpolate(indexArray, calibrationCurveFromTopLeftToCenter);
 		
 		int[][] res = new int[w][h];
 		try {
@@ -3523,7 +3522,7 @@ public class ImageOperation {
 					res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 				}
 			}
-		} catch (FunctionEvaluationException e) {
+		} catch (Exception e) {
 			throw new UnsupportedOperationException(e);
 		}
 		return new ImageOperation(res);
@@ -3668,7 +3667,7 @@ public class ImageOperation {
 			labImage1[1][idx] = aDiff / 255f + 1;
 			labImage1[2][idx] = bDiff / 255f + 1;
 		}
-		return new FlexibleImage(w, h, labImage1).getIO();
+		return new FlexibleImage(w, h, labImage1).io();
 	}
 	
 	public ImageOperation subtractGrayImages(FlexibleImage image2) {
@@ -3694,7 +3693,7 @@ public class ImageOperation {
 			res[idx] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			
 		}
-		return new FlexibleImage(w, h, res).getIO();
+		return new FlexibleImage(w, h, res).io();
 	}
 	
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
@@ -3840,7 +3839,7 @@ public class ImageOperation {
 		return new ImageOperation(out, w, h);
 	}
 	
-	public ImageCanvas getCanvas() {
+	public ImageCanvas canvas() {
 		return new ImageCanvas(getImage());
 	}
 	
@@ -3886,12 +3885,14 @@ public class ImageOperation {
 	}
 	
 	/**
+	 * @author pape
 	 * @param sizeOfRegion
 	 *           - size of the local region to detect threshold
 	 * @param assumedBackground
-	 * @return
-	 * @author pape
+	 *           e.g. 150 or 180
 	 * @param K
+	 *           0.1
+	 * @return
 	 */
 	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
@@ -4089,7 +4090,7 @@ public class ImageOperation {
 					}
 				}
 			}
-		return new FlexibleImage(aa).getIO();
+		return new FlexibleImage(aa).io();
 	}
 	
 	/**
@@ -4112,7 +4113,7 @@ public class ImageOperation {
 				} else
 					aa[x][y] = BACKGROUND_COLORint;
 			}
-		return new FlexibleImage(aa).getIO();
+		return new FlexibleImage(aa).io();
 	}
 	
 	public ImageOperation xor(FlexibleImage b) {
@@ -4130,7 +4131,7 @@ public class ImageOperation {
 					aa[x][y] = BACKGROUND_COLORint;
 				}
 			}
-		return new FlexibleImage(aa).getIO();
+		return new FlexibleImage(aa).io();
 	}
 	
 	public ImageOperation filterGray(int minBrightness, int maxAdiff, int maxBdiff) {
@@ -4147,6 +4148,18 @@ public class ImageOperation {
 				res[i] = BACKGROUND_COLORint;
 			else
 				res[i] = in[i];
+		}
+		return new ImageOperation(res, w, h);
+	}
+	
+	public ImageOperation grayscaleByLab() {
+		float[][] lab = getImage().getLab(true);
+		int w = getWidth();
+		int h = getHeight();
+		int res[] = new int[w * h];
+		for (int i = 0; i < w * h; i++) {
+			float l = lab[0][i] / 256f;
+			res[i] = new Color(l, l, l).getRGB();
 		}
 		return new ImageOperation(res, w, h);
 	}
@@ -4185,7 +4198,7 @@ public class ImageOperation {
 	public ImageOperation removeSmallElements(int cutOffMinimumArea, int cutOffMinimumDimension) {
 		return ImageOperation.removeSmallPartsOfImage(
 				true, getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
-				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).getIO();
+				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).io();
 	}
 	
 	public ImageOperation flipVert() {
@@ -4266,6 +4279,57 @@ public class ImageOperation {
 	public ImageOperation clearOutsideRectangle(int left, int top, int right, int bottom) {
 		return clearImageLeft(left, BACKGROUND_COLORint).clearImageAbove(top, BACKGROUND_COLORint).clearImageRight(right, BACKGROUND_COLORint)
 				.clearImageBottom(bottom, BACKGROUND_COLORint);
+	}
+	
+	public ArrayList<java.lang.Double> calculateVerticalPattern() {
+		double max = 0;
+		int h = getHeight();
+		int w = getWidth();
+		ArrayList<java.lang.Double> values = new ArrayList<java.lang.Double>();
+		float[][] lab = getImage().getLab(true);
+		for (int y = 0; y < h; y++) {
+			double sum = 0;
+			for (int x = 0; x < w; x++) {
+				int i = y * w + x;
+				float l = lab[0][i] / 256f;
+				if (l < 0.95)
+					if (l > 0.02)
+						sum += 1;// l;
+			}
+			if (sum > max)
+				max = sum;
+			values.add(sum);
+		}
+		if (max > 0)
+			for (int y = 0; y < h; y++)
+				values.set(y, values.get(y) / max);
+		return values;
+	}
+	
+	public ArrayList<java.lang.Double> calculateHorizontalPattern() {
+		return rotate90().calculateVerticalPattern();
+	}
+	
+	/**
+	 * Rotates 90° to the left. The width and height are adapted correctly, no empty space is generated.
+	 * 
+	 * @author Christian Klukas
+	 */
+	public ImageOperation rotate90() {
+		int[][] in = getImageAs2array();
+		int w = getWidth();
+		int h = getHeight();
+		int[][] res = new int[h][w];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				res[y][x] = in[x][y];
+			}
+		}
+		return new FlexibleImage(res).io();
+	}
+	
+	public TranslationMatch prepareTranlationMatch(boolean debug) {
+		return new TranslationMatch(this, debug);
 	}
 	
 	// not tested:

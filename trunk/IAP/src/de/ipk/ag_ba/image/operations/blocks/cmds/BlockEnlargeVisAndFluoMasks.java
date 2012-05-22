@@ -10,13 +10,13 @@ public class BlockEnlargeVisAndFluoMasks extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return enlargeMask(getInput().getMasks().getVis(), options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_ERODE_LOOPS),
+		return enlargeMask(input().masks().vis(), options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_ERODE_LOOPS),
 						options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_DILATE_LOOPS), ImageConfiguration.RgbTop);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return enlargeMask(getInput().getMasks().getFluo(), options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_ERODE_LOOPS),
+		return enlargeMask(input().masks().fluo(), options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_ERODE_LOOPS),
 				options.getIntSetting(Setting.RGB_SIDE_NUMBER_OF_DILATE_LOOPS), ImageConfiguration.FluoTop);
 	}
 	

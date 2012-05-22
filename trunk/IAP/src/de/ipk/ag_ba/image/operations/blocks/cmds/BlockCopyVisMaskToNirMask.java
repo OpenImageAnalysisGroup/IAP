@@ -9,6 +9,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockCopyVisMaskToNirMask extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 }

@@ -14,9 +14,9 @@ public class BlockClosing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null)
+		if (input().masks().fluo() == null)
 			return null;
-		return closing(getInput().getMasks().getFluo().getIO().blur(0.5).getImage(), getInput().getImages().getFluo());
+		return closing(input().masks().fluo().io().blur(0.5).getImage(), input().images().fluo());
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {

@@ -32,9 +32,9 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		numericResult.clear();
-		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage vis = input().masks().vis();
 		if (vis == null)
-			vis = getInput().getImages().getVis();
+			vis = input().images().vis();
 		
 		if (vis != null) {
 			markerMask = getMarkers(vis.copy(), numericResult);
@@ -65,7 +65,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 				calculateDistanceBetweenMarkers(numericResult, w);
 			}
 		}
-		if (getInput().getMasks().getVis() != null)
+		if (input().masks().vis() != null)
 			return vis;
 		else
 			return null;
@@ -124,7 +124,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage getMarkers(FlexibleImage image, ArrayList<MarkerPair> result) {
 		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
-		ImageOperation io = image.getIO().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), options.isMaize(), true);
+		ImageOperation io = image.io().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), options.isMaize(), true);
 		return io != null ? io.getImage() : null;
 	}
 	
@@ -132,10 +132,10 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		if (debug)
-			new ImageOperation(processedImages.getVis()).drawMarkers(numericResult).print("Marker Positions", debug);
-		if (markerMask != null && processedImages.getVis() != null)
-			processedImages.setVis(processedImages.getVis().getIO().and(markerMask).getImage());
-		if (markerMask != null && processedMasks.getVis() != null)
-			processedMasks.setVis(processedMasks.getVis().getIO().and(markerMask).getImage());
+			new ImageOperation(processedImages.vis()).drawMarkers(numericResult).print("Marker Positions", debug);
+		if (markerMask != null && processedImages.vis() != null)
+			processedImages.setVis(processedImages.vis().io().and(markerMask).getImage());
+		if (markerMask != null && processedMasks.vis() != null)
+			processedMasks.setVis(processedMasks.vis().io().and(markerMask).getImage());
 	}
 }

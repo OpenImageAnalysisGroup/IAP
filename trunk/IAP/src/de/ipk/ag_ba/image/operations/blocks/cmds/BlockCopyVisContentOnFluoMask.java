@@ -11,8 +11,8 @@ public class BlockCopyVisContentOnFluoMask extends AbstractSnapshotAnalysisBlock
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getImages().getVis()).applyMask_ResizeSourceIfNeeded(
-				getInput().getMasks().getFluo(), options.getBackground()).getImage();
+		return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(
+				input().masks().fluo(), options.getBackground()).getImage();
 	}
 	
 }

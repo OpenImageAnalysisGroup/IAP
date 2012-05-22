@@ -9,34 +9,34 @@ public class BlockRemoveLevitatingObjects_vis_fluo extends AbstractSnapshotAnaly
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null || getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null || input().masks().vis() == null)
 			return null;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = getInput().getMasks().getVis();
+			FlexibleImage input = input().masks().vis();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < getInput().getMasks().getVis().getHeight() * 0.5)
-				return new ImageOperation(getInput().getMasks().getVis()).clearImageAbove(cut, background).getImage();
+			if (cut > 0 && cut < input().masks().vis().getHeight() * 0.5)
+				return new ImageOperation(input().masks().vis()).clearImageAbove(cut, background).getImage();
 			else
-				return getInput().getMasks().getVis();
+				return input().masks().vis();
 		}
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getFluo() == null)
+		if (input().masks().fluo() == null || input().masks().fluo() == null)
 			return null;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = getInput().getMasks().getFluo();
+			FlexibleImage input = input().masks().fluo();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < getInput().getMasks().getFluo().getHeight() * 0.5)
-				return new ImageOperation(getInput().getMasks().getFluo()).clearImageAbove(cut, background).getImage();
+			if (cut > 0 && cut < input().masks().fluo().getHeight() * 0.5)
+				return new ImageOperation(input().masks().fluo()).clearImageAbove(cut, background).getImage();
 			else
-				return getInput().getMasks().getFluo();
+				return input().masks().fluo();
 		}
-		return getInput().getMasks().getFluo();
+		return input().masks().fluo();
 	}
 	
 	private int searchSplitObjectsInYDirection(FlexibleImage input, int tolerance, int background) {

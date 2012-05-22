@@ -26,41 +26,41 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 		}
 		if (options.getTrayCnt() == 6) {
 			// 3x2
-			FlexibleImage vis = getInput().getImages().getVis();
+			FlexibleImage vis = input().images().vis();
 			if (vis != null)
 				processCuttingOfImage(vis, FlexibleImageType.VIS, -30, 0.75d, 3, 2);
 			
-			FlexibleImage fluo = getInput().getImages().getFluo();
+			FlexibleImage fluo = input().images().fluo();
 			if (fluo != null)
 				processCuttingOfImage(fluo, FlexibleImageType.FLUO, -30, 0.75d, 3, 2);
 			
-			FlexibleImage nir = getInput().getImages().getNir();
+			FlexibleImage nir = input().images().nir();
 			if (nir != null)
 				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, 0.75d, 3, 2);
 			
-			FlexibleImage ir = getInput().getImages().getIr();
+			FlexibleImage ir = input().images().getIr();
 			if (ir != null) {
-				ir = ir.getIO().rotate(180).getImage();
+				ir = ir.io().rotate(180).getImage();
 				processCuttingOfImage(ir, FlexibleImageType.IR, 0, 0.75d, 3, 2);
 			}
 		}
 		if (options.getTrayCnt() == 12) {
 			// 4x3
-			FlexibleImage vis = getInput().getImages().getVis();
+			FlexibleImage vis = input().images().vis();
 			if (vis != null)
 				processCuttingOfImage(vis, FlexibleImageType.VIS, -30, 0.75d, 4, 3);
 			
-			FlexibleImage fluo = getInput().getImages().getFluo();
+			FlexibleImage fluo = input().images().fluo();
 			if (fluo != null)
 				processCuttingOfImage(fluo, FlexibleImageType.FLUO, -30, 0.75d, 4, 3);
 			
-			FlexibleImage nir = getInput().getImages().getNir();
+			FlexibleImage nir = input().images().nir();
 			if (nir != null)
 				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, 0.75d, 4, 3);
 			
-			FlexibleImage ir = getInput().getImages().getIr();
+			FlexibleImage ir = input().images().getIr();
 			if (ir != null) {
-				ir = ir.getIO().rotate(180).getImage();
+				ir = ir.io().rotate(180).getImage();
 				processCuttingOfImage(ir, FlexibleImageType.IR, 0, 0.75d, 4, 3);
 			}
 		}
@@ -81,9 +81,9 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 		int to = (int) r.getMinY();
 		int ri = (int) r.getMaxX();
 		int bo = (int) r.getMaxY();
-		FlexibleImage res = img.getIO().clearOutsideRectangle(le, to, ri, bo).getImage();
+		FlexibleImage res = img.io().clearOutsideRectangle(le, to, ri, bo).getImage();
 		res.setType(type);
-		getInput().getImages().set(res);
+		input().images().set(res);
 	}
 	
 	private Rectangle2D.Double getGridPos(int trayIdx, int columns, int rows, int w, int h, int centerX, int centerY) {
@@ -108,9 +108,9 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		FlexibleImage img = getInput().getImages().getVis();
+		FlexibleImage img = input().images().vis();
 		if (img != null && !multiTray) {
-			return img.copy().getIO().
+			return img.copy().io().
 					clearOutsideCircle(
 							img.getWidth() / 2,
 							img.getHeight() / 2 - 30,
@@ -121,9 +121,9 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		FlexibleImage img = getInput().getImages().getFluo();
+		FlexibleImage img = input().images().fluo();
 		if (img != null && !multiTray) {
-			return img.copy().getIO().
+			return img.copy().io().
 					clearOutsideCircle(
 							img.getWidth() / 2,
 							img.getHeight() / 2,
@@ -134,9 +134,9 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		FlexibleImage img = getInput().getImages().getNir();
+		FlexibleImage img = input().images().nir();
 		if (img != null && !multiTray) {
-			return img.copy().getIO().translate(-3, 0).
+			return img.copy().io().translate(-3, 0).
 					clearOutsideCircle(
 							img.getWidth() / 2,
 							img.getHeight() / 2,
@@ -147,9 +147,9 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processIRimage() {
-		FlexibleImage img = getInput().getImages().getIr();
+		FlexibleImage img = input().images().getIr();
 		if (img != null && !multiTray) {
-			return img.copy().getIO().rotate(180).translate(-3, 0).
+			return img.copy().io().rotate(180).translate(-3, 0).
 					clearOutsideCircle(
 							img.getWidth() / 2,
 							img.getHeight() / 2,
@@ -160,36 +160,36 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage img = getInput().getImages().getVis();
+		FlexibleImage img = input().images().vis();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage img = getInput().getImages().getFluo();
+		FlexibleImage img = input().images().fluo();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		FlexibleImage img = getInput().getImages().getNir();
+		FlexibleImage img = input().images().nir();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processIRmask() {
-		FlexibleImage img = getInput().getImages().getIr();
+		FlexibleImage img = input().images().getIr();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}

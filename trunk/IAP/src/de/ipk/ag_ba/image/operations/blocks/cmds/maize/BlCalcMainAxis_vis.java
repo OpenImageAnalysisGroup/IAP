@@ -34,9 +34,9 @@ public class BlCalcMainAxis_vis extends
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP
-				&& getInput().getMasks().getVis() != null) {
-			MainAxisCalculationResult macr = getAngle(getInput().getMasks()
-					.getVis());
+				&& input().masks().vis() != null) {
+			MainAxisCalculationResult macr = getAngle(input().masks()
+					.vis());
 			if (macr != null) {
 				double angle = macr.getMinResult().getAngle();
 
@@ -75,7 +75,7 @@ public class BlCalcMainAxis_vis extends
 						getBlockPosition());
 			}
 		}
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 
 	private MainAxisCalculationResult getAngle(FlexibleImage image) {

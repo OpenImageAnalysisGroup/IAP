@@ -66,7 +66,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private final PanelTarget target;
 	private final JPanel actionPanelRight;
 	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.FLAT;
-	private final JCheckBoxMenuItem menuItemCompact;
+	private final JCheckBoxMenuItem menuItemCompact, menuItemCompact2;
 	private final JCheckBoxMenuItem menuItemFlat;
 	private final JCheckBoxMenuItem menuItemButtons;
 	private JScrollPane scrollpane;
@@ -92,6 +92,12 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		menuItemCompact.addActionListener(this);
 		
 		popup.add(menuItemCompact);
+		
+		menuItemCompact2 = new JCheckBoxMenuItem("Compact (2)", buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
+		menuItemCompact2.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST_2);
+		menuItemCompact2.addActionListener(this);
+		
+		popup.add(menuItemCompact2);
 		
 		menuItemFlat = new JCheckBoxMenuItem("Flat", buttonStyle == ButtonDrawStyle.FLAT);
 		menuItemFlat.putClientProperty("style", ButtonDrawStyle.FLAT);
@@ -179,7 +185,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
 			if (target == PanelTarget.ACTION) {
-				if (theOther != null && getEntitySet(true).size() == 0) {
+				if (theOther != null && getEntitySet(true).size() == 0 && theOther.buttonStyle != ButtonDrawStyle.COMPACT_LIST_2) {
 					theOther.buttonStyle = ButtonDrawStyle.COMPACT_LIST;
 					theOther.updateGUI();
 					theOther.disableContextMenu();
@@ -278,12 +284,14 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	
 	private void enableContextMenu() {
 		menuItemCompact.setEnabled(true);
+		menuItemCompact2.setEnabled(true);
 		menuItemFlat.setEnabled(true);
 		menuItemButtons.setEnabled(true);
 	}
 	
 	private void disableContextMenu() {
 		menuItemCompact.setEnabled(false);
+		menuItemCompact2.setEnabled(false);
 		menuItemFlat.setEnabled(false);
 		menuItemButtons.setEnabled(false);
 	}
@@ -466,10 +474,12 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			theOther.buttonStyle = bds;
 			
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+			menuItemCompact2.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 			
 			theOther.menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+			theOther.menuItemCompact2.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 			theOther.menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
 			theOther.menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 			

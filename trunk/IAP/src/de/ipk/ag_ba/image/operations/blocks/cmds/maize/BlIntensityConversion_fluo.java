@@ -15,11 +15,11 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 	protected synchronized FlexibleImage processFLUOmask() {
 		
 		// getInput().getMasks().getFluo().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeFLUOMask2.png");
-		if (getInput().getMasks().getFluo() == null) {
+		if (input().masks().fluo() == null) {
 			return null;
 		}
 		boolean debug = false;
-		ImageOperation io = new ImageOperation(getInput().getMasks().getFluo()).applyMask_ResizeSourceIfNeeded(getInput().getImages().getFluo(),
+		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(),
 				options.getBackground());
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 		if (debug)
@@ -27,13 +27,14 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		double min = 200;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 210;
+		boolean isOldBarley = false;
+		
 		if (options.isBarleyInBarleySystem()) {
 			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 190;
 			
-			boolean isOldBarley = false;
 			if (options.isBarleyInBarleySystem()) {
 				try {
-					String db = getInput().getImages().getFluoInfo().getParentSample().getParentCondition().getExperimentDatabaseId();
+					String db = input().images().getFluoInfo().getParentSample().getParentCondition().getExperimentDatabaseId();
 					if (!LemnaTecDataExchange.known(db))
 						isOldBarley = true;
 				} catch (Exception e) {
@@ -52,6 +53,8 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		
 		FlexibleImage resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, min).getImage();
+		if (isOldBarley && options.getCameraPosition() == CameraPosition.SIDE)
+			min = min;
 		if (options.isBarleyInBarleySystem())
 			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 150;
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
@@ -154,9 +157,9 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		processedImages.setFluo(processedMasks.getFluo());
-		if (processedMasks.getFluo() != null)
-			processedMasks.setFluo(processedMasks.getFluo().getIO().medianFilter32Bit().getImage());
+		processedImages.setFluo(processedMasks.fluo());
+		if (processedMasks.fluo() != null)
+			processedMasks.setFluo(processedMasks.fluo().io().medianFilter32Bit().getImage());
 	}
 	
 }

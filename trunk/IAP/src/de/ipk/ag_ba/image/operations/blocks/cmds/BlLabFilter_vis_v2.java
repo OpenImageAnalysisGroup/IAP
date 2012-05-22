@@ -19,18 +19,18 @@ public class BlLabFilter_vis_v2 extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null
-				|| getInput().getImages().getVis() == null)
+		if (input().masks().vis() == null
+				|| input().images().vis() == null)
 			return null;
 		else {
-			FlexibleImage ref = getInput().getImages().getVis();
-			FlexibleImage mask = getInput().getMasks().getVis();
+			FlexibleImage ref = input().images().vis();
+			FlexibleImage mask = input().masks().vis();
 			int w = mask.getWidth();
 			int h = mask.getHeight();
 			
 			// remove blue markers at the side
 			double hhhh = options.isBarleyInBarleySystem() ? 1d : 0.9d;
-			mask = mask.getIO().hq_thresholdLAB_multi_color_or_and_not(
+			mask = mask.io().hq_thresholdLAB_multi_color_or_and_not(
 					new int[] { 110 }, new int[] { 190 },
 					new int[] { 127 - 5 }, new int[] { 127 + 5 },
 					new int[] { 70 - 5 }, new int[] { 90 + 5 },
@@ -41,12 +41,12 @@ public class BlLabFilter_vis_v2 extends AbstractSnapshotAnalysisBlockFIS {
 					0, 1).dilate(20).
 					print("removed blue markers at side", debug).getImage();
 			
-			mask = mask.copy().getIO().applyMaskInversed_ResizeMaskIfNeeded(ref, options.getBackground()).getImage();
+			mask = mask.copy().io().applyMaskInversed_ResizeMaskIfNeeded(ref, options.getBackground()).getImage();
 			
 			double blueCurbWidthBarley0_1 = options.isBarleyInBarleySystem() ? 0.15 : 0.28;
 			double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.71 : 0.7;
 			if (options.getCameraPosition() == CameraPosition.SIDE)
-				mask = mask.getIO()
+				mask = mask.io()
 						.hq_thresholdLAB_multi_color_or_and_not(
 								// noise colors
 								new int[] {
@@ -92,7 +92,7 @@ public class BlLabFilter_vis_v2 extends AbstractSnapshotAnalysisBlockFIS {
 						print("removed noise", debug).getImage();
 			else
 				mask = mask
-						.getIO()
+						.io()
 						.hq_thresholdLAB_multi_color_or_and_not(
 								// noise colors
 								new int[] { 215 - 5, 225, -1, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,

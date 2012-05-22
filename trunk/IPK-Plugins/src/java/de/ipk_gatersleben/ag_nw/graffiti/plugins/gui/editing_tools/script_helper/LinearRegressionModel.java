@@ -3,7 +3,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import java.awt.geom.Line2D;
 import java.util.TreeMap;
 
-import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.graffiti.util.GraphicHelper;
 
 public class LinearRegressionModel {

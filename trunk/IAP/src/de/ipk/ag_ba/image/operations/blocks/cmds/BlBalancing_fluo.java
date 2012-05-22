@@ -29,11 +29,11 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		FlexibleImage input = getInput().getImages().getFluo();
+		FlexibleImage input = input().images().fluo();
 		FlexibleImage res;
 		boolean invert = true;
 		if (input != null)
-			res = balance(input, input.getIO().medianFilter32Bit().getImage(), 255, invert);
+			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
 		else
 			res = input;
 		return res;
@@ -42,10 +42,10 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage inputMain = getInput().getImages().getFluo();
+		FlexibleImage inputMain = input().images().fluo();
 		if (inputMain == null)
 			return null;
-		FlexibleImage input = getInput().getMasks().getFluo();
+		FlexibleImage input = input().masks().fluo();
 		FlexibleImage res;
 		boolean invert = true;
 		if (input != null)
@@ -62,7 +62,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	 */
 	private double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
 			BlockProperty bpright) {
-		image = image.getIO().crop().getImage();
+		image = image.io().crop().getImage();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -147,7 +147,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				if (invert) {
 					// NIR
 					ImageOperation io = new ImageOperation(input);
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, bpleft, bpright);
 					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, side, null, null);// 0.08);
@@ -175,7 +175,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			double[] pix;
 			if (markerPosY != -1)
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else { // nir - remove round shade
 					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
@@ -183,7 +183,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			else
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.getIO().invert().getImage(), 0.08, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, bpleft, bpright);
@@ -222,10 +222,10 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			int left = (int) (bmpXl.getValue() * w);
 			int right = (int) (bmpXr.getValue() * w);
 			
-			topL = inputUsedForColorAnalysis.getIO().getRGBAverage(left, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
-			topR = inputUsedForColorAnalysis.getIO().getRGBAverage(right - scanWidth, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
-			bottomL = inputUsedForColorAnalysis.getIO().getRGBAverage(left, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
-			bottomR = inputUsedForColorAnalysis.getIO().getRGBAverage(right - scanWidth, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			topL = inputUsedForColorAnalysis.io().getRGBAverage(left, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			topR = inputUsedForColorAnalysis.io().getRGBAverage(right - scanWidth, yTop, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottomL = inputUsedForColorAnalysis.io().getRGBAverage(left, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottomR = inputUsedForColorAnalysis.io().getRGBAverage(right - scanWidth, yBottom, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
 			
 			int i = 0;
 			top[i] = (topL[i] + topR[i]) / 2;
@@ -235,7 +235,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			top[++i] = (topL[i] + topR[i]) / 2;
 			bottom[i] = (bottomL[i] + bottomR[i]) / 2;
 			
-			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth, h / 2 - scanHeight, scanWidth * 2, scanHeight * 2, minL, 50,
+			center = inputUsedForColorAnalysis.io().getRGBAverage(w / 2 - scanWidth, h / 2 - scanHeight, scanWidth * 2, scanHeight * 2, minL, 50,
 					searchWhiteTrue,
 					debug);
 		} else {
@@ -243,9 +243,9 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				scanWidth = w;
 			if (scanHeight > h)
 				scanHeight = h;
-			top = inputUsedForColorAnalysis.getIO().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
-			bottom = inputUsedForColorAnalysis.getIO().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
-			center = inputUsedForColorAnalysis.getIO().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50,
+			top = inputUsedForColorAnalysis.io().getRGBAverage(w - scanWidth, 0, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			bottom = inputUsedForColorAnalysis.io().getRGBAverage(0, h - scanHeight, scanWidth, scanHeight, minL, 50, searchWhiteTrue, debug);
+			center = inputUsedForColorAnalysis.io().getRGBAverage(w / 2 - scanWidth / 2, h / 2 - scanHeight / 2, scanWidth, scanHeight, minL, 50,
 					searchWhiteTrue, debug);
 		}
 		// get TopRight

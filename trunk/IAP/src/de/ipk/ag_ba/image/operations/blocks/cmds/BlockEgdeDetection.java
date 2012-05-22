@@ -14,6 +14,6 @@ public class BlockEgdeDetection extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(getInput().getMasks().getFluo()).findEdge().getImage();
+		return new ImageOperation(input().masks().fluo()).findEdge().getImage();
 	}
 }

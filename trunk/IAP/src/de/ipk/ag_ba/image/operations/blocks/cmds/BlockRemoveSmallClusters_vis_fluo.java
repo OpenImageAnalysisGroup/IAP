@@ -19,9 +19,9 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null)
 			return null;
-		FlexibleImage res, mask = getInput().getMasks().getVis();
+		FlexibleImage res, mask = input().masks().vis();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isMaize()) {
 				// not for barley
@@ -57,36 +57,36 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null)
+		if (input().masks().fluo() == null)
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isMaize()) {
-				return new ImageOperation(getInput().getMasks().getFluo()).
+				return new ImageOperation(input().masks().fluo()).
 						dilate().
 						removeSmallClusters(ngUse,
 								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
-								(getInput().getMasks().getFluo().getWidth() / 100) * 1,
+								(input().masks().fluo().getWidth() / 100) * 1,
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
 				if (options.isArabidopsis()) {
-					return new ImageOperation(getInput().getMasks().getFluo()).
+					return new ImageOperation(input().masks().fluo()).
 							removeSmallClusters(ngUse,
 									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
 									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO).intValue(),
 									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				} else
-					return new ImageOperation(getInput().getMasks().getFluo()).
+					return new ImageOperation(input().masks().fluo()).
 							dilate().
 							removeSmallClusters(ngUse,
 									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
-									(getInput().getMasks().getFluo().getWidth() / 300) * 1,
+									(input().masks().fluo().getWidth() / 300) * 1,
 									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 		} else {
-			int cut2 = (int) ((getInput().getMasks().getFluo().getWidth() / 100) * 0.5);
+			int cut2 = (int) ((input().masks().fluo().getWidth() / 100) * 0.5);
 			double cut = options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO);
-			return new ImageOperation(getInput().getMasks().getFluo()).removeSmallClusters(ngUse,
+			return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
 					cut, cut2,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		}

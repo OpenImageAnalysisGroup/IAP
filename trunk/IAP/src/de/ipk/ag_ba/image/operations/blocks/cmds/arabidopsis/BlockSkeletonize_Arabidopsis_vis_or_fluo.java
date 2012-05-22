@@ -41,8 +41,8 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage vis = getInput().getMasks().getVis();
-		FlexibleImage fluo = getInput().getMasks().getFluo() != null ? getInput().getMasks().getFluo().copy() : null;
+		FlexibleImage vis = input().masks().vis();
+		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
 		FlexibleImage res = fluo.copy();
@@ -55,32 +55,32 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-						res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+						res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
 						if (res != null)
 							getProperties().setImage("skeleton_fluo", sk);
 					}
 				}
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = fluo.copy().getIO().blur(2).getImage().print("fluo", debug);
+			FlexibleImage viswork = fluo.copy().io().blur(2).getImage().print("fluo", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
 					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-						res = res.getIO().drawSkeleton(sk, drawSkeleton).getImage();
+						res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
 						if (res != null)
 							getProperties().setImage("skeleton_fluo", sk);
 					}
 				}
 		}
-		return getInput().getMasks().getFluo();
+		return input().masks().fluo();
 	}
 	
 	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.getIO().skeletonize().getImage()));
+		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize().getImage()));
 		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
 		
@@ -90,10 +90,10 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		int h = vis.getHeight();
 		
 		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.getIO().blur(10).getImage().print("blurf", false), 0.075f, h, 20).getIO().// blur(3).
+		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().print("blurf", false), 0.075f, h, 20).io().// blur(3).
 				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 		
-		probablyBloomFluo = probablyBloomFluo.getIO().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
+		probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
 				erode().erode().erode().erode().invert().
 				getImage();
 		
@@ -124,9 +124,9 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				for (Point p : branchPoints)
 					tempImage[p.x][p.y] = black;
 				FlexibleImage temp = new FlexibleImage(tempImage);
-				temp = temp.getIO().hull().setCustomBackgroundImageForDrawing(clearImage).
+				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0).getImage();
-				temp = temp.getIO().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
+				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
@@ -139,21 +139,21 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 						ttt[p.x][p.y] = clear;
-				temp = new FlexibleImage(ttt).getIO().print("FINAL", debug).getImage();
+				temp = new FlexibleImage(ttt).io().print("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int skeletonLength;
 				do {
-					skeletonLength = temp.getIO().skeletonize().print("SKELETON", false).countFilledPixels();
+					skeletonLength = temp.io().skeletonize().print("SKELETON", false).countFilledPixels();
 					if (skeletonLength > 0)
 						leafWidthInPixels++;
-					temp = temp.getIO().erode().getImage();
+					temp = temp.io().erode().getImage();
 				} while (skeletonLength > 0);
 			}
 		}
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
-		int leaflength = skelres.getIO().countFilledPixels(SkeletonProcessor2d.background);
+		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.background);
 		leafcount -= bloomLimbCount;
 		
 		// ***Out***
@@ -182,7 +182,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			
 			inputImage = new FlexibleImage(inp2d);
 			
-			ImageCanvas canvas = inputImage.getIO().getCanvas();
+			ImageCanvas canvas = inputImage.io().canvas();
 			ArrayList<Point> branchPoints = skel2d.getBranches();
 			int lw;
 			if (leafWidthInPixels != null)
@@ -198,12 +198,12 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			int skeletonLength;
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 			do {
-				skeletonLength = inputImage.getIO().skeletonize().print("SKELETON2", false).countFilledPixels();
+				skeletonLength = inputImage.io().skeletonize().print("SKELETON2", false).countFilledPixels();
 				if (skeletonLength > 0)
 					leafWidthInPixels2++;
 				if (fis != null)
 					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
-				inputImage = inputImage.getIO().erode().getImage();
+				inputImage = inputImage.io().erode().getImage();
 			} while (skeletonLength > 0);
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);
@@ -218,7 +218,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
-		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.getIO().print("BLOOM AREA", debug2).countFilledPixels());
+		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
 		
 		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
@@ -246,7 +246,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		}
 		
 		if (leafcount > 0) {
-			double filled = inp.getIO().countFilledPixels();
+			double filled = inp.io().countFilledPixels();
 			if (distHorizontal != null)
 				rt.addValue("leaf.width.average.norm", (filled / leaflength) * normFactor);
 			rt.addValue("leaf.width.average", filled / leaflength);

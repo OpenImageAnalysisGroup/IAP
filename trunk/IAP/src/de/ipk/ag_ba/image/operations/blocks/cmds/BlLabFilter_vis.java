@@ -19,21 +19,21 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null
-				|| getInput().getImages().getVis() == null)
+		if (input().masks().vis() == null
+				|| input().images().vis() == null)
 			return null;
 		else {
 			boolean isOldBarley = false;
 			if (options.isBarleyInBarleySystem()) {
 				try {
-					String db = getInput().getImages().getVisInfo().getParentSample().getParentCondition().getExperimentHeader().getDatabase();
+					String db = input().images().getVisInfo().getParentSample().getParentCondition().getExperimentHeader().getDatabase();
 					if (!LemnaTecDataExchange.known(db))
 						isOldBarley = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			ImageOperation vis = getInput().getMasks().getVis().getIO();
+			ImageOperation vis = input().masks().vis().io();
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 			if (fis != null)
 				fis.addImage("start", vis.getImage());

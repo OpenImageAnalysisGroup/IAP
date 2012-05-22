@@ -16,13 +16,13 @@ public class BlockLabFilterMaskToMaskBlack extends AbstractSnapshotAnalysisBlock
 	@Override
 	protected FlexibleImage processVISmask() {
 		boolean maize = true;
-		return labFilter(getInput().getMasks().getVis(), getInput().getImages().getVis(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
+		return labFilter(input().masks().vis(), input().images().vis(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		boolean maize = true;
-		return labFilter(getInput().getMasks().getFluo(), getInput().getImages().getFluo(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
+		return labFilter(input().masks().fluo(), input().images().fluo(), 110, 255, 0, 255, 0, 255, options.getCameraPosition(), maize);
 	}
 	
 	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,

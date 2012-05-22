@@ -14,14 +14,14 @@ public class BlockClosingForMaizeBloom_vis_stores_image extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null)
 			return null;
 		else
-			if (getInput().getImages().getVis() != null) {
-				getProperties().setImage("beforeBloomEnhancement", getInput().getMasks().getVis().copy());
-				return closing(getInput().getMasks().getVis(), getInput().getImages().getVis());
+			if (input().images().vis() != null) {
+				getProperties().setImage("beforeBloomEnhancement", input().masks().vis().copy());
+				return closing(input().masks().vis(), input().images().vis());
 			} else
-				return getInput().getMasks().getVis();
+				return input().masks().vis();
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
@@ -35,7 +35,7 @@ public class BlockClosingForMaizeBloom_vis_stores_image extends AbstractSnapshot
 		int[] in = mask.copy().getAs1A();
 		
 		// erodeRetainingLines()
-		FlexibleImage workImage = closing(mask.getIO().getImage(), options.getBackground(), lThresh, bThresh, aDiffFromZero);
+		FlexibleImage workImage = closing(mask.io().getImage(), options.getBackground(), lThresh, bThresh, aDiffFromZero);
 		// run twice, because on the input image above "erode" is called once
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);

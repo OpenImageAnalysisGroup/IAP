@@ -55,13 +55,10 @@ import org.JLabelJavaHelpLink;
 import org.JMButton;
 import org.StringManipulationTools;
 import org.SystemInfo;
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.DistributionFactory;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.TDistribution;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.inference.TTestImpl;
-import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.TDistribution;
+import org.apache.commons.math3.stat.inference.TTest;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.graffiti.attributes.AttributeNotFoundException;
 import org.graffiti.attributes.CollectionAttribute;
 import org.graffiti.editor.GravistoService;
@@ -104,7 +101,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -1629,7 +1626,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 		// useApache,
 		// DescriptiveStatistics stat = DescriptiveStatistics.newInstance();
 		Boolean res1;
-		TTestImpl ttest = new TTestImpl();
+		TTest ttest = new TTest();
 		double[] xd = new double[X.length];
 		int i = 0;
 		for (Double v : X)
@@ -1685,9 +1682,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					+ StringManipulationTools.formatNumber(alpha, "#.###")
 					+ "]? " + (res1 != null && res1 ? "YES" : "NO")
 					+ " : Sample " + sampleIdx + "</b>");
-		} catch (IllegalArgumentException e) {
-			// empty
-		} catch (MathException e) {
+		} catch (Exception e) {
 			// empty
 		}
 		// if (useApache)
@@ -1701,8 +1696,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			boolean useApache, StringBuilder statusResult, int sampleIdx) {
 		Boolean res1, res2;
 		
-		DescriptiveStatistics.newInstance();
-		TTestImpl ttest = new TTestImpl();
+		TTest ttest = new TTest();
 		double[] xd = new double[X.length];
 		int i = 0;
 		for (Double v : X)
@@ -1764,7 +1758,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 					+ " : Sample " + sampleIdx + "</b>");
 		} catch (IllegalArgumentException e) {
 			// empty
-		} catch (MathException e) {
+		} catch (Exception e) {
 			// empty
 		}
 		if (useApache)
@@ -1773,10 +1767,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			return res2;
 	}
 	
-	private static DistributionFactory factory = DistributionFactory
-			.newInstance();
-	private static NormalDistribution normalDistribution = factory
-			.createNormalDistribution();
+	private static NormalDistribution normalDistribution = new NormalDistribution();
 	
 	private boolean calcuteWilcoxonTest(Double[] X, Double[] Y, double alpha,
 			StringBuilder statusResult, int sampleIdx) {
@@ -1867,7 +1858,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			statusResult.append("? <b>" + (z_ > compare_z ? "YES" : "NO")
 					+ " : Sample " + sampleIdx + "</b>");
 			return z_ > compare_z;
-		} catch (MathException e) {
+		} catch (Exception e) {
 			statusResult.append(", MATH ERROR FOR SAMPLE " + sampleIdx);
 			ErrorMsg.addErrorMessage(e);
 			return false;
@@ -2360,8 +2351,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 		return corrRes;
 	}
 	
-	private static TDistribution tDistribution = factory
-			.createTDistribution(100);
+	private static TDistribution tDistribution = new TDistribution(100);
 	
 	// private static NormalDistribution nDistribution =
 	// factory.createNormalDistribution();
@@ -2385,11 +2375,11 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 				 * t_or_z = r*Math.sqrt(n-1); p2 =
 				 * nDistribution.cumulativeProbability(Math.abs(t_or_z));
 				 */
-				tDistribution.setDegreesOfFreedom(n - 2);
+				tDistribution = new TDistribution(n - 2);
 				t_or_z = Math.abs(r) / Math.sqrt((1 - r * r) / (n - 2));
 				p2 = tDistribution.cumulativeProbability(Math.abs(t_or_z));
 			} else {
-				tDistribution.setDegreesOfFreedom(n - 2);
+				tDistribution = new TDistribution(n - 2);
 				t_or_z = r / Math.sqrt((1 - r * r) / (n - 2));
 				p2 = tDistribution.cumulativeProbability(Math.abs(t_or_z));
 			}
@@ -2427,7 +2417,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			calculationHistory
 					.append("<tr><td colspan=\"5\">CALCULATION (to few datapoints): "
 							+ iae.getLocalizedMessage() + "</td></tr>\n");
-		} catch (MathException e) {
+		} catch (Exception e) {
 			calculationHistory
 					.append("<tr><td colspan=\"5\">CALCULATION ERROR: "
 							+ e.getLocalizedMessage() + "</td></tr>\n");

@@ -37,10 +37,10 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null)
 			return null;
 		
-		FlexibleImage input = getInput().getMasks().getVis();
+		FlexibleImage input = input().masks().vis();
 		FlexibleImage result = input;
 		int color = options.getBackground();
 		boolean visCutPosSet = false;
@@ -49,7 +49,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			if (options.isBarleyInBarleySystem()) {
 				double temp = 0.001;
 				
-				int cy = (int) (input.getHeight() - temp * getInput().getImages().getVis().getHeight());
+				int cy = (int) (input.getHeight() - temp * input().images().vis().getHeight());
 				result = new ImageOperation(input).clearImageBottom(
 						cy, options.getBackground()).getImage();
 				getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
@@ -65,7 +65,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				if (markerPosLeftY != null) {
 					if (markerPosLeftY.getValue() > 0.55) {
 						// Integer cuof = options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS);
-						int cy = (int) (markerPosLeftY.getValue() * getInput().getMasks().getVis().getHeight());
+						int cy = (int) (markerPosLeftY.getValue() * input().masks().vis().getHeight());
 						result = new ImageOperation(result).clearImageBottom(cy, color).getImage();
 						getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
 						visCutPosSet = true;
@@ -74,7 +74,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					if (markerPosLeftY == null && markerPosRightY != null) {
 						if (markerPosRightY.getValue() > 0.55) {
 							// - options.getIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS)
-							int cy = (int) (markerPosRightY.getValue() * getInput().getMasks().getVis().getHeight());
+							int cy = (int) (markerPosRightY.getValue() * input().masks().vis().getHeight());
 							result = new ImageOperation(result).clearImageBottom(
 									cy, color).getImage();
 							getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, cy);
@@ -83,12 +83,12 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					}
 			}
 			// Clear Sides
-			int width = getInput().getMasks().getVis().getWidth();
+			int width = input().masks().vis().getWidth();
 			result = clearSides(result, width);
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isBarley() && options.isHighResMaize()) {
-				int width = getInput().getMasks().getVis().getWidth();
+				int width = input().masks().vis().getWidth();
 				clearSides(result, width, 10);
 			}
 		}
@@ -108,10 +108,10 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null || getInput().getMasks().getVis() == null)
-			return getInput().getMasks().getFluo();
+		if (input().masks().fluo() == null || input().masks().vis() == null)
+			return input().masks().fluo();
 		
-		FlexibleImage input = getInput().getMasks().getFluo();
+		FlexibleImage input = input().masks().fluo();
 		FlexibleImage result = input;
 		boolean fluoCutPosSet = false;
 		if (!options.isBarleyInBarleySystem())
@@ -122,7 +122,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					if (markerPosLeftY != null) {
 						double temp = markerPosLeftY.getValue();
 						if (temp > 0.55) {
-							int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor); // - 18
+							int cy = (int) (temp * input().images().fluo().getHeight() * scaleFactor); // - 18
 							result = new ImageOperation(input).clearImageBottom(
 									cy, options.getBackground()).getImage();
 							getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
@@ -134,7 +134,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 					if (markerPosLeftY == null && markerPosRightY != null) {
 						double temp = markerPosRightY.getValue();
 						if (temp > 0.55) {
-							int cy = (int) (temp * getInput().getImages().getFluo().getHeight() * scaleFactor); // - 18
+							int cy = (int) (temp * input().images().fluo().getHeight() * scaleFactor); // - 18
 							result = new ImageOperation(input).clearImageBottom(
 									cy, options.getBackground()).getImage();
 							getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
@@ -143,12 +143,12 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 						}
 					}
 				}
-				int width = getInput().getMasks().getFluo().getWidth();
+				int width = input().masks().fluo().getWidth();
 				result = clearSides(result, width, 10);
 			}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isBarley() && options.isHighResMaize()) {
-				int width = getInput().getMasks().getFluo().getWidth();
+				int width = input().masks().fluo().getWidth();
 				clearSides(result, width, 10);
 			}
 		}
@@ -159,7 +159,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		if (options.isBarleyInBarleySystem())
 			temp = 0.001;
 		
-		int cy = (int) (input.getHeight() - temp * getInput().getImages().getFluo().getHeight());
+		int cy = (int) (input.getHeight() - temp * input().images().fluo().getHeight());
 		result = new ImageOperation(input).clearImageBottom(
 				cy, options.getBackground()).getImage();
 		if (!fluoCutPosSet)
@@ -169,9 +169,9 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (getInput().getImages().getNir() == null)
+		if (input().images().nir() == null)
 			return null;
-		FlexibleImage input = getInput().getImages().getNir();
+		FlexibleImage input = input().images().nir();
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			result = cutNir(input);
@@ -184,15 +184,15 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			return result;
 		}
 		else
-			return getInput().getImages().getNir();
+			return input().images().nir();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() == null)
+		if (input().masks().nir() == null)
 			return null;
 		
-		FlexibleImage input = getInput().getMasks().getNir();
+		FlexibleImage input = input().masks().nir();
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			result = cutNir(input);
@@ -205,10 +205,10 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
 			return result;
 		}
-		FlexibleImage res = getInput().getMasks().getNir();
+		FlexibleImage res = input().masks().nir();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isBarley() && options.isHighResMaize()) {
-				int width = getInput().getMasks().getNir().getWidth();
+				int width = input().masks().nir().getWidth();
 				clearSides(res, width, 10);
 			}
 		}
@@ -218,11 +218,11 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 	private FlexibleImage cutNir(FlexibleImage input) {
 		FlexibleImage result = input;
 		if (hasThreeVerticalMarkerPositionsVisible) {
-			if (getInput().getMasks().getNir() != null) {
+			if (input().masks().nir() != null) {
 				if (markerPosLeftY != null) {
 					double temp = markerPosLeftY.getValue();
 					if (temp > 0.5) {
-						double pos = temp * getInput().getImages().getNir().getHeight();
+						double pos = temp * input().images().nir().getHeight();
 						// if (pos > 10)
 						// pos -= 10;
 						result = new ImageOperation(input).clearImageBottom(
@@ -232,12 +232,12 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(
-										(int) (0.98 * markerPosLeftX.getValue() * getInput().getMasks().getNir().getWidth()), options.getNirBackground()).getImage();
+										(int) (0.98 * markerPosLeftX.getValue() * input().masks().nir().getWidth()), options.getNirBackground()).getImage();
 							}
 						if (clearSides)
 							if (markerPosRightX != null) {
 								result = new ImageOperation(result).clearImageRight(
-										(int) (1.02 * markerPosRightX.getValue() * getInput().getMasks().getNir().getWidth()), options.getNirBackground()).getImage();
+										(int) (1.02 * markerPosRightX.getValue() * input().masks().nir().getWidth()), options.getNirBackground()).getImage();
 							}
 						return result;
 					}
@@ -246,7 +246,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				if (markerPosLeftY == null && markerPosRightY != null) {
 					double temp = markerPosRightY.getValue();
 					if (temp > 0.5) {
-						double pos = (temp * getInput().getImages().getNir().getHeight());
+						double pos = (temp * input().images().nir().getHeight());
 						// if (pos > 10)
 						// pos -= 14;
 						result = new ImageOperation(input).clearImageBottom(
@@ -256,12 +256,12 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 						if (clearSides)
 							if (markerPosLeftX != null) {
 								result = new ImageOperation(result).clearImageLeft(
-										(int) (0.95 * markerPosLeftX.getValue() * getInput().getMasks().getNir().getWidth()), options.getNirBackground()).getImage();
+										(int) (0.95 * markerPosLeftX.getValue() * input().masks().nir().getWidth()), options.getNirBackground()).getImage();
 							}
 						if (clearSides)
 							if (markerPosRightX != null) {
 								result = new ImageOperation(result).clearImageRight(
-										(int) (1.05 * markerPosRightX.getValue() * getInput().getMasks().getNir().getWidth()), options.getNirBackground()).getImage();
+										(int) (1.05 * markerPosRightX.getValue() * input().masks().nir().getWidth()), options.getNirBackground()).getImage();
 							}
 					}
 				}

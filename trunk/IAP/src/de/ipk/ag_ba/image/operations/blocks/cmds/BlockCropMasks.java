@@ -12,24 +12,24 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getVis() != null)
-			return getInput().getMasks().getVis().crop();
+		if (input() != null && input().masks() != null && input().masks().vis() != null)
+			return input().masks().vis().crop();
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getFluo() != null)
-			return getInput().getMasks().getFluo().crop();
+		if (input() != null && input().masks() != null && input().masks().fluo() != null)
+			return input().masks().fluo().crop();
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getNir() != null)
-			return getInput().getMasks().getNir().crop();
+		if (input() != null && input().masks() != null && input().masks().nir() != null)
+			return input().masks().nir().crop();
 		else
 			return null;
 	}

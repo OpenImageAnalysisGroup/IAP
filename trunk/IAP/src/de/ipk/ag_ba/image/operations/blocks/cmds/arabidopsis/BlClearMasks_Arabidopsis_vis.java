@@ -14,45 +14,45 @@ public class BlClearMasks_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		FlexibleImage img = getInput().getImages().getVis();
+		FlexibleImage img = input().images().vis();
 		if (img != null) {
-			return img.copy().getIO().border(40).getImage();
+			return img.copy().io().border(40).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		FlexibleImage img = getInput().getImages().getNir();
+		FlexibleImage img = input().images().nir();
 		if (img != null) {
-			return img.copy().getIO().translate(-3, 0).getImage();
+			return img.copy().io().translate(-3, 0).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage img = getInput().getImages().getVis();
+		FlexibleImage img = input().images().vis();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage img = getInput().getImages().getFluo();
+		FlexibleImage img = input().images().fluo();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		FlexibleImage img = getInput().getImages().getNir();
+		FlexibleImage img = input().images().nir();
 		if (img != null) {
-			return img.copy().getIO().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
+			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
 			return null;
 	}

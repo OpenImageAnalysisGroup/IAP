@@ -67,65 +67,65 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 		
 		switch (typ) {
 			case TRANSLATION:
-				fluoMask = automaticProcessIntervallSearch(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), resultValues, typ);
+				fluoMask = automaticProcessIntervallSearch(input().masks().fluo(), input().masks().vis(), resultValues, typ);
 				t = (Vector2d) resultValues.getObject();
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_FLUO_X, t.x);
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_FLUO_Y, t.y);
 				// System.out.println("translation des Originalbildes: " + t.x + " " + t.y);
-				fluoImage = new ImageOperation(getInput().getImages().getFluo()).translate(t.x, t.y).getImage();
+				fluoImage = new ImageOperation(input().images().fluo()).translate(t.x, t.y).getImage();
 				
 				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
-					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
+					nirMask = automaticProcessIntervallSearch(input().masks().nir(), input().masks().vis(), resultValues, typ);
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_NIR_X, t.x);
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.TRANSLATION_NIR_Y, t.y);
 					t = (Vector2d) resultValues.getObject();
-					nirImage = new ImageOperation(getInput().getImages().getNir()).translate(t.x, t.y).getImage();
+					nirImage = new ImageOperation(input().images().nir()).translate(t.x, t.y).getImage();
 				} else {
-					nirImage = getInput().getImages().getNir();
-					nirMask = getInput().getMasks().getNir();
+					nirImage = input().images().nir();
+					nirMask = input().masks().nir();
 				}
 				
 				break;
 			
 			case ROTATION:
-				fluoMask = automaticProcessIntervallSearch(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), resultValues, typ);
+				fluoMask = automaticProcessIntervallSearch(input().masks().fluo(), input().masks().vis(), resultValues, typ);
 				t = (Vector2d) resultValues.getObject();
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.ROTATION_FLUO, t.x);
-				fluoImage = new ImageOperation(getInput().getImages().getFluo()).rotate(t.x).getImage();
+				fluoImage = new ImageOperation(input().images().fluo()).rotate(t.x).getImage();
 				
 				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
-					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
+					nirMask = automaticProcessIntervallSearch(input().masks().nir(), input().masks().vis(), resultValues, typ);
 					t = (Vector2d) resultValues.getObject();
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.ROTATION_NIR, t.x);
-					nirImage = new ImageOperation(getInput().getImages().getNir()).rotate(t.x).getImage();
+					nirImage = new ImageOperation(input().images().nir()).rotate(t.x).getImage();
 				} else {
-					nirImage = getInput().getImages().getNir();
-					nirMask = getInput().getMasks().getNir();
+					nirImage = input().images().nir();
+					nirMask = input().masks().nir();
 				}
 				break;
 			
 			case SCALING:
-				fluoMask = automaticProcessIntervallSearch(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), resultValues, typ);
+				fluoMask = automaticProcessIntervallSearch(input().masks().fluo(), input().masks().vis(), resultValues, typ);
 				t = (Vector2d) resultValues.getObject();
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_FLUO_X, t.x);
 				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_FLUO_Y, t.y);
-				fluoImage = new ImageOperation(getInput().getImages().getFluo()).scale(t.x, t.y).getImage();
+				fluoImage = new ImageOperation(input().images().fluo()).scale(t.x, t.y).getImage();
 				
 				if (options.getBooleanSetting(Setting.PROCESS_NIR)) {
-					nirMask = automaticProcessIntervallSearch(getInput().getMasks().getNir(), getInput().getMasks().getVis(), resultValues, typ);
+					nirMask = automaticProcessIntervallSearch(input().masks().nir(), input().masks().vis(), resultValues, typ);
 					t = (Vector2d) resultValues.getObject();
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_NIR_X, t.x);
 					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.SCALING_NIR_Y, t.y);
-					nirImage = new ImageOperation(getInput().getImages().getNir()).scale(t.x, t.y).getImage();
+					nirImage = new ImageOperation(input().images().nir()).scale(t.x, t.y).getImage();
 				} else {
-					nirImage = getInput().getImages().getNir();
-					nirMask = getInput().getMasks().getNir();
+					nirImage = input().images().nir();
+					nirMask = input().masks().nir();
 				}
 				break;
 		}
 		
-		FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages().getVis(), fluoImage, nirImage, irImage);
-		FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getMasks().getVis(), fluoMask, nirMask, irMask);
+		FlexibleImageSet processedImages = new FlexibleImageSet(input().images().vis(), fluoImage, nirImage, irImage);
+		FlexibleImageSet processedMasks = new FlexibleImageSet(input().masks().vis(), fluoMask, nirMask, irMask);
 		
 		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
 	}

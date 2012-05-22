@@ -23,22 +23,22 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null
-				|| getInput().getImages().getVis() == null)
+		if (input().masks().vis() == null
+				|| input().images().vis() == null)
 			return null;
 		else {
 			FlexibleImageStack fis = debug ?
 					new FlexibleImageStack() : null;
 			int dilate;
 			FlexibleImage result;
-			FlexibleImage mask = getInput().getMasks().getVis();
-			FlexibleImage orig = getInput().getImages().getVis();
+			FlexibleImage mask = input().masks().vis();
+			FlexibleImage orig = input().images().vis();
 			// fis.addImage("mask", mask.copy());
 			boolean side = options.getCameraPosition() == CameraPosition.SIDE;
 			if (options.isMaize()) {
 				dilate = 3;
 				result = labFilterVis(side, mask, orig, dilate, debug);
-				return result.getIO().filterGray(220, 15, 15).getImage()
+				return result.io().filterGray(220, 15, 15).getImage()
 						.print("Gray filtered", debug);
 			} else {
 				dilate = 0;
@@ -64,7 +64,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 					offB2 = 0;
 				}
 				int upperLimit = 255;
-				toBeFiltered = result.copy().getIO().filterRemoveLAB(
+				toBeFiltered = result.copy().io().filterRemoveLAB(
 						lowerLimit, upperLimit,
 						120 - an, 120 + an,
 						120 - offB, 120 + 2 * bn + offB2,
@@ -76,7 +76,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 				int w = toBeFiltered.getWidth();
 				int h = toBeFiltered.getHeight();
 				
-				result = result.copy().getIO().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).
+				result = result.copy().io().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).
 						print("unknown 1", false).getImage();
 				
 				// .removeSmallElements(30, 30).getImage().print("ORRR GREEN (NACH REMOVAL)", debug)
@@ -91,7 +91,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 				double blueCurbHeightEndBarly0_8 = options.isBarleyInBarleySystem() ? 0.71 : 0.7;
 				if (options.getCameraPosition() == CameraPosition.SIDE)
 					toBeFiltered = result
-							.getIO()
+							.io()
 							.hq_thresholdLAB_multi_color_or_and_not(
 									// noise colors
 									new int[] {
@@ -137,7 +137,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 							print("removed noise", debug).getImage();
 				else
 					toBeFiltered = result
-							.getIO()
+							.io()
 							.hq_thresholdLAB_multi_color_or_and_not(
 									// noise colors
 									new int[] { 215 - 5, 225, 0, 0, 135,
@@ -201,15 +201,15 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 							// Color.red.getRGB()).
 							print("removed noise", false).getImage();
 				if (!options.isBarleyInBarleySystem())
-					toBeFiltered = toBeFiltered.getIO().medianFilter32Bit().medianFilter32Bit().getImage();
+					toBeFiltered = toBeFiltered.io().medianFilter32Bit().medianFilter32Bit().getImage();
 				if (fis != null)
 					fis.addImage("step 7", toBeFiltered.copy());
 				
-				result = result.getIO().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage(); // copy().
+				result = result.io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage(); // copy().
 				if (fis != null)
 					fis.addImage("step 8", result);
 				if (debug)
-					result.copy().getIO().replaceColors(options.getBackground(), Color.black.getRGB()).print("Left-Over", false);
+					result.copy().io().replaceColor(options.getBackground(), Color.black.getRGB()).print("Left-Over", false);
 				if (fis != null)
 					fis.addImage("step 9", result);
 				
@@ -219,9 +219,9 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 				// fis.addImage("gray filtered", result);
 				if (fis != null)
 					fis.print("lab filter vis");
-				return getInput().getImages().getVis().copy().getIO()
+				return input().images().vis().copy().io()
 						.applyMask_ResizeSourceIfNeeded(
-								result.getIO().erode().blur(1).getImage(), options.getBackground())
+								result.io().erode().blur(1).getImage(), options.getBackground())
 						.getImage();
 			}
 		}
@@ -251,7 +251,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 		FlexibleImage labResult = labFilter(
 				// getInput().getMasks().getVis().getIO().dilate(3,
 				// getInput().getImages().getVis()).blur(2).getImage(),
-				mask.copy().getIO().blur((dilate > 0 ? 3 : 0)).getImage(),
+				mask.copy().io().blur((dilate > 0 ? 3 : 0)).getImage(),
 				orig.copy(),
 				options.getIntSetting(Setting.LAB_MIN_L_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_L_VALUE_VIS),
@@ -260,10 +260,10 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 				options.getIntSetting(Setting.LAB_MIN_B_VALUE_VIS),
 				options.getIntSetting(Setting.LAB_MAX_B_VALUE_VIS),
 				options.getCameraPosition(), options.isMaize(), false, true,
-				options.getBackground()).getIO().erode(dilate > 0 ? 2 : 0)
+				options.getBackground()).io().erode(dilate > 0 ? 2 : 0)
 				.print("before dilate, after lab", debug)
 				.dilate(dilate > 0 ? 3 : 0).getImage()
-				.print("after lab", debug).getIO().erode(2).getImage();
+				.print("after lab", debug).io().erode(2).getImage();
 		
 		if (debug) {
 			fis.addImage("mask", mask.copy());
@@ -272,7 +272,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 		
 		FlexibleImage result = mask
 				.copy()
-				.getIO()
+				.io()
 				.removePixel(labResult.copy(), options.getBackground(), 1, 105,
 						120).getImage();
 		
@@ -283,7 +283,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 			if (options.isHighResMaize()) {
 				// remove black matts inside the holes
 				return result
-						.getIO()
+						.io()
 						.thresholdLAB(0, 150, 110, 150, 100, 150,
 								ImageOperation.BACKGROUND_COLORint,
 								CameraPosition.TOP, false, true).getImage();
@@ -293,7 +293,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 		
 		FlexibleImage potFiltered = labFilter(
 				// options.isMaize() ?
-				result.copy(), getInput().getImages().getVis().copy(),
+				result.copy(), input().images().vis().copy(),
 				100, // filter anything that is very dark
 				255,
 				0, // 127 - 10,
@@ -302,7 +302,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 				255, // 127 + 10,
 				options.getCameraPosition(), options.isMaize(), false, true,
 				options.getBackground())
-				.getIO()
+				.io()
 				.clearImageAbove(mask.getHeight() * 0.6,
 						options.getBackground()).erode(1)
 				.print("A: " + dilate, debug)
@@ -319,7 +319,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 		}
 		
 		return result = result
-				.getIO()
+				.io()
 				.removePixel(
 						potFiltered.print(
 								"black parts removed from blue parts removal",
