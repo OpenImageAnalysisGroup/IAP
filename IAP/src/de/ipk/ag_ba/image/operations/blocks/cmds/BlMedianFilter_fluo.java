@@ -16,12 +16,12 @@ public class BlMedianFilter_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput().getMasks().getFluo() == null)
+		if (input().masks().fluo() == null)
 			return null;
 		
-		FlexibleImage medianMask = new ImageOperation(getInput().getMasks().getFluo()).medianFilter32Bit().border(2).getImage();
+		FlexibleImage medianMask = new ImageOperation(input().masks().fluo()).medianFilter32Bit().border(2).getImage();
 		
-		return new ImageOperation(getInput().getImages().getFluo()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
+		return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
 	}
 	
 }

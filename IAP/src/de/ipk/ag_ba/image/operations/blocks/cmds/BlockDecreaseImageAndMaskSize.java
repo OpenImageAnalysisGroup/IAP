@@ -22,28 +22,28 @@ public class BlockDecreaseImageAndMaskSize extends AbstractSnapshotAnalysisBlock
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		FlexibleImage vis = getInput().getImages().getVis();
+		FlexibleImage vis = input().images().vis();
 		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		return pre(vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight())));
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		FlexibleImage vis = getInput().getImages().getFluo();
+		FlexibleImage vis = input().images().fluo();
 		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		return pre(vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight())));
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage vis = input().masks().vis();
 		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		return pre(vis.resize((int) (scaleFactor * vis.getWidth()), (int) (scaleFactor * vis.getHeight())));
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage fluo = getInput().getMasks().getFluo();
+		FlexibleImage fluo = input().masks().fluo();
 		double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		return pre(fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight())));
 	}

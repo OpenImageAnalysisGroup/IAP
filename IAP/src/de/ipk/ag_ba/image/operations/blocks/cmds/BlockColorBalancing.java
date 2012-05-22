@@ -16,7 +16,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		FlexibleImage vis = getInput().getImages().getVis();
+		FlexibleImage vis = input().images().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
@@ -30,7 +30,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage vis = input().masks().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
@@ -44,7 +44,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		FlexibleImage fluo = getInput().getImages().getFluo();
+		FlexibleImage fluo = input().images().fluo();
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
@@ -55,7 +55,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage fluo = getInput().getMasks().getFluo();
+		FlexibleImage fluo = input().masks().fluo();
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
@@ -66,29 +66,29 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processNIRimage() {
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (getInput().getImages().getNir() != null) {
+			if (input().images().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = getInput().getImages().getNir();
+				FlexibleImage nir = input().images().nir();
 				// White Balancing
 				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
 			}
 		}
-		return getInput().getImages().getNir();
+		return input().images().nir();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (getInput().getMasks().getNir() != null) {
+			if (input().masks().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = getInput().getMasks().getNir();
+				FlexibleImage nir = input().masks().nir();
 				// White Balancing
 				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
 			}
 		}
-		return getInput().getMasks().getNir();
+		return input().masks().nir();
 	}
 	
 	/**

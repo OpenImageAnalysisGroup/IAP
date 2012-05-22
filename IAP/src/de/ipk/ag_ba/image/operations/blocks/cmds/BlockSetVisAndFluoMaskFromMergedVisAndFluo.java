@@ -18,9 +18,9 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		MaskOperation o = new MaskOperation(getInput().getMasks().getFluo(), getInput().getMasks().getVis(), null, options.getBackground(), Color.GRAY.getRGB());
+		MaskOperation o = new MaskOperation(input().masks().fluo(), input().masks().vis(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		FlexibleImage result = new FlexibleImage(getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight(), o.getMask());
+		FlexibleImage result = new FlexibleImage(input().masks().getLargestWidth(), input().masks().getLargestHeight(), o.getMask());
 		int[] resPixels = result.getAs1A();
 		{
 			int filled = 0;
@@ -30,10 +30,10 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 					filled++;
 			// if vis is emptied by mask operation, don't change vis (fluo image is empty in this case)
 			if (filled < resPixels.length * 0.001d)
-				return getInput().getMasks().getVis();
+				return input().masks().vis();
 		}
 		{
-			int[] srcPixels = getInput().getMasks().getVis().getAs1A();
+			int[] srcPixels = input().masks().vis().getAs1A();
 			int b = options.getBackground();
 			int filledSrc = 0;
 			for (int p : srcPixels)
@@ -45,7 +45,7 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 					filledRes++;
 			// if vis is cleared for more than 95%, the vis image remains unchanged
 			if (filledRes < filledSrc * 0.05d)
-				return getInput().getMasks().getVis();
+				return input().masks().vis();
 		}
 		
 		return result;
@@ -53,8 +53,8 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		MaskOperation o = new MaskOperation(getInput().getMasks().getVis(), getInput().getMasks().getFluo(), null, options.getBackground(), Color.GRAY.getRGB());
+		MaskOperation o = new MaskOperation(input().masks().vis(), input().masks().fluo(), null, options.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
-		return new FlexibleImage(getInput().getMasks().getLargestWidth(), getInput().getMasks().getLargestHeight(), o.getMask());
+		return new FlexibleImage(input().masks().getLargestWidth(), input().masks().getLargestHeight(), o.getMask());
 	}
 }

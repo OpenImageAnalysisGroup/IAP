@@ -175,7 +175,7 @@ public class FlexibleImage {
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			PrintImage.printImage(
-					copy().getIO().replaceColors(ImageOperation.BACKGROUND_COLORint, new Color(115, 155, 225).getRGB()).getImage().image,
+					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(115, 155, 225).getRGB()).getImage().image,
 					title);
 			IAPmain.showImageJ();
 		}
@@ -287,7 +287,7 @@ public class FlexibleImage {
 	/**
 	 * gets a ImageOperation
 	 */
-	public ImageOperation getIO() {
+	public ImageOperation io() {
 		return new ImageOperation(this);
 	}
 	
@@ -371,6 +371,6 @@ public class FlexibleImage {
 	 * @return
 	 */
 	public void saveToFile(String fileName) {
-		getIO().saveImage(fileName);
+		io().saveImage(fileName);
 	}
 }

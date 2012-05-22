@@ -15,25 +15,25 @@ public class BlockCountPixel extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_VIS, countPixel(getInput().getMasks().getVis()));
+		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_VIS, countPixel(input().masks().vis()));
 		
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		
-		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_FLUO, countPixel(getInput().getMasks().getFluo()));
+		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_FLUO, countPixel(input().masks().fluo()));
 		
-		return getInput().getMasks().getFluo();
+		return input().masks().fluo();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
 		
-		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_NIR, countPixel(getInput().getMasks().getNir()));
+		getProperties().setNumericProperty(0, PropertyNames.COUNT_PIXEL_NIR, countPixel(input().masks().nir()));
 		
-		return getInput().getMasks().getNir();
+		return input().masks().nir();
 	}
 	
 	private int countPixel(FlexibleImage workMask) {

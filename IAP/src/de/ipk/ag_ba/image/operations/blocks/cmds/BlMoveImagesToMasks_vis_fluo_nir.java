@@ -7,6 +7,6 @@ public class BlMoveImagesToMasks_vis_fluo_nir extends AbstractImageAnalysisBlock
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() {
-		return new FlexibleMaskAndImageSet(getInput().getImages(), getInput().getImages());
+		return new FlexibleMaskAndImageSet(input().images(), input().images());
 	}
 }

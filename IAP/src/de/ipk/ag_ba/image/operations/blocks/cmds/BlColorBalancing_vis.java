@@ -18,15 +18,15 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		if (getInput() == null || getInput().getImages() == null)
+		if (input() == null || input().images() == null)
 			return null;
-		FlexibleImage vis = getInput().getImages().getVis();
+		FlexibleImage vis = input().images().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -10, 50);
+			pix = getProbablyWhitePixels(vis.copy().io().blur(5).getImage(), true, -10, 50);
 		} else
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", false);
@@ -34,13 +34,13 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = getInput().getMasks().getVis();
+		FlexibleImage vis = input().masks().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis.copy().getIO().blur(5).getImage(), true, -10, 50);
+			pix = getProbablyWhitePixels(vis.copy().io().blur(5).getImage(), true, -10, 50);
 		else
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
 		return io.imageBalancing(255, pix).getImage().print("after", false);

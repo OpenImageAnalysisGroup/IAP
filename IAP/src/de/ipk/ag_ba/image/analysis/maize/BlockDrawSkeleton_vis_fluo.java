@@ -8,26 +8,26 @@ public class BlockDrawSkeleton_vis_fluo extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput() == null || getInput().getMasks() == null)
+		if (input() == null || input().masks() == null)
 			return null;
-		FlexibleImage plantImg = getInput().getMasks().getVis();
+		FlexibleImage plantImg = input().masks().vis();
 		boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 		FlexibleImage skel = getProperties().getImage("skeleton");
 		if (skel != null && plantImg != null)
-			return plantImg.getIO().drawSkeleton(skel, drawSkeleton).getImage();
+			return plantImg.io().drawSkeleton(skel, drawSkeleton).getImage();
 		else
 			return plantImg;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput() == null || getInput().getMasks() == null)
+		if (input() == null || input().masks() == null)
 			return null;
-		FlexibleImage plantImg = getInput().getMasks().getFluo();
+		FlexibleImage plantImg = input().masks().fluo();
 		boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
 		FlexibleImage skel = getProperties().getImage("skeleton_fluo");
 		if (skel != null && plantImg != null)
-			return plantImg.getIO().drawSkeleton(skel, drawSkeleton).getImage();
+			return plantImg.io().drawSkeleton(skel, drawSkeleton).getImage();
 		else
 			return plantImg;
 	}

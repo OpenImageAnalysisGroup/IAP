@@ -30,7 +30,10 @@ public class BookmarkAction extends AbstractNavigationAction {
 	}
 	
 	private static String pretify(String target) {
-		return "<html>" + StringManipulationTools.stringReplace(target, ".", " " + Unicode.ARROW_RIGHT + " ");
+		String res = "<html>" + StringManipulationTools.stringReplace(target, ".", " " + Unicode.ARROW_RIGHT + " ");
+		res = StringManipulationTools.stringReplace(res, Unicode.STAR, "*");
+		res = StringManipulationTools.stringReplace(res, Unicode.ARROW_RIGHT, "&gt;");
+		return res;
 	}
 	
 	@Override

@@ -9,7 +9,7 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		FlexibleImage fi = getInput().getMasks().getVis();
+		FlexibleImage fi = input().masks().vis();
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
@@ -22,7 +22,7 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		FlexibleImage fi = getInput().getImages().getVis();
+		FlexibleImage fi = input().images().vis();
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISImage.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()

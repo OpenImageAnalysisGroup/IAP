@@ -14,10 +14,10 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlockFilterFluoMaskByValue30 extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput() == null || getInput().getMasks() == null || getInput().getMasks().getFluo() == null)
+		if (input() == null || input().masks() == null || input().masks().fluo() == null)
 			return null;
 		
-		FlexibleImage fluoMask = getInput().getMasks().getFluo();
+		FlexibleImage fluoMask = input().masks().fluo();
 		
 		Color backgroundFill = ImageOperation.BACKGROUND_COLOR;
 		final int iBackgroundFill = backgroundFill.getRGB();

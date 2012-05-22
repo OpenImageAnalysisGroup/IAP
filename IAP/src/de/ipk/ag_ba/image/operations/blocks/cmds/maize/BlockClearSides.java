@@ -19,7 +19,7 @@ public class BlockClearSides extends AbstractBlock {
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
 		if (mask != null)
-			return mask.getIO().border((int) (0.01d * mask.getWidth())).getImage();
+			return mask.io().border((int) (0.01d * mask.getWidth())).getImage();
 		else
 			return null;
 	}
@@ -27,7 +27,7 @@ public class BlockClearSides extends AbstractBlock {
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
 		if (image != null)
-			return image.getIO().border((int) (0.01d * image.getWidth())).getImage();
+			return image.io().border((int) (0.01d * image.getWidth())).getImage();
 		else
 			return null;
 	}

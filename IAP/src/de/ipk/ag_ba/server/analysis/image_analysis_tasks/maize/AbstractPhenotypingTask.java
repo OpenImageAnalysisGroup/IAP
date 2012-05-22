@@ -884,12 +884,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					debugImageStack);
 			
 			for (Integer key : ret.keySet()) {
-				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).getImages() : null;
+				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).images() : null;
 				if (pipelineResult != null) {
 					FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
-					resVis = pipelineResult.getVis();
-					resFluo = pipelineResult.getFluo();
-					resNir = pipelineResult.getNir();
+					resVis = pipelineResult.vis();
+					resFluo = pipelineResult.fluo();
+					resNir = pipelineResult.nir();
 					resIr = pipelineResult.getIr();
 					analysisResults = imageProcessor.getSettings();
 					

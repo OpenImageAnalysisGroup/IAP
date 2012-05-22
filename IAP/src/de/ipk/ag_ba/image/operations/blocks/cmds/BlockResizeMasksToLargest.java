@@ -15,24 +15,24 @@ public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS 
 	
 	@Override
 	protected void prepare() {
-		w = getInput().getMasks().getLargestWidth();
-		h = getInput().getMasks().getLargestHeight();
+		w = input().masks().getLargestWidth();
+		h = input().masks().getLargestHeight();
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return getInput().getMasks().getVis().resize(w, h);
+		return input().masks().vis().resize(w, h);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return getInput().getMasks().getFluo().resize(w, h);
+		return input().masks().fluo().resize(w, h);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() != null)
-			return getInput().getMasks().getNir().resize(w, h);
+		if (input().masks().nir() != null)
+			return input().masks().nir().resize(w, h);
 		else
 			return null;
 	}

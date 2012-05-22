@@ -21,22 +21,22 @@ public class BlLoadImagesIfNeeded_images_masks extends
 	
 	@Override
 	protected void prepare() {
-		if (getInput() != null) {
+		if (input() != null) {
 			// synchronized (options) {
-			if (getInput().getImages() != null)
-				getInput().setImages(
-						new FlexibleImageSet(getInput().getImages()));
-			if (getInput().getMasks() != null)
-				getInput()
-						.setMasks(new FlexibleImageSet(getInput().getMasks()));
+			if (input().images() != null)
+				input().setImages(
+						new FlexibleImageSet(input().images()));
+			if (input().masks() != null)
+				input()
+						.setMasks(new FlexibleImageSet(input().masks()));
 			
-			if (getInput().getImages().getVis() == null
-					&& getInput().getImages().getVisInfo() != null) {
-				IOurl url = getInput().getImages().getVisInfo().getURL();
+			if (input().images().vis() == null
+					&& input().images().getVisInfo() != null) {
+				IOurl url = input().images().getVisInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-						getInput().getImages().setVis(fi);
+						input().images().setVis(fi);
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: VIS-MAIN: " + e.getMessage()
@@ -46,13 +46,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 							+ ">ERROR: VIS-MAIN: " + e.getMessage() + " // "
 							+ url);
 				}
-				if (getInput().getMasks() != null) {
-					url = getInput().getImages().getVisInfo().getLabelURL();
+				if (input().masks() != null) {
+					url = input().images().getVisInfo().getLabelURL();
 					try {
 						FlexibleImage fi = new FlexibleImage(url);
 						if (fi != null && fi.getWidth() > 1
 								&& fi.getHeight() > 1)
-							getInput().getMasks().setVis(fi);
+							input().masks().setVis(fi);
 					} catch (Error e) {
 						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: ERROR: VIS-REFERENCE: "
@@ -65,13 +65,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 				}
 			}
 			
-			if (getInput().getImages().getFluo() == null
-					&& getInput().getImages().getFluoInfo() != null) {
-				IOurl url = getInput().getImages().getFluoInfo().getURL();
+			if (input().images().fluo() == null
+					&& input().images().getFluoInfo() != null) {
+				IOurl url = input().images().getFluoInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-						getInput().getImages().setFluo(fi);
+						input().images().setFluo(fi);
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: FLUO-MAIN: " + e.getMessage()
@@ -81,13 +81,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 							+ ">ERROR: EXCEPTION FLUO-MAIN: " + e.getMessage()
 							+ " // " + url);
 				}
-				if (getInput().getMasks() != null) {
-					url = getInput().getImages().getFluoInfo().getLabelURL();
+				if (input().masks() != null) {
+					url = input().images().getFluoInfo().getLabelURL();
 					try {
 						FlexibleImage fi = new FlexibleImage(url);
 						if (fi != null && fi.getWidth() > 1
 								&& fi.getHeight() > 1)
-							getInput().getMasks().setFluo(fi);
+							input().masks().setFluo(fi);
 					} catch (Error e) {
 						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: ERROR: FLUO-REFERENCE: "
@@ -100,13 +100,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 				}
 			}
 			
-			if (getInput().getImages().getNir() == null
-					&& getInput().getImages().getNirInfo() != null) {
-				IOurl url = getInput().getImages().getNirInfo().getURL();
+			if (input().images().nir() == null
+					&& input().images().getNirInfo() != null) {
+				IOurl url = input().images().getNirInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-						getInput().getImages().setNir(fi);
+						input().images().setNir(fi);
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: NIR-MAIN: " + e.getMessage()
@@ -116,13 +116,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 							+ ">ERROR: NIR-MAIN: " + e.getMessage() + " // "
 							+ url);
 				}
-				if (getInput().getMasks() != null) {
-					url = getInput().getImages().getNirInfo().getLabelURL();
+				if (input().masks() != null) {
+					url = input().images().getNirInfo().getLabelURL();
 					try {
 						FlexibleImage fi = new FlexibleImage(url);
 						if (fi != null && fi.getWidth() > 1
 								&& fi.getHeight() > 1)
-							getInput().getMasks().setNir(fi);
+							input().masks().setNir(fi);
 					} catch (Error e) {
 						System.out.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: ERROR: NIR-REFERENCE: "
@@ -138,13 +138,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			// }
 		}
 		
-		if (getInput().getImages().getIr() == null
-				&& getInput().getImages().getIrInfo() != null) {
-			IOurl url = getInput().getImages().getIrInfo().getURL();
+		if (input().images().getIr() == null
+				&& input().images().getIrInfo() != null) {
+			IOurl url = input().images().getIrInfo().getURL();
 			try {
 				FlexibleImage fi = new FlexibleImage(url);
 				if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-					getInput().getImages().setIr(fi);
+					input().images().setIr(fi);
 			} catch (Error e) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: ERROR: IR-MAIN: " + e.getMessage()
@@ -154,13 +154,13 @@ public class BlLoadImagesIfNeeded_images_masks extends
 						+ ">ERROR: IR-MAIN: " + e.getMessage() + " // "
 						+ url);
 			}
-			if (getInput().getMasks() != null) {
-				url = getInput().getImages().getIrInfo().getLabelURL();
+			if (input().masks() != null) {
+				url = input().images().getIrInfo().getLabelURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
 					if (fi != null && fi.getWidth() > 1
 							&& fi.getHeight() > 1)
-						getInput().getMasks().setIr(fi);
+						input().masks().setIr(fi);
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: IR-REFERENCE: "
@@ -177,64 +177,64 @@ public class BlLoadImagesIfNeeded_images_masks extends
 	}
 	
 	private void checkForStrangeTVtestImageAndReplaceWithNull() {
-		if (getInput().getImages().getVis() != null) {
+		if (input().images().vis() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getImages().getVis();
+			FlexibleImage i = input().images().vis();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getImages().setVis(null);
+				input().images().setVis(null);
 			}
 		}
-		if (getInput().getImages().getFluo() != null) {
+		if (input().images().fluo() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getImages().getFluo();
+			FlexibleImage i = input().images().fluo();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getImages().setFluo(null);
+				input().images().setFluo(null);
 			}
 		}
-		if (getInput().getImages().getNir() != null) {
+		if (input().images().nir() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getImages().getNir();
+			FlexibleImage i = input().images().nir();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getImages().setNir(null);
+				input().images().setNir(null);
 			}
 		}
-		if (getInput().getMasks().getVis() != null) {
+		if (input().masks().vis() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getMasks().getVis();
+			FlexibleImage i = input().masks().vis();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getMasks().setVis(null);
+				input().masks().setVis(null);
 			}
 		}
-		if (getInput().getMasks().getFluo() != null) {
+		if (input().masks().fluo() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getMasks().getFluo();
+			FlexibleImage i = input().masks().fluo();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getMasks().setFluo(null);
+				input().masks().setFluo(null);
 			}
 		}
-		if (getInput().getMasks().getNir() != null) {
+		if (input().masks().nir() != null) {
 			// check for TV test image
-			FlexibleImage i = getInput().getMasks().getNir();
+			FlexibleImage i = input().masks().nir();
 			if (i.getWidth() == 768 && i.getHeight() == 576) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				getInput().getMasks().setNir(null);
+				input().masks().setNir(null);
 			}
 		}
 	}
@@ -245,36 +245,36 @@ public class BlLoadImagesIfNeeded_images_masks extends
 		super.postProcess(processedImages, processedMasks);
 		if (options != null) // && !options.isMaize()
 			if (processedImages != null
-					&& processedImages.getVis() != null
-					&& processedImages.getFluo() != null
-					&& processedImages.getVis().getHeight() > processedImages
-							.getFluo().getHeight())
+					&& processedImages.vis() != null
+					&& processedImages.fluo() != null
+					&& processedImages.vis().getHeight() > processedImages
+							.fluo().getHeight())
 				options.setHighResVisCamera(true);
 		
-		if (processedImages.getVis() != null
-				&& processedMasks.getVis() != null
-				&& processedImages.getVis().getWidth() != processedMasks
-						.getVis().getWidth()) {
+		if (processedImages.vis() != null
+				&& processedMasks.vis() != null
+				&& processedImages.vis().getWidth() != processedMasks
+						.vis().getWidth()) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (VIS)");
 			// processedImages.setVis(null);
 			processedMasks.setVis(null);
 		}
-		if (processedImages.getFluo() != null
-				&& processedMasks.getFluo() != null
-				&& processedImages.getFluo().getWidth() != processedMasks
-						.getFluo().getWidth()) {
+		if (processedImages.fluo() != null
+				&& processedMasks.fluo() != null
+				&& processedImages.fluo().getWidth() != processedMasks
+						.fluo().getWidth()) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (FLUO)");
 			// processedImages.setFluo(null);
 			processedMasks.setFluo(null);
 		}
-		if (processedImages.getNir() != null
-				&& processedMasks.getNir() != null
-				&& processedImages.getNir().getWidth() != processedMasks
-						.getNir().getWidth()) {
+		if (processedImages.nir() != null
+				&& processedMasks.nir() != null
+				&& processedImages.nir().getWidth() != processedMasks
+						.nir().getWidth()) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime()
 							+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (NIR)");

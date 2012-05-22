@@ -11,43 +11,43 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		if (getInput().getImages().getVis() == null || options.getCameraPosition() == CameraPosition.TOP)
-			return getInput().getImages().getVis();
+		if (input().images().vis() == null || options.getCameraPosition() == CameraPosition.TOP)
+			return input().images().vis();
 		
-		FlexibleImage input = getInput().getImages().getVis();
+		FlexibleImage input = input().images().vis();
 		
-		return input.getIO().rmCircleShadeFixedRGB(255d).getImage();
+		return input.io().rmCircleShadeFixedRGB(255d).getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null || options.getCameraPosition() == CameraPosition.TOP)
-			return getInput().getMasks().getVis();
+		if (input().masks().vis() == null || options.getCameraPosition() == CameraPosition.TOP)
+			return input().masks().vis();
 		
-		FlexibleImage input = getInput().getMasks().getVis();
+		FlexibleImage input = input().masks().vis();
 		
-		return input.getIO().rmCircleShadeFixedRGB(255d).getImage();
+		return input.io().rmCircleShadeFixedRGB(255d).getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (getInput().getImages().getNir() == null || options.getCameraPosition() == CameraPosition.TOP)
-			return getInput().getImages().getNir();
+		if (input().images().nir() == null || options.getCameraPosition() == CameraPosition.TOP)
+			return input().images().nir();
 		
-		FlexibleImage input = getInput().getImages().getNir();
+		FlexibleImage input = input().images().nir();
 		
-		return input.getIO().// rmCircleShadeFixedGray(180d).
+		return input.io().// rmCircleShadeFixedGray(180d).
 				flipVert().rmCircleShadeFixedGray(180d).flipVert().getImage();
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput().getMasks().getNir() == null || options.getCameraPosition() == CameraPosition.TOP)
-			return getInput().getMasks().getNir();
+		if (input().masks().nir() == null || options.getCameraPosition() == CameraPosition.TOP)
+			return input().masks().nir();
 		
-		FlexibleImage input = getInput().getMasks().getNir();
+		FlexibleImage input = input().masks().nir();
 		
-		return input.getIO().
+		return input.io().
 				flipVert().rmCircleShadeFixedGray(180d).flipVert().
 				// rmCircleShadeFixedGray(180d).
 				getImage();

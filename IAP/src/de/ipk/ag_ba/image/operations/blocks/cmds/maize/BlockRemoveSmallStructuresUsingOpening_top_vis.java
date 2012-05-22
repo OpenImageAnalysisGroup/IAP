@@ -10,15 +10,15 @@ public class BlockRemoveSmallStructuresUsingOpening_top_vis extends AbstractSnap
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() == null)
+		if (input().masks().vis() == null)
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage mask = new ImageOperation(getInput().getMasks().getVis()).opening(
+			FlexibleImage mask = new ImageOperation(input().masks().vis()).opening(
 						(int) (1 * options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK))).getImage();
-			return new ImageOperation(getInput().getMasks().getVis()).applyMask_ResizeMaskIfNeeded(mask, options.getBackground()).getImage();
+			return new ImageOperation(input().masks().vis()).applyMask_ResizeMaskIfNeeded(mask, options.getBackground()).getImage();
 		} else
-			return getInput().getMasks().getVis();
+			return input().masks().vis();
 	}
 	
 	// @Override

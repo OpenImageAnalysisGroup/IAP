@@ -24,16 +24,16 @@ public class BlockRemoveMaizeBambooStick_vis extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			if (processedMasks.getVis() != null && processedMasks.getFluo() != null) {
+			if (processedMasks.vis() != null && processedMasks.fluo() != null) {
 				int background = options.getBackground();
 				boolean show = false;
 				// visible search most high Y
-				TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.getVis().print("Mask Search For Maxima", show)).getExtremePoints(background);
+				TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.vis().print("Mask Search For Maxima", show)).getExtremePoints(background);
 				// cut fluo from top
 				if (extremePoints != null) {
-					int h = processedMasks.getFluo().getHeight();
-					int temp = (int) ((extremePoints.getTopY() / (double) processedMasks.getVis().getHeight()) * processedMasks.getFluo().getHeight());
-					FlexibleImage fi = new ImageOperation(processedMasks.getFluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
+					int h = processedMasks.fluo().getHeight();
+					int temp = (int) ((extremePoints.getTopY() / (double) processedMasks.vis().getHeight()) * processedMasks.fluo().getHeight());
+					FlexibleImage fi = new ImageOperation(processedMasks.fluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
 					processedMasks.setFluo(fi.print("Fluo Result", show));
 				}
 			}
@@ -41,11 +41,11 @@ public class BlockRemoveMaizeBambooStick_vis extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput().getMasks().getVis() != null) {
+		if (input().masks().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				return clearBamboo(getInput().getMasks().getVis());
+				return clearBamboo(input().masks().vis());
 			}
-			return getInput().getMasks().getVis();
+			return input().masks().vis();
 		}
 		return null;
 	}
@@ -90,7 +90,7 @@ public class BlockRemoveMaizeBambooStick_vis extends AbstractSnapshotAnalysisBlo
 			}
 		}
 		if (lastX > 0 && n > 10)
-			return new FlexibleImage(width, height, origarr).getIO().getCanvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB(), 0).getImage();
+			return new FlexibleImage(width, height, origarr).io().canvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB(), 0).getImage();
 		else
 			return new FlexibleImage(width, height, origarr);
 	}

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
@@ -36,16 +36,16 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
-		FlexibleImage image = getInput().getMasks().getVis();
-		ImageData info = getInput().getImages().getVisInfo();
+		FlexibleImage image = input().masks().vis();
+		ImageData info = input().images().getVisInfo();
 		ImageOperation res = processImage(image, info);
 		return res != null ? res.getImage() : null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		FlexibleImage image = getInput().getMasks().getFluo();
-		ImageData info = getInput().getImages().getFluoInfo();
+		FlexibleImage image = input().masks().fluo();
+		ImageData info = input().images().getFluoInfo();
 		ImageOperation res = processImage(image, info);
 		return res != null ? res.getImage() : null;
 	}
@@ -120,7 +120,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				double sideArea_for_angleNearestTo90 = Double.NaN;
 				double distanceTo0 = Double.MAX_VALUE;
 				double distanceTo90 = Double.MAX_VALUE;
-				DescriptiveStatistics areaStat = DescriptiveStatistics.newInstance();
+				DescriptiveStatistics areaStat = new DescriptiveStatistics();
 				
 				for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);

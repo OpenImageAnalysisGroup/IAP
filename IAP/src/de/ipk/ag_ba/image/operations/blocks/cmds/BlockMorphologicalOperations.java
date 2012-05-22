@@ -19,19 +19,19 @@ public class BlockMorphologicalOperations extends AbstractSnapshotAnalysisBlockF
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getVis(), getInput().getMasks().getVis(), options.getCameraPosition(),
+		return morphologicalOperatorsToInitinalImageProcess(input().images().vis(), input().masks().vis(), options.getCameraPosition(),
 				ImageTyp.RGB);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options.getCameraPosition(),
+		return morphologicalOperatorsToInitinalImageProcess(input().images().fluo(), input().masks().fluo(), options.getCameraPosition(),
 				ImageTyp.FLUO);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return morphologicalOperatorsToInitinalImageProcess(getInput().getImages().getNir(), getInput().getMasks().getNir(), options.getCameraPosition(),
+		return morphologicalOperatorsToInitinalImageProcess(input().images().nir(), input().masks().nir(), options.getCameraPosition(),
 				ImageTyp.NIR);
 	}
 	

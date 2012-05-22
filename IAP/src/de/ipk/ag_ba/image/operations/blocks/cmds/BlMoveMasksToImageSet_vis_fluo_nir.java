@@ -8,6 +8,6 @@ public class BlMoveMasksToImageSet_vis_fluo_nir extends AbstractImageAnalysisBlo
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() {
-		return new FlexibleMaskAndImageSet(getInput().getMasks(), new FlexibleImageSet());
+		return new FlexibleMaskAndImageSet(input().masks(), new FlexibleImageSet());
 	}
 }

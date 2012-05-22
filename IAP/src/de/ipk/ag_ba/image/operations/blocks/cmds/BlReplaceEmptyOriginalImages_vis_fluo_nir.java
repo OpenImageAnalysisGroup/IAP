@@ -19,17 +19,17 @@ public class BlReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
 	public FlexibleImage processImage(FlexibleImage image) {
 		FlexibleImageType it = image == null ? FlexibleImageType.UNKNOWN : image.getType();
 		if (image != null) {
-			if (image.getIO().countFilledPixels() == 0) {
+			if (image.io().countFilledPixels() == 0) {
 				ImageData imageInfo = null;
 				switch (it) {
 					case FLUO:
-						imageInfo = getInput().getImages().getFluoInfo();
+						imageInfo = input().images().getFluoInfo();
 						break;
 					case NIR:
-						imageInfo = getInput().getImages().getNirInfo();
+						imageInfo = input().images().getNirInfo();
 						break;
 					case VIS:
-						imageInfo = getInput().getImages().getVisInfo();
+						imageInfo = input().images().getVisInfo();
 						break;
 					case UNKNOWN:
 						break;
@@ -40,8 +40,8 @@ public class BlReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
 						int x = 0, y = 0, w = image.getWidth(), h = image.getHeight();
 						double alpha = 0.5;
 						int color = new Color(50, 50, 50).getRGB();
-						image = image.getIO().getCanvas().fillRect(x, y, w, h, color, alpha).getImage().getIO().addBorder(120, 0, 0, lri).getImage();
-						image = image.getIO().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
+						image = image.io().canvas().fillRect(x, y, w, h, color, alpha).getImage().io().addBorder(120, 0, 0, lri).getImage();
+						image = image.io().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
 								.getImage();
 					}
 				} catch (Exception e) {
@@ -54,7 +54,7 @@ public class BlReplaceEmptyOriginalImages_vis_fluo_nir extends AbstractBlock {
 			int[] img = new int[sz * sz];
 			img = ImageOperation.fillArray(img, Color.WHITE.getRGB());
 			image = new FlexibleImage(sz, sz, img);
-			image = image.getIO().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
+			image = image.io().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
 					.getImage();
 		}
 		return image;

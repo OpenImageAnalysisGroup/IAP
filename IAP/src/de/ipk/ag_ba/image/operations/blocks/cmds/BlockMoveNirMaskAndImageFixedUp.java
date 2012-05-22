@@ -13,16 +13,16 @@ public class BlockMoveNirMaskAndImageFixedUp extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getNir() != null)
-			return new ImageOperation(getInput().getImages().getNir()).translate(0, -getInput().getImages().getNir().getHeight() * 0.01d).getImage();
+		if (input() != null && input().images() != null && input().images().nir() != null)
+			return new ImageOperation(input().images().nir()).translate(0, -input().images().nir().getHeight() * 0.01d).getImage();
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getNir() != null)
-			return new ImageOperation(getInput().getMasks().getNir()).translate(0, -getInput().getMasks().getNir().getHeight() * 0.01d).getImage();
+		if (input() != null && input().masks() != null && input().masks().nir() != null)
+			return new ImageOperation(input().masks().nir()).translate(0, -input().masks().nir().getHeight() * 0.01d).getImage();
 		else
 			return null;
 	}

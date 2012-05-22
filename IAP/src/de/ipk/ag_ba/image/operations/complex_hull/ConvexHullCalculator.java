@@ -131,7 +131,7 @@ public class ConvexHullCalculator {
 					"This parameter combination (draw border and draw input image) does not work correctly.");
 		
 		if (drawInputimage) {
-			ImageOperation inDrawing = customImage != null ? customImage.getIO() : io;
+			ImageOperation inDrawing = customImage != null ? customImage.io() : io;
 			// FlexibleImage border = new FlexibleImage(borderImage).copy();
 			overDrawBorderImage(w, h, inDrawing.getImageAs2array(), borderImage,
 					borderColor, drawBorder);
@@ -204,7 +204,7 @@ public class ConvexHullCalculator {
 				
 				if (drawInputimage) {
 					FlexibleImage inDrawing = res.getImage();
-					ImageCanvas a = inDrawing.getIO().getCanvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
+					ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
 					if (span2.getP1() != null && span2.getP1l() != null) {
 						a = a.drawLine(span2.getP1(), span2.getP1l(), Color.ORANGE.getRGB(), 0.5, 1);
 						// a = a.drawCircle((int) span2.getP1().x, (int) span2.getP1().y, 25, Color.RED.getRGB(), 0, 2);

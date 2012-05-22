@@ -20,8 +20,8 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
 		int parentPriority = getParentPriority();
-		final FlexibleImageSet processedImages = new FlexibleImageSet(getInput().getImages());
-		final FlexibleImageSet processedMasks = new FlexibleImageSet(getInput().getImages());
+		final FlexibleImageSet processedImages = new FlexibleImageSet(input().images());
+		final FlexibleImageSet processedMasks = new FlexibleImageSet(input().images());
 		
 		try {
 			prepare();
@@ -140,53 +140,53 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	protected FlexibleImage processVISimage() {
-		return getInput().getImages().getVis();
+		return input().images().vis();
 	}
 	
 	protected FlexibleImage processFLUOimage() {
-		return getInput().getImages().getFluo();
+		return input().images().fluo();
 	}
 	
 	protected FlexibleImage processNIRimage() {
-		if (getInput() != null && getInput().getImages() != null)
-			return getInput().getImages().getNir();
+		if (input() != null && input().images() != null)
+			return input().images().nir();
 		else
 			return null;
 	}
 	
 	protected FlexibleImage processIRimage() {
-		if (getInput() != null && getInput().getImages() != null)
-			return getInput().getImages().getIr();
+		if (input() != null && input().images() != null)
+			return input().images().getIr();
 		else
 			return null;
 	}
 	
 	protected FlexibleImage processVISmask() {
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 	
 	protected FlexibleImage processFLUOmask() {
-		if (getInput() == null)
+		if (input() == null)
 			System.out.println("ERROR 1");
-		if (getInput().getMasks() == null)
+		if (input().masks() == null)
 			System.out.println("ERROR 2");
-		return getInput().getMasks().getFluo();
+		return input().masks().fluo();
 	}
 	
 	protected FlexibleImage processNIRmask() {
-		if (getInput() == null)
+		if (input() == null)
 			System.out.println("ERROR 3");
-		if (getInput().getMasks() == null)
+		if (input().masks() == null)
 			System.out.println("ERROR 4");
-		return getInput().getMasks().getNir();
+		return input().masks().nir();
 	}
 	
 	protected FlexibleImage processIRmask() {
-		if (getInput() == null)
+		if (input() == null)
 			System.out.println("ERROR 5");
-		if (getInput().getMasks() == null)
+		if (input().masks() == null)
 			System.out.println("ERROR 6");
-		return getInput().getMasks().getIr();
+		return input().masks().getIr();
 	}
 	
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {

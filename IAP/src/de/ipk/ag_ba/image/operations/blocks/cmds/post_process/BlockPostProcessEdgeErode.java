@@ -22,17 +22,17 @@ public abstract class BlockPostProcessEdgeErode extends AbstractSnapshotAnalysis
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return postProcessResultImage(getInput().getImages().getVis(), getInput().getMasks().getVis(), options, options.getCameraPosition(), ImageTyp.RGB, enlarge);
+		return postProcessResultImage(input().images().vis(), input().masks().vis(), options, options.getCameraPosition(), ImageTyp.RGB, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return postProcessResultImage(getInput().getImages().getFluo(), getInput().getMasks().getFluo(), options, options.getCameraPosition(), ImageTyp.FLUO, enlarge);
+		return postProcessResultImage(input().images().fluo(), input().masks().fluo(), options, options.getCameraPosition(), ImageTyp.FLUO, enlarge);
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return postProcessResultImage(getInput().getImages().getNir(), getInput().getMasks().getNir(), options, options.getCameraPosition(), ImageTyp.NIR, enlarge);
+		return postProcessResultImage(input().images().nir(), input().masks().nir(), options, options.getCameraPosition(), ImageTyp.NIR, enlarge);
 	}
 	
 	static FlexibleImage postProcessResultImage(FlexibleImage srcImage, FlexibleImage finalImage, ImageProcessorOptions options, CameraPosition cameraTyp,

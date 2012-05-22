@@ -40,8 +40,8 @@ public class BlueMarkerFinder {
 		double scaleFactor = scale;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
-		io1 = io1.getCanvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, ImageOperation.BACKGROUND_COLORint).getImage()
-				.getIO();
+		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, ImageOperation.BACKGROUND_COLORint).getImage()
+				.io();
 		
 		markerPositionsImage = io1
 				.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).print("nach lab", debug)

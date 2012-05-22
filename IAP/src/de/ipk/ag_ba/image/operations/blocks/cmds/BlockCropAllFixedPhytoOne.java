@@ -17,48 +17,48 @@ public class BlockCropAllFixedPhytoOne extends AbstractSnapshotAnalysisBlockFIS 
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getVis() != null)
-			return getInput().getImages().getVis().crop(a, b, c, d);
+		if (input() != null && input().images() != null && input().images().vis() != null)
+			return input().images().vis().crop(a, b, c, d);
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getFluo() != null)
-			return getInput().getImages().getFluo().crop(a, b, c, d);
+		if (input() != null && input().images() != null && input().images().fluo() != null)
+			return input().images().fluo().crop(a, b, c, d);
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (getInput() != null && getInput().getImages() != null && getInput().getImages().getNir() != null)
-			return getInput().getImages().getNir().crop(a, b, c, d);
+		if (input() != null && input().images() != null && input().images().nir() != null)
+			return input().images().nir().crop(a, b, c, d);
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getVis() != null)
-			return getInput().getMasks().getVis().crop(a, b, c, d);
+		if (input() != null && input().masks() != null && input().masks().vis() != null)
+			return input().masks().vis().crop(a, b, c, d);
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getFluo() != null)
-			return getInput().getMasks().getFluo().crop(a, b, c, d);
+		if (input() != null && input().masks() != null && input().masks().fluo() != null)
+			return input().masks().fluo().crop(a, b, c, d);
 		else
 			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (getInput() != null && getInput().getMasks() != null && getInput().getMasks().getNir() != null)
-			return getInput().getMasks().getNir().crop(a, b, c, d);
+		if (input() != null && input().masks() != null && input().masks().nir() != null)
+			return input().masks().nir().crop(a, b, c, d);
 		else
 			return null;
 	}

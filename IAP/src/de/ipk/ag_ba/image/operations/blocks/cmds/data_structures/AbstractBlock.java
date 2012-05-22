@@ -13,31 +13,31 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		return processImage(getInput().getImages().getVis());
+		return processImage(input().images().vis());
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		return processImage(getInput().getImages().getFluo());
+		return processImage(input().images().fluo());
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		return processImage(getInput().getImages().getNir());
+		return processImage(input().images().nir());
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return processMask(getInput().getMasks().getVis());
+		return processMask(input().masks().vis());
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return processMask(getInput().getMasks().getFluo());
+		return processMask(input().masks().fluo());
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return processMask(getInput().getMasks().getNir());
+		return processMask(input().masks().nir());
 	}
 }

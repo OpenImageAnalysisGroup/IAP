@@ -26,17 +26,17 @@ public class BlockPrintInfosEND extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		printInfo(getInput().getMasks().getVis(), BlockPrintInfosTyp.VisMask);
+		printInfo(input().masks().vis(), BlockPrintInfosTyp.VisMask);
 		// printInfo(getInput().getImages().getVis(), BlockPrintInfosTyp.VisImage);
 		
-		printInfo(getInput().getMasks().getFluo(), BlockPrintInfosTyp.FluoMask);
+		printInfo(input().masks().fluo(), BlockPrintInfosTyp.FluoMask);
 		// getProperties().setNumericProperty(getBlockPosition(), Property.HEIGHT_FLUO_MASK.toString(), );
 		// printInfo(getInput().getImages().getFluo(), BlockPrintInfosTyp.FluoImage);
 		
-		printInfo(getInput().getMasks().getNir(), BlockPrintInfosTyp.NirMask);
+		printInfo(input().masks().nir(), BlockPrintInfosTyp.NirMask);
 		// printInfo(getInput().getImages().getNir(), BlockPrintInfosTyp.NirImage);
 		
-		return getInput().getMasks().getVis();
+		return input().masks().vis();
 	}
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {

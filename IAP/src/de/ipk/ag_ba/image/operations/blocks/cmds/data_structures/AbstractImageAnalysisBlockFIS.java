@@ -54,13 +54,13 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null && isChangingImages())
-			debugStack.addImage("Input for " + task, getInput().getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
+			debugStack.addImage("Input for " + task, input().getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
 		if (options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES)) {
 			if (options.getBooleanSetting(Setting.IS_DEBUG_PRINT_EACH_STEP))
-				if (getInput().getMasks() != null)
-					getInput().getMasks().getFluo().print("Mask-Input for step: " + task);
+				if (input().masks() != null)
+					input().masks().fluo().print("Mask-Input for step: " + task);
 				else
-					getInput().getImages().getFluo().print("Image-Input for step: " + task);
+					input().images().fluo().print("Image-Input for step: " + task);
 			return new StopWatch("phytochamberTopImageProcessor: " + task);
 		} else
 			return null;
@@ -76,7 +76,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
-	public FlexibleMaskAndImageSet getInput() {
+	public FlexibleMaskAndImageSet input() {
 		return input;
 	}
 	
