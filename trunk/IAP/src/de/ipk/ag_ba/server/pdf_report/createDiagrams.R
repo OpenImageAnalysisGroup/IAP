@@ -1,11 +1,13 @@
 # Author: Entzian, Klukas
 ###############################################################################
 
+cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
+
 # multi threaded (4, ba-09: 48sec)
 # not threaded   (ba-09:    33sec)
 
-threaded <- FALSE
-innerThreaded = FALSE
+threaded <- TRUE
+innerThreaded = TRUE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
 debug <- TRUE
@@ -130,10 +132,10 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 ownCat <- function(text, endline=TRUE){
-	cat(text)
-	if (endline) {
-		cat("\n")
-	}
+	# cat(text)
+	# if (endline) {
+	#	cat("\n")
+	# }
 }
 
 overallOutlierDetection <- function(overallList) {
@@ -235,7 +237,10 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	
 	if (length(libraries) > 0) {
 		for(n in libraries) {
-			library(n, character.only = TRUE)
+			if (sfParallel())
+				sfLibrary(n, character.only = TRUE)
+			else
+				library(n, character.only = TRUE)
 		}
 	
 		if (useDev) {
@@ -1372,7 +1377,7 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 
 saveImageFile <- function(overallList, plot, filename, extraString="") {
 	filename = preprocessingOfValues(paste(filename, extraString, sep=""), FALSE, replaceString = "_")	
-	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
+	ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 
 
 }
@@ -1687,7 +1692,9 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 }
 
 loadLibs <- function(installAndUpdate = FALSE) {
-	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "fmsb", "methods", "grid", "snow", "snowfall") #, "mvoutlier")
+	libraries  <- c(
+		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
+		 "fmsb", "methods", "grid", "snow", "snowfall") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, installAndUpdate, installAndUpdate, FALSE)
 }
 
@@ -1703,10 +1710,6 @@ parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor,
 #imagesIndex <- "1"
 #############
 
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-
-	
 	overallList$debug %debug% "makeLinearDiagram()"	
 	
 	#tempOverallResult =  na.omit(overallResult)
@@ -1743,9 +1746,6 @@ makeLinearDiagram <- function(
 	
   ylabelForAppendix <- ""
     
-	if (innerThreaded)
-		loadLibs(FALSE)
-	
 	if (length(overallResult[, 1]) > 0) {
 	
 		if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
@@ -2011,10 +2011,6 @@ parMakeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overa
 	tempOverallResult =  na.omit(overallResult)
 	#tempOverallResult = overallResult
 	
-	
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-	
 	for (imagesIndex in names(overallDescriptor)) {
 		createOuputOverview("stacked barplot", imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "boxplotstacked")
@@ -2034,9 +2030,6 @@ parMakeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overa
 
 makeBoxplotStackedDiagram <- function(overallResult, overallDescriptor, overallColor, 
 		overallDesName, overallFileName, overallList, imagesIndex) {
-		
-	if (innerThreaded)
-		loadLibs(FALSE)
 		
 	if (length(overallResult[, 1]) > 0) {
 		PreWorkForMakeBigOverallImage(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, imagesIndex)
@@ -2098,9 +2091,6 @@ parMakeSpiderPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 
 	tempOverallResult =  na.omit(overallResult)
 	
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-	
 	
 	for (imagesIndex in names(overallDescriptor)) {
 		overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
@@ -2121,9 +2111,6 @@ parMakeSpiderPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 makeSpiderPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
 		overallFileName, options, overallList, diagramTypSave="spiderplot", imagesIndex) {
 		
-	if (innerThreaded)
-		loadLibs(FALSE)
-
 	createOuputOverview("spider/linerange plot", imagesIndex, length(names(overallDescriptor)), getVector(overallDesName[[imagesIndex]]))
 	
 	if (length(overallResult[, 1]) > 0) {
@@ -2454,10 +2441,6 @@ parMakeBarDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 
 	tempOverallResult =  overallResult
 	
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-	
-
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {	
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, "barplot")
@@ -2483,10 +2466,6 @@ parMakeBarDiagram <- function(overallResult, overallDescriptor, overallColor, ov
 makeBarDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName,
 		 overallFileName, overallList, isOnlyOneValue = FALSE, diagramTypSave="barplot", imagesIndex) {
 		 
-	if (innerThreaded)
-		loadLibs(FALSE)
-
-		
 	if (length(overallResult[, 1]) > 0) {
 		if (isOnlyOneValue) {
 			plot = ggplot(data=overallResult, aes(x=name, y=mean))
@@ -2596,10 +2575,6 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 	
 	tempOverallResult =  overallResult
 	
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-		
-	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
 			createOuputOverview("violin plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
@@ -2621,9 +2596,6 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 
 makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
 	overallFileName, overallList, diagramTypSave="violinplot", imagesIndex) {
-	
-	if (innerThreaded)
-		loadLibs(FALSE)
 	
 	if ("primaerTreatment" %in% colnames(overallResult)) {
 		for (value in unique(as.character(overallResult$primaerTreatment))) { 
@@ -2700,10 +2672,6 @@ parMakeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor
 	overallList$debug %debug% "makeBoxplotDiagram()"
 	tempOverallResult =  na.omit(overallResult)
 	
-	if (threaded && !innerThreaded)
-		loadLibs(FALSE)
-	
-	
 	for (imagesIndex in names(overallDescriptor)) {
 		
 		if (innerThreaded)
@@ -2721,9 +2689,6 @@ parMakeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor
 makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName,
 	 options, overallList, diagramTypSave="boxplot", imagesIndex, tempOverallResult) {
 	 
-	if (innerThreaded)
-		loadLibs(FALSE)
-	 	
 	if (!is.na(overallDescriptor[[imagesIndex]])) {
 		#ownCat(paste("Process ", overallDesName[[imagesIndex]]))
 		createOuputOverview("boxplot", imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
@@ -2767,7 +2732,8 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
-	sfExport("overallList")
+	if (threaded)
+		sfExport("overallList")
 	if (!calculateNothing) {			
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
@@ -2940,7 +2906,6 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	initRfunction(debug)
 	#typOfStartOptions = "test"
 	typOfStartOptions = tolower(typOfStartOptions)
-	ownCat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, sep=""))
 		
 	args = commandArgs(TRUE)
 
@@ -3690,6 +3655,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 }
 
 initSnow <- function() {
+	# loadLibs(TRUE)
 	library("snowfall")
 	
 	if(cpuAutoDetected) {
@@ -3705,7 +3671,8 @@ initSnow <- function() {
 		ownCat("Running in sequential mode.")
 		threaded <- FALSE
 	}
-	sfExportAll()
+	if (threaded)
+		sfExportAll()
 }
 
 stopSnow <- function() {
