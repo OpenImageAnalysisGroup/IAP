@@ -2386,10 +2386,10 @@ plotLineRangeImage <- function(overallList, overallResult, title = "", makeOvera
 					)
 			
 			if (sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
-				
-				nRowCrowList <- calculateLegendRowAndColNumber(unique(overallResult$hist))
-
-				plot <-  plot + guides(col=guide_legend(nrow=nRowCrowList$nrow, ncol=nRowCrowList$ncol, byrow=T)) 
+				plot <-  plot + guides(colour=guide_legend(title.position= "top", 
+										ncol=calculateLegendRowAndColNumber(unique(overallResult$hist)),
+										byrow=T)			
+								) 
 			}
 				
 			
