@@ -4,9 +4,10 @@
 # multi threaded (4, ba-09: 48sec)
 # not threaded   (ba-09:    33sec)
 
-threaded <- TRUE
+threaded <- FALSE
 innerThreaded = FALSE
 cpuCNT <- 2
+cpuAutoDetected <- TRUE
 debug <- TRUE
 
 
@@ -235,13 +236,6 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	if (length(libraries) > 0) {
 		for(n in libraries) {
 			library(n, character.only = TRUE)
-#			library("Cairo") # save images (default image)
-#			library("RColorBrewer") #color space
-#			library("data.table") #fast grouping
-#			library("ggplot2") #plotting system (also save images)
-#			library("psych")
-#			library("fmsb")	#radarchart
-#			library("plotrix") # second radarchart -> radial.plot
 		}
 	
 		if (useDev) {
@@ -1697,8 +1691,7 @@ loadLibs <- function(installAndUpdate = FALSE) {
 	loadInstallAndUpdatePackages(libraries, installAndUpdate, installAndUpdate, FALSE)
 }
 
-parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
-	overallFileName, overallList, diagramTypSave="nboxplot") {
+parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, overallList, diagramTypSave="nboxplot") {
 
 ########
 #overallResult <- overallList$overallResult_nBoxDes
@@ -1827,7 +1820,7 @@ makeLinearDiagram <- function(
 			
 		
 						
-			print(plot)
+			#print(plot)
 
 ##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
 ##!#				newCoords = seq(min(overallList$filterXaxis, na.rm=TRUE), max(overallList$filterXaxis, na.rm=TRUE), 1)
@@ -2249,8 +2242,9 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 			} else {
 				plot = plot + 
 					   opts(#legend.justifiownCation = 'bottom', 
-							  # legend.direction="vertical",
+							   legend.direction="horizontal",
 							   legend.position="bottom",
+							   legend.box = "vertical",
 							   #legend.position=c(0.5,0),
 							  # legend.title = theme_blank(),
 							   legend.key = theme_blank()
@@ -2258,9 +2252,13 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 				#if (as.numeric(sessionInfo()[1]$R.version$minor) > 13 & as.numeric(sessionInfo()[1]$R.version$major) > 1) {
 				if (sessionInfo()$otherPkgs$ggplot2$Version != "0.8.9") {
 						
-					plot <-  plot + guides(col=guide_legend(ncol=calculateLegendRowAndColNumber(unique(overallResult$name), "Condition"), byrow=T)) 
-					plot <-  plot + guides(shape=guide_legend(ncol=calculateLegendRowAndColNumber(unique(overallResult$hist), "Property"), byrow=T))
-					
+					plot <-  plot + guides(colour=guide_legend(title.position= "top", 
+															ncol=calculateLegendRowAndColNumber(unique(overallResult$name)),
+															byrow=T),
+									 	   shape=guide_legend(title.position= "top", 
+															ncol=calculateLegendRowAndColNumber(unique(overallResult$hist)), 
+															byrow=T)
+										  ) 
 				
 #				if (numberOfHist > 3 & numberOfHist < 10) {
 #					plot = plot + opts(legend.text = theme_text(size=6), 
@@ -2289,7 +2287,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 #					plot = plot + facet_grid(name ~ xAxisfactor)
 #				}
 			}
-			print(plot)
+			#print(plot)
 			
 			subtitle <- ""
 			if (positionType == overallList$spiderOptions$typOfGeomBar[1] || length(overallList$spiderOptions$typOfGeomBar) == 1) {
@@ -2313,7 +2311,7 @@ plotSpiderImage <- function(overallList, overallResult, title = "", makeOverallI
 	}				
 }
 
-calculateLegendRowAndColNumber <- function(legendText, heading) {
+calculateLegendRowAndColNumber <- function(legendText) {
 ########	
 #legendText <- unique(overallResult$name)
 #######	
@@ -2322,7 +2320,7 @@ calculateLegendRowAndColNumber <- function(legendText, heading) {
 	
 	averageLengthOfSet <- round(sum(nchar(legendText),na.rm=TRUE) / length(legendText))
 
-	ncol <- floor(lengthOfOneRow / averageLengthOfSet)
+	ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
 	if (ncol == 0) {
 		ncol <- 1
 	}
@@ -2768,60 +2766,60 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, o
 }
 
 makeDiagrams <- function(overallList) {
-	sfExport("overallList")
 	overallList$debug %debug% "makeDiagrams()"
+	sfExport("overallList")
 	if (!calculateNothing) {			
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
-			sfClusterEval(
-				parMakeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, 
-					overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, 
+						overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
+				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
 		
 		if (sum(!is.na(overallList$boxDes)) > 0) {
 			if (overallList$debug) {ownCat("Boxplot...")}
-			sfClusterEval(
-				parMakeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
+				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for Boxplot are 'NA'...")
 		}
 		
 		if (sum(!is.na(overallList$boxStackDes)) > 0) {
 			if (overallList$debug) {ownCat("Stacked Boxplot...")}
-			sfClusterEval(
-				parMakeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 			}
 			
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {ownCat("Spider plot...")}
-			sfClusterEval(
-				parMakeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
+				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 		}
 
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
-			sfClusterEval(
-				parMakeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
+				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
 		
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
-			sfClusterEval(
-				parMakeBarDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
-			, stopOnError=FALSE)
+				sfClusterEval(
+					parMakeBarDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
+				, stopOnError=FALSE)
 		}
 	}
 }
@@ -3693,6 +3691,11 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 
 initSnow <- function() {
 	library("snowfall")
+	
+	if(cpuAutoDetected) {
+		cpuCNT <- parallel::detectCores()
+	}
+	
 	sfInit(parallel=threaded, cpus=cpuCNT)
 	
 	if (sfParallel()) {
