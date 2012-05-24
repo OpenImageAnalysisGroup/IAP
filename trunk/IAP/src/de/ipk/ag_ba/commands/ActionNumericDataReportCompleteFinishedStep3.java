@@ -272,7 +272,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				experiment = experiment.calc().ratioDataset(new String[] { "norm", "sufficient" }, cf);
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
-				experiment.calc().fitThreeStepLinearModel("side.hull.pc2.norm");
+				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.average", "side.hull.pc2.norm");
 				if (status != null)
 					status.setCurrentStatusText2("Stress analysis finished");
 			}
