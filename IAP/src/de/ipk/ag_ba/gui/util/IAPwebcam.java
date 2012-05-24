@@ -49,6 +49,18 @@ public enum IAPwebcam {
 	}
 	
 	public InputStream getSnapshotJPGdataLR() throws Exception {
+		if (this == MAIZE)
+			;// 640x480
+		if (this == BARLEY)
+			;// 640x480
+		return getSnapshotJPGdataLRintern();
+	}
+	
+	public InputStream getSnapshotJPGdata() throws Exception {
+		return getSnapshotJPGdataIntern();
+	}
+	
+	private InputStream getSnapshotJPGdataLRintern() throws Exception {
 		String imageSrc = null;
 		if (this == MAIZE)
 			imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity";
@@ -67,7 +79,7 @@ public enum IAPwebcam {
 		return is;
 	}
 	
-	public InputStream getSnapshotJPGdata() throws Exception {
+	private InputStream getSnapshotJPGdataIntern() throws Exception {
 		String imageSrc = null;
 		if (this == MAIZE)
 			imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";

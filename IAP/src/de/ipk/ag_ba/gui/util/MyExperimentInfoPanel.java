@@ -263,11 +263,11 @@ public class MyExperimentInfoPanel extends JPanel {
 		boolean hasCorrelationTableData = correlationInfo != null;
 		
 		if (hasCorrelationTableData) {
-			setLayout(new TableLayout(new double[][] { { 0, TableLayout.PREFERRED, 0 },
+			setLayout(new TableLayout(new double[][] { { 0, 750 /* TableLayout.PREFERRED */, 0 },
 					{ 0, TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 0 } }));
 			add(correlationInfo, "1,3");
 		} else
-			setLayout(new TableLayout(new double[][] { { 0, TableLayout.PREFERRED, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
+			setLayout(new TableLayout(new double[][] { { 0, 750/* TableLayout.PREFERRED */, 0 }, { 0, TableLayout.PREFERRED, 0 } }));
 		
 		setOpaque(false);
 		
@@ -309,10 +309,10 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
-		String ts = "Use ' // ' to split information. Specify stress time range as '5-10' (days) or 'Stress:5-10', multiple regions as 'Stress:3-5//Stress:10-15' or '3-5//10-15'.";
+		String ts = "Use ' // ' to split information. Specify stress as follows (examples): 'Stress:4;5;d;drought stress' or (two periods) 'Stress:4$10;5$13;d$n;drought stress$handling'.";
 		fp.addGuiComponentRow(tooltip(new JLabel("Sequence/Stress"), ts), tooltip(sequence, ts), false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
-		String to = "Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs.";
+		String to = "Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
 		fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
@@ -470,6 +470,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			for (MatchInfo mi : sortedMatch) {
 				JComponent desc, height, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
+				desc.setToolTipText(mi.getDesc());
 				height = new JLabel(mi.getHeight());
 				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
@@ -495,6 +496,7 @@ public class MyExperimentInfoPanel extends JPanel {
 			for (MatchInfo mi : sortedMatch) {
 				JComponent desc, height, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
+				desc.setToolTipText(mi.getDesc());
 				height = new JLabel(mi.getHeight());
 				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());

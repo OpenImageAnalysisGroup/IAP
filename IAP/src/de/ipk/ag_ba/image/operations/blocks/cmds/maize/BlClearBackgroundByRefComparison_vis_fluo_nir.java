@@ -83,7 +83,68 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return input().images().fluo();
+		// return input().images().fluo();
+		if (input().images().fluo() != null && input().masks().fluo() != null) {
+			if ((options.isBarley() && options.isHighResMaize()))
+				return input().images().fluo();
+			else
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+					FlexibleImage fluo = input().images().fluo();
+					fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()),
+							(int) (scaleFactor * fluo.getHeight()));
+					FlexibleImage result = new ImageOperation(fluo.io().copy()
+							.blur(1d).print("Blurred 1.5 fluo image", false)
+							.medianFilter32Bit()
+							.getImage()).compare()
+							.compareImages("fluo", input().masks().fluo().io()
+									// .blur(/* 2 */options.getUnitTestIdx() / 2d).print("Blurred 1.5 fluo mask", false)
+									.medianFilter32Bit()
+									.getImage(),
+									options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
+									options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
+									options.getIntSetting(Setting.abDiff_FLUO) * 0.1d,
+									back).border(2).border_left_right((int) (fluo.getWidth() * 0.1), options.getBackground()).getImage();
+					double blueCurbWidthBarley0_1 = 0;
+					double blueCurbHeightEndBarly0_8 = 1;
+					FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
+							// black background and green pot (fluo of white pot)
+							new int[] { -1, 200 - 40, 50 - 4, 0 }, new int[] { 115, 200 + 20, 50 + 4, 50 },
+							new int[] { 80 - 5, 104 - 15, 169 - 4, 0 }, new int[] { 140 + 5, 104 + 15, 169 + 4, 250 },
+							new int[] { 116 - 5, 206 - 20, 160 - 4, 0 }, new int[] { 175 + 5, 206 + 20, 160 + 4, 250 },
+							options.getBackground(), Integer.MAX_VALUE, false,
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							new int[] {}, new int[] {},
+							blueCurbWidthBarley0_1,
+							blueCurbHeightEndBarly0_8).
+							print("removed noise", debug).getImage();
+					
+					result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+					
+					if (debug)
+						result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).print("Left-Over");
+					
+					return result;
+				}
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+				FlexibleImage fluo = input().images().fluo();
+				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
+				return new ImageOperation(fluo).compare()
+						.compareImages("fluo", input().masks().fluo()
+								// .io().
+								// copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
+								,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
+								options.getIntSetting(Setting.abDiff_FLUO) * 0.2d,
+								back).border(2).getImage();
+			}
+			throw new UnsupportedOperationException("Unknown camera setting.");
+		} else {
+			return null;
+		}
 	}
 	
 	@Override

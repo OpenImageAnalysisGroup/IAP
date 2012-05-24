@@ -808,7 +808,7 @@ public class FolderPanel extends JComponent {
 			public void actionPerformed(ActionEvent e) {
 				currentPage++;
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK)
-					currentPage = guiComponentRows.size() / maxRowCount;
+					currentPage = (getFilteredList(guiComponentRows).size()) / maxRowCount;
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
 					al.actionPerformed(new ActionEvent(this, condensedState ? 0

@@ -37,16 +37,17 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 			if (fis != null)
 				fis.addImage("start", vis.getImage());
-			vis = vis.blur(1).filterRemoveHSV(1 / 2d - 1 / 3d, 2 / 3d); // filter out blue
+			vis = vis.blur(0.5).filterRemoveHSV(1 / 2d - 1 / 3d, 2 / 3d); // filter out blue
 			if (fis != null)
 				fis.addImage("blue filtered by HSV", vis.getImage());
 			
 			int m = (225 - 26) / 2 + 26; // 125
 			int m2 = (8 + 222) / 2 + 8; // 123
-			int a1 = 15;
+			int a1 = (15 + 2 - 5);
+			
 			int a2 = 10;
-			int b1 = 15;
-			int b2 = 4;
+			int b1 = 14;
+			int b2 = 4;// (4 - 5); // options.getUnitTestIdx()
 			// very light yellow and green (background shadow, esp. in maize with 4 pot)
 			if (options.isHighResMaize()) {
 				vis = vis.filterRemoveLAB(240, 255, 110, 120, 125, 135, options.getBackground(), true).print("LIGHT BACKGROUND", debug);
@@ -66,7 +67,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 			}
 			// if (true)
 			// vis.filterRemoveLAB(180, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), false).print("OAEA");
-			vis = vis.filterRemoveLAB(180, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), true);
+			vis = vis.filterRemoveLAB(179, 255, m - a1, m + a2, m2 - b1, m2 + b2, options.getBackground(), true);
 			if (fis != null)
 				fis.addImage("main lab filter", vis.getImage());
 			
