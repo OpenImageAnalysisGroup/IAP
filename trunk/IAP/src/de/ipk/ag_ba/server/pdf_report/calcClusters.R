@@ -11,14 +11,14 @@ cat(c("Calculate clustering for",(length(mydata)),"groups. Using bootstrap N =",
 result <- NULL
 
 if (n>0) {
-	tryCatch( 
-	library(snow);
-	cl <- makeCluster(6); 
-	result <- parPvclust(cl=cl, data=data.frame(mydata), nboot=n, method.hclust="ward");
-,	error = function(e) {
-		cat("Could not create compute cluster!\n")
+#	tryCatch( 
+#	library(snow)
+#	cl <- makeCluster(6); 
+#	result <- parPvclust(cl=cl, data=data.frame(mydata), nboot=n, method.hclust="ward");
+#,	error = function(e) {
+#		cat("Could not create compute cluster!\n")
 	result <- pvclust(data=data.frame(mydata), nboot=n, method.hclust="ward");
-		} )
+#		} )
 	
 
 	pdf("clusters.pdf")

@@ -3,15 +3,25 @@
 
 cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
 
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
+
+library(ggplot2);
+
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
+
 # multi threaded (4, ba-09: 48sec)
 # not threaded   (ba-09:    33sec)
 
-threaded <- FALSE
+threaded <- TRUE
 innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
 debug <- TRUE
 
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -131,22 +141,25 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	return(colnames(dataSet)[!colnames(dataSet) %in% withoutColNamesVector])
 }
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY");
+
 ownCat <- function(text, endline=TRUE){
-	#print(text)
-	
+	print(text)
+#	return
 #	while (class(text) == "list") {
 #		text <- unlist(text)
 #	}
 	
-	if (sfParallel()) {
-		sfCat(text, master=TRUE)
-		if (endline)
-			sfCat("\n", master=TRUE)
-	} else {
-		cat(unlist(text))
-		if (endline)
-			cat("\n")
-	}
+#	
+#	if (sfParallel()) {
+#		sfCat(text, master=TRUE)
+#		if (endline)
+#			sfCat("\n", master=TRUE)
+#	} else {
+#		cat(unlist(text))
+#		if (endline)
+#			cat("\n")
+#	}
 	
 #tryCatch({	
 #	if (sfParallel()) {
@@ -266,9 +279,9 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		ownCat("Load libraries:")
 		for(n in libraries) {
 			ownCat(n)
-			if (sfParallel())
-				sfLibrary(n, character.only = TRUE)
-			else
+			#if (sfParallel())
+			#	sfLibrary(n, character.only = TRUE)
+			#else
 				library(n, character.only = TRUE)
 		}
 	
@@ -314,6 +327,8 @@ reNameHist <-  function(colNameWichMustBind) {
 	
 	return(colNameWichMustBind)	
 }
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY2");
 
 reNameColumn <-  function(plotThisValues, columnNameReplace="name", columnNameWhichUsedToReplace="primaerTreatment") {
 	if (!is.null(plotThisValues[columnNameWhichUsedToReplace])) {
@@ -383,6 +398,9 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 
 	return(listOfTreatAndFilterTreat)
 }
+
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY6");
 
 overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	overallList$debug %debug% "overallCheckIfDescriptorIsNaOrAllZero()"	
@@ -490,6 +508,8 @@ checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescr
 		return(NA)
 	}
 }
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 7");
 
 overallChangeName <- function(overallList) {
 	overallList$debug %debug% "overallChangefileName()"	
@@ -1778,10 +1798,10 @@ makeLinearDiagram <- function(
   	diagramTypSave <- "nboxplot"
 	color <- overallColor[[imagesIndex]]
   
-#	if(overallList$stress.Start != -1) {
-#		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, (overallResult$mean + overallResult$se), diagramTypSave)
-#		color <- addColorForStressPhaseAndOther(stressArea, color)
-#	}
+	if(overallList$stress.Start != -1) {
+		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, (overallResult$mean + overallResult$se), diagramTypSave)
+		color <- addColorForStressPhaseAndOther(stressArea, color)
+	}
   
 	if (length(overallResult[, 1]) > 0) {
 	
@@ -1789,12 +1809,12 @@ makeLinearDiagram <- function(
 	
 			plot <-	ggplot() 
 					
-#			if(length(stressArea) >0) {
-#				plot <- plot + 
-#						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
-#						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
-#				
-#			}	
+			if(length(stressArea) >0) {
+				plot <- plot + 
+						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
+						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
+				
+			}	
 			
 			if (length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio || length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
 				plot <- plot + geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, colour=name, fill=name), method="loess", stat="smooth", alpha=0.1)
@@ -2610,6 +2630,9 @@ setColorDependentOfGroup <- function(overallResult) {
 	return(color)
 }
 
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 8");
+
 parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
 		overallFileName, overallList, diagramTypSave="violinplot") {
 	########
@@ -2654,6 +2677,9 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 	}		
 }
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 88");
+
+
 makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
 	overallFileName, overallList, diagramTypSave="violinplot", imagesIndex) {
 	
@@ -2670,6 +2696,9 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 	}
 	
 }
+
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 888");
 
 reorderThePlotOrder <- function(overallResult) {
 	groupedOverallResult <- data.table(overallResult)
@@ -2741,23 +2770,31 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 	return(stress.Area)
 }
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 888888");
+
+
 addColorForStressPhaseAndOther <- function(stressArea, color) {
 	
 	for (kk in unique(stressArea$typ)) {
 		if (kk == "d")
-			color <- c("cornsilk1", color)
+			color <- c(color, "cornsilk1")
 		else if (kk == "n")
-			color <- c("red", color)
+			color <- c(color, "red")
 		else if (kk == "w")
-			color <- c("lightskyblue1", color)
+			color <- c(color, "lightskyblue1")
 		else if (kk == "s")
-			color <- c("seashell1", color)
+			color <- c(color, "seashell1")
 		else if (kk == "c")
-			color <- c("papayawhip", color)
+			color <- c(color, "papayawhip")
+		else
+			color <- c(color, "yellow")
 	}
 	
 	return(color)
 }
+
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 999");
+
 
 plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName, overallList, imagesIndex, title="") {
 ########
@@ -2834,32 +2871,38 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 }
 
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 999999");
+
 scores = data.frame(category = 1:4, percentage = c(34,62,41,44), type = c("a","a","a","b"))
 rects <- data.frame(ystart = c(0,25,45,65,85), yend = c(25,45,65,85,100), col = letters[1:5])
 rects$col <- c("Z1","Z2","Z3","Z4","Z5")
 labels = c("ER", "OP", "PAE", "Overall")
 medals = c("navy","goldenrod4","darkgrey","gold","cadetblue1")
 
-ggplot() + 
-		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, 
-						ymax = yend, fill=col), alpha = 0.3) + 
-		opts(legend.position="none") + 
-		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
-		scale_fill_manual(values=c("indianred1", "indianred4", medals)) +
-		scale_x_continuous(breaks = 1:4, labels = labels) 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 999 1001010101");
 
 
-ggplot() + 
-		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, ymax = yend, fill=col), alpha = 0.3) + 
-		scale_fill_manual(values=medals) +
-		opts(legend.position="none") + 
-		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
-scale_fill_manual(values = c("indianred1", "indianred4")) +
-		scale_x_continuous(breaks = 1:4, labels = labels) 
+#ggplot() +
+#		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, 
+#						ymax = yend, fill=col), alpha = 0.3) + 
+#		opts(legend.position="none") + 
+#		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
+#		scale_fill_manual(values=c("indianred1", "indianred4", medals)) +
+#		scale_x_continuous(breaks = 1:4, labels = labels) 
+#
+#
+#ggplot() + 
+#		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, ymax = yend, fill=col), alpha = 0.3) + 
+#		scale_fill_manual(values=medals) +
+#		opts(legend.position="none") + 
+#		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
+#scale_fill_manual(values = c("indianred1", "indianred4")) +
+#		scale_x_continuous(breaks = 1:4, labels = labels) 
 
 
 
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 999 1001010101");
 
 
 
@@ -2934,59 +2977,80 @@ makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
 	if (threaded)
 		sfExport("overallList")
+		
 	if (!calculateNothing) {			
-if(!calculateOnlyViolin) {		
-		if (sum(!is.na(overallList$nBoxDes)) > 0) {
-			if (overallList$debug) {ownCat("nBoxplot...")}
-				sfClusterEval(
-					parMakeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, 
-						overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
-				, stopOnError=FALSE)
-		} else {
-			ownCat("All values for nBoxplot are 'NA'")
-		}
+		if(!calculateOnlyViolin) {		
+				if (sum(!is.na(overallList$nBoxDes)) > 0) {
+					if (overallList$debug) {ownCat("nBoxplot...")}
+					if (threaded)
+						sfClusterEval(
+							parMakeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, 
+								overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
+						, stopOnError=FALSE)
+					else
+						parMakeLinearDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, 
+							overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots , overallList)
+				} else {
+					ownCat("All values for nBoxplot are 'NA'")
+				}
+				
+				if (sum(!is.na(overallList$boxDes)) > 0) {
+					if (overallList$debug) {ownCat("Boxplot...")}
+					if (threaded)
+						sfClusterEval(
+							parMakeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
+						, stopOnError=FALSE)
+					else
+						parMakeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
+				} else {
+					ownCat("All values for Boxplot are 'NA'...")
+				}
+				
+				if (sum(!is.na(overallList$boxStackDes)) > 0) {
+					if (overallList$debug) {ownCat("Stacked Boxplot...")}
+					if (threaded)
+						sfClusterEval(
+							parMakeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+						, stopOnError=FALSE)
+					else
+						parMakeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
+				} else {
+					ownCat("All values for stacked Boxplot are 'NA'...")
+					}
 		
-		if (sum(!is.na(overallList$boxDes)) > 0) {
-			if (overallList$debug) {ownCat("Boxplot...")}
-				sfClusterEval(
-					parMakeBoxplotDiagram(overallList$overallResult_boxDes, overallList$boxDes, overallList$color_box, overallDesName=overallList$boxDesName, overallList$imageFileNames_Boxplots, overallList$boxOptions, overallList)
-				, stopOnError=FALSE)
-		} else {
-			ownCat("All values for Boxplot are 'NA'...")
-		}
-		
-		if (sum(!is.na(overallList$boxStackDes)) > 0) {
-			if (overallList$debug) {ownCat("Stacked Boxplot...")}
-				sfClusterEval(
-					parMakeBoxplotStackedDiagram(overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$color_boxStack, overallDesName=overallList$boxStackDesName, overallList$imageFileNames_StackedPlots, overallList)
-				, stopOnError=FALSE)
-		} else {
-			ownCat("All values for stacked Boxplot are 'NA'...")
-			}
-
-		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
-			if (overallList$debug) {ownCat("Spider plot...")}
-				sfClusterEval(
-					parMakeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
-				, stopOnError=FALSE)
-		} else {
-			ownCat("All values for stacked Boxplot are 'NA'...")
-		}
-}	
+				if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+					if (overallList$debug) {ownCat("Spider plot...")}
+					if (threaded)
+						sfClusterEval(
+							parMakeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
+						, stopOnError=FALSE)
+					else
+						parMakeSpiderPlotDiagram(overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$color_spider, overallDesName=overallList$boxSpiderDesName, overallList$imageFileNames_SpiderPlots, overallList$spiderOptions, overallList)
+					
+				} else {
+					ownCat("All values for stacked Boxplot are 'NA'...")
+				}
+		}	
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
-				sfClusterEval(
+				if (threaded)
+					sfClusterEval(
+						parMakeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
+						, stopOnError=FALSE)
+				else
 					parMakeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
-				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
 
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
-				sfClusterEval(
+				if (threaded)
+					sfClusterEval(
+						parMakeBarDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
+						, stopOnError=FALSE)
+				else
 					parMakeBarDiagram(overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$color_nBox, overallDesName=overallList$nBoxDesName, overallList$imageFileNames_nBoxplots, overallList)
-				, stopOnError=FALSE)
 		}
 	}
 }
@@ -3820,6 +3884,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	} 
 }
 
+print("XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYY 9");
+
 createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
 		nBoxDes = NULL, boxDes = NULL, boxStackDes = NULL, boxSpiderDes = NULL, violinBoxDes=NULL,
 		nBoxDesName = NULL, boxDesName = NULL, boxStackDesName = NULL, boxSpiderDesName = NULL, violinBoxDesName = NULL,
@@ -3890,7 +3956,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 }
 
 initSnow <- function() {
-	# loadLibs(TRUE)
+	loadLibs(TRUE)
 	library("snowfall")
 	
 	if(cpuAutoDetected) {
@@ -3914,6 +3980,10 @@ stopSnow <- function() {
 	sfStop()
 }
 
+
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
+
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
 calculateNothing <- FALSE
 calculateOnlyViolin <- FALSE
@@ -3923,9 +3993,16 @@ calculateOnlyViolin <- FALSE
 #startOptions("allmanual", TRUE)
 
 
-initSnow()
+# initSnow()
+
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
+loadLibs(TRUE)
+
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXX") 
+	
 startOptions("report", debug)
 ownCat("Completing diagram creation...")
-stopSnow()
++ stopSnow()
 
 rm(list=ls(all=TRUE))
