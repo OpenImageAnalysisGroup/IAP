@@ -344,8 +344,8 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 #	ownCat(args[5])
 #	ownCat(args[6])
 
-	treatment = treatment %exists% args[5]
-	secondTreatment = secondTreatment %exists% args[6]
+	treatment = treatment %exists% args[3]
+	secondTreatment = secondTreatment %exists% args[4]
 	secondTreatment = treatment %checkEqual% secondTreatment
 	
 	listOfTreat = list(treatment=treatment, secondTreatment=secondTreatment)
@@ -1779,7 +1779,7 @@ makeLinearDiagram <- function(
 	color <- overallColor[[imagesIndex]]
   
 	if(overallList$stress.Start != "none") {
-		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, (overallResult$mean + overallResult$se), diagramTypSave)
+		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, (overallResult$mean + overallResult$se), diagramTypSave)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
   
@@ -2705,6 +2705,11 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 		}
 	} 
 
+	print(stress.Start)
+	print(stress.End)
+	print(stress.Typ)
+	print(stress.Label)
+	
 	for (kk in seq(along=stress.Start)) {
 		if (stress.Start[kk] != -1 && stress.End[kk] != -1) {
 			stress.Start <- as.numeric(stress.Start)
@@ -3062,7 +3067,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	typOfStartOptions = tolower(typOfStartOptions)
 		
 	args = commandArgs(TRUE)
-
+#	for(nn in seq(along=args)) {
+#		ownCat(paste(nn, ".: ", args[nn], sep=""))
+#	}
+	
 	saveFormat = "pdf"
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
 	
@@ -3084,6 +3092,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	xAxisName = "DAS"
 	filterXaxis = "none"
 	
+	should.Clustered <- FALSE
+	bootstrap.N <- -1
+	
 #	diagramTypVector = vector()
 	descriptorSet = vector()
 	descriptorSetName = vector()
@@ -3098,10 +3109,12 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	if (typOfStartOptions == "all" | typOfStartOptions == "report" | typOfStartOptions == "allmanual") {
 		fileName <- fileName %exists% args[1]
 		
-		stress.Start <- loadStressPeriod(stress.Start, args[8])
-		stress.End <- loadStressPeriod(stress.End, args[9])
-		stress.Typ <- loadStressPeriod(stress.Typ, args[10])
-		stress.Label <- loadStressPeriod(stress.Label, args[11])
+		should.Clustered <- should.Clustered %exists% args[7]
+		bootstrap.N <- bootstrap.N %exists% args[8] 
+		stress.Start <- loadStressPeriod(stress.Start, args[9])
+		stress.End <- loadStressPeriod(stress.End, args[10])
+		stress.Typ <- loadStressPeriod(stress.Typ, args[11])
+		stress.Label <- loadStressPeriod(stress.Label, args[12])
 		
 		if (fileName != "error") {
 			workingDataSet <- separation %readInputDataFile% fileName
@@ -3355,7 +3368,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 				
-				appendix = as.logical(appendix %exists% args[3])
+				appendix = as.logical(appendix %exists% args[5])
 			
 				if (appendix) {
 					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
@@ -3376,7 +3389,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 				}
 
-				isRatio	= as.logical(isRatio %exists% args[4])
+				isRatio	= as.logical(isRatio %exists% args[6])
 			} else {
 				fileName = "error"
 			}
