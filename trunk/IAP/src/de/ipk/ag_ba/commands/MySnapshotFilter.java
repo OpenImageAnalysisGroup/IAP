@@ -51,28 +51,38 @@ public class MySnapshotFilter implements SnapshotFilter {
 				if (plantId != null && plantId.equals(o))
 					return true;
 				else
-					if (d != null && d.equals(o))
-						return true;
-					else
-						if (d != null) {
-							int day = globalOutlierDays[idx];
-							if (day < Integer.MAX_VALUE)
-								if (o.contains(">=") && d >= day)
-									return true;
-								else
-									if (o.contains(">") && d > day)
+					if (plantId != null && o.startsWith(plantId + "/")) {
+						try {
+							String fromDay = o.substring((plantId + "/").length());
+							int fromD = Integer.parseInt(fromDay);
+							return d >= fromD;
+						} catch (Exception e) {
+							System.out.println("Problematic outlier definition (ignored): " + o);
+							return false;
+						}
+					} else
+						if (d != null && d.equals(o))
+							return true;
+						else
+							if (d != null) {
+								int day = globalOutlierDays[idx];
+								if (day < Integer.MAX_VALUE)
+									if (o.contains(">=") && d >= day)
 										return true;
 									else
-										if (o.contains("<=") && d <= day)
+										if (o.contains(">") && d > day)
 											return true;
 										else
-											if (o.contains("<") && d < day)
+											if (o.contains("<=") && d <= day)
 												return true;
 											else
-												if (o.contains("=") && d == day)
+												if (o.contains("<") && d < day)
 													return true;
-							
-						}
+												else
+													if (o.contains("=") && d == day)
+														return true;
+								
+							}
 				idx++;
 			}
 		}

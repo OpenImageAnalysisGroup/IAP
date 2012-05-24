@@ -94,6 +94,8 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 	}
 	
 	private double unitTestChange(double val) {
+		if (true)
+			return val;
 		if (val == 190 && options.getUnitTestSteps() > 0) {
 			val = options.getUnitTestIdx() - 4 + val;
 			System.out.println(val + " // " + options.getUnitTestIdx() + "/" + options.getUnitTestSteps());

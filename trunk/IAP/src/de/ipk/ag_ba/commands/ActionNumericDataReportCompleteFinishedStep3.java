@@ -73,9 +73,12 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	public ActionNumericDataReportCompleteFinishedStep3(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering, ArrayList<ThreadSafeOptions> togglesInterestingProperties, ThreadSafeOptions tsoBootstrapN) {
-		this("Create report" +
+		this("Create report"
+				+
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF (" + StringManipulationTools.getStringList(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), ", ") + ")"),
+						: " PDF ("
+								+ StringManipulationTools.getStringList(
+										getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), ", ") + ")"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
@@ -92,7 +95,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		}
 	}
 	
-	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int n) {
+	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
@@ -129,7 +132,34 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		else
 			res.add("FALSE");
 		
-		res.add(n + "");
+		res.add(nBootstrap + "");
+		
+		String stressStart = "-1";
+		String stressEnd = "-1";
+		String stressType = "n"; // normal
+		String stressLabel = "(not defined)";
+		
+		try {
+			for (String s : stressDefinition.split("//")) {
+				s = s.trim();
+				if (s.toUpperCase().startsWith("Stress:")) {
+					s = s.substring("Stress:".length());
+					String[] def = s.split(";");
+					stressLabel = def[3];
+					stressStart = def[0];
+					stressEnd = def[1];
+					stressType = def[2];
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not properly interpret stress definition: " + stressDefinition + ". Error: "
+					+ e.getMessage());
+		}
+		
+		res.add(stressStart);
+		res.add(stressEnd);
+		res.add(stressType);
+		res.add(stressLabel);
 		
 		return res.toArray(new String[] {});
 	}
@@ -188,9 +218,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
 							StringManipulationTools.getStringList(
-									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), ", ") + ")") + add;
+									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), ", ") + ")") + add;
 		} else {
-			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt());
+			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence());
 			String filter = StringManipulationTools.getStringList(
 					arr, ", ");
 			if (filter.endsWith(", TRUE"))
@@ -413,7 +443,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					timeoutMinutes = 60 * 12; // 12 h
 				if (tsoBootstrapN.getInt() > 100)
 					timeoutMinutes = 60 * 24 * 7; // 7*24h
-				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt()), experiment, status, lastOutput, timeoutMinutes);
+				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), experiment, status,
+						lastOutput, timeoutMinutes);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
 				if (ok)
