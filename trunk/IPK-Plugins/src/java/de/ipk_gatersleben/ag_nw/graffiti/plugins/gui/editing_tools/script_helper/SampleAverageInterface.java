@@ -2,6 +2,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.Map;
 
+import org.MeasurementFilter;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
@@ -9,8 +10,9 @@ public interface SampleAverageInterface extends Measurement {
 	
 	public abstract void getString(StringBuilder r);
 	
-	public abstract double getValue();
+	public abstract double getValue(MeasurementFilter pf);
 	
+	@Override
 	public abstract SampleInterface getParentSample();
 	
 	public abstract void calculateValuesFromSampleData();
@@ -19,12 +21,14 @@ public interface SampleAverageInterface extends Measurement {
 	
 	public abstract String getUnit();
 	
+	@Override
 	public abstract boolean setData(Element averageElement);
 	
 	public abstract void setUnit(String ownUnit);
 	
 	public abstract void setReplicateId(int replicates);
 	
+	@Override
 	public abstract int getReplicateID();
 	
 	public abstract void setMax(double max);
@@ -47,6 +51,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#getStringOfChildren(java.lang.StringBuilder)
 	 */
+	@Override
 	public abstract void getStringOfChildren(StringBuilder r);
 	
 	/*
@@ -55,6 +60,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#getXMLAttributeString(java.lang.StringBuilder)
 	 */
+	@Override
 	public abstract void getXMLAttributeString(StringBuilder r);
 	
 	/*
@@ -63,6 +69,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#setAttribute(org.jdom.Attribute)
 	 */
+	@Override
 	public abstract void setAttribute(Attribute attr);
 	
 	/*
@@ -71,6 +78,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .MappingDataEntity#setDataOfChildElement(org.jdom.Element)
 	 */
+	@Override
 	public abstract void setDataOfChildElement(Element childElement);
 	
 	/*
@@ -79,6 +87,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 	 * .AttributeValuePairSupport#fillAttributeMap(java.util.Map)
 	 */
+	@Override
 	public abstract void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
 }

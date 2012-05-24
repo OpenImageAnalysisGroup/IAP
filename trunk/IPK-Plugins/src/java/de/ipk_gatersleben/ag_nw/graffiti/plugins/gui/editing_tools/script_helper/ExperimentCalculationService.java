@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.MeasurementFilter;
 import org.SystemAnalysis;
 
 public class ExperimentCalculationService {
@@ -20,7 +21,7 @@ public class ExperimentCalculationService {
 	 *           If this is an empty array, the reference is determined automatically
 	 *           (largest value sum for any substance defines the reference).
 	 */
-	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf) {
+	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf, MeasurementFilter pf) {
 		Experiment res = new Experiment();
 		res.setHeader(experiment.getHeader().clone());
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of impact of stress)");
@@ -75,7 +76,7 @@ public class ExperimentCalculationService {
 						}
 					}
 					if (ciRef != null)
-						processRef(ciRef, ci, res, si);
+						processRef(ciRef, ci, res, si, pf);
 				}
 			}
 		}
@@ -83,7 +84,7 @@ public class ExperimentCalculationService {
 	}
 	
 	private void processRef(ConditionInterface ciRef, ConditionInterface ci, ExperimentInterface res,
-			SubstanceInterface si) {
+			SubstanceInterface si, MeasurementFilter pf) {
 		// found reference for "ci"
 		TreeSet<Integer> timePointsAvailForBoth = new TreeSet<Integer>();
 		for (SampleInterface sample : ci)
@@ -101,8 +102,8 @@ public class ExperimentCalculationService {
 		HashMap<Integer, NumericMeasurementInterface> ciValueExample = new HashMap<Integer, NumericMeasurementInterface>();
 		for (SampleInterface sample : ci) {
 			if (timePointsAvailForBoth.contains(sample.getTime())) {
-				Double v = sample.getSampleAverage().getValue();
-				if (v == null || Double.isNaN(v) || Double.isInfinite(v))
+				Double sampleAverageValue = sample.getSampleAverage().getValue(pf);
+				if (sampleAverageValue == null || Double.isNaN(sampleAverageValue) || Double.isInfinite(sampleAverageValue))
 					continue;
 				if (!ciSampleExample.containsKey(sample.getTime()))
 					ciSampleExample.put(sample.getTime(), sample);
@@ -115,7 +116,7 @@ public class ExperimentCalculationService {
 				Double s = ciSum.get(sample.getTime());
 				if (s == null)
 					s = 0d;
-				s += v;
+				s += sampleAverageValue;
 				ciSum.put(sample.getTime(), s);
 				if (!ciN.containsKey(sample.getTime())) {
 					ciN.put(sample.getTime(), 1);
@@ -131,13 +132,13 @@ public class ExperimentCalculationService {
 		HashMap<Integer, Integer> ciRefN = new HashMap<Integer, Integer>();
 		for (SampleInterface sample : ciRef) {
 			if (timePointsAvailForBoth.contains(sample.getTime())) {
-				Double v = sample.getSampleAverage().getValue();
-				if (v == null || Double.isNaN(v) || Double.isInfinite(v))
+				Double sampleAverageValue = sample.getSampleAverage().getValue(pf);
+				if (sampleAverageValue == null || Double.isNaN(sampleAverageValue) || Double.isInfinite(sampleAverageValue))
 					continue;
 				Double s = ciRefSum.get(sample.getTime());
 				if (s == null)
 					s = 0d;
-				s += sample.getSampleAverage().getValue();
+				s += sampleAverageValue;
 				ciRefSum.put(sample.getTime(), s);
 				if (!ciRefN.containsKey(sample.getTime())) {
 					ciRefN.put(sample.getTime(), 1);
