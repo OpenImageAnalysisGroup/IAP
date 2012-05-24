@@ -1,0 +1,75 @@
+package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.OpenExcelFileDialogService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ProjectEntity;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
+import de.ipk_gatersleben.ag_pbi.dbe2.algorithms.buttons.ExperimentSaveButton;
+import de.ipk_gatersleben.ag_pbi.dbe2.algorithms.menuItems.ExperimentUpload;
+
+/**
+ * @author klukas
+ * 
+ */
+public class AddImagesToDatabase extends AbstractNavigationAction {
+	private final boolean images;
+
+	AddImagesToDatabase(boolean imagesTrueAllFilesFalse) {
+		super("Store Images in Database");
+		this.images = imagesTrueAllFilesFalse;
+	}
+
+	@Override
+	public void performActionCalculateResults(NavigationGraphicalEntity src) {
+	}
+
+	@Override
+	public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(ArrayList<NavigationGraphicalEntity> currentSet) {
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+		// create data set with attached images
+		// perform upload
+		if (images) {
+			ProcessImages.prepareDataSetFromFileList(new RunnableWithMappingData() {
+				private ExperimentInterface experiment;
+
+				@Override
+				public void run() {
+					if (experiment != null) {
+						Collection<Experiment> experiments = experiment.split();
+						for (Experiment e : experiments) {
+							ProjectEntity pe = new ProjectEntity(e.getName(), e);
+							ExperimentUpload es = new ExperimentUpload();
+							es.saveExperiment(pe);
+						}
+					}
+
+				}
+
+				@Override
+				public void setExperimenData(ExperimentInterface experiment) {
+					this.experiment = experiment;
+				}
+			});
+		} else {
+			final Collection<File> fileList = OpenExcelFileDialogService.getExcelOrBinaryFiles();
+			if (fileList != null) {
+				GravistoMainHelper.processDroppedFiles(fileList.toArray(new File[] {}), false,
+						(Class) ExperimentSaveButton.class);
+			}
+		}
+
+		return null;
+	}
+}
