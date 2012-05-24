@@ -2,7 +2,7 @@
 cd /d %~dp0
 echo Current directory:
 cd
-echo %*
+
 echo #####
 echo Condition 1   : %1
 echo Condition 2   : %2
@@ -13,7 +13,7 @@ echo Bootstrap-n?  : %6
 echo Stress start? : %7
 echo Stress end?   : %8
 echo Stress typ?   : %9
-shift
+shift /8
 echo Stress label? : %9
 
 IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6

@@ -1778,10 +1778,10 @@ makeLinearDiagram <- function(
   	diagramTypSave <- "nboxplot"
 	color <- overallColor[[imagesIndex]]
   
-	if(overallList$stress.Start != "none") {
-		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, (overallResult$mean + overallResult$se), diagramTypSave)
-		color <- addColorForStressPhaseAndOther(stressArea, color)
-	}
+#	if(overallList$stress.Start != -1) {
+#		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, (overallResult$mean + overallResult$se), diagramTypSave)
+#		color <- addColorForStressPhaseAndOther(stressArea, color)
+#	}
   
 	if (length(overallResult[, 1]) > 0) {
 	
@@ -1789,12 +1789,12 @@ makeLinearDiagram <- function(
 	
 			plot <-	ggplot() 
 					
-			if(length(stressArea) >0) {
-				plot <- plot + 
-						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
-						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
-				
-			}	
+#			if(length(stressArea) >0) {
+#				plot <- plot + 
+#						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
+#						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
+#				
+#			}	
 			
 			if (length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio || length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
 				plot <- plot + geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, colour=name, fill=name), method="loess", stat="smooth", alpha=0.1)
@@ -2597,14 +2597,15 @@ setColorDependentOfGroup <- function(overallResult) {
 	} else {
 		color <- c(color, "palegreen2")
 	}
-	if(length(unique(overallResult$group)) > 1) {
+
+	if(length(as.character(unique(overallResult$group))) > 1) {
 		if (lastColorPositiv) {
 			color <- c(color, "palegreen2")
 		} else {
 			color <- c(color, "light grey")
 		}
 	}
-	
+
 	return(color)
 }
 
@@ -2727,29 +2728,31 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 				stress.Typ[kk] <- "n"
 			}
 			
-			if(stress.Label[kk] != -1) {
+			if(stress.Label[kk] == -1) {
 				ownCat("... no stresslabel are set, change to standard label for the stresstyp")
-				stress.Typ[kk] <- standard.Stress.Labels[[stress.Typ[kk]]]
+				stress.Label[kk] <- standard.Stress.Labels[[stress.Typ[kk]]]
 			}
 			
-			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stress.Typ[kk], label=stress.Typ[kk]))
+			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stress.Typ[kk], label=stress.Label[kk]))
 		}
 	}
-	
+	#print(stress.Area)
 	return(stress.Area)
 }
 
 addColorForStressPhaseAndOther <- function(stressArea, color) {
 	
 	for (kk in unique(stressArea$typ)) {
-		if (kk == "dry")
+		if (kk == "d")
 			color <- c("cornsilk1", color)
-		else if (kk == "normal")
-			color <- color("darkolivegreen1", color)
-		else if (kk == "water")
-			color <- color("lightskyblue1", color)
-		else if (kk == "salt")
-			color <- color("seashell1", color)
+		else if (kk == "n")
+			color <- c("red", color)
+		else if (kk == "w")
+			color <- c("lightskyblue1", color)
+		else if (kk == "s")
+			color <- c("seashell1", color)
+		else if (kk == "c")
+			color <- c("papayawhip", color)
 	}
 	
 	return(color)
@@ -2761,17 +2764,19 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 #title <- ""
 ########
 	diagramTypSave<-"violinplot"
+
 	overallResult <- reownCategorized(overallResult)
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name,onlySecondTreatment = TRUE)
 	overallResult$name <- reorderThePlotOrder(overallResult)
 	stressArea <- data.frame()
 
-	if(overallList$stress.Start != "none") {
+	if(overallList$stress.Start != -1) {
 		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$mean, diagramTypSave)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
-	
+	print(color)
+	print(stressArea)
 	if (length(overallResult[, 1]) > 0) {
 						
 		plot <-	ggplot()				
@@ -3077,10 +3082,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	isGray = FALSE
 	#showResultInR = FALSE
 	
-	stress.Start <- 10 # -1
-	stress.End <- 25 # -1
-	stress.Typ <- "d" # -1 ## d -> dry; w -> wet; n -> normal; s -> salt
-	stress.Label <- "drought stress" # -1
+	stress.Start <- -1 #"10" # -1
+	stress.End <- -1 #"15" # -1
+	stress.Typ <- -1 #"d" # -1 ## d -> dry; w -> wet; n -> normal; s -> salt
+	stress.Label <- -1 #"drought stress" # -1
 	
 	treatment = "Treatment"
 	filterTreatment = "none"
@@ -3867,7 +3872,7 @@ stopSnow <- function() {
 
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
 calculateNothing <- FALSE
-calculateOnlyViolin <- FALSE
+calculateOnlyViolin <- TRUE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
