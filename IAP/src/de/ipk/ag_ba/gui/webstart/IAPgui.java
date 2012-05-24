@@ -38,7 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class IAPgui {
 	
-	public static JComponent getNavigation(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
+	public static JComponent getMainGUIcontent(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow) {
 		
 		final JPanel graphPanel = new JPanel();
@@ -62,7 +62,7 @@ public class IAPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 		
-		ActionIapHome home = new ActionIapHome(myStatus);
+		final ActionIapHome home = new ActionIapHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
 		
 		navigationPanel.setGuiSetting(guiSetting);
@@ -70,10 +70,10 @@ public class IAPgui {
 		
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
 		
-		overView.setTitle("Initialize");
-		overView.setProcessing(true);
+		// overView.setTitle("Initialize");
+		// overView.setProcessing(true);
 		
-		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
+		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
 		home.performActionCalculateResults(overView);
 		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
 		actionPanel.setEntitySet(home.getActionEntitySet());
@@ -82,8 +82,8 @@ public class IAPgui {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
 			@Override
 			public void run() {
-				overView.setTitle("Overview");
-				overView.setProcessing(false);
+				// overView.setTitle("Overview");
+				// overView.setProcessing(false);
 				try {
 					JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
 					Object o = win.eval("s = window.location.hash;");
@@ -120,14 +120,13 @@ public class IAPgui {
 		}
 		lbl.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
-		graphPanel.validate();
+		graphPanel.revalidate();
 		
 		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
 				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
 				TableLayout.PREFERRED, TableLayout.FILL);
 		
-		navigateTo("IAP", navigationPanel, actionPanel, graphPanel);
-		
+		// navigateTo("IAP", navigationPanel, actionPanel, graphPanel);
 		return res;
 	}
 	

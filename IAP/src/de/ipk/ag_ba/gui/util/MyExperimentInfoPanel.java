@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui.util;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
@@ -236,6 +237,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	private JComponent disable(JComponent jTextField) {
 		if (jTextField instanceof JTextField)
 			((JTextField) jTextField).setEditable(false);
+		jTextField.setBorder(null);
+		jTextField.setBackground(Color.WHITE);
 		return style(jTextField);
 	}
 	
@@ -292,31 +295,33 @@ public class MyExperimentInfoPanel extends JPanel {
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
-		outliers.setToolTipText("Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs.");
 		sequence = new JTextField(experimentHeader.getSequence());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
 		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 				false);
-		fp.addGuiComponentRow(new JLabel("Origin"), new JLabel(experimentHeader.getOriginDbId() + ""), false);
-		fp.addGuiComponentRow(new JLabel("Database"), new JLabel(experimentHeader.getDatabase() + ""), false);
+		fp.addGuiComponentRow(new JLabel("Origin"), disable(new JTextField(experimentHeader.getOriginDbId() + "")), false);
+		fp.addGuiComponentRow(new JLabel("Database"), disable(new JTextField(experimentHeader.getDatabase() + "")), false);
 		
 		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);
-		fp.addGuiComponentRow(new JLabel("Group"), groupVisibility, false);
+		fp.addGuiComponentRow(new JLabel("Access Group"), groupVisibility, false);
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
-		fp.addGuiComponentRow(new JLabel("Sequence"), sequence, false);
+		String ts = "Use ' // ' to split information. Specify stress time range as '5-10' (days) or 'Stress:5-10', multiple regions as 'Stress:3-5//Stress:10-15' or '3-5//10-15'.";
+		fp.addGuiComponentRow(tooltip(new JLabel("Sequence/Stress"), ts), tooltip(sequence, ts), false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
-		fp.addGuiComponentRow(new JLabel("Outliers"), outliers, false);
-		fp.addGuiComponentRow(new JLabel("Connected Files"), new JLabel(niceValue(experimentHeader.getNumberOfFiles(), null)
-				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")"), false);
+		String to = "Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs.";
+		fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
+		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(niceValue(experimentHeader.getNumberOfFiles(), null)
+				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
 		if (optExperiment != null)
-			fp.addGuiComponentRow(new JLabel("Numeric Values"), new JLabel(niceValue(optExperiment.getNumberOfMeasurementValues(), null)), false);
+			fp.addGuiComponentRow(new JLabel("Numeric Values"), disable(new JTextField(niceValue(optExperiment.getNumberOfMeasurementValues(), null))), false);
 		if (experimentHeader.getStorageTime() != null)
-			fp.addGuiComponentRow(new JLabel("Storage Time"), new JLabel(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime())), false);
-		fp.addGuiComponentRow(new JLabel("History"), new JLabel(getVersionString(experimentHeader)), false);
+			fp.addGuiComponentRow(new JLabel("Storage Time"), disable(new JTextField(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime()))),
+					false);
+		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		if (optExperiment != null)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
 		
@@ -433,6 +438,11 @@ public class MyExperimentInfoPanel extends JPanel {
 		
 		// setBorder(BorderFactory.createEtchedBorder());
 		setBorder(BorderFactory.createLoweredBevelBorder());
+	}
+	
+	private JComponent tooltip(JComponent jc, String to) {
+		jc.setToolTipText(to);
+		return jc;
 	}
 	
 	private JComponent getCorrelationInfo(ExperimentInterface optExperiment) {

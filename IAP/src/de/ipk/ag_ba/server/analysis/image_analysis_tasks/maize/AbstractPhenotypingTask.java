@@ -76,6 +76,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private Exception error;
 	private boolean runOK;
 	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
+	private int unit_test_idx;
+	private int unit_test_steps;
 	
 	@Override
 	public void setInput(
@@ -627,7 +629,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result,
-			DatabaseTarget storeResultInDatabase, boolean processLabelUrl, 
+			DatabaseTarget storeResultInDatabase, boolean processLabelUrl,
 			int tray, int tray_cnt) {
 		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, result.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
@@ -635,7 +637,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (result.getLabelURL() != null && processLabelUrl) {
 			result.getLabelURL().setFileName(
 					addTrayInfo(tray, tray_cnt,
-					result.getLabelURL().getFileName()));
+							result.getLabelURL().getFileName()));
 			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
 		}
 		
@@ -670,12 +672,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private String addTrayInfo(int tray, int tray_cnt, String fileName) {
-		if (tray_cnt>1) 
-			fileName = StringManipulationTools.stringReplace(fileName, 
-					".png", "."+tray+"."+tray_cnt+".png");
+		if (tray_cnt > 1)
+			fileName = StringManipulationTools.stringReplace(fileName,
+					".png", "." + tray + "." + tray_cnt + ".png");
 		return fileName;
 	}
-
+	
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		if (output == null)
@@ -832,6 +834,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// s.printTime();
 	}
 	
+	@Override
+	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
+		this.unit_test_idx = unit_test_idx;
+		this.unit_test_steps = unit_test_steps;
+	}
+	
 	private HashMap<Integer, BlockResultSet> processAngleWithinSnapshot(ImageSet id,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -857,6 +865,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		boolean side = id.isSide();
 		
 		ImageProcessorOptions options = new ImageProcessorOptions();
+		
+		options.setUnitTestInfo(unit_test_idx, unit_test_steps);
+		
 		if (inVis != null && inVis.getPosition() != null)
 			options.addDoubleSetting(Setting.ROTATION_ANGLE,
 					inVis.getPosition());

@@ -32,4 +32,6 @@ public interface ImageAnalysisTask {
 			int numberOfSubsets);
 	
 	public Collection<NumericMeasurementInterface> getOutput();
+	
+	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps);
 }

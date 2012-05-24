@@ -1049,6 +1049,7 @@ public class FolderPanel extends JComponent {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+						fp.revalidate();
 						Component pc = fp.getParent();
 						performDialogResize(pc);
 					}

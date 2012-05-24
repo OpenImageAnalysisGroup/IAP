@@ -156,4 +156,12 @@ public class TranslationMatch {
 		}
 		return res;
 	}
+	
+	public double getOffsetVerticalY() {
+		return offsetVertY;
+	}
+	
+	public void setOffsetVerticalY(double y) {
+		offsetVertY = y;
+	}
 }

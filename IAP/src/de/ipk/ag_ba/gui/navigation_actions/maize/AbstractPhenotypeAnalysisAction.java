@@ -122,8 +122,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						// if (sd3.getTime() != 29)
 						// continue;
 						if (!containsAnOutlier)
-							if (filter == null || filter.isValidSample(sd3))
+							if (filter == null || filter.isValidSample(sd3)) {
 								workload.add(sd3);
+							}
 					}
 				}
 			}
@@ -143,6 +144,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			task.setInput(
 					AbstractPhenotypingTask.getWateringInfo(experimentToBeAnalysed),
 					workload, null, m, workOnSubset, numberOfSubsets);
+			
+			task.setUnitTestInfo(unit_test_idx, unit_test_steps);
+			
 			task.performAnalysis(pi, ti, status);
 			
 			if (status != null)
@@ -307,6 +311,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected abstract HashSet<ImageConfiguration> getValidImageTypes();
 	
 	private SampleFilter filter;
+	private int unit_test_idx = -1;
+	private int unit_test_steps = -1;
 	
 	public void setFilter(SampleFilter filter) {
 		this.filter = filter;
@@ -320,4 +326,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		this.resultReceiver = resultReceiver;
 	}
 	
+	public void setUnitTestValueRangeInfo(int idx, int steps) {
+		this.unit_test_idx = idx;
+		this.unit_test_steps = steps;
+	}
 }

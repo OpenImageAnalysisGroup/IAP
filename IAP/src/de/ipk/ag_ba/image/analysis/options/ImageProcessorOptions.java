@@ -327,6 +327,8 @@ public class ImageProcessorOptions {
 	private boolean isArabidopsis;
 	private int tray_idx;
 	private int tray_cnt;
+	private int unit_test_idx;
+	private int unit_test_steps;
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -381,5 +383,18 @@ public class ImageProcessorOptions {
 	
 	public boolean isBarley() {
 		return isBarley;
+	}
+	
+	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
+		this.unit_test_idx = unit_test_idx;
+		this.unit_test_steps = unit_test_steps;
+	}
+	
+	public double getUnitTestIdx() {
+		return unit_test_idx;
+	}
+	
+	public double getUnitTestSteps() {
+		return unit_test_steps;
 	}
 }

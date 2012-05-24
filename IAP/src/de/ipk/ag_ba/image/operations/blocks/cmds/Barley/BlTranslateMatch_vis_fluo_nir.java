@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author Christian Klukas
  */
-public class BlTranslateMatch_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private final boolean debug = false;
 	
@@ -36,10 +36,18 @@ public class BlTranslateMatch_fluo_nir extends AbstractSnapshotAnalysisBlockFIS 
 					tm.calcOffsetVerticalY(fluo);
 					tm.calcOffsetHorizontalX(fluo);
 					
-					if (input().images().fluo() != null)
-						input().images().setFluo(tm.translate(input().images().fluo()));
-					
-					input().masks().setFluo(tm.translate(input().masks().fluo()));
+					if (tm.getOffsetVerticalY() < 0) {
+						if (input().images().fluo() != null)
+							input().images().setFluo(tm.translate(input().images().fluo()));
+						
+						input().masks().setFluo(tm.translate(input().masks().fluo()));
+					} else {
+						tm.setOffsetVerticalY(-tm.getOffsetVerticalY());
+						if (input().images().vis() != null)
+							input().images().setVis(tm.translate(input().images().vis()));
+						
+						input().masks().setVis(tm.translate(input().masks().vis()));
+					}
 				}
 				
 				if (input().images().nir() != null) {
