@@ -1778,8 +1778,8 @@ makeLinearDiagram <- function(
   	diagramTypSave <- "nboxplot"
 	color <- overallColor[[imagesIndex]]
   
-	if(overallList$stressStart != "none") {
-		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, (overallResult$mean + overallResult$se), diagramTypSave)
+	if(overallList$stress.Start != "none") {
+		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, (overallResult$mean + overallResult$se), diagramTypSave)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
   
@@ -2619,8 +2619,8 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 #diagramTypSave="violinplot"
 #imagesIndex <- "1"
 #isOnlyOneValue <- FALSE
-#stressStart <- overallList$stressStart
-#stressEnd <- overallList$stressEnd
+#stress.Start <- overallList$stress.Start
+#stress.End <- overallList$stress.End
 	#############	
 	
 	overallList$debug %debug% "makeViolinPlotDiagram()"	
@@ -2682,15 +2682,18 @@ reorderThePlotOrder <- function(overallResult) {
 	return(factor(overallResult$name, levels = sumVector[order(sumVector$V1),]$c))
 }
 
-buildStressArea <- function(stressStart, stressEnd, yValues, diagramTypSave) {
+buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, yValues, diagramTypSave) {
 #############
-#stressStart <- overallList$stressStart
-#stressEnd <- overallList$stressEnd
+#stress.Start <- overallList$stress.Start
+#stress.End <- overallList$stress.End
 #yValues <- overallResult$mean
 #diagramTypSave <- diagramTypSave
 #############
 	
-	stressArea <- data.frame()
+	stress.Area <- data.frame()
+	possible.Stress.Values <- c("n", "d", "w", "c", "s")
+	standard.Stress.Labels <- list(n = "normal", d = "drought stress", w = "moisture stress", c = "chemical stress", s = "salt stress")
+	
 	ymin <- min(yValues,na.rm = TRUE)
 	ymax <- max(yValues, na.rm = TRUE)
 	
@@ -2701,23 +2704,34 @@ buildStressArea <- function(stressStart, stressEnd, yValues, diagramTypSave) {
 			ymin <- (-1*ymax)
 		}
 	} 
-	
-	for (kk in seq(along=stressStart)) {
-		if (stressStart[kk] != "none" && stressEnd[kk] != "none") {
-			stressStart <- as.numeric(stressStart)
-			stressEnd <- as.numeric(stressEnd)
-			if (stressStart[kk] >= stressEnd[kk]) {
-				xmin <- stressEnd[kk]
-				xmax <- stressStart[kk]
+
+	for (kk in seq(along=stress.Start)) {
+		if (stress.Start[kk] != -1 && stress.End[kk] != -1) {
+			stress.Start <- as.numeric(stress.Start)
+			stress.End <- as.numeric(stress.End)
+			if (stress.Start[kk] >= stress.End[kk]) {
+				xmin <- stress.End[kk]
+				xmax <- stress.Start[kk]
 			} else {
-				xmin <- stressStart[kk]
-				xmax <- stressEnd[kk]
+				xmin <- stress.Start[kk]
+				xmax <- stress.End[kk]
 			}
-			stressArea <- rbind(stressArea, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ="dry", label="drought stress"))
+			
+			if(!(stress.Typ[kk] %in% possible.Stress.Values)) {
+				ownCat("... unknown stresstyp, change to \"(n)ormal\"")
+				stress.Typ[kk] <- "n"
+			}
+			
+			if(stress.Label[kk] != -1) {
+				ownCat("... no stresslabel are set, change to standard label for the stresstyp")
+				stress.Typ[kk] <- standard.Stress.Labels[[stress.Typ[kk]]]
+			}
+			
+			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stress.Typ[kk], label=stress.Typ[kk]))
 		}
 	}
 	
-	return(stressArea)
+	return(stress.Area)
 }
 
 addColorForStressPhaseAndOther <- function(stressArea, color) {
@@ -2748,8 +2762,8 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 	overallResult$name <- reorderThePlotOrder(overallResult)
 	stressArea <- data.frame()
 
-	if(overallList$stressStart != "none") {
-		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallResult$mean, diagramTypSave)
+	if(overallList$stress.Start != "none") {
+		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$mean, diagramTypSave)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
 	
@@ -2995,11 +3009,11 @@ buildBlacklist <- function(workingDataSet, descriptorSet) {
 }
 
 
-loadStressPeriod <- function(stressDay, arg) {
-	stressDay <- stressDay %exists% arg
-	stressDay <- unlist(preprocessingOfValues(stressDay,isColName=TRUE))
+loadStressPeriod <- function(stress.Value, arg) {
+	stress.Value <- stress.Value %exists% arg
+	stress.Value <- unlist(preprocessingOfValues(stress.Value, isColName = TRUE))
 
-	return(stressDay)
+	return(stress.Value)
 }
 
 initRfunction <- function(DEBUG = FALSE) {
@@ -3055,8 +3069,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	isGray = FALSE
 	#showResultInR = FALSE
 	
-	stressStart <- 10
-	stressEnd <- 25
+	stress.Start <- 10 # -1
+	stress.End <- 25 # -1
+	stress.Typ <- "d" # -1 ## d -> dry; w -> wet; n -> normal; s -> salt
+	stress.Label <- "drought stress" # -1
 	
 	treatment = "Treatment"
 	filterTreatment = "none"
@@ -3082,8 +3098,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	if (typOfStartOptions == "all" | typOfStartOptions == "report" | typOfStartOptions == "allmanual") {
 		fileName <- fileName %exists% args[1]
 		
-		stressStart <- loadStressPeriod(stressStart, args[8])
-		stressEnd <- loadStressPeriod(stressEnd, args[9])
+		stress.Start <- loadStressPeriod(stress.Start, args[8])
+		stress.End <- loadStressPeriod(stress.End, args[9])
+		stress.Typ <- loadStressPeriod(stress.Typ, args[10])
+		stress.Label <- loadStressPeriod(stress.Label, args[11])
 		
 		if (fileName != "error") {
 			workingDataSet <- separation %readInputDataFile% fileName
@@ -3392,8 +3410,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		saveName <- "test2"
 		yAxisName <- "test2"
 		
-		stressStart <- 10
-		stressEnd <- 30
+		stress.Start <- 10
+		stress.End <- 30
+		stress.Typ <- "d"
+		stress.Label <- "drought stress"
 		
 		isRatio <- FALSE
 		calculateNothing <- FALSE
@@ -3700,7 +3720,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										treatment = treatment, filterTreatment = filterTreatment, 
 										secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
 										xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio,
-										stressStart=stressStart, stressEnd = stressEnd)
+										stress.Start=stress.Start, stress.End = stress.End, stress.Typ = stress.Typ, stress.Label = stress.Label)
 					if (secondRun) {
 						appendix = TRUE
 						secondRun = FALSE
@@ -3745,7 +3765,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		treatment="Treatment", filterTreatment="none", 
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)", 
 		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE, isRatio=FALSE,
-		stressStart=stressStart, stressEnd=stressEnd) {		
+		stress.Start = -1, stress.End = -1, stress.Typ = -1, stress.Label = -1) {		
 
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes,
@@ -3759,7 +3779,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(), overallResult_violinBoxDes = data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), color_violin= list(), user="none", typ="none",
 						filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
-						stressStart = stressStart, stressEnd = stressEnd
+						stress.Start = stress.Start, stress.End = stress.End, stress.Typ = stress.Typ, stress.Label = stress.Label
 						)	
 				
 	overallList$debug %debug% "Start"
