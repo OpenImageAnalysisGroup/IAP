@@ -2743,7 +2743,7 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 
 addColorForStressPhaseAndOther <- function(stressArea, color) {
 	
-	for (kk in rev(unique(stressArea$typ))) {
+	for (kk in unique(stressArea$typ)) {
 		if (kk == "d")
 			color <- c("cornsilk1", color)
 		else if (kk == "n")
