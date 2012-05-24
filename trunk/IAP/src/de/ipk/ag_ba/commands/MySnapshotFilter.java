@@ -44,6 +44,7 @@ public class MySnapshotFilter implements SnapshotFilter {
 		return false;
 	}
 	
+	@Override
 	public boolean filterOut(String plantId, Integer d) {
 		if (globalOutlierArr.length > 0) {
 			int idx = 0;
