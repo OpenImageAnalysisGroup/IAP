@@ -6,8 +6,8 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 # multi threaded (4, ba-09: 48sec)
 # not threaded   (ba-09:    33sec)
 
-threaded <- TRUE
-innerThreaded = TRUE
+threaded <- FALSE
+innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
 debug <- TRUE
@@ -132,10 +132,37 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 ownCat <- function(text, endline=TRUE){
-	# cat(text)
-	# if (endline) {
-	#	cat("\n")
-	# }
+	#print(text)
+	
+#	while (class(text) == "list") {
+#		text <- unlist(text)
+#	}
+	
+	if (sfParallel()) {
+		sfCat(text, master=TRUE)
+		if (endline)
+			sfCat("\n", master=TRUE)
+	} else {
+		cat(unlist(text))
+		if (endline)
+			cat("\n")
+	}
+	
+#tryCatch({	
+#	if (sfParallel()) {
+#		sfCat(text, master=TRUE)
+#		if (endline)
+#			sfCat("\n", master=TRUE)
+#	} else {
+#		cat(unlist(text))
+#		if (endline)
+#			cat("\n")
+#	}
+#	},
+#	error = function(e) {
+#		print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+#		print(text)
+#		print("hhhhhhhhhhhhhhhhhhhhhhhhhhhh")})
 }
 
 overallOutlierDetection <- function(overallList) {
@@ -236,7 +263,9 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	}
 	
 	if (length(libraries) > 0) {
+		ownCat("Load libraries:")
 		for(n in libraries) {
+			ownCat(n)
 			if (sfParallel())
 				sfLibrary(n, character.only = TRUE)
 			else
@@ -1377,8 +1406,9 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 
 saveImageFile <- function(overallList, plot, filename, extraString="") {
 	filename = preprocessingOfValues(paste(filename, extraString, sep=""), FALSE, replaceString = "_")	
-	ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
-
+	
+	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
+	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 
 }
 
@@ -1728,13 +1758,13 @@ parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor,
 			if (innerThreaded)
 				sfClusterCall(makeLinearDiagram, 
 					overallResult, overallDescriptor, overallColor, 
-					overallDesName, overallFileName, overallList, diagramTypSave="nboxplot",
+					overallDesName, overallFileName, overallList,
 					imagesIndex, 
 					stopOnError=FALSE)
 			else
 				makeLinearDiagram(
 					overallResult, overallDescriptor, overallColor, 
-					overallDesName, overallFileName, overallList, diagramTypSave="nboxplot",
+					overallDesName, overallFileName, overallList,
 					imagesIndex)
 		}
 	}
@@ -1742,27 +1772,40 @@ parMakeLinearDiagram <- function(overallResult, overallDescriptor, overallColor,
 
 makeLinearDiagram <- function(
 	overallResult, overallDescriptor, overallColor, overallDesName, 
-	overallFileName, overallList, diagramTypSave="nboxplot", imagesIndex) {
+	overallFileName, overallList, imagesIndex) {
 	
-  ylabelForAppendix <- ""
-    
+	ylabelForAppendix <- ""
+  	diagramTypSave <- "nboxplot"
+	color <- overallColor[[imagesIndex]]
+  
+	if(overallList$stressStart != "none") {
+		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, (overallResult$mean + overallResult$se), diagramTypSave)
+		color <- addColorForStressPhaseAndOther(stressArea, color)
+	}
+  
 	if (length(overallResult[, 1]) > 0) {
 	
 		if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 	
-			plot <-	ggplot(data=overallResult, aes(x=xAxis, y=mean, shape=name)) 
-					#geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), stat="identity", alpha=0.1) +
+			plot <-	ggplot() 
+					
+			if(length(stressArea) >0) {
+				plot <- plot + 
+						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
+						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
+				
+			}	
 			
 			if (length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || overallList$isRatio || length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
-				plot <- plot + geom_smooth(aes(ymin=mean-se, ymax=mean+se, colour=name, fill=name), method="loess", stat="smooth", alpha=0.1)
+				plot <- plot + geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, colour=name, fill=name), method="loess", stat="smooth", alpha=0.1)
 				#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
 			} else {
-				plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
-						geom_line(aes(color=name), alpha=0.2)
+				plot <- plot + geom_ribbon(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
+						geom_line(data=overallResult, aes(x=xAxis, y=mean, color=name), alpha=0.2)
 			}
 					
 			plot <- plot +	
-					geom_point(aes(color=name), size=3) +
+					geom_point(data=overallResult, aes(x=xAxis, y=mean, color=name), size=3) +
 #							ownCat("drinne")
 #							ownCat(overallResult$xAxis)
 #							ownCat(min(as.numeric(as.character(overallResult$xAxis))))
@@ -1779,7 +1822,7 @@ makeLinearDiagram <- function(
 					
 								
 				plot <- plot +
-					scale_fill_manual(values = overallColor[[imagesIndex]]) +
+					scale_fill_manual(values = color) +
 					scale_colour_manual(values= overallColor[[imagesIndex]]) +
 					scale_shape_manual(values = c(1:length(overallColor[[imagesIndex]]))) +
 					theme_bw() +
@@ -1817,10 +1860,8 @@ makeLinearDiagram <- function(
 					plot = plot + facet_wrap(~ name)
 				} 
 			#}
-			
-		
-						
-			#print(plot)
+									
+			print(plot)
 
 ##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
 ##!#				newCoords = seq(min(overallList$filterXaxis, na.rm=TRUE), max(overallList$filterXaxis, na.rm=TRUE), 1)
@@ -2538,17 +2579,32 @@ reownCategorized <- function(overallResult) {
 
 setColorDependentOfGroup <- function(overallResult) {
 	
+#	lastColorPositiv <- ifelse(overallResult$mean[1] < 0, TRUE, FALSE)
+#	color <- vector()
+#	for(n in 1:length(unique(overallResult$group))) {
+#		if (lastColorPositiv) {
+#			color <- c(color, "light gray")
+#			lastColorPositiv <- FALSE
+#		} else {
+#			color <- c(color, "green")
+#			lastColorPositiv <- TRUE
+#		}
+#	}
 	lastColorPositiv <- ifelse(overallResult$mean[1] < 0, TRUE, FALSE)
 	color <- vector()
-	for(n in 1:length(unique(overallResult$group))) {
+	if (lastColorPositiv) {
+		color <- c(color, "light grey")
+	} else {
+		color <- c(color, "palegreen2")
+	}
+	if(length(unique(overallResult$group)) > 1) {
 		if (lastColorPositiv) {
-			color <- c(color, "light gray")
-			lastColorPositiv <- FALSE
+			color <- c(color, "palegreen2")
 		} else {
-			color <- c(color, "green")
-			lastColorPositiv <- TRUE
+			color <- c(color, "light grey")
 		}
 	}
+	
 	return(color)
 }
 
@@ -2563,6 +2619,8 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 #diagramTypSave="violinplot"
 #imagesIndex <- "1"
 #isOnlyOneValue <- FALSE
+#stressStart <- overallList$stressStart
+#stressEnd <- overallList$stressEnd
 	#############	
 	
 	overallList$debug %debug% "makeViolinPlotDiagram()"	
@@ -2584,7 +2642,7 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 			if (innerThreaded)
 				sfClusterCall(makeViolinPlotDiagram, 
 					overallResult, overallDescriptor, overallColor, overallDesName, 
-					overallFileName, overallList, diagramTypSave="violinplot", imagesIndex, 
+					overallFileName, overallList, diagramTypSave="violinplot", imagesIndex,
 					stopOnError=FALSE)
 			else
 				makeViolinPlotDiagram( 
@@ -2602,7 +2660,7 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 			title = overallList$filterTreatmentRename[[value]]			
 			booleanVector = getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = value))
 			plotThisValues = overallResult[booleanVector, ]
-			plotThisValues$name <- factor(substr(plotThisValues$name,nchar(value)+2, nchar(as.character(plotThisValues$name))))
+			#plotThisValues$name <- factor(substr(plotThisValues$name,nchar(value)+2, nchar(as.character(plotThisValues$name))))
 			plotViolinPlotDiagram(plotThisValues, overallDesName, overallFileName, overallList, imagesIndex, title)
 		}	 
 	} else {
@@ -2624,47 +2682,120 @@ reorderThePlotOrder <- function(overallResult) {
 	return(factor(overallResult$name, levels = sumVector[order(sumVector$V1),]$c))
 }
 
+buildStressArea <- function(stressStart, stressEnd, yValues, diagramTypSave) {
+#############
+#stressStart <- overallList$stressStart
+#stressEnd <- overallList$stressEnd
+#yValues <- overallResult$mean
+#diagramTypSave <- diagramTypSave
+#############
+	
+	stressArea <- data.frame()
+	ymin <- min(yValues,na.rm = TRUE)
+	ymax <- max(yValues, na.rm = TRUE)
+	
+	if (diagramTypSave == "violinplot")  {
+		if (abs(ymin) >= abs(ymax)) {
+			ymax <- abs(ymin)
+		} else {
+			ymin <- (-1*ymax)
+		}
+	} 
+	
+	for (kk in seq(along=stressStart)) {
+		if (stressStart[kk] != "none" && stressEnd[kk] != "none") {
+			stressStart <- as.numeric(stressStart)
+			stressEnd <- as.numeric(stressEnd)
+			if (stressStart[kk] >= stressEnd[kk]) {
+				xmin <- stressEnd[kk]
+				xmax <- stressStart[kk]
+			} else {
+				xmin <- stressStart[kk]
+				xmax <- stressEnd[kk]
+			}
+			stressArea <- rbind(stressArea, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ="dry", label="drought stress"))
+		}
+	}
+	
+	return(stressArea)
+}
 
-plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName, overallList, imagesIndex, title="", diagramTypSave="violinplot") {
+addColorForStressPhaseAndOther <- function(stressArea, color) {
+	
+	for (kk in unique(stressArea$typ)) {
+		if (kk == "dry")
+			color <- c("cornsilk1", color)
+		else if (kk == "normal")
+			color <- color("darkolivegreen1", color)
+		else if (kk == "water")
+			color <- color("lightskyblue1", color)
+		else if (kk == "salt")
+			color <- color("seashell1", color)
+	}
+	
+	return(color)
+}
+
+plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName, overallList, imagesIndex, title="") {
 ########
-#overallResult <- plotThisValues	
+#overallResult <- plotThisValues
+#title <- ""
 ########
+	diagramTypSave<-"violinplot"
 	overallResult <- reownCategorized(overallResult)
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name,onlySecondTreatment = TRUE)
 	overallResult$name <- reorderThePlotOrder(overallResult)
-		
+	stressArea <- data.frame()
+
+	if(overallList$stressStart != "none") {
+		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallResult$mean, diagramTypSave)
+		color <- addColorForStressPhaseAndOther(stressArea, color)
+	}
+	
 	if (length(overallResult[, 1]) > 0) {
 						
-		plot <-	ggplot(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group)) +				
-				geom_ribbon(aes(ymin=-mean, ymax=mean)) +						
+		plot <-	ggplot()				
+				
+		if(length(stressArea) >0) {
+			plot <- plot + 
+				geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
+				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
+			
+		}	
+			plot <- plot +
+				geom_ribbon(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group, ymin=-mean, ymax=mean)) +						
 				scale_fill_manual(values = color) +
-				guides(fill=FALSE) +
-				coord_flip()+
-				scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) +					
-				ylab(overallDesName[[imagesIndex]])			+	
+				scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) + 
+				scale_y_continuous(name=overallDesName[[imagesIndex]],  minor_breaks = min(as.numeric(as.character(overallResult$mean))):max(as.numeric(as.character(overallResult$mean)))) +
+				#ylab(overallDesName[[imagesIndex]]) +
+				#label=c("0.4", "0.2", "0.0", "0.2", "0.4")
+				#scale_y_discrete(aes(factor(c(0.4, 0.2, 0.0, 0.2, 0.4))), name=overallDesName[[imagesIndex]],limits=c(-10,1)) +
 				#scale_fill_manual(values = overallColor[[imagesIndex]]) +
 				#scale_colour_manual(values= overallColor[[imagesIndex]]) +
+				coord_flip()+
 				theme_bw() +
 				opts(axis.title.x = theme_text(face="bold", size=11), 
 						axis.title.y = theme_text(face="bold", size=11, angle=90), 
 						#panel.grid.major = theme_blank(), # switch off major gridlines
 						#panel.grid.minor = theme_blank(), # switch off minor gridlines
-						legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
-						legend.title = theme_blank(), # switch off the legend title						
+						legend.position = "none", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
+						#legend.title = theme_blank(), # switch off the legend title						
 						#legend.key.size = unit(1.5, "lines"), 
-						legend.key = theme_blank(), # switch off the rectangle around symbols in the legend
+						#legend. key = theme_blank(), # switch off the rectangle around symbols in the legend
 						panel.border = theme_rect(colour="Grey", size=0.1)
 				)
 		if (title != "") {
-			plot = plot + opts(title = title)
+			plot <- plot + opts(title = title)
 		}
 		
-		plot = plot + facet_wrap(~ name, ncol=5)
+		plot <- plot + facet_wrap(~ name, ncol=5) 
+	
+		#print(plot)
+		
 		writeTheData(overallList, plot, overallFileName[imagesIndex], diagramTypSave, writeLatexFileFirstValue= paste(overallFileName[imagesIndex], "violinOverallImage", sep=""), writeLatexFileSecondValue= paste(overallFileName[imagesIndex],diagramTypSave,sep=""), makeOverallImage=TRUE, subSectionTitel = overallDesName[[imagesIndex]], subsectionDepth=2)
 	}
 }
-
 
 parMakeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, 
 	options, overallList, diagramTypSave="boxplot") {
@@ -2735,6 +2866,7 @@ makeDiagrams <- function(overallList) {
 	if (threaded)
 		sfExport("overallList")
 	if (!calculateNothing) {			
+if(!calculateOnlyViolin) {		
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
 				sfClusterEval(
@@ -2762,7 +2894,7 @@ makeDiagrams <- function(overallList) {
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 			}
-			
+
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {ownCat("Spider plot...")}
 				sfClusterEval(
@@ -2771,7 +2903,7 @@ makeDiagrams <- function(overallList) {
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 		}
-
+}	
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
 				sfClusterEval(
@@ -2780,7 +2912,7 @@ makeDiagrams <- function(overallList) {
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
-		
+
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
 				sfClusterEval(
@@ -2862,6 +2994,14 @@ buildBlacklist <- function(workingDataSet, descriptorSet) {
 	return(c(colnames(workingDataSet)[grep(searchString, colnames(workingDataSet), ignore.case = TRUE)], preprocessingOfValues(additionalDescriptors, TRUE)))
 }
 
+
+loadStressPeriod <- function(stressDay, arg) {
+	stressDay <- stressDay %exists% arg
+	stressDay <- unlist(preprocessingOfValues(stressDay,isColName=TRUE))
+
+	return(stressDay)
+}
+
 initRfunction <- function(DEBUG = FALSE) {
 	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
 	#Sys.setlocale(locale="de_DE.ISO8859-15")
@@ -2915,6 +3055,9 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	isGray = FALSE
 	#showResultInR = FALSE
 	
+	stressStart <- 10
+	stressEnd <- 25
+	
 	treatment = "Treatment"
 	filterTreatment = "none"
 	
@@ -2937,10 +3080,13 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 	separation = ";"
 
 	if (typOfStartOptions == "all" | typOfStartOptions == "report" | typOfStartOptions == "allmanual") {
-		fileName = fileName %exists% args[1]
+		fileName <- fileName %exists% args[1]
+		
+		stressStart <- loadStressPeriod(stressStart, args[8])
+		stressEnd <- loadStressPeriod(stressEnd, args[9])
 		
 		if (fileName != "error") {
-			workingDataSet = separation %readInputDataFile% fileName
+			workingDataSet <- separation %readInputDataFile% fileName
 			descriptorSet_nBoxplot <- vector()
 			descriptorSet_boxplot <- vector()
 			descriptorSet_boxplotStacked <- vector()
@@ -3220,14 +3366,17 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 	}  else if (typOfStartOptions == "test"){
 		
+		library("snowfall")
 		debug <- TRUE
 		initRfunction(debug)
+		sfStop()
 		
-		treatment <- "Species"
-		filterTreatment <- "none"
+		treatment <- "Treatment"
+		filterTreatment <- "dry$normal"
 		
-		secondTreatment <- "Treatment"
-		filterSecondTreatment  <- "normal"
+		secondTreatment <- "Species"
+		filterSecondTreatment  <- "Athletico$Fernandez"
+		
 		#filterSecondTreatment <- "Athletico$Weisse Zarin"
 		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
@@ -3243,7 +3392,11 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		saveName <- "test2"
 		yAxisName <- "test2"
 		
+		stressStart <- 10
+		stressEnd <- 30
 		
+		isRatio <- FALSE
+		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
 		
@@ -3527,9 +3680,6 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int("average", times = length(workingDataSet[,1])))	
 		}
 		
-		
-		isRatio <- TRUE
-		calculateNothing <- FALSE
 	}
 	
 	if (typOfStartOptions != "test"){
@@ -3549,7 +3699,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 										nBoxOptions= nBoxOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions, violinOptions = violinOptions,
 										treatment = treatment, filterTreatment = filterTreatment, 
 										secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
-										xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio)
+										xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio,
+										stressStart=stressStart, stressEnd = stressEnd)
 					if (secondRun) {
 						appendix = TRUE
 						secondRun = FALSE
@@ -3593,7 +3744,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		nBoxOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL, violinOptions = NULL,
 		treatment="Treatment", filterTreatment="none", 
 		secondTreatment="none", filterSecondTreatment="none", filterXaxis="none", xAxis="Day (Int)", 
-		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE, isRatio=FALSE) {		
+		xAxisName="none", debug = FALSE, appendix=FALSE, stoppTheCalculation=FALSE, isRatio=FALSE,
+		stressStart=stressStart, stressEnd=stressEnd) {		
 
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes,
@@ -3606,7 +3758,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						appendix=appendix, stoppTheCalculation=stoppTheCalculation, isRatio = isRatio,
 						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(), overallResult_violinBoxDes = data.frame(),
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), color_violin= list(), user="none", typ="none",
-						filterTreatmentRename = list(), secondFilterTreatmentRename = list()
+						filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
+						stressStart = stressStart, stressEnd = stressEnd
 						)	
 				
 	overallList$debug %debug% "Start"
@@ -3681,6 +3834,7 @@ stopSnow <- function() {
 
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
 calculateNothing <- FALSE
+calculateOnlyViolin <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
