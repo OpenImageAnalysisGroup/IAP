@@ -26,15 +26,15 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 			fis.addImage("FLUO", io.copy().getImage());
 		double min = 200;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			min = 210;
+			min = 220;
 		boolean isOldBarley = false;
 		
 		if (options.isBarleyInBarleySystem()) {
-			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 190;
+			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 188;
 			
 			if (options.isBarleyInBarleySystem()) {
 				try {
-					String db = input().images().getFluoInfo().getParentSample().getParentCondition().getExperimentDatabaseId();
+					String db = input().images().getFluoInfo().getParentSample().getParentCondition().getExperimentHeader().getDatabase();
 					if (!LemnaTecDataExchange.known(db))
 						isOldBarley = true;
 				} catch (Exception e) {
@@ -51,12 +51,15 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		if (options.isBarley() && !options.isBarleyInBarleySystem())
 			min = 230;
 		
+		min = unitTestChange(min);
+		
 		FlexibleImage resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, min).getImage();
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, min).getImage();
 		if (isOldBarley && options.getCameraPosition() == CameraPosition.SIDE)
 			min = min;
 		if (options.isBarleyInBarleySystem())
-			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 150;
+			min = options.getCameraPosition() == CameraPosition.SIDE ? unitTestChange(225) : unitTestChange(149);
+		
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
 		
@@ -90,69 +93,13 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		return r;
 	}
 	
-	// private FlexibleImage getDiffImg(FlexibleImage resChlorophyll, FlexibleImage resPhenol) {
-	// int w = resChlorophyll.getWidth();
-	// int h = resChlorophyll.getHeight();
-	// int[] workimg = resChlorophyll.getAs1A();
-	// int[] workimg1 = resPhenol.getAs1A();
-	// int[] res = new int[w * h];
-	// for (int i = 0; i < workimg.length; i++) {
-	// if (workimg[i] != options.getBackground() || workimg1[i] != options.getBackground()) {
-	// int rf = (workimg[i] & 0xff0000) >> 16;
-	// int rf1 = (workimg1[i] & 0xff0000) >> 16;
-	// int diff = Math.abs(rf - rf1);
-	// res[i] = (0xFF << 24 | (diff & 0xFF) << 16) | ((diff & 0xFF) << 8) | ((diff & 0xFF) << 0);
-	// }
-	// }
-	// return new FlexibleImage(w, h, res);
-	// }
-	//
-	// private FlexibleImage getColorGradient(FlexibleImage resChlorophyll, int maxHsv) {
-	// int hue = 0;
-	// int w = resChlorophyll.getWidth();
-	// int h = resChlorophyll.getHeight();
-	// int[] workimg = resChlorophyll.getAs1A();
-	// int[] res = new int[w * h];
-	// MinMax minMax = getMinMax(workimg);
-	// minMax.setMin(40);
-	// minMax.setMax(130);
-	// for (int i = 0; i < workimg.length; i++) {
-	// if (workimg[i] != options.getBackground()) {
-	// int rf = (workimg[i] & 0xff0000) >> 16;
-	//
-	// double hsvColMax = maxHsv;
-	// hue = (int) ((rf - minMax.getMin()) * (hsvColMax / (minMax.getMax() - minMax.getMin())));
-	// if (hue > hsvColMax)
-	// hue = (int) hsvColMax;
-	// if (hue < 0)
-	// hue = 0;
-	// // Color hsb = Color.getHSBColor((float) ((hsvColMax - hue) / 255d), 0.8f, 0.8f);
-	// hue = 255 - hue;
-	// Color hsb = Color.getHSBColor(1 / 3f, hue / 255f * hue / 255f, hue / 255f);
-	// res[i] = hsb.getRGB();
-	// // int hueR = hue;
-	// // int hueG = (int) (hue / 2.5);
-	// // int hueB = hue / 5;
-	// // res[i] = (0xFF << 24 | (hueR & 0xFF) << 16) | ((hueG & 0xFF) << 8) | ((hueB & 0xFF) << 0);
-	// } else
-	// res[i] = Color.WHITE.getRGB();
-	// }
-	// return new FlexibleImage(w, h, res);
-	// }
-	//
-	// private MinMax getMinMax(int[] workimg) {
-	// MinMax minMax = new MinMax(Integer.MAX_VALUE, 0);
-	// for (int i = 0; i < workimg.length; i++) {
-	// if (workimg[i] != options.getBackground()) {
-	// int rf = (workimg[i] & 0xff0000) >> 16;
-	// if (rf < minMax.getMin())
-	// minMax.setMin(rf);
-	// if (rf > minMax.getMax())
-	// minMax.setMax(rf);
-	// }
-	// }
-	// return minMax;
-	// }
+	private double unitTestChange(double val) {
+		if (val == 190 && options.getUnitTestSteps() > 0) {
+			val = options.getUnitTestIdx() - 4 + val;
+			System.out.println(val + " // " + options.getUnitTestIdx() + "/" + options.getUnitTestSteps());
+		}
+		return val;
+	}
 	
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {

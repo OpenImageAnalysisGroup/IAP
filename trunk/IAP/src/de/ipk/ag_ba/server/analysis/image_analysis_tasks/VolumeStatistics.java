@@ -144,4 +144,9 @@ public class VolumeStatistics implements ImageAnalysisTask {
 		this.workLoadSize = workLoadSize;
 	}
 	
+	@Override
+	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
+		if (unit_test_steps > 0)
+			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
+	}
 }

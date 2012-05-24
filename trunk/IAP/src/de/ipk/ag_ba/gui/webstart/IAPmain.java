@@ -131,9 +131,10 @@ public class IAPmain extends JApplet {
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");
-		JComponent advancedNavigation = IAPgui.getNavigation(myStatus, false);
+		JComponent advancedNavigation = IAPgui.getMainGUIcontent(myStatus, false);
 		add(advancedNavigation, "0,0");
-		validate();
+		setVisible(true);
+		revalidate();
 		
 		Thread t = new Thread() {
 			

@@ -125,13 +125,13 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 						"", "");
-				jff.add(IAPgui.getNavigation(myStatus, true), "0,0");
-				jff.validate();
+				jff.add(IAPgui.getMainGUIcontent(myStatus, true), "0,0");
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
 				jff.setVisible(true);
-				
+				jff.revalidate();
+				jff.doLayout();
 			}
 		};
 		return res;
@@ -264,11 +264,11 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			}
 		}
 		if (getParent() != null) {
-			// getParent().revalidate();
+			getParent().revalidate();
 			getParent().repaint();
-			revalidate();
+			// revalidate();
 			if (getParent() != null) {
-				getParent().getParent().validate();
+				// getParent().getParent().revalidate();
 				// getParent().getParent().repaint();
 			}
 			
@@ -494,7 +494,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							JComponent jc = MyNavigationPanel.this;
 							while (jc.getParent() != null && jc.getParent() instanceof JComponent)
 								jc = (JComponent) jc.getParent();
-							jc.validate();
+							jc.revalidate();
 							jc.repaint();
 						}
 					});

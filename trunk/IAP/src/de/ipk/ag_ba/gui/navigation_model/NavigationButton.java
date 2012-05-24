@@ -518,7 +518,7 @@ public class NavigationButton implements StyleAware {
 											TableLayout.PREFERRED, TableLayout.FILL);
 								}
 								graphPanel.add(gui, "0,0");
-								graphPanel.validate();
+								graphPanel.revalidate();
 								graphPanel.setEnabled(true);
 								graphPanel.setVisible(true);
 								graphPanel.repaint();
@@ -542,7 +542,7 @@ public class NavigationButton implements StyleAware {
 									JComponent gui = TableLayout.getMultiSplitVertical(errors, 2);
 									
 									graphPanel.add(gui, "0,0");
-									graphPanel.validate();
+									graphPanel.revalidate();
 									graphPanel.setEnabled(true);
 									graphPanel.setVisible(true);
 									graphPanel.repaint();

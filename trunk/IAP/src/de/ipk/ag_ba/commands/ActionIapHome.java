@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author klukas
  */
 public final class ActionIapHome extends AbstractNavigationAction {
-	private ArrayList<NavigationButton> homePrimaryActions;
+	private ArrayList<NavigationButton> homePrimaryActions = new ArrayList<NavigationButton>();
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 	
 	public ActionIapHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
@@ -176,8 +176,9 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
 		homeNavigation.add(new NavigationButton(this, src != null ? src.getGUIsetting() : null));
 		
-		for (NavigationButton n : bookmarks)
-			homeNavigation.add(n);
+		if (bookmarks != null)
+			for (NavigationButton n : bookmarks)
+				homeNavigation.add(n);
 		
 		return homeNavigation;
 	}

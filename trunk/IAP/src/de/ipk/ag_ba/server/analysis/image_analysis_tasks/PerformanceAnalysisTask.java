@@ -51,6 +51,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		// empty
 	}
 	
+	@Override
 	public void setInput(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input,
@@ -519,5 +520,11 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		m.getParentSample().getParentCondition().setSequence("");
 		m.getParentSample().getParentCondition().setSpecies("Performance Test");
 		m.getParentSample().getParentCondition().setGenotype(maximumThreadCountParallelImages + " threads");
+	}
+	
+	@Override
+	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
+		if (unit_test_steps > 0)
+			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
 	}
 }

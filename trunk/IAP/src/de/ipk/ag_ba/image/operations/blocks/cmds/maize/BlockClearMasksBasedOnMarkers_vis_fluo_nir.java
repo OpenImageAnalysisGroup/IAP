@@ -174,13 +174,10 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		FlexibleImage input = input().images().nir();
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			result = cutNir(input);
-			double temp = 0.05;
 			if (options.isBarleyInBarleySystem())
-				temp = 0.001;
-			int cy = (int) (input.getHeight() - temp * input.getHeight());
-			result = new ImageOperation(input).clearImageBottom(
-					cy, new Color(180, 180, 180).getRGB()).getImage();
+				result = input;
+			else
+				result = cutNir(input);
 			return result;
 		}
 		else
@@ -195,14 +192,10 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		FlexibleImage input = input().masks().nir();
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			result = cutNir(input);
-			// return getInput().getMasks().getNir();
-			// default
-			double temp = 0.05;
-			int cy = (int) (input.getHeight() - temp * input.getHeight());
-			result = new ImageOperation(input).clearImageBottom(
-					cy, new Color(180, 180, 180).getRGB()).getImage();
-			getProperties().setNumericProperty(0, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, cy);
+			if (options.isBarleyInBarleySystem())
+				result = input;
+			else
+				result = cutNir(input);
 			return result;
 		}
 		FlexibleImage res = input().masks().nir();
