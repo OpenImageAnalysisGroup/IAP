@@ -24,16 +24,17 @@ public class ExperimentCalculationService {
 	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf, MeasurementFilter pf) {
 		Experiment res = new Experiment();
 		res.setHeader(experiment.getHeader().clone());
-		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of impact of stress)");
+		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of stress impact)");
 		for (SubstanceInterface si : experiment) {
 			// omit color histogram values in the blue range
 			// only bins < 11 are OK
 			try {
-				if (si.getName().contains(".vis.hue.histogram.bin.") || si.getName().contains(".vis.normalized.histogram.ratio.bin.")) {
+				if (si.getName().contains(".vis.hue.histogram.ratio.bin.") || si.getName().contains(".vis.hue.histogram.bin.")
+						|| si.getName().contains(".vis.normalized.histogram.ratio.bin.")) {
 					String b = si.getName().substring(si.getName().indexOf(".bin.") + ".bin.".length());
 					b = b.substring(0, b.indexOf("."));
 					int bin = Integer.parseInt(b);
-					if (bin < 11)
+					if (bin >= 11)
 						continue;
 				}
 			} catch (Exception e) {
