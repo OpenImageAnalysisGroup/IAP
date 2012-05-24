@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ErrorMsg;
+import org.MeasurementFilter;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
@@ -61,6 +62,30 @@ public class SampleAverage implements SampleAverageInterface {
 	@Override
 	public double getValue() {
 		return value;
+	}
+	
+	@Override
+	public double getValue(MeasurementFilter pf) {
+		if (parentSample.size() == 0) {
+			return Double.NaN;
+		} else {
+			int n = 0;
+			double sum = 0;
+			for (NumericMeasurementInterface m : parentSample) {
+				if (pf.filterOut(m.getQualityAnnotation(), getParentSample().getTime()))
+					continue;
+				double v = m.getValue();
+				if (Double.isNaN(v))
+					continue;
+				n++;
+				sum += v;
+			}
+			
+			if (n == 0) {
+				return Double.NaN;
+			}
+			return sum / n;
+		}
 	}
 	
 	@Override
