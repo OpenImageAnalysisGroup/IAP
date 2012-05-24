@@ -2572,6 +2572,7 @@ reownCategorized <- function(overallResult) {
 		overallResultTemp[booleanVector, ] <- overallResult
 	}
 	
+	overallResultTemp$group <- as.factor(overallResultTemp$group)
 	return(overallResultTemp)
 	#return(overallResult)
 }
@@ -2742,7 +2743,7 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 
 addColorForStressPhaseAndOther <- function(stressArea, color) {
 	
-	for (kk in unique(stressArea$typ)) {
+	for (kk in rev(unique(stressArea$typ))) {
 		if (kk == "d")
 			color <- c("cornsilk1", color)
 		else if (kk == "n")
@@ -2767,11 +2768,22 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 
 	overallResult <- reownCategorized(overallResult)
 	color <- setColorDependentOfGroup(overallResult)
-	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name,onlySecondTreatment = TRUE)
+	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
 	overallResult$name <- reorderThePlotOrder(overallResult)
 	stressArea <- data.frame()
 
-	if(overallList$stress.Start != -1) {
+	
+#	overallList$stress.Start <- c(10,20,30,37)
+#	overallList$stress.End <- c(13, 23, 33, 40)
+#	overallList$stress.Typ <- c("d","d","s", "c")
+#	overallList$stress.Label <- c(-1, -1, -1, -1)
+#	
+#	overallList$stress.Start <- c(10,20,30)
+#	overallList$stress.End <- c(13, 23,33)
+#	overallList$stress.Typ <- c("w","d","w")
+#	overallList$stress.Label <- c(-1, -1,-1)
+	
+	if(overallList$stress.Start[1] != -1) {
 		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$mean, diagramTypSave)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
@@ -2783,7 +2795,7 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 				
 		if(length(stressArea) >0) {
 			plot <- plot + 
-				geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ, group=typ)) +
+				geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ)) +
 				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
 			
 		}	
@@ -2815,11 +2827,44 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 		
 		plot <- plot + facet_wrap(~ name, ncol=5) 
 	
-		#print(plot)
+		print(plot)
 		
 		writeTheData(overallList, plot, overallFileName[imagesIndex], diagramTypSave, writeLatexFileFirstValue= paste(overallFileName[imagesIndex], "violinOverallImage", sep=""), writeLatexFileSecondValue= paste(overallFileName[imagesIndex],diagramTypSave,sep=""), makeOverallImage=TRUE, subSectionTitel = overallDesName[[imagesIndex]], subsectionDepth=2)
 	}
 }
+
+
+scores = data.frame(category = 1:4, percentage = c(34,62,41,44), type = c("a","a","a","b"))
+rects <- data.frame(ystart = c(0,25,45,65,85), yend = c(25,45,65,85,100), col = letters[1:5])
+rects$col <- c("Z1","Z2","Z3","Z4","Z5")
+labels = c("ER", "OP", "PAE", "Overall")
+medals = c("navy","goldenrod4","darkgrey","gold","cadetblue1")
+
+ggplot() + 
+		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, 
+						ymax = yend, fill=col), alpha = 0.3) + 
+		opts(legend.position="none") + 
+		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
+		scale_fill_manual(values=c("indianred1", "indianred4", medals)) +
+		scale_x_continuous(breaks = 1:4, labels = labels) 
+
+
+ggplot() + 
+		geom_rect(data = rects, aes(xmin = -Inf, xmax = Inf, ymin = ystart, ymax = yend, fill=col), alpha = 0.3) + 
+		scale_fill_manual(values=medals) +
+		opts(legend.position="none") + 
+		geom_bar(data=scores, aes(x=category, y=percentage, fill=type), stat="identity") +
+scale_fill_manual(values = c("indianred1", "indianred4")) +
+		scale_x_continuous(breaks = 1:4, labels = labels) 
+
+
+
+
+
+
+
+
+
 
 parMakeBoxplotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, overallFileName, 
 	options, overallList, diagramTypSave="boxplot") {
@@ -3063,7 +3108,6 @@ initRfunction <- function(DEBUG = FALSE) {
 	
 	loadLibs(debug)
 }
-
 
 
 startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
@@ -3408,10 +3452,10 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		sfStop()
 		
 		treatment <- "Treatment"
-		filterTreatment <- "dry$normal"
+		filterTreatment <- "dry / normal"
 		
 		secondTreatment <- "Species"
-		filterSecondTreatment  <- "Athletico$Fernandez"
+		filterSecondTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#filterSecondTreatment <- "Athletico$Weisse Zarin"
 		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
@@ -3433,7 +3477,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		stress.Typ <- "d"
 		stress.Label <- "drought stress"
 		
-		isRatio <- FALSE
+		isRatio <- TRUE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
@@ -3872,7 +3916,7 @@ stopSnow <- function() {
 
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
 calculateNothing <- FALSE
-calculateOnlyViolin <- TRUE
+calculateOnlyViolin <- FALSE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
