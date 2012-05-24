@@ -13,20 +13,44 @@ public class ExperimentCalculationService {
 		this.experiment = experiment;
 	}
 	
+	/**
+	 * @param treatmentReference
+	 *           If this is an empty array, the reference is determined automatically
+	 *           (largest value sum for any substance defines the reference).
+	 */
 	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf) {
 		Experiment res = new Experiment();
 		res.setHeader(experiment.getHeader().clone());
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " (STRESS RATIO)");
 		for (SubstanceInterface si : experiment) {
+			ConditionInterface treatmentReferenceRES = null;
+			if (treatmentReference == null || treatmentReference.length == 0) {
+				// search reference for this substance
+				double largestSum = Double.NaN;
+				for (ConditionInterface ci : si) {
+					double s = 0;
+					for (double v : ci.getMeanValues())
+						if (!Double.isNaN(v) && !Double.isInfinite(v))
+							s += v;
+					if (s > largestSum || Double.isNaN(largestSum)) {
+						largestSum = s;
+						treatmentReferenceRES = ci;
+					}
+				}
+			}
 			for (ConditionInterface ci : si) {
 				ci.setExperimentHeader(experiment.getHeader());
 				if (cf.filterConditionOut(ci))
 					continue;
 				boolean reference = false;
-				for (String t : treatmentReference) {
-					boolean v = ci.getTreatment() != null && ci.getTreatment().contains(t);
-					if (v)
-						reference = true;
+				if (treatmentReferenceRES != null && treatmentReferenceRES == ci)
+					reference = true;
+				else {
+					for (String t : treatmentReference) {
+						boolean v = ci.getTreatment() != null && ci.getTreatment().contains(t);
+						if (v)
+							reference = true;
+					}
 				}
 				if (reference) {
 					// nothing to do here
@@ -35,10 +59,14 @@ public class ExperimentCalculationService {
 					ConditionInterface ciRef = null;
 					for (ConditionInterface ciPotentialRef : si) {
 						boolean ref = false;
-						for (String t : treatmentReference) {
-							boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains(t);
-							if (v)
-								ref = true;
+						if (treatmentReferenceRES != null && treatmentReferenceRES == ciPotentialRef)
+							ref = true;
+						else {
+							for (String t : treatmentReference) {
+								boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains(t);
+								if (v)
+									ref = true;
+							}
 						}
 						if (ref) {
 							boolean speciesOK = (ci.getSpecies() + "").equals(ciPotentialRef.getSpecies() + "");

@@ -269,7 +269,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (ratio) {
 				if (status != null)
 					status.setCurrentStatusText2("Calculate stress-ratio");
-				experiment = experiment.calc().ratioDataset(new String[] { "norm", "sufficient" }, cf);
+				experiment = experiment.calc().ratioDataset(new String[] { /* "norm", "sufficient" */}, cf);
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
 				experiment.calc().fitThreeStepLinearModel("side.hull.pc2.norm");
