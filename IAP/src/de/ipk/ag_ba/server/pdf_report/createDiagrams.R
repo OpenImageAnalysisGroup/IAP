@@ -1538,9 +1538,9 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 newTreatmentNameFunction <- function(seq, n) {
 	numberCharAfterSeparate <- 8
 	if (nchar(n) > (numberCharAfterSeparate+4)) {
-		newTreatmentName <- paste(seq, ".) ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
+		newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
 	} else {
-		newTreatmentName <- paste(seq, ".) ", n, sep="")
+		newTreatmentName <- paste(seq, ". ", n, sep="")
 	}
 	return(newTreatmentName)
 }
@@ -2348,7 +2348,7 @@ calculateLegendRowAndColNumber <- function(legendText) {
 	
 	averageLengthOfSet <- round(sum(nchar(legendText),na.rm=TRUE) / length(legendText))
 
-	ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
+	ncol <- floor(lengthOfOneRow / averageLengthOfSet) # -1
 	if (ncol == 0) {
 		ncol <- 1
 	}
@@ -2673,7 +2673,7 @@ makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor
 
 reorderThePlotOrder <- function(overallResult) {
 	groupedOverallResult <- data.table(overallResult)
-	sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), sum, na.rm=TRUE), by=c(name)])
+	sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm=TRUE), by=c(name)])
 	sumVector$c <- levels(overallResult$name)
 	
 	for(n in levels(overallResult$name)) {
@@ -2693,7 +2693,7 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 #############
 	
 	stress.Area <- data.frame()
-	possible.Stress.Values <- c("0", "1", "2", "3", "4") # c("n", "d", "w", "c", "s")
+	#possible.Stress.Values <- c("0", "1", "2", "3", "4") # c("n", "d", "w", "c", "s")
 	standard.Stress.Labels <- list("0" = "normal", "1" = "drought stress", "2" = "moisture stress", "3" = "chemical stress", "4" = "salt stress")
 	
 	ymin <- min(yValues,na.rm = TRUE)
@@ -2707,10 +2707,10 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 		}
 	} 
 
-	print(stress.Start)
-	print(stress.End)
-	print(stress.Typ)
-	print(stress.Label)
+#	print(stress.Start)
+#	print(stress.End)
+#	print(stress.Typ)
+#	print(stress.Label)
 	
 	for (kk in seq(along=stress.Start)) {
 		if (stress.Start[kk] != -1 && stress.End[kk] != -1) {
@@ -2724,9 +2724,9 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 				xmax <- stress.End[kk]
 			}
 			
-			if(!(stress.Typ[kk] %in% possible.Stress.Values)) {
-				ownCat("... unknown stresstyp, change to \"(n)ormal\"")
-				stress.Typ[kk] <- "n"
+			if(!(stress.Typ[kk] %in% names(standard.Stress.Labels))) {
+				ownCat("... unknown stresstyp, change to \"normal\" -> (0)")
+				stress.Typ[kk] <- names(standard.Stress.Labels)[1]
 			}
 			
 			if(stress.Label[kk] == -1) {
@@ -2796,7 +2796,7 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 		if(length(stressArea) >0) {
 			plot <- plot + 
 				geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ)) +
-				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=3, hjust=0, vjust=1, angle = 90)
+				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
 			
 		}	
 			plot <- plot +
@@ -2823,6 +2823,18 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 				)
 		if (title != "") {
 			plot <- plot + opts(title = title)
+		}
+		
+		if (length(unique(overallResult$name)) > 4) {
+			plot = plot + opts(
+					axis.text.x = theme_text(size = 8),
+					strip.text.x = theme_text(size = 7)
+			)
+		} else {
+			plot = plot + opts(
+					axis.text.x = theme_text(size = 9),
+					strip.text.x = theme_text(size = 10)
+			)
 		}
 		
 		plot <- plot + facet_wrap(~ name, ncol=5) 
@@ -3038,6 +3050,19 @@ loadStressPeriod <- function(stress.Value, arg) {
 	return(stress.Value)
 }
 
+checkStressTypValues <- function(stress.Typ) {
+	
+	new.Values <- list("n" = "0", "d" = "1", "w" = "2", "c" = "3", "s" = "4")
+	
+	for (kk in seq(along=stress.Typ)) {
+		if (stress.Typ[kk] %in% names(new.Values)) {
+			stress.Typ[kk] <- new.Values[[stress.Typ[kk]]]
+			ownCat("... change old stresstyp value to new!")
+		}
+	}
+	return(stress.Typ)
+}
+
 initRfunction <- function(DEBUG = FALSE) {
 	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
 	#Sys.setlocale(locale="de_DE.ISO8859-15")
@@ -3131,6 +3156,8 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		stress.Start <- loadStressPeriod(stress.Start, args[9])
 		stress.End <- loadStressPeriod(stress.End, args[10])
 		stress.Typ <- loadStressPeriod(stress.Typ, args[11])
+		stress.Typ <- checkStressTypValues(stress.Typ)
+		
 		stress.Label <- loadStressPeriod(stress.Label, args[12])
 		
 		if (fileName != "error") {
@@ -3788,6 +3815,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			
 		}
 	} 
+#### Bis hier einlesen beim manuellen testen ##############	
 }
 
 createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
@@ -3886,7 +3914,7 @@ stopSnow <- function() {
 
 #sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
 calculateNothing <- FALSE
-calculateOnlyViolin <- FALSE
+calculateOnlyViolin <- TRUE
 ######### START #########
 #rm(list=ls(all=TRUE))
 #startOptions("test", TRUE)
