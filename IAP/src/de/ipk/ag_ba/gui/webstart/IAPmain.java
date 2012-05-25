@@ -60,7 +60,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
 	
-	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R29_2012-05-24_optimized1";
+	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R30_2012-05-24_optimized2";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R28_2012-05-11_barley__in_maize_improved";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R25_2012-04-27_multi_tray_barley_in_maize";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R24_2012-04-16_remove_not_needed_histograms";

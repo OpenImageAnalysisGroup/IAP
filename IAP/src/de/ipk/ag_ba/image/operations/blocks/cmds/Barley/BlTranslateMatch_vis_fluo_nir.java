@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = false;
+	private final boolean debug = true;
 	
 	@Override
 	protected void prepare() {
@@ -36,7 +36,8 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 					tm.calcOffsetVerticalY(fluo);
 					tm.calcOffsetHorizontalX(fluo);
 					
-					if (tm.getOffsetVerticalY() < 0) {
+					boolean dontMoveDown = false;;
+					if (tm.getOffsetVerticalY() < 0 && dontMoveDown) {
 						if (input().images().fluo() != null)
 							input().images().setFluo(tm.translate(input().images().fluo()));
 						
