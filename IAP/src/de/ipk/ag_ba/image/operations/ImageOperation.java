@@ -4164,11 +4164,11 @@ public class ImageOperation {
 		return new ImageOperation(res, w, h);
 	}
 	
-	private int getHeight() {
+	public int getHeight() {
 		return image.getHeight();
 	}
 	
-	private int getWidth() {
+	public int getWidth() {
 		return image.getWidth();
 	}
 	
@@ -4296,9 +4296,12 @@ public class ImageOperation {
 					if (l > 0.02)
 						sum += 1;// l;
 			}
-			if (sum > max)
-				max = sum;
-			values.add(sum);
+			if (y < h * 0.9d) {
+				if (sum > max)
+					max = sum;
+				values.add(sum);
+			} else
+				values.add(sum);
 		}
 		if (max > 0)
 			for (int y = 0; y < h; y++)
@@ -4328,7 +4331,7 @@ public class ImageOperation {
 		return new FlexibleImage(res).io();
 	}
 	
-	public TranslationMatch prepareTranlationMatch(boolean debug) {
+	public TranslationMatch prepareTranslationMatch(boolean debug) {
 		return new TranslationMatch(this, debug);
 	}
 	

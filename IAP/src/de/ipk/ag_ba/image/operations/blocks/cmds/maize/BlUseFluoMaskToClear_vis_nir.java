@@ -42,8 +42,8 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 				// if (options.isBarley() && !options.isBarleyInBarleySystem()) {
 				// mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();
 				// }
-				input().masks().vis().copy().io().or(
-						mask).print("OR operation", debug);
+				// input().masks().vis().copy().io().or(
+				// mask).print("OR operation", debug);
 				return vis.applyMask_ResizeMaskIfNeeded(
 						mask,
 						options.getBackground()).print("FILTERED VIS", debug).getImage();
@@ -70,7 +70,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().masks().nir();
 			
-			return clearImageSide(input, input().masks().fluo(), 0.01);
+			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.01);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -87,7 +87,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 			return input().images().nir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().images().nir();
-			return clearImageSide(input, input().masks().fluo(), 0.001);
+			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.001);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -177,8 +177,8 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 							processedMasks.vis().copy().io().or(
 									input().masks().fluo()
 									).print("OR operation", debug);
-			if (options.isBarley() && !options.isBarleyInBarleySystem())
-				maskIO = maskIO.blur(10);
+			if (options.isBarley())
+				maskIO = maskIO.blur(20);
 			else
 				maskIO = maskIO.blur(20);
 			FlexibleImage mask = maskIO.binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
