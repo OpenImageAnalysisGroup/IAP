@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = true;
+	private final boolean debug = false;
 	
 	@Override
 	protected void prepare() {
@@ -29,19 +29,40 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				if (debug)
 					vis.copy().canvas().drawSideHistogram().io().print("VIS");
 				
-				TranslationMatch tm = vis.prepareTranlationMatch(debug);
+				TranslationMatch tm = vis.prepareTranslationMatch(debug);
 				
 				if (input().masks().fluo() != null) {
 					FlexibleImage fluo = input().masks().fluo().copy().io().getG().getImage();
 					tm.calcOffsetVerticalY(fluo);
 					tm.calcOffsetHorizontalX(fluo);
 					
-					boolean dontMoveDown = false;;
+					boolean dontMoveDown = true;;
 					if (tm.getOffsetVerticalY() < 0 && dontMoveDown) {
 						if (input().images().fluo() != null)
 							input().images().setFluo(tm.translate(input().images().fluo()));
 						
 						input().masks().setFluo(tm.translate(input().masks().fluo()));
+						
+						ImageOperation v = input().masks().vis().io();
+						int w = v.getWidth();
+						int h = v.getHeight();
+						double scale = input().images().vis().getHeight() / (double) input().images().fluo().getHeight();
+						int o = -(int) (tm.getOffsetVerticalY() * scale);
+						FlexibleImage vi = v.canvas().fillRect(0, h - o, w, o, options.getBackground()).getImage();
+						input().masks().setVis(vi);
+						// if (input().images().nir() != null) {
+						// v = input().masks().nir().io();
+						// w = v.getWidth();
+						// h = v.getHeight();
+						// scale = input().images().nir().getHeight() / (double) input().images().fluo().getHeight();
+						// o = -(int) (2 * tm.getOffsetVerticalY() * scale);
+						// FlexibleImage ni = v.canvas().fillRect(0, h - o, w, o, options.getBackground()).getImage();
+						// input().masks().setNir(ni);
+						//
+						// v = input().images().nir().io();
+						// ni = v.canvas().fillRect(0, h - o, w, o, options.getBackground()).getImage();
+						// input().images().setNir(ni);
+						// }
 					} else {
 						tm.setOffsetVerticalY(-tm.getOffsetVerticalY());
 						if (input().images().vis() != null)
@@ -51,7 +72,7 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 					}
 				}
 				
-				if (input().images().nir() != null) {
+				if (input().images().nir() != null && options.isBarleyInBarleySystem()) {
 					FlexibleImage nir = input().images().nir().copy().io().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.1).
 							applyMask_ResizeMaskIfNeeded(vis.blur(40).getImage().print("VIS IMAGE AS MASK", debug), Color.black.getRGB()).
 							replaceColor(Color.black.getRGB(), options.getBackground()).
@@ -63,7 +84,14 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 					else
 						tm.calcOffsetHorizontalX(null);
 					
-					input().images().setNir(tm.translate(input().images().nir()));
+					boolean dontMoveUp = false;
+					if (dontMoveUp) {
+						// don't move NIR pot up, only down
+						if (tm.getOffsetVerticalY() < 0)
+							tm.setOffsetVerticalY(0);
+					}
+					
+					input().images().setNir(tm.translate(input().images().nir().copy()));
 					
 					if (input().masks().nir() != null)
 						input().masks().setNir(tm.translate(input().masks().nir()));

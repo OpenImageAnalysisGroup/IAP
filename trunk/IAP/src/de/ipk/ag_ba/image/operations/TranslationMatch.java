@@ -95,7 +95,7 @@ public class TranslationMatch {
 		}
 		int bestOffset = 0;
 		double bestCorrelation = 0;
-		int v = (int) (movePattern.size() * 0.15);
+		int v = (int) (movePattern.size() * 0.25);
 		for (int offY = -v; offY <= v; offY++) {
 			double corr = correlate(staticPattern, movePattern, offY);
 			if (corrs != null)
@@ -106,7 +106,7 @@ public class TranslationMatch {
 			}
 		}
 		// the offset will be near the end, if no good fit is found (e.g. nearly empty NR image)
-		if (Math.abs(bestOffset) < v * 0.05d || bestCorrelation < 0.5)
+		if (Math.abs(bestOffset) < v * 0.05d || bestCorrelation < 0.4)
 			return 0;
 		else
 			return bestOffset;

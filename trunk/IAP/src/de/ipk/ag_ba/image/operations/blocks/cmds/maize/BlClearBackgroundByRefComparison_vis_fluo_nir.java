@@ -10,6 +10,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
  * Clears the background by comparison of foreground and background.
@@ -175,6 +176,16 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					// remove horizontal bar
 					nir = filterHorBar(nir);
 				}
+				if (options.isMaize()) {
+					int blackDiff = options.getIntSetting(Setting.B_Diff_NIR_TOP) / 3;
+					int whiteDiff = options.getIntSetting(Setting.W_Diff_NIR_TOP) / 3;
+					FlexibleImage msk = new ImageOperation(nir.print("NIR MSK", debug)).compare()
+							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
+							.print("result nir", debug).getImage();
+					// .thresholdClearBlueBetween(150 - 10, 169 + 10).thresholdBlueHigherThan(240).border(2).getImage();
+					
+					return msk; // 150 169 240
+				}
 				return nir;
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -239,5 +250,16 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			return input().images().getIr().copy();
 		else
 			return input().masks().getIr();
+	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			FlexibleImage i = processedImages.nir();
+			FlexibleImage m = processedMasks.nir();
+			if (i != null && m != null)
+				i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
+			processedImages.setNir(i);
+		}
 	}
 }

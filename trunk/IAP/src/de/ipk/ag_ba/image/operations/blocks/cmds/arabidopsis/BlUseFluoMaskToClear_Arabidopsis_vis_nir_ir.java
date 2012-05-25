@@ -67,7 +67,7 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir extends AbstractSnapsho
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().masks().nir();
 			
-			return clearImageSide(input, input().masks().fluo(), 0.01);
+			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.01);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {

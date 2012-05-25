@@ -27,6 +27,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
+import org.MeasurementFilter;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -38,6 +39,7 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.commands.MySnapshotFilter;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
@@ -443,8 +445,9 @@ public class DataExchangeHelperForExperiments {
 				// soll der Button hinzugefügt werden
 				if (mt == expTree.getSelectionPath().getLastPathComponent()
 						&& DataSetFileButton.ICON_WIDTH == tw) {
+					MeasurementFilter mf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), mt.getExperiment().getHeader().getGlobalOutlierInfo());
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(
-							imageButton, mt);
+							imageButton, mt, mf);
 					JComponent buttonAndInfo = !binaryFileInfo.isPrimary() ? imageButton
 							: TableLayout.getSplitVertical(imageButton, aip,
 									TableLayout.PREFERRED,
