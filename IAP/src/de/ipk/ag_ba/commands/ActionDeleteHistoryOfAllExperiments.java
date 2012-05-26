@@ -23,7 +23,8 @@ public class ActionDeleteHistoryOfAllExperiments extends AbstractNavigationActio
 	}
 	
 	public ActionDeleteHistoryOfAllExperiments(MongoDB m) {
-		this("Delete all old data sets (which have a newer version)");
+		this("Delete all old data sets (which have a newer version, " +
+				"Unit Test data is not affected)");
 		this.m = m;
 	}
 	
@@ -33,13 +34,15 @@ public class ActionDeleteHistoryOfAllExperiments extends AbstractNavigationActio
 		ArrayList<ExperimentHeaderInterface> expHeaders = m.getExperimentList(null, status);
 		int toBeDeleted = 0;
 		for (ExperimentHeaderInterface ehi : expHeaders) {
-			for (ExperimentHeaderInterface old : ehi.getHistory().values()) {
-				toBeDeleted++;
-			}
+			if (!ehi.getExperimentName().startsWith("Unit Test "))
+				for (ExperimentHeaderInterface old : ehi.getHistory().values()) {
+					toBeDeleted++;
+				}
 		}
 		
 		int deleted = 0;
 		for (ExperimentHeaderInterface ehi : expHeaders) {
+			if (!ehi.getExperimentName().startsWith("Unit Test "))
 			for (ExperimentHeaderInterface old : ehi.getHistory().values()) {
 				m.deleteExperiment(old.getDatabaseId());
 				deleted++;
