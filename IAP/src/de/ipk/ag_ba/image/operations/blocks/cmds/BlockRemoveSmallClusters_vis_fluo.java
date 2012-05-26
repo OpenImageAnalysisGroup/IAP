@@ -48,7 +48,7 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 				
 			} else {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 3d, (mask.getWidth() / 100) / 2,
+						2, (mask.getWidth() / 100) / 2,
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
@@ -85,7 +85,7 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 			}
 		} else {
 			int cut2 = (int) ((input().masks().fluo().getWidth() / 100) * 0.5);
-			double cut = options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO);
+			double cut = 3;
 			return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
 					cut, cut2,
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
