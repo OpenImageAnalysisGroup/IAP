@@ -15,6 +15,10 @@ echo Stress end?   : %8
 echo Stress typ?   : %9
 shift /8
 echo Stress label? : %9
+shift /8
+echo Split Cond1?  : %9
+shift /8
+echo Split Cond2?  : %9
 
 IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6
 
