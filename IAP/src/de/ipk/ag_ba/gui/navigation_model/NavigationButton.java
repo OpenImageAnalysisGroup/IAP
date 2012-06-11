@@ -308,9 +308,12 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public void setIcon(ImageIcon i, String optStaticIconId) {
-		iconUpdated = i != icon;
-		this.icon = i;
-		this.optStaticIconId = optStaticIconId;
+		if (i != null) {
+			iconUpdated = i != icon;
+			this.icon = i;
+		}
+		if (optStaticIconId != null)
+			this.optStaticIconId = optStaticIconId;
 	}
 	
 	public boolean isIconUpdated() {
@@ -633,16 +636,16 @@ public class NavigationButton implements StyleAware {
 			else
 				imgS = 48;
 		
-		ImageIcon icon;
-		if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
+		ImageIcon icon = null;
+		if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
 			icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
 		} else
-			if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
+			if (target == PanelTarget.ACTION && n.getIconInactive() != null && n.getIconInactive().getImage() != null) {
 				icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
 			} else {
 				if (target == PanelTarget.NAVIGATION)
 					icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS);
-				else
+				if (target != PanelTarget.NAVIGATION || icon == null)
 					icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
 			}
 		if (icon != null)

@@ -21,6 +21,8 @@ import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -372,5 +374,11 @@ public class FlexibleImage {
 	 */
 	public void saveToFile(String fileName) {
 		io().saveImage(fileName);
+	}
+	
+	public InputStream getAsPNGstream() throws IOException {
+		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
+		ImageIO.write(getAsBufferedImage(), "PNG", output);
+		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
 }

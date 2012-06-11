@@ -783,7 +783,7 @@ public class StringManipulationTools implements HelperClass {
 		if (s == null || s.isEmpty())
 			return 0;
 		else
-			return s.length() - StringManipulationTools.stringReplace(s, find, "").length();
+			return (s.length() - StringManipulationTools.stringReplace(s, find, "").length()) / find.length();
 	}
 	
 	public static String getStringList(Set<Integer> times, String div) {
@@ -792,10 +792,12 @@ public class StringManipulationTools implements HelperClass {
 	
 	public static String getMergedStringItems(String list1, String list2, String split) {
 		TreeSet<String> res = new TreeSet<String>();
-		for (String s : list1.split(split))
-			res.add(s);
-		for (String s : list2.split(split))
-			res.add(s);
+		if (list1 != null)
+			for (String s : list1.split(split))
+				res.add(s);
+		if (list2 != null)
+			for (String s : list2.split(split))
+				res.add(s);
 		return getStringList(res, " " + split + " ");
 	}
 }

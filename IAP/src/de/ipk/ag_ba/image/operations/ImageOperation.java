@@ -43,6 +43,7 @@ import org.Vector2d;
 import org.Vector2i;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -1098,23 +1099,12 @@ public class ImageOperation {
 		image.getProcessor().draw(boundingBox);
 	}
 	
-	/**
-	 * Needs to be tested. Where and how to use.
-	 * 
-	 * @author entzian
-	 */
-	public ImageOperation cutAreaBoundingBox(Roi boundingBox) {
-		image.getProcessor().setRoi(boundingBox);
-		return new ImageOperation(image.getProcessor().crop()
-				.getBufferedImage());
-	}
-	
-	public ImageOperation cutArea(int bx, int by, int bw, int bh,
+	public ImageOperation clearArea(int bx, int by, int bw, int bh,
 			int iBackgroundFill) {
-		return cutArea(bx, by, bw, bh, iBackgroundFill, true);
+		return clearArea(bx, by, bw, bh, iBackgroundFill, true);
 	}
 	
-	public ImageOperation cutArea(int bx, int by, int bw, int bh,
+	public ImageOperation clearArea(int bx, int by, int bw, int bh,
 			int iBackgroundFill, boolean clearOutsideTrue_insideFalse) {
 		int[][] imgArr = new FlexibleImage(image).getAs2A();
 		int bx2 = bx + bw;
@@ -1135,7 +1125,7 @@ public class ImageOperation {
 		return new ImageOperation(imgArr);
 	}
 	
-	public ImageOperation cutAreaCircle(int bx, int by, int d,
+	public ImageOperation clearCircularArea(int bx, int by, int d,
 			int iBackgroundFill) {
 		int[][] imgArr = new FlexibleImage(image).getAs2A();
 		Vector2d center = new Vector2d(bx, by);
@@ -1148,25 +1138,6 @@ public class ImageOperation {
 					imgArr[x][y] = iBackgroundFill;
 			}
 		return new ImageOperation(imgArr);
-	}
-	
-	public ImageOperation enlarge() {
-		
-		int[][] img = ImageConverter.convertIJto2A(image);
-		int[][] newImage = new int[2 * img.length][2 * img[0].length];
-		
-		for (int i = 0; i < newImage.length; i++)
-			for (int j = 0; j < newImage[0].length; j++) {
-				if (i > (img.length * 0.5) && j > (img[0].length * 0.5)
-						&& i < (img.length * 1.5) && j < (img[0].length * 1.5)) {
-					newImage[i][j] = img[(i - (img.length / 2) - 1)][(j
-							- (img[0].length / 2) - 1)];
-				} else
-					newImage[i][j] = (int) image.getProcessor()
-							.getBackgroundValue();
-			}
-		
-		return new ImageOperation(ImageConverter.convert2AtoBI(newImage));
 	}
 	
 	public ImageOperation removeSmallClusters(boolean nextGeneration, ObjectRef optClusterSizeReturn) {
@@ -1258,13 +1229,13 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation saveImage(String fileName) {
-		saveImage(fileName, SaveImage.PNG);
+		saveImage(fileName, ImageSaveFormat.PNG);
 		return this;
 	}
 	
-	public void saveImage(String pfad, SaveImage typ) {
+	public void saveImage(String pfad, ImageSaveFormat type) {
 		
-		switch (typ) {
+		switch (type) {
 			case TIFF:
 				new FileSaver(image).saveAsTiff(pfad);
 				break;
@@ -2277,14 +2248,6 @@ public class ImageOperation {
 		System.out.println("B:[" + bmi + "," + bma + "]");
 	}
 	
-	public static double MathPow(double v, double ot) {
-		// if (v < 0 || v > 1.1) {
-		// System.out.println("TODO: " + v);
-		// return Math.pow(v, ot);
-		// } else
-		return IAPservice.cubeRoots[(int) (1000 * v)];
-	}
-	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
 		ai = ai - 127;
 		boolean aNoColor, bNoColor;
@@ -2829,14 +2792,17 @@ public class ImageOperation {
 		int height = image.getHeight();
 		
 		int[][] img2d = getImageAs2array();
-		int[][] result = new int[width + (2 * bordersize)][height + (2 * bordersize)];
+		int nw = width + (2 * bordersize);
+		int nh = height + (2 * bordersize);
+		int[][] result = new int[nw][nh];
 		
 		result = fillArray(result, borderColor);
 		
 		for (int xt = bordersize + translatex; xt < (width + bordersize + translatex); xt++) {
 			for (int yt = bordersize + translatey; yt < (height + bordersize + translatey); yt++) {
 				if (xt - bordersize - translatex >= 0 && yt - bordersize - translatey >= 0 && xt >= 0 && yt >= 0)
-					result[xt][yt] = img2d[xt - bordersize - translatex][yt - bordersize - translatey];
+					if (xt < nw && yt < nh)
+						result[xt][yt] = img2d[xt - bordersize - translatex][yt - bordersize - translatey];
 			}
 		}
 		return new ImageOperation(result);
@@ -3322,7 +3288,6 @@ public class ImageOperation {
 		}
 		
 		if (count > 0) {
-			
 			return new float[] { sumR / 255f / count, sumG / 255f / count, sumB / 255f / count };
 		} else
 			return new float[] { 1, 1, 1 };
@@ -4333,6 +4298,37 @@ public class ImageOperation {
 	
 	public TranslationMatch prepareTranslationMatch(boolean debug) {
 		return new TranslationMatch(this, debug);
+	}
+	
+	public static ImageOperation median(ArrayList<FlexibleImage> images) {
+		FlexibleImage first = images.iterator().next();
+		int[][] values = new int[images.size()][];
+		for (int i = 0; i < images.size(); i++) {
+			int[] pixels = images.get(i).getAs1A();
+			values[i] = pixels;
+		}
+		int w = first.getWidth();
+		int h = first.getHeight();
+		int[] median = new int[w * h];
+		for (int p = 0; p < w * h; p++) {
+			DescriptiveStatistics statsR = new DescriptiveStatistics();
+			DescriptiveStatistics statsG = new DescriptiveStatistics();
+			DescriptiveStatistics statsB = new DescriptiveStatistics();
+			for (int i = 0; i < images.size(); i++) {
+				int c = values[i][p];
+				int r = ((c & 0xff0000) >> 16);
+				int g = ((c & 0x00ff00) >> 8);
+				int b = (c & 0x0000ff);
+				statsR.addValue(r);
+				statsG.addValue(g);
+				statsB.addValue(b);
+			}
+			int r = (int) statsR.getPercentile(50);
+			int g = (int) statsG.getPercentile(50);
+			int b = (int) statsB.getPercentile(50);
+			median[p] = new Color(r, g, b).getRGB();
+		}
+		return new FlexibleImage(w, h, median).io();
 	}
 	
 	// not tested:

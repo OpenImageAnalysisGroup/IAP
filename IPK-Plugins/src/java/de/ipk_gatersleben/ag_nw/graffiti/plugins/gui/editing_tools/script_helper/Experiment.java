@@ -935,6 +935,42 @@ public class Experiment implements ExperimentInterface {
 				continue;
 			if (value == null || value.equals("null"))
 				continue;// value = "[unknown]";
+			if (value.contains("//") && value.contains(":")) {
+				// create sub-table to show values (e.g. Aussaat:25.05.2012 // Keimung:13.03.2012 // ...)
+				StringBuilder t = new StringBuilder();
+				t.append("<table border=0>");
+				for (String s : value.split("//")) {
+					s = s.trim();
+					if (s.startsWith("zoom-top")) {
+						t.append("<tr><th>Top Zoom Adjustments (Zoom, X, Y)</th><th>VIS</th><th>FLUO</th><th>NIR</th><th>IR</th></tr>");
+						try {
+							String[] sARR = s.split(":", 2);
+							String s1 = sARR[0];
+							sARR = s.split(";");
+							sARR[0] = sARR[0].substring("zoom-top:".length());
+							String sVIS = sARR[0];
+							String sFLU = sARR[1];
+							String sNIR = sARR[2];
+							String sIR = sARR[3];
+							sVIS = sVIS.replace(":", "<br>");
+							sFLU = sFLU.replace(":", "<br>");
+							sNIR = sNIR.replace(":", "<br>");
+							sIR = sIR.replace(":", "<br>");
+							t.append("<tr><td>" + s1 + "</td><td>" + sVIS + "</td><td>" + sFLU + "</td><td>" + sNIR + "</td><td>" + sIR + "</td></tr>");
+						} catch (Exception e) {
+							t.append("<tr><td>Could not parse correctly: " + s + "</td></tr>");
+						}
+					} else {
+						for (String ss : s.split(":", 2)) {
+							t.append("<td>");
+							t.append(ss);
+							t.append("</td>");
+						}
+						t.append("</tr>");
+					}
+				}
+				t.append("</table>");
+			}
 			niceProperties.put(keyName, value);
 		}
 		for (String n : niceProperties.keySet()) {

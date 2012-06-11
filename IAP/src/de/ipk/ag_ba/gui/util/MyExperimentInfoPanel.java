@@ -312,8 +312,11 @@ public class MyExperimentInfoPanel extends JPanel {
 		String ts = "Use ' // ' to split information. Specify stress as follows (examples): 'Stress:4;5;d;drought stress' or (two periods) 'Stress:4$10;5$13;d$n;drought stress$handling'.";
 		fp.addGuiComponentRow(tooltip(new JLabel("Sequence/Stress"), ts), tooltip(sequence, ts), false);
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
-		String to = "Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
-		fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
+		String to = "<html>" +
+				"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or " +
+				"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).<br>" +
+				"Input-Zoom-Adjustment: example: zoom-top:82:90:120;100:0:0;76.5:10:13;100:0:0";
+		fp.addGuiComponentRow(tooltip(new JLabel("Zoom/Outliers"), to), tooltip(outliers, to), false);
 		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(niceValue(experimentHeader.getNumberOfFiles(), null)
 				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
 		if (optExperiment != null)

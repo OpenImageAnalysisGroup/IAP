@@ -34,4 +34,6 @@ public interface ImageProcessor {
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception;
+	
+	public abstract void setValidTrays(int[] debugValidTrays);
 }

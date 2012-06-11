@@ -49,7 +49,7 @@ public class UpdatingImagePanel extends JPanel {
 			boolean doIt = false;
 			if (doIt)
 				status.setCurrentStatusText1(s + "");
-			img = webcam.getSnapshotLR().getAsBufferedImage();
+			img = webcam.getSnapshot().getAsBufferedImage();
 			if (doIt)
 				status.setCurrentStatusText1(s.substring(0, s.length() - 1) + "#");
 			
