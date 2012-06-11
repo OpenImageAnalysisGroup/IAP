@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -92,16 +93,26 @@ public class BlockPipeline {
 		if (abc != null && options.getCameraPosition() == CameraPosition.TOP) {
 			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
 			String t = abc.getParentSample().getParentCondition().getTreatment();
-			if (t != null && t.contains("OAC_2x3")) {
+			if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
 				executionTrayCount = 6; // 2x3
 			} else
-				if (t != null && t.contains("OAC_4x3")) {
+				if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
 					executionTrayCount = 12; // 3x4
+				} else {
+					t = abc.getParentSample().getParentCondition().getGrowthconditions();
+					if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
+						executionTrayCount = 6; // 2x3
+					} else
+						if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
+							executionTrayCount = 12; // 3x4
+						}
 				}
 		}
 		
 		HashMap<Integer, FlexibleMaskAndImageSet> res = new HashMap<Integer, FlexibleMaskAndImageSet>();
 		for (int idx = 0; idx < executionTrayCount; idx++) {
+			if (debugValidTrays != null && !debugValidTrays.contains(idx))
+				continue;
 			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
 			BlockResultSet set = new BlockResults();
 			options.setTray(idx, executionTrayCount);
@@ -215,7 +226,13 @@ public class BlockPipeline {
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));
 			// status.setCurrentStatusText1("Pipeline finished");
-			status.setCurrentStatusText2("T=" + ((b - a) / 1000) + "s");
+			String s1 = status.getCurrentStatusMessage1();
+			if (s1 != null && !s1.isEmpty())
+				s1 = s1 + ", ";
+			int n = StringManipulationTools.count(s1, "T=");
+			if (n >= 2)
+				s1 = s1.substring(0, s1.indexOf("T="));
+			status.setCurrentStatusText1(s1 + "T=" + ((b - a) / 1000) + "s");
 		}
 		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		if (pipelineExecutionsWithinCurrentHour % 5 == 0) {
@@ -286,6 +303,7 @@ public class BlockPipeline {
 	}
 	
 	private static int pipelineExecutionsWithinCurrentHour = 0;
+	private HashSet<Integer> debugValidTrays;
 	
 	/**
 	 * The given image set is analyzed by a image pipeline upon users choice.
@@ -358,21 +376,26 @@ public class BlockPipeline {
 				} else {
 					int idx = 1;
 					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
-					for (FlexibleImageStack fisArr : analysisTaskFinal
-							.getForcedDebugStackStorageResult()) {
+					for (FlexibleImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
+						if (fisArr == null) {
+							idx++;
+							continue;
+						}
 						FlexibleImageStack fis = fisArr;
-						fis.print(analysisTaskFinal.getName() + " // Result " + idx + "/" + nn, new Runnable() {
+						final int idxF = idx - 1;
+						fis.print(analysisTaskFinal.getName() + " // Result tray " + idx + "/" + nn, new Runnable() {
 							@Override
 							public void run() {
+								analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
 								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, m, 0, 1);
 								BackgroundTaskHelper.issueSimpleTaskInWindow(
 										analysisTaskFinal.getName(), "Analyze...",
 										backgroundTask,
-										(Runnable) finishSwingTaskRef
-												.getObject(), status, false,
+										(Runnable) finishSwingTaskRef.getObject(), status, false,
 										true);
 							}
 						}, "Re-run Analysis (debug)");
+						idx++;
 					}
 					idx++;
 				}
@@ -406,4 +429,12 @@ public class BlockPipeline {
 		return summaryResult;
 	}
 	
+	public void setValidTrays(int[] debugValidTrays) {
+		if (debugValidTrays == null)
+			return;
+		
+		this.debugValidTrays = new HashSet<Integer>();
+		for (int i : debugValidTrays)
+			this.debugValidTrays.add(i);
+	}
 }

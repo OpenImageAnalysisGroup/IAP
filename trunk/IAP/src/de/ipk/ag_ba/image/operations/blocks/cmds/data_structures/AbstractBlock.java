@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.data_structures;
 
-
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
@@ -13,31 +12,49 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		return processImage(input().images().vis());
+		if (input().images().vis() != null)
+			return processImage(input().images().vis());
+		else
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOimage() {
-		return processImage(input().images().fluo());
+		if (input().images().fluo() != null)
+			return processImage(input().images().fluo());
+		else
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		return processImage(input().images().nir());
+		if (input().images().nir() != null)
+			return processImage(input().images().nir());
+		else
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		return processMask(input().masks().vis());
+		if (input().masks().fluo() != null)
+			return processMask(input().masks().fluo());
+		else
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return processMask(input().masks().fluo());
+		if (input().masks().fluo() != null)
+			return processMask(input().masks().fluo());
+		else
+			return null;
 	}
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		return processMask(input().masks().nir());
+		if (input().masks().nir() != null)
+			return processMask(input().masks().nir());
+		else
+			return null;
 	}
 }

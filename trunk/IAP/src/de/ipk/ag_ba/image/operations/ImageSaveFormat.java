@@ -6,7 +6,7 @@ package de.ipk.ag_ba.image.operations;
 /**
  * @author entzian
  */
-public enum SaveImage {
+public enum ImageSaveFormat {
 	TIFF, PNG, JPG, GIF, TIFF_STACK;
 	
 }

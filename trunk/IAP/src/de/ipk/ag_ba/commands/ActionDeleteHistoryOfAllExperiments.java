@@ -43,21 +43,21 @@ public class ActionDeleteHistoryOfAllExperiments extends AbstractNavigationActio
 		int deleted = 0;
 		for (ExperimentHeaderInterface ehi : expHeaders) {
 			if (!ehi.getExperimentName().startsWith("Unit Test "))
-			for (ExperimentHeaderInterface old : ehi.getHistory().values()) {
-				m.deleteExperiment(old.getDatabaseId());
-				deleted++;
-				status.setCurrentStatusValueFine(100d * deleted / toBeDeleted);
-				status.setCurrentStatusText2("Deleted " + old.getExperimentName() +
-						" (from " + SystemAnalysis.getCurrentTime(old.getStorageTime().getTime()) + ")");
-				history.add("Deleted " + old.getExperimentName() +
-						" (from " + SystemAnalysis.getCurrentTime(old.getStorageTime().getTime()) + ")");
-			}
+				for (ExperimentHeaderInterface old : ehi.getHistory().values()) {
+					m.deleteExperiment(old.getDatabaseId());
+					deleted++;
+					status.setCurrentStatusValueFine(100d * deleted / toBeDeleted);
+					status.setCurrentStatusText2("Deleted " + old.getExperimentName() +
+							" (from " + SystemAnalysis.getCurrentTime(old.getStorageTime().getTime()) + ")");
+					history.add("Deleted " + old.getExperimentName() +
+							" (from " + SystemAnalysis.getCurrentTime(old.getStorageTime().getTime()) + ")");
+				}
 		}
 	}
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("<h1>Removed non-current experiments with available a newer version:</h1>"
+		return new MainPanelComponent("<h1>Removed non-current experiments with an available newer version:</h1>"
 				+ StringManipulationTools.getStringList(history, "<br>"));
 	}
 	

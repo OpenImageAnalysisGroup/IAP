@@ -78,6 +78,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
 	private int unit_test_idx;
 	private int unit_test_steps;
+	private int[] debugValidTrays;
 	
 	@Override
 	public void setInput(
@@ -385,7 +386,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			innerLoopSemaphore.acquire(threadsToStart);
 			innerLoopSemaphore.release(threadsToStart);
 		}
-		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ", post-processing)");
+		Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
@@ -400,8 +401,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 		}
 		tso.addInt(1);
-		status.setCurrentStatusText1("Snapshot " + tso.getInt() + "/"
-				+ workloadSnapshots);
+		status.setCurrentStatusText1("Processing " + tso.getInt() + "/" + workloadSnapshots);
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ")");
 	}
 	
@@ -770,7 +770,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
 		if (forceDebugStack) {
-			forcedDebugStacks.add(debugImageStack);
+			while (forcedDebugStacks.size() < tray_cnt)
+				forcedDebugStacks.add(null);
+			forcedDebugStacks.set(tray, debugImageStack);
 		} else {
 			byte[] buf = null;
 			if (debugImageStack != null) {
@@ -889,7 +891,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			ImageProcessor imageProcessor = getImageProcessor();
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
-			
+			imageProcessor.setValidTrays(debugValidTrays);
 			HashMap<Integer, FlexibleMaskAndImageSet> ret = imageProcessor.pipeline(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);
@@ -950,6 +952,21 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			
 			@Override
+			public String getCurrentStatusMessage1() {
+				return status.getCurrentStatusMessage1();
+			}
+			
+			@Override
+			public String getCurrentStatusMessage2() {
+				return status.getCurrentStatusMessage2();
+			}
+			
+			@Override
+			public String getCurrentStatusMessage3() {
+				return status.getCurrentStatusMessage3();
+			}
+			
+			@Override
 			public void setCurrentStatusValue(int value) {
 				setCurrentStatusValueFine(value);
 			}
@@ -1002,5 +1019,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 		}
 		return result;
+	}
+	
+	public void debugSetValidTrays(int[] debugValidTrays) {
+		this.debugValidTrays = debugValidTrays;
 	}
 }

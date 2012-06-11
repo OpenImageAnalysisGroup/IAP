@@ -24,6 +24,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
 	private final HashMap<Integer, BlockResultSet> settings;
+	private int[] debugValidTrays;
 	
 	public AbstractImageProcessor() {
 		this(new HashMap<Integer, BlockResultSet>());
@@ -56,7 +57,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			HashMap<Integer, FlexibleImageStack> debugStack)
 			throws Exception {
 		BlockPipeline pipeline = getPipeline(options);
-		
+		pipeline.setValidTrays(debugValidTrays);
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
 		HashMap<Integer, FlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
@@ -95,5 +96,10 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 				inImages,
 				analysisResults,
 				optStatus);
+	}
+	
+	@Override
+	public void setValidTrays(int[] debugValidTrays) {
+		this.debugValidTrays = debugValidTrays;
 	}
 }

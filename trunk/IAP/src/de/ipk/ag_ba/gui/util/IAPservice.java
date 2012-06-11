@@ -1288,4 +1288,12 @@ public class IAPservice {
 	public static String getNiceNameForPhenotypicProperty(String substanceName) {
 		return niceNames.get(substanceName);
 	}
+
+	public static double MathPow(double v, double ot) {
+		// if (v < 0 || v > 1.1) {
+		// System.out.println("TODO: " + v);
+		// return Math.pow(v, ot);
+		// } else
+		return cubeRoots[(int) (1000 * v)];
+	}
 }

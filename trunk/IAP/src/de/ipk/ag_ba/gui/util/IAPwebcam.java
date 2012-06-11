@@ -2,12 +2,14 @@ package de.ipk.ag_ba.gui.util;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.HttpBasicAuth;
 
@@ -57,7 +59,22 @@ public enum IAPwebcam {
 	}
 	
 	public InputStream getSnapshotJPGdata() throws Exception {
-		return getSnapshotJPGdataIntern();
+		int n = 1;
+		if (n == 1)
+			return getSnapshotJPGdataIntern();
+		else {
+			ArrayList<FlexibleImage> il = new ArrayList<FlexibleImage>();
+			for (int i = 0; i < n; i++) {
+				InputStream is = getSnapshotJPGdataIntern();
+				if (is != null) {
+					BufferedImage img = ImageIO.read(is);
+					il.add(new FlexibleImage(img).io().resize(0.33d).getImage());
+				}
+			}
+			
+			ImageOperation i = ImageOperation.median(il);
+			return i.multiplicateImageChannelsWithFactors(new double[] { 10d, 10d, 10d }).getImage().getAsPNGstream();
+		}
 	}
 	
 	private InputStream getSnapshotJPGdataLRintern() throws Exception {
