@@ -22,9 +22,9 @@ public class WebCamHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
-		if (url.getDetail() != null && url.getDetail().startsWith("barley"))
+		if (url.getFileName() != null && url.getFileName().startsWith("barley"))
 			return IAPwebcam.BARLEY.getSnapshotJPGdata();
-		if (url.getDetail() != null && url.getDetail().startsWith("maize"))
+		if (url.getFileName() != null && url.getFileName().startsWith("maize"))
 			return IAPwebcam.MAIZE.getSnapshotJPGdata();
 		return null;
 	}

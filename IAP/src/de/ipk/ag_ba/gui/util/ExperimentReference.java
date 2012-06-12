@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.WeakHashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
@@ -38,8 +37,8 @@ public class ExperimentReference {
 	
 	private static ArrayList<ExperimentLoader> knownExperimentLoaders = new ArrayList<ExperimentLoader>();
 	
-	private static WeakHashMap<String, ExperimentInterface> weakId2exp =
-			new WeakHashMap<String, ExperimentInterface>();
+	// private static WeakHashMap<String, ExperimentInterface> weakId2exp =
+	// new WeakHashMap<String, ExperimentInterface>();
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentName();
@@ -126,7 +125,7 @@ public class ExperimentReference {
 		else {
 			synchronized (ExperimentReference.class) {
 				String databaseId = header.getDatabaseId();
-				ExperimentInterface res = weakId2exp.get(databaseId);
+				ExperimentInterface res = null; // weakId2exp.get(databaseId);
 				if (res != null)
 					return res;
 				for (ExperimentLoader loader : knownExperimentLoaders) {
@@ -146,7 +145,7 @@ public class ExperimentReference {
 							res = m.getExperiment(header, interactiveGetExperimentSize, status);
 						else
 							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
-				weakId2exp.put(databaseId, res);
+				// weakId2exp.put(databaseId, res);
 				return res;
 			}
 		}

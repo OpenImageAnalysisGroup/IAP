@@ -285,6 +285,31 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("outliers", globalOutliers);
 	}
 	
+	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {
+		HashMap<String, String> res = new HashMap<String, String>();
+		
+		res.put("experimenttype", "<!-- A -->Type of Experiment");
+		res.put("startdate", "<!-- C BR -->Experiment Start");
+		
+		res.put("database", "<!-- D-->Database");
+		res.put("origin", "<!-- D-->Origin");
+		res.put("importdate", "<!-- E -->Import Date");
+		res.put("storagetime", "<!-- F -->Storage Time");
+		res.put("excelfileid", "<!-- G BR -->Experiment ID");
+		
+		res.put("importusername", "<!-- H -->Owner");
+		res.put("coordinator", "<!-- I -->Coordinator");
+		res.put("importusergroup", "<!-- J BR -->Data Visibility");
+		
+		res.put("remark", "<!-- K -->Remark");
+		res.put("sequence", "<!-- L BR -->Sequence");
+		
+		res.put("measurements", "<!-- M -->Numeric Measurements");
+		res.put("imagefiles", "<!-- N BR -->Binary Files");
+		res.put("outliers", "<!-- O -->Binary Files");
+		return res;
+	}
+	
 	@Override
 	public String toStringLines() {
 		StringBuilder sb = new StringBuilder();

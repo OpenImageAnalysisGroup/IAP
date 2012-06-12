@@ -130,7 +130,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
 				jff.setVisible(true);
-				jff.revalidate();
+				jff.validate();
 				jff.doLayout();
 			}
 		};
@@ -264,7 +264,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			}
 		}
 		if (getParent() != null) {
-			getParent().revalidate();
+			getParent().validate();
 			getParent().repaint();
 			// revalidate();
 			if (getParent() != null) {

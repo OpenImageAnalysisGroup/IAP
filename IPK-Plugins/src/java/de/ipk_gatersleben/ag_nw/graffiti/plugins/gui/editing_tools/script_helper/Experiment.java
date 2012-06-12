@@ -86,6 +86,10 @@ public class Experiment implements ExperimentInterface {
 			setHeader(m.getHeader());
 	}
 	
+	private HashMap<String, String> getNiceHTMLfieldNameMapping() {
+		return ExperimentHeader.getNiceHTMLfieldNameMapping();
+	}
+	
 	@Override
 	public Experiment filter(Collection<String> validNames,
 			Collection<String> validTimes) {
@@ -970,6 +974,7 @@ public class Experiment implements ExperimentInterface {
 					}
 				}
 				t.append("</table>");
+				value = t.toString();
 			}
 			niceProperties.put(keyName, value);
 		}
@@ -981,29 +986,6 @@ public class Experiment implements ExperimentInterface {
 		}
 		sb.append("</table>");
 		return sb.toString();
-	}
-	
-	private HashMap<String, String> getNiceHTMLfieldNameMapping() {
-		HashMap<String, String> res = new HashMap<String, String>();
-		
-		res.put("experimenttype", "<!-- A -->Type of Experiment");
-		res.put("startdate", "<!-- C BR -->Experiment Start");
-		
-		res.put("database", "<!-- D-->Database");
-		res.put("origin", "<!-- D-->Origin");
-		res.put("importdate", "<!-- E -->Import Date");
-		res.put("excelfileid", "<!-- F BR -->Experiment ID");
-		
-		res.put("importusername", "<!-- G -->Owner");
-		res.put("coordinator", "<!-- H -->Coordinator");
-		res.put("importusergroup", "<!-- I BR -->Data Visibility");
-		
-		res.put("remark", "<!-- J -->Remark");
-		res.put("sequence", "<!-- K BR -->Sequence");
-		
-		res.put("measurements", "<!-- L -->Numeric Measurements");
-		res.put("imagefiles", "<!-- M -->Binary Files");
-		return res;
 	}
 	
 	@Override
