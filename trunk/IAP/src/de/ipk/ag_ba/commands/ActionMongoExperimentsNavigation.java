@@ -9,6 +9,8 @@ package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
@@ -520,6 +522,15 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			@Override
 			public void run() {
 				experimentList = m.getExperimentList(currentUser, status, tso_LastDbResult);
+				boolean reSort = false;
+				if (reSort)
+					if (experimentList != null)
+						Collections.sort(experimentList, new Comparator<ExperimentHeaderInterface>() {
+							@Override
+							public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
+								return o1.getImportdate().compareTo(o2.getImportdate());
+							}
+						});
 			}
 		};
 		error = false;
