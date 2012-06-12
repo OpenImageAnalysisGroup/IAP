@@ -135,7 +135,7 @@ public class IAPmain extends JApplet {
 		JComponent advancedNavigation = IAPgui.getMainGUIcontent(myStatus, false);
 		add(advancedNavigation, "0,0");
 		setVisible(true);
-		revalidate();
+		validate();
 		
 		Thread t = new Thread() {
 			

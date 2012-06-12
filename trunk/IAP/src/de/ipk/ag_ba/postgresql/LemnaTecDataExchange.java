@@ -575,7 +575,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					snapshot.setWeight_before(w);
 				
 				snapshot.setCamera_label(rs.getString("compname"));
-				System.out.println("LABLAB: " + rs.getString("compname"));
+				// System.out.println("LABLAB: " + rs.getString("compname"));
 				snapshot.setXfactor(rs.getDouble("xfactor"));
 				snapshot.setYfactor(rs.getDouble("yfactor"));
 				
@@ -665,14 +665,21 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		String res = "";
 		if (conf.toUpperCase().contains("NIR"))
 			res += "nir.";
-		if (conf.toUpperCase().contains("RGB"))
-			res += "vis.";
-		if (conf.toUpperCase().contains("FLU"))
-			res += "fluo.";
-		if (conf.toUpperCase().contains("FLOU"))
-			res += "fluo.";
-		if (res.length() == 0)
-			res += "ir.";
+		else
+			if (conf.toUpperCase().contains("VIS"))
+				res += "vis.";
+			else
+				if (conf.toUpperCase().contains("RGB"))
+					res += "vis.";
+				else
+					if (conf.toUpperCase().contains("FLU"))
+						res += "fluo.";
+					else
+						if (conf.toUpperCase().contains("FLOU"))
+							res += "fluo.";
+						else
+							if (res.length() == 0)
+								res += "ir.";
 		if (conf.toUpperCase().contains("TOP"))
 			res += "top";
 		if (conf.toUpperCase().contains("SIDE"))
@@ -805,7 +812,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			}
 			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
-			
 			species = conditionTemplate != null ? conditionTemplate.getSpecies() : "not specified";
 			genotype = conditionTemplate != null ? conditionTemplate.getGenotype() : "not specified";
 			variety = conditionTemplate != null ? conditionTemplate.getVariety() : "not specified";
@@ -972,6 +978,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					if (fn != null) {
 						try {
 							String a = sn.getUserDefinedCameraLabel();
+							if (a != null && a.length() > 3)
+								a = a.substring(2);
 							String b = StringManipulationTools.getNumbersFromString(a);
 							if (b.length() == 0)
 								position = 0d;
@@ -1201,7 +1209,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				while (rs.next()) {
 					
 					String plantID = rs.getString(1);
-					
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
@@ -1209,6 +1216,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
+						// System.out.println(plantID);
 						res.put(plantID, new Condition(null));
 						res.get(plantID).setSpecies(species);
 					}
@@ -1328,9 +1336,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		String current = (condition.getSequence() != null) ? condition.getSequence() : "";
 		if (current.length() > 0)
 			current += " // ";
-		current += value;
-		condition.setSequence(current);
-		header.setSequence(current);
+		if (!current.contains(value + " // ")) {
+			current += value;
+			condition.setSequence(current);
+			header.setSequence(current);
+		}
 	}
 	
 	private String filterName(String metaValue) {

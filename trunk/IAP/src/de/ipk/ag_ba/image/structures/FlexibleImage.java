@@ -376,7 +376,7 @@ public class FlexibleImage {
 		io().saveImage(fileName);
 	}
 	
-	public InputStream getAsPNGstream() throws IOException {
+	public MyByteArrayInputStream getAsPNGstream() throws IOException {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
 		ImageIO.write(getAsBufferedImage(), "PNG", output);
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
