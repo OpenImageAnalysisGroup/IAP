@@ -198,8 +198,12 @@ public class SystemAnalysis {
 	}
 	
 	public static String getWaitTime(long fullTime) {
+		return getWaitTime(fullTime, 2);
+	}
+	
+	public static String getWaitTime(long fullTime, int n) {
 		ProgressStatusService pss = new ProgressStatusService();
-		String res = pss.getRemainTimeString(-1, fullTime / 1000, 2);
+		String res = pss.getRemainTimeString(-1, fullTime / 1000, n);
 		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
 	}
 	
@@ -207,6 +211,8 @@ public class SystemAnalysis {
 		String w = getWaitTime(l);
 		w = StringManipulationTools.stringReplace(w, " years", "y");
 		w = StringManipulationTools.stringReplace(w, " year", "y");
+		w = StringManipulationTools.stringReplace(w, " months", "mo");
+		w = StringManipulationTools.stringReplace(w, " month", "mo");
 		w = StringManipulationTools.stringReplace(w, " weeks", "w");
 		w = StringManipulationTools.stringReplace(w, " week", "w");
 		w = StringManipulationTools.stringReplace(w, " days", "d");

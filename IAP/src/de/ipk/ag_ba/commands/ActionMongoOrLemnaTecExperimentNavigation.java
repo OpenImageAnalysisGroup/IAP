@@ -234,10 +234,14 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public String getDefaultTitle() {
 		ExperimentHeaderInterface header = experimentReference.getHeader();
+		String old =
+				SystemAnalysis.getWaitTime(
+						System.currentTimeMillis() - header.getImportdate().getTime());
+		String lu = "<br>(" + old + " ago)";
 		if (displayName != null)
-			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "");
+			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "") + lu;
 		else
-			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "");
+			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "") + lu;
 	}
 	
 	@Override

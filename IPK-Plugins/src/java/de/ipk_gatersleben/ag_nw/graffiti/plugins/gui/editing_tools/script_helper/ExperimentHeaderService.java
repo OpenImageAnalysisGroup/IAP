@@ -16,15 +16,15 @@ public class ExperimentHeaderService {
 		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		Collections.sort(in, new Comparator<ExperimentHeaderInterface>() {
 			@Override
-			public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
+			public int compare(ExperimentHeaderInterface o2, ExperimentHeaderInterface o1) {
 				if (o1 == null || o2 == null)
 					return 0;
 				Long ct = o1.getImportdate() != null ? o1.getImportdate().getTime() : -1;
 				Long pt = o2.getImportdate() != null ? o2.getImportdate().getTime() : -1;
 				
-				if (o1.getStorageTime() != null)
+				if (ct < 0 && o1.getStorageTime() != null)
 					ct = o1.getStorageTime().getTime();
-				if (o2.getStorageTime() != null)
+				if (pt < 0 && o2.getStorageTime() != null)
 					pt = o2.getStorageTime().getTime();
 				return ct.compareTo(pt);
 			}
