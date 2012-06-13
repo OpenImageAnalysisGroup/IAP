@@ -1262,7 +1262,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 												|| metaName.equalsIgnoreCase("Temperatur (Nacht)")
 												|| metaName.equalsIgnoreCase("rel.Luftfeuchte (Tag)")
 												|| metaName.equalsIgnoreCase("rel.Luftfeuchte (Nacht)")) {
-											addSequenceInfoToExperiment(header, metaName + ":" + metaValue);
+											addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
 										} else {
 											if (metaValue != null && metaValue.trim().length() > 0) {
 												String oldTreatment = res.get(plantID).getTreatment();
