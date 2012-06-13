@@ -14,12 +14,17 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 public class ActionToggle extends AbstractNavigationAction {
 	
-	private final String setting;
+	private final String setting, setting2;
 	private final ThreadSafeOptions option;
 	
 	public ActionToggle(String tooltip, String setting, ThreadSafeOptions option) {
+		this(tooltip, setting, null, option);
+	}
+	
+	public ActionToggle(String tooltip, String setting, String settingDesc2, ThreadSafeOptions option) {
 		super("<html>" + StringManipulationTools.stringReplace(tooltip, ";", ";<br>"));
 		this.setting = setting;
+		this.setting2 = settingDesc2;
 		this.option = option;
 	}
 	
@@ -35,10 +40,18 @@ public class ActionToggle extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		if (SystemAnalysis.isHeadless())
-			return (option.getBval(0, true) ? "(#) " : "(_) ") + pretty(setting);
-		else
-			return pretty(setting);
+		if (setting2 != null) {
+			if (option.getBval(0, true))
+				return setting;
+			else
+				return setting2;
+		} else {
+			String s = setting;
+			if (SystemAnalysis.isHeadless())
+				return (option.getBval(0, true) ? "(#) " : "(_) ") + pretty(s);
+			else
+				return pretty(s);
+		}
 	}
 	
 	private String pretty(String s) {
