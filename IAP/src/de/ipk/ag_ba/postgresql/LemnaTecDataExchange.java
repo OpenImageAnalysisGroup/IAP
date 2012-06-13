@@ -122,10 +122,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return dbName != null && (dbName.startsWith("CGH_") || dbName.startsWith("BGH_") || dbName.startsWith("APH_"));
 	}
 	
-	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
+	public synchronized ArrayList<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
-		Collection<ExperimentHeaderInterface> res = null;// memRes1.get(user + ";" + database);
+		ArrayList<ExperimentHeaderInterface> res = null;// memRes1.get(user + ";" + database);
 		// if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
 		res = getExperimentsInDatabaseIC(user, database, optStatus);
 		// updateTime = System.currentTimeMillis();
@@ -134,13 +134,13 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return res;
 	}
 	
-	private Collection<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database,
+	private ArrayList<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
 		// System.out.println("GET EXP LIST LT");
 		String sqlText = "SELECT distinct(measurement_label) FROM snapshot"; // ORDER BY measurement_label
 		
-		Collection<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
+		ArrayList<ExperimentHeaderInterface> result = new ArrayList<ExperimentHeaderInterface>();
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Connect to database...");
 		Connection connection = openConnectionToDatabase(database);
@@ -331,6 +331,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Found " + result.size() + " experiments in db " + database);
+		
 		return result;
 	}
 	

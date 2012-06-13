@@ -7,7 +7,6 @@
 package de.ipk.ag_ba.commands.lemnatec;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
@@ -32,7 +31,7 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 	private String pass;
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 	private ArrayList<String> listOfDatabases = null;
-	private final TreeMap<String, Collection<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, Collection<ExperimentHeaderInterface>>();
+	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 	
 	public ActionLemnaTecNavigation() {
 		super("Access LemnaTec-DB");
@@ -105,12 +104,12 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 				status.setCurrentStatusText1(n + " experiments");
 				try {
 					if (!experimentMap.containsKey(db)) {
-						Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().
+						ArrayList<ExperimentHeaderInterface> res = new LemnaTecDataExchange().
 								getExperimentsInDatabase(login, db, status);
 						n += res.size();
 						experimentMap.put(db, res);
 					}
-					Collection<ExperimentHeaderInterface> experiments = experimentMap.get(db);
+					ArrayList<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
 						if (!LemnaTecDataExchange.known(db))
 							unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));

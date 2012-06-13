@@ -64,8 +64,6 @@ public class ProgressStatusService implements HelperClass {
 		if (true)
 			averageSpeed = currentSpeedUntilNow;
 		
-		String result;
-		
 		double remainPercent = 100 - currentStatusValueFine;
 		double remainTimeSeconds = remainPercent / averageSpeed;
 		
@@ -77,8 +75,8 @@ public class ProgressStatusService implements HelperClass {
 	}
 	
 	public String getRemainTimeString(double averageSpeed, double remainTimeSeconds, int nn) {
-		String result;
-		if (remainTimeSeconds < 0)
+		String result = "";
+		if (remainTimeSeconds < 1)
 			return "less than 1 second";
 		
 		double remainTimeYears = remainTimeSeconds / 365 / 24 / 60 / 60;
@@ -98,11 +96,17 @@ public class ProgressStatusService implements HelperClass {
 		double remainTimeMonths = remainTimeSeconds / 30.5 / 24 / 60 / 60 % 12;
 		
 		if (remainTimeMonths >= 1 && numberResults < nn) {
+			remainTimeSeconds -= 30.5 * 24 * 60 * 60 * (int) remainTimeMonths;
+			double remainTimeWeeks = remainTimeSeconds / 7 / 24 / 60 / 60 % 56;
+			if ((int) remainTimeWeeks == 4) {
+				remainTimeMonths += 1;
+				remainTimeSeconds -= 30.5 * 24 * 60 * 60 * 1;
+			}
 			if (((int) remainTimeMonths) == 1)
 				res[numberResults++] = (int) remainTimeMonths + "&nbsp;month";
 			else
 				res[numberResults++] = (int) remainTimeMonths + "&nbsp;months";
-			remainTimeSeconds -= 30.5 * 24 * 60 * 60 * (int) remainTimeMonths;
+			
 		}
 		
 		double remainTimeWeeks = remainTimeSeconds / 7 / 24 / 60 / 60 % 56;
@@ -148,9 +152,9 @@ public class ProgressStatusService implements HelperClass {
 			result = res[0] + " " + res[1] + " " + res[2];
 		else
 			if (numberResults == 2)
-				result = res[0] + " " + res[1];
+				result = res[0] + " and " + res[1];
 			else
-				result = "~&nbsp;" + res[0];
+				result = /* "~&nbsp;" + */res[0];
 		
 		if (averageSpeed > 0) {
 			// increase expectation only if the value increased 10 times without
@@ -164,8 +168,6 @@ public class ProgressStatusService implements HelperClass {
 			lastSpeed = averageSpeed;
 		}
 		lastRes = result;
-		if (remainTimeSeconds < 1)
-			result = "less than 1 second";
 		return result;
 	}
 	

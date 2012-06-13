@@ -203,6 +203,7 @@ public class SystemAnalysis {
 	
 	public static String getWaitTime(long fullTime, int n) {
 		ProgressStatusService pss = new ProgressStatusService();
+		fullTime += 0;
 		String res = pss.getRemainTimeString(-1, fullTime / 1000, n);
 		return StringManipulationTools.stringReplace(res, "&nbsp;", " ");
 	}
