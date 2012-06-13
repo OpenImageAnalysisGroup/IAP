@@ -234,14 +234,19 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public String getDefaultTitle() {
 		ExperimentHeaderInterface header = experimentReference.getHeader();
-		String old =
-				SystemAnalysis.getWaitTime(
-						System.currentTimeMillis() - header.getImportdate().getTime());
-		String lu = "<br>(" + old + " ago)";
+		long t = header.getStorageTime() != null ? header.getStorageTime().getTime() : header.getImportdate().getTime();
+		String add = "updated";
+		if (header.getStorageTime() != null && header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString())) {
+			add = "input age " + SystemAnalysis.getWaitTime(
+					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>analysis";
+			t = header.getStorageTime().getTime();
+		}
+		String age = "<br><small><font color='gray'>" + add + " " + SystemAnalysis.getWaitTime(
+				System.currentTimeMillis() - t, 1) + " ago</font></small>";
 		if (displayName != null)
-			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "") + lu;
+			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "") + age;
 		else
-			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "") + lu;
+			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "") + age;
 	}
 	
 	@Override

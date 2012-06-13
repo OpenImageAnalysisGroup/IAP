@@ -7,7 +7,8 @@
 package de.ipk.ag_ba.commands.lemnatec;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
@@ -23,9 +24,9 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	
 	private NavigationButton src;
 	private final String db;
-	private final Collection<ExperimentHeaderInterface> experiments;
+	private final ArrayList<ExperimentHeaderInterface> experiments;
 	
-	public ActionLemnaDb(String db, Collection<ExperimentHeaderInterface> experiments) {
+	public ActionLemnaDb(String db, ArrayList<ExperimentHeaderInterface> experiments) {
 		super("Open LemnaTec-DB " + db);
 		this.db = db;
 		this.experiments = experiments;
@@ -51,6 +52,12 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		Collections.sort(experiments, new Comparator<ExperimentHeaderInterface>() {
+			@Override
+			public int compare(ExperimentHeaderInterface a, ExperimentHeaderInterface b) {
+				return b.getImportdate().compareTo(a.getImportdate());
+			}
+		});
 	}
 	
 	@Override

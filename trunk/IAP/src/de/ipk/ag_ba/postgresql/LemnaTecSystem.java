@@ -19,8 +19,8 @@ public enum LemnaTecSystem {
 		if (this == Maize)
 			return user.equals("Muraya") ||
 					user.equalsIgnoreCase("Altmann");
-		if (this == Unknown)
-			return user.equals("Neumannk");
+		// if (this == Unknown)
+		// return user.equals("Neumannk");
 		if (this == Barley)
 			return user.equals("Neumannk");
 		if (this == Phytochamber)
