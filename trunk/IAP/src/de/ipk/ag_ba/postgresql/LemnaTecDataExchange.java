@@ -1241,7 +1241,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							)
 								res.get(plantID).setGenotype(metaValue);
 							else
-								if (metaName.equalsIgnoreCase("Variety"))
+								if (metaName.equalsIgnoreCase("Variety") || metaName.equalsIgnoreCase("variety-tax"))
 									res.get(plantID).setVariety(metaValue);
 								else
 									if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") || metaName.equalsIgnoreCase("Topf"))
