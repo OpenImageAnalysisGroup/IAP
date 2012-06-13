@@ -89,26 +89,34 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		int w = vis.getWidth();
 		int h = vis.getHeight();
 		
-		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-		FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().print("blurf", false), 0.075f, h, 20).io().// blur(3).
-				thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
+		ResultsTable rt = new ResultsTable();
+		rt.incrementCounter();
 		
-		probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
-				erode().erode().erode().erode().invert().
-				getImage();
-		
-		if (debug2) {
-			FlexibleImageStack fis = new FlexibleImageStack();
-			fis.addImage("PROB", probablyBloomFluo);
-			fis.addImage("FLUO", fluo);
-			fis.print("CHECK THIS");
+		boolean bloomDetection = false;
+		int bloomLimbCount = 0;
+		if (bloomDetection) {
+			skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
+			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().print("blurf", false), 0.075f, h, 20).io().// blur(3).
+					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
+			
+			probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
+					erode().erode().erode().erode().invert().
+					getImage();
+			
+			if (debug2) {
+				FlexibleImageStack fis = new FlexibleImageStack();
+				fis.addImage("PROB", probablyBloomFluo);
+				fis.addImage("FLUO", fluo);
+				fis.print("CHECK THIS");
+			}
+			
+			HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
+			bloomLimbCount = knownBloompoints.size();
+			skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
+			skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
+			
+			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
 		}
-		
-		HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-		int bloomLimbCount = knownBloompoints.size();
-		skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
-		skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-		
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {
@@ -166,8 +174,6 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		// ***Saved***
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 		double normFactor = distHorizontal != null ? options.getIntSetting(Setting.REAL_MARKER_DISTANCE) / distHorizontal.getValue() : 1;
-		ResultsTable rt = new ResultsTable();
-		rt.incrementCounter();
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
@@ -218,9 +224,8 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
-		rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
-		
-		rt.addValue("bloom.count", bloomLimbCount);
+		if (bloomDetection)
+			rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {
 			if (distHorizontal != null)
@@ -234,10 +239,11 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			rt.addValue("leaf.width.outer.max", leafWidthInPixels);
 		}
 		
-		if (bloomLimbCount > 0)
-			rt.addValue("bloom", 1);
-		else
-			rt.addValue("bloom", 0);
+		if (bloomDetection)
+			if (bloomLimbCount > 0)
+				rt.addValue("bloom", 1);
+			else
+				rt.addValue("bloom", 0);
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
