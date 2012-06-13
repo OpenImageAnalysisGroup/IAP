@@ -114,12 +114,47 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		final ThreadSafeOptions tsoBootstrapN = new ThreadSafeOptions();
 		tsoBootstrapN.setInt(0);
 		
+		final ThreadSafeOptions tsoSplitFirst = new ThreadSafeOptions();
+		tsoSplitFirst.setBval(0, false);
+		final ThreadSafeOptions tsoSplitSecond = new ThreadSafeOptions();
+		tsoSplitSecond.setBval(0, false);
+		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportCompleteFinishedStep3(
 						m, experimentReference, false, divideDatasetBy, false, toggles,
-						togglesForInterestingProperties, tsoBootstrapN),
+						togglesForInterestingProperties, tsoBootstrapN,
+						tsoSplitFirst, tsoSplitSecond),
 				src.getGUIsetting()));
+		
+		ArrayList<String> factors = new ArrayList<String>();
+		for (ThreadSafeOptions tso : divideDatasetBy) {
+			String s = (String) tso.getParam(0, "");
+			if (tso.getBval(0, false)) {
+				if (!s.equals("Appendix") && !s.equals("Ratio") && !s.equals("Clustering"))
+					factors.add(s);
+			}
+		}
+		if (factors.size() > 0) {
+			String f1 = factors.get(0);
+			if (!f1.endsWith("s"))
+				f1 += "s";
+			actions.add(new NavigationButton(
+					new ActionToggle("Create individual diagrams for factor 1 " + f1 + "?",
+							"<html><center>Show " + f1 + " using<br>multiple diagrams</center>",
+							"<html><center>Show " + f1 + " in<br>a single diagram</center>", tsoSplitFirst),
+					src.getGUIsetting()));
+		}
+		if (factors.size() > 1) {
+			String f2 = factors.get(1);
+			if (!f2.endsWith("s"))
+				f2 += "s";
+			actions.add(new NavigationButton(
+					new ActionToggle("Create individual diagrams for factor 2" + f2 + "?",
+							"<html><center>Show " + f2 + " using<br>multiple diagrams</center>",
+							"<html><center>Show " + f2 + " in<br>a single diagram</center>", tsoSplitSecond),
+					src.getGUIsetting()));
+		}
 		
 		// init clustering variable
 		getArrayFrom(divideDatasetBy);

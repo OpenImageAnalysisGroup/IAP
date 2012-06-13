@@ -59,7 +59,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	private final ArrayList<ThreadSafeOptions> divideDatasetBy;
 	private boolean clustering;
 	private ArrayList<ThreadSafeOptions> togglesInterestingProperties;
-	private ThreadSafeOptions tsoBootstrapN;
+	private ThreadSafeOptions tsoBootstrapN, tsoSplitFirst, tsoSplitSecond;
 	
 	public ActionNumericDataReportCompleteFinishedStep3(String tooltip,
 			boolean exportIndividualAngles,
@@ -72,13 +72,16 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	public ActionNumericDataReportCompleteFinishedStep3(MongoDB m, ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
-			ArrayList<ThreadSafeOptions> togglesFiltering, ArrayList<ThreadSafeOptions> togglesInterestingProperties, ThreadSafeOptions tsoBootstrapN) {
+			ArrayList<ThreadSafeOptions> togglesFiltering,
+			ArrayList<ThreadSafeOptions> togglesInterestingProperties, ThreadSafeOptions tsoBootstrapN,
+			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
 		this("Create report"
 				+
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF ("
 								+ StringManipulationTools.getStringList(
-										getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), ", ") + ")"),
+										getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
+												tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, true)), ", ") + ")"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
@@ -93,9 +96,12 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					clustering = true;
 			}
 		}
+		this.tsoSplitFirst = tsoSplitFirst;
+		this.tsoSplitSecond = tsoSplitSecond;
 	}
 	
-	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition) {
+	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition, Boolean splitFirst,
+			Boolean splitSecond) {
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
@@ -161,6 +167,17 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		res.add(stressType);
 		res.add(stressLabel);
 		
+		if (splitFirst != null && splitSecond != null) {
+			if (splitFirst)
+				res.add("TRUE");
+			else
+				res.add("FALSE");
+			
+			if (splitSecond)
+				res.add("TRUE");
+			else
+				res.add("FALSE");
+		}
 		return res.toArray(new String[] {});
 	}
 	
@@ -218,9 +235,13 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
 							StringManipulationTools.getStringList(
-									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), ", ") + ")") + add;
+									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
+											tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
+									", ") + ")") + add;
 		} else {
-			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence());
+			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
+					experimentReference.getHeader().getSequence(),
+					tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false));
 			String filter = StringManipulationTools.getStringList(
 					arr, ", ");
 			if (filter.endsWith(", TRUE"))
@@ -231,11 +252,11 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				filter = filter.substring(0, filter.length() - ", none".length());
 			filter = StringManipulationTools.stringReplace(filter, ", ", " and ");
 			if (arr[2].equals("TRUE"))
-				return "<html><center>Specify overview" + (clustering ? "/<br>clustering " : "<br>") + "" +
-						"properties --&gt;<br>Click here for full report PDF" + add;
+				return "<html><center>Create PDF (click here)<br><br>Specify overview" + (clustering ? "/<br>clustering " : "<br>") + "" +
+						" properties --&gt;" + add;
 			else
-				return "Specify overview" + (clustering ? "/<br>clustering " : "") + "" +
-						"properties --&gt;<br>Click here to create short PDF" + add;
+				return "Create PDF (click here)<br><br>Specify overview" + (clustering ? "/<br>clustering " : "") + "" +
+						" properties --&gt;" + add;
 		}
 	}
 	
@@ -443,7 +464,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					timeoutMinutes = 60 * 12; // 12 h
 				if (tsoBootstrapN.getInt() > 100)
 					timeoutMinutes = 60 * 24 * 7; // 7*24h
-				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence()), experiment, status,
+				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
+						experimentReference.getHeader().getSequence(),
+						tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
+						experiment, status,
 						lastOutput, timeoutMinutes);
 				p.getOutput();
 				boolean ok = p.hasPDFcontent();
