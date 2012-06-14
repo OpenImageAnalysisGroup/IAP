@@ -168,7 +168,10 @@ public class ProgressStatusService implements HelperClass {
 			lastSpeed = averageSpeed;
 		}
 		lastRes = result;
-		return result;
+		if (result != null)
+			return result;
+		else
+			return "";
 	}
 	
 }
