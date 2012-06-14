@@ -15,7 +15,7 @@ debug <- TRUE
 
 calculateNothing <- FALSE
 calculateOnlyNBox <- FALSE
-calculateOnlyViolin <- FALSE
+calculateOnlyViolin <- TRUE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
 calculateOnlyBoxplot <- FALSE
@@ -3152,16 +3152,16 @@ OneMinusTheValue <- function(overallResult) {
 
 parMakeViolinPlotDiagram <- function(overallList) {
 	########
-#overallResult <- overallList$overallResult_violinBoxDes
-#overallDescriptor <- overallList$violinBoxDes
-#overallColor <- overallList$color_violin
-#overallDesName <-overallList$violinBoxDesName
-#overallFileName <- overallList$imageFileNames_violinPlots
-#diagramTypSave="violinplot"
+##overallResult <- overallList$overallResult_violinBoxDes
+##overallDescriptor <- overallList$violinBoxDes
+##overallColor <- overallList$color_violin
+##overallDesName <-overallList$violinBoxDesName
+##overallFileName <- overallList$imageFileNames_violinPlots
+##diagramTypSave="violinplot"
 #imagesIndex <- "1"
-#isOnlyOneValue <- FALSE
-#stress.Start <- overallList$stress.Start
-#stress.End <- overallList$stress.End
+##isOnlyOneValue <- FALSE
+##stress.Start <- overallList$stress.Start
+##stress.End <- overallList$stress.End
 	#############	
 	
 	overallList$debug %debug% "makeViolinPlotDiagram()"	
@@ -3178,16 +3178,16 @@ parMakeViolinPlotDiagram <- function(overallList) {
 			overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult <- OneMinusTheValue(overallResult)		
 		
-		if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {	
-			for(nn in unique(as.character(overallResult$primaerTreatment))) {
-				booleanVector <- getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = nn))
-				overallResultSplit <- overallResult[booleanVector, ]
-				nn <- replaceTreatmentNamesOverallOneValue(overallList, nn)
-				splitMakeStackedDiagram(overallResultSplit, overallDesName, overallList, imagesIndex, diagramTypSave, nn)
-			}	
-		} else {
-			splitMakeStackedDiagram(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave)
-		}
+#		if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {	
+#			for(nn in unique(as.character(overallResult$primaerTreatment))) {
+#				booleanVector <- getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = nn))
+#				overallResultSplit <- overallResult[booleanVector, ]
+#				nn <- replaceTreatmentNamesOverallOneValue(overallList, nn)
+#				makeViolinPlotDiagram(overallResultSplit, overallDesName, overallList, imagesIndex, diagramTypSave, nn)
+#			}	
+#		} else {
+			makeViolinPlotDiagram(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave)
+#		}
 			
 #			if ("primaerTreatment" %in% colnames(overallResult)) {
 #				for (value in unique(as.character(overallResult$primaerTreatment))) { 
@@ -3205,20 +3205,19 @@ parMakeViolinPlotDiagram <- function(overallList) {
 	}		
 }
 
-makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallDesName, 
-	overallList, diagramTypSave, imagesIndex) {
-
-	if (innerThreaded)
-		sfClusterCall(makeViolinPlotDiagram, 
-				overallResult, overallDescriptor, overallDesName, 
-				overallList, diagramTypSave, imagesIndex,
-				stopOnError=FALSE)
-	else
-		makeViolinPlotDiagram( 
-				overallResult, overallDescriptor, overallDesName, 
-				overallList, diagramTypSave, imagesIndex)
+makeViolinPlotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title = "") {
+	overallList$debug %debug% "makeViolinPlotDiagram()"
 	
-	
+	if (length(overallResult[, 1]) > 0) {
+		if (innerThreaded) {
+			sfClusterCall(plotViolinPlotDiagram, 
+					overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title, 
+					stopOnError=FALSE)
+		} else {
+			plotViolinPlotDiagram( 
+					overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title)
+		}	
+	}		
 }
 
 reorderThePlotOrder <- function(overallResult) {
@@ -3345,19 +3344,21 @@ addColorForStressPhaseAndOther <- function(stressArea, color, diagramTypSave = "
 	return(color)
 }
 
-plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName, overallList, imagesIndex, title="") {
+plotViolinPlotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title="") {
 ########
 #overallResult <- plotThisValues
 #title <- ""
 ########
-	diagramTypSave<-"violinplot"
 
 	overallResult <- reownCategorized(overallResult)
+	overallFileName <- overallList$imageFileNames_violinPlots
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
 	overallResult$name <- reorderThePlotOrder(overallResult)
 	stressArea <- data.frame()
 
+	#print(head(overallResult))
+	
 #  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
 #	overallList$stress.Start <- c(10,20,30,37)
 #	overallList$stress.End <- c(13, 23, 33, 40)
@@ -3408,8 +3409,10 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 						#legend. key = theme_blank(), # switch off the rectangle around symbols in the legend
 						panel.border = theme_rect(colour="Grey", size=0.1)
 				)
-		if (title != "") {
-			plot <- plot + opts(title = title)
+		if(FALSE) {
+			if (title != "") {
+				plot <- plot + opts(title = title)
+			}
 		}
 		
 		if (length(unique(overallResult$name)) > 4) {
@@ -3427,8 +3430,16 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallFileName
 		plot <- plot + facet_wrap(~ name, ncol=5) 
 	
 		#print(plot)
-		
-		writeTheData(overallList, plot, overallFileName[imagesIndex], diagramTypSave, writeLatexFileFirstValue= paste(overallFileName[imagesIndex], "violinOverallImage", sep=""), makeOverallImage=TRUE, subSectionTitel = overallDesName[[imagesIndex]], subsectionDepth=2)
+				
+#		if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+#			subsectionDepth <- 3
+#		} else {
+#			subsectionDepth <- 2
+#		}		
+#		print(title)
+#		print(overallDesName[[imagesIndex]])
+			
+		writeTheData(overallList, plot, overallFileName[imagesIndex], paste(title, diagramTypSave, sep=""), paste(overallFileName[[imagesIndex]], "violinOverallImage", sep=""), overallDesName[[imagesIndex]], TRUE, subsectionDepth=2)
 	}
 }
 
