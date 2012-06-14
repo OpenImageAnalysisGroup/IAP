@@ -15,7 +15,7 @@ debug <- TRUE
 
 calculateNothing <- FALSE
 calculateOnlyNBox <- FALSE
-calculateOnlyViolin <- TRUE
+calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
 calculateOnlyBoxplot <- FALSE
