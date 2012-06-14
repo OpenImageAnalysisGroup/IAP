@@ -2005,7 +2005,7 @@ makeLinearDiagram <- function(
 			} else {
 				plot <- plot + 
 						#plot <-	ggplot()+
-						geom_ribbon(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", fill=whichColumShouldUse), stat="identity", alpha=0.1) +
+						geom_ribbon(data=overallResult, aes_string(x="xAxis", y="mean", ymin="ymin", ymax="ymax", fill=whichColumShouldUse), stat="identity", alpha=0.1) +
 						geom_line(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), alpha=0.2)
 						#geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), size=3)
 				#print(plot)
@@ -2027,7 +2027,7 @@ makeLinearDiagram <- function(
 			
 			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0) {
 					plot <- plot +	
-							geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), size=3)
+							geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse, shape=whichColumShouldUse), size=3)
 #				if(isOtherTyp) {
 #					plot <- plot +	
 #							geom_point(data=overallResult, aes(x=xAxis, y=mean, color=primaerTreatment), size=3)
@@ -3141,8 +3141,16 @@ setColorDependentOfGroup <- function(overallResult) {
 	return(color)
 }
 
-parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
-		overallFileName, overallList, diagramTypSave="violinplot") {
+OneMinusTheValue <- function(overallResult) {
+	if ("primaerTreatment" %in% colnames(overallResult)) {
+		overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
+	} else {
+		overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
+	}
+	return(overallResult)
+}
+
+parMakeViolinPlotDiagram <- function(overallList) {
 	########
 #overallResult <- overallList$overallResult_violinBoxDes
 #overallDescriptor <- overallList$violinBoxDes
@@ -3158,47 +3166,58 @@ parMakeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallCo
 	
 	overallList$debug %debug% "makeViolinPlotDiagram()"	
 	
-	if ("primaerTreatment" %in% colnames(overallResult)) {
-		overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
-	} else {
-		overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
-	}
-	
-	tempOverallResult =  overallResult
-	
+	overallDescriptor <- overallList$violinBoxDes
+	overallDesName <-overallList$violinBoxDesName
+	tempOverallResult <-  overallList$overallResult_violinBoxDes
+	diagramTypSave <- "violinplot"
+		
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]])) {
 			createOuputOverview("violin plot", imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
-			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
-			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+			overallResult <- reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
+			overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+			overallResult <- OneMinusTheValue(overallResult)		
+		
+		if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {	
+			for(nn in unique(as.character(overallResult$primaerTreatment))) {
+				booleanVector <- getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = nn))
+				overallResultSplit <- overallResult[booleanVector, ]
+				nn <- replaceTreatmentNamesOverallOneValue(overallList, nn)
+				splitMakeStackedDiagram(overallResultSplit, overallDesName, overallList, imagesIndex, diagramTypSave, nn)
+			}	
+		} else {
+			splitMakeStackedDiagram(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave)
+		}
 			
-			if (innerThreaded)
-				sfClusterCall(makeViolinPlotDiagram, 
-					overallResult, overallDescriptor, overallColor, overallDesName, 
-					overallFileName, overallList, diagramTypSave="violinplot", imagesIndex,
-					stopOnError=FALSE)
-			else
-				makeViolinPlotDiagram( 
-					overallResult, overallDescriptor, overallColor, overallDesName, 
-					overallFileName, overallList, diagramTypSave="violinplot", imagesIndex)
+#			if ("primaerTreatment" %in% colnames(overallResult)) {
+#				for (value in unique(as.character(overallResult$primaerTreatment))) { 
+#					title = overallList$filterTreatmentRename[[value]]			
+#					booleanVector = getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = value))
+#					plotThisValues = overallResult[booleanVector, ]
+#					#plotThisValues$name <- factor(substr(plotThisValues$name,nchar(value)+2, nchar(as.character(plotThisValues$name))))
+#					plotViolinPlotDiagram(plotThisValues, overallDesName, overallFileName, overallList, imagesIndex, title)
+#				}	 
+#			} else {
+#				plotViolinPlotDiagram(overallResult, overallDesName, overallFileName, overallList, imagesIndex)
+#			}		
+		
 		}
 	}		
 }
 
-makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallColor, overallDesName, 
-	overallFileName, overallList, diagramTypSave="violinplot", imagesIndex) {
+makeViolinPlotDiagram <- function(overallResult, overallDescriptor, overallDesName, 
+	overallList, diagramTypSave, imagesIndex) {
+
+	if (innerThreaded)
+		sfClusterCall(makeViolinPlotDiagram, 
+				overallResult, overallDescriptor, overallDesName, 
+				overallList, diagramTypSave, imagesIndex,
+				stopOnError=FALSE)
+	else
+		makeViolinPlotDiagram( 
+				overallResult, overallDescriptor, overallDesName, 
+				overallList, diagramTypSave, imagesIndex)
 	
-	if ("primaerTreatment" %in% colnames(overallResult)) {
-		for (value in unique(as.character(overallResult$primaerTreatment))) { 
-			title = overallList$filterTreatmentRename[[value]]			
-			booleanVector = getBooleanVectorForFilterValues(overallResult, list(primaerTreatment = value))
-			plotThisValues = overallResult[booleanVector, ]
-			#plotThisValues$name <- factor(substr(plotThisValues$name,nchar(value)+2, nchar(as.character(plotThisValues$name))))
-			plotViolinPlotDiagram(plotThisValues, overallDesName, overallFileName, overallList, imagesIndex, title)
-		}	 
-	} else {
-		plotViolinPlotDiagram(overallResult, overallDesName, overallFileName, overallList, imagesIndex)
-	}
 	
 }
 
@@ -3745,7 +3764,7 @@ if(!calculateOnlySpider) {
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
 				sfClusterEval(
-					parMakeViolinPlotDiagram(overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$color_violin, overallDesName=overallList$violinBoxDesName, overallList$imageFileNames_violinPlots , overallList)
+					parMakeViolinPlotDiagram(overallList)
 				, stopOnError=FALSE)
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
@@ -4243,18 +4262,18 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		#treatment <- "Species"
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
-		#treatment <- "Treatment"
-		treatment <- "Genotype"
-		#filterTreatment <- "dry / normal"
+		treatment <- "Treatment"
+		#treatment <- "Genotype"
+		filterTreatment <- "dry / normal"
 		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
-		filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
+		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
 
-		secondTreatment <- "none"
-		filterSecondTreatment  <- "none"
+		#secondTreatment <- "none"
+		#filterSecondTreatment  <- "none"
 		
-		#secondTreatment <- "Species"
-		#filterSecondTreatment  <- "Athletico$Fernandez$Weisse Zarin"
+		secondTreatment <- "Species"
+		filterSecondTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#secondTreatment <- "Treatment"
 		#filterSecondTreatment <- "dry / normal"
@@ -4282,7 +4301,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		split.Treatment.First <- TRUE
 		split.Treatment.Second <- FALSE
-		isRatio <- FALSE
+		isRatio <- TRUE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
