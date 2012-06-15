@@ -1214,7 +1214,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
@@ -1289,25 +1289,25 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 												} else
 													if (metaName.startsWith("Sorte")) {
 														if (!oldTreatment.contains(metaValue.trim()))
-															res.get(plantID).setVariety(oldVariety + metaValue.trim());
+															res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
 													} else {
 														if (metaName.equalsIgnoreCase("Typ")) {
-															if (!oldTreatment.contains(metaValue))
-																res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
-															else {
-																if (metaName.startsWith("conditions "))
-																	metaName = metaName.substring("conditions ".length()).trim();
-																if (!oldTreatment.contains(metaName + ": " + metaValue.trim()))
-																	res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
-															}
+															res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
 														} else {
-															if (metaValue != null && metaValue.trim().length() > 0) {
-																String ss = metaName + ": " + metaValue;
-																if (oldTreatment != null && oldTreatment.length() > 0) {
-																	if (!oldTreatment.contains(ss))
-																		res.get(plantID).setTreatment(oldTreatment + ss);
-																} else
-																	res.get(plantID).setTreatment(ss);
+															if (metaName.startsWith("conditions "))
+																metaName = metaName.substring("conditions ".length()).trim();
+															
+															if (!oldTreatment.contains(metaName + ": " + metaValue.trim()))
+																res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
+															else {
+																if (metaValue != null && metaValue.trim().length() > 0) {
+																	String ss = metaName + ": " + metaValue;
+																	if (oldTreatment != null && oldTreatment.length() > 0) {
+																		if (!oldTreatment.contains(ss))
+																			res.get(plantID).setTreatment(oldTreatment + ss);
+																	} else
+																		res.get(plantID).setTreatment(ss);
+																}
 															}
 														}
 													}
