@@ -2045,9 +2045,27 @@ public class MongoDB {
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
 		if (l != null) {
 			double max = l.size();
+			
+			DBCollection collCond = db.getCollection("conditions");
+			
 			for (Object o : l) {
-				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
-				DBObject cond = condr.fetch();
+				
+				boolean useRef = false;
+				DBObject cond;
+				if (useRef) {
+					DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
+					cond = condr.fetch();
+				} else {
+					cond = collCond.findOne(
+							new ObjectId(o.toString()),
+							new BasicDBObject()
+									.append("_id", new Integer(1))
+									.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
+									.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
+									.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+							);
+				}
+				// find objects in "condition" collection, but only fields images, volumes, networks
 				if (cond != null) {
 					visitCondition.setDBid(cond.get("_id") + "");
 					visitCondition.run();
@@ -2640,10 +2658,13 @@ public class MongoDB {
 							ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
 							// no changes in between
 							DBCursor fl = gridfs.getFileList();
+							int n = 0;
 							while (fl.hasNext()) {
 								DBObject dbo = fl.next();
 								GridFSDBFile f = (GridFSDBFile) dbo;
 								String md5 = f.getFilename();
+								n++;
+								status.setCurrentStatusText2("Check " + n + ": " + md5);
 								if (!linkedHashes.contains(md5))
 									toBeRemoved.add(f);
 							}
