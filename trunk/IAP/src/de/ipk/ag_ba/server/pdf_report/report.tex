@@ -68,11 +68,16 @@
 \usepackage{titletoc}
 % \titlecontents{Abschnitt}[Links]{Gesamtformatierung}{Vor dem %
 % Label}{Nach dem Label}{Abstandsfüller & Seitenzahl}[Rechts]
-\titlecontents{subsection}[4.5em]{}{\contentslabel{3em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+%4.5 and 3.0
+%7.5 and 3.2
+%10.6 and 3.7
+\titlecontents{subsection}[4.5em]{}{\contentslabel{3.0em}}{}{\titlerule*[0.6pc]{.}\contentspage}
 \titlecontents{subsubsection}[7.5em]{}{\contentslabel{3.2em}}{}{\titlerule*[0.6pc]{.}\contentspage}
-%\titlecontents{subsubsubsection}[10.7em]{}{\contentslabel{3.2em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{paragraph}[10.6em]{}{\contentslabel{3.7em}}{}{\titlerule*[0.6pc]{.}\contentspage}
 % —– Ende: Angaben zur Formatierung von Überschriften —– %
 
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
 
 \makeatletter
 
