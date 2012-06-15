@@ -38,7 +38,7 @@ NOT.EXISTS <- "notExists"
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- TRUE
+calculateOnlyNBox <- FALSE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
