@@ -1067,10 +1067,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		experiment.getHeader().setDatabaseId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		experiment.getHeader().setOriginDbId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		
-		if (seq != null && seq.contains("SeedDate")) {
-			String[] values = seq.split(";");
+		if (seq != null && StringManipulationTools.containsAny(seq, getMetaNamesSeedDates())) {
+			String[] values = seq.split("//");
 			seedDateLookupLoop: for (String v : values) {
-				if (v.contains("SeedDate") && v.contains(":")) {
+				v = v.trim();
+				if (StringManipulationTools.containsAny(v, getMetaNamesSeedDates()) && v.contains(":")) {
 					try {
 						String[] descAndVal = v.split(":", 2);
 						String seedDate = descAndVal[1];
@@ -1193,6 +1194,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			ClassNotFoundException {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
 		
+		HashSet<String> globalEnvironmentMetaNames = getEnvironmentMetaNames();
+		
 		Connection connection = openConnectionToDatabase(header.getDatabase());
 		try {
 			String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
@@ -1247,22 +1250,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 									if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") || metaName.equalsIgnoreCase("Topf"))
 										res.get(plantID).setGrowthconditions(metaValue);
 									else
-										if (metaName.equalsIgnoreCase("SEEDDATE")
-												|| metaName.equalsIgnoreCase("seed date")
-												|| metaName.equalsIgnoreCase("Aussaat")
-												|| metaName.equalsIgnoreCase("Kühlung")
-												|| metaName.equalsIgnoreCase("Keimung")
-												|| metaName.equalsIgnoreCase("Start Experiment")
-												|| metaName.equalsIgnoreCase("Ende Experiment")
-												|| metaName.equalsIgnoreCase("Bewässerung")
-												|| metaName.equalsIgnoreCase("Aufnahme")
-												|| metaName.equalsIgnoreCase("Lichtintensität")
-												|| metaName.equalsIgnoreCase("Lichtzeitraum")
-												|| metaName.equalsIgnoreCase("Tageslänge")
-												|| metaName.equalsIgnoreCase("Temperatur (Tag)")
-												|| metaName.equalsIgnoreCase("Temperatur (Nacht)")
-												|| metaName.equalsIgnoreCase("rel.Luftfeuchte (Tag)")
-												|| metaName.equalsIgnoreCase("rel.Luftfeuchte (Nacht)")) {
+										if (globalEnvironmentMetaNames.contains(metaName)) {
 											addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
 										} else {
 											if (metaValue != null && metaValue.trim().length() > 0) {
@@ -1334,6 +1322,49 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		} finally {
 			closeDatabaseConnection(connection);
 		}
+		return res;
+	}
+	
+	private HashSet<String> getMetaNamesSeedDates() {
+		HashSet<String> res = new HashSet<String>();
+		res.add("SEEDDATE");
+		res.add("seed date");
+		res.add("Aussaat");
+		res.add("Sowing");
+		return res;
+	}
+	
+	private HashSet<String> getEnvironmentMetaNames() {
+		HashSet<String> res = new HashSet<String>();
+		res.add("SEEDDATE");
+		res.add("seed date");
+		res.add("Aussaat");
+		res.add("Kühlung");
+		res.add("Keimung");
+		res.add("Start Experiment");
+		res.add("Ende Experiment");
+		res.add("Bewässerung");
+		res.add("Aufnahme");
+		res.add("Lichtintensität");
+		res.add("Lichtzeitraum");
+		res.add("Tageslänge");
+		res.add("Temperatur (Tag)");
+		res.add("Temperatur (Nacht)");
+		res.add("rel.Luftfeuchte (Tag)");
+		res.add("rel.Luftfeuchte (Nacht)");
+		res.add("Day Length");
+		res.add("Finish Experiment");
+		res.add("Germination"); // ?? eventually plant specific
+		res.add("Imaging");
+		res.add("Light Intensity");
+		res.add("Light Period");
+		res.add("Sowing");
+		res.add("Stratification");
+		res.add("Temperature (Day)");
+		res.add("Temperature (Night)");
+		res.add("Watering");
+		res.add("rel.Humidity (Day)");
+		res.add("rel.Humidity (Night)");
 		return res;
 	}
 	

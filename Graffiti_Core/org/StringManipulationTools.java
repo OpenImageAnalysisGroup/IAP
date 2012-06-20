@@ -800,4 +800,11 @@ public class StringManipulationTools implements HelperClass {
 				res.add(s);
 		return getStringList(res, " " + split + " ");
 	}
+	
+	public static boolean containsAny(String input, Collection<String> search) {
+		for (String s : search)
+			if (input.contains(s))
+				return true;
+		return false;
+	}
 }
