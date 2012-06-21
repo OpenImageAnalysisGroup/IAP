@@ -99,7 +99,7 @@ public class CloudTaskManager {
 								name = "[BatchCmd==null]";
 								progress.add("n/a");
 							} else {
-								name = td.getBatchCmd().getExperimentHeader().getExperimentName() + " (" + td.getBatchCmd().getPartIdx() + "/"
+								name = td.getBatchCmd().getExperimentHeader().getExperimentName() + " (" + (td.getBatchCmd().getPartIdx() + 1) + "/"
 										+ td.getBatchCmd().getPartCnt() + ")";
 								progress.add(td.getBatchCmd().getCurrentStatusMessage3());
 							}
