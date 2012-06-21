@@ -138,7 +138,7 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 		if (processedMasks.fluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.nir() != null ? processedMasks.nir().copy().io().print("NIRRRR", debug) : null;
-			ImageOperation ir = processedMasks.getIr() != null ? processedMasks.getIr().copy().io().print("IR", debug) : null;
+			ImageOperation ir = processedMasks.ir() != null ? processedMasks.ir().copy().io().print("IR", debug) : null;
 			FlexibleImage mask = processedMasks.fluo().copy().io().blur(3).
 					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
 			if (nir != null)
@@ -152,8 +152,8 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 			if (processedImages.nir() != null)
 				processedImages.setNir(processedImages.nir().io().applyMask_ResizeMaskIfNeeded(
 						mask, back).print("FILTERED NIR IMAGE", debug).getImage());
-			if (processedImages.getIr() != null)
-				processedImages.setIr(processedImages.getIr().io().applyMask_ResizeMaskIfNeeded(
+			if (processedImages.ir() != null)
+				processedImages.setIr(processedImages.ir().io().applyMask_ResizeMaskIfNeeded(
 						mask.io().invert().getImage(), back).print("FILTERED IR IMAGE", debug).getImage());
 			return;
 		}
@@ -169,8 +169,8 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (processedMasks.nir() != null)
 				processedMasks.setNir(clearImageTop(processedMasks.nir(), processedMasks.fluo()));
-			if (processedMasks.getIr() != null)
-				processedMasks.setIr(clearImageTop(processedMasks.getIr(), processedMasks.fluo()));
+			if (processedMasks.ir() != null)
+				processedMasks.setIr(clearImageTop(processedMasks.ir(), processedMasks.fluo()));
 			return;
 		}
 	}

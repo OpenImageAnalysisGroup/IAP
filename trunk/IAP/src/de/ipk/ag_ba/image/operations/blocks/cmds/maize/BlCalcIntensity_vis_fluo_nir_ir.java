@@ -167,8 +167,8 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 	protected FlexibleImage processIRmask() {
 		FlexibleImage irSkel = null;
 		// getProperties().getImage("ir_skeleton");
-		if (input().masks().getIr() != null)
-			irSkel = input().masks().getIr().io().skeletonize().getImage();
+		if (input().masks().ir() != null)
+			irSkel = input().masks().ir().io().skeletonize().getImage();
 		if (irSkel != null) {
 			int irSkeletonFilledPixels = irSkel.io().countFilledPixels();
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);
@@ -176,11 +176,11 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 			getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".ir.skeleton.intensity.average", avgIrSkel);
 		}
 		
-		if (input().masks().getIr() != null) {
-			ImageOperation io = new ImageOperation(input().masks().getIr());
-			if (input().masks().getIr().getHeight() > 1) {
-				int irFilledPixels = input().masks().getIr().io().countFilledPixels();
-				double irIntensitySum = input().masks().getIr().io().intensitySumOfChannel(false, true, false, false);
+		if (input().masks().ir() != null) {
+			ImageOperation io = new ImageOperation(input().masks().ir());
+			if (input().masks().ir().getHeight() > 1) {
+				int irFilledPixels = input().masks().ir().io().countFilledPixels();
+				double irIntensitySum = input().masks().ir().io().intensitySumOfChannel(false, true, false, false);
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
 				getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".ir.intensity.average", avgIr);
 				ResultsTable rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,

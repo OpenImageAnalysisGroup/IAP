@@ -39,7 +39,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 			if (nir != null)
 				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade, 3, 2);
 			
-			FlexibleImage ir = input().images().getIr();
+			FlexibleImage ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().rotate(180).getImage();
 				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade, 3, 2);
@@ -59,7 +59,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 			if (nir != null)
 				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade, 4, 3);
 			
-			FlexibleImage ir = input().images().getIr();
+			FlexibleImage ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().rotate(180).getImage();
 				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade, 4, 3);
@@ -148,7 +148,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processIRimage() {
-		FlexibleImage img = input().images().getIr();
+		FlexibleImage img = input().images().ir();
 		if (img != null && !multiTray) {
 			return img.copy().io().rotate(180).translate(-3, 0).
 					clearOutsideCircle(
@@ -188,7 +188,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	
 	@Override
 	protected FlexibleImage processIRmask() {
-		FlexibleImage img = input().images().getIr();
+		FlexibleImage img = input().images().ir();
 		if (img != null) {
 			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else

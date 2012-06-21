@@ -903,7 +903,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					resVis = pipelineResult.vis();
 					resFluo = pipelineResult.fluo();
 					resNir = pipelineResult.nir();
-					resIr = pipelineResult.getIr();
+					resIr = pipelineResult.ir();
 					analysisResults = imageProcessor.getSettings();
 					
 					processAndOrSaveTiffImagesOrResultImages(

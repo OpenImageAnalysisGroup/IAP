@@ -21,10 +21,14 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.ImageSetDescription;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -158,17 +162,23 @@ public class BlockPipeline {
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
-			int n = input.getImageCount();
+			
+			ImageSetDescription isd = input.getImageSetDescription();
+			
 			FlexibleMaskAndImageSet input2 = block.process();
-			if (n - input.getImageCount() > 0) {
-				System.out.println();
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
-						+ " HAS SET "
-						+ (n - input.getImageCount() + " IMAGE(S) TO NULL!"));
-				System.out.println("IN: " + input);
-				System.out.println("OUT: " + input2);
-			}
+			
+			if (block.getClass() != BlReplaceEmptyOriginalImages_vis_fluo_nir.class)
+				if (block.getClass() != BlCrop_images_vis_fluo_nir_ir.class)
+					if (block.getClass() != BlMoveMasksToImageSet_vis_fluo_nir.class)
+						if (isd.isDifferentTo(input2)) {
+							System.out.println();
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
+									+ " HAS MODIFIED THE IMAGE SET:\n"
+									+ isd.getDifferenceDescription(input2));
+							System.out.println("IN: " + input);
+							System.out.println("OUT: " + input2);
+						}
 			input = input2;
 			long tb = System.currentTimeMillis();
 			
