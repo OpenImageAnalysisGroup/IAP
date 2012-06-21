@@ -291,7 +291,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		if (!createPDFmode) {
 			if (executed)
 				return "Filter definition";
-			if (toggles.size() > 0)
+			if (toggles != null && toggles.size() > 0)
 				return "<html><center>If desired, filter<br>" +
 						"experiment factors out --&gt;<br>(click here to continue)";
 			else

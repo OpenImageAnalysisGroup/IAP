@@ -16,6 +16,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ActionNumericDataReport;
+import de.ipk.ag_ba.commands.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetupMainPropertiesStep1;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.ActionToggle;
@@ -181,20 +182,22 @@ public class ImageAnalysisCommandManager {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				
+				// watering table
 				// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 				
 				ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
 				
-				// actions.add(new NavigationButton(new ActionNumericDataReportSetupInterestingProperties(
+				// actions.add(new NavigationButton(new ActionNumericDataReportSetupInterestingTraitsStep2(
 				// m, experimentReference, true,
 				// toggles,
 				// true, null, false),
 				// guiSetting));
-				// actions.add(new NavigationButton(new ActionNumericDataReportComplete(
-				// m, experimentReference, false,
-				// toggles,
-				// true, null),
-				// guiSetting));
+				actions.add(new NavigationButton(new ActionNumericDataReportCompleteFinishedStep3(
+						m, experimentReference, false,
+						toggles,
+						true, null, null, null, null, null),
+						guiSetting));
+				
 				actions.add(
 						new NavigationButton(
 								new ActionNumericDataReportSetupMainPropertiesStep1(m, experimentReference, false, false,

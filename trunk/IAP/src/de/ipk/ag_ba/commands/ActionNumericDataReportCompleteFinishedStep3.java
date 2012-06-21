@@ -80,8 +80,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF ("
 								+ StringManipulationTools.getStringList(
-										getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
-												tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, true)), ", ") + ")"),
+										getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1, experimentReference.getHeader().getSequence(),
+												tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
+												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true), ", ") + ")"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
@@ -229,7 +230,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					add = "<br>[NO PROPERTY OVERVIEW]";
 			}
 		}
-		if (exportIndividualAngles)
+		if (exportIndividualAngles || xlsx)
 			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table" + add;
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
@@ -239,9 +240,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 											tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
 									", ") + ")") + add;
 		} else {
-			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
+			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1,
 					experimentReference.getHeader().getSequence(),
-					tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false));
+					tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
+					tsoSplitSecond != null ? tsoSplitSecond.getBval(0, false) : false);
 			String filter = StringManipulationTools.getStringList(
 					arr, ", ");
 			if (filter.endsWith(", TRUE"))
@@ -369,12 +371,13 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			} else {
 				boolean germanLanguage = false;
 				int row = 1; // header is added before at row 0
-				for (SnapshotDataIAP s : snapshots) {
-					String rowContent = s.getCSVvalue(germanLanguage, separator);
-					csv.append(rowContent);
-					if (row2col2value != null)
-						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
-				}
+				if (!xlsx)
+					for (SnapshotDataIAP s : snapshots) {
+						String rowContent = s.getCSVvalue(germanLanguage, separator);
+						csv.append(rowContent);
+						if (row2col2value != null)
+							row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
+					}
 			}
 			if (xlsx) {
 				csv = null;
