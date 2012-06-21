@@ -106,13 +106,13 @@ public class IntensityAnalysis {
 			if (optDistHorizontal != null && optRealMarkerDistance != null) {
 				double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
 				for (int i = 0; i < this.n; i++) {
-					result.addValue("normalized.histogram.ratio.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+					result.addValue("normalized.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 							histHue.getFreqAt(i) * normalize);
 				}
 			}
 			for (int i = 0; i < this.n; i++) {
 				result.addValue(
-						"hue.histogram.ratio.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255), histHue.getFreqAt(i));
+						"hue.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255), histHue.getFreqAt(i));
 			}
 			result.addValue("hue.average", sumOfHue / plantImagePixelCnt);
 			// if (maxHue != null)

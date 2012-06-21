@@ -225,7 +225,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						
 						Double waterUsePerDay = getWaterUsePerDay(
 								plandID2time2waterData.get(plantID),
-								time, lastTimeVolumeIAP, timeForOneDay);
+								time, lastTimeSideAreaIAP, timeForOneDay);
 						
 						System.out.println("Plant " + plantID + " got " + waterUsePerDay + " ml water per day.");
 						
