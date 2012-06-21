@@ -669,7 +669,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
-				separator + "Water (pumped)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
+				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
 				"\r\n";
 	}
 	
