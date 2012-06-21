@@ -83,7 +83,7 @@ public class BlLoadImagesIfNeeded_images extends
 				}
 			}
 			
-			if (input().images().getIr() == null
+			if (input().images().ir() == null
 					&& input().images().getIrInfo() != null) {
 				IOurl url = input().images().getIrInfo().getURL();
 				try {

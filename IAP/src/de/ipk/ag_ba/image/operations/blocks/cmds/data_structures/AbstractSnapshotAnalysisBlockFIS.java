@@ -156,7 +156,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	
 	protected FlexibleImage processIRimage() {
 		if (input() != null && input().images() != null)
-			return input().images().getIr();
+			return input().images().ir();
 		else
 			return null;
 	}
@@ -186,7 +186,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 			System.out.println("ERROR 5");
 		if (input().masks() == null)
 			System.out.println("ERROR 6");
-		return input().masks().getIr();
+		return input().masks().ir();
 	}
 	
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {

@@ -3027,6 +3027,9 @@ public class ImageOperation {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
 		
+		if (w <= bb || h <= bb)
+			return this;
+		
 		int backgroundColor = ImageOperation.BACKGROUND_COLORint;
 		
 		if (h > bb)

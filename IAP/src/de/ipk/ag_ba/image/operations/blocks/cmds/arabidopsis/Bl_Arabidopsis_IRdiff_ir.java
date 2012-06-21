@@ -19,8 +19,8 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processIRimage() {
-		FlexibleImage warmBack = input().images().getIr();
-		FlexibleImage coldRef = input().masks().getIr();
+		FlexibleImage warmBack = input().images().ir();
+		FlexibleImage coldRef = input().masks().ir();
 		if (warmBack != null && coldRef != null) {
 			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
 			warmBack.io().intensitySumOfChannel(false, false, false, false, warmBackgroundValues);
@@ -42,8 +42,8 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		FlexibleImage f = processedImages.getIr();
-		processedImages.setIr(processedMasks.getIr());
+		FlexibleImage f = processedImages.ir();
+		processedImages.setIr(processedMasks.ir());
 		processedMasks.setIr(f);
 	}
 }

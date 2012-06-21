@@ -7,17 +7,21 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * @author Entzian
+ * @author Entzian, Klukas
  */
 public class BlockPrintInfosEND extends AbstractSnapshotAnalysisBlockFIS {
+	
+	private final boolean debug = true;
 	
 	public enum BlockInfoProperty {
 		CONSOLE_OUTPUT, HEIGHT, WIDTH
 	}
 	
 	HashMap<BlockInfoProperty, Boolean> infoMap = new HashMap<BlockInfoProperty, Boolean>() {
+		private static final long serialVersionUID = 1L;
+		
 		{
-			put(BlockInfoProperty.CONSOLE_OUTPUT, false);
+			put(BlockInfoProperty.CONSOLE_OUTPUT, debug);
 			put(BlockInfoProperty.HEIGHT, true);
 			put(BlockInfoProperty.WIDTH, true);
 		}
@@ -40,34 +44,39 @@ public class BlockPrintInfosEND extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private void printInfo(FlexibleImage workImage, BlockPrintInfosTyp typ) {
+		if (workImage == null)
+			return;
 		
-		switch (typ) {
-			case FluoImage:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_FLUO_IMAGE, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_FLUO_IMAGE, workImage.getWidth());
-				break;
-			case FluoMask:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_FLUO_MASK, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_FLUO_MASK, workImage.getWidth());
-				break;
-			case NirImage:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_NIR_IMAGE, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_NIR_IMAGE, workImage.getWidth());
-				break;
-			case NirMask:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_NIR_MASK, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_NIR_MASK, workImage.getWidth());
-				break;
-			case VisImage:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_VIS_IMAGE, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_VIS_IMAGE, workImage.getWidth());
-				break;
-			case VisMask:
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_VIS_MASK, workImage.getHeight());
-				getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_VIS_MASK, workImage.getWidth());
-				break;
+		boolean doSomeThingStrange = false;
+		
+		if (doSomeThingStrange)
+			switch (typ) {
+				case FluoImage:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_FLUO_IMAGE, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_FLUO_IMAGE, workImage.getWidth());
+					break;
+				case FluoMask:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_FLUO_MASK, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_FLUO_MASK, workImage.getWidth());
+					break;
+				case NirImage:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_NIR_IMAGE, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_NIR_IMAGE, workImage.getWidth());
+					break;
+				case NirMask:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_NIR_MASK, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_NIR_MASK, workImage.getWidth());
+					break;
+				case VisImage:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_VIS_IMAGE, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_VIS_IMAGE, workImage.getWidth());
+					break;
+				case VisMask:
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_HEIGHT_VIS_MASK, workImage.getHeight());
+					getProperties().setNumericProperty(getBlockPosition(), PropertyNames.END_WIDTH_VIS_MASK, workImage.getWidth());
+					break;
 			
-		}
+			}
 		
 		if (infoMap.get(BlockInfoProperty.CONSOLE_OUTPUT)) {
 			

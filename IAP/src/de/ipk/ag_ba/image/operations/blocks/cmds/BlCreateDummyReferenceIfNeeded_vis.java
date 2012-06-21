@@ -19,8 +19,12 @@ public class BlCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysis
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (input().images().vis() != null && input().masks().vis() == null)
-			return super.processVISmask();
+		if (input().images().vis() != null && input().masks().vis() == null) {
+			FlexibleImage n = input().images().vis();
+			int w = n.getWidth();
+			int h = n.getHeight();
+			return n.copy().io().canvas().fillRect(0, 0, w, h, new Color(180, 180, 180).getRGB()).getImage();
+		}
 		/*
 		 * getInput().getImages().getVis().copy().getIO().thresholdLAB(
 		 * 100, 150,
@@ -58,8 +62,8 @@ public class BlCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysis
 		 * .blur(2).
 		 * getImage();
 		 */
-		else
-			return super.processVISmask();
+		
+		return super.processVISmask();
 	}
 	
 	@Override

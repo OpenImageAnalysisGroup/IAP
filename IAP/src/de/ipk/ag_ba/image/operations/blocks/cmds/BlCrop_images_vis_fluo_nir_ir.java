@@ -80,9 +80,9 @@ public class BlCrop_images_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlock
 	
 	@Override
 	protected FlexibleImage processIRimage() {
-		if (input() != null && input().images() != null && input().images().getIr() != null) {
+		if (input() != null && input().images() != null && input().images().ir() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().getIr().crop();
+				return input().images().ir().crop();
 			} else {
 				int potCut = -1;
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
@@ -94,7 +94,7 @@ public class BlCrop_images_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlock
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
 				//
-				return input().images().getIr().cropAbs(-1, -1, -1, potCut);
+				return input().images().ir().cropAbs(-1, -1, -1, potCut);
 			}
 		} else
 			return null;

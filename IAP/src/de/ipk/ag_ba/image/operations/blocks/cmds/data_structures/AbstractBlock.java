@@ -36,8 +36,8 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (input().masks().fluo() != null)
-			return processMask(input().masks().fluo());
+		if (input().masks().vis() != null)
+			return processMask(input().masks().vis());
 		else
 			return null;
 	}

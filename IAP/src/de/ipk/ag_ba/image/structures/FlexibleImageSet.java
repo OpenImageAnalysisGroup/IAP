@@ -85,7 +85,7 @@ public class FlexibleImageSet {
 		return nir;
 	}
 	
-	public FlexibleImage getIr() {
+	public FlexibleImage ir() {
 		if (ir != null)
 			ir.setType(FlexibleImageType.IR);
 		return ir;
@@ -217,7 +217,7 @@ public class FlexibleImageSet {
 		FlexibleImage v = new ImageOperation(vis).draw(masks.vis(), background);
 		FlexibleImage f = new ImageOperation(fluo).draw(masks.fluo(), background);
 		FlexibleImage n = new ImageOperation(nir).draw(masks.nir(), background);
-		FlexibleImage i = new ImageOperation(ir).draw(masks.getIr(), background);
+		FlexibleImage i = new ImageOperation(ir).draw(masks.ir(), background);
 		return new FlexibleImageSet(v, f, n, i);
 	}
 	

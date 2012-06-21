@@ -807,4 +807,9 @@ public class StringManipulationTools implements HelperClass {
 				return true;
 		return false;
 	}
+	
+	public static void addIfNotEmpty(ArrayList<String> list, String content) {
+		if (list != null && content != null && !content.isEmpty())
+			list.add(content);
+	}
 }

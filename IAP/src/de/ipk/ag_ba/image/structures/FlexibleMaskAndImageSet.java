@@ -73,7 +73,7 @@ public class FlexibleMaskAndImageSet {
 		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : null;
 		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : null;
 		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : null;
-		int[][] imgIr = resizedImages.getIr() != null ? resizedImages.getIr().getAs2A() : null;
+		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : null;
 		
 		ImageOperation io = new ImageOperation(image);
 		
@@ -98,7 +98,7 @@ public class FlexibleMaskAndImageSet {
 			int[][] imgVisMask = resizedMasks.vis() != null ? resizedMasks.vis().getAs2A() : null;
 			int[][] imgFluoMask = resizedMasks.fluo() != null ? resizedMasks.fluo().getAs2A() : null;
 			int[][] imgNirMask = resizedMasks.nir() != null ? resizedMasks.nir().getAs2A() : null;
-			int[][] imgIrMask = resizedMasks.getIr() != null ? resizedMasks.getIr().getAs2A() : null;
+			int[][] imgIrMask = resizedMasks.ir() != null ? resizedMasks.ir().getAs2A() : null;
 			
 			if (imgVisMask != null)
 				io = io.drawAndFillRect(0 * wn, hn, imgVisMask);
@@ -136,9 +136,9 @@ public class FlexibleMaskAndImageSet {
 		if (masks.nir() != null)
 			fis.addImage("nir mask", masks.nir());
 		if (images.nir() != null)
-			fis.addImage("ir", images.getIr());
+			fis.addImage("ir", images.ir());
 		if (masks.nir() != null)
-			fis.addImage("ir mask", masks.getIr());
+			fis.addImage("ir mask", masks.ir());
 		
 		fis.saveAsLayeredTif(new File(fileName));
 	}
@@ -160,7 +160,7 @@ public class FlexibleMaskAndImageSet {
 				res.append("NIR:1,");
 			else
 				res.append("NIR:NULL,");
-			if (images.getIr() != null)
+			if (images.ir() != null)
 				res.append("IR:1/");
 			else
 				res.append("IR:NULL/");
@@ -179,7 +179,7 @@ public class FlexibleMaskAndImageSet {
 				res.append("NIR:1,");
 			else
 				res.append("NIR:NULL,");
-			if (masks.getIr() != null)
+			if (masks.ir() != null)
 				res.append("IR:1");
 			else
 				res.append("IR:NULL");
@@ -198,7 +198,7 @@ public class FlexibleMaskAndImageSet {
 				res++;
 			if (images.nir() != null)
 				res++;
-			if (images.getIr() != null)
+			if (images.ir() != null)
 				res++;
 		}
 		if (masks != null) {
@@ -208,9 +208,13 @@ public class FlexibleMaskAndImageSet {
 				res++;
 			if (masks.nir() != null)
 				res++;
-			if (masks.getIr() != null)
+			if (masks.ir() != null)
 				res++;
 		}
 		return res;
+	}
+	
+	public ImageSetDescription getImageSetDescription() {
+		return new ImageSetDescription(this);
 	}
 }

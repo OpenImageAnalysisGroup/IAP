@@ -27,6 +27,14 @@ public class ImageComparator {
 	public ImageOperation compareImages(String desc, FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background,
 			boolean adaptiveDependingOnIntensity) {
 		
+		if (inputImage != null && referenceImage != null) {
+			if (inputImage.getWidth() != referenceImage.getWidth()
+					|| inputImage.getHeight() != referenceImage.getHeight()) {
+				inputImage.print("A");
+				referenceImage.print("A (ref)");
+			}
+		}
+		
 		// inputImage = new ImageOperation(inputImage).blur(1).getImage();
 		// referenceImage = new ImageOperation(referenceImage).blur(2).getImage();
 		

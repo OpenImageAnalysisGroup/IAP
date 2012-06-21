@@ -246,10 +246,10 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	
 	@Override
 	protected FlexibleImage processIRmask() {
-		if (input().images().getIr() != null)
-			return input().images().getIr().copy();
+		if (input().images().ir() != null)
+			return input().images().ir().copy();
 		else
-			return input().masks().getIr();
+			return input().masks().ir();
 	}
 	
 	@Override
