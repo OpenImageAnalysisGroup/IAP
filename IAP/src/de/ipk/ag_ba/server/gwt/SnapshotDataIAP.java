@@ -33,7 +33,7 @@ public class SnapshotDataIAP {
 	
 	public Double weight_before, weight_after;
 	
-	public Integer water_amount;
+	public Integer water_amount_whole_day;
 	
 	public String condition, timePoint;
 	
@@ -149,12 +149,12 @@ public class SnapshotDataIAP {
 		this.weight_after = weight_after;
 	}
 	
-	public Integer getWaterAmount() {
-		return water_amount;
+	public Integer getWholeDayWaterAmount() {
+		return water_amount_whole_day;
 	}
 	
-	public void setTargetWaterAmount(Integer water_amount) {
-		this.water_amount = water_amount;
+	public void setWholeDayWaterAmount(Integer water_amount) {
+		this.water_amount_whole_day = water_amount;
 	}
 	
 	public void setCondition(String conditionName) {
@@ -417,7 +417,7 @@ public class SnapshotDataIAP {
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
 		String waterWeight = enDe(numberFormat_deTrue_enFalse, s.getWeightOfWatering() != null ? s.getWeightOfWatering() + "" : "");
-		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWaterAmount() != null ? s.getWaterAmount() + "" : "");
+		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWholeDayWaterAmount() != null ? s.getWholeDayWaterAmount() + "" : "");
 		String sumBA = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
 				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
 		if (position2store == null) {
@@ -612,7 +612,7 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getWeightBefore()));
 			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 			row.add(new DateDoubleString(s.getWeightOfWatering()));
-			row.add(new DateDoubleString(s.getWaterAmount()));
+			row.add(new DateDoubleString(s.getWholeDayWaterAmount()));
 			row.add(new DateDoubleString(s.getRgbUrlCnt()));
 			row.add(new DateDoubleString(s.getFluoUrlCnt()));
 			row.add(new DateDoubleString(s.getNirUrlCnt()));
@@ -636,7 +636,7 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getWeightBefore()));
 				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 				row.add(new DateDoubleString(s.getWeightOfWatering()));
-				row.add(new DateDoubleString(s.getWaterAmount()));
+				row.add(new DateDoubleString(s.getWholeDayWaterAmount()));
 				row.add(new DateDoubleString(s.getRgbUrlCnt()));
 				row.add(new DateDoubleString(s.getFluoUrlCnt()));
 				row.add(new DateDoubleString(s.getNirUrlCnt()));

@@ -62,7 +62,8 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				}
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = fluo.copy().io().blur(2).getImage().print("fluo", debug);
+			ImageOperation in = fluo.copy().io();
+			FlexibleImage viswork = in.blur(2).getImage().print("fluo", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
@@ -116,6 +117,9 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
 			
 			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
+		} else {
+			skel2d.deleteShortEndLimbs(10, false, new HashSet<Point>());
+			skel2d.deleteShortEndLimbs(-30, false, new HashSet<Point>());
 		}
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;

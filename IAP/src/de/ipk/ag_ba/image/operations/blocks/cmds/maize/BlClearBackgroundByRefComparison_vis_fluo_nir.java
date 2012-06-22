@@ -94,6 +94,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					FlexibleImage fluo = input().images().fluo();
 					fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()),
 							(int) (scaleFactor * fluo.getHeight()));
+					
+					double leftRightBorder = 0.1;
+					
+					if (options.isArabidopsis())
+						leftRightBorder = 0;
+					
 					FlexibleImage result = new ImageOperation(fluo.io().copy()
 							.blur(1d).print("Blurred 1.5 fluo image", false)
 							.medianFilter32Bit()
@@ -105,7 +111,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 									options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
 									options.getIntSetting(Setting.L_Diff_FLUO) * 0.1d,
 									options.getIntSetting(Setting.abDiff_FLUO) * 0.1d,
-									back).border(2).border_left_right((int) (fluo.getWidth() * 0.1), options.getBackground()).getImage();
+									back).border(2).border_left_right((int) (fluo.getWidth() * leftRightBorder), options.getBackground()).getImage();
 					double blueCurbWidthBarley0_1 = 0;
 					double blueCurbHeightEndBarly0_8 = 1;
 					FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
