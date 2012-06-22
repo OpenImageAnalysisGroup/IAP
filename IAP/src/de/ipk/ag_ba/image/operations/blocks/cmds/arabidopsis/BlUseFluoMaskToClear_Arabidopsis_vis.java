@@ -132,23 +132,24 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 		if (processedMasks.fluo() == null) {
 			return;
 		}
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			int back = options.getBackground();
-			if (processedMasks.fluo() != null) {
-				// apply enlarged VIS mask to nir
-				ImageOperation vis = processedMasks.vis() != null ? processedMasks.vis().copy().io().print("NIRRRR", debug) : null;
-				FlexibleImage mask = processedMasks.fluo().copy().io().blur(3).
-						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
-				if (vis != null)
-					processedMasks.setVis(vis.applyMask_ResizeMaskIfNeeded(
-							mask,
-							back).print("FILTERED VIS MASK", debug).getImage());
-				if (processedImages.vis() != null)
-					processedImages.setVis(processedImages.vis().io().applyMask_ResizeMaskIfNeeded(
-							mask, back).print("FILTERED VIS IMAGE", debug).getImage());
-				return;
-			}
+		// if (options.getCameraPosition() == CameraPosition.SIDE) {
+		int back = options.getBackground();
+		if (processedMasks.fluo() != null) {
+			// apply enlarged FLUO mask to VIS
+			ImageOperation vis = processedMasks.vis() != null ? processedMasks.vis().copy().io().print("NIRRRR", debug) : null;
+			FlexibleImage mask = processedMasks.fluo().copy().io().
+					blur(options.getCameraPosition() == CameraPosition.SIDE ? 3 : 30).
+					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
+			if (vis != null)
+				processedMasks.setVis(vis.applyMask_ResizeMaskIfNeeded(
+						mask,
+						back).print("FILTERED VIS MASK", debug).getImage());
+			if (processedImages.vis() != null)
+				processedImages.setVis(processedImages.vis().io().applyMask_ResizeMaskIfNeeded(
+						mask, back).print("FILTERED VIS IMAGE", debug).getImage());
+			return;
 		}
+		// }
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = processedMasks.vis();
 			if (input != null)
