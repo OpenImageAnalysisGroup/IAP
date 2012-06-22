@@ -192,15 +192,20 @@ public class ImageAnalysisCommandManager {
 				// toggles,
 				// true, null, false),
 				// guiSetting));
-				actions.add(new NavigationButton(new ActionNumericDataReportCompleteFinishedStep3(
-						m, experimentReference, true,
-						toggles,
-						true, null, null, null, null, null),
+				actions.add(new NavigationButton(
+						new ActionNumericDataReportCompleteFinishedStep3(
+								m,
+								experimentReference,
+								toggles,
+								false,
+								true,
+								null, null, null, null, null),
 						guiSetting));
 				
 				actions.add(
 						new NavigationButton(
-								new ActionNumericDataReportSetupMainPropertiesStep1(m, experimentReference, false, false,
+								new ActionNumericDataReportSetupMainPropertiesStep1(
+										m, experimentReference, false, false,
 										toggles),
 								guiSetting));
 				
