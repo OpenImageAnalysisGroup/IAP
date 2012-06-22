@@ -315,7 +315,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
-						exportIndividualAngles, snFilter);
+						exportIndividualAngles, xlsx, snFilter);
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
@@ -328,7 +328,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles, snFilter);
+						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter);
 				csv.append(csvHeader);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
@@ -550,19 +550,19 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		if (status != null)
 			status.setCurrentStatusText2("Fill workbook");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
-		Queue<SnapshotDataIAP> todo = new LinkedList<SnapshotDataIAP>(snapshots);
+		Queue<SnapshotDataIAP> snapshotsToBeProcessed = new LinkedList<SnapshotDataIAP>(snapshots);
 		snapshots = null;
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
-		while (!todo.isEmpty()) {
-			SnapshotDataIAP s = todo.poll();
+		while (!snapshotsToBeProcessed.isEmpty()) {
+			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			if (status != null)
-				status.setCurrentStatusText1("Rows remaining: " + todo.size());
+				status.setCurrentStatusText1("Rows remaining: " + snapshotsToBeProcessed.size());
 			if (status != null)
 				status.setCurrentStatusText2("Memory status: "
 						+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + todo.size() + " "
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + snapshotsToBeProcessed.size() + " "
 					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
 			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {

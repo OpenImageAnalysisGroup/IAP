@@ -750,6 +750,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (inSamples.get(time).size() > 0) {
 							NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
 							m.setReplicateID(template.getReplicateID());
+							if (multipleTrays) {
+								m.setReplicateID(m.getReplicateID() * 100 + tray);
+							}
 							m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
 							m.setPosition(template.getPosition());
 							m.setPositionUnit(template.getPositionUnit());

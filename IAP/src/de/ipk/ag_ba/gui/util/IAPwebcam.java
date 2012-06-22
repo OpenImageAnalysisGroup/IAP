@@ -99,7 +99,7 @@ public enum IAPwebcam {
 	private InputStream getSnapshotJPGdataIntern() throws Exception {
 		String imageSrc = null;
 		if (this == MAIZE)
-			imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";
+			imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity"; // 1280 x 960
 		if (this == BARLEY)
 			imageSrc = "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" + System.currentTimeMillis();
 		
