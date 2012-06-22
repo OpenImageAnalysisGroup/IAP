@@ -122,7 +122,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportCompleteFinishedStep3(
-						m, experimentReference, false, divideDatasetBy, false, toggles,
+						m, experimentReference, divideDatasetBy, false, false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
 						tsoSplitFirst, tsoSplitSecond),
 				src.getGUIsetting()));

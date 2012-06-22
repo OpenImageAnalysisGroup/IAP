@@ -70,13 +70,16 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportCompleteFinishedStep3(MongoDB m, ExperimentReference experimentReference,
-			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
+	public ActionNumericDataReportCompleteFinishedStep3(
+			MongoDB m, ExperimentReference experimentReference,
+			ArrayList<ThreadSafeOptions> divideDatasetBy,
+			boolean exportIndividualAngles,
+			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
-			ArrayList<ThreadSafeOptions> togglesInterestingProperties, ThreadSafeOptions tsoBootstrapN,
+			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
+			ThreadSafeOptions tsoBootstrapN,
 			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
-		this("Create report"
-				+
+		this("Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
 						: " PDF ("
 								+ StringManipulationTools.getStringList(
@@ -292,7 +295,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (ratio) {
 				if (status != null)
 					status.setCurrentStatusText2("Calculate stress-ratio");
-				experiment = experiment.calc().ratioDataset(new String[] { "norm", "sufficient" , "control"}, cf, snFilter);
+				experiment = experiment.calc().ratioDataset(new String[] { "norm", "sufficient", "control" }, cf, snFilter);
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
 				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.average", "side.hull.pc2.norm");
