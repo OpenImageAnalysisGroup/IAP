@@ -563,7 +563,7 @@ public class IAPservice {
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
-		HashMap<Long, SnapshotDataIAP> timestampe2snapshot = new HashMap<Long, SnapshotDataIAP>();
+		HashMap<Long, SnapshotDataIAP> timestamp2snapshot = new HashMap<Long, SnapshotDataIAP>();
 		
 		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
 		
@@ -656,13 +656,13 @@ public class IAPservice {
 						
 						boolean addSN = false;
 						
-						if (!timestampe2snapshot.containsKey(time)) {
+						if (!timestamp2snapshot.containsKey(time)) {
 							SnapshotDataIAP ns = new SnapshotDataIAP();
-							timestampe2snapshot.put(time, ns);
+							timestamp2snapshot.put(time, ns);
 							addSN = true;
 						}
 						
-						SnapshotDataIAP sn = timestampe2snapshot.get(time);
+						SnapshotDataIAP sn = timestamp2snapshot.get(time);
 						
 						// set fields
 						if (sn.getCondition() == null)
@@ -731,7 +731,7 @@ public class IAPservice {
 								}
 								if (sub.equals("water_sum")) {
 									if (mmSum > 0)
-										sn.setTargetWaterAmount((int) mmSum);
+										sn.setWholeDayWaterAmount((int) mmSum);
 								} else
 									if (sub.equals("weight_before")) {
 										if (mmLowest < Double.MAX_VALUE)

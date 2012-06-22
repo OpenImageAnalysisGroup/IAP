@@ -219,19 +219,22 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					double avgArea = areaSum / areaCnt;
 					
 					if (lastTimeSideAreaIAP != null && lastSideAreaIAP > 0 && plantID != null) {
-						double days = 1d / (time - lastTimeSideAreaIAP) * timeForOneDay;
+						double days = (time - lastTimeSideAreaIAP) / timeForOneDay;
 						
-						double growthPerDay = (avgArea - lastSideAreaIAP) * days;
+						double absoluteGrowthPerDay = (avgArea - lastSideAreaIAP) / days;
 						
 						Double waterUsePerDay = getWaterUsePerDay(
 								plandID2time2waterData.get(plantID),
 								time, lastTimeSideAreaIAP, timeForOneDay);
 						
-						System.out.println("Plant " + plantID + " got " + waterUsePerDay + " ml water per day.");
-						
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
-							double wue = growthPerDay / waterUsePerDay;
-							summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.avg.wue", wue);
+							double wue = absoluteGrowthPerDay / waterUsePerDay;
+							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
+								summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.avg.wue", wue);
+								System.out.println("Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
+										+ new Date(time).toString() + ", used for side area growth of " + (int) wue + " pixels per ml per day");
+								
+							}
 						}
 					}
 					
@@ -250,18 +253,23 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
-						double ratioPerDay = ratio / (time - lastTimeVolumeIAP) * timeForOneDay;
+						double ratioPerDay = Math.pow(ratio, 1 / (time - lastTimeVolumeIAP) * timeForOneDay);
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
-						double days = 1d / (time - lastTimeVolumeIAP) * timeForOneDay;
-						double growthPerDay = (volume_iap - lastVolumeIAP) * days;
+						double days = (time - lastTimeVolumeIAP) / timeForOneDay;
+						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
 						
 						Double waterUsePerDay = getWaterUsePerDay(
 								plandID2time2waterData.get(plantID),
 								time, lastTimeVolumeIAP, timeForOneDay);
 						
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
-							double wue = growthPerDay / waterUsePerDay;
+							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.wue", wue);
+							
+							System.out.println("Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
+									+ new Date(time).toString() + ", used for side volume growth of " + (int) wue + " pixels per ml per day, relative volume growth: "
+									+ ratioPerDay);
+							
 						}
 					}
 					
@@ -276,6 +284,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		}
+		
 	}
 	
 	private Double getWaterUsePerDay(
@@ -304,7 +313,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					prolonged = true;
 					endTime = time;
 				}
-				if (time >= startTime && time < endTime) {
+				if (time >= startTime && time <= endTime) {
 					waterSum += time2waterData.get(time);
 					if (firstWaterTime == null || time < firstWaterTime)
 						firstWaterTime = time;

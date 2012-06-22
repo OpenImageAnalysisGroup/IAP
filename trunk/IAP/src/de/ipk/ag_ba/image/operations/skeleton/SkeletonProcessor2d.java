@@ -468,7 +468,9 @@ public class SkeletonProcessor2d {
 				// System.out.println("numofendlimbs1: " + endlimbs.size() + " auto: " + autothreshold);
 				
 				for (Limb l : endlimbs) {
-					if (l.length() < autothreshold && !knownBlooms.contains(l.endpoint)) {
+					if (((threshold < 0 && l.length() < -threshold) ||
+							(l.length() < autothreshold)
+							) && !knownBlooms.contains(l.endpoint)) {
 						if (!simulate && !forRemove.contains(l)) {
 							forRemove.add(l);
 							goRecursive = true;

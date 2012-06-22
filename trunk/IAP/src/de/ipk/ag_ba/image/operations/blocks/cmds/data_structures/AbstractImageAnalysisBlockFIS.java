@@ -147,11 +147,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 								if (!prop2config2lastHeightAndWidthTime.containsKey(property))
 									prop2config2lastHeightAndWidthTime.put(property, new TreeMap<String, Long>());
 								
-								Double lastWidth = prop2config2lastHeightAndWidth.get(property).get(key);
-								if (lastWidth != null && lastWidth > 0 && prop2config2lastHeightAndWidth.get(property).containsKey(key) &&
+								Double lastPropertyValue = prop2config2lastHeightAndWidth.get(property).get(key);
+								if (lastPropertyValue != null && lastPropertyValue > 0 && prop2config2lastHeightAndWidth.get(property).containsKey(key) &&
 										time - prop2config2lastHeightAndWidthTime.get(property).get(key) > 0) {
-									double width = v.getValue().doubleValue();
-									double ratio = width / lastWidth;
+									double currentPropertyValue = v.getValue().doubleValue();
+									double ratio = currentPropertyValue / lastPropertyValue;
 									double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDay;
 									double ratioPerDay = Math.pow(ratio, 1 / days);
 									summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay);

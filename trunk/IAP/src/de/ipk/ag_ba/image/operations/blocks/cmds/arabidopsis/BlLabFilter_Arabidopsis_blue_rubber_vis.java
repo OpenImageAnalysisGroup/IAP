@@ -133,7 +133,7 @@ public class BlLabFilter_Arabidopsis_blue_rubber_vis extends AbstractSnapshotAna
 									new int[] {}, new int[] {},
 									blueCurbWidthBarley0_1,
 									blueCurbHeightEndBarly0_8).
-							border_left_right((int) (options.isBarleyInBarleySystem() ? 0 : w * 0.05), Color.red.getRGB()).
+							border_left_right((int) (options.isBarleyInBarleySystem() || options.isArabidopsis() ? 0 : w * 0.05), Color.red.getRGB()).
 							print("removed noise", debug).getImage();
 				else
 					toBeFiltered = result

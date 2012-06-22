@@ -58,10 +58,10 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	/**
 	 * Calculates the average of the brightness of an area around an image.
 	 * 
-	 * @author pape
+	 * @author pape, klukas
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image, double size, double MarkerPosX, double MarkerPosY, BlockProperty bpleft,
-			BlockProperty bpright) {
+	private double[] getProbablyWhitePixels(FlexibleImage image, double size,
+			BlockProperty bpleft, BlockProperty bpright) {
 		image = image.io().crop().getImage();
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -110,12 +110,6 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		double b = values[2];
 		
 		return new double[] { r * 255, g * 255, b * 255 };
-	}
-	
-	private double[] getProbablyWhitePixels(FlexibleImage image, double size, BlockProperty bpleft,
-			BlockProperty bpright) {
-		double[] res = getProbablyWhitePixels(image, size, -1., -1, bpleft, bpleft);
-		return res;
 	}
 	
 	public FlexibleImage balance(FlexibleImage input, int whitePoint, boolean invert) {
@@ -175,7 +169,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			double[] pix;
 			if (markerPosY != -1)
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, markerPosX, markerPosY, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else { // nir - remove round shade
 					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);

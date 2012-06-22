@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
 import java.awt.geom.Rectangle2D;
 
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
@@ -111,11 +112,18 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	protected FlexibleImage processVISimage() {
 		FlexibleImage img = input().images().vis();
 		if (img != null && !multiTray) {
-			return img.copy().io().
-					clearOutsideCircle(
-							img.getWidth() / 2,
-							img.getHeight() / 2 - 30,
-							(int) (img.getHeight() / 2.45d)).getImage();
+			if (options.getCameraPosition() == CameraPosition.TOP)
+				return img.copy().io().
+						clearOutsideCircle(
+								img.getWidth() / 2,
+								img.getHeight() / 2 - 30,
+								(int) (img.getHeight() / 2.45d)).getImage();
+			else
+				return img;
+			/*
+			 * .copy().io().
+			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
+			 */
 		} else
 			return img;
 	}
@@ -124,11 +132,18 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	protected FlexibleImage processFLUOimage() {
 		FlexibleImage img = input().images().fluo();
 		if (img != null && !multiTray) {
-			return img.copy().io().
-					clearOutsideCircle(
-							img.getWidth() / 2,
-							img.getHeight() / 2,
-							(int) (img.getHeight() / 2.45d)).getImage();
+			if (options.getCameraPosition() == CameraPosition.TOP)
+				return img.copy().io().
+						clearOutsideCircle(
+								img.getWidth() / 2,
+								img.getHeight() / 2,
+								(int) (img.getHeight() / 2.45d)).getImage();
+			else
+				return img;
+			/*
+			 * .copy().io().
+			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
+			 */
 		} else
 			return img;
 	}
@@ -137,11 +152,18 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	protected FlexibleImage processNIRimage() {
 		FlexibleImage img = input().images().nir();
 		if (img != null && !multiTray) {
-			return img.copy().io().translate(-3, 0).
-					clearOutsideCircle(
-							img.getWidth() / 2,
-							img.getHeight() / 2,
-							(int) (img.getHeight() / 2.45d)).getImage();
+			if (options.getCameraPosition() == CameraPosition.TOP)
+				return img.copy().io().translate(-3, 0).
+						clearOutsideCircle(
+								img.getWidth() / 2,
+								img.getHeight() / 2,
+								(int) (img.getHeight() / 2.45d)).getImage();
+			else
+				return img;
+			/*
+			 * .copy().io().
+			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
+			 */
 		} else
 			return img;
 	}
@@ -150,11 +172,18 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 	protected FlexibleImage processIRimage() {
 		FlexibleImage img = input().images().ir();
 		if (img != null && !multiTray) {
-			return img.copy().io().rotate(180).translate(-3, 0).
-					clearOutsideCircle(
-							img.getWidth() / 2,
-							img.getHeight() / 2,
-							(int) (img.getHeight() / 2.45d)).getImage();
+			if (options.getCameraPosition() == CameraPosition.TOP)
+				return img.copy().io().rotate(180).translate(-3, 0).
+						clearOutsideCircle(
+								img.getWidth() / 2,
+								img.getHeight() / 2,
+								(int) (img.getHeight() / 2.45d)).getImage();
+			else
+				return img;
+			/*
+			 * .copy().io().
+			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
+			 */
 		} else
 			return img;
 	}

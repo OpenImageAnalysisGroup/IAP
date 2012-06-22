@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -12,7 +13,11 @@ public class BlCutZoomedImages extends AbstractBlock {
 	@Override
 	protected void prepare() {
 		super.prepare();
-		zoomLevels = getFillGradeFromOutlierString();
+		String zoomID = "zoom-top:";
+		if (options.getCameraPosition() == CameraPosition.SIDE)
+			zoomID = "zoom-side:";
+		
+		zoomLevels = getFillGradeFromOutlierString(zoomID);
 	}
 	
 	@Override
@@ -60,18 +65,18 @@ public class BlCutZoomedImages extends AbstractBlock {
 	/**
 	 * Example: zoom-top:75;75;75;75 ==> carrier fills 75 percent of VIS;FLUO;NIR;IR images
 	 */
-	private double[][] getFillGradeFromOutlierString() {
+	private double[][] getFillGradeFromOutlierString(String zoomID) {
 		ImageData i = input().images().getVisInfo();
 		if (i == null)
 			i = input().images().getFluoInfo();
 		if (i == null)
 			i = input().images().getNirInfo();
 		String outlierDef = i.getParentSample().getParentCondition().getExperimentGlobalOutlierInfo();
-		if (outlierDef != null && outlierDef.contains("zoom-top:")) {
+		if (outlierDef != null && outlierDef.contains(zoomID)) {
 			for (String s : outlierDef.split("//")) {
 				s = s.trim();
-				if (s.startsWith("zoom-top:")) {
-					s = s.substring("zoom-top:".length());
+				if (s.startsWith(zoomID)) {
+					s = s.substring(zoomID.length());
 					String[] levels = s.split(";");
 					double[][] res = new double[3][4];
 					res[0][0] = Double.parseDouble(levels[0].split(":")[0]) / 100d;
