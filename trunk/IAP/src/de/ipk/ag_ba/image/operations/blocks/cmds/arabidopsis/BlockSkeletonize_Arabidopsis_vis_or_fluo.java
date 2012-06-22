@@ -118,8 +118,8 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			
 			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
 		} else {
-			skel2d.deleteShortEndLimbs(10, false, new HashSet<Point>());
-			skel2d.deleteShortEndLimbs(-30, false, new HashSet<Point>());
+			// skel2d.deleteShortEndLimbs(5, false, new HashSet<Point>());
+			// skel2d.deleteShortEndLimbs(-20, false, new HashSet<Point>());
 		}
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
