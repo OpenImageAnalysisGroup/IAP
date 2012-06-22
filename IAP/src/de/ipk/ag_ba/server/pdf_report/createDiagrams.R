@@ -10,7 +10,7 @@ threaded <- FALSE
 innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
-debug <- TRUE
+debug <- FALSE
 
 ########## Constants ###########
 
