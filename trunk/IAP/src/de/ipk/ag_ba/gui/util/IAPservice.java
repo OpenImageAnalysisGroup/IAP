@@ -559,11 +559,13 @@ public class IAPservice {
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
 			boolean prepareTransportToBrowser,
-			boolean storeAllAngleValues, SnapshotFilter optSnapshotFilter) {
+			boolean storeAllAngleValues,
+			boolean storeAllReplicates,
+			SnapshotFilter optSnapshotFilter) {
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
-		HashMap<Long, SnapshotDataIAP> timestamp2snapshot = new HashMap<Long, SnapshotDataIAP>();
+		HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();
 		
 		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
 		
@@ -647,188 +649,224 @@ public class IAPservice {
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {
 				for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
-					for (SampleInterface s : c) {
-						Long time = s.getRowId();
+					for (SampleInterface sample : c) {
+						TreeSet<String> qualities = new TreeSet<String>();
+						if (storeAllReplicates) {
+							for (NumericMeasurementInterface nmi : sample) {
+								String q = getQuality(nmi);
+								qualities.add(q);
+							}
+						} else
+							qualities.add(null);
 						
-						if (time == null)
-							time = (long) s.getTime();
-						// continue;
-						
-						boolean addSN = false;
-						
-						if (!timestamp2snapshot.containsKey(time)) {
-							SnapshotDataIAP ns = new SnapshotDataIAP();
-							timestamp2snapshot.put(time, ns);
-							addSN = true;
-						}
-						
-						SnapshotDataIAP sn = timestamp2snapshot.get(time);
-						
-						// set fields
-						if (sn.getCondition() == null)
-							sn.setCondition(c.getConditionName());
-						// species, genotype, variety, growthCondition, treatment, sequence;
-						if (sn.getSpecies() == null)
-							sn.setSpecies(c.getSpecies());
-						if (sn.getGenotype() == null)
-							sn.setGenotype(c.getGenotype());
-						if (sn.getVariety() == null)
-							sn.setVariety(c.getVariety());
-						if (sn.getGrowthCondition() == null)
-							sn.setGrowthCondition(c.getGrowthconditions());
-						if (sn.getTreatment() == null)
-							sn.setTreatment(c.getTreatment());
-						if (sn.getSequence() == null)
-							sn.setSequence(c.getSequence());
-						
-						if (sn.getTimePoint() == null)
-							sn.setTimePoint(s.getSampleTime());
-						if (sn.getSnapshotTime() == null)
-							sn.setSnapshotTime(s.getRowId());
-						sn.setDay(s.getTime());
-						
-						if (s.size() > 0) {
-							NumericMeasurementInterface mm = s.iterator().next();
-							if (sn.getPlantId() == null)
-								if (mm.getQualityAnnotation() != null && mm.getQualityAnnotation().length() > 0)
-									sn.setPlantId("" + mm.getQualityAnnotation());
-								else
-									sn.setPlantId("" + mm.getReplicateID());
-							String sub = s.getParentCondition().getParentSubstance().getName();
-							if (optSubstanceIds != null &&
-									!sub.equals("water_sum") && !sub.equals("weight_before") && !sub.equals("water_weight")) {
-								sub = s.getSubstanceNameWithUnit();
-								synchronized (optSubstanceIds) {
-									if (!optSubstanceIds.containsKey(sub)) {
-										optSubstanceIds.put(sub, optSubstanceIds.size());
+						for (String qualityFilter : qualities) {
+							Long snapshotTimeIndex = sample.getRowId();
+							
+							if (snapshotTimeIndex == null)
+								snapshotTimeIndex = (long) sample.getTime();
+							
+							boolean addSN = false;
+							if (!timestampAndQuality2snapshot.containsKey(snapshotTimeIndex + "//" + qualityFilter)) {
+								SnapshotDataIAP ns = new SnapshotDataIAP();
+								timestampAndQuality2snapshot.put(snapshotTimeIndex + "//" + qualityFilter, ns);
+								addSN = true;
+							}
+							
+							SnapshotDataIAP sn = timestampAndQuality2snapshot.get(snapshotTimeIndex + "//" + qualityFilter);
+							
+							// set fields
+							if (sn.getCondition() == null)
+								sn.setCondition(c.getConditionName());
+							// species, genotype, variety, growthCondition, treatment, sequence;
+							if (sn.getSpecies() == null)
+								sn.setSpecies(c.getSpecies());
+							if (sn.getGenotype() == null)
+								sn.setGenotype(c.getGenotype());
+							if (sn.getVariety() == null)
+								sn.setVariety(c.getVariety());
+							if (sn.getGrowthCondition() == null)
+								sn.setGrowthCondition(c.getGrowthconditions());
+							if (sn.getTreatment() == null)
+								sn.setTreatment(c.getTreatment());
+							if (sn.getSequence() == null)
+								sn.setSequence(c.getSequence());
+							
+							if (sn.getTimePoint() == null)
+								sn.setTimePoint(sample.getSampleTime());
+							if (sn.getSnapshotTime() == null)
+								sn.setSnapshotTime(sample.getRowId());
+							sn.setDay(sample.getTime());
+							
+							if (sample.size() > 0) {
+								for (NumericMeasurementInterface mm : sample) {
+									if (!isOKquality(qualityFilter, mm))
+										continue;
+									if (sn.getPlantId() == null) {
+										if (mm.getQualityAnnotation() != null && mm.getQualityAnnotation().length() > 0)
+											sn.setPlantId("" + mm.getQualityAnnotation());
+										else
+											sn.setPlantId("" + mm.getReplicateID());
 									}
-									int idx = optSubstanceIds.get(sub);
-									s.recalculateSampleAverage();
-									if (s.getSampleAverage() != null) {
-										double vvv = s.calcMean();
-										sn.storeValue(idx, vvv);
+									if (storeAllReplicates) {
+										sn.setPlantId(sn.getPlantId() + "//" + getQuality(mm));
+									}
+									
+									break;
+								}
+								String sub = sample.getParentCondition().getParentSubstance().getName();
+								if (optSubstanceIds != null &&
+										!sub.equals("water_sum") && !sub.equals("weight_before") && !sub.equals("water_weight")) {
+									sub = sample.getSubstanceNameWithUnit();
+									synchronized (optSubstanceIds) {
+										if (!optSubstanceIds.containsKey(sub)) {
+											optSubstanceIds.put(sub, optSubstanceIds.size());
+										}
+										int idx = optSubstanceIds.get(sub);
+										sample.recalculateSampleAverage();
+										if (sample.getSampleAverage() != null && qualityFilter == null) {
+											double vvv = sample.calcMean();
+											sn.storeValue(idx, vvv);
+										} else {
+											// find all values with OK quality and calculate average
+											double sum = 0;
+											int n = 0;
+											for (NumericMeasurementInterface nmi : sample) {
+												if (!isOKquality(qualityFilter, nmi))
+													continue;
+												double v = nmi.getValue();
+												if (!Double.isNaN(v)) {
+													sum += v;
+													n++;
+												}
+											}
+											sn.storeValue(idx, sum / n);
+										}
+										if (storeAllAngleValues) {
+											for (NumericMeasurementInterface nmi : sample) {
+												NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
+												sn.storeAngleValue(idx, nmi3d.getPosition(), nmi3d.getValue());
+											}
+										}
+									}
+								} else {
+									double mmSum = 0;
+									double mmLowest = Double.MAX_VALUE;
+									for (NumericMeasurementInterface mmm : sample) {
+										if (!isOKquality(qualityFilter, mmm))
+											continue;
+										double mmmValue = mmm.getValue();
+										if (!Double.isNaN(mmmValue) && !Double.isInfinite(mmmValue)) {
+											if (mmmValue > 0) {
+												mmSum += mmmValue;
+												if (mmmValue < mmLowest)
+													mmLowest = mmmValue;
+											}
+										}
+									}
+									if (sub.equals("water_sum")) {
+										if (mmSum > 0)
+											sn.setWholeDayWaterAmount((int) mmSum);
 									} else
-										sn.storeValue(idx, mm.getValue());
-									if (storeAllAngleValues) {
-										for (NumericMeasurementInterface nmi : s) {
-											NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
-											sn.storeAngleValue(idx, nmi3d.getPosition(), nmi3d.getValue());
+										if (sub.equals("weight_before")) {
+											if (mmLowest < Double.MAX_VALUE)
+												sn.setWeightBefore(mmLowest);
+										} else
+											if (sub.equals("water_weight")) {
+												if (mmSum > 0)
+													sn.setWeightAfter(mmSum);
+											}
+								}
+							}
+							
+							if (sample instanceof Sample3D) {
+								Sample3D s3d = (Sample3D) sample;
+								
+								Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
+										MeasurementNodeType.VOLUME));
+								int imageCount = 0;
+								for (NumericMeasurementInterface ii : sl) {
+									if (!isOKquality(qualityFilter, ii))
+										continue;
+									imageCount++;
+									if (ii instanceof ImageData) {
+										ImageData i = (ImageData) ii;
+										String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
+										ImageConfiguration ic = ImageConfiguration.get(subn);
+										long urlId = urlManager != null ? urlManager.getId(i.getURL().toString()) : -1;
+										if (ic == ImageConfiguration.Unknown) {
+											ic = ImageConfiguration.get(i.getURL().getFileName());
+										}
+										Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
+										if (p == null)
+											p = 0;
+										if (ic == ImageConfiguration.Unknown) {
+											sn.addUnknown(urlId, p);
+										} else {
+											if (ic == ImageConfiguration.RgbSide)
+												sn.addRgb(urlId, p);
+											if (ic == ImageConfiguration.FluoSide)
+												sn.addFluo(urlId, p);
+											if (ic == ImageConfiguration.NirSide)
+												sn.addNir(urlId, p);
+											if (ic == ImageConfiguration.IrSide)
+												sn.addIr(urlId, p);
+											
+											if (ic == ImageConfiguration.RgbTop)
+												sn.addRgb(urlId, p < 1 ? -1 : -p);
+											if (ic == ImageConfiguration.FluoTop)
+												sn.addFluo(urlId, p < 1 ? -1 : -p);
+											if (ic == ImageConfiguration.NirTop)
+												sn.addNir(urlId, p < 1 ? -1 : -p);
+											if (ic == ImageConfiguration.IrTop)
+												sn.addIr(urlId, p < 1 ? -1 : -p);
+										}
+									}
+									if (ii instanceof VolumeData) {
+										VolumeData i = (VolumeData) ii;
+										String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
+										ImageConfiguration ic = ImageConfiguration.get(subn);
+										long urlId = urlManager.getId(i.getURL().toString());
+										if (ic == ImageConfiguration.Unknown) {
+											ic = ImageConfiguration.get(i.getURL().getFileName());
+										}
+										Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
+										if (p == null)
+											p = 0;
+										if (ic == ImageConfiguration.Unknown) {
+											sn.addUnknown(urlId, p);
+										} else {
+											if (ic == ImageConfiguration.RgbSide)
+												sn.addRgb(urlId, p);
+											if (ic == ImageConfiguration.FluoSide)
+												sn.addFluo(urlId, p);
+											if (ic == ImageConfiguration.NirSide)
+												sn.addNir(urlId, p);
+											
+											if (ic == ImageConfiguration.RgbTop)
+												sn.addRgb(urlId, p < 1 ? -1 : -p);
+											if (ic == ImageConfiguration.FluoTop)
+												sn.addFluo(urlId, p < 1 ? -1 : -p);
+											if (ic == ImageConfiguration.NirTop)
+												sn.addNir(urlId, p < 1 ? -1 : -p);
 										}
 									}
 								}
-							} else {
-								double mmSum = 0;
-								double mmLowest = Double.MAX_VALUE;
-								for (NumericMeasurementInterface mmm : s) {
-									double mmmValue = mmm.getValue();
-									if (!Double.isNaN(mmmValue) && !Double.isInfinite(mmmValue)) {
-										if (mmmValue > 0) {
-											mmSum += mmmValue;
-											if (mmmValue < mmLowest)
-												mmLowest = mmmValue;
-										}
-									}
-								}
-								if (sub.equals("water_sum")) {
-									if (mmSum > 0)
-										sn.setWholeDayWaterAmount((int) mmSum);
-								} else
-									if (sub.equals("weight_before")) {
-										if (mmLowest < Double.MAX_VALUE)
-											sn.setWeightBefore(mmLowest);
-									} else
-										if (sub.equals("water_weight")) {
-											if (mmSum > 0)
-												sn.setWeightAfter(mmSum);
-										}
-							}
-						}
-						
-						if (s instanceof Sample3D) {
-							Sample3D s3d = (Sample3D) s;
-							Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
-									MeasurementNodeType.VOLUME));
-							int imageCount = 0;
-							for (NumericMeasurementInterface ii : sl) {
-								imageCount++;
-								if (ii instanceof ImageData) {
-									ImageData i = (ImageData) ii;
-									String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
-									ImageConfiguration ic = ImageConfiguration.get(subn);
-									long urlId = urlManager != null ? urlManager.getId(i.getURL().toString()) : -1;
-									if (ic == ImageConfiguration.Unknown) {
-										ic = ImageConfiguration.get(i.getURL().getFileName());
-									}
-									Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
-									if (p == null)
-										p = 0;
-									if (ic == ImageConfiguration.Unknown) {
-										sn.addUnknown(urlId, p);
-									} else {
-										if (ic == ImageConfiguration.RgbSide)
-											sn.addRgb(urlId, p);
-										if (ic == ImageConfiguration.FluoSide)
-											sn.addFluo(urlId, p);
-										if (ic == ImageConfiguration.NirSide)
-											sn.addNir(urlId, p);
-										if (ic == ImageConfiguration.IrSide)
-											sn.addIr(urlId, p);
-										
-										if (ic == ImageConfiguration.RgbTop)
-											sn.addRgb(urlId, p < 1 ? -1 : -p);
-										if (ic == ImageConfiguration.FluoTop)
-											sn.addFluo(urlId, p < 1 ? -1 : -p);
-										if (ic == ImageConfiguration.NirTop)
-											sn.addNir(urlId, p < 1 ? -1 : -p);
-										if (ic == ImageConfiguration.IrTop)
-											sn.addIr(urlId, p < 1 ? -1 : -p);
-									}
-								}
-								if (ii instanceof VolumeData) {
-									VolumeData i = (VolumeData) ii;
-									String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
-									ImageConfiguration ic = ImageConfiguration.get(subn);
-									long urlId = urlManager.getId(i.getURL().toString());
-									if (ic == ImageConfiguration.Unknown) {
-										ic = ImageConfiguration.get(i.getURL().getFileName());
-									}
-									Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
-									if (p == null)
-										p = 0;
-									if (ic == ImageConfiguration.Unknown) {
-										sn.addUnknown(urlId, p);
-									} else {
-										if (ic == ImageConfiguration.RgbSide)
-											sn.addRgb(urlId, p);
-										if (ic == ImageConfiguration.FluoSide)
-											sn.addFluo(urlId, p);
-										if (ic == ImageConfiguration.NirSide)
-											sn.addNir(urlId, p);
-										
-										if (ic == ImageConfiguration.RgbTop)
-											sn.addRgb(urlId, p < 1 ? -1 : -p);
-										if (ic == ImageConfiguration.FluoTop)
-											sn.addFluo(urlId, p < 1 ? -1 : -p);
-										if (ic == ImageConfiguration.NirTop)
-											sn.addNir(urlId, p < 1 ? -1 : -p);
+								if (imageCount > 0 && optSubstanceIds != null) {
+									String sub = sample.getSubstanceNameWithUnit();
+									if (sub != null) {
+										int idx = optSubstanceIds.get(sub);
+										sn.storeValue(idx, (double) imageCount);
 									}
 								}
 							}
-							if (imageCount > 0 && optSubstanceIds != null) {
-								String sub = s.getSubstanceNameWithUnit();
-								if (sub != null) {
-									int idx = optSubstanceIds.get(sub);
-									sn.storeValue(idx, (double) imageCount);
-								}
-							}
-						}
-						
-						if (addSN) {
-							if (optSnapshotFilter == null)
-								result.add(sn);
-							else
-								if (!optSnapshotFilter.filterOut(sn))
+							
+							if (addSN) {
+								if (optSnapshotFilter == null)
 									result.add(sn);
+								else
+									if (!optSnapshotFilter.filterOut(sn))
+										result.add(sn);
+							}
 						}
 					}
 				}
@@ -864,6 +902,20 @@ public class IAPservice {
 			sd.prepareFieldsForDataTransport();
 		
 		return result;
+	}
+	
+	private static String getQuality(NumericMeasurementInterface nmi) {
+		String rs;
+		if (Math.abs(nmi.getReplicateID()) < 10)
+			rs = "0" + nmi.getReplicateID();
+		else
+			rs = "" + nmi.getReplicateID();
+		
+		return rs + "//" + nmi.getQualityAnnotation();
+	}
+	
+	private static boolean isOKquality(String qualityFilter, NumericMeasurementInterface nmi) {
+		return qualityFilter == null || qualityFilter.equals(getQuality(nmi));
 	}
 	
 	/**
@@ -1288,7 +1340,7 @@ public class IAPservice {
 	public static String getNiceNameForPhenotypicProperty(String substanceName) {
 		return niceNames.get(substanceName);
 	}
-
+	
 	public static double MathPow(double v, double ot) {
 		// if (v < 0 || v > 1.1) {
 		// System.out.println("TODO: " + v);

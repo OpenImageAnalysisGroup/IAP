@@ -26,7 +26,7 @@ public class SnapshotDataIAP {
 	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
 	public String dataTransport;
-	public TreeMap<Double, ArrayList<Double>> storeValues;
+	public TreeMap<Double, ArrayList<Double>> storeAngleToValues;
 	
 	public Long snapshotTime;
 	public int day;
@@ -363,15 +363,15 @@ public class SnapshotDataIAP {
 	}
 	
 	private void prepareStore() {
-		storeValues = new TreeMap<Double, ArrayList<Double>>();
+		storeAngleToValues = new TreeMap<Double, ArrayList<Double>>();
 		if (position2store != null && !position2store.isEmpty())
 			for (Double angle : position2store.keySet())
 				for (Integer i : position2store.get(angle).keySet()) {
-					if (!storeValues.containsKey(angle))
-						storeValues.put(angle, new ArrayList<Double>());
-					while (storeValues.get(angle).size() <= i)
-						storeValues.get(angle).add(null);
-					storeValues.get(angle).set(i, position2store.get(angle).get(i));
+					if (!storeAngleToValues.containsKey(angle))
+						storeAngleToValues.put(angle, new ArrayList<Double>());
+					while (storeAngleToValues.get(angle).size() <= i)
+						storeAngleToValues.get(angle).add(null);
+					storeAngleToValues.get(angle).set(i, position2store.get(angle).get(i));
 				}
 	}
 	
@@ -398,13 +398,13 @@ public class SnapshotDataIAP {
 			setDataTransport(null);
 		}
 		
-		if (storeValues != null && storeValues.size() > 0) {
+		if (storeAngleToValues != null && storeAngleToValues.size() > 0) {
 			position2store = new TreeMap<Double, TreeMap<Integer, Double>>();
-			for (Double angle : storeValues.keySet()) {
+			for (Double angle : storeAngleToValues.keySet()) {
 				position2store.put(angle, new TreeMap<Integer, Double>());
-				int n = storeValues.get(angle).size();
+				int n = storeAngleToValues.get(angle).size();
 				for (int i = 0; i < n; i++) {
-					Double d = storeValues.get(angle).get(i);
+					Double d = storeAngleToValues.get(angle).get(i);
 					if (d != null)
 						position2store.get(angle).put(i, d);
 				}
@@ -440,16 +440,16 @@ public class SnapshotDataIAP {
 		} else {
 			StringBuilder result = new StringBuilder();
 			int nmax = 0;
-			for (Double angle : storeValues.keySet()) {
-				int n = storeValues.get(angle).size();
+			for (Double angle : storeAngleToValues.keySet()) {
+				int n = storeAngleToValues.get(angle).size();
 				if (n > nmax)
 					nmax = n;
 			}
-			for (Double angle : storeValues.keySet()) {
+			for (Double angle : storeAngleToValues.keySet()) {
 				StringBuilder columnData = new StringBuilder();
 				for (int i = 0; i < nmax; i++) {
 					columnData.append(separator);
-					Double v = storeValues.get(angle).get(i);
+					Double v = storeAngleToValues.get(angle).get(i);
 					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
 						if (!numberFormat_deTrue_enFalse)
 							columnData.append(v);
@@ -619,7 +619,7 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getUnknownUrlCnt()));
 			result.add(row);
 		} else {
-			for (Double angle : storeValues.keySet()) {
+			for (Double angle : storeAngleToValues.keySet()) {
 				ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
 				row.add(new DateDoubleString(angle));
 				row.add(new DateDoubleString(s.getPlantId()));
@@ -641,9 +641,9 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getFluoUrlCnt()));
 				row.add(new DateDoubleString(s.getNirUrlCnt()));
 				row.add(new DateDoubleString(s.getUnknownUrlCnt()));
-				int n = storeValues.get(angle).size();
+				int n = storeAngleToValues.get(angle).size();
 				for (int i = 0; i < n; i++) {
-					Double v = storeValues.get(angle).get(i);
+					Double v = storeAngleToValues.get(angle).get(i);
 					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
 						row.add(new DateDoubleString(v));
 					} else
