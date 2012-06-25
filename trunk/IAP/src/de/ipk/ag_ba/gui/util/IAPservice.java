@@ -657,7 +657,7 @@ public class IAPservice {
 								qualities.add(q);
 							}
 						} else
-							qualities.add(null);
+							qualities.add("");
 						
 						for (String qualityFilter : qualities) {
 							Long snapshotTimeIndex = sample.getRowId();
@@ -915,7 +915,7 @@ public class IAPservice {
 	}
 	
 	private static boolean isOKquality(String qualityFilter, NumericMeasurementInterface nmi) {
-		return qualityFilter == null || qualityFilter.equals(getQuality(nmi));
+		return qualityFilter.isEmpty() || qualityFilter.equals(getQuality(nmi));
 	}
 	
 	/**
