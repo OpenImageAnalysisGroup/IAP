@@ -1225,8 +1225,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						res.get(plantID).setSpecies(species);
 					}
 					
-					if (metaName.equalsIgnoreCase("Sequence") ||
-							metaName.equalsIgnoreCase("ID Genotyp")) {
+					if (metaName.equalsIgnoreCase("Sequence")
+					/*
+					 * ||
+					 * metaName.equalsIgnoreCase("ID Genotyp")
+					 */) {
 						if (metaName.equalsIgnoreCase("Sequence"))
 							addSequenceInfoToCondition(res.get(plantID), metaValue);
 						else
@@ -1244,7 +1247,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							)
 								res.get(plantID).setGenotype(metaValue);
 							else
-								if (metaName.equalsIgnoreCase("Variety") || metaName.equalsIgnoreCase("variety-tax"))
+								if (metaName.equalsIgnoreCase("Variety") || metaName.equalsIgnoreCase("variety-tax")
+										|| metaName.equalsIgnoreCase("ID genotype") || metaName.equalsIgnoreCase("ID Genotyp"))
 									res.get(plantID).setVariety(metaValue);
 								else
 									if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") || metaName.equalsIgnoreCase("Topf"))

@@ -284,8 +284,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			
 			boolean ratio = false;
 			boolean clustering = false;
+			System.out.println();
 			for (ThreadSafeOptions tso : divideDatasetBy) {
-				System.out.println("TOGGLE: " + tso.getParam(0, "") + ":" + tso.getBval(0, false));
+				System.out.println(SystemAnalysis.getCurrentTime() + ">TOGGLE: " + tso.getParam(0, "") + ":" + tso.getBval(0, false));
 				if (((String) tso.getParam(0, "")).equals("Ratio"))
 					ratio = tso.getBval(0, false);
 				if (((String) tso.getParam(0, "")).equals("Clustering"))
