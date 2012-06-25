@@ -253,6 +253,8 @@ public class PdfCreator {
 		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
 		c = StringManipulationTools.stringReplace(c, "--Outliers--", safe(experiment.getHeader().getGlobalOutlierInfo() != null ? experiment.getHeader()
 				.getGlobalOutlierInfo() : ""));
+		c = StringManipulationTools.stringReplace(c, "--Sequence--", safe(experiment.getHeader().getSequence() != null ? experiment.getHeader()
+				.getSequence() : ""));
 		
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
 		
@@ -286,14 +288,13 @@ public class PdfCreator {
 				String gt = StringManipulationTools.string2Latex(ci.getGenotype() != null ? ci.getGenotype() : "");
 				String v = StringManipulationTools.string2Latex(ci.getVariety() != null ? ci.getVariety() : "");
 				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
-				String s = StringManipulationTools.string2Latex(ci.getSequence() != null ? ci.getSequence() : "");
 				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
 				boolean first = true;
 				String row = "";
 				// t.split(";")
 				for (String inRow : new String[] { t }) {
 					if (first) {
-						row = safe(id + " & " + sp + " & " + gt + " & " + v + " & " + inRow + " & " + s + " & " + gc + " \\tabularnewline");
+						row = safe(id + " & " + sp + " & " + gt + " & " + v + " & " + inRow + " & " + gc + " \\tabularnewline");
 						first = false;
 					} else {
 						row += safe(" &  &  &  & " + inRow + " & &  \\tabularnewline");
