@@ -40,6 +40,10 @@ public class IntensityAnalysis {
 		DescriptiveStatistics statsSatValues = new DescriptiveStatistics();
 		DescriptiveStatistics statsValValues = new DescriptiveStatistics();
 		
+		DescriptiveStatistics statsLabL = new DescriptiveStatistics();
+		DescriptiveStatistics statsLabA = new DescriptiveStatistics();
+		DescriptiveStatistics statsLabB = new DescriptiveStatistics();
+		
 		double weightOfPlant = 0;
 		
 		int background = ImageOperation.BACKGROUND_COLORint;
@@ -63,6 +67,18 @@ public class IntensityAnalysis {
 			int b_intensityPhenol = (c & 0x0000ff);
 			
 			if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+				
+				int r = r_intensityClassic;
+				int g = g_intensityChlorophyl;
+				int b = b_intensityPhenol;
+				
+				int Li = (int) ImageOperation.labCube[r][g][b];
+				int ai = (int) ImageOperation.labCube[r][g][b + 256];
+				int bi = (int) ImageOperation.labCube[r][g][b + 512];
+				statsLabL.addValue(Li);
+				statsLabA.addValue(ai);
+				statsLabB.addValue(bi);
+				
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
 				{
 					double h = hsb[0];
@@ -79,7 +95,7 @@ public class IntensityAnalysis {
 					statsSatValues.addValue(s);
 				}
 				{
-					double v = hsb[0];
+					double v = hsb[2];
 					if ((int) (v * 255) > 0)
 						histVal.addDataPoint((int) (v * 255), 255);
 					sumOfVal += v;
@@ -127,39 +143,55 @@ public class IntensityAnalysis {
 				if (optDistHorizontal != null && optRealMarkerDistance != null) {
 					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
 					for (int i = 0; i < this.n; i++) {
-						result.addValue("hsv.normalized.hue.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+						result.addValue("hsv.normalized.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.sat.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+						result.addValue("hsv.normalized.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 								histSat.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.val.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+						result.addValue("hsv.normalized.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 								histVal.getFreqAt(i) * normalize);
 					}
 				}
 			}
 			for (int i = 0; i < this.n; i++) {
-				result.addValue("hsv.hue.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+				result.addValue("hsv.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 						histHue.getFreqAt(i));
-				result.addValue("hsv.sat.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+				result.addValue("hsv.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 						histSat.getFreqAt(i));
-				result.addValue("hsv.val.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+				result.addValue("hsv.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 						histVal.getFreqAt(i));
 			}
-			result.addValue("hsv.hue.average", sumOfHue / plantImagePixelCnt);
-			result.addValue("hsv.sat.average", sumOfSat / plantImagePixelCnt);
-			result.addValue("hsv.val.average", sumOfVal / plantImagePixelCnt);
+			result.addValue("hsv.h.average", sumOfHue / plantImagePixelCnt);
+			result.addValue("hsv.s.average", sumOfSat / plantImagePixelCnt);
+			result.addValue("hsv.v.average", sumOfVal / plantImagePixelCnt);
 			
 			if (statsHueValues.getN() > 0) {
-				result.addValue("hsv.hue.stddev", statsHueValues.getStandardDeviation());
-				result.addValue("hsv.sat.stddev", statsSatValues.getStandardDeviation());
-				result.addValue("hsv.val.stddev", statsValValues.getStandardDeviation());
+				result.addValue("hsv.h.stddev", statsHueValues.getStandardDeviation());
+				result.addValue("hsv.s.stddev", statsSatValues.getStandardDeviation());
+				result.addValue("hsv.v.stddev", statsValValues.getStandardDeviation());
 				
-				result.addValue("hsv.hue.skewess", statsHueValues.getSkewness());
-				result.addValue("hsv.sat.skewness", statsSatValues.getSkewness());
-				result.addValue("hsv.val.skewness", statsValValues.getSkewness());
+				result.addValue("hsv.h.skewness", statsHueValues.getSkewness());
+				result.addValue("hsv.s.skewness", statsSatValues.getSkewness());
+				result.addValue("hsv.v.skewness", statsValValues.getSkewness());
 				
-				result.addValue("hsv.hue.kurtosis", statsHueValues.getKurtosis());
-				result.addValue("hsv.sat.kurtosis", statsSatValues.getKurtosis());
-				result.addValue("hsv.val.kurtosis", statsValValues.getKurtosis());
+				result.addValue("hsv.h.kurtosis", statsHueValues.getKurtosis());
+				result.addValue("hsv.s.kurtosis", statsSatValues.getKurtosis());
+				result.addValue("hsv.v.kurtosis", statsValValues.getKurtosis());
+				
+				result.addValue("lab.l.mean", statsLabL.getMean());
+				result.addValue("lab.a.mean", statsLabA.getMean());
+				result.addValue("lab.b.mean", statsLabB.getMean());
+				
+				result.addValue("lab.l.stddev", statsLabL.getStandardDeviation());
+				result.addValue("lab.a.stddev", statsLabA.getStandardDeviation());
+				result.addValue("lab.b.stddev", statsLabB.getStandardDeviation());
+				
+				result.addValue("lab.l.skewness", statsLabL.getSkewness());
+				result.addValue("lab.a.skewness", statsLabA.getSkewness());
+				result.addValue("lab.b.skewness", statsLabB.getSkewness());
+				
+				result.addValue("lab.l.kurtosis", statsLabL.getKurtosis());
+				result.addValue("lab.a.kurtosis", statsLabA.getKurtosis());
+				result.addValue("lab.b.kurtosis", statsLabB.getKurtosis());
 			}
 		} else {
 			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
