@@ -10,7 +10,7 @@ threaded <- FALSE
 innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
-debug <- FALSE
+debug <- TRUE
 
 ########## Constants ###########
 
@@ -1403,7 +1403,8 @@ renameYForSubsection <- function(label) {
 	
 	label <- gsub("\\\\% ","percent", label)
 	label <- gsub("\\^2","$^2$", label)
-	
+	label <- paste(toupper(substr(label,0,1)),substr(label, 2, nchar(label)), sep="")
+			
 	return(label)
 }
 
@@ -1646,9 +1647,11 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
-newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong) {
+newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong, maxValues) {
 	#numberCharAfterSeparate <- 8
 	if(tooLong) {
+		if(maxValues > 10)
+		
 		if (nchar(n) > (numberCharAfterSeparate + 4)) {
 			newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
 		} else {
@@ -1683,7 +1686,7 @@ renameOfTheTreatments <- function(overallList) {
 			
 			for(n in overallList$filterTreatment) {
 				seq <- seq+1
-				overallList$filterTreatmentRename[[n]] <- newTreatmentNameFunction(seq, n, numberCharAfterSeparate, tooLong)
+				overallList$filterTreatmentRename[[n]] <- newTreatmentNameFunction(seq, n, numberCharAfterSeparate, tooLong, length(overallList$filterTreatment))
 				writeLatexTable(FileName, value=c(overallList$filterTreatmentRename[[n]],n))
 			}
 			writeLatexTable(FileName)
@@ -1702,7 +1705,7 @@ renameOfTheTreatments <- function(overallList) {
 			
 			for(n in overallList$filterSecondTreatment) {
 				seq <- seq+1
-				overallList$secondFilterTreatmentRename[[n]] <- newTreatmentNameFunction(letters[seq], n, numberCharAfterSeparate, tooLong)
+				overallList$secondFilterTreatmentRename[[n]] <- newTreatmentNameFunction(letters[seq], n, numberCharAfterSeparate, tooLong, length(overallList$filterTreatment))
 				writeLatexTable(FileName, value=c(overallList$secondFilterTreatmentRename[[n]],n))
 			}
 			writeLatexTable(FileName)
@@ -1799,7 +1802,23 @@ replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFir
 }
 
 createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
-	ownCat(paste("Create ", typ, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
+	typString <- ""
+
+	if(typ == NBOX.PLOT) {
+		typString <- "line plot"
+	} else if (typ == STACKBOX.PLOT) {
+		typString <- "stacked barplot"
+	} else if(typ == BOX.PLOT) {
+		typString <- "box plot"
+	} else if(typ == SPIDER.PLOT) {
+		typString <- "spider/linerange plot"
+	} else if(typ == VIOLIN.PLOT) {
+		typString <- "violin plot"
+	}
+	
+	
+	
+	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
 	
 }
 
@@ -1854,6 +1873,18 @@ renameY <- function(label) {
 	label <- gsub("\\)\\)",")", label)
 	label <- str_trim(label)
 
+	if(nchar(label) > 4) {
+		if(substring(tolower(label), 1,4) == "top ") {
+			label <- paste(substring(label, 4), "top", sep=" - ")
+		}
+	}
+	
+	if(nchar(label) > 5) {
+		if(substring(tolower(label), 1,5) == "side ") {
+			label <- paste(substring(label, 5), "side", sep=" - ")
+		}
+	}
+
 	return(label)		
 }
 
@@ -1894,7 +1925,8 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
 
-	if(diagramTypSave == LINERANGE.PLOT || (overallList$split.Treatment.First && overallList$split.Treatment.Second && diagramTypSave == SPIDER.PLOT)) {
+#	if(diagramTypSave == LINERANGE.PLOT || (overallList$split.Treatment.First && overallList$split.Treatment.Second && diagramTypSave == SPIDER.PLOT)) {
+	if(diagramTypSave == LINERANGE.PLOT || diagramTypSave == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
 		saveImageFile(overallList, plot, fileName)
@@ -1927,6 +1959,41 @@ loadLibs <- function(installAndUpdate = FALSE) {
 		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, installAndUpdate, installAndUpdate, FALSE)
 }
+
+myBreaks <- function(value){
+	minV <- min(value)
+	maxV <- max(value)
+	
+	if((maxV - minV) <= 10) {
+		steps <- 1
+	} else if((maxV - minV) > 10 && (maxV - minV) < 30) {
+		steps <- 5
+	} else {
+		steps <- 10
+	}
+	
+	breaks <- seq(minV, maxV, steps)
+	names(breaks) <- attr(breaks,"labels")
+	return(breaks)
+}
+
+shapeTransparence <- function(column) {
+	
+	alpha <- 0.1
+	
+	numberOfDescriptors <- length(unique(column))
+	
+	if(numberOfDescriptors > 5) {
+		alpha <- 0.1 - (numberOfDescriptors - 5) * 0.0036
+	}
+	
+	if(alpha < 0) {
+		alpha = 0
+	}
+	
+	return(alpha)
+}
+
 
 parMakeLinearDiagram <- function(overallList) {
 
@@ -1992,8 +2059,7 @@ splitMakeLinearDiagram <- function(overallResult, overallDesName, overallList, i
 	}
 }
 
-makeLinearDiagram <- function(overallResult, overallDesName, 
-		overallList, imagesIndex, diagramTypSave, title = "") {
+makeLinearDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title = "") {
 #############
 #overallResult <- overallResultSplit
 #title <- nn
@@ -2049,7 +2115,7 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 						length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) &&
 						(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0)) {
 					plot <- plot + 
-							geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=0.1)
+							geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))
 #				if(isOtherTyp) {
 #					plot <- plot +
 #							geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=primaerTreatment, ymin=mean-se, ymax=mean+se, colour=primaerTreatment, fill=primaerTreatment), method="loess", stat="smooth", alpha=0.1)
@@ -2061,12 +2127,12 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
 			} else if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
 				plot <- plot + 
-						geom_smooth(data=overallResult, aes(x=xAxis, y=mean, ymin=ymin, ymax=ymax), method="loess", stat="smooth", alpha=0.1)	
+						geom_smooth(data=overallResult, aes(x=xAxis, y=mean, ymin=ymin, ymax=ymax), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))	
 			} else {
 				plot <- plot + 
 						#plot <-	ggplot()+
-						geom_ribbon(data=overallResult, aes_string(x="xAxis", y="mean", ymin="ymin", ymax="ymax", fill=whichColumShouldUse), stat="identity", alpha=0.1) +
-						geom_line(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), alpha=0.2)
+						geom_ribbon(data=overallResult, aes_string(x="xAxis", y="mean", ymin="ymin", ymax="ymax", fill=whichColumShouldUse), stat="identity", alpha=shapeTransparence(overallResult[[whichColumShouldUse]])) +
+						geom_line(data=overallResult, aes_string(x="xAxis", y="mean", colour=whichColumShouldUse), alpha=0.95)
 						#geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), size=3)
 				#print(plot)
 #				if(isOtherTyp) {
@@ -2087,7 +2153,7 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 			
 			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0) {
 					plot <- plot +	
-							geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse, shape=whichColumShouldUse), size=3)
+							geom_point(data=overallResult, aes_string(x="xAxis", y="mean", colour=whichColumShouldUse, shape=whichColumShouldUse), size=3)
 #				if(isOtherTyp) {
 #					plot <- plot +	
 #							geom_point(data=overallResult, aes(x=xAxis, y=mean, color=primaerTreatment), size=3)
@@ -2099,13 +2165,13 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 				plot <- plot +	
 						geom_point(data=overallResult, aes(x=xAxis, y=mean), size=3)
 			}
-#							ownCat("drinne")
+							#ownCat("drinne")
 #							ownCat(overallResult$xAxis)
 #							ownCat(min(as.numeric(as.character(overallResult$xAxis))))
 #							ownCat(max(as.numeric(as.character(overallResult$xAxis))))
 			plot <-  plot + 
-					scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
-					
+					#scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))), limits=min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
+					scale_x_continuous(name=overallList$xAxisName, breaks=myBreaks(as.numeric(as.character(overallResult$xAxis))))		
 					if (overallList$appendix) {
 						ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
 						plot <- plot + 
@@ -2137,30 +2203,38 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 							#panel.grid.minor = theme_blank(), # switch off minor gridlines
 							#legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
 							legend.title = theme_blank(), # switch off the legend title						
-							legend.key.size = unit(1.5, "lines"), 
+							#legend.key.size = unit(1.5, "lines"), 
 							legend.key = theme_blank(), # switch off the rectangle around symbols in the legend
 							panel.border = theme_rect(colour="Grey", size=0.1)
 					) 
 					#+ guides(colour = guide_legend("none"))
+			plot <- setFontSize(plot, overallColor[[imagesIndex]], diagramTypSave)
+					
+			plot <-  plot + guides(
+					shape=guide_legend(ncol=calculateLegendRowAndColNumber(overallColor[[imagesIndex]], diagramTypSave),
+							byrow=FALSE),
+					colour=guide_legend(ncol=calculateLegendRowAndColNumber(overallColor[[imagesIndex]], diagramTypSave),
+							byrow=FALSE)
+			)
 			
-			if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
-				plot = plot + 
-					   opts(legend.text = theme_text(size=6),
-							legend.key.size = unit(0.7, "lines"),
-							strip.text.x = theme_text(size=6)
-						)
-			} else if (length(overallColor[[imagesIndex]]) >= 31) {
-				plot = plot + 
-					   opts(legend.text = theme_text(size=4),
-							legend.key.size = unit(0.4, "lines"),
-							strip.text.x = theme_text(size=4)
-						)
-			} else {
-				plot <- plot + 
-					   opts(legend.text = theme_text(size=11),
-							strip.text.x = theme_text(size=11)
-						)
-			}
+#			if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
+#				plot = plot + 
+#					   opts(legend.text = theme_text(size=6),
+#							legend.key.size = unit(0.7, "lines"),
+#							strip.text.x = theme_text(size=6)
+#						)
+#			} else if (length(overallColor[[imagesIndex]]) >= 31) {
+#				plot = plot + 
+#					   opts(legend.text = theme_text(size=4),
+#							legend.key.size = unit(0.4, "lines"),
+#							strip.text.x = theme_text(size=4)
+#						)
+#			} else {
+#				plot <- plot + 
+#					   opts(legend.text = theme_text(size=11),
+#							strip.text.x = theme_text(size=11)
+#						)
+#			}
 			
 			if(FALSE) {
 				if (title != "") {
@@ -2244,7 +2318,7 @@ makeLinearDiagram <- function(overallResult, overallDesName,
 			tempXaxisName = overallList$xAxisName
 			overallList$xAxisName = paste(overallList$xAxisName, day)
 			#overallList$overallResult = overallList$overallResult[!is.na(overallList$overallResult$mean), ]
-			makeBarDiagram(overallResult, overallList, BAR.PLOT, imagesIndex, title, TRUE)
+			makeBarDiagram(overallResult, overallDesName, overallList, diagramTypSave, imagesIndex, title, TRUE)
 			overallList$xAxisName = tempXaxisName
 		}
 	}
@@ -2267,6 +2341,61 @@ getTheColumWhichShouldUse <- function(colNames) {
 	} else {
 		return(NAME)
 	}
+}
+
+setFontSize <- function(plot, value, typOfPlot) {
+	
+	
+	if(typOfPlot == STACKBOX.PLOT) {
+		if(PRIMAER.TREATMENT %in% colnames(value)) {
+			numerOfDescriptors <- length(unique(value[[PRIMAER.TREATMENT]]))
+		} else {
+			numerOfDescriptors <- length(unique(value[[NAME]]))
+		}
+	} else if(typOfPlot == NBOX.PLOT) {
+		numerOfDescriptors <- length(value)
+	}
+	#print(numerOfDescriptors)
+	
+	if(numerOfDescriptors > 50) {
+		if(typOfPlot == STACKBOX.PLOT) {
+			plot <- plot + 
+					opts(strip.text.x = theme_text(size=5))
+		} else if(typOfPlot == NBOX.PLOT) {
+			plot = plot + 
+					opts(legend.text = theme_text(size=4),
+							legend.key.size = unit(0.1, "lines"),
+							strip.text.x = theme_text(size= 4)
+					)
+			
+			#grid.gedit(size=unit(3, "mm"), "key.points", grep=T) 
+		}
+	} else if(numerOfDescriptors > 30) {
+		if(typOfPlot == STACKBOX.PLOT) {
+			plot <- plot + 
+					opts(strip.text.x = theme_text(size=6))
+		} else if(typOfPlot == NBOX.PLOT) {
+			plot = plot + 
+					opts(legend.text = theme_text(size=5),
+						 legend.key.size = unit(0.5, "lines"),
+						 strip.text.x = theme_text(size=6)
+					)
+		}
+	} else if(numerOfDescriptors > 12 && numerOfDescriptors <= 30) {
+		if(typOfPlot == STACKBOX.PLOT) {
+			plot <- plot + 
+					opts(strip.text.x = theme_text(size=8))
+		} else if(typOfPlot == NBOX.PLOT) {
+			plot = plot + 
+					opts(legend.text = theme_text(size=6),
+						 legend.key.size = unit(0.7, "lines"),
+						 strip.text.x = theme_text(size=8)
+					)
+		}
+	} 
+	
+
+	return(plot)
 }
 
 plotStackedImage <- function(overallResult, overallDesName, overallList, imagesIndex, title = "", legende=TRUE, minor_breaks=FALSE) {
@@ -2363,7 +2492,7 @@ plotStackedImage <- function(overallResult, overallDesName, overallList, imagesI
 					#coord_cartesian(ylim=c(0, 1)) +
 			
 			if (minor_breaks) {
-				plot = plot + scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(overallResult$xAxis):max(overallResult$xAxis))
+				plot = plot + scale_x_continuous(name=overallList$xAxisName, breaks = myBreaks(as.numeric(as.character(overallResult$xAxis))))
 			} else {
 				plot <- plot + xlab(overallList$xAxisName)
 			}
@@ -2394,9 +2523,10 @@ plotStackedImage <- function(overallResult, overallDesName, overallList, imagesI
 							#panel.background = theme_rect(linetype = "dotted"), 
 							panel.border = theme_rect(colour="Grey", size=0.1), 
 							strip.background = theme_rect(colour=NA)
-	#						plot.title = theme_text(size=10), 
-	#						plot.title = theme_rect(colour="Pink", size=0.1), 
+							#plot.title = theme_text(size=5) 
+	#						plot.title = theme_rect(colour="Pink", size=0.1)
 					) 
+			plot <- setFontSize(plot, overallResult, STACKBOX.PLOT)
 			
 			if (!legende) {
 				plot = plot + opts(legend.position="none")
@@ -2878,10 +3008,10 @@ plotSpiderImage <- function(overallList, overallResult, overallDesName, imagesIn
 #				} else {
 					plot <-  plot + guides(
 							shape=guide_legend(title.position= "top", 
-									ncol=calculateLegendRowAndColNumber(nameString),
+									ncol=calculateLegendRowAndColNumber(nameString, diagramTypSave),
 									byrow=FALSE),
 							fill=guide_legend(title.position= "top", 
-									ncol=calculateLegendRowAndColNumber(histVec), 
+									ncol=calculateLegendRowAndColNumber(histVec, diagramTypSave), 
 									byrow=FALSE)
 					)
 				#}
@@ -2934,19 +3064,24 @@ plotSpiderImage <- function(overallList, overallResult, overallDesName, imagesIn
 	}				
 }
 
-calculateLegendRowAndColNumber <- function(legendText) {
+calculateLegendRowAndColNumber <- function(legendText, typOfPlot) {
 ########	
 #legendText <- unique(overallResult$name)
 #legendText <- unique(overallResult$hist)	
 #######	
-	lengthOfOneRow <- 90
 	legendText <- as.character(getVector(legendText))
-
-	averageLengthOfSet <- round(sum(nchar(legendText),na.rm=TRUE) / length(legendText))
-
-	ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
-	if (ncol == 0) {
-		ncol <- 1
+	
+	if(typOfPlot == NBOX.PLOT) {
+		ncol <- ceiling(length(legendText) / 40)
+	} else {
+		lengthOfOneRow <- 90
+	
+		averageLengthOfSet <- round(sum(nchar(legendText),na.rm=TRUE) / length(legendText))
+	
+		ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
+		if (ncol == 0) {
+			ncol <- 1
+		}
 	}
 	return(ncol)
 } 
@@ -3035,7 +3170,7 @@ plotLineRangeImage <- function(overallList, overallResult, overallDesName, image
 					)
 
 			plot <-  plot + guides(colour=guide_legend(title.position= "top", 
-									ncol=calculateLegendRowAndColNumber(nameString),
+									ncol=calculateLegendRowAndColNumber(nameString, diagramTypSave),
 									byrow=T)			
 							) 
 			
@@ -3108,8 +3243,9 @@ parMakeBarDiagram <- function(overallList) {
 	#############	
 
 	overallList$debug %debug% "parMakeBarDiagram()"
-	tempOverallResult <-  overallResult
-	overallDescriptor <- overallList$overallResult_nBoxDes
+	tempOverallResult <-   overallList$overallResult_nBoxDes
+	overallDescriptor <- overallList$nBoxDes
+	overallDesName <- overallList$nBoxDesName
 	diagramTypSave <- BAR.PLOT
 	
 	for (imagesIndex in names(overallDescriptor)) {
@@ -3118,7 +3254,7 @@ parMakeBarDiagram <- function(overallList) {
 			overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 			overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0
 			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name)
-			
+						
 			if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {	
 				extraPlot <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, diagramTypSave, colnames(overallResult), TRUE)
 				for(nn in unique(as.character(overallResult$primaerTreatment))) {
@@ -3140,15 +3276,15 @@ parMakeBarDiagram <- function(overallList) {
 }
 
 
-splitMakeBarDiagram <- function(overallResult, overallList, imagesIndex, diagramTypSave, title = "") {
+splitMakeBarDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title = "") {
 	overallList$debug %debug% "splitMakeBarDiagram()"	
 	
 	if (innerThreaded) {
-		sfClusterCall(makeBarDiagram, overallResult, overallList,
+		sfClusterCall(makeBarDiagram, overallResult, overallDesName, overallList,
 				diagramTypSave,	imagesIndex, title,
 				stopOnError=FALSE)
 	} else {
-		makeBarDiagram(overallResult, overallList,
+		makeBarDiagram(overallResult, overallDesName, overallList,
 				diagramTypSave,	imagesIndex, title)
 	}
 }
@@ -3157,7 +3293,7 @@ splitMakeBarDiagram <- function(overallResult, overallList, imagesIndex, diagram
 
 
 
-makeBarDiagram <- function(overallResult, overallList, diagramTypSave, imagesIndex, title="", isOnlyOneValue = FALSE) {
+makeBarDiagram <- function(overallResult, overallDesName, overallList, diagramTypSave, imagesIndex, title="", isOnlyOneValue = FALSE) {
 	overallList$debug %debug% "makeBarDiagram()"	
 	
 	overallFileName <- overallList$imageFileNames_nBoxplots
@@ -3173,12 +3309,21 @@ makeBarDiagram <- function(overallResult, overallList, diagramTypSave, imagesInd
 		} else {
 			plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
 		}
-				
+	
+		if (overallList$appendix) {
+			ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
+			plot <- plot + 
+					ylab(ylabelForAppendix)
+		} else {
+			plot <- plot + 
+					ylab(overallDesName[[imagesIndex]])
+		}
+		
 		plot = plot + 						
 				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), colour="Grey", size=0.1) +
 				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
 				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
-				ylab(overallDesName[[imagesIndex]]) +
+				#ylab(overallDesName[[imagesIndex]]) +
 				coord_cartesian(ylim=c(0, maxMean + maxSe + (110*maxMean)/100)) +
 				xlab(overallList$xAxisName) +
 				scale_fill_manual(values = overallColor[[imagesIndex]]) +
@@ -3190,8 +3335,36 @@ makeBarDiagram <- function(overallResult, overallList, diagramTypSave, imagesInd
 						axis.text.x = theme_text(angle=90),
 						panel.grid.minor = theme_blank(), 
 						panel.border = theme_rect(colour="Grey", size=0.1)
-				)	
-		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, diagramTypSave, sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, "BarplotOverallImage", sep=""), title, TRUE, isAppendix=overallList$appendix, subsectionDepth=2)										
+				)
+		
+		subtitle <- ""
+		overallImage <- TRUE
+		
+		if(title != "") {
+			sep <- " - "
+		} else {
+			sep <- ""
+		}
+		
+		if (!overallList$appendix) {
+			if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
+				subsectionDepth <- 2
+			}
+		} else {
+			subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep=sep)
+			
+			subsectionDepth <- 1
+			overallImage <- FALSE
+		}
+			
+		if(diagramTypSave == BOX.PLOT) {
+			overallImageText <- "BarplotOverallImage"										
+		} else {
+			overallImageText <- "OverallImage"
+		}
+		
+		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, diagramTypSave, sep=""), paste(overallFileName[[imagesIndex]], diagramTypSave, overallImageText, sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth)
 	}
 }
 
@@ -3809,7 +3982,7 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallDesName,
 #							opts(axis.text.x =theme_blank())
 #				} else {
 					plot = plot + 
-							opts(axis.text.x = theme_text(size=6, angle=90))	
+							opts(axis.text.x = theme_text(size=5, angle=90))	
 				#}
 				
 				plot = plot +	
@@ -3837,6 +4010,71 @@ makeBoxplotDiagram <- function(overallResult, overallDescriptor, overallDesName,
 	}
 }
 
+
+plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title) {
+	
+
+	
+	
+}
+
+makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave) {
+	overallList$debug %debug% "makeSplitDiagram()"
+	
+	if((!overallList$split.Treatment.First && !overallList$split.Treatment.Second && !(diagramTypSave == NBOX.PLOT || diagramTypSave == BAR.PLOT)) || 
+		(overallList$split.Treatment.First && overallList$secondTreatment == NONE && !(diagramTypSave == NBOX.PLOT || diagramTypSave == BAR.PLOT)) || 
+		(diagramTypSave == VIOLIN.PLOT) ||
+		(!(overallList$split.Treatment.First && overallList$split.Treatment.Second) && (diagramTypSave == NBOX.PLOT || diagramTypSave == BAR.PLOT))
+		) {
+		plotDiagram(overallResult, overallDesName, overallList, imagesIndex, diagramTypSave, title = "")	
+	} else {
+		extraPlot <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, diagramTypSave, colnames(overallResult), TRUE)
+		for(nn in unique(as.character(overallResult[[extraPlot]]))) {
+			optionListForGetBoolean <- list(value = nn)
+			names(optionListForGetBoolean) <- extraPlot
+			booleanVector <- getBooleanVectorForFilterValues(overallResult, optionListForGetBoolean)
+			overallResultSplit <- overallResult[booleanVector, ]
+			nn <- replaceTreatmentNamesOverallOneValue(overallList, nn, diagramTypSave)
+			
+			plotDiagram(overallResultSplit, overallDesName, overallList, imagesIndex, diagramTypSave, nn)
+		}
+	}
+}
+
+
+paralleliseDiagramming <- function(tempOverallResult, overallDescriptor, overallDesName, diagramTypSave) {
+	overallList$debug %debug% "paralleliseDiagramming()"
+	
+	for (imagesIndex in names(overallDescriptor)) {
+		if (!is.na(overallDescriptor[[imagesIndex]])) {
+			createOuputOverview(diagramTypSave, imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, diagramTypSave)
+			
+			if(diagramTypSave == NBOX.PLOT || diagramTypSave == BAR.PLOT) {
+				overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+				overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0		
+				overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
+				
+			} else if(diagramTypSave == VIOLIN.PLOT) {
+				overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+				overallResult <- OneMinusTheValue(overallResult)
+			}
+
+			
+			if (innerThreaded) {
+				sfClusterCall(makeSplitDiagram, 
+						overallResult, overallDesName, 
+						overallList, imagesIndex, diagramTypSave,
+						stopOnError=FALSE)
+			} else {
+				makeSplitDiagram( 
+						overallResult, overallDesName, 
+						overallList, imagesIndex, diagramTypSave)
+			}
+		}
+	}
+}
+
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
 	if (threaded)
@@ -3853,10 +4091,13 @@ if(!calculateOnlyBoxplot) {
 				sfClusterEval(
 					parMakeLinearDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT), 
+#						stopOnError = FALSE)
 		} else {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
 }
+
 
 if(!calculateOnlyNBox) {
 		if (sum(!is.na(overallList$boxDes)) > 0) {
@@ -3864,6 +4105,8 @@ if(!calculateOnlyNBox) {
 				sfClusterEval(
 					parMakeBoxplotDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxDes,  overallList$boxDes, overallList$boxDesName, BOX.PLOT), 
+#						stopOnError = FALSE)			
 		} else {
 			ownCat("All values for Boxplot are 'NA'...")
 		}
@@ -3876,10 +4119,13 @@ if(!calculateOnlyBoxplot) {
 				sfClusterEval(
 					parMakeBoxplotStackedDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxStackDes,  overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT), 
+#						stopOnError = FALSE)	
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 			}
 }}}
+
 
 if(!calculateOnlyStacked) {
 if(!calculateOnlyBoxplot) {
@@ -3889,10 +4135,13 @@ if(!calculateOnlyNBox) {
 				sfClusterEval(
 					parMakeSpiderPlotDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxSpiderDes,  overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT), 
+#						stopOnError = FALSE)
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 		}
 }}}}
+
 
 if(!calculateOnlyStacked) {
 if(!calculateOnlyBoxplot) {
@@ -3903,6 +4152,8 @@ if(!calculateOnlySpider) {
 				sfClusterEval(
 					parMakeViolinPlotDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_violinBoxDes,  overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT), 
+#						stopOnError = FALSE)
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
@@ -3912,9 +4163,12 @@ if(!calculateOnlySpider) {
 				sfClusterEval(
 					parMakeBarDiagram(overallList)
 				, stopOnError=FALSE)
+#				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT), 
+#						stopOnError = FALSE)
 		}
 	}
 }
+
 
 addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet) {
 	addDescSet = character()
@@ -4126,115 +4380,166 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				} else { #Report	
 					descriptorSet_nBoxplot = c(#"volume.my", "volume.fluo.plant_weight.iap"
 							 					"Weight A (g)", 
-												"Weight B (g)", 
-												"Water (weight-diff)", 
+												"Weight B (g)",
+												"Water (sum of day)",
+												#"Water (weight-diff)", 
 												"side.height.norm (mm)", 
 												"side.width.norm (mm)", 
+												
 												"side.area.norm (mm^2)", 
 												"top.area.norm (mm^2)", 											
 												"side.fluo.intensity.chlorophyl.average (relative)", 
 												"side.fluo.intensity.phenol.average (relative)", 
 												"side.nir.intensity.average (relative)",
-												"top.nir.intensity.average (relative / pix)",
 												
+												"top.nir.intensity.average (relative / pix)",												
 												"side.leaf.count.median (leafs)", 
 												"side.bloom.count (tassel)", 
 												"side.leaf.length.sum.norm.max (mm)", 
 												"volume.iap (px^3)", 
+												
 												"volume.lt (px^3)", 
-												"volume.iap.wue", 
+												"volume.iap.wue",
+												"side.area.avg.wue",
 												"side.nir.wetness.plant_weight_drought_loss", 
 												"top.nir.wetness.plant_weight_drought_loss", 
+												
 												"side.nir.wetness.average (percent)", 
 												"top.nir.wetness.average (percent)", 
-												"side.area.relative", 
+												#"side.area.relative", 
 												"side.height.norm.relative", 
 												"side.width.norm.relative", 
+												
 												"top.area.relative", 
 												"side.area.relative", 
 												"volume.iap.relative", 
 												"side.height (px)", 
 												"side.width (px)", 
+												
 												"side.area (px)", 
 												"top.area (px)",
 												############ new #######
 												"side.hull.area (px)",
 												"side.hull.area.norm (mm^2)",
-												"side.hull.pc1 (px)",
+												"side.hull.pc1",
+												
 												"side.hull.pc1.norm",
 												"side.hull.pc2",
 												"side.hull.pc2.norm",
 												"side.hull.fillgrade (percent)",		
 												"top.hull.area (px)",
+												
 												"top.hull.area.norm (mm^2)",
 												"top.hull.pc1",
 												"top.hull.pc1.norm",
 												"top.hull.pc2",
 												"top.hull.pc2.norm",
+												
 												"top.hull.fillgrade (percent)",
 												"side.vis.hue.average",
 												"top.vis.hue.average",
 												"mark1.y (percent)",
-												"mark2.y (percent)",
+												#"mark2.y (percent)",
+												
 												"mark3.y (percent)",
 												"top.ir.intensity.average",
-												"side.ir.intensity.average"
+												"side.ir.intensity.average",
+												"side.nir.skeleton.intensity.average (relative)",
+												"top.nir.skeleton.intensity.average",
+												
+												"side.compactness.16 (relative)",
+												"top.compactness.16 (relative)",
+												"side.hull.circularity (relative)",
+												"top.hull.circularity (relative)",
+												"side.compactness.01 (relative)",
+												
+												"top.compactness.01 (relative)",
+												"side.fluo.intensity.average (relative)",
+												"top.fluo.intensity.average (relative / pix)",
+												"side.hull.circumcircle.d (px)",
+												"top.hull.circumcircle.d (px)"
 												)
 				
 					descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
 													"weight before watering (g)", 
-													"weight after watering (g)", 
-													"water weight (g)", 
+													"weight after watering (g)",
+													"daily watering amount (g)",
+													#"water weight (g)", 
 													"height (zoom corrected) (mm)", 
 													"width (zoom corrected) (mm)", 
+													
 													"side area (zoom corrected) (mm^2)", 
 													"top area (zoom corrected) (mm^2)", 
 													"chlorophyll intensity (relative intensity/pixel)", 
 													"fluorescence intensity (relative intensity/pixel)", 
 													"side nir intensity (relative intensity/pixel)",
+													
 													"top nir intensity (relative intensity/pixel)",
 													"number of leafs", 
 													"number of tassel florets", 
 													"length of leafs plus stem (mm)", 			 
 													"digital biomass (visible light images, IAP formula) (px^3)", 
+													
 													"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
 													"volume based water use efficiency", 
+													"digital side area based water use efficiency",
 													"weighted loss through drought stress (side)", 
 													"weighted loss through drought stress (top)", 
+													
 													"Average wetness of side image", 
 													"Average wetness of top image", 
-													"growth in %/day", 
+													#"growth in %/day", 
 													"plant height growth rate (%/day)", 
 													"plant width growth rate (%/day)", 
+													
 													"top area growth rate (%/day)", 
 													"side area growth rate (%/day)", 
 													"volume growth (visible light images, IAP based formula) (%/day)", 
 													"height (px)", 
 													"width (px)", 
+													
 													"side area (px)", 
 													"top area (px)",
 													####### new #######
 													"side area of convex hull (px)",
 													"side area of convex hull (zoom corrected) (mm^2)",
 													"side maximum extension (px)",
+													
 													"side maximum extension (zoom corrected) (mm)",
 													"opposite direction of the side maximum extension (px)",
 													"opposite direction of the side maximum extension (zoom corrected) (mm)",
 													"fillgrade of side convex hull (%)",
 													"top area of convex hull (px)",
+													
 													"top area of convex hull (zoom corrected) (mm^2)",
 													"top maximum extension (px)",
 													"top maximum extension (zoom corrected) (mm)",
 													"opposite direction of the top maximum extension (px)",
 													"opposite direction of the top maximum extension (zoom corrected) (mm)",
+													
 													"fillgrade of top convex hull (%)",
 													"side visible hue average value",
 													"top visible hue average value",
 													"blue marker position from top (%)",
-													"blue marker position from middle (%)",
+													#"blue marker position from middle (%)",
+													
 													"blue marker position from bottom  (%)",
 													"top ir intensity",
-													"side ir intensity"
+													"side ir intensity",
+													"side skeleton nir intensity (relative intensity/pixel)",
+													"top skeleton nir intensity (relative intensity/pixel)",
+													
+													"side compactness (1-16)",
+													"top compactness (1-16)",
+													"side circularity",
+													"top circularity",
+													"side compactness (0-1)",
+													
+													"top compactness (0-1)",
+													"side fluo intensity (relative intensity/pixel)",
+													"top fluo intensity (relative intensity/pixel)",
+													"side circumcircle diameter (px)",
+													"top circumcircle diameter (px)"
 													)		
 				}
 	
@@ -4300,20 +4605,25 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 						"side.vis.hue.average",
 						"top.vis.hue.average",
 						"top.ir.intensity.average",
-						"side.ir.intensity.average"
+						"side.ir.intensity.average",
+						"top.nir.intensity.average (relative / pix)",
+						"top.fluo.intensity.average (relative / pix)"
+
 				)	
 				
 				descriptorSetName_violinBox = c(
-						"height (zoom corrected) (mm)",
-						"width (zoom corrected) (mm)",
-						"side area (zoom corrected) (mm^2)",
-						"top area (zoom corrected) (mm^2)",
+						"height (zoom corrected)",
+						"width (zoom corrected)",
+						"side area (zoom corrected)",
+						"top area (zoom corrected)",
 						"side fluo intensity",
 						"side nir intensity",
 						"side visible hue average value",
 						"top visible hue average value",
 						"top ir intensity",
-						"side ir intensity"
+						"side ir intensity",
+						"top nir intensity",
+						"top fluo intensity"
 				)	
 				
 				violinOptions= NULL
@@ -4327,12 +4637,13 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 												  "side.nir.normalized.histogram.bin.", 
 												  "side.fluo.normalized.histogram.bin.", 
 												  "side.fluo.normalized.histogram.ratio.bin.", 
-												  "side.vis.hue.histogram.ratio.bin.", 
-												  "side.vis.normalized.histogram.ratio.bin.", 
+												  "side.vis.hue.histogram.bin.", 
+												  "side.vis.normalized.histogram.bin.", 
 												  "top.fluo.histogram.bin.", 
 												  "top.fluo.histogram.ratio.bin.", 
 												  "top.nir.histogram.bin.", 
-												  "top.vis.hue.histogram.ratio.bin.",
+												  "top.vis.hue.histogram.bin.",
+												  "top.vis.hue.normalized.histogram.bin.",
 												  "top.ir.histogram.bin.",
 												  "side.ir.histogram.bin."
 												)
@@ -4351,6 +4662,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 													  "top fluo ratio histogram (%)", 
 													  "NIR top histogram (%)", 
 													  "top visible light color histogram (%)",
+													  "top visible light color histogram (zoom corrected) (%)",
 													  "top infrared light heat histogram (%)",
 													  "side infrared light heat histogram (%)"
 														)
@@ -4359,7 +4671,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				descriptorSet_boxplotStacked <- descriptorList$desSet
 				descriptorSetName_boxplotStacked <- descriptorList$desName
 				
-				stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
+				stackedBarOptions = list(typOfGeomBar=c("fill", "stack")) #, "dodge"
 				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
 				
 				appendix = as.logical(appendix %exists% args[5])
@@ -4480,7 +4792,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				############ new #######
 				"side.hull.area (px)",
 				"side.hull.area.norm (mm^2)",
-				"side.hull.pc1 (px)",
+				"side.hull.pc1",
 				"side.hull.pc1.norm",
 				"side.hull.pc2",
 				"side.hull.pc2.norm",
@@ -4499,6 +4811,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 				"mark3.y (percent)",
 				"top.ir.intensity.average",
 				"side.ir.intensity.average"
+				
 		)
 		
 		descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"

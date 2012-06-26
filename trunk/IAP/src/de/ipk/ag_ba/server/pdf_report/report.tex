@@ -256,6 +256,8 @@ of the group image analysis.
 	\hline
 	{\textbf{Storage}} & --StorageExp-- \tabularnewline
 	\hline
+	{\textbf{Sequence}} & --SequenceEXP-- \tabularnewline
+	\hline
 	{\textbf{Defined Outliers}} & --Outliers-- \tabularnewline
 	\hline
 	\hline 
@@ -307,7 +309,8 @@ of the group image analysis.
 
 \subsection{Full list of experiment factors}
 \begin{center}
-	\begin{longtable}{|p{0.7cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
+	\begin{longtable}{|p{0.7cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
+	%|p{2.2cm}
 	
 	%This is the header for the first page of the table...
 	
@@ -317,7 +320,7 @@ of the group image analysis.
 	{\textbf{Genotype}} & 
 	{\textbf{Variety}} &
 	{\textbf{Treatment}} & 
-	{\textbf{Sequence}} & 
+% 	{\textbf{Sequence}} & 
 	{\textbf{Growth conditions}}
 	\tabularnewline
 	\hline
@@ -332,7 +335,7 @@ of the group image analysis.
 	{\textbf{Genotype}} & 
 	{\textbf{Variety}} &
 	{\textbf{Treatment}} & 
-	{\textbf{Sequence}} & 
+% 	{\textbf{Sequence}} & 
 	{\textbf{Growth conditions}}
 	\tabularnewline
 	\hline
@@ -341,7 +344,7 @@ of the group image analysis.
 	
 	%This is the footer for all pages except the last page of the table...
 	
-	\multicolumn{7}{l}{{Continued on Next Page\ldots}} 
+	\multicolumn{6}{l}{{Continued on Next Page\ldots}} 
 	\tabularnewline
 	\endfoot
 	
@@ -371,7 +374,8 @@ of the group image analysis.
 \resetBoolean
 \checkFileNoReset{Weight_A__g_nboxplotOverallImage.tex}{}{}
 \checkFileNoReset{Weight_B__g_nboxplotOverallImage.tex}{}{}
-\checkFileNoReset{Water__weight_diff_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{Water__sum_of_day_nboxplotOverallImage.tex}{}{}
+%\checkFileNoReset{Water__weight_diff_nboxplotOverallImage.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\clearpage
@@ -392,17 +396,27 @@ of the group image analysis.
 			\loadTex{Weight_B__g_nboxplotOverallImage}
 		}{}
 	}{}
-		
-	\checkFile{Water__weight_diff_nboxplotOverallImage.tex}{}{}
+	
+	\checkFile{Water__sum_of_day_nboxplotOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
-		\subsection{Watering amounts / consumption}
+		\subsection{Daily watering amounts}
 		\begin{itemize}
-		\item Consumption of water based on weight differences.
-		\item Colnum name: Watering (weight-diff)
+		\item The sum of the watering amount of the day.
+		\item Colnum name: Water (sum of day)
 		\item Unit: g
 		\end{itemize}
-		\loadTex{Water__weight_diff_nboxplotOverallImage}
+		\loadTex{Water__sum_of_day_nboxplotOverallImage}
 	}{}
+%   \checkFile{Water__weight_diff_nboxplotOverallImage.tex}{}{}
+% 	\ifthenelse{\boolean{isFile1}}{
+% 		\subsection{Watering amounts / consumption}
+% 		\begin{itemize}
+% 		\item Consumption of water based on weight differences.
+% 		\item Colnum name: Watering (weight-diff)
+% 		\item Unit: g
+% 		\end{itemize}
+% 		\loadTex{Water__weight_diff_nboxplotOverallImage}
+% 	}{}
 }{}
 
 \resetBoolean
@@ -504,6 +518,8 @@ of the group image analysis.
 	\checkFileNoReset{side_height_norm__mm_violinOverallImage.tex}{}{}
 	\checkFileNoReset{side_vis_hue_averageviolinOverallImage.tex}{}{}
 	\checkFileNoReset{top_vis_hue_averageviolinOverallImage.tex}{}{}
+	\checkFileNoReset{top_fluo_intensity_average__relative___pix_violinOverallImage.tex}{}{}
+	\checkFileNoReset{top_nir_intensity_average__relative___pix_violinOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 		\ownClearPage
 		\subsection{Stress ratio}
@@ -521,17 +537,27 @@ of the group image analysis.
 			\loadTex{side_fluo_intensity_average__relative_violinOverallImage}
 		}{}
 	
-		\checkFile{side_nir_intensity_average__relative_violinOverallImage.tex}{side_width_norm__mm_violinOverallImage.tex}{side_height_norm__mm_violinOverallImage.tex}
+		\checkFile{top_fluo_intensity_average__relative___pix_violinOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadTex{top_fluo_intensity_average__relative___pix_violinOverallImage}
+		}{}
+	
+		\checkFile{side_nir_intensity_average__relative_violinOverallImage.tex}{top_nir_intensity_average__relative___pix_violinOverallImage.tex}{side_height_norm__mm_violinOverallImage.tex}
 		\ifthenelse{\boolean{isFile1}}{
 			\loadTex{side_nir_intensity_average__relative_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile2}}{
-			\loadTex{side_width_norm__mm_violinOverallImage}
+			\loadTex{top_nir_intensity_average__relative___pix_violinOverallImage}
 		}{}
 		
 		\ifthenelse{\boolean{isFile3}}{
 			\loadTex{side_height_norm__mm_violinOverallImage}
+		}{}
+	
+		\checkFile{side_width_norm__mm_violinOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\loadTex{side_width_norm__mm_violinOverallImage}
 		}{}
 	
 		\checkFile{side_vis_hue_averageviolinOverallImage.tex}{top_vis_hue_averageviolinOverallImage.tex}{}
@@ -607,22 +633,35 @@ of the group image analysis.
 		\loadTex{digital_biomass_keygene_normnboxplotOverallImage}
 	}{}
 	
-	
-	\checkFile{volume_iap_wuenboxplotOverallImage.tex}{}{}
+	\resetBoolean	
+	\checkFileNoReset{volume_iap_wuenboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_area_avg_wuenboxplotOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 		\ownClearPage
 		\section{\noindent Water use efficiency}
 		\begin{itemize}
-		\item Ratio of plant growth and water use.
+		\item Ratio of daily plant growth, determined by increasing projected side
+		area and/or digital biomass, and water ussaged per day.
 		\end{itemize}
 		
-		\subsection{Based on digital biomass}
-		\begin{itemize}
-		\item Growth per day divided by water usage per day.
-		\item Colnum name: volume.iap.wue
-		\item Unit: $pixel^3/g$
-		\end{itemize}
-		\loadTex{volume_iap_wuenboxplotOverallImage}
+		\checkFile{volume_iap_wuenboxplotOverallImage.tex}{side_area_avg_wuenboxplotOverallImage.tex}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\subsection{Based on digital biomass}
+			\begin{itemize}
+			\item Colnum name: volume.iap.wue
+			\item Unit: $pixel^3/g$
+			\end{itemize}
+			\loadTex{volume_iap_wuenboxplotOverallImage}
+		}
+		
+		\ifthenelse{\boolean{isFile2}}{
+			\subsection{Based on projected side area}
+			\begin{itemize}
+			\item Colnum name: side.area.avg.wue
+			\item Unit: $pixel^2/g$
+			\end{itemize}
+			\loadTex{side_area_avg_wuenboxplotOverallImage}
+		}
 	}{}
 }{}
 
@@ -907,10 +946,10 @@ of the group image analysis.
 \resetBoolean
 \checkFileNoReset{side_vis_hue_averagenboxplotOverallImage.tex}{}{}
 \checkFileNoReset{top_vis_hue_averagenboxplotOverallImage.tex}{}{}
-\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-\checkFileNoReset{side_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-\checkFileNoReset{top_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_vis_hue_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_vis_hue_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{side_vis_normalized_histogram_bin_stackedOverallImage.tex}{}{}
+\checkFileNoReset{top_vis_normalized_histogram_bin_stackedOverallImage.tex}{}{}
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -948,40 +987,40 @@ of the group image analysis.
 	
 	
 	\resetBoolean
-	\checkFileNoReset{side_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{}{side_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}
+	\checkFileNoReset{side_vis_hue_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{side_vis_normalized_histogram_bin_stackedOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 				
 		\ownClearPage
 		\subsection{Color histogram side view (zoom corrected)}
 		%Visible light color histogram (zoom corrected) for side view (hue):
-		\loadTex{side_vis_normalized_histogram_ratio_bin_stackedOverallImage}	
+		\loadTex{side_vis_normalized_histogram_bin_stackedOverallImage}	
 	}{
 		\ifthenelse{\boolean{isFile1}}{
 		
 			\ownClearPage
 			\subsection{Color histogram side view}
 			%Visible light color histogram for side view (hue):
-			\loadTex{side_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			\loadTex{side_vis_hue_histogram_bin_stackedOverallImage}
 		}{}	
 	}
 	
 	\resetBoolean
-	\checkFileNoReset{top_vis_hue_histogram_ratio_bin_stackedOverallImage.tex}{}{}
-	\checkFileNoReset{}{top_vis_normalized_histogram_ratio_bin_stackedOverallImage.tex}{}
+	\checkFileNoReset{top_vis_hue_histogram_bin_stackedOverallImage.tex}{}{}
+	\checkFileNoReset{}{top_vis_normalized_histogram_bin_stackedOverallImage.tex}{}
 	\ifthenelse{\boolean{isFile2}}{
 				
 		\ownClearPage
 		\subsection{Color histogram top view (zoom corrected)}
 		%Visible light color histogram (zoom corrected) for side view (hue):
-		\loadTex{top_vis_normalized_histogram_ratio_bin_stackedOverallImage}	
+		\loadTex{top_vis_normalized_histogram_bin_stackedOverallImage}	
 	}{
 		\ifthenelse{\boolean{isFile1}}{
 		
 			\ownClearPage
 			\subsection{Color histogram top view}
 			%Visible light color histogram for side view (hue):
-			\loadTex{top_vis_hue_histogram_ratio_bin_stackedOverallImage}
+			\loadTex{top_vis_hue_histogram_bin_stackedOverallImage}
 		}{}	
 	}		
 }{}
@@ -1136,6 +1175,8 @@ of the group image analysis.
 \checkFileNoReset{top_nir_normalized_histogram_bin_stackedOverallImage.tex}{}{}
 \checkFileNoReset{side_nir_intensity_average__relative_nboxplotOverallImage.tex}{}{}
 \checkFileNoReset{top_nir_intensity_average__relative___pix_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{side_nir_skeleton_intensity_average__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{top_nir_skeleton_intensity_average__relative_nboxplotOverallImage.tex}{}{}
 
 \ifthenelse{\boolean{isFile1}}{
 
@@ -1147,18 +1188,40 @@ of the group image analysis.
 	\item Represents the water content of the plant
 	\end{itemize}
 	
-	\checkFile{side_nir_intensity_average__relative_nboxplotOverallImage.tex}{top_nir_intensity_average__relative___pix_nboxplotOverallImage.tex}{}
-	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+	\resetBoolean
+	\checkFileNoReset{side_nir_intensity_average__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_nir_intensity_average__relative___pix_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_nir_skeleton_intensity_average__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_nir_skeleton_intensity_averagenboxplotOverallImage.tex}{}{}
+
+	\ifthenelse{\boolean{isFile1}}{
+% 	\checkFile{side_nir_intensity_average__relative_nboxplotOverallImage.tex}{top_nir_intensity_average__relative___pix_nboxplotOverallImage.tex}{}
+% 	\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
 		\ownClearPage
 		\subsection{Average near-infrared intensity}
-		
-		\ifthenelse{\boolean{isFile1}}{	
+			
+		\checkFile{side_nir_intensity_average__relative_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
 			Average NIR intensity for side view:
 			\loadTex{side_nir_intensity_average__relative_nboxplotOverallImage}
 		}{}
-		\ifthenelse{\boolean{isFile2}}{
+		
+		\checkFile{side_nir_skeleton_intensity_average__relative_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			Average NIR intensity of skeleton for side view:
+			\loadTex{side_nir_skeleton_intensity_average__relative_nboxplotOverallImage}
+		}{}
+		
+		\checkFile{top_nir_intensity_average__relative___pix_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
 			Average NIR intensity for top view:
 			\loadTex{top_nir_intensity_average__relative___pix_nboxplotOverallImage}
+		}{}
+		
+		\checkFile{top_nir_skeleton_intensity_averagenboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			Average NIR intensity of skeleton for top view:
+			\loadTex{top_nir_skeleton_intensity_averagenboxplotOverallImage}
 		}{}
 	}{}
 	
@@ -1449,6 +1512,14 @@ of the group image analysis.
 \checkFileNoReset{top_hull_pc2nboxplotOverallImage.tex}{}{}
 \checkFileNoReset{top_hull_pc2_normnboxplotOverallImage.tex}{}{}
 \checkFileNoReset{top_hull_fillgrade__percent_nboxplotOverallImage.tex}{}{}
+
+\checkFileNoReset{side_compactness_16__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{top_compactness_16__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{side_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{top_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{side_compactness_01__relative_nboxplotOverallImage.tex}{}{}
+\checkFileNoReset{top_compactness_01__relative_nboxplotOverallImage.tex}{}{}
+
 \ifthenelse{\boolean{isFile1}}{
 
 	\resetClear
@@ -1477,6 +1548,10 @@ of the group image analysis.
 	\checkFileNoReset{side_hull_pc2nboxplotOverallImage.tex}{}{}
 	\checkFileNoReset{side_hull_pc2_normnboxplotOverallImage.tex}{}{}
 	\checkFileNoReset{side_hull_fillgrade__percent_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_compactness_16__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_compactness_01__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{side_hull_circumcircle_d__px_nboxplotOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
  		
  		\resetClearSub
@@ -1508,6 +1583,19 @@ of the group image analysis.
 			}{}
 		}
 		
+		\checkFileNoReset{side_hull_circumcircle_d__px_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+	
+			\ownClearPageSub
+			\subsubsection{Circumcircle diameter}
+			\begin{itemize}
+			\item The minimum diameter of a circle surrounding the plant. 
+			\item Unit: px
+			\end{itemize}
+			\loadTex{side_hull_circumcircle_d__px_nboxplotOverallImage}
+			
+		}
+
 
 		\resetBoolean
 		\checkFileNoReset{side_hull_pc1nboxplotOverallImage.tex}{}{}
@@ -1573,7 +1661,46 @@ of the group image analysis.
 			\end{itemize}
 			\loadTex{side_hull_fillgrade__percent_nboxplotOverallImage}
 		}{}
-
+		
+		\checkFile{side_compactness_16__relative_nboxplotOverallImage.tex}{side_compactness_01__relative_nboxplotOverallImage.tex}{}
+		\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+			\ownClearPageSub
+			\subsubsection{Compactness}
+			
+			"The compactness measure of a shape, sometimes called the shape factor, is a
+			numerical quantity representing the degree to which a shape is compact.
+			\ldots A common compactness measure is the Isoperimetric quotient, the ratio
+			of the area of the shape to the area of a circle (the most compact shape) having the same perimeter."
+	
+		 	\begin{tiny}
+		 	Wikipedia contributors, "Compactness measure of a shape",
+		 	Wikipedia, The Free Encyclopedia,
+			\url{http://en.wikipedia.org/w/index.php?title=Compactness_measure_of_a_shape&oldid=485591387}
+			(accessed June 25, 2012).
+			\end{tiny}
+			
+			\ifthenelse{\boolean{isFile1}} {
+				\loadTex{side_compactness_16__relative_nboxplotOverallImage}
+			}{}
+			\ifthenelse{\boolean{isFile2}} {
+				\loadTex{side_compactness_01__relative_nboxplotOverallImage}
+			}{}
+		
+		\checkFile{side_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Circularity}
+			"Roundness is the measure of the sharpness of a particle's edges and corners."
+	
+		 	\begin{tiny}
+		 	Wikipedia contributors, "Roundness (object)",
+		 	Wikipedia, The Free Encyclopedia,
+			\url{http://en.wikipedia.org/w/index.php?title=Roundness_(object)&oldid=487251484}
+			(accessed June 25, 2012).
+			\end{tiny}
+			\loadTex{side_hull_circularity__relative_nboxplotOverallImage}
+		}{}
+	}{}
 }{}
 
 
@@ -1585,6 +1712,10 @@ of the group image analysis.
 	\checkFileNoReset{top_hull_pc2nboxplotOverallImage.tex}{}{}
 	\checkFileNoReset{top_hull_pc2_normnboxplotOverallImage.tex}{}{}
 	\checkFileNoReset{top_hull_fillgrade__percent_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_compactness_16__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_compactness_01__relative_nboxplotOverallImage.tex}{}{}
+	\checkFileNoReset{top_hull_circumcircle_d__px_nboxplotOverallImage.tex}{}{}
 	\ifthenelse{\boolean{isFile1}}{
 		\resetClearSub
 		\ownClearPage
@@ -1614,6 +1745,18 @@ of the group image analysis.
 			}{}
 		}
 
+		\checkFileNoReset{top_hull_circumcircle_d__px_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+	
+			\ownClearPageSub
+			\subsubsection{Circumcircle diameter}
+			\begin{itemize}
+			\item The minimum diameter of a circle surrounding the plant. 
+			\item Unit: px
+			\end{itemize}
+			\loadTex{top_hull_circumcircle_d__px_nboxplotOverallImage}
+			
+		}
 
 		\resetBoolean
 		\checkFileNoReset{top_hull_pc1nboxplotOverallImage.tex}{}{}
@@ -1677,6 +1820,47 @@ of the group image analysis.
 			\end{itemize}
 			\loadTex{top_hull_fillgrade__percent_nboxplotOverallImage}
 		}{}
+		
+		\checkFile{top_compactness_16__relative_nboxplotOverallImage.tex}{top_compactness_01__relative_nboxplotOverallImage.tex}{}
+		\ifthenelse{\boolean{isFile1} \or \boolean{isFile2}}{
+			\ownClearPageSub
+			\subsubsection{Compactness}
+			
+			"The compactness measure of a shape, sometimes called the shape factor, is a
+			numerical quantity representing the degree to which a shape is compact.
+			\ldots A common compactness measure is the Isoperimetric quotient, the ratio
+			of the area of the shape to the area of a circle (the most compact shape) having the same perimeter."
+	
+		 	\begin{tiny}
+		 	Wikipedia contributors, "Compactness measure of a shape",
+		 	Wikipedia, The Free Encyclopedia,
+			\url{http://en.wikipedia.org/w/index.php?title=Compactness_measure_of_a_shape&oldid=485591387}
+			(accessed June 25, 2012).
+			\end{tiny}
+			
+			\ifthenelse{\boolean{isFile1}} {
+				\loadTex{top_compactness_16__relative_nboxplotOverallImage}
+			}{}
+			\ifthenelse{\boolean{isFile2}} {
+				\loadTex{top_compactness_01__relative_nboxplotOverallImage}
+			}{}
+		}{}
+		
+		\checkFile{top_hull_circularity__relative_nboxplotOverallImage.tex}{}{}
+		\ifthenelse{\boolean{isFile1}}{
+			\ownClearPageSub
+			\subsubsection{Circularity}
+			"Roundness is the measure of the sharpness of a particle's edges and corners."
+	
+		 	\begin{tiny}
+		 	Wikipedia contributors, "Roundness (object)",
+		 	Wikipedia, The Free Encyclopedia,
+			\url{http://en.wikipedia.org/w/index.php?title=Roundness_(object)&oldid=487251484}
+			(accessed June 25, 2012).
+			\end{tiny}
+			\loadTex{top_hull_circularity__relative_nboxplotOverallImage}
+		}{}
+		
 	}{}
 }{}
 
