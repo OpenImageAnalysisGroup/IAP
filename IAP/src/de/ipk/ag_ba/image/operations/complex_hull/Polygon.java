@@ -224,7 +224,7 @@ class Polygon {
 	}
 	
 	public Span2result getMaxSpan2len(Line span) {
-		double res = Double.NaN;
+		// double res = Double.NaN;
 		Line2D.Double l = new Line2D.Double(span.getP0().x, span.getP0().y, span.getP1().x, span.getP1().y);
 		Point p1 = null, p1l = null;
 		double distP1 = Double.NaN;
@@ -232,8 +232,8 @@ class Polygon {
 		double distP2 = Double.NaN;
 		for (int i = 0; i < points.length; i++) {
 			double dist = l.ptLineDist(points[i].x, points[i].y);
-			if (Double.isNaN(res) || dist > res)
-				res = dist;
+			// if (Double.isNaN(res) || dist > res)
+			// res = dist;
 			
 			int ccw = l.relativeCCW(points[i].x, points[i].y);
 			if (ccw < 0) {
@@ -261,7 +261,7 @@ class Polygon {
 				}
 			}
 		}
-		
-		return new Span2result(res, p1, p2, p1l, p2l, distP1, distP2);
+		// (res
+		return new Span2result(l.getP1().distance(l.getP2()), p1, p2, p1l, p2l, distP1, distP2);
 	}
 }
