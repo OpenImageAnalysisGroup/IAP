@@ -255,8 +255,10 @@ public class PdfCreator {
 				safe(experiment.getHeader().getGlobalOutlierInfo() != null ?
 						StringManipulationTools.stringReplace(experiment.getHeader().getGlobalOutlierInfo(), "//", "; ")
 						: ""));
-		c = StringManipulationTools.stringReplace(c, "--SequenceEXP--", safe(experiment.getHeader().getSequence() != null ? experiment.getHeader()
-				.getSequence() : ""));
+		c = StringManipulationTools.stringReplace(c, "--SequenceEXP--",
+				safe(experiment.getHeader().getSequence() != null ?
+						StringManipulationTools.stringReplace(experiment.getHeader().getSequence(), "//", "& \\tabularnewline ")
+						: ""));
 		
 		c = StringManipulationTools.stringReplace(c, "--ImagesExp--", safe(experiment.getHeader().getNumberOfFiles() + ""));
 		

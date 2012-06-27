@@ -35,10 +35,13 @@ NONE.TREATMENT <- "noneTreatment"
 NOT.NUMERIC.OR.ALL.ZERO <- "NotNumericOrAllZero"
 NOT.EXISTS <- "notExists"
 
+##path
+PLOTTING.LISTS <- "plottingLists"
+
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- FALSE
+calculateOnlyNBox <- TRUE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
@@ -197,6 +200,13 @@ ownCat <- function(text, endline=TRUE){
 #		print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 #		print(text)
 #		print("hhhhhhhhhhhhhhhhhhhhhhhhhhhh")})
+}
+
+loadFiles <- function(path, pattern = "\\.[Rr]$", trace = TRUE) {
+	for (nm in list.files(path, pattern = pattern)) {
+		if(trace) ownCat(paste("load", nm, sep=""))           
+		source(file.path(path, nm))
+	}
 }
 
 overallOutlierDetection <- function(overallList) {
@@ -533,7 +543,7 @@ overallChangeName <- function(overallList) {
 	
 	if (!is.null(overallList$imageFileNames_nBoxplots)) {
 		if (overallList$debug) {ownCat("line plots..."); }
-		overallList$imageFileNames_nBoxplots <- changefileName(overallList$imageFileNames_nBoxplots)
+		overallList$imageFileNames_nBoxplots <- changefileName(overallList$imageFileNames_nBoxplots, NBOX.PLOT)
 		names(overallList$imageFileNames_nBoxplots) <- c(1:length(overallList$imageFileNames_nBoxplots))
 		
 		overallList$nBoxDesName <- as.list(overallList$nBoxDesName)
@@ -542,7 +552,7 @@ overallChangeName <- function(overallList) {
 	
 	if (!is.null(overallList$imageFileNames_Boxplots)) {
 		if (overallList$debug) {ownCat("boxplots...");}
-		overallList$imageFileNames_Boxplots <- changefileName(overallList$imageFileNames_Boxplots)
+		overallList$imageFileNames_Boxplots <- changefileName(overallList$imageFileNames_Boxplots, BOX.PLOT)
 		names(overallList$imageFileNames_Boxplots) <- c(1:length(overallList$imageFileNames_Boxplots))
 		
 		overallList$boxDesName <- as.list(overallList$boxDesName)
@@ -551,7 +561,7 @@ overallChangeName <- function(overallList) {
 	
 	if (!is.null(overallList$imageFileNames_StackedPlots)) {
 		if (overallList$debug) {ownCat("Stacked boxplots...");}
-		overallList$imageFileNames_StackedPlots <- changefileName(overallList$imageFileNames_StackedPlots)
+		overallList$imageFileNames_StackedPlots <- changefileName(overallList$imageFileNames_StackedPlots, STACKBOX.PLOT)
 		names(overallList$imageFileNames_StackedPlots) <- c(1:length(overallList$imageFileNames_StackedPlots))
 		
 		overallList$boxStackDesName = as.list(overallList$boxStackDesName)
@@ -560,7 +570,7 @@ overallChangeName <- function(overallList) {
 	
 	if (!is.null(overallList$imageFileNames_SpiderPlots)) {
 		if (overallList$debug) {ownCat("spiderplots...");}
-		overallList$imageFileNames_SpiderPlots <- changefileName(overallList$imageFileNames_SpiderPlots)
+		overallList$imageFileNames_SpiderPlots <- changefileName(overallList$imageFileNames_SpiderPlots, SPIDER.PLOT)
 		names(overallList$imageFileNames_SpiderPlots) <- c(1:length(overallList$imageFileNames_SpiderPlots))
 		
 		#overallList$boxSpiderDesName = as.list(overallList$boxSpiderDesName)
@@ -569,7 +579,7 @@ overallChangeName <- function(overallList) {
 
 	if (!is.null(overallList$imageFileNames_violinPlots) & overallList$isRatio) {
 		if (overallList$debug) {ownCat("violinplots...");}
-		overallList$imageFileNames_violinPlots <- changefileName(overallList$imageFileNames_violinPlots)
+		overallList$imageFileNames_violinPlots <- changefileName(overallList$imageFileNames_violinPlots, VIOLIN.PLOT)
 		names(overallList$imageFileNames_violinPlots) <- c(1:length(overallList$imageFileNames_violinPlots))
 		
 		overallList$violinBoxDesName <- as.list(overallList$violinBoxDesName)
@@ -648,17 +658,19 @@ checkTypOfExperiment <- function(overallList) {
 }
 
 
-changefileName <- function(fileNameVector) {
+changefileName <- function(fileNameVector, typOfPlot) {
 	#Sollten hier nicht noch die Leerzeichen durch Punkte ersetzt werden?
 	
 	fileNameVector = gsub("\\$", ";", substr(fileNameVector, 1, 70))
 	fileNameVector = gsub("\\^", "", fileNameVector)
 
-	for(i in 1:length(fileNameVector)) {
-		if (length(grep("\\.bin\\.",fileNameVector[i], ignore.case=TRUE)) > 0){
-			stringSplit <- paste(strsplit(fileNameVector[i], '\\.bin\\.')[[1]][1], ".bin.", sep="")
-			fileNameVector[i] <- stringSplit
-		} 
+	if(typOfPlot == STACKBOX.PLOT) {
+		for(i in 1:length(fileNameVector)) {
+			if (length(grep("\\.bin\\.",fileNameVector[i], ignore.case=TRUE)) > 0){
+				stringSplit <- paste(strsplit(fileNameVector[i], '\\.bin\\.')[[1]][1], ".bin.", sep="")
+				fileNameVector[i] <- stringSplit
+			} 
+		}
 	}
 
 	return(as.list(fileNameVector))
@@ -686,6 +698,7 @@ preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".", is
 overallPreprocessingOfDescriptor <- function(overallList) {
 	overallList$debug %debug% "overallPreprocessingOfDescriptor()"	
 	
+	#columnsAfterCheckOfNormalized <- checkForNormalizedColumns(descriptorSet_nBoxplot)
 	if (!is.null(overallList$nBoxDes)) {
 		if (overallList$debug) {ownCat(NBOX.PLOT)}
 		for (n in 1:length(overallList$nBoxDes)) {
@@ -759,10 +772,23 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 	
 	errorDescriptor = descriptorVector %GetDescriptorAfterCheckIfDescriptorNotExists% iniDataSet 
 	descriptorVector = descriptorVector %GetDescriptorsAfterCheckIfDescriptorExists% iniDataSet
+
+	for(nn in descriptorVector) {	
+		if((length(grep("normalized.",nn , ignore.case=TRUE)) > 0) ||
+		   (length(grep("norm.",nn , ignore.case=TRUE)) > 0)){
+   			nnUn <- gsub("normalized."," ",nn)
+			nnUn <- gsub("norm."," ",nnUn)
+			if(nnUn %in% descriptorVector) {
+				errorDescriptor <- c(errorDescriptor, nnUn)
+				descriptorVector[descriptorVector!=nnUn]
+			} 
+  		}
+	}
+	
 	if (length(errorDescriptor)>0) {
 		errorDescriptor %errorReport% NOT.EXISTS
 	} 
-	
+
 	if (length(descriptorVector) > 0) {
 		return(as.data.frame(descriptorVector))
 	} else {
@@ -1311,14 +1337,15 @@ setColorListHist <- function(descriptorList) {
 	
 	if (length(grep("fluo", getVector(descriptorList), ignore.case=TRUE)) > 0) { #rot			
 		colorList = as.list(hsv(h=c(rev(intervalFluo), rev(intervalFluo20)), s=c(intervalSat, intervalSat20), v=1))
-	} else 
-	if (length(grep("phenol", getVector(descriptorList), ignore.case=TRUE)) > 0) { #gelb
+	} else if (length(grep("phenol", getVector(descriptorList), ignore.case=TRUE)) > 0) { #gelb
 		colorList = as.list(hsv(h=c(intervalFluo, intervalFluo20), s=c(intervalSat, intervalSat20), v=1))
-	} else 
-	if (length(grep("vis", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+	} else if (length(grep("vis.h", getVector(descriptorList), ignore.case=TRUE)) > 0) {
 		colorList = as.list(hsv(h=c(interval, interval20), s=1, v=c(intervalSat, intervalSat20)))
-	} else 
-	if (length(grep("nir", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+	} else if (length(grep("vis.s", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+		#muss noch angepasst werden!!
+		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval),rev(interval20)), max = 1))
+	} else if ((length(grep("nir", getVector(descriptorList), ignore.case=TRUE)) > 0) ||
+			   (length(grep("vis.v", getVector(descriptorList), ignore.case=TRUE)) > 0)) {
 		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval),rev(interval20)), max = 1))		
 	} else {
 		return(list(0))
@@ -1423,6 +1450,8 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 			latexText = paste(latexText, "\\subsubsection{",ylabel,"}\n", sep="" )
 		} else if (subsectionDepth == 3) {
 			latexText = paste(latexText, "\\paragraph{",ylabel,"}~", sep="" )
+		} else if (subsectionDepth == 4) {
+			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
 		}
 	}
 	
@@ -1650,7 +1679,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong, maxValues) {
 	#numberCharAfterSeparate <- 8
 	if(tooLong) {
-		if(maxValues > 10)
+#		if(maxValues > 10)
 		
 		if (nchar(n) > (numberCharAfterSeparate + 4)) {
 			newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
@@ -2096,7 +2125,11 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	
 		if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 			whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), diagramTypSave)
+		#print(whichColumShouldUse)
 			overallResult <- cbind(overallResult, ymin=overallResult$mean-overallResult$se, ymax=overallResult$mean+overallResult$se)
+			
+			reorderList <- reorderThePlotOrder(overallResult, diagramTypSave, whichColumShouldUse)
+			overallResult <- reorderList$overallResult
 #			print(whichColumShouldUse)
 #			print(head(overallResult))
 			plot <-	ggplot() 
@@ -2181,11 +2214,14 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 								ylab(overallDesName[[imagesIndex]])
 					}
 					
+			colorReorder <- overallColor[[imagesIndex]][reorderList$sortList]
+			shapeReorder <- c(1:length(overallColor[[imagesIndex]]))[reorderList$sortList]
 								
+			
 			plot <- plot +
 					scale_fill_manual(values = color, guide="none") +
-					scale_colour_manual(values= overallColor[[imagesIndex]]) +
-					scale_shape_manual(values = c(1:length(overallColor[[imagesIndex]]))) +
+					scale_colour_manual(values= colorReorder) +
+					scale_shape_manual(values = shapeReorder) +
 					theme_bw()
 					
 			if((overallList$secondTreatment == NONE && overallList$split.Treatment.First) || 
@@ -2279,6 +2315,8 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 					if((length(grep("convex",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) ||
 					   (length(grep("maximum extension",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0)){
 						subsectionDepth <- 3
+					} else if((length(grep("_vis_hsv_",overallFileName[[imagesIndex]], ignore.case=TRUE)) > 0)) {
+						subsectionDepth <- 4
 					} else {
 						subsectionDepth <- 2
 					}
@@ -2438,7 +2476,9 @@ plotStackedImage <- function(overallResult, overallDesName, overallList, imagesI
 		}
 		
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
-#		
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), STACKBOX.PLOT)
+		reorderList <- reorderThePlotOrder(overallResult, STACKBOX.PLOT, whichColumShouldUse)
+		overallResult <- reorderList$overallResult
 #		if ("primaerTreatment" %in% colnames(overallResult)) {
 #			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 #		} else {
@@ -3440,11 +3480,21 @@ setColorDependentOfGroup <- function(overallResult) {
 }
 
 OneMinusTheValue <- function(overallResult) {
-	if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
-		overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
-	} else {
-		overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
+	
+	for(nn in colnames(overallResult)) {
+		if(length(grep("nir",nn, ignore.case=TRUE)) > 0){
+			notOneMinus <- c(notOneMinus, nn)
+		}
 	}
+	colMinus <- overallResult %allColnamesWithoutThisOnes% notOneMinus
+		if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+			#overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
+			colMinus <- colMinus[-c(1:3)]
+		} else {
+			#overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
+			colMinus <- colMinus[-c(1:2)]
+		}
+		overallResult[,colMinus] <- 1-overallResult[,colMinus]
 	return(overallResult)
 }
 
@@ -3518,17 +3568,38 @@ makeViolinPlotDiagram <- function(overallResult, overallDesName, overallList, im
 	}		
 }
 
-reorderThePlotOrder <- function(overallResult) {
+reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = NAME) {
 	groupedOverallResult <- data.table(overallResult)
-	sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm=TRUE), by=c(NAME)])
-	sumVector$c <- levels(overallResult[[NAME]])
+	#sortString <- NAME
 	
-	for(n in levels(overallResult[[NAME]])) {
-		overallResult[[NAME]] <- replace(as.character(overallResult[[NAME]]), overallResult[[NAME]] == n, paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep=""))
-		sumVector[sumVector$c == n,]$c <- paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep="")
+#	if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
+#		sortString <- PRIMAER.TREATMENT
+#	}
+#print(head(groupedOverallResult))
+#print(whichColumShouldUse)
+
+	if(typOfPlot == STACKBOX.PLOT) {
+		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(values), sum, na.rm=TRUE), by=c(whichColumShouldUse)])
+	} else {
+		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm=TRUE), by=c(whichColumShouldUse)])
 	}
+	sumVector$c <- levels(overallResult[[whichColumShouldUse]])
 	
-	return(factor(overallResult[[NAME]], levels = sumVector[order(sumVector$V1),]$c))
+#	print(head(sumVector))
+#	print(levels(overallResult[[sortString]]))
+#	print(sumVector[order(sumVector$V1),]$c)
+	
+	if(typOfPlot == VIOLIN.PLOT) {
+		for(n in levels(overallResult[[whichColumShouldUse]])) {
+			overallResult[[whichColumShouldUse]] <- replace(as.character(overallResult[[whichColumShouldUse]]), overallResult[[whichColumShouldUse]] == n, paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep=""))
+			sumVector[sumVector$c == n,]$c <- paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep="")
+		}
+	}
+	sortList <- order(sumVector$V1, decreasing = TRUE)
+	overallResult[[whichColumShouldUse]] <- factor(overallResult[[whichColumShouldUse]], levels = sumVector[sortList, ]$c)
+	print(head(sortList))
+	
+	return(list(overallResult = overallResult, sortList = sortList))
 }
 
 buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, yValues, diagramTypSave, additionalValues = NONE, additionalDataFrameValues = NONE) {
@@ -3652,7 +3723,7 @@ plotViolinPlotDiagram <- function(overallResult, overallDesName, overallList, im
 	overallFileName <- overallList$imageFileNames_violinPlots
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
-	overallResult$name <- reorderThePlotOrder(overallResult)
+	overallResult <- reorderThePlotOrder(overallResult, diagramTypSave)
 	stressArea <- data.frame()
 
 	#print(head(overallResult))
@@ -4371,308 +4442,31 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			descriptorSet_boxplotStacked <- vector()
 			
 			if (length(workingDataSet[,1]) > 0) {
-				#nboxplot
+				
+				loadFiles(path = ".", pattern = "PlotList\\.[Rr]$")
 
 				if (typOfStartOptions == "all") {
-					descriptorSet_nBoxplot = colnames(workingDataSet)
-					descriptorSetName_nBoxplot = descriptorSet
+					descriptorSet_nBoxplot <- colnames(workingDataSet)
+					descriptorSetName_nBoxplot <- descriptorSet
 					
-				} else { #Report	
-					descriptorSet_nBoxplot = c(#"volume.my", "volume.fluo.plant_weight.iap"
-							 					"Weight A (g)", 
-												"Weight B (g)",
-												"Water (sum of day)",
-												#"Water (weight-diff)", 
-												"side.height.norm (mm)", 
-												"side.width.norm (mm)", 
-												
-												"side.area.norm (mm^2)", 
-												"top.area.norm (mm^2)", 											
-												"side.fluo.intensity.chlorophyl.average (relative)", 
-												"side.fluo.intensity.phenol.average (relative)", 
-												"side.nir.intensity.average (relative)",
-												
-												"top.nir.intensity.average (relative / pix)",												
-												"side.leaf.count.median (leafs)", 
-												"side.bloom.count (tassel)", 
-												"side.leaf.length.sum.norm.max (mm)", 
-												"volume.iap (px^3)", 
-												
-												"volume.lt (px^3)", 
-												"volume.iap.wue",
-												"side.area.avg.wue",
-												"side.nir.wetness.plant_weight_drought_loss", 
-												"top.nir.wetness.plant_weight_drought_loss", 
-												
-												"side.nir.wetness.average (percent)", 
-												"top.nir.wetness.average (percent)", 
-												#"side.area.relative", 
-												"side.height.norm.relative", 
-												"side.width.norm.relative", 
-												
-												"top.area.relative", 
-												"side.area.relative", 
-												"volume.iap.relative", 
-												"side.height (px)", 
-												"side.width (px)", 
-												
-												"side.area (px)", 
-												"top.area (px)",
-												############ new #######
-												"side.hull.area (px)",
-												"side.hull.area.norm (mm^2)",
-												"side.hull.pc1",
-												
-												"side.hull.pc1.norm",
-												"side.hull.pc2",
-												"side.hull.pc2.norm",
-												"side.hull.fillgrade (percent)",		
-												"top.hull.area (px)",
-												
-												"top.hull.area.norm (mm^2)",
-												"top.hull.pc1",
-												"top.hull.pc1.norm",
-												"top.hull.pc2",
-												"top.hull.pc2.norm",
-												
-												"top.hull.fillgrade (percent)",
-												"side.vis.hue.average",
-												"top.vis.hue.average",
-												"mark1.y (percent)",
-												#"mark2.y (percent)",
-												
-												"mark3.y (percent)",
-												"top.ir.intensity.average",
-												"side.ir.intensity.average",
-												"side.nir.skeleton.intensity.average (relative)",
-												"top.nir.skeleton.intensity.average",
-												
-												"side.compactness.16 (relative)",
-												"top.compactness.16 (relative)",
-												"side.hull.circularity (relative)",
-												"top.hull.circularity (relative)",
-												"side.compactness.01 (relative)",
-												
-												"top.compactness.01 (relative)",
-												"side.fluo.intensity.average (relative)",
-												"top.fluo.intensity.average (relative / pix)",
-												"side.hull.circumcircle.d (px)",
-												"top.hull.circumcircle.d (px)"
-												)
-				
-					descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
-													"weight before watering (g)", 
-													"weight after watering (g)",
-													"daily watering amount (g)",
-													#"water weight (g)", 
-													"height (zoom corrected) (mm)", 
-													"width (zoom corrected) (mm)", 
-													
-													"side area (zoom corrected) (mm^2)", 
-													"top area (zoom corrected) (mm^2)", 
-													"chlorophyll intensity (relative intensity/pixel)", 
-													"fluorescence intensity (relative intensity/pixel)", 
-													"side nir intensity (relative intensity/pixel)",
-													
-													"top nir intensity (relative intensity/pixel)",
-													"number of leafs", 
-													"number of tassel florets", 
-													"length of leafs plus stem (mm)", 			 
-													"digital biomass (visible light images, IAP formula) (px^3)", 
-													
-													"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
-													"volume based water use efficiency", 
-													"digital side area based water use efficiency",
-													"weighted loss through drought stress (side)", 
-													"weighted loss through drought stress (top)", 
-													
-													"Average wetness of side image", 
-													"Average wetness of top image", 
-													#"growth in %/day", 
-													"plant height growth rate (%/day)", 
-													"plant width growth rate (%/day)", 
-													
-													"top area growth rate (%/day)", 
-													"side area growth rate (%/day)", 
-													"volume growth (visible light images, IAP based formula) (%/day)", 
-													"height (px)", 
-													"width (px)", 
-													
-													"side area (px)", 
-													"top area (px)",
-													####### new #######
-													"side area of convex hull (px)",
-													"side area of convex hull (zoom corrected) (mm^2)",
-													"side maximum extension (px)",
-													
-													"side maximum extension (zoom corrected) (mm)",
-													"opposite direction of the side maximum extension (px)",
-													"opposite direction of the side maximum extension (zoom corrected) (mm)",
-													"fillgrade of side convex hull (%)",
-													"top area of convex hull (px)",
-													
-													"top area of convex hull (zoom corrected) (mm^2)",
-													"top maximum extension (px)",
-													"top maximum extension (zoom corrected) (mm)",
-													"opposite direction of the top maximum extension (px)",
-													"opposite direction of the top maximum extension (zoom corrected) (mm)",
-													
-													"fillgrade of top convex hull (%)",
-													"side visible hue average value",
-													"top visible hue average value",
-													"blue marker position from top (%)",
-													#"blue marker position from middle (%)",
-													
-													"blue marker position from bottom  (%)",
-													"top ir intensity",
-													"side ir intensity",
-													"side skeleton nir intensity (relative intensity/pixel)",
-													"top skeleton nir intensity (relative intensity/pixel)",
-													
-													"side compactness (1-16)",
-													"top compactness (1-16)",
-													"side circularity",
-													"top circularity",
-													"side compactness (0-1)",
-													
-													"top compactness (0-1)",
-													"side fluo intensity (relative intensity/pixel)",
-													"top fluo intensity (relative intensity/pixel)",
-													"side circumcircle diameter (px)",
-													"top circumcircle diameter (px)"
-													)		
+				} else { #Report		
+					descriptorSet_nBoxplot <- names(nBox.plot.list)
+					descriptorSetName_nBoxplot <- getVector(nBox.plot.list)		
 				}
-	
-				nBoxOptions= NULL
-				#diagramTypVector = rep.int("nboxplot", times=length(descriptorSetName))
-		
-				#boxplot
-				descriptorSet_boxplot = c(#"volume.my"
-										   "side.height.norm (mm)", 
-										   "side.width.norm (mm)", 
-										   "side.area.norm (mm^2)", 
-										   "top.area.norm (mm^2)", 
-										   "volume.fluo.iap", 
-										   "volume.iap (px^3)", 
-										   "volume.lt (px^3)", 
-										   "side.height (px)", 
-										   "side.width (px)", 
-										   "side.area (px)", 
-										   "top.area (px)"
-											)
+							
+				descriptorSet_boxplot <- names(box.plot.list)
+				descriptorSetName_boxplot <- getVector(box.plot.list)
 				
-				descriptorSetName_boxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-											   "height (zoom corrected) (mm)", 
-										  	   "width (zoom corrected) (mm)", 
-											   "side area (zoom corrected) (mm^2)", 
-											   "top area (zoom corrected) (mm^2)", 
-											   "digital biomass (fluorescence images, IAP formula) (px^3)", 
-											   "digital biomass (visible light images, IAP formula) (px^3)", 
-											   "digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
-											   "height (px)", 
-											   "width (px)", 
-											   "side area (px)", 
-											   "top area (px)"
-												)	
-				#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-				boxOptions= NULL
+				descriptorSet_spiderplot <- names(spider.plot.list)
+				descriptorSetName_spiderplot <- getVector(spider.plot.list)
 				
-				#spiderplot
-				descriptorSet_spiderplot = c(#"volume.my"
-						"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
-						"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
-
-				)
-				
-				descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-						"height (zoom corrected) (mm)$width (zoom corrected) (mm)$side area (zoom corrected) (mm^2)$top area (zoom corrected) (mm^2)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value",
-						"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value"
-#						"Zoom corrected Spiderchart", 
-#						"Spiderchart"
-				)	
-
-				#spiderOptions= list(typOfGeomBar=c("x", "y"))
-				spiderOptions= list(typOfGeomBar=c("x"))
-				
-				
-				descriptorSet_violinBox = c(
-						"side.height.norm (mm)",
-						"side.width.norm (mm)",
-						"side.area.norm (mm^2)",
-						"top.area.norm (mm^2)",
-						"side.fluo.intensity.average (relative)",
-						"side.nir.intensity.average (relative)",
-						"side.vis.hue.average",
-						"top.vis.hue.average",
-						"top.ir.intensity.average",
-						"side.ir.intensity.average",
-						"top.nir.intensity.average (relative / pix)",
-						"top.fluo.intensity.average (relative / pix)"
-
-				)	
-				
-				descriptorSetName_violinBox = c(
-						"height (zoom corrected)",
-						"width (zoom corrected)",
-						"side area (zoom corrected)",
-						"top area (zoom corrected)",
-						"side fluo intensity",
-						"side nir intensity",
-						"side visible hue average value",
-						"top visible hue average value",
-						"top ir intensity",
-						"side ir intensity",
-						"top nir intensity",
-						"top fluo intensity"
-				)	
-				
-				violinOptions= NULL
-				
-				
-				#boxplotStacked
-				descriptorSet_boxplotStacked = c("side.nir.normalized.histogram.bin.", 
-								   				  "side.fluo.histogram.bin.", 
-										  		  "top.nir.histogram.bin.", 
-												  "side.fluo.histogram.ratio.bin.", 
-												  "side.nir.normalized.histogram.bin.", 
-												  "side.fluo.normalized.histogram.bin.", 
-												  "side.fluo.normalized.histogram.ratio.bin.", 
-												  "side.vis.hue.histogram.bin.", 
-												  "side.vis.normalized.histogram.bin.", 
-												  "top.fluo.histogram.bin.", 
-												  "top.fluo.histogram.ratio.bin.", 
-												  "top.nir.histogram.bin.", 
-												  "top.vis.hue.histogram.bin.",
-												  "top.vis.hue.normalized.histogram.bin.",
-												  "top.ir.histogram.bin.",
-												  "side.ir.histogram.bin."
-												)
-												  
-										  
-				descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
-													  "side fluorescence colour spectra (%)", 
-													  "top near-infrared intensities (%)", 
-													  "side fluorescence ratio histogram (%)", 
-													  "side near-infrared (zoom corrected) (%)", 
-													  "side fluorescence colour spectra (zoom corrected) (%)", 
-													  "side fluorescence  colour spectra (%)", 
-													  "side visible light colour histogram (%)", 
-													  "side visible light ratio histogram (zoom corrected) (%)", 
-													  "top fluorescence colour spectra (%)", 
-													  "top fluo ratio histogram (%)", 
-													  "NIR top histogram (%)", 
-													  "top visible light color histogram (%)",
-													  "top visible light color histogram (zoom corrected) (%)",
-													  "top infrared light heat histogram (%)",
-													  "side infrared light heat histogram (%)"
-														)
-				
-				descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
+				descriptorSet_violinBox <- names(violin.plot.list)
+				descriptorSetName_violinBox <- getVector(violin.plot.list)
+								
+				descriptorList <- addDesSet(names(stacked.plot.list), getVector(stacked.plot.list), workingDataSet)
 				descriptorSet_boxplotStacked <- descriptorList$desSet
 				descriptorSetName_boxplotStacked <- descriptorList$desName
-				
-				stackedBarOptions = list(typOfGeomBar=c("fill", "stack")) #, "dodge"
-				#diagramTypVector = c(diagramTypVector, "boxplotStacked", "boxplotStacked")
+
 				
 				appendix = as.logical(appendix %exists% args[5])
 			
@@ -4755,244 +4549,25 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
 		
+		loadFiles(path = ".", pattern = "PlotList\\.[Rr]$")
 		
-		descriptorSet_nBoxplot = c(#"volume.my", "volume.fluo.plant_weight.iap"
-				"Weight A (g)", 
-				"Weight B (g)", 
-				"Water (weight-diff)", 
-				"side.height.norm (mm)", 
-				"side.width.norm (mm)", 
-				"side.area.norm (mm^2)", 
-				"top.area.norm (mm^2)", 											
-				"side.fluo.intensity.chlorophyl.average (relative)", 
-				"side.fluo.intensity.phenol.average (relative)", 
-				"side.nir.intensity.average (relative)",
-				"top.nir.intensity.average (relative / pix)",
-				
-				"side.leaf.count.median (leafs)", 
-				"side.bloom.count (tassel)", 
-				"side.leaf.length.sum.norm.max (mm)", 
-				"volume.iap (px^3)", 
-				"volume.lt (px^3)", 
-				"volume.iap.wue", 
-				"side.nir.wetness.plant_weight_drought_loss", 
-				"top.nir.wetness.plant_weight_drought_loss", 
-				"side.nir.wetness.average (percent)", 
-				"top.nir.wetness.average (percent)", 
-				"side.area.relative", 
-				"side.height.norm.relative", 
-				"side.width.norm.relative", 
-				"top.area.relative", 
-				"side.area.relative", 
-				"volume.iap.relative", 
-				"side.height (px)", 
-				"side.width (px)", 
-				"side.area (px)", 
-				"top.area (px)",
-				############ new #######
-				"side.hull.area (px)",
-				"side.hull.area.norm (mm^2)",
-				"side.hull.pc1",
-				"side.hull.pc1.norm",
-				"side.hull.pc2",
-				"side.hull.pc2.norm",
-				"side.hull.fillgrade (percent)",		
-				"top.hull.area (px)",
-				"top.hull.area.norm (mm^2)",
-				"top.hull.pc1",
-				"top.hull.pc1.norm",
-				"top.hull.pc2",
-				"top.hull.pc2.norm",
-				"top.hull.fillgrade (percent)",
-				"side.vis.hue.average",
-				"top.vis.hue.average",
-				"mark1.y (percent)",
-				"mark2.y (percent)",
-				"mark3.y (percent)",
-				"top.ir.intensity.average",
-				"side.ir.intensity.average"
-				
-		)
+		descriptorSet_nBoxplot <- names(nBox.plot.list)
+		descriptorSetName_nBoxplot <- getVector(nBox.plot.list)		
 		
-		descriptorSetName_nBoxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)", "yellow spectra normed to the realtionship between dry and normal"
-				"weight before watering (g)", 
-				"weight after watering (g)", 
-				"water weight (g)", 
-				"height (zoom corrected) (mm)", 
-				"width (zoom corrected) (mm)", 
-				"side area (zoom corrected) (mm^2)", 
-				"top area (zoom corrected) (mm^2)", 
-				"chlorophyll intensity (relative intensity/pixel)", 
-				"fluorescence intensity (relative intensity/pixel)", 
-				"side nir intensity (relative intensity/pixel)",
-				"top nir intensity (relative intensity/pixel)",
-				"number of leafs", 
-				"number of tassel florets", 
-				"length of leafs plus stem (mm)", 			 
-				"digital biomass (visible light images, IAP formula) (px^3)", 
-				"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
-				"volume based water use efficiency", 
-				"weighted loss through drought stress (side)", 
-				"weighted loss through drought stress (top)", 
-				"Average wetness of side image", 
-				"Average wetness of top image", 
-				"growth in %/day", 
-				"plant height growth rate (%/day)", 
-				"plant width growth rate (%/day)", 
-				"top area growth rate (%/day)", 
-				"side area growth rate (%/day)", 
-				"volume growth (visible light images, IAP based formula) (%/day)", 
-				"height (px)", 
-				"width (px)", 
-				"side area (px)", 
-				"top area (px)",
-				####### new #######
-				"side area of convex hull (px)",
-				"side area of convex hull (zoom corrected) (mm^2)",
-				"side maximum extension (px)",
-				"side maximum extension (zoom corrected) (mm)",
-				"opposite direction of the side maximum extension (px)",
-				"opposite direction of the side maximum extension (zoom corrected) (mm)",
-				"fillgrade of side convex hull (%)",
-				"top area of convex hull (px)",
-				"top area of convex hull (zoom corrected) (mm^2)",
-				"top maximum extension (px)",
-				"top maximum extension (zoom corrected) (mm)",
-				"opposite direction of the top maximum extension (px)",
-				"opposite direction of the top maximum extension (zoom corrected) (mm)",
-				"fillgrade of top convex hull (%)",
-				"side visible hue average value",
-				"top visible hue average value",
-				"blue marker position from top (%)",
-				"blue marker position from middle (%)",
-				"blue marker position from bottom  (%)",
-				"top ir intensity",
-				"side ir intensity"
-		)		
-	
-	nBoxOptions= NULL
-	
-	#boxplot
-	descriptorSet_boxplot = c(#"volume.my"
-			"side.height.norm (mm)", 
-			"side.width.norm (mm)", 
-			"side.area.norm (mm^2)", 
-			"top.area.norm (mm^2)", 
-			"volume.fluo.iap", 
-			"volume.iap (px^3)", 
-			"volume.lt (px^3)", 
-			"side.height (px)", 
-			"side.width (px)", 
-			"side.area (px)", 
-			"top.area (px)"
-	)
-	
-	descriptorSetName_boxplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-			"height (zoom corrected) (mm)", 
-			"width (zoom corrected) (mm)", 
-			"side area (zoom corrected) (mm^2)", 
-			"top area (zoom corrected) (mm^2)", 
-			"digital biomass (flurescence images, IAP formula) (px^3)", 
-			"digital biomass (visible light images, IAP formula) (px^3)", 
-			"digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
-			"height (px)", 
-			"width (px)", 
-			"side area (px)", 
-			"top area (px)"
-	)	
-	
-	#boxOptions= list(daysOfBoxplotNeeds=c("phase4"))
-	boxOptions= NULL
-	
-	#violinplot
-	descriptorSet_violinBox = c(
-			"side.height.norm (mm)",
-			"side.width.norm (mm)",
-			"side.area.norm (mm^2)",
-			"top.area.norm (mm^2)",
-			"side.fluo.intensity.average (relative)",
-			"side.nir.intensity.average (relative)",
-			"side.vis.hue.average",
-			"top.vis.hue.average",
-			"top.ir.intensity.average",
-			"side.ir.intensity.average"
-	)	
-	
-	descriptorSetName_violinBox = c(
-			"height (zoom corrected) (mm)",
-			"width (zoom corrected) (mm)",
-			"side area (zoom corrected) (mm^2)",
-			"top area (zoom corrected) (mm^2)",
-			"side fluo intensity",
-			"side nir intensity",
-			"side visible hue average value",
-			"top visible hue average value",
-			"top ir intensity",
-			"side ir intensity"
-	)	
-	
-	violinOptions= NULL
-	
-	
-	#boxplotStacked
-	descriptorSet_boxplotStacked = c("side.nir.normalized.histogram.bin.", 
-			"side.fluo.histogram.bin.", 
-			"top.nir.histogram.bin.", 
-			"side.fluo.histogram.ratio.bin.", 
-			"side.nir.normalized.histogram.bin.", 
-			"side.fluo.normalized.histogram.bin.", 
-			"side.fluo.normalized.histogram.ratio.bin.", 
-			"side.vis.hue.histogram.ratio.bin.", 
-			"side.vis.normalized.histogram.ratio.bin.", 
-			"top.fluo.histogram.bin.", 
-			"top.fluo.histogram.ratio.bin.", 
-			"top.nir.histogram.bin.", 
-			"top.vis.hue.histogram.ratio.bin.",
-			"top.ir.histogram.bin.",
-			"side.ir.histogram.bin."
-	)
-	
-	
-	descriptorSetName_boxplotStacked = c("side near-infrared intensities (zoom corrected) (%)", 
-			"side fluorescence colour spectra (%)", 
-			"top near-infrared intensities (%)", 
-			"side fluorescence ratio histogram (%)", 
-			"side near-infrared (zoom corrected) (%)", 
-			"side fluorescence colour spectra (zoom corrected) (%)", 
-			"side fluorescence  colour spectra (%)", 
-			"side visible light colour histogram (%)", 
-			"side visible light ratio histogram (zoom corrected) (%)", 
-			"top fluorescence colour spectra (%)", 
-			"top fluo ratio histogram (%)", 
-			"NIR top histogram (%)", 
-			"top visible light color histogram (%)",
-			"top infrared light heat histogram (%)",
-			"side infrared light heat histogram (%)"
-	)
-	
-	#spiderplot
-	descriptorSet_spiderplot = c(#"volume.my"
-			"side.height.norm (mm)$side.width.norm (mm)$side.area.norm (mm^2)$top.area.norm (mm^2)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average",
-			"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average"
-	
-	)
-	
-	descriptorSetName_spiderplot = c(#"digital biomass (visible light images, IAP formula) (px^3)"
-			"height (zc) (mm)$width (zc) (mm)$side area (zc) (mm^2)$top area (zc) (mm^2)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value",
-			"height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value"
-#						"Zoom corrected Spiderchart", 
-#						"Spiderchart"
-	)	
-	
-	#spiderOptions= list(typOfGeomBar=c("x", "y"))
-	spiderOptions= list(typOfGeomBar=c("x"))
-	
-	descriptorList <- addDesSet(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet)
-	descriptorSet_boxplotStacked <- descriptorList$desSet
-	descriptorSetName_boxplotStacked <- descriptorList$desName
-	
-	stackedBarOptions = list(typOfGeomBar=c("fill", "stack", "dodge"))
+		descriptorSet_boxplot <- names(box.plot.list)
+		descriptorSetName_boxplot <- getVector(box.plot.list)
 		
+		escriptorSet_spiderplot <- names(spider.plot.list)
+		descriptorSetName_spiderplot <- getVector(spider.plot.list)
+		
+		descriptorSet_violinBox <- names(violin.plot.list)
+		descriptorSetName_violinBox <- getVector(violin.plot.list)
+		
+		descriptorList <- addDesSet(names(spider.plot.list), getVector(spider.plot.list), workingDataSet)
+		descriptorSet_boxplotStacked <- descriptorList$desSet
+		descriptorSetName_boxplotStacked <- descriptorList$desName
+		
+		###################
 		
 		boxDes = descriptorSet_boxplot
 		boxStackDes = descriptorSet_boxplotStacked 
@@ -5121,7 +4696,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						stress.Start = stress.Start, stress.End = stress.End, stress.Typ = stress.Typ, stress.Label = stress.Label,
 						split.Treatment.First = split.Treatment.First, split.Treatment.Second = split.Treatment.Second
 						)	
-				
+	
 	overallList$debug %debug% "Start"
 	
 	overallList = checkTypOfExperiment(overallList)
