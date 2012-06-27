@@ -489,6 +489,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					snapshot.setWeight_after(rs.getDouble("weight_after"));
 					snapshot.setWeight_before(rs.getDouble("weight_before"));
 					
+					boolean printWater = false;
+					if (printWater)
+						System.out.println("Water data: " +
+								snapshot.getWater_amount() + " // " + (snapshot.getWeight_after() - snapshot.getWeight_before()));
+					
 					result.add(snapshot);
 				}
 				rs.close();
@@ -865,42 +870,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				// }
 			}
 			
-			if (firstSnapshotInfoForTimePoint) {
-				// if (sn.getWeight_after() > sn.getWeight_before()) {
-				// process water_weight
-				double wa = sn.getWeight_after();
-				double wb = sn.getWeight_before();
-				
-				if (!Double.isNaN(wb) && !Double.isNaN(wa)) {
-					Substance s = new Substance();
-					s.setName("water_weight");
-					
-					Condition condition = new Condition(s);
-					condition.setExperimentInfo(experimentReq);
-					condition.setSpecies(species);
-					condition.setGenotype(genotype);
-					condition.setVariety(variety);
-					condition.setGrowthconditions(growthconditions);
-					condition.setTreatment(treatment);
-					
-					Sample sample = new Sample(condition);
-					sample.setTime(day);
-					sample.setTimeUnit("day");
-					sample.setRowId(sn.getTimestamp().getTime());
-					
-					NumericMeasurement weightBefore = new NumericMeasurement(sample);
-					weightBefore.setReplicateID(replicateID);
-					weightBefore.setUnit("g");
-					weightBefore.setValue(wa - wb);
-					weightBefore.setQualityAnnotation(idTag);
-					
-					measurements.add(weightBefore);
-				}
-				// }
-			}
-			
-			if (firstSnapshotInfoForTimePoint) {
-				// if (sn.getWater_amount() > 0) {
+			if (sn.getWater_amount() > 0) {
 				// process water_amount
 				String iidd = day + "/" + replicateID;
 				
@@ -913,34 +883,60 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						NumericMeasurement water = knownDayAndReplicateIDs.get(iidd);
 						water.setValue(water.getValue() + (wa - wb));// sn.getWater_amount());
 					} else {
-						Substance s = new Substance();
-						s.setName("water_sum");
-						
-						Condition condition = new Condition(s);
-						condition.setExperimentInfo(experimentReq);
-						condition.setSpecies(species);
-						condition.setGenotype(genotype);
-						condition.setVariety(variety);
-						condition.setGrowthconditions(growthconditions);
-						condition.setTreatment(treatment);
-						
-						Sample sample = new Sample(condition);
-						sample.setTime(day);
-						sample.setTimeUnit("day");
-						sample.setRowId(sn.getTimestamp().getTime());
-						
-						NumericMeasurement water = new NumericMeasurement(sample);
-						water.setReplicateID(replicateID);
-						water.setUnit("g");
-						water.setValue(wa - wb);// sn.getWater_amount());
-						water.setQualityAnnotation(idTag);
-						
-						measurements.add(water);
-						
-						knownDayAndReplicateIDs.put(iidd, water);
+						{
+							Substance s = new Substance();
+							s.setName("water_weight");
+							
+							Condition condition = new Condition(s);
+							condition.setExperimentInfo(experimentReq);
+							condition.setSpecies(species);
+							condition.setGenotype(genotype);
+							condition.setVariety(variety);
+							condition.setGrowthconditions(growthconditions);
+							condition.setTreatment(treatment);
+							
+							Sample sample = new Sample(condition);
+							sample.setTime(day);
+							sample.setTimeUnit("day");
+							sample.setRowId(sn.getTimestamp().getTime());
+							
+							NumericMeasurement weightBefore = new NumericMeasurement(sample);
+							weightBefore.setReplicateID(replicateID);
+							weightBefore.setUnit("g");
+							weightBefore.setValue(wa - wb);
+							weightBefore.setQualityAnnotation(idTag);
+							
+							measurements.add(weightBefore);
+						}
+						{
+							Substance s = new Substance();
+							s.setName("water_sum");
+							
+							Condition condition = new Condition(s);
+							condition.setExperimentInfo(experimentReq);
+							condition.setSpecies(species);
+							condition.setGenotype(genotype);
+							condition.setVariety(variety);
+							condition.setGrowthconditions(growthconditions);
+							condition.setTreatment(treatment);
+							
+							Sample sample = new Sample(condition);
+							sample.setTime(day);
+							sample.setTimeUnit("day");
+							sample.setRowId(sn.getTimestamp().getTime());
+							
+							NumericMeasurement water = new NumericMeasurement(sample);
+							water.setReplicateID(replicateID);
+							water.setUnit("g");
+							water.setValue(wa - wb);// sn.getWater_amount());
+							water.setQualityAnnotation(idTag);
+							
+							measurements.add(water);
+							
+							knownDayAndReplicateIDs.put(iidd, water);
+						}
 					}
 				}
-				// }
 			}
 			{
 				// process image
