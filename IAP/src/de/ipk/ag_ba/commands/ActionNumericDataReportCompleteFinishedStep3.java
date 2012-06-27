@@ -574,6 +574,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		cellStylePercent.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
 		
 		HashSet<Integer> percentColumns = new HashSet<Integer>();
+		HashSet<Integer> dateColumns = new HashSet<Integer>();
 		for (int i = 0; i < excelColumnHeaders.size(); i++) {
 			String ch = excelColumnHeaders.get(i);
 			if (ch != null && ch.endsWith("(percent)"))
@@ -585,6 +586,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		
 		// for (String s : BuiltinFormats.getAll())
 		// System.out.println("format: " + s);
+		
+		boolean adjusted = false;
 		
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
@@ -600,6 +603,14 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
+				
+				if (!adjusted && rowNum >= 100) {
+					adjustColumnWidths(sheet, excelColumnHeaders);
+					adjusted = true;
+					if (status != null)
+						status.setCurrentStatusText1("Rows remaining: " + snapshotsToBeProcessed.size());
+				}
+				
 				for (DateDoubleString o : valueRow) {
 					if (o.getString() != null && !o.getString().isEmpty())
 						row.createCell(colNum++).setCellValue(o.getString());
@@ -612,6 +623,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 							}
 						} else
 							if (o.getDate() != null) {
+								dateColumns.add(colNum);
 								Cell cell = row.createCell(colNum++);
 								cell.setCellValue(o.getDate());
 								cell.setCellStyle(cellStyleDate);
@@ -620,8 +632,30 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				}
 			}
 		}
+		
+		if (!adjusted) {
+			adjustColumnWidths(sheet, excelColumnHeaders);
+			adjusted = true;
+		}
+		for (Integer dateCol : dateColumns)
+			sheet.setColumnWidth(dateCol, 5000);
+		
+		if (status != null)
+			status.setCurrentStatusText1("Workbook is filled");
+		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
 		return snapshots;
+	}
+	
+	private void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders) {
+		for (int i = 0; i < excelColumnHeaders.size(); i++) {
+			if (status != null)
+				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
+			sheet.autoSizeColumn(i);
+			System.out.println("w=" + sheet.getColumnWidth(i));
+			if (sheet.getColumnWidth(i) > 10000)
+				sheet.setColumnWidth(i, 10000);
+		}
 	}
 	
 	@Override
