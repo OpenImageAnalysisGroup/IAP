@@ -20,6 +20,9 @@ import javax.swing.JLabel;
 import org.AttributeHelper;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -341,14 +344,18 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			Workbook wb = xlsx ? new XSSFWorkbook() : null;
 			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
+			ArrayList<String> excelColumnHeaders = new ArrayList<String>();
 			if (sheet != null) {
+				// create Header row
 				Row row = sheet.createRow(0);
 				int col = 0;
 				String c = csv.toString().trim();
 				c = StringManipulationTools.stringReplace(c, "\r\n", "");
 				c = StringManipulationTools.stringReplace(c, "\n", "");
-				for (String h : c.split(separator))
+				for (String h : c.split(separator)) {
 					row.createCell(col++).setCellValue(h);
+					excelColumnHeaders.add(h);
+				}
 			}
 			
 			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
@@ -357,7 +364,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusText2("Create XLSX");
 				experiment = null;
-				snapshots = setExcelSheetValues(snapshots, sheet);
+				snapshots = setExcelSheetValues(snapshots, sheet, excelColumnHeaders);
 			} else
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
@@ -550,7 +557,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return res;
 	}
 	
-	private ArrayList<SnapshotDataIAP> setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet) {
+	private ArrayList<SnapshotDataIAP> setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet, ArrayList<String> excelColumnHeaders) {
 		if (status != null)
 			status.setCurrentStatusText2("Fill workbook");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
@@ -558,6 +565,24 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		snapshots = null;
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
+		
+		CreationHelper createHelper = sheet.getWorkbook().getCreationHelper();
+		CellStyle cellStyleDate = sheet.getWorkbook().createCellStyle();
+		cellStyleDate.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
+		
+		CellStyle cellStylePercent = sheet.getWorkbook().createCellStyle();
+		cellStylePercent.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
+		
+		HashSet<Integer> percentColumns = new HashSet<Integer>();
+		for (int i = 0; i < excelColumnHeaders.size(); i++) {
+			String ch = excelColumnHeaders.get(i);
+			if (ch != null && ch.endsWith("(percent)"))
+				percentColumns.add(i);
+		}
+		
+		// for (String s : BuiltinFormats.getAll())
+		// System.out.println("format: " + s);
+		
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			if (status != null)
@@ -576,12 +601,18 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					if (o.getString() != null && !o.getString().isEmpty())
 						row.createCell(colNum++).setCellValue(o.getString());
 					else
-						if (o.getDouble() != null)
-							row.createCell(colNum++).setCellValue(o.getDouble());
-						else
-							if (o.getDate() != null)
-								row.createCell(colNum++).setCellValue(o.getDate());
-							else
+						if (o.getDouble() != null) {
+							Cell cell = row.createCell(colNum++);
+							cell.setCellValue(o.getDouble());
+							if (percentColumns.contains(colNum)) {
+								cell.setCellStyle(cellStylePercent);
+							}
+						} else
+							if (o.getDate() != null) {
+								Cell cell = row.createCell(colNum++);
+								cell.setCellValue(o.getDate());
+								cell.setCellStyle(cellStyleDate);
+							} else
 								colNum++;
 				}
 			}
