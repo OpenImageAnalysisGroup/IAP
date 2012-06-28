@@ -168,9 +168,12 @@ public class ProgressStatusService implements HelperClass {
 			lastSpeed = averageSpeed;
 		}
 		lastRes = result;
-		if (result != null)
-			return result;
-		else
+		if (result != null) {
+			if (result.contains("years"))
+				return "";
+			else
+				return result;
+		} else
 			return "";
 	}
 	
