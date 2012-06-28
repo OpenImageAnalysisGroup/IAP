@@ -131,8 +131,10 @@ public class ExperimentReference {
 				for (ExperimentLoader loader : knownExperimentLoaders) {
 					if (loader.canHandle(databaseId)) {
 						res = loader.getExperiment(header, interactiveGetExperimentSize, status);
-						if (res != null)
+						if (res != null) {
+							experiment = res;
 							return res;
+						}
 					}
 				}
 				if (databaseId.startsWith("lemnatec:"))
@@ -146,6 +148,7 @@ public class ExperimentReference {
 						else
 							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
 				// weakId2exp.put(databaseId, res);
+				this.experiment = res;
 				return res;
 			}
 		}

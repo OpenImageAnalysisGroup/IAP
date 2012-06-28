@@ -208,7 +208,7 @@ public class NavigationButton implements StyleAware {
 				progress = "";
 				
 				s = "<br>";
-				int len = (dots + " " + title + progress).length();
+				int len = 20;// (dots + " " + title + progress).length();
 				s += "[" + getProgress("#", "-", len + 5, dp) + "]";
 			}
 			String line2 = "";
