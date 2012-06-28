@@ -467,7 +467,12 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
 						"report.tex",
-						"HSV_Farbtonskala.png"
+						"HSV_Farbtonskala.png",
+						"linearPlotList.R",
+						"violinPlotList.R",
+						"stackedPlotList.R",
+						"boxPlotList.R",
+						"spiderPlotList.R"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
