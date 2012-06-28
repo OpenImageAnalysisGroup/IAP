@@ -58,6 +58,7 @@ import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -69,6 +70,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTable rt;
+	private FlexibleImageType type;
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
@@ -96,10 +98,12 @@ public class ImageOperation {
 	
 	public ImageOperation(FlexibleImage image) {
 		this(image.getAsImagePlus());
+		setType(image.getType());
 	}
 	
 	public ImageOperation(FlexibleImage image, ResultsTable resultTable) {
 		this(image.getAsImagePlus(), resultTable);
+		setType(image.getType());
 	}
 	
 	public ImageOperation(int[] image, int width, int height) {
@@ -113,6 +117,20 @@ public class ImageOperation {
 	public ImageOperation(BufferedImage bufferedImage, ResultsTable rt) {
 		this(bufferedImage);
 		setResultsTable(rt);
+	}
+	
+	public ImageOperation(FlexibleImage flexibleImage, FlexibleImageType type) {
+		this(flexibleImage);
+		setType(type);
+	}
+	
+	private ImageOperation setType(FlexibleImageType type) {
+		this.type = type;
+		return this;
+	}
+	
+	public FlexibleImageType getType() {
+		return type;
 	}
 	
 	/**
@@ -238,6 +256,14 @@ public class ImageOperation {
 	public ImageOperation resize(double factor) {
 		return resize((int) (factor * image.getWidth()),
 				(int) (factor * image.getHeight()));
+	}
+	
+	/**
+	 * Scales the image itself according to the given factors.
+	 */
+	public ImageOperation resize(double factorX, double factorY) {
+		return resize((int) (factorX * image.getWidth()),
+				(int) (factorY * image.getHeight()));
 	}
 	
 	/**
@@ -388,6 +414,8 @@ public class ImageOperation {
 					image.getHeight()).getImage();
 		}
 		
+		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
+		
 		int[] maskPixels = mask.getAs1A();
 		int[] originalImage = ImageConverter.convertIJto1A(image);
 		
@@ -399,6 +427,45 @@ public class ImageOperation {
 		}
 		
 		return new ImageOperation(maskPixels, mask.getWidth(), mask.getHeight());
+	}
+	
+	/**
+	 * Copies the content of the stored image of this operation onto the given
+	 * mask (and returns the result). Pixels where the mask has not the
+	 * background color are set according to the source image. Pixels with
+	 * background color are not modified.
+	 * 
+	 * @param mask
+	 *           The mask which is used as a template.
+	 * @param background
+	 *           The color which is used to determine which parts of the mask
+	 *           are considered as background (empty), all other pixels are
+	 *           considered as foreground.
+	 * @return The source image, filtered by the given mask.
+	 */
+	public ImageOperation applyMask(FlexibleImage mask, int background) {
+		
+		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
+		
+		int[][] maskPixels = mask.getAs2A();
+		int[][] originalImage = getImageAs2array();
+		int mW = mask.getWidth();
+		int mH = mask.getHeight();
+		
+		for (int x = 0; x < getWidth(); x++) {
+			for (int y = 0; y < getHeight(); y++) {
+				int maskPixel;
+				if (x > 0 && y > 0 && x < mW && y < mH)
+					maskPixel = maskPixels[x][y];
+				else
+					maskPixel = background;
+				
+				if (maskPixel == background)
+					originalImage[x][y] = background;
+			}
+		}
+		
+		return new ImageOperation(originalImage).setType(getType());
 	}
 	
 	/**
@@ -995,6 +1062,10 @@ public class ImageOperation {
 		image.getProcessor().drawRect(leftX, leftY, width, heigh);
 	}
 	
+	/**
+	 * not tested
+	 */
+	@Deprecated
 	public void fillRect(int leftX, int topY, int width, int height) {
 		image.getProcessor().fill(new Roi(leftX, topY, width, height));
 	}
@@ -1004,12 +1075,13 @@ public class ImageOperation {
 	 * the imagePlus variable instead could be used or if simple "return this" would give
 	 * better performance and if this then has no side effects.
 	 */
+	@Deprecated
 	public ImageOperation fillRect2(int leftX, int leftY, int width, int heigh) {
 		image.getProcessor().fill(new Roi(leftX, leftY, width, heigh));
 		return new ImageOperation(image.getProcessor().getBufferedImage());
 	}
 	
-	public ImageOperation drawAndFillRect(int leftX, int leftY,
+	public ImageOperation drawAndFillRect(int offX, int offY,
 			int[][] fillValue) {
 		
 		int width = fillValue.length;
@@ -1019,11 +1091,14 @@ public class ImageOperation {
 		
 		int ww = image.getWidth();
 		
-		for (int x = leftX; x < leftX + width; x++)
-			for (int y = leftY; y < leftY + height; y++)
-				bigImage[x + y * ww] = fillValue[x - leftX][y - leftY];
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++) {
+				int i = (x + offX) + (y + offY) * ww;
+				if (i >= 0 && i < bigImage.length)
+					bigImage[i] = fillValue[x][y];
+			}
 		
-		return new ImageOperation(ImageConverter.convert1AtoIJ(ww, image.getHeight(), bigImage));
+		return new ImageOperation(bigImage, ww, image.getHeight());
 	}
 	
 	/**
@@ -1316,7 +1391,9 @@ public class ImageOperation {
 	}
 	
 	public FlexibleImage getImage() {
-		return new FlexibleImage(image);
+		FlexibleImage res = new FlexibleImage(image);
+		res.setType(getType());
+		return res;
 	}
 	
 	public ImageOperation invert() {
@@ -1337,6 +1414,8 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation blur(double radius) {
+		if (radius < 0.001)
+			return this;
 		boolean oldStyle = true;
 		if (oldStyle) {
 			Prefs.setThreads(1);
@@ -2549,6 +2628,28 @@ public class ImageOperation {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
+	public ImageOperation thresholdLabBrightnessClearLowerThan(int threshold, int back) {
+		int[] res = getImageAs1array();
+		int idx = 0;
+		for (int c : res) {
+			if (c == back) {
+				idx++;
+				continue;
+			}
+			int r = ((c & 0xff0000) >> 16);
+			int g = ((c & 0x00ff00) >> 8);
+			int b = (c & 0x0000ff);
+			
+			int Li = (int) ImageOperation.labCube[r][g][b];
+			// ai = (int) ImageOperation.labCube[r][g][b + 256];
+			// bi = (int) ImageOperation.labCube[r][g][b + 512];
+			if (Li < threshold)
+				res[idx] = back;
+			idx++;
+		}
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
 	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
 		int[] res = getImageAs1array();
 		int b;
@@ -2803,6 +2904,38 @@ public class ImageOperation {
 				if (xt - bordersize - translatex >= 0 && yt - bordersize - translatey >= 0 && xt >= 0 && yt >= 0)
 					if (xt < nw && yt < nh)
 						result[xt][yt] = img2d[xt - bordersize - translatex][yt - bordersize - translatey];
+			}
+		}
+		return new ImageOperation(result);
+	}
+	
+	/**
+	 * Copy the image into a new image, which size is increased according to the specified bordersize.
+	 * 
+	 * @param input
+	 * @param bordersize
+	 * @param translatex
+	 * @param translatey
+	 * @param borderColor
+	 *           - color of the border
+	 * @return
+	 */
+	public ImageOperation addBorder(int bordersizeSides, int borderSizeTopBottom, int translatex, int translatey, int borderColor) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		int[][] img2d = getImageAs2array();
+		int nw = width + (2 * bordersizeSides);
+		int nh = height + (2 * borderSizeTopBottom);
+		int[][] result = new int[nw][nh];
+		
+		result = fillArray(result, borderColor);
+		
+		for (int xt = bordersizeSides + translatex; xt < (width + bordersizeSides + translatex); xt++) {
+			for (int yt = borderSizeTopBottom + translatey; yt < (height + borderSizeTopBottom + translatey); yt++) {
+				if (xt - bordersizeSides - translatex >= 0 && yt - borderSizeTopBottom - translatey >= 0 && xt >= 0 && yt >= 0)
+					if (xt < nw && yt < nh)
+						result[xt][yt] = img2d[xt - bordersizeSides - translatex][yt - borderSizeTopBottom - translatey];
 			}
 		}
 		return new ImageOperation(result);
@@ -4061,6 +4194,31 @@ public class ImageOperation {
 		return new FlexibleImage(aa).io();
 	}
 	
+	public ImageOperation crossfade(FlexibleImage b, double progress) {
+		if (b == null)
+			return this;
+		int[][] aa = getImageAs2array();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] ba = b.getAs2A();
+		int bW = b.getWidth();
+		int bH = b.getHeight();
+		int red = Color.RED.getRGB();
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int apixel = aa[x][y];
+				int bpixel = red;
+				if (x < bW && y < bH)
+					bpixel = ba[x][y];
+				// Cr = Cd*(1-t)+Cs*t;
+				if (((x * y) / 2) % 2 == 0)
+					aa[x][y] = apixel; // ColorUtil.getAvgColor(apixel, bpixel);
+				else
+					aa[x][y] = bpixel;
+			}
+		return new FlexibleImage(aa).io();
+	}
+	
 	/**
 	 * @return The combined image (a and b where a pixels are background).
 	 */
@@ -4334,6 +4492,20 @@ public class ImageOperation {
 		return new FlexibleImage(w, h, median).io();
 	}
 	
+	public ImageOperation adjustWidthHeightRatio(int w, int h, int epsilon) {
+		int ow = getWidth();
+		double targetRatio = w / (double) h;
+		int targetHeight = (int) (ow / targetRatio);
+		if (Math.abs(targetHeight - getHeight()) < epsilon)
+			return this;
+		else {
+			int verticalTooTooMuch = getHeight() - targetHeight;
+			int b = verticalTooTooMuch / 2;
+			ImageOperation res = new ImageOperation(new int[ow][targetHeight]);
+			res = res.canvas().fillRect(0, 0, ow, targetHeight, BACKGROUND_COLORint).drawImage(this.getImage(), 0, -b).getImage().io().setType(getType());
+			return res;
+		}
+	}
 	// not tested:
 	// public ImageOperation move(int dx, int dy) {
 	// int[][] image = getImageAs2array();

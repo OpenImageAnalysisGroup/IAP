@@ -4,6 +4,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlCutZoomedImages extends AbstractBlock {
@@ -22,15 +23,21 @@ public class BlCutZoomedImages extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
-		return cut(image);
+		int w = 1624;
+		int h = 1234;
+		if (image.getWidth() < image.getHeight()) {
+			w = 1234;
+			h = 1624;
+		}
+		return cut(image.io().adjustWidthHeightRatio(w, h, 10));
 	}
 	
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
-		return cut(mask);
+		return cut(mask.io().adjustWidthHeightRatio(1624, 1234, 10));
 	}
 	
-	private FlexibleImage cut(FlexibleImage img) {
+	private FlexibleImage cut(ImageOperation img) {
 		double zoom = Double.NaN;
 		double offX = Double.NaN;
 		double offY = Double.NaN;
@@ -59,7 +66,7 @@ public class BlCutZoomedImages extends AbstractBlock {
 		int verticalTooTooMuch = (int) ((1d - zoom) * img.getHeight());
 		// add border or cut outside
 		int b = -verticalTooTooMuch / 2;
-		return img.io().addBorder(b, (int) (b / 2d + offX), (int) (b / 2d + offY), ImageOperation.BACKGROUND_COLORint).getImage();
+		return img.addBorder(b, (int) (b / 2d + offX), (int) (b / 2d + offY), ImageOperation.BACKGROUND_COLORint).getImage();
 	}
 	
 	/**
@@ -100,5 +107,12 @@ public class BlCutZoomedImages extends AbstractBlock {
 			return new double[][] { { 0.75d, 0.75d, 0.75d, 0.75d }, { 0d, 0d, 0d, 0d }, { 0d, 0d, 0d, 0d } };
 		} else
 			return new double[][] { { 0.75d, 0.75d, 0.75d, 0.75d }, { 0d, 0d, 0d, 0d }, { 0d, 0d, 0d, 0d } };
+	}
+	
+	@Override
+	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		super.postProcess(processedImages, processedMasks);
+		// processedImages.fluo().io().crossfade(processedImages.nir(), 0.5d).print("overlay");
+		// processedImages.copy().equalize().print("debug");
 	}
 }

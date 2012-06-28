@@ -26,7 +26,7 @@ public class ColorUtil {
 		int idx = 0;
 		for (Color check : palette) {
 			int diff = Math.abs(c.getRed() - check.getRed()) + Math.abs(c.getGreen() - check.getGreen())
-								+ Math.abs(c.getBlue() - check.getBlue());
+					+ Math.abs(c.getBlue() - check.getBlue());
 			if (diff < minDiff) {
 				minDiff = diff;
 				nearestColor = idx;
@@ -228,7 +228,7 @@ public class ColorUtil {
 			xHX /= 2;
 		}
 		double xTX = 1 - 0.17 * Math.cos(dtor(xHX - 30)) + 0.24 * Math.cos(deg2rad(2 * xHX)) + 0.32
-							* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
+				* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
 		double xPH = 30 * Math.exp(-((xHX - 275) / 25) * ((xHX - 275) / 25));
 		double xRC = 2 * Math.sqrt((Math.pow(xCY, 7)) / ((Math.pow(xCY, 7)) + (Math.pow(25, 7))));
 		double xSL = 1 + ((0.015 * ((xLX - 50) * (xLX - 50))) / Math.sqrt(20 + ((xLX - 50) * (xLX - 50))));
@@ -311,5 +311,18 @@ public class ColorUtil {
 	@Deprecated
 	public static Color getAvgColor(ArrayList<Color> cc) {
 		return getAvgColor(cc);
+	}
+	
+	public static int getAvgColor(int apixel, int bpixel) {
+		float n = 2;
+		float h = 0, s = 0, b = 0;
+		for (Color c : new Color[] { new Color(apixel), new Color(bpixel) }) {
+			float hsb[] = new float[3];
+			Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
+			h += hsb[0] / n;
+			s += hsb[1] / n;
+			b += hsb[2] / n;
+		}
+		return Color.HSBtoRGB(h, s, b);
 	}
 }

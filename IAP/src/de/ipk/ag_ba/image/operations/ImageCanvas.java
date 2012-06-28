@@ -13,7 +13,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class ImageCanvas {
 	
 	private FlexibleImage image;
-	private Graphics graphics;
 	
 	public ImageCanvas(FlexibleImage image) {
 		this.image = image;
@@ -296,6 +295,11 @@ public class ImageCanvas {
 				.getImage().io().rotate90().canvas();
 		
 		return ic;
+	}
+	
+	public ImageCanvas drawImage(FlexibleImage image2, int ox, int oy) {
+		image = image.io().drawAndFillRect(ox, oy, image2.getAs2A()).getImage();
+		return this;
 	}
 	
 }

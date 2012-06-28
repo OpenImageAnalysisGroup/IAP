@@ -8,8 +8,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
- * Remove "peper and salt" noise from Fluo mask.
- * 
  * @author Klukas
  */
 public class BlMedianFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
@@ -19,7 +17,7 @@ public class BlMedianFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 		if (input().masks().vis() == null)
 			return null;
 		
-		FlexibleImage medianMask = new ImageOperation(input().masks().vis()).medianFilter32Bit().border(2).getImage();
+		FlexibleImage medianMask = new ImageOperation(input().masks().vis()).medianFilter32Bit().dilate(4).border(2).getImage();
 		
 		return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
 	}

@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCopyImagesApplyMask_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
@@ -28,9 +28,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.Bl_Arabidopsis_IRdi
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlockSkeletonize_Arabidopsis_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
@@ -55,43 +53,29 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 		p.add(BlColorBalancing_vis.class);
 		p.add(BlCutZoomedImages.class);
 		p.add(BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir.class);
-		// p.add(BlockColorBalancing_vertical_nir.class);
-		// p.add(BlColorBalancingRoundCamera_vis_nir.class);
-		// p.add(BlockColorBalancing_vertical_nir.class);
-		// p.add(BlBalancing_fluo.class);
-		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
-		p.add(BlLabFilter_Arabidopsis_blue_rubber_vis.class);
-		p.add(BlMedianFilter_vis.class);
-		p.add(BlIntensityConversion_fluo.class);
-		// p.add(BlockClearNirPot_nir.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		// p.add(BlUseVisMaskToClearFluo_fluo.class);
-		// p.add(BlUseFluoMaskToClear_Arabidopsis_vis_nir.class);
-		p.add(BlUseFluoMaskToClear_Arabidopsis_vis.class);
-		p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
-		p.add(Bl_Arabidopsis_IRdiff_ir.class);
-		p.add(BlMedianFilter_vis.class);
-		p.add(BlMedianFilter_vis.class);
-		p.add(BlNirFilterSide_nir.class);
-		p.add(BlCopyImagesApplyMask_vis_fluo.class);
-		
-		p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
-		
-		// calculation of numeric values
-		p.add(BlCalcMainAxis_vis.class);
-		p.add(BlCalcWidthAndHeight_vis.class);
-		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
-		p.add(BlConvexHull_vis_fluo.class);
-		// postprocessing
-		p.add(BlockRunPostProcessors.class);
-		
-		p.add(BlockDrawSkeleton_vis_fluo.class);
-		
-		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
-		p.add(BlCrop_images_vis_fluo_nir_ir.class);
-		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
-		
+		boolean debug = false;
+		if (!debug) {
+			p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
+			p.add(BlLabFilter_Arabidopsis_blue_rubber_vis.class);
+			p.add(BlIntensityConversion_fluo.class);
+			p.add(BlMedianFilter_fluo.class);
+			p.add(BlockRemoveSmallClusters_vis_fluo.class);
+			p.add(BlUseFluoMaskToClear_Arabidopsis_vis.class);
+			p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
+			p.add(Bl_Arabidopsis_IRdiff_ir.class);
+			p.add(BlNirFilterSide_nir.class);
+			p.add(BlCopyImagesApplyMask_vis_fluo.class);
+			p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
+			p.add(BlCalcWidthAndHeight_vis.class);
+			p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
+			p.add(BlConvexHull_vis_fluo.class);
+			// postprocessing
+			p.add(BlockRunPostProcessors.class);
+			p.add(BlockDrawSkeleton_vis_fluo.class);
+			p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
+			p.add(BlCrop_images_vis_fluo_nir_ir.class);
+			p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
+		}
 		return p;
 	}
 	

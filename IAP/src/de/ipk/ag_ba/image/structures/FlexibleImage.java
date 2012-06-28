@@ -177,7 +177,7 @@ public class FlexibleImage {
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			PrintImage.printImage(
-					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(115, 155, 225).getRGB()).getImage().image,
+					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(215, 255, 245).getRGB()).getImage().image,
 					title);
 			IAPmain.showImageJ();
 		}
@@ -214,15 +214,14 @@ public class FlexibleImage {
 		}
 	}
 	
-	int[][] cache2A = null;
-	
 	public int[][] getAs2A() {
-		boolean useCache = true; // 7777777777777777777777777777 false
-		if (!useCache)
-			return ImageConverter.convertIJto2A(image);
-		
-		if (cache2A == null)
-			cache2A = ImageConverter.convertIJto2A(image);
+		int[][] cache2A = null;
+		// boolean useCache = true; // 7777777777777777777777777777 false
+		// if (!useCache)
+		// return ImageConverter.convertIJto2A(image);
+		//
+		// if (cache2A == null)
+		cache2A = ImageConverter.convertIJto2A(image);
 		// else
 		// System.out.println("CACHED 2A");
 		return cache2A;
@@ -286,11 +285,8 @@ public class FlexibleImage {
 				arrayL, arrayA, arrayB };
 	}
 	
-	/**
-	 * gets a ImageOperation
-	 */
 	public ImageOperation io() {
-		return new ImageOperation(this);
+		return new ImageOperation(this, getType());
 	}
 	
 	/**

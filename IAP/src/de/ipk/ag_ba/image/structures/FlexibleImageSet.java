@@ -194,7 +194,11 @@ public class FlexibleImageSet {
 	}
 	
 	public FlexibleImageSet copy() {
-		return new FlexibleImageSet(vis.copy(), fluo.copy(), nir.copy(), ir.copy());
+		return new FlexibleImageSet(
+				vis != null ? vis.copy() : null,
+				fluo != null ? fluo.copy() : null,
+				nir != null ? nir.copy() : null,
+				ir != null ? ir.copy() : null);
 	}
 	
 	public FlexibleImageSet resize(double scaleVis, double scaleFluo, double scaleNir, double scaleIr) {
@@ -317,5 +321,18 @@ public class FlexibleImageSet {
 			return smallest;
 		else
 			return 0;
+	}
+	
+	public void print(String title) {
+		FlexibleImageStack fis = new FlexibleImageStack();
+		if (vis != null)
+			fis.addImage("vis", vis);
+		if (fluo != null)
+			fis.addImage("fluo", fluo);
+		if (nir != null)
+			fis.addImage("nir", nir);
+		if (ir != null)
+			fis.addImage("ir", ir);
+		fis.print(title);
 	}
 }
