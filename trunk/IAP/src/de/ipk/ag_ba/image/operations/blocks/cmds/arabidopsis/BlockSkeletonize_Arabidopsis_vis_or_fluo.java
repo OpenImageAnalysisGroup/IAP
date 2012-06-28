@@ -47,23 +47,25 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			return fluo;
 		FlexibleImage res = fluo.copy();
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = fluo.copy().print("fluo", debug);
-			
-			if (viswork != null)
-				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-					if (sk != null) {
-						boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-						res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
-						if (res != null)
-							getProperties().setImage("skeleton_fluo", sk);
+		boolean analyzeSide = false;
+		if (analyzeSide)
+			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+				FlexibleImage viswork = fluo.copy().print("fluo", debug);
+				
+				if (viswork != null)
+					if (vis != null && fluo != null) {
+						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+						if (sk != null) {
+							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
+							res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
+							if (res != null)
+								getProperties().setImage("skeleton_fluo", sk);
+						}
 					}
-				}
-		}
+			}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
 			ImageOperation in = fluo.copy().io();
-			FlexibleImage viswork = in.blur(2).getImage().print("fluo", debug);
+			FlexibleImage viswork = in.blur(1).getImage().print("fluo", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {

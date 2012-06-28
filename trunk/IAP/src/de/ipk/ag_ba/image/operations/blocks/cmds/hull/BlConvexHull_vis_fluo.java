@@ -128,33 +128,34 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				
 				for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-					for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
-						if (v.getValue() != null) {
-							double area = v.getValue().doubleValue();
-							areaStat.addValue(area);
-							areaSum += area;
-							areaCnt += 1;
-							
-							TreeMap<String, ImageData> tid = time2inImages.get(time);
-							if (tid != null) {
-								ImageData id = tid.get(key);
-								if (id != null) {
-									plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
-									Double pos = id.getPosition();
-									if (pos == null)
-										pos = 0d;
-									if (Math.abs(pos - 0) < distanceTo0) {
-										distanceTo0 = Math.abs(pos - 0);
-										sideArea_for_angleNearestTo0 = area;
-									}
-									if (Math.abs(pos - 90) < distanceTo90) {
-										distanceTo0 = Math.abs(pos - 90);
-										sideArea_for_angleNearestTo90 = area;
+					if (rt != null)
+						for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.area")) {
+							if (v.getValue() != null) {
+								double area = v.getValue().doubleValue();
+								areaStat.addValue(area);
+								areaSum += area;
+								areaCnt += 1;
+								
+								TreeMap<String, ImageData> tid = time2inImages.get(time);
+								if (tid != null) {
+									ImageData id = tid.get(key);
+									if (id != null) {
+										plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
+										Double pos = id.getPosition();
+										if (pos == null)
+											pos = 0d;
+										if (Math.abs(pos - 0) < distanceTo0) {
+											distanceTo0 = Math.abs(pos - 0);
+											sideArea_for_angleNearestTo0 = area;
+										}
+										if (Math.abs(pos - 90) < distanceTo90) {
+											distanceTo0 = Math.abs(pos - 90);
+											sideArea_for_angleNearestTo90 = area;
+										}
 									}
 								}
 							}
 						}
-					}
 					for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_side.fluo.filled.pixels")) {
 						if (v.getValue() != null) {
 							double area = v.getValue().doubleValue();
@@ -198,10 +199,12 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.fluo.plant_weight.iap", volume_iap);
 				}
 				
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.min", areaStat.getMin());
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.max", areaStat.getMax());
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.median", areaStat.getPercentile(50));
-				summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.avg", areaStat.getMean());
+				if (areaStat.getN() > 0) {
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.min", areaStat.getMin());
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.max", areaStat.getMax());
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.median", areaStat.getPercentile(50));
+					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.area.avg", areaStat.getMean());
+				}
 				
 				double topAreaSum = 0;
 				double topAreaCnt = 0;

@@ -22,10 +22,10 @@ public class ImageSetDescription {
 		nirDesc = new ImageDescription(baseForComparison.images().nir());
 		irDesc = new ImageDescription(baseForComparison.images().ir());
 		
-		visMaskDesc = new ImageDescription(baseForComparison.images().vis());
-		fluoMaskDesc = new ImageDescription(baseForComparison.images().fluo());
-		nirMaskDesc = new ImageDescription(baseForComparison.images().nir());
-		irMaskDesc = new ImageDescription(baseForComparison.images().ir());
+		visMaskDesc = new ImageDescription(baseForComparison.masks().vis());
+		fluoMaskDesc = new ImageDescription(baseForComparison.masks().fluo());
+		nirMaskDesc = new ImageDescription(baseForComparison.masks().nir());
+		irMaskDesc = new ImageDescription(baseForComparison.masks().ir());
 	}
 	
 	public boolean isDifferentTo(FlexibleMaskAndImageSet compareWith) {

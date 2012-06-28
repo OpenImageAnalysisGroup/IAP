@@ -50,15 +50,15 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 			// 4x3
 			FlexibleImage vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, FlexibleImageType.VIS, -30, vertFillGrade, 4, 3);
+				processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
 			
 			FlexibleImage fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, FlexibleImageType.FLUO, -30, vertFillGrade, 4, 3);
+				processCuttingOfImage(fluo, FlexibleImageType.FLUO, 0, vertFillGrade, 4, 3);
 			
 			FlexibleImage nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade, 4, 3);
+				processCuttingOfImage(nir, FlexibleImageType.NIR, 5, vertFillGrade, 4, 3);
 			
 			FlexibleImage ir = input().images().ir();
 			if (ir != null) {

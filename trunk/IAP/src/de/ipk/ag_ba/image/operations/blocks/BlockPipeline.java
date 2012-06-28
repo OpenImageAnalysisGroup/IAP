@@ -24,6 +24,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -167,18 +168,19 @@ public class BlockPipeline {
 			
 			FlexibleMaskAndImageSet input2 = block.process();
 			
-			if (block.getClass() != BlReplaceEmptyOriginalImages_vis_fluo_nir.class)
-				if (block.getClass() != BlCrop_images_vis_fluo_nir_ir.class)
-					if (block.getClass() != BlMoveMasksToImageSet_vis_fluo_nir.class)
-						if (isd.isDifferentTo(input2)) {
-							System.out.println();
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
-									+ " HAS MODIFIED THE IMAGE SET:\n"
-									+ isd.getDifferenceDescription(input2));
-							System.out.println("IN: " + input);
-							System.out.println("OUT: " + input2);
-						}
+			if (block.getClass() != BlCutZoomedImages.class)
+				if (block.getClass() != BlReplaceEmptyOriginalImages_vis_fluo_nir.class)
+					if (block.getClass() != BlCrop_images_vis_fluo_nir_ir.class)
+						if (block.getClass() != BlMoveMasksToImageSet_vis_fluo_nir.class)
+							if (isd.isDifferentTo(input2)) {
+								System.out.println();
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
+										+ " HAS MODIFIED THE IMAGE SET:\n"
+										+ isd.getDifferenceDescription(input2));
+								System.out.println("IN: " + input);
+								System.out.println("OUT: " + input2);
+							}
 			input = input2;
 			long tb = System.currentTimeMillis();
 			
@@ -188,7 +190,7 @@ public class BlockPipeline {
 			
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
-				if (seconds >= 20)
+				if (seconds >= 1)
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "
