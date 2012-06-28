@@ -26,6 +26,6 @@ public class Line {
 	}
 	
 	public int getlength() {
-		return (int) Math.sqrt(((p0.x - p0.y) * (p0.x - p0.y)) + ((p1.x - p1.y) * (p1.x - p1.y)));
+		return (int) Math.sqrt(((p0.x - p1.x) * (p0.x - p1.x)) + ((p0.y - p1.y) * (p0.y - p1.y)));
 	}
 }
