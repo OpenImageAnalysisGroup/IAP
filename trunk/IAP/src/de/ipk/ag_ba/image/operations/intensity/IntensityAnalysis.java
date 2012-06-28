@@ -164,6 +164,20 @@ public class IntensityAnalysis {
 			result.addValue("hsv.s.average", sumOfSat / plantImagePixelCnt);
 			result.addValue("hsv.v.average", sumOfVal / plantImagePixelCnt);
 			
+			boolean addStressIndicatorHueValues = true;
+			if (addStressIndicatorHueValues) {
+				double green5to8 = histHue.getFreqAt(5 - 1) + histHue.getFreqAt(6 - 1) + histHue.getFreqAt(7 - 1) + histHue.getFreqAt(8 - 1);
+				if (green5to8 > 0) {
+					double yello4togreen5to8 = histHue.getFreqAt(4 - 1) / green5to8;
+					double red1and2togreen5to8 = (histHue.getFreqAt(1 - 1) + histHue.getFreqAt(2 - 1)) / green5to8;
+					double brown3togreen5to8 = histHue.getFreqAt(3 - 1) / green5to8;
+					
+					result.addValue("stress.hue.yellow2green", yello4togreen5to8);
+					result.addValue("stress.hue.red2green", red1and2togreen5to8);
+					result.addValue("stress.hue.brown2green", brown3togreen5to8);
+				}
+			}
+			
 			if (statsHueValues.getN() > 0) {
 				result.addValue("hsv.h.stddev", statsHueValues.getStandardDeviation());
 				result.addValue("hsv.s.stddev", statsSatValues.getStandardDeviation());
