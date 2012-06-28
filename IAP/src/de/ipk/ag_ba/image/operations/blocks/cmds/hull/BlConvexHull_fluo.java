@@ -32,15 +32,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
-	@Override
-	protected FlexibleImage processVISmask() {
-		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
-		FlexibleImage image = input().masks().vis();
-		ImageData info = input().images().getVisInfo();
-		ImageOperation res = processImage(image, info);
-		return res != null ? res.getImage() : null;
-	}
+public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {

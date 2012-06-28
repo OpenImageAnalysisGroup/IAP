@@ -27,7 +27,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
@@ -90,7 +90,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlCalcMainAxis_vis.class);
 		p.add(BlCalcWidthAndHeight_vis.class);
 		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
-		p.add(BlConvexHull_vis_fluo.class);
+		p.add(BlConvexHull_fluo.class);
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
 		if (skelet)
