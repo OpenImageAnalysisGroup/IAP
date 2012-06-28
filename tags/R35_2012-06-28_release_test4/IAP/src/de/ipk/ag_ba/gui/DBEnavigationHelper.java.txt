@@ -1,0 +1,140 @@
+/*******************************************************************************
+ * 
+ *    Copyright (c) 2003-2009 Plant Bioinformatics Group, IPK Gatersleben
+ * 
+ *******************************************************************************/
+/*
+ * Created on Apr 28, 2010 by Christian Klukas
+ */
+package de.ipk_gatersleben.ag_ba.graffiti.plugins.gui;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.TreeMap;
+
+import javax.swing.ImageIcon;
+
+import org.ErrorMsg;
+import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MainFrame;
+import org.w3c.dom.Document;
+
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.enums.DBEtype;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.interfaces.NavigationAction;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.AbstractNavigationAction;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_actions.DBEexperiment;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.navigation_model.NavigationGraphicalEntity;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.picture_gui.SupplementaryFilePanelMongoDB;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_ba.graffiti.plugins.gui.webstart.AIPmain;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
+import de.ipk_gatersleben.ag_pbi.dbe2.picture_gui.SupplementaryFilePanel;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.CallDBE2WebService;
+import de.ipk_gatersleben.ag_pbi.dbe2.webService.sets.ExperimentInfo;
+
+/**
+ * @author klukas
+ * 
+ */
+public class DBEnavigationHelper {
+
+	public static ArrayList<NavigationGraphicalEntity> getUserList(final DBEtype dbeType, final String login,
+			final String pass, String optGroupFilter, final TreeMap<String, Collection<ExperimentInfo>> group2ei) {
+		ArrayList<NavigationGraphicalEntity> users = new ArrayList<NavigationGraphicalEntity>();
+		try {
+			for (ExperimentInfo ei : CallDBE2WebService.getExperimentInfos(login, pass, CallDBE2WebService
+					.getAllExperimentsVisibleForUser(login, pass))) {
+				if (ei.experimentType.equalsIgnoreCase("Trash"))
+					continue;
+				if (optGroupFilter != null && !ei.userGroup.equals(optGroupFilter))
+					continue;
+				// if (dbeType == DBEtype.Phenotyping &&
+				// !ei.experimentType.equals("Phenomics"))
+				// continue;
+				// if (dbeType != DBEtype.Phenotyping &&
+				// ei.experimentType.equals("Phenomics"))
+				// continue;
+				if (!group2ei.containsKey(ei.importUser)) {
+					group2ei.put(ei.importUser, new ArrayList<ExperimentInfo>());
+				}
+				group2ei.get(ei.importUser).add(ei);
+			}
+			for (String userName : group2ei.keySet()) {
+				String imgn = "img/ext/folder-remote.png";
+
+				final String fUserName = userName;
+
+				NavigationGraphicalEntity userEntity = new NavigationGraphicalEntity(new AbstractNavigationAction(
+						"Open User-Folder") {
+					private NavigationGraphicalEntity src;
+
+					@Override
+					public void performActionCalculateResults(NavigationGraphicalEntity src) {
+						this.src = src;
+					}
+
+					@Override
+					public ArrayList<NavigationGraphicalEntity> getResultNewNavigationSet(
+							ArrayList<NavigationGraphicalEntity> currentSet) {
+						ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>(currentSet);
+						res.add(src);
+						return res;
+					}
+
+					@Override
+					public ArrayList<NavigationGraphicalEntity> getResultNewActionSet() {
+						ArrayList<NavigationGraphicalEntity> res = new ArrayList<NavigationGraphicalEntity>();
+						for (ExperimentInfo ei : group2ei.get(fUserName)) {
+							// if (optGroupFilter!=null &&
+							// !optGroupFilter.equals(ei.userGroup))
+							// continue;
+							// if (dbeType == DBEtype.Phenotyping &&
+							// !ei.experimentType.equals("Phenomics"))
+							// continue;
+							// if (dbeType != DBEtype.Phenotyping &&
+							// ei.experimentType.equals("Phenomics"))
+							// continue;
+							if (!ei.experimentType.equalsIgnoreCase("Trash")) {
+								ExperimentHeaderInterface eh = getExperimentInfo(ei);
+								NavigationGraphicalEntity exp = DBEexperiment.getExperimentButton(login, pass, eh);
+								res.add(exp);
+							}
+						}
+						return res;
+					}
+
+				}, userName, "img/ext/folder-remote-open.png", imgn);
+
+				users.add(userEntity);
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+			MainFrame.showMessageDialog("Error: " + e.getMessage(), "Error");
+		}
+		return users;
+	}
+
+
+	public static ExperimentHeaderInterface getExperimentInfo(ExperimentInfo ei) {
+		ExperimentHeaderInterface eh = new ExperimentHeader();
+		eh.setExperimentname(ei.experimentName);
+		eh.setExperimentId(ei.experimentID);
+		eh.setImportusername(ei.importUser);
+		eh.setImportusergroup(ei.userGroup);
+		eh.setExperimenttype(ei.experimentType);
+		eh.setStartdate(ei.dateExperimentStart);
+		eh.setImportdate(ei.dateExperimentImport);
+		eh.setRemark(ei.remark);
+		eh.setCoordinator(ei.coordinator);
+		eh.setExcelfileid(ei.excelFileMd5);
+		eh.setImagefiles(ei.fileCount);
+		eh.setSizekb(ei.byteSize / 1024 + "");
+		return eh;
+	}
+
+}
