@@ -885,7 +885,8 @@ public class IAPservice {
 				// r = a.getCondition().compareTo(b.getCondition());
 				// if (r != 0)
 				// return r;
-				r = a.getSnapshotTime().compareTo(b.getSnapshotTime());
+				if (a.getSnapshotTime() != null && b.getSnapshotTime() != null)
+					r = a.getSnapshotTime().compareTo(b.getSnapshotTime());
 				if (r != 0)
 					return r;
 				r = a.getCondition().compareTo(b.getCondition());

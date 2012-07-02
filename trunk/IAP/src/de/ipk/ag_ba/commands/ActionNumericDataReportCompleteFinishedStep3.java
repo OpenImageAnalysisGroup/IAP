@@ -609,7 +609,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
 				
-				if (!adjusted && rowNum >= 100) {
+				if (!adjusted && rowNum >= 15) {
 					adjustColumnWidths(sheet, excelColumnHeaders);
 					adjusted = true;
 					if (status != null)
@@ -657,7 +657,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (status != null)
 				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
 			sheet.autoSizeColumn(i);
-			System.out.println("w=" + sheet.getColumnWidth(i));
+			// System.out.println("w=" + sheet.getColumnWidth(i));
 			if (sheet.getColumnWidth(i) > 10000)
 				sheet.setColumnWidth(i, 10000);
 		}
@@ -721,6 +721,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	private String replaceInvalidChars(String experimentName) {
 		String res = StringManipulationTools.stringReplace(experimentName, ":", "_");
+		res = StringManipulationTools.stringReplace(res, "\\", "");
 		return res;
 	}
 	
