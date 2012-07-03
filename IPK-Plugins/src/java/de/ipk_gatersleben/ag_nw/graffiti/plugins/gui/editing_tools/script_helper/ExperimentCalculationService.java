@@ -156,8 +156,10 @@ public class ExperimentCalculationService {
 				break;
 			}
 		}
-		if (newS == null)
+		if (newS == null) {
 			newS = si.clone();
+			System.out.println("New substance: "+newS.getName());
+		}
 		ConditionInterface newC = ci.clone(newS);
 		
 		// divide sample average by average of reference condition
@@ -210,9 +212,11 @@ public class ExperimentCalculationService {
 			}
 		}
 		if (newC.size() > 0) {
-			res.add(newS);
+			if (!res.contains(newS))
+				res.add(newS);
 			newS.add(newC);
-		}
+		} else 
+			System.out.println("No ratio data for substance "+newS.getName());
 	}
 	
 	/**
