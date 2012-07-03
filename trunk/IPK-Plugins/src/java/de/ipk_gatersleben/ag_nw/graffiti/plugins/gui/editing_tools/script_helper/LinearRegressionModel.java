@@ -21,8 +21,8 @@ public class LinearRegressionModel {
 	}
 	
 	public IntersectionPoint intersect(LinearRegressionModel m2) {
-		Line2D.Double line1 = new Line2D.Double(0, sr.getIntercept(), 1, sr.getSlope());
-		Line2D.Double line2 = new Line2D.Double(0, m2.sr.getIntercept(), 1, m2.sr.getSlope());
+		Line2D.Double line1 = new Line2D.Double(sr.getXbar(), sr.getYbar(), sr.getXbar() + 1, sr.getYbar() + sr.getSlope());
+		Line2D.Double line2 = new Line2D.Double(m2.sr.getXbar(), m2.sr.getYbar(), m2.sr.getXbar() + 1, m2.sr.getYbar() + m2.sr.getSlope());
 		
 		return new IntersectionPoint(GraphicHelper.getIntersection(line1, line2));
 	}
