@@ -563,6 +563,11 @@ public class IAPservice {
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter) {
 		
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
+		System.out.println("Transport to browser? " + prepareTransportToBrowser);
+		System.out.println("Store all angles? " + prepareTransportToBrowser);
+		System.out.println("Store all replicates? " + prepareTransportToBrowser);
+		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		
 		HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();

@@ -235,7 +235,7 @@ public class ImageAnalysisCommandManager {
 				
 				for (String c : new String[] {
 						"Condition", "Species", "Genotype", "Variety",
-						"Growth condition", "Treatment" }) {
+						"Growth condition", "Treatment", "Plant ID" }) {
 					if (c.equals("Species") && ss.size() <= 1)
 						continue;
 					if (c.equals("Genotype") && gs.size() <= 1)
