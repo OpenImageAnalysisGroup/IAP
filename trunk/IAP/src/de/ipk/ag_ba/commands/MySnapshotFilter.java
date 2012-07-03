@@ -46,6 +46,8 @@ public class MySnapshotFilter implements SnapshotFilter {
 	
 	@Override
 	public boolean filterOut(String plantId, Integer d) {
+		if (d == Integer.MAX_VALUE)
+			return false;
 		if (globalOutlierArr.length > 0) {
 			int idx = 0;
 			for (String o : globalOutlierArr) {
@@ -67,9 +69,6 @@ public class MySnapshotFilter implements SnapshotFilter {
 						else
 							if (d != null) {
 								int day = globalOutlierDays[idx];
-								if (day<0)
-									return false;
-								else
 								if (day < Integer.MAX_VALUE)
 									if (o.contains(">=") && d >= day)
 										return true;

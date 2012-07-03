@@ -871,6 +871,10 @@ public class IAPservice {
 								else
 									if (!optSnapshotFilter.filterOut(sn))
 										result.add(sn);
+									else {
+										System.out.println("About to filter out a snapshot: " + sn);
+										System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
+									}
 							}
 						}
 					}
@@ -902,10 +906,11 @@ public class IAPservice {
 		});
 		sw.printTime(50);
 		
-		// if (prepareTransportToBrowser)
-		// currently this needs to be performed, independently on if the data needs to be transported
 		for (SnapshotDataIAP sd : result)
-			sd.prepareFieldsForDataTransport();
+			if (prepareTransportToBrowser)
+				sd.prepareFieldsForDataTransport();
+			else
+				sd.prepareStore();
 		
 		return result;
 	}
