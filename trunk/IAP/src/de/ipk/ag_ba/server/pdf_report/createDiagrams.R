@@ -41,7 +41,7 @@ PLOTTING.LISTS <- "plottingLists"
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- TRUE
+calculateOnlyNBox <- FALSE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
@@ -895,6 +895,8 @@ getVector <- function(descriptorSet) {
 			lengthVec <- length(descriptorSet[,1])
 		} else if (class(descriptorSet) == "list") {
 			lengthVec <- length(descriptorSet)
+		} else {
+			lengthVec <- length(descriptorSet)
 		}
 		
 		for (n in 1:lengthVec) {
@@ -1454,6 +1456,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 	#o=""
 	#fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
 	fileNameLatexFile = preprocessingOfValues(fileNameLatexFile, FALSE, "_")
+	print("drinne3")
 	#o = gsub('[[:punct:]]', "_", o)
 	#print(fileNameImageFile)
 	latexText <- ""
@@ -1469,7 +1472,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
 		}
 	}
-	
+	print("drinne4")
 #	if (insertSubsections & nchar(ylabel) > 0) {
 #		ylabel <- renameYForAppendix(ylabel)
 #		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
@@ -1481,7 +1484,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 					  #ifelse(o == "", "", paste("_", o , sep="")), 
 					  #ifelse(o == "", "", o), 
 					   ".",saveFormatImage,"}", sep="")
-	
+	print("drinne5")
 	write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, "tex", sep="."))
 }
 
@@ -1960,20 +1963,22 @@ checkFileName <- function(filename, extraString) {
 writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1, typOfPlot = "") {
 	#writeLatexFileSecondValue="",
 	overallList$debug %debug% "writeTheData()"		
-
+	print("drinne-2")
 	fileName <- checkFileName(fileName, extraString)
-	
+	print("drinne-1")
 	if (subSectionTitel != "") {
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
-
+	
+	print(plot)
+	print("drinne0")
 #	if(typOfPlot == LINERANGE.PLOT || (overallList$split.Treatment.First && overallList$split.Treatment.Second && typOfPlot == SPIDER.PLOT)) {
 	if(typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
 		saveImageFile(overallList, plot, fileName)
 	}
-	
+	print("drinne1")
 	if (makeOverallImage) {
 		if (subSectionTitel != "") {
 			writeLatexFile(writeLatexFileFirstValue, fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, saveFormatImage = overallList$saveFormat)	
@@ -1981,7 +1986,7 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 			writeLatexFile(writeLatexFileFirstValue, fileName, saveFormatImage = overallList$saveFormat)
 		}
 	} 
-	
+	print("drinne2")
 #	else {
 #		writeLatexFile(fileName, writeLatexFileSecondValue)	
 #	}
@@ -2317,7 +2322,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 ##!#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
 #			} 
 			
-				
+				#print(overallResult)
 			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, typOfPlot, sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, "OverallImage", sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth)
 					
 		} else {
@@ -3077,18 +3082,28 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 					ylab(overallDesName[[imagesIndex]])
 		}
 		
+		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1){
+			plot = plot + 
+					xlab(overallList$xAxisName) +
+					opts(axis.title.x = theme_text(face="bold", size=11))
+		} else {
+			plot = plot +
+					opts(axis.title.x = theme_blank())
+							
+		}
+		
 		plot = plot + 						
 				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), colour="Grey", size=0.1) +
 				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
 				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
 				#ylab(overallDesName[[imagesIndex]]) +
 				coord_cartesian(ylim=c(0, maxMean + maxSe + (110*maxMean)/100)) +
-				xlab(overallList$xAxisName) +
+				
 				scale_fill_manual(values = overallColor[[imagesIndex]]) +
 				theme_bw() +
 				opts(legend.position="none", 
 						#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-						axis.title.x = theme_text(face="bold", size=11), 
+						#axis.title.x = theme_text(face="bold", size=11), 
 						axis.title.y = theme_text(face="bold", size=11, angle=90), 
 						axis.text.x = theme_text(angle=90),
 						panel.grid.minor = theme_blank(), 
