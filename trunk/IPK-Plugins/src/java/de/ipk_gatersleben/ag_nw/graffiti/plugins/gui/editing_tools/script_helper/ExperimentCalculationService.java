@@ -2,9 +2,11 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.MeasurementFilter;
 import org.SystemAnalysis;
 
@@ -21,11 +23,18 @@ public class ExperimentCalculationService {
 	 *           If this is an empty array, the reference is determined automatically
 	 *           (largest value sum for any substance defines the reference).
 	 */
-	public ExperimentInterface ratioDataset(String[] treatmentReference, ConditionFilter cf, MeasurementFilter pf) {
+	public ExperimentInterface ratioDataset(
+			String[] treatmentReference, ConditionFilter cf, MeasurementFilter pf,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		Experiment res = new Experiment();
+		HashSet<String> addedSubstances = new HashSet<String>();
 		res.setHeader(experiment.getHeader().clone());
 		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of stress impact)");
 		for (SubstanceInterface si : experiment) {
+			if (si.getName().startsWith("RESULT_"))
+				continue;
+			if (optStatus!=null)
+				optStatus.setCurrentStatusText2(si.getName());
 			// omit color histogram values in the blue range
 			// only bins < 11 are OK
 			try {
@@ -77,15 +86,17 @@ public class ExperimentCalculationService {
 						}
 					}
 					if (ciRef != null)
-						processRef(ciRef, ci, res, si, pf);
+						processRef(ciRef, ci, res, si, pf, addedSubstances);
 				}
 			}
 		}
+		if (optStatus!=null)
+			optStatus.setCurrentStatusText2("");
 		return res;
 	}
 	
 	private void processRef(ConditionInterface ciRef, ConditionInterface ci, ExperimentInterface res,
-			SubstanceInterface si, MeasurementFilter pf) {
+			SubstanceInterface si, MeasurementFilter pf, HashSet<String> addedSubstances) {
 		// found reference for "ci"
 		TreeSet<Integer> timePointsAvailForBoth = new TreeSet<Integer>();
 		for (SampleInterface sample : ci)
@@ -212,8 +223,10 @@ public class ExperimentCalculationService {
 			}
 		}
 		if (newC.size() > 0) {
-			if (!res.contains(newS))
+			if (!addedSubstances.contains(newS.getName())) {
 				res.add(newS);
+				addedSubstances.add(newS.getName());
+			}
 			newS.add(newC);
 		} else 
 			System.out.println("No ratio data for substance "+newS.getName());

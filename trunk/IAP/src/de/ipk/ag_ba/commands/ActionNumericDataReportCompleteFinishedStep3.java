@@ -300,7 +300,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusText2("Calculate stress-ratio");
 				System.out.println("Substance-Count 0: "+experiment.size());
-				experiment = experiment.calc().ratioDataset(new String[] { "norm", "sufficient", "control" }, cf, snFilter);
+				experiment = experiment.calc().ratioDataset(
+						new String[] { "norm", "sufficient", "control" }, 
+						cf, snFilter,
+						status);
 				System.out.println("Substance-Count 1: "+experiment.size());
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
