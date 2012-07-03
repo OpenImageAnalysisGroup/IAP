@@ -59,7 +59,7 @@ import org.apache.commons.math3.util.Precision;
  * constant term and {@link #getIntercept()} returns {@code 0}.</li>
  * </ul></p>
  *
- * @version $Id: SimpleRegression.java,v 1.1 2012-05-22 20:42:36 klukas Exp $
+ * @version $Id: SimpleRegression.java,v 1.2 2012-07-03 13:36:12 klukas Exp $
  */
 public class SimpleRegression implements Serializable, UpdatingMultipleLinearRegression {
 
@@ -131,19 +131,19 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
      */
     public void addData(final double x,final double y) {
         if (n == 0) {
-            xbar = x;
-            ybar = y;
+            setXbar(x);
+            setYbar(y);
         } else {
             if( hasIntercept ){
                 final double fact1 = 1.0 + n;
                 final double fact2 = n / (1.0 + n);
-                final double dx = x - xbar;
-                final double dy = y - ybar;
+                final double dx = x - getXbar();
+                final double dy = y - getYbar();
                 sumXX += dx * dx * fact2;
                 sumYY += dy * dy * fact2;
                 sumXY += dx * dy * fact2;
-                xbar += dx / fact1;
-                ybar += dy / fact1;
+                setXbar(getXbar() + dx / fact1);
+                setYbar(getYbar() + dy / fact1);
             }
          }
         if( !hasIntercept ){
@@ -176,20 +176,20 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
             if (hasIntercept) {
                 final double fact1 = n - 1.0;
                 final double fact2 = n / (n - 1.0);
-                final double dx = x - xbar;
-                final double dy = y - ybar;
+                final double dx = x - getXbar();
+                final double dy = y - getYbar();
                 sumXX -= dx * dx * fact2;
                 sumYY -= dy * dy * fact2;
                 sumXY -= dx * dy * fact2;
-                xbar -= dx / fact1;
-                ybar -= dy / fact1;
+                setXbar(getXbar() - dx / fact1);
+                setYbar(getYbar() - dy / fact1);
             } else {
                 final double fact1 = n - 1.0;
                 sumXX -= x * x;
                 sumYY -= y * y;
                 sumXY -= x * y;
-                xbar -= x / fact1;
-                ybar -= y / fact1;
+                setXbar(getXbar() - x / fact1);
+                setYbar(getYbar() - y / fact1);
             }
              sumX -= x;
              sumY -= y;
@@ -570,7 +570,7 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
             return Double.NaN;
         }
         return FastMath.sqrt(
-            getMeanSquareError() * ((1d / n) + (xbar * xbar) / sumXX));
+            getMeanSquareError() * ((1d / n) + (getXbar() * getXbar()) / sumXX));
     }
 
     /**
@@ -725,8 +725,8 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
               final double mse = getMeanSquareError();
               final double _syy = sumYY + sumY * sumY / n;
               final double[] vcv = new double[]{
-                mse * (xbar *xbar /sumXX + 1.0 / n),
-                -xbar*mse/sumXX,
+                mse * (getXbar() *getXbar() /sumXX + 1.0 / n),
+                -getXbar()*mse/sumXX,
                 mse/sumXX };
               return new RegressionResults(
                       params, new double[][]{vcv}, true, n, 2,
@@ -735,7 +735,7 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
               final double[] params = new double[]{ sumY / n, Double.NaN };
               //final double mse = getMeanSquareError();
               final double[] vcv = new double[]{
-                ybar / (n - 1.0),
+                getYbar() / (n - 1.0),
                 Double.NaN,
                 Double.NaN };
               return new RegressionResults(
@@ -801,7 +801,7 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
                 if( variablesToInclude[0] == 0 ){
                     //just the mean
                     final double[] vcv = new double[]{ sumYY/(((n-1)*n)) };
-                    final double[] params = new double[]{ ybar };
+                    final double[] params = new double[]{ getYbar() };
                     return new RegressionResults(
                       params, new double[][]{vcv}, true, n, 1,
                       sumY, _syy+_mean, sumYY,true,false);
@@ -836,4 +836,16 @@ public class SimpleRegression implements Serializable, UpdatingMultipleLinearReg
 
         return null;
     }
+	public double getXbar() {
+		return xbar;
+	}
+	public void setXbar(double xbar) {
+		this.xbar = xbar;
+	}
+	public double getYbar() {
+		return ybar;
+	}
+	public void setYbar(double ybar) {
+		this.ybar = ybar;
+	}
 }
