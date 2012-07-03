@@ -362,7 +362,7 @@ public class SnapshotDataIAP {
 		prepareStore();
 	}
 	
-	private void prepareStore() {
+	public void prepareStore() {
 		storeAngleToValues = new TreeMap<Double, ArrayList<Double>>();
 		if (position2store != null && !position2store.isEmpty())
 			for (Double angle : position2store.keySet())

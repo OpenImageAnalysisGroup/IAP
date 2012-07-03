@@ -33,7 +33,7 @@ public class ExperimentCalculationService {
 		for (SubstanceInterface si : experiment) {
 			if (si.getName().startsWith("RESULT_"))
 				continue;
-			if (optStatus!=null)
+			if (optStatus != null)
 				optStatus.setCurrentStatusText2(si.getName());
 			// omit color histogram values in the blue range
 			// only bins < 11 are OK
@@ -90,7 +90,7 @@ public class ExperimentCalculationService {
 				}
 			}
 		}
-		if (optStatus!=null)
+		if (optStatus != null)
 			optStatus.setCurrentStatusText2("");
 		return res;
 	}
@@ -169,7 +169,7 @@ public class ExperimentCalculationService {
 		}
 		if (newS == null) {
 			newS = si.clone();
-			//System.out.println("New substance: "+newS.getName());
+			// System.out.println("New substance: "+newS.getName());
 		}
 		ConditionInterface newC = ci.clone(newS);
 		
@@ -228,8 +228,8 @@ public class ExperimentCalculationService {
 				addedSubstances.add(newS.getName());
 			}
 			newS.add(newC);
-		} // else 
-			//System.out.println("No ratio data for substance "+newS.getName());
+		} // else
+			// System.out.println("No ratio data for substance "+newS.getName());
 	}
 	
 	/**
@@ -317,23 +317,23 @@ public class ExperimentCalculationService {
 							
 							SubstanceInterface sStressStart = addOrCreateSubstance("lm3s_stress_start" + s.getName());
 							ConditionInterface cSST = addOrCreateCondition(sStressStart, ci);
-							addOrCreateSampleAndAddValue(cSST, -1, timeUnit, timeOfStressStart, timeUnit, artificialSampleFineTime++);
+							addOrCreateSampleAndAddValue(cSST, Integer.MAX_VALUE, timeUnit, timeOfStressStart, timeUnit, artificialSampleFineTime++);
 							
 							SubstanceInterface sStressSpeed = addOrCreateSubstance("lm3s_stress_speed" + s.getName());
 							ConditionInterface cSSP = addOrCreateCondition(sStressSpeed, ci);
-							addOrCreateSampleAndAddValue(cSSP, -1, timeUnit, stressReactionSpeed, "%/" + timeUnit, artificialSampleFineTime++);
+							addOrCreateSampleAndAddValue(cSSP, Integer.MAX_VALUE, timeUnit, stressReactionSpeed, "%/" + timeUnit, artificialSampleFineTime++);
 							
 							SubstanceInterface sStressExtend = addOrCreateSubstance("lm3s_stress_extend" + s.getName());
 							ConditionInterface cSSE = addOrCreateCondition(sStressExtend, ci);
-							addOrCreateSampleAndAddValue(cSSE, -1, timeUnit, worstStressExtend, "%", artificialSampleFineTime++);
+							addOrCreateSampleAndAddValue(cSSE, Integer.MAX_VALUE, timeUnit, worstStressExtend, "%", artificialSampleFineTime++);
 							
 							SubstanceInterface sRecoveryStart = addOrCreateSubstance("lm3s_recovery_start" + s.getName());
 							ConditionInterface cRST = addOrCreateCondition(sRecoveryStart, ci);
-							addOrCreateSampleAndAddValue(cRST, -1, timeUnit, timeOfRecoveryStart, timeUnit, artificialSampleFineTime++);
+							addOrCreateSampleAndAddValue(cRST, Integer.MAX_VALUE, timeUnit, timeOfRecoveryStart, timeUnit, artificialSampleFineTime++);
 							
 							SubstanceInterface sRecoverySpeed = addOrCreateSubstance("lm3s_recovery_speed" + s.getName());
 							ConditionInterface cRSP = addOrCreateCondition(sRecoverySpeed, ci);
-							addOrCreateSampleAndAddValue(cRSP, -1, timeUnit, stressRecoverySpeed, "%/" + timeUnit, artificialSampleFineTime++);
+							addOrCreateSampleAndAddValue(cRSP, Integer.MAX_VALUE, timeUnit, stressRecoverySpeed, "%/" + timeUnit, artificialSampleFineTime++);
 						}
 					}
 				}
