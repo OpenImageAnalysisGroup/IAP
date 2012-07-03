@@ -2004,8 +2004,8 @@ public class MongoDB {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		
-		if (optStatusProvider!=null)
-			optStatusProvider.setCurrentStatusText1(""+s3d.getName()+" (n_s="+n+")");
+		if (optStatusProvider != null)
+			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s=" + n + ")");
 		
 		experiment.add(s3d);
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
@@ -2141,12 +2141,13 @@ public class MongoDB {
 	
 	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
 		Condition3D condition = new Condition3D(s3d, cond.toMap());
-		if (optStatusProvider!=null)
-			optStatusProvider.setCurrentStatusText2(""+condition.getConditionName()+" (n_c="+(int)max+")");
-
+		
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
-		if (sampList != null)
+		if (sampList != null) {
+			if (optStatusProvider != null)
+				optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
+			
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
 				Sample3D sample = new Sample3D(condition, sam.toMap());
@@ -2208,6 +2209,7 @@ public class MongoDB {
 					}
 				}
 			}
+		}
 	}
 	
 	private Map filter(Map map) {
