@@ -41,7 +41,7 @@ PLOTTING.LISTS <- "plottingLists"
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- FALSE
+calculateOnlyNBox <- TRUE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
@@ -395,7 +395,7 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 	listOfTreat <- list(treatment=treatment, secondTreatment=secondTreatment)
 	listOfFilterTreat <- list(filterTreatment = filterTreatment, filterSecondTreatment = filterSecondTreatment)	## wird erstmal noch nichts weiter mit gemacht! nur geswapt falls notwendig
 
-	if (treatment == NONE & secondTreatment == NONE) {
+	if (treatment == NONE && secondTreatment == NONE) {
 		listOfTreat$treatment <- NONE.TREATMENT
 		listOfTreatAndFilterTreat <- list(listOfTreat, listOfFilterTreat)
 	} else {	
@@ -433,7 +433,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	
 	if (sum(!is.na(overallList$nBoxDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "nBoxplots..."));}
-		for (n in 1:length(overallList$nBoxDes)) {
+		for (n in seq(along = overallList$nBoxDes)) {
 			if (!is.na(overallList$nBoxDes[[n]][1])) {
 				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet)
 			}
@@ -446,7 +446,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	
 	if (sum(!is.na(overallList$boxDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxDes), "Boxplots..."))}
-		for (n in 1:length(overallList$boxDes)) {
+		for (n in seq(along = overallList$boxDes)) {
 			if (!is.na(overallList$boxDes[[n]][1])) {
 				overallList$boxDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet)
 			}
@@ -459,7 +459,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 
 	if (sum(!is.na(overallList$boxStackDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxStackDes), "stacked boxplots..."))}
-		for (n in 1:length(overallList$boxStackDes)) {
+		for (n in seq(along = overallList$boxStackDes)) {
 			if (!is.na(overallList$boxStackDes[[n]][1])) {
 				overallList$boxStackDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet)
 			}
@@ -472,7 +472,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 
 	if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxSpiderDes), "spiderplots..."))}
-		for (n in 1:length(overallList$boxSpiderDes)) {
+		for (n in seq(along = overallList$boxSpiderDes)) {
 			if (!is.na(overallList$boxSpiderDes[[n]][1])) {
 				initDescriptor <- overallList$boxSpiderDes[[n]]
 				overallList$boxSpiderDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
@@ -490,7 +490,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	
 	if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 		if (overallList$debug) {ownCat(paste(length(overallList$violinBoxDes), "violinplot..."))}
-		for (n in 1:length(overallList$violinBoxDes)) {
+		for (n in seq(along = overallList$violinBoxDes)) {
 			if (!is.na(overallList$violinBoxDes[[n]][1])) {
 				overallList$violinBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$violinBoxDes[[n]], overallList$iniDataSet)
 			}
@@ -514,12 +514,18 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	return(overallList)
 }
 
+
 checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescriptor = TRUE) {
+#############
+#descriptorVector <- overallList$nBoxDes[[7]]
+#iniDataSet <- overallList$iniDataSet
+#############
+	
 	#overallList$debug %debug% "checkIfDescriptorIsNaOrAllZero()"
 	descriptorVector <- as.vector(descriptorVector)
 	#descriptorVector = getVector(descriptorVector)
 	tempDescriptor <- descriptorVector 
-	
+		
 	if (isDescriptor) {
 		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0 & colSums(iniDataSet[descriptorVector] *1, na.rm = TRUE) > 0]
 	} else {
@@ -685,7 +691,7 @@ preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".", is
 		}
 		
 		if (!isColName){
-			for (n in 1:length(value)) {
+			for (n in seq(along = value)) {
 				value[[n]] = gsub(regExpressionCol, replaceString, value[[n]])
 			}
 		}
@@ -701,7 +707,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	#columnsAfterCheckOfNormalized <- checkForNormalizedColumns(descriptorSet_nBoxplot)
 	if (!is.null(overallList$nBoxDes)) {
 		if (overallList$debug) {ownCat(NBOX.PLOT)}
-		for (n in 1:length(overallList$nBoxDes)) {
+		for (n in seq(along = overallList$nBoxDes)) {
 			overallList$nBoxDes[n] = preprocessingOfDescriptor(overallList$nBoxDes[[n]], overallList$iniDataSet)
 		}
 	} else {
@@ -884,9 +890,19 @@ check <- function(value, checkValue=c(NONE, NA)) {
 
 getVector <- function(descriptorSet) {
 	if (!is.null(descriptorSet)) {
-		vector =  vector()
-		for (n in 1:length(descriptorSet)) {
-			vector = c(vector, as.vector(unlist(descriptorSet[[n]])))
+		vector <-  vector()
+		if(class(descriptorSet) == "data.frame") {
+			lengthVec <- length(descriptorSet[,1])
+		} else if (class(descriptorSet) == "list") {
+			lengthVec <- length(descriptorSet)
+		}
+		
+		for (n in 1:lengthVec) {
+			if(class(descriptorSet) == "data.frame") {
+				vector = c(vector, as.vector(descriptorSet[n,]))
+			} else if(class(descriptorSet) == "list") {
+				vector = c(vector, as.vector(unlist(descriptorSet[[n]])))
+			}
 		}
 		return(vector)
 	}
@@ -1843,9 +1859,7 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 	} else if(typ == VIOLIN.PLOT) {
 		typString <- "violin plot"
 	}
-	
-	
-	
+
 	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
 	
 }
@@ -2022,6 +2036,23 @@ shapeTransparence <- function(column) {
 	return(alpha)
 }
 
+testfunction <- function(parameter) {
+	sum(abs(numbers - x) < 1e-6)
+}
+
+checkIfOnePlotTypeHasLessThanThreeValues <- function(overallResult, whichColumShouldUse) {
+
+	dataTableOverallResult <- data.table(overallResult)
+	sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), sum, na.rm=TRUE), by=c(whichColumShouldUse, "xAxis")])
+	for(n in sumOfXAxis[,whichColumShouldUse]) {
+		if(sum(sumOfXAxis[,whichColumShouldUse] == as.character(n)) < 3) {
+			return(TRUE)
+		}
+	}
+	return(FALSE)
+}
+
+
 makeLinearDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
 #############
 #overallResult <- overallResultSplit
@@ -2043,6 +2074,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	overallList$debug %debug% "makeLinearDiagram()"	
 	ylabelForAppendix <- ""
 	stressArea <- data.frame()
+	hasLessThanThreeValues <- FALSE
 	
 	overallFileName <- overallList$imageFileNames_nBoxplots
 	overallColor <- overallList$color_nBox
@@ -2062,13 +2094,15 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 		#print(whichColumShouldUse)
 			overallResult <- cbind(overallResult, ymin=overallResult$mean-overallResult$se, ymax=overallResult$mean+overallResult$se)
 			
+			hasLessThanThreeValues <- checkIfOnePlotTypeHasLessThanThreeValues(overallResult, whichColumShouldUse)
+			
 			reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 			overallResult <- reorderList$overallResult
 #			print(whichColumShouldUse)
 #			print(head(overallResult))
 			plot <-	ggplot() 
 					
-			if(length(stressArea) >0) {
+			if(length(stressArea) > 0) {
 				plot <- plot + 
 						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ)) +
 						#geom_text(data=stressArea, aes(x=xmin, y=(ymax-ymax*0.15), label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
@@ -2076,13 +2110,15 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 				
 			}	
 			
-			if ((length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || 
+			if (((length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || 
 						overallList$isRatio || 
 						length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || 
 						length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) &&
-						(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0)) {
-					plot <- plot + 
-							geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))
+						(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0)) &&
+						!hasLessThanThreeValues) {
+							plot <- plot + 
+									geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))
+				
 #				if(isOtherTyp) {
 #					plot <- plot +
 #							geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=primaerTreatment, ymin=mean-se, ymax=mean+se, colour=primaerTreatment, fill=primaerTreatment), method="loess", stat="smooth", alpha=0.1)
@@ -2280,7 +2316,8 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 #				}
 ##!#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
 #			} 
-																																																						
+			
+				
 			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, typOfPlot, sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, "OverallImage", sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth)
 					
 		} else {
@@ -3593,6 +3630,12 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 }
 
 plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
+#########
+#title <- ""
+#title	<- nn
+#overallResult <- overallResultSplit
+#########
+
 	overallList$debug %debug% "plotDiagram()"	
 	
 	if(typOfPlot == NBOX.PLOT) {
@@ -3644,6 +3687,20 @@ makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesI
 
 
 paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
+###############
+#tempOverallResult <- overallList$overallResult_nBoxDes  
+#overallDescriptor <- overallList$nBoxDes 
+#overallDesName <- overallList$nBoxDesName
+#typOfPlot <- NBOX.PLOT	
+#imagesIndex <- "1"
+###############
+#tempOverallResult <- overallList$overallResult_boxSpiderDes 
+#overallDescriptor <- overallList$boxSpiderDes  
+#overallDesName <- overallList$boxSpiderDesName 
+#typOfPlot <- SPIDER.PLOT
+#imagesIndex <- "1"
+###############
+
 	overallList$debug %debug% "paralleliseDiagramming()"
 	
 	for (imagesIndex in names(overallDescriptor)) {
@@ -4024,16 +4081,16 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		
 		treatment <- "Treatment"
 		#treatment <- "Genotype"
-		filterTreatment <- "dry / normal"
+		filterTreatment <- "stress / control"
 		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
 		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
 
 		#secondTreatment <- "none"
-		#filterSecondTreatment  <- "none"
+		filterSecondTreatment  <- "none"
 		
-		secondTreatment <- "Species"
-		filterSecondTreatment  <- "Athletico$Fernandez$Weisse Zarin"
+		secondTreatment <- "Genotype"
+		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
 		
 		#secondTreatment <- "Treatment"
 		#filterSecondTreatment <- "dry / normal"
@@ -4074,7 +4131,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 		descriptorSet_boxplot <- names(box.plot.list)
 		descriptorSetName_boxplot <- getVector(box.plot.list)
 		
-		escriptorSet_spiderplot <- names(spider.plot.list)
+		descriptorSet_spiderplot <- names(spider.plot.list)
 		descriptorSetName_spiderplot <- getVector(spider.plot.list)
 		
 		descriptorSet_violinBox <- names(violin.plot.list)
@@ -4117,7 +4174,7 @@ startOptions <- function(typOfStartOptions = "test", debug=FALSE) {
 			descriptorSetName_spiderplot = NULL
 			descriptorSet_violinBox = NULL
 		}
-		
+
 		listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug)
 		treatment = listOfTreatAndFilterTreat[[1]][[1]]
 		secondTreatment = listOfTreatAndFilterTreat[[1]][[2]]
