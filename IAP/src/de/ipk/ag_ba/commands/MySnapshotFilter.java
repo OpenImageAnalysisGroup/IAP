@@ -67,6 +67,9 @@ public class MySnapshotFilter implements SnapshotFilter {
 						else
 							if (d != null) {
 								int day = globalOutlierDays[idx];
+								if (day<0)
+									return false;
+								else
 								if (day < Integer.MAX_VALUE)
 									if (o.contains(">=") && d >= day)
 										return true;
