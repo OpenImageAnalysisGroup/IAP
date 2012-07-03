@@ -115,7 +115,7 @@ public class MongoDB {
 	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
-	private static boolean ensureIndex = true;
+	private static boolean ensureIndex = false;
 	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
@@ -1278,17 +1278,20 @@ public class MongoDB {
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
 						BasicDBList subList = (BasicDBList) expref.get("substances");
-						if (subList != null)
+						if (subList != null) {
+							int n = subList.size();
 							for (Object co : subList) {
 								DBObject substance = (DBObject) co;
 								if (optDBPbjectsOfSubstances != null)
 									optDBPbjectsOfSubstances.add(substance);
-								processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions);
+								processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, n);
 							}
+						}
 						if (ensureIndex)
 							db.getCollection("substances").ensureIndex("_id");
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
-						if (l != null)
+						if (l != null) {
+							int n = l.size();
 							for (Object o : l) {
 								if (o == null)
 									continue;
@@ -1298,10 +1301,11 @@ public class MongoDB {
 									if (substance != null) {
 										if (optDBPbjectsOfSubstances != null)
 											optDBPbjectsOfSubstances.add(substance);
-										processSubstance(db, experiment, substance, optStatusProvider, 100d / l.size(), optDBPbjectsOfConditions);
+										processSubstance(db, experiment, substance, optStatusProvider, 100d / l.size(), optDBPbjectsOfConditions, n);
 									}
 								}
 							}
+						}
 					}
 					experiment.setHeader(header);
 					
@@ -1996,18 +2000,24 @@ public class MongoDB {
 	
 	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
-			ArrayList<DBObject> optDBObjectsConditions) {
+			ArrayList<DBObject> optDBObjectsConditions, int n) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
+		
+		if (optStatusProvider!=null)
+			optStatusProvider.setCurrentStatusText1(""+s3d.getName()+" (n_s="+n+")");
+		
 		experiment.add(s3d);
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
-		if (condList != null)
+		if (condList != null) {
+			int nc = condList.size();
 			for (Object co : condList) {
 				DBObject cond = (DBObject) co;
 				if (optDBObjectsConditions != null)
 					optDBObjectsConditions.add(cond);
-				processCondition(s3d, cond);
+				processCondition(s3d, cond, optStatusProvider, nc);
 			}
+		}
 		if (ensureIndex)
 			db.getCollection("conditions").ensureIndex("_id");
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
@@ -2019,7 +2029,7 @@ public class MongoDB {
 				if (cond != null) {
 					if (optDBObjectsConditions != null)
 						optDBObjectsConditions.add(cond);
-					processCondition(s3d, cond);
+					processCondition(s3d, cond, optStatusProvider, max);
 				}
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
@@ -2129,8 +2139,11 @@ public class MongoDB {
 			}
 	}
 	
-	private void processCondition(Substance3D s3d, DBObject cond) {
+	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
 		Condition3D condition = new Condition3D(s3d, cond.toMap());
+		if (optStatusProvider!=null)
+			optStatusProvider.setCurrentStatusText2(""+condition.getConditionName()+" (n_c="+(int)max+")");
+
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
 		if (sampList != null)
