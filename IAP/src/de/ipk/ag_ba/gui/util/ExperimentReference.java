@@ -124,6 +124,8 @@ public class ExperimentReference {
 			return experiment;
 		else {
 			synchronized (ExperimentReference.class) {
+				if (experiment != null)
+					return experiment;
 				String databaseId = header.getDatabaseId();
 				ExperimentInterface res = null; // weakId2exp.get(databaseId);
 				if (res != null)
