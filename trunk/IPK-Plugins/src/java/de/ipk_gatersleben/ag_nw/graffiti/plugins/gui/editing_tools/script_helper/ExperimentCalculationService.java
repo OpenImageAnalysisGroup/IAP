@@ -169,7 +169,7 @@ public class ExperimentCalculationService {
 		}
 		if (newS == null) {
 			newS = si.clone();
-			System.out.println("New substance: "+newS.getName());
+			//System.out.println("New substance: "+newS.getName());
 		}
 		ConditionInterface newC = ci.clone(newS);
 		
@@ -228,8 +228,8 @@ public class ExperimentCalculationService {
 				addedSubstances.add(newS.getName());
 			}
 			newS.add(newC);
-		} else 
-			System.out.println("No ratio data for substance "+newS.getName());
+		} // else 
+			//System.out.println("No ratio data for substance "+newS.getName());
 	}
 	
 	/**
