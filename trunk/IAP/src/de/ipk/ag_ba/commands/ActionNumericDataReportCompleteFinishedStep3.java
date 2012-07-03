@@ -304,7 +304,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
 				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.average", "side.hull.pc2.norm");
 				if (status != null)
-					status.setCurrentStatusText2("Stress analysis finished");
+					status.setCurrentStatusText2("Stress model calculated");
 			}
 			
 			ArrayList<SnapshotDataIAP> snapshots;
@@ -362,33 +362,23 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			
 			if (xlsx) {
 				if (status != null)
-					status.setCurrentStatusText2("Create XLSX");
+					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
 				experiment = null;
-				snapshots = setExcelSheetValues(snapshots, sheet, excelColumnHeaders);
-			} else
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders);
+			} else {
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
-			if (exportIndividualAngles) {
-				if (!xlsx) {
-					boolean germanLanguage = false;
-					int row = 1; // header is added before at row 0
-					for (SnapshotDataIAP s : snapshots) {
-						String rowContent = s.getCSVvalue(germanLanguage, separator);
-						csv.append(rowContent);
-						if (row2col2value != null)
-							row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
-					}
-				}
-			} else {
+				
 				boolean germanLanguage = false;
 				int row = 1; // header is added before at row 0
-				if (!xlsx)
-					for (SnapshotDataIAP s : snapshots) {
-						String rowContent = s.getCSVvalue(germanLanguage, separator);
-						csv.append(rowContent);
-						if (row2col2value != null)
-							row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
-					}
+				for (SnapshotDataIAP s : snapshots) {
+					String rowContent = s.getCSVvalue(germanLanguage, separator);
+					csv.append(rowContent);
+					if (row2col2value != null)
+						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
+				}
+				
+				snapshots = null;
 			}
 			if (xlsx) {
 				csv = null;
@@ -452,13 +442,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					status.setCurrentStatusText2("Clustering input created");
 			}
 			
-			// p.saveScripts(new String[] {
-			// "diagramForReportPDF.r",
-			// "diagramIAP.cmd",
-			// "diagramIAP.bat",
-			// "initLinux.r",
-			// "report2.tex", "createDiagramFromValuesLinux.r"
-			// });
 			if (!xlsx)
 				p.saveScripts(new String[] {
 						"inc.R",
@@ -562,7 +545,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return res;
 	}
 	
-	private ArrayList<SnapshotDataIAP> setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet, ArrayList<String> excelColumnHeaders) {
+	private void setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet, ArrayList<String> excelColumnHeaders) {
 		if (status != null)
 			status.setCurrentStatusText2("Fill workbook");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
@@ -649,7 +632,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			status.setCurrentStatusText1("Workbook is filled");
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
-		return snapshots;
 	}
 	
 	private void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders) {
