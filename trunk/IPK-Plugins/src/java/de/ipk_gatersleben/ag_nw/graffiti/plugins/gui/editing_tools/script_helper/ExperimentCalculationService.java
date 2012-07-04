@@ -29,8 +29,6 @@ public class ExperimentCalculationService {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		Experiment res = new Experiment();
 		HashSet<String> addedSubstances = new HashSet<String>();
-		res.setHeader(experiment.getHeader().clone());
-		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of stress impact)");
 		for (SubstanceInterface si : experiment) {
 			if (si.getName().startsWith("RESULT_"))
 				continue;
@@ -91,6 +89,8 @@ public class ExperimentCalculationService {
 				}
 			}
 		}
+		res.setHeader(experiment.getHeader().clone());
+		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of stress impact)");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("");
 		return res;
@@ -315,9 +315,9 @@ public class ExperimentCalculationService {
 						}
 						if (bestM1 != null) {
 							// construct result data points
-							System.out.println("Best days D1: "+StringManipulationTools.getStringList(bestDaysD1, ","));
-							System.out.println("Best days D2: "+StringManipulationTools.getStringList(bestDaysD2, ","));
-							System.out.println("Best days D3: "+StringManipulationTools.getStringList(bestDaysD3, ","));
+							System.out.println("Best days D1: " + StringManipulationTools.getStringList(bestDaysD1, ","));
+							System.out.println("Best days D2: " + StringManipulationTools.getStringList(bestDaysD2, ","));
+							System.out.println("Best days D3: " + StringManipulationTools.getStringList(bestDaysD3, ","));
 							double timeOfStressStart = bestP1.getX();
 							double timeOfRecoveryStart = bestP2.getX();
 							double worstStressExtend = bestP2.getY(); // 1 ==> no stress reaction, 0.5 ==> stress reaction result is 50% of analyzed property in
@@ -330,7 +330,7 @@ public class ExperimentCalculationService {
 							SubstanceInterface sNoStressInter = addOrCreateSubstance("lm3s_nostress_ratio." + s.getName());
 							ConditionInterface cNSSI = addOrCreateCondition(sNoStressInter, ci);
 							addOrCreateSampleAndAddValue(cNSSI, Integer.MAX_VALUE, timeUnit, noStressRatioDifference, "%", artificialSampleFineTime++);
-
+							
 							SubstanceInterface sNoStressSpeed = addOrCreateSubstance("lm3s_nostress_slope." + s.getName());
 							ConditionInterface cNSSP = addOrCreateCondition(sNoStressSpeed, ci);
 							addOrCreateSampleAndAddValue(cNSSP, Integer.MAX_VALUE, timeUnit, noStressGrowthDifference, "%/" + timeUnit, artificialSampleFineTime++);
