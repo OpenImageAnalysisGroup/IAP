@@ -331,10 +331,6 @@ public class ExperimentCalculationService {
 							ConditionInterface cNSSI = addOrCreateCondition(sNoStressInter, ci);
 							addOrCreateSampleAndAddValue(cNSSI, Integer.MAX_VALUE, timeUnit, noStressRatioDifference, "%", artificialSampleFineTime++);
 							
-							SubstanceInterface sNoStressSpeed = addOrCreateSubstance("lm3s_nostress_slope." + s.getName());
-							ConditionInterface cNSSP = addOrCreateCondition(sNoStressSpeed, ci);
-							addOrCreateSampleAndAddValue(cNSSP, Integer.MAX_VALUE, timeUnit, noStressGrowthDifference, "%/" + timeUnit, artificialSampleFineTime++);
-							
 							SubstanceInterface sStressStart = addOrCreateSubstance("lm3s_stress_start." + s.getName());
 							ConditionInterface cSST = addOrCreateCondition(sStressStart, ci);
 							addOrCreateSampleAndAddValue(cSST, Integer.MAX_VALUE, timeUnit, timeOfStressStart, timeUnit, artificialSampleFineTime++);
