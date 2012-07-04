@@ -30,4 +30,8 @@ public class LinearRegressionModel {
 	public double getM() {
 		return sr.getSlope();
 	}
+	
+	public double getI() {
+		return sr.getIntercept();
+	}
 }
