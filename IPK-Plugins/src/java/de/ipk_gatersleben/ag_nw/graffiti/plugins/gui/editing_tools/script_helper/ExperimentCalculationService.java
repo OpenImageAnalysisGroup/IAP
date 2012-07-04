@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.MeasurementFilter;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 public class ExperimentCalculationService {
@@ -279,6 +280,9 @@ public class ExperimentCalculationService {
 						LinearRegressionModel bestM3 = null;
 						IntersectionPoint bestP1 = null;
 						IntersectionPoint bestP2 = null;
+						TreeSet<Integer> bestDaysD1 = null;
+						TreeSet<Integer> bestDaysD2 = null;
+						TreeSet<Integer> bestDaysD3 = null;
 						double lowestErrorSum = Double.MAX_VALUE;
 						for (int stressStartTimeIndex = 0; stressStartTimeIndex < days.size() - 6; stressStartTimeIndex++) {
 							for (int stressEndTimeIndex = stressStartTimeIndex + 3; stressEndTimeIndex < days.size() - 3; stressEndTimeIndex++) {
@@ -287,11 +291,11 @@ public class ExperimentCalculationService {
 								TreeSet<Integer> d3 = getDays(idx2day, stressEndTimeIndex, days.size());
 								if (d1.size() > 2 && d2.size() > 2 && d3.size() > 2) {
 									// fit day index 1 to startIdx ==> line segment 1 (normal growth phase)
-									LinearRegressionModel m1 = new LinearRegressionModel(getValues(ci, d1));
+									LinearRegressionModel m1 = new LinearRegressionModel(getValues(ci, d1), true);
 									// fit startIdx to endIdx ==> line segment 2 (stress phase)
-									LinearRegressionModel m2 = new LinearRegressionModel(getValues(ci, d2));
+									LinearRegressionModel m2 = new LinearRegressionModel(getValues(ci, d2), false);
 									// fit endIdx to days.size()-1 ==> line segment 3 (stress recovery phase)
-									LinearRegressionModel m3 = new LinearRegressionModel(getValues(ci, d3));
+									LinearRegressionModel m3 = new LinearRegressionModel(getValues(ci, d3), false);
 									IntersectionPoint p1 = m1.intersect(m2);
 									IntersectionPoint p2 = m2.intersect(m3);
 									double squareSumError = m1.getErrorSquareSum() + m2.getErrorSquareSum() + m3.getErrorSquareSum();
@@ -301,6 +305,9 @@ public class ExperimentCalculationService {
 										bestM3 = m3;
 										bestP1 = p1;
 										bestP2 = p2;
+										bestDaysD1 = d1;
+										bestDaysD2 = d2;
+										bestDaysD3 = d3;
 										lowestErrorSum = squareSumError;
 									}
 								}
@@ -308,16 +315,23 @@ public class ExperimentCalculationService {
 						}
 						if (bestM1 != null) {
 							// construct result data points
+							System.out.println("Best days D1: "+StringManipulationTools.getStringList(bestDaysD1, ","));
+							System.out.println("Best days D2: "+StringManipulationTools.getStringList(bestDaysD2, ","));
+							System.out.println("Best days D3: "+StringManipulationTools.getStringList(bestDaysD3, ","));
 							double timeOfStressStart = bestP1.getX();
 							double timeOfRecoveryStart = bestP2.getX();
 							double worstStressExtend = bestP2.getY(); // 1 ==> no stress reaction, 0.5 ==> stress reaction result is 50% of analyzed property in
 																					// comparison to reference
-							double noStressGrowthDifference = bestM1.getM();
 							double stressReactionSpeed = bestM2.getM();
 							double stressRecoverySpeed = bestM3.getM();
-							double noStressDifference = bestM1.getI();
+							double noStressGrowthDifference = bestM1.getM();
+							double noStressRatioDifference = bestM1.getAverageY();
 							
-							SubstanceInterface sNoStressSpeed = addOrCreateSubstance("lm3s_nostress_speed." + s.getName());
+							SubstanceInterface sNoStressInter = addOrCreateSubstance("lm3s_nostress_ratio." + s.getName());
+							ConditionInterface cNSSI = addOrCreateCondition(sNoStressInter, ci);
+							addOrCreateSampleAndAddValue(cNSSI, Integer.MAX_VALUE, timeUnit, noStressRatioDifference, "%", artificialSampleFineTime++);
+
+							SubstanceInterface sNoStressSpeed = addOrCreateSubstance("lm3s_nostress_slope." + s.getName());
 							ConditionInterface cNSSP = addOrCreateCondition(sNoStressSpeed, ci);
 							addOrCreateSampleAndAddValue(cNSSP, Integer.MAX_VALUE, timeUnit, noStressGrowthDifference, "%/" + timeUnit, artificialSampleFineTime++);
 							
@@ -325,11 +339,11 @@ public class ExperimentCalculationService {
 							ConditionInterface cSST = addOrCreateCondition(sStressStart, ci);
 							addOrCreateSampleAndAddValue(cSST, Integer.MAX_VALUE, timeUnit, timeOfStressStart, timeUnit, artificialSampleFineTime++);
 							
-							SubstanceInterface sStressSpeed = addOrCreateSubstance("lm3s_stress_speed." + s.getName());
+							SubstanceInterface sStressSpeed = addOrCreateSubstance("lm3s_stress_slope." + s.getName());
 							ConditionInterface cSSP = addOrCreateCondition(sStressSpeed, ci);
 							addOrCreateSampleAndAddValue(cSSP, Integer.MAX_VALUE, timeUnit, stressReactionSpeed, "%/" + timeUnit, artificialSampleFineTime++);
 							
-							SubstanceInterface sStressExtend = addOrCreateSubstance("lm3s_stress_extend." + s.getName());
+							SubstanceInterface sStressExtend = addOrCreateSubstance("lm3s_stress_max_extend." + s.getName());
 							ConditionInterface cSSE = addOrCreateCondition(sStressExtend, ci);
 							addOrCreateSampleAndAddValue(cSSE, Integer.MAX_VALUE, timeUnit, worstStressExtend, "%", artificialSampleFineTime++);
 							
@@ -337,13 +351,9 @@ public class ExperimentCalculationService {
 							ConditionInterface cRST = addOrCreateCondition(sRecoveryStart, ci);
 							addOrCreateSampleAndAddValue(cRST, Integer.MAX_VALUE, timeUnit, timeOfRecoveryStart, timeUnit, artificialSampleFineTime++);
 							
-							SubstanceInterface sRecoverySpeed = addOrCreateSubstance("lm3s_recovery_speed." + s.getName());
+							SubstanceInterface sRecoverySpeed = addOrCreateSubstance("lm3s_recovery_slope." + s.getName());
 							ConditionInterface cRSP = addOrCreateCondition(sRecoverySpeed, ci);
 							addOrCreateSampleAndAddValue(cRSP, Integer.MAX_VALUE, timeUnit, stressRecoverySpeed, "%/" + timeUnit, artificialSampleFineTime++);
-							
-							SubstanceInterface sNoStressInter = addOrCreateSubstance("lm3s_nostress_intercept." + s.getName());
-							ConditionInterface cNSSI = addOrCreateCondition(sNoStressInter, ci);
-							addOrCreateSampleAndAddValue(cNSSI, Integer.MAX_VALUE, timeUnit, noStressDifference, "%", artificialSampleFineTime++);
 						}
 					}
 				}
