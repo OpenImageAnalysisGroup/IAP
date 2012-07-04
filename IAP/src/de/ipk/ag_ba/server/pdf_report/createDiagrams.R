@@ -42,7 +42,7 @@ PLOTTING.LISTS <- "plottingLists"
 
 calculateNothing <- FALSE
 calculateOnlyNBox <- FALSE
-calculateOnlyViolin <- FALSE
+calculateOnlyViolin <- TRUE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
 calculateOnlyBoxplot <- FALSE
@@ -811,8 +811,7 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 preprocessingOfxAxisValue <- function(overallList) {
 	overallList$debug %debug% "preprocessingOfxAxisValue()"
 	overallList$xAxis = unlist(preprocessingOfValues(overallList$xAxis, TRUE))
-	print(overallList$xAxis)
-	print(overallList$filterXaxis)
+	
 	if (overallList$filterXaxis != NONE) {
 		print(overallList$filterXaxis)
 		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE))
@@ -1017,7 +1016,11 @@ buildRowName <- function(mergeDataSet, groupBy, contactTheValues, yName = "value
 		#temp = mergeDataSet[, groupBy[2]]
 	
 		if(contactTheValues) {
-			temp = mergeDataSet[, groupBy[1]]
+			if(length(unique(mergeDataSet[, groupBy[1]])) == 1) {
+				()
+			} else {
+				temp = mergeDataSet[, groupBy[1]]
+			}
 			for (h in 2:length(groupBy)) {
 				temp = paste(temp, mergeDataSet[, groupBy[h]], sep = "/") #  #/#
 			}
@@ -1811,11 +1814,13 @@ replaceTreatmentNamesOverall <- function(overallList, overallResult) {
 }
 
 
-replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment=FALSE, onlySecondTreatment=FALSE, oneValue=FALSE) {
+replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment = FALSE, onlySecondTreatment = FALSE, oneValue = FALSE) {
 ##########
 #columnWhichShouldReplace <- overallResult$name
 #onlyFirstTreatment <- TRUE
 #onlySecondTreatment <- TRUE
+#n <- overallList$filterTreatment[1]
+#k <- overallList$filterSecondTreatment[1]
 ##########
 
 #print(columnWhichShouldReplace)
@@ -1830,11 +1835,19 @@ replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFir
 		if(oneValue) {
 			columnWhichShouldReplace <- paste(overallList$filterTreatmentRename[[columnWhichShouldReplace]],"/", overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]], sep="")
 		} else {
-			for(n in overallList$filterTreatment) {
-				for(k in overallList$filterSecondTreatment) {
-					columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
+			
+			if(length(overallList$filterTreatment) < 2) {
+				
+				
+			} else if(length(overallList$filterSecondTreatment) < 2) {
+				
+			} else {
+				for(n in overallList$filterTreatment) {
+					for(k in overallList$filterSecondTreatment) {
+						columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
+					}
 				}
-			} 
+			}
 		}
 	} 
 	
@@ -3234,23 +3247,24 @@ setColorDependentOfGroup <- function(overallResult) {
 	return(color)
 }
 
-OneMinusTheValue <- function(overallResult) {
+OneMinusTheValue <- function(tempOverallResult, overallDescriptor) {
 	
-	for(nn in colnames(overallResult)) {
-		if(length(grep("nir",nn, ignore.case=TRUE)) > 0){
-			notOneMinus <- c(notOneMinus, nn)
+	notOneMinus <- vector()
+	for(nn in names(overallDescriptor)) {
+		if(length(grep("nir",overallDescriptor[[nn]], ignore.case=TRUE)) > 0){
+			notOneMinus <- c(notOneMinus, paste("mean", nn, sep=""))
 		}
 	}
-	colMinus <- overallResult %allColnamesWithoutThisOnes% notOneMinus
-		if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+	colMinus <- tempOverallResult %allColnamesWithoutThisOnes% notOneMinus
+		if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
 			#overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
 			colMinus <- colMinus[-c(1:3)]
 		} else {
 			#overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
 			colMinus <- colMinus[-c(1:2)]
 		}
-		overallResult[,colMinus] <- 1-overallResult[,colMinus]
-	return(overallResult)
+		tempOverallResult[,colMinus] <- 1-tempOverallResult[,colMinus]
+	return(tempOverallResult)
 }
 
 reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = NAME) {
@@ -3412,7 +3426,11 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	overallFileName <- overallList$imageFileNames_violinPlots
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
-	overallResult <- reorderThePlotOrder(overallResult, typOfPlot)
+
+	reorderList <- reorderThePlotOrder(overallResult, typOfPlot)
+	overallResult <- reorderList$overallResult
+	
+	#overallResult <- reorderThePlotOrder(overallResult, typOfPlot)
 	stressArea <- data.frame()
 
 	#print(head(overallResult))
@@ -3445,6 +3463,7 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
 			
 		}	
+		#print(plot)
 			plot <- plot +
 				geom_ribbon(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group, ymin=-mean, ymax=mean)) +						
 				scale_fill_manual(values = color) +
@@ -3737,27 +3756,36 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 #typOfPlot <- SPIDER.PLOT
 #imagesIndex <- "1"
 ###############
+#tempOverallResult <- overallList$overallResult_violinBoxDes
+#overallDescriptor <- overallList$violinBoxDes
+#overallDesName <- overallList$violinBoxDesName
+#typOfPlot <- VIOLIN.PLOT
+#imagesIndex <- "1"
+###############
 
 	overallList$debug %debug% "paralleliseDiagramming()"
+	
+#	if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
+#		tempOverallResult <- na.omit(tempOverallResult)
+#	} else 
+	if(typOfPlot == VIOLIN.PLOT){
+		tempOverallResult <- OneMinusTheValue(tempOverallResult, overallDescriptor)
+	}
 	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]][1])) {
 			createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
 			
-			if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
-				tempOverallResult <- na.omit(tempOverallResult)
-			}
-			
 			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, typOfPlot)
 		
-			if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT) {
+			if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
+				overallResult <- na.omit(overallResult)
+			} else if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT) {
 				overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 				overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0		
-				overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
-				
+				overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)				
 			} else if(typOfPlot == VIOLIN.PLOT) {
 				overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-				overallResult <- OneMinusTheValue(overallResult)
 			} 
 
 			
@@ -4325,10 +4353,10 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
 #	overallList = reduceWorkingDataSize(overallList)
 #	overallList = setDefaultAxisNames(overallList)
-#	
-#	#overallList = overallOutlierDetection(overallList)
-#	overallList = overallGetResultDataFrame(overallList)
-#	overallList = setColor(overallList) 
+	
+	#overallList = overallOutlierDetection(overallList)
+	overallList = overallGetResultDataFrame(overallList)
+	overallList = setColor(overallList) 
 #	makeDiagrams(overallList)
 	#######
 	
