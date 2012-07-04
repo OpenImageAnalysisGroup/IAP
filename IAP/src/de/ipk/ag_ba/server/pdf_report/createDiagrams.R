@@ -3084,7 +3084,7 @@ plotLineRangeImage <- function(overallList, overallResult, overallDesName, image
 makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, isOnlyOneValue = FALSE) {
 	overallList$debug %debug% "makeBarDiagram()"	
 	
-	overallFileName <- overallList$imageFileNames_nBoxplots
+	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
 	overallColor <- overallList$color_nBox
 	maxMean <- max(overallResult$mean)
 	maxSe <- max(overallResult$se)
@@ -3106,18 +3106,28 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			plot <- plot + 
 					ylab(overallDesName[[imagesIndex]])
 		}
+#		print(overallFileName)
+#		print(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0)
+#		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
+#			yminValue <- floor(min(overallResult$mean)/10)*10
+#			ymaxValue <- ceiling(max(overallResult$mean)/10)*10
+#			print(yminValue)
+#			print(ymaxValue)
+#			print(seq(yminValue, ymaxValue, 5))
+#			plot <- plot + 
+#					scale_y_continuous(labels=seq(yminValue, ymaxValue, 5), breaks=seq(yminValue, ymaxValue, 5))
+#		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
+#			print(overallResult$mean)
+#			yminValue <- floor(min(overallResult$mean)/0.2)*0.2
+#			ymaxValue <- ceiling(max(overallResult$mean)/0.2)*0.2
+#			print(yminValue)
+#			print(ymaxValue)
+#			print(seq(yminValue, ymaxValue, 0.2))
+#			plot <- plot + 
+#					scale_y_continuous(labels=seq(yminValue, ymaxValue, 0.2), breaks=seq(yminValue, ymaxValue, 0.2))
+#		}
 		
-		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1){
-			plot = plot + 
-					xlab(overallList$xAxisName) +
-					opts(axis.title.x = theme_text(face="bold", size=11))
-		} else {
-			plot = plot +
-					opts(axis.title.x = theme_blank())
-							
-		}
-		
-		plot = plot + 						
+		plot <- plot + 						
 				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), colour="Grey", size=0.1) +
 				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
 				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
@@ -3135,6 +3145,16 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 						panel.border = theme_rect(colour="Grey", size=0.1)
 				)
 		
+		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) > 0){
+			plot <- plot + 
+					xlab(overallList$xAxisName) +
+					opts(axis.title.x = theme_text(face="bold", size=11))
+		} else {
+			plot <- plot +
+					opts(axis.title.x = theme_blank())
+			
+		}
+		
 		subtitle <- ""
 		overallImage <- TRUE
 		subsectionDepth <- 1
@@ -3149,7 +3169,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
 				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
 				
-				if((length(grep("lm3s_",overallFileName[[imagesIndex]], ignore.case=TRUE)) > 0)) {
+				if((length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0)) {
 					subsectionDepth <- 5
 				} else {
 					subsectionDepth <- 2
@@ -3168,7 +3188,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			overallImageText <- "OverallImage"
 		}
 		
-		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, typOfPlot, sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, overallImageText, sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth)
+		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, typOfPlot, overallImageText, sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth)
 	}
 }
 
