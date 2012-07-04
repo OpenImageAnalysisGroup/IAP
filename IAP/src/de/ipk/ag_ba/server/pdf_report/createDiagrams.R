@@ -42,7 +42,7 @@ PLOTTING.LISTS <- "plottingLists"
 
 calculateNothing <- FALSE
 calculateOnlyNBox <- FALSE
-calculateOnlyViolin <- TRUE
+calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
 calculateOnlyBoxplot <- FALSE
@@ -1007,31 +1007,27 @@ buildRowName <- function(mergeDataSet, groupBy, contactTheValues, yName = "value
 #####
 #mergeDataSet <- iniDataSet
 #####
-		
+	
 	if (length(groupBy) == 0) {
 		return(data.frame(name=rep.int(yName, length(mergeDataSet[, 1])), mergeDataSet))
 	} else if (length(groupBy) == 1) {
 		return(data.frame(name=mergeDataSet[, groupBy], mergeDataSet[, !(colnames(mergeDataSet) %in% groupBy)]))
 	} else {		
 		#temp = mergeDataSet[, groupBy[2]]
-	
-		if(contactTheValues) {
-			if(length(unique(mergeDataSet[, groupBy[1]])) == 1) {
-				()
+		temp <- vector()	
+		first <- FALSE
+		for (hh in seq(along = groupBy)) {
+			if(!contactTheValues && !first) {
+			 first <- TRUE
 			} else {
-				temp = mergeDataSet[, groupBy[1]]
-			}
-			for (h in 2:length(groupBy)) {
-				temp = paste(temp, mergeDataSet[, groupBy[h]], sep = "/") #  #/#
-			}
-		} else {
-			temp = mergeDataSet[, groupBy[2]]
-			if (length(groupBy) > 2) {
-				reduceGroupBy <- groupBy[3:length(groupBy)]
-				for (h in seq(along=reduceGroupBy)) {
-					temp = paste(temp, mergeDataSet[, reduceGroupBy[h]], sep = "/") #  #/#
+				if(length(unique(mergeDataSet[, groupBy[hh]])) > 1) {
+					if(length(temp) > 0) {
+						temp <- paste(temp, mergeDataSet[, groupBy[hh]], sep = "/") #  #/#
+					} else {
+						temp <- mergeDataSet[, groupBy[hh]]
+					}
 				}
-			}
+			}				
 		}
 	
 		return(data.frame(name=temp, primaerTreatment= mergeDataSet[, groupBy[1]], mergeDataSet[, mergeDataSet %allColnamesWithoutThisOnes% groupBy]))
@@ -4353,10 +4349,10 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	overallList = overallCheckIfDescriptorIsNaOrAllZero(overallList)
 #	overallList = reduceWorkingDataSize(overallList)
 #	overallList = setDefaultAxisNames(overallList)
-	
-	#overallList = overallOutlierDetection(overallList)
-	overallList = overallGetResultDataFrame(overallList)
-	overallList = setColor(overallList) 
+#	
+#	#overallList = overallOutlierDetection(overallList)
+#	overallList = overallGetResultDataFrame(overallList)
+#	overallList = setColor(overallList) 
 #	makeDiagrams(overallList)
 	#######
 	
