@@ -517,8 +517,9 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 
 checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescriptor = TRUE) {
 #############
-#descriptorVector <- overallList$nBoxDes[[7]]
+#descriptorVector <- overallList$nBoxDes[[18]]
 #iniDataSet <- overallList$iniDataSet
+#isDescriptor <- TRUE
 #############
 	
 	#overallList$debug %debug% "checkIfDescriptorIsNaOrAllZero()"
@@ -527,7 +528,7 @@ checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescr
 	tempDescriptor <- descriptorVector 
 		
 	if (isDescriptor) {
-		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0 & colSums(iniDataSet[descriptorVector] *1, na.rm = TRUE) > 0]
+		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0 & colSums(iniDataSet[descriptorVector] *1, na.rm = TRUE) != 0]
 	} else {
 		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0]
 	}
@@ -773,6 +774,11 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 }
 
 preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
+##############	
+#descriptorVector <- overallList$nBoxDes[[1]] 
+#iniDataSet <- overallList$iniDataSet	
+##############	
+	
 	#overallList$debug %debug% "preprocessingOfDescriptor()"
 	descriptorVector = unlist(preprocessingOfValues(descriptorVector, isColValue = TRUE))	#descriptor is value for yAxis
 	
@@ -805,8 +811,13 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 preprocessingOfxAxisValue <- function(overallList) {
 	overallList$debug %debug% "preprocessingOfxAxisValue()"
 	overallList$xAxis = unlist(preprocessingOfValues(overallList$xAxis, TRUE))
-	
+	print(overallList$xAxis)
+	print(overallList$filterXaxis)
 	if (overallList$filterXaxis != NONE) {
+		print(overallList$filterXaxis)
+		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE))
+		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
+		print(as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]]))
 		overallList$filterXaxis = as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
 	} else {
 		overallList$filterXaxis = as.numeric(unique(overallList$iniDataSet[overallList$xAxis])[[1]])	#xAxis muss einen Wert enthalten ansonsten Bricht das Program weiter oben ab
@@ -903,6 +914,8 @@ getVector <- function(descriptorSet) {
 			if(class(descriptorSet) == "data.frame") {
 				vector = c(vector, as.vector(descriptorSet[n,]))
 			} else if(class(descriptorSet) == "list") {
+				vector = c(vector, as.vector(unlist(descriptorSet[[n]])))
+			} else {
 				vector = c(vector, as.vector(unlist(descriptorSet[[n]])))
 			}
 		}
@@ -1456,7 +1469,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 	#o=""
 	#fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
 	fileNameLatexFile = preprocessingOfValues(fileNameLatexFile, FALSE, "_")
-	print("drinne3")
+
 	#o = gsub('[[:punct:]]', "_", o)
 	#print(fileNameImageFile)
 	latexText <- ""
@@ -1472,7 +1485,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
 		}
 	}
-	print("drinne4")
+
 #	if (insertSubsections & nchar(ylabel) > 0) {
 #		ylabel <- renameYForAppendix(ylabel)
 #		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
@@ -1484,7 +1497,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 					  #ifelse(o == "", "", paste("_", o , sep="")), 
 					  #ifelse(o == "", "", o), 
 					   ".",saveFormatImage,"}", sep="")
-	print("drinne5")
+
 	write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, "tex", sep="."))
 }
 
@@ -1963,22 +1976,20 @@ checkFileName <- function(filename, extraString) {
 writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1, typOfPlot = "") {
 	#writeLatexFileSecondValue="",
 	overallList$debug %debug% "writeTheData()"		
-	print("drinne-2")
+
 	fileName <- checkFileName(fileName, extraString)
-	print("drinne-1")
+
 	if (subSectionTitel != "") {
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
 	
-	print(plot)
-	print("drinne0")
 #	if(typOfPlot == LINERANGE.PLOT || (overallList$split.Treatment.First && overallList$split.Treatment.Second && typOfPlot == SPIDER.PLOT)) {
 	if(typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
 		saveImageFile(overallList, plot, fileName)
 	}
-	print("drinne1")
+
 	if (makeOverallImage) {
 		if (subSectionTitel != "") {
 			writeLatexFile(writeLatexFileFirstValue, fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, saveFormatImage = overallList$saveFormat)	
@@ -1986,7 +1997,7 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 			writeLatexFile(writeLatexFileFirstValue, fileName, saveFormatImage = overallList$saveFormat)
 		}
 	} 
-	print("drinne2")
+
 #	else {
 #		writeLatexFile(fileName, writeLatexFileSecondValue)	
 #	}
@@ -2123,6 +2134,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 						!hasLessThanThreeValues) {
 							plot <- plot + 
 									geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))
+									
 				
 #				if(isOtherTyp) {
 #					plot <- plot +
@@ -2220,14 +2232,16 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 					) 
 					#+ guides(colour = guide_legend("none"))
 			plot <- setFontSize(plot, overallColor[[imagesIndex]], typOfPlot)
-					
+			
+			
+	
 			plot <-  plot + guides(
 					shape=guide_legend(ncol=calculateLegendRowAndColNumber(overallColor[[imagesIndex]], typOfPlot),
 							byrow=FALSE),
 					colour=guide_legend(ncol=calculateLegendRowAndColNumber(overallColor[[imagesIndex]], typOfPlot),
 							byrow=FALSE)
 			)
-			
+			#print(plot)
 #			if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
 #				plot = plot + 
 #					   opts(legend.text = theme_text(size=6),
@@ -2276,6 +2290,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 
 			subtitle <- ""
 			overallImage <- TRUE
+			subsectionDepth <- 1
 			
 			if(title != "") {
 				sep <- " - "
@@ -2893,7 +2908,8 @@ plotSpiderImage <- function(overallList, overallResult, overallDesName, imagesIn
 calculateLegendRowAndColNumber <- function(legendText, typOfPlot) {
 ########	
 #legendText <- unique(overallResult$name)
-#legendText <- unique(overallResult$hist)	
+#legendText <- unique(overallResult$hist)
+#legendText <- overallColor[[imagesIndex]]
 #######	
 	legendText <- as.character(getVector(legendText))
 	
@@ -3112,6 +3128,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		
 		subtitle <- ""
 		overallImage <- TRUE
+		subsectionDepth <- 1
 		
 		if(title != "") {
 			sep <- " - "
@@ -3122,7 +3139,12 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		if (!overallList$appendix) {
 			if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
 				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
-				subsectionDepth <- 2
+				
+				if((length(grep("lm3s_",overallFileName[[imagesIndex]], ignore.case=TRUE)) > 0)) {
+					subsectionDepth <- 5
+				} else {
+					subsectionDepth <- 2
+				}
 			}
 		} else {
 			subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep=sep)
@@ -3130,7 +3152,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			subsectionDepth <- 1
 			overallImage <- FALSE
 		}
-			
+
 		if(typOfPlot == BOX.PLOT) {
 			overallImageText <- "BarplotOverallImage"										
 		} else {
@@ -4287,7 +4309,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						)	
 	
 	overallList$debug %debug% "Start"
-	
+
 	overallList = checkTypOfExperiment(overallList)
 	overallList = checkUserOfExperiment(overallList)
 	overallList = setSomePrintingOptions(overallList)
