@@ -8,16 +8,32 @@ import org.graffiti.util.GraphicHelper;
 
 public class LinearRegressionModel {
 	
-	private final SimpleRegression sr;
+	private SimpleRegression sr;
+	private TreeMap<Integer, Double> values;
 	
-	public LinearRegressionModel(TreeMap<Integer, Double> xy) {
-		sr = new SimpleRegression();
-		for (Integer x : xy.keySet())
-			sr.addData(x.doubleValue(), xy.get(x));
+	public LinearRegressionModel(TreeMap<Integer, Double> xy, boolean horizontalLine) {
+		if (!horizontalLine) {
+			sr = new SimpleRegression(false);
+			for (Integer x : xy.keySet())
+				sr.addData(x.doubleValue(), xy.get(x));
+		} else
+			values = xy;
 	}
 	
 	public double getErrorSquareSum() {
-		return sr.getSumSquaredErrors();
+		if (sr!=null)
+			return sr.getSumSquaredErrors();
+		else {
+			if (values.size()>0) {
+				double errorSqareSum = 0;
+				double avg = getAverageY();
+				for (Double v : values.values()) {
+					errorSqareSum+=(v-avg)*(v-avg);
+				}
+				return errorSqareSum;
+			} else
+				return 0;
+		}
 	}
 	
 	public IntersectionPoint intersect(LinearRegressionModel m2) {
@@ -28,10 +44,25 @@ public class LinearRegressionModel {
 	}
 	
 	public double getM() {
-		return sr.getSlope();
+		if (sr!=null)
+			return sr.getSlope();
+		else
+			return 0;
 	}
-	
-	public double getI() {
-		return sr.getIntercept();
+
+	public double getAverageY() {
+		if (sr!=null)
+			return sr.getYbar();
+		else {
+			int n = values.size();
+			double sum = 0;
+			if (n>0) {
+				for (Double v : values.values())
+					sum+=v;
+				double avg = sum/n;
+				return avg;
+			} else
+				return Double.NaN;
+		}
 	}
 }
