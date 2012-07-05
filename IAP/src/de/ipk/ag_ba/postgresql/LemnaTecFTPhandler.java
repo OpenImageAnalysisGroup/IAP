@@ -84,6 +84,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				InputStream iss = null;
 				synchronized (PREFIX) {
 					ChannelSftp c = getChannel();
+					c.getSession().setTimeout(60 * 60 * 1000); // set timeout of 60 minutes
 					String detail = url.getDetail();
 					detail = "/data0/pgftp/" + detail.split("/", 2)[1];
 					c.cd(detail.substring(0, detail.lastIndexOf("/")));

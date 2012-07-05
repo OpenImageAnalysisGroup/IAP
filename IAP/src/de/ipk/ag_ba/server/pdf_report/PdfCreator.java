@@ -238,7 +238,8 @@ public class PdfCreator {
 		String c = TextFile.read(fff);
 		String experimentName = safe(StringManipulationTools.stringReplace(experiment.getName(), ".", " "));
 		
-		c = StringManipulationTools.stringReplace(c, "--experimentname--", experimentName);
+		c = StringManipulationTools.stringReplace(c, "--experimentname--",
+				StringManipulationTools.stringReplace(experimentName, " (", "\\ ("));
 		
 		experimentName = StringManipulationTools.stringReplace(experimentName, "\\textunderscore", "_");
 		if (experimentName.length() > 80) {
