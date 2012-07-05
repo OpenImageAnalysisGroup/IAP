@@ -3108,24 +3108,28 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		}
 #		print(overallFileName)
 #		print(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0)
-#		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
-#			yminValue <- floor(min(overallResult$mean)/10)*10
-#			ymaxValue <- ceiling(max(overallResult$mean)/10)*10
+		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
+			yminValue <- floor(min(overallResult$mean)/10)*10
+			ymaxValue <- ceiling(max(overallResult$mean)/10)*10
 #			print(yminValue)
 #			print(ymaxValue)
 #			print(seq(yminValue, ymaxValue, 5))
-#			plot <- plot + 
-#					scale_y_continuous(labels=seq(yminValue, ymaxValue, 5), breaks=seq(yminValue, ymaxValue, 5))
-#		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
-#			print(overallResult$mean)
-#			yminValue <- floor(min(overallResult$mean)/0.2)*0.2
-#			ymaxValue <- ceiling(max(overallResult$mean)/0.2)*0.2
+			plot <- plot + 
+					scale_y_continuous(limits = c(yminValue, ymaxValue)) +
+					coord_cartesian(ylim = c(yminValue, ymaxValue))
+					#scale_y_continuous(labels=seq(yminValue, ymaxValue, 5), breaks=seq(yminValue, ymaxValue, 5))
+		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
+			#print(overallResult$mean)
+			yminValue <- floor(min(overallResult$mean)/0.2)*0.2
+			ymaxValue <- ceiling(max(overallResult$mean)/0.2)*0.2
 #			print(yminValue)
 #			print(ymaxValue)
 #			print(seq(yminValue, ymaxValue, 0.2))
-#			plot <- plot + 
-#					scale_y_continuous(labels=seq(yminValue, ymaxValue, 0.2), breaks=seq(yminValue, ymaxValue, 0.2))
-#		}
+			plot <- plot + 
+					#scale_y_continuous(labels=seq(yminValue, ymaxValue, 0.2), breaks=seq(yminValue, ymaxValue, 0.2))
+					scale_y_continuous(limits = c(yminValue, ymaxValue)) +
+					coord_cartesian(ylim = c(yminValue, ymaxValue))
+		}
 		
 		plot <- plot + 						
 				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), colour="Grey", size=0.1) +
