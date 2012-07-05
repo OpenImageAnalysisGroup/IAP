@@ -813,10 +813,10 @@ preprocessingOfxAxisValue <- function(overallList) {
 	overallList$xAxis = unlist(preprocessingOfValues(overallList$xAxis, TRUE))
 	
 	if (overallList$filterXaxis != NONE) {
-		print(overallList$filterXaxis)
-		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE))
-		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
-		print(as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]]))
+#		print(overallList$filterXaxis)
+#		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE))
+#		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
+#		print(as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]]))
 		overallList$filterXaxis = as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
 	} else {
 		overallList$filterXaxis = as.numeric(unique(overallList$iniDataSet[overallList$xAxis])[[1]])	#xAxis muss einen Wert enthalten ansonsten Bricht das Program weiter oben ab
@@ -3081,13 +3081,51 @@ plotLineRangeImage <- function(overallList, overallResult, overallDesName, image
 	}		
 }
 
+lim <- function(value, newValue) {
+	limValue <- (newValue/value) + 0.1
+
+	if(limValue > 1.15 || limValue < 0.85) {
+		return(FALSE)
+	} else {
+		return(TRUE)
+	}
+}
+
+
+scallyAxis <- function(factor, overallResult) {
+	
+	minValue <- min(overallResult$mean) - min(overallResult$se)
+	maxValue <- max(overallResult$mean) + max(overallResult$se)
+	middelBorder <- 0.5 * factor
+	minBorder <- 0.1 * factor
+	
+	if(minValue > -minBorder && maxValue < minBorder) {
+		factor <- minBorder
+	} else if(minValue > -middelBorder && maxValue < middelBorder) {
+		factor <- middelBorder
+	}
+	
+	yminValue <- floor(minValue / factor) * factor
+	ymaxValue <- ceiling(maxValue / factor) * factor
+	
+	if(lim(minValue, yminValue)) {
+		yminValue <- yminValue - factor
+	}
+	
+	if(lim(maxValue, ymaxValue)) {
+		ymaxValue <- ymaxValue + factor
+	}
+	
+	return(coord_cartesian(ylim = c(yminValue, ymaxValue)))
+	
+}
+
 makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, isOnlyOneValue = FALSE) {
 	overallList$debug %debug% "makeBarDiagram()"	
 	
 	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
 	overallColor <- overallList$color_nBox
-	maxMean <- max(overallResult$mean)
-	maxSe <- max(overallResult$se)
+
 	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
 	
 	
@@ -3106,38 +3144,38 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			plot <- plot + 
 					ylab(overallDesName[[imagesIndex]])
 		}
-#		print(overallFileName)
-#		print(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0)
-		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
-			yminValue <- floor(min(overallResult$mean)/10)*10
-			ymaxValue <- ceiling(max(overallResult$mean)/10)*10
-#			print(yminValue)
-#			print(ymaxValue)
-#			print(seq(yminValue, ymaxValue, 5))
-			plot <- plot + 
-					scale_y_continuous(limits = c(yminValue, ymaxValue)) +
-					coord_cartesian(ylim = c(yminValue, ymaxValue))
-					#scale_y_continuous(labels=seq(yminValue, ymaxValue, 5), breaks=seq(yminValue, ymaxValue, 5))
-		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
-			#print(overallResult$mean)
-			yminValue <- floor(min(overallResult$mean)/0.2)*0.2
-			ymaxValue <- ceiling(max(overallResult$mean)/0.2)*0.2
-#			print(yminValue)
-#			print(ymaxValue)
-#			print(seq(yminValue, ymaxValue, 0.2))
-			plot <- plot + 
-					#scale_y_continuous(labels=seq(yminValue, ymaxValue, 0.2), breaks=seq(yminValue, ymaxValue, 0.2))
-					scale_y_continuous(limits = c(yminValue, ymaxValue)) +
-					coord_cartesian(ylim = c(yminValue, ymaxValue))
-		}
+
 		
 		plot <- plot + 						
 				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), colour="Grey", size=0.1) +
-				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")+
+				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")
 				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
 				#ylab(overallDesName[[imagesIndex]]) +
-				coord_cartesian(ylim=c(0, maxMean + maxSe + (110*maxMean)/100)) +
 				
+				
+
+		
+		
+		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
+			print("_start")
+			factor <- 10
+			plot <- plot + 
+					scallyAxis(factor, overallResult)
+		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
+			print("lm3s_")
+			factor <- 0.2
+			plot <- plot + 
+					scallyAxis(factor, overallResult)
+		} else {
+			print("sonst")
+			maxMean <- max(overallResult$mean)
+			maxSe <- max(overallResult$se)
+			
+			plot <- plot +
+					coord_cartesian(ylim=c(0, maxMean + maxSe+ (110*maxMean)/100)) 
+		}				
+				
+			plot <- plot +	
 				scale_fill_manual(values = overallColor[[imagesIndex]]) +
 				theme_bw() +
 				opts(legend.position="none", 
@@ -3149,7 +3187,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 						panel.border = theme_rect(colour="Grey", size=0.1)
 				)
 		
-		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) > 0){
+		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1){
 			plot <- plot + 
 					xlab(overallList$xAxisName) +
 					opts(axis.title.x = theme_text(face="bold", size=11))
