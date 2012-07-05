@@ -177,7 +177,7 @@ public class FlexibleImage {
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			PrintImage.printImage(
-					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(215, 255, 245).getRGB()).getImage().image,
+					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage().image,
 					title);
 			IAPmain.showImageJ();
 		}
