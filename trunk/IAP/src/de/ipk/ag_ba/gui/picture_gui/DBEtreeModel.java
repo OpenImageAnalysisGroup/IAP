@@ -140,12 +140,12 @@ public class DBEtreeModel implements TreeModel {
 					sampleArray.add(sample);
 				}
 				for (SampleInterface si : samples.get(key)) {
-					if (si.getRowId() == null)
+					if (si.getSampleFineTimeOrRowId() == null)
 						continue;
-					if (si.getRowId() < firstTime || firstTime == 0)
-						firstTime = si.getRowId();
-					if (si.getRowId() > lastTime || lastTime == 0)
-						lastTime = si.getRowId();
+					if (si.getSampleFineTimeOrRowId() < firstTime || firstTime == 0)
+						firstTime = si.getSampleFineTimeOrRowId();
+					if (si.getSampleFineTimeOrRowId() > lastTime || lastTime == 0)
+						lastTime = si.getSampleFineTimeOrRowId();
 				}
 				key2sampleNode.get(key).setTooltipInfo(sdf.format(new Date(firstTime)) + " to " + sdf.format(new Date(lastTime)));
 				
@@ -183,8 +183,8 @@ public class DBEtreeModel implements TreeModel {
 							meas.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
-					if (sample.getRowId() != null)
-						measNode.setTooltipInfo(sdf.format(new Date(sample.getRowId())));
+					if (sample.getSampleFineTimeOrRowId() != null)
+						measNode.setTooltipInfo(sdf.format(new Date(sample.getSampleFineTimeOrRowId())));
 					children.add(measNode);
 				}
 			}

@@ -175,6 +175,8 @@ public class Other {
 					resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
 				}
 				
+				resultNavigationButtons.add(new NavigationButton(new CheckLtTimesAction(null), src.getGUIsetting()));
+				
 				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
 						null, null,
 						"Enable or disable the automated backup of LT data sets to the HSM file system",

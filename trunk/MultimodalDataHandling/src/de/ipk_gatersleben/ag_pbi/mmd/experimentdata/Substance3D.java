@@ -290,7 +290,7 @@ public class Substance3D extends Substance {
 				String protypeConditionName = prototype.getParentSample()
 						.getParentCondition().getConditionName();
 				Long prototypeSampleRowID = prototype.getParentSample()
-						.getRowId();
+						.getSampleFineTimeOrRowId();
 				int prototypeReplicateID = prototype.getReplicateID();
 				String prototypeQualityAnnotation = prototype
 						.getQualityAnnotation();
@@ -301,7 +301,7 @@ public class Substance3D extends Substance {
 					String ciC = ci.getConditionName().split(": ", 2)[1];
 					if (ciC.equals(ptC)) {
 						for (SampleInterface si : ci) {
-							if (prototypeSampleRowID.equals(si.getRowId())) {
+							if (prototypeSampleRowID.equals(si.getSampleFineTimeOrRowId())) {
 								for (NumericMeasurementInterface nmi : si) {
 									if (nmi instanceof NumericMeasurement3D) {
 										NumericMeasurement3D n3 = (de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D) nmi;
@@ -334,14 +334,14 @@ public class Substance3D extends Substance {
 				String protypeConditionName = prototype.getParentSample()
 						.getParentCondition().getConditionName();
 				Long prototypeSampleRowID = prototype.getParentSample()
-						.getRowId();
+						.getSampleFineTimeOrRowId();
 				int prototypeReplicateID = prototype.getReplicateID();
 				String ptC = protypeConditionName.split(": ", 2)[1];
 				for (ConditionInterface ci : s) {
 					String ciC = ci.getConditionName().split(": ", 2)[1];
 					if (ciC.equals(ptC)) {
 						for (SampleInterface si : ci) {
-							if (prototypeSampleRowID.equals(si.getRowId())) {
+							if (prototypeSampleRowID.equals(si.getSampleFineTimeOrRowId())) {
 								SampleAverageInterface n3 = si.getSampleAverage();
 								if (n3.getReplicateID() == prototypeReplicateID)
 									res.add(n3);

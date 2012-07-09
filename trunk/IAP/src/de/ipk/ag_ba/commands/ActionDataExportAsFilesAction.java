@@ -199,7 +199,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								Date t = new Date(nm.getParentSample().getRowId());
+								Date t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
 								gc.setTime(t);
 								
 								final String zefn;
@@ -241,7 +241,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 														File f = new File(targetDirectory.getAbsolutePath() + File.separator + zefn);
 														OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
 														ResourceIOManager.copyContent(in, os);
-														f.setLastModified(nm.getParentSample().getRowId());
+														f.setLastModified(nm.getParentSample().getSampleFineTimeOrRowId());
 														in.close();
 													} catch (IOException e) {
 														System.out.println("ERROR: " + e.getMessage());
