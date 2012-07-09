@@ -613,7 +613,7 @@ public class IAPservice {
 				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {
 					for (ConditionInterface ci : substance) {
 						for (SampleInterface sa : ci) {
-							Long time = sa.getRowId();
+							Long time = sa.getSampleFineTimeOrRowId();
 							if (time != null) {
 								double temp = sa.getSampleAverage().getValue();
 								timeDay2averageTemp.put(SystemAnalysis.getUnixDay(time, gc), temp - ggd_baseline);
@@ -629,7 +629,7 @@ public class IAPservice {
 				for (SubstanceInterface substance : experiment) {
 					for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 						for (SampleInterface s : c) {
-							Long time = s.getRowId();
+							Long time = s.getSampleFineTimeOrRowId();
 							if (time == null)
 								continue;
 							// replace DAY X or DAS X with GDD Y, based on temperature data
@@ -665,7 +665,7 @@ public class IAPservice {
 							qualities.add("");
 						
 						for (String qualityFilter : qualities) {
-							Long snapshotTimeIndex = sample.getRowId();
+							Long snapshotTimeIndex = sample.getSampleFineTimeOrRowId();
 							
 							if (snapshotTimeIndex == null)
 								snapshotTimeIndex = (long) sample.getTime();
@@ -699,7 +699,7 @@ public class IAPservice {
 							if (sn.getTimePoint() == null)
 								sn.setTimePoint(sample.getSampleTime());
 							if (sn.getSnapshotTime() == null)
-								sn.setSnapshotTime(sample.getRowId());
+								sn.setSnapshotTime(sample.getSampleFineTimeOrRowId());
 							sn.setDay(sample.getTime());
 							
 							if (sample.size() > 0) {

@@ -189,6 +189,10 @@ public class SystemAnalysis {
 		return sdfInclSec.format(new Date());
 	}
 	
+	public static String getCurrentTimeInclSec(long time) {
+		return sdfInclSec.format(new Date(time));
+	}
+	
 	public static String getCurrentTime() {
 		return sdf.format(new Date());
 	}

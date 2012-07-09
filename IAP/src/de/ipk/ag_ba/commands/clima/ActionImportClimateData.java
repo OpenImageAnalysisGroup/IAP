@@ -227,7 +227,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
-				si.setRowId(date.getTime());
+				si.setSampleFineTimeOrRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				
@@ -251,7 +251,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
-				si.setRowId(date.getTime());
+				si.setSampleFineTimeOrRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				
@@ -275,7 +275,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				gc.setTime(date);
 				SampleInterface si = tm.getNewSample(ci);
 				ci.add(si);
-				si.setRowId(date.getTime());
+				si.setSampleFineTimeOrRowId(date.getTime());
 				si.setTime((int) SystemAnalysis.getUnixDay(date.getTime(), gc));
 				si.setTimeUnit("unix day");
 				

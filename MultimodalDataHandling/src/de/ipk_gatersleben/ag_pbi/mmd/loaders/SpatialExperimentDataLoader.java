@@ -183,7 +183,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 		for (SubstanceInterface e : experiment)
 			for (ConditionInterface condition : e.getConditions(null))
 				for (SampleInterface sample : condition) {
-					sample.setRowId(sampleID);
+					sample.setSampleFineTimeOrRowId(sampleID);
 					sampleID++;
 				}
 		return experiment;

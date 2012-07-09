@@ -244,7 +244,7 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								Date t = new Date(nm.getParentSample().getRowId());
+								Date t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
 								gc.setTime(t);
 								
 								String zefn;
@@ -290,7 +290,7 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 												try {
 													TarArchiveEntry entry = new TarArchiveEntry(zefnf);
 													entry.setSize(in.getCount());
-													entry.setModTime(sa.getRowId());
+													entry.setModTime(sa.getSampleFineTimeOrRowId());
 													out.putArchiveEntry(entry);
 													out.write(in.getBuff(), 0, in.getCount());
 													out.closeArchiveEntry();

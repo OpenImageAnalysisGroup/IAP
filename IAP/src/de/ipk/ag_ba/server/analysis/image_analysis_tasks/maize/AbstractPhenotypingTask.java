@@ -457,6 +457,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					ImageData id = (ImageData) md;
 					
 					String sampleTimeAndFullPlantAnnotation = id.getParentSample().getSampleTime() + ";"
+							+ id.getParentSample().getSampleFineTimeOrRowId() + ";"
 							+ id.getParentSample().getFullId() + ";"
 							+ id.getReplicateID();
 					if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.containsKey(sampleTimeAndFullPlantAnnotation)) {
@@ -544,8 +545,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				String val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
 						is.firstEntry().getValue().getVIS().getQualityAnnotation();
-				// if (!val.equals("11;1107BA1130"))
-				// continue;
+				
 				int workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != workOnSubset)
 					continue;
@@ -555,7 +555,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				knownOutput.add(info);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
-				long time = is.firstEntry().getValue().getVIS().getParentSample().getRowId();
+				long time = is.firstEntry().getValue().getVIS().getParentSample().getSampleFineTimeOrRowId();
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
@@ -1003,7 +1003,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (si.getName().equals("water_sum")) {
 					for (ConditionInterface ci : si) {
 						for (SampleInterface sa : ci) {
-							long time = sa.getRowId();
+							long time = sa.getSampleFineTimeOrRowId();
 							for (NumericMeasurementInterface nmi : sa) {
 								String plantID = nmi.getReplicateID() + ";" + nmi.getQualityAnnotation();
 								if (!result.containsKey(plantID))

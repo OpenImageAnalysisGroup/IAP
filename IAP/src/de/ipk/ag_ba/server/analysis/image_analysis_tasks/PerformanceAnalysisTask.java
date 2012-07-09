@@ -404,7 +404,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			ThreadSafeOptions tsoLoadDataErrorsVISside, ThreadSafeOptions tsoLoadDataErrorsVIStop) {
 		String sss = SystemAnalysis.getCurrentTime() + ">ERROR: CONVERTING IMAGE DATA TO IMAGE: " + message
 				+ ", IMAGE: " + id.getURL() + ", TIME " + id.getParentSample().getTime() + " " + id.getParentSample().getTimeUnit() + ", "
-				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysis.getCurrentTime(id.getParentSample().getRowId()) + ", ID "
+				+ id.getParentSample().getSampleTime() + ", " + SystemAnalysis.getCurrentTime(id.getParentSample().getSampleFineTimeOrRowId()) + ", ID "
 				+ id.getQualityAnnotation() + ", CONFIG: " + ic;
 		System.out.println(sss);
 		errors.add(sss);

@@ -99,6 +99,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			for (SubstanceInterface m : experimentToBeAnalysed) {
 				Substance3D m3 = (Substance3D) m;
+				if (!m3.getName().contains(".top"))
+					continue;
+				System.out.println("Substance-Name: " + m3.getName());
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
@@ -119,10 +122,15 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 								}
 							}
 						}
-						// if (sd3.getTime() != 29)
-						// continue;
+						if (sd3.getTime() != 48)
+							continue;
+						String qa = sd3.iterator().next().getQualityAnnotation();
+						if (!qa.contains("1121KN063"))
+							continue;
+						
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3)) {
+								System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
 								workload.add(sd3);
 							}
 					}
@@ -130,7 +138,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			}
 			
 			if (status != null) {
-				status.setCurrentStatusText1("Experiment: " + workload.size() + " image snapshot sets (vis+fluo+nir)");
+				status.setCurrentStatusText1("Experiment: " + workload.size() + " images (vis+fluo+nir)");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">To be analyzed: " + workload.size() + " images (vis+fluo+nir)");
 			}
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();

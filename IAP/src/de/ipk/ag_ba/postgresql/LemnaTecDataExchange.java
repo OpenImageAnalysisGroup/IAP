@@ -856,7 +856,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				Sample sample = new Sample(condition);
 				sample.setTime(day);
 				sample.setTimeUnit("day");
-				sample.setRowId(sn.getTimestamp().getTime());
+				sample.setSampleFineTimeOrRowId(sn.getTimestamp().getTime());
 				
 				double w = sn.getWeight_before();
 				if (!Double.isNaN(w)) {
@@ -898,7 +898,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							Sample sample = new Sample(condition);
 							sample.setTime(day);
 							sample.setTimeUnit("day");
-							sample.setRowId(sn.getTimestamp().getTime());
+							sample.setSampleFineTimeOrRowId(sn.getTimestamp().getTime());
 							
 							NumericMeasurement weightBefore = new NumericMeasurement(sample);
 							weightBefore.setReplicateID(replicateID);
@@ -923,7 +923,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							Sample sample = new Sample(condition);
 							sample.setTime(day);
 							sample.setTimeUnit("day");
-							sample.setRowId(sn.getTimestamp().getTime());
+							sample.setSampleFineTimeOrRowId(sn.getTimestamp().getTime());
 							
 							NumericMeasurement water = new NumericMeasurement(sample);
 							water.setReplicateID(replicateID);
@@ -956,7 +956,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
 					sample.setTimeUnit("day");
-					sample.setRowId(sn.getTimestamp().getTime());
+					sample.setSampleFineTimeOrRowId(sn.getTimestamp().getTime());
 					
 					ImageData image = new ImageData(sample);
 					image.setPixelsizeX(sn.getXfactor());
@@ -1038,8 +1038,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		Collections.sort(measurements, new Comparator<NumericMeasurementInterface>() {
 			@Override
 			public int compare(NumericMeasurementInterface arg0, NumericMeasurementInterface arg1) {
-				int timeComparison = arg0.getParentSample().getRowId() < arg1.getParentSample().getRowId() ? -1 : (arg0.getParentSample().getRowId() > arg1
-						.getParentSample().getRowId() ? 1 : 0);
+				int timeComparison = arg0.getParentSample().getSampleFineTimeOrRowId() < arg1.getParentSample().getSampleFineTimeOrRowId() ? -1 : (arg0.getParentSample().getSampleFineTimeOrRowId() > arg1
+						.getParentSample().getSampleFineTimeOrRowId() ? 1 : 0);
 				if (timeComparison != 0)
 					return timeComparison;
 				else
@@ -1213,7 +1213,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);

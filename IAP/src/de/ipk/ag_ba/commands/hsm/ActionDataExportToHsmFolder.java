@@ -234,7 +234,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				return idx;
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
-			final Long t = nm.getParentSample().getRowId();
+			final Long t = nm.getParentSample().getSampleFineTimeOrRowId();
 			if (!includeMainImages) {
 				targetExists = true;
 				bm.setURL(null);
@@ -363,7 +363,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			if (!includeReferenceImages) {
 				bm.setLabelURL(null);
 			} else {
-				long t = nm.getParentSample().getRowId();
+				long t = nm.getParentSample().getSampleFineTimeOrRowId();
 				
 				final String zefn;
 				try {
@@ -426,7 +426,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			} else {
 				final IOurl oldRefUrl = new IOurl(oldRef);
 				
-				long t = nm.getParentSample().getRowId();
+				long t = nm.getParentSample().getSampleFineTimeOrRowId();
 				
 				final String zefn;
 				try {

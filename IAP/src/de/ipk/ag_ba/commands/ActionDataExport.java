@@ -250,7 +250,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								Date t = new Date(nm.getParentSample().getRowId());
+								Date t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
 								gc.setTime(t);
 								
 								final String zefn;
@@ -291,7 +291,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
 															entry.setSize(in.getCount());
 															entry.setCrc(in.getCRC32());
-															entry.setTime(id.getParentSample().getRowId());
+															entry.setTime(id.getParentSample().getSampleFineTimeOrRowId());
 															out.putNextEntry(entry);
 															out.write(in.getBuff(), 0, in.getCount());
 															out.closeEntry();

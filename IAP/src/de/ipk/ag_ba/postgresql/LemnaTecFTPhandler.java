@@ -41,7 +41,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return PREFIX;
 	}
 	
-	public static boolean useCachedCloudDataIfAvailable = true;
+	public static boolean useCachedCloudDataIfAvailable = true; // TODO: use setting, in IAP-Data-Navigator änderbar
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
@@ -50,17 +50,18 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		}
 		if (useCachedCloudDataIfAvailable) {
 			try {
-				if (MongoDB.getDefaultCloud() != null) {
-					MongoDB dc = MongoDB.getDefaultCloud();
+				for (MongoDB dc : MongoDB.getMongos()) {
 					IOurl urlForCopiedData = dc.getURLforStoredData(url);
 					if (urlForCopiedData != null) {
 						InputStream is = urlForCopiedData.getInputStream();
-						if (is != null)
+						if (is != null) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Use cache for " + url);
 							return is;
+						}
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("ERROR: Could not check default cloud for cached input stream data url: " + e.getMessage());
+				System.out.println("ERROR: Could not check mongodb for cached input stream data url " + url + ", message: " + e.getMessage());
 			}
 		}
 		if (url.isEqualPrefix(getPrefix())) {
