@@ -130,8 +130,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
 				jff.setVisible(true);
-				jff.validate();
-				jff.doLayout();
+				jff.revalidate();
 			}
 		};
 		return res;
@@ -263,23 +262,13 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				}
 			}
 		}
-		if (getParent() != null) {
-			getParent().validate();
-			getParent().repaint();
-			// revalidate();
-			if (getParent() != null) {
-				// getParent().getParent().revalidate();
-				// getParent().getParent().repaint();
-			}
-			
-		} else {
-			revalidate();
-			repaint();
-			if (actionPanelRight != null) {
-				actionPanelRight.revalidate();
-				actionPanelRight.repaint();
-			}
+		
+		if (actionPanelRight != null) {
+			actionPanelRight.revalidate();
+			actionPanelRight.repaint();
 		}
+		revalidate();
+		repaint();
 	}
 	
 	private void enableContextMenu() {

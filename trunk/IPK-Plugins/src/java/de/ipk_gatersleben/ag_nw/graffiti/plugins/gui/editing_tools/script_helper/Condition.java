@@ -218,7 +218,7 @@ public class Condition implements ConditionInterface {
 			String serie = m.getParentSample().getParentCondition().getConditionName();
 			String timeUnitAndTime = m.getParentSample().getSampleTime();
 			String measurementUnit = m.getUnit();
-			long timeValueForComparison = m.getParentSample().getRowId() != null && m.getParentSample().getRowId() > 0 ? m.getParentSample().getRowId() : m
+			long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m
 					.getParentSample().getTime();
 			TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 			String timeUnit = m.getParentSample().getTimeUnit();
@@ -244,7 +244,7 @@ public class Condition implements ConditionInterface {
 				String serie = m.getParentSample().getParentCondition().getConditionName();
 				String timeUnitAndTime = m.getParentSample().getSampleTime();
 				String measurementUnit = m.getUnit();
-				long timeValueForComparison = m.getParentSample().getRowId() > 0 ? m.getParentSample().getRowId() : m.getParentSample().getTime();
+				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m.getParentSample().getTime();
 				TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 				String timeUnit = m.getParentSample().getTimeUnit();
 				int seriesID = m.getParentSample().getParentCondition().getSeriesId();

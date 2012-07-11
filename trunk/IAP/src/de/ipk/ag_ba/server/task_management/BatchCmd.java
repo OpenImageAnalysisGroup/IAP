@@ -6,6 +6,7 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
@@ -15,7 +16,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -137,8 +138,8 @@ public class BatchCmd extends BasicDBObject {
 			return release;
 	}
 	
-	public void setCompatibleImageAnalysisPipelineName(String pipline_id) {
-		put("release", pipline_id);
+	public void setCompatibleImageAnalysisPipelineName(IAP_RELEASE pipline_id) {
+		put("release", pipline_id.toString());
 	}
 	
 	public CloudAnalysisStatus getRunStatus() {
@@ -194,8 +195,11 @@ public class BatchCmd extends BasicDBObject {
 		return getString("owner");
 	}
 	
-	public static DBObject getRunstatusMatcher(CloudAnalysisStatus starting) {
-		return new BasicDBObject("runstatus", starting.toString()).append("release", IAPmain.RELEASE_IAP_IMAGE_ANALYSIS);
+	public static ArrayList<DBObject> getRunstatusMatchers(CloudAnalysisStatus starting) {
+		ArrayList<DBObject> res = new ArrayList<DBObject>();
+		for (IAP_RELEASE ir : IAP_RELEASE.values())
+			res.add(new BasicDBObject("runstatus", starting.toString()).append("release", ir.toString()));
+		return res;
 	}
 	
 	public int getCpuTargetUtilization() {

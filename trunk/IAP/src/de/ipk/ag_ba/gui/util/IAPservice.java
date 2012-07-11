@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.gui.util;
 
+import ij.ImageJ;
 import info.StopWatch;
 
 import java.awt.Color;
@@ -78,6 +79,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
@@ -1358,5 +1360,52 @@ public class IAPservice {
 		// return Math.pow(v, ot);
 		// } else
 		return cubeRoots[(int) (1000 * v)];
+	}
+	
+	public static int getMaxTrayCount(ExperimentInterface experiment) throws Exception {
+		int max = 1;
+		for (SubstanceInterface si : experiment)
+			for (ConditionInterface ci : si) {
+				int tc = getTrayCountFromCondition(ci);
+				if (tc > max)
+					max = tc;
+			}
+		return max;
+	}
+	
+	public static boolean isAnalyzedWithCurrentRelease(ExperimentHeaderInterface exp) {
+		for (IAP_RELEASE ir : IAP_RELEASE.values())
+			if (exp.getRemark().contains(ir.toString()))
+				return true;
+		return false;
+	}
+	
+	public static void showImageJ() {
+		if (SystemAnalysis.isHeadless())
+			return;
+		if (IAPservice.ij == null || !IAPservice.ij.isShowing())
+			IAPservice.ij = new ImageJ();
+	}
+	
+	private static ImageJ ij = null;
+	
+	public static int getTrayCountFromCondition(ConditionInterface con) {
+		String t = con.getTreatment();
+		int executionTrayCount = 1;
+		if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
+			executionTrayCount = 6; // 2x3
+		} else
+			if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
+				executionTrayCount = 12; // 3x4
+			} else {
+				t = con.getGrowthconditions();
+				if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
+					executionTrayCount = 6; // 2x3
+				} else
+					if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
+						executionTrayCount = 12; // 3x4
+					}
+			}
+		return executionTrayCount;
 	}
 }

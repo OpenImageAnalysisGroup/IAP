@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -34,4 +35,6 @@ public interface ImageAnalysisTask {
 	public Collection<NumericMeasurementInterface> getOutput();
 	
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps);
+	
+	public IAP_RELEASE getVersionTag();
 }

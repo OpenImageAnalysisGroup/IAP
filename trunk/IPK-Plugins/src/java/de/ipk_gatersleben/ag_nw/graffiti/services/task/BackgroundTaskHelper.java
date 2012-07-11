@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -309,6 +310,15 @@ public class BackgroundTaskHelper implements HelperClass {
 			throw new UnsupportedOperationException("When using this method, a device needs to be specified!");
 		Semaphore s = lockGetSemaphore(device, -1);
 		s.release();
+	}
+	
+	public static void layoutLater(final JComponent jc) {
+		executeLaterOnSwingTask(0, new Runnable() {
+			@Override
+			public void run() {
+				jc.validate();
+			}
+		});
 	}
 }
 

@@ -1108,7 +1108,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						ImagePlus imp = o.openTiffStack(info);
 						imp.show("Image Label View - "
 								+ myImage.fileURLlabel.getFileNameDecoded());
-						IAPmain.showImageJ();
+						IAPservice.showImageJ();
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null,
 								"Error: " + e.getLocalizedMessage()

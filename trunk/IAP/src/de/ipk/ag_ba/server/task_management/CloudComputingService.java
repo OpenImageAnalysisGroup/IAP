@@ -30,6 +30,7 @@ import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -97,7 +98,8 @@ public class CloudComputingService {
 		System.out.println(fillLen("*IAP - Integrated Analysis Platform*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*--  Systems Biology Cloud Computing --*", l));
-		System.out.println(fillLen("*-- " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + " --*", l));
+		for (IAP_RELEASE ir : IAP_RELEASE.values())
+			System.out.println(fillLen("*-- " + ir.toString() + " --*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*(c) 2010-2012 IPK, Group Image Analysis*", l));
 		System.out.println(fillLen("**", l));
@@ -319,7 +321,7 @@ public class CloudComputingService {
 					String submTime = cc[3];
 					if (!processedSubmissionTimes.contains(submTime))
 						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime, i.getOriginDbId(),
-								IAPmain.RELEASE_IAP_IMAGE_ANALYSIS));
+								IAP_RELEASE.getReleaseFromDescription(i)));
 					processedSubmissionTimes.add(submTime);
 				}
 			}
@@ -484,7 +486,7 @@ public class CloudComputingService {
 						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 						e.getHeader().setRemark(
 								e.getHeader().getRemark() +
-										" // IAP image analysis release " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS +
+										" // IAP image analysis release " + tempDataSetDescription.getReleaseIAP() +
 										" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
 										" // processing time: " +
 										SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +

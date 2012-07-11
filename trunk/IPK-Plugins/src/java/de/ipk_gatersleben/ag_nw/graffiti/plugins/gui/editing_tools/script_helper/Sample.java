@@ -60,7 +60,7 @@ public class Sample implements SampleInterface {
 	}
 	
 	private Object[] getAttributeValues() {
-		return new Object[] { getRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
+		return new Object[] { getSampleFineTimeOrRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
 				getTtestInfo().toString() };
 	}
 	
@@ -137,7 +137,7 @@ public class Sample implements SampleInterface {
 		String seriesName = parent.getConditionName();
 		String species = parent.getSpecies();
 		String genotype = parent.getGenotype();
-		String rowId = getRowId() + "";
+		String rowId = getSampleFineTimeOrRowId() + "";
 		String timeP = getTime() + "";
 		String timeU = getTimeUnit();
 		
@@ -197,9 +197,9 @@ public class Sample implements SampleInterface {
 		if (attr.getName().equals("id")) {
 			try {
 				if (attr.getValue().length() > 0)
-					setRowId(Long.parseLong(attr.getValue()));
+					setSampleFineTimeOrRowId(Long.parseLong(attr.getValue()));
 				else
-					setRowId(-1l);
+					setSampleFineTimeOrRowId(-1l);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -263,12 +263,12 @@ public class Sample implements SampleInterface {
 	}
 	
 	@Override
-	public void setRowId(Long rowId) {
+	public void setSampleFineTimeOrRowId(Long rowId) {
 		this.rowId = rowId;
 	}
 	
 	@Override
-	public Long getRowId() {
+	public Long getSampleFineTimeOrRowId() {
 		return rowId;
 	}
 	
@@ -384,7 +384,7 @@ public class Sample implements SampleInterface {
 	@Override
 	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
 		if (!ignoreSnapshotFineTime) {
-			int rr = getRowId().compareTo(sd.getRowId());
+			int rr = getSampleFineTimeOrRowId().compareTo(sd.getSampleFineTimeOrRowId());
 			if (rr != 0)
 				return rr;
 		}
@@ -433,7 +433,7 @@ public class Sample implements SampleInterface {
 	public SampleInterface clone(ConditionInterface parent) {
 		SampleInterface s = Experiment.getTypeManager().getNewSample(parent);
 		s.setMeasurementtool(getMeasurementtool());
-		s.setRowId(getRowId());
+		s.setSampleFineTimeOrRowId(getSampleFineTimeOrRowId());
 		s.setTime(getTime());
 		s.setTimeUnit(getTimeUnit());
 		s.setTtestInfo(getTtestInfo());

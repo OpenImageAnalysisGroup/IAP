@@ -23,6 +23,7 @@ import de.ipk.ag_ba.commands.ImagePreProcessor;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
@@ -79,6 +80,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int unit_test_idx;
 	private int unit_test_steps;
 	private int[] debugValidTrays;
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return getImageProcessor().getVersionTag();
+	}
 	
 	@Override
 	public void setInput(

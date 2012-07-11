@@ -19,6 +19,7 @@ import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
@@ -97,21 +98,7 @@ public class BlockPipeline {
 			abc = input.images().getIrInfo();
 		if (abc != null && options.getCameraPosition() == CameraPosition.TOP) {
 			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
-			String t = abc.getParentSample().getParentCondition().getTreatment();
-			if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
-				executionTrayCount = 6; // 2x3
-			} else
-				if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
-					executionTrayCount = 12; // 3x4
-				} else {
-					t = abc.getParentSample().getParentCondition().getGrowthconditions();
-					if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
-						executionTrayCount = 6; // 2x3
-					} else
-						if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
-							executionTrayCount = 12; // 3x4
-						}
-				}
+			executionTrayCount = IAPservice.getTrayCountFromCondition(abc.getParentSample().getParentCondition());
 		}
 		
 		HashMap<Integer, FlexibleMaskAndImageSet> res = new HashMap<Integer, FlexibleMaskAndImageSet>();
@@ -120,7 +107,7 @@ public class BlockPipeline {
 				continue;
 			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
 			BlockResultSet set = new BlockResults();
-			options.setTray(idx, executionTrayCount);
+			options.setTrayCnt(idx, executionTrayCount);
 			res.put(idx, executeInnerCall(options, input, ds, set, status));
 			if (debugStack != null)
 				debugStack.put(idx, ds);

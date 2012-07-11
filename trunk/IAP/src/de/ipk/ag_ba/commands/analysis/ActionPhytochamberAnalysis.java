@@ -61,5 +61,4 @@ public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction 
 	public String getDefaultTitle() {
 		return "<html><center>Arabidopsis Analysis<br>(no cover)";
 	}
-	
 }

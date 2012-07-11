@@ -501,8 +501,6 @@ public class NavigationButton implements StyleAware {
 							boolean reload = false;
 							MainPanelComponent mpc = na.getResultMainPanel();
 							if (mpc != null) {
-								graphPanel.setEnabled(false);
-								graphPanel.setVisible(false);
 								graphPanel.removeAll();
 								JComponent gui = mpc.getGUI();
 								if (ErrorMsg.getErrorMsgCount() > 0) {
@@ -522,13 +520,9 @@ public class NavigationButton implements StyleAware {
 								}
 								graphPanel.add(gui, "0,0");
 								graphPanel.revalidate();
-								graphPanel.setEnabled(true);
-								graphPanel.setVisible(true);
 								graphPanel.repaint();
 							} else {
 								if (ErrorMsg.getErrorMsgCount() > 0) {
-									graphPanel.setEnabled(false);
-									graphPanel.setVisible(false);
 									graphPanel.removeAll();
 									ArrayList<JComponent> errors = new ArrayList<JComponent>();
 									for (String s : ErrorMsg.getErrorMessages()) {
@@ -546,8 +540,6 @@ public class NavigationButton implements StyleAware {
 									
 									graphPanel.add(gui, "0,0");
 									graphPanel.revalidate();
-									graphPanel.setEnabled(true);
-									graphPanel.setVisible(true);
 									graphPanel.repaint();
 								}
 							}

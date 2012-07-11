@@ -21,6 +21,7 @@ import org.bson.types.ObjectId;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -220,7 +221,7 @@ public class TaskDescription {
 								int nToDo = batch.getPartCnt();
 								e.getHeader().setRemark(
 										e.getHeader().getRemark() +
-												" // IAP image analysis release " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS +
+												" // IAP image analysis release " + IAP_RELEASE.getReleaseFromDescription(e.getHeader()) +
 												" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
 												" // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
 												+ SystemAnalysis.getCurrentTime());
