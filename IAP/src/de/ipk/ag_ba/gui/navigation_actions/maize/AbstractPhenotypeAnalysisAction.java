@@ -23,7 +23,7 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -62,6 +62,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	
 	public AbstractPhenotypeAnalysisAction(String tooltip) {
 		super(tooltip);
+	}
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return getImageAnalysisTask().getVersionTag();
 	}
 	
 	@Override
@@ -231,7 +236,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					
 					statisticsResult.getHeader().setRemark(
 							statisticsResult.getHeader().getRemark() +
-									" // IAP image analysis release " + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS +
+									" // IAP image analysis release " + getVersionTag() +
 									" // analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime() +
 									" // processing time: " +

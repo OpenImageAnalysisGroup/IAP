@@ -20,6 +20,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
@@ -526,5 +527,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
 		if (unit_test_steps > 0)
 			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
+	}
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_OTHER;
 	}
 }

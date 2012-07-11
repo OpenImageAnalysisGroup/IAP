@@ -102,4 +102,5 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	public void setValidTrays(int[] debugValidTrays) {
 		this.debugValidTrays = debugValidTrays;
 	}
+	
 }

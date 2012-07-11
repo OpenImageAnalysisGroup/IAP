@@ -21,7 +21,8 @@ import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
@@ -71,7 +72,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		String dbID = eh.getDatabaseId();
 		for (ExperimentHeaderInterface e : experimentList2) {
 			if (e.getOriginDbId() != null && e.getOriginDbId().equals(dbID)) {
-				if (e.getRemark().contains(IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))
+				if (IAPservice.isAnalyzedWithCurrentRelease(e))
 					return AnalysisStatus.CURRENT;
 				else {
 					if (e.getImportusergroup() != null && e.getImportusergroup().equals("Temp")) {
@@ -111,7 +112,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
 				continue;
 			if (knownAnalysis(eh, experimentList) == AnalysisStatus.CURRENT) {
-				res.append("<li>Analysis result with current image analysis pipeline (" + IAPmain.RELEASE_IAP_IMAGE_ANALYSIS + ") available for "
+				res.append("<li>Analysis result with current image analysis pipeline (" + IAP_RELEASE.getReleaseFromDescription(eh) + ") available for "
 						+ eh.getExperimentName());
 				continue;
 			}

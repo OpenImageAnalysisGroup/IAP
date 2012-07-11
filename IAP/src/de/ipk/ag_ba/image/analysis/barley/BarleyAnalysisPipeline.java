@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.analysis.barley;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_vertical_nir;
 import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
@@ -23,7 +24,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
@@ -186,4 +186,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		return status;
 	}
 	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_BARLEY;
+	}
 }

@@ -2,9 +2,12 @@ package de.ipk.ag_ba.commands.analysis;
 
 import java.util.HashSet;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisBlueRubberTask;
@@ -47,6 +50,12 @@ public class ActionPhytochamberBlueRubberAnalysis extends AbstractPhenotypeAnaly
 	@Override
 	public int getNumberOfJobs() {
 		int snapshotsPerJob = 1000;
+		try {
+			snapshotsPerJob = snapshotsPerJob / IAPservice.getMaxTrayCount(experiment.getData(m));
+		} catch (Exception e) {
+			System.err.println(SystemAnalysis.getCurrentTime() + ">Could not get experiment data for analysis of tray-count. Error is ignored at this stage.");
+			e.printStackTrace();
+		}
 		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 		
 		return numberOfJobs;

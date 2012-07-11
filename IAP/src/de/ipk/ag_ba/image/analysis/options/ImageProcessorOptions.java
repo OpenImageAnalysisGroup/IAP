@@ -368,7 +368,7 @@ public class ImageProcessorOptions {
 		return isArabidopsis;
 	}
 	
-	public void setTray(int tray_idx, int tray_cnt) {
+	public void setTrayCnt(int tray_idx, int tray_cnt) {
 		this.tray_idx = tray_idx;
 		this.tray_cnt = tray_cnt;
 	}

@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
@@ -176,6 +177,11 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	@Override
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatus() {
 		return status;
+	}
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_MAIZE;
 	}
 	
 }

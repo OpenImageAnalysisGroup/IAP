@@ -214,7 +214,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 						SampleInterface sampleEntry = Experiment.getTypeManager().getNewSample(lineEntry);
 						lineEntry.add(sampleEntry);
 						// ADD SAMPLE ATTRIBUTES: ID, TIME, UNIT
-						sampleEntry.setRowId(++sampleIDcount);
+						sampleEntry.setSampleFineTimeOrRowId(++sampleIDcount);
 						sampleEntry.setTime(new Integer(timeAndPlantName.getTime()));
 						if (optTimeUnit != null && optTimeUnit.length() > 0)
 							sampleEntry.setTimeUnit(optTimeUnit);

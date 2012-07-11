@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -27,6 +28,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_3D;
+	}
 	
 	@Override
 	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
@@ -75,5 +81,4 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatus() {
 		return status;
 	}
-	
 }

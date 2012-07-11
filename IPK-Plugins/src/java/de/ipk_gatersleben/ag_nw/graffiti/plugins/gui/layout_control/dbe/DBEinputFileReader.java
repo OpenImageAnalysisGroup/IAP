@@ -236,10 +236,10 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		c.add(s);
 		
 		// ADD SAMPLE ATTRIBUTES: ID, TIME, UNIT
-		s.setRowId(++sampleIDcount);
+		s.setSampleFineTimeOrRowId(++sampleIDcount);
 		s.setTime(sample.getTime());
 		if (sample.getOptFineTime() != null)
-			s.setRowId(sample.getOptFineTime());
+			s.setSampleFineTimeOrRowId(sample.getOptFineTime());
 		
 		// new Integer(processTimeData(new Double(sample.getTime()).toString())));
 		s.setTimeUnit(sample.getTimeUnit());

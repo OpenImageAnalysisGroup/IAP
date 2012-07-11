@@ -3,7 +3,6 @@
  *******************************************************************************/
 package de.ipk.ag_ba.gui.webstart;
 
-import ij.ImageJ;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionListener;
@@ -59,19 +58,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
-	
-	public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R35_2012-06-28_release_test4";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R34_2012-06-26_color_stats_pc1";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R33_2012-06-22_release_test3_arabidopsis";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R32_2012-06-20_release_test2";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R31_2012-05-27_release_test1";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R30_2012-05-24_optimized2";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R28_2012-05-11_barley__in_maize_improved";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R25_2012-04-27_multi_tray_barley_in_maize";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R24_2012-04-16_remove_not_needed_histograms";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R23_2012-04-14_relative_leaf_length";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R22_2012-04-13_ratio_fix";
-	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R21_2012-03-17_trimmed_fluo_vis_hist";
 	
 	static MainFrame mainFrame1;
 	
@@ -139,7 +125,7 @@ public class IAPmain extends JApplet {
 		JComponent advancedNavigation = IAPgui.getMainGUIcontent(myStatus, false);
 		add(advancedNavigation, "0,0");
 		setVisible(true);
-		validate();
+		revalidate();
 		
 		Thread t = new Thread() {
 			
@@ -198,7 +184,7 @@ public class IAPmain extends JApplet {
 		
 		// AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		JComponent result = new JPanel();
+		final JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
 		String s = ""
@@ -433,16 +419,7 @@ public class IAPmain extends JApplet {
 		}
 	}
 	
-	private static ImageJ ij = null;
-	
 	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;
-	
-	public static void showImageJ() {
-		if (SystemAnalysis.isHeadless())
-			return;
-		if (ij == null || !ij.isShowing())
-			ij = new ImageJ();
-	}
 	
 	public static IAPrunMode getRunMode() {
 		return currentGuiMode;

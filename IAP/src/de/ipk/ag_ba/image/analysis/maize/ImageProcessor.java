@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -36,4 +37,6 @@ public interface ImageProcessor {
 			throws Exception;
 	
 	public abstract void setValidTrays(int[] debugValidTrays);
+	
+	public abstract IAP_RELEASE getVersionTag();
 }

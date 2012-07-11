@@ -11,7 +11,6 @@ import de.ipk.ag_ba.commands.ParameterOptions;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
@@ -65,7 +64,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 			cmd.setExperimentMongoID(experimentInputMongoID);
 			cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
-			cmd.setCompatibleImageAnalysisPipelineName(IAPmain.RELEASE_IAP_IMAGE_ANALYSIS);
+			cmd.setCompatibleImageAnalysisPipelineName(remoteAction.getVersionTag());
 			MongoDB m = remoteAction.getMongoDB();
 			if (m == null)
 				m = MongoDB.getDefaultCloud();

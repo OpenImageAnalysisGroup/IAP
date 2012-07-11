@@ -368,7 +368,7 @@ public class ExperimentCalculationService {
 			ss = new Sample(c);
 			ss.setTime(time);
 			ss.setTimeUnit(timeUnit);
-			ss.setRowId(artificialSampleFineTime);
+			ss.setSampleFineTimeOrRowId(artificialSampleFineTime);
 			c.add(ss);
 		}
 		NumericMeasurementInterface n = new NumericMeasurement(ss);

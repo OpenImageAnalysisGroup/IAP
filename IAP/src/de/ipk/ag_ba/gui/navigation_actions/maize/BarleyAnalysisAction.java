@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
@@ -59,6 +60,11 @@ public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 		
 		return numberOfJobs;
+	}
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return getImageAnalysisTask().getVersionTag();
 	}
 	
 }

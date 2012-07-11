@@ -72,7 +72,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -1785,68 +1785,77 @@ public class MongoDB {
 						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;
 						int addCnt = 0;
-						for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.SCHEDULED)).sort(new BasicDBObject("submission", 1))
-								.limit(maxTasks)) {
-							BatchCmd batch = (BatchCmd) dbo;
-							if (batch.getCpuTargetUtilization() < maxTasks) {
-								if (batch.getExperimentHeader() == null)
-									continue;
-								if (batch.getOwner() == null)
-									if (batchClaim(batch, CloudAnalysisStatus.STARTING, false))
-										if (hostName.equals("" + batch.getOwner())) {
-											res.add(batch);
-											added = true;
-											addCnt += batch.getCpuTargetUtilization();
-											if (addCnt >= maxTasks)
-												break;
-										}
+						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
+							for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
+								BatchCmd batch = (BatchCmd) dbo;
+								if (batch.getCpuTargetUtilization() < maxTasks) {
+									if (batch.getExperimentHeader() == null)
+										continue;
+									if (batch.getOwner() == null)
+										if (batchClaim(batch, CloudAnalysisStatus.STARTING, false))
+											if (hostName.equals("" + batch.getOwner())) {
+												res.add(batch);
+												added = true;
+												addCnt += batch.getCpuTargetUtilization();
+												if (addCnt >= maxTasks)
+													break;
+											}
+								}
 							}
 						}
 						int claimed = 0;
-						if (addCnt < maxTasks) {
-							loop: for (DBObject dbo : collection.find().sort(
-									new BasicDBObject("submission", 1).append("release", IAPmain.RELEASE_IAP_IMAGE_ANALYSIS))) {
-								BatchCmd batch = (BatchCmd) dbo;
-								if (batch.getExperimentHeader() == null)
-									continue;
-								if (!added && batch.getCpuTargetUtilization() <= maxTasks)
-									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
-										// after 5 minutes tasks are taken away from other systems
-										if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
-											claimed++;
-											if (claimed >= maxTasks)
-												break loop;
+						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
+							if (addCnt < maxTasks) {
+								loop: for (DBObject dbo : collection.find().sort(
+										new BasicDBObject("submission", 1).append("release", ir.toString()))) {
+									BatchCmd batch = (BatchCmd) dbo;
+									if (batch.getExperimentHeader() == null)
+										continue;
+									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
+										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
+											// after 5 minutes tasks are taken away from other systems
+											if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
+												claimed++;
+												if (claimed >= maxTasks)
+													break loop;
+											}
 										}
-									}
+								}
 							}
 						}
-						if (addCnt < maxTasks)
-							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.STARTING)).sort(new BasicDBObject("submission", 1))) {
-								BatchCmd batch = (BatchCmd) dbo;
-								if (batch.getExperimentHeader() == null)
-									continue;
-								if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
-									res.add(batch);
-									addCnt += batch.getCpuTargetUtilization();
-									if (addCnt >= maxTasks)
-										added = true;
-									break;
+						while (addCnt < maxTasks) {
+							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
+								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", 1))) {
+									BatchCmd batch = (BatchCmd) dbo;
+									if (batch.getExperimentHeader() == null)
+										continue;
+									if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
+										res.add(batch);
+										addCnt += batch.getCpuTargetUtilization();
+										if (addCnt >= maxTasks)
+											added = true;
+										break;
+									}
 								}
 							}
-						if (addCnt < maxTasks)
-							for (DBObject dbo : collection.find(BatchCmd.getRunstatusMatcher(CloudAnalysisStatus.FINISHED_INCOMPLETE)).sort(
-									new BasicDBObject("submission", 1))) {
-								BatchCmd batch = (BatchCmd) dbo;
-								if (batch.getExperimentHeader() == null)
-									continue;
-								if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
-									res.add(batch);
-									addCnt += batch.getCpuTargetUtilization();
-									if (addCnt >= maxTasks)
-										added = true;
-									break;
+						}
+						while (addCnt < maxTasks) {
+							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
+								for (DBObject dbo : collection.find(sm).sort(
+										new BasicDBObject("submission", 1))) {
+									BatchCmd batch = (BatchCmd) dbo;
+									if (batch.getExperimentHeader() == null)
+										continue;
+									if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
+										res.add(batch);
+										addCnt += batch.getCpuTargetUtilization();
+										if (addCnt >= maxTasks)
+											added = true;
+										break;
+									}
 								}
 							}
+						}
 					} catch (UnknownHostException e) {
 						ErrorMsg.addErrorMessage(e);
 					}

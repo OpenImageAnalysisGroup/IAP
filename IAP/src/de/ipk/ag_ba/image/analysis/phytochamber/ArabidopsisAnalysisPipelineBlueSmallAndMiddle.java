@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.analysis.phytochamber;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
@@ -159,6 +160,11 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 	@Override
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatus() {
 		return status;
+	}
+	
+	@Override
+	public IAP_RELEASE getVersionTag() {
+		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_ARABIDOPSIS;
 	}
 	
 }

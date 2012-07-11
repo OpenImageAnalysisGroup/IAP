@@ -25,7 +25,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operations.Channel;
 import de.ipk.ag_ba.image.operations.ImageConverter;
@@ -179,7 +179,7 @@ public class FlexibleImage {
 			PrintImage.printImage(
 					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage().image,
 					title);
-			IAPmain.showImageJ();
+			IAPservice.showImageJ();
 		}
 		return this;
 	}

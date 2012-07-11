@@ -36,5 +36,4 @@ public class Maize3DanalysisTask extends AbstractPhenotypingTask {
 	protected boolean analyzeSideImages() {
 		return true;
 	}
-	
 }

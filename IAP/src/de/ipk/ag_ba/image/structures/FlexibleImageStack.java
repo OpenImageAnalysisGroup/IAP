@@ -16,7 +16,7 @@ import javax.swing.JButton;
 import org.ErrorMsg;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
 
 public class FlexibleImageStack {
@@ -69,7 +69,7 @@ public class FlexibleImageStack {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		image.show(title + " (" + stack.getSize() + ")");
-		IAPmain.showImageJ();
+		IAPservice.showImageJ();
 	}
 	
 	public void print(String title, final Runnable actionCmd, String buttonTitle) {
@@ -89,7 +89,7 @@ public class FlexibleImageStack {
 			});
 			win.add(jb);
 			win.doLayout();
-			IAPmain.showImageJ();
+			IAPservice.showImageJ();
 		}
 	}
 	
