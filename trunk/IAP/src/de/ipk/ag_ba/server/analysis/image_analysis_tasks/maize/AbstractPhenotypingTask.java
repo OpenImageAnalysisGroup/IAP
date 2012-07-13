@@ -718,6 +718,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						bpv.getName(), inVis.getParentSample().getParentCondition()
 								.getExperimentName()
 								+ " (" + getName() + ")");
+				m.setAnnotation(null);
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
 				if (multiTray)
