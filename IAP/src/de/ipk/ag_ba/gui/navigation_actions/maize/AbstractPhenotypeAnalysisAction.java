@@ -102,10 +102,17 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			MySnapshotFilter sf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), experiment.getHeader().getGlobalOutlierInfo());
 			
+			boolean filterTop = false; // process only top images?
+			boolean filterTime = false; // process only one day?
+			boolean filterPlant = false; // process only one plant?
+			String plantFilter = "1107BA1350"; // "1121KN063";
+			
 			for (SubstanceInterface m : experimentToBeAnalysed) {
 				Substance3D m3 = (Substance3D) m;
-				if (!m3.getName().contains(".top"))
-					continue;
+				if (filterTop) {
+					if (!m3.getName().contains(".top"))
+						continue;
+				}
 				System.out.println("Substance-Name: " + m3.getName());
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
@@ -127,15 +134,18 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 								}
 							}
 						}
-						if (sd3.getTime() != 48)
-							continue;
-						String qa = sd3.iterator().next().getQualityAnnotation();
-						if (!qa.contains("1121KN063"))
-							continue;
-						
+						if (filterTime) {
+							if (sd3.getTime() != 48)
+								continue;
+						}
+						if (filterPlant) {
+							String qa = sd3.iterator().next().getQualityAnnotation();
+							if (!qa.contains(plantFilter))
+								continue;
+						}
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3)) {
-								System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
+								// System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
 								workload.add(sd3);
 							}
 					}

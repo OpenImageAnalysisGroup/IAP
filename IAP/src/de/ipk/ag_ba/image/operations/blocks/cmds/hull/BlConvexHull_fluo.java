@@ -214,7 +214,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					double avgArea = areaSum / areaCnt;
 					
 					if (lastTimeSideAreaIAP != null && lastSideAreaIAP > 0 && plantID != null) {
-						double days = (time - lastTimeSideAreaIAP) / timeForOneDay;
+						double days = (time / 1000d - lastTimeSideAreaIAP / 1000d) / (timeForOneDay / 1000d);
 						
 						double absoluteGrowthPerDay = (avgArea - lastSideAreaIAP) / days;
 						

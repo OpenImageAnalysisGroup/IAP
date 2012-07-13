@@ -344,11 +344,9 @@ public class DataExchangeHelperForExperiments {
 								continue;
 							if (vs.contains("#"))
 								fileName = vs.split("#", 2)[1];
-							bbb.add(new BinaryFileInfo(primary
-									.getFileNameLabel(), new IOurl(fileName),
-									false, mt.getTargetEntity()));
-							bbb.add(new BinaryFileInfo(new IOurl(fileName),
-									null, false, mt.getTargetEntity()));
+							if (primary != null)
+								bbb.add(new BinaryFileInfo(primary.getFileNameLabel(), new IOurl(fileName), false, mt.getTargetEntity()));
+							bbb.add(new BinaryFileInfo(new IOurl(fileName), null, false, mt.getTargetEntity()));
 							break search;
 						}
 					}
