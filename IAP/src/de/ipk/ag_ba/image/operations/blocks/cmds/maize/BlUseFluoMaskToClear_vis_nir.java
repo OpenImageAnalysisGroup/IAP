@@ -13,6 +13,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
+	boolean debugOR = true;
 	
 	@Override
 	protected void prepare() {
@@ -37,7 +38,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 				// apply enlarged FLUO mask to vis
 				ImageOperation vis = input().masks().vis().copy().io().print("VISSSS", debug);
 				FlexibleImage mask = input().masks().fluo().copy().io()
-						.blur(options.isMaize() ? 25 : ((options.isBarley() && !options.isBarleyInBarleySystem()) ? 30 : 30)).
+						.blur(options.isMaize() ? 25 : ((options.isBarley() && !options.isBarleyInBarleySystem()) ? 30 : 20)).
 						binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred fluo mask", debug).getImage();
 				// if (options.isBarley() && !options.isBarleyInBarleySystem()) {
 				// mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();

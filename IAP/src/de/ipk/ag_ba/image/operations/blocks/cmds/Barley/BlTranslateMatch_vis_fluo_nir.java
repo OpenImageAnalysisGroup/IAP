@@ -22,7 +22,7 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 	protected void prepare() {
 		super.prepare();
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE)
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (input().masks().vis() != null) {
 				ImageOperation vis = input().masks().vis().copy().io().grayscaleByLab();
 				
@@ -97,6 +97,18 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 						input().masks().setNir(tm.translate(input().masks().nir()));
 				}
 			}
+		} // if side
+		else {
+			// top
+			if (options.isBarleyInBarleySystem()) {
+				if (input().masks().vis() != null || input().masks().vis() != null) {
+					FlexibleImage vis = input().masks().vis();
+					input().masks().setVis(vis.io().translate(-18, -8).getImage());
+					vis = input().images().vis();
+					input().images().setVis(vis.io().translate(-18, -8).getImage());
+				}
+			}
+		}
 	}
 	
 }

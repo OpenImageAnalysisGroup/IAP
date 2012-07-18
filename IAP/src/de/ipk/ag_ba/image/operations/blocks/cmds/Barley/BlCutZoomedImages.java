@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
+package de.ipk.ag_ba.image.operations.blocks.cmds.Barley;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
@@ -34,7 +34,13 @@ public class BlCutZoomedImages extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
-		return cut(mask.io().adjustWidthHeightRatio(1624, 1234, 10));
+		int w = 1624;
+		int h = 1234;
+		if (mask.getWidth() < mask.getHeight()) {
+			w = 1234;
+			h = 1624;
+		}
+		return cut(mask.io().adjustWidthHeightRatio(w, h, 10));
 	}
 	
 	private FlexibleImage cut(ImageOperation img) {
