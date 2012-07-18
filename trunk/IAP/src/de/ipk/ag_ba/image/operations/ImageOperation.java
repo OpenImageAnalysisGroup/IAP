@@ -1496,6 +1496,16 @@ public class ImageOperation {
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
+		return removeSmallPartsOfImage(nextGeneration, workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
+				considerArea, null);
+	}
+	
+	public static FlexibleImage removeSmallPartsOfImage(
+			boolean nextGeneration,
+			FlexibleImage workImage, int iBackgroundFill,
+			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
+			ObjectRef optClusterSizeReturn,
+			boolean considerArea, RunnableWithVetoRight veto) {
 		
 		if (cutOffMinimumArea < 1) {
 			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");

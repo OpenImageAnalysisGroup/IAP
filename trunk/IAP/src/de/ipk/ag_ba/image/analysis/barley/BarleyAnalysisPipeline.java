@@ -26,6 +26,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
@@ -57,6 +58,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images_masks.class);
+		p.add(BlCutZoomedImages.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlCreateDummyReferenceIfNeeded_vis.class);
 		p.add(BlColorBalancing_vis.class);

@@ -35,8 +35,9 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS).intValue(),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				else
+					// barley
 					res = new ImageOperation(mask).removeSmallClusters(ngUse,
-							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 1,
+							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 2,
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
@@ -76,12 +77,11 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO).intValue(),
 									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				} else
-					return new ImageOperation(input().masks().fluo()).
-							dilate().
+					return new ImageOperation(input().masks().fluo()).copy().dilate().dilate().dilate().
 							removeSmallClusters(ngUse,
 									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
-									(input().masks().fluo().getWidth() / 300) * 1,
-									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+									(input().masks().fluo().getWidth() / 300) * 3,
+									options.getNeighbourhood(), options.getCameraPosition(), null, true).getImage();
 			}
 		} else {
 			int cut2 = (int) ((input().masks().fluo().getWidth() / 100) * 0.5);

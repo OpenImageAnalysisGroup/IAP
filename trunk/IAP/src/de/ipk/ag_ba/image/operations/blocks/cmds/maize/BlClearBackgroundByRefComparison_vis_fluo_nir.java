@@ -138,14 +138,15 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 				FlexibleImage fluo = input().images().fluo();
 				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
+				double f = 0.2d;
 				return new ImageOperation(fluo).compare()
 						.compareImages("fluo", input().masks().fluo()
 								// .io().
 								// copyImagesParts(0.26, 0.3).print("cut out", true).getImage()
 								,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
-								options.getIntSetting(Setting.L_Diff_FLUO) * 0.2d,
-								options.getIntSetting(Setting.abDiff_FLUO) * 0.2d,
+								options.getIntSetting(Setting.L_Diff_FLUO) * f,
+								options.getIntSetting(Setting.L_Diff_FLUO) * f,
+								options.getIntSetting(Setting.abDiff_FLUO) * f,
 								back).border(2).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");

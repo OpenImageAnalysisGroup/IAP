@@ -30,7 +30,7 @@ public class BlIntensityConversion_fluo extends AbstractSnapshotAnalysisBlockFIS
 		boolean isOldBarley = false;
 		
 		if (options.isBarleyInBarleySystem()) {
-			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 188;
+			min = options.getCameraPosition() == CameraPosition.SIDE ? 225 : 160;// 188;
 			
 			if (options.isBarleyInBarleySystem()) {
 				try {
