@@ -36,9 +36,9 @@ public class IntensityAnalysis {
 		double sumOfSat = 0;
 		double sumOfVal = 0;
 		
-		DescriptiveStatistics statsHueValues = new DescriptiveStatistics();
-		DescriptiveStatistics statsSatValues = new DescriptiveStatistics();
-		DescriptiveStatistics statsValValues = new DescriptiveStatistics();
+		DescriptiveStatistics statsHueValuesOverall = new DescriptiveStatistics();
+		DescriptiveStatistics statsSatValuesOverall = new DescriptiveStatistics();
+		DescriptiveStatistics statsValValuesOverall = new DescriptiveStatistics();
 		
 		DescriptiveStatistics statsLabL = new DescriptiveStatistics();
 		DescriptiveStatistics statsLabA = new DescriptiveStatistics();
@@ -82,24 +82,25 @@ public class IntensityAnalysis {
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
 				{
 					double h = hsb[0];
-					if ((int) (h * 255) > 0)
-						histHue.addDataPoint((int) (h * 255), 255);
-					sumOfHue += h;
-					statsHueValues.addValue(h);
-				}
-				{
 					double s = hsb[1];
-					if ((int) (s * 255) > 0)
-						histSat.addDataPoint((int) (s * 255), 255);
-					sumOfSat += s;
-					statsSatValues.addValue(s);
-				}
-				{
 					double v = hsb[2];
-					if ((int) (v * 255) > 0)
-						histVal.addDataPoint((int) (v * 255), 255);
-					sumOfVal += v;
-					statsValValues.addValue(v);
+					if ((int) (v * 255) > 0) {
+						{
+							histHue.addDataPoint((int) (h * 255), 255, s, v);
+							sumOfHue += h;
+							statsHueValuesOverall.addValue(h);
+						}
+						{
+							histSat.addDataPoint((int) (s * 255), 255, h, v);
+							sumOfSat += s;
+							statsSatValuesOverall.addValue(s);
+						}
+						{
+							histVal.addDataPoint((int) (v * 255), 255, h, s);
+							sumOfVal += v;
+							statsValValuesOverall.addValue(v);
+						}
+					}
 				}
 			}
 			if (mode == Mode.MODE_IR_ANALYSIS) {
@@ -111,9 +112,9 @@ public class IntensityAnalysis {
 					h = (255d - r_intensityClassic);
 				}
 				sumOfIntensityChlorophyl += h;
-				histHue.addDataPoint((int) h, 255);
+				histHue.addDataPoint((int) h, 255, Double.NaN, Double.NaN);
 				sumOfHue += h;
-				statsHueValues.addValue(h);
+				statsHueValuesOverall.addValue(h);
 			} else {
 				// double intensityChloro = (255d - g_intensityChlorophyl) / 255d;
 				double intensityPhenol = (255d - b_intensityPhenol) / 255d;
@@ -127,9 +128,9 @@ public class IntensityAnalysis {
 					sumOfIntensityClassic += (255 - r_intensityClassic);
 				}
 				if (g_intensityChlorophyl > 0)
-					histChlorophyl.addDataPoint(g_intensityChlorophyl, 255);
+					histChlorophyl.addDataPoint(g_intensityChlorophyl, 255, Double.NaN, Double.NaN);
 				if (b_intensityPhenol > 0)
-					histPhenol.addDataPoint(b_intensityPhenol, 255);
+					histPhenol.addDataPoint(b_intensityPhenol, 255, Double.NaN, Double.NaN);
 				// if (intensityPhenol + intensityChloro > 0)
 				// histRatio.addDataPoint((int) Math.round(intensityPhenol / (intensityPhenol + intensityChloro) * 255d), 255);
 			}
@@ -139,26 +140,47 @@ public class IntensityAnalysis {
 		
 		boolean addNormalizedHistogramValues = true;
 		if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
-			if (addNormalizedHistogramValues) {
-				if (optDistHorizontal != null && optRealMarkerDistance != null) {
-					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
-					for (int i = 0; i < this.n; i++) {
-						result.addValue("hsv.normalized.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
-								histHue.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
-								histSat.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
-								histVal.getFreqAt(i) * normalize);
-					}
+			if (optDistHorizontal != null && optRealMarkerDistance != null && addNormalizedHistogramValues) {
+				double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+				for (int i = 0; i < this.n; i++) {
+					result.addValue("hsv.normalized.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+							histHue.getFreqAt(i) * normalize);
+					result.addValue("hsv.normalized.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+							histSat.getFreqAt(i) * normalize);
+					result.addValue("hsv.normalized.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+							histVal.getFreqAt(i) * normalize);
+				}
+			} else {
+				for (int i = 0; i < this.n; i++) {
+					result.addValue("hsv.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+							histHue.getFreqAt(i));
+					result.addValue("hsv.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+							histSat.getFreqAt(i));
+					result.addValue("hsv.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+							histVal.getFreqAt(i));
 				}
 			}
 			for (int i = 0; i < this.n; i++) {
-				result.addValue("hsv.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
-						histHue.getFreqAt(i));
-				result.addValue("hsv.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
-						histSat.getFreqAt(i));
-				result.addValue("hsv.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
-						histVal.getFreqAt(i));
+				if (histHue.getOther1avg(i) != null)
+					result.addValue("hsv.normalized.h.histogram.s_avg.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+							histHue.getOther1avg(i));
+				if (histHue.getOther2avg(i) != null)
+					result.addValue("hsv.normalized.h.histogram.v_avg.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+							histHue.getOther2avg(i));
+				
+				if (histSat.getOther1avg(i) != null)
+					result.addValue("hsv.normalized.s.histogram.h_avg.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+							histSat.getOther1avg(i));
+				if (histSat.getOther2avg(i) != null)
+					result.addValue("hsv.normalized.s.histogram.v_avg.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+							histSat.getOther2avg(i));
+				
+				if (histVal.getOther1avg(i) != null)
+					result.addValue("hsv.normalized.v.histogram.h_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+							histVal.getOther1avg(i));
+				if (histVal.getOther2avg(i) != null)
+					result.addValue("hsv.normalized.v.histogram.s_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+							histVal.getOther2avg(i));
 			}
 			result.addValue("hsv.h.average", sumOfHue / plantImagePixelCnt);
 			result.addValue("hsv.s.average", sumOfSat / plantImagePixelCnt);
@@ -178,18 +200,18 @@ public class IntensityAnalysis {
 				}
 			}
 			
-			if (statsHueValues.getN() > 0) {
-				result.addValue("hsv.h.stddev", statsHueValues.getStandardDeviation());
-				result.addValue("hsv.s.stddev", statsSatValues.getStandardDeviation());
-				result.addValue("hsv.v.stddev", statsValValues.getStandardDeviation());
+			if (statsHueValuesOverall.getN() > 0) {
+				result.addValue("hsv.h.stddev", statsHueValuesOverall.getStandardDeviation());
+				result.addValue("hsv.s.stddev", statsSatValuesOverall.getStandardDeviation());
+				result.addValue("hsv.v.stddev", statsValValuesOverall.getStandardDeviation());
 				
-				result.addValue("hsv.h.skewness", statsHueValues.getSkewness());
-				result.addValue("hsv.s.skewness", statsSatValues.getSkewness());
-				result.addValue("hsv.v.skewness", statsValValues.getSkewness());
+				result.addValue("hsv.h.skewness", statsHueValuesOverall.getSkewness());
+				result.addValue("hsv.s.skewness", statsSatValuesOverall.getSkewness());
+				result.addValue("hsv.v.skewness", statsValValuesOverall.getSkewness());
 				
-				result.addValue("hsv.h.kurtosis", statsHueValues.getKurtosis());
-				result.addValue("hsv.s.kurtosis", statsSatValues.getKurtosis());
-				result.addValue("hsv.v.kurtosis", statsValValues.getKurtosis());
+				result.addValue("hsv.h.kurtosis", statsHueValuesOverall.getKurtosis());
+				result.addValue("hsv.s.kurtosis", statsSatValuesOverall.getKurtosis());
+				result.addValue("hsv.v.kurtosis", statsValValuesOverall.getKurtosis());
 				
 				result.addValue("lab.l.mean", statsLabL.getMean());
 				result.addValue("lab.a.mean", statsLabA.getMean());
@@ -217,10 +239,10 @@ public class IntensityAnalysis {
 				result.addValue("filled.pixels", plantImagePixelCnt);
 				result.addValue("filled.percent", (100d * plantImagePixelCnt) / pixels.length);
 				
-				if (statsHueValues.getN() > 0) {
-					result.addValue("intensity.stddev", statsHueValues.getStandardDeviation());
-					result.addValue("intensity.skewness", statsHueValues.getSkewness());
-					result.addValue("intensity.kurtosis", statsHueValues.getKurtosis());
+				if (statsHueValuesOverall.getN() > 0) {
+					result.addValue("intensity.stddev", statsHueValuesOverall.getStandardDeviation());
+					result.addValue("intensity.skewness", statsHueValuesOverall.getSkewness());
+					result.addValue("intensity.kurtosis", statsHueValuesOverall.getKurtosis());
 				}
 			}
 			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
