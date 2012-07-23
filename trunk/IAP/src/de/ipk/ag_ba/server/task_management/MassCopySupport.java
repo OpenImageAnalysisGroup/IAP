@@ -152,7 +152,14 @@ public class MassCopySupport {
 				}
 			}
 			
-			for (MongoDB m : MongoDB.getMongos()) {
+			boolean useOnlyMainDatabase = true;
+			ArrayList<MongoDB> checkM;
+			if (useOnlyMainDatabase) {
+				checkM = new ArrayList<MongoDB>();
+				checkM.add(MongoDB.getDefaultCloud());
+			} else
+				checkM = MongoDB.getMongos();
+			for (MongoDB m : checkM) {
 				try {
 					print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
 					for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
@@ -213,7 +220,10 @@ public class MassCopySupport {
 				MongoDB m = it.getMongoDB();
 				if (m == null) {
 					// new data set, copy to last mongo instance
-					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
+					if (useOnlyMainDatabase)
+						m = MongoDB.getDefaultCloud();
+					else
+						m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
 				}
 				ExperimentHeaderInterface src = it.getExperimentHeader();
 				print("Copy " + it.Id + " to " + m.getDatabaseName());

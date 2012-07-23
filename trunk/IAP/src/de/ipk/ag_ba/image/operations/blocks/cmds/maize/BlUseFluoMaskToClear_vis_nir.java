@@ -192,6 +192,13 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 					mask,
 					options.getBackground()).print("FILTERED NIR IMAGE", debug).
 					replaceColor(back, gray).getImage());
+			
+			if (options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE)
+				if (processedImages.nir() != null) {
+					processedMasks.setNir(processedImages.nir().copy());
+					return;
+				}
+			
 			return;
 		}
 		// }
@@ -206,6 +213,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 			FlexibleImage input = processedMasks.nir();
 			
 			processedMasks.setNir(clearImageLeftAround(input, processedMasks.fluo()));
+			
 			return;
 		}
 	}
