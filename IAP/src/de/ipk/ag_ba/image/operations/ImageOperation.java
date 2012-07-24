@@ -4516,6 +4516,7 @@ public class ImageOperation {
 			return res;
 		}
 	}
+	
 	// not tested:
 	// public ImageOperation move(int dx, int dy) {
 	// int[][] image = getImageAs2array();
@@ -4534,4 +4535,78 @@ public class ImageOperation {
 	// }
 	// return new ImageOperation(res);
 	// }
+	
+	/**
+	 * @param idx
+	 *           0..(n-1)
+	 * @param parts
+	 *           n
+	 * @return horizontal stripe of an image (pixels below or above the current region are cleared).
+	 */
+	public ImageOperation getBottom(int idx, int parts) {
+		int[][] pix = getImageAs2array();
+		int pixels = countFilledPixels();
+		int from = (idx * pixels) / parts;
+		int to = from + pixels / parts;
+		int i = 0;
+		// enumerate from bottom to top (and left to right)
+		for (int y = getHeight() - 1; y >= 0; y--) {
+			for (int x = 0; x < getWidth(); x++) {
+				int c = pix[x][y];
+				if (c != BACKGROUND_COLORint) {
+					if (i < from || i >= to)
+						pix[x][y] = BACKGROUND_COLORint;
+					i++;
+				}
+			}
+		}
+		return new ImageOperation(pix);
+	}
+	
+	/**
+	 * @param idx
+	 *           0..(n-1)
+	 * @param parts
+	 *           n
+	 * @return inner part of an image (pixels outside the current "ring" are cleared)
+	 */
+	public ImageOperation getInnerCircle(int idx, int parts) {
+		// make list of foreground pixels and their distances to the center
+		ArrayList<DoublePixel> distances = new ArrayList<DoublePixel>();
+		int[][] pix = getImageAs2array();
+		double cx = getWidth() / 2d;
+		double cy = getHeight() / 2d;
+		for (int x = 0; x < getWidth(); x++) {
+			for (int y = 0; y < getHeight(); y++) {
+				int c = pix[x][y];
+				pix[x][y] = BACKGROUND_COLORint; // prepare for result
+				if (c != BACKGROUND_COLORint) {
+					double distanceToCenter = getDistancePlantToCenter(x, y, cx, cy);
+					distances.add(new DoublePixel(distanceToCenter, x, y, c));
+				}
+			}
+		}
+		// sort according to distance
+		Collections.sort(distances, new Comparator<DoublePixel>() {
+			@Override
+			public int compare(DoublePixel arg0, DoublePixel arg1) {
+				return arg0.distanceToCenter.compareTo(arg1.distanceToCenter);
+			}
+		});
+		// "draw" result image, with only the proper distance part
+		int pixels = countFilledPixels();
+		int from = (idx * pixels) / parts;
+		int to = from + pixels / parts;
+		int i = 0;
+		for (DoublePixel dp : distances) {
+			if (i >= from && i < to)
+				pix[dp.x][dp.y] = dp.c;
+			i++;
+		}
+		return new ImageOperation(pix);
+	}
+	
+	private static double getDistancePlantToCenter(double x, double y, double cx, double cy) {
+		return Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+	}
 }

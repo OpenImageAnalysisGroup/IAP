@@ -5,6 +5,7 @@ import ij.measure.ResultsTable;
 import org.SystemAnalysis;
 import org.graffiti.plugin.parameter.Parameter;
 
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -24,6 +25,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
+	private boolean debugRegionParts = false;
+	
 	@Override
 	protected boolean isChangingImages() {
 		return false;
@@ -39,52 +42,65 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 	}
 	
-	/**
-	 * ndvi [-1-1]
-	 */
 	@Override
 	protected FlexibleImage processVISmask() {
-		
 		if (input().masks().vis() != null) {
 			
-			ImageOperation io = new ImageOperation(input().masks().vis().copy()).print("BEFORE TRIMM", false).
-					erode(2);
+			ImageOperation io = new ImageOperation(input().masks().vis().copy()).print("BEFORE TRIMM", false).erode(2);
 			io = input().masks().vis().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.print("AFTER ERODE", false);
 			
-			int visibleFilledPixels = io.countFilledPixels();
-			
-			double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
-			double visibleIntensitySumG = io.intensitySumOfChannel(false, false, true, false);
-			double visibleIntensitySumB = io.intensitySumOfChannel(false, false, false, true);
-			double averageVisR = visibleIntensitySumR / visibleFilledPixels;
-			double averageVisG = visibleIntensitySumG / visibleFilledPixels;
-			double averageVisB = visibleIntensitySumB / visibleFilledPixels;
-			
-			ResultsTable rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS);
-			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
-			
-			ResultsTable rt = new ResultsTable();
-			rt.incrementCounter();
-			rt.addValue("ndvi.vis.red.intensity.average", averageVisR);
-			rt.addValue("ndvi.vis.green.intensity.average", averageVisG);
-			rt.addValue("ndvi.vis.blue.intensity.average", averageVisB);
-			
-			if (input().masks().nir() != null) {
-				double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
-				int nirFilledPixels = input().masks().nir().io().countFilledPixels();
-				double averageNir = 1 - nirIntensitySum / nirFilledPixels;
-				// rt.addValue("ndvi.nir.intensity.average", averageNir);
-				
-				double ndvi = (averageNir - averageVisR) / (averageNir + averageVisR);
-				rt.addValue("ndvi", ndvi);
+			String pre = "RESULT_" + options.getCameraPosition();
+			int regions = 5;
+			if (options.getCameraPosition() == CameraPosition.SIDE) {
+				for (int r = 0; r < regions; r++)
+					processVisibleImage(io.getBottom(r, regions).print("Side Part " + r + "/" + regions, debugRegionParts),
+							pre + ".section_" + (r + 1) + "_" + regions + ".");
+			}
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				for (int r = 0; r < regions; r++)
+					processVisibleImage(io.getInnerCircle(r, regions).print("Top Part " + r + "/" + regions, debugRegionParts),
+							pre + ".section_" + (r + 1) + "_" + regions + ".");
 			}
 			
-			getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".", rt, getBlockPosition());
+			processVisibleImage(io, pre + ".");
+			
 			return input().masks().vis();
 		} else
 			return null;
+	}
+	
+	protected void processVisibleImage(ImageOperation io, String resultPrefix) {
+		int visibleFilledPixels = io.countFilledPixels();
+		
+		double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
+		double visibleIntensitySumG = io.intensitySumOfChannel(false, false, true, false);
+		double visibleIntensitySumB = io.intensitySumOfChannel(false, false, false, true);
+		double averageVisR = visibleIntensitySumR / visibleFilledPixels;
+		double averageVisG = visibleIntensitySumG / visibleFilledPixels;
+		double averageVisB = visibleIntensitySumB / visibleFilledPixels;
+		
+		ResultsTable rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+				options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS);
+		getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
+		
+		ResultsTable rt = new ResultsTable();
+		rt.incrementCounter();
+		rt.addValue("ndvi.vis.red.intensity.average", averageVisR);
+		rt.addValue("ndvi.vis.green.intensity.average", averageVisG);
+		rt.addValue("ndvi.vis.blue.intensity.average", averageVisB);
+		
+		if (input().masks().nir() != null) {
+			double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
+			int nirFilledPixels = input().masks().nir().io().countFilledPixels();
+			double averageNir = 1 - nirIntensitySum / nirFilledPixels;
+			// rt.addValue("ndvi.nir.intensity.average", averageNir);
+			
+			double ndvi = (averageNir - averageVisR) / (averageNir + averageVisR);
+			rt.addValue("ndvi", ndvi);
+		}
+		
+		getProperties().storeResults(resultPrefix, rt, getBlockPosition());
 	}
 	
 	@Override
