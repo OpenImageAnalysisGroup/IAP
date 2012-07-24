@@ -663,7 +663,7 @@ public class Experiment2GraphHelper implements BackgroundTaskStatusProviderSuppo
 		}
 		if (graphElement instanceof org.graffiti.graph.Node) {
 			org.graffiti.graph.Node n = (org.graffiti.graph.Node) graphElement;
-			String keggId = KeggGmlHelper.getKeggId((org.graffiti.graph.Node) graphElement);
+			String keggId = KeggGmlHelper.getKeggId(graphElement);
 			if (keggId != null && keggId.length() > 0) {
 				keggId = keggId.trim();
 				String lbl = AttributeHelper.getLabel(n, "");
@@ -855,5 +855,10 @@ public class Experiment2GraphHelper implements BackgroundTaskStatusProviderSuppo
 	@Override
 	public String getCurrentStatusMessage3() {
 		return null;
+	}
+	
+	@Override
+	public void setPrefix1(String prefix1) {
+		// empty
 	}
 }

@@ -172,6 +172,12 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			public String getCurrentStatusMessage3() {
 				return status3provider.getCurrentStatusMessage3();
 			}
+			
+			@Override
+			public void setPrefix1(String prefix1) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 	

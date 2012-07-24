@@ -3512,10 +3512,15 @@ public class ImageOperation {
 		ImageOperation left = copy().imageBalancing(brightness, rgbInfoLEFT);
 		ImageOperation right = copy().imageBalancing(brightness, rgbInfoRIGHT);
 		int pixL[][] = left.getImageAs2dArray();
-		int pixR[][] = left.getImageAs2dArray();
+		int pixR[][] = right.getImageAs2dArray();
 		int w = getWidth();
 		int h = getHeight();
-		return null;
+		for (int x = w / 2; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				pixL[x][y] = pixR[x][y];
+			}
+		}
+		return new ImageOperation(pixL).flipHor().print("merged balanced", false);
 	}
 	
 	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d) {

@@ -7,7 +7,7 @@ package org;
  * @author klukas
  */
 public interface BackgroundTaskStatusProviderSupportingExternalCall
-					extends BackgroundTaskStatusProvider {
+		extends BackgroundTaskStatusProvider {
 	public abstract void setCurrentStatusValueFine(double value);
 	
 	public boolean wantsToStop();
@@ -17,4 +17,6 @@ public interface BackgroundTaskStatusProviderSupportingExternalCall
 	public abstract void setCurrentStatusText2(String status);
 	
 	public abstract void setCurrentStatusValueFineAdd(double smallProgressStep);
+	
+	public abstract void setPrefix1(String prefix1);
 }

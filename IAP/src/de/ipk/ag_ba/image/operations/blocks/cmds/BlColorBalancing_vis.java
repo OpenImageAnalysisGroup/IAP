@@ -38,8 +38,8 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 			if (remark != null && remark.length() > 0 && !remark.contains("n")) {
 				if (remark.contains("auto")) {
 					double[] pixLeft, pixRight;
-					pixLeft = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage(), false, -10, 10);
-					pixRight = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage(), false, -10, 10);
+					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().print("left part", debug), false, -10, 10);
+					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().print("right part", debug), false, -10, 10);
 					return io.imageBalancing(255, pixLeft, pixRight).getImage().print("after", false);
 				} else {
 					try {

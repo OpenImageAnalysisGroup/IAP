@@ -58,7 +58,7 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 	
 	@Override
 	public String getCurrentStatusMessage1() {
-		return status1;
+		return prefix1 != null ? prefix1 + status1 : status1;
 	}
 	
 	@Override
@@ -107,6 +107,7 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 	double firstProgressFineValue = -1;
 	double lastPro = -1;
 	long lastProgressUpdateTime = -1;
+	private String prefix1;
 	
 	private synchronized String getProgressStatus() {
 		String result = "";
@@ -155,5 +156,10 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 			}
 		}
 		return result;
+	}
+	
+	@Override
+	public void setPrefix1(String prefix1) {
+		this.prefix1 = prefix1;
 	}
 }

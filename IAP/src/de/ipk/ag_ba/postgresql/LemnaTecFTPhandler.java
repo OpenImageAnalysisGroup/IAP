@@ -55,7 +55,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					if (urlForCopiedData != null) {
 						InputStream is = urlForCopiedData.getInputStream();
 						if (is != null) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Use cache for " + url);
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">Use cache for " + url);
 							return is;
 						}
 					}

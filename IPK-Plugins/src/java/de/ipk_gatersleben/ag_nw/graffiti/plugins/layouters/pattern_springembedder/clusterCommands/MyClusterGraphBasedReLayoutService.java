@@ -393,4 +393,9 @@ public class MyClusterGraphBasedReLayoutService
 	public String getCurrentStatusMessage3() {
 		return null;
 	}
+	
+	@Override
+	public void setPrefix1(String prefix1) {
+		// empty
+	}
 }
