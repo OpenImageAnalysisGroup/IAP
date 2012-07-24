@@ -46,28 +46,28 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				FlexibleImage visMsk = input().masks().vis().print("In Mask", false);
 				FlexibleImage cleared = visImg.io().compare() // medianFilter32Bit().
 						.compareImages("vis", visMsk.io().blur(2).print("Blurred Mask", false).getImage(),
-								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
-								options.getIntSetting(Setting.L_Diff_VIS_SIDE) * 0.5,
-								options.getIntSetting(Setting.abDiff_VIS_SIDE) * 0.5,
+								options.getIntSetting(Setting.L_Diff_VIS_SIDE),
+								options.getIntSetting(Setting.L_Diff_VIS_SIDE),
+								options.getIntSetting(Setting.abDiff_VIS_SIDE),
 								back, true).
 						// protect blue: (will be removed later)
 						or(visMsk.copy().io().filterRemainHSV(0.02, 0.62).getImage()).
 						border(2).getImage(); //
 				return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
-						.print("CLEAR RESULT", false).getImage();
+						.print("CLEAR RESULT", debug).getImage();
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				// double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
 				FlexibleImage visX = input().images().vis().copy();
 				// visX = visX.resize((int) (scaleFactor * visX.getWidth()), (int) (scaleFactor * visX.getHeight()));
-				FlexibleImage cleared = new ImageOperation(visX)
+				FlexibleImage cleared = new ImageOperation(visX).blur(2)
 						// .blur(3).printImage("median", false)
 						.compare()
 						.compareImages("vis", input().masks().vis().io().blur(2).print("medianb", debug).getImage(),
-								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.2d,
-								options.getIntSetting(Setting.L_Diff_VIS_TOP) * 0.2d,
-								options.getIntSetting(Setting.abDiff_VIS_TOP) * 0.2d,
-								back, false).
+								options.getIntSetting(Setting.L_Diff_VIS_TOP),
+								options.getIntSetting(Setting.L_Diff_VIS_TOP),
+								options.getIntSetting(Setting.abDiff_VIS_TOP),
+								back, debug).print("comparison result", debug).
 						// protect blue: (will be removed later)
 						or(visX.copy().io().filterRemainHSV(0.02, 0.62).getImage()).
 						// .dilate().dilate().dilate()

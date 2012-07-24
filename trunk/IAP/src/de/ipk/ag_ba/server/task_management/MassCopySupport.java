@@ -138,7 +138,7 @@ public class MassCopySupport {
 			LemnaTecDataExchange lt = new LemnaTecDataExchange();
 			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
 			ArrayList<IdTime> mongoIdsArr = new ArrayList<IdTime>();
-			ArrayList<IdTime> toSave = new ArrayList<IdTime>();
+			final ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 			
 			for (String db : lt.getDatabases()) {
 				try {
@@ -212,7 +212,7 @@ public class MassCopySupport {
 			print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
 			status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
 			int done = 0;
-			for (IdTime it : toSave) {
+			for (final IdTime it : toSave) {
 				boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
 				if (!en)
 					continue;
@@ -229,6 +229,8 @@ public class MassCopySupport {
 				print("Copy " + it.Id + " to " + m.getDatabaseName());
 				ExperimentReference er = new ExperimentReference(src);
 				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
+				final int doneF = done;
+				status.setPrefix1("<html>Copying " + (doneF + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
 				copyAction.setStatusProvider(status);
 				boolean simulate = false;
 				if (!simulate)
@@ -238,6 +240,7 @@ public class MassCopySupport {
 				status.setCurrentStatusValueFine(100d * done / toSave.size());
 				Thread.sleep(1000);
 			}
+			status.setPrefix1(null);
 			status.setCurrentStatusText1("Copy complete (" + done + " finished)");
 			status.setCurrentStatusText2("Next sync at 8 PM");
 			status.setCurrentStatusValueFine(100d);

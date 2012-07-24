@@ -186,6 +186,12 @@ public class BSHscriptMenuEntry extends JMenuItem {
 					// TODO Auto-generated method stub
 					return null;
 				}
+				
+				@Override
+				public void setPrefix1(String prefix1) {
+					// TODO Auto-generated method stub
+					
+				}
 			};
 			BackgroundTaskHelper.issueSimpleTask(title, "Perform Script Command...", new Runnable() {
 				@Override

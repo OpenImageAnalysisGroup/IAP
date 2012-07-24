@@ -126,4 +126,9 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 		}
 	}
 	
+	@Override
+	public void setPrefix1(String prefix1) {
+		// empty
+	}
+	
 }

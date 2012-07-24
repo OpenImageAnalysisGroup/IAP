@@ -156,7 +156,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		}
 		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 7); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 50); // 20
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 40); // 20
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20); // 20
 		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 0);
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for

@@ -45,7 +45,7 @@ public class ImageComparator {
 		boolean ignoreRed = false;
 		if (ignoreRed) {
 			double[] factors = new double[] { 0.05, 0.7, 0.7 };
-			boolean show = false;
+			boolean show = true;
 			labImage = new ImageOperation(inputImage).multiplicateImageChannelsWithFactors(factors).print("input", show).getImage().getLab(false);
 			labImageRef = new ImageOperation(referenceImage).multiplicateImageChannelsWithFactors(factors).print("reference", show).getImage().getLab(false);
 		} else {
