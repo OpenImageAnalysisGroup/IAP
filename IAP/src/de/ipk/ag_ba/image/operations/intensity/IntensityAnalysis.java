@@ -26,7 +26,7 @@ public class IntensityAnalysis {
 		
 		ResultsTable result = new ResultsTable();
 		
-		int[] pixels = io.getImageAs1array();
+		int[] pixels = io.getImageAs1dArray();
 		
 		double sumOfIntensityChlorophyl = 0;
 		double sumOfIntensityPhenol = 0;

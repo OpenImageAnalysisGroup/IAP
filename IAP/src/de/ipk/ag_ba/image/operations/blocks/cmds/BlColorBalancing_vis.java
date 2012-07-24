@@ -1,7 +1,12 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
+import java.awt.Color;
+
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.PixelProcessor;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
@@ -9,6 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
  * Recolor pictures according to white point (or black point for fluo).
+ * May adjust the top-right-half brightness with the remark setting "top.right.half.brightness".
  * 
  * @author pape, klukas
  */
@@ -27,8 +33,43 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			pix = getProbablyWhitePixels(vis.copy().io().blur(5).getImage(), true, -10, 50);
-		} else
+		} else {
+			String remark = getRemarkSetting("vis.top.split.adjust", "");
+			if (remark != null && remark.length() > 0 && !remark.contains("n")) {
+				if (remark.contains("auto")) {
+					double[] pixLeft, pixRight;
+					pixLeft = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage(), false, -10, 10);
+					pixRight = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage(), false, -10, 10);
+					return io.imageBalancing(255, pixLeft, pixRight).getImage().print("after", false);
+				} else {
+					try {
+						final Float brightup = Float.parseFloat(remark.trim());
+						io = io.adjustPixelValues(new PixelProcessor() {
+							float[] hsb = new float[3];
+							
+							@Override
+							public int processPixelForegroundValue(int x, int y, int rgb, int w, int h) {
+								if (x >= w / 2) {
+									int r = ((rgb >> 16) & 0xff);
+									int g = ((rgb >> 8) & 0xff);
+									int b = (rgb & 0xff);
+									Color.RGBtoHSB(r, g, b, hsb);
+									hsb[2] *= brightup;
+									if (hsb[2] > 1)
+										hsb[2] = 1;
+									return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+								} else
+									return rgb;
+							}
+						});
+					} catch (Exception e) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Could not interpret remark setting 'top-half': '" + remark
+								+ "' (needs to be number indicating top-right brightness correction)");
+					}
+				}
+			}
 			pix = getProbablyWhitePixels(vis, false, -10, 10);
+		}
 		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
 	

@@ -43,7 +43,7 @@ public class BlockMatchBrightness extends AbstractSnapshotAnalysisBlockFIS {
 		int s = (int) (vis.getWidth() * d);
 		int w = vis.getWidth();
 		int h = vis.getHeight();
-		int[][] i = io.getImageAs2array();
+		int[][] i = io.getImageAs2dArray();
 		return new double[] {
 				io.getLABAverage(i, 0, 0, s, s).getAverageA(), io.getLABAverage(i, w - s, 0, s, s).getAverageA(),
 				io.getLABAverage(i, 0, h - s, s, s).getAverageA(), io.getLABAverage(i, w - s, h - s, s, s).getAverageA() };

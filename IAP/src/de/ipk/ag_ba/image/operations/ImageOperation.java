@@ -152,7 +152,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation replaceColor(int search, int replace) {
-		int[] source = getImageAs1array();
+		int[] source = getImageAs1dArray();
 		int[] target = new int[source.length];
 		
 		int idx = 0;
@@ -167,8 +167,8 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation replaceColorsScanLine(int search, int replace) {
-		int[][] source2d = getImageAs2array();
-		int[][] target = getImageAs2array();
+		int[][] source2d = getImageAs2dArray();
+		int[][] target = getImageAs2dArray();
 		
 		int w = getWidth(), h = getHeight();
 		for (int y = 0; y < h; y++) {
@@ -192,7 +192,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation replaceColors(int search, FlexibleImage replace) {
-		int[] source = getImageAs1array();
+		int[] source = getImageAs1dArray();
 		int[] target = new int[source.length];
 		
 		int[] replaceColors = replace.getAs1A();
@@ -277,7 +277,7 @@ public class ImageOperation {
 		if (minimumIntensity < 0)
 			minimumIntensity = 150;
 		
-		int[] in = getImageAs1array(); // gamma(0.1) // 99999999999999999999999999999999
+		int[] in = getImageAs1dArray(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int idx = 0;
@@ -354,7 +354,7 @@ public class ImageOperation {
 	
 	public ImageOperation convertFluo2intensityOldRGBbased() {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int[] in = getImageAs1array();
+		int[] in = getImageAs1dArray();
 		int idx = 0;
 		for (int c : in) {
 			if (c == background) {
@@ -448,7 +448,7 @@ public class ImageOperation {
 		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
 		
 		int[][] maskPixels = mask.getAs2A();
-		int[][] originalImage = getImageAs2array();
+		int[][] originalImage = getImageAs2dArray();
 		int mW = mask.getWidth();
 		int mH = mask.getHeight();
 		
@@ -532,7 +532,7 @@ public class ImageOperation {
 		}
 		
 		int[] maskPixels = mask;
-		int[] originalImage = io.getImageAs1array();
+		int[] originalImage = io.getImageAs1dArray();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -570,7 +570,7 @@ public class ImageOperation {
 		}
 		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = io.getImageAs1array();
+		int[] originalImage = io.getImageAs1dArray();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -583,7 +583,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation erodeRetainingLines() {
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] res = new int[w][h];
@@ -664,7 +664,7 @@ public class ImageOperation {
 	 */
 	public ImageOperation dilateHor(int n) {
 		if (n == Integer.MAX_VALUE) {
-			int[][] img = getImageAs2array();
+			int[][] img = getImageAs2dArray();
 			int w = image.getWidth();
 			int h = image.getHeight();
 			boolean foundFilled = false;
@@ -767,7 +767,7 @@ public class ImageOperation {
 	 * @author pape, klukas
 	 */
 	public ImageOperation dilatationColorImage() {
-		int[][] src_image = getImageAs2array();
+		int[][] src_image = getImageAs2dArray();
 		int w = src_image.length;
 		int h = src_image[0].length;
 		int[][] image_result = new int[w][h];
@@ -784,7 +784,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new ImageOperation(getImageAs2array());
+		return new ImageOperation(getImageAs2dArray());
 	}
 	
 	/**
@@ -886,7 +886,7 @@ public class ImageOperation {
 	 */
 	@Deprecated
 	public ImageOperation dilateNG(int n) {
-		int[] imagePixels = getImageAs1array();
+		int[] imagePixels = getImageAs1dArray();
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -928,7 +928,7 @@ public class ImageOperation {
 	 */
 	@Deprecated
 	public ImageOperation dilateNG(int n, FlexibleImage inputImageForNewPixels) {
-		int[] imagePixels = getImageAs1array();
+		int[] imagePixels = getImageAs1dArray();
 		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
@@ -971,7 +971,7 @@ public class ImageOperation {
 	 */
 	private ImageOperation erodeNG(int n) {
 		// todo this command does not work correctly, yet
-		int[] imagePixels = getImageAs1array();
+		int[] imagePixels = getImageAs1dArray();
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -1256,11 +1256,11 @@ public class ImageOperation {
 	
 	// ################## get... ###################
 	
-	public int[] getImageAs1array() {
+	public int[] getImageAs1dArray() {
 		return ImageConverter.convertIJto1A(image);
 	}
 	
-	public int[][] getImageAs2array() {
+	public int[][] getImageAs2dArray() {
 		return ImageConverter.convertIJto2A(image);
 	}
 	
@@ -1402,7 +1402,7 @@ public class ImageOperation {
 	}
 	
 	public FlexibleImage draw(FlexibleImage fi, int background) {
-		int[] img = getImageAs1array();
+		int[] img = getImageAs1dArray();
 		int[] over = fi.getAs1A();
 		int idx = 0;
 		for (int o : over)
@@ -1426,7 +1426,7 @@ public class ImageOperation {
 			int sidePixels = (int) (radius * 2d);
 			if (sidePixels < 3)
 				sidePixels = 3;
-			int[] img = getImageAs1array();
+			int[] img = getImageAs1dArray();
 			int[] imgR = new int[img.length];
 			int[] imgG = new int[img.length];
 			int[] imgB = new int[img.length];
@@ -1642,7 +1642,7 @@ public class ImageOperation {
 		int smallestY = Integer.MAX_VALUE;
 		int largestY = 0;
 		
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -1733,7 +1733,7 @@ public class ImageOperation {
 		int smallestY = (int) (h * pTop);
 		int largestY = (int) (h * (1 - pBottom)) - 1;
 		
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		
 		int[][] res = new int[largestX - smallestX + 1][largestY - smallestY
 				+ 1];
@@ -1747,7 +1747,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation filterByHSV_value(double t, int clearColor) {
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		float[] hsb = new float[3];
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
@@ -1771,7 +1771,7 @@ public class ImageOperation {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1796,7 +1796,7 @@ public class ImageOperation {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1821,7 +1821,7 @@ public class ImageOperation {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1852,7 +1852,7 @@ public class ImageOperation {
 		
 		float t = hsb[0];
 		
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1894,7 +1894,7 @@ public class ImageOperation {
 		int height = image.getProcessor().getHeight();
 		
 		int[] resultImage = new int[width * height];
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB, background, typ, maize, getRemoved);
@@ -1909,7 +1909,7 @@ public class ImageOperation {
 		int height = image.getProcessor().getHeight();
 		
 		int[] resultImage = new int[width * height];
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB, background, typ, maize, false);
@@ -2089,7 +2089,7 @@ public class ImageOperation {
 		int width = getWidth();
 		int height = getHeight();
 		
-		int[] imagePixels = getImageAs1array();
+		int[] imagePixels = getImageAs1dArray();
 		
 		int[] resultImage = new int[imagePixels.length];
 		
@@ -2144,7 +2144,7 @@ public class ImageOperation {
 		int w = getWidth();
 		int h = getHeight();
 		
-		int[] imagePixels = getImageAs1array();
+		int[] imagePixels = getImageAs1dArray();
 		
 		int[] resultImage = new int[imagePixels.length];
 		
@@ -2398,7 +2398,7 @@ public class ImageOperation {
 	
 	public ImageOperation medianFilter32Bit(boolean performanceOptimized) {
 		if (performanceOptimized) {
-			int[] img = getImageAs1array();
+			int[] img = getImageAs1dArray();
 			int w = image.getWidth();
 			int h = image.getHeight();
 			int[] out = new int[img.length];
@@ -2426,7 +2426,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation medianFilter32BitvariableMask(int n) {
-		int[] img = getImageAs1array();
+		int[] img = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[] out = new int[img.length];
@@ -2604,7 +2604,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation thresholdBlueHigherThan(int threshold) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int b;
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
@@ -2622,7 +2622,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation thresholdGrayClearLowerThan(int threshold, int back) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int b;
 		int idx = 0;
 		for (int c : res) {
@@ -2639,7 +2639,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation thresholdLabBrightnessClearLowerThan(int threshold, int back) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int idx = 0;
 		for (int c : res) {
 			if (c == back) {
@@ -2661,7 +2661,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int b;
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
@@ -2694,7 +2694,7 @@ public class ImageOperation {
 	 * If a pixel value (only RGB-Blue!) is below the threshold, the background color is applied, otherwise the foreground color.
 	 */
 	public ImageOperation threshold(int threshold, int background, int foreground) {
-		int[] pixels = getImageAs1array();
+		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -2762,7 +2762,7 @@ public class ImageOperation {
 	
 	public MainAxisCalculationResult calculateTopMainAxis(Vector2d centroid, int step, int background) {
 		
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		
 		DistanceSumAndPixelCount minResult = new DistanceSumAndPixelCount(java.lang.Double.MAX_VALUE, 0);
 		
@@ -2818,7 +2818,7 @@ public class ImageOperation {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] image2d = getImageAs2array();
+		int[][] image2d = getImageAs2dArray();
 		
 		int black = backgroundColor;
 		
@@ -2865,7 +2865,7 @@ public class ImageOperation {
 	
 	public ImageOperation getOriginalImageFromMask(FlexibleImage imageInput, int background) {
 		int[] originalArray = imageInput.getAs1A();
-		int[] resultMask = getImageAs1array();
+		int[] resultMask = getImageAs1dArray();
 		int w = imageInput.getWidth();
 		int h = imageInput.getHeight();
 		int idx = 0;
@@ -2902,7 +2902,7 @@ public class ImageOperation {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] img2d = getImageAs2array();
+		int[][] img2d = getImageAs2dArray();
 		int nw = width + (2 * bordersize);
 		int nh = height + (2 * bordersize);
 		int[][] result = new int[nw][nh];
@@ -2934,7 +2934,7 @@ public class ImageOperation {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] img2d = getImageAs2array();
+		int[][] img2d = getImageAs2dArray();
 		int nw = width + (2 * bordersizeSides);
 		int nh = height + (2 * borderSizeTopBottom);
 		int[][] result = new int[nw][nh];
@@ -2968,7 +2968,7 @@ public class ImageOperation {
 	 * @return top, bottom, left, right
 	 */
 	public TopBottomLeftRight getExtremePoints(int background) {
-		int[] img1d = getImageAs1array();
+		int[] img1d = getImageAs1dArray();
 		
 		int top = Integer.MAX_VALUE;
 		int bottom = 0;
@@ -3023,7 +3023,7 @@ public class ImageOperation {
 	public int countFilledPixels(int back) {
 		int res = 0;
 		int background = back;
-		int[] img1d = getImageAs1array();
+		int[] img1d = getImageAs1dArray();
 		
 		for (int c : img1d) {
 			if (c != background)
@@ -3048,11 +3048,11 @@ public class ImageOperation {
 			ArrayList<java.lang.Double> optValues) {
 		double res = 0;
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		
 		int[] grayScaledIfNeeded;
 		if (performGrayScale)
-			grayScaledIfNeeded = grayscale().getImageAs1array();
+			grayScaledIfNeeded = grayscale().getImageAs1dArray();
 		else
 			grayScaledIfNeeded = img2d;
 		
@@ -3105,7 +3105,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageLeft(double cutoff, int background) {
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int threshold = (int) cutoff;
@@ -3122,7 +3122,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageRight(double threshold, int background) {
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int y = 0; y < image.getHeight(); y++) {
@@ -3137,7 +3137,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageAbove(double threshold, int background) {
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int end = w * (int) threshold;
 		int idx = 0;
@@ -3148,7 +3148,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation clearImageBottom(int threshold, int background) {
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int y = threshold; y < h; y++) {
@@ -3165,7 +3165,7 @@ public class ImageOperation {
 	 * lines may be specified using the parameter bb.
 	 */
 	public ImageOperation border(int bb) {
-		int[] in = getImageAs1array();
+		int[] in = getImageAs1dArray();
 		
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
@@ -3195,7 +3195,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation border_left_right(int bb, int color) {
-		int[] in = getImageAs1array();
+		int[] in = getImageAs1dArray();
 		
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
@@ -3231,7 +3231,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factorsTop, double[] factorsBottom) {
-		int[][] img2d = getImageAs2array();
+		int[][] img2d = getImageAs2dArray();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		double rf, gf, bf;
@@ -3270,7 +3270,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factors) {
-		int[] img2d = getImageAs1array();
+		int[] img2d = getImageAs1dArray();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		double rf, gf, bf;
@@ -3343,7 +3343,7 @@ public class ImageOperation {
 		int imgw = getImage().getWidth();
 		int imgh = getImage().getHeight();
 		
-		int[][] img2d = getImageAs2array();
+		int[][] img2d = getImageAs2dArray();
 		float[] p;
 		if (LThresh < 0) {
 			ArrayList<Float> lArray = new ArrayList<Float>();
@@ -3508,6 +3508,16 @@ public class ImageOperation {
 		return res;
 	}
 	
+	public ImageOperation imageBalancing(int brightness, double[] rgbInfoLEFT, double[] rgbInfoRIGHT) {
+		ImageOperation left = copy().imageBalancing(brightness, rgbInfoLEFT);
+		ImageOperation right = copy().imageBalancing(brightness, rgbInfoRIGHT);
+		int pixL[][] = left.getImageAs2dArray();
+		int pixR[][] = left.getImageAs2dArray();
+		int w = getWidth();
+		int h = getHeight();
+		return null;
+	}
+	
 	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d) {
 		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
 		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
@@ -3519,7 +3529,7 @@ public class ImageOperation {
 	 * @return A gray image composed from the R channel.
 	 */
 	public ImageOperation getR() {
-		int[] img = copy().getImageAs1array();
+		int[] img = copy().getImageAs1dArray();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3539,7 +3549,7 @@ public class ImageOperation {
 	 * @return A gray image composed from the G channel.
 	 */
 	public ImageOperation getG() {
-		int[] img = copy().getImageAs1array();
+		int[] img = copy().getImageAs1dArray();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3559,7 +3569,7 @@ public class ImageOperation {
 	 * @return A gray image composed from the B channel.
 	 */
 	public ImageOperation getB() {
-		int[] img = copy().getImageAs1array();
+		int[] img = copy().getImageAs1dArray();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3576,7 +3586,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d) {
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		int w = img.length;
 		int h = img[0].length;
 		int cx = w / 2;
@@ -3640,7 +3650,7 @@ public class ImageOperation {
 	}
 	
 	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		int w = img.length;
 		int h = img[0].length;
 		int cx = w / 2;
@@ -3677,7 +3687,7 @@ public class ImageOperation {
 	}
 	
 	private ImageOperation multiplyHSV(double hf, double sf, double vf) {
-		int[] image = getImageAs1array();
+		int[] image = getImageAs1dArray();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		float[] hsbvals = new float[3];
@@ -3784,7 +3794,7 @@ public class ImageOperation {
 	public ImageOperation subtractGrayImages(FlexibleImage image2) {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
-		int[] img1 = getImageAs1array();
+		int[] img1 = getImageAs1dArray();
 		int[] img2 = image2.getAs1A();
 		int[] res = new int[img1.length];
 		
@@ -3810,7 +3820,7 @@ public class ImageOperation {
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
 		int w = image.getWidth();
 		int h = image.getHeight();
-		int[][] img2a = getImageAs2array();
+		int[][] img2a = getImageAs2dArray();
 		int[][] res = img2a;
 		
 		for (int x = (int) (w * factorW); x < w - (w * factorW); x++) {
@@ -3863,7 +3873,7 @@ public class ImageOperation {
 	 */
 	private double getLabAverage(int x, int y, int colorMode) {
 		double average = 0;
-		int[] img2a = getImageAs1array();
+		int[] img2a = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		if (x > 1 && y > 1 && x < w - 1 && y < h - 1) {
@@ -3923,7 +3933,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation dilateHorizontal(int maskWidth) {
-		int[] img = getImageAs1array();
+		int[] img = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[] out = new int[img.length];
@@ -3959,7 +3969,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation drawSkeleton2(FlexibleImage image2, int size, boolean doItReally) {
-		int[][] res = getImageAs2array();
+		int[][] res = getImageAs2dArray();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -4007,7 +4017,7 @@ public class ImageOperation {
 	 */
 	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
-		int[][] img = getImageAs2array();
+		int[][] img = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] out = new int[w][h];
@@ -4081,7 +4091,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation removePixel(FlexibleImage inp, int background) {
-		int[] img = getImageAs1array();
+		int[] img = getImageAs1dArray();
 		int[] mask = inp.getAs1A();
 		int[] res = new int[img.length];
 		
@@ -4102,7 +4112,7 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation removePixel(FlexibleImage inp, int background, int l, int a, int b) {
-		int[] img = getImageAs1array();
+		int[] img = getImageAs1dArray();
 		int[] mask = inp.getAs1A();
 		int width = inp.getWidth();
 		int lenght = img.length;
@@ -4164,7 +4174,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation binary() {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int i = 0;
 		for (int c : res)
 			res[i++] = c != BACKGROUND_COLORint ? 1 : 0;
@@ -4172,7 +4182,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation binary(int foreground, int background) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int i = 0;
 		for (int c : res)
 			res[i++] = c != BACKGROUND_COLORint ? foreground : background;
@@ -4185,7 +4195,7 @@ public class ImageOperation {
 	public ImageOperation or(FlexibleImage b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2array();
+		int[][] aa = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.resize(w, h).getAs2A();
@@ -4207,7 +4217,7 @@ public class ImageOperation {
 	public ImageOperation crossfade(FlexibleImage b, double progress) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2array();
+		int[][] aa = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.getAs2A();
@@ -4235,7 +4245,7 @@ public class ImageOperation {
 	public ImageOperation and(FlexibleImage b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2array();
+		int[][] aa = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.resize(w, h).getAs2A();
@@ -4255,7 +4265,7 @@ public class ImageOperation {
 	public ImageOperation xor(FlexibleImage b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2array();
+		int[][] aa = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.resize(w, h).getAs2A();
@@ -4274,7 +4284,7 @@ public class ImageOperation {
 		float[][] lab = getImage().getLab(true);
 		int w = getWidth();
 		int h = getHeight();
-		int[] in = getImageAs1array();
+		int[] in = getImageAs1dArray();
 		int res[] = new int[w * h];
 		for (int i = 0; i < w * h; i++) {
 			float l = lab[0][i];
@@ -4319,7 +4329,7 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation filterRGB(int rMax, int gMax, int bMax) {
-		int[] res = getImageAs1array();
+		int[] res = getImageAs1dArray();
 		int r, g, b;
 		for (int i = 0; i < res.length; i++) {
 			r = ((res[i] & 0xff0000) >> 16);
@@ -4342,8 +4352,13 @@ public class ImageOperation {
 		return this;
 	}
 	
+	public ImageOperation flipHor() {
+		image.getProcessor().flipHorizontal();
+		return this;
+	}
+	
 	public ImageOperation clearOutsideCircle(int cx, int cy, int radius) {
-		int[][] res = getImageAs2array();
+		int[][] res = getImageAs2dArray();
 		int w = getWidth();
 		int h = getHeight();
 		int rsq = radius * radius;
@@ -4455,7 +4470,7 @@ public class ImageOperation {
 	 * @author Christian Klukas
 	 */
 	public ImageOperation rotate90() {
-		int[][] in = getImageAs2array();
+		int[][] in = getImageAs2dArray();
 		int w = getWidth();
 		int h = getHeight();
 		int[][] res = new int[h][w];
@@ -4544,7 +4559,7 @@ public class ImageOperation {
 	 * @return horizontal stripe of an image (pixels below or above the current region are cleared).
 	 */
 	public ImageOperation getBottom(int idx, int parts) {
-		int[][] pix = getImageAs2array();
+		int[][] pix = getImageAs2dArray();
 		int pixels = countFilledPixels();
 		int from = (idx * pixels) / parts;
 		int to = from + pixels / parts;
@@ -4573,7 +4588,7 @@ public class ImageOperation {
 	public ImageOperation getInnerCircle(int idx, int parts) {
 		// make list of foreground pixels and their distances to the center
 		ArrayList<DoublePixel> distances = new ArrayList<DoublePixel>();
-		int[][] pix = getImageAs2array();
+		int[][] pix = getImageAs2dArray();
 		double cx = getWidth() / 2d;
 		double cy = getHeight() / 2d;
 		for (int x = 0; x < getWidth(); x++) {
@@ -4608,5 +4623,41 @@ public class ImageOperation {
 	
 	private static double getDistancePlantToCenter(double x, double y, double cx, double cy) {
 		return Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+	}
+	
+	public ImageOperation adjustPixelValues(PixelProcessor pixelProcessor) {
+		if (pixelProcessor == null)
+			return this;
+		else {
+			int[][] pix = getImageAs2dArray();
+			int w = getWidth();
+			int h = getHeight();
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int rgb = pix[x][y];
+					if (rgb != BACKGROUND_COLORint) {
+						pix[x][y] = pixelProcessor.processPixelForegroundValue(x, y, rgb, w, h);
+					}
+				}
+			}
+			return new ImageOperation(pix);
+		}
+	}
+	
+	public ImageOperation mirrorLeftToRight() {
+		final int pix[][] = getImageAs2dArray();
+		return adjustPixelValues(new PixelProcessor() {
+			@Override
+			public int processPixelForegroundValue(int x, int y, int rgb, int w, int h) {
+				if (x > w / 2) {
+					// 0 1 2 3 4 5 6 7
+					// ==>
+					// 0 1 2 3 3 2 1 0
+					// w- x
+					return pix[w - x][y];
+				} else
+					return rgb;
+			}
+		});
 	}
 }

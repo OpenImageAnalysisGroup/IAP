@@ -43,7 +43,7 @@ public class ConvexHullCalculator {
 	}
 	
 	private void calculate(int borderColor) {
-		int[][] in = io.getImageAs2array();
+		int[][] in = io.getImageAs2dArray();
 		
 		int w = io.getImage().getWidth();
 		int h = io.getImage().getHeight();
@@ -133,7 +133,7 @@ public class ConvexHullCalculator {
 		if (drawInputimage) {
 			ImageOperation inDrawing = customImage != null ? customImage.io() : io;
 			// FlexibleImage border = new FlexibleImage(borderImage).copy();
-			overDrawBorderImage(w, h, inDrawing.getImageAs2array(), borderImage,
+			overDrawBorderImage(w, h, inDrawing.getImageAs2dArray(), borderImage,
 					borderColor, drawBorder);
 		}
 		Point centroid = null;

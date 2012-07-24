@@ -38,7 +38,7 @@ public class BorderImageOperation {
 	 * @author klukas
 	 */
 	public ImageOperation borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders) {
-		int[][] in = new ImageOperation(image, rt).getImageAs2array();
+		int[][] in = new ImageOperation(image, rt).getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] out = new int[w][h];
@@ -185,7 +185,7 @@ public class BorderImageOperation {
 	 */
 	public ImageOperation floodFillFromOutside(int background, int fill) {
 		
-		int[][] out = new ImageOperation(image, rt).getImageAs2array();
+		int[][] out = new ImageOperation(image, rt).getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int filled = 0;
