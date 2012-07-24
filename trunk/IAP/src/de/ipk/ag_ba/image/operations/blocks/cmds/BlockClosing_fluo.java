@@ -58,7 +58,7 @@ public class BlockClosing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			op.closing();
 			cnt++;
 		} while (cnt < closingRepeat);
-		image = op.getImageAs2array();
+		image = op.getImageAs2dArray();
 		int[][] mask = image;
 		
 		for (int x = 0; x < w; x++) {

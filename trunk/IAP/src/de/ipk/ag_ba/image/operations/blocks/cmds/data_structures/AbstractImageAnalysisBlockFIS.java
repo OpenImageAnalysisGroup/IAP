@@ -122,6 +122,31 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// empty
 	}
 	
+	protected String getRemarkSetting(String remarkID, String defaultReturn) {
+		ImageData info = input() != null && input.images() != null ? input().images().getVisInfo() : null;
+		if (info == null)
+			info = input() != null && input.images() != null ? input().images().getFluoInfo() : null;
+		if (info == null)
+			info = input() != null && input.images() != null ? input().images().getNirInfo() : null;
+		if (info == null)
+			return defaultReturn;
+		else {
+			try {
+				String rem = info.getParentSample().getParentCondition().getExperimentHeader().getRemark();
+				for (String r : rem.split("//")) {
+					r = r.trim();
+					if (r.startsWith(remarkID) && r.contains(":"))
+						return r.split(":", 2)[1].trim();
+				}
+				return defaultReturn;
+			} catch (Exception e) {
+				System.err.println(SystemAnalysis.getCurrentTime() + ">Error processing remark information:");
+				e.printStackTrace();
+				return defaultReturn;
+			}
+		}
+	}
+	
 	protected void calculateRelativeValues(TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, int blockPosition,

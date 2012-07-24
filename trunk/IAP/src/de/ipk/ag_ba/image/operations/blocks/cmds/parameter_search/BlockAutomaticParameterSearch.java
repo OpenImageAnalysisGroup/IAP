@@ -426,7 +426,7 @@ public abstract class BlockAutomaticParameterSearch extends AbstractImageAnalysi
 			
 			return o.getUnknownMeasurementValuePixels(correctionForDeletedArea);
 		} else {
-			optUseSingleMaskOperationObject.mergeMasks(visMaskImage.getAs1A(), io.getImageAs1array(), null,
+			optUseSingleMaskOperationObject.mergeMasks(visMaskImage.getAs1A(), io.getImageAs1dArray(), null,
 					visMaskImage.getWidth(),
 					visMaskImage.getHeight());
 			return optUseSingleMaskOperationObject.getUnknownMeasurementValuePixels(correctionForDeletedArea);
