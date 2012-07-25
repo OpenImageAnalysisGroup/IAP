@@ -1,16 +1,17 @@
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.server.task_management.MassCopySupport;
 
-final class ActionMassCopyHistory extends AbstractNavigationAction {
+public final class ActionMassCopyHistory extends AbstractNavigationAction {
 	private NavigationButton src;
 	
-	ActionMassCopyHistory(String tooltip) {
+	public ActionMassCopyHistory(String tooltip) {
 		super(tooltip);
 	}
 	

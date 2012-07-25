@@ -5,7 +5,7 @@
  * Created on Aug 18, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
@@ -13,6 +13,11 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionTrash;
+import de.ipk.ag_ba.commands.DeletionCommand;
+import de.ipk.ag_ba.commands.ExperimentHistoryNavigationAction;
+import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;

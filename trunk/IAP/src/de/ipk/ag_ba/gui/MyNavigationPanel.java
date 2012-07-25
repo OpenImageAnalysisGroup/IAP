@@ -39,8 +39,8 @@ import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 
-import de.ipk.ag_ba.commands.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.commands.BookmarkAction;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;

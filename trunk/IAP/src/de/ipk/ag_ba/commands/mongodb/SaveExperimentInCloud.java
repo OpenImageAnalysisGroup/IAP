@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ import org.OpenFileDialogService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -47,7 +48,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	private MongoDB m;
 	
-	SaveExperimentInCloud(boolean storeInMongo) {
+	public SaveExperimentInCloud(boolean storeInMongo) {
 		super("Upload data set to the IAP Systems Biology Cloud database service");
 		this.storeInMongo = storeInMongo;
 	}

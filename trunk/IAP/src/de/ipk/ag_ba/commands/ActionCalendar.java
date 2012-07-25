@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import org.ObjectRef;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.calendar.Calendar;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

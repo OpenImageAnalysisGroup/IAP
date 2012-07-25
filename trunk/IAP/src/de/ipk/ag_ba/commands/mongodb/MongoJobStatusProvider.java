@@ -5,7 +5,7 @@
  * Created on Dec 5, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
