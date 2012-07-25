@@ -18,6 +18,8 @@ import java.util.TreeMap;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import com.mongodb.BasicDBObject;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionDomainLogout;
 import de.ipk.ag_ba.commands.ActionTrash;
@@ -89,6 +91,11 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (!SystemAnalysis.isHeadless()) {
 					res.add(new NavigationButton(new ActionMongoDatabaseManagement(
 							"Database Mangement", m, experimentList), src.getGUIsetting()));
+				} else {
+					res.add(new NavigationButton(new ActionMongoDatabaseServerStatus(
+							"Show server status information", m, "serverStatus", "Server Status"), src.getGUIsetting()));
+					res.add(new NavigationButton(new ActionMongoDatabaseServerStatus(
+							"Show database statistics", m, new BasicDBObject("dbstats", 1), "Database Statistics"), src.getGUIsetting()));
 				}
 				
 				SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
