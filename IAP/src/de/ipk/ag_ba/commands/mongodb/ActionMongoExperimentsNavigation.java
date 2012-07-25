@@ -19,10 +19,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
-import de.ipk.ag_ba.commands.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.ActionDomainLogout;
-import de.ipk.ag_ba.commands.ActionFolder;
 import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.AddNewsAction;
 import de.ipk.ag_ba.commands.DeletionCommand;
@@ -90,16 +87,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (!SystemAnalysis.isHeadless())
 					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 				if (!SystemAnalysis.isHeadless()) {
-					res.add(new NavigationButton(new ActionFolder(
-							"Database Management",
-							"Database Management",
-							new NavigationAction[] {
-									new ActionAnalyzeAllExperiments(m, experimentList),
-									new ActionMongoDbReorganize(m),
-									new ActionMongoDbCompact(m),
-									new ActionDeleteHistoryOfAllExperiments(m)
-							},
-							src.getGUIsetting()), src.getGUIsetting()));
+					res.add(new NavigationButton(new ActionMongoDatabaseManagement(
+							"Database Mangement", m, experimentList), src.getGUIsetting()));
 				}
 				
 				SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
