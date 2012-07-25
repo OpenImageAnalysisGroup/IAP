@@ -39,6 +39,14 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 	
 	@Override
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		res.addAll(currentSet);
+		res.add(new NavigationButton(srcAction, guiSetting));
+		return res;
+	}
+	
+	@Override
 	public boolean requestTitleUpdates() {
 		return false;
 	}
