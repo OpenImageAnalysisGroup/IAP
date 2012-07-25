@@ -4,10 +4,12 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ParameterOptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

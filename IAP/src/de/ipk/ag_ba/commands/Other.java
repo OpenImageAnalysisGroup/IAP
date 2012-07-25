@@ -23,6 +23,7 @@ import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamBarleyGH;
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamMaizeGH;
+import de.ipk.ag_ba.commands.mongodb.ActionMassCopyHistory;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

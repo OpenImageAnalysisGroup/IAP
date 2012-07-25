@@ -6,12 +6,12 @@ import org.SettingsHelperDefaultIsFalse;
 import org.SettingsHelperDefaultIsTrue;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.ActionDataExport;
 import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.commands.hsm.ActionDataUdpBroadcast;
+import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;

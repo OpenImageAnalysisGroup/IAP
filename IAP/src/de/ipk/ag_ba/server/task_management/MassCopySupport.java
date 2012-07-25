@@ -19,7 +19,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.ActionCopyToMongo;
+import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;

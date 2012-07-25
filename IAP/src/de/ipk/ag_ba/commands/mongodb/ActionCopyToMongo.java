@@ -5,7 +5,7 @@
  * Created on Aug 8, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import de.ipk.ag_ba.commands.analysis.AbstractExperimentAnalysisNavigation;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;

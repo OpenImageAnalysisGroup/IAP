@@ -5,7 +5,7 @@
  * Created on Aug 18, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,15 @@ import java.util.TreeMap;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
+import de.ipk.ag_ba.commands.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.ActionDomainLogout;
+import de.ipk.ag_ba.commands.ActionFolder;
+import de.ipk.ag_ba.commands.ActionTrash;
+import de.ipk.ag_ba.commands.AddNewsAction;
+import de.ipk.ag_ba.commands.DeletionCommand;
+import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.clima.ActionImportClimateData;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;

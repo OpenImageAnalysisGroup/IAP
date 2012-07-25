@@ -5,13 +5,14 @@
  * Created on Dec 5, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloudHost;
