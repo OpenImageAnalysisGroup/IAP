@@ -90,7 +90,6 @@ public class CloudComputingService {
 			return "Join Compute Cloud";
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		int l = "***************************************************".length();
 		System.out.println("***************************************************");

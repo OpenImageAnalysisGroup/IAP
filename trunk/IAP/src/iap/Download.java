@@ -18,11 +18,11 @@ public class Download {
 			}
 			bout.close();
 			in.close();
-			// return 0;
+			System.exit(0);
 		} catch (Exception e) {
 			System.out.println("Help: call as follows java -jar iap.jar http://server/url target.file.name");
 			e.printStackTrace();
-			// return 1;
+			System.exit(1);
 		}
 	}
 }
