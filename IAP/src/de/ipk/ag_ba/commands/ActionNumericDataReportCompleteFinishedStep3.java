@@ -299,17 +299,17 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (ratio) {
 				if (status != null)
 					status.setCurrentStatusText2("Calculate stress-ratio");
-				System.out.println("Substance-Count 0: "+experiment.size());
+				System.out.println("Substance-Count 0: " + experiment.size());
 				experiment = experiment.calc().ratioDataset(
-						new String[] { "norm", "sufficient", "control" }, 
+						new String[] { "norm", "sufficient", "control" },
 						cf, snFilter,
 						status);
-				System.out.println("Substance-Count 1: "+experiment.size());
+				System.out.println("Substance-Count 1: " + experiment.size());
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
-				System.out.println("Substance-Count 2: "+experiment.size());
+				System.out.println("Substance-Count 2: " + experiment.size());
 				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.average", "side.hull.pc2.norm");
-				System.out.println("Substance-Count 3: "+experiment.size());
+				System.out.println("Substance-Count 3: " + experiment.size());
 				if (status != null)
 					status.setCurrentStatusText2("Stress model calculated");
 			}
@@ -451,18 +451,23 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			
 			if (!xlsx)
 				p.saveScripts(new String[] {
-						"inc.R",
 						"createDiagrams.R",
 						"calcClusters.R",
 						"diagramIAP.cmd",
 						"diagramIAP.bat",
-						"report.tex",
+						// "report.tex",
+						"reportCluster.tex",
+						"reportDefGeneralSection.tex",
+						"reportDefHead.tex",
+						"reportFooter.tex",
 						"HSV_Farbtonskala.png",
 						"linearPlotList.R",
 						"violinPlotList.R",
 						"stackedPlotList.R",
 						"boxPlotList.R",
-						"spiderPlotList.R"
+						"spiderPlotList.R",
+						"linerangePlotList.R",
+						"sectionMapping.R"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {

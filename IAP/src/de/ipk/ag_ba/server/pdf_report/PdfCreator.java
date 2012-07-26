@@ -87,7 +87,7 @@ public class PdfCreator {
 	public void executeRstat(final String[] parameter, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
 		this.lastOutput = lastOutput;
-		readAndModifyLaTexFile("report.tex", exp);
+		readAndModifyLaTexFile("reportDefGeneralSection.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
 		if (AttributeHelper.windowsRunning())
