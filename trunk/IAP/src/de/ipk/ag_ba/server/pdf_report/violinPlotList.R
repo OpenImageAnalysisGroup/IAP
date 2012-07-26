@@ -2,54 +2,58 @@
 # 
 # Author: Entzian
 ###############################################################################
+### section start with: 40
 
 violinOptions= NULL
 
-violin.plot.list <- list(
-		"side.height.norm (mm)" = "height (zoom corrected)",
-		"side.width.norm (mm)" = "width (zoom corrected)",
-		"side.area.norm (mm^2)" = "side area (zoom corrected)",
-		"top.area.norm (mm^2)" = "top area (zoom corrected)",
-		"side.fluo.intensity.average (relative)" = "side fluo intensity",
-		"side.nir.intensity.average (relative)" = "side nir intensity",
-		"side.vis.hue.average" = "side visible hue average value",
-		"top.vis.hue.average" = "top visible hue average value",
-		"top.ir.intensity.average" = "top ir intensity",
-		"side.ir.intensity.average" = "side ir intensity",
-		"top.nir.intensity.average (relative / pix)" = "top nir intensity",
-		"top.fluo.intensity.average (relative / pix)" = "top fluo intensity"
-
+violinPlotList <- list(
+		"side.height.norm (mm)" = list(
+									plotName = "height (zoom corrected)", 
+									section = 40,
+									subsection = 1),
+		"side.width.norm (mm)" = list(
+									plotName = "width (zoom corrected)", 
+									section = 40,
+									subsection = 1),
+		"side.area.norm (mm^2)" = list(
+									plotName = "side area (zoom corrected)", 
+									section = 40,
+									subsection = 1),
+		"top.area.norm (mm^2)" = list(
+									plotName = "top area (zoom corrected)", 
+									section = 40,
+									subsection = 1),
+		"side.fluo.intensity.average (relative)" = list(
+														plotName = "side fluo intensity", 
+														section = 40,
+														subsection = 1),
+		"side.nir.intensity.average (relative)" = list(
+													plotName = "side nir intensity", 
+													section = 40,
+													subsection = 1),
+		"side.vis.hue.average" = list(
+									plotName = "side visible hue average value", 
+									section = 40,
+									subsection = 1),
+		"top.vis.hue.average" = list(
+									plotName = "top visible hue average value", 
+									section = 40,
+									subsection = 1),
+		"top.ir.intensity.average" = list(
+										plotName = "top ir intensity", 
+										section = 40,
+										subsection = 1),
+		"side.ir.intensity.average" = list(
+										plotName = "side ir intensity", 
+										section = 40,
+										subsection = 1),
+		"top.nir.intensity.average (relative / pix)" = list(
+															plotName = "top nir intensity", 
+															section = 40,
+															subsection = 1),
+		"top.fluo.intensity.average (relative / pix)" = list(
+															plotName = "top fluo intensity", 
+															section = 40,
+															subsection = 1)
 )	
-#
-#descriptorSet_violinBox = c(
-#		"side.height.norm (mm)",
-#		"side.width.norm (mm)",
-#		"side.area.norm (mm^2)",
-#		"top.area.norm (mm^2)",
-#		"side.fluo.intensity.average (relative)",
-#		"side.nir.intensity.average (relative)",
-#		"side.vis.hue.average",
-#		"top.vis.hue.average",
-#		"top.ir.intensity.average",
-#		"side.ir.intensity.average",
-#		"top.nir.intensity.average (relative / pix)",
-#		"top.fluo.intensity.average (relative / pix)"
-#
-#)	
-#
-#descriptorSetName_violinBox = c(
-#		"height (zoom corrected)",
-#		"width (zoom corrected)",
-#		"side area (zoom corrected)",
-#		"top area (zoom corrected)",
-#		"side fluo intensity",
-#		"side nir intensity",
-#		"side visible hue average value",
-#		"top visible hue average value",
-#		"top ir intensity",
-#		"side ir intensity",
-#		"top nir intensity",
-#		"top fluo intensity"
-#)	
-#
-#violinOptions= NULL
+
