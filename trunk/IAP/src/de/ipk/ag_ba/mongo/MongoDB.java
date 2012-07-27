@@ -1848,7 +1848,7 @@ public class MongoDB {
 								}
 							}
 						}
-						while (addCnt < maxTasks) {
+						if (addCnt < maxTasks) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
@@ -1864,7 +1864,7 @@ public class MongoDB {
 								}
 							}
 						}
-						while (addCnt < maxTasks) {
+						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
 								for (DBObject dbo : collection.find(sm).sort(
 										new BasicDBObject("submission", 1))) {
