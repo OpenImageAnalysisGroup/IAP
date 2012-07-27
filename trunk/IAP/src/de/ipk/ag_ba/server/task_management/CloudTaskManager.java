@@ -227,8 +227,8 @@ public class CloudTaskManager {
 				Thread.sleep(1000);
 				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
-						System.out.println(SystemAnalysis.getCurrentTime() + "> Cluster Execution Mode is active // NO RUNNING TASK");
-						System.out.println(SystemAnalysis.getCurrentTime() + "> SYSTEM.EXIT");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 						System.exit(0);
 					}
 				} // else
