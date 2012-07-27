@@ -416,6 +416,7 @@ public class MongoDB {
 			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
 		for (ExperimentHeaderInterface ehi : getExperimentList(null)) {
+			// preserve outlier info (add values, available at destination)
 			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
 					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
 				if (ehi.getGlobalOutlierInfo() != null && !ehi.getGlobalOutlierInfo().isEmpty()) {
@@ -424,6 +425,30 @@ public class MongoDB {
 							ehi.getGlobalOutlierInfo(),
 							"//");
 					experiment.getHeader().setGlobalOutlierInfo(outliers);
+				}
+				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
+			}
+			// preserve sequence/stress info (add values, available at destination)
+			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
+					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				if (ehi.getSequence() != null && !ehi.getSequence().isEmpty()) {
+					String sequence = StringManipulationTools.getMergedStringItems(
+							experiment.getHeader().getSequence(),
+							ehi.getSequence(),
+							"//");
+					experiment.getHeader().setSequence(sequence);
+				}
+				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
+			}
+			// preserve remark info (add values, available at destination)
+			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
+					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				if (ehi.getRemark() != null && !ehi.getRemark().isEmpty()) {
+					String remark = StringManipulationTools.getMergedStringItems(
+							experiment.getHeader().getRemark(),
+							ehi.getRemark(),
+							"//");
+					experiment.getHeader().setRemark(remark);
 				}
 				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
 			}
