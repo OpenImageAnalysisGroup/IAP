@@ -49,6 +49,11 @@ THIRD.SECTION <- "subsubsection"
 FOURTH.SECTION <- "paragraph"
 APPENDIX.SECTION <- "appendix"
 
+DIRECTORY.SECTION <- "section"
+DIRECTORY.PLOTS <- "plots"
+DIRECTORY.PLOTSTEX <- "plotTex"
+DIRECTORY.SEPARATOR <- "/"
+
 ## fileName Pattern
 PRE.AND.POST.VALUE <- "_"
 SECTION.TEX <- paste(PRE.AND.POST.VALUE, "sec", PRE.AND.POST.VALUE, sep="")
@@ -80,7 +85,7 @@ START.TYP.REPORT <- "report"
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- FALSE
+calculateOnlyNBox <- TRUE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
@@ -1627,13 +1632,17 @@ trimSectionSeparator <-  function(string) {
 	return("")
 }
 
-buildSectionString <-  function(sectionList, imagesIndex) {
+buildSectionString <-  function(sectionList, imagesIndex, appendix) {
 	#sectionList <- overallList$nBoxSection
-	sectionVector <- vector()
-	for(nn in sectionList) {
-		sectionVector <- paste(sectionVector, nn[as.numeric(imagesIndex)], sep = SECTION.SEPARATOR)
+	if(appendix) {
+		return(APPENDIX.SECTION)
+	} else {
+		sectionVector <- vector()
+		for(nn in sectionList) {
+			sectionVector <- paste(sectionVector, nn[as.numeric(imagesIndex)], sep = SECTION.SEPARATOR)
+		}
+		return(trimSectionSeparator(sectionVector))
 	}
-	return(trimSectionSeparator(sectionVector))
 }
 
 firstLetterBig <- function(string) {
@@ -1669,13 +1678,14 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 #	}
 	
 	if(fileNameImageFile == "") {
-		latexText <- paste(latexText, "\\loadTex{", fileNameLatexFile, sep="")
+		latexText <- paste(latexText, "\\loadTex{", DIRECTORY.PLOTSTEX, DIRECTORY.SEPARATOR, fileNameLatexFile, sep="")
 	} else {
-		latexText <- paste(latexText, "\\loadImage{", fileNameImageFile, sep="")
+		latexText <- paste(latexText, "\\loadImage{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, fileNameImageFile, sep="")
 	}
 	
 	latexText = paste(latexText, ".", saveFormatImage, "}", sep="")
 
+	fileNameLatexFile <- paste(DIRECTORY.PLOTSTEX, fileNameLatexFile, sep=DIRECTORY.SEPARATOR)
 	write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
 }
 
@@ -1740,9 +1750,9 @@ writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, colu
 #						"\\end{tabular}", sep=" ")
 						"\\end{longtable}", sep=" ")
 	}
-	
+
 	if (latexText != "") {
-		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, "tex", sep="."))
+		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
 	}	
 }
 
@@ -1783,8 +1793,9 @@ getConstance <- function(sectionTyp, typ) {
 	return(NONE)
 }
 
-writeLatexFinalFile <- function(latexTex, fileName) {
-	write(x=latexText, append=TRUE, file=paste(fileName, TEX, sep="."))
+writeLatexFinalFile <- function(latexText, fileName) {
+	#fileName <- paste("tex",fileName, sep="/")
+	write(x=latexText, append=FALSE, file=paste(fileName, TEX, sep="."))
 }
 
 
@@ -1792,12 +1803,11 @@ writeLatexSectionFile <- function(latexText, sectionTyp, sectionID, debug = FALS
 	debug %debug% "writeLatexSectionFile()"
 
 	const <- getConstance(sectionTyp, OVERALL.FILENAME.TEX)
-	print(sectionTyp)
-	print(sectionID)
 	newSection <- checkValue(sectionMappingList[[sectionTyp]], sectionID, NEW.SECTION, NONE, TRUE)
 	newSection <- paste(NEW.SECTION.TEX, newSection, sep="")
 	
 	fileName <- paste(const, sectionID, newSection, sep="")
+	fileName <- paste(DIRECTORY.SECTION, fileName, sep=DIRECTORY.SEPARATOR)
 	write(x=latexText, append=TRUE, file=paste(fileName, TEX, sep="."))
 }
 
@@ -1807,18 +1817,20 @@ setReset <- function(latexText, tabText="") {
 }
 
 
-getBooleanVectorForWholeSection <- function(sectionMatrix, sectionIDVector, identicalMatrix, debug) {
+getBooleanVectorForWholeSection <- function(sectionMatrix, sectionID, identicalMatrix, debug) {
 #########
 #sectionIDVector <- c(sectionID, list(additionalSection))
 #identicalMatrix <- identicalMatrixSection
 #sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
 #identicalMatrix <- identicalMatrixSubSection
+#sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection))
+#identicalMatrix <- identicalMatrixSubSubSection	
 #########
 	debug %debug% "getBooleanVectorForWholeSection()"
 
 	#splitId <- unlist(str_split(sectionIDVector[[1]],POINT.PATTERN))
 	#booleanVectorForWholeSectionIni <- rep.int(FALSE, length(sectionMatrix[,1]))
-	addValues <- c(sectionIDVector[[1]], rownames(identicalMatrix)[as.vector(identicalMatrix[,sectionIDVector[[1]]])])	
+	addValues <- c(sectionID, rownames(identicalMatrix)[as.vector(identicalMatrix[,sectionID])])	
 	addValues <- str_split(addValues, POINT.PATTERN)
 	
 	booleanVec <- data.frame(rep.int(FALSE, length(sectionMatrix[,1])))
@@ -1844,10 +1856,10 @@ getBooleanVectorForWholeSection <- function(sectionMatrix, sectionIDVector, iden
 }
 
 
-
 setCheckFiles <- function(latexText, fileVector, tabText="") {
 	
 	for(file in fileVector) {
+		file <- paste(DIRECTORY.PLOTSTEX, file, sep=DIRECTORY.SEPARATOR)
 		latexText <- paste(latexText, tabText, "\\checkFileNoReset{", file ,"}{}{}", NEWLINE.TEX, sep="")
 	}
 	return(latexText)
@@ -1949,7 +1961,7 @@ checkValue <- function(sectionMappingListSectionTyp, position, whichValueShouldB
 }
 
 
-setAdditionInfos <- function(latexText, sectionTyp, sectionIDVector, tabText = "") {
+setAdditionInfos <- function(latexText, sectionTyp, sectionID, tabText = "") {
 ###########
 #sectionTyp <- THIRD.SECTION
 ###########
@@ -1964,10 +1976,10 @@ setAdditionInfos <- function(latexText, sectionTyp, sectionIDVector, tabText = "
 #		
 #	} else {
 		
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionIDVector[[1]], "typOfClear", CLEAR.PAGE.NO), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionIDVector[[1]], "typOfReset", RESET.PAGE.NO), tabText) 
-		latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList[[sectionTyp]], sectionIDVector[[1]], "title", paste(sectionTyp, sectionIDVector[[1]], sep=" ")), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionIDVector[[1]], "text", ""), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "typOfClear", CLEAR.PAGE.NO), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "typOfReset", RESET.PAGE.NO), tabText) 
+		latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList[[sectionTyp]], sectionID, "title", paste(sectionTyp, sectionID, sep=" ")), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "text", ""), tabText)
 	
 #	}
 	return(latexText)
@@ -1979,7 +1991,6 @@ setClosedBraces <- function(latexText, tabText) {
 
 
 setResetCheckAndIFPart <- function(latexText, fileVector, tabText = "") {
-	print(fileVector)
 	latexText <- setReset(latexText, tabText)
 	latexText <- setCheckFiles(latexText, fileVector, tabText)
 	latexText <- setIfThenElse(latexText, tabText)
@@ -1988,9 +1999,14 @@ setResetCheckAndIFPart <- function(latexText, fileVector, tabText = "") {
 }
 
 setLoadFile <- function(latexText, file, isTex = TRUE, tabText = "") {
+	
+	
+	
 	if(isTex) {
+		file <- paste(DIRECTORY.PLOTSTEX, file, sep=DIRECTORY.SEPARATOR)
 		latexText <- paste(latexText, tabText, "\\loadTex{", str_sub(file, 1, str_locate(file, TEX.PATTERN)[,"start"]-1), "}", NEWLINE.TEX, sep="")
 	} else {
+		file <- paste(DIRECTORY.PLOTS, file, sep=DIRECTORY.SEPARATOR)
 		latexText <- paste(latexText, tabText, "\\loadImage{", file, "}", NEWLINE.TEX, sep="")
 	}
 	
@@ -2037,16 +2053,11 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 #sectionTyp <- SECOND.SECTION
 #uniqueVector <- uniqueSubSectionVector
 ##########	
-	print(uniqueVector)
+
 	identicalMatrix <- matrix(FALSE,nrow=length(uniqueVector),ncol=length(uniqueVector), dimnames = list(uniqueVector, uniqueVector))
-	print(identicalMatrix)
-	#uniqueVector <- conectSectionIDVectorList(preIdVector, uniqueVector)
 	for(kk in uniqueVector) {
 #		sectionIDVector <- conectSectionIDVector(c(preSectionIDVector, kk))
-		print("index:")
-		print(kk)
 		identicalVector <- checkValue(sectionMappingList[[sectionTyp]], kk, NEW.SECTION, NONE)
-		print(identicalVector)
 
 		if(identicalVector != NONE) {	
 			newIdenticalVector <- identicalVector[!(identicalVector %in% colnames(identicalMatrix))]
@@ -2064,28 +2075,33 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 		}
 	}
 	
-#	for(nn in colnames(identicalMatrix)) {
-#		repeat {
-#			checkV <- rownames(identicalMatrix)[identicalMatrix[nn,]]
-#			for()
-#		}
-#		
-#		
-#		
-#		lengthCheck <- length(checkV)
-#		repeat{
-#			for(kk in checkV) {
-#				identicalMatrix[kk,nn] <- TRUE
-#			}
-#			if(lengthCheck > 1) {
-#				nn <- checkV[lengthCheck]
-#				lengthCheck <- lengthCheck-1
-#			} else {
-#				break
-#			}
-#		}
-#		
-#	}
+	checkVector <- vector()
+	goThroughVector <- vector()
+	allColumns <- colnames(identicalMatrix)
+		
+	repeat {
+		if(length(allColumns) > 0 ) {	
+			checkVector <- rownames(identicalMatrix)[identicalMatrix[,allColumns[1]]]
+			goThroughVector <- allColumns[1]
+			repeat {
+				if(length(checkVector) > 0) {
+					newValues <- rownames(identicalMatrix)[identicalMatrix[,checkVector[1]]]
+					goThroughVector <- c(goThroughVector, checkVector[1])
+					checkVector <- checkVector[checkVector!=checkVector[1]]
+					checkVector <- c(checkVector, newValues[!(newValues %in% goThroughVector) & !(newValues %in% checkVector)])
+				} else {
+					break
+				}
+			}
+			
+			for(kk in goThroughVector) {
+				identicalMatrix[goThroughVector[goThroughVector!=kk],kk] <- TRUE
+			}
+			allColumns <- allColumns[!(allColumns %in% goThroughVector)]
+		} else {
+			break
+		}	
+	}
 	
 	return(identicalMatrix)
 }
@@ -2119,8 +2135,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 			#print(paste("sectionID: ", sectionID, sep=""))
 			latexTextS <- ""
 			tabTextS <- ""
-			sectionIDVector <- c(sectionID, list(additionalSection))
-			booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionIDVector, identicalMatrixSection, debug)
+			#sectionIDVector <- c(sectionID, list(additionalSection))
+			booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionID, identicalMatrixSection, debug)
 			latexTextS <- setResetCheckAndIFPart(latexTextS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextS)
 			tabTextS <- increaseTabText(tabTextS)
 			latexTextS <- setAdditionInfos(latexTextS, FIRST.SECTION, sectionID, tabTextS)
@@ -2147,11 +2163,11 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 						#subsectionIDShort <- str_sub(subsectionID, 1, str_locate(subsectionID,"\\.")[,"start"]-1)
 						sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
 						#() hier was ändern
-						booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionIDVector, identicalMatrixSubSection, debug)
+						booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsectionID, identicalMatrixSubSection, debug)
 						
 						latexTextSS <- setResetCheckAndIFPart(latexTextSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSS)
 						tabTextSS <- increaseTabText(tabTextSS)
-						latexTextSS <- setAdditionInfos(latexTextSS, SECOND.SECTION, sectionIDVector, tabTextSS)
+						latexTextSS <- setAdditionInfos(latexTextSS, SECOND.SECTION, subsectionID, tabTextSS)
 						
 						if(sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 3]))) == 0) {
 							latexTextSS <- setLoadImageAndLoadTex(latexTextSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSS)
@@ -2169,19 +2185,13 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 									alreadyBeenProcessedSubSubSection <- c(alreadyBeenProcessedSubSubSection, additionalSubSubSection)
 									latexTextSSS <- ""
 									tabTextSSS <- ""
-									
-									
-									#print(paste("subsubsectionID: ", subsubsectionID, sep=""))
 									#sectionIDVector <- c(sectionID, subsectionIDShort, subsubsectionID)
 									
-									sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection))
-									booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionIDVector, identicalMatrixSubSubSection, debug)
-									#print("Hallo2")
+									#sectionIDVector <- c(subsubsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection))
+									booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsubsectionID, identicalMatrixSubSubSection, debug)
 									latexTextSSS <- setResetCheckAndIFPart(latexTextSSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSSS)
-									#print("Hallo3")
 									tabTextSSS <- increaseTabText(tabTextSSS)
-									#print("Hallo4")
-									latexTextSSS <- setAdditionInfos(latexTextSSS, THIRD.SECTION, sectionIDVector, tabTextSSS)
+									latexTextSSS <- setAdditionInfos(latexTextSSS, THIRD.SECTION, subsubsectionID, tabTextSSS)
 									
 									if(sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 4]))) == 0) {
 										latexTextSSS <- setLoadImageAndLoadTex(latexTextSSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSSS)
@@ -2191,7 +2201,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 										identicalMatrixParagraph <- makeIdenticalMatrix(FOURTH.SECTION, uniqueParagraphVector)
 										alreadyBeenProcessedParagraph <- vector()
 										
-										for(paragraphID in unique(sectionMatrix[booleanVectorForWholeSection, 4])) {
+										for(paragraphID in uniqueParagraphVector) {
 											debug %debug% paste("... paragraphID", paragraphID)
 											if(!checkIfNull(paragraphID) && !(paragraphID %in% alreadyBeenProcessedParagraph)) {
 												
@@ -2200,13 +2210,12 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 												latexTextP <- ""
 												tabTextP <- ""
 												
-												#print(paste("paragraphID: ", paragraphID, sep=""))
 												#sectionIDVector <- c(sectionID, subsectionIDShort, subsubsectionID, paragraphID)
-												sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection, additionalParagraph))
-												booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionIDVector, identicalMatrixParagraph, debug)
+												#sectionIDVector <- c(paragraphID, list(additionalSection, additionalSubSection, additionalSubSubSection, additionalParagraph))
+												booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, paragraphID, identicalMatrixParagraph, debug)
 												latexTextP <- setResetCheckAndIFPart(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
 												tabTextP <- increaseTabText(tabTextP)
-												latexTextP <- setAdditionInfos(latexTextP, FOURTH.SECTION, sectionIDVector, tabTextP)
+												latexTextP <- setAdditionInfos(latexTextP, FOURTH.SECTION, paragraphID, tabTextP)
 												latexTextP <- setLoadImageAndLoadTex(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
 												tabTextP <- reduceTabText(tabTextP)
 												latexTextP <- setClosedBraces(latexTextP, tabTextP)
@@ -2245,7 +2254,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 			latexTextS <- setClosedBraces(latexTextS, tabTextS)
 			
 			writeLatexSectionFile(latexTextS, FIRST.SECTION, sectionID, debug)
-		}		
+		}
 	}
 }
 
@@ -2259,17 +2268,26 @@ writeInclude <- function(latexText, tabText, sectionTyp, alreadyWrittenFiles, de
 	
 	
 	debug %debug% "writeInclude()"	
-	
-	fileNames <- getFileNames(path = ".", pattern = getConstance(sectionTyp, OVERALL.FILENAME.PATTERN), debug)
+		
+	fileNames <- getFileNames(path = paste(DIRECTORY.SECTION, "", sep=DIRECTORY.SEPARATOR), pattern = getConstance(sectionTyp, OVERALL.FILENAME.PATTERN), debug)
 	fileNames <- fileNames[!(fileNames %in% alreadyWrittenFiles)]
 	alreadyWrittenFiles <- c(alreadyWrittenFiles, fileNames)
-	print(fileNames)
+
 	if(!is.null(fileNames)) {
 		sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(NEW.SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2))
 		fileNames <- fileNames[order(as.numeric(sectionIDVector))]
-		fileNames <- str_sub(fileNames, 1, str_locate(fileNames, TEX.PATTERN)[,"start"]-1)
+		if(sectionTyp == FIRST.SECTION) {
+			fileNames <- str_sub(fileNames, 1, str_locate(fileNames, TEX.PATTERN)[,"start"]-1)
+		}
 		for(nn in fileNames) {
-			latexText <- includeFile(latexText, tabText, nn)
+			
+			
+			nn <- paste(DIRECTORY.SECTION,nn, sep=DIRECTORY.SEPARATOR)
+			if(sectionTyp == FIRST.SECTION) {
+				latexText <- includeFile(latexText, tabText, nn)
+			} else {
+				latexText <- inputFile(latexText, tabText, nn)
+			}
 		}
 	}
 	return(list(latexText= latexText, alreadyWrittenFiles = alreadyWrittenFiles))
@@ -2280,15 +2298,36 @@ includeFile <- function(latexText, tabText, file) {
 	return(paste(latexText, tabText, "\\include{", file, "}", NEWLINE.TEX, sep=""))
 }
 
+inputFile <- function(latexText, tabText, file) {
+	return(paste(latexText, tabText, "\\input{", file, "}", NEWLINE.TEX, sep=""))
+}
+
+includeAppendix <- function(buildAppendixTexPart, tabText, debug) {
+	debug %debug% "buildAppendixPart()"
+	
+	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, APPENDIX.SECTION,sep=""), debug)
+	if(length(fileName) > 0) {
+		setResetCheckAndIFPart(buildAppendixTexPart, fileName, tabText)
+		tabText <- increaseTabText(tabText)
+		buildAppendixTexPart <- setAdditionInfos(buildAppendixTexPart, FIRST.SECTION, APPENDIX.SECTION, tabText)
+		buildAppendixTexPart <- setLoadImageAndLoadTex(buildAppendixTexPart, fileName, tabText)
+		tabText <- reduceTabText(tabText)
+		buildAppendixTexPart <- setClosedBraces(buildAppendixTexPart, tabText)					
+	} else {
+		return(buildReportFileText)
+	}
+}
+
 writeReportFile <- function(tabText = "", debug = FALSE) {
 	debug %debug% "writeReportFile()"
 	
 	buildReportFileText <- includeFile("", tabText, "reportDefHead") 
 	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportDefGeneralSection")
 	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportCluster")
-	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, debug)
+	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug)$latexText
+	buildReportFileText <- includeAppendix(buildReportFileText, tabText, debug)
 	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportFooter")
-	writeLatexFinalFile(buildReportFileText, "reportT")
+	writeLatexFinalFile(buildReportFileText, "report")
 }
 
 buildReportTex <- function(debug) {
@@ -2303,18 +2342,18 @@ buildReportTex <- function(debug) {
 #linerangePlot	70
 ##################	
 
-	fileNames <- getFileNames(path = ".", pattern = SECTION.PATTERN, debug)
-	
+	fileNames <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = SECTION.PATTERN, debug)
+	print(fileNames)
 	if(!is.null(fileNames)) {
 		sectionMatrix <- getSectionMatrix(str_sub(fileNames, str_locate(fileNames, fixed(SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2)), fileNames, debug)
 		colnames(sectionMatrix) <- c(names(sectionMappingList), "file")
-		buildSectionTexFile(sectionMatrix, debug)		
+		buildSectionTexFile(sectionMatrix, debug)	
 	}
 
 	#fileNames <- getFileNames(path = ".", pattern = OVERALL.SECTION.PATTERN, debug)
 	#if(!is.null(fileNames)) {
 	#	sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(OVERALL.SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2))
-		writeReportFile(debug)
+		writeReportFile(debug = debug)
 	#}
 }
 
@@ -2328,6 +2367,7 @@ saveImageFile <- function(overallList, plot, filename, newHeight = "") {
 	}
 	#print(filename)
 	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
+	filename <- paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR)
 	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
 
 }
@@ -2868,7 +2908,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
 	overallColor <- overallList$color_nBox
 	color <- overallColor[[imagesIndex]]
-	section <- buildSectionString(overallList$nBoxSection, imagesIndex)
+	section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
 	
 	
 
@@ -2984,7 +3024,6 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 					}
 								
 			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 && length(colorReorder) == 1) {
-				#print("drinne")
 				colorReorder <- c(colorReorder, colorReorder)
 				shapeReorder <- c(1:2)
 			}
@@ -3243,7 +3282,7 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 	legende <- TRUE
 	overallColor <- overallList$color_boxStack
 	overallFileName <- overallList$imageFileNames_StackedPlots	
-	section <- buildSectionString(overallList$boxStackSection, imagesIndex)
+	section <- buildSectionString(overallList$boxStackSection, imagesIndex, overallList$appendix)
 
 	if (length(overallResult[, 1]) > 0) {
 	
@@ -3540,7 +3579,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallResult <- normalizeEachDescriptor(overallResult)	
 		overallColor <- overallList$color_spider
-		section <- buildSectionString(overallList$boxSpiderSection, imagesIndex)
+		section <- buildSectionString(overallList$boxSpiderSection, imagesIndex, overallList$appendix)
 
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
 		histVec <- levels(overallResult$hist)
@@ -3753,7 +3792,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 		overallResult <- normalizeEachDescriptor(overallResult)
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallColor <- overallList$color_linerange
-		section <- buildSectionString(overallList$linerangeSection, imagesIndex)
+		section <- buildSectionString(overallList$linerangeSection, imagesIndex, overallList$appendix)
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
 		nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
 		
@@ -3913,7 +3952,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 	
 	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
 	overallColor <- overallList$color_nBox
-	section <- buildSectionString(overallList$nBoxSection, imagesIndex)
+	section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
 	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
 	
 	
@@ -4274,7 +4313,7 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	overallFileName <- overallList$imageFileNames_violinPlots
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
-	section <- buildSectionString(overallList$violinBoxSection, imagesIndex)
+	section <- buildSectionString(overallList$violinBoxSection, imagesIndex, overallList$appendix)
 	reorderList <- reorderThePlotOrder(overallResult, typOfPlot)
 	overallResult <- reorderList$overallResult
 	
@@ -4419,7 +4458,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	overallFileName <- overallList$imageFileNames_Boxplots
 	overallColor <- overallList$color_box
 	options <- overallList$boxOptions
-	section <- buildSectionString(overallList$boxSection, imagesIndex)
+	section <- buildSectionString(overallList$boxSection, imagesIndex, overallList$appendix)
 
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
 	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
@@ -4930,12 +4969,12 @@ checkStressTypValues <- function(stress.Typ) {
 	return(stress.Typ)
 }
 
-initRfunction <- function(DEBUG = FALSE) {
+initRfunction <- function(debug) {
 	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
 	#Sys.setlocale(locale="de_DE.ISO8859-15")
 	#Sys.setlocale("LC_ALL", "en_US.UTF-8")
-	
-	if (DEBUG) {
+	debug %debug% "initRfunction()"
+	if (debug) {
 		options(error = quote({
 			#sink(file="error.txt", split = TRUE);
 			dump.frames();
@@ -4968,10 +5007,21 @@ initRfunction <- function(DEBUG = FALSE) {
 	loadLibs(debug)
 }
 
+createInitDirectories <- function(debug) {
+	debug %debug% "createInitDirectories()"
+	
+	dir.create(paste(".",DIRECTORY.SECTION, sep=DIRECTORY.SEPARATOR))
+	dir.create(paste(".",DIRECTORY.PLOTS, sep=DIRECTORY.SEPARATOR))
+	dir.create(paste(".",DIRECTORY.PLOTSTEX, sep=DIRECTORY.SEPARATOR))
+
+}
+
+
 
 startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	initRfunction(debug)
-	#typOfStartOptions = START.TYP.TEST
+	#typOfStartOptions = START.TYP.TEST; debug=TRUE;
+	createInitDirectories(debug)
 	typOfStartOptions = tolower(typOfStartOptions)
 		
 	args = commandArgs(TRUE)
@@ -5080,7 +5130,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 					descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
 					descriptorSetNameAppendix = descriptorSetAppendix
-				print(length(descriptorSetAppendix))
+				#print(length(descriptorSetAppendix))
 					descriptorSectionAppendix <- changeSectionToRealSection(NULL, sectionMappingList, length(descriptorSetAppendix))
 					#rep.int(99, length(descriptorSetAppendix))
 					#diagramTypVectorAppendix = rep.int("nboxplot", times=length(descriptorSetNameAppendix))

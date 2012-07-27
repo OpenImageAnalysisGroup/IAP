@@ -103,7 +103,8 @@
 %\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!htb] \centering \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
 %\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
 \newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{#1} \end{OwnLoadImage}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
-\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
+\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{OwnLoadImage}
+\includegraphics[height=\ScaleIfNeeded,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
 
 \newenvironment{OwnLoadImage}
   {\par\noindent\minipage{\textwidth}\centering}
