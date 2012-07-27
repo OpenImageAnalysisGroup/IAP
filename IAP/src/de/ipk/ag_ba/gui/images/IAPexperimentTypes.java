@@ -30,6 +30,15 @@ public enum IAPexperimentTypes {
 		return "Unknown";
 	}
 	
+	public static IAPexperimentTypes getExperimentTypeFromExperimentTypeName(String expType) {
+		if (expType != null)
+			for (IAPexperimentTypes t : IAPexperimentTypes.values()) {
+				if (expType.equals(t.toString()))
+					return t;
+			}
+		return UnknownGreenhouse;
+	}
+	
 	private String getSpecies() {
 		return species;
 	}

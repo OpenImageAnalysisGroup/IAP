@@ -20,6 +20,8 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -229,8 +231,7 @@ public class MassCopySupport {
 				print("Copy " + it.Id + " to " + m.getDatabaseName());
 				ExperimentReference er = new ExperimentReference(src);
 				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-				final int doneF = done;
-				status.setPrefix1("<html>Copying " + (doneF + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
+				status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
 				copyAction.setStatusProvider(status);
 				boolean simulate = false;
 				if (!simulate)
@@ -238,6 +239,22 @@ public class MassCopySupport {
 				print("Copied " + it.Id + " to " + m.getDatabaseName());
 				done++;
 				status.setCurrentStatusValueFine(100d * done / toSave.size());
+				
+				IAPexperimentTypes experimentType = IAPexperimentTypes.getExperimentTypeFromExperimentTypeName(er.getHeader().getExperimentType());
+				NavigationAction analysisAction = null;
+				switch (experimentType) {
+					case BarleyGreenhouse:
+					case MaizeGreenhouse:
+					case Phytochamber:
+					case PhytochamberBlueRubber:
+				}
+				if (analysisAction != null) {
+					// submit analysis action analysis tasks to target cloud
+					
+					// available result data should be checked upon analysis start (based on experiment header date info)
+					// only snapshots with a date newer than the given last newest time should be analysed
+				}
+				
 				Thread.sleep(1000);
 			}
 			status.setPrefix1(null);
