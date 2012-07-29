@@ -1811,7 +1811,7 @@ public class MongoDB {
 						boolean added = false;
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
-							for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
+							for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (batch.getCpuTargetUtilization() < maxTasks) {
 									if (batch.getExperimentHeader() == null)
@@ -1832,7 +1832,7 @@ public class MongoDB {
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks) {
 								loop: for (DBObject dbo : collection.find().sort(
-										new BasicDBObject("submission", 1).append("release", ir.toString()))) {
+										new BasicDBObject("submission", -1).append("release", ir.toString()))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -1850,7 +1850,7 @@ public class MongoDB {
 						}
 						if (addCnt < maxTasks) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
-								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", 1))) {
+								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -1867,7 +1867,7 @@ public class MongoDB {
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
 								for (DBObject dbo : collection.find(sm).sort(
-										new BasicDBObject("submission", 1))) {
+										new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
