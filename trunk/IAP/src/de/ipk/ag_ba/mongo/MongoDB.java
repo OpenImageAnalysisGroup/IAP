@@ -1499,7 +1499,7 @@ public class MongoDB {
 				for (NumericMeasurementInterface nmd : abc) {
 					if (nmd instanceof BinaryMeasurement) {
 						n++;
-						if (optStatusProvider != null && n % 1000 == 0) {
+						if (optStatusProvider != null && n % 100 == 0) {
 							optStatusProvider.setCurrentStatusValueFine(100d * n / max);
 							optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
 						}
