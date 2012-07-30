@@ -248,7 +248,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
-						double ratioPerDay = Math.pow(ratio, 1 / (time - lastTimeVolumeIAP) * timeForOneDay);
+						double ratioPerDay = Math.pow(ratio, 1d / ((time - lastTimeVolumeIAP) * timeForOneDay));
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
 						double days = (time - lastTimeVolumeIAP) / timeForOneDay;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;

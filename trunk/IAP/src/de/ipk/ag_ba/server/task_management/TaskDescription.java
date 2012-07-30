@@ -184,6 +184,7 @@ public class TaskDescription {
 									deleteIDs.add(i.getDatabaseId());
 									System.out.println("*****************************");
 									iii++;
+									System.out.println(SystemAnalysis.getCurrentTime() + ">Merged dataset " + iii + "/" + mmm);
 									if (statusProvider != null) {
 										statusProvider.setCurrentStatusText1("Merged dataset " + iii + "/" + mmm);
 										statusProvider.setCurrentStatusValueFine(100d / mmm * iii);
