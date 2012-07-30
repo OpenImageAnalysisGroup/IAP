@@ -161,8 +161,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (options.isBarleyInBarleySystem()) {
 				// remove horizontal bar
-				if (nir != null)
+				if (nir != null) {
 					nir = filterHorBar(nir);
+				}
 			}
 		}
 		return nir;
@@ -189,6 +190,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					FlexibleImage msk = new ImageOperation(nir.print("NIR MSK", debug)).compare()
 							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
 							.print("result nir", debug).getImage();
+					msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
 					// .thresholdClearBlueBetween(150 - 10, 169 + 10).thresholdBlueHigherThan(240).border(2).getImage();
 					
 					return msk; // 150 169 240
@@ -266,7 +268,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			FlexibleImage m = processedMasks.nir();
 			if (i != null && m != null)
 				i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
+			i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
 			processedImages.setNir(i);
+			processedMasks.setNir(i.copy());
 		}
 	}
 }
