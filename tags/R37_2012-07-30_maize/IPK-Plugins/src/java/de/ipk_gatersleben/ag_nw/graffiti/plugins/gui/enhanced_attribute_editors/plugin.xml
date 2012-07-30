@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+ "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+    <author>Christian Klukas</author>
+    <description>Enhanced Editing Tools for Parameters and Attributes</description>
+    <plugindesc>
+        <name>IPK Parameter Editors</name>
+        <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.enhanced_attribute_editors.IPKeditComponents</main>
+        <version>1.0.0</version>
+        <available>www.ipk-gatersleben.de</available>
+    </plugindesc>
+</plugin>
