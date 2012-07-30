@@ -85,7 +85,7 @@ START.TYP.REPORT <- "report"
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- TRUE
+calculateOnlyNBox <- FALSE
 calculateOnlyViolin <- FALSE
 calculateOnlyStacked <- FALSE
 calculateOnlySpider <- FALSE
@@ -2314,7 +2314,7 @@ includeAppendix <- function(buildAppendixTexPart, tabText, debug) {
 		tabText <- reduceTabText(tabText)
 		buildAppendixTexPart <- setClosedBraces(buildAppendixTexPart, tabText)					
 	} else {
-		return(buildReportFileText)
+		return(buildAppendixTexPart)
 	}
 }
 
