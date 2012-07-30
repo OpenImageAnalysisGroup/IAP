@@ -193,6 +193,9 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 					options.getBackground()).print("FILTERED NIR IMAGE", debug).
 					replaceColor(back, gray).getImage());
 			
+			if (options.getCameraPosition() == CameraPosition.SIDE)
+				processedMasks.setNir(processedImages.nir().copy());
+			
 			if (options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE)
 				if (processedImages.nir() != null) {
 					processedMasks.setNir(processedImages.nir().copy());

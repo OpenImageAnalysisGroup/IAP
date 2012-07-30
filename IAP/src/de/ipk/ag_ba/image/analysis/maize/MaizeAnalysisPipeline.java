@@ -154,10 +154,10 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
 		}
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 110);
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 50);
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 60);
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 40);
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20);
+		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20);
+		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 20);
+		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 20);
 		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 90);
 		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 90);
 		options.clearAndAddIntSetting(Setting.B_Diff_NIR, 30); // 20
