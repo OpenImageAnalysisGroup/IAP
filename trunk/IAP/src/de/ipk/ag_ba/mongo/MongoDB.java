@@ -477,7 +477,7 @@ public class MongoDB {
 		final ObjectRef startTime = new ObjectRef();
 		startTime.setLong(System.currentTimeMillis());
 		
-		DBCollection substances = db.getCollection("substances");
+		final DBCollection substances = db.getCollection("substances");
 		
 		final DBCollection conditions = db.getCollection("conditions");
 		
@@ -505,53 +505,38 @@ public class MongoDB {
 		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		Runtime r = Runtime.getRuntime();
-		ArrayList<String> substanceIDs = new ArrayList<String>();
+		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
 		errorCount.setLong(0);
+		int nLock = 8;
+		final Semaphore lock = new Semaphore(nLock, true);
 		while (!sl.isEmpty()) {
-			SubstanceInterface s = sl.get(0);
+			final SubstanceInterface s = sl.get(0);
 			sl.remove(0);
 			// if (status != null && status.wantsToStop())
 			// break;
-			if (status != null)
-				status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
-			attributes.clear();
-			s.fillAttributeMap(attributes);
-			BasicDBObject substance = new BasicDBObject(filter(attributes));
-			// dbSubstances.add(substance);
-			
-			final ArrayList<String> conditionIDs = new ArrayList<String>();
-			
-			int nLock = 50;
-			final Semaphore lock = new Semaphore(nLock, true);
-			
-			for (final ConditionInterface c : s) {
-				Runnable rr = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							processConditionSaving(db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
-									lastTransferSum, lastTime, count, errors, numberOfBinaryData, conditionIDs, c);
-						} catch (Exception e) {
-							e.printStackTrace();
-							errorCount.addLong(1);
-							errors.append("<li>" + e.getMessage());
-						} finally {
-							lock.release(1);
-						}
+			Runnable rrr = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						processSubstanceSaving(db, status, keepDataLinksToDataSource_safe_space, attributes,
+								overallFileSize, startTime, substances, conditions,
+								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs, errorCount, s);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						errorCount.addLong(1);
+						errors.append("<li>Error saving substance " + s.getName());
+					} finally {
+						lock.release(1);
 					}
-				};
-				lock.acquire(1);
-				Thread t = new Thread(rr);
-				t.setName("Process condition " + c.getName());
-				t.start();
-			} // condition
-			lock.acquire(nLock);
-			lock.release(nLock);
-			processSubstanceSaving(status, substances, substance, conditionIDs);
-			substanceIDs.add((substance).getString("_id"));
-			
+				}
+			};
+			lock.acquire(1);
+			Thread t = new Thread(rrr, "Thread Substance Saving " + s.getName());
+			t.start();
 		} // substance
+		lock.acquire(nLock);
+		lock.release(nLock);
 		
 		System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
@@ -596,6 +581,50 @@ public class MongoDB {
 							+ "", "Errors");
 		}
 		
+	}
+	
+	private void processSubstanceSaving(final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final boolean keepDataLinksToDataSource_safe_space, final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
+			final ObjectRef startTime, DBCollection substances, final DBCollection conditions, final ObjectRef lastTransferSum, final ObjectRef lastTime,
+			final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData, ArrayList<String> substanceIDs, final ObjectRef errorCount,
+			SubstanceInterface s) throws InterruptedException {
+		if (status != null)
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
+		attributes.clear();
+		s.fillAttributeMap(attributes);
+		BasicDBObject substance = new BasicDBObject(filter(attributes));
+		// dbSubstances.add(substance);
+		
+		final ArrayList<String> conditionIDs = new ArrayList<String>();
+		
+		int nLock = 10;
+		final Semaphore lock = new Semaphore(nLock, true);
+		
+		for (final ConditionInterface c : s) {
+			Runnable rr = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						processConditionSaving(db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
+								lastTransferSum, lastTime, count, errors, numberOfBinaryData, conditionIDs, c);
+					} catch (Exception e) {
+						e.printStackTrace();
+						errorCount.addLong(1);
+						errors.append("<li>" + e.getMessage());
+					} finally {
+						lock.release(1);
+					}
+				}
+			};
+			lock.acquire(1);
+			Thread t = new Thread(rr);
+			t.setName("Process condition " + c.getName());
+			t.start();
+		} // condition
+		lock.acquire(nLock);
+		lock.release(nLock);
+		processSubstanceSaving(status, substances, substance, conditionIDs);
+		substanceIDs.add((substance).getString("_id"));
 	}
 	
 	private void processConditionSaving(DB db, final BackgroundTaskStatusProviderSupportingExternalCall status, boolean keepDataLinksToDataSource_safe_space,
