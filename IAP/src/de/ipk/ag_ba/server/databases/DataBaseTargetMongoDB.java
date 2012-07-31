@@ -43,15 +43,17 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 		m.processDB(new RunnableOnDB() {
 			private DB db;
 			
+			@Override
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, keepRemoteURLs_safe_space);//.get();
+					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, keepRemoteURLs_safe_space).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);
 				}
 			}
 			
+			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}
@@ -82,10 +84,12 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 		m.processDB(new RunnableOnDB() {
 			private DB db;
 			
+			@Override
 			public void run() {
 				m.saveVolumeFile(db, volume, null, optStatus);
 			}
 			
+			@Override
 			public void setDB(DB db) {
 				this.db = db;
 			}

@@ -149,7 +149,7 @@ public class SystemAnalysisExt {
 			});
 			BufferedReader input =
 					new BufferedReader
-						(new InputStreamReader(p.getInputStream()));
+					(new InputStreamReader(p.getInputStream()));
 			String line;
 			while ((line = input.readLine()) != null) {
 				if (line.startsWith(setting)) {
@@ -483,7 +483,7 @@ public class SystemAnalysisExt {
 		}
 		String[] roots = new String[] { IAPmain.getHSMfolder(),
 				"/media/data4", "/home", "/Users",
-				"/backups", "/data0" };
+				"/backups", "/data0", "/media/16TB" };
 		for (String r : roots) {
 			if (r == null)
 				continue;

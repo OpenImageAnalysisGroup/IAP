@@ -83,16 +83,25 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			boolean useSCP = true;
 			if (useSCP) {
 				InputStream iss = null;
-				synchronized (PREFIX) {
-					ChannelSftp c = getChannel();
-					c.getSession().setTimeout(60 * 60 * 1000); // set timeout of 60 minutes
-					String detail = url.getDetail();
-					detail = "/data0/pgftp/" + detail.split("/", 2)[1];
-					c.cd(detail.substring(0, detail.lastIndexOf("/")));
-					String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
-					InputStream is = c.get(fn);
-					iss = ResourceIOManager.getInputStreamMemoryCached(is);
-				}
+				// synchronized (PREFIX) {
+				ChannelSftp c = getNewChannel();
+				c.getSession().setTimeout(60 * 60 * 1000); // set timeout of 60 minutes
+				String detail = url.getDetail();
+				detail = "/data0/pgftp/" + detail.split("/", 2)[1];
+				String dir = detail.substring(0, detail.lastIndexOf("/"));
+				System.out.println(SystemAnalysis.getCurrentTime() + ">SCP change directory: " + dir);
+				c.cd(dir);
+				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
+				InputStream is = c.get(fn);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">SCP request initiated: " + fn);
+				iss = ResourceIOManager.getInputStreamMemoryCached(is);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">SCP request finished: " + fn);
+				// }
+				
+				c.getSession().disconnect();
+				
+				c.disconnect();
+				
 				return iss;
 			} else {
 				boolean advancedFTP = true;
@@ -167,6 +176,24 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			channel = session.openChannel("sftp");
 			channel.connect(30);
 		}
+		
+		ChannelSftp c = (ChannelSftp) channel;
+		return c;
+	}
+	
+	private ChannelSftp getNewChannel() throws Exception {
+		JSch jsch = new JSch();
+		String host = "lemna-db.ipk-gatersleben.de";
+		String user = "root";
+		int port = 22;
+		Session session = jsch.getSession(user, host, port);
+		UserInfo ui = new MyStoredUserInfo();
+		session.setUserInfo(ui);
+		session.setPassword("LemnaTec");
+		session.connect();
+		
+		Channel channel = session.openChannel("sftp");
+		channel.connect(30);
 		
 		ChannelSftp c = (ChannelSftp) channel;
 		return c;
