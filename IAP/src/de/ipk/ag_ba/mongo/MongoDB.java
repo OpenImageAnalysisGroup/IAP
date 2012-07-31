@@ -701,7 +701,7 @@ public class MongoDB {
 					try {
 						if (m instanceof ImageData) {
 							ImageData id = (ImageData) m;
-							boolean direct = false;
+							boolean direct = true;
 							if (direct) {
 								res = saveImageFileDirect(db, id, overallFileSize,
 										keepDataLinksToDataSource_safe_space);
