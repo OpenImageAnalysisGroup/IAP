@@ -248,7 +248,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
-						double ratioPerDay = Math.pow(ratio, 1d / ((time - lastTimeVolumeIAP) * timeForOneDay));
+						double ratioPerDay = Math.pow(ratio, 1d / ((time - lastTimeVolumeIAP) * (double) timeForOneDay));
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
 						double days = (time - lastTimeVolumeIAP) / timeForOneDay;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
@@ -263,7 +263,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 							
 							System.out.println("Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
 									+ new Date(time).toString() + ", used for side volume growth of " + (int) wue + " pixels per ml per day, relative volume growth: "
-									+ ratioPerDay);
+									+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
 							
 						}
 					}
