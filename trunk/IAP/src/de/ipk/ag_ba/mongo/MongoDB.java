@@ -508,7 +508,7 @@ public class MongoDB {
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
 		errorCount.setLong(0);
-		int nLock = 8;
+		int nLock = 4;
 		final Semaphore lock = new Semaphore(nLock, true);
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.get(0);
@@ -590,14 +590,17 @@ public class MongoDB {
 			SubstanceInterface s) throws InterruptedException {
 		if (status != null)
 			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
-		attributes.clear();
-		s.fillAttributeMap(attributes);
-		BasicDBObject substance = new BasicDBObject(filter(attributes));
+		BasicDBObject substance;
+		synchronized (attributes) {
+			attributes.clear();
+			s.fillAttributeMap(attributes);
+			substance = new BasicDBObject(filter(attributes));
+		}
 		// dbSubstances.add(substance);
 		
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
 		
-		int nLock = 10;
+		int nLock = 5;
 		final Semaphore lock = new Semaphore(nLock, true);
 		
 		for (final ConditionInterface c : s) {
@@ -643,7 +646,7 @@ public class MongoDB {
 			condition = new BasicDBObject(filter(attributes));
 		}
 		
-		int nLock = 10;
+		int nLock = 2;
 		boolean fair = true;
 		final Semaphore lock = new Semaphore(nLock, fair);
 		
