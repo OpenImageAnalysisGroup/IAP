@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ReleaseInfo;
+import org.SettingsHelperDefaultIsTrue;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -213,6 +214,13 @@ public class BackupSupport {
 				public void run() {
 					try {
 						Thread.sleep(1000);
+						
+						String hsmFolder = IAPmain.getHSMfolder();
+						if (!new SettingsHelperDefaultIsTrue().isEnabled("backup"))
+							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
+						else
+							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
+						
 						BackupSupport sb = BackupSupport.getInstance();
 						sb.makeBackup();
 					} catch (InterruptedException e) {
