@@ -814,14 +814,12 @@ public class MongoDB {
 		if (lastN == count.getLong())
 			return;
 		lastN = count.getLong();
-		if (res != null)
-			count.addLong(1);
 		double prog = count.getLong() * (100d / numberOfBinaryData);
 		String err = "";
 		if (errorCount.getLong() > 0)
 			err = " (" + errorCount.getLong() + " errors)";
 		if (res != null)
-			status.setCurrentStatusText1(count.getLong() + "/" + numberOfBinaryData + ": " + res + err);
+			status.setCurrentStatusText1(count.getLong() + "/" + numberOfBinaryData + ": " + res + err + " // " + SystemAnalysis.getCurrentTimeInclSec());
 		status.setCurrentStatusValueFine(prog);
 		long currentTime = System.currentTimeMillis();
 		
@@ -832,7 +830,8 @@ public class MongoDB {
 			long transfered = overallFileSize.getLong() - lastTransferSum.getLong();
 			String lastSpeed = SystemAnalysis.getDataTransferSpeedString(transfered, lastTime.getLong(), currentTime);
 			String overallSpeed = SystemAnalysis.getDataTransferSpeedString(overallFileSize.getLong(), startTime.getLong(), currentTime);
-			status.setCurrentStatusText2("last " + lastSpeed + " (" + SystemAnalysis.getWaitTime(currentTime - lastTime.getLong()) + "), overall " + overallSpeed
+			status.setCurrentStatusText2("last " + lastSpeed +
+					" (" + SystemAnalysis.getWaitTime(currentTime - lastTime.getLong()) + "), overall " + overallSpeed
 					+ mbs);
 		}
 		
