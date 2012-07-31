@@ -258,4 +258,25 @@ public class SystemAnalysis {
 		long day = (long) Math.floor((time + offset) / ((double) MILLISECS_PER_DAY));
 		return day;
 	}
+	
+	/**
+	 * @return Transfer speed string as in these examples: 2.4 MB/sec, 4.0 MB/min, 6 MB/hour or 0.8 MB/day.
+	 */
+	public static String getDataTransferSpeedString(long transfered, long start, long end) {
+		if (transfered <= 0)
+			return "- MB/sec";
+		double megaBytesPerSecond = transfered / 1024d / 1024d / ((end - start) / 1000d);
+		double megaBytesPerMinute = megaBytesPerSecond * 60d;
+		double megaBytesPerHour = megaBytesPerMinute * 60d;
+		double megaBytesPerDay = megaBytesPerHour * 24d;
+		if (megaBytesPerSecond > 1)
+			return StringManipulationTools.formatNumber(megaBytesPerSecond, "#.#") + " MB/sec";
+		else
+			if (megaBytesPerMinute > 1)
+				return StringManipulationTools.formatNumber(megaBytesPerMinute, "#.#") + " MB/min";
+		if (megaBytesPerHour > 1)
+			return StringManipulationTools.formatNumber(megaBytesPerHour, "#.#") + " MB/hour";
+		else
+			return StringManipulationTools.formatNumber(megaBytesPerDay, "#.#") + " MB/day";
+	}
 }

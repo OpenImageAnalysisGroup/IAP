@@ -60,4 +60,11 @@ public class ObjectRef implements HelperClass {
 	public void setString(String string) {
 		toStringVal = string;
 	}
+	
+	public void setLong(long v) {
+		if (data == null)
+			data = v;
+		else
+			data = v;
+	}
 }

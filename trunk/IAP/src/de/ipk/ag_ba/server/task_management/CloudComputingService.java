@@ -355,11 +355,13 @@ public class CloudComputingService {
 				boolean addNewTasksIfMissing = false;
 				
 				Object[] res;
-				if (GraphicsEnvironment.isHeadless()) {
-					System.out.println(">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
+				if (SystemAnalysis.isHeadless()) {
+					System.out.println(SystemAnalysis.getCurrentTime()+">Analyzed experiment: "
+											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
+					System.out.println(SystemAnalysis.getCurrentTime()+">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
 							+ knownResults.size());
 					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
-					String in = System.console().readLine();
+					String in = SystemAnalysis.getCommandLineInput();
 					if (in == null)
 						res = null;
 					else
@@ -381,9 +383,12 @@ public class CloudComputingService {
 				if (res == null) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 					System.exit(1);
-				} else
-					addNewTasksIfMissing = (Boolean) res[0];
-				
+				} else {
+					if (res[0] instanceof String) 
+						addNewTasksIfMissing = !((String) res[0]).contains("n");
+					else
+						addNewTasksIfMissing = (Boolean) res[0];
+				}
 				if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
 					if (addNewTasksIfMissing) {
 						// not everything has been computed (internal error)
@@ -414,113 +419,124 @@ public class CloudComputingService {
 					}
 				} else
 					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
-						System.out.println("*****************************");
-						System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
-								+ ", RESULTS AVAILABLE: " + knownResults.size());
-						Experiment e = new Experiment();
-						long tFinish = System.currentTimeMillis();
-						final int wl = knownResults.size();
-						final ThreadSafeOptions tso = new ThreadSafeOptions();
-						final Runtime r = Runtime.getRuntime();
-						HashMap<ExperimentHeaderInterface, String> experiment2id =
-								new HashMap<ExperimentHeaderInterface, String>();
-						String originName = null;
-						for (ExperimentHeaderInterface ii : knownResults) {
-							experiment2id.put(ii, ii.getDatabaseId());
-							if (originName == null) {
-								String ori = ii.getOriginDbId();
-								ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
-								String[] cc = ii.getExperimentName().split("§");
-								String ana = cc[0];
-								ana = ana.substring(ana.lastIndexOf(".") + ".".length());
-								originName = ana + ": " + oriH.getExperimentName();
-							}
-							System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
-									/ 1024
-									+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
-							StopWatch s1 = new StopWatch(">m.getExperiment");
-							ExperimentInterface ei = m.getExperiment(ii);
-							s1.printTime();
-							TreeSet<String> condS = new TreeSet<String>();
-							for (SubstanceInterface s : ei) {
-								for (ConditionInterface ci : s) {
-									condS.add(ci.getConditionName());
-								}
-							}
-							String[] cc = ii.getExperimentName().split("§");
-							tso.addInt(1);
-							System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
-							for (String c : condS)
-								System.out.println(">Condition: " + c);
-							
-							StopWatch s = new StopWatch(">e.addMerge");
-							e.addAndMerge(ei);
-							s.printTime();
+						try {
+							doMerge(m, tempDataSetDescription, knownResults);
+						} catch(Exception e) {
+							e.printStackTrace();
 						}
-						String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
-						if (sn.indexOf(".") > 0)
-							sn = sn.substring(sn.lastIndexOf(".") + 1);
-						e.getHeader().setDatabaseId("");
-						for (SubstanceInterface si : e) {
-							for (ConditionInterface ci : si) {
-								ci.setExperimentName(e.getHeader().getExperimentName());
-								ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
-							}
-						}
-						boolean superMerge = false;
-						if (superMerge) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
-							ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
-							e.clear();
-							System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-							e = (Experiment) MappingData3DPath.merge(mdpl, false);
-							System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
-						}
-						long tStart = tempDataSetDescription.getSubmissionTimeL();
-						long tProcessing = tFinish - tStart;
-						int nToDo = tempDataSetDescription.getPartCntI();
-						int nFinish = knownResults.size();
-						e.getHeader().setExperimentname(originName);
-						e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-						e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-						e.getHeader().setRemark(
-								e.getHeader().getRemark() +
-										" // IAP image analysis release " + tempDataSetDescription.getReleaseIAP() +
-										" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
-										" // processing time: " +
-										SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +
-										SystemAnalysis.getCurrentTime() + " // manual merge");
-						System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-						System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
-						System.out.println("*****************************");
-						System.out.println("Merged Experiment: " + e.getName());
-						System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
-						
-						System.out.println("> SAVE COMBINED EXPERIMENT...");
-						m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
-						// System.out.println("> DELETE TEMP DATA IS DISABLED!");
-						// System.out.println("> DELETE TEMP DATA...");
-						System.out.println("> MARK TEMP DATA AS TRASHED...");
-						for (ExperimentHeaderInterface i : knownResults) {
-							try {
-								if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
-									ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
-									m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-									
-									// m.deleteExperiment(experiment2id.get(i));
-								}
-								
-							} catch (Exception err) {
-								System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
-										err.getMessage() + ")");
-							}
-						}
-						System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 					}
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+
+	private static void doMerge(MongoDB m,
+			TempDataSetDescription tempDataSetDescription,
+			ArrayList<ExperimentHeaderInterface> knownResults) throws Exception {
+		System.out.println("*****************************");
+		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
+				+ ", RESULTS AVAILABLE: " + knownResults.size());
+		Experiment e = new Experiment();
+		long tFinish = System.currentTimeMillis();
+		final int wl = knownResults.size();
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		final Runtime r = Runtime.getRuntime();
+		HashMap<ExperimentHeaderInterface, String> experiment2id =
+				new HashMap<ExperimentHeaderInterface, String>();
+		String originName = null;
+		for (ExperimentHeaderInterface ii : knownResults) {
+			experiment2id.put(ii, ii.getDatabaseId());
+			if (originName == null) {
+				String ori = ii.getOriginDbId();
+				ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
+				String[] cc = ii.getExperimentName().split("§");
+				String ana = cc[0];
+				ana = ana.substring(ana.lastIndexOf(".") + ".".length());
+				originName = ana + ": " + oriH.getExperimentName();
+			}
+			System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
+					/ 1024
+					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+			StopWatch s1 = new StopWatch(">m.getExperiment");
+			BackgroundTaskConsoleLogger status = new BackgroundTaskConsoleLogger("", "", true);
+			ExperimentInterface ei = m.getExperiment(ii, false, status);
+			s1.printTime();
+			TreeSet<String> condS = new TreeSet<String>();
+			for (SubstanceInterface s : ei) {
+				for (ConditionInterface ci : s) {
+					condS.add(ci.getConditionName());
+				}
+			}
+			String[] cc = ii.getExperimentName().split("§");
+			tso.addInt(1);
+			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+			for (String c : condS)
+				System.out.println(">Condition: " + c);
+			
+			StopWatch s = new StopWatch(">e.addMerge");
+			e.addAndMerge(ei);
+			s.printTime();
+		}
+		String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
+		if (sn.indexOf(".") > 0)
+			sn = sn.substring(sn.lastIndexOf(".") + 1);
+		e.getHeader().setDatabaseId("");
+		for (SubstanceInterface si : e) {
+			for (ConditionInterface ci : si) {
+				ci.setExperimentName(e.getHeader().getExperimentName());
+				ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
+			}
+		}
+		boolean superMerge = false;
+		if (superMerge) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
+			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
+			e.clear();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
+			e = (Experiment) MappingData3DPath.merge(mdpl, false);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
+		}
+		long tStart = tempDataSetDescription.getSubmissionTimeL();
+		long tProcessing = tFinish - tStart;
+		int nToDo = tempDataSetDescription.getPartCntI();
+		int nFinish = knownResults.size();
+		e.getHeader().setExperimentname(originName);
+		e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+		e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+		e.getHeader().setRemark(
+				e.getHeader().getRemark() +
+						" // IAP image analysis release " + tempDataSetDescription.getReleaseIAP() +
+						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
+						" // processing time: " +
+						SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +
+						SystemAnalysis.getCurrentTime() + " // manual merge");
+		System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+		System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
+		System.out.println("*****************************");
+		System.out.println("Merged Experiment: " + e.getName());
+		System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
+		
+		System.out.println("> SAVE COMBINED EXPERIMENT...");
+		m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
+		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
+		// System.out.println("> DELETE TEMP DATA...");
+		System.out.println("> MARK TEMP DATA AS TRASHED...");
+		for (ExperimentHeaderInterface i : knownResults) {
+			try {
+				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
+					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
+					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+					
+					// m.deleteExperiment(experiment2id.get(i));
+				}
+				
+			} catch (Exception err) {
+				System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
+						err.getMessage() + ")");
+			}
+		}
+		System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 	}
 	
 	public void switchStatus(MongoDB m) {

@@ -16,11 +16,9 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,10 +27,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 
 import javax.imageio.ImageIO;
@@ -411,9 +411,10 @@ public class MongoDB {
 		}
 	}
 	
-	private void storeExperimentInnerCall(ExperimentInterface experiment, DB db,
-			BackgroundTaskStatusProviderSupportingExternalCall status,
-			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
+	private void storeExperimentInnerCall(
+			ExperimentInterface experiment, final DB db,
+			final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
 		for (ExperimentHeaderInterface ehi : getExperimentList(null)) {
 			// preserve outlier info (add values, available at destination)
@@ -466,22 +467,27 @@ public class MongoDB {
 		System.out.println(">>> KEEP EXTERNAL REFS?  : " + keepDataLinksToDataSource_safe_space);
 		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		
-		HashMap<String, Object> attributes = new HashMap<String, Object>();
+		final HashMap<String, Object> attributes = new HashMap<String, Object>();
 		
-		ObjectRef overallFileSize = new ObjectRef();
+		final ObjectRef overallFileSize = new ObjectRef();
 		overallFileSize.addLong(0);
+		
+		final ObjectRef startTime = new ObjectRef();
+		startTime.setLong(System.currentTimeMillis());
 		
 		DBCollection substances = db.getCollection("substances");
 		
-		DBCollection conditions = db.getCollection("conditions");
+		final DBCollection conditions = db.getCollection("conditions");
 		
-		int errorCount = 0;
+		final ObjectRef lastTransferSum = new ObjectRef();
+		lastTransferSum.setLong(0);
+		final ObjectRef lastTime = new ObjectRef();
+		lastTime.setLong(-1);
+		final ObjectRef count = new ObjectRef();
+		count.setLong(0);
 		
-		long lastTransferSum = 0;
-		int lastSecond = -1;
-		int count = 0;
-		StringBuilder errors = new StringBuilder();
-		int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
+		final StringBuilder errors = new StringBuilder();
+		final int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		
 		if (status != null)
@@ -498,6 +504,8 @@ public class MongoDB {
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		Runtime r = Runtime.getRuntime();
 		ArrayList<String> substanceIDs = new ArrayList<String>();
+		final ObjectRef errorCount = new ObjectRef();
+		errorCount.setLong(0);
 		while (!sl.isEmpty()) {
 			SubstanceInterface s = sl.get(0);
 			sl.remove(0);
@@ -510,166 +518,34 @@ public class MongoDB {
 			BasicDBObject substance = new BasicDBObject(filter(attributes));
 			// dbSubstances.add(substance);
 			
-			ArrayList<String> conditionIDs = new ArrayList<String>();
+			final ArrayList<String> conditionIDs = new ArrayList<String>();
 			
-			for (ConditionInterface c : s) {
-				// if (status != null && status.wantsToStop())
-				// break;
-				attributes.clear();
-				c.fillAttributeMap(attributes);
-				BasicDBObject condition = new BasicDBObject(filter(attributes));
-				
-				List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
-				for (SampleInterface sa : c) {
-					// if (status != null && status.wantsToStop())
-					// break;
-					attributes.clear();
-					sa.fillAttributeMap(attributes);
-					BasicDBObject sample = new BasicDBObject(filter(attributes));
-					dbSamples.add(sample);
-					
-					boolean foundNumeric = false;
-					List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
-					for (Measurement m : sa) {
-						if (!(m instanceof BinaryMeasurement)) {
-							if (!foundNumeric && !Double.isNaN(m.getValue()))
-								foundNumeric = true;
-							attributes.clear();
-							m.fillAttributeMap(attributes);
-							BasicDBObject measurement = new BasicDBObject(filter(attributes));
-							dbMeasurements.add(measurement);
-						}
-					} // measurement
-					
-					if (foundNumeric) {
-						// only add sample average if at least one non-NaN numeric value is found
-						attributes.clear();
-						if (sa.size() > 0) {
-							sa.getSampleAverage().fillAttributeMap(attributes);
-							BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
-							
-							sample.put("average", dbSampleAverage);
+			int nLock = 50;
+			final Semaphore lock = new Semaphore(nLock, true);
+			
+			for (final ConditionInterface c : s) {
+				Runnable rr = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							processConditionSaving(db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
+									lastTransferSum, lastTime, count, errors, numberOfBinaryData, conditionIDs, c);
+						} catch (Exception e) {
+							e.printStackTrace();
+							errorCount.addLong(1);
+							errors.append("<li>" + e.getMessage());
+						} finally {
+							lock.release(1);
 						}
 					}
-					
-					List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
-					List<BasicDBObject> dbVolumes = new ArrayList<BasicDBObject>();
-					List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
-					
-					Queue<Future<DatabaseStorageResult>> storageResults = new LinkedList<Future<DatabaseStorageResult>>();
-					Queue<ImageData> imageDataQueue = new LinkedList<ImageData>();
-					
-					if (sa instanceof Sample3D) {
-						Sample3D s3 = (Sample3D) sa;
-						for (NumericMeasurementInterface m : s3.getMeasurements(new MeasurementNodeType[] {
-								MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK })) {
-							DatabaseStorageResult res = null;
-							attributes.clear();
-							try {
-								if (m instanceof ImageData) {
-									ImageData id = (ImageData) m;
-									// boolean direct = true;
-									// if (direct) {
-									res = saveImageFileDirect(db, id, overallFileSize,
-											keepDataLinksToDataSource_safe_space);
-									
-									attributes.clear();
-									id.fillAttributeMap(attributes);
-									BasicDBObject dbo = new BasicDBObject(filter(attributes));
-									dbImages.add(dbo);
-									
-									// } else {
-									// storageResults.add(saveImageFile(db, id, overallFileSize,
-									// keepDataLinksToDataSource_safe_space));
-									// imageDataQueue.add(id);
-									// }
-									// count++;
-								}
-								if (m instanceof VolumeData) {
-									VolumeData vd = (VolumeData) m;
-									res = saveVolumeFile(db, vd, overallFileSize, status);
-									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-										errorCount++;
-										errors.append("<li>" + vd.getURL().getFileName());
-									} else {
-										m.fillAttributeMap(attributes);
-										BasicDBObject dbo = new BasicDBObject(filter(attributes));
-										dbVolumes.add(dbo);
-									}
-								}
-								if (m instanceof NetworkData) {
-									NetworkData nd = (NetworkData) m;
-									res = saveNetworkFile(db, nd, overallFileSize, status);
-									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-										errorCount++;
-										errors.append("<li>" + nd.getURL().getFileName());
-									} else {
-										m.fillAttributeMap(attributes);
-										BasicDBObject dbo = new BasicDBObject(filter(attributes));
-										dbNetworks.add(dbo);
-									}
-								}
-							} catch (Exception e) {
-								ErrorMsg.addErrorMessage(e);
-								res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
-							}
-							if (status != null) {
-								if (res != null)
-									count++;
-								double prog = count * (100d / numberOfBinaryData);
-								if (res != null)
-									status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
-								status.setCurrentStatusValueFine(prog);
-								int currentSecond = new GregorianCalendar().get(Calendar.SECOND);
-								if (currentSecond != lastSecond) {
-									if (lastSecond >= 0) {
-										long transfered = overallFileSize.getLong() - lastTransferSum;
-										long mbps = transfered / 1024 / 1024;
-										status.setCurrentStatusText2(mbps + " MB/s");
-									}
-									lastSecond = currentSecond;
-									lastTransferSum = overallFileSize.getLong();
-								}
-							}
-						} // binary measurement
-					}
-					if (dbMeasurements.size() > 0)
-						sample.put("measurements", dbMeasurements);
-					
-					{
-						while (!storageResults.isEmpty()) {
-							Future<DatabaseStorageResult> fres = storageResults.poll();
-							ImageData id = imageDataQueue.poll();
-							DatabaseStorageResult res = fres.get();
-							if (res != null && status != null)
-								status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
-							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-								errorCount++;
-								errors.append("<li>" + id.getURL().getFileName());
-							} else {
-								attributes.clear();
-								id.fillAttributeMap(attributes);
-								BasicDBObject dbo = new BasicDBObject(filter(attributes));
-								dbImages.add(dbo);
-							}
-						}
-						if (dbImages.size() > 0)
-							sample.put("images", dbImages);
-					}
-					if (dbVolumes.size() > 0)
-						sample.put("volumes", dbVolumes);
-					if (dbNetworks.size() > 0)
-						sample.put("networks", dbVolumes);
-				} // sample
-				condition.put("samples", dbSamples);
-				try {
-					conditions.insert(condition);
-					conditionIDs.add((condition).getString("_id"));
-				} catch (MongoInternalException mie) {
-					System.out.println("Invalid condition: " + c + ", with " + c.size() + " samples");
-				}
-				
+				};
+				lock.acquire(1);
+				Thread t = new Thread(rr);
+				t.setName("Process condition " + c.getName());
+				t.start();
 			} // condition
+			lock.acquire(nLock);
+			lock.release(nLock);
 			processSubstanceSaving(status, substances, substance, conditionIDs);
 			substanceIDs.add((substance).getString("_id"));
 			
@@ -712,12 +588,254 @@ public class MongoDB {
 		// System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		
-		if (errorCount > 0) {
+		if (errorCount.getLong() > 0) {
 			MainFrame.showMessageDialog(
 					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
 							+ "", "Errors");
 		}
 		
+	}
+	
+	private void processConditionSaving(DB db, final BackgroundTaskStatusProviderSupportingExternalCall status, boolean keepDataLinksToDataSource_safe_space,
+			final HashMap<String, Object> attributes, final ObjectRef overallFileSize, final ObjectRef startTime, DBCollection conditions,
+			final ObjectRef errorCount,
+			final ObjectRef lastTransferSum, final ObjectRef lastTime, final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData,
+			ArrayList<String> conditionIDs,
+			ConditionInterface c) throws InterruptedException, ExecutionException {
+		// if (status != null && status.wantsToStop())
+		// break;
+		
+		BasicDBObject condition;
+		synchronized (attributes) {
+			attributes.clear();
+			c.fillAttributeMap(attributes);
+			condition = new BasicDBObject(filter(attributes));
+		}
+		
+		int nLock = 10;
+		boolean fair = true;
+		final Semaphore lock = new Semaphore(nLock, fair);
+		
+		List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
+		for (SampleInterface sa : c) {
+			// if (status != null && status.wantsToStop())
+			// break;
+			final BasicDBObject sample;
+			synchronized (attributes) {
+				attributes.clear();
+				sa.fillAttributeMap(attributes);
+				sample = new BasicDBObject(filter(attributes));
+				dbSamples.add(sample);
+			}
+			
+			boolean foundNumeric = false;
+			List<BasicDBObject> dbMeasurements = new ArrayList<BasicDBObject>();
+			for (Measurement m : sa) {
+				if (!(m instanceof BinaryMeasurement)) {
+					if (!foundNumeric && !Double.isNaN(m.getValue()))
+						foundNumeric = true;
+					synchronized (attributes) {
+						attributes.clear();
+						m.fillAttributeMap(attributes);
+						BasicDBObject measurement = new BasicDBObject(filter(attributes));
+						dbMeasurements.add(measurement);
+					}
+				}
+			} // measurement
+			
+			if (foundNumeric) {
+				// only add sample average if at least one non-NaN numeric value is found
+				if (sa.size() > 0) {
+					synchronized (attributes) {
+						attributes.clear();
+						sa.getSampleAverage().fillAttributeMap(attributes);
+						BasicDBObject dbSampleAverage = new BasicDBObject(filter(attributes));
+						sample.put("average", dbSampleAverage);
+					}
+				}
+			}
+			
+			final List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
+			List<BasicDBObject> dbVolumes = new ArrayList<BasicDBObject>();
+			List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
+			
+			final Queue<Future<DatabaseStorageResult>> storageResults = new LinkedList<Future<DatabaseStorageResult>>();
+			final Queue<ImageData> imageDataQueue = new LinkedList<ImageData>();
+			
+			if (sa instanceof Sample3D) {
+				Sample3D s3 = (Sample3D) sa;
+				for (NumericMeasurementInterface m : s3.getMeasurements(new MeasurementNodeType[] {
+						MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK })) {
+					DatabaseStorageResult res = null;
+					try {
+						if (m instanceof ImageData) {
+							ImageData id = (ImageData) m;
+							boolean direct = false;
+							if (direct) {
+								res = saveImageFileDirect(db, id, overallFileSize,
+										keepDataLinksToDataSource_safe_space);
+								if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+									errorCount.addLong(1);
+									errors.append("<li>" + id.getURL().getFileName());
+								} else {
+									synchronized (attributes) {
+										attributes.clear();
+										id.fillAttributeMap(attributes);
+										BasicDBObject dbo = new BasicDBObject(filter(attributes));
+										dbImages.add(dbo);
+									}
+								}
+								count.addLong(1);
+							} else {
+								storageResults.add(saveImageFile(db, id, overallFileSize,
+										keepDataLinksToDataSource_safe_space));
+								imageDataQueue.add(id);
+							}
+						}
+						if (m instanceof VolumeData) {
+							VolumeData vd = (VolumeData) m;
+							res = saveVolumeFile(db, vd, overallFileSize, status);
+							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+								errorCount.addLong(1);
+								errors.append("<li>" + vd.getURL().getFileName());
+							} else {
+								synchronized (attributes) {
+									attributes.clear();
+									m.fillAttributeMap(attributes);
+									BasicDBObject dbo = new BasicDBObject(filter(attributes));
+									dbVolumes.add(dbo);
+								}
+							}
+						}
+						if (m instanceof NetworkData) {
+							NetworkData nd = (NetworkData) m;
+							res = saveNetworkFile(db, nd, overallFileSize, status);
+							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+								errorCount.addLong(1);
+								errors.append("<li>" + nd.getURL().getFileName());
+							} else {
+								synchronized (attributes) {
+									attributes.clear();
+									m.fillAttributeMap(attributes);
+									BasicDBObject dbo = new BasicDBObject(filter(attributes));
+									dbNetworks.add(dbo);
+								}
+							}
+						}
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+						res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
+					}
+					if (status != null && storageResults.size() == 0)
+						updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount, startTime);
+				} // binary measurement
+			}
+			if (dbMeasurements.size() > 0)
+				sample.put("measurements", dbMeasurements);
+			
+			{
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							boolean waited = false;
+							while (!storageResults.isEmpty()) {
+								waited = true;
+								// System.out.println(SystemAnalysis.getCurrentTime() + ">WAITING FOR DATA: " + storageResults.size() + " FILES NEED YET TO BE COPIED");
+								Future<DatabaseStorageResult> fres = storageResults.poll();
+								ImageData id = imageDataQueue.poll();
+								DatabaseStorageResult res;
+								try {
+									res = fres.get();
+									// if (res != null && status != null)
+									// status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
+									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+										errorCount.addLong(1);
+										errors.append("<li>" + id.getURL().getFileName());
+									} else {
+										synchronized (attributes) {
+											attributes.clear();
+											id.fillAttributeMap(attributes);
+											BasicDBObject dbo = new BasicDBObject(filter(attributes));
+											dbImages.add(dbo);
+										}
+									}
+									count.addLong(1);
+									if (status != null)
+										updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount,
+												startTime);
+								} catch (Exception e) {
+									e.printStackTrace();
+									errorCount.addLong(1);
+									errors.append("<li>" + e.getMessage());
+								}
+							}
+							// if (waited)
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">WAITING FOR DATA FINISHED");
+							if (dbImages.size() > 0)
+								sample.put("images", dbImages);
+						} finally {
+							lock.release(1);
+						}
+					}
+				};
+				lock.acquire(1);
+				Thread t = new Thread(r, "Sample storage thread");
+				t.start();
+			}
+			if (dbVolumes.size() > 0)
+				sample.put("volumes", dbVolumes);
+			if (dbNetworks.size() > 0)
+				sample.put("networks", dbVolumes);
+		} // sample
+		
+		lock.acquire(nLock);
+		lock.release(nLock);
+		
+		condition.put("samples", dbSamples);
+		try {
+			conditions.insert(condition);
+			conditionIDs.add((condition).getString("_id"));
+		} catch (MongoInternalException mie) {
+			System.out.println("Invalid condition: " + c + ", with " + c.size() + " samples");
+		}
+	}
+	
+	private long lastN = -1;
+	
+	private void updateStatusForFileStorage(
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			ObjectRef overallFileSize, ObjectRef lastTransferSum,
+			ObjectRef lastTime, ObjectRef count,
+			int numberOfBinaryData, DatabaseStorageResult res, ObjectRef errorCount,
+			ObjectRef startTime) {
+		if (lastN == count.getLong())
+			return;
+		lastN = count.getLong();
+		if (res != null)
+			count.addLong(1);
+		double prog = count.getLong() * (100d / numberOfBinaryData);
+		String err = "";
+		if (errorCount.getLong() > 0)
+			err = " (" + errorCount.getLong() + " errors)";
+		if (res != null)
+			status.setCurrentStatusText1(count.getLong() + "/" + numberOfBinaryData + ": " + res + err);
+		status.setCurrentStatusValueFine(prog);
+		long currentTime = System.currentTimeMillis();
+		
+		if (lastTime.getLong() > 0) {
+			String mbs = "";
+			if (overallFileSize != null)
+				mbs = ", copied " + overallFileSize.getLong() / 1024 / 1024 + " MB";
+			long transfered = overallFileSize.getLong() - lastTransferSum.getLong();
+			String lastSpeed = SystemAnalysis.getDataTransferSpeedString(transfered, lastTime.getLong(), currentTime);
+			String overallSpeed = SystemAnalysis.getDataTransferSpeedString(overallFileSize.getLong(), startTime.getLong(), currentTime);
+			status.setCurrentStatusText2("last " + lastSpeed + " (" + SystemAnalysis.getWaitTime(currentTime - lastTime.getLong()) + "), overall " + overallSpeed
+					+ mbs);
+		}
+		
+		lastTransferSum.setLong(overallFileSize.getLong());
+		lastTime.setLong(currentTime);
 	}
 	
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
@@ -977,7 +1095,7 @@ public class MongoDB {
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
 	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(3, new ThreadFactory() {
+	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(15, new ThreadFactory() {
 		int n = 1;
 		
 		@Override
@@ -989,23 +1107,23 @@ public class MongoDB {
 		}
 	});
 	
-	// public Future<DatabaseStorageResult> saveImageFile(final DB db,
-	// final ImageData image, final ObjectRef fileSize,
-	// final boolean keepRemoteURLs_safe_space) throws Exception {
-	//
-	// return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
-	// @Override
-	// public DatabaseStorageResult call() throws Exception {
-	// return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
-	// }
-	// });
-	// }
-	
-	public DatabaseStorageResult saveImageFile(final DB db,
+	public Future<DatabaseStorageResult> saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
-		return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+		
+		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
+			@Override
+			public DatabaseStorageResult call() throws Exception {
+				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+			}
+		});
 	}
+	
+	// public DatabaseStorageResult saveImageFile(final DB db,
+	// final ImageData image, final ObjectRef fileSize,
+	// final boolean keepRemoteURLs_safe_space) throws Exception {
+	// return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+	// }
 	
 	protected boolean processLabelData(boolean keepRemoteURLs_safe_space, IOurl labelURL) {
 		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LemnaTecFTPhandler.PREFIX)
