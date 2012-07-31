@@ -15,7 +15,8 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -37,8 +38,6 @@ public class CloudTaskManager {
 	
 	Thread timerThread;
 	private MongoDB m;
-	
-	private boolean autoClose;
 	
 	private boolean fixedDisableProcess;
 	
@@ -225,7 +224,7 @@ public class CloudTaskManager {
 					// System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
 				Thread.sleep(1000);
-				if (autoClose && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
+				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
@@ -237,11 +236,6 @@ public class CloudTaskManager {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void setClusterExecutionModeSingleTaskAndExit(boolean autoClose) {
-		this.autoClose = autoClose;
-		IAPservice.setGridBatchExecutionMode(autoClose);
 	}
 	
 	public void setDisableProcess(boolean fixedDisableProcess) {

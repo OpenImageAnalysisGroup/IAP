@@ -505,7 +505,6 @@ public class IAPservice {
 	
 	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
 	private static Boolean mainMongoDBreachable = null;
-	private static boolean autoClose;
 	private static HashMap<String, String> niceNames = initNiceNames();
 	
 	public static float[] getCubeRoots(float lo, float up, int n) {
@@ -540,14 +539,6 @@ public class IAPservice {
 		res.put("top.area (px)", "Top area");
 		res.put("volume.fluo.iap (px^3)", "Digital biomass (fluo)");
 		return res;
-	}
-	
-	public static void setGridBatchExecutionMode(boolean autoClose) {
-		IAPservice.autoClose = autoClose;
-	}
-	
-	public static boolean isGridBatchExecutionModeActive() {
-		return autoClose;
 	}
 	
 	public static boolean isMongoReachable() {
