@@ -49,6 +49,10 @@ THIRD.SECTION <- "subsubsection"
 FOURTH.SECTION <- "paragraph"
 APPENDIX.SECTION <- "appendix"
 
+REDUCE.SECTION <- "reduceSection"
+GET.INT.AS.SECTION <- "getIntAsSection"
+GET.NUMBER.OF.SECTION <- "getNumberOfSection"
+
 DIRECTORY.SECTION <- "section"
 DIRECTORY.PLOTS <- "plots"
 DIRECTORY.PLOTSTEX <- "plotTex"
@@ -804,6 +808,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		for (n in seq(along = overallList$nBoxDes)) {
 			overallList$nBoxDes[n] = preprocessingOfDescriptor(overallList$nBoxDes[[n]], overallList$iniDataSet)
 		}
+		overallList$nBoxDes <- checkOfNormalizedAndUnnormalized(overallList$nBoxDes)
 	} else {
 		ownCat(paste(NBOX.PLOT," is NULL", sep=""))
 		
@@ -811,9 +816,10 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	
 	if (!is.null(overallList$boxDes)) {
 		if (overallList$debug) {ownCat(BOX.PLOT)}
-		for (n in 1:length(overallList$boxDes)) {
+		for (n in seq(along = overallList$boxDes)) {
 			overallList$boxDes[n] = preprocessingOfDescriptor(overallList$boxDes[[n]], overallList$iniDataSet)
 		}
+		overallList$boxDes <- checkOfNormalizedAndUnnormalized(overallList$boxDes)
 	} else {
 		ownCat(paste(BOX.PLOT, " is NULL", sep=""))
 		
@@ -821,9 +827,11 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	
 	if (!is.null(overallList$boxStackDes)) {
 		if (overallList$debug) {ownCat(STACKBOX.PLOT)}
-		for (n in 1:length(overallList$boxStackDes)) {
-			overallList$boxStackDes[n] = preprocessingOfDescriptor(overallList$boxStackDes[[n]], overallList$iniDataSet)
-		}
+		for (n in seq(along = overallList$boxStackDes)) {
+			overallList$boxStackDes[n] <- preprocessingOfDescriptor(overallList$boxStackDes[[n]], overallList$iniDataSet)
+		}	
+		overallList$boxStackDes <- checkOfNormalizedAndUnnormalized(overallList$boxStackDes)			
+
 	} else {
 		ownCat(paste(STACKBOX.PLOT, " is NULL", sep=""))
 		
@@ -831,12 +839,14 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 
 	if (!is.null(overallList$boxSpiderDes)) {
 		if (overallList$debug) {ownCat(SPIDER.PLOT)}
-		for (n in 1:length(overallList$boxSpiderDes)) {
+		for (n in seq(along = overallList$boxSpiderDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$boxSpiderDes[n], isColValue = TRUE)
 			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
 			overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
 		}
+		overallList$boxSpiderDesName <- checkOfNormalizedAndUnnormalized(overallList$boxSpiderDesName)
+		
 	} else {
 		ownCat(paste(SPIDER.PLOT, " is NULL", sep=""))
 		
@@ -844,12 +854,14 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 
 	if (!is.null(overallList$linerangeDes)) {
 		if (overallList$debug) {ownCat(LINERANGE.PLOT)}
-		for (n in 1:length(overallList$linerangeDes)) {
+		for (n in seq(along = overallList$linerangeDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$linerangeDes[n], isColValue = TRUE)
 			overallList$linerangeDes[n] = preprocessingOfDescriptor(overallList$linerangeDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$linerangeDes[n][[1]]
 			overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName=TRUE)[[1]][booleanVector])
 		}
+		overallList$linerangeDes <- checkOfNormalizedAndUnnormalized(overallList$linerangeDes)
+		
 	} else {
 		ownCat(paste(LINERANGE.PLOT, " is NULL", sep=""))
 		
@@ -857,12 +869,14 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 
 	if (!is.null(overallList$violinBoxDes) & overallList$isRatio) {
 		if (overallList$debug) {ownCat(VIOLIN.PLOT)}
-		for (n in 1:length(overallList$violinBoxDes)) {
+		for (n in seq(along = overallList$violinBoxDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$violinBoxDes[n], isColValue = TRUE)
 			overallList$violinBoxDes[n] = preprocessingOfDescriptor(overallList$violinBoxDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$violinBoxDes[n][[1]]
 			overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName=TRUE)[[1]][booleanVector])
 		}
+		overallList$violinBoxDes <- checkOfNormalizedAndUnnormalized(overallList$violinBoxDes)
+		
 	} else {
 		ownCat("No ratio data set/violin plot")
 		
@@ -879,9 +893,36 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	return(overallList)
 }
 
+checkOfNormalizedAndUnnormalized <- function(allDes) {
+#########
+#allDes <- overallList$boxStackDes
+#########
+
+	tempAllDes <- allDes
+	for(kk in seq(along = allDes)) {
+		## das unlist bei nbox überprüfen
+		vector <- unlist(allDes[kk])
+		if((length(grep("normalized.",vector , ignore.case=TRUE)) > 0) ||
+				(length(grep("norm.",vector , ignore.case=TRUE)) > 0)){
+			nnUn <- gsub("normalized.","",vector)
+			nnUn <- gsub("norm.", "",nnUn)
+			for(nn in seq(along = allDes)) {
+				#if(sum(nnUn %in% unlist(allDes[nn])) == length(unlist(allDes[nn]))) {
+				if(identical(nnUn, as.character(allDes[[nn]]))) {
+				#	print("raus damit")
+					tempAllDes[[nn]] <- NA
+				} 
+			}
+		}
+	}	
+	return(tempAllDes)
+}
+
+
 preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 ##############	
 #descriptorVector <- overallList$nBoxDes[[1]] 
+#descriptorVector <- overallList$boxStackDes[[n]]
 #iniDataSet <- overallList$iniDataSet	
 ##############	
 	
@@ -890,19 +931,7 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 	
 	errorDescriptor = descriptorVector %GetDescriptorAfterCheckIfDescriptorNotExists% iniDataSet 
 	descriptorVector = descriptorVector %GetDescriptorsAfterCheckIfDescriptorExists% iniDataSet
-
-	for(nn in descriptorVector) {	
-		if((length(grep("normalized.",nn , ignore.case=TRUE)) > 0) ||
-		   (length(grep("norm.",nn , ignore.case=TRUE)) > 0)){
-   			nnUn <- gsub("normalized."," ",nn)
-			nnUn <- gsub("norm."," ",nnUn)
-			if(nnUn %in% descriptorVector) {
-				errorDescriptor <- c(errorDescriptor, nnUn)
-				descriptorVector[descriptorVector!=nnUn]
-			} 
-  		}
-	}
-	
+		
 	if (length(errorDescriptor)>0) {
 		errorDescriptor %errorReport% NOT.EXISTS
 	} 
@@ -1639,6 +1668,8 @@ buildSectionString <-  function(sectionList, imagesIndex, appendix) {
 	} else {
 		sectionVector <- vector()
 		for(nn in sectionList) {
+			print(nn)
+			print(imagesIndex)
 			sectionVector <- paste(sectionVector, nn[as.numeric(imagesIndex)], sep = SECTION.SEPARATOR)
 		}
 		return(trimSectionSeparator(sectionVector))
@@ -1772,21 +1803,45 @@ getSectionMatrix <- function(sectionOverall, fileNames, debug) {
 
 getConstance <- function(sectionTyp, typ) {
 	
-	if(sectionTyp == FIRST.SECTION) {
+	if(sectionTyp == FIRST.SECTION || sectionTyp == 1) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.FIRST.SECTION.TEX)
-		} 
-	} else if(sectionTyp == SECOND.SECTION) {
+		} else if(typ == REDUCE.SECTION) {
+			return(NONE)
+		} else if(typ == GET.INT.AS.SECTION) {
+			return(FIRST.SECTION)
+		} else if(typ == GET.NUMBER.OF.SECTION) {
+			return(1)
+		}
+	} else if(sectionTyp == SECOND.SECTION || sectionTyp == 2) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.SECOND.SECTION.TEX)
+		} else if(typ == REDUCE.SECTION) {
+			return(FIRST.SECTION)
+		} else if(typ == GET.INT.AS.SECTION) {
+			return(SECOND.SECTION)
+		} else if(typ == GET.NUMBER.OF.SECTION) {
+			return(2)
 		}
-	} else if(sectionTyp == THIRD.SECTION) {
+	} else if(sectionTyp == THIRD.SECTION || sectionTyp == 3) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.THIRD.SECTION.TEX)
+		} else if(typ == REDUCE.SECTION) {
+			return(SECOND.SECTION)
+		} else if(typ == GET.INT.AS.SECTION) {
+			return(THIRD.SECTION)
+		} else if(typ == GET.NUMBER.OF.SECTION) {
+			return(3)
 		}
-	} else if(sectionTyp == FOURTH.SECTION) {
+	} else if(sectionTyp == FOURTH.SECTION || sectionTyp == 4) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.FOURTH.SECTION.TEX)
+		} else if(typ == REDUCE.SECTION) {
+			return(THIRD.SECTION)
+		} else if(typ == GET.INT.AS.SECTION) {
+			return(FOURTH.SECTION)
+		} else if(typ == GET.NUMBER.OF.SECTION) {
+			return(4)
 		}
 	}
 	
@@ -1803,7 +1858,7 @@ writeLatexSectionFile <- function(latexText, sectionTyp, sectionID, debug = FALS
 	debug %debug% "writeLatexSectionFile()"
 
 	const <- getConstance(sectionTyp, OVERALL.FILENAME.TEX)
-	newSection <- checkValue(sectionMappingList[[sectionTyp]], sectionID, NEW.SECTION, NONE, TRUE)
+	newSection <- checkValue(sectionMappingList, sectionTyp, sectionID, NEW.SECTION, NONE, TRUE)
 	newSection <- paste(NEW.SECTION.TEX, newSection, sep="")
 	
 	fileName <- paste(const, sectionID, newSection, sep="")
@@ -1870,8 +1925,12 @@ setIfThenElse <- function(latexText, tabText="") {
 }
 
 conectEachRow <- function(matrixVector) {
-	
-	if(class(matrixVector) == "matrix") {
+#########
+#matrixVector <- unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3,4)])
+#########
+	if(class(matrixVector) == "character") {
+		return(conectSectionIDVector(matrixVector))
+	} else if(class(matrixVector) == "matrix") {
 		conectVector <- vector()
 		
 		for(nn in seq(along = matrixVector[,1])) {
@@ -1916,21 +1975,56 @@ setTitle <- function(latexText, sectionTyp, title, tabText) {
 					sep=""))
 }
 
-checkValue <- function(sectionMappingListSectionTyp, position, whichValueShouldBeChecked, defaultValue = "", getNewSection=FALSE) {
+isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, whichValueShouldBeChecked, defaultValue, getNewSection) {
+#######
+#newPosition <- position
+#######	
+	
+	print(oldPosition)
+	print(newPosition)
+
+	toCheckMother <- unlist(str_split(oldPosition, POINT.PATTERN))
+	toCheckSon <- unlist(str_split(newPosition, POINT.PATTERN))
+	#print("check if there a pre relation")
+	if(length(toCheckMother) == length(toCheckSon)) {
+		for(nn in 1:(length(toCheckMother)-1)) {
+			if(toCheckMother[nn] != toCheckSon[nn]) {
+				if(nn == 1) {
+					tempMother <- toCheckMother[1]
+					tempSon <- toCheckSon[1]
+				} else {
+					tempMother <- conectEachRow(toCheckMother[1:nn])
+					tempSon <- conectEachRow(toCheckSon[1:nn])
+				}
+				print("########")
+				print(tempMother)
+				print(checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection))
+				if(tempSon %in% checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection)) {
+					print("interner Check")
+					return(TRUE)
+				}
+				print("geschafft")
+			}
+			print(nn)
+			print(toCheckMother[nn])
+			print(toCheckSon[nn])
+		}
+	} else {
+		print("not the same length!")
+		return(FALSE)	
+	}
+	return(FALSE)
+}
+
+checkValue <- function(sectionMappingList, sectionTyp, position, whichValueShouldBeChecked, defaultValue = "", getNewSection=FALSE) {
 ############
 #sectionMappingListSectionTyp <- sectionMappingList[[sectionTyp]]
-#position <- sectionIDVector
+#position <- "13.2.7"
 #whichValueShouldBeChecked <- "newSection"
 #defaultValue <- CLEAR.PAGE.NO
+#getNewSection <- FALSE
 ############
-#	print(position)
-#	print(whichValueShouldBeChecked)
-#	print(!is.null(sectionMappingListSectionTyp[[position]][[whichValueShouldBeChecked]]))
-#	print(!is.null(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom))
-#	print(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom == position)
-	
-	
-	
+	sectionMappingListSectionTyp <- sectionMappingList[[sectionTyp]]
 	
 	positionVector <- vector()
 	repeat {
@@ -1949,9 +2043,16 @@ checkValue <- function(sectionMappingListSectionTyp, position, whichValueShouldB
 			if(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom == position) {
 				break;
 			}
+			oldPosition <- position
 			position <- sectionMappingListSectionTyp[[position]]$takeRestValuesFrom
 			if(whichValueShouldBeChecked == NEW.SECTION && !getNewSection) {
-				positionVector <- c(positionVector, position)
+				if(getConstance(sectionTyp, REDUCE.SECTION) != NONE) {
+					if(isThereAPreRelation(sectionMappingList, oldPosition, position, whichValueShouldBeChecked, defaultValue, getNewSection)) {
+						positionVector <- c(positionVector, position)
+					}
+				} else {
+					positionVector <- c(positionVector, position)
+				}
 			}
 		} else {
 			break;
@@ -1976,10 +2077,10 @@ setAdditionInfos <- function(latexText, sectionTyp, sectionID, tabText = "") {
 #		
 #	} else {
 		
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "typOfClear", CLEAR.PAGE.NO), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "typOfReset", RESET.PAGE.NO), tabText) 
-		latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList[[sectionTyp]], sectionID, "title", paste(sectionTyp, sectionID, sep=" ")), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList[[sectionTyp]], sectionID, "text", ""), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfClear", CLEAR.PAGE.NO), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfReset", RESET.PAGE.NO), tabText) 
+		latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList, sectionTyp, sectionID, "title", paste(sectionTyp, sectionID, sep=" ")), tabText)
+		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "text", ""), tabText)
 	
 #	}
 	return(latexText)
@@ -2052,12 +2153,14 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 #uniqueVector <- uniqueSectionVector
 #sectionTyp <- SECOND.SECTION
 #uniqueVector <- uniqueSubSectionVector
+#sectionTyp <- THIRD.SECTION 
+#uniqueVector <- uniqueSubSubSectionVector
 ##########	
 
 	identicalMatrix <- matrix(FALSE,nrow=length(uniqueVector),ncol=length(uniqueVector), dimnames = list(uniqueVector, uniqueVector))
 	for(kk in uniqueVector) {
 #		sectionIDVector <- conectSectionIDVector(c(preSectionIDVector, kk))
-		identicalVector <- checkValue(sectionMappingList[[sectionTyp]], kk, NEW.SECTION, NONE)
+		identicalVector <- checkValue(sectionMappingList, sectionTyp, kk, NEW.SECTION, NONE)
 
 		if(identicalVector != NONE) {	
 			newIdenticalVector <- identicalVector[!(identicalVector %in% colnames(identicalMatrix))]
@@ -2074,7 +2177,7 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 			identicalMatrix[identicalVector, kk] <- TRUE
 		}
 	}
-	
+
 	checkVector <- vector()
 	goThroughVector <- vector()
 	allColumns <- colnames(identicalMatrix)
@@ -2102,7 +2205,7 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 			break
 		}	
 	}
-	
+print(identicalMatrix)
 	return(identicalMatrix)
 }
 
@@ -2112,6 +2215,26 @@ checkIfNull <- function(value) {
 
 }
 
+getUniqueSectionsValues <- function(booleanVectorForWholeSection = NULL, sectionMatrix, sectionTyp) {
+########
+#sectionTyp <- FOURTH.SECTION
+########
+	if(!is.null(booleanVectorForWholeSection)) {
+		tempVector <- sectionMatrix[booleanVectorForWholeSection, c(1:getConstance(sectionTyp, GET.NUMBER.OF.SECTION))]
+		
+		if(class(tempVector) == "matrix") {
+			return(conectEachRow(unique(tempVector)))
+		} else {
+			return(conectEachRow(tempVector))
+		}
+	} else {
+		if(class(sectionMatrix) == "matrix") {
+			return(unique(sectionMatrix[, 1]))
+		} else {
+			return(sectionMatrix[, 1])
+		}
+	}
+}
 
 buildSectionTexFile <- function(sectionMatrix, debug) {
 #########
@@ -2119,7 +2242,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 #subsectionID <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2)]))[1]
 #########
 	debug %debug% "buildSectionTexFile()"
-	uniqueSectionVector <- unique(sectionMatrix[, 1])
+	#uniqueSectionVector <- unique(sectionMatrix[, 1])
+	uniqueSectionVector <- getUniqueSectionsValues(sectionMatrix = sectionMatrix, sectionTyp = FIRST.SECTION)
 	identicalMatrixSection <- makeIdenticalMatrix(FIRST.SECTION, uniqueSectionVector)
 	alreadyBeenProcessedSection <- vector()
 	alreadyWrittenFilesSSS <- vector()
@@ -2145,7 +2269,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 				latexTextS <- setLoadImageAndLoadTex(latexTextS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextS)
 			} else {
 					
-				uniqueSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2)]))
+			#	uniqueSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2)]))
+				uniqueSubSectionVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, SECOND.SECTION)
 				identicalMatrixSubSection <- makeIdenticalMatrix(SECOND.SECTION, uniqueSubSectionVector)
 				alreadyBeenProcessedSubSection <- vector()
 				
@@ -2161,7 +2286,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 						
 						#print(paste("subsectionID: ", subsectionID, sep=""))
 						#subsectionIDShort <- str_sub(subsectionID, 1, str_locate(subsectionID,"\\.")[,"start"]-1)
-						sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
+						#sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
 						#() hier was ändern
 						booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsectionID, identicalMatrixSubSection, debug)
 						
@@ -2173,7 +2298,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 							latexTextSS <- setLoadImageAndLoadTex(latexTextSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSS)
 						} else {
 						
-							uniqueSubSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3)]))
+							#uniqueSubSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3)]))
+							uniqueSubSubSectionVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, THIRD.SECTION)
 							identicalMatrixSubSubSection <- makeIdenticalMatrix(THIRD.SECTION, uniqueSubSubSectionVector)
 							alreadyBeenProcessedSubSubSection <- vector()
 							
@@ -2197,7 +2323,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 										latexTextSSS <- setLoadImageAndLoadTex(latexTextSSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSSS)
 									} else {
 				
-										uniqueParagraphVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3,4)]))
+										#uniqueParagraphVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3,4)]))
+										uniqueParagraphVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, FOURTH.SECTION)
 										identicalMatrixParagraph <- makeIdenticalMatrix(FOURTH.SECTION, uniqueParagraphVector)
 										alreadyBeenProcessedParagraph <- vector()
 										
@@ -2343,7 +2470,7 @@ buildReportTex <- function(debug) {
 ##################	
 
 	fileNames <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = SECTION.PATTERN, debug)
-	print(fileNames)
+	#print(fileNames)
 	if(!is.null(fileNames)) {
 		sectionMatrix <- getSectionMatrix(str_sub(fileNames, str_locate(fileNames, fixed(SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2)), fileNames, debug)
 		colnames(sectionMatrix) <- c(names(sectionMappingList), "file")
@@ -2368,6 +2495,7 @@ saveImageFile <- function(overallList, plot, filename, newHeight = "") {
 	#print(filename)
 	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 	filename <- paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR)
+print(filename)
 	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
 
 }
@@ -3283,7 +3411,8 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 	overallColor <- overallList$color_boxStack
 	overallFileName <- overallList$imageFileNames_StackedPlots	
 	section <- buildSectionString(overallList$boxStackSection, imagesIndex, overallList$appendix)
-
+print(section)
+print(overallDesName[[imagesIndex]])
 	if (length(overallResult[, 1]) > 0) {
 	
 		isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
@@ -4798,13 +4927,21 @@ if(!calculateOnlyLineRange) {
 }
 
 
-addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet) {
-	addDescSet = character()
-	addDescSetNames = character()
-	i = 0
+addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet, descriptorSet_section = NULL) {
+############
+#descriptorSet_boxplotStacked <- descriptorSet_temp$columName
+#descriptorSetName_boxplotStacked <- descriptorSet_temp$plotName
+#descriptorSet_section <- descriptorSet_temp$section
+############
+	
+	
+	addDescSet <- character()
+	addDescSetNames <- character()
+	addDesSection <- list()
+	i <- 0
 	for (ds in descriptorSet_boxplotStacked) {
-		addCol = ""
-		#addColDesc = ""
+		addCol <- ""
+		#addColDesc <- ""
 		for (col in colnames(workingDataSet)) {	
 			if (nchar(ds)>5) {
 				last4chars = substr(col, nchar(ds)-4, nchar(ds))
@@ -4814,24 +4951,31 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 						if (nchar(addCol)>0) {
 							addCol = paste(addCol, "$", sep="")
 						}
-						addCol= paste(addCol, col, sep="")
+						addCol <- paste(addCol, col, sep="")
 					} 
 				}
 			}
 		}
-		i=i+1
-		addColDesc = descriptorSetName_boxplotStacked[i]
+		i <- i+1
+	#	addColDesc = descriptorSetName_boxplotStacked[i]
 		if (nchar(addCol)>0) {
 			#ownCat(paste("Adding ", addCol, "with description", addColDesc))
-			addDescSet = c(addDescSet, addCol)
-			addDescSetNames = c(addDescSetNames, addColDesc)
+			if(!is.null(descriptorSet_section)) {
+				addDesSection <- list(section = c(addDesSection$section, descriptorSet_section$section[i]),
+									  subsection = c(addDesSection$subsection, descriptorSet_section$subsection[i]),
+									  subsubsection = c(addDesSection$subsubsection, descriptorSet_section$subsubsection[i]),
+									  paragraph = c(addDesSection$paragraph, descriptorSet_section$paragraph[i]))
+			}
+			
+			addDescSet <- c(addDescSet, addCol)
+			addDescSetNames <- c(addDescSetNames, descriptorSetName_boxplotStacked[i])
 		}
 	}
 	
 	if (length(addDescSet) > 0) {
-		return(list(desSet=addDescSet, desName = addDescSetNames))
+		return(list(desSet=addDescSet, desName = addDescSetNames, desSec = addDesSection))
 	} else {
-		return(list(desSet=descriptorSet_boxplotStacked, desName = descriptorSetName_boxplotStacked))
+		return(list(desSet=descriptorSet_boxplotStacked, desName = descriptorSetName_boxplotStacked, desSec = addDesSection))
 	}
 	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 	
 	#return(descriptorSet_boxplotStacked)
@@ -5017,7 +5161,6 @@ createInitDirectories <- function(debug) {
 }
 
 
-
 startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	initRfunction(debug)
 	#typOfStartOptions = START.TYP.TEST; debug=TRUE;
@@ -5118,10 +5261,10 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 				descriptorSection_violinBox <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
 				
 				descriptorSet_temp <- getRealNameAndPrintSection(stackedPlotList)
-				descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet)
+				descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section)
 				descriptorSet_boxplotStacked <- descriptorList$desSet
 				descriptorSetName_boxplotStacked <- descriptorList$desName
-				descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+				descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList)
 
 				
 				appendix = as.logical(appendix %exists% args[5])
@@ -5237,12 +5380,13 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		descriptorSet_violinBox <- descriptorSet_temp$columName
 		descriptorSetName_violinBox <- descriptorSet_temp$plotName	
 		descriptorSection_violinBox <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
-		
+				
 		descriptorSet_temp <- getRealNameAndPrintSection(stackedPlotList)
-		descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet)
+		descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section)
 		descriptorSet_boxplotStacked <- descriptorList$desSet
 		descriptorSetName_boxplotStacked <- descriptorList$desName
-		descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+		descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList)
+		
 		
 		###################
 		
@@ -5446,7 +5590,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 			overallList = overallGetResultDataFrame(overallList)			
 			if (!overallList$stoppTheCalculation) {
 				overallList = setColor(overallList) 
-				
+	
 				makeDiagrams(overallList)
 			}
 		}

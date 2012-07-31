@@ -182,13 +182,13 @@ nBoxPlotList <- list(
 		"volume.iap.wue" = list(
 				plotName = "volume based water use efficiency", 
 				section = 4,
-				subsection = 7, 
-				subsubsection = 1),		
+				subsection = 3,
+				subsubsection = 1),	
 		"side.area.avg.wue" = list(
 				plotName = "digital side area based water use efficiency",
 				section = 4,
-				subsection = 7, 
-				subsubsection = 2),		
+				subsection = 3,
+				subsubsection = 2),	
 		
 		#############################  new Section ##############################										
 		
@@ -204,7 +204,7 @@ nBoxPlotList <- list(
 		"side.width.norm (mm)" = list(
 				plotName = "width (zoom corrected) (mm)", 
 				section = 5,
-				subsection = 7),
+				subsection = 3),
 		"side.width (px)" = list(
 				plotName = "width (px)", 
 				section = 5,
