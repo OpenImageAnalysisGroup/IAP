@@ -9,6 +9,8 @@ package de.ipk.ag_ba.server.task_management;
 
 import com.mongodb.BasicDBObject;
 
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+
 /**
  * @author klukas
  */
@@ -144,5 +146,9 @@ public class CloudHost extends BasicDBObject {
 		if (get("clusterMode") != null)
 			return (Boolean) get("clusterMode");
 		return false;
+	}
+	
+	public void setExecutionMode(IAPrunMode runMode) {
+		put("runMode", runMode.toString());
 	}
 }

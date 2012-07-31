@@ -73,6 +73,8 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -387,28 +389,28 @@ public class MongoDB {
 	private void storeExperiment(ExperimentInterface experiment, DB db,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
-		tso.setBval(0, true);
-		if (IAPservice.isGridBatchExecutionModeActive()) {
-			Thread loadGen = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (tso.getBval(0, true)) {
-						double v = Math.random();
-						v = Math.sin(v);
-						tso.setDouble(v);
-					}
-				}
-			});
-			loadGen.setPriority(Thread.MIN_PRIORITY);
-			loadGen.start();
-		}
-		
-		try {
-			storeExperimentInnerCall(experiment, db, status, keepDataLinksToDataSource_safe_space);
-		} finally {
-			tso.setBval(0, false);
-		}
+		// final ThreadSafeOptions tso = new ThreadSafeOptions();
+		// tso.setBval(0, true);
+		// if (IAPservice.isGridBatchExecutionModeActive()) {
+		// Thread loadGen = new Thread(new Runnable() {
+		// @Override
+		// public void run() {
+		// while (tso.getBval(0, true)) {
+		// double v = Math.random();
+		// v = Math.sin(v);
+		// tso.setDouble(v);
+		// }
+		// }
+		// });
+		// loadGen.setPriority(Thread.MIN_PRIORITY);
+		// loadGen.start();
+		// }
+		//
+		// try {
+		storeExperimentInnerCall(experiment, db, status, keepDataLinksToDataSource_safe_space);
+		// } finally {
+		// tso.setBval(0, false);
+		// }
 	}
 	
 	private void storeExperimentInnerCall(
@@ -1749,7 +1751,8 @@ public class MongoDB {
 				if (res != null) {
 					res.updateTime();
 					res.setHostName(ip);
-					res.setClusterExecutionMode(IAPservice.isGridBatchExecutionModeActive());
+					res.setClusterExecutionMode(IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
+					res.setExecutionMode(IAPmain.getRunMode());
 					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
