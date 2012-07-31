@@ -97,7 +97,7 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Presented values in relative dependence per day.", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$\\%/day\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: \\\\$\\%/day\\\\$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -317,7 +317,7 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
-									LINE.ITEM, "Equation: \\$Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}\\$", NEWLINE.TEX,
+									LINE.ITEM, "Equation: \\\\$Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}\\\\$", NEWLINE.TEX,
 									LINE.ITEM, "Column name: volume.iap", NEWLINE.TEX,
 									END.ITEM,
 									sep = SEPARATOR.ITEM)
@@ -333,7 +333,7 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
-								LINE.ITEM, "Equation: \\$Biomass_{LemnaTec}=\\sqrt{side.area_{0^{\\circ}}*side.area_{90^{\\circ}}*top.area}\\$", NEWLINE.TEX,
+								LINE.ITEM, "Equation: \\\\$Biomass_{LemnaTec}=\\sqrt{side.area_{0^{\\circ}}*side.area_{90^{\\circ}}*top.area}\\\\$", NEWLINE.TEX,
 								LINE.ITEM, "Column name: volume.lt", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
@@ -544,7 +544,7 @@ sectionMappingList <- list(
 				"7.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -734,6 +734,12 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE.OWN,
 						title = "Side",
 						text = ""
+				),
+				
+				"13.2" = list(
+						newSection = 2,
+						title = "Top",
+						takeRestValuesFrom = "13.1"
 				)			
 				
 				
