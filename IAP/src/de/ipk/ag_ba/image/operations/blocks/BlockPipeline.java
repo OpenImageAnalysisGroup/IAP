@@ -177,7 +177,7 @@ public class BlockPipeline {
 			
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
-				if (seconds >= 5)
+				if (seconds >= 30)
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "

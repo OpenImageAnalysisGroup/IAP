@@ -71,10 +71,10 @@ public class ErrorMsg implements HelperClass {
 						// caused the
 						// problem
 						res = res + "     Line: " + stack[i].getLineNumber() + " Method: " + stack[i].getClassName() + "/"
-											+ methodName + "<br>";
+								+ methodName + "<br>";
 						if (firstMethod.length() <= 0 && methodName != null && !methodName.endsWith("addErrorMessage")) {
 							firstMethod = ", Line " + stack[i].getLineNumber() + " Method " + stack[i].getClassName() + "/"
-												+ methodName;
+									+ methodName;
 						}
 					}
 					if (stack[i].getMethodName().equalsIgnoreCase("addErrorMessage"))
@@ -198,14 +198,15 @@ public class ErrorMsg implements HelperClass {
 				SwingUtilities.invokeLater(r);
 			}
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					finishedListeners.clear();
 				}
 			});
 		}
 		if (apploadingCompleted == ApplicationStatus.ADDONS_LOADED
-							|| (apploadingCompleted == ApplicationStatus.PROGRAM_LOADING_FINISHED && ReleaseInfo
-												.getIsAllowedFeature(FeatureSet.ADDON_LOADING))) {
+				|| (apploadingCompleted == ApplicationStatus.PROGRAM_LOADING_FINISHED && ReleaseInfo
+						.getIsAllowedFeature(FeatureSet.ADDON_LOADING))) {
 			Collection<Runnable> fl;
 			synchronized (finishedAddonLoadingListeners) {
 				fl = new ArrayList<Runnable>(finishedAddonLoadingListeners);
@@ -214,6 +215,7 @@ public class ErrorMsg implements HelperClass {
 				SwingUtilities.invokeLater(r);
 			}
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					finishedAddonLoadingListeners.clear();
 				}
@@ -308,13 +310,11 @@ public class ErrorMsg implements HelperClass {
 		if (SystemAnalysis.isHeadless() && e != null) {
 			System.out.println("ERROR-MSG: " + e.getMessage());
 			e.printStackTrace();
-			throw new Error(e);
 		}
 		if (rethrowErrorMessages)
-			throw new Error(e);
+			throw new UnsupportedOperationException(e);
 		
 		addErrorMessage(e.getLocalizedMessage());
-		e.printStackTrace();
 	}
 	
 	public static void addOnAddonLoadingFinishedAction(Runnable runnable) {
