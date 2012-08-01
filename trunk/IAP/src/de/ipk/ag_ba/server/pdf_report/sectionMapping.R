@@ -863,7 +863,7 @@ sectionMappingList <- list(
 				),
 				
 				"60.2.1" = list(
-						takeRestValuesFrom = "7.1.1"
+						takeRestValuesFrom = "7.2.1"
 				),
 				
 				"7.2.2" = list(
@@ -871,7 +871,7 @@ sectionMappingList <- list(
 				),
 				
 				"60.2.2" = list(
-						takeRestValuesFrom = "7.1.2"
+						takeRestValuesFrom = "7.2.2"
 				),
 				
 				"7.2.3" = list(
@@ -879,7 +879,7 @@ sectionMappingList <- list(
 				),
 				
 				"60.2.3" = list(
-						takeRestValuesFrom = "7.1.3"
+						takeRestValuesFrom = "7.2.3"
 				),
 				
 				"13.1.1" = list(

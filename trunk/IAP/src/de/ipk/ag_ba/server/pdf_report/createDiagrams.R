@@ -52,6 +52,7 @@ APPENDIX.SECTION <- "appendix"
 REDUCE.SECTION <- "reduceSection"
 GET.INT.AS.SECTION <- "getIntAsSection"
 GET.NUMBER.OF.SECTION <- "getNumberOfSection"
+FILL.WITH.NULL.SECTION <- "fillWithNullSection" 
 
 DIRECTORY.SECTION <- "section"
 DIRECTORY.PLOTS <- "plots"
@@ -1851,6 +1852,8 @@ getConstance <- function(sectionTyp, typ) {
 			return(FIRST.SECTION)
 		} else if(typ == GET.NUMBER.OF.SECTION) {
 			return(1)
+		} else if(typ == FILL.WITH.NULL.SECTION) {
+			return(3)
 		}
 	} else if(sectionTyp == SECOND.SECTION || sectionTyp == 2) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
@@ -1860,6 +1863,8 @@ getConstance <- function(sectionTyp, typ) {
 		} else if(typ == GET.INT.AS.SECTION) {
 			return(SECOND.SECTION)
 		} else if(typ == GET.NUMBER.OF.SECTION) {
+			return(2)
+		} else if(typ == FILL.WITH.NULL.SECTION) {
 			return(2)
 		}
 	} else if(sectionTyp == THIRD.SECTION || sectionTyp == 3) {
@@ -1871,6 +1876,8 @@ getConstance <- function(sectionTyp, typ) {
 			return(THIRD.SECTION)
 		} else if(typ == GET.NUMBER.OF.SECTION) {
 			return(3)
+		} else if(typ == FILL.WITH.NULL.SECTION) {
+			return(1)
 		}
 	} else if(sectionTyp == FOURTH.SECTION || sectionTyp == 4) {
 		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
@@ -1881,9 +1888,10 @@ getConstance <- function(sectionTyp, typ) {
 			return(FOURTH.SECTION)
 		} else if(typ == GET.NUMBER.OF.SECTION) {
 			return(4)
+		} else if(typ == FILL.WITH.NULL.SECTION) {
+			return(0)
 		}
 	}
-	
 	return(NONE)
 }
 
@@ -2190,6 +2198,8 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 #uniqueVector <- uniqueSubSectionVector
 #sectionTyp <- THIRD.SECTION 
 #uniqueVector <- uniqueSubSubSectionVector
+#sectionTyp <- FOURTH.SECTION
+#uniqueVector <- uniqueParagraphVector
 ##########	
 
 	identicalMatrix <- matrix(FALSE,nrow=length(uniqueVector),ncol=length(uniqueVector), dimnames = list(uniqueVector, uniqueVector))
@@ -2278,6 +2288,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 #########
 	debug %debug% "buildSectionTexFile()"
 	#uniqueSectionVector <- unique(sectionMatrix[, 1])
+	alreadyWrittenSection <- matrix(rep.int(FALSE, length(sectionMatrix[,1])), dimnames = c(list(cbind(conectEachRow(sectionMatrix[,1:4]))), "alreadyWritten"))
 	uniqueSectionVector <- getUniqueSectionsValues(sectionMatrix = sectionMatrix, sectionTyp = FIRST.SECTION)
 	identicalMatrixSection <- makeIdenticalMatrix(FIRST.SECTION, uniqueSectionVector)
 	alreadyBeenProcessedSection <- vector()
@@ -2287,7 +2298,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 	alreadyWrittenFilesP <- vector()
 	for(sectionID in uniqueSectionVector) {
 		debug %debug% paste("... sectionID", sectionID)
-		if(!checkIfNull(sectionID) && !(sectionID %in% alreadyBeenProcessedSection)) {
+		if(!checkIfNull(sectionID) && !((sectionID %in% alreadyBeenProcessedSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,sectionID, FIRST.SECTION))) {
 			additionalSection <- colnames(identicalMatrixSection)[getVector(identicalMatrixSection[,sectionID])]
 			alreadyBeenProcessedSection <- c(alreadyBeenProcessedSection, additionalSection)
 
@@ -2311,7 +2322,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 				
 				for(subsectionID in uniqueSubSectionVector) {
 					debug %debug% paste("... subsectionID", subsectionID)
-					if(!checkIfNull(subsectionID) && !(subsectionID %in% alreadyBeenProcessedSubSection)) {
+					if(!checkIfNull(subsectionID) && !((subsectionID %in% alreadyBeenProcessedSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,subsectionID, SECOND.SECTION))) {
 						
 						additionalSubSection <- colnames(identicalMatrixSubSection)[getVector(identicalMatrixSubSection[,subsectionID])]
 						alreadyBeenProcessedSubSection <- c(alreadyBeenProcessedSubSection, additionalSubSection)
@@ -2340,7 +2351,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 							
 							for(subsubsectionID in uniqueSubSubSectionVector) {
 								debug %debug% paste("... subsubsectionID", subsubsectionID)
-								if(!checkIfNull(subsubsectionID) && !(subsubsectionID %in% alreadyBeenProcessedSubSubSection)) {
+								if(!checkIfNull(subsubsectionID) && !((subsubsectionID %in% alreadyBeenProcessedSubSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,subsubsectionID, THIRD.SECTION))) {
 									
 									additionalSubSubSection <- colnames(identicalMatrixSubSubSection)[getVector(identicalMatrixSubSubSection[,subsubsectionID])]
 									alreadyBeenProcessedSubSubSection <- c(alreadyBeenProcessedSubSubSection, additionalSubSubSection)
@@ -2365,7 +2376,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 										
 										for(paragraphID in uniqueParagraphVector) {
 											debug %debug% paste("... paragraphID", paragraphID)
-											if(!checkIfNull(paragraphID) && !(paragraphID %in% alreadyBeenProcessedParagraph)) {
+											if(!checkIfNull(paragraphID) && !((paragraphID %in% alreadyBeenProcessedParagraph) || checkAlreadyWrittenSection(alreadyWrittenSection ,paragraphID, FOURTH.SECTION))) {
 												
 												additionalParagraph <- colnames(identicalMatrixParagraph)[getVector(identicalMatrixParagraph[,paragraphID])]
 												alreadyBeenProcessedParagraph <- c(alreadyBeenProcessedParagraph, additionalParagraph)
@@ -2383,8 +2394,10 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 												latexTextP <- setClosedBraces(latexTextP, tabTextP)
 												if(paragraphID == "7.1.1.1") {
 													print("##################################### here we are ###############################")
+													print(alreadyWrittenSection[paragraphID,1])
 												}
-												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug)	
+												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug)
+												alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, paragraphID, FOURTH.SECTION)
 											}
 										}
 									}
@@ -2396,6 +2409,7 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 									latexTextSSS <- setClosedBraces(latexTextSSS, tabTextSSS)
 									
 									writeLatexSectionFile(latexTextSSS, THIRD.SECTION, subsubsectionID, debug)
+									alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, subsubsectionID, THIRD.SECTION)
 								}
 							}
 						}
@@ -2407,6 +2421,8 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 						latexTextSS <- setClosedBraces(latexTextSS,tabTextSS)
 				
 						writeLatexSectionFile(latexTextSS, SECOND.SECTION, subsectionID, debug)
+						alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, subsectionID, SECOND.SECTION)
+						
 					}
 				}
 			}
@@ -2418,11 +2434,42 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 			latexTextS <- setClosedBraces(latexTextS, tabTextS)
 			
 			writeLatexSectionFile(latexTextS, FIRST.SECTION, sectionID, debug)
+			alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, sectionID, FIRST.SECTION)
 		}
 	}
 }
 
+checkAlreadyWrittenSection <- function(alreadyWrittenSection , sectionID, sectionTyp) {
+	
+	repInt <- getConstance(sectionTyp, FILL.WITH.NULL.SECTION)
+	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0,repInt)))
+	
+	if(sectionID %in% rownames(alreadyWrittenSection)) {
+		return(alreadyWrittenSection[sectionID,])
+	} else {
+		return(FALSE)
+	}
+}
 
+
+setAlreadyWrittenSectionMatrix <- function(alreadyWrittenSection, sectionID, sectionTyp) {
+##########
+#sectionID <- subsectionID
+#sectionTyp <- SECOND.SECTION
+##########
+	
+	repInt <- getConstance(sectionTyp, FILL.WITH.NULL.SECTION)
+	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0,repInt)))
+	
+	if(sectionID %in% rownames(alreadyWrittenSection)) {
+		alreadyWrittenSection[sectionID,1] <- TRUE
+	} else {
+		
+		alreadyWrittenSection <- rbind(alreadyWrittenSection, TRUE)
+		rownames(alreadyWrittenSection)[length(alreadyWrittenSection)] <- sectionID
+	}
+	return(alreadyWrittenSection)
+}
 
 
 writeInclude <- function(latexText, tabText, sectionTyp, alreadyWrittenFiles, debug = FALSE) {
