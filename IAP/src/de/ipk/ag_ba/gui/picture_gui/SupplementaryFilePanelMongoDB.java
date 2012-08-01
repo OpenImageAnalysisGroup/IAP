@@ -126,10 +126,12 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
+		ToolTipManager.sharedInstance().setDismissDelay(30000);
+		
 		// todo if mongo knows this ID as an experiment ID
 		boolean readOnly = doc.getHeader().getDatabaseId() != null;
 		
-		expTree = new JTree(new DBEtreeModel(this, m, doc, readOnly));
+		expTree = new JTree(new ExperimentTreeModel(this, m, doc, readOnly));
 		
 		ToolTipManager.sharedInstance().registerComponent(expTree);
 		

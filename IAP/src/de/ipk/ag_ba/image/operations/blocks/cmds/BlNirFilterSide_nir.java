@@ -68,8 +68,8 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage mapOriginalOnSkel(FlexibleImage skeleton, FlexibleImage original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
-		int[] img = skeleton.getAs1A().clone();
-		int[] oi = original.getAs1A().clone();
+		int[] img = skeleton.getAs1A();// .clone();
+		int[] oi = original.getAs1A();// .clone();
 		for (int i = 0; i < img.length; i++) {
 			if (img[i] != back) {
 				img[i] = oi[i];

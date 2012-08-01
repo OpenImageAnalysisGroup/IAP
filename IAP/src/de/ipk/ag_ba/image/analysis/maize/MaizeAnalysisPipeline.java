@@ -23,7 +23,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
@@ -74,15 +73,21 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlMedianFilter_fluo.class);
 		// p.add(BlockClosingForYellowVisMask.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class); // requires lab filter before
-		p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
+		boolean doBambooRemoval = false;
+		if (doBambooRemoval)
+			p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
 		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
+		// p.add(BlTranslateMatch_vis_fluo_nir.class);
+		p.add(BlUseFluoMaskToClear_vis_nir.class);
+		
 		p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class); // 2nd run
-		p.add(BlTranslateMatch_vis_fluo_nir.class);
-		p.add(BlUseFluoMaskToClear_vis_nir.class);
 		// "skelton" image is saved in the following block
 		// "beforeBloomEnhancement" is restored by the following block
-		p.add(BlockSkeletonize_vis_or_fluo.class);
+		
+		boolean doSkeletonize = false;
+		if (doSkeletonize)
+			p.add(BlockSkeletonize_vis_or_fluo.class);
 		
 		// p.add(BlockRemoveSmallClusters_vis.class);
 		// p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
@@ -104,7 +109,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
-		p.add(BlockDrawSkeleton_vis_fluo.class);
+		if (doSkeletonize)
+			p.add(BlockDrawSkeleton_vis_fluo.class);
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir_ir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);

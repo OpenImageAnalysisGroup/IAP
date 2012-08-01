@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.event.TreeModelListener;
@@ -18,13 +19,14 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
  */
-public class DBEtreeModel implements TreeModel {
+public class ExperimentTreeModel implements TreeModel {
 	
 	private final class GetSubstances implements Runnable {
 		boolean readOnly;
@@ -49,6 +51,7 @@ public class DBEtreeModel implements TreeModel {
 						substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
 				
 				substNode.setIsLeaf(false);
+				substNode.setTooltipInfo(substance.getHTMLdescription());
 				substNode.setIndex(p++);
 				substNode.setGetChildrenMethod(new GetConditions(substNode, experiment, substance, readOnly,
 						dataChangedListener));
@@ -84,8 +87,9 @@ public class DBEtreeModel implements TreeModel {
 				
 				condNode.setIsLeaf(false);
 				condNode.setIndex(p++);
-				condNode
-						.setGetChildrenMethod(new GetSamples(condNode, experiment, condition, readOnly, dataChangedListener));
+				condNode.setTooltipInfo(condition.getHTMLdescription());
+				condNode.setGetChildrenMethod(
+						new GetSamples(condNode, experiment, condition, readOnly, dataChangedListener));
 				children.add(condNode);
 			}
 			substNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
@@ -183,8 +187,28 @@ public class DBEtreeModel implements TreeModel {
 							meas.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
-					if (sample.getSampleFineTimeOrRowId() != null)
-						measNode.setTooltipInfo(sdf.format(new Date(sample.getSampleFineTimeOrRowId())));
+					
+					if (meas instanceof NumericMeasurementInterface) {
+						NumericMeasurementInterface nm = (NumericMeasurementInterface) meas;
+						Map<String, Object> attributes = new HashMap<String, Object>();
+						nm.fillAttributeMap(attributes);
+						StringBuilder s = new StringBuilder();
+						s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+						if (sample.getSampleFineTimeOrRowId() != null)
+							s.append("<tr><td>Sample Time</td><td>" + sdf.format(new Date(sample.getSampleFineTimeOrRowId())) + "</td></tr>");
+						for (String id : attributes.keySet()) {
+							String idC = id;
+							if (idC != null && idC.equals("replicates"))
+								idC = "replicate ID";
+							s.append("<tr><td>" + idC + "</td><td>" + attributes.get(id) + "</td></tr>");
+						}
+						s.append("</table></html>");
+						measNode.setTooltipInfo(s.toString());
+					} else {
+						if (sample.getSampleFineTimeOrRowId() != null)
+							measNode.setTooltipInfo(sdf.format(new Date(sample.getSampleFineTimeOrRowId())));
+					}
+					
 					children.add(measNode);
 				}
 			}
@@ -197,7 +221,7 @@ public class DBEtreeModel implements TreeModel {
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 	
-	public DBEtreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface doc,
+	public ExperimentTreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface doc,
 			boolean readOnly) {
 		this.m = m;
 		this.document = doc;
@@ -217,6 +241,17 @@ public class DBEtreeModel implements TreeModel {
 		}
 		expNode.setIndex(0);
 		expNode.setIsLeaf(false);
+		
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		document.fillAttributeMap(attributes);
+		StringBuilder s = new StringBuilder();
+		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+		for (String id : attributes.keySet()) {
+			String idC = id;
+			s.append("<tr><td>" + idC + "</td><td>" + attributes.get(id) + "</td></tr>");
+		}
+		s.append("</table></html>");
+		expNode.setTooltipInfo(s.toString());
 		
 		expNode.setGetChildrenMethod(new GetSubstances(expNode, document, isReadOnly, dataChangedListener));
 		return expNode;
