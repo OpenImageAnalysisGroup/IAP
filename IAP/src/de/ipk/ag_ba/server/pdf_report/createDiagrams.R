@@ -893,19 +893,58 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	return(overallList)
 }
 
+replaceUnits <- function(label) {
+	
+	label <- str_replace_all(label, fixed(".percent."),"")
+	label <- str_replace_all(label, fixed(".mm.2."),"")
+	label <- str_replace_all(label, fixed(".mm."),"")
+	label <- str_replace_all(label, fixed(".g."),"")
+	label <- str_replace_all(label, fixed(".relative...pix."),"")
+	label <- str_replace_all(label, fixed(".relative."),"")
+	label <- str_replace_all(label, fixed(".px.3."),"")
+	label <- str_replace_all(label, fixed(".px."),"")
+	label <- str_replace_all(label, fixed(".tassel."),"")
+	label <- str_replace_all(label, fixed(".sum.of.day."),"")
+	label <- str_replace_all(label, fixed(".leafs."),"")
+	label <- str_replace_all(label, fixed("...day."),"")
+	label <- str_replace_all(label, fixed("..."),"") #entspricht (%)
+	label <- str_trim(label)
+	
+	return(label)
+}
+
+
+reduceAllUnits <- function(allDes) {
+	
+	for(nn in seq(along = allDes)) {
+		label <- getVector(allDes[[nn]])
+		label <- replaceUnits(label)
+		allDes[[nn]] <- label
+	}
+	
+	return(allDes)
+}
+
 checkOfNormalizedAndUnnormalized <- function(allDes) {
 #########
 #allDes <- overallList$boxStackDes
+#allDes <- overallList$nBoxDes
 #########
 
 	tempAllDes <- allDes
+	allDes <- reduceAllUnits(allDes)
 	for(kk in seq(along = allDes)) {
 		## das unlist bei nbox überprüfen
 		vector <- unlist(allDes[kk])
 		if((length(grep("normalized.",vector , ignore.case=TRUE)) > 0) ||
-				(length(grep("norm.",vector , ignore.case=TRUE)) > 0)){
+		   (length(grep("norm.",vector , ignore.case=TRUE)) > 0) ||
+		   (length(grep(".normalized",vector , ignore.case=TRUE)) > 0) ||
+		   (length(grep(".norm",vector , ignore.case=TRUE)) > 0)){
 			nnUn <- gsub("normalized.","",vector)
 			nnUn <- gsub("norm.", "",nnUn)
+			nnUn <- gsub(".normalized","",nnUn)
+			nnUn <- gsub(".norm", "",nnUn)
+			
 			for(nn in seq(along = allDes)) {
 				#if(sum(nnUn %in% unlist(allDes[nn])) == length(unlist(allDes[nn]))) {
 				if(identical(nnUn, as.character(allDes[[nn]]))) {
@@ -1874,12 +1913,8 @@ setReset <- function(latexText, tabText="") {
 
 getBooleanVectorForWholeSection <- function(sectionMatrix, sectionID, identicalMatrix, debug) {
 #########
-#sectionIDVector <- c(sectionID, list(additionalSection))
-#identicalMatrix <- identicalMatrixSection
-#sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
-#identicalMatrix <- identicalMatrixSubSection
-#sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection))
-#identicalMatrix <- identicalMatrixSubSubSection	
+#sectionID <- subsubsectionID
+#identicalMatrix <- identicalMatrixSubSubSection
 #########
 	debug %debug% "getBooleanVectorForWholeSection()"
 
@@ -2346,7 +2381,9 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 												latexTextP <- setLoadImageAndLoadTex(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
 												tabTextP <- reduceTabText(tabTextP)
 												latexTextP <- setClosedBraces(latexTextP, tabTextP)
-												
+												if(paragraphID == "7.1.1.1") {
+													print("##################################### here we are ###############################")
+												}
 												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug)	
 											}
 										}
