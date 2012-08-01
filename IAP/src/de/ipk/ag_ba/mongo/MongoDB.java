@@ -492,12 +492,18 @@ public class MongoDB {
 		final int numberOfBinaryData = countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME, MeasurementNodeType.NETWORK });
 		
-		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Determine Size");
-		{
-			if (experiment.getHeader().getDatabaseId() != null && !experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
-				long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
-				experiment.getHeader().setSizekb(l / 1024);
+		boolean updatedSizeAvailable = false;
+		boolean determineSizeFromSource = false;
+		
+		if (determineSizeFromSource) {
+			if (status != null)
+				status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Determine Size");
+			{
+				if (experiment.getHeader().getDatabaseId() != null && !experiment.getHeader().getDatabaseId().startsWith("hsm:")) {
+					long l = Substance3D.getFileSize(Substance3D.getAllFiles(experiment));
+					experiment.getHeader().setSizekb(l / 1024);
+					updatedSizeAvailable = true;
+				}
 			}
 		}
 		
@@ -570,7 +576,8 @@ public class MongoDB {
 			}
 		}
 		
-		updateExperimentSize(db, experiment, status);
+		if (!updatedSizeAvailable)
+			updateExperimentSize(db, experiment, status);
 		
 		// System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
