@@ -629,7 +629,7 @@ public class Condition implements ConditionInterface {
 	@Override
 	public void getXMLAttributeStringForDocument(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNamesForDocument, new Object[] { getGenotype(), getGrowthconditions(),
-				getRowId(), getSpecies(), getTreatment(), getVariety() });
+				getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence() });
 	}
 	
 	@Override
