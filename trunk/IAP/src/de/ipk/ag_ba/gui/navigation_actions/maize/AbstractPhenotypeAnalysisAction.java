@@ -103,7 +103,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			MySnapshotFilter sf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), experiment.getHeader().getGlobalOutlierInfo());
 			
 			boolean filterTop = false; // process only top images?
-			boolean filterTime = false; // process only one day?
+			boolean filterTime = false; // process only one day? (day 48, see below)
 			boolean filterPlant = false; // process only one plant?
 			String plantFilter = "1107BA1350"; // "1121KN063";
 			
@@ -113,7 +113,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					if (!m3.getName().contains(".top"))
 						continue;
 				}
-				System.out.println("Substance-Name: " + m3.getName());
+				// System.out.println("Substance-Name: " + m3.getName());
 				for (ConditionInterface s : m3) {
 					Condition3D s3 = (Condition3D) s;
 					for (SampleInterface sd : s3) {
@@ -143,9 +143,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 							if (!qa.contains(plantFilter))
 								continue;
 						}
+						for (NumericMeasurementInterface nmi : sd3) {
+							System.out.println(nmi.getQualityAnnotation() + " // " + sd3.getTime() + " " + sd3.getTimeUnit());
+							break;
+						}
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3)) {
-								// System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
+								System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
 								workload.add(sd3);
 							}
 					}
@@ -155,6 +159,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			if (status != null) {
 				status.setCurrentStatusText1("Experiment: " + workload.size() + " images (vis+fluo+nir)");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">To be analyzed: " + workload.size() + " images (vis+fluo+nir)");
+				
+			}
+			if (workload.size() == 0) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">NO WORKLOAD! PROCESSING IS SKIPPED");
+				getResultReceiver().setExperimenData(null);
+				getResultReceiver().run();
+				return;
 			}
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();

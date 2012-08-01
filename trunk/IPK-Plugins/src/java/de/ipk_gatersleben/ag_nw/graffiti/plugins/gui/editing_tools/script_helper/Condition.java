@@ -47,7 +47,7 @@ public class Condition implements ConditionInterface {
 	 * If list of state variables is modified/extended, check and modify equals,
 	 * hashCode and eventually compareTo method implementation.
 	 */
-	private String species, genotype, growthconditions, treatment, variety;
+	private String species, genotype, growthconditions, treatment, variety, sequence;
 	private int rowId;
 	
 	private final Set<SampleInterface> samples = new LinkedHashSet<SampleInterface>();
@@ -55,11 +55,12 @@ public class Condition implements ConditionInterface {
 	private ExperimentHeaderInterface header;
 	
 	private static final String[] attributeNames = new String[] { "experimentname", "database", "experimenttype",
-			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype", "growthconditions", "id", "name", "treatment",
-			"variety" };
+			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
+			"growthconditions", "id", "name", "treatment",
+			"variety", "sequence" };
 	
 	private static final String[] attributeNamesForDocument = new String[] { "genotype", "growthconditions", "id",
-			"name", "treatment", "variety" };
+			"name", "treatment", "variety", "sequence" };
 	
 	public Condition(SubstanceInterface md) {
 		parent = md;
@@ -92,10 +93,25 @@ public class Condition implements ConditionInterface {
 		Substance.getAttributeString(r, attributeNames, getAttributeValues());
 	}
 	
+	@Override
+	public String getHTMLdescription() {
+		StringBuilder res = new StringBuilder();
+		res.append("<html><table border='1'>");
+		res.append("<tr><th>Property</th><th>Value</th></tr>");
+		res.append("<tr><td>Species</td><td>" + species + "</td></tr>");
+		res.append("<tr><td>Genotype</td><td>" + genotype + "</td></tr>");
+		res.append("<tr><td>Variety</td><td>" + variety + "</td></tr>");
+		res.append("<tr><td>Sequence</td><td>" + sequence + "</td></tr>");
+		res.append("<tr><td>Growth conditions</td><td>" + growthconditions + "</td></tr>");
+		res.append("<tr><td>Treatment</td><td>" + treatment + "</td></tr>");
+		res.append("</table></html>");
+		return res.toString();
+	}
+	
 	private Object[] getAttributeValues() {
 		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
 				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(), getExperimentRemark(), getGenotype(),
-				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety() };
+				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence() };
 	}
 	
 	@Override
@@ -148,8 +164,7 @@ public class Condition implements ConditionInterface {
 					&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 				serie += "/" + genotype;
 			if (treatment != null && treatment.length() > 0 && !treatment.equals("null")
-					&& !treatment.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)
-					&& !checkForSameGenoTypeAndTreatment(genotype, treatment))
+					&& !treatment.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 				serie += " (" + treatment + ")";
 			
 			String res = getRowId() + ": " + serie;
@@ -157,15 +172,6 @@ public class Condition implements ConditionInterface {
 				conditionCache = res;
 			return res;
 		}
-	}
-	
-	private static boolean checkForSameGenoTypeAndTreatment(String genotype, String treatment) {
-		if (genotype == null || treatment == null)
-			return false;
-		if (genotype.equalsIgnoreCase(treatment))
-			return true;
-		else
-			return false;
 	}
 	
 	@Override
@@ -218,7 +224,8 @@ public class Condition implements ConditionInterface {
 			String serie = m.getParentSample().getParentCondition().getConditionName();
 			String timeUnitAndTime = m.getParentSample().getSampleTime();
 			String measurementUnit = m.getUnit();
-			long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m
+			long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m
+					.getParentSample().getSampleFineTimeOrRowId() : m
 					.getParentSample().getTime();
 			TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 			String timeUnit = m.getParentSample().getTimeUnit();
@@ -244,7 +251,8 @@ public class Condition implements ConditionInterface {
 				String serie = m.getParentSample().getParentCondition().getConditionName();
 				String timeUnitAndTime = m.getParentSample().getSampleTime();
 				String measurementUnit = m.getUnit();
-				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m.getParentSample().getTime();
+				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m
+						.getParentSample().getTime();
 				TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 				String timeUnit = m.getParentSample().getTimeUnit();
 				int seriesID = m.getParentSample().getParentCondition().getSeriesId();
@@ -585,7 +593,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public String getSequence() {
-		return header.getSequence();
+		return sequence;
 	}
 	
 	@Override
@@ -605,7 +613,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public void setSequence(String sequence) {
-		header.setSequence(sequence != null ? sequence.intern() : null);
+		this.sequence = sequence != null ? sequence.intern() : null;
 	}
 	
 	@Override
@@ -818,9 +826,9 @@ public class Condition implements ConditionInterface {
 			return false;
 		if (!(obj instanceof Condition))
 			return false;
-		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + rowId;
+		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + sequence + ";" + rowId;
 		Condition c = (Condition) obj;
-		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";"
+		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";" + c.sequence + ";"
 				+ c.rowId;
 		return s1.equals(s2);
 	}

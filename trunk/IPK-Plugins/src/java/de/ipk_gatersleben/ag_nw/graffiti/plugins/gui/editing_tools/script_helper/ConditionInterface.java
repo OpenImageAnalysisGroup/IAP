@@ -205,4 +205,6 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	public void setExperimentHeader(ExperimentHeaderInterface header);
 	
 	public String getExperimentGlobalOutlierInfo();
+	
+	public String getHTMLdescription();
 }

@@ -196,4 +196,6 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	
 	public abstract int getNumberOfMeasurements();
 	
+	String getHTMLdescription();
+	
 }

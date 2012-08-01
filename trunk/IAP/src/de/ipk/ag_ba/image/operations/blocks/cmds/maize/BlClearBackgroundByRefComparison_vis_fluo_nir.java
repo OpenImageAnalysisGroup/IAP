@@ -266,11 +266,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage i = processedImages.nir();
 			FlexibleImage m = processedMasks.nir();
-			if (i != null && m != null)
+			if (i != null && m != null) {
 				i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
-			i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
-			processedImages.setNir(i);
-			processedMasks.setNir(i.copy());
+				i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
+				processedImages.setNir(i);
+				processedMasks.setNir(i.copy());
+			}
 		}
 	}
 }

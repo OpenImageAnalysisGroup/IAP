@@ -37,6 +37,29 @@ public class Substance implements SubstanceInterface {
 		// empty
 	}
 	
+	@Override
+	public String getHTMLdescription() {
+		StringBuilder res = new StringBuilder();
+		res.append("<html><table border='1'>");
+		res.append("<tr><th>Property</th><th>Value</th></tr>");
+		res.append("<tr><td>name</td><td>" + name + "</td></tr>");
+		res.append("<tr><td>funcat</td><td>" + funcat + "</td></tr>");
+		res.append("<tr><td>info</td><td>" + info + "</td></tr>");
+		res.append("<tr><td>formula</td><td>" + formula + "</td></tr>");
+		res.append("<tr><td>group</td><td>" + substancegroup + "</td></tr>");
+		res.append("<tr><td>cluster ID</td><td>" + cluster_id + "</td></tr>");
+		res.append("<tr><td>spot</td><td>" + spot + "</td></tr>");
+		res.append("<tr><td>new_blast</td><td>" + new_blast + "</td></tr>");
+		res.append("<tr><td>new_blast_e_val</td><td>" + new_blast_e_val + "</td></tr>");
+		res.append("<tr><td>new_blast_score</td><td>" + new_blast_score + "</td></tr>");
+		res.append("<tr><td>affy_hit</td><td>" + new_blast_score + "</td></tr>");
+		res.append("<tr><td>scroe</td><td>" + score + "</td></tr>");
+		res.append("<tr><td>secure</td><td>" + secure + "</td></tr>");
+		res.append("<tr><td>row ID</td><td>" + rowId + "</td></tr>");
+		res.append("</table></html>");
+		return res.toString();
+	}
+	
 	/**
 	 * Whole XML dataset: <experimentdata> <experiment experimentid="-1">
 	 * <experimentname>Gerstenentwicklung-Frühjahr 2003</experimentname>

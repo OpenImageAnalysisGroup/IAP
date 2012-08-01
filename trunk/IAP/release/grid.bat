@@ -25,7 +25,8 @@ GOTO download
 :morework
 echo Return value indicates more work needs to be done. Start processing next job in 10 seconds ...
 PING 1.1.1.1 -n 1 -w 10000 >NUL
-GOTO start
+rem GOTO start
+GOTO download
 :downloaderror
 echo Return value indicates that the current release could not be downloaded. Waiting 10 minutes for next try.
 PING 1.1.1.1 -n 10 -w 60000 >NUL
