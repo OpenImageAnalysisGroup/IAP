@@ -2217,15 +2217,21 @@ public class MongoDB {
 		if (l != null) {
 			double max = l.size();
 			for (Object o : l) {
-				DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
-				DBObject cond = condr.fetch();
-				if (cond != null) {
-					if (optDBObjectsConditions != null)
-						optDBObjectsConditions.add(cond);
-					processCondition(s3d, cond, optStatusProvider, max);
+				try {
+					if (o == null)
+						continue;
+					DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
+					DBObject cond = condr.fetch();
+					if (cond != null) {
+						if (optDBObjectsConditions != null)
+							optDBObjectsConditions.add(cond);
+						processCondition(s3d, cond, optStatusProvider, max);
+					}
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 			}
 		}
 	}
