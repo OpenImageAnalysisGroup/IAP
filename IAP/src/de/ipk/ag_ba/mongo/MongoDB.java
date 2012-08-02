@@ -2197,6 +2197,20 @@ public class MongoDB {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		
+		if (experiment.getName().startsWith("Unit Test "))
+			if (s3d.getName() != null && (s3d.getName().contains("histogram")
+					|| s3d.getName().contains(".angles")
+					|| s3d.getName().contains(".hsv.")
+					|| !s3d.getName().startsWith("corr.")
+					|| s3d.getName().contains(".lab.")
+					|| s3d.getName().contains(".percent.")
+					|| s3d.getName().contains("RESULT_"))) {
+				System.out.println("Skip substance loading of substance " + s3d.getName());
+				if (optStatusProvider != null)
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
+				return;
+			}
+		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s=" + n + ")");
 		
