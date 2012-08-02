@@ -25,7 +25,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private boolean debugRegionParts = false;
+	private final boolean debugRegionParts = false;
+	
+	private final boolean calculateValuesAlsoForDifferentRegions = false;
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -52,17 +54,18 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 			
 			String pre = "RESULT_" + options.getCameraPosition();
 			int regions = 5;
-			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				for (int r = 0; r < regions; r++)
-					processVisibleImage(io.getBottom(r, regions).print("Side Part " + r + "/" + regions, debugRegionParts),
-							pre + ".section_" + (r + 1) + "_" + regions + ".");
+			if (calculateValuesAlsoForDifferentRegions) {
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					for (int r = 0; r < regions; r++)
+						processVisibleImage(io.getBottom(r, regions).print("Side Part " + r + "/" + regions, debugRegionParts),
+								pre + ".section_" + (r + 1) + "_" + regions + ".");
+				}
+				if (options.getCameraPosition() == CameraPosition.TOP) {
+					for (int r = 0; r < regions; r++)
+						processVisibleImage(io.getInnerCircle(r, regions).print("Top Part " + r + "/" + regions, debugRegionParts),
+								pre + ".section_" + (r + 1) + "_" + regions + ".");
+				}
 			}
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				for (int r = 0; r < regions; r++)
-					processVisibleImage(io.getInnerCircle(r, regions).print("Top Part " + r + "/" + regions, debugRegionParts),
-							pre + ".section_" + (r + 1) + "_" + regions + ".");
-			}
-			
 			processVisibleImage(io, pre + ".");
 			
 			return input().masks().vis();

@@ -1458,6 +1458,9 @@ public class MongoDB {
 				public void run() {
 					// synchronized (db) {
 					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
+					
+					experiment.setHeader(header);
+					
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
 						BasicDBList subList = (BasicDBList) expref.get("substances");
@@ -1490,7 +1493,6 @@ public class MongoDB {
 							}
 						}
 					}
-					experiment.setHeader(header);
 					
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
 							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
@@ -2197,19 +2199,22 @@ public class MongoDB {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		
-		if (experiment.getName().startsWith("Unit Test "))
-			if (s3d.getName() != null && (s3d.getName().contains("histogram")
-					|| s3d.getName().contains(".angles")
-					|| s3d.getName().contains(".hsv.")
-					|| !s3d.getName().startsWith("corr.")
-					|| s3d.getName().contains(".lab.")
-					|| s3d.getName().contains(".percent.")
-					|| s3d.getName().contains("RESULT_"))) {
-				System.out.println("Skip substance loading of substance " + s3d.getName());
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
-				return;
-			}
+		boolean speedupLoading = false;
+		if (speedupLoading)
+			if (experiment.getName().startsWith("Unit Test "))
+				if (s3d.getName().contains("histogram")
+						|| s3d.getName().contains(".angles")
+						// || s3d.getName().contains(".hsv.")
+						|| !s3d.getName().contains(".all.")
+						// || !s3d.getName().startsWith("corr.")
+						|| s3d.getName().contains(".lab.")
+						// || s3d.getName().contains(".percent.")
+						|| s3d.getName().contains("RESULT_")) {
+					System.out.println("Skip substance loading of substance " + s3d.getName());
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
+					return;
+				}
 		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s=" + n + ")");
