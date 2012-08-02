@@ -425,6 +425,8 @@ nBoxPlotList <- list(
 		"top.hull.circularity (relative)" = list(plotName = "top circularity", section = 13, subsection = 2, subsubsection = 8),
 		"top.compactness.01 (relative)" = list(plotName = "top compactness (0-1)", section = 13, subsection = 2, subsubsection = 9)
 		
+		
+		
 #		"side.fluo.intensity.chlorophyl.average (relative)" = list(plotName = "chlorophyll intensity (relative intensity/pixel)", section = 2), 
 #		"side.fluo.intensity.phenol.average (relative)" = list(plotName = "fluorescence intensity (relative intensity/pixel)", section = 2), 													
 #		 

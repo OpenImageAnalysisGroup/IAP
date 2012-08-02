@@ -23,6 +23,7 @@ LINERANGE.PLOT <- "lineRangePlot"
 ## colum names
 NAME <- "name"
 PRIMAER.TREATMENT <- "primaerTreatment"
+X.AXIS <- "xAxis"
 
 ## fail values
 NONE <- "none"
@@ -75,6 +76,15 @@ TEX.PATTERN <- paste(POINT.PATTERN, "[Tt][Ee][Xx]$", sep="")
 SECTION.PATTERN <- paste(SECTION.TEX, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, TEX.PATTERN, sep="")
 
 OVERALL.FILENAME.PATTERN <- "overallFileNamePattern"
+
+## build new Columns
+BUILD.TOP <- "top"
+BUILD.SIDE <- "side"
+BUILD.SECTION <- "section"
+BUILD.SEPARATOR.ONE <- "."
+BUILD.SEPARATOR.TWO <- "_"
+BUILD.SECTION.FIRST.INDEX <- 5
+BUILD.SECTION.SECOND.INDEX <- 5
 
 ## Tex
 NEWLINE.TEX <- " \n"
@@ -2673,11 +2683,13 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 			colNames = c("mean")
 		}
 		
-		if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
-			standardColumnName = c("name", PRIMAER.TREATMENT, "xAxis")
-		} else {
-			standardColumnName = c("name", "xAxis")
-		}
+		standardColumnName = getStandardColnames(tempOverallResult)
+		
+#		if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
+#			standardColumnName = c("name", PRIMAER.TREATMENT, "xAxis")
+#		} else {
+#			standardColumnName = c("name", "xAxis")
+#		}
 
 		if (sum(!(colNames %in% colnames(tempOverallResult)))>0) {
 
@@ -4923,6 +4935,49 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 	}
 }
 
+getStandardColnames <- function(tempOverallResult) {
+	if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
+		return(c(NAME, PRIMAER.TREATMENT, X.AXIS))
+	} else {
+		return(c(NAME, X.AXIS))
+	}
+}
+
+#####
+# possible Columns in overallResult(for NBOX.PLOT <- linear Diagrams) :
+# "name": either a combination from the primär Treatment and the second one or only the primär Treamtent (only if no secondary treatment was selected)
+# "primaerTreatment": the colum is only there when a second treatment was selected and represent than the primär Treatment
+# "xAxis": all the days that are available
+# "mean": average value on the descriptor
+# "se": standard deviation
+######
+calculateSomeStressForTheGivenTyp <- function(overallResult) {
+	return(mean(overallResult[,"mean"], na.rm=TRUE))	
+}
+
+
+calculateStressValues <- function(overallList) {
+	overallList$debug %debug% "calculateStressValues()"
+
+	workingData <- overallList$overallResult_nBoxDes	
+	uniqueValues <- unique(as.character(workingData[,NAME]))
+	desVec <- na.omit(unlist(overallList$nBoxDes))
+	
+	stressResultMatrix <- matrix(0, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
+	
+	for(nn in uniqueValues) {
+		newWorkingDataSet <- workingData[workingData[,NAME] == nn,]
+		for (descriptorIndex in names(desVec)) {	
+				overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
+				stressResultMatrix[descriptorIndex, nn] <- calculateSomeStressForTheGivenTyp(overallResult)
+		}
+	}
+	rownames(stressResultMatrix) <- getVector(overallList$nBoxDesName[names(desVec)])
+	overallList$stressMatrix <- stressResultMatrix
+	return(overallList)
+}
+
+
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
 	if (threaded)
@@ -5196,6 +5251,32 @@ checkStressTypValues <- function(stress.Typ) {
 	}
 	return(stress.Typ)
 }
+#()
+#addVisibleSections <- function(descriptorSet_temp, plotTyp) {
+#	
+#	buildBackbone <- vector()
+# 	preValues <- c(BUILD.TOP, BUILD.SIDE)
+#	
+#	index <- 1
+#	for(nn in preValues) {
+#		buildBackboneBase <- paste(nn, BUILD.SEPARATOR.ONE, BUILD.SECTION, BUILD.SEPARATOR.TWO, sep = "")
+#		for(kk in seq(BUILD.SECTION.FIRST.INDEX)) {
+#			for(hh in seq(BUILD.SECTION.SECOND.INDEX)) {
+#				buildBackbone[index] <- paste(buildBackboneBase
+#			}
+#		}
+#	}
+#	
+#	buildBackbone <- paste()	
+#}
+#
+#addAdditionalColums <-  function(descriptorSet_temp, plotTyp) {
+#	
+#	descriptorSet_temp <- addVisibleSections(descriptorSet_temp, plotTyp)
+#	
+#	return(descriptorSet_temp)
+#}
+
 
 initRfunction <- function(debug) {
 	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
@@ -5319,6 +5400,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 				loadFiles(path = ".", pattern = "sectionMapping\\.[Rr]$")	## load sectionMappingList
 				
 				descriptorSet_temp <- getRealNameAndPrintSection(nBoxPlotList)
+				#descriptorSet_temp <- addAdditionalColums(descriptorSet_temp, NBOX.PLOT)
 				descriptorSet_nBoxplot <- descriptorSet_temp$columName
 				descriptorSetName_nBoxplot <- descriptorSet_temp$plotName	
 				descriptorSection_nBoxplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
@@ -5394,8 +5476,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		treatment <- "Treatment"
 		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
-		filterTreatment <- "control"
-		#filterTreatment <- "dry$normal"
+		#filterTreatment <- "control"
+		filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
 		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
 
@@ -5403,7 +5485,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#filterSecondTreatment  <- "none"
 		
 		secondTreatment <- "Genotype"
-		filterSecondTreatment  <- "Wiebke"
+		filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
 		
 		#secondTreatment <- "Treatment"
@@ -5673,9 +5755,10 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		#	overallList = overallOutlierDetection(overallList)
 			overallList = overallGetResultDataFrame(overallList)			
 			if (!overallList$stoppTheCalculation) {
-				overallList = setColor(overallList) 
-	
+				overallList <- setColor(overallList) 
+				overallList <- calculateStressValues(overallList)
 				makeDiagrams(overallList)
+				
 			}
 		}
 	}
