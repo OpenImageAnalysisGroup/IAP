@@ -43,6 +43,8 @@ stackedPlotList <- list(
 		
 		"top.ir.normalized.histogram.bin." = list(plotName = "top infrared light intensities (zoom corrected) (%)", section = 63, subsection = 3),
 		"top.ir.histogram.bin." = list(plotName = "top infrared light intensities (%)", section = 63, subsection = 4)
+
+		
 		
 )
 
