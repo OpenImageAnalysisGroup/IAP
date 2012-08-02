@@ -143,13 +143,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 							if (!qa.contains(plantFilter))
 								continue;
 						}
-						for (NumericMeasurementInterface nmi : sd3) {
-							System.out.println(nmi.getQualityAnnotation() + " // " + sd3.getTime() + " " + sd3.getTimeUnit());
-							break;
-						}
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3)) {
-								System.out.println("Add something: " + sd3 + " (" + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
+								System.out.println("Add sample to workload (to be analyzed): " + sd3 + " ("
+										+ SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
 								workload.add(sd3);
 							}
 					}

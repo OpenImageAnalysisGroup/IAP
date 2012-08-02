@@ -151,7 +151,8 @@ public class ExperimentReference {
 							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
 				// weakId2exp.put(databaseId, res);
 				this.experiment = res;
-				System.out.println(SystemAnalysis.getCurrentTime()+">Loaded experiment with "+experiment.size()+" substances.");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " + experiment.size() + " substances (DB ID "
+						+ res.getHeader().getDatabaseId() + ").");
 				return res;
 			}
 		}

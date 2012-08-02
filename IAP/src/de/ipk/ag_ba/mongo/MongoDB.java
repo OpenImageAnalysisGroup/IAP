@@ -61,7 +61,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
-import com.mongodb.MongoInternalException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
@@ -118,6 +117,8 @@ public class MongoDB {
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
 	private static boolean ensureIndex = false;
+	
+	private final boolean multiThreadedStorage = false;
 	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
@@ -514,7 +515,7 @@ public class MongoDB {
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
 		errorCount.setLong(0);
-		int nLock = 4;
+		int nLock = multiThreadedStorage ? 4 : 1;
 		final Semaphore lock = new Semaphore(nLock, true);
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.get(0);
@@ -607,7 +608,7 @@ public class MongoDB {
 		
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
 		
-		int nLock = 5;
+		int nLock = multiThreadedStorage ? 5 : 1;
 		final Semaphore lock = new Semaphore(nLock, true);
 		
 		for (final ConditionInterface c : s) {
@@ -653,7 +654,7 @@ public class MongoDB {
 			condition = new BasicDBObject(filter(attributes));
 		}
 		
-		int nLock = 2;
+		int nLock = multiThreadedStorage ? 2 : 1;
 		boolean fair = true;
 		final Semaphore lock = new Semaphore(nLock, fair);
 		
@@ -836,9 +837,10 @@ public class MongoDB {
 		condition.put("samples", dbSamples);
 		try {
 			conditions.insert(condition);
-			conditionIDs.add((condition).getString("_id"));
-		} catch (MongoInternalException mie) {
+			conditionIDs.add(condition.getString("_id"));
+		} catch (Exception mie) {
 			System.out.println("Invalid condition: " + c + ", with " + c.size() + " samples");
+			mie.printStackTrace();
 		}
 	}
 	
@@ -1494,6 +1496,8 @@ public class MongoDB {
 						}
 					}
 					
+					experiment.setHeader(header);
+					
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
 							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
@@ -1604,6 +1608,8 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
+				if (header.getDatabaseId() == null)
+					System.out.println("Cant update experiment, as header DB id is null!");
 				ObjectId id = new ObjectId(header.getDatabaseId());
 				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
