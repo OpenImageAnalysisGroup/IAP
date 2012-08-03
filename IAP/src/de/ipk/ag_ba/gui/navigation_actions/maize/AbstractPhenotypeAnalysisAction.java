@@ -145,8 +145,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						}
 						if (!containsAnOutlier)
 							if (filter == null || filter.isValidSample(sd3)) {
-								System.out.println("Add sample to workload (to be analyzed): " + sd3 + " ("
-										+ SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
+//								System.out.println("Add sample to workload (to be analyzed): " + sd3 + " ("
+//										+ SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
 								workload.add(sd3);
 							}
 					}
