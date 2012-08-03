@@ -34,6 +34,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.imageio.ImageIO;
 
@@ -540,7 +542,10 @@ public class MongoDB {
 			};
 			lock.acquire(1);
 			Thread t = new Thread(rrr, "Thread Substance Saving " + s.getName());
-			t.start();
+			if (multiThreadedStorage)
+				t.start();
+			else
+				t.run();
 		} // substance
 		lock.acquire(nLock);
 		lock.release(nLock);
@@ -630,7 +635,10 @@ public class MongoDB {
 			lock.acquire(1);
 			Thread t = new Thread(rr);
 			t.setName("Process condition " + c.getName());
-			t.start();
+			if (multiThreadedStorage)
+				t.start();
+			else
+				t.run();
 		} // condition
 		lock.acquire(nLock);
 		lock.release(nLock);
@@ -823,7 +831,10 @@ public class MongoDB {
 				};
 				lock.acquire(1);
 				Thread t = new Thread(r, "Sample storage thread");
-				t.start();
+				if (multiThreadedStorage)
+					t.start();
+				else
+					t.run();
 			}
 			if (dbVolumes.size() > 0)
 				sample.put("volumes", dbVolumes);
@@ -1136,8 +1147,8 @@ public class MongoDB {
 					+ ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
-	
-	private final ExecutorService storageTaskQueue = Executors.newFixedThreadPool(15, new ThreadFactory() {
+	private final boolean useThreads = false;
+	private final ExecutorService storageTaskQueue = useThreads ? Executors.newFixedThreadPool(15, new ThreadFactory() {
 		int n = 1;
 		
 		@Override
@@ -1147,13 +1158,44 @@ public class MongoDB {
 			n++;
 			return res;
 		}
-	});
+	}) : null;
 	
 	public Future<DatabaseStorageResult> saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
-		
-		return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
+		if (storageTaskQueue==null) {
+			final DatabaseStorageResult res = saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+			return new Future<DatabaseStorageResult>() {
+
+				@Override
+				public boolean cancel(boolean mayInterruptIfRunning) {
+					return false;
+				}
+
+				@Override
+				public DatabaseStorageResult get() throws InterruptedException,
+						ExecutionException {
+					return res;
+				}
+
+				@Override
+				public DatabaseStorageResult get(long timeout, TimeUnit unit)
+						throws InterruptedException, ExecutionException,
+						TimeoutException {
+					return res;
+				}
+
+				@Override
+				public boolean isCancelled() {
+					return false;
+				}
+
+				@Override
+				public boolean isDone() {
+					return true;
+				}};
+		} else
+			return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
 			@Override
 			public DatabaseStorageResult call() throws Exception {
 				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
