@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ReleaseInfo;
-import org.SettingsHelperDefaultIsTrue;
+import org.SettingsHelperDefaultIsFalse;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -98,6 +98,10 @@ public class BackupSupport {
 	}
 	
 	public void makeBackup() {
+		if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE BACKUP OPERATION IS DISABLED");
+			return;
+		}
 		if (backupRunning) {
 			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE PREVIOUS BACKUP OPERATION IS STILL RUNNING");
 			return;
@@ -144,6 +148,11 @@ public class BackupSupport {
 						IAPmain.loadIcon("img/ext/folder-remote.png"));
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
+					if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+						print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
+						return;
+					}
+					
 					if (hsmExp.getOriginDbId() != null)
 						hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(),
 								hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
@@ -185,6 +194,10 @@ public class BackupSupport {
 			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
 			MongoDB m = MongoDB.getDefaultCloud();
 			for (IdTime it : toSave) {
+				if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+					print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
+					return;
+				}
 				ExperimentHeaderInterface src = it.getExperimentHeader();
 				print("START BACKUP OF EXPERIMENT: " + it.Id);
 				
@@ -216,13 +229,13 @@ public class BackupSupport {
 						Thread.sleep(1000);
 						
 						String hsmFolder = IAPmain.getHSMfolder();
-						if (!new SettingsHelperDefaultIsTrue().isEnabled("backup"))
+						if (!new SettingsHelperDefaultIsFalse().isEnabled("backup"))
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
-						else
+						else {
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
-						
-						BackupSupport sb = BackupSupport.getInstance();
-						sb.makeBackup();
+							BackupSupport sb = BackupSupport.getInstance();
+							sb.makeBackup();
+						}
 					} catch (InterruptedException e) {
 						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 					}
