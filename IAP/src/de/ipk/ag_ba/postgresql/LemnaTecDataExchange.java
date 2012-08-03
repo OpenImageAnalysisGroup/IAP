@@ -1226,7 +1226,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
