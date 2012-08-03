@@ -143,6 +143,8 @@ public class MassCopySupport {
 			final ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 			
 			for (String db : lt.getDatabases()) {
+				if (db.endsWith("11"))
+					continue;
 				try {
 					for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
 						ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
