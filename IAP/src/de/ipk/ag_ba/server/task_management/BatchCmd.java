@@ -139,7 +139,7 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public void setCompatibleImageAnalysisPipelineName(IAP_RELEASE pipline_id) {
-		put("release", pipline_id.toString());
+		put("release", pipline_id + "");
 	}
 	
 	public CloudAnalysisStatus getRunStatus() {

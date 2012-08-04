@@ -8,7 +8,6 @@ package de.ipk.ag_ba.server.task_management;
 
 import info.StopWatch;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -356,9 +355,10 @@ public class CloudComputingService {
 				
 				Object[] res;
 				if (SystemAnalysis.isHeadless()) {
-					System.out.println(SystemAnalysis.getCurrentTime()+">Analyzed experiment: "
-											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
-					System.out.println(SystemAnalysis.getCurrentTime()+">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
+							+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
+							+ ", FINISHED: "
 							+ knownResults.size());
 					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
 					String in = SystemAnalysis.getCommandLineInput();
@@ -384,7 +384,7 @@ public class CloudComputingService {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 					System.exit(1);
 				} else {
-					if (res[0] instanceof String) 
+					if (res[0] instanceof String)
 						addNewTasksIfMissing = !((String) res[0]).contains("n");
 					else
 						addNewTasksIfMissing = (Boolean) res[0];
@@ -412,7 +412,10 @@ public class CloudComputingService {
 							cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
 							cmd.setRemoteCapableAnalysisActionParams("");
 							cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
-							cmd.setCompatibleImageAnalysisPipelineName(tempDataSetDescription.getReleaseIAP());
+							if (tempDataSetDescription.getReleaseIAP() != null)
+								cmd.setCompatibleImageAnalysisPipelineName(tempDataSetDescription.getReleaseIAP());
+							else
+								cmd.setCompatibleImageAnalysisPipelineName(IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_MAIZE);
 							BatchCmd.enqueueBatchCmd(m, cmd);
 							System.out.println("Enqueue: " + jobID);
 						}
@@ -421,7 +424,7 @@ public class CloudComputingService {
 					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 						try {
 							doMerge(m, tempDataSetDescription, knownResults);
-						} catch(Exception e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
@@ -430,7 +433,7 @@ public class CloudComputingService {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
-
+	
 	private static void doMerge(MongoDB m,
 			TempDataSetDescription tempDataSetDescription,
 			ArrayList<ExperimentHeaderInterface> knownResults) throws Exception {
