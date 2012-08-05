@@ -3,14 +3,14 @@ package de.ipk.ag_ba.gui.webstart;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public enum IAP_RELEASE {
-	RELEASE_IAP_IMAGE_ANALYSIS_BARLEY("R37_2012-07-10_barley"),
-	RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R37_2012-08-03_maize_no_regions_no_threads"),
+	RELEASE_IAP_IMAGE_ANALYSIS_BARLEY("R38_2012-08-05_barley"),
+	RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R38_2012-08-05_maize"),
 	// RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R37_2012-08-02_maize"),
 	// RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R37_2012-07-30_maize"),
 	// RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R37_2012-07-10_maize"),
-	RELEASE_IAP_IMAGE_ANALYSIS_ARABIDOPSIS("R37_2012-07-10_arabidopsis"),
-	RELEASE_IAP_IMAGE_ANALYSIS_3D("R37_2012-07-10_3D"),
-	RELEASE_IAP_IMAGE_ANALYSIS_OTHER("R37_2012-07-10_other");
+	RELEASE_IAP_IMAGE_ANALYSIS_ARABIDOPSIS("R38_2012-08-05_arabidopsis"),
+	RELEASE_IAP_IMAGE_ANALYSIS_3D("R38_2012-08-05_3D"),
+	RELEASE_IAP_IMAGE_ANALYSIS_OTHER("R38_2012-08-05_other");
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R34_2012-06-26_color_stats_pc1";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R33_2012-06-22_release_test3_arabidopsis";
 	// public static final String RELEASE_IAP_IMAGE_ANALYSIS = "R32_2012-06-20_release_test2";
