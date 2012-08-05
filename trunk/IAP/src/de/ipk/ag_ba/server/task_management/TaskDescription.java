@@ -127,6 +127,8 @@ public class TaskDescription {
 					finishedIncomplete = true;
 					return;
 				}
+				if (batch.getStatusProvider() != null)
+					batch.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
 				if (cmd != null && cmd.getStatusProvider() != null)
 					cmd.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
 				experiment.getHeader().setExperimentname(
@@ -135,6 +137,9 @@ public class TaskDescription {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
 						+ SystemAnalysis.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
+				experiment.getHeader().setRemark(
+						"IAP image analysis release " + batch.getCompatibleImageAnalysisPipelineName() + " // " +
+								experiment.getHeader().getRemark());
 				// System.out.println("Received result: " + experiment.getName());
 				try {
 					BatchCmd bcmd = m.batchGetCommand(batch);
