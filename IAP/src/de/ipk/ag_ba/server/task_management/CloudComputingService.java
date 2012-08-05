@@ -318,7 +318,8 @@ public class CloudComputingService {
 					String partCnt = cc[2];
 					String submTime = cc[3];
 					if (!processedSubmissionTimes.contains(submTime))
-						availableTempDatasets.add(new TempDataSetDescription(className, partCnt, submTime, i.getOriginDbId(),
+						availableTempDatasets.add(new TempDataSetDescription(
+								className, partCnt, submTime, i.getOriginDbId(),
 								IAP_RELEASE.getReleaseFromDescription(i)));
 					processedSubmissionTimes.add(submTime);
 				}
