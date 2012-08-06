@@ -19,6 +19,7 @@ import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -200,7 +201,14 @@ public class TaskDescription {
 								String sn = cmd.getRemoteCapableAnalysisActionClassName();
 								if (sn.indexOf(".") > 0)
 									sn = sn.substring(sn.lastIndexOf(".") + 1);
-								e.getHeader().setExperimentname(sn + ": " + experimentInput.getExperimentName());
+								try {
+									Object o = Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
+									AbstractPhenotypeAnalysisAction apa = (AbstractPhenotypeAnalysisAction) o;
+									sn = apa.getDefaultTitle() + " (version " + apa.getVersionTag() + ")";
+								} catch (Exception er) {
+									MongoDB.saveSystemErrorMessage("Could not determine image analysis task name.", er);
+								}
+								e.getHeader().setExperimentname(sn + " of " + experimentInput.getExperimentName());
 								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 								e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 								e.getHeader().setDatabaseId("");
