@@ -64,6 +64,7 @@ public class TaskDescription {
 			startTime = cmd.getSubmissionTime();
 		} catch (Exception e) {
 			System.out.println("Invalid task-description: " + cmd);
+			MongoDB.saveSystemErrorMessage("Invalid task-description: " + cmd, e);
 			analysisActionClassName = null;
 			params = null;
 		}
@@ -106,6 +107,7 @@ public class TaskDescription {
 						try {
 							action.performActionCalculateResults(null);
 						} catch (Exception e) {
+							MongoDB.saveSystemErrorMessage("Error calculating phenotypic data set.", e);
 							e.printStackTrace();
 							ErrorMsg.addErrorMessage(e);
 						}
@@ -259,6 +261,7 @@ public class TaskDescription {
 									+ ". Therefore analysis result is not saved.");
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
+					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
 					e.printStackTrace();
 				}
 				finishedComplete = true;

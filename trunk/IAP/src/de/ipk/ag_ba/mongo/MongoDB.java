@@ -1147,6 +1147,7 @@ public class MongoDB {
 					+ ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes() / 1024 / 1024 + " MB)");
 		return ((VolumeInputStream) network.getURL().getInputStream()).getNumberOfBytes();
 	}
+	
 	private final boolean useThreads = false;
 	private final ExecutorService storageTaskQueue = useThreads ? Executors.newFixedThreadPool(15, new ThreadFactory() {
 		int n = 1;
@@ -1163,44 +1164,45 @@ public class MongoDB {
 	public Future<DatabaseStorageResult> saveImageFile(final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
-		if (storageTaskQueue==null) {
+		if (storageTaskQueue == null) {
 			final DatabaseStorageResult res = saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
 			return new Future<DatabaseStorageResult>() {
-
+				
 				@Override
 				public boolean cancel(boolean mayInterruptIfRunning) {
 					return false;
 				}
-
+				
 				@Override
 				public DatabaseStorageResult get() throws InterruptedException,
 						ExecutionException {
 					return res;
 				}
-
+				
 				@Override
 				public DatabaseStorageResult get(long timeout, TimeUnit unit)
 						throws InterruptedException, ExecutionException,
 						TimeoutException {
 					return res;
 				}
-
+				
 				@Override
 				public boolean isCancelled() {
 					return false;
 				}
-
+				
 				@Override
 				public boolean isDone() {
 					return true;
-				}};
+				}
+			};
 		} else
 			return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
-			@Override
-			public DatabaseStorageResult call() throws Exception {
-				return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
-			}
-		});
+				@Override
+				public DatabaseStorageResult call() throws Exception {
+					return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+				}
+			});
 	}
 	
 	// public DatabaseStorageResult saveImageFile(final DB db,
@@ -3232,5 +3234,20 @@ public class MongoDB {
 			} else
 				return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
+	}
+	
+	public static void saveSystemMessage(String msg) {
+		try {
+			MongoDB.getDefaultCloud().addNewsItem(msg, "system");
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	public static void saveSystemErrorMessage(String error, Exception e) {
+		saveSystemMessage("System eror message from host " + SystemAnalysisExt.getHostNameNoError() + ": " + error + " - Exception: " + e.getMessage() +
+				".<br>Stack-trace:<br>" +
+				e.getStackTrace() != null ?
+				StringManipulationTools.getStringList(e.getStackTrace(), "<br>") : "(no stacktrace)");
 	}
 }
