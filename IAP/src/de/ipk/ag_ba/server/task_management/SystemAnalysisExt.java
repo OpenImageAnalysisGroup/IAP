@@ -495,4 +495,12 @@ public class SystemAnalysisExt {
 		}
 		return res;
 	}
+	
+	public static String getHostNameNoError() {
+		try {
+			return getHostName();
+		} catch (UnknownHostException e) {
+			return "(unknown host)";
+		}
+	}
 }
