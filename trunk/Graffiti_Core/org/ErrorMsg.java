@@ -307,9 +307,9 @@ public class ErrorMsg implements HelperClass {
 	}
 	
 	public static void addErrorMessage(Exception e) {
+		e.printStackTrace();
 		if (SystemAnalysis.isHeadless() && e != null) {
 			System.out.println("ERROR-MSG: " + e.getMessage());
-			e.printStackTrace();
 		}
 		if (rethrowErrorMessages)
 			throw new UnsupportedOperationException(e);

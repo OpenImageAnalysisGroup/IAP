@@ -612,17 +612,17 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				}
 				
 				for (DateDoubleString o : valueRow) {
-					if (o.getString() != null && !o.getString().isEmpty())
+					if (o != null && o.getString() != null && !o.getString().isEmpty())
 						row.createCell(colNum++).setCellValue(o.getString());
 					else
-						if (o.getDouble() != null) {
+						if (o != null && o.getDouble() != null) {
 							Cell cell = row.createCell(colNum++);
 							cell.setCellValue(o.getDouble());
 							if (percentColumns.contains(colNum)) {
 								cell.setCellStyle(cellStylePercent);
 							}
 						} else
-							if (o.getDate() != null) {
+							if (o != null && o.getDate() != null) {
 								dateColumns.add(colNum);
 								Cell cell = row.createCell(colNum++);
 								cell.setCellValue(o.getDate());

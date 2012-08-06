@@ -631,7 +631,7 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getTreatment()));
 				row.add(new DateDoubleString(s.getSequence()));
 				row.add(new DateDoubleString(s.getTimePoint()));
-				row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
+				row.add(s.getSnapshotTime() != null ? new DateDoubleString(new Date(s.getSnapshotTime())) : null);
 				row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
 				row.add(new DateDoubleString(s.getWeightBefore()));
 				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
