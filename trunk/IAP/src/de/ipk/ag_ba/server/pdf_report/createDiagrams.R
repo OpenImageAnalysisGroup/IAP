@@ -1,8 +1,14 @@
 # Author: Entzian, Klukas
 ###############################################################################
-
 cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
 
+doModellingOfStress <- TRUE
+stressModellInput <- "report_1121KN.csv"
+stressModellTreatment <- "Treatment"
+descriptorStressVector <- vector()
+
+
+doParallelisation <- FALSE
 threaded <- FALSE
 innerThreaded = FALSE
 cpuCNT <- 2
@@ -19,11 +25,15 @@ SPIDER.PLOT <- "spiderplot"
 VIOLIN.PLOT <- "violinplot"
 BAR.PLOT <- "barplot"
 LINERANGE.PLOT <- "lineRangePlot"
+STRESS.PLOT <- "stressplot"
 
 ## colum names
 NAME <- "name"
 PRIMAER.TREATMENT <- "primaerTreatment"
 X.AXIS <- "xAxis"
+MEAN <- "mean"
+STRESS <- "stress"
+VALUES <- "values"
 
 ## fail values
 NONE <- "none"
@@ -95,20 +105,20 @@ TABULATOR.TEX <- "    "
 VALUE.AVERAGE <- "average"
 START.TYP.TEST <- "test"
 START.TYP.REPORT <- "report"
-
+START.TYP.STRESS <- "stress"
 
 ############## Flags for debugging ####################
 
 calculateNothing <- FALSE
-calculateOnlyNBox <- FALSE
-calculateOnlyViolin <- FALSE
-calculateOnlyStacked <- FALSE
-calculateOnlySpider <- FALSE
-calculateOnlyLineRange <- FALSE
-calculateOnlyBoxplot <- FALSE
+plotNothing <- FALSE
 
-
-
+plotOnlyNBox <- FALSE
+plotOnlyViolin <- FALSE
+plotOnlyStacked <- FALSE
+plotOnlySpider <- FALSE
+plotOnlyLineRange <- FALSE
+plotOnlyBoxplot <- FALSE
+plotOnlyStressValues <- TRUE
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -239,11 +249,16 @@ ownCat <- function(text, endline=TRUE){
 #	while (class(text) == "list") {
 #		text <- unlist(text)
 #	}
-	
-	if (sfParallel()) {
-		sfCat(text, master=TRUE)
-		if (endline)
-			sfCat("\n", master=TRUE)
+	if(doParallelisation) {
+		if (sfParallel()) {
+			sfCat(text, master=TRUE)
+			if (endline)
+				sfCat("\n", master=TRUE)
+		} else {
+			cat(unlist(text))
+			if (endline)
+				cat("\n")
+		}
 	} else {
 		cat(unlist(text))
 		if (endline)
@@ -392,10 +407,14 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		ownCat("Load libraries:")
 		for(n in libraries) {
 			ownCat(n)
-			if (sfParallel())
-				sfLibrary(n, character.only = TRUE)
-			else
+			if(doParallelisation) {
+				if (sfParallel())
+					sfLibrary(n, character.only = TRUE)
+				else
+					library(n, character.only = TRUE)
+			} else {
 				library(n, character.only = TRUE)
+			}
 		}
 	
 		if (useDev) {
@@ -1619,6 +1638,25 @@ setColorListHist <- function(descriptorList, colorVector) {
 	return(colorList)
 }
 
+getColorVector <- function(isGray) {
+	if (!as.logical(isGray)) {
+		#colorVector = c(brewer.pal(8, "Set1"))
+		return(c(brewer.pal(7, "Dark2")))
+		#colorVector = c(brewer.pal(11, "Spectral")) # sometimes very pale colors
+	} else {
+		return(c(brewer.pal(9, "Greys")))
+	}
+}
+
+getColorRampPalette <- function(colorVector, overallResult = NULL, whichColumShouldUse, typOfPlot=NULL) {
+	if(!is.null(typOfPlot)) {
+		return(colorRampPalette(colorVector)(length(unique(overallResult[[whichColumShouldUse]]))))
+	} else {
+		return(colorRampPalette(colorVector)(whichColumShouldUse))
+	}
+}
+
+
 setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, first, second) {
 ######################
 #diagramTyp <- "spiderplot"
@@ -1627,21 +1665,15 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, firs
 #isGray <- overallList$isGray
 ######################	
 	whichColumShouldUse <- checkWhichColumShouldUseForPlot(first, second, colnames(overallResult), diagramTyp)	
-
-	if (!as.logical(isGray)) {
-		#colorVector = c(brewer.pal(8, "Set1"))
-		colorVector = c(brewer.pal(7, "Dark2"))
-		#colorVector = c(brewer.pal(11, "Spectral")) # sometimes very pale colors
-	} else {
-		colorVector = c(brewer.pal(9, "Greys"))
-	}
+	colorVector <- getColorVector(isGray)
 	
 	colorList = list()
 	if (diagramTyp == NBOX.PLOT || diagramTyp == BOX.PLOT || diagramTyp == VIOLIN.PLOT || diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
 		for (n in names(descriptorList)) {
 			#if (!is.na(descriptorList[[n]])) {
 			if (sum(!is.na(descriptorList[[n]])) > 0) {
-				colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult[[whichColumShouldUse]])))
+				
+				colorList[[n]] = getColorRampPalette(colorVector, overallResult, whichColumShouldUse, diagramTyp)
 				#print(colorList[[n]])
 #				if (isOtherTyp) {
 #					colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
@@ -2670,7 +2702,24 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
-	if (diagramTyp == STACKBOX.PLOT || diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
+	if(diagramTyp == STRESS.PLOT) {
+		workingDataSet <- tempOverallResult[tempOverallResult$descriptor == imagesIndex, ]
+		stressColumns <- grep("stress",colnames(workingDataSet), ignore.case=TRUE)
+		standardValues <- seq(min(stressColumns)-1)
+		
+		#newWorkingDataSet <- matrix(ncol=length(c(standardValues, "values", "stress")), dimnames=list("",c(colnames(workingDataSet)[standardValues], "values", "stress")))
+		
+		for(nn in seq(along = stressColumns)) {
+			if(nn == 1) {
+				newWorkingDataSet <- cbind(workingDataSet[,c(standardValues)], values = as.numeric(as.character(workingDataSet[,stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]])
+			} else {
+				newWorkingDataSet <- rbind(newWorkingDataSet, cbind(workingDataSet[,c(standardValues)], values = as.numeric(as.character(workingDataSet[,stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]]))
+			}
+		}
+		
+		workingDataSet <- newWorkingDataSet
+		
+	} else if (diagramTyp == STACKBOX.PLOT || diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
 		workingDataSet = tempOverallResult[tempOverallResult$plot == imagesIndex, ]
 		workingDataSet$hist = factor(workingDataSet$hist, unique(workingDataSet$hist))
 	} else {
@@ -2912,6 +2961,8 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 		typString <- "linerange plot"
 	} else if(typ == VIOLIN.PLOT) {
 		typString <- "violin plot"
+	} else if(typ == STRESS.PLOT) {
+		typString <- "stress plot"
 	}
 
 	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
@@ -3028,13 +3079,15 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 		saveImageFile(overallList, plot, fileName)
 	}
 
-	if (makeOverallImage) {
-		if (subSectionTitel != "") {
-			writeLatexFile(writeLatexFileFirstValue, fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, saveFormatImage = overallList$saveFormat, section = section)	
-		} else {
-			writeLatexFile(writeLatexFileFirstValue, fileName, saveFormatImage = overallList$saveFormat, section = section)
+	if(typOfPlot != STRESS.PLOT) {
+		if (makeOverallImage) {
+			if (subSectionTitel != "") {
+				writeLatexFile(writeLatexFileFirstValue, fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, saveFormatImage = overallList$saveFormat, section = section)	
+			} else {
+				writeLatexFile(writeLatexFileFirstValue, fileName, saveFormatImage = overallList$saveFormat, section = section)
+			}
 		}
-	} 
+	}
 
 #	else {
 #		writeLatexFile(fileName, writeLatexFileSecondValue)	
@@ -3106,6 +3159,15 @@ checkIfOnePlotTypeHasLessThanThreeValues <- function(overallResult, whichColumSh
 	return(FALSE)
 }
 
+makeStressDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
+	overallList$debug %debug% "makeStressDiagram()"	
+	
+	#overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+	#overallColor <- getColorRampPalette(colorVector = getColorVector(overallList$isGray), whichColumShouldUse = 5)
+	#section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
+	
+	makeBarDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, TRUE)
+}
 
 makeLinearDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
 #############
@@ -4175,18 +4237,28 @@ scallyAxis <- function(factor, overallResult) {
 makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, isOnlyOneValue = FALSE) {
 	overallList$debug %debug% "makeBarDiagram()"	
 	
-	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
-	overallColor <- overallList$color_nBox
-	section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
-	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
 	
-	
+	if(typOfPlot == NBOX.PLOT) {
+		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+		overallColor <- overallList$color_nBox
+		section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+		yValue <- MEAN
+	} else if(typOfPlot == STRESS.PLOT){
+		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+		overallColor <- getColorRampPalette(colorVector = getColorVector(overallList$isGray), whichColumShouldUse = 5)
+		section <- STRESS
+		#section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
+		whichColumShouldUse <- NAME
+		yValue <- VALUES
+	}
+		
 	if (length(overallResult[, 1]) > 0) {
 		if (isOnlyOneValue) {
 			reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 			overallResult <- reorderList$overallResult
 			
-			plot = ggplot(data=overallResult, aes_string(x=whichColumShouldUse, y="mean"))
+			plot = ggplot(data=overallResult, aes_string(x=whichColumShouldUse, y=yValue))
 		} else {
 			plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
 		}
@@ -4201,8 +4273,12 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		}
 		
 		plot <- plot + 						
-				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), size=0.1) + ## colour="Grey",
+				geom_bar(stat="identity", aes_string(fill=whichColumShouldUse), size=0.1) ## colour="Grey",
+		
+	if(typOfPlot != STRESS.PLOT) {
+		plot <- plot + 
 				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")
+	}
 				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
 				#ylab(overallDesName[[imagesIndex]]) +
 	
@@ -4214,7 +4290,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			factor <- 0.2
 			plot <- plot + 
 					scallyAxis(factor, overallResult)
-		} else {
+		} else if(typOfPlot != STRESS.PLOT) {
 			maxMean <- max(overallResult$mean)
 			maxSe <- max(overallResult$se)
 			
@@ -4223,8 +4299,13 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		}				
 
 		if(isOnlyOneValue) {
-			plot <- plot +	
-					scale_fill_manual(values = overallColor[[imagesIndex]][reorderList$sortList])
+			if(typOfPlot == STRESS.PLOT) {
+				plot <- plot +	
+						scale_fill_manual(values = overallColor[reorderList$sortList])
+			} else {
+				plot <- plot +	
+						scale_fill_manual(values = overallColor[[imagesIndex]][reorderList$sortList])
+			}
 		} else {
 			plot <- plot +	
 					scale_fill_manual(values = overallColor[[imagesIndex]])
@@ -4241,7 +4322,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 						panel.border = theme_rect(colour="Grey", size=0.1)
 				)
 		
-		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1){
+		if(length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1 && typOfPlot != STRESS.PLOT){
 			plot <- plot + 
 					xlab(overallList$xAxisName) +
 					opts(axis.title.x = theme_text(face="bold", size=11))
@@ -4250,6 +4331,11 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 					opts(axis.title.x = theme_blank())
 			
 		}
+		
+		if(typOfPlot == STRESS.PLOT) {
+			plot <- plot +
+					facet_wrap(~ stress)
+		}	
 		
 		subtitle <- ""
 		overallImage <- TRUE
@@ -4280,6 +4366,8 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 
 		if(typOfPlot == BOX.PLOT) {
 			overallImageText <- "BarplotOI"										
+		} else if(typOfPlot == STRESS.PLOT) {
+			overallImageText <- "StressOI"	
 		} else {
 			overallImageText <- "OI"
 		}
@@ -4389,7 +4477,7 @@ reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = 
 #print(head(groupedOverallResult))
 #print(whichColumShouldUse)
 
-	if(typOfPlot == STACKBOX.PLOT) {
+	if(typOfPlot == STACKBOX.PLOT || typOfPlot == STRESS.PLOT) {
 		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(values), sum, na.rm=TRUE), by=c(whichColumShouldUse)])
 	} else {
 		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm=TRUE), by=c(whichColumShouldUse)])
@@ -4820,6 +4908,8 @@ plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex,
 		makeViolinDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 	} else if(typOfPlot == BAR.PLOT) {
 		makeBarDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
+	} else if(typOfPlot == STRESS.PLOT) {
+		makeStressDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 	}
 	
 #	switch(typOfPlot,
@@ -4894,6 +4984,12 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 #typOfPlot <- LINERANGE.PLOT
 #imagesIndex <- "1"
 ###############
+#tempOverallResult <- overallList$overallResult_stressDes 
+#overallDescriptor <- overallList$stressDes  
+#overallDesName <- overallList$stressDesName 
+#typOfPlot <- STRESS.PLOT
+#imagesIndex <- "1"
+###############
 
 	overallList$debug %debug% "paralleliseDiagramming()"
 	
@@ -4906,30 +5002,41 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]][1])) {
-			createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+			plot <- TRUE
+			if(doModellingOfStress && length(descriptorStressVector) > 0) {
+				if(!(overallDescriptor[[imagesIndex]] %in% descriptorStressVector)) {
+					plot <- FALSE	
+				}
+			}
+			if(plot) {
+				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+				
+				overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, typOfPlot)
 			
-			overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, typOfPlot)
-		
-			if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-				overallResult <- na.omit(overallResult)
-			} else if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT) {
-				overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-				overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0		
-				overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)				
-			} else if(typOfPlot == VIOLIN.PLOT) {
-				overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-			} 
-
-			
-			if (innerThreaded) {
-				sfClusterCall(makeSplitDiagram, 
-						overallResult, overallDesName, 
-						overallList, imagesIndex, typOfPlot,
-						stopOnError=FALSE)
-			} else {
-				makeSplitDiagram( 
-						overallResult, overallDesName, 
-						overallList, imagesIndex, typOfPlot)
+				if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+					overallResult <- na.omit(overallResult)
+				} else if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT) {
+					overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+					overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0		
+					overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)				
+				} else if(typOfPlot == VIOLIN.PLOT) {
+					overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
+				} else if(typOfPlot == STRESS.PLOT) {
+					overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)	
+				}
+	
+				
+				if (innerThreaded) {
+					sfClusterCall(makeSplitDiagram, 
+							overallResult, overallDesName, 
+							overallList, imagesIndex, typOfPlot,
+							stopOnError=FALSE)
+				} else {
+					makeSplitDiagram( 
+							overallResult, overallDesName, 
+							overallList, imagesIndex, typOfPlot)
+				}
+				
 			}
 		}
 	}
@@ -4951,11 +5058,38 @@ getStandardColnames <- function(tempOverallResult) {
 # "mean": average value on the descriptor
 # "se": standard deviation
 ######
-calculateSomeStressForTheGivenTyp <- function(overallResult) {
-	return(mean(overallResult[,"mean"], na.rm=TRUE))	
+calculateSomeStressForTheGivenTyp <- function(overallResult, descriptorName) {
+	plantName <- overallResult[,NAME]
+	days <- overallResult[,X.AXIS]
+	valuesMean <- overallResult[,"mean"]
+	valuesSd <- overallResult[,"se"]
+	
+	stressName <- vector()
+	for(nn in 1:5) {
+		stressName <- c(stressName, paste("stress", nn, sep=""))
+	}	
+	
+	stress1 <- mean(valuesMean, na.rm=TRUE)
+	stress2 <- max(valuesMean, na.rm=TRUE)
+	stress3 <- min(valuesMean, na.rm=TRUE)
+	stress4 <- sd(valuesMean, na.rm=TRUE)
+	stress5 <- sum(valuesMean, na.rm=TRUE)
+	
+	#stressMatrix <- matrix(c(stress1, stress2, stress3, stress4, stress5), dimnames = list(stressName, "value"))
+	stressVector <- c(stress1, stress2, stress3, stress4, stress5)
+	names(stressVector) <- stressName
+	
+	return(stressVector)	
 }
 
-
+#############
+# How you can access the stress values
+# overallList$stressMatrixList <- this is the whole list of the stress values
+# overallList$stressMatrixList$genevalue1 <- here you get all values for all descriptors for the genotype "genevalue1" the same access is: overallList$stressMatrixList[["genevalue1"]]
+# overallList$stressMatrixList$genevalue1$descriptor1 <- here you get a matrix with all stress values of the genotype "genevalue1" and the descriptor "descriptor1"
+# overallList$stressMatrixList$genevalue1$descriptor1[1,1] <- here you get the first stress value
+# overallList$stressMatrixList$genevalue1$descriptor1[2,1] <- the second ...
+###########
 calculateStressValues <- function(overallList) {
 	overallList$debug %debug% "calculateStressValues()"
 
@@ -4963,17 +5097,39 @@ calculateStressValues <- function(overallList) {
 	uniqueValues <- unique(as.character(workingData[,NAME]))
 	desVec <- na.omit(unlist(overallList$nBoxDes))
 	
-	stressResultMatrix <- matrix(0, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
+	#stressResultMatrix <- matrix(-1, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
+	##stressMatrixList <- list()
+	numberOfStressValues <- 5
+	numberOfColumns <- 2 + numberOfStressValues
+	stressResultMatrix <- matrix(-1, nrow = length(uniqueValues) * length(desVec), ncol = numberOfColumns)
+	colnames(stressResultMatrix) <- c("name", "descriptor", paste("stress", seq(1:5), sep=""))
 	
-	for(nn in uniqueValues) {
-		newWorkingDataSet <- workingData[workingData[,NAME] == nn,]
+	index <- 1
+	for(pp in uniqueValues) {
+		newWorkingDataSet <- workingData[workingData[,NAME] == pp,]
 		for (descriptorIndex in names(desVec)) {	
-				overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
-				stressResultMatrix[descriptorIndex, nn] <- calculateSomeStressForTheGivenTyp(overallResult)
+			overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
+			
+			stressResultMatrix[index,] <- c(pp, descriptorIndex, calculateSomeStressForTheGivenTyp(overallResult, as.character(overallList$nBoxDes[[descriptorIndex]])))
+			#overallList$nBoxDesName[[descriptorIndex]]
+			
+			
+			#stressResultMatrix[descriptorIndex, nn] <- calculateSomeStressForTheGivenTyp(overallResult)
+			##stressMatrixList[[nn]][[overallList$nBoxDesName[[descriptorIndex]]]] <- calculateSomeStressForTheGivenTyp(overallResult)
+			index <- index +1
 		}
 	}
-	rownames(stressResultMatrix) <- getVector(overallList$nBoxDesName[names(desVec)])
-	overallList$stressMatrix <- stressResultMatrix
+	#rownames(stressResultMatrix) <- getVector(overallList$nBoxDesName[names(desVec)])
+	overallList$overallResult_stressDes <- as.data.frame(stressResultMatrix)
+	overallList$stressDes <- overallList$nBoxDes 
+	overallList$stressDesName <- overallList$nBoxDesName
+	overallList$stressOptions <- NULL
+	
+	#tempOverallResult <- overallList$overallResult_nBoxDes  
+#overallDescriptor <- overallList$nBoxDes 
+#overallDesName <- overallList$nBoxDesName
+#typOfPlot <- NBOX.PLOT	
+	
 	return(overallList)
 }
 
@@ -4983,13 +5139,23 @@ makeDiagrams <- function(overallList) {
 	if (threaded)
 		sfExport("overallList")
 	
-	if (!calculateNothing) {			
-if(!calculateOnlyViolin) {	
-if(!calculateOnlySpider) {
-if(!calculateOnlyLineRange) {
-if(!calculateOnlyStacked) {
-if(!calculateOnlyBoxplot) {
+	if (!calculateNothing) {
+				
+if(!plotOnlyViolin) {	
+if(!plotOnlySpider) {
+if(!plotOnlyLineRange) {
+if(!plotOnlyStacked) {
+if(!plotOnlyBoxplot) {
 
+		if (sum(!is.na(overallList$stressDes)) > 0) {
+			if (overallList$debug) {ownCat("stress modelling...")}
+			sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_stressDes,  overallList$stressDes, overallList$stressDesName, STRESS.PLOT), 
+					stopOnError = FALSE)
+		} else {
+			ownCat("All values for nBoxplot are 'NA'")
+		}
+
+if(!plotOnlyStressValues) {
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT), 
@@ -4997,10 +5163,10 @@ if(!calculateOnlyBoxplot) {
 		} else {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
-}
+}}
 
-
-if(!calculateOnlyNBox) {
+if(!plotOnlyStressValues) {
+if(!plotOnlyNBox) {
 		if (sum(!is.na(overallList$boxDes)) > 0) {
 			if (overallList$debug) {ownCat("Boxplot...")}						
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxDes,  overallList$boxDes, overallList$boxDesName, BOX.PLOT), 
@@ -5008,10 +5174,11 @@ if(!calculateOnlyNBox) {
 		} else {
 			ownCat("All values for Boxplot are 'NA'...")
 		}
-}}
+}}}
 
-if(!calculateOnlyNBox) {
-if(!calculateOnlyBoxplot) {
+if(!plotOnlyStressValues) {
+if(!plotOnlyNBox) {
+if(!plotOnlyBoxplot) {
 		if (sum(!is.na(overallList$boxStackDes)) > 0) {
 			if (overallList$debug) {ownCat("Stacked Boxplot...")}
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxStackDes,  overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT), 
@@ -5019,13 +5186,13 @@ if(!calculateOnlyBoxplot) {
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 			}
-}}}}
+}}}}}
 
-
-if(!calculateOnlyStacked) {
-if(!calculateOnlyBoxplot) {
-if(!calculateOnlyNBox) {
-if(!calculateOnlyLineRange) {
+if(!plotOnlyStressValues) {
+if(!plotOnlyStacked) {
+if(!plotOnlyBoxplot) {
+if(!plotOnlyNBox) {
+if(!plotOnlyLineRange) {
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {ownCat("Spider plot...")}
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxSpiderDes,  overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT), 
@@ -5041,14 +5208,14 @@ if(!calculateOnlyLineRange) {
 		} else {
 			ownCat("All values for linerange plot are 'NA'...")
 		}
-}}}}
+}}}}}
 
-
-if(!calculateOnlyStacked) {
-if(!calculateOnlyBoxplot) {
-if(!calculateOnlyNBox) {
-if(!calculateOnlySpider) {
-if(!calculateOnlyLineRange) {
+if(!plotOnlyStressValues) {
+if(!plotOnlyStacked) {
+if(!plotOnlyBoxplot) {
+if(!plotOnlyNBox) {
+if(!plotOnlySpider) {
+if(!plotOnlyLineRange) {
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_violinBoxDes,  overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT), 
@@ -5056,7 +5223,7 @@ if(!calculateOnlyLineRange) {
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
-}}}}}
+}}}}}}
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
 				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT), 
@@ -5331,7 +5498,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	#typOfStartOptions = START.TYP.TEST; debug=TRUE;
 	createInitDirectories(debug)
 	typOfStartOptions = tolower(typOfStartOptions)
-		
+	
 	args = commandArgs(TRUE)
 #	for(nn in seq(along=args)) {
 #		ownCat(paste(nn, ".: ", args[nn], sep=""))
@@ -5349,7 +5516,14 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	stress.Typ <- -1 #"1" # -1 ## 1 -> dry; 2 -> wet; 0 -> normal; 4 -> salt; 3 -> chemical
 	stress.Label <- -1 #"drought stress" # -1
 	
-	treatment = "Treatment"
+	
+	
+	if(doModellingOfStress) {
+		treatment <- stressModellTreatment
+	} else {
+		treatment = "Treatment"
+	}
+	
 	filterTreatment = NONE
 	split.Treatment.First = TRUE
 	
@@ -5361,6 +5535,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	xAxisName = "DAS"
 	filterXaxis = NONE
 	
+	isRatio <- FALSE
+	
 	should.Clustered <- FALSE
 	bootstrap.N <- -1
 	
@@ -5368,8 +5544,12 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	descriptorSet = vector()
 	descriptorSetName = vector()
 	
-	fileName = NONE
-
+	if(doModellingOfStress) {
+		fileName <- stressModellInput
+	} else {
+		fileName = NONE
+	}
+	
 	appendix = FALSE
 	#appendix = TRUE
 	
@@ -5468,8 +5648,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		library("snowfall")
 		debug <- TRUE
 		initRfunction(debug)
-		sfStop()
-		
+		if(doParallelisation) {
+			sfStop()
+		}
 		#treatment <- "Species"
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
@@ -5519,9 +5700,10 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
 		
+		
 		loadFiles(path = ".", pattern = "PlotList\\.[Rr]$")
 		loadFiles(path = ".", pattern = "sectionMapping\\.[Rr]$")
-
+		
 		descriptorSet_temp <- getRealNameAndPrintSection(nBoxPlotList)
 		descriptorSet_nBoxplot <- descriptorSet_temp$columName
 		descriptorSetName_nBoxplot <- descriptorSet_temp$plotName	
@@ -5757,8 +5939,9 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 			if (!overallList$stoppTheCalculation) {
 				overallList <- setColor(overallList) 
 				overallList <- calculateStressValues(overallList)
-				makeDiagrams(overallList)
-				
+				if(!plotNothing) {
+					makeDiagrams(overallList)
+				}
 			}
 		}
 	}
@@ -5795,10 +5978,22 @@ stopSnow <- function() {
 #startOptions("test", TRUE)
 #startOptions("allmanual", TRUE)
 
-
-initSnow()
+#initSnow()
+#if(plotNothing) {
+#	startOptions(START.TYP.STRESS, debug)
+#	ownCat("Completing stress calculation ...")
+#} else {
+#	startOptions(START.TYP.REPORT, debug)
+#	ownCat("Completing diagram creation ...")
+#}
+#stopSnow()
+if(doParallelisation) {
+	initSnow()
+}
 startOptions(START.TYP.REPORT, debug)
-ownCat("Completing diagram creation...")
-stopSnow()
+ownCat("Completing diagram creation ...")
+if(doParallelisation) {
+	stopSnow()
+}
 
 rm(list=ls(all=TRUE))
