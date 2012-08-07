@@ -209,6 +209,14 @@ sectionMappingList <- list(
 										sep = SEPARATOR.ITEM)
 				),
 				
+				"stress" = list(
+						newSection = 98,
+						title = "Stress",
+						typOfReset = RESET.PAGE,
+						typOfClear = CLEAR.PAGE,
+						text = ""
+				),	
+				
 				"appendix" = list(
 						newSection = 99,
 						title = "Appendix",
