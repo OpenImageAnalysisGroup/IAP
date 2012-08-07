@@ -2621,7 +2621,7 @@ saveImageFile <- function(overallList, plot, filename, newHeight = "") {
 	#print(filename)
 	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 	filename <- paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR)
-print(filename)
+#print(filename)
 	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
 
 }
