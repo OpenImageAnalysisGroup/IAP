@@ -496,9 +496,25 @@ public class SystemAnalysisExt {
 		return res;
 	}
 	
+	/**
+	 * @return IP_startupMS
+	 */
 	public static String getHostNameNoError() {
 		try {
 			return getHostName();
+		} catch (UnknownHostException e) {
+			return "(unknown host)";
+		}
+	}
+	
+	public static String getHostNameNiceNoError() {
+		try {
+			String res = getHostName();
+			if (res != null && res.contains("_")) {
+				String[] parts = res.split("_", 2);
+				return parts[0] + " (started " + SystemAnalysis.getCurrentTimeInclSec(Long.parseLong(parts[1])) + ")";
+			}
+			return res;
 		} catch (UnknownHostException e) {
 			return "(unknown host)";
 		}

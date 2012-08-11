@@ -91,8 +91,9 @@ public class TaskDescription {
 				analysisActionClassName);
 		action.setParams(experimentInput, m, params);
 		
-		MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
-				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName() + " with " + action.getDefaultTitle() + ".");
+		MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
+				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName() + " with " + action.getDefaultTitle() + " / "
+				+ batch.getCompatibleImageAnalysisPipelineName() + ".");
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
@@ -156,13 +157,13 @@ public class TaskDescription {
 							m.saveExperiment(experiment, statusProvider, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
-							MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
+							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has completed analysis and saving of " + experiment.getName());
 							boolean saveOverallDatasetIfPossible = false;
 							if (saveOverallDatasetIfPossible)
 								mergeResultDataset(batch, m, statusProvider);
 						} else {
-							MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNoError()
+							MongoDB.saveSystemMessage("INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNoError()
