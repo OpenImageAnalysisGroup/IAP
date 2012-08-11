@@ -91,6 +91,9 @@ public class TaskDescription {
 				analysisActionClassName);
 		action.setParams(experimentInput, m, params);
 		
+		MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
+				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName() + " with " + action.getDefaultTitle() + ".");
+		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
 		batch.setStatusProvider(statusProvider);
@@ -153,120 +156,19 @@ public class TaskDescription {
 							m.saveExperiment(experiment, statusProvider, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
-							
-							TreeMap<Integer, ExperimentHeaderInterface> knownResults = new TreeMap<Integer, ExperimentHeaderInterface>();
-							for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
-								if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
-									String[] cc = i.getExperimentName().split("§");
-									if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
-										String className = cc[0];
-										String partIdx = cc[1];
-										String partCnt = cc[2];
-										String submTime = cc[3];
-										String bcn = cmd.getRemoteCapableAnalysisActionClassName();
-										String bpn = cmd.getPartCnt() + "";
-										String bst = batch.getSubmissionTime() + "";
-										if (className.equals(bcn)
-												&& partCnt.equals(bpn)
-												&& submTime.equals(bst))
-											knownResults.put(Integer.parseInt(partIdx), i);
-										// else
-										// System.out.println("NO FIT: " + i.getExperimentname());
-									}
-								}
-							}
-							System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-							System.out.println("> TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
-							if (knownResults.size() >= batch.getPartCnt()) {
-								System.out.println("*****************************");
-								System.out.println("MERGE RESULTS:");
-								System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
-								Experiment e = new Experiment();
-								long tFinish = System.currentTimeMillis();
-								ArrayList<String> deleteIDs = new ArrayList<String>();
-								int iii = 0;
-								int mmm = knownResults.size();
-								for (ExperimentHeaderInterface i : knownResults.values()) {
-									ExperimentInterface ei = m.getExperiment(i);
-									e.addAndMerge(ei);
-									deleteIDs.add(i.getDatabaseId());
-									System.out.println("*****************************");
-									iii++;
-									System.out.println(SystemAnalysis.getCurrentTime() + ">Merged dataset " + iii + "/" + mmm);
-									if (statusProvider != null) {
-										statusProvider.setCurrentStatusText1("Merged dataset " + iii + "/" + mmm);
-										statusProvider.setCurrentStatusValueFine(100d / mmm * iii);
-									}
-								}
-								String sn = cmd.getRemoteCapableAnalysisActionClassName();
-								if (sn.indexOf(".") > 0)
-									sn = sn.substring(sn.lastIndexOf(".") + 1);
-								try {
-									Object o = Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
-									AbstractPhenotypeAnalysisAction apa = (AbstractPhenotypeAnalysisAction) o;
-									sn = apa.getDefaultTitle() + " (version " + apa.getVersionTag() + ")";
-								} catch (Exception er) {
-									MongoDB.saveSystemErrorMessage("Could not determine image analysis task name.", er);
-								}
-								e.getHeader().setExperimentname(sn + " of " + experimentInput.getExperimentName());
-								e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-								e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-								e.getHeader().setDatabaseId("");
-								for (SubstanceInterface si : e) {
-									for (ConditionInterface ci : si) {
-										ci.setExperimentName(e.getHeader().getExperimentName());
-										ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
-									}
-								}
-								boolean superMerge = false;
-								if (superMerge) {
-									ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
-									if (statusProvider != null)
-										statusProvider.setCurrentStatusText1("Merging Analysis Results");
-									e = (Experiment) MappingData3DPath.merge(mdpl, false);
-									if (statusProvider != null)
-										statusProvider.setCurrentStatusText1("Merged Analysis Results");
-								}
-								
-								e.sortSubstances();
-								
-								long tStart = cmd.getSubmissionTime();
-								long tProcessing = tFinish - tStart;
-								int nFinish = mmm;
-								int nToDo = batch.getPartCnt();
-								e.getHeader().setRemark(
-										e.getHeader().getRemark() +
-												" // IAP image analysis release " + batch.getCompatibleImageAnalysisPipelineName() +
-												" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
-												" // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
-												+ SystemAnalysis.getCurrentTime());
-								System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-								System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
-								System.out.println("*****************************");
-								System.out.println("Merged Experiment: " + e.getName());
-								// System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
-								m.saveExperiment(e, statusProvider, true); // new BackgroundTaskConsoleLogger("", "", true)
-								int idx = 0;
-								int max = deleteIDs.size();
-								if (statusProvider != null)
-									statusProvider.setCurrentStatusText1("Saved Merged Analysis Results");
-								for (String delID : deleteIDs) {
-									// m.deleteExperiment(delID);
-									ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(delID));
-									m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-									idx++;
-									if (statusProvider != null) {
-										// statusProvider.setCurrentStatusText2("Deleted temp result " + idx + "/" + max);
-										statusProvider.setCurrentStatusText2("Marked temp result " + idx + "/" + max +
-												" as trashed");
-										statusProvider.setCurrentStatusValueFine(100d / max * idx);
-									}
-								}
-							}
-						} else
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostName()
+							MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
+									+ " has completed analysis and saving of " + experiment.getName());
+							boolean saveOverallDatasetIfPossible = false;
+							if (saveOverallDatasetIfPossible)
+								mergeResultDataset(batch, m, statusProvider);
+						} else {
+							MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNoError()
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNoError()
+									+ " has been claimed by " + bcmd.getOwner()
+									+ ". Therefore analysis result is not saved.");
+						}
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
@@ -276,7 +178,122 @@ public class TaskDescription {
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 					System.out.println("> Cluster Execution Mode is active // FINISHED COMPUTE TASK");
 					System.out.println("> SYSTEM.EXIT");
+					MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
+							+ " finished compute task - SYSTEM.EXIT(0)");
 					System.exit(0);
+				}
+			}
+			
+			protected void mergeResultDataset(final BatchCmd batch, final MongoDB m, final BackgroundTaskStatusProviderSupportingExternalCall statusProvider)
+					throws Exception {
+				TreeMap<Integer, ExperimentHeaderInterface> knownResults = new TreeMap<Integer, ExperimentHeaderInterface>();
+				for (ExperimentHeaderInterface i : m.getExperimentList(null)) {
+					if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
+						String[] cc = i.getExperimentName().split("§");
+						if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
+							String className = cc[0];
+							String partIdx = cc[1];
+							String partCnt = cc[2];
+							String submTime = cc[3];
+							String bcn = cmd.getRemoteCapableAnalysisActionClassName();
+							String bpn = cmd.getPartCnt() + "";
+							String bst = batch.getSubmissionTime() + "";
+							if (className.equals(bcn)
+									&& partCnt.equals(bpn)
+									&& submTime.equals(bst))
+								knownResults.put(Integer.parseInt(partIdx), i);
+							// else
+							// System.out.println("NO FIT: " + i.getExperimentname());
+						}
+					}
+				}
+				System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+				System.out.println("> TODO: " + batch.getPartCnt() + ", FINISHED: " + knownResults.size());
+				if (knownResults.size() >= batch.getPartCnt()) {
+					System.out.println("*****************************");
+					System.out.println("MERGE RESULTS:");
+					System.out.println("TODO: " + batch.getPartCnt() + ", RESULTS FINISHED: " + knownResults.size());
+					Experiment e = new Experiment();
+					long tFinish = System.currentTimeMillis();
+					ArrayList<String> deleteIDs = new ArrayList<String>();
+					int iii = 0;
+					int mmm = knownResults.size();
+					for (ExperimentHeaderInterface i : knownResults.values()) {
+						ExperimentInterface ei = m.getExperiment(i);
+						e.addAndMerge(ei);
+						deleteIDs.add(i.getDatabaseId());
+						System.out.println("*****************************");
+						iii++;
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Merged dataset " + iii + "/" + mmm);
+						if (statusProvider != null) {
+							statusProvider.setCurrentStatusText1("Merged dataset " + iii + "/" + mmm);
+							statusProvider.setCurrentStatusValueFine(100d / mmm * iii);
+						}
+					}
+					String sn = cmd.getRemoteCapableAnalysisActionClassName();
+					if (sn.indexOf(".") > 0)
+						sn = sn.substring(sn.lastIndexOf(".") + 1);
+					try {
+						Object o = Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
+						AbstractPhenotypeAnalysisAction apa = (AbstractPhenotypeAnalysisAction) o;
+						sn = apa.getDefaultTitle() + " (version " + apa.getVersionTag() + ")";
+					} catch (Exception er) {
+						MongoDB.saveSystemErrorMessage("Could not determine image analysis task name.", er);
+					}
+					e.getHeader().setExperimentname(sn + " of " + experimentInput.getExperimentName());
+					e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+					e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+					e.getHeader().setDatabaseId("");
+					for (SubstanceInterface si : e) {
+						for (ConditionInterface ci : si) {
+							ci.setExperimentName(e.getHeader().getExperimentName());
+							ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
+						}
+					}
+					boolean superMerge = false;
+					if (superMerge) {
+						ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e);
+						if (statusProvider != null)
+							statusProvider.setCurrentStatusText1("Merging Analysis Results");
+						e = (Experiment) MappingData3DPath.merge(mdpl, false);
+						if (statusProvider != null)
+							statusProvider.setCurrentStatusText1("Merged Analysis Results");
+					}
+					
+					e.sortSubstances();
+					
+					long tStart = cmd.getSubmissionTime();
+					long tProcessing = tFinish - tStart;
+					int nFinish = mmm;
+					int nToDo = batch.getPartCnt();
+					e.getHeader().setRemark(
+							e.getHeader().getRemark() +
+									" // IAP image analysis release " + batch.getCompatibleImageAnalysisPipelineName() +
+									" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
+									" // processing time: " + SystemAnalysis.getWaitTime(tProcessing) + " // finished: "
+									+ SystemAnalysis.getCurrentTime());
+					System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
+					System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
+					System.out.println("*****************************");
+					System.out.println("Merged Experiment: " + e.getName());
+					// System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
+					m.saveExperiment(e, statusProvider, true); // new BackgroundTaskConsoleLogger("", "", true)
+					int idx = 0;
+					int max = deleteIDs.size();
+					if (statusProvider != null)
+						statusProvider.setCurrentStatusText1("Saved Merged Analysis Results");
+					for (String delID : deleteIDs) {
+						// m.deleteExperiment(delID);
+						ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(delID));
+						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+						idx++;
+						if (statusProvider != null) {
+							// statusProvider.setCurrentStatusText2("Deleted temp result " + idx + "/" + max);
+							statusProvider.setCurrentStatusText2("Marked temp result " + idx + "/" + max +
+									" as trashed");
+							statusProvider.setCurrentStatusValueFine(100d / max * idx);
+						}
+					}
 				}
 			}
 			
