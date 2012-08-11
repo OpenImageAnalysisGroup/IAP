@@ -65,7 +65,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			}
 		}
 		if (url.isEqualPrefix(getPrefix())) {
-			boolean lokalCache = true;
+			boolean lokalCache = false;
 			if (lokalCache) {
 				for (String path : new String[] { "/Volumes/3TB_1/pgftp/", "I:/", "J:/", "/data0/pgftp/" }) {
 					String detail = url.getDetail();
@@ -80,7 +80,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					}
 				}
 			}
-			boolean useSCP = true;
+			boolean useSCP = false;
 			if (useSCP) {
 				InputStream iss = null;
 				// synchronized (PREFIX) {
