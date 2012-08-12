@@ -171,12 +171,13 @@ public class TaskDescription {
 									+ " has been claimed by " + bcmd.getOwner()
 									+ ". Therefore analysis result is not saved.");
 						}
+					finishedComplete = true;
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
 					ErrorMsg.addErrorMessage(e);
+					finishedIncomplete = true;
 				}
-				finishedComplete = true;
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 					System.out.println(">Cluster Execution Mode is active // FINISHED COMPUTE TASK");
 					System.out.println(">SYSTEM.EXIT(0)");
