@@ -112,8 +112,7 @@ public class TaskDescription {
 						try {
 							action.performActionCalculateResults(null);
 						} catch (Exception e) {
-							MongoDB.saveSystemErrorMessage("Error calculating phenotypic data set.", e);
-							e.printStackTrace();
+							MongoDB.saveSystemErrorMessage("Error calculating phenotypic data set!", e);
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
@@ -152,7 +151,6 @@ public class TaskDescription {
 					BatchCmd bcmd = m.batchGetCommand(batch);
 					if (bcmd != null)
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
-							m.batchClearJob(batch);
 							StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
 							m.saveExperiment(experiment, statusProvider, true);
 							sw.printTime();
@@ -162,6 +160,9 @@ public class TaskDescription {
 							boolean saveOverallDatasetIfPossible = false;
 							if (saveOverallDatasetIfPossible)
 								mergeResultDataset(batch, m, statusProvider);
+							boolean deleteCompletedJobs = false;
+							if (deleteCompletedJobs)
+								m.batchDeleteJob(batch);
 						} else {
 							MongoDB.saveSystemMessage("INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has been claimed by " + bcmd.getOwner()
@@ -173,12 +174,12 @@ public class TaskDescription {
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
-					e.printStackTrace();
+					ErrorMsg.addErrorMessage(e);
 				}
 				finishedComplete = true;
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
-					System.out.println("> Cluster Execution Mode is active // FINISHED COMPUTE TASK");
-					System.out.println("> SYSTEM.EXIT");
+					System.out.println(">Cluster Execution Mode is active // FINISHED COMPUTE TASK");
+					System.out.println(">SYSTEM.EXIT(0)");
 					MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ">INFO: Host " + SystemAnalysisExt.getHostNameNoError()
 							+ " finished compute task - SYSTEM.EXIT(0)");
 					System.exit(0);

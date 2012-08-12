@@ -2214,7 +2214,7 @@ public class MongoDB {
 		return (BatchCmd) tso.getParam(0, null);
 	}
 	
-	public BatchCmd batchClearJob(final BatchCmd batch) {
+	public BatchCmd batchDeleteJob(final BatchCmd batch) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		// try to claim a batch cmd
 		try {
