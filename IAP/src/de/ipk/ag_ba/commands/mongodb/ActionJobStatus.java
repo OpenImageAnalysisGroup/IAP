@@ -53,6 +53,9 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			private String remain = "";
 			
+			private long firstStatusUpdate = -1l;
+			private double firstStatusProgress = 0d;
+			
 			@Override
 			public double getCurrentStatusValueFine() {
 				double finishedJobs = 0.00001;
@@ -83,7 +86,9 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							if (st > 0 && (firstSubmission == null || st < firstSubmission))
 								firstSubmission = st;
 							
-							String id = b.getRemoteCapableAnalysisActionClassName() + "$" + b.getExperimentDatabaseId() + "$" + b.getSubmissionTime();
+							String id = b.getRemoteCapableAnalysisActionClassName() +
+									"$" + b.getExperimentDatabaseId() +
+									"$" + b.getSubmissionTime();
 							
 							if (!submission2partCnt.containsKey(id))
 								submission2partCnt.put(id, b.getPartCnt());
@@ -103,23 +108,33 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					double value = 100d * (part_cnt - remainingJobs) / part_cnt;
 					// status3provider.setCurrentStatusValueFine(value);
 					
-					if (firstSubmission != null) {
-						long ct = System.currentTimeMillis();
-						long processingTime = ct - firstSubmission;
-						double progress = finishedJobs / part_cnt;
+					long ct = System.currentTimeMillis();
+					if (firstStatusUpdate < 0) {
+						firstStatusUpdate = ct;
+						firstStatusProgress = finishedJobs;
+					}
+					
+					if (ct > firstStatusUpdate) {
+						long processingTime = ct - firstStatusUpdate;
+						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
 						long fullTime = (long) (processingTime / progress);
 						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
-								+ SystemAnalysis.getWaitTimeShort(fullTime) + ", remain: " + SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
+								+ SystemAnalysis.getWaitTimeShort(fullTime)
+								+ ", remain: "
+								+ SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
 						ArrayList<String> s = new ArrayList<String>();
 						for (String ss : submission2partCnt.keySet()) {
-							long l = Long.parseLong(ss.substring(ss.lastIndexOf("$") + "$".length()));
+							long l = Long.parseLong(ss.substring(ss.lastIndexOf("$")
+									+ "$".length()));
 							s.add(SystemAnalysis.getCurrentTime(l));
 						}
 						remain += "<br>starts: " + StringManipulationTools.getStringListMerge(s, ", ");
 						long partTime = fullTime / part_cnt;
 						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
-								+ SystemAnalysis.getWaitTimeShort(processingTime) + ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
-					}
+								+ SystemAnalysis.getWaitTimeShort(processingTime)
+								+ ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
+					} else
+						remain = "";
 					return value;
 				} else {
 					status3provider.setCurrentStatusValueFine(-1);
@@ -145,7 +160,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						}
 					}
 					if (detail.length() > 0)
-						detail = " (" + detail + ")";
+						detail = "<br>(" + detail + ")";
 				} catch (Exception e) {
 					detail = " (error " + e.getMessage() + ")";
 				}
