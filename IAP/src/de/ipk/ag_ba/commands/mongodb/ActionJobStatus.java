@@ -109,31 +109,33 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					// status3provider.setCurrentStatusValueFine(value);
 					
 					long ct = System.currentTimeMillis();
-					if (firstStatusUpdate < 0) {
+					if (firstStatusUpdate < 0 && part_cnt != 0 && firstSubmission != null) {
 						firstStatusUpdate = ct;
-						firstStatusProgress = finishedJobs;
+						firstStatusProgress = finishedJobs / part_cnt;
 					}
 					
-					if (ct > firstStatusUpdate) {
+					if (ct > firstStatusUpdate && firstSubmission != null) {
 						long processingTimePPP = ct - firstStatusUpdate;
 						long processingTime = ct - firstSubmission;
-						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
-						long fullTime = (long) (processingTimePPP / progress);
-						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
-								+ SystemAnalysis.getWaitTimeShort(fullTime)
-								+ ", remain: "
-								+ SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
-						ArrayList<String> s = new ArrayList<String>();
-						for (String ss : submission2partCnt.keySet()) {
-							long l = Long.parseLong(ss.substring(ss.lastIndexOf("$")
-									+ "$".length()));
-							s.add(SystemAnalysis.getCurrentTime(l));
+						double progress = finishedJobs / part_cnt - firstStatusProgress;
+						if (progress > 0) {
+							long fullTime = (long) (processingTimePPP / progress);
+							remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
+									+ SystemAnalysis.getWaitTimeShort(fullTime)
+									+ ", remain: "
+									+ SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
+							ArrayList<String> s = new ArrayList<String>();
+							for (String ss : submission2partCnt.keySet()) {
+								long l = Long.parseLong(ss.substring(ss.lastIndexOf("$")
+										+ "$".length()));
+								s.add(SystemAnalysis.getCurrentTime(l));
+							}
+							remain += "<br>starts: " + StringManipulationTools.getStringListMerge(s, ", ");
+							long partTime = fullTime / part_cnt;
+							remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
+									+ SystemAnalysis.getWaitTimeShort(processingTime)
+									+ ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
 						}
-						remain += "<br>starts: " + StringManipulationTools.getStringListMerge(s, ", ");
-						long partTime = fullTime / part_cnt;
-						remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
-								+ SystemAnalysis.getWaitTimeShort(processingTime)
-								+ ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
 					} else
 						remain = "";
 					return value;
