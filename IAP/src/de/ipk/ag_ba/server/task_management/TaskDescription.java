@@ -160,6 +160,7 @@ public class TaskDescription {
 							boolean saveOverallDatasetIfPossible = false;
 							if (saveOverallDatasetIfPossible)
 								mergeResultDataset(batch, m, statusProvider);
+							m.batchClaim(bcmd, CloudAnalysisStatus.FINISHED, false);
 							boolean deleteCompletedJobs = false;
 							if (deleteCompletedJobs)
 								m.batchDeleteJob(batch);
@@ -173,6 +174,8 @@ public class TaskDescription {
 						}
 					finishedComplete = true;
 				} catch (Exception e) {
+					BatchCmd bcmd = m.batchGetCommand(batch);
+					m.batchClaim(bcmd, CloudAnalysisStatus.FINISHED_INCOMPLETE, false);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
 					ErrorMsg.addErrorMessage(e);
