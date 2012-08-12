@@ -226,6 +226,7 @@ public class SystemAnalysis {
 		w = StringManipulationTools.stringReplace(w, " hour", "h");
 		w = StringManipulationTools.stringReplace(w, " min", "m");
 		w = StringManipulationTools.stringReplace(w, " hour", "h");
+		w = StringManipulationTools.stringReplace(w, " second", "s");
 		w = StringManipulationTools.stringReplace(w, " sec", "s");
 		return w;
 	}

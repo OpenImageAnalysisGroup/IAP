@@ -115,9 +115,10 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					}
 					
 					if (ct > firstStatusUpdate) {
-						long processingTime = ct - firstStatusUpdate;
+						long processingTimePPP = ct - firstStatusUpdate;
+						long processingTime = ct - firstSubmission;
 						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
-						long fullTime = (long) (processingTime / progress);
+						long fullTime = (long) (processingTimePPP / progress);
 						remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
 								+ SystemAnalysis.getWaitTimeShort(fullTime)
 								+ ", remain: "
