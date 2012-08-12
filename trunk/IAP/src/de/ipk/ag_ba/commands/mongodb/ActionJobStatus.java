@@ -26,11 +26,10 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		super("Analyze Workload");
 		this.m = m;
 		
-		final HashSet<String> jobIds = new HashSet<String>();
-		
 		this.jobStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
 			int remainingJobs = 0;
 			int part_cnt = 0;
+			TreeMap<CloudAnalysisStatus, Integer> sss = new TreeMap<CloudAnalysisStatus, Integer>();
 			
 			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 			
@@ -61,19 +60,25 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				TreeMap<String, Integer> submission2partCnt = new TreeMap<String, Integer>();
 				Long firstSubmission = null;
 				try {
+					sss.clear();
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
 						String jid = b.getString("_id");
 						if (jid != null)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
 						
-						if (b.getRunStatus() == CloudAnalysisStatus.FINISHED_INCOMPLETE)
+						CloudAnalysisStatus rs = b.getRunStatus();
+						if (!sss.containsKey(rs))
+							sss.put(rs, 1);
+						else
+							sss.put(rs, sss.get(rs) + 1);
+						
+						if (rs == CloudAnalysisStatus.FINISHED_INCOMPLETE) {
 							fs = 0;
+						}
 						if (fs >= 0)
 							finishedJobs += fs / 100d;
 						if (jid != null) {
-							jobIds.add(jid);
-							
 							long st = b.getSubmissionTime();
 							if (st > 0 && (firstSubmission == null || st < firstSubmission))
 								firstSubmission = st;
@@ -91,8 +96,6 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					finishedJobs += part_cnt - remainingJobs;
 					
 					remainingJobs = activeJobsIds.size();
-					if (remainingJobs == 0)
-						jobIds.clear();
 				} catch (Exception e) {
 					System.out.println("ERROR: " + e.getMessage());
 				}
@@ -131,7 +134,22 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage1() {
-				return remainingJobs + "/" + part_cnt + " remaining";
+				String detail = "";
+				try {
+					for (CloudAnalysisStatus cas : sss.keySet()) {
+						Integer n = sss.get(cas);
+						if (n != null) {
+							if (detail.length() > 0)
+								detail = detail + ", ";
+							detail = detail + n + " " + cas.toString();
+						}
+					}
+					if (detail.length() > 0)
+						detail = " (" + detail + ")";
+				} catch (Exception e) {
+					detail = " (error " + e.getMessage() + ")";
+				}
+				return (part_cnt - remainingJobs) + "/" + part_cnt + " completed" + detail;
 			}
 			
 			@Override
