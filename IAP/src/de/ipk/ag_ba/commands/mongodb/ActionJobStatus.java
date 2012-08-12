@@ -66,7 +66,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					sss.clear();
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
 						String jid = b.getString("_id");
-						if (jid != null)
+						if (jid != null && b.getRunStatus() != CloudAnalysisStatus.FINISHED)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
 						
