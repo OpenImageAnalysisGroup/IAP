@@ -109,15 +109,16 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					// status3provider.setCurrentStatusValueFine(value);
 					
 					long ct = System.currentTimeMillis();
-					if (firstStatusUpdate < 0 && part_cnt != 0 && firstSubmission != null) {
+					if ((firstStatusProgress < 0.1 || firstStatusUpdate < 0 || firstStatusProgress > finishedJobs) && part_cnt != 0 && firstSubmission != null) {
 						firstStatusUpdate = ct;
-						firstStatusProgress = finishedJobs / part_cnt;
+						firstStatusProgress = finishedJobs;
+						System.out.println(">progress init");
 					}
 					
 					if (ct > firstStatusUpdate && firstSubmission != null) {
 						long processingTimePPP = ct - firstStatusUpdate;
 						long processingTime = ct - firstSubmission;
-						double progress = finishedJobs / part_cnt - firstStatusProgress;
+						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
 						if (progress > 0) {
 							long fullTime = (long) (processingTimePPP / progress);
 							remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
