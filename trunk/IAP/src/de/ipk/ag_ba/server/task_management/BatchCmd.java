@@ -143,6 +143,9 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public CloudAnalysisStatus getRunStatus() {
+		for (CloudAnalysisStatus cas : CloudAnalysisStatus.values())
+			if (cas.toNiceString().equals(getString("runstatus")))
+				return cas;
 		return CloudAnalysisStatus.valueOf(getString("runstatus"));
 	}
 	
