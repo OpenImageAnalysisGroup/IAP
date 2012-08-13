@@ -127,7 +127,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 									+ ", overall: "
 									+ SystemAnalysis.getWaitTimeShort(fullTime)
 									+ ", remain: "
-									+ SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
+									+ SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - progress)));
 							ArrayList<String> s = new ArrayList<String>();
 							for (String ss : submission2partCnt.keySet()) {
 								long l = Long.parseLong(ss.substring(ss.lastIndexOf("$")
