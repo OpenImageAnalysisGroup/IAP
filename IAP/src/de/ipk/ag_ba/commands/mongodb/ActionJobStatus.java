@@ -66,6 +66,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					sss.clear();
 					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
 						String jid = b.getString("_id");
+						System.out.println(b.getRunStatus());
 						if (jid != null && b.getRunStatus() != CloudAnalysisStatus.FINISHED)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
@@ -121,7 +122,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
 						if (progress > 0) {
 							long fullTime = (long) (processingTimePPP / progress);
-							remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime) + ", overall: "
+							remain = "eta: " + SystemAnalysis.getCurrentTime(ct + fullTime - processingTime)
+									+ ", overall: "
 									+ SystemAnalysis.getWaitTimeShort(fullTime)
 									+ ", remain: "
 									+ SystemAnalysis.getWaitTimeShort(fullTime - processingTime);
@@ -160,7 +162,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						if (n != null) {
 							if (detail.length() > 0)
 								detail = detail + ", ";
-							detail = detail + n + " " + cas.toString();
+							detail = detail + n + " " + cas.toNiceString();
 						}
 					}
 					if (detail.length() > 0)

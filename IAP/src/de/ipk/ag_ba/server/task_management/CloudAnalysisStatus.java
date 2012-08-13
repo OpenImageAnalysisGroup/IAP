@@ -12,8 +12,7 @@ package de.ipk.ag_ba.server.task_management;
 public enum CloudAnalysisStatus {
 	SCHEDULED, STARTING, IN_PROGRESS, FINISHED, FINISHED_INCOMPLETE;
 	
-	@Override
-	public String toString() {
+	public String toNiceString() {
 		switch (this) {
 			case FINISHED:
 				return "finished";
