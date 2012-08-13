@@ -2027,15 +2027,13 @@ public class MongoDB {
 								if (batch.getCpuTargetUtilization() < maxTasks) {
 									if (batch.getExperimentHeader() == null)
 										continue;
-									if (batch.getOwner() == null)
-										if (batchClaim(batch, CloudAnalysisStatus.STARTING, false))
-											if (hostName.equals("" + batch.getOwner())) {
-												res.add(batch);
-												added = true;
-												addCnt += batch.getCpuTargetUtilization();
-												if (addCnt >= maxTasks)
-													break;
-											}
+									if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
+										res.add(batch);
+										added = true;
+										addCnt += batch.getCpuTargetUtilization();
+										if (addCnt >= maxTasks)
+											break;
+									}
 								}
 							}
 						}
@@ -2050,11 +2048,12 @@ public class MongoDB {
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
 											// after 5 minutes tasks are taken away from other systems
-											if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
-												claimed++;
-												if (claimed >= maxTasks)
-													break loop;
-											}
+											if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED)
+												if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
+													claimed++;
+													if (claimed >= maxTasks)
+														break loop;
+												}
 										}
 								}
 							}
