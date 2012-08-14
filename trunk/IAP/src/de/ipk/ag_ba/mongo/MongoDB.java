@@ -1425,7 +1425,7 @@ public class MongoDB {
 						optStatus.setCurrentStatusText1("Get Experiment List");
 					DBCollection col = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 					if (optStatus != null)
-						optStatus.setCurrentStatusText1("Iterate Experiments");
+						optStatus.setCurrentStatusText1("Iterate Experimentlist");
 					HashMap<String, String> mapableNames = new HashMap<String, String>();
 					mapableNames.put("klukas", "Christian Klukas");
 					for (DBObject header : col.find()) {
