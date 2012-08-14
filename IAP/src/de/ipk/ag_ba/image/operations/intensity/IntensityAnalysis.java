@@ -33,6 +33,7 @@ public class IntensityAnalysis {
 		double sumOfIntensityClassic = 0;
 		
 		double sumOfHue = 0;
+		double sumOfHueLimitedToGreen = 0;
 		double sumOfSat = 0;
 		double sumOfVal = 0;
 		
@@ -88,6 +89,13 @@ public class IntensityAnalysis {
 						{
 							histHue.addDataPoint((int) (h * 255), 255, s, v);
 							sumOfHue += h;
+							double hLimit = h;
+							if (hLimit < 60d / 360d)
+								hLimit = 60d / 360d;
+							else
+								if (hLimit > 120d / 360d)
+									hLimit = 120d / 360d;
+							sumOfHueLimitedToGreen += hLimit;
 							statsHueValuesOverall.addValue(h);
 						}
 						{
@@ -182,9 +190,21 @@ public class IntensityAnalysis {
 					result.addValue("hsv.normalized.v.histogram.s_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 							histVal.getOther2avg(i));
 			}
-			result.addValue("hsv.h.average", sumOfHue / plantImagePixelCnt);
-			result.addValue("hsv.s.average", sumOfSat / plantImagePixelCnt);
-			result.addValue("hsv.v.average", sumOfVal / plantImagePixelCnt);
+			double havg = sumOfHue / plantImagePixelCnt;
+			double savg = sumOfSat / plantImagePixelCnt;
+			double vavg = sumOfVal / plantImagePixelCnt;
+			result.addValue("hsv.h.average", havg);
+			result.addValue("hsv.s.average", savg);
+			result.addValue("hsv.v.average", vavg);
+			
+			if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+				// calc DGCI (dark green color index)
+				double averageGreenHue = sumOfHueLimitedToGreen / plantImagePixelCnt;
+				double p1 = (averageGreenHue - 60d / 360d) / (60d / 360d);
+				double p2 = 1 - savg;
+				double p3 = 1 - vavg;
+				result.addValue("hsv.dgci.average", (p1 + p2 + p3) / 3d);
+			}
 			
 			boolean addStressIndicatorHueValues = true;
 			if (addStressIndicatorHueValues) {
