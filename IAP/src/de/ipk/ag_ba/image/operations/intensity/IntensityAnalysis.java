@@ -33,9 +33,10 @@ public class IntensityAnalysis {
 		double sumOfIntensityClassic = 0;
 		
 		double sumOfHue = 0;
-		double sumOfHueLimitedToGreen = 0;
 		double sumOfSat = 0;
 		double sumOfVal = 0;
+		
+		double sumOfDGCIs = 0;
 		
 		DescriptiveStatistics statsHueValuesOverall = new DescriptiveStatistics();
 		DescriptiveStatistics statsSatValuesOverall = new DescriptiveStatistics();
@@ -95,7 +96,12 @@ public class IntensityAnalysis {
 							else
 								if (hLimit > 120d / 360d)
 									hLimit = 120d / 360d;
-							sumOfHueLimitedToGreen += hLimit;
+							
+							double p1 = (hLimit - 60d / 360d) / (60d / 360d);
+							double p2 = 1 - s;
+							double p3 = 1 - v;
+							sumOfDGCIs += (p1 + p2 + p3) / 3d;
+							
 							statsHueValuesOverall.addValue(h);
 						}
 						{
@@ -198,12 +204,7 @@ public class IntensityAnalysis {
 			result.addValue("hsv.v.average", vavg);
 			
 			if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
-				// calc DGCI (dark green color index)
-				double averageGreenHue = sumOfHueLimitedToGreen / plantImagePixelCnt;
-				double p1 = (averageGreenHue - 60d / 360d) / (60d / 360d);
-				double p2 = 1 - savg;
-				double p3 = 1 - vavg;
-				result.addValue("hsv.dgci.average", (p1 + p2 + p3) / 3d);
+				result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCnt);
 			}
 			
 			boolean addStressIndicatorHueValues = true;
