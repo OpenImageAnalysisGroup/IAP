@@ -2,10 +2,6 @@ package de.ipk.ag_ba.image.operations;
 
 import java.util.HashMap;
 
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;
-
 public class SkeletonizeProcessor {
 	
 	private final ImageOperation image;
@@ -17,14 +13,11 @@ public class SkeletonizeProcessor {
 	/**
 	 * @author klukas
 	 *         The "fire" burns down each solid voxel with fixed speed.
-	 *         Warning: changes this VolumeOperation instance and modifes actual instance, and returns it.
-	 * @return A int cube, where each int value is either BACKGROUND_COLORint (no skeleton pixel here) or a number greater or equal to 1, which denotes
+	 * @return A image where each int value is either BACKGROUND_COLORint (no skeleton pixel here) or a number greater or equal to 1, which denotes
 	 *         the minimum distance of the skeleton pixel to the free space in the input cube. Therefore, each pixel denotes a width at this
 	 *         particular part of the input voxel.
 	 */
-	public ImageOperation calculateThicknessSkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg,
-			BlockProperty distHorizontal,
-			double realMarkerDistHorizontal, boolean calcDistanceTrueOrNormalColoredSkeletonFalse) {
+	public ImageOperation calculateThicknessSkeleton(int voxelresolution, boolean calcDistanceTrueOrNormalColoredSkeletonFalse) {
 		
 		int[][] cube = image.getImageAs2dArray();
 		
@@ -70,7 +63,6 @@ public class SkeletonizeProcessor {
 			}
 			loop++;
 		} while (foundBorderVoxel);
-		long skeletonLength = 0;
 		for (int x = 1; x < voxelresolution - 1; x++) {
 			if (x2y2colorSkeleton.containsKey(x)) {
 				HashMap<Integer, Integer> y2c = x2y2colorSkeleton.get(x);
@@ -78,18 +70,10 @@ public class SkeletonizeProcessor {
 					if (y2c.containsKey(y)) {
 						Integer c = y2c.get(y);
 						cube[x][y] = c;
-						skeletonLength++;
 					}
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
-		if (distHorizontal != null) {
-			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-			summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
-					skeletonLength * corr);
-		}
-		
 		return new ImageOperation(cube);
 	}
 	
