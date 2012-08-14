@@ -17,6 +17,7 @@ public class ByteShortIntArray {
 	private byte[][][] bytearray = null;
 	private short[][][] shortarray = null;
 	private int[][][] intarray = null;
+	private int[][][] intarray2;
 	
 	public ByteShortIntArray(Object volume) {
 		if (volume instanceof byte[][][])
@@ -83,5 +84,9 @@ public class ByteShortIntArray {
 	
 	public int[][][] getIntArray() {
 		return intarray;
+	}
+	
+	public void setIntArray(int[][][] intarray) {
+		this.intarray = intarray;
 	}
 }

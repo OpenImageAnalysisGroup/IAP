@@ -1024,6 +1024,10 @@ public class ImageOperation {
 		return new ImageOperation(byteProcessor.getBufferedImage());
 	}
 	
+	public SkeletonizeProcessor skel() {
+		return new SkeletonizeProcessor(this);
+	}
+	
 	public void outline(int[][] mask) { // starke Farbübergänge werden als
 		// Kante
 		// erkannt

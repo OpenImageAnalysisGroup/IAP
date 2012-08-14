@@ -161,7 +161,7 @@ public class TaskDescription {
 							if (saveOverallDatasetIfPossible)
 								mergeResultDataset(batch, m, statusProvider);
 							m.batchClaim(bcmd, CloudAnalysisStatus.FINISHED, false);
-							boolean deleteCompletedJobs = false;
+							boolean deleteCompletedJobs = true;
 							if (deleteCompletedJobs)
 								m.batchDeleteJob(batch);
 						} else {
