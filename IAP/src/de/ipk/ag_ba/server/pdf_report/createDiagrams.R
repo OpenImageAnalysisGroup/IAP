@@ -2,7 +2,7 @@
 ###############################################################################
 cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
 
-doModellingOfStress <- TRUE
+doModellingOfStress <- FALSE
 stressModellInput <- "report_1121KN.csv"
 stressModellTreatment <- "Treatment"
 descriptorStressVector <- vector()
@@ -14,6 +14,7 @@ innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
 debug <- TRUE
+checkInputFileIfEngOrGer <- FALSE
 
 ########## Constants ###########
 
@@ -118,7 +119,7 @@ plotOnlyStacked <- FALSE
 plotOnlySpider <- FALSE
 plotOnlyLineRange <- FALSE
 plotOnlyBoxplot <- FALSE
-plotOnlyStressValues <- TRUE
+plotOnlyStressValues <- FALSE
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -185,11 +186,16 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	#separation = ";"
 	ownCat(paste("Read input file", fileName))
 	if (file.exists(fileName)) {
+		allCharacterSeparated <- vector()
 		
-		preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
-		preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
-		allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
-		
+		if(checkInputFileIfEngOrGer) {
+			preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
+			preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
+			allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
+		} else {
+			allCharacterSeparated["."] <- 1
+			allCharacterSeparated[","] <- 0
+		}
 		if (allCharacterSeparated["."] > allCharacterSeparated[","]) {
 			
 			ownCat("Read input (English number format)...")
@@ -3105,7 +3111,8 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 loadLibs <- function(installAndUpdate = FALSE) {
 	libraries  <- c(
 		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
-		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr") #, "mvoutlier")
+		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr",
+		 "pls") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, installAndUpdate, installAndUpdate, FALSE)
 }
 
