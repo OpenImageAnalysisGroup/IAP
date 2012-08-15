@@ -866,6 +866,8 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		for (n in seq(along = overallList$boxStackDes)) {
 			overallList$boxStackDes[n] <- preprocessingOfDescriptor(overallList$boxStackDes[[n]], overallList$iniDataSet)
 		}	
+#		print("test_stacked")
+#		print(overallList$boxStackDes)
 		overallList$boxStackDes <- checkOfNormalizedAndUnnormalized(overallList$boxStackDes)			
 
 	} else {
@@ -879,8 +881,15 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 			initDescriptor <- preprocessingOfValues(overallList$boxSpiderDes[n], isColValue = TRUE)
 			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
-			overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			print(booleanVector)
+			print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector]))
+			if(sum(booleanVector) > 0) {
+				overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			} else {
+				overallList$boxSpiderDesName[n] <- NA
+			}
 		}
+		print(overallList$boxSpiderDesName)
 		overallList$boxSpiderDesName <- checkOfNormalizedAndUnnormalized(overallList$boxSpiderDesName)
 		
 	} else {
@@ -894,7 +903,11 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 			initDescriptor <- preprocessingOfValues(overallList$linerangeDes[n], isColValue = TRUE)
 			overallList$linerangeDes[n] = preprocessingOfDescriptor(overallList$linerangeDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$linerangeDes[n][[1]]
-			overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			if(sum(booleanVector) > 0) {
+				overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			} else {
+				overallList$linerangeDesName[n] <- NA
+			}
 		}
 		overallList$linerangeDes <- checkOfNormalizedAndUnnormalized(overallList$linerangeDes)
 		
@@ -909,7 +922,11 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 			initDescriptor <- preprocessingOfValues(overallList$violinBoxDes[n], isColValue = TRUE)
 			overallList$violinBoxDes[n] = preprocessingOfDescriptor(overallList$violinBoxDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$violinBoxDes[n][[1]]
-			overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			if(sum(booleanVector) > 0) {
+				overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			} else {
+				overallList$violinBoxDesName[n] <- NA
+			}
 		}
 		overallList$violinBoxDes <- checkOfNormalizedAndUnnormalized(overallList$violinBoxDes)
 		
@@ -1756,8 +1773,8 @@ buildSectionString <-  function(sectionList, imagesIndex, appendix) {
 	} else {
 		sectionVector <- vector()
 		for(nn in sectionList) {
-			print(nn)
-			print(imagesIndex)
+			#print(nn)
+			#print(imagesIndex)
 			sectionVector <- paste(sectionVector, nn[as.numeric(imagesIndex)], sep = SECTION.SEPARATOR)
 		}
 		return(trimSectionSeparator(sectionVector))
