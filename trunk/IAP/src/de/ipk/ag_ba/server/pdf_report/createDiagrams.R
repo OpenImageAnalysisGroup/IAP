@@ -2,6 +2,23 @@
 ###############################################################################
 cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
 
+
+############## Flags for debugging ####################
+debug <- FALSE
+
+calculateNothing <- FALSE
+plotNothing <- FALSE
+
+plotOnlyNBox <- FALSE
+plotOnlyViolin <- FALSE
+plotOnlyStacked <- FALSE
+plotOnlySpider <- FALSE
+plotOnlyLineRange <- FALSE
+plotOnlyBoxplot <- FALSE
+plotOnlyStressValues <- FALSE
+
+############# Modelling ######################
+
 doModellingOfStress <- FALSE
 stressModellInput <- "report_1121KN.csv"
 stressModellTreatment <- "Treatment"
@@ -13,7 +30,6 @@ threaded <- FALSE
 innerThreaded = FALSE
 cpuCNT <- 2
 cpuAutoDetected <- TRUE
-debug <- TRUE
 checkInputFileIfEngOrGer <- FALSE
 
 ########## Constants ###########
@@ -108,18 +124,6 @@ START.TYP.TEST <- "test"
 START.TYP.REPORT <- "report"
 START.TYP.STRESS <- "stress"
 
-############## Flags for debugging ####################
-
-calculateNothing <- FALSE
-plotNothing <- FALSE
-
-plotOnlyNBox <- FALSE
-plotOnlyViolin <- FALSE
-plotOnlyStacked <- FALSE
-plotOnlySpider <- FALSE
-plotOnlyLineRange <- FALSE
-plotOnlyBoxplot <- FALSE
-plotOnlyStressValues <- FALSE
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -1095,22 +1099,22 @@ preprocessingOfSecondTreatment <- function(overallList) {
 			if (length(overallList$filterSecondTreatment) == 1) {
 				overallList$secondTreatment <- NONE
 				overallList$filterSecondTreatment <- NONE
-				overallList$split.Treatment.Second <- FALSE
-				ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'split.Treatment.Second' to 'FALSE'!", sep=""))
+				overallList$splitTreatmentSecond <- FALSE
+				ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
 			}
 			
 		} else {
 			overallList$secondTreatment <- NONE
 			overallList$filterSecondTreatment <- NONE
-			overallList$split.Treatment.Second <- FALSE
-			ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'split.Treatment.Second' to 'FALSE'!", sep=""))
+			overallList$splitTreatmentSecond <- FALSE
+			ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
 			
 		}	
 	} else {
 		overallList$secondTreatment <- NONE
 		overallList$filterSecondTreatment <- NONE
-		overallList$split.Treatment.Second <- FALSE
-		ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'split.Treatment.Second' to 'FALSE'!", sep=""))
+		overallList$splitTreatmentSecond <- FALSE
+		ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
 		
 	}
 	return(overallList)
@@ -1382,7 +1386,7 @@ overallGetResultDataFrame <- function(overallList) {
 			columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
 			contactTheValues <- FALSE
 			
-			if((!overallList$split.Treatment.First && !overallList$split.Treatment.Second) && overallList$secondTreatment != NONE) {
+			if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) && overallList$secondTreatment != NONE) {
 				contactTheValues <- TRUE
 				ownCat("... there should be no split, so the data have to be conected now!")
 			}
@@ -1502,8 +1506,8 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug	
 #########################
-#split.Treatment.First <- overallList$split.Treatment.First
-#split.Treatment.Second <- overallList$split.Treatment.Second
+#splitTreatmentFirst <- overallList$splitTreatmentFirst
+#splitTreatmentSecond <- overallList$splitTreatmentSecond
 #########################
 
 	debug %debug% "getResultDataFrame()"
@@ -1726,13 +1730,13 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, firs
 setColor <- function(overallList) {
 	overallList$debug %debug% "setColor()" 
 	
-	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
+	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 					
-	overallList$color_nBox = setColorList(NBOX.PLOT, overallList$nBoxDes, overallList$overallResult_nBoxDes, overallList$isGray, overallList$split.Treatment.First, overallList$split.Treatment.Second)
-	overallList$color_box = setColorList(BOX.PLOT, overallList$boxDes, overallList$overallResult_boxDes, overallList$isGray, overallList$split.Treatment.First, overallList$split.Treatment.Second)
-	overallList$color_boxStack = setColorList(STACKBOX.PLOT, overallList$boxStackDes, overallList$overallResult_boxStackDes, overallList$isGray, overallList$split.Treatment.First, overallList$split.Treatment.Second)
-	overallList$color_spider = setColorList(SPIDER.PLOT, overallList$boxSpiderDes, overallList$overallResult_boxSpiderDes, overallList$isGray, overallList$split.Treatment.First, overallList$split.Treatment.Second)
-	overallList$color_linerange = setColorList(LINERANGE.PLOT, overallList$linerangeDes, overallList$overallResult_linerangeDes, overallList$isGray, overallList$split.Treatment.First, overallList$split.Treatment.Second)
+	overallList$color_nBox = setColorList(NBOX.PLOT, overallList$nBoxDes, overallList$overallResult_nBoxDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+	overallList$color_box = setColorList(BOX.PLOT, overallList$boxDes, overallList$overallResult_boxDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+	overallList$color_boxStack = setColorList(STACKBOX.PLOT, overallList$boxStackDes, overallList$overallResult_boxStackDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+	overallList$color_spider = setColorList(SPIDER.PLOT, overallList$boxSpiderDes, overallList$overallResult_boxSpiderDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+	overallList$color_linerange = setColorList(LINERANGE.PLOT, overallList$linerangeDes, overallList$overallResult_linerangeDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	
 	#overallList$color_violin = setColorList("violinplot", overallList$violinBoxDes, overallList$overallResult_violinBoxDes, overallList$isGray, isOtherTyp)
 	return(overallList)
@@ -1804,7 +1808,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 		} else if (subsectionDepth == 3) {
 			latexText = paste(latexText, "\\paragraph{",ylabel,"}~", sep="" )
 		} else if (subsectionDepth == 4) {
-			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~ \n", sep="" )
+			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
 		}
 	}
 
@@ -2023,7 +2027,7 @@ setCheckFiles <- function(latexText, fileVector, tabText="") {
 	
 	for(file in fileVector) {
 		file <- paste(DIRECTORY.PLOTSTEX, file, sep=DIRECTORY.SEPARATOR)
-		latexText <- paste(latexText, tabText, "\\checkFileNoReset{", file ,"}{}{}", NEWLINE.TEX, sep="")
+		latexText <- paste(latexText, tabText, "\\checkFileNoReset{", file ,"}", NEWLINE.TEX, sep="")
 	}
 	return(latexText)
 }
@@ -2078,7 +2082,7 @@ setTextOrTypOfClearOrReset <- function(latexText, text, tabText) {
 }
 
 setTitle <- function(latexText, sectionTyp, title, tabText) {
-	return(paste(latexText, tabText, "\\", sectionTyp,"{\\noindent ", title, "}",
+	return(paste(latexText, tabText, "\\", sectionTyp,"{", title, "}", #\\noindent
 					ifelse(sectionTyp != FOURTH.SECTION, NEWLINE.TEX, NEWLINE.PARA.TEX), 
 					sep=""))
 }
@@ -2559,11 +2563,11 @@ writeInclude <- function(latexText, tabText, sectionTyp, alreadyWrittenFiles, de
 			
 			
 			nn <- paste(DIRECTORY.SECTION,nn, sep=DIRECTORY.SEPARATOR)
-			if(sectionTyp == FIRST.SECTION) {
-				latexText <- includeFile(latexText, tabText, nn)
-			} else {
+			#if(sectionTyp == FIRST.SECTION) {
+			#	latexText <- includeFile(latexText, tabText, nn)
+			#} else {
 				latexText <- inputFile(latexText, tabText, nn)
-			}
+			#}
 		}
 	}
 	return(list(latexText= latexText, alreadyWrittenFiles = alreadyWrittenFiles))
@@ -2597,12 +2601,12 @@ includeAppendix <- function(buildAppendixTexPart, tabText, debug) {
 writeReportFile <- function(tabText = "", debug = FALSE) {
 	debug %debug% "writeReportFile()"
 	
-	buildReportFileText <- includeFile("", tabText, "reportDefHead") 
-	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportDefGeneralSection")
-	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportCluster")
+	buildReportFileText <- inputFile("", tabText, "reportDefHead") 
+	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportDefGeneralSection")
+	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportCluster")
 	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug)$latexText
 	buildReportFileText <- includeAppendix(buildReportFileText, tabText, debug)
-	buildReportFileText <- includeFile(buildReportFileText, tabText, "reportFooter")
+	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportFooter")
 	writeLatexFinalFile(buildReportFileText, "report")
 }
 
@@ -2866,7 +2870,7 @@ replaceTreatmentNamesOverallOneValue <- function(overallList, title, typOfPlot="
 	overallList$debug %debug% "replaceTreatmentNamesOverallOneValue()"
 
 	if((typOfPlot == SPIDER.PLOT || typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == LINERANGE.PLOT) && 
-		!overallList$split.Treatment.First && overallList$split.Treatment.Second) {		
+		!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {		
 		title <- replaceTreatmentNames(overallList, title, onlySecondTreatment = TRUE, oneValue = TRUE)
 	} else {
 		title <- replaceTreatmentNames(overallList, title, onlyFirstTreatment = TRUE, oneValue = TRUE)
@@ -2881,7 +2885,7 @@ replaceTreatmentNamesOverall <- function(overallList, overallResult) {
 	if(!overallList$appendix) {
 
 		if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
-			if(!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+			if(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 				overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]])
 			} else {
 				overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]], onlySecondTreatment = TRUE)
@@ -3095,7 +3099,7 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
 	
-#	if(typOfPlot == LINERANGE.PLOT || (overallList$split.Treatment.First && overallList$split.Treatment.Second && typOfPlot == SPIDER.PLOT)) {
+#	if(typOfPlot == LINERANGE.PLOT || (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond && typOfPlot == SPIDER.PLOT)) {
 	if(typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
@@ -3200,15 +3204,15 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 ############	
 	
 #  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stress.Start <- c(10,20,30,37)
-#	overallList$stress.End <- c(13, 23, 33, 40)
-#	overallList$stress.Typ <- c("001","001","004", "003")
-#	overallList$stress.Label <- c(-1, -1, -1, -1)
+#	overallList$stressStart <- c(10,20,30,37)
+#	overallList$stressEnd <- c(13, 23, 33, 40)
+#	overallList$stressTyp <- c("001","001","004", "003")
+#	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stress.Start <- c(10,20,30)
-#	overallList$stress.End <- c(13, 23,33)
-#	overallList$stress.Typ <- c("002","001","002")
-#	overallList$stress.Label <- c(-1, -1,-1)
+#	overallList$stressStart <- c(10,20,30)
+#	overallList$stressEnd <- c(13, 23,33)
+#	overallList$stressTyp <- c("002","001","002")
+#	overallList$stressLabel <- c(-1, -1,-1)
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
 	ylabelForAppendix <- ""
@@ -3222,12 +3226,12 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	
 	
 
-	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
+	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	
 	if (length(overallResult[, 1]) > 0) {
 		if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 
-			whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+			whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		#print(whichColumShouldUse)
 			overallResult <- cbind(overallResult, ymin=overallResult$mean-overallResult$se, ymax=overallResult$mean+overallResult$se)
 			
@@ -3239,8 +3243,8 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			colorReorder <- color[reorderList$sortList]
 			shapeReorder <- c(1:length(color))[reorderList$sortList]
 			
-			if(overallList$stress.Start != -1) {
-				stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$mean, typOfPlot, overallResult$se)
+			if(overallList$stressStart != -1) {
+				stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$mean, typOfPlot, overallResult$se)
 				colorReorder <- addColorForStressPhaseAndOther(stressArea, colorReorder, typOfPlot)
 			}
 			
@@ -3344,8 +3348,8 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 					scale_shape_manual(values = shapeReorder) +
 					theme_bw()
 			#print(plot)		
-			if((overallList$secondTreatment == NONE && overallList$split.Treatment.First) || 
-				(overallList$split.Treatment.First && overallList$split.Treatment.Second)) {
+			if((overallList$secondTreatment == NONE && overallList$splitTreatmentFirst) || 
+				(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond)) {
 				plot <- plot +
 						opts(legend.position = "none")
 			} else {
@@ -3402,9 +3406,9 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			
 			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0) {
 								
-				if (!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+				if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 					# no facet_wrap!
-				} else if (overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+				} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 					
 					if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
 						plot <- plot + 
@@ -3432,7 +3436,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			}
 			
 			if (!overallList$appendix) {
-				if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+				if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 					subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
 					
 					if((length(grep("convex",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) ||
@@ -3576,15 +3580,15 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 
 
 #  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stress.Start <- c(10,20,30,37)
-#	overallList$stress.End <- c(13, 23, 33, 40)
-#	overallList$stress.Typ <- c("001","001","004", "003")
-#	overallList$stress.Label <- c(-1, -1, -1, -1)
+#	overallList$stressStart <- c(10,20,30,37)
+#	overallList$stressEnd <- c(13, 23, 33, 40)
+#	overallList$stressTyp <- c("001","001","004", "003")
+#	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stress.Start <- c(10,20,30)
-#	overallList$stress.End <- c(13, 23,33)
-#	overallList$stress.Typ <- c("002","001","002")
-#	overallList$stress.Label <- c(-1, -1,-1)
+#	overallList$stressStart <- c(10,20,30)
+#	overallList$stressEnd <- c(13, 23,33)
+#	overallList$stressTyp <- c("002","001","002")
+#	overallList$stressLabel <- c(-1, -1,-1)
 
 
 	overallList$debug %debug% "makeStackedDiagram()"	
@@ -3597,14 +3601,14 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 #print(overallDesName[[imagesIndex]])
 	if (length(overallResult[, 1]) > 0) {
 	
-		isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
+		isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 		
 		if (length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
 			overallList$stackedBarOptions$typOfGeomBar = c("fill")
 		}
 		
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
-		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 		overallResult <- reorderList$overallResult
 #		if ("primaerTreatment" %in% colnames(overallResult)) {
@@ -3625,12 +3629,12 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 				makeStress <- FALSE
 			}
 			
-			if(overallList$stress.Start != -1 && positionType != "fill" && makeStress) {
-				stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$values, typOfPlot, positionType, overallResult[, c("xAxis", getTheColumWhichShouldUse(colnames(overallResult)))])
+			if(overallList$stressStart != -1 && positionType != "fill" && makeStress) {
+				stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$values, typOfPlot, positionType, overallResult[, c("xAxis", getTheColumWhichShouldUse(colnames(overallResult)))])
 				color <- addColorForStressPhaseAndOther(stressArea, colorWithoutStress, positionType)
 			}
 #			print(stressArea)
-#			print(overallList$stress.Start)
+#			print(overallList$stressStart)
 			plot <- ggplot()
 			
 			if(length(stressArea) >0) {
@@ -3721,11 +3725,11 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 			}
 			
 		
-#			if (!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #				# no facet_wrap!
 #			} else
 #print(head(overallResult))
-			if (!overallList$split.Treatment.First && overallList$split.Treatment.Second) {		
+			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {		
 				if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
 					plot <- plot + 
 							facet_wrap(~ primaerTreatment)
@@ -3892,7 +3896,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		overallColor <- overallList$color_spider
 		section <- buildSectionString(overallList$boxSpiderSection, imagesIndex, overallList$appendix)
 
-		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		histVec <- levels(overallResult$hist)
 		for(kk in seq(along=histVec)) {
 			histVec[kk] <- paste(kk,histVec[kk])
@@ -3904,10 +3908,10 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		for (positionType in options$typOfGeomBar) {			
  		
 		
-#			if (!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
 #				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
-#				#} else if (overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+#				#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #			} else {
 				#print(head(overallResult))
 				plot <- ggplot(overallResult, aes_string(x="hist", y="values", group=whichColumShouldUse, shape=whichColumShouldUse, color=whichColumShouldUse, fill="hist")) +
@@ -3988,7 +3992,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 			   			)			
 				
 			
-#				if(overallList$split.Treatment.First && !overallList$split.Treatment.Second && overallList$secondTreatment == "none") {
+#				if(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && overallList$secondTreatment == "none") {
 #					plot <-  plot + guides(fill=guide_legend(title.position= "top", 
 #									ncol=calculateLegendRowAndColNumber(histVec), 
 #									byrow=FALSE)
@@ -4010,7 +4014,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 #				plot = plot + opts(title = title)
 #			}
 			
-			if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+			if(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 				if(whichColumShouldUse == NAME) {
 					plot = plot + facet_grid(name ~ xAxisfactor)
 				} else {
@@ -4104,7 +4108,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallColor <- overallList$color_linerange
 		section <- buildSectionString(overallList$linerangeSection, imagesIndex, overallList$appendix)
-		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
 		
 #		if ("primaerTreatment" %in% colnames(overallResult)) {
@@ -4187,7 +4191,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 		}
 		
 		
-		if(overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+		if(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 			if(whichColumShouldUse == NAME) {
 				plot = plot + facet_grid(name ~ xAxisfactor)
 			} else {
@@ -4266,7 +4270,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
 		overallColor <- overallList$color_nBox
 		section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
-		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		yValue <- MEAN
 	} else if(typOfPlot == STRESS.PLOT){
 		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
@@ -4372,7 +4376,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		}
 		
 		if (!overallList$appendix) {
-			if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+			if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
 				
 				if((length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0)) {
@@ -4527,10 +4531,10 @@ reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = 
 	return(list(overallResult = overallResult, sortList = sortList))
 }
 
-buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, yValues, typOfPlot, additionalValues = NONE, additionalDataFrameValues = NONE) {
+buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yValues, typOfPlot, additionalValues = NONE, additionalDataFrameValues = NONE) {
 #############
-#stress.Start <- overallList$stress.Start
-#stress.End <- overallList$stress.End
+#stressStart <- overallList$stressStart
+#stressEnd <- overallList$stressEnd
 #yValues <- overallResult$mean
 #typOfPlot <- typOfPlot
 #############
@@ -4543,7 +4547,7 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 
 	stress.Area <- data.frame()
 	#possible.Stress.Values <- c("0", "1", "2", "3", "4") # c("n", "d", "w", "c", "s")
-	standard.Stress.Labels <- list("000" = "normal", "001" = "drought stress", "002" = "moisture stress", "003" = "chemical stress", "004" = "salt stress")
+	standard.stressLabels <- list("000" = "normal", "001" = "drought stress", "002" = "moisture stress", "003" = "chemical stress", "004" = "salt stress")
 	
 	ymin <- min(yValues,na.rm = TRUE)
 	ymax <- max(yValues, na.rm = TRUE)
@@ -4578,34 +4582,34 @@ buildStressArea <- function(stress.Start, stress.End, stress.Typ, stress.Label, 
 
 #	ymin <- (ymin - ymin * 0.01)
 #	ymax <- (ymax + ymax * 0.01)
-#	print(stress.Start)
-#	print(stress.End)
-#	print(stress.Typ)
-#	print(stress.Label)
+#	print(stressStart)
+#	print(stressEnd)
+#	print(stressTyp)
+#	print(stressLabel)
 	
-	for (kk in seq(along=stress.Start)) {
-		if (stress.Start[kk] != -1 && stress.End[kk] != -1) {
-			stress.Start <- as.numeric(stress.Start)
-			stress.End <- as.numeric(stress.End)
-			if (stress.Start[kk] >= stress.End[kk]) {
-				xmin <- stress.End[kk]
-				xmax <- stress.Start[kk]
+	for (kk in seq(along=stressStart)) {
+		if (stressStart[kk] != -1 && stressEnd[kk] != -1) {
+			stressStart <- as.numeric(stressStart)
+			stressEnd <- as.numeric(stressEnd)
+			if (stressStart[kk] >= stressEnd[kk]) {
+				xmin <- stressEnd[kk]
+				xmax <- stressStart[kk]
 			} else {
-				xmin <- stress.Start[kk]
-				xmax <- stress.End[kk]
+				xmin <- stressStart[kk]
+				xmax <- stressEnd[kk]
 			}
 			
-			if(!(stress.Typ[kk] %in% names(standard.Stress.Labels))) {
+			if(!(stressTyp[kk] %in% names(standard.stressLabels))) {
 				ownCat("... unknown stresstyp, change to \"normal\" -> (0)")
-				stress.Typ[kk] <- names(standard.Stress.Labels)[1]
+				stressTyp[kk] <- names(standard.stressLabels)[1]
 			}
 			
-			if(stress.Label[kk] == -1) {
+			if(stressLabel[kk] == -1) {
 				ownCat("... no stresslabel are set, change to standard label for the stresstyp")
-				stress.Label[kk] <- standard.Stress.Labels[[stress.Typ[kk]]]
+				stressLabel[kk] <- standard.stressLabels[[stressTyp[kk]]]
 			}
 			
-			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stress.Typ[kk], label=stress.Label[kk]))
+			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stressTyp[kk], label=stressLabel[kk]))
 		}
 	}
 	#dCNV_Biom[order(attr(dCNV_Bio, "Labels")),order(attr(dCNV_Bio, "Labels"))]
@@ -4660,18 +4664,18 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	#print(head(overallResult))
 	
 #  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stress.Start <- c(10,20,30,37)
-#	overallList$stress.End <- c(13, 23, 33, 40)
-#	overallList$stress.Typ <- c("d","d","s", "c")
-#	overallList$stress.Label <- c(-1, -1, -1, -1)
+#	overallList$stressStart <- c(10,20,30,37)
+#	overallList$stressEnd <- c(13, 23, 33, 40)
+#	overallList$stressTyp <- c("d","d","s", "c")
+#	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stress.Start <- c(10,20,30)
-#	overallList$stress.End <- c(13, 23,33)
-#	overallList$stress.Typ <- c("2","1","2")
-#	overallList$stress.Label <- c(-1, -1,-1)
+#	overallList$stressStart <- c(10,20,30)
+#	overallList$stressEnd <- c(13, 23,33)
+#	overallList$stressTyp <- c("2","1","2")
+#	overallList$stressLabel <- c(-1, -1,-1)
 	
-	if(overallList$stress.Start[1] != -1) {
-		stressArea <- buildStressArea(overallList$stress.Start, overallList$stress.End, overallList$stress.Typ, overallList$stress.Label, overallResult$mean, typOfPlot)
+	if(overallList$stressStart[1] != -1) {
+		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$mean, typOfPlot)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
 	
@@ -4732,7 +4736,7 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	
 		#print(plot)
 				
-#		if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+#		if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #			subsectionDepth <- 3
 #		} else {
 #			subsectionDepth <- 2
@@ -4797,8 +4801,8 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	options <- overallList$boxOptions
 	section <- buildSectionString(overallList$boxSection, imagesIndex, overallList$appendix)
 
-	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
-	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, colnames(overallResult), typOfPlot)
+	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 	#print(whichColumShouldUse)
 	#if (!is.na(overallDescriptor[[imagesIndex]])) {
 		#ownCat(paste("Process ", overallDesName[[imagesIndex]]))
@@ -4816,17 +4820,17 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 				#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
 			
 				
-	#			if (!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+	#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 	#				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
 	#				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
-	#			#} else if (overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+	#			#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 	#			} else {
 					#print(head(overallResult))
 					plot <- ggplot(overallResult, aes_string(x=whichColumShouldUse, y="value", fill=whichColumShouldUse))
 				#}
 				
 				
-	#			else if (overallList$split.Treatment.First && overallList$split.Treatment.Second) {
+	#			else if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 	#				plot <- ggplot(overallResult, aes(factor(name), value, fill=name))
 	#			} else if (!isOtherTyp) {
 	#				if("primaerTreatment" %in% colnames(overallResult)) {
@@ -4839,7 +4843,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	#			}
 				
 		
-	#			if(!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+	#			if(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 	#				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
 	#				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
 	#			} else {
@@ -4850,7 +4854,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	#				}
 	#			}
 				if(FALSE) {
-					if (title != "" && !(!overallList$split.Treatment.First && !overallList$split.Treatment.Second)) {
+					if (title != "" && !(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
 						plot = plot + opts(title = title)
 					}
 				}
@@ -4862,7 +4866,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 						#coord_cartesian(ylim=c(0, max(overallList$overallResult$mean + overallList$overallResult$se + 10, na.rm=TRUE))) +
 						#xlab(paste(min(overallResult$xAxis), overallList$xAxisName, "..", max(overallResult$xAxis), overallList$xAxisName)) +
 	#print(plot)		
-	#			if(!(!overallList$split.Treatment.First && !overallList$split.Treatment.Second)) {	
+	#			if(!(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {	
 	#				plot = plot +
 	#						scale_fill_manual(values = overallColor[[imagesIndex]])
 	#			}
@@ -4877,7 +4881,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 								panel.border = theme_rect(colour="Grey", size=0.1)
 								
 						)
-#				if(overallList$split.Treatment.First && overallList$secondTreatment == "none") {
+#				if(overallList$splitTreatmentFirst && overallList$secondTreatment == "none") {
 #					plot = plot +
 #							opts(axis.text.x =theme_blank())
 #				} else {
@@ -4892,7 +4896,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 				
 				subtitle <- title
 				
-				if (!overallList$split.Treatment.First && !overallList$split.Treatment.Second) {
+				if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 					subsectionDepth <- 1
 				} else {
 					subsectionDepth <- 2
@@ -4950,13 +4954,13 @@ plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex,
 makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot) {
 	overallList$debug %debug% "makeSplitDiagram()"
 	
-	if((!overallList$split.Treatment.First && !overallList$split.Treatment.Second && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
-		(overallList$split.Treatment.First && overallList$secondTreatment == NONE && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
+	if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
+		(overallList$splitTreatmentFirst && overallList$secondTreatment == NONE && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
 		(typOfPlot == VIOLIN.PLOT) ||
-		(!(overallList$split.Treatment.First && overallList$split.Treatment.Second) && (typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT))) {
+		(!(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) && (typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT))) {
 			plotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "")	
 	} else {
-		extraPlot <- checkWhichColumShouldUseForPlot(overallList$split.Treatment.First, overallList$split.Treatment.Second, typOfPlot, colnames(overallResult), TRUE)
+		extraPlot <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, typOfPlot, colnames(overallResult), TRUE)
 		for(nn in unique(as.character(overallResult[[extraPlot]]))) {
 			optionListForGetBoolean <- list(value = nn)
 			names(optionListForGetBoolean) <- extraPlot
@@ -5422,25 +5426,25 @@ buildBlacklist <- function(workingDataSet, descriptorSet) {
 }
 
 
-loadStressPeriod <- function(stress.Value, arg) {
-	stress.Value <- stress.Value %exists% arg
-	stress.Value <- unlist(preprocessingOfValues(stress.Value, isColName = TRUE))
+loadStressPeriod <- function(stressValue, arg) {
+	stressValue <- stressValue %exists% arg
+	stressValue <- unlist(preprocessingOfValues(stressValue, isColName = TRUE))
 
-	return(stress.Value)
+	return(stressValue)
 }
 
-checkStressTypValues <- function(stress.Typ) {
+checkStressTypValues <- function(stressTyp) {
 	
-	new.Values <- list("n" = "000", "d" = "001", "w" = "002", "c" = "003", "s" = "004",
+	newValues <- list("n" = "000", "d" = "001", "w" = "002", "c" = "003", "s" = "004",
 					   "0" = "000", "1" = "001", "2" = "002", "3" = "003", "4" = "004")
 	
-	for (kk in seq(along=stress.Typ)) {
-		if (stress.Typ[kk] %in% names(new.Values)) {
-			stress.Typ[kk] <- new.Values[[stress.Typ[kk]]]
+	for (kk in seq(along=stressTyp)) {
+		if (stressTyp[kk] %in% names(newValues)) {
+			stressTyp[kk] <- newValues[[stressTyp[kk]]]
 			ownCat("... change old stresstyp value to new!")
 		}
 	}
-	return(stress.Typ)
+	return(stressTyp)
 }
 #()
 #addVisibleSections <- function(descriptorSet_temp, plotTyp) {
@@ -5535,10 +5539,10 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	#showResultInR = FALSE
 	
 	# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
-	stress.Start <- -1 #"10" # -1
-	stress.End <- -1 #"15" # -1
-	stress.Typ <- -1 #"1" # -1 ## 1 -> dry; 2 -> wet; 0 -> normal; 4 -> salt; 3 -> chemical
-	stress.Label <- -1 #"drought stress" # -1
+	stressStart <- -1 #"10" # -1
+	stressEnd <- -1 #"15" # -1
+	stressTyp <- -1 #"1" # -1 ## 1 -> dry; 2 -> wet; 0 -> normal; 4 -> salt; 3 -> chemical
+	stressLabel <- -1 #"drought stress" # -1
 	
 	
 	
@@ -5549,11 +5553,11 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	}
 	
 	filterTreatment = NONE
-	split.Treatment.First = TRUE
+	splitTreatmentFirst = TRUE
 	
 	secondTreatment = NONE
 	filterSecondTreatment = NONE
-	split.Treatment.Second= FALSE
+	splitTreatmentSecond= FALSE
 	
 	xAxis = "Day (Int)" 
 	xAxisName = "DAS"
@@ -5584,13 +5588,13 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		should.Clustered <- should.Clustered %exists% args[7]
 		bootstrap.N <- bootstrap.N %exists% args[8] 
-		stress.Start <- loadStressPeriod(stress.Start, args[9])
-		stress.End <- loadStressPeriod(stress.End, args[10])
-		stress.Typ <- loadStressPeriod(stress.Typ, args[11])
-		stress.Typ <- checkStressTypValues(stress.Typ)	
-		stress.Label <- loadStressPeriod(stress.Label, args[12])
-		split.Treatment.First <- as.logical(split.Treatment.First %exists% args[13])
-		split.Treatment.Second <- as.logical(split.Treatment.Second %exists% args[14])
+		stressStart <- loadStressPeriod(stressStart, args[9])
+		stressEnd <- loadStressPeriod(stressEnd, args[10])
+		stressTyp <- loadStressPeriod(stressTyp, args[11])
+		stressTyp <- checkStressTypValues(stressTyp)	
+		stressLabel <- loadStressPeriod(stressLabel, args[12])
+		splitTreatmentFirst <- as.logical(splitTreatmentFirst %exists% args[13])
+		splitTreatmentSecond <- as.logical(splitTreatmentSecond %exists% args[14])
 		
 		if (fileName != NONE) {
 			workingDataSet <- separation %readInputDataFile% fileName
@@ -5712,13 +5716,13 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		yAxisName <- "test2"
 		
 		# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
-		stress.Start <- 27
-		stress.End <- 44
-		stress.Typ <- "001"
-		stress.Label <- "-1"
+		stressStart <- 27
+		stressEnd <- 44
+		stressTyp <- "001"
+		stressLabel <- "-1"
 		
-		split.Treatment.First <- FALSE
-		split.Treatment.Second <- FALSE
+		splitTreatmentFirst <- FALSE
+		splitTreatmentSecond <- FALSE
 		isRatio <- FALSE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
@@ -5846,8 +5850,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 										treatment = treatment, filterTreatment = filterTreatment, 
 										secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
 										xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio,
-										stress.Start=stress.Start, stress.End = stress.End, stress.Typ = stress.Typ, stress.Label = stress.Label,
-										split.Treatment.First=split.Treatment.First, split.Treatment.Second=split.Treatment.Second)
+										stressStart=stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
+										splitTreatmentFirst=splitTreatmentFirst, splitTreatmentSecond=splitTreatmentSecond)
 					if (secondRun) {
 						appendix = TRUE
 						secondRun = FALSE
@@ -5903,8 +5907,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		treatment = "Treatment", filterTreatment = NONE, 
 		secondTreatment = NONE, filterSecondTreatment = NONE, filterXaxis = NONE, xAxis = "Day (Int)", 
 		xAxisName = NONE, debug = FALSE, appendix = FALSE, stoppTheCalculation = FALSE, isRatio = FALSE,
-		stress.Start = -1, stress.End = -1, stress.Typ = -1, stress.Label = -1,
-		split.Treatment.First = TRUE, split.Treatment.Second = FALSE) {		
+		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1,
+		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE) {		
 
 	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes, linerangeDes = linerangeDes,
@@ -5920,8 +5924,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), color_violin= list(), color_linerange= list(),
 						user=NONE, typ=NONE,
 						filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
-						stress.Start = stress.Start, stress.End = stress.End, stress.Typ = stress.Typ, stress.Label = stress.Label,
-						split.Treatment.First = split.Treatment.First, split.Treatment.Second = split.Treatment.Second
+						stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
+						splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond
 						)	
 	
 	overallList$debug %debug% "Start"

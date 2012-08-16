@@ -78,33 +78,29 @@ of the group image analysis.
 
 
 \resetBoolean
-\checkFileNoReset{conditionsFirstFilter.tex}{}{}
-\checkFileNoReset{conditionsSecondFilter.tex}{}{}
+\checkFileNoReset{conditionsFirstFilter.tex}
+\checkFileNoReset{conditionsSecondFilter.tex}
 \ifthenelse{\boolean{isFile1}}{
 	\subsection{Grouping of selected experiment factors}
-	\checkFile{conditionsFirstFilter.tex}{conditionsSecondFilter.tex}{}
-	\ifthenelse{\boolean{isFile1} \and \boolean{isFile2}}{
+	
+	\resetBoolean
+	\checkFileNoReset{conditionsFirstFilter.tex}
+	\ifthenelse{\boolean{isFile1}} {
 		\subsubsection{Primary filter}
 		\begin{center}
 		\loadTex{conditionsFirstFilter}
 		\end{center}
-		
+	}{}
+	
+	\resetBoolean
+	\checkFileNoReset{conditionsSecondFilter.tex}
+	\ifthenelse{\boolean{isFile1}} {
 		\subsubsection{Secondary filter}
 		\begin{center}
 		\loadTex{conditionsSecondFilter}
 		\end{center}
-	}{
-		\ifthenelse{\boolean{isFile1}}{
-			\begin{center}
-			\loadTex{conditionsFirstFilter}
-			\end{center}
-		}{
-			\begin{center}
-			\loadTex{conditionsSecondFilter}
-			\end{center}	
-		}
-	}
-}
+	}{}
+}{}
 
 \subsection{Full list of experiment factors}
 \begin{center}
