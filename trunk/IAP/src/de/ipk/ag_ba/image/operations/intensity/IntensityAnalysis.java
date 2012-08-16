@@ -196,15 +196,18 @@ public class IntensityAnalysis {
 					result.addValue("hsv.normalized.v.histogram.s_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 							histVal.getOther2avg(i));
 			}
-			double havg = sumOfHue / plantImagePixelCnt;
-			double savg = sumOfSat / plantImagePixelCnt;
-			double vavg = sumOfVal / plantImagePixelCnt;
-			result.addValue("hsv.h.average", havg);
-			result.addValue("hsv.s.average", savg);
-			result.addValue("hsv.v.average", vavg);
 			
-			if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
-				result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCnt);
+			if (plantImagePixelCnt > 0) {
+				double havg = sumOfHue / plantImagePixelCnt;
+				double savg = sumOfSat / plantImagePixelCnt;
+				double vavg = sumOfVal / plantImagePixelCnt;
+				result.addValue("hsv.h.average", havg);
+				result.addValue("hsv.s.average", savg);
+				result.addValue("hsv.v.average", vavg);
+				
+				if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+					result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCnt);
+				}
 			}
 			
 			boolean addStressIndicatorHueValues = true;
@@ -280,7 +283,8 @@ public class IntensityAnalysis {
 			} else
 				result.addValue("intensity.sum", sumOfIntensityChlorophyl);
 			
-			result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
+			if (plantImagePixelCnt > 0)
+				result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 			
 			if (addNormalizedHistogramValues) {
 				if (optDistHorizontal != null && optRealMarkerDistance != null) {
