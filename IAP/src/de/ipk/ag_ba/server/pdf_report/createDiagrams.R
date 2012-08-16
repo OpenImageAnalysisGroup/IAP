@@ -1804,7 +1804,7 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 		} else if (subsectionDepth == 3) {
 			latexText = paste(latexText, "\\paragraph{",ylabel,"}~", sep="" )
 		} else if (subsectionDepth == 4) {
-			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
+			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~ \n", sep="" )
 		}
 	}
 
@@ -2457,10 +2457,10 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 												latexTextP <- setLoadImageAndLoadTex(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
 												tabTextP <- reduceTabText(tabTextP)
 												latexTextP <- setClosedBraces(latexTextP, tabTextP)
-												if(paragraphID == "7.1.1.1") {
-													print("##################################### here we are ###############################")
-													print(alreadyWrittenSection[paragraphID,1])
-												}
+												#if(paragraphID == "7.1.1.1") {
+													#print("##################################### here we are ###############################")
+													#print(alreadyWrittenSection[paragraphID,1])
+												#}
 												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug)
 												alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, paragraphID, FOURTH.SECTION)
 											}
@@ -3593,8 +3593,8 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 	overallColor <- overallList$color_boxStack
 	overallFileName <- overallList$imageFileNames_StackedPlots	
 	section <- buildSectionString(overallList$boxStackSection, imagesIndex, overallList$appendix)
-print(section)
-print(overallDesName[[imagesIndex]])
+#print(section)
+#print(overallDesName[[imagesIndex]])
 	if (length(overallResult[, 1]) > 0) {
 	
 		isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$split.Treatment.First, overallList$split.Treatment.Second)
