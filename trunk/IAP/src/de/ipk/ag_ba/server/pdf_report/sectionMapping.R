@@ -858,7 +858,7 @@ sectionMappingList <- list(
 				
 				"7.1.3" = list(
 						newSection = 3,
-						title = "Brigthness",
+						title = "Brightness",
 						takeRestValuesFrom = "7.1.1"
 				),
 				
@@ -1380,12 +1380,12 @@ sectionMappingList <- list(
 				),
 				
 				"7.1.3.1" = list(
-						title = "Average brigthness",
+						title = "Average brightness",
 						takeRestValuesFrom = "7.1.1.1"
 				),
 				
 				"7.1.3.2" = list(
-						title = "Average brigthness (zoom corrected)",
+						title = "Average brightness (zoom corrected)",
 						takeRestValuesFrom = "7.1.1.2"
 				),
 				
