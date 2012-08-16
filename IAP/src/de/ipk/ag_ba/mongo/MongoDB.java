@@ -2040,34 +2040,38 @@ public class MongoDB {
 						}
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
-							if (addCnt < maxTasks) {
+							if (addCnt < maxTasks && claimed < maxTasks) {
 								loop: for (DBObject dbo : collection.find().sort(
 										new BasicDBObject("submission", -1).append("release", ir.toString()))) {
 									BatchCmd batch = (BatchCmd) dbo;
-									if (batch.getExperimentHeader() == null)
-										continue;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
 											// after 5 minutes tasks are taken away from other systems
-											if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED)
+											if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED) {
+												if (batch.getExperimentHeader() == null) {
+													System.out.println(SystemAnalysis.getCurrentTime() + ">Remove batch with NULL experiment ref: " + batch);
+													collection.remove(batch);
+													continue;
+												}
 												if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
 													claimed++;
 													if (claimed >= maxTasks)
 														break loop;
 												}
+											}
 										}
 								}
 							}
 						}
 						// check all tasks (regardless of release)
-						for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
-							BatchCmd batch = (BatchCmd) dbo;
-							if (batch.getExperimentHeader() == null) {
-								System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: found batch CMD with NULL experiment-header!");
-								continue;
-							}
-							System.out.println("" + dbo);
-						}
+						// for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
+						// BatchCmd batch = (BatchCmd) dbo;
+						// if (batch.getExperimentHeader() == null) {
+						// System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: found batch CMD with NULL experiment-header!");
+						// continue;
+						// }
+						// System.out.println("" + dbo);
+						// }
 						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
