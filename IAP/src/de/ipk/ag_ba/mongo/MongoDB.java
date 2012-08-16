@@ -2022,20 +2022,21 @@ public class MongoDB {
 						boolean added = false;
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
-							for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
-								BatchCmd batch = (BatchCmd) dbo;
-								if (batch.getCpuTargetUtilization() < maxTasks) {
-									if (batch.getExperimentHeader() == null)
-										continue;
-									if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
-										res.add(batch);
-										added = true;
-										addCnt += batch.getCpuTargetUtilization();
-										if (addCnt >= maxTasks)
-											break;
+							if (addCnt < maxTasks)
+								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
+									BatchCmd batch = (BatchCmd) dbo;
+									if (batch.getCpuTargetUtilization() < maxTasks) {
+										if (batch.getExperimentHeader() == null)
+											continue;
+										if (batchClaim(batch, CloudAnalysisStatus.STARTING, false)) {
+											res.add(batch);
+											added = true;
+											addCnt += batch.getCpuTargetUtilization();
+											if (addCnt >= maxTasks)
+												break;
+										}
 									}
 								}
-							}
 						}
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
