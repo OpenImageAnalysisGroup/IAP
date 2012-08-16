@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
+debug <- TRUE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -14,23 +14,24 @@ plotOnlyViolin <- FALSE
 plotOnlyStacked <- FALSE
 plotOnlySpider <- FALSE
 plotOnlyLineRange <- FALSE
-plotOnlyBoxplot <- FALSE
+plotOnlyBoxplot <- TRUE
 plotOnlyStressValues <- FALSE
 
 ############# Modelling ######################
 
-doModellingOfStress <- FALSE
-stressModellInput <- "report_1121KN.csv"
-stressModellTreatment <- "Treatment"
+DO.MODELLING.OF.STRESS <- FALSE
+STRESS.MODELL.INPUT <- "report_1121KN.csv"
+STRESS.MODELL.TREATMENT <- "Treatment"
 descriptorStressVector <- vector()
 
 
-doParallelisation <- FALSE
+DO.PARALLELISATION <- FALSE
 threaded <- FALSE
-innerThreaded = FALSE
-cpuCNT <- 2
-cpuAutoDetected <- TRUE
-checkInputFileIfEngOrGer <- FALSE
+INNER.THREADED = FALSE
+CPU.CNT <- 2
+CPU.ATUO.DETECTED <- TRUE
+CHECK.INPUT.FILE.IF.ENG.OR.GER <- FALSE
+CHECK.FOR.UPDATE <- FALSE
 
 ########## Constants ###########
 
@@ -192,7 +193,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	if (file.exists(fileName)) {
 		allCharacterSeparated <- vector()
 		
-		if(checkInputFileIfEngOrGer) {
+		if(CHECK.INPUT.FILE.IF.ENG.OR.GER) {
 			preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
 			preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
 			allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
@@ -259,7 +260,7 @@ ownCat <- function(text, endline=TRUE){
 #	while (class(text) == "list") {
 #		text <- unlist(text)
 #	}
-	if(doParallelisation) {
+	if(DO.PARALLELISATION) {
 		if (sfParallel()) {
 			sfCat(text, master=TRUE)
 			if (endline)
@@ -417,7 +418,7 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		ownCat("Load libraries:")
 		for(n in libraries) {
 			ownCat(n)
-			if(doParallelisation) {
+			if(DO.PARALLELISATION) {
 				if (sfParallel())
 					sfLibrary(n, character.only = TRUE)
 				else
@@ -3134,7 +3135,7 @@ loadLibs <- function(installAndUpdate = FALSE) {
 		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
 		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr",
 		 "pls") #, "mvoutlier")
-	loadInstallAndUpdatePackages(libraries, installAndUpdate, installAndUpdate, FALSE)
+	loadInstallAndUpdatePackages(libraries, installAndUpdate, CHECK.FOR.UPDATE, FALSE)
 }
 
 myBreaks <- function(value){
@@ -5031,7 +5032,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 	for (imagesIndex in names(overallDescriptor)) {
 		if (!is.na(overallDescriptor[[imagesIndex]][1])) {
 			plot <- TRUE
-			if(doModellingOfStress && length(descriptorStressVector) > 0) {
+			if(DO.MODELLING.OF.STRESS && length(descriptorStressVector) > 0) {
 				if(!(overallDescriptor[[imagesIndex]] %in% descriptorStressVector)) {
 					plot <- FALSE	
 				}
@@ -5054,7 +5055,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 				}
 	
 				
-				if (innerThreaded) {
+				if (INNER.THREADED) {
 					sfClusterCall(makeSplitDiagram, 
 							overallResult, overallDesName, 
 							overallList, imagesIndex, typOfPlot,
@@ -5546,8 +5547,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	
 	
 	
-	if(doModellingOfStress) {
-		treatment <- stressModellTreatment
+	if(DO.MODELLING.OF.STRESS) {
+		treatment <- STRESS.MODELL.TREATMENT
 	} else {
 		treatment = "Treatment"
 	}
@@ -5572,8 +5573,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	descriptorSet = vector()
 	descriptorSetName = vector()
 	
-	if(doModellingOfStress) {
-		fileName <- stressModellInput
+	if(DO.MODELLING.OF.STRESS) {
+		fileName <- STRESS.MODELL.INPUT
 	} else {
 		fileName = NONE
 	}
@@ -5676,7 +5677,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		library("snowfall")
 		debug <- TRUE
 		initRfunction(debug)
-		if(doParallelisation) {
+		if(DO.PARALLELISATION) {
 			sfStop()
 		}
 		#treatment <- "Species"
@@ -5979,11 +5980,11 @@ initSnow <- function() {
 	# loadLibs(TRUE)
 	library("snowfall")
 	
-	if(cpuAutoDetected) {
-		cpuCNT <- parallel::detectCores()
+	if(CPU.ATUO.DETECTED) {
+		CPU.CNT <- parallel::detectCores()
 	}
 	
-	sfInit(parallel=threaded, cpus=cpuCNT)
+	sfInit(parallel=threaded, cpus=CPU.CNT)
 	
 	if (sfParallel()) {
 		ownCat(c("Running in parallel mode on", sfCpus(), "nodes."))
@@ -6015,12 +6016,12 @@ stopSnow <- function() {
 #	ownCat("Completing diagram creation ...")
 #}
 #stopSnow()
-if(doParallelisation) {
+if(DO.PARALLELISATION) {
 	initSnow()
 }
 startOptions(START.TYP.REPORT, debug)
 ownCat("Completing diagram creation ...")
-if(doParallelisation) {
+if(DO.PARALLELISATION) {
 	stopSnow()
 }
 
