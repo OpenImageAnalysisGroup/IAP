@@ -134,7 +134,7 @@ public class CloudComputingService {
 				try {
 					IAPservice.monitorExperimentDataProgress();
 				} catch (Exception e) {
-					e.printStackTrace();
+					MongoDB.saveSystemErrorMessage("Error monitoring experiment data progress.", e);
 				} finally {
 					System.exit(0);
 				}
