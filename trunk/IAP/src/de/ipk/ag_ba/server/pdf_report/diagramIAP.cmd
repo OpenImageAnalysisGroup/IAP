@@ -12,9 +12,9 @@ echo "Bootstrap-n?  : $6"
 echo "Stress start? : $7"
 echo "Stress end?   : $8"
 echo "Stress typ?   : $9"
-echo "Stress label? : $10"
-echo "Split Cond1?  : $11"
-echo "Split Cond2?  : $12"
+echo "Stress label? : ${10}"
+echo "Split Cond1?  : ${11}"
+echo "Split Cond2?  : ${12}"
 
 if [ -f report.clustering.csv ]
 then
