@@ -68,7 +68,7 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Digital Biomass based on the side.area and top.area", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$pixel^3\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $pixel^3$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -97,7 +97,7 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Presented values in relative dependence per day.", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\\\$\\%/day\\\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $\\%/day$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -325,7 +325,7 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
-									LINE.ITEM, "Equation: \\\\$Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}\\\\$", NEWLINE.TEX,
+									LINE.ITEM, "Equation: $Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}$", NEWLINE.TEX,
 									LINE.ITEM, "Column name: volume.iap", NEWLINE.TEX,
 									END.ITEM,
 									sep = SEPARATOR.ITEM)
@@ -341,7 +341,7 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
-								LINE.ITEM, "Equation: \\\\$Biomass_{LemnaTec}=\\sqrt{side.area_{0^{\\circ}}*side.area_{90^{\\circ}}*top.area}\\\\$", NEWLINE.TEX,
+								LINE.ITEM, "Equation: $Biomass_{LemnaTec}=\\sqrt{side.area_{0^{\\circ}}*side.area_{90^{\\circ}}*top.area}$", NEWLINE.TEX,
 								LINE.ITEM, "Column name: volume.lt", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
@@ -437,7 +437,7 @@ sectionMappingList <- list(
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Number of foreground pixels from side camera (normalized to distance of left and right marker)", NEWLINE.TEX,
 								LINE.ITEM, "Column name: side.area.norm", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$mm^2\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $mm^2$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -469,7 +469,7 @@ sectionMappingList <- list(
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Number of foreground pixels from top camera (normalized to distance of left and right marker)", NEWLINE.TEX,
 								LINE.ITEM, "Column name: top.area.norm", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$mm^2\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $mm^2$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -817,7 +817,7 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE.NO,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Colnum name: volume.iap.wue", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$pixel^3/g\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $pixel^3/g$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
@@ -829,7 +829,7 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE.NO,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Colnum name: side.area.avg.wue", NEWLINE.TEX,
-								LINE.ITEM, "Unit: \\$pixel^2/g\\$", NEWLINE.TEX,
+								LINE.ITEM, "Unit: $pixel^2/g$", NEWLINE.TEX,
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
