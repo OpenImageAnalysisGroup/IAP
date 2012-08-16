@@ -92,7 +92,9 @@ public class TaskDescription {
 		action.setParams(experimentInput, m, params);
 		
 		MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName() + " with " + action.getDefaultTitle() + " / "
+				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
+				+ " (part index " + batch.getPartIdx() + " of " + batch.getPartCnt() + ")"
+				+ " with " + action.getDefaultTitle() + " / "
 				+ batch.getCompatibleImageAnalysisPipelineName() + ".");
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
