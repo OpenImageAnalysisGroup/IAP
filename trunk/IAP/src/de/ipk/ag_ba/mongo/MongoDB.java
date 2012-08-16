@@ -2069,8 +2069,8 @@ public class MongoDB {
 							System.out.println("" + dbo);
 						}
 						//
-						if (addCnt < maxTasks) {
-							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
+						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
+							if (addCnt < maxTasks) {
 								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
