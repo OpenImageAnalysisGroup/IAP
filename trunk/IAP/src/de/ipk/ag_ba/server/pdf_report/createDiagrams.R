@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- TRUE
+debug <- FALSE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -14,7 +14,7 @@ plotOnlyViolin <- FALSE
 plotOnlyStacked <- FALSE
 plotOnlySpider <- FALSE
 plotOnlyLineRange <- FALSE
-plotOnlyBoxplot <- TRUE
+plotOnlyBoxplot <- FALSE
 plotOnlyStressValues <- FALSE
 
 ############# Modelling ######################
