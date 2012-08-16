@@ -209,6 +209,8 @@ public class BlockPipeline {
 									: ")<b>");
 					status.setCurrentStatusText2(p);
 				} catch (Exception e) {
+					MongoDB.saveSystemErrorMessage("Finished " + index + "/"
+							+ blocks.size() + " (Error:" + e.getMessage() + ")", e);
 					status.setCurrentStatusText2("Finished " + index + "/"
 							+ blocks.size() + " (Error:" + e.getMessage() + ")");// + "<br>" +"" +
 				} // filter(blockClass.getSimpleName()));
@@ -362,7 +364,7 @@ public class BlockPipeline {
 							}
 						}
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					MongoDB.saveSystemErrorMessage("BlockPipeline backgroundTask InterruptedException.", e);
 				}
 			}
 		};
