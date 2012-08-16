@@ -5529,9 +5529,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	typOfStartOptions = tolower(typOfStartOptions)
 	
 	args = commandArgs(TRUE)
-#	for(nn in seq(along=args)) {
-#		ownCat(paste(nn, ".: ", args[nn], sep=""))
-#	}
+	for(nn in seq(along=args)) {
+		ownCat(paste(nn, ".: ", args[nn], sep=""))
+	}
 	
 	saveFormat = "pdf"
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
