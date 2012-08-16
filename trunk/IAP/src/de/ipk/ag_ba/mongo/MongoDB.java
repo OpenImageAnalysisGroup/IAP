@@ -2058,6 +2058,16 @@ public class MongoDB {
 								}
 							}
 						}
+						// check all tasks (regardless of release)
+						for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
+							BatchCmd batch = (BatchCmd) dbo;
+							if (batch.getExperimentHeader() == null) {
+								System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: found batch CMD with NULL experiment-header!");
+								continue;
+							}
+							System.out.println("" + dbo);
+						}
+						//
 						if (addCnt < maxTasks) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {

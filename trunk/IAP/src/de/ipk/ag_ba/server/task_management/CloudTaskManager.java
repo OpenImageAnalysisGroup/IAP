@@ -50,6 +50,7 @@ public class CloudTaskManager {
 					try {
 						CloudTaskManager.this.run();
 					} catch (Exception e) {
+						MongoDB.saveSystemErrorMessage("Error executing cloud task manager.", e);
 						ErrorMsg.addErrorMessage(e);
 					}
 				}
@@ -105,7 +106,7 @@ public class CloudTaskManager {
 							names.add(name);
 						}
 					} catch (Exception e) {
-						// empty
+						MongoDB.saveSystemErrorMessage("Error processing running tasks.", e);
 					}
 					
 					m.batchPingHost(hostName,
@@ -200,7 +201,7 @@ public class CloudTaskManager {
 											try {
 												tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
 											} catch (Exception e) {
-												e.printStackTrace();
+												MongoDB.saveSystemErrorMessage("Error executing analysis batch task.", e);
 											}
 										}
 									};
@@ -210,6 +211,7 @@ public class CloudTaskManager {
 								}
 							} catch (Exception e) {
 								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
+								MongoDB.saveSystemErrorMessage("Could not start batch-cmd.", e);
 							}
 						} else {
 							System.out.println(SystemAnalysis.getCurrentTime()
@@ -234,7 +236,7 @@ public class CloudTaskManager {
 					// System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
 			} while (true);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			MongoDB.saveSystemErrorMessage("Cloud task manager interrupted exception.", e);
 		}
 	}
 	
