@@ -1507,7 +1507,8 @@ public class MongoDB {
 					
 					experiment.setHeader(header);
 					
-					int NTHREDS = 4;
+					int NTHREDS = SystemAnalysis.getNumberOfCPUs();
+					NTHREDS = 10;
 					ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
 					
 					DBObject expref = dbr.fetch();
@@ -1564,7 +1565,7 @@ public class MongoDB {
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
 							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
-					
+					((Experiment) experiment).sortSubstances();
 					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
 						updateExperimentSize(db, experiment, optStatusProvider);
 					}
