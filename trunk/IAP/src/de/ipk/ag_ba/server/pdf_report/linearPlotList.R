@@ -270,7 +270,7 @@ nBoxPlotList <- list(
 		"side.vis.hsv.h.normalized.histogram.bin.05.51_63" = list(plotName = "side rgb h - bin5 (zoom corrected)", section = 7, subsection = 1, subsubsection = 1, paragraph = 18),
 		"side.vis.hsv.h.histogram.bin.06.63_76" = list(plotName = "side rgb h - bin6", section = 7, subsection = 1, subsubsection = 1, paragraph = 19),
 		"side.vis.hsv.h.normalized.histogram.bin.06.63_76" = list(plotName = "side rgb h - bin6 (zoom corrected)", section = 7, subsection = 1, subsubsection = 1, paragraph = 20),		
-		
+		"side.vis.hsv.dgci.average" = list(plotName = "side dark green color index", section = 7, subsection = 1, subsubsection = 1, paragraph = 21),
 		
 		"side.vis.hsv.s.average" = list(plotName = "side rgb s - average", section = 7, subsection = 1, subsubsection = 2, paragraph = 1),
 		"side.vis.hsv.s.normalized.average" = list(plotName = "side rgb s - average (zoom corrected)", section = 7, subsection = 1, subsubsection = 2, paragraph = 2),
@@ -334,6 +334,7 @@ nBoxPlotList <- list(
 		"top.vis.hsv.h.normalized.histogram.bin.05.51_63" = list(plotName = "top rgb h - bin5 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 18),
 		"top.vis.hsv.h.histogram.bin.06.63_76" = list(plotName = "top rgb h - bin6", section = 7, subsection = 2, subsubsection = 1, paragraph = 19),
 		"top.vis.hsv.h.normalized.histogram.bin.06.63_76" = list(plotName = "top rgb h - bin6 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 20),				
+		"top.vis.hsv.dgci.average" = list(plotName = "top dark green color index", section = 7, subsection = 1, subsubsection = 1, paragraph = 21),
 		
 		"top.vis.hsv.s.average" = list(plotName = "top rgb s - average", section = 7, subsection = 2, subsubsection = 2, paragraph = 1),
 		"top.vis.hsv.s.normalized.average" = list(plotName = "top rgb s - average (zoom corrected)", section = 7, subsection = 2, subsubsection = 2, paragraph = 2),

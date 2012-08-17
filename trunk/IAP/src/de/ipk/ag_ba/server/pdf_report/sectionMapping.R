@@ -1183,7 +1183,7 @@ sectionMappingList <- list(
 								NEWLINE.TEX,
 								"The term kurtosis is described as following:", NEWLINE.TEX, 
 								NEWLINE.TEX,
-								"\"In probability theory and statistics, kurtosis (from the Greek word κυρτός,
+								"\"In probability theory and statistics, kurtosis (from the Greek word
 								kyrtos or kurtos, meaning bulging) is any measure of the \"peakedness\" of the
 								probability distribution of a real-valued random variable. In a similar
 								way to the concept of skewness, kurtosis is a descriptor of the shape of a
@@ -1275,6 +1275,26 @@ sectionMappingList <- list(
 				"7.1.1.20" = list(
 						title = "Hue bin 6 (63-76) (zoom corrected)",
 						takeRestValuesFrom = "7.1.1.19"
+				),
+			
+				"7.1.1.21" = list(
+						newSection = 11,
+						title = "DGCI, dark green color index",
+						text = paste(
+								NEWLINE.TEX,
+								"\"Hue, saturation, and brightness (HSB) values from digital images are processed
+										into a dark green color index (DGCI), which combines HSB values into one composite number.
+										Leaf color has been recognized as one of the most sensitive indicators of nutrient
+										deficiencies (Blinn et al., 1988). Nitrogen is directly related to leaf color
+										because it is a key component of the chlorophyll molecule (Tracy et al., 1992)
+										Karcher and Richardson (2003) found that amounts of red and blue may alter how
+										green an image appears. They suggested using a drak green color index (DGCI),
+										which is derived from values of hue, saturation, and brightness (HSB). They found
+										significant DGCI differences due to N treatments and that DGCI was a more consistent 
+										measure of dark green color than were individual HSB values.\"", NEWLINE.TEX,
+										"IAP use \"",
+								sep = SEPARATOR.ITEM),
+						takeRestValuesFrom = "7.1.1.1"
 				),
 				
 				"60.1.1.1" = list(
@@ -1369,6 +1389,10 @@ sectionMappingList <- list(
 				
 				"7.1.2.20" = list(
 						takeRestValuesFrom = "7.1.1.20"
+				),
+				
+				"7.1.2.21" = list(
+						takeRestValuesFrom = "7.1.1.21"
 				),
 				
 				"60.1.2.1" = list(

@@ -125,6 +125,9 @@ START.TYP.TEST <- "test"
 START.TYP.REPORT <- "report"
 START.TYP.STRESS <- "stress"
 
+## file names
+REPORT <- "report"
+REPORT.FILE <- paste(REPORT, TEX, sep =".")
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -2608,7 +2611,7 @@ writeReportFile <- function(tabText = "", debug = FALSE) {
 	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug)$latexText
 	buildReportFileText <- includeAppendix(buildReportFileText, tabText, debug)
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportFooter")
-	writeLatexFinalFile(buildReportFileText, "report")
+	writeLatexFinalFile(buildReportFileText, REPORT)
 }
 
 buildReportTex <- function(debug) {
@@ -5402,19 +5405,32 @@ changeXAxisName <- function(overallList) {
 	return(overallList)
 }
 
+ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
+	ownCat("Check if the noValues-Image is there")
+	
+	if (!file.exists(file)) {
+		library("Cairo")
+		ownCat(paste("Create defaultImage '", file, "'", sep=""))
+		Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
+		par(mar = c(0, 0, 0, 0))
+		plot.new()
+		legend("left", "no values", col= c("black"), pch=1, bty="n")
+		dev.off()
+	}
+}
+
+ckeckIfNoValuesImagesIsThere <- function(file = REPORT.FILE) {
+	ownCat("Check if the report.tex file is there")
+	
+	if (!file.exists(file)) {
+		write(x="there was a error!", append=FALSE, file=file)
+	}
+}
 
 checkIfAllNecessaryFilesAreThere <- function() {
-		ownCat("Check if the noValues-Image is there")
-		file = "noValues.pdf"
-		if (!file.exists(file)) {
-			library("Cairo")
-			ownCat(paste("Create defaultImage '", file, "'", sep=""))
-			Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
-			par(mar = c(0, 0, 0, 0))
-			plot.new()
-			legend("left", "no values", col= c("black"), pch=1, bty="n")
-			dev.off()
-		}	
+		ownCat("... check if all necessary files are there")
+		ckeckIfNoValuesImagesIsThere()
+		ckeckIfNoValuesImagesIsThere()
 }
 
 buildBlacklist <- function(workingDataSet, descriptorSet) {
@@ -5529,9 +5545,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	typOfStartOptions = tolower(typOfStartOptions)
 	
 	args = commandArgs(TRUE)
-	for(nn in seq(along=args)) {
-		ownCat(paste(nn, ".: ", args[nn], sep=""))
-	}
+#	for(nn in seq(along=args)) {
+#		ownCat(paste(nn, ".: ", args[nn], sep=""))
+#	}
 	
 	saveFormat = "pdf"
 	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
