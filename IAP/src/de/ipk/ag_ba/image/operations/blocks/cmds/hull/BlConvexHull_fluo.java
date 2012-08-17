@@ -86,7 +86,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		Double lastSideAreaIAP = null;
 		Long lastTimeSideAreaIAP = null;
 		
-		final long timeForOneDay = 1000 * 60 * 60 * 24;
+		final Long timeForOneDay = (long) (1000 * 60 * 60 * 24);
 		
 		String plantID = null;
 		
@@ -109,9 +109,9 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 				
 				double areaSum = 0, areaSumFluo = 0, areaSumFluoWeight = 0;
-				int areaCnt = 0, areaCntFluo = 0, areaCntWeight = 0;
+				double areaCnt = 0, areaCntFluo = 0, areaCntWeight = 0;
 				double topAreaSumFluo = 0, topAreaWeightSumFluo = 0;
-				int topAreaCntFluo = 0, topAreaCntWeightCnt = 0;
+				double topAreaCntFluo = 0, topAreaCntWeightCnt = 0;
 				double sideArea_for_angleNearestTo0 = Double.NaN;
 				double sideArea_for_angleNearestTo90 = Double.NaN;
 				double distanceTo0 = Double.MAX_VALUE;
@@ -248,7 +248,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
-						double ratioPerDay = Math.pow(ratio, 1d / ((time - lastTimeVolumeIAP) * (double) timeForOneDay));
+						double ratioPerDay = Math.pow(ratio, timeForOneDay / ((time - lastTimeVolumeIAP)));
 						summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.relative", ratioPerDay);
 						double days = (time - lastTimeVolumeIAP) / timeForOneDay;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
@@ -257,12 +257,14 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 								plandID2time2waterData.get(plantID),
 								time, lastTimeVolumeIAP, timeForOneDay);
 						
-						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
+						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay) && !Double.isNaN(waterUsePerDay)) {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							summaryResult.setNumericProperty(getBlockPosition(), "RESULT_volume.iap.wue", wue);
 							
-							System.out.println("Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
-									+ new Date(time).toString() + ", used for side volume growth of " + (int) wue + " pixels per ml per day, relative volume growth: "
+							System.out.println("Plant " + plantID + " has been watered with about "
+									+ waterUsePerDay.intValue() + " ml per day, at "
+									+ new Date(time).toString() + ", used for side volume growth of "
+									+ (int) wue + " pixels per ml per day, relative volume growth: "
 									+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
 							
 						}
@@ -284,7 +286,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private Double getWaterUsePerDay(
 			TreeMap<Long, Double> time2waterData,
-			Long endTime, Long startTime, long timeForOneDay) {
+			Long endTime, Long startTime, Long timeForOneDay) {
 		// time == startTime, OK
 		// time < endTime, OK
 		Double waterSum = 0d;
