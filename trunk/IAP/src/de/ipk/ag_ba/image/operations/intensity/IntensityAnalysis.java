@@ -58,6 +58,7 @@ public class IntensityAnalysis {
 		Histogram histPhenol = new Histogram(this.n);
 		// Histogram histRatio = new Histogram(this.n);
 		int plantImagePixelCnt = 0;
+		int plantImagePixelCntVgreater0 = 0;
 		float[] hsb = new float[3];
 		for (int c : pixels) {
 			if (c == background)
@@ -87,6 +88,7 @@ public class IntensityAnalysis {
 					double s = hsb[1];
 					double v = hsb[2];
 					if ((int) (v * 255) > 0) {
+						plantImagePixelCntVgreater0++;
 						{
 							histHue.addDataPoint((int) (h * 255), 255, s, v);
 							sumOfHue += h;
@@ -98,7 +100,7 @@ public class IntensityAnalysis {
 									hLimit = 120d / 360d;
 							
 							double p1 = (hLimit - 60d / 360d) / (60d / 360d);
-							double p2 = 1 - s;
+							double p2 = s;
 							double p3 = 1 - v;
 							sumOfDGCIs += (p1 + p2 + p3) / 3d;
 							
@@ -197,16 +199,16 @@ public class IntensityAnalysis {
 							histVal.getOther2avg(i));
 			}
 			
-			if (plantImagePixelCnt > 0) {
-				double havg = sumOfHue / plantImagePixelCnt;
-				double savg = sumOfSat / plantImagePixelCnt;
-				double vavg = sumOfVal / plantImagePixelCnt;
+			if (plantImagePixelCntVgreater0 > 0) {
+				double havg = sumOfHue / plantImagePixelCntVgreater0;
+				double savg = sumOfSat / plantImagePixelCntVgreater0;
+				double vavg = sumOfVal / plantImagePixelCntVgreater0;
 				result.addValue("hsv.h.average", havg);
 				result.addValue("hsv.s.average", savg);
 				result.addValue("hsv.v.average", vavg);
 				
 				if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
-					result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCnt);
+					result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCntVgreater0);
 				}
 			}
 			

@@ -1507,6 +1507,9 @@ public class MongoDB {
 					
 					experiment.setHeader(header);
 					
+					int NTHREDS = 4;
+					ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
+					
 					DBObject expref = dbr.fetch();
 					if (expref != null) {
 						BasicDBList subList = (BasicDBList) expref.get("substances");
@@ -1523,20 +1526,36 @@ public class MongoDB {
 							db.getCollection("substances").ensureIndex("_id");
 						BasicDBList l = (BasicDBList) expref.get("substance_ids");
 						if (l != null) {
-							int n = l.size();
+							final int n = l.size();
 							for (Object o : l) {
 								if (o == null)
 									continue;
 								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
 								if (subr != null) {
-									DBObject substance = subr.fetch();
+									final DBObject substance = subr.fetch();
 									if (substance != null) {
 										if (optDBPbjectsOfSubstances != null)
 											optDBPbjectsOfSubstances.add(substance);
-										processSubstance(db, experiment, substance, optStatusProvider, 100d / l.size(), optDBPbjectsOfConditions, n);
+										final int lss = l.size();
+										Runnable r = new Runnable() {
+											@Override
+											public void run() {
+												processSubstance(db, experiment, substance, optStatusProvider, 100d / lss, optDBPbjectsOfConditions, n);
+											}
+										};
+										executor.execute(r);
 									}
 								}
 							}
+						}
+					}
+					
+					executor.shutdown();
+					while (!executor.isTerminated()) {
+						try {
+							Thread.sleep(20);
+						} catch (InterruptedException e) {
+							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
 						}
 					}
 					
@@ -2282,8 +2301,9 @@ public class MongoDB {
 		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s=" + n + ")");
-		
-		experiment.add(s3d);
+		synchronized (experiment) {
+			experiment.add(s3d);
+		}
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		if (condList != null) {
 			int nc = condList.size();
