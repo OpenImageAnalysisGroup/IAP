@@ -889,15 +889,15 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 			initDescriptor <- preprocessingOfValues(overallList$boxSpiderDes[n], isColValue = TRUE)
 			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
 			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
-			print(booleanVector)
-			print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector]))
+			#print(booleanVector)
+			#print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector]))
 			if(sum(booleanVector) > 0) {
 				overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
 			} else {
 				overallList$boxSpiderDesName[n] <- NA
 			}
 		}
-		print(overallList$boxSpiderDesName)
+		#print(overallList$boxSpiderDesName)
 		overallList$boxSpiderDesName <- checkOfNormalizedAndUnnormalized(overallList$boxSpiderDesName)
 		
 	} else {
@@ -2096,8 +2096,8 @@ isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, wh
 #newPosition <- position
 #######	
 	
-	print(oldPosition)
-	print(newPosition)
+	#print(oldPosition)
+	#print(newPosition)
 
 	toCheckMother <- unlist(str_split(oldPosition, POINT.PATTERN))
 	toCheckSon <- unlist(str_split(newPosition, POINT.PATTERN))
@@ -2112,18 +2112,18 @@ isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, wh
 					tempMother <- conectEachRow(toCheckMother[1:nn])
 					tempSon <- conectEachRow(toCheckSon[1:nn])
 				}
-				print("########")
-				print(tempMother)
-				print(checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection))
+				#print("########")
+				#print(tempMother)
+				#print(checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection))
 				if(tempSon %in% checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection)) {
-					print("interner Check")
+					#print("interner Check")
 					return(TRUE)
 				}
-				print("geschafft")
+				#print("geschafft")
 			}
-			print(nn)
-			print(toCheckMother[nn])
-			print(toCheckSon[nn])
+			#print(nn)
+			#print(toCheckMother[nn])
+			#print(toCheckSon[nn])
 		}
 	} else {
 		print("not the same length!")
@@ -2323,7 +2323,7 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 			break
 		}	
 	}
-print(identicalMatrix)
+#print(identicalMatrix)
 	return(identicalMatrix)
 }
 
