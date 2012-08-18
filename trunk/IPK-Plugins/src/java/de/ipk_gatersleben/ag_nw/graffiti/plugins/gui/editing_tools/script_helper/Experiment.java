@@ -1034,11 +1034,16 @@ public class Experiment implements ExperimentInterface {
 	
 	public static ExperimentInterface loadFromIOurl(IOurl url)
 			throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
 		InputStream is = url.getInputStream();
 		if (is == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No input stream for URL " + url);
+		Experiment md = loadFromXmlBinInputStream(is);
+		return md;
+	}
+	
+	public static Experiment loadFromXmlBinInputStream(InputStream is) throws SAXException, IOException, ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document w3Doc = builder.parse(is);
 		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
 		return md;

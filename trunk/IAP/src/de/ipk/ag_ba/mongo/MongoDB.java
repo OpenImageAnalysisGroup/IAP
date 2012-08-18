@@ -9,11 +9,13 @@ package de.ipk.ag_ba.mongo;
 
 import info.StopWatch;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -417,7 +419,7 @@ public class MongoDB {
 	}
 	
 	private void storeExperimentInnerCall(
-			ExperimentInterface experiment, final DB db,
+			final ExperimentInterface experiment, final DB db,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final boolean keepDataLinksToDataSource_safe_space) throws InterruptedException, ExecutionException {
 		
@@ -519,6 +521,7 @@ public class MongoDB {
 		errorCount.setLong(0);
 		int nLock = multiThreadedStorage ? 4 : 1;
 		final Semaphore lock = new Semaphore(nLock, true);
+		
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.get(0);
 			sl.remove(0);
@@ -532,6 +535,7 @@ public class MongoDB {
 								overallFileSize, startTime, substances, conditions,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs, errorCount, s);
 					} catch (InterruptedException e) {
+						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ",experiment " + experiment.getName(), e);
 						e.printStackTrace();
 						errorCount.addLong(1);
 						errors.append("<li>Error saving substance " + s.getName());
@@ -575,16 +579,32 @@ public class MongoDB {
 		if (true) {// || (status != null && !status.wantsToStop())
 			experiments.insert(dbExperiment);
 			String id = dbExperiment.get("_id").toString();
-			System.out.println(">>> STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id + " // "
-					+ SystemAnalysis.getCurrentTime());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id);
 			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 				eh.setDatabaseId(id);
 			}
+			System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
+			try {
+				// store XML experiment bin and attach Hash value to header
+				// when loading a experiment, the quick XML bin is loaded and then the header updated from the database content
+				db.getCollection("xmlFiles");
+				GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
+				GridFSDBFile fffMain = gridfsExperimentStorage.findOne(id);
+				if (fffMain != null)
+					gridfsExperimentStorage.remove(fffMain);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
+				ByteArrayInputStream in = new ByteArrayInputStream(experiment.toStringWithErrorThrowing().getBytes(StandardCharsets.UTF_8));
+				System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
+				gridfsExperimentStorage.createFile(in, id, true);
+				
+				System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
+			} catch (Exception e) {
+				MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
+			}
+			
+			if (!updatedSizeAvailable)
+				updateExperimentSize(db, experiment, status);
 		}
-		
-		if (!updatedSizeAvailable)
-			updateExperimentSize(db, experiment, status);
-		
 		// System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		
@@ -593,7 +613,6 @@ public class MongoDB {
 					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
 							+ "", "Errors");
 		}
-		
 	}
 	
 	private void processSubstanceSaving(final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -1505,58 +1524,85 @@ public class MongoDB {
 					// synchronized (db) {
 					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
 					
+					boolean quickLoaded = false;
+					
+					GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
+					GridFSDBFile fffMain = gridfsExperimentStorage.findOne(header.getDatabaseId());
+					if (fffMain != null) {
+						try {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">TRY QUICK XML BIN LOADING OF " + header.getDatabaseId() + ", "
+									+ header.getExperimentName());
+							InputStream in = fffMain.getInputStream();
+							Experiment e = Experiment.loadFromXmlBinInputStream(in);
+							experiment.addAll(e);
+							quickLoaded = true;
+							System.out.println(SystemAnalysis.getCurrentTime() + ">QUICK XML BIN LOADING OF " + header.getDatabaseId() + ", "
+									+ header.getExperimentName() + " SUCCEDED!");
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR DURING QUICK XML LOADING OF " + header.getDatabaseId() + ", "
+									+ header.getExperimentName() + ": " + e.getMessage());
+							e.printStackTrace();
+							MongoDB.saveSystemErrorMessage(
+									"Quick XML BIN Loading of experiment "
+											+ header.getDatabaseId()
+											+ ", experiment "
+											+ header.getExperimentName()
+											+ " failed!", e);
+						}
+					}
 					experiment.setHeader(header);
 					
-					int NTHREDS = SystemAnalysis.getNumberOfCPUs();
-					NTHREDS = 10;
-					ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
-					
-					DBObject expref = dbr.fetch();
-					if (expref != null) {
-						BasicDBList subList = (BasicDBList) expref.get("substances");
-						if (subList != null) {
-							int n = subList.size();
-							for (Object co : subList) {
-								DBObject substance = (DBObject) co;
-								if (optDBPbjectsOfSubstances != null)
-									optDBPbjectsOfSubstances.add(substance);
-								processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, n);
+					if (!quickLoaded) {
+						int nThreads = 10;
+						ExecutorService executor = Executors.newFixedThreadPool(nThreads);
+						
+						DBObject expref = dbr.fetch();
+						if (expref != null) {
+							BasicDBList subList = (BasicDBList) expref.get("substances");
+							if (subList != null) {
+								int n = subList.size();
+								for (Object co : subList) {
+									DBObject substance = (DBObject) co;
+									if (optDBPbjectsOfSubstances != null)
+										optDBPbjectsOfSubstances.add(substance);
+									processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, n);
+								}
 							}
-						}
-						if (ensureIndex)
-							db.getCollection("substances").ensureIndex("_id");
-						BasicDBList l = (BasicDBList) expref.get("substance_ids");
-						if (l != null) {
-							final int n = l.size();
-							for (Object o : l) {
-								if (o == null)
-									continue;
-								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-								if (subr != null) {
-									final DBObject substance = subr.fetch();
-									if (substance != null) {
-										if (optDBPbjectsOfSubstances != null)
-											optDBPbjectsOfSubstances.add(substance);
-										final int lss = l.size();
-										Runnable r = new Runnable() {
-											@Override
-											public void run() {
-												processSubstance(db, experiment, substance, optStatusProvider, 100d / lss, optDBPbjectsOfConditions, n);
-											}
-										};
-										executor.execute(r);
+							if (ensureIndex)
+								db.getCollection("substances").ensureIndex("_id");
+							BasicDBList l = (BasicDBList) expref.get("substance_ids");
+							if (l != null) {
+								final int n = l.size();
+								for (Object o : l) {
+									if (o == null)
+										continue;
+									DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+									if (subr != null) {
+										final DBObject substance = subr.fetch();
+										if (substance != null) {
+											if (optDBPbjectsOfSubstances != null)
+												optDBPbjectsOfSubstances.add(substance);
+											final int lss = l.size();
+											Runnable r = new Runnable() {
+												@Override
+												public void run() {
+													processSubstance(db, experiment, substance, optStatusProvider, 100d / lss, optDBPbjectsOfConditions, n);
+												}
+											};
+											executor.execute(r);
+										}
 									}
 								}
 							}
 						}
-					}
-					
-					executor.shutdown();
-					while (!executor.isTerminated()) {
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException e) {
-							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
+						
+						executor.shutdown();
+						while (!executor.isTerminated()) {
+							try {
+								Thread.sleep(20);
+							} catch (InterruptedException e) {
+								MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
+							}
 						}
 					}
 					
@@ -1565,7 +1611,9 @@ public class MongoDB {
 					int numberOfImagesAndVolumes = countMeasurementValues(experiment, new MeasurementNodeType[] {
 							MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 					experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
-					((Experiment) experiment).sortSubstances();
+					boolean sortSubstances = false;
+					if (sortSubstances)
+						((Experiment) experiment).sortSubstances();
 					if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
 						updateExperimentSize(db, experiment, optStatusProvider);
 					}
@@ -1578,6 +1626,7 @@ public class MongoDB {
 				}
 			});
 		} catch (Exception e) {
+			MongoDB.saveSystemErrorMessage("Error during experiment loading.", e);
 			ErrorMsg.addErrorMessage(e);
 		}
 		return experiment;

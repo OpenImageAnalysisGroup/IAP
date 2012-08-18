@@ -83,11 +83,11 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		double border = 5;
 		double[][] size = { { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border,
-												TableLayout.PREFERRED, // buttonPanelDBE
+						TableLayout.PREFERRED, // buttonPanelDBE
 						5,
-												TableLayout.PREFERRED, // buttonPanelFile
+						TableLayout.PREFERRED, // buttonPanelFile
 						3,
-												TableLayoutConstants.FILL, // experimentInfoPane
+						TableLayoutConstants.FILL, // experimentInfoPane
 						border } }; // Rows
 		
 		size[1][1] = TableLayout.PREFERRED;
@@ -112,7 +112,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		}
 		
 		FolderPanel buttonPanelFile =
-							new FolderPanel("Load Input File", false, true, false, o1);
+				new FolderPanel("Load Input File", false, true, false, o1);
 		buttonPanelFile.setFrameColor(new JTabbedPane().getBackground(), Color.BLACK, 0, 5);
 		buttonPanelFile.setBackground(null);
 		
@@ -130,9 +130,9 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		
 		buttonPanelFile.addGuiComponentRow(null, loadInputForm, false);
 		buttonPanelFile.addGuiComponentRow(null,
-							new JLabel("<html><font color=\"gray\"><small>Supported formats: " +
-												"templates 1 and 2, VANTED binary (xml), KEGG Expression, text/csv files"),
-							false);
+				new JLabel("<html><font color=\"gray\"><small>Supported formats: " +
+						"templates 1 and 2, IAP/VANTED binary (xml), KEGG Expression, text/csv files"),
+				false);
 		
 		/*
 		 * buttonPanelFile.addGuiComponentRow(null,
@@ -143,10 +143,10 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		buttonPanelFile.layoutRows();
 		
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.DBE_ACCESS) ||
-							ReleaseInfo.getIsAllowedFeature(FeatureSet.FLAREX_ACCESS) ||
-							ReleaseInfo.getIsAllowedFeature(FeatureSet.METHOUSE_ACCESS)) {
+				ReleaseInfo.getIsAllowedFeature(FeatureSet.FLAREX_ACCESS) ||
+				ReleaseInfo.getIsAllowedFeature(FeatureSet.METHOUSE_ACCESS)) {
 			this.add(new JLabel(""),
-								"1,1");
+					"1,1");
 		} else
 			this.add(TemplateFileManager.getInstance().getTemplateFolderPanel(), "1,1");
 		this.add(buttonPanelFile, "1,3");
@@ -162,7 +162,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 				} catch (Exception err) {
 					ErrorMsg.addErrorMessage(err);
 					MainFrame.showMessageDialog("Error: Could not open MAGE-ML: " + err.getLocalizedMessage(),
-										"File could not be processed");
+							"File could not be processed");
 				}
 			}
 		};
@@ -426,8 +426,8 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		shownExpPanes.add(expPane);
 		
 		Component c = jTabbedPaneExperimentPanels.add("<html>&nbsp;&nbsp;"
-							+ experimentName,
-							expPane);
+				+ experimentName,
+				expPane);
 		MainFrame.getInstance().getInspectorPlugin().setSelectedTab(this);
 		try {
 			jTabbedPaneExperimentPanels.setSelectedComponent(c);

@@ -705,9 +705,15 @@ public class IAPservice {
 										else
 											sn.setPlantId("" + mm.getReplicateID());
 									}
-									if (storeAllReplicates) {
-										sn.setPlantId(sn.getPlantId() + "//" + getQuality(mm));
-									}
+									// if (storeAllReplicates) {
+									// System.out.println("Plant ID: " + sn.getPlantId());
+									// if (mm.getQualityAnnotation() != null && sn.getPlantId() != null && !sn.getPlantId().contains(mm.getQualityAnnotation())) {
+									// sn.setPlantId(sn.getPlantId() + "//" + mm.getQualityAnnotation());
+									// System.out.println("-> Plant ID: " + sn.getPlantId());
+									// }
+									// sn.setPlantId(sn.getPlantId() + "//" + mm.getReplicateID());
+									// System.out.println("--> Plant ID: " + sn.getPlantId());
+									// }
 									
 									break;
 								}
@@ -911,9 +917,12 @@ public class IAPservice {
 	private static String getQuality(NumericMeasurementInterface nmi) {
 		String rs;
 		if (Math.abs(nmi.getReplicateID()) < 10)
-			rs = "0" + nmi.getReplicateID();
+			rs = "00" + nmi.getReplicateID();
 		else
-			rs = "" + nmi.getReplicateID();
+			if (Math.abs(nmi.getReplicateID()) < 100)
+				rs = "0" + nmi.getReplicateID();
+			else
+				rs = "" + nmi.getReplicateID();
 		
 		return rs + "//" + nmi.getQualityAnnotation();
 	}

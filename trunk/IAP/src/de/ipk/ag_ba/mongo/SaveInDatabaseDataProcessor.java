@@ -31,63 +31,68 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 	
 	@Override
 	protected void processData() {
-		MyExperimentInfoPanel panel = new MyExperimentInfoPanel();
-		MongoDB m;
-		
-		mappingData = mappingData.clone();
-		mappingData.getHeader().setDatabaseId("");
-		
-		Object[] sel = MyInputHelper.getInput("Select the database-target:", "Storage System", new Object[] {
-				"MongoDB", MongoDB.getMongos(),
-				"Store not in MongoDB but in VFS?", false,
-				"VFS", VirtualFileSystem.getKnown()
-		});
-		
-		if (sel == null)
-			return;
-		
-		boolean useVFS = (Boolean) sel[1];
-		if (useVFS) {
-			panel.setCancelText("Revert Changes");
-			panel.setExperimentInfo(null, mappingData.getHeader(), true, mappingData);
+		try {
+			MyExperimentInfoPanel panel = new MyExperimentInfoPanel();
+			MongoDB m;
 			
-			VirtualFileSystem vfs = (VirtualFileSystem) sel[2];
+			mappingData = mappingData.clone();
+			mappingData.getHeader().setDatabaseId("");
 			
-			sel = MyInputHelper.getInput("[Store in database;Cancel]You may modify the dataset annotation before storage:", "Copy to IAP Storage", new Object[] {
-					"", panel
+			Object[] sel = MyInputHelper.getInput("Select the database-target:", "Storage System", new Object[] {
+					"MongoDB", MongoDB.getMongos(),
+					"Store not in MongoDB but in VFS?", false,
+					"VFS", VirtualFileSystem.getKnown()
 			});
 			
-			if (sel == null) {
-				mappingData = null;
-			} else {
-				try {
-					ExperimentReference er = new ExperimentReference(mappingData);
-					vfs.saveExperiment(er, new CommandLineBackgroundTaskStatusProvider(true));
+			if (sel == null)
+				return;
+			
+			boolean useVFS = (Boolean) sel[1];
+			if (useVFS) {
+				panel.setCancelText("Revert Changes");
+				panel.setExperimentInfo(null, mappingData.getHeader(), true, mappingData);
+				
+				VirtualFileSystem vfs = (VirtualFileSystem) sel[2];
+				
+				sel = MyInputHelper.getInput("[Store in database;Cancel]You may modify the dataset annotation before storage:", "Copy to IAP Storage",
+						new Object[] {
+								"", panel
+						});
+				
+				if (sel == null) {
 					mappingData = null;
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
+				} else {
+					try {
+						ExperimentReference er = new ExperimentReference(mappingData);
+						vfs.saveExperiment(er, new CommandLineBackgroundTaskStatusProvider(true));
+						mappingData = null;
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+			} else {
+				m = (MongoDB) sel[0];
+				
+				panel.setCancelText("Revert Changes");
+				panel.setExperimentInfo(m, mappingData.getHeader(), true, mappingData);
+				
+				sel = MyInputHelper.getInput("[Store in database;Cancel]You may modify dataset before storage:", "Copy into IAP Cloud Storage", new Object[] {
+						"", panel
+				});
+				
+				if (sel == null) {
+					mappingData = null;
+				} else {
+					try {
+						m.saveExperiment(mappingData, new CommandLineBackgroundTaskStatusProvider(true));
+						mappingData = null;
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
 				}
 			}
-		} else {
-			m = (MongoDB) sel[0];
-			
-			panel.setCancelText("Revert Changes");
-			panel.setExperimentInfo(m, mappingData.getHeader(), true, mappingData);
-			
-			sel = MyInputHelper.getInput("[Store in database;Cancel]You may modify dataset before storage:", "Copy into IAP Cloud Storage", new Object[] {
-					"", panel
-			});
-			
-			if (sel == null) {
-				mappingData = null;
-			} else {
-				try {
-					m.saveExperiment(mappingData, new CommandLineBackgroundTaskStatusProvider(true));
-					mappingData = null;
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-				}
-			}
+		} finally {
+			mappingData = null;
 		}
 	}
 	
