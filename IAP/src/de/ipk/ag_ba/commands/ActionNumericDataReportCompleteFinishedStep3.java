@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import javax.swing.JLabel;
 
 import org.AttributeHelper;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.poi.ss.usermodel.Cell;
@@ -53,7 +54,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	ArrayList<String> lastOutput = new ArrayList<String>();
 	
-	private static final String separator = ";";// "\t";// ";";// "\t";
+	public static final String separator = ";";// "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final boolean xlsx;
 	
@@ -320,11 +321,11 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (!clustering)
 				row2col2value = null;
 			boolean water = false;
-			String csvHeader = getCSVheader();
 			if (status != null)
 				status.setCurrentStatusText2("Create snapshots");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
 			StringBuilder indexHeader = new StringBuilder();
+			String csvHeader = "";
 			if (!water) {
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
@@ -335,6 +336,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					cola.put(indexInfo.get(val), val);
 				for (String val : cola.values())
 					indexHeader.append(separator + val);
+				csvHeader = getCSVheader();
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
 				csv.append(csvHeader + indexHeader.toString() + "\r\n");
@@ -343,6 +345,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter);
+				csvHeader = getCSVheader();
 				csv.append(csvHeader);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
@@ -371,7 +374,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
 				experiment = null;
-				setExcelSheetValues(snapshots, sheet, excelColumnHeaders);
+				
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status);
 			} else {
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
@@ -557,9 +561,11 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return res;
 	}
 	
-	private void setExcelSheetValues(ArrayList<SnapshotDataIAP> snapshots, Sheet sheet, ArrayList<String> excelColumnHeaders) {
-		if (status != null)
-			status.setCurrentStatusText2("Fill workbook");
+	public static void setExcelSheetValues(
+			ArrayList<SnapshotDataIAP> snapshots,
+			Sheet sheet,
+			ArrayList<String> excelColumnHeaders,
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		Queue<SnapshotDataIAP> snapshotsToBeProcessed = new LinkedList<SnapshotDataIAP>(snapshots);
 		snapshots = null;
@@ -605,7 +611,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				int colNum = 0;
 				
 				if (!adjusted && rowNum >= 15) {
-					adjustColumnWidths(sheet, excelColumnHeaders);
+					adjustColumnWidths(sheet, excelColumnHeaders, status);
 					adjusted = true;
 					if (status != null)
 						status.setCurrentStatusText1("Rows remaining: " + snapshotsToBeProcessed.size());
@@ -634,7 +640,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		}
 		
 		if (!adjusted) {
-			adjustColumnWidths(sheet, excelColumnHeaders);
+			adjustColumnWidths(sheet, excelColumnHeaders, status);
 			adjusted = true;
 		}
 		for (Integer dateCol : dateColumns)
@@ -646,7 +652,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
 	}
 	
-	private void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders) {
+	private static void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders,
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		for (int i = 0; i < excelColumnHeaders.size(); i++) {
 			if (status != null)
 				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
@@ -713,7 +720,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return value.equals(content);
 	}
 	
-	private String replaceInvalidChars(String experimentName) {
+	public static String replaceInvalidChars(String experimentName) {
 		String res = StringManipulationTools.stringReplace(experimentName, ":", "_");
 		res = StringManipulationTools.stringReplace(res, "\\", "");
 		return res;
@@ -735,7 +742,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return m;
 	}
 	
-	public String getCSVheader() {
+	public static String getCSVheader() {
 		return "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator
 				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"

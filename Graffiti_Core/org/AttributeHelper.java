@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -3592,5 +3592,22 @@ public class AttributeHelper implements HelperClass {
 			date = new Date();
 		}
 		return new SimpleDateFormat().format(date);
+	}
+	
+	public static void showInFileBrowser(String folder, String fileName) throws Exception {
+		if (SystemAnalysis.isWindowsRunning()) {
+			// explorer.exe /select,"file" ==> select in file explorer
+			Runtime r = Runtime.getRuntime();
+			r.exec(new String[] { "explorer.exe", "/select,+\"" + folder + File.separator + fileName + "\"" }, null, null);
+		} else {
+			if (SystemAnalysis.isMacRunning()) {
+				// open -R ==> reveal in Finder
+				Runtime r = Runtime.getRuntime();
+				String p = folder + File.separator + fileName;
+				r.exec(new String[] { "open", "-R", p }, null, null);
+			} else {
+				showInBrowser(folder + File.pathSeparator + fileName);
+			}
+		}
 	}
 }

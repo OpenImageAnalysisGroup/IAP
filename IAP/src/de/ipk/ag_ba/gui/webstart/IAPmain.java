@@ -44,6 +44,7 @@ import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.util.WebCamHandler;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
 import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
@@ -329,6 +330,7 @@ public class IAPmain extends JApplet {
 		}
 		
 		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveInDatabaseDataProcessor());
+		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveAsCsvDataProcessor());
 		
 		splashScreen.setText("Initialize GUI...");
 		splashScreen.setVisible(false);

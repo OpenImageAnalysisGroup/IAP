@@ -280,4 +280,8 @@ public class SystemAnalysis {
 		else
 			return StringManipulationTools.formatNumber(megaBytesPerDay, "#.#") + " MB/day";
 	}
+	
+	public static boolean isMacRunning() {
+		return AttributeHelper.macOSrunning();
+	}
 }
