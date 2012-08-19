@@ -593,10 +593,14 @@ public class MongoDB {
 				if (fffMain != null)
 					gridfsExperimentStorage.remove(fffMain);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
-				ByteArrayInputStream in = new ByteArrayInputStream(experiment.toStringWithErrorThrowing().getBytes(StandardCharsets.UTF_8));
+				String ss = experiment.toStringWithErrorThrowing();
+				byte[] bb = ss.getBytes(StandardCharsets.UTF_8);
+				ss = null;
+				ByteArrayInputStream in = new ByteArrayInputStream(bb);
+				bb = null;
 				System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
 				gridfsExperimentStorage.createFile(in, id, true);
-				
+				in = null;
 				System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
