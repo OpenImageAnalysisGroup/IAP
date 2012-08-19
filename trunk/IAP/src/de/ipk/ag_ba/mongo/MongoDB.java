@@ -583,6 +583,8 @@ public class MongoDB {
 			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
 				eh.setDatabaseId(id);
 			}
+			boolean storeXML = false;
+			if (storeXML){
 			System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
 			try {
 				// store XML experiment bin and attach Hash value to header
@@ -605,7 +607,7 @@ public class MongoDB {
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
 			}
-			
+			}	
 			if (!updatedSizeAvailable)
 				updateExperimentSize(db, experiment, status);
 		}
