@@ -134,7 +134,7 @@ public class MappingData3DPath {
 		return isValid;
 	}
 	
-	public static ArrayList<MappingData3DPath> get(Experiment e) {
+	public static ArrayList<MappingData3DPath> get(ExperimentInterface e) {
 		ArrayList<MappingData3DPath> res = new ArrayList<MappingData3DPath>();
 		for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(e)) {
 			res.add(new MappingData3DPath(nmi));
@@ -142,7 +142,7 @@ public class MappingData3DPath {
 		return res;
 	}
 	
-	public static ArrayList<MappingData3DPath> get(Experiment e, boolean clone) {
+	public static ArrayList<MappingData3DPath> get(ExperimentInterface e, boolean clone) {
 		ArrayList<MappingData3DPath> res = new ArrayList<MappingData3DPath>();
 		for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(e)) {
 			res.add(new MappingData3DPath(nmi, clone));

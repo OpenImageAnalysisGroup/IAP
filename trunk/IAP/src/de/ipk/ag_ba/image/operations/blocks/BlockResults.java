@@ -425,4 +425,9 @@ public class BlockResults implements BlockResultSet {
 			System.out.println("WARNING: Stored postprocessors size > 0");
 		storedPostProcessors.clear();
 	}
+	
+	@Override
+	public boolean isNumericStoreEmpty() {
+		return storedNumerics.isEmpty();
+	}
 }
