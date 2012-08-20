@@ -68,4 +68,6 @@ public interface BlockResultSet {
 			ImageConfiguration rgbside);
 	
 	public void clearStore();
+	
+	public boolean isNumericStoreEmpty();
 }
