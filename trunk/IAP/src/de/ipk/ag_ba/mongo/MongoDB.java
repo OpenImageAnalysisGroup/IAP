@@ -2122,8 +2122,8 @@ public class MongoDB {
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks && claimed < maxTasks) {
-								loop: for (DBObject dbo : collection.find().batchSize(500).sort(
-										new BasicDBObject("submission", -1).append("release", ir.toString()))) {
+								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString())).batchSize(500).sort(
+										new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
