@@ -27,7 +27,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 	
 	private final boolean debugRegionParts = false;
 	
-	private final boolean calculateValuesAlsoForDifferentRegions = false;
+	private final boolean calculateValuesAlsoForDifferentRegions = true;
 	
 	@Override
 	protected boolean isChangingImages() {
