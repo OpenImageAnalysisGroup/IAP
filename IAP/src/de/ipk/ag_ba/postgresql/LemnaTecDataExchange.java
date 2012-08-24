@@ -1027,8 +1027,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_null_image(), sn.getId_tag()
-								+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+								+ sn.getPath_null_image(), 
+								"ref_"+sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/")+"/".length())+".png"
+//								sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
+								);
 						image.setLabelURL(url);
 					}
 					

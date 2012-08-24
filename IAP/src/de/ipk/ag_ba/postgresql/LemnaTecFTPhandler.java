@@ -111,7 +111,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
 				
 				if (advancedFTP) {
-					System.out.print(SystemAnalysis.getCurrentTimeInclSec()+">"+url.getFileName());
+					System.out.print(SystemAnalysis.getCurrentTimeInclSec()+">"+url);
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
 							false);
