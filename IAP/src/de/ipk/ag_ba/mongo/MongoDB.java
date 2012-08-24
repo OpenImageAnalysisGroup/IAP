@@ -120,7 +120,7 @@ public class MongoDB {
 	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
-	public static boolean ensureIndex = false;
+	public static boolean ensureIndex = true;
 	
 	private final boolean multiThreadedStorage = false;
 	
@@ -1867,7 +1867,7 @@ public class MongoDB {
 					
 					ArrayList<CloudHost> del = new ArrayList<CloudHost>();
 					
-					DBCursor cursor = dbc.find();
+					DBCursor cursor = dbc.find().batchSize(500);
 					final long curr = System.currentTimeMillis();
 					while (cursor.hasNext()) {
 						CloudHost h = (CloudHost) cursor.next();
@@ -2067,7 +2067,7 @@ public class MongoDB {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
+					for (DBObject dbo : collection.find().batchSize(500).sort(new BasicDBObject("submission", 1))) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
@@ -2104,7 +2104,7 @@ public class MongoDB {
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
 							if (addCnt < maxTasks)
-								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
+								for (DBObject dbo : collection.find(rm).batchSize(500).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getCpuTargetUtilization() < maxTasks) {
 										if (batch.getExperimentHeader() == null)
@@ -2122,7 +2122,7 @@ public class MongoDB {
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks && claimed < maxTasks) {
-								loop: for (DBObject dbo : collection.find().sort(
+								loop: for (DBObject dbo : collection.find().batchSize(500).sort(
 										new BasicDBObject("submission", -1).append("release", ir.toString()))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
@@ -2156,7 +2156,7 @@ public class MongoDB {
 						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
-								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {
+								for (DBObject dbo : collection.find(sm).batchSize(500).sort(new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -2172,7 +2172,7 @@ public class MongoDB {
 						}
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
-								for (DBObject dbo : collection.find(sm).sort(
+								for (DBObject dbo : collection.find(sm).batchSize(500).sort(
 										new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
@@ -2734,7 +2734,7 @@ public class MongoDB {
 				@Override
 				public void run() {
 					SimpleDateFormat sdf = new SimpleDateFormat();
-					for (DBObject newsItem : db.getCollection("news").find()) {
+					for (DBObject newsItem : db.getCollection("news").find().batchSize(1000)) {
 						Date l = (Date) newsItem.get("date");
 						String text = (String) newsItem.get("text");
 						String user = (String) newsItem.get("user");
@@ -2886,7 +2886,7 @@ public class MongoDB {
 					DBCollection substances = db.getCollection("substances");
 					long nn = 0, max = substances.count();
 					status.setCurrentStatusText2("Read list of substance IDs (" + max + ")");
-					DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1));
+					DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1)).batchSize(5000);
 					while (subCur.hasNext()) {
 						DBObject subO = subCur.next();
 						dbIdsOfSubstances.add(subO.get("_id") + "");
@@ -2906,7 +2906,9 @@ public class MongoDB {
 						conditions.ensureIndex(new BasicDBObject("_id", 1));
 					long nn = 0, max = conditions.count();
 					status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");
-					DBCursor condCur = conditions.find(new BasicDBObject(), new BasicDBObject("_id", 1));
+					DBCursor condCur = conditions
+						.find(new BasicDBObject(), new BasicDBObject("_id", 1))
+						.batchSize(5000);
 					while (condCur.hasNext()) {
 						DBObject condO = condCur.next();
 						dbIdsOfConditions.add(condO.get("_id") + "");

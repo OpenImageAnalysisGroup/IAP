@@ -225,7 +225,7 @@ public class CloudTaskManager {
 				} else {
 					// System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
-				Thread.sleep(1000);
+				Thread.sleep(30000);
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
