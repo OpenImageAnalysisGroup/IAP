@@ -120,7 +120,7 @@ public class MongoDB {
 	
 	private static final ArrayList<MongoDB> mongos = initMongoList();
 	
-	private static boolean ensureIndex = false;
+	public static boolean ensureIndex = false;
 	
 	private final boolean multiThreadedStorage = false;
 	
@@ -514,6 +514,9 @@ public class MongoDB {
 		
 		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
+		
+		final CollectionStorage cols = new CollectionStorage(db, ensureIndex);
+		
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		Runtime r = Runtime.getRuntime();
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
@@ -531,7 +534,7 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
-						processSubstanceSaving(db, status, keepDataLinksToDataSource_safe_space, attributes,
+						processSubstanceSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes,
 								overallFileSize, startTime, substances, conditions,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs, errorCount, s);
 					} catch (InterruptedException e) {
@@ -621,7 +624,8 @@ public class MongoDB {
 		}
 	}
 	
-	private void processSubstanceSaving(final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
+	private void processSubstanceSaving(final CollectionStorage cols, 
+			final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final boolean keepDataLinksToDataSource_safe_space, final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
 			final ObjectRef startTime, DBCollection substances, final DBCollection conditions, final ObjectRef lastTransferSum, final ObjectRef lastTime,
 			final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData, ArrayList<String> substanceIDs, final ObjectRef errorCount,
@@ -646,7 +650,7 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
-						processConditionSaving(db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
+						processConditionSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, conditionIDs, c);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -671,7 +675,7 @@ public class MongoDB {
 		substanceIDs.add((substance).getString("_id"));
 	}
 	
-	private void processConditionSaving(DB db, final BackgroundTaskStatusProviderSupportingExternalCall status, boolean keepDataLinksToDataSource_safe_space,
+	private void processConditionSaving(CollectionStorage cols, DB db, final BackgroundTaskStatusProviderSupportingExternalCall status, boolean keepDataLinksToDataSource_safe_space,
 			final HashMap<String, Object> attributes, final ObjectRef overallFileSize, final ObjectRef startTime, DBCollection conditions,
 			final ObjectRef errorCount,
 			final ObjectRef lastTransferSum, final ObjectRef lastTime, final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData,
@@ -747,7 +751,7 @@ public class MongoDB {
 							ImageData id = (ImageData) m;
 							boolean direct = true;
 							if (direct) {
-								res = saveImageFileDirect(db, id, overallFileSize,
+								res = saveImageFileDirect(cols, db, id, overallFileSize,
 										keepDataLinksToDataSource_safe_space);
 								if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 									errorCount.addLong(1);
@@ -762,7 +766,7 @@ public class MongoDB {
 								}
 								count.addLong(1);
 							} else {
-								storageResults.add(saveImageFile(db, id, overallFileSize,
+								storageResults.add(saveImageFile(cols, db, id, overallFileSize,
 										keepDataLinksToDataSource_safe_space));
 								imageDataQueue.add(id);
 							}
@@ -1186,11 +1190,13 @@ public class MongoDB {
 		}
 	}) : null;
 	
-	public Future<DatabaseStorageResult> saveImageFile(final DB db,
+	public Future<DatabaseStorageResult> saveImageFile(
+			final CollectionStorage cols,
+			final DB db,
 			final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
 		if (storageTaskQueue == null) {
-			final DatabaseStorageResult res = saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+			final DatabaseStorageResult res = saveImageFileDirect(cols, db, image, fileSize, keepRemoteURLs_safe_space);
 			return new Future<DatabaseStorageResult>() {
 				
 				@Override
@@ -1225,7 +1231,7 @@ public class MongoDB {
 			return storageTaskQueue.submit(new Callable<DatabaseStorageResult>() {
 				@Override
 				public DatabaseStorageResult call() throws Exception {
-					return saveImageFileDirect(db, image, fileSize, keepRemoteURLs_safe_space);
+					return saveImageFileDirect(cols, db, image, fileSize, keepRemoteURLs_safe_space);
 				}
 			});
 	}
@@ -3142,7 +3148,7 @@ public class MongoDB {
 		return res.toString();
 	}
 	
-	private DatabaseStorageResult saveImageFileDirect(final DB db, final ImageData image, final ObjectRef fileSize, final boolean keepRemoteURLs_safe_space)
+	private DatabaseStorageResult saveImageFileDirect(CollectionStorage cols, final DB db, final ImageData image, final ObjectRef fileSize, final boolean keepRemoteURLs_safe_space)
 			throws Exception, IOException {
 		// if the image data source is equal to the target (determined by the prefix),
 		// the image content does not need to be copied (assumption valid while using MongoDB data storage)
@@ -3176,8 +3182,8 @@ public class MongoDB {
 			if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()) && image.getLabelURL() != null) {
 				DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 				if (knownURL != null && knownLabelURL != null) {
-					GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
-					GridFS gridfs_label_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
+					GridFS gridfs_images = cols.gridfs_images;
+					GridFS gridfs_label_files = cols.gridfs_label_files;
 					
 					String hashMain = (String) knownURL.get("hash");
 					GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
@@ -3241,57 +3247,42 @@ public class MongoDB {
 				db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 			
 			if (hashMain != null) {
-				DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
+				DBObject knownURL = cols.constantSrc2hash.findOne(new BasicDBObject("srcUrl", image.getURL().toString()));
 				if (knownURL == null) {
 					Map<String, String> m1 = new HashMap<String, String>();
 					m1.put("srcUrl", image.getURL().toString());
 					m1.put("hash", hashMain);
-					db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					cols.constantSrc2hash.insert(new BasicDBObject(m1));
 				}
 			}
 			if (hashLabel != null) {
-				DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
+				DBObject knownLabelURL =cols.constantSrc2hash.findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 				if (knownLabelURL == null) {
 					Map<String, String> m1 = new HashMap<String, String>();
 					m1.put("srcUrl", image.getLabelURL().toString());
 					m1.put("hash", hashLabel);
-					db.getCollection("constantSrc2hash").insert(new BasicDBObject(m1));
+					cols.constantSrc2hash.insert(new BasicDBObject(m1));
 				}
 			}
 		}
 		
-		GridFS gridfs_images = new GridFS(db, "" + MongoGridFS.FS_IMAGES.toString());
-		DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
-		if (ensureIndex)
-			collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
-		
-		GridFS gridfs_label_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
-		DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
-		if (ensureIndex)
-			collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
-		
-		GridFS gridfs_preview_files = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
-		DBCollection collectionC = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
-		if (ensureIndex)
-			collectionC.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
-		
-		GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
+		GridFSDBFile fffMain = cols.gridfs_images.findOne(hashMain);
 		image.getURL().setPrefix(mh.getPrefix());
 		image.getURL().setDetail(hashMain);
 		
 		GridFSDBFile fffLabel = null;
 		if (hashLabel != null && image.getLabelURL() != null) {
-			fffLabel = gridfs_label_files.findOne(hashLabel);
+			fffLabel = cols.gridfs_label_files.findOne(hashLabel);
 		}
 		
 		// GridFSDBFile fffPreview = null;// gridfs_preview_files.findOne(hashMain);
 		
 		if (fffMain != null && fffMain.getLength() <= 0) {
-			gridfs_images.remove(fffMain);
+			cols.gridfs_images.remove(fffMain);
 			fffMain = null;
 		}
 		if (fffLabel != null && fffLabel.getLength() <= 0) {
-			gridfs_images.remove(fffLabel);
+			cols.gridfs_images.remove(fffLabel);
 			fffLabel = null;
 		}
 		// if (fffPreview != null && fffPreview.getLength() <= 0) {
@@ -3314,8 +3305,8 @@ public class MongoDB {
 					new MyByteArrayInputStream(isMain),
 					isLabel != null ? new MyByteArrayInputStream(isLabel) : null,
 					getPreviewImageStream(new MyByteArrayInputStream(isMain))
-			}, gridfs_images, gridfs_label_files,
-					gridfs_preview_files, image, hashMain,
+			}, cols.gridfs_images, cols.gridfs_label_files,
+					cols.gridfs_preview_files, image, hashMain,
 					hashLabel,
 					fffMain == null, fffLabel == null);
 			

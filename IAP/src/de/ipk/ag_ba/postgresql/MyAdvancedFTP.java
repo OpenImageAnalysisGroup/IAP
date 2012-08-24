@@ -140,7 +140,7 @@ public class MyAdvancedFTP {
 			}
 			boolean autoClose = true;
 			if (autoClose)
-				BackgroundTaskHelper.executeLaterOnSwingTask(10000, new Runnable() {
+				BackgroundTaskHelper.executeLaterOnSwingTask(5*6*10000, new Runnable() {
 					public void run() {
 						try {
 							synchronized (GUIhelper.class) {
