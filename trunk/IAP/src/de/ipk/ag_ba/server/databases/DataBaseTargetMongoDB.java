@@ -14,6 +14,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.mongodb.DB;
 
+import de.ipk.ag_ba.mongo.CollectionStorage;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
@@ -35,7 +36,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	}
 	
 	@Override
-	public LoadedImage saveImage(final LoadedImage limg,
+	public LoadedImage saveImage(
+			final LoadedImage limg,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
 		if (!store)
 			return null;
@@ -46,7 +48,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			@Override
 			public void run() {
 				try {
-					DatabaseStorageResult dsr = m.saveImageFile(db, limg, null, keepRemoteURLs_safe_space).get();
+					CollectionStorage cols = new CollectionStorage(db, MongoDB.ensureIndex);
+					DatabaseStorageResult dsr = m.saveImageFile(cols,db, limg, null, keepRemoteURLs_safe_space).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);

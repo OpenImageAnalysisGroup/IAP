@@ -80,7 +80,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					}
 				}
 			}
-			boolean useSCP = true;
+			boolean useSCP = false;
 			if (useSCP) {
 				InputStream iss = null;
 				// synchronized (PREFIX) {
@@ -111,6 +111,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
 				
 				if (advancedFTP) {
+					System.out.print(SystemAnalysis.getCurrentTimeInclSec()+">"+url.getFileName());
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
 							false);
@@ -126,6 +127,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 						return null;
 					}
 					MyByteArrayInputStream res = new MyByteArrayInputStream(bos.getBuff(), bos.size());
+					System.out.println(".");
 					return res;
 				} else {
 					return new BufferedInputStream(new URL(ur).openStream());
