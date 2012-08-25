@@ -2998,7 +2998,7 @@ public class MongoDB {
 					}
 				};
 
-				int nThreads = 10;
+				int nThreads = 20;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 
 				for (final ExperimentHeaderInterface ehii : todo) {
