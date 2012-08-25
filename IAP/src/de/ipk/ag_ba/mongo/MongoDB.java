@@ -100,7 +100,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -589,30 +588,30 @@ public class MongoDB {
 				eh.setDatabaseId(id);
 			}
 			boolean storeXML = false;
-			if (storeXML){
-			System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
-			try {
-				// store XML experiment bin and attach Hash value to header
-				// when loading a experiment, the quick XML bin is loaded and then the header updated from the database content
-				db.getCollection("xmlFiles");
-				GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
-				GridFSDBFile fffMain = gridfsExperimentStorage.findOne(id);
-				if (fffMain != null)
-					gridfsExperimentStorage.remove(fffMain);
-				System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
-				String ss = experiment.toStringWithErrorThrowing();
-				byte[] bb = ss.getBytes(StandardCharsets.UTF_8);
-				ss = null;
-				ByteArrayInputStream in = new ByteArrayInputStream(bb);
-				bb = null;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
-				gridfsExperimentStorage.createFile(in, id, true);
-				in = null;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
-			} catch (Exception e) {
-				MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
+			if (storeXML) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
+				try {
+					// store XML experiment bin and attach Hash value to header
+					// when loading a experiment, the quick XML bin is loaded and then the header updated from the database content
+					db.getCollection("xmlFiles");
+					GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
+					GridFSDBFile fffMain = gridfsExperimentStorage.findOne(id);
+					if (fffMain != null)
+						gridfsExperimentStorage.remove(fffMain);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
+					String ss = experiment.toStringWithErrorThrowing();
+					byte[] bb = ss.getBytes(StandardCharsets.UTF_8);
+					ss = null;
+					ByteArrayInputStream in = new ByteArrayInputStream(bb);
+					bb = null;
+					System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
+					gridfsExperimentStorage.createFile(in, id, true);
+					in = null;
+					System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
+				} catch (Exception e) {
+					MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
+				}
 			}
-			}	
 			if (!updatedSizeAvailable)
 				updateExperimentSize(db, experiment, status);
 		}
@@ -626,7 +625,7 @@ public class MongoDB {
 		}
 	}
 	
-	private void processSubstanceSaving(final CollectionStorage cols, 
+	private void processSubstanceSaving(final CollectionStorage cols,
 			final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final boolean keepDataLinksToDataSource_safe_space, final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
 			final ObjectRef startTime, DBCollection substances, final DBCollection conditions, final ObjectRef lastTransferSum, final ObjectRef lastTime,
@@ -652,7 +651,8 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
-						processConditionSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions, errorCount,
+						processConditionSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes, overallFileSize, startTime, conditions,
+								errorCount,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, conditionIDs, c);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -677,7 +677,8 @@ public class MongoDB {
 		substanceIDs.add((substance).getString("_id"));
 	}
 	
-	private void processConditionSaving(CollectionStorage cols, DB db, final BackgroundTaskStatusProviderSupportingExternalCall status, boolean keepDataLinksToDataSource_safe_space,
+	private void processConditionSaving(CollectionStorage cols, DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
+			boolean keepDataLinksToDataSource_safe_space,
 			final HashMap<String, Object> attributes, final ObjectRef overallFileSize, final ObjectRef startTime, DBCollection conditions,
 			final ObjectRef errorCount,
 			final ObjectRef lastTransferSum, final ObjectRef lastTime, final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData,
@@ -1687,18 +1688,18 @@ public class MongoDB {
 								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
 								if (subr != null) {
 									DBObject substance = subr.fetch();
-									if (visitSubstance!=null) {
+									if (visitSubstance != null) {
 										if (substance != null) {
 											synchronized (visitSubstance) {
 												visitSubstance.processDBid(substance.get("_id") + "");
 											}
-											visitSubstance(header, 
+											visitSubstance(header,
 													db, substance, optStatusProvider, 100d / l.size(),
 													visitCondition, visitBinaryMeasurement,
 													invalid);
 										} else
 											if (!printed) {
-												System.out.println("WARNING: Missing substance(s) in experiment "+header.getExperimentName());
+												System.out.println("WARNING: Missing substance(s) in experiment " + header.getExperimentName());
 												printed = true;
 												invalid.setBval(0, true);
 											}
@@ -1885,7 +1886,7 @@ public class MongoDB {
 					
 					ArrayList<CloudHost> del = new ArrayList<CloudHost>();
 					
-					DBCursor cursor = dbc.find().batchSize(500);
+					DBCursor cursor = dbc.find();
 					final long curr = System.currentTimeMillis();
 					while (cursor.hasNext()) {
 						CloudHost h = (CloudHost) cursor.next();
@@ -2085,7 +2086,7 @@ public class MongoDB {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find().batchSize(500).sort(new BasicDBObject("submission", 1))) {
+					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
@@ -2122,7 +2123,7 @@ public class MongoDB {
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
 							if (addCnt < maxTasks)
-								for (DBObject dbo : collection.find(rm).batchSize(500).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
+								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getCpuTargetUtilization() < maxTasks) {
 										if (batch.getExperimentHeader() == null)
@@ -2140,7 +2141,7 @@ public class MongoDB {
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks && claimed < maxTasks) {
-								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString())).batchSize(500).sort(
+								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString())).sort(
 										new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
@@ -2174,7 +2175,7 @@ public class MongoDB {
 						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
-								for (DBObject dbo : collection.find(sm).batchSize(500).sort(new BasicDBObject("submission", -1))) {
+								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -2190,7 +2191,7 @@ public class MongoDB {
 						}
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
-								for (DBObject dbo : collection.find(sm).batchSize(500).sort(
+								for (DBObject dbo : collection.find(sm).sort(
 										new BasicDBObject("submission", -1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
@@ -2444,41 +2445,41 @@ public class MongoDB {
 			double max = l.size();
 			boolean printed = false;
 			DBCollection collCond = db.getCollection("conditions");
-			if (collCond!=null)
-			for (Object o : l) {
-				if (o==null)
-					continue;
-				boolean useRef = false;
-				DBObject cond;
-				if (useRef) {
-					DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
-					cond = condr.fetch();
-				} else {
-					cond = collCond.findOne(
-							new ObjectId(o.toString()),
-							new BasicDBObject()
-									.append("_id", new Integer(1))
-									.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
-									.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
-									.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
-							);
-				}
-				// find objects in "condition" collection, but only fields images, volumes, networks
-				if (cond != null) {
-					synchronized (visitCondition) {
-						visitCondition.processDBid(cond.get("_id") + "");
+			if (collCond != null)
+				for (Object o : l) {
+					if (o == null)
+						continue;
+					boolean useRef = false;
+					DBObject cond;
+					if (useRef) {
+						DBRef condr = new DBRef(db, "conditions", new ObjectId(o.toString()));
+						cond = condr.fetch();
+					} else {
+						cond = collCond.findOne(
+								new ObjectId(o.toString()),
+								new BasicDBObject()
+										.append("_id", new Integer(1))
+										.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
+										.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
+										.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+								);
 					}
-					visitCondition(s3d, cond, visitBinary);
-				} else {
-					if (!printed) {
-						System.out.println("WARNING: Condition could not be retrieved for experiment "+header.getExperimentName());
-						printed = true;
-						invalid.setBval(0, true);
+					// find objects in "condition" collection, but only fields images, volumes, networks
+					if (cond != null) {
+						synchronized (visitCondition) {
+							visitCondition.processDBid(cond.get("_id") + "");
+						}
+						visitCondition(s3d, cond, visitBinary);
+					} else {
+						if (!printed) {
+							System.out.println("WARNING: Condition could not be retrieved for experiment " + header.getExperimentName());
+							printed = true;
+							invalid.setBval(0, true);
+						}
 					}
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 				}
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
-			}
 		}
 	}
 	
@@ -2913,7 +2914,7 @@ public class MongoDB {
 					long nn = 0, max = substances.count();
 					status.setCurrentStatusText2("Read list of substance IDs (" + max + ")");
 					DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1))
-					.hint(new BasicDBObject("_id", 1)).batchSize(5000);
+							.hint(new BasicDBObject("_id", 1)).batchSize(5000);
 					while (subCur.hasNext()) {
 						DBObject subO = subCur.next();
 						dbIdsOfSubstances.add(subO.get("_id") + "");
@@ -2934,8 +2935,8 @@ public class MongoDB {
 					long nn = 0, max = conditions.count();
 					status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");
 					DBCursor condCur = conditions
-						.find(new BasicDBObject(), new BasicDBObject("_id", 1)).hint(new BasicDBObject("_id", 1))
-						.batchSize(100000);
+							.find(new BasicDBObject(), new BasicDBObject("_id", 1)).hint(new BasicDBObject("_id", 1))
+							.batchSize(100000);
 					while (condCur.hasNext()) {
 						DBObject condO = condCur.next();
 						dbIdsOfConditions.add(condO.get("_id") + "");
@@ -2994,7 +2995,7 @@ public class MongoDB {
 						}
 					}
 				};
-
+				
 				int nThreads = 20;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
@@ -3005,7 +3006,7 @@ public class MongoDB {
 							ThreadSafeOptions invalid = new ThreadSafeOptions();
 							invalid.setBval(0, false);
 							ii.addInt(1);
-							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName() 
+							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName()
 									+ " (" + ii.getInt() + "/" + nn + ")");
 							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger();
 							ss.setEnabled(false);
@@ -3034,7 +3035,7 @@ public class MongoDB {
 					String id = (String) inv.getParam(0, "");
 					try {
 						System.out.println(
-								"DELETE EXPERIMENT "+id);
+								"DELETE EXPERIMENT " + id);
 						MongoDB.getDefaultCloud().deleteExperiment(id);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -3045,7 +3046,7 @@ public class MongoDB {
 					DBCollection substances = db.getCollection("substances");
 					long cnt = substances.count();
 					long max = dbIdsOfSubstances.size();
-					System.out.println(SystemAnalysis.getCurrentTimeInclSec()+">Remove stale substances: " + max + "/" + cnt);
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Remove stale substances: " + max + "/" + cnt);
 					status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
 					int n = 0;
 					for (String subID : dbIdsOfSubstances) {
@@ -3062,13 +3063,13 @@ public class MongoDB {
 					final long max = dbIdsOfConditions.size();
 					final DBCollection conditions = db.getCollection("conditions");
 					long cnt = conditions.count();
-					System.out.println(SystemAnalysis.getCurrentTimeInclSec()+">Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					final ArrayList<String> ids = new ArrayList<String>();
 					for (String condID : dbIdsOfConditions) {
 						n.addInt(0);
 						ids.add(condID);
-						if (ids.size()>=5000) {
+						if (ids.size() >= 5000) {
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
@@ -3079,7 +3080,7 @@ public class MongoDB {
 										ids.clear();
 									}
 									conditions.remove(
-											new BasicDBObject("_id", new BasicDBObject("$in", list)), 
+											new BasicDBObject("_id", new BasicDBObject("$in", list)),
 											WriteConcern.NONE);
 									status.setCurrentStatusValueFine(100d / max * n.getInt());
 									status.setCurrentStatusText2(n.getInt() + "/" + max);
@@ -3095,7 +3096,7 @@ public class MongoDB {
 							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
 						}
 					}
-					if (ids.size()>0) {
+					if (ids.size() > 0) {
 						BasicDBList list = new BasicDBList();
 						synchronized (ids) {
 							for (String coID : ids)
@@ -3103,11 +3104,10 @@ public class MongoDB {
 							ids.clear();
 						}
 						conditions.remove(
-							new BasicDBObject("_id", new BasicDBObject("$in", list)), 
-							WriteConcern.NONE);
+								new BasicDBObject("_id", new BasicDBObject("$in", list)),
+								WriteConcern.NONE);
 					}
 					
-
 					status.setCurrentStatusValueFine(100d / max * n.getInt());
 					status.setCurrentStatusText2(n + "/" + max);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
@@ -3122,7 +3122,7 @@ public class MongoDB {
 					status.setCurrentStatusValueFine(100d / 5 * 2);
 					
 					double stepSize = 100d / 5 * 3 / MongoGridFS.getFileCollectionsInclPreview().size();
-					executor = Executors.newFixedThreadPool(nThreads); 
+					executor = Executors.newFixedThreadPool(nThreads);
 					for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
 						final GridFS gridfs = new GridFS(db, mgfs);
 						int cnt = gridfs.getFileList().count();
@@ -3169,7 +3169,7 @@ public class MongoDB {
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);
 					}
-
+					
 					executor.shutdown();
 					while (!executor.isTerminated()) {
 						try {
@@ -3178,7 +3178,7 @@ public class MongoDB {
 							MongoDB.saveSystemErrorMessage("InterruptedException during reorganization.", e);
 						}
 					}
-
+					
 					System.out.println("REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
 							+ SystemAnalysis.getCurrentTime());
 					
@@ -3256,7 +3256,8 @@ public class MongoDB {
 		return res.toString();
 	}
 	
-	private DatabaseStorageResult saveImageFileDirect(CollectionStorage cols, final DB db, final ImageData image, final ObjectRef fileSize, final boolean keepRemoteURLs_safe_space)
+	private DatabaseStorageResult saveImageFileDirect(CollectionStorage cols, final DB db, final ImageData image, final ObjectRef fileSize,
+			final boolean keepRemoteURLs_safe_space)
 			throws Exception, IOException {
 		// if the image data source is equal to the target (determined by the prefix),
 		// the image content does not need to be copied (assumption valid while using MongoDB data storage)
@@ -3364,7 +3365,7 @@ public class MongoDB {
 				}
 			}
 			if (hashLabel != null) {
-				DBObject knownLabelURL =cols.constantSrc2hash.findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
+				DBObject knownLabelURL = cols.constantSrc2hash.findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 				if (knownLabelURL == null) {
 					Map<String, String> m1 = new HashMap<String, String>();
 					m1.put("srcUrl", image.getLabelURL().toString());
