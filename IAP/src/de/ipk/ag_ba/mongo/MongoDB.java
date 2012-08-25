@@ -1651,7 +1651,8 @@ public class MongoDB {
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider,
 			final RunnableProcessingDBid visitSubstance,
 			final RunnableProcessingDBid visitCondition,
-			final RunnableProcessingBinaryMeasurement visitBinaryMeasurement) {
+			final RunnableProcessingBinaryMeasurement visitBinaryMeasurement,
+			final ThreadSafeOptions invalid) {
 		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusValue(0);
@@ -1672,7 +1673,8 @@ public class MongoDB {
 										header,
 										db, substance, optStatusProvider, 100d / subList.size(),
 										visitCondition,
-										visitBinaryMeasurement);
+										visitBinaryMeasurement,
+										invalid);
 							}
 						boolean printed = false;
 						if (ensureIndex)
@@ -1690,18 +1692,15 @@ public class MongoDB {
 											synchronized (visitSubstance) {
 												visitSubstance.processDBid(substance.get("_id") + "");
 											}
-											visitSubstance(header, db, substance, optStatusProvider, 100d / l.size(), visitCondition, visitBinaryMeasurement);
+											visitSubstance(header, 
+													db, substance, optStatusProvider, 100d / l.size(),
+													visitCondition, visitBinaryMeasurement,
+													invalid);
 										} else
 											if (!printed) {
 												System.out.println("WARNING: Missing substance(s) in experiment "+header.getExperimentName());
 												printed = true;
-												try {
-													System.out.println(
-															"DELETE EXPERIMENT "+header.getExperimentName());
-													MongoDB.this.deleteExperiment(header.getDatabaseId());
-												} catch (Exception e) {
-													e.printStackTrace();
-												}
+												invalid.setBval(0, true);
 											}
 									}
 								}
@@ -2425,7 +2424,10 @@ public class MongoDB {
 			DB db, DBObject substance,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
 			RunnableProcessingDBid visitCondition,
-			RunnableProcessingBinaryMeasurement visitBinary) {
+			RunnableProcessingBinaryMeasurement visitBinary,
+			ThreadSafeOptions invalid) {
+		if (invalid.getBval(0, false))
+			return;
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
@@ -2471,13 +2473,7 @@ public class MongoDB {
 					if (!printed) {
 						System.out.println("WARNING: Condition could not be retrieved for experiment "+header.getExperimentName());
 						printed = true;
-						try {
-							System.out.println(
-									"DELETE EXPERIMENT "+header.getExperimentName());
-							MongoDB.this.deleteExperiment(header.getDatabaseId());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						invalid.setBval(0, true);
 					}
 				}
 				if (optStatusProvider != null)
@@ -3001,18 +2997,27 @@ public class MongoDB {
 
 				int nThreads = 20;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
-
+				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
 				for (final ExperimentHeaderInterface ehii : todo) {
 					executor.submit(new Runnable() {
 						@Override
 						public void run() {
+							ThreadSafeOptions invalid = new ThreadSafeOptions();
+							invalid.setBval(0, false);
 							ii.addInt(1);
 							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName() 
 									+ " (" + ii.getInt() + "/" + nn + ")");
 							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger();
 							ss.setEnabled(false);
-							visitExperiment(ehii, ss, visitSubstance, visitCondition, visitBinaryMeasurement);
+							visitExperiment(
+									ehii,
+									ss, visitSubstance, visitCondition, visitBinaryMeasurement,
+									invalid);
 							status.setCurrentStatusValueFineAdd(smallStep);
+							if (invalid.getBval(0, false)) {
+								invalid.setParam(0, ehii.getDatabaseId());
+								invalids.add(invalid);
+							}
 						}
 					});
 				} // experiments
@@ -3024,7 +3029,17 @@ public class MongoDB {
 						MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
 					}
 				}
-
+				
+				for (ThreadSafeOptions inv : invalids) {
+					String id = (String) inv.getParam(0, "");
+					try {
+						System.out.println(
+								"DELETE EXPERIMENT "+id);
+						MongoDB.getDefaultCloud().deleteExperiment(id);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				
 				{
 					DBCollection substances = db.getCollection("substances");
@@ -3041,17 +3056,17 @@ public class MongoDB {
 					}
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS");
 				}
-				executor = Executors.newFixedThreadPool(nThreads);
 				{
-					int n = 0;
-					long max = dbIdsOfConditions.size();
+					executor = Executors.newFixedThreadPool(1);
+					final ThreadSafeOptions n = new ThreadSafeOptions();
+					final long max = dbIdsOfConditions.size();
 					final DBCollection conditions = db.getCollection("conditions");
 					long cnt = conditions.count();
 					System.out.println(SystemAnalysis.getCurrentTimeInclSec()+">Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					final ArrayList<String> ids = new ArrayList<String>();
 					for (String condID : dbIdsOfConditions) {
-						n++;
+						n.addInt(0);
 						ids.add(condID);
 						if (ids.size()>=5000) {
 							executor.submit(new Runnable() {
@@ -3066,29 +3081,36 @@ public class MongoDB {
 									conditions.remove(
 											new BasicDBObject("_id", new BasicDBObject("$in", list)), 
 											WriteConcern.NONE);
+									status.setCurrentStatusValueFine(100d / max * n.getInt());
+									status.setCurrentStatusText2(n.getInt() + "/" + max);
 								}
 							});
 						}
-						status.setCurrentStatusValueFine(100d / max * n);
-						status.setCurrentStatusText2(n + "/" + max);
+					}
+					executor.shutdown();
+					while (!executor.isTerminated()) {
+						try {
+							Thread.sleep(20);
+						} catch (InterruptedException e) {
+							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
+						}
 					}
 					if (ids.size()>0) {
 						BasicDBList list = new BasicDBList();
-						for (String coID : ids)
-							list.add(new ObjectId(coID));
+						synchronized (ids) {
+							for (String coID : ids)
+								list.add(new ObjectId(coID));
+							ids.clear();
+						}
 						conditions.remove(
 							new BasicDBObject("_id", new BasicDBObject("$in", list)), 
 							WriteConcern.NONE);
 					}
+					
+
+					status.setCurrentStatusValueFine(100d / max * n.getInt());
+					status.setCurrentStatusText2(n + "/" + max);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
-				}
-				executor.shutdown();
-				while (!executor.isTerminated()) {
-					try {
-						Thread.sleep(20);
-					} catch (InterruptedException e) {
-						MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
-					}
 				}
 				
 				if (linkedHashes.size() >= 0) {
