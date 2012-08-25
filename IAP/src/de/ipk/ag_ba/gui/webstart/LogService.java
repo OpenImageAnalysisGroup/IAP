@@ -23,9 +23,11 @@ public class LogService {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						for (String item : MongoDB.getDefaultCloud().getNews(5)) {
-							news.push(preLine + item);
-						}
+						MongoDB dc = MongoDB.getDefaultCloud();
+						if (dc!=null)
+							for (String item : dc.getNews(5)) {
+								news.push(preLine + item);
+							}
 					}
 				};
 				Thread t = new Thread(r, "Read MonogDB news");
@@ -34,7 +36,7 @@ public class LogService {
 				do {
 					Thread.sleep(10);
 					long current = System.currentTimeMillis();
-					if (current - start > 1000) {
+					if (current - start > 2000) {
 						news.add(preLine
 								+ SystemAnalysis.getCurrentTime()
 								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");

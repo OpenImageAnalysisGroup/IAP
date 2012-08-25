@@ -8,7 +8,8 @@ public enum IAPexperimentTypes {
 	MaizeGreenhouse("Maize", "Zea"),
 	UnknownGreenhouse("LemnaTec (Other)", "Unknown"),
 	AnalysisResults("Analysis Results", "Unknown"),
-	Raps("Rapeseed", "Canola");
+	Raps("Rapeseed", "Canola"),
+	ManualMeasurements("Manual Measurements", "Unknown");
 	
 	private String title, species;
 	
