@@ -15,7 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class BackgroundTaskConsoleLogger extends
 		BackgroundTaskStatusProviderSupportingExternalCallImpl {
 	
-	private final boolean enabled;
+	private boolean enabled;
 	
 	public BackgroundTaskConsoleLogger(String status1, String status2, boolean enabled) {
 		super(status1, status2);
@@ -40,5 +40,9 @@ public class BackgroundTaskConsoleLogger extends
 		super.setCurrentStatusText2(status);
 		if (enabled)
 			System.out.println(status);
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }
