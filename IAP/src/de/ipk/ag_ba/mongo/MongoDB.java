@@ -1668,7 +1668,9 @@ public class MongoDB {
 						if (subList != null)
 							for (Object co : subList) {
 								DBObject substance = (DBObject) co;
-								visitSubstance(db, substance, optStatusProvider, 100d / subList.size(),
+								visitSubstance(
+										header,
+										db, substance, optStatusProvider, 100d / subList.size(),
 										visitCondition,
 										visitBinaryMeasurement);
 							}
@@ -1688,11 +1690,18 @@ public class MongoDB {
 											synchronized (visitSubstance) {
 												visitSubstance.processDBid(substance.get("_id") + "");
 											}
-											visitSubstance(db, substance, optStatusProvider, 100d / l.size(), visitCondition, visitBinaryMeasurement);
+											visitSubstance(header, db, substance, optStatusProvider, 100d / l.size(), visitCondition, visitBinaryMeasurement);
 										} else
 											if (!printed) {
 												System.out.println("WARNING: Missing substance(s) in experiment "+header.getExperimentName());
 												printed = true;
+												try {
+													System.out.println(
+															"DELETE EXPERIMENT "+header.getExperimentName());
+													MongoDB.this.deleteExperiment(header.getDatabaseId());
+												} catch (Exception e) {
+													e.printStackTrace();
+												}
 											}
 									}
 								}
@@ -2411,7 +2420,9 @@ public class MongoDB {
 		}
 	}
 	
-	private void visitSubstance(DB db, DBObject substance,
+	private void visitSubstance(
+			ExperimentHeaderInterface header,
+			DB db, DBObject substance,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
 			RunnableProcessingDBid visitCondition,
 			RunnableProcessingBinaryMeasurement visitBinary) {
@@ -2429,7 +2440,7 @@ public class MongoDB {
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
 		if (l != null) {
 			double max = l.size();
-			
+			boolean printed = false;
 			DBCollection collCond = db.getCollection("conditions");
 			if (collCond!=null)
 			for (Object o : l) {
@@ -2456,6 +2467,18 @@ public class MongoDB {
 						visitCondition.processDBid(cond.get("_id") + "");
 					}
 					visitCondition(s3d, cond, visitBinary);
+				} else {
+					if (!printed) {
+						System.out.println("WARNING: Condition could not be retrieved for experiment "+header.getExperimentName());
+						printed = true;
+						try {
+							System.out.println(
+									"DELETE EXPERIMENT "+header.getExperimentName());
+							MongoDB.this.deleteExperiment(header.getDatabaseId());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 				}
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
