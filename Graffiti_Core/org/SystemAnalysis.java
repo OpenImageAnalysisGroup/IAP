@@ -41,6 +41,8 @@ public class SystemAnalysis {
 	public static int getNumberOfCPUs() {
 		if (fixedCPUload > 0)
 			return fixedCPUload;
+		if (getMemoryMB() < 4000)
+			return 1;
 		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 6;
 		// useHalfCPUpower = false;
 		if (fullPower)
