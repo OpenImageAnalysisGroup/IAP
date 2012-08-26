@@ -178,19 +178,19 @@ public class BlCalcWidthAndHeight_vis extends
 									"RESULT_side.width.norm",
 									values.x
 											* (realMarkerDistHorizontal / distHorizontal
-													.getValue()) * resf);
+													.getValue()) * resf, "mm");
 					getProperties()
 							.setNumericProperty(
 									getBlockPosition(),
 									"RESULT_side.height.norm",
 									values.y
 											* (realMarkerDistHorizontal / distHorizontal
-													.getValue()) * resf);
+													.getValue()) * resf, "mm");
 				}
 				getProperties().setNumericProperty(getBlockPosition(),
-						"RESULT_side.width", values.x);
+						"RESULT_side.width", values.x, "px");
 				getProperties().setNumericProperty(getBlockPosition(),
-						"RESULT_side.height", values.y);
+						"RESULT_side.height", values.y, "px");
 				
 			}
 		}

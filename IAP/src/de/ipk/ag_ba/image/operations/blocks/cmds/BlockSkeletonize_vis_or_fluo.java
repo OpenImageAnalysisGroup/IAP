@@ -18,6 +18,7 @@ import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.ImageCanvas;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -169,7 +170,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
 		
-		ResultsTable rt = new ResultsTable();
+		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		
 		int bloomLimbCount = 0;
@@ -484,7 +485,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 								cnt = v.getValue();
 						}
 						if (cnt != null && summaryResult != null) {
-							summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.best", cnt);
+							summaryResult.setNumericProperty(getBlockPosition(),
+									"RESULT_side.leaf.count.best", cnt, null);
 							// System.out.println("Leaf count for best side image: " + cnt);
 						}
 					}
@@ -511,17 +513,21 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				}
 				
 				if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
-					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.max", maxLeafcount);
+					summaryResult.setNumericProperty(getBlockPosition(),
+							"RESULT_side.leaf.count.max", maxLeafcount, null);
 					// System.out.println("MAX leaf count: " + maxLeafcount);
 					Double[] lca = lc.toArray(new Double[] {});
 					Arrays.sort(lca);
 					Double median = lca[lca.length / 2];
-					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.count.median", median);
+					summaryResult.setNumericProperty(getBlockPosition(), 
+							"RESULT_side.leaf.count.median", median, null);
 				}
 				if (maxLeaflength != null && maxLeaflength > 0)
-					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.max", maxLeaflength);
+					summaryResult.setNumericProperty(getBlockPosition(),
+							"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
 				if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-					summaryResult.setNumericProperty(getBlockPosition(), "RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm);
+					summaryResult.setNumericProperty(getBlockPosition(), 
+							"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
 				
 			}
 		}

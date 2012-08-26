@@ -112,11 +112,12 @@ public class VolumeOperation {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
+		summaryResult.setNumericProperty(0, 
+				"RESULT_plant3d.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
 			summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
-					skeletonLength * corr);
+					skeletonLength * corr, "mm");
 		}
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);

@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
 
@@ -21,10 +22,10 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTable calculateHistorgram(BlockProperty optDistHorizontal, Integer optRealMarkerDistance,
+	public ResultsTableWithUnits calculateHistorgram(BlockProperty optDistHorizontal, Integer optRealMarkerDistance,
 			Histogram.Mode mode) {
 		
-		ResultsTable result = new ResultsTable();
+		ResultsTableWithUnits result = new ResultsTableWithUnits();
 		
 		int[] pixels = io.getImageAs1dArray();
 		

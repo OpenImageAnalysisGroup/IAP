@@ -122,12 +122,13 @@ public class BlockThreeDgeneration extends AbstractBlock {
 					}
 					double vv = 1;
 					double plantVolume = vv * solidVoxels;
-					summaryResult.setNumericProperty(0, "RESULT_plant3d.volume", plantVolume);
+					summaryResult.setNumericProperty(0, 
+							"RESULT_plant3d.volume", plantVolume, "voxel");
 					
 					if (distHorizontal != null) {
 						double corr = realMarkerDistHorizontal / distHorizontal.getValue();
 						summaryResult.setNumericProperty(0, "RESULT_plant3d.volume.norm",
-								plantVolume * corr * corr * corr);
+								plantVolume * corr * corr * corr, "mm^3");
 					}
 					
 					boolean createVolumeDataset = true;
@@ -251,11 +252,13 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length", skeletonLength);
+		summaryResult.setNumericProperty(0, 
+				"RESULT_plant3d.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-			summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
-					skeletonLength * corr);
+			summaryResult.setNumericProperty(0, 
+					"RESULT_plant3d.skeleton.length.norm",
+					skeletonLength * corr, "mm");
 		}
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
@@ -335,11 +338,13 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0, "RESULT_plant3d.probability-skeleton.length", skeletonLength);
+		summaryResult.setNumericProperty(0, 
+				"RESULT_plant3d.probability-skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-			summaryResult.setNumericProperty(0, "RESULT_plant3d.probability-skeleton.length.norm",
-					skeletonLength * corr);
+			summaryResult.setNumericProperty(0, 
+					"RESULT_plant3d.probability-skeleton.length.norm",
+					skeletonLength * corr, "mm");
 		}
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);

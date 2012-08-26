@@ -49,6 +49,7 @@ import org.graffiti.editor.GravistoService;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
@@ -69,7 +70,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class ImageOperation {
 	protected final ImagePlus image;
-	protected ResultsTable rt;
+	protected ResultsTableWithUnits rt;
 	private FlexibleImageType type;
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
@@ -87,7 +88,7 @@ public class ImageOperation {
 		this.image = image;
 	}
 	
-	public ImageOperation(ImagePlus image, ResultsTable resultTable) {
+	public ImageOperation(ImagePlus image, ResultsTableWithUnits resultTable) {
 		this.image = image;
 		this.rt = resultTable;
 	}
@@ -101,7 +102,7 @@ public class ImageOperation {
 		setType(image.getType());
 	}
 	
-	public ImageOperation(FlexibleImage image, ResultsTable resultTable) {
+	public ImageOperation(FlexibleImage image, ResultsTableWithUnits resultTable) {
 		this(image.getAsImagePlus(), resultTable);
 		setType(image.getType());
 	}
@@ -114,7 +115,7 @@ public class ImageOperation {
 		this(ImageConverter.convert2AtoIJ(image));
 	}
 	
-	public ImageOperation(BufferedImage bufferedImage, ResultsTable rt) {
+	public ImageOperation(BufferedImage bufferedImage, ResultsTableWithUnits rt) {
 		this(bufferedImage);
 		setResultsTable(rt);
 	}
@@ -2549,9 +2550,9 @@ public class ImageOperation {
 			
 			if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
 				// p.getBufferedImage() ==> image (ck, 25.6.11)
-				return new ImageOperation(image, (ResultsTable) rt.clone());
+				return new ImageOperation(image, (ResultsTableWithUnits) rt.clone());
 			} else {
-				setResultsTable((ResultsTable) rt.clone());
+				setResultsTable((ResultsTableWithUnits) rt.clone());
 				return this;
 			}
 			
@@ -2715,11 +2716,11 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
-	public void setResultsTable(ResultsTable rt) {
+	public void setResultsTable(ResultsTableWithUnits rt) {
 		this.rt = rt;
 	}
 	
-	public ResultsTable getResultsTable() {
+	public ResultsTableWithUnits getResultsTable() {
 		return rt;
 	}
 	
