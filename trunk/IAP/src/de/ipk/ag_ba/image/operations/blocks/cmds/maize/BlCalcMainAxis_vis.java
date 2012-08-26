@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.MainAxisCalculationResult;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -65,7 +66,7 @@ public class BlCalcMainAxis_vis extends
 				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y,
 						macr.getCentroid().y);
 
-				ResultsTable rt = new ResultsTable();
+				ResultsTableWithUnits rt = new ResultsTableWithUnits();
 				rt.incrementCounter();
 				rt.addValue("main.axis.rotation", angle);
 				rt.addValue("main.axis.normalized.distance.avg",

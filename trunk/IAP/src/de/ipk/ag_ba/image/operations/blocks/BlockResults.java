@@ -72,11 +72,18 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void setNumericProperty(int position, String name,
-			double value) {
+			double value, String unit) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
 		
 		storedNumerics.get(position).put(name, value);
+		
+		if (unit!=null) {
+			name2unit.put(name, unit);
+			if (name.startsWith("RESULT_")) {
+				name2unit.put(name.substring("RESULT_".length()), unit);
+			}
+		}
 	}
 	
 	@Override
@@ -342,13 +349,14 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void storeResults(String id_prefix,
-			ResultsTable numericResults, int position) {
+			ResultsTableWithUnits numericResults, int position) {
 		for (int row = 0; row < numericResults.getCounter(); row++) {
 			for (int col = 0; col <= numericResults.getLastColumn(); col++) {
 				String id = numericResults.getColumnHeading(col);
 				double val = numericResults.getValueAsDouble(col, row);
+				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericProperty(position, id_prefix + id, val);
+					setNumericProperty(position, id_prefix + id, val, unit);
 			}
 		}
 	}

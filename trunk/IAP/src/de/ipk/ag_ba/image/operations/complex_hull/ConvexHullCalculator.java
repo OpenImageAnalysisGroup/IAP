@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 
 import de.ipk.ag_ba.image.operations.ImageCanvas;
 import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -139,9 +140,9 @@ public class ConvexHullCalculator {
 		Point centroid = null;
 		
 		ImageOperation res = new ImageOperation(borderImage);
-		ResultsTable rt = io.getResultsTable();
+		ResultsTableWithUnits rt = io.getResultsTable();
 		if (rt == null)
-			rt = new ResultsTable();
+			rt = new ResultsTableWithUnits();
 		
 		if (polygon != null) {
 			rt.incrementCounter();

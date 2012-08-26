@@ -5,12 +5,13 @@ import ij.measure.ResultsTable;
 import java.awt.Color;
 import java.util.Stack;
 
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BorderImageOperation {
 	
 	private final FlexibleImage image;
-	private ResultsTable rt;
+	private ResultsTableWithUnits rt;
 	
 	public BorderImageOperation(ImageOperation imageOperation) {
 		image = imageOperation.getImage();
@@ -48,7 +49,7 @@ public class BorderImageOperation {
 		ImageOperation res = new ImageOperation(new FlexibleImage(out));
 		
 		if (rt == null)
-			rt = new ResultsTable();
+			rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		rt.addValue("border", border);
 		res.setResultsTable(rt);
@@ -201,7 +202,7 @@ public class BorderImageOperation {
 		// sw.printTime(0);
 		ImageOperation res = new ImageOperation(new FlexibleImage(out));
 		if (rt == null)
-			rt = new ResultsTable();
+			rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		rt.addValue("filled", filled);
 		res.setResultsTable(rt);
