@@ -128,6 +128,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 				navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
 			
 			if (navigationAction != null) {
+				Thread.sleep(100);
 				RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
 				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), null, false);
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
