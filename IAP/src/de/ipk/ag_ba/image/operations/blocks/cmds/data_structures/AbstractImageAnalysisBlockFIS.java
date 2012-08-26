@@ -151,7 +151,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, int blockPosition,
 			String[] desiredProperties) {
-		final long timeForOneDay = 1000 * 60 * 60 * 24;
+		final double timeForOneDayD = 1000 * 60 * 60 * 24d;
 		HashMap<String, TreeMap<String, Long>> prop2config2lastHeightAndWidthTime = new HashMap<String, TreeMap<String, Long>>();
 		HashMap<String, TreeMap<String, Double>> prop2config2lastHeightAndWidth = new HashMap<String, TreeMap<String, Double>>();
 		for (Long time : time2inSamples.keySet()) {
@@ -177,7 +177,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 										time - prop2config2lastHeightAndWidthTime.get(property).get(key) > 0) {
 									double currentPropertyValue = v.getValue().doubleValue();
 									double ratio = currentPropertyValue / lastPropertyValue;
-									double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDay;
+									double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDayD;
 									double ratioPerDay = Math.pow(ratio, 1 / days);
 									summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay);
 								}
