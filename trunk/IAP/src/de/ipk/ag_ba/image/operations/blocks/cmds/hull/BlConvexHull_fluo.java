@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.hull;
 
-import ij.measure.ResultsTable;
-
 import java.awt.Color;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -114,8 +112,10 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				double topAreaSumFluo = 0, topAreaWeightSumFluo = 0;
 				double topAreaCntFluo = 0, topAreaCntWeightCnt = 0;
 				double sideArea_for_angleNearestTo0 = Double.NaN;
+				double sideArea_for_angleNearestTo45 = Double.NaN;
 				double sideArea_for_angleNearestTo90 = Double.NaN;
 				double distanceTo0 = Double.MAX_VALUE;
+				double distanceTo45 = Double.MAX_VALUE;
 				double distanceTo90 = Double.MAX_VALUE;
 				DescriptiveStatistics areaStat = new DescriptiveStatistics();
 				
@@ -141,6 +141,10 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									if (Math.abs(pos - 0) < distanceTo0) {
 										distanceTo0 = Math.abs(pos - 0);
 										sideArea_for_angleNearestTo0 = area;
+									}
+									if (Math.abs(pos - 0) < distanceTo45) {
+										distanceTo45 = Math.abs(pos - 45);
+										sideArea_for_angleNearestTo45 = area;
 									}
 									if (Math.abs(pos - 90) < distanceTo90) {
 										distanceTo0 = Math.abs(pos - 90);
@@ -198,11 +202,11 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				if (areaStat.getN() > 0) {
 					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.area.min", areaStat.getMin(), "px^2");
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.area.max", areaStat.getMax(), "px^2");
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.area.median", areaStat.getPercentile(50), "px^2");
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.area.avg", areaStat.getMean(), "px^2");
 				}
 				
@@ -225,7 +229,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						double days = (time / 1000d - lastTimeSideAreaIAP / 1000d) / (timeForOneDayD / 1000d);
 						
 						double absoluteGrowthPerDay = (avgArea - lastSideAreaIAP) / days;
-						double relativeGrowthPerDay = Math.pow(avgArea/lastSideAreaIAP, 1d / days);
+						double relativeGrowthPerDay = Math.pow(avgArea / lastSideAreaIAP, 1d / days);
 						Double waterUsePerDay = getWaterUsePerDay(
 								plandID2time2waterData.get(plantID),
 								time, lastTimeSideAreaIAP, timeForOneDayD);
@@ -233,7 +237,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
-								summaryResult.setNumericProperty(getBlockPosition(), 
+								summaryResult.setNumericProperty(getBlockPosition(),
 										"RESULT_side.area.avg.wue", wue, "px^2/ml/day");
 								System.out.println("[Absolute] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
 										+ new Date(time).toString() + ", used for side area growth of " + wue + " pixels per ml per day");
@@ -243,7 +247,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay)) {
 							double wue = relativeGrowthPerDay / waterUsePerDay;
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
-								summaryResult.setNumericProperty(getBlockPosition(), 
+								summaryResult.setNumericProperty(getBlockPosition(),
 										"RESULT_side.area.avg.wue.relative", wue, "percent/ml/day");
 								System.out.println("[Relative] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
 										+ new Date(time).toString() + ", used for side area growth of " + wue + " percent per ml per day");
@@ -264,7 +268,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 					double volume_iap_max = Math.sqrt(side * side * avgTopArea);
 					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_volume.iap", volume_iap, "px^3");
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_volume.iap_max", volume_iap_max, "px^3");
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
@@ -281,13 +285,13 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay) && !Double.isNaN(waterUsePerDay)) {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
-							summaryResult.setNumericProperty(getBlockPosition(), 
+							summaryResult.setNumericProperty(getBlockPosition(),
 									"RESULT_volume.iap.wue", wue, "px^3/ml/day");
 							
 							System.out.println("Plant " + plantID + " has been watered with about "
 									+ waterUsePerDay.intValue() + " ml per day, at "
 									+ new Date(time).toString() + ", used for side volume growth of "
-									+  wue + " pixels per ml per day, relative volume growth: "
+									+ wue + " pixels per ml per day, relative volume growth: "
 									+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
 							
 						}
@@ -300,6 +304,17 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
 						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_volume.lt", volume_lt, "px^3");
+					}
+					
+					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
+						double s1, s2, s3, t1; // side area 1, 2, 3 and top area
+						t1 = avgTopArea;
+						s1 = sideArea_for_angleNearestTo0;
+						s2 = sideArea_for_angleNearestTo45;
+						s3 = sideArea_for_angleNearestTo90;
+						double volume_prism = Math.sqrt(t1 * s2 * s3 / 2d * Math.sqrt(1 - Math.pow((s2 * s2 + s3 * s3 - s1 * s1) / (2d * s2 * s3), 2)));
+						summaryResult.setNumericProperty(getBlockPosition(),
+								"RESULT_volume.prism", volume_prism, "px^3");
 					}
 				}
 			}
