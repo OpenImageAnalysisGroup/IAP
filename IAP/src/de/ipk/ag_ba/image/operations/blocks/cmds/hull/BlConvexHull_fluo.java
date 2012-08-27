@@ -138,6 +138,9 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 									Double pos = id.getPosition();
 									if (pos == null)
 										pos = 0d;
+									pos = pos % 180;
+									if (pos > 90)
+										pos = 180 - pos;
 									if (Math.abs(pos - 0) < distanceTo0) {
 										distanceTo0 = Math.abs(pos - 0);
 										sideArea_for_angleNearestTo0 = area;
