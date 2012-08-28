@@ -145,7 +145,7 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 										distanceTo0 = Math.abs(pos - 0);
 										sideArea_for_angleNearestTo0 = area;
 									}
-									if (Math.abs(pos - 0) < distanceTo45) {
+									if (Math.abs(pos - 45) < distanceTo45) {
 										distanceTo45 = Math.abs(pos - 45);
 										sideArea_for_angleNearestTo45 = area;
 									}
