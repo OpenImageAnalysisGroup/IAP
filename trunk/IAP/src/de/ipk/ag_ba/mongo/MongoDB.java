@@ -927,8 +927,8 @@ public class MongoDB {
 	
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
 			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
-		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
+//		if (status != null)
+//			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
 		substances.insert(dbSubstance);
