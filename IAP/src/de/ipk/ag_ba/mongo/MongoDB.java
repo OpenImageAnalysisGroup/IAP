@@ -525,7 +525,7 @@ public class MongoDB {
 		errorCount.setLong(0);
 		int nLock = multiThreadedStorage ? 4 : 1;
 		final Semaphore lock = new Semaphore(nLock, true);
-		
+		final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.get(0);
 			sl.remove(0);
@@ -535,9 +535,11 @@ public class MongoDB {
 				@Override
 				public void run() {
 					try {
+						tsoIdxS.addInt(1);
 						processSubstanceSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes,
 								overallFileSize, startTime, substances, conditions,
-								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs, errorCount, s);
+								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs,
+								errorCount,s);
 					} catch (InterruptedException e) {
 						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ",experiment " + experiment.getName(), e);
 						e.printStackTrace();
@@ -1576,11 +1578,13 @@ public class MongoDB {
 							BasicDBList subList = (BasicDBList) expref.get("substances");
 							if (subList != null) {
 								int n = subList.size();
+								int idxS =0;
 								for (Object co : subList) {
 									DBObject substance = (DBObject) co;
 									if (optDBPbjectsOfSubstances != null)
 										optDBPbjectsOfSubstances.add(substance);
-									processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, n);
+									idxS++;
+									processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS,  n);
 								}
 							}
 							if (ensureIndex)
@@ -1598,10 +1602,14 @@ public class MongoDB {
 											if (optDBPbjectsOfSubstances != null)
 												optDBPbjectsOfSubstances.add(substance);
 											final int lss = l.size();
+											final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 											Runnable r = new Runnable() {
 												@Override
 												public void run() {
-													processSubstance(db, experiment, substance, optStatusProvider, 100d / lss, optDBPbjectsOfConditions, n);
+												tsoIdxS.addInt(1);
+													processSubstance(db, experiment, substance, optStatusProvider,
+															100d / lss, optDBPbjectsOfConditions,
+															tsoIdxS.getInt(), n);
 												}
 											};
 											executor.execute(r);
@@ -2359,7 +2367,7 @@ public class MongoDB {
 	
 	private void processSubstance(DB db, ExperimentInterface experiment, DBObject substance,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
-			ArrayList<DBObject> optDBObjectsConditions, int n) {
+			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
 		
@@ -2381,7 +2389,7 @@ public class MongoDB {
 				}
 		
 		if (optStatusProvider != null)
-			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s=" + n + ")");
+			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s="+idxS+"/" + n + ")");
 		synchronized (experiment) {
 			experiment.add(s3d);
 		}
