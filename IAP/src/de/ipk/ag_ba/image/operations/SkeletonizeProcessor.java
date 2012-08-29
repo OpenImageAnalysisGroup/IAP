@@ -28,15 +28,16 @@ public class SkeletonizeProcessor {
 	
 	public ImageOperation calculateThicknessSkeleton(boolean calcDistanceTrueOrNormalColoredSkeletonFalse, int back) {
 		
-		int[][] cube = image.getImageAs2dArray();
+		int[][] img = image.getImageAs2dArray();
+		int[][] output = image.getImageAs2dArray();
 		
 		int fire = back;
 		HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton = new HashMap<Integer, HashMap<Integer, Integer>>();
 		boolean foundBorderVoxel = false;
 		int loop = 1;
 		
-		int voxelresolutionX = cube.length;
-		int voxelresolutionY = cube[0].length;
+		int voxelresolutionX = img.length;
+		int voxelresolutionY = img[0].length;
 		
 		boolean debug = true;
 		
@@ -49,64 +50,65 @@ public class SkeletonizeProcessor {
 			
 			for (int x = 1; x < voxelresolutionX - 1; x++) {
 				for (int y = 1; y < voxelresolutionY - 1; y++) {
-					int c = cube[x][y];
+					int c = img[x][y];
 					boolean filled = c != fire;
 					if (filled) {
-						boolean left = cube[x - 1][y] != fire;
-						boolean right = cube[x + 1][y] != fire;
-						boolean above = cube[x][y - 1] != fire;
-						boolean below = cube[x][y + 1] != fire;
+						boolean left = img[x - 1][y] != fire;
+						boolean right = img[x + 1][y] != fire;
+						boolean above = img[x][y - 1] != fire;
+						boolean below = img[x][y + 1] != fire;
 						
-						boolean tl = cube[x - 1][y - 1] != fire;
-						boolean tr = cube[x + 1][y - 1] != fire;
-						boolean bl = cube[x - 1][y + 1] != fire;
-						boolean br = cube[x + 1][y + 1] != fire;
+						boolean tl = img[x - 1][y - 1] != fire;
+						boolean tr = img[x + 1][y - 1] != fire;
+						boolean bl = img[x - 1][y + 1] != fire;
+						boolean br = img[x + 1][y + 1] != fire;
 						
-						if (!left || !right || !above || !below || !tl || !tr || !bl || !br) {
-							// border voxel
+						int filledSurrounding = 0;
+						// border voxel
+						if (left)
+							filledSurrounding++;
+						if (right)
+							filledSurrounding++;
+						if (above)
+							filledSurrounding++;
+						if (below)
+							filledSurrounding++;
+						if (tl)
+							filledSurrounding++;
+						if (tr)
+							filledSurrounding++;
+						if (bl)
+							filledSurrounding++;
+						if (br)
+							filledSurrounding++;
+						
+						if (filledSurrounding < 6) {
 							foundBorderVoxel = true;
-							int filledSurrounding = 0;
-							if (left)
-								filledSurrounding++;
-							if (right)
-								filledSurrounding++;
-							if (above)
-								filledSurrounding++;
-							if (below)
-								filledSurrounding++;
-							if (tl)
-								filledSurrounding++;
-							if (tr)
-								filledSurrounding++;
-							if (bl)
-								filledSurrounding++;
-							if (br)
-								filledSurrounding++;
-							
-							if (filledSurrounding <= 4) {
-								if (!calcDistanceTrueOrNormalColoredSkeletonFalse)
-									addSkeleton(x2y2colorSkeleton, x, y, c);
-								else {
-									addSkeleton(x2y2colorSkeleton, x, y, new Color(loop, loop, loop).getRGB());
-								}
-							}
-						}
-						if (!(left && right && above && below)) { // && tl && tr && bl && br)) {
 							borderX.add(x);
 							borderY.add(y);
 						}
+						if (filledSurrounding <= 3) {
+							if (!calcDistanceTrueOrNormalColoredSkeletonFalse)
+								addSkeleton(x2y2colorSkeleton, x, y, c);
+							else {
+								addSkeleton(x2y2colorSkeleton, x, y, new Color(loop, loop, loop).getRGB());
+							}
+						}
+						
 					}
 				}
 			}
 			for (int i = 0; i < borderX.size(); i++) {
-				cube[borderX.get(i)][borderY.get(i)] = fire;
+				int x = borderX.get(i);
+				int y = borderY.get(i);
+				img[x][y] = fire;
 			}
 			borderX.clear();
 			borderY.clear();
 			if (fis != null)
-				fis.addImage("Loop " + loop, new FlexibleImage(cube).copy());
+				fis.addImage("Loop " + loop, new FlexibleImage(img).copy());
 			loop++;
-		} while (foundBorderVoxel);
+		} while (foundBorderVoxel && loop < 255);
 		if (fis != null)
 			fis.print("LOOP");
 		for (int x = 1; x < voxelresolutionX - 1; x++) {
@@ -115,17 +117,21 @@ public class SkeletonizeProcessor {
 				for (int y = 1; y < voxelresolutionY - 1; y++) {
 					if (y2c.containsKey(y)) {
 						Integer c = y2c.get(y);
-						cube[x][y] = c;
+						img[x][y] = c;
 					}
 				}
 			}
 		}
-		return new ImageOperation(cube);
+		return new ImageOperation(img);
 	}
 	
 	private void addSkeleton(HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton, int x, int y, int c) {
 		if (!x2y2colorSkeleton.containsKey(x))
 			x2y2colorSkeleton.put(x, new HashMap<Integer, Integer>());
 		x2y2colorSkeleton.get(x).put(y, c);
+	}
+	
+	private boolean filled(int x, int y, HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton) {
+		return x2y2colorSkeleton.containsKey(x) && x2y2colorSkeleton.get(x).containsKey(y);
 	}
 }
