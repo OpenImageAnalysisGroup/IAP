@@ -2538,8 +2538,8 @@ public class MongoDB {
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
 		if (sampList != null) {
-			if (optStatusProvider != null)
-				optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
+//			if (optStatusProvider != null)
+//				optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
 			
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
