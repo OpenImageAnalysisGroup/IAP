@@ -3251,8 +3251,15 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	color <- overallColor[[imagesIndex]]
 	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 
-	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
+#	if(length(grep("2147483647",overallResult$xAxis, ignore.case=TRUE))){
+#		if(length(unique(overallResult$xAxis)) >1 ) {
+#			overallResult$xAxis[overallResult$xAxis == 2147483647] <- sort(unique(overallResult$xAxis), decreasing = TRUE)[2]+1
+#		} else {
+#			overallResult$xAxis[overallResult$xAxis == 2147483647] <- 1
+#		}
+#	}
 	
+	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	if (length(overallResult[, 1]) > 0) {
 		if (!CheckIfOneColumnHasOnlyValues(overallResult)) {
 
@@ -5060,6 +5067,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 #	if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
 #		tempOverallResult <- na.omit(tempOverallResult)
 #	} else 
+	
 	if(typOfPlot == VIOLIN.PLOT){
 		tempOverallResult <- OneMinusTheValue(tempOverallResult, overallDescriptor)
 	}
@@ -5088,13 +5096,22 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 				} else if(typOfPlot == STRESS.PLOT) {
 					overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)	
 				}
-	
+
+				if("2147483647" %in% overallResult[,X.AXIS]){
+					if(length(unique(overallResult[,X.AXIS])) >1 ) {
+						overallResult[overallResult[,X.AXIS] == 2147483647, X.AXIS] <- sort(unique(overallResult[,X.AXIS]), decreasing = TRUE)[2]+1
+					} else {
+						overallResult[overallResult$xAxis == 2147483647,X.AXIS] <- 1
+					}
+				}
+						
 				if (INNER.THREADED && DO.PARALLELISATION) {
 					error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
 								stopOnError=FALSE), silent = !overallList$debug)
 				} else {
 					error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
 				}
+			
 				checkOfTryError(error, overallList, imagesIndex, typOfPlot)
 			}
 		}
@@ -5844,8 +5861,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		treatment <- "Treatment"
 		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
+		filterTreatment <- "none"
 		#filterTreatment <- "control"
-		filterTreatment <- "dry$normal"
+		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
 		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
 
@@ -5853,7 +5871,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#filterSecondTreatment  <- "none"
 		
 		secondTreatment <- "Genotype"
-		filterSecondTreatment  <- "S 250$S 280"
+		filterSecondTreatment  <- "none"
+		#filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
 		
 		#secondTreatment <- "Treatment"
@@ -5882,7 +5901,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		splitTreatmentFirst <- FALSE
 		splitTreatmentSecond <- FALSE
-		isRatio <- FALSE
+		isRatio <- TRUE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
