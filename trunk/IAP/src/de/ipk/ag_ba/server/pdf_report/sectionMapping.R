@@ -208,7 +208,7 @@ sectionMappingList <- list(
 										"(accessed March 30, 2012).", END.TINY,
 										sep = SEPARATOR.ITEM)
 				),
-				
+						
 				"stress" = list(
 						newSection = 98,
 						title = "Stress",
@@ -220,6 +220,14 @@ sectionMappingList <- list(
 				"appendix" = list(
 						newSection = 99,
 						title = "Appendix",
+						typOfReset = RESET.PAGE,
+						typOfClear = CLEAR.PAGE,
+						text = ""
+				),
+				
+				"error" = list(
+						newSection = 100,
+						title = "Error-Messages",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
 						text = ""

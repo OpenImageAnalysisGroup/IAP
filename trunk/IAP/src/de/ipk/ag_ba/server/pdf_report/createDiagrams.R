@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
+debug <- TRUE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -34,6 +34,13 @@ CHECK.INPUT.FILE.IF.ENG.OR.GER <- FALSE
 CHECK.FOR.UPDATE <- FALSE
 
 ########## Constants ###########
+
+ERROR <- "error"
+
+## value typs
+GET.OVERALL.FILE.NAME <- "overallFileName"
+GET.SECTION.VALUE <- "section"
+
 
 ## plot typs
 NBOX.PLOT <- "nboxplot"
@@ -77,6 +84,8 @@ SECOND.SECTION <- "subsection"
 THIRD.SECTION <- "subsubsection"
 FOURTH.SECTION <- "paragraph"
 APPENDIX.SECTION <- "appendix"
+ERROR.SECTION <- ERROR
+
 
 REDUCE.SECTION <- "reduceSection"
 GET.INT.AS.SECTION <- "getIntAsSection"
@@ -115,6 +124,7 @@ BUILD.SECTION.FIRST.INDEX <- 5
 BUILD.SECTION.SECOND.INDEX <- 5
 
 ## Tex
+NEWLINE.TEX.INCLUDE <- " \\newline "
 NEWLINE.TEX <- " \n"
 NEWLINE.PARA.TEX <- "~"
 TABULATOR.TEX <- "    "
@@ -128,6 +138,8 @@ START.TYP.STRESS <- "stress"
 ## file names
 REPORT <- "report"
 REPORT.FILE <- paste(REPORT, TEX, sep =".")
+ERROR.FILE <- paste(ERROR, TEX, sep =".")
+
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -1797,11 +1809,11 @@ firstLetterBig <- function(string) {
 }
 
 
-writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", subsectionDepth=1, saveFormatImage = "pdf", section = 99) { #insertSubsections=FALSE,
+writeLatexFile <- function(preFileNameLatexFile, fileNameImageFile="", ylabel="", subsectionDepth=1, saveFormatImage = "pdf", section = 99) { #insertSubsections=FALSE,
 	#o=""
 	#fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
 
-	fileNameLatexFile = paste(preprocessingOfValues(fileNameLatexFile, FALSE, "_"), SECTION.TEX, section, sep="")
+	fileNameLatexFile = paste(preprocessingOfValues(preFileNameLatexFile, FALSE, "_"), SECTION.TEX, section, sep="")
 	
 	#o = gsub('[[:punct:]]', "_", o)
 	#print(fileNameImageFile)
@@ -1825,15 +1837,19 @@ writeLatexFile <- function(fileNameLatexFile, fileNameImageFile="", ylabel="", s
 #	}
 	
 	if(fileNameImageFile == "") {
-		latexText <- paste(latexText, "\\loadTex{", DIRECTORY.PLOTSTEX, DIRECTORY.SEPARATOR, fileNameLatexFile, sep="")
+		latexText <- paste(latexText, "\\loadTex{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, preFileNameLatexFile, sep="")
+		latexText = paste(latexText, ".", TEX, "}", sep="")
 	} else {
 		latexText <- paste(latexText, "\\loadImage{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, fileNameImageFile, sep="")
+		latexText = paste(latexText, ".", saveFormatImage, "}", sep="")
 	}
 	
-	latexText = paste(latexText, ".", saveFormatImage, "}", sep="")
+	
 
 	fileNameLatexFile <- paste(DIRECTORY.PLOTSTEX, fileNameLatexFile, sep=DIRECTORY.SEPARATOR)
-	write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
+	if(!(section == ERROR && file.exists(paste(fileNameLatexFile, TEX, sep=".")))) {
+		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
+	}
 }
 
 writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, columnWidth=NULL) {
@@ -1971,9 +1987,9 @@ getConstance <- function(sectionTyp, typ) {
 	return(NONE)
 }
 
-writeLatexFinalFile <- function(latexText, fileName) {
+writeOnlyALatexFile <- function(latexText, fileName, append=FALSE) {
 	#fileName <- paste("tex",fileName, sep="/")
-	write(x=latexText, append=FALSE, file=paste(fileName, TEX, sep="."))
+	write(x=latexText, append=append, file=paste(fileName, TEX, sep="."))
 }
 
 
@@ -2589,14 +2605,14 @@ inputFile <- function(latexText, tabText, file) {
 	return(paste(latexText, tabText, "\\input{", file, "}", NEWLINE.TEX, sep=""))
 }
 
-includeAppendix <- function(buildAppendixTexPart, tabText, debug) {
-	debug %debug% "buildAppendixPart()"
+includeAppendixAndError <- function(buildAppendixTexPart, tabText, pattern, debug) {
+	debug %debug% "includeAppendixAndError()"
 	
-	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, APPENDIX.SECTION,sep=""), debug)
+	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, pattern,sep=""), debug)
 	if(length(fileName) > 0) {
 		setResetCheckAndIFPart(buildAppendixTexPart, fileName, tabText)
 		tabText <- increaseTabText(tabText)
-		buildAppendixTexPart <- setAdditionInfos(buildAppendixTexPart, FIRST.SECTION, APPENDIX.SECTION, tabText)
+		buildAppendixTexPart <- setAdditionInfos(buildAppendixTexPart, FIRST.SECTION, pattern, tabText)
 		buildAppendixTexPart <- setLoadImageAndLoadTex(buildAppendixTexPart, fileName, tabText)
 		tabText <- reduceTabText(tabText)
 		buildAppendixTexPart <- setClosedBraces(buildAppendixTexPart, tabText)					
@@ -2612,9 +2628,10 @@ writeReportFile <- function(tabText = "", debug = FALSE) {
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportDefGeneralSection")
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportCluster")
 	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug)$latexText
-	buildReportFileText <- includeAppendix(buildReportFileText, tabText, debug)
+	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, APPENDIX.SECTION, debug)
+	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, ERROR.SECTION, debug)
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportFooter")
-	writeLatexFinalFile(buildReportFileText, REPORT)
+	writeOnlyALatexFile(buildReportFileText, REPORT)
 }
 
 buildReportTex <- function(debug) {
@@ -2654,10 +2671,14 @@ saveImageFile <- function(overallList, plot, filename, newHeight = "") {
 	}
 	#print(filename)
 	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
-	filename <- paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR)
+	filename <- getPlotFileName(filename)
 #print(filename)
 	ggsave (filename=paste(filename, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
 
+}
+
+getPlotFileName <-  function(filename) {
+	return(paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR))
 }
 
 #makeDepthBoxplotDiagram <- function(h, overallList) {
@@ -3225,11 +3246,11 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	stressArea <- data.frame()
 	hasLessThanThreeValues <- FALSE
 	
-	overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	overallColor <- overallList$color_nBox
 	color <- overallColor[[imagesIndex]]
-	section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
-	
+	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
+
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	
 	if (length(overallResult[, 1]) > 0) {
@@ -3599,8 +3620,8 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 	
 	legende <- TRUE
 	overallColor <- overallList$color_boxStack
-	overallFileName <- overallList$imageFileNames_StackedPlots	
-	section <- buildSectionString(overallList$boxStackSection, imagesIndex, overallList$appendix)
+	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)	
+	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 #print(section)
 #print(overallDesName[[imagesIndex]])
 	if (length(overallResult[, 1]) > 0) {
@@ -3761,7 +3782,7 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 			}
 	
 			
-			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""), paste(overallFileName[[imagesIndex]], "stackedOI", sep=""), subtitle, TRUE,subsectionDepth=2, section = section)
+			writeTheData(overallList, plot, overallFileName, paste("overall", title, positionType, sep=""), paste(overallFileName, "stackedOI", sep=""), subtitle, TRUE,subsectionDepth=2, section = section)
 			
 #			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
 #			if (makeOverallImage) {
@@ -3890,7 +3911,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (length(overallResult[, 1]) > 0) {
 			
-		overallFileName <- overallList$imageFileNames_SpiderPlots
+		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		options <- overallList$spiderOptions
 
 		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName,  overallResult[c("xAxis","values")], "values", options)
@@ -3898,7 +3919,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallResult <- normalizeEachDescriptor(overallResult)	
 		overallColor <- overallList$color_spider
-		section <- buildSectionString(overallList$boxSpiderSection, imagesIndex, overallList$appendix)
+		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		histVec <- levels(overallResult$hist)
@@ -4043,7 +4064,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 				subtitle <- title
 			}
 			
-			writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, positionType, sep=""), paste(overallFileName[[imagesIndex]], "spiderOI", sep=""), subtitle, TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
+			writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, positionType, sep=""), paste(overallFileName, "spiderOI", sep=""), subtitle, TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
 																													
 #			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, positionType, sep=""))
 #			if (makeOverallImage) {
@@ -4104,14 +4125,14 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 	overallList$debug %debug% "plotLineRangeImage()"
 	
 	if (length(overallResult[, 1]) > 0) {
-		overallFileName <- overallList$imageFileNames_LinerangePlots
+		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		options <- overallList$linerangeOptions
 		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult[c("xAxis","values")], "values", options)
 		overallResult <- na.omit(overallResult)
 		overallResult <- normalizeEachDescriptor(overallResult)
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallColor <- overallList$color_linerange
-		section <- buildSectionString(overallList$linerangeSection, imagesIndex, overallList$appendix)
+		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
 		
@@ -4215,7 +4236,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 		
 		#print(plot)
 
-		writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, sep=""), paste(overallFileName[[imagesIndex]], "lineRangeOI", sep=""), title, TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
+		writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, sep=""), paste(overallFileName, "lineRangeOI", sep=""), title, TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
 
 #		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, sep=""))
 #		if (makeOverallImage) {
@@ -4271,15 +4292,15 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 	
 	
 	if(typOfPlot == NBOX.PLOT) {
-		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		overallColor <- overallList$color_nBox
-		section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
+		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		yValue <- MEAN
 	} else if(typOfPlot == STRESS.PLOT){
-		overallFileName <- overallList$imageFileNames_nBoxplots[[imagesIndex]]
+		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		overallColor <- getColorRampPalette(colorVector = getColorVector(overallList$isGray), whichColumShouldUse = 5)
-		section <- STRESS
+		section <- getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE)
 		#section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
 		whichColumShouldUse <- NAME
 		yValue <- VALUES
@@ -4655,10 +4676,10 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	overallList$debug %debug% "makeViolinDiagram()"
 
 	overallResult <- reownCategorized(overallResult)
-	overallFileName <- overallList$imageFileNames_violinPlots
+	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	color <- setColorDependentOfGroup(overallResult)
 	overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, onlySecondTreatment = TRUE)
-	section <- buildSectionString(overallList$violinBoxSection, imagesIndex, overallList$appendix)
+	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 	reorderList <- reorderThePlotOrder(overallResult, typOfPlot)
 	overallResult <- reorderList$overallResult
 	
@@ -4748,7 +4769,7 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 #		print(title)
 #		print(overallDesName[[imagesIndex]])
 			
-		writeTheData(overallList, plot, overallFileName[imagesIndex], paste(title, typOfPlot, sep=""), paste(overallFileName[[imagesIndex]], "violinOI", sep=""), overallDesName[[imagesIndex]], TRUE, subsectionDepth=2, section = section)
+		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, "violinOI", sep=""), overallDesName[[imagesIndex]], TRUE, subsectionDepth=2, section = section)
 	}
 }
 
@@ -4800,10 +4821,10 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
  
-	overallFileName <- overallList$imageFileNames_Boxplots
+	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	overallColor <- overallList$color_box
 	options <- overallList$boxOptions
-	section <- buildSectionString(overallList$boxSection, imagesIndex, overallList$appendix)
+	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
@@ -4906,7 +4927,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 					subsectionDepth <- 2
 				}		
 				
-				writeTheData(overallList, plot, overallFileName[[imagesIndex]], paste(title, typOfPlot, sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, "OI", sep=""), subtitle, TRUE, subsectionDepth=subsectionDepth, section = section)
+				writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, typOfPlot, "OI", sep=""), subtitle, TRUE, subsectionDepth=subsectionDepth, section = section)
 							
 	#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], typOfPlot)
 	#
@@ -5069,20 +5090,112 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 				}
 	
 				if (INNER.THREADED && DO.PARALLELISATION) {
-					sfClusterCall(makeSplitDiagram, 
-							overallResult, overallDesName, 
-							overallList, imagesIndex, typOfPlot,
-							stopOnError=FALSE)
+					error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
+								stopOnError=FALSE), silent = !overallList$debug)
 				} else {
-					makeSplitDiagram( 
-							overallResult, overallDesName, 
-							overallList, imagesIndex, typOfPlot)
+					error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
 				}
-				
+				checkOfTryError(error, overallList, imagesIndex, typOfPlot)
 			}
 		}
 	}
 }
+
+
+getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = -1) {
+	overallList$debug %debug% "getOverallValues()"
+
+	if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT || typOfPlot == STRESS.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_nBoxplots)
+			} else {
+				return(overallList$imageFileNames_nBoxplots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			if(typOfPlot == STRESS.PLOT) {
+				return(STRESS)
+			} else {			
+				return(overallList$nBoxSection)
+			}
+		}
+	} else if(typOfPlot == BOX.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_Boxplots)
+			} else {
+				return(overallList$imageFileNames_Boxplots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return(overallList$boxSection)
+		}
+	} else if(typOfPlot == STACKBOX.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_StackedPlots)
+			} else {
+				return(overallList$imageFileNames_StackedPlots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return(overallList$boxStackSection)
+		}
+	} else if(typOfPlot == SPIDER.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_SpiderPlots)
+			} else {
+				return(overallList$imageFileNames_SpiderPlots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return(overallList$boxSpiderSection)
+		}
+	} else if(typOfPlot == LINERANGE.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_LinerangePlots)
+			} else {
+				return(overallList$imageFileNames_LinerangePlots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return(overallList$linerangeSection)
+		}
+	} else if(typOfPlot == VIOLIN.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			if(imagesIndex == -1) {
+				return(overallList$imageFileNames_violinPlots)
+			} else {
+				return(overallList$imageFileNames_violinPlots[[imagesIndex]])
+			}
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return(overallList$violinBoxSection)
+		}
+	} 	
+}
+
+checkOfTryError <- function(error, overallList, imagesIndex, typOfPlot) {
+	overallList$debug %debug% "checkOfTryError()"
+
+	if(isTRUE(all.equal(class(error), "try-error"))) {
+		preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
+		filename <- checkFileName(preFilename, typOfPlot)
+		filenamePlot <- getPlotFileName(filename)
+		createErrorPlot(filenamePlot, filename)
+		
+		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
+		writeLatexFile(paste(preFilename, typOfPlot, "OI", sep=""), filename, saveFormatImage = overallList$saveFormat, section = section)
+				
+		text <- paste("Error in file: ", filenamePlot, NEWLINE.TEX.INCLUDE,
+					  "Error-Message: ", NEWLINE.TEX.INCLUDE,
+					  geterrmessage(), NEWLINE.TEX.INCLUDE,
+					  "ooooooooooooooooooooooooooo", NEWLINE.TEX.INCLUDE, NEWLINE.TEX.INCLUDE, sep="")
+		text<- parseString2Latex(text)	
+		writeLatexFile(ERROR, saveFormatImage = overallList$saveFormat, section = ERROR)
+		#errorFile <- paste(ERROR, SECTION.TEX, ERROR, sep="")
+			  
+		writeOnlyALatexFile(text, getPlotFileName(ERROR), TRUE)
+	} 
+}
+
 
 getStandardColnames <- function(tempOverallResult) {
 	if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
@@ -5408,6 +5521,17 @@ changeXAxisName <- function(overallList) {
 		overallList$xAxisName <- substr(day, 1, nchar(day)-(nchar(day_int)+1))
 	}
 	return(overallList)
+}
+
+createErrorPlot <- function(file, name) {
+	
+	library("Cairo")
+	ownCat(paste("Create error plot '", file, "'", sep=""))
+	Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
+	par(mar = c(0, 0, 0, 0))
+	plot.new()
+	legend("left", paste("error in ", name, sep=""), col= c("black"), pch=1, bty="n")
+	dev.off()
 }
 
 #ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
