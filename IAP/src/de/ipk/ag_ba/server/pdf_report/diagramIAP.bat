@@ -24,6 +24,9 @@ IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6
 
 rem In the R Skript the first Value is report.csv so the %1 is in the R-Script args[3]
 Rscript --encoding=UTF-8 createDiagrams.R report.csv pdf %*
+Rscript --encoding=UTF-8 createMissingFiles.R
+
+rem IF NOT EXIST noValues.pdf Rscript --encoding=UTF-8 createMissingFiles.R
 
 rem The delete option is important at the development phase
 rem del /s report.aux

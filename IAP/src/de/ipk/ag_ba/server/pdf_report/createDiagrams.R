@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- TRUE
+debug <- FALSE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -26,7 +26,7 @@ descriptorStressVector <- vector()
 
 
 DO.PARALLELISATION <- FALSE
-threaded <- FALSE
+SHOULD.THREADED <- FALSE
 INNER.THREADED = FALSE
 CPU.CNT <- 2
 CPU.ATUO.DETECTED <- TRUE
@@ -377,12 +377,15 @@ overallOutlierDetection <- function(overallList) {
 	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
 }
 
-
 loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE) {	
 #	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")	
 	repos <- c("http://cran.r-project.org","http://www.rforge.net/")
 	#libPath <- ".libPaths()[1]"
 	libPath <- Sys.getenv("R_LIBS_USER")
+	
+#	if(libPath == "") {
+#		createLibPath(, debug)
+#	}
 	
 	if (install & length(libraries) > 0) {
 		ownCat("Check for new packages...")
@@ -3136,8 +3139,7 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 loadLibs <- function(installAndUpdate = FALSE) {
 	libraries  <- c(
 		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
-		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr",
-		 "pls") #, "mvoutlier")
+		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr") #, "mvoutlier")
 	loadInstallAndUpdatePackages(libraries, installAndUpdate, CHECK.FOR.UPDATE, FALSE)
 }
 
@@ -3228,8 +3230,6 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	color <- overallColor[[imagesIndex]]
 	section <- buildSectionString(overallList$nBoxSection, imagesIndex, overallList$appendix)
 	
-	
-
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	
 	if (length(overallResult[, 1]) > 0) {
@@ -4925,7 +4925,7 @@ plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex,
 #########
 
 	overallList$debug %debug% "plotDiagram()"	
-		
+
 	if(typOfPlot == NBOX.PLOT) {
 		makeLinearDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 	} else if(typOfPlot == BOX.PLOT) {
@@ -4957,7 +4957,7 @@ plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex,
 
 makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot) {
 	overallList$debug %debug% "makeSplitDiagram()"
-	
+
 	if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
 		(overallList$splitTreatmentFirst && overallList$secondTreatment == NONE && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
 		(typOfPlot == VIOLIN.PLOT) ||
@@ -4975,6 +4975,17 @@ makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesI
 			plotDiagram(overallResultSplit, overallDesName, overallList, imagesIndex, typOfPlot, nn)
 		}
 	}
+}
+
+startDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
+	overallList$debug %debug% "startDiagramming()"
+
+	if(DO.PARALLELISATION) {
+		sfClusterEval(paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot), 
+				stopOnError = FALSE)
+	} else {
+		paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot)
+	}	
 }
 
 
@@ -5057,8 +5068,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 					overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)	
 				}
 	
-				
-				if (INNER.THREADED) {
+				if (INNER.THREADED && DO.PARALLELISATION) {
 					sfClusterCall(makeSplitDiagram, 
 							overallResult, overallDesName, 
 							overallList, imagesIndex, typOfPlot,
@@ -5125,42 +5135,44 @@ calculateSomeStressForTheGivenTyp <- function(overallResult, descriptorName) {
 calculateStressValues <- function(overallList) {
 	overallList$debug %debug% "calculateStressValues()"
 
-	workingData <- overallList$overallResult_nBoxDes	
-	uniqueValues <- unique(as.character(workingData[,NAME]))
-	desVec <- na.omit(unlist(overallList$nBoxDes))
-	
-	#stressResultMatrix <- matrix(-1, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
-	##stressMatrixList <- list()
-	numberOfStressValues <- 5
-	numberOfColumns <- 2 + numberOfStressValues
-	stressResultMatrix <- matrix(-1, nrow = length(uniqueValues) * length(desVec), ncol = numberOfColumns)
-	colnames(stressResultMatrix) <- c("name", "descriptor", paste("stress", seq(1:5), sep=""))
-	
-	index <- 1
-	for(pp in uniqueValues) {
-		newWorkingDataSet <- workingData[workingData[,NAME] == pp,]
-		for (descriptorIndex in names(desVec)) {	
-			overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
-			
-			stressResultMatrix[index,] <- c(pp, descriptorIndex, calculateSomeStressForTheGivenTyp(overallResult, as.character(overallList$nBoxDes[[descriptorIndex]])))
-			#overallList$nBoxDesName[[descriptorIndex]]
-			
-			
-			#stressResultMatrix[descriptorIndex, nn] <- calculateSomeStressForTheGivenTyp(overallResult)
-			##stressMatrixList[[nn]][[overallList$nBoxDesName[[descriptorIndex]]]] <- calculateSomeStressForTheGivenTyp(overallResult)
-			index <- index +1
+	if(DO.MODELLING.OF.STRESS) {
+		workingData <- overallList$overallResult_nBoxDes	
+		uniqueValues <- unique(as.character(workingData[,NAME]))
+		desVec <- na.omit(unlist(overallList$nBoxDes))
+		
+		#stressResultMatrix <- matrix(-1, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
+		##stressMatrixList <- list()
+		numberOfStressValues <- 5
+		numberOfColumns <- 2 + numberOfStressValues
+		stressResultMatrix <- matrix(-1, nrow = length(uniqueValues) * length(desVec), ncol = numberOfColumns)
+		colnames(stressResultMatrix) <- c("name", "descriptor", paste("stress", seq(1:5), sep=""))
+		
+		index <- 1
+		for(pp in uniqueValues) {
+			newWorkingDataSet <- workingData[workingData[,NAME] == pp,]
+			for (descriptorIndex in names(desVec)) {	
+				overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
+				
+				stressResultMatrix[index,] <- c(pp, descriptorIndex, calculateSomeStressForTheGivenTyp(overallResult, as.character(overallList$nBoxDes[[descriptorIndex]])))
+				#overallList$nBoxDesName[[descriptorIndex]]
+				
+				
+				#stressResultMatrix[descriptorIndex, nn] <- calculateSomeStressForTheGivenTyp(overallResult)
+				##stressMatrixList[[nn]][[overallList$nBoxDesName[[descriptorIndex]]]] <- calculateSomeStressForTheGivenTyp(overallResult)
+				index <- index +1
+			}
 		}
+		#rownames(stressResultMatrix) <- getVector(overallList$nBoxDesName[names(desVec)])
+		overallList$overallResult_stressDes <- as.data.frame(stressResultMatrix)
+		overallList$stressDes <- overallList$nBoxDes 
+		overallList$stressDesName <- overallList$nBoxDesName
+		overallList$stressOptions <- NULL
+		
+		#tempOverallResult <- overallList$overallResult_nBoxDes  
+		#overallDescriptor <- overallList$nBoxDes 
+		#overallDesName <- overallList$nBoxDesName
+		#typOfPlot <- NBOX.PLOT	
 	}
-	#rownames(stressResultMatrix) <- getVector(overallList$nBoxDesName[names(desVec)])
-	overallList$overallResult_stressDes <- as.data.frame(stressResultMatrix)
-	overallList$stressDes <- overallList$nBoxDes 
-	overallList$stressDesName <- overallList$nBoxDesName
-	overallList$stressOptions <- NULL
-	
-	#tempOverallResult <- overallList$overallResult_nBoxDes  
-#overallDescriptor <- overallList$nBoxDes 
-#overallDesName <- overallList$nBoxDesName
-#typOfPlot <- NBOX.PLOT	
 	
 	return(overallList)
 }
@@ -5168,9 +5180,10 @@ calculateStressValues <- function(overallList) {
 
 makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
-	if (threaded)
-		sfExport("overallList")
 	
+	if (SHOULD.THREADED && DO.PARALLELISATION) {
+			sfExport("overallList")
+	}
 	if (!calculateNothing) {
 				
 if(!plotOnlyViolin) {	
@@ -5179,10 +5192,9 @@ if(!plotOnlyLineRange) {
 if(!plotOnlyStacked) {
 if(!plotOnlyBoxplot) {
 
-		if (sum(!is.na(overallList$stressDes)) > 0) {
+		if (sum(!is.na(overallList$stressDes)) > 0 && DO.MODELLING.OF.STRESS) {
 			if (overallList$debug) {ownCat("stress modelling...")}
-			sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_stressDes,  overallList$stressDes, overallList$stressDesName, STRESS.PLOT), 
-					stopOnError = FALSE)
+			startDiagramming(overallList, overallList$overallResult_stressDes,  overallList$stressDes, overallList$stressDesName, STRESS.PLOT)				
 		} else {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
@@ -5190,8 +5202,7 @@ if(!plotOnlyBoxplot) {
 if(!plotOnlyStressValues) {
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT), 
-						stopOnError = FALSE)
+				startDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT)
 		} else {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
@@ -5201,8 +5212,7 @@ if(!plotOnlyStressValues) {
 if(!plotOnlyNBox) {
 		if (sum(!is.na(overallList$boxDes)) > 0) {
 			if (overallList$debug) {ownCat("Boxplot...")}						
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxDes,  overallList$boxDes, overallList$boxDesName, BOX.PLOT), 
-						stopOnError = FALSE)			
+			startDiagramming(overallList, overallList$overallResult_boxDes,  overallList$boxDes, overallList$boxDesName, BOX.PLOT)		
 		} else {
 			ownCat("All values for Boxplot are 'NA'...")
 		}
@@ -5213,8 +5223,7 @@ if(!plotOnlyNBox) {
 if(!plotOnlyBoxplot) {
 		if (sum(!is.na(overallList$boxStackDes)) > 0) {
 			if (overallList$debug) {ownCat("Stacked Boxplot...")}
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxStackDes,  overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT), 
-						stopOnError = FALSE)	
+			startDiagramming(overallList, overallList$overallResult_boxStackDes,  overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT)
 		} else {
 			ownCat("All values for stacked Boxplot are 'NA'...")
 			}
@@ -5227,16 +5236,14 @@ if(!plotOnlyNBox) {
 if(!plotOnlyLineRange) {
 		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 			if (overallList$debug) {ownCat("Spider plot...")}
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_boxSpiderDes,  overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT), 
-						stopOnError = FALSE)
+			startDiagramming(overallList, overallList$overallResult_boxSpiderDes,  overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT)
 		} else {
 			ownCat("All values for spider plot are 'NA'...")
 		}
 }
 		if (sum(!is.na(overallList$linerangeDes)) > 0) {
 			if (overallList$debug) {ownCat("Linerange plot...")}
-			sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_linerangeDes,  overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT), 
-					stopOnError = FALSE)
+			startDiagramming(overallList, overallList$overallResult_linerangeDes,  overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT)
 		} else {
 			ownCat("All values for linerange plot are 'NA'...")
 		}
@@ -5250,16 +5257,14 @@ if(!plotOnlySpider) {
 if(!plotOnlyLineRange) {
 		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 			if (overallList$debug) {ownCat("Violin plot...")}
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_violinBoxDes,  overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT), 
-						stopOnError = FALSE)
+			startDiagramming(overallList, overallList$overallResult_violinBoxDes,  overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT)
 		} else {
 			ownCat("All values for violin Boxplot are 'NA'...")
 		}
 }}}}}}
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
-				sfClusterEval(paralleliseDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT), 
-						stopOnError = FALSE)
+			startDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT)
 		}
 	}
 }
@@ -5405,32 +5410,36 @@ changeXAxisName <- function(overallList) {
 	return(overallList)
 }
 
-ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
-	ownCat("Check if the noValues-Image is there")
-	
-	if (!file.exists(file)) {
-		library("Cairo")
-		ownCat(paste("Create defaultImage '", file, "'", sep=""))
-		Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
-		par(mar = c(0, 0, 0, 0))
-		plot.new()
-		legend("left", "no values", col= c("black"), pch=1, bty="n")
-		dev.off()
-	}
-}
+#ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
+#	ownCat("Check if the noValues-Image is there")
+#	
+#	if (!file.exists(file)) {
+#		library("Cairo")
+#		ownCat(paste("Create defaultImage '", file, "'", sep=""))
+#		Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
+#		par(mar = c(0, 0, 0, 0))
+#		plot.new()
+#		legend("left", "no values", col= c("black"), pch=1, bty="n")
+#		dev.off()
+#	}
+#}
+#
+#ckeckIfReportTexIsThere <- function(file = REPORT.FILE) {
+#	ownCat("Check if the report.tex file is there")
+#	
+#	if (!file.exists(file)) {
+#		write(x="there was a error!", append=FALSE, file=file)
+#	}
+#}
+#
+#checkIfAllNecessaryFilesAreThere <- function() {
+#		ownCat("... check if all necessary files are there")
+#		ckeckIfNoValuesImagesIsThere()
+#		ckeckIfReportTexIsThere()
+#}
 
-ckeckIfNoValuesImagesIsThere <- function(file = REPORT.FILE) {
-	ownCat("Check if the report.tex file is there")
-	
-	if (!file.exists(file)) {
-		write(x="there was a error!", append=FALSE, file=file)
-	}
-}
-
-checkIfAllNecessaryFilesAreThere <- function() {
-		ownCat("... check if all necessary files are there")
-		ckeckIfNoValuesImagesIsThere()
-		ckeckIfNoValuesImagesIsThere()
+loadCheckIfAllNecessaryFilesAreThere <- function() {
+	source("createMissingFiles.R")
 }
 
 buildBlacklist <- function(workingDataSet, descriptorSet) {
@@ -5526,6 +5535,13 @@ initRfunction <- function(debug) {
 	}
 	
 	loadLibs(debug)
+}
+
+createLibPath <- function(debug) {
+	debug %debug% "createLibPath()"
+	
+	dir.create(paste(".",DIRECTORY.SECTION, sep=DIRECTORY.SEPARATOR))
+	
 }
 
 createInitDirectories <- function(debug) {
@@ -5690,7 +5706,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 	}  else if (typOfStartOptions == START.TYP.TEST){
 		
-		library("snowfall")
+		if(DO.PARALLELISATION) {
+			library("snowfall")
+		}
 		debug <- TRUE
 		initRfunction(debug)
 		if(DO.PARALLELISATION) {
@@ -5896,7 +5914,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 						break
 					}
 				}
-				checkIfAllNecessaryFilesAreThere()
+				loadCheckIfAllNecessaryFilesAreThere()
 			}, TRUE)
 			
 			ownCat("Processing finished")		
@@ -5904,7 +5922,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 			
 		} else {
 			ownCat("No filename or no descriptor!")
-			checkIfAllNecessaryFilesAreThere()
+			loadCheckIfAllNecessaryFilesAreThere()
 		}
 		buildReportTex(debug)
 		

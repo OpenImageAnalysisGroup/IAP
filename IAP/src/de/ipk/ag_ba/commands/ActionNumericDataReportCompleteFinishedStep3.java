@@ -471,7 +471,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						"boxPlotList.R",
 						"spiderPlotList.R",
 						"linerangePlotList.R",
-						"sectionMapping.R"
+						"sectionMapping.R",
+						"createMissingFiles.R"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {

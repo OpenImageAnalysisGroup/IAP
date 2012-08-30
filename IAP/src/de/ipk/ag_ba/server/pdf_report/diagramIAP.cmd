@@ -22,6 +22,7 @@ Rscript calcClusters.R $6
 fi
 
 Rscript createDiagrams.R report.csv pdf "$@"
+Rscript createMissingFiles.R
 
 echo "Create PDF..."
 /usr/bin/pdflatex report.tex -interaction batchmode
