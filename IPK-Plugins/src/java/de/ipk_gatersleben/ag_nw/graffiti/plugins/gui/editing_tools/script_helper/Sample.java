@@ -384,6 +384,8 @@ public class Sample implements SampleInterface {
 	@Override
 	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
 		if (!ignoreSnapshotFineTime) {
+			if (getSampleFineTimeOrRowId() == null || sd.getSampleFineTimeOrRowId() == 1)
+				return compareTo(sd);
 			int rr = getSampleFineTimeOrRowId().compareTo(sd.getSampleFineTimeOrRowId());
 			if (rr != 0)
 				return rr;
