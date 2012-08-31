@@ -539,7 +539,7 @@ public class MongoDB {
 						processSubstanceSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes,
 								overallFileSize, startTime, substances, conditions,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs,
-								errorCount,s);
+								errorCount, s);
 					} catch (InterruptedException e) {
 						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ",experiment " + experiment.getName(), e);
 						e.printStackTrace();
@@ -927,8 +927,8 @@ public class MongoDB {
 	
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
 			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
-//		if (status != null)
-//			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
+		// if (status != null)
+		// status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		
 		dbSubstance.put("condition_ids", conditionIDs);
 		substances.insert(dbSubstance);
@@ -1578,19 +1578,20 @@ public class MongoDB {
 							BasicDBList subList = (BasicDBList) expref.get("substances");
 							if (subList != null) {
 								int n = subList.size();
-								int idxS =0;
+								int idxS = 0;
 								for (Object co : subList) {
 									DBObject substance = (DBObject) co;
 									if (optDBPbjectsOfSubstances != null)
 										optDBPbjectsOfSubstances.add(substance);
 									idxS++;
-									processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS,  n);
+									processSubstance(db, experiment, substance, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS, n);
 								}
 							}
 							if (ensureIndex)
 								db.getCollection("substances").ensureIndex("_id");
 							BasicDBList l = (BasicDBList) expref.get("substance_ids");
 							if (l != null) {
+								final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 								final int n = l.size();
 								for (Object o : l) {
 									if (o == null)
@@ -1602,11 +1603,10 @@ public class MongoDB {
 											if (optDBPbjectsOfSubstances != null)
 												optDBPbjectsOfSubstances.add(substance);
 											final int lss = l.size();
-											final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 											Runnable r = new Runnable() {
 												@Override
 												public void run() {
-												tsoIdxS.addInt(1);
+													tsoIdxS.addInt(1);
 													processSubstance(db, experiment, substance, optStatusProvider,
 															100d / lss, optDBPbjectsOfConditions,
 															tsoIdxS.getInt(), n);
@@ -2389,7 +2389,7 @@ public class MongoDB {
 				}
 		
 		if (optStatusProvider != null)
-			optStatusProvider.setCurrentStatusText1("" + s3d.getName() + " (n_s="+idxS+"/" + n + ")");
+			optStatusProvider.setCurrentStatusText1("" + idxS + "/" + n + ": " + s3d.getName());
 		synchronized (experiment) {
 			experiment.add(s3d);
 		}
@@ -2546,8 +2546,8 @@ public class MongoDB {
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
 		if (sampList != null) {
-//			if (optStatusProvider != null)
-//				optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
+			// if (optStatusProvider != null)
+			// optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
 			
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
