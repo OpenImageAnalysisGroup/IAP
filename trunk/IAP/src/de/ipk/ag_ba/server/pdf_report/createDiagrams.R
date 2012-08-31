@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- TRUE
+debug <- FALSE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -2610,12 +2610,13 @@ includeAppendixAndError <- function(buildAppendixTexPart, tabText, pattern, debu
 	
 	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, pattern,sep=""), debug)
 	if(length(fileName) > 0) {
-		setResetCheckAndIFPart(buildAppendixTexPart, fileName, tabText)
+		buildAppendixTexPart <- setResetCheckAndIFPart(buildAppendixTexPart, fileName, tabText)
 		tabText <- increaseTabText(tabText)
 		buildAppendixTexPart <- setAdditionInfos(buildAppendixTexPart, FIRST.SECTION, pattern, tabText)
 		buildAppendixTexPart <- setLoadImageAndLoadTex(buildAppendixTexPart, fileName, tabText)
 		tabText <- reduceTabText(tabText)
-		buildAppendixTexPart <- setClosedBraces(buildAppendixTexPart, tabText)					
+		buildAppendixTexPart <- setClosedBraces(buildAppendixTexPart, tabText)		
+		return(buildAppendixTexPart)
 	} else {
 		return(buildAppendixTexPart)
 	}
@@ -2823,72 +2824,83 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 	return(workingDataSet)	
 }
 
-newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong, maxValues) {
-	#numberCharAfterSeparate <- 8
-	if(tooLong) {
-#		if(maxValues > 10)
-		
-		if (nchar(n) > (numberCharAfterSeparate + 4)) {
-			newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
-		} else {
-			newTreatmentName <- paste(seq, ". ", n, sep="")
-		}
-	} else {
-		newTreatmentName <- n
-	}
-	return(newTreatmentName)
-}
+#newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong, maxValues) {
+#	#numberCharAfterSeparate <- 8
+#	if(tooLong) {
+##		if(maxValues > 10)
+#		
+#		if (nchar(n) > (numberCharAfterSeparate + 4)) {
+#			newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
+#		} else {
+#			newTreatmentName <- paste(seq, ". ", n, sep="")
+#		}
+#	} else {
+#		newTreatmentName <- n
+#	}
+#	return(newTreatmentName)
+#}
 
+newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, lengthForPoints) {
+		
+	if (nchar(n) > (numberCharAfterSeparate + lengthForPoints)) {
+		return(paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep=""))
+	} else {
+		return(paste(seq, ". ", n, sep=""))
+	}	
+	#return(newTreatmentName)
+}
 
 renameOfTheTreatments <- function(overallList) {
 	overallList$debug %debug% "renameOfTheTreatments()"
 	
-	if (!overallList$appendix) {
-		
-		#newTreatmentName <- character()
-		columnName <- c("Short name", "Full Name")
-		numberCharAfterSeparate <- 8
-		
+	if (!overallList$appendix) {		
 		if (overallList$filterTreatment[1] != NONE) {
-			seq <- 0;
-			FileName <- "conditionsFirstFilter"
-			writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
-		
-			tooLong <- FALSE
-			for(n in overallList$filterTreatment) {
-				if (nchar(n) > (numberCharAfterSeparate+4))
-					tooLong <- TRUE
-			}
-			
-			for(n in overallList$filterTreatment) {
-				seq <- seq+1
-				overallList$filterTreatmentRename[[n]] <- newTreatmentNameFunction(seq, n, numberCharAfterSeparate, tooLong, length(overallList$filterTreatment))
-				writeLatexTable(FileName, value=c(overallList$filterTreatmentRename[[n]],n))
-			}
-			writeLatexTable(FileName)
+			overallList$filterTreatmentRename <- setFilterTreatmentRename(overallList$filterTreatment, overallList$filterTreatmentRename, "conditionsFirstFilter")
 		}
 	
 		if (overallList$filterSecondTreatment[1] != NONE) {
-			seq <- 0
-			FileName <- "conditionsSecondFilter"
-			writeLatexTable(FileName, columnName, columnWidth=c("3cm","13cm"))
-			
-			tooLong <- FALSE
-			for(n in overallList$filterSecondTreatment) {
-				if (nchar(n) > (numberCharAfterSeparate+4))
-					tooLong <- TRUE
-			}
-			
-			for(n in overallList$filterSecondTreatment) {
-				seq <- seq+1
-				overallList$secondFilterTreatmentRename[[n]] <- newTreatmentNameFunction(letters[seq], n, numberCharAfterSeparate, tooLong, length(overallList$filterTreatment))
-				writeLatexTable(FileName, value=c(overallList$secondFilterTreatmentRename[[n]],n))
-			}
-			writeLatexTable(FileName)
+			overallList$secondFilterTreatmentRename <- setFilterTreatmentRename(overallList$filterSecondTreatment, overallList$secondFilterTreatmentRename, "conditionsSecondFilter")
 		}
 	}
-
 	return(overallList)
+}
+
+setFilterTreatmentRename <- function(oldNames, newNames, fileName) {
+	columnName <- c("Short name", "Full Name")
+	numberCharAfterSeparate <- 8
+	lengthForPoints <- 4
+	
+	tooLong <- checkIfTooLong(oldNames, (numberCharAfterSeparate + lengthForPoints))
+		
+	if(tooLong) {
+		writeLatexTable(fileName, columnName, columnWidth=c("3cm","13cm"))
+	}
+	
+	seq <- 0;
+	for(n in oldNames) {	
+		if(tooLong) {
+			seq <- seq+1
+			newNames[[n]] <- newTreatmentNameFunction(seq, n, numberCharAfterSeparate, lengthForPoints)
+			writeLatexTable(fileName, value=c(newNames[[n]],n))
+		} else {
+			newNames[[n]] <- n
+		}
+	}
+	if(tooLong) {
+		writeLatexTable(fileName)
+	}
+	return(newNames)
+}
+
+
+checkIfTooLong <- function(nameVector, cutline) {
+	for(n in nameVector) {
+		if (nchar(n) > cutline) {
+			return(TRUE)
+			break
+		}
+	}
+	return(FALSE)
 }
 
 replaceTreatmentNamesOverallOneValue <- function(overallList, title, typOfPlot="") {
