@@ -6,7 +6,7 @@
 
 nBoxOptions= NULL
 
-nBoxPlotList <- list(		
+nBoxPlotList <- list(	
 		#############################  new Section ##############################
 		"Weight A (g)" = list(
 							plotName = "weight before watering (g)",
@@ -324,9 +324,9 @@ nBoxPlotList <- list(
 		"top.vis.hsv.h.normalized.kurtosis" = list(plotName = "top rgb h - kurtosis (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 8),
 		"top.vis.hsv.h.histogram.bin.01.0_12" = list(plotName = "top rgb h - bin1", section = 7, subsection = 2, subsubsection = 1, paragraph = 9),
 		"top.vis.hsv.h.normalized.histogram.bin.01.0_12" = list(plotName = "top rgb h - bin1 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 10),
-		"top.vis.hsv.h.histogram.bin.02.12_25" = list(plotName = "top rgb h - bin2", section = 7,	subsection = 1,	subsubsection = 1, paragraph = 11),
+		"top.vis.hsv.h.histogram.bin.02.12_25" = list(plotName = "top rgb h - bin2", section = 7,	subsection = 2,	subsubsection = 1, paragraph = 11),
 		"top.vis.hsv.h.normalized.histogram.bin.02.12_25" = list(plotName = "top rgb h - bin2 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 12),
-		"top.vis.hsv.h.histogram.bin.03.25_38" = list(plotName = "top rgb h - bin3", section = 7,	subsection = 1,	subsubsection = 1, paragraph = 13),
+		"top.vis.hsv.h.histogram.bin.03.25_38" = list(plotName = "top rgb h - bin3", section = 7,	subsection =2,	subsubsection = 1, paragraph = 13),
 		"top.vis.hsv.h.normalized.histogram.bin.03.25_38" = list(plotName = "top rgb h - bin3 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 14),
 		"top.vis.hsv.h.histogram.bin.04.38_51" = list(plotName = "top rgb h - bin4", section = 7, subsection = 2, subsubsection = 1, paragraph = 15),
 		"top.vis.hsv.h.normalized.histogram.bin.04.38_51" = list(plotName = "top rgb h - bin4 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 16),
@@ -334,7 +334,7 @@ nBoxPlotList <- list(
 		"top.vis.hsv.h.normalized.histogram.bin.05.51_63" = list(plotName = "top rgb h - bin5 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 18),
 		"top.vis.hsv.h.histogram.bin.06.63_76" = list(plotName = "top rgb h - bin6", section = 7, subsection = 2, subsubsection = 1, paragraph = 19),
 		"top.vis.hsv.h.normalized.histogram.bin.06.63_76" = list(plotName = "top rgb h - bin6 (zoom corrected)", section = 7, subsection = 2, subsubsection = 1, paragraph = 20),				
-		"top.vis.hsv.dgci.average" = list(plotName = "top dark green color index", section = 7, subsection = 1, subsubsection = 1, paragraph = 21),
+		"top.vis.hsv.dgci.average" = list(plotName = "top dark green color index", section = 7, subsection = 2, subsubsection = 1, paragraph = 21),
 		
 		"top.vis.hsv.s.average" = list(plotName = "top rgb s - average", section = 7, subsection = 2, subsubsection = 2, paragraph = 1),
 		"top.vis.hsv.s.normalized.average" = list(plotName = "top rgb s - average (zoom corrected)", section = 7, subsection = 2, subsubsection = 2, paragraph = 2),
