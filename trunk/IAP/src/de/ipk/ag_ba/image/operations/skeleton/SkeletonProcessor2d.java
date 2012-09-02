@@ -33,18 +33,8 @@ public class SkeletonProcessor2d {
 		// TODO findEndpointsAndBranches(); all in one, do it later
 	}
 	
-	public SkeletonProcessor2d(int[][] image, ArrayList<Point> endpoints, ArrayList<Point> branches) {
-		this.skelImg = image.clone();
-		this.endpoints = endpoints;
-		this.branches = branches;
-	}
-	
 	public SkeletonProcessor2d(int[][] image) {
 		this.skelImg = image;
-	}
-	
-	public void setBranches(ArrayList<Point> branches) {
-		this.branches = branches;
 	}
 	
 	public void setEndpoints(ArrayList<Point> endPoints) {
@@ -412,6 +402,7 @@ public class SkeletonProcessor2d {
 	 * Not Mask based
 	 */
 	public void findEndpointsAndBranches2() {
+		new FlexibleImage(skelImg).copy().print("TTTT");
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
@@ -870,5 +861,9 @@ public class SkeletonProcessor2d {
 	
 	public ArrayList<Point> getBranches() {
 		return branches;
+	}
+	
+	public ArrayList<Point> getEndpoints() {
+		return endpoints;
 	}
 }

@@ -4670,4 +4670,8 @@ public class ImageOperation {
 			}
 		});
 	}
+	
+	public SkeletonProcessor2d skel2d() {
+		return new SkeletonProcessor2d(getImage());
+	}
 }

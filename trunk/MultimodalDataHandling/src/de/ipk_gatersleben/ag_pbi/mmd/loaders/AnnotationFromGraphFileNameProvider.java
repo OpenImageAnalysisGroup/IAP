@@ -255,7 +255,7 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 					s = new FileNameScanner(optProvidedFileNameFormat, fn);
 				} else
 					if (elements != null && elements.length == 1 && fn.endsWith(".jpg")) {
-						// process root scann images from GED
+						// process root scan images from GED
 						if (StringManipulationTools.count(fn, "-") == 2) {
 							// type 2: C1-17-P1256.jpg
 							s = new FileNameScanner("V-G-R", fn);

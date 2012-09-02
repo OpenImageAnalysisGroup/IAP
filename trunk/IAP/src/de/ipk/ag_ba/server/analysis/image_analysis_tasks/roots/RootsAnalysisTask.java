@@ -15,12 +15,12 @@ public class RootsAnalysisTask extends AbstractPhenotypingTask {
 	
 	@Override
 	public String getTaskDescription() {
-		return "Analyse Root Scanns";
+		return "Analyse Root Scans";
 	}
 	
 	@Override
 	public String getName() {
-		return "Root Scann Analysis";
+		return "Root Scan Analysis";
 	}
 	
 	@Override
