@@ -322,7 +322,7 @@ public class ImageProcessorOptions {
 	
 	private Boolean isMaize = null;
 	private final int nirBackground = new Color(180, 180, 180).getRGB();
-	private boolean highResMaize;
+	private boolean higherResVisCamera;
 	private boolean isBarley;
 	private boolean isArabidopsis;
 	private int tray_idx;
@@ -345,15 +345,15 @@ public class ImageProcessorOptions {
 	}
 	
 	public boolean isBarleyInBarleySystem() {
-		return !isMaize() && !isHighResMaize();
+		return !isMaize() && !isHigherResVisCamera();
 	}
 	
-	public void setHighResVisCamera(boolean highResMaize) {
-		this.highResMaize = highResMaize;
+	public void setHigherResVisCamera(boolean highResMaize) {
+		this.higherResVisCamera = highResMaize;
 	}
 	
-	public boolean isHighResMaize() {
-		return highResMaize;
+	public boolean isHigherResVisCamera() {
+		return higherResVisCamera;
 	}
 	
 	public void setIsBarley(boolean isBarley) {

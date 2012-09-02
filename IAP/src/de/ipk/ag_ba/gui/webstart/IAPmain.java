@@ -99,6 +99,8 @@ public class IAPmain extends JApplet {
 	}
 	
 	public IAPmain() {
+		if (getRunMode() == IAPrunMode.UNKNOWN)
+			setRunMode(IAPrunMode.SWING_APPLET);
 		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		ReleaseInfo.setRunningAsApplet(this);
 		

@@ -23,11 +23,13 @@ public class LogService {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						MongoDB dc = MongoDB.getDefaultCloud();
-						if (dc!=null)
-							for (String item : dc.getNews(5)) {
-								news.push(preLine + item);
-							}
+						synchronized (MongoDB.class) {
+							MongoDB dc = MongoDB.getDefaultCloud();
+							if (dc != null)
+								for (String item : dc.getNews(5)) {
+									news.push(preLine + item);
+								}
+						}
 					}
 				};
 				Thread t = new Thread(r, "Read MonogDB news");

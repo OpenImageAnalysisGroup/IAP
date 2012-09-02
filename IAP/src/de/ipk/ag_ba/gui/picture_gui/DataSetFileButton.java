@@ -58,12 +58,9 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisSmallBlueRubberTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.Maize3DanalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -357,231 +354,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTest0a = new JMenuItem(
-							"Arabidopsis Analysis Large No Rubber (Image+Reference)");
-					debugPipelineTest0a.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchFor(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment());
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new ArabidopsisAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest00a = new JMenuItem(
-							"Arabidopsis Analysis Large No Rubber (Reference+Old Reference)");
-					debugPipelineTest00a.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchForReference(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment(),
-												m);
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new ArabidopsisAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest0b = new JMenuItem(
-							"Arabidopsis Analysis Small Blue Rubber (Image+Reference)");
-					debugPipelineTest0b.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchFor(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment());
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new ArabidopsisAnalysisSmallBlueRubberTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest00b = new JMenuItem(
-							"Arabidopsis Analysis Small Blue Rubber (Reference+Old Reference)");
-					debugPipelineTest00b.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchForReference(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment(),
-												m);
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new ArabidopsisAnalysisSmallBlueRubberTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest1 = new JMenuItem(
-							"Maize Analysis Pipeline (Image+Reference)");
-					debugPipelineTest1.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchFor(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment());
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new MaizeAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest2 = new JMenuItem(
-							"Maize Analysis Pipeline (Reference+Old Reference)");
-					debugPipelineTest2.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchForReference(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment(),
-												m);
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new MaizeAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest3 = new JMenuItem(
-							"Barley Analysis Pipeline (Image+Reference)");
-					debugPipelineTest3.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								ArrayList<NumericMeasurementInterface> match = IAPservice
-										.getMatchFor(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment());
-								BlockPipeline.debugTryAnalysis(targetTreeNode.getExperiment(), match, m,
-										new BarleyAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
-					JMenuItem debugPipelineTest4 = new JMenuItem(
-							"Barley Analysis Pipeline (Reference+Old Reference)");
-					debugPipelineTest4.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchForReference(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(),
-												targetTreeNode.getExperiment(),
-												m);
-								
-								BlockPipeline.debugTryAnalysis(
-										targetTreeNode.getExperiment(),
-										match, m,
-										new BarleyAnalysisTask());
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getLocalizedMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
 					JMenuItem debugPipelineTest5 = new JMenuItem(
 							"Maize 3-D Analysis (Snapshot Images+References)");
 					debugPipelineTest5.addActionListener(new ActionListener() {
@@ -704,14 +476,67 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					sn.add(debugShowSnapshot);
 					jp.add(sn);
 					
-					jp.add(debugPipelineTest0a);
-					jp.add(debugPipelineTest00a);
-					jp.add(debugPipelineTest0b);
-					jp.add(debugPipelineTest00b);
-					jp.add(debugPipelineTest1);
-					jp.add(debugPipelineTest2);
-					jp.add(debugPipelineTest3);
-					jp.add(debugPipelineTest4);
+					for (final AbstractPhenotypingTask iat : new ImageAnalysisTasks().getKnownImageAnalysisTasks()) {
+						JMenuItem debugPipelineTest0a = new JMenuItem(
+								iat.getName() + " (Image+Reference)");
+						debugPipelineTest0a.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								try {
+									Collection<NumericMeasurementInterface> match = IAPservice
+											.getMatchFor(imageResult
+													.getBinaryFileInfo()
+													.getFileNameMain(),
+													targetTreeNode.getExperiment());
+									
+									BlockPipeline.debugTryAnalysis(
+											targetTreeNode.getExperiment(),
+											match, m,
+											iat);
+								} catch (Exception err) {
+									JOptionPane.showMessageDialog(null, "Error: "
+											+ err.getLocalizedMessage()
+											+ ". Command execution error.",
+											"Error",
+											JOptionPane.INFORMATION_MESSAGE);
+									ErrorMsg.addErrorMessage(err);
+									return;
+								}
+							}
+						});
+						
+						JMenuItem debugPipelineTest00a = new JMenuItem(
+								iat.getName() + " (Reference+Old Reference)");
+						debugPipelineTest00a.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								try {
+									Collection<NumericMeasurementInterface> match = IAPservice
+											.getMatchForReference(imageResult
+													.getBinaryFileInfo()
+													.getFileNameMain(),
+													targetTreeNode.getExperiment(),
+													m);
+									
+									BlockPipeline.debugTryAnalysis(
+											targetTreeNode.getExperiment(),
+											match, m,
+											iat);
+								} catch (Exception err) {
+									JOptionPane.showMessageDialog(null, "Error: "
+											+ err.getLocalizedMessage()
+											+ ". Command execution error.",
+											"Error",
+											JOptionPane.INFORMATION_MESSAGE);
+									ErrorMsg.addErrorMessage(err);
+									return;
+								}
+							}
+						});
+						
+						jp.add(debugPipelineTest0a);
+						jp.add(debugPipelineTest00a);
+					}
 					jp.add(debugPipelineTest5);
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -721,6 +546,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	JLabel mmlbl;
 	private boolean primary;
+	private String additionalFileNameInfo;
 	
 	public void updateLayout(String label, MyImageIcon icon,
 			ImageIcon previewImage) {
@@ -1490,5 +1316,17 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 			}
 		};
+	}
+	
+	@Override
+	public String getText() {
+		if (additionalFileNameInfo == null)
+			return super.getText();
+		else
+			return super.getText() + " (" + additionalFileNameInfo + ")";
+	}
+	
+	public void setAdditionalFileNameInfo(String additionalFileNameInfo) {
+		this.additionalFileNameInfo = additionalFileNameInfo;
 	}
 }

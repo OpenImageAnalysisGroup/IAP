@@ -231,7 +231,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 			FlexibleImage orig, int dilate, boolean debug) {
 		FlexibleImageStack fis = new FlexibleImageStack();
 		
-		if (!sideImage && !options.isHighResMaize()) {
+		if (!sideImage && !options.isHigherResVisCamera()) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 10);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
 			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98
@@ -279,8 +279,8 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 		if (debug)
 			fis.addImage("without blue parts", result);
 		
-		if (!sideImage || !options.isHighResMaize()) {
-			if (options.isHighResMaize()) {
+		if (!sideImage || !options.isHigherResVisCamera()) {
+			if (options.isHigherResVisCamera()) {
 				// remove black matts inside the holes
 				return result
 						.io()

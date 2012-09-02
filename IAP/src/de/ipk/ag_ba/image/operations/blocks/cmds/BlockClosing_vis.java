@@ -18,7 +18,7 @@ public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
 		int n = 3;
-		if (options.isHighResMaize())
+		if (options.isHigherResVisCamera())
 			n = 5;
 		FlexibleImage workImage = closing(mask, image, options.getBackground(), n);
 		return workImage;

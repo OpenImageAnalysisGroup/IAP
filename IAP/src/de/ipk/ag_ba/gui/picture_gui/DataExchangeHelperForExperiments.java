@@ -289,29 +289,15 @@ public class DataExchangeHelperForExperiments {
 												.getMeasurements((MeasurementNodeType) null)) {
 											if (nmi instanceof ImageData) {
 												ImageData id = (ImageData) nmi;
-												IOurl urlMain = new IOurl(id.getURL()
-														.toString()
-														+ " ("
-														+ s3d.toString() + ")");
-												IOurl urlLabel =
-														new IOurl(
-																(id != null && id.getLabelURL() != null ?
-																		id.getLabelURL().toString() : "[no label URL]")
-																		+ " (" + s3d.toString() + ")");
-												primary = new BinaryFileInfo(urlMain,
-														urlLabel, true, id);
+												IOurl urlMain = id.getURL();
+												IOurl urlLabel = id.getLabelURL();
+												primary = new BinaryFileInfo(urlMain, urlLabel, true, id, s3d.toString());
 											} else
 												if (nmi instanceof VolumeData) {
 													VolumeData id = (VolumeData) nmi;
-													IOurl urlMain = new IOurl(id.getURL()
-															.toString()
-															+ " ("
-															+ s3d.toString() + ")");
-													IOurl urlLabel = new IOurl(id
-															.getLabelURL().toString()
-															+ " (" + s3d.toString() + ")");
-													primary = new BinaryFileInfo(urlMain,
-															urlLabel, true, id);
+													IOurl urlMain = id.getURL();
+													IOurl urlLabel = id.getLabelURL();
+													primary = new BinaryFileInfo(urlMain, urlLabel, true, id, s3d.toString());
 												}
 											if (primary != null)
 												bbb.add(primary);
@@ -404,7 +390,7 @@ public class DataExchangeHelperForExperiments {
 						mt, imageResult, previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
-				
+				imageButton.setAdditionalFileNameInfo(binaryFileInfo.getAdditionalFileNameInfo());
 				imageButton.setDownloadNeeded(!FileSystemHandler
 						.isFileUrl(binaryFileInfo.getFileNameMain()));
 				imageButton.setVerticalTextPosition(SwingConstants.BOTTOM);

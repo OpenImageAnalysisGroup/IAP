@@ -31,8 +31,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.OpenExce
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.AnnotationFromGraphFileNameProvider;
+import de.ipk_gatersleben.ag_pbi.mmd.loaders.FileNameScanner;
 import de.ipk_gatersleben.ag_pbi.mmd.loaders.ImageLoader;
-import de.ipk_gatersleben.ag_pbi.mmd.loaders.MyScanner;
 
 /**
  * @author klukas
@@ -55,8 +55,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
-		
-		if (m == null) {
+		if (storeInMongo && m == null) {
 			Object[] sel = MyInputHelper.getInput("Select the database-target:", "Target Selection", new Object[] {
 					"Target", MongoDB.getMongos()
 			});
@@ -121,7 +120,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (newExperiment != null) {
 			res.add(src);
 			res.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(
-					new ExperimentReference(newExperiment.getHeader(), m),
+					new ExperimentReference(newExperiment),
 					src.getGUIsetting()));
 		}
 		return res;
@@ -134,14 +133,13 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	private static void processData(RunnableWithMappingData resultProcessor, ImageLoader il, ArrayList<File> fileList,
 			AnnotationFromGraphFileNameProvider provider) {
-		for (ExperimentInterface mdl : il.process(fileList, provider)) {
-			if (mdl != null) {
-				if (resultProcessor != null) {
+		if (fileList != null && provider != null)
+			for (ExperimentInterface mdl : il.process(fileList, provider)) {
+				if (mdl != null && resultProcessor != null) {
 					resultProcessor.setExperimenData(mdl);
 					resultProcessor.run();
 				}
 			}
-		}
 	}
 	
 	public static void prepareDataSetFromFileList(RunnableWithMappingData resultProcessor) {
@@ -156,7 +154,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			}
 		});
 		
-		String providedFileNameFormat = null;
 		HashMap<Integer, Condition> replicateNumber2conditionTemplate = null;
 		
 		Object[] lm = MyInputHelper.getInput(
@@ -222,19 +219,20 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			}
 		}
 		
-		MyScanner[] replicateIDs = AnnotationFromGraphFileNameProvider.getFileNameInfos(fileList, providedFileNameFormat,
+		String providedFileNameFormat = null;
+		FileNameScanner[] replicateIDs = AnnotationFromGraphFileNameProvider.getFileNameInfos(fileList, providedFileNameFormat,
 				replicateNumber2conditionTemplate);
-		HashSet<String> detectedConditions = getConditions(replicateIDs);
+		HashSet<String> detectedConditions = getGenotypes(replicateIDs);
 		if (replicateIDs == null || replicateIDs.length == 0) {
 			processData(resultProcessor, il, fileList, null);
 		} else
 			if (detectedConditions.size() > 0) {
-				HashMap<String, MyScanner> filename2scanner = new HashMap<String, MyScanner>();
-				for (MyScanner s : replicateIDs) {
+				HashMap<String, FileNameScanner> filename2scanner = new HashMap<String, FileNameScanner>();
+				for (FileNameScanner s : replicateIDs) {
 					filename2scanner.put(s.getFileName(), s);
 				}
 				HashMap<Integer, Condition> replId2ConditionInfo = new HashMap<Integer, Condition>();
-				for (MyScanner rId : filename2scanner.values())
+				for (FileNameScanner rId : filename2scanner.values())
 					replId2ConditionInfo.put(rId.getReplicateID(), getCondition(rId));
 				AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(replId2ConditionInfo,
 						filename2scanner);
@@ -286,8 +284,8 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 							for (int r = min; r <= max; r++)
 								replId2ConditionInfo.put(r, c);
 						}
-						HashMap<String, MyScanner> rrr = new HashMap<String, MyScanner>();
-						for (MyScanner s : replicateIDs) {
+						HashMap<String, FileNameScanner> rrr = new HashMap<String, FileNameScanner>();
+						for (FileNameScanner s : replicateIDs) {
 							rrr.put(s.getFileName(), s);
 						}
 						AnnotationFromGraphFileNameProvider provider = new AnnotationFromGraphFileNameProvider(
@@ -302,38 +300,42 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	 * @param rId
 	 * @return
 	 */
-	private static Condition getCondition(MyScanner rId) {
+	private static Condition getCondition(FileNameScanner rId) {
 		Condition c = new Condition(null);
-		c.setSpecies("Arabidopsis");
-		c.setGenotype(rId.getCondition());
+		if (rId.getSpecies() != null)
+			c.setSpecies(rId.getSpecies());
+		else
+			c.setSpecies("Arabidopsis");
+		c.setGenotype(rId.getGenotype());
+		c.setVariety(rId.getVariety());
 		return c;
 	}
 	
-	private static HashSet<String> getConditions(MyScanner[] replicateIDs) {
+	private static HashSet<String> getGenotypes(FileNameScanner[] replicateIDs) {
 		HashSet<String> res = new HashSet<String>();
-		for (MyScanner s : replicateIDs) {
-			String cond = s.getCondition();
-			if ((cond == null || cond.length() == 0) && s.getConditionTemplate() != null)
-				cond = s.getConditionTemplate().getName();
-			if (cond != null && cond.length() > 0)
-				res.add(cond);
+		for (FileNameScanner s : replicateIDs) {
+			String genotype = s.getGenotype();
+			if ((genotype == null || genotype.length() == 0) && s.getConditionTemplate() != null)
+				genotype = s.getConditionTemplate().getName();
+			if (genotype != null && genotype.length() > 0)
+				res.add(genotype);
 		}
 		return res;
 	}
 	
-	private static int lowestOrHighestReplicateID(boolean lowestTrue, MyScanner[] replicateIDs) {
+	private static int lowestOrHighestReplicateID(boolean lowestTrue, FileNameScanner[] replicateIDs) {
 		int res;
 		if (lowestTrue) {
 			// find lowest replicate ID
 			res = Integer.MAX_VALUE;
-			for (MyScanner s : replicateIDs) {
+			for (FileNameScanner s : replicateIDs) {
 				if (s.getReplicateID() < res)
 					res = s.getReplicateID();
 			}
 		} else {
 			// find highest replicate ID
 			res = Integer.MIN_VALUE;
-			for (MyScanner s : replicateIDs) {
+			for (FileNameScanner s : replicateIDs) {
 				if (s.getReplicateID() > res)
 					res = s.getReplicateID();
 			}
@@ -351,7 +353,10 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Add files";
+		if (storeInMongo)
+			return "Add files";
+		else
+			return "Load files";
 	}
 	
 	@Override

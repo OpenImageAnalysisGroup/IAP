@@ -178,6 +178,6 @@ public class BlLoadImagesIfNeeded_images extends
 					&& processedImages.fluo() != null
 					&& processedImages.vis().getHeight() > processedImages
 							.fluo().getHeight())
-				options.setHighResVisCamera(true);
+				options.setHigherResVisCamera(true);
 	}
 }

@@ -9,6 +9,8 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -38,7 +40,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
-		boolean addFilesIconAtMainLevel = false;
+		boolean addFilesIconAtMainLevel = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
 		if (addFilesIconAtMainLevel) {
 			NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
 			NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process files",

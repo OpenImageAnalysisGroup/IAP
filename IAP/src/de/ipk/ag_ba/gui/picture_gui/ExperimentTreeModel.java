@@ -46,17 +46,18 @@ public class ExperimentTreeModel implements TreeModel {
 		public void run() {
 			int p = 0;
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
-			for (SubstanceInterface substance : experiment) {
-				MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
-						substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
-				
-				substNode.setIsLeaf(false);
-				substNode.setTooltipInfo(substance.getHTMLdescription());
-				substNode.setIndex(p++);
-				substNode.setGetChildrenMethod(new GetConditions(substNode, experiment, substance, readOnly,
-						dataChangedListener));
-				children.add(substNode);
-			}
+			if (experiment != null)
+				for (SubstanceInterface substance : experiment) {
+					MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
+							substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
+					
+					substNode.setIsLeaf(false);
+					substNode.setTooltipInfo(substance.getHTMLdescription());
+					substNode.setIndex(p++);
+					substNode.setGetChildrenMethod(new GetConditions(substNode, experiment, substance, readOnly,
+							dataChangedListener));
+					children.add(substNode);
+				}
 			projectNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
 		}
 	}
@@ -232,7 +233,7 @@ public class ExperimentTreeModel implements TreeModel {
 	@Override
 	public Object getRoot() {
 		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, document, document,
-				document.getName(), isReadOnly);
+				document == null ? "NULL" : document.getName(), isReadOnly);
 		expNode.setSizeDirty(true);
 		try {
 			expNode.updateSizeInfo(m, dataChangedListener);
@@ -243,7 +244,8 @@ public class ExperimentTreeModel implements TreeModel {
 		expNode.setIsLeaf(false);
 		
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		document.fillAttributeMap(attributes);
+		if (document != null)
+			document.fillAttributeMap(attributes);
 		StringBuilder s = new StringBuilder();
 		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
 		for (String id : attributes.keySet()) {

@@ -87,6 +87,8 @@ public class ImageAnalysisCommandManager {
 			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
 			actions.add(ImageAnalysis.getBarleyEntity(m, experimentReference, 10, 15, guiSetting));
 			
+			actions.add(ImageAnalysis.getRootScannEntity(m, experimentReference, guiSetting));
+			
 			actions.add(ImageAnalysis.getMaize3dEntity(m, experimentReference, 10, 15, guiSetting));
 			
 			// actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,

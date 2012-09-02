@@ -59,9 +59,14 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 				if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.equals(IAPexperimentTypes.MaizeGreenhouse))
 					return IAPmain.loadIcon(IAPimages.getMaizeGreenhouse());
 				else
-					return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
+					if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
+							|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
+						return IAPmain.loadIcon(IAPimages.getRoots());
+					else
+						return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
 	}
 	
+	@Override
 	public NavigationImage getIconActive() {
 		return getIconInactive();
 	}

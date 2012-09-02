@@ -139,20 +139,24 @@ public class ExperimentReference {
 						}
 					}
 				}
-				if (databaseId.startsWith("lemnatec:"))
-					res = new LemnaTecDataExchange().getExperiment(header, interactiveGetExperimentSize, status);
-				else
-					if (databaseId.startsWith("hsm:")) {
-						res = HSMfolderTargetDataManager.getExperiment(databaseId);
-					} else
-						if (m != null)
-							res = m.getExperiment(header, interactiveGetExperimentSize, status);
-						else
-							res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
+				if (databaseId != null)
+					if (databaseId.startsWith("lemnatec:"))
+						res = new LemnaTecDataExchange().getExperiment(header, interactiveGetExperimentSize, status);
+					else
+						if (databaseId.startsWith("hsm:")) {
+							res = HSMfolderTargetDataManager.getExperiment(databaseId);
+						} else
+							if (m != null)
+								res = m.getExperiment(header, interactiveGetExperimentSize, status);
+							else
+								res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
 				// weakId2exp.put(databaseId, res);
 				this.experiment = res;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " + experiment.size() + " substances (DB ID "
-						+ res.getHeader().getDatabaseId() + ").");
+				if (res == null)
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded.");
+				else
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " +
+							experiment.size() + " substances (DB ID " + res.getHeader().getDatabaseId() + ").");
 				return res;
 			}
 		}

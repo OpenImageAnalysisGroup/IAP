@@ -9,7 +9,8 @@ public enum IAPexperimentTypes {
 	UnknownGreenhouse("LemnaTec (Other)", "Unknown"),
 	AnalysisResults("Analysis Results", "Unknown"),
 	Raps("Rapeseed", "Canola"),
-	ManualMeasurements("Manual Measurements", "Unknown");
+	ManualMeasurements("Manual Measurements", "Unknown"),
+	RootWaterScan("Roots (Scann)", "Barley Roots");
 	
 	private String title, species;
 	

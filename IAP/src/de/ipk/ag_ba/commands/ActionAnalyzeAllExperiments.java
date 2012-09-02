@@ -18,6 +18,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.roots.RootScannAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -118,6 +119,8 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			}
 			NavigationAction navigationAction = null;
 			System.out.println("Experiment-type: " + eh.getExperimentType());
+			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
+				navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
 			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
 				navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
 			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))

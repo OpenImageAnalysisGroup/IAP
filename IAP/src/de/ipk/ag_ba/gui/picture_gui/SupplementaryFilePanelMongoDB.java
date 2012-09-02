@@ -129,7 +129,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		ToolTipManager.sharedInstance().setDismissDelay(30000);
 		
 		// todo if mongo knows this ID as an experiment ID
-		boolean readOnly = doc.getHeader().getDatabaseId() != null;
+		boolean readOnly = doc != null && doc.getHeader() != null && doc.getHeader().getDatabaseId() != null;
 		
 		expTree = new JTree(new ExperimentTreeModel(this, m, doc, readOnly));
 		
@@ -174,7 +174,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							MongoTreeNode mtn = (MongoTreeNode) mt;
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
-								String msg = "<font color='black'>You may also use drag+drop to upload files to the database and to assign them to this entry";
+								String msg = "<font color='black'>You may also use drag+drop to add files to the currently selected entity of the experiment";
 								filePanel.setHeader(true, msg, false, true);
 							} else {
 								filePanel.setHeader(false,

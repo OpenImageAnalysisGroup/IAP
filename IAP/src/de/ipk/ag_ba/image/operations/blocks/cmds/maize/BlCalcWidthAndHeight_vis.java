@@ -50,7 +50,7 @@ public class BlCalcWidthAndHeight_vis extends
 		
 		int vertYsoilLevel = -1;
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE && options.isHighResMaize() && options.isBarley()
+		if (options.getCameraPosition() == CameraPosition.SIDE && options.isHigherResVisCamera() && options.isBarley()
 				&& options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS) > 0) {
 			vertYsoilLevel = visRes.getHeight() - options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS);
 		} else

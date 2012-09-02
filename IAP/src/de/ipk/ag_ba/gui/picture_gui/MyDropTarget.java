@@ -21,6 +21,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
@@ -229,31 +230,41 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.setToolTipText(file.getName());
 				
 				if (file.canRead()) {
-					imageButton.setProgressValue(-1);
-					DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertHashedFile(m, file,
-							imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
-									.getTargetEntity());
-					((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
-					if (md5 == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-						SupplementaryFilePanelMongoDB.showError("The file " + file.getName()
-								+ " could not be stored to the Database (Target-Table " + targetTreeNode.getTargetEntity(),
-								null);
+					if (m == null) {
+						MappingDataEntity target = targetTreeNode.getTargetEntity();
+						BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false,
+								targetTreeNode.getTargetEntity());
+						imageButton.imageResult = new ImageResult(icon, bfi);
+						System.out.println("TARGET: " + target);
+						imageButton.setProgressValue(100);
+						imageButton.hideProgressbar();
+					} else {
+						imageButton.setProgressValue(-1);
+						DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertHashedFile(m, file,
+								imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(), imageButton, targetTreeNode
+										.getTargetEntity());
+						((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
+						if (md5 == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+							SupplementaryFilePanelMongoDB.showError("The file " + file.getName()
+									+ " could not be stored to the Database (Target-Table " + targetTreeNode.getTargetEntity(),
+									null);
+						}
+						imageButton.setDownloadNeeded(true);
+						imageButton.downloadInProgress = false;
+						
+						BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false, targetTreeNode
+								.getTargetEntity());
+						
+						imageButton.imageResult = new ImageResult(icon, bfi);
+						imageButton.setProgressValue(100);
+						imageButton.hideProgressbar();
 					}
-					imageButton.setDownloadNeeded(true);
-					imageButton.downloadInProgress = false;
-					
-					BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false, targetTreeNode
-							.getTargetEntity());
-					
-					imageButton.imageResult = new ImageResult(icon, bfi);
-					imageButton.setProgressValue(100);
 					targetTreeNode.setSizeDirty(true);
 					try {
 						targetTreeNode.updateSizeInfo(m, targetTreeNode.getSizeChangedListener());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					imageButton.hideProgressbar();
 				}
 				if (deleteUponCompletion)
 					file.delete();

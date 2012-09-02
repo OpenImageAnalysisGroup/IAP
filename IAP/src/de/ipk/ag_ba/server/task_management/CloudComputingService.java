@@ -103,8 +103,9 @@ public class CloudComputingService {
 		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
 		System.out.println(fillLen("**", l));
-		System.out.println(fillLenLA("*  PI: Dr. Christian Klukas  *", ".", l, 2));
-		System.out.println(fillLenLA("*  Dr. Alexander Entzian  *", ".", l, 2));
+		System.out.println(fillLenLA("*  PI: Christian Klukas  *", ".", l, 2));
+		System.out.println(fillLenLA("*  Dijun Chen  *", ".", l, 2));
+		System.out.println(fillLenLA("*  Alexander Entzian  *", ".", l, 2));
 		System.out.println(fillLenLA("*  Jean-Michel Pape  *", ".", l, 2));
 		System.out.println(fillLen("**", l));
 		System.out.println("***************************************************");
@@ -311,6 +312,8 @@ public class CloudComputingService {
 			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 			HashSet<String> processedSubmissionTimes = new HashSet<String>();
 			for (ExperimentHeaderInterface i : el) {
+				if ((i.getExperimentType() + "").contains("Trash"))
+					continue;
 				String[] cc = i.getExperimentName().split("§");
 				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") && cc.length == 4) {
 					String className = cc[0];
@@ -475,8 +478,8 @@ public class CloudComputingService {
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
 			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
-			for (String c : condS)
-				System.out.println(">Condition: " + c);
+			// for (String c : condS)
+			// System.out.println(">Condition: " + c);
 			
 			StopWatch s = new StopWatch(">e.addMerge");
 			e.addAndMerge(ei);

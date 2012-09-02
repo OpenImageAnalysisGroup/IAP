@@ -49,7 +49,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 			int b1 = 14;
 			int b2 = 4;// (4 - 5); // options.getUnitTestIdx()
 			// very light yellow and green (background shadow, esp. in maize with 4 pot)
-			if (options.isHighResMaize()) {
+			if (options.isHigherResVisCamera()) {
 				vis = vis.filterRemoveLAB(240, 255, 110, 120, 125, 135, options.getBackground(), true).print("LIGHT BACKGROUND", debug);
 				if (fis != null)
 					fis.addImage("removed light white/green background", vis.getImage());
@@ -60,7 +60,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 				if (fis != null)
 					fis.addImage("removed light white pot", vis.getImage());
 			}
-			if (options.isHighResMaize()) { // black pot
+			if (options.isHigherResVisCamera()) { // black pot
 				vis = vis.filterRemoveLAB(0, 150, m - a1, m + a2, 100, 133, options.getBackground(), true).print("BLACK POT", debug);
 				if (fis != null)
 					fis.addImage("removed black pot", vis.getImage());
