@@ -30,6 +30,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.FolderPanel.Iconsize;
+import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -54,7 +55,7 @@ public class DataImportDialog {
 	 * @param templateLoader
 	 */
 	public Collection<ExperimentInterface> getExperimentMetadataFromUserByDialog(List<File> files_unfiltered,
-						TemplateLoaderMMD templateLoader, final List<ExperimentDataProcessor> optUseTheseAnnotationProviders) {
+			TemplateLoaderMMD templateLoader, final List<ExperimentDataProcessor> optUseTheseAnnotationProviders) {
 		
 		final TreeSet<File> files = new TreeSet<File>();
 		
@@ -66,10 +67,11 @@ public class DataImportDialog {
 					File f2 = new File(f.getAbsolutePath().replaceAll(".hdr", ".img"));
 					if (!f2.exists())
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								MainFrame.showMessageDialog(
-													"<html>No *.img file exists for the *.hdr file! Skipping import of<br><i>" + f,
-													"Error while importing!");
+										"<html>No *.img file exists for the *.hdr file! Skipping import of<br><i>" + f,
+										"Error while importing!");
 							}
 						});
 					else
@@ -123,6 +125,7 @@ public class DataImportDialog {
 		fp.addCollapseListenerDialogSizeUpdate();
 		
 		BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+			@Override
 			public void run() {
 				fp.dialogSizeUpdate();
 			}
@@ -130,30 +133,32 @@ public class DataImportDialog {
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-							"Requesting Annotations", "...");
+				"Requesting Annotations", "...");
 		BackgroundTaskHelper.issueSimpleTask("Requesting Annotations", "...", new Runnable() {
+			@Override
 			public void run() {
 				HashMap<File, ExperimentDataAnnotation> res = ExperimentDataAnnotationManager.getInstance()
-									.getExperimentAnnotation(optUseTheseAnnotationProviders, files);
+						.getExperimentAnnotation(optUseTheseAnnotationProviders, files);
 				tso.setParam(0, res);
 			}
 		}, new Runnable() {
+			@Override
 			@SuppressWarnings("unchecked")
 			public void run() {
 				HashMap<File, ExperimentDataAnnotation> res = (HashMap<File, ExperimentDataAnnotation>) tso.getParam(0,
-									null);
+						null);
 				for (ImportDialogFile idf : idflist)
 					idf.setAnnotation(res.get(idf.getFile()));
 			}
 		}, status, 1000);
 		
 		int n = JOptionPane.showConfirmDialog(MainFrame.getInstance(), fp, "Add Annotation for " + idflist.size()
-							+ " File" + (idflist.size() > 1 ? "s" : ""), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				+ " File" + (idflist.size() > 1 ? "s" : ""), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (n != 0)
 			return null;
 		
 		ExperimentInterface experiment = new Experiment();
-		
+		long fs = 0;
 		for (ImportDialogFile idf : idflist) {
 			SubstanceInterface md = Substance3D.createnewSubstance(idf.getSubstance());
 			
@@ -162,6 +167,7 @@ public class DataImportDialog {
 			series.setGenotype(idf.getGenotype());
 			series.setTreatment(idf.getTreatment());
 			series.setExperimentName(idf.getExperimentName());
+			series.setExperimentDatabaseOriginId(idf.getExperimentSrc());
 			series.setExperimentCoordinator(idf.getCoordinator());
 			series.setExperimentStartDate(idf.getStartdate());
 			series.setExperimentImportdate(new Date());
@@ -175,15 +181,21 @@ public class DataImportDialog {
 			series.add(sample);
 			
 			List<NumericMeasurementInterface> e1 = idf.getLoader().addMeasurementsToHierarchy(sample,
-								idf.getExperimentName());
+					idf.getExperimentName());
 			
 			if (e1 != null) {
 				sample.addAll(e1);
 				Substance3D.addAndMerge(experiment, md, false);
+				File f = idf.getFile();
+				if (f != null && f.exists() && f.canRead()) {
+					fs += f.length();
+				}
 			} else
 				ErrorMsg.addErrorMessage("File " + idf.getFile() + " could not be loaded. Ignoring...");
 		}
-		
+		experiment.getHeader().setNumberOfFiles(idflist.size());
+		experiment.getHeader().setSizekb(fs / 1024);
+		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
 		return experiment.split();
 	}
 	

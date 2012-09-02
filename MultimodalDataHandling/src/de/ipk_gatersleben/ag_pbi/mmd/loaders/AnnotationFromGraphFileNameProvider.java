@@ -37,10 +37,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataProcessor {
 	
 	private final HashMap<Integer, Condition> replId2ConditionInfo;
-	private final HashMap<String, MyScanner> fileName2scanner;
+	private final HashMap<String, FileNameScanner> fileName2scanner;
 	
 	public AnnotationFromGraphFileNameProvider(HashMap<Integer, Condition> replId2ConditionInfo,
-						HashMap<String, MyScanner> fileName2scanner) {
+			HashMap<String, FileNameScanner> fileName2scanner) {
 		this.replId2ConditionInfo = replId2ConditionInfo;
 		this.fileName2scanner = fileName2scanner;
 	}
@@ -49,6 +49,7 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Annotation from graph file name";
 	}
@@ -61,18 +62,20 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 		GregorianCalendar first = null;
 		GregorianCalendar last = null;
 		HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
-		
+		String parentFolderName = null;
 		for (File f : files) {
 			if (parentFolder == null) {
 				parentFolder = f.getParent();
+				parentFolderName = parentFolder;
 				if (parentFolder != null) {
+					
 					if (parentFolder.indexOf(File.separator) >= 0)
 						parentFolder = parentFolder.substring(parentFolder.lastIndexOf(File.separator)
-											+ File.separator.length());
+								+ File.separator.length());
 				}
 			}
 			String fn = f.getName();
-			MyScanner s = null;
+			FileNameScanner s = null;
 			try {
 				s = fileName2scanner.get(fn);
 				System.out.println(fn);
@@ -101,27 +104,37 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 					eda2day.put(eda, gc);
 					eda.setExpname(hs(parentFolder));
 					eda.setExpcoord(hs(SystemAnalysis.getUserName()));
-					
+					try {
+						eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@" + SystemAnalysis.getLocalHost().getCanonicalHostName() +
+								":" + parentFolderName));
+					} catch (Exception e) {
+						eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@localhost:" + parentFolderName));
+						
+					}
 					if (replId2ConditionInfo != null) {
 						Condition c = replId2ConditionInfo.get(replicateID);
 						if (c != null) {
 							eda.setCondspecies(hs(c.getSpecies()));
 							eda.setCondgenotype(hs(c.getGenotype()));
 							eda.setCondtreatment(hs(c.getTreatment()));
+							eda.setCondvariety(hs(c.getVariety()));
 						}
 					}
 					
 					if (s.getConditionTemplate() != null) {
 						Condition template = s.getConditionTemplate();
 						if (template.getConditionName() != null
-											&& !template.getSpecies().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+								&& !template.getSpecies().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 							eda.setCondspecies(hs(template.getSpecies()));
 						if (template.getGenotype() != null
-											&& !template.getGenotype().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+								&& !template.getGenotype().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 							eda.setCondgenotype(hs(template.getGenotype()));
 						if (template.getTreatment() != null
-											&& !template.getTreatment().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+								&& !template.getTreatment().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 							eda.setCondtreatment(hs(template.getTreatment()));
+						if (template.getVariety() != null
+								&& !template.getVariety().equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+							eda.setCondtreatment(hs(template.getVariety()));
 					}
 					
 					eda.setReplicateIDs(hs(replicateID));
@@ -214,14 +227,15 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 	 * org.graffiti.plugin.algorithm.EditorAlgorithm#activeForView(org.graffiti
 	 * .plugin.view.View)
 	 */
+	@Override
 	public boolean activeForView(View v) {
 		return false;
 	}
 	
-	public static MyScanner[] getFileNameInfos(ArrayList<File> fileList, String optProvidedFileNameFormat,
-						HashMap<Integer, Condition> optReplicate2conditionInfo) {
+	public static FileNameScanner[] getFileNameInfos(ArrayList<File> fileList, String optProvidedFileNameFormat,
+			HashMap<Integer, Condition> optReplicate2conditionInfo) {
 		try {
-			ArrayList<MyScanner> result = new ArrayList<MyScanner>();
+			ArrayList<FileNameScanner> result = new ArrayList<FileNameScanner>();
 			for (File f : fileList) {
 				String fn = f.getName();
 				String[] elements = fn.split("_");
@@ -236,58 +250,69 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 				 */
 				// [001, 2010-03-04 16, 24, 03, LT, FLUO, Side, 90Grad.png]
 				// 001_2010-03-04 16_24_03_LT_FLUO_Side_90Grad.png
-				MyScanner s = null;
+				FileNameScanner s = null;
 				if (optProvidedFileNameFormat != null) {
-					s = new MyScanner(optProvidedFileNameFormat, fn);
+					s = new FileNameScanner(optProvidedFileNameFormat, fn);
 				} else
-					if (elements != null && elements.length == 1) {
-						if (fn.endsWith("Grad.png")) {
-							s = new MyScanner("A'Grad'", fn);
-							s.setCondition("Unspecified");
-							s.setSubstance("RgbSide");
-						}
+					if (elements != null && elements.length == 1 && fn.endsWith(".jpg")) {
+						// process root scann images from GED
+						if (StringManipulationTools.count(fn, "-") == 2) {
+							// type 2: C1-17-P1256.jpg
+							s = new FileNameScanner("V-G-R", fn);
+						} else
+							if (StringManipulationTools.count(fn, "-") == 3) {
+								// type 1: Ep2-C1-3-P2428.jpg
+								s = new FileNameScanner("X-V-G-R", fn);
+							}
 					} else
-						if (elements != null && elements.length == 8) {
-							// 001
-							try {
-								s = new MyScanner("R_D X_X_X_X_S_S_A'Grad'", fn);
-							} catch (Exception er) {
-								s = new MyScanner("G_X_R_S_D_X", fn);
+						if (elements != null && elements.length == 1) {
+							if (fn.endsWith("Grad.png")) {
+								s = new FileNameScanner("A'Grad'", fn);
+								s.setCondition("Unspecified");
+								s.setSubstance("RgbSide");
 							}
-						} else {
-							boolean transferGerste = false;
-							if (transferGerste) {
-								fn = StringManipulationTools.stringReplace(fn, "_Side", "Side");
-								fn = StringManipulationTools.stringReplace(fn, "_Top", "Top");
-								fn = StringManipulationTools.stringReplace(fn, "RGB", "Rgb");
-								fn = StringManipulationTools.stringReplace(fn, "FLUO", "Fluo");
-								fn = StringManipulationTools.stringReplace(fn, "NIR", "Nir");
-								fn = StringManipulationTools.stringReplace(fn, ".png", "");
-								s = new MyScanner("R_D X_X_X_X_X_S_A'Grad'", fn);
-								/*
-								 * G = genotype, R = replicate ID, X = ignore, A =
-								 * rotation
-								 * (degree), D = date (yyyy-mm-dd), 'some string' = some
-								 * string (ignored, but may be used to divide strings)
-								 */
+						} else
+							if (elements != null && elements.length == 8) {
+								// 001
+								try {
+									s = new FileNameScanner("R_D X_X_X_X_S_S_A'Grad'", fn);
+								} catch (Exception er) {
+									s = new FileNameScanner("G_X_R_S_D_X", fn);
+								}
 							} else {
-								// WT_10_1394_RgbTopHL2_2010-06-28_07_43_31.png
-								//
-								// H13_01_1016_Fluo_Top_2010-06-18_07_40_05.png
-								// WT_04_1388_Nir_Top_2010-06-18_07_37_41.png
-								// H13_01_1016_FluoSide_90_Grad_HL2_2010-06-25_07_40_02.png
-								// H13_02_1020_RgbSide_0_Grad_HL2_2010-06-28_07_44_49.png
-								// WT_05_1389_NirSide_0_Grad_HL2_2010-06-28_07_40_16.png
-								if (fn.contains("Side_")) {
-									// side view
-									s = new MyScanner("G_X_R_S_A_X_D_X", fn);
-								} else
-									if (fn.contains("Top_")) {
-										// top view
-										s = new MyScanner("G_X_R_S_S_D_X", fn);
-									}
+								boolean transferGerste = false;
+								if (transferGerste) {
+									fn = StringManipulationTools.stringReplace(fn, "_Side", "Side");
+									fn = StringManipulationTools.stringReplace(fn, "_Top", "Top");
+									fn = StringManipulationTools.stringReplace(fn, "RGB", "Rgb");
+									fn = StringManipulationTools.stringReplace(fn, "FLUO", "Fluo");
+									fn = StringManipulationTools.stringReplace(fn, "NIR", "Nir");
+									fn = StringManipulationTools.stringReplace(fn, ".png", "");
+									s = new FileNameScanner("R_D X_X_X_X_X_S_A'Grad'", fn);
+									/*
+									 * G = genotype, R = replicate ID, X = ignore, A =
+									 * rotation
+									 * (degree), D = date (yyyy-mm-dd), 'some string' = some
+									 * string (ignored, but may be used to divide strings)
+									 */
+								} else {
+									// WT_10_1394_RgbTopHL2_2010-06-28_07_43_31.png
+									//
+									// H13_01_1016_Fluo_Top_2010-06-18_07_40_05.png
+									// WT_04_1388_Nir_Top_2010-06-18_07_37_41.png
+									// H13_01_1016_FluoSide_90_Grad_HL2_2010-06-25_07_40_02.png
+									// H13_02_1020_RgbSide_0_Grad_HL2_2010-06-28_07_44_49.png
+									// WT_05_1389_NirSide_0_Grad_HL2_2010-06-28_07_40_16.png
+									if (fn.contains("Side_")) {
+										// side view
+										s = new FileNameScanner("G_X_R_S_A_X_D_X", fn);
+									} else
+										if (fn.contains("Top_")) {
+											// top view
+											s = new FileNameScanner("G_X_R_S_S_D_X", fn);
+										}
+								}
 							}
-						}
 				if (s != null) {
 					if (optReplicate2conditionInfo != null && optReplicate2conditionInfo.containsKey(s.getReplicateID())) {
 						Condition c = optReplicate2conditionInfo.get(s.getReplicateID());
@@ -299,10 +324,10 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 					System.out.println("No scanner for: " + fn);
 				}
 			}
-			return result.toArray(new MyScanner[] {});
+			return result.toArray(new FileNameScanner[] {});
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new MyScanner[] {};
+			return new FileNameScanner[] {};
 		}
 	}
 }

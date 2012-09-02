@@ -51,6 +51,7 @@ public class ImportDialogFile extends JPanel {
 	private TemplateLoaderInterface loader;
 	
 	private JComboBoxAutoCompleteAndSelectOnTab combonameexp;
+	private JComboBoxAutoCompleteAndSelectOnTab comboexpsrc;
 	private JComboBoxAutoCompleteAndSelectOnTab combocoordinator;
 	private JComboBoxAutoCompleteAndSelectOnTab combostartdate;
 	private JComboBoxAutoCompleteAndSelectOnTab comboimportdate;
@@ -92,7 +93,7 @@ public class ImportDialogFile extends JPanel {
 		while (name.length() < 30)
 			name += " ";
 		add(TableLayout.getSplit(new JLabel("File " + (cnt + 1) + " (" + loader.toString() + "):"), new JLabel("<html>"
-							+ name), LEFTSIZE, RIGHTSIZE));
+				+ name), LEFTSIZE, RIGHTSIZE));
 		
 		addSeparator();
 		createExperimentDialog();
@@ -121,16 +122,17 @@ public class ImportDialogFile extends JPanel {
 		dataDuplicateBT = new JButton(ImportDialogFile.DUPLICATE_TEXT);
 		dataDuplicateBT.setToolTipText(ImportDialogFile.DUPLICATE_TOOLTIP);
 		dataDuplicateBT.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (ImportDialogFile idf : idflist)
 					idf.getLoader().setFormularData(loader, loader.getFormData());
 				MainFrame.getInstance().showMessageDialog(
-									"<html>Data-values marked with * were copied to<br>" + "all other formulars of type \""
-														+ loader.toString() + "\".");
+						"<html>Data-values marked with * were copied to<br>" + "all other formulars of type \""
+								+ loader.toString() + "\".");
 			}
 		});
 		add(TableLayout.getSplit(new JLabel("<html><small><hspace> *copied field "), dataDuplicateBT,
-							ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
 	}
 	
 	private void addSeparator() {
@@ -149,9 +151,11 @@ public class ImportDialogFile extends JPanel {
 		expFormDuplicateBT = new JButton(DUPLICATE_TEXT);
 		expFormDuplicateBT.setToolTipText(DUPLICATE_TOOLTIP);
 		expFormDuplicateBT.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (ImportDialogFile idf : idflist) {
 					idf.setExperimentName(getExperimentName());
+					idf.setExperimentSrc(getExperimentSrc());
 					idf.setCoordinator(getCoordinator());
 					idf.setStartdate(getStartdate());
 					idf.setImportdate(getImportdate());
@@ -161,10 +165,13 @@ public class ImportDialogFile extends JPanel {
 			}
 		});
 		add(TableLayout.getSplit(new JLabel("<html><large>Experiment:"), TableLayout.getSplit(null, expFormDuplicateBT,
-							100, 200), LEFTSIZE, RIGHTSIZE));
+				100, 200), LEFTSIZE, RIGHTSIZE));
 		combonameexp = new JComboBoxAutoCompleteAndSelectOnTab();
 		combonameexp.setEditable(true);
 		add(TableLayout.getSplit(new JLabel("Experimentname"), combonameexp, LEFTSIZE, RIGHTSIZE));
+		comboexpsrc = new JComboBoxAutoCompleteAndSelectOnTab();
+		comboexpsrc.setEditable(true);
+		add(TableLayout.getSplit(new JLabel("Experiment src"), comboexpsrc, LEFTSIZE, RIGHTSIZE));
 		combocoordinator = new JComboBoxAutoCompleteAndSelectOnTab();
 		combocoordinator.setEditable(true);
 		add(TableLayout.getSplit(new JLabel("Coordinator"), combocoordinator, LEFTSIZE, RIGHTSIZE));
@@ -183,6 +190,7 @@ public class ImportDialogFile extends JPanel {
 		condFormDuplicateBT = new JButton(DUPLICATE_TEXT);
 		condFormDuplicateBT.setToolTipText(DUPLICATE_TOOLTIP);
 		condFormDuplicateBT.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (ImportDialogFile idf : idflist) {
 					idf.setSpecies(getSpecies());
@@ -193,7 +201,7 @@ public class ImportDialogFile extends JPanel {
 			}
 		});
 		add(TableLayout.getSplit(new JLabel("<html><large>Condition:"), TableLayout.getSplit(null, condFormDuplicateBT,
-							100, 200), LEFTSIZE, RIGHTSIZE));
+				100, 200), LEFTSIZE, RIGHTSIZE));
 		combospecies = new JComboBoxAutoCompleteAndSelectOnTab();
 		combospecies.setEditable(true);
 		add(TableLayout.getSplit(new JLabel("Species"), combospecies, LEFTSIZE, RIGHTSIZE));
@@ -209,6 +217,7 @@ public class ImportDialogFile extends JPanel {
 		sampFormDuplicateBT = new JButton(DUPLICATE_TEXT);
 		sampFormDuplicateBT.setToolTipText(DUPLICATE_TOOLTIP);
 		sampFormDuplicateBT.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (ImportDialogFile idf : idflist) {
 					idf.setTime(getTime());
@@ -220,7 +229,7 @@ public class ImportDialogFile extends JPanel {
 			}
 		});
 		add(TableLayout.getSplit(new JLabel("<html><large>Sample:"), TableLayout.getSplit(null, sampFormDuplicateBT, 100,
-							200), LEFTSIZE, RIGHTSIZE));
+				200), LEFTSIZE, RIGHTSIZE));
 		spinnertimepoint = new JSpinnerSelectOnTab(new SpinnerNumberModel(-1, -1, 1000000, 1));
 		add(TableLayout.getSplit(new JLabel("Timepoint"), spinnertimepoint, LEFTSIZE, RIGHTSIZE));
 		combounit = new JComboBoxAutoCompleteAndSelectOnTab();
@@ -255,6 +264,13 @@ public class ImportDialogFile extends JPanel {
 		if (expname == null || expname.equals(""))
 			expname = ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME;
 		return expname;
+	}
+	
+	public String getExperimentSrc() {
+		String expsrc = getCorrectItem(comboexpsrc);
+		if (expsrc == null || expsrc.equals(""))
+			expsrc = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
+		return expsrc;
 	}
 	
 	public String getCommentar() {
@@ -332,6 +348,10 @@ public class ImportDialogFile extends JPanel {
 	
 	public void setExperimentName(String val) {
 		combonameexp.setSelectedItem(val);
+	}
+	
+	public void setExperimentSrc(String val) {
+		comboexpsrc.setSelectedItem(val);
 	}
 	
 	public void setCommentar(String val) {
@@ -419,6 +439,9 @@ public class ImportDialogFile extends JPanel {
 		for (String s : ed.getExpname())
 			combonameexp.addItem(s);
 		combonameexp.addSelectionOnTab();
+		for (String s : ed.getExpsrc())
+			comboexpsrc.addItem(s);
+		comboexpsrc.addSelectionOnTab();
 		for (String s : ed.getExpcoord())
 			combocoordinator.addItem(s);
 		combocoordinator.addSelectionOnTab();
@@ -452,5 +475,4 @@ public class ImportDialogFile extends JPanel {
 		if (loader != null)
 			loader.setAnnotation(ed);
 	}
-	
 }

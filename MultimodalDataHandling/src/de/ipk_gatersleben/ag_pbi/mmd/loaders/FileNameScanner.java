@@ -26,10 +26,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  * 
  * @author klukas
  */
-public class MyScanner {
+public class FileNameScanner {
 	
 	private int replicateID;
-	private String condition;
+	private String species, genotype, variety;
 	private int dateYear;
 	private int dateMonth;
 	private int dateDay;
@@ -41,7 +41,7 @@ public class MyScanner {
 	/**
 	 * needed by JUnit, don't use this constructor
 	 */
-	public MyScanner() {
+	public FileNameScanner() {
 	}
 	
 	public void setSubstance(String substance) {
@@ -49,20 +49,20 @@ public class MyScanner {
 	}
 	
 	public void setCondition(String condition) {
-		this.condition = condition;
+		this.genotype = condition;
 	}
 	
 	/**
 	 * G = genotype, R = replicate ID, X = ignore, A = rotation (degree), D =
 	 * date (yyyy-mm-dd), 'some string' = some string (ignored, but may be used
-	 * to divide strings)
+	 * to divide strings), S = substance, V = variety, P = species
 	 * Examples: "R_D X_X_X_X_S_S_A'Grad'", "G_X_R_S_A_X_X_D_X", "G_X_R_S_S_D_X"
 	 * 
 	 * @param fn
 	 * @param string
 	 * @throws Exception
 	 */
-	public MyScanner(String type, String fn) throws Exception {
+	public FileNameScanner(String type, String fn) throws Exception {
 		
 		this.fileName = fn;
 		
@@ -80,46 +80,63 @@ public class MyScanner {
 			type = StringManipulationTools.stringReplace(type, "'" + ignore + "'", "_");
 			fn = StringManipulationTools.stringReplace(fn, ignore, "_");
 		}
+		if (fn.endsWith(".jpg"))
+			fn = fn.substring(0, fn.length() - ".jpg".length());
+		if (fn.endsWith(".png"))
+			fn = fn.substring(0, fn.length() - ".png".length());
+		if (fn.endsWith(".tif"))
+			fn = fn.substring(0, fn.length() - ".tif".length());
 		
-		char lastChar = 0;
 		String remaining = fn;
-		for (char c : type.toCharArray()) {
-			if (lastChar > 0) {
-				String input = scan(remaining, c);
+		char[] types = (type + "#").toCharArray();
+		for (int iii = 0; iii < types.length;) {
+			char currType = types[iii++];
+			char nextType = types[iii++];
+			String input;
+			if (currType == '_' && remaining.startsWith("_")) {
+				remaining = remaining.substring(1);
+				input = scan(remaining, nextType);
+			} else {
+				input = scan(remaining, nextType);
 				try {
 					remaining = remaining.substring(input.length() + 1);
 				} catch (StringIndexOutOfBoundsException err) {
-					System.out.println("check: " + remaining + " // " + type);
-					break;
+					remaining = "";
 				}
-				if (lastChar == 'R') {
-					replicateID = Integer.parseInt(input);
-				}
-				if (lastChar == 'G') {
-					condition = input;
-				}
-				if (lastChar == 'S') {
-					if (substance == null)
-						substance = input;
-					else
-						substance += input;
-				}
-				if (lastChar == 'A') {
-					double degree = Integer.parseInt(input);
-					rotation = degree;// / 180 * Math.PI;
-				}
-				if (lastChar == 'D') {
-					String[] parts = input.split("-");
-					dateYear = Integer.parseInt(parts[0]);
-					dateMonth = Integer.parseInt(parts[1]);
-					dateDay = Integer.parseInt(parts[2]);
-				}
-				if (lastChar == 'X') {
-					// ignore
-				}
-				c = 0;
 			}
-			lastChar = c;
+			if (currType == 'R') {
+				replicateID = Integer.parseInt(StringManipulationTools.getNumbersFromString(input));
+			}
+			if (currType == 'G') {
+				genotype = input;
+			}
+			if (currType == 'P') {
+				species = input;
+			}
+			if (currType == 'V') {
+				variety = input;
+			}
+			if (currType == 'S') {
+				if (substance == null)
+					substance = input;
+				else
+					substance += input;
+			}
+			if (currType == 'A') {
+				double degree = Integer.parseInt(input);
+				rotation = degree;// / 180 * Math.PI;
+			}
+			if (currType == 'D') {
+				String[] parts = input.split("-");
+				dateYear = Integer.parseInt(parts[0]);
+				dateMonth = Integer.parseInt(parts[1]);
+				dateDay = Integer.parseInt(parts[2]);
+			}
+			if (currType == 'X') {
+				// ignore
+			}
+			if (nextType == '#' || remaining.isEmpty())
+				break;
 		}
 		
 		boolean b = false;
@@ -141,8 +158,12 @@ public class MyScanner {
 		return replicateID;
 	}
 	
-	public String getCondition() {
-		return condition;
+	public String getGenotype() {
+		return genotype;
+	}
+	
+	public String getVariety() {
+		return variety;
 	}
 	
 	public int getDateYear() {
@@ -175,5 +196,9 @@ public class MyScanner {
 	
 	public Condition getConditionTemplate() {
 		return conditionTemplate;
+	}
+	
+	public String getSpecies() {
+		return species;
 	}
 }
