@@ -40,7 +40,7 @@ public class ImageLoader extends TemplateLoaderMMD {
 		myAnnotationFromFileProviders.add(annotationProvider);
 		Collection<ExperimentInterface> c = did.getExperimentMetadataFromUserByDialog(files, this, myAnnotationFromFileProviders);
 		if (c == null)
-			return null;
+			return new ArrayList<ExperimentInterface>();
 		else
 			return new ArrayList<ExperimentInterface>(c);
 	}

@@ -328,6 +328,8 @@ public class StringManipulationTools implements HelperClass {
 		int findLength;
 		// the next statement has the side effect of throwing a null pointer
 		// exception if s is null.
+		if (s == null)
+			return s;
 		int stringLength = s.length();
 		if (find == null || (findLength = find.length()) == 0) {
 			// If there is nothing to find, we won't try and find it.

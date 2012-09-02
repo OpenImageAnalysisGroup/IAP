@@ -5,12 +5,14 @@ import java.util.LinkedHashSet;
 public class ExperimentDataAnnotation {
 	
 	private LinkedHashSet<String> expname;
+	private LinkedHashSet<String> expsrc;
 	private LinkedHashSet<String> expcoord;
 	private LinkedHashSet<String> expstartdate;
 	private LinkedHashSet<String> expimportdate;
 	private LinkedHashSet<String> condspecies;
 	private LinkedHashSet<String> condgenotype;
 	private LinkedHashSet<String> condtreatment;
+	private final LinkedHashSet<String> condvariety;
 	private LinkedHashSet<String> samptimepoint;
 	private LinkedHashSet<String> samptimeunit;
 	private LinkedHashSet<String> sampcomp;
@@ -23,12 +25,14 @@ public class ExperimentDataAnnotation {
 	public ExperimentDataAnnotation() {
 		super();
 		expname = new LinkedHashSet<String>();
+		expsrc = new LinkedHashSet<String>();
 		expcoord = new LinkedHashSet<String>();
 		expstartdate = new LinkedHashSet<String>();
 		expimportdate = new LinkedHashSet<String>();
 		condspecies = new LinkedHashSet<String>();
 		condgenotype = new LinkedHashSet<String>();
 		condtreatment = new LinkedHashSet<String>();
+		condvariety = new LinkedHashSet<String>();
 		samptimepoint = new LinkedHashSet<String>();
 		samptimeunit = new LinkedHashSet<String>();
 		sampcomp = new LinkedHashSet<String>();
@@ -43,12 +47,14 @@ public class ExperimentDataAnnotation {
 	public void mergeAnnotations(ExperimentDataAnnotation annotations) {
 		if (annotations != null) {
 			expname.addAll(annotations.getExpname());
+			expsrc.addAll(annotations.getExpsrc());
 			expcoord.addAll(annotations.getExpcoord());
 			expstartdate.addAll(annotations.getExpstartdate());
 			expimportdate.addAll(annotations.getExpimportdate());
 			condspecies.addAll(annotations.getCondspecies());
 			condgenotype.addAll(annotations.getCondgenotype());
 			condtreatment.addAll(annotations.getCondtreatment());
+			condvariety.addAll(annotations.getCondvariety());
 			samptimepoint.addAll(annotations.getSamptimepoint());
 			samptimeunit.addAll(annotations.getSamptimeunit());
 			sampcomp.addAll(annotations.getSampcomp());
@@ -66,6 +72,14 @@ public class ExperimentDataAnnotation {
 	
 	public LinkedHashSet<String> getExpname() {
 		return expname;
+	}
+	
+	public void setExpsrc(LinkedHashSet<String> expsrc) {
+		this.expsrc = expsrc;
+	}
+	
+	public LinkedHashSet<String> getExpsrc() {
+		return expsrc;
 	}
 	
 	public void setExpcoord(LinkedHashSet<String> expcoord) {
@@ -112,8 +126,16 @@ public class ExperimentDataAnnotation {
 		this.condtreatment = condtreatment;
 	}
 	
+	public void setCondvariety(LinkedHashSet<String> condvariety) {
+		this.condtreatment = condvariety;
+	}
+	
 	public LinkedHashSet<String> getCondtreatment() {
 		return condtreatment;
+	}
+	
+	public LinkedHashSet<String> getCondvariety() {
+		return condvariety;
 	}
 	
 	public void setSamptimepoint(LinkedHashSet<String> samptimepoint) {
