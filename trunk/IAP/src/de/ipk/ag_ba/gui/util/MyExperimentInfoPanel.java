@@ -187,6 +187,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		typeset.add(IAPexperimentTypes.PhytochamberBlueRubber + "");
 		typeset.add(IAPexperimentTypes.BarleyGreenhouse + "");
 		typeset.add(IAPexperimentTypes.MaizeGreenhouse + "");
+		typeset.add(IAPexperimentTypes.RootWaterScan + "");
 		typeset.add("Analysis Results");
 		typeset.add("Imported Analysis Results");
 		typeset.add("Climate");

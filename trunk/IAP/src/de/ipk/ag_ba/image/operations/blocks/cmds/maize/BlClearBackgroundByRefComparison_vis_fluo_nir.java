@@ -86,7 +86,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	protected FlexibleImage processFLUOmask() {
 		// return input().images().fluo();
 		if (input().images().fluo() != null && input().masks().fluo() != null) {
-			if ((options.isBarley() && options.isHighResMaize()))
+			if ((options.isBarley() && options.isHigherResVisCamera()))
 				return input().images().fluo();
 			else
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
@@ -207,7 +207,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 							.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
 							.print("result nir", debug).thresholdClearBlueBetween(150, 169).thresholdBlueHigherThan(240).border(2).getImage(); // 150 169 240
 				} else {
-					if (options.isHighResMaize())
+					if (options.isHigherResVisCamera())
 						return new ImageOperation(nir).compare()
 								.compareGrayImages(input().masks().nir(), 10, 23, options.getBackground())
 								.print("result nir", debug).thresholdBlueHigherThan(240).border(2).getImage();

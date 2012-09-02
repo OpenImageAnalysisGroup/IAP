@@ -264,7 +264,11 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
 							return IAPimages.getMaizeGreenhouse();
 						else
-							return "img/ext/network-workgroup.png";
+							if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
+									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
+								return IAPimages.getRoots();
+							else
+								return "img/ext/network-workgroup.png";
 			}
 			
 			@Override
@@ -282,7 +286,11 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
 							return IAPimages.getMaizeGreenhouse();
 						else
-							return "img/ext/network-workgroup-power.png";
+							if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
+									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
+								return IAPimages.getRoots();
+							else
+								return "img/ext/network-workgroup-power.png";
 			}
 			
 			@Override

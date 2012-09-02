@@ -81,6 +81,10 @@ public class IAPimages {
 		return "img/000Grad_3_.png";
 	}
 	
+	public static String getRoots() {
+		return "img/root.png";
+	}
+	
 	public static String getMaizeGreenhouse() {
 		return "img/maisMultiple.png";
 	}

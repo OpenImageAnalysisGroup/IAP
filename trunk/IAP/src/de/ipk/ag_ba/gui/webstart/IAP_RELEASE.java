@@ -3,6 +3,7 @@ package de.ipk.ag_ba.gui.webstart;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public enum IAP_RELEASE {
+	RELEASE_IAP_IMAGE_ANALYSIS_ROOTS("R40_2012-08-31_roots"),
 	RELEASE_IAP_IMAGE_ANALYSIS_BARLEY("R39_2012-08-20_barley"),
 	RELEASE_IAP_IMAGE_ANALYSIS_MAIZE("R39_2012-08-20_maize"),
 	RELEASE_IAP_IMAGE_ANALYSIS_ARABIDOPSIS("R39_2012-08-20_arabidopsis"),

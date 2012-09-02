@@ -56,12 +56,18 @@ public class HsmFtpDataSourceLevelForExperimentType implements DataSourceLevel {
 			if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)") || group.equals(IAPexperimentTypes.BarleyGreenhouse))
 				return IAPmain.loadIcon(IAPimages.getBarleyGreenhouse());
 			else
-				if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)") || group.equals(IAPexperimentTypes.MaizeGreenhouse))
+				if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)")
+						|| group.equals(IAPexperimentTypes.MaizeGreenhouse))
 					return IAPmain.loadIcon(IAPimages.getMaizeGreenhouse());
 				else
-					return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
+					if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
+							|| group.equals(IAPexperimentTypes.RootWaterScan))
+						return IAPmain.loadIcon(IAPimages.getRoots());
+					else
+						return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
 	}
 	
+	@Override
 	public NavigationImage getIconActive() {
 		return getIconInactive();
 	}

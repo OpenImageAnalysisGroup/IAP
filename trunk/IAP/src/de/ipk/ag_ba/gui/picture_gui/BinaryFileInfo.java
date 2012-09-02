@@ -20,6 +20,12 @@ public class BinaryFileInfo {
 	private IOurl fileNameMain, fileNameLabel;
 	private final boolean primary;
 	final MappingDataEntity entity;
+	private String additionalItemInfo;
+	
+	public BinaryFileInfo(IOurl fileNameMain, IOurl fileNameLabel, boolean primary, MappingDataEntity entity, String additionalItemInfo) {
+		this(fileNameMain, fileNameLabel, primary, entity);
+		this.additionalItemInfo = additionalItemInfo;
+	}
 	
 	public BinaryFileInfo(IOurl fileNameMain, IOurl fileNameLabel, boolean primary, MappingDataEntity entity) {
 		this.fileNameMain = fileNameMain;
@@ -61,5 +67,9 @@ public class BinaryFileInfo {
 	
 	public void setFileNameLabel(IOurl fileName) {
 		this.fileNameLabel = fileName;
+	}
+	
+	public String getAdditionalFileNameInfo() {
+		return additionalItemInfo;
 	}
 }

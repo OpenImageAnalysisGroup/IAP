@@ -276,7 +276,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private void startThread(Thread t) {
 		t.setPriority(Thread.MIN_PRIORITY);
 		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * 0.6 && SystemAnalysis.getMemoryMB()>4000) {
+				.getMemoryMB() * 0.6 && SystemAnalysis.getMemoryMB() > 4000) {
 			System.out.println();
 			System.out
 					.print(SystemAnalysis.getCurrentTime()
@@ -290,7 +290,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				.getMemoryMB() * 0.6) {
 			System.out.println();
 			System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
+					+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
 			t.run();
 		} else {
 			t.start();
@@ -560,7 +560,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				knownOutput.add(info);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
-				long time = is.firstEntry().getValue().getVIS().getParentSample().getSampleFineTimeOrRowId();
+				Long time = is.firstEntry().getValue().getVIS().getParentSample().getSampleFineTimeOrRowId();
+				if (time == null)
+					time = new Long(is.firstEntry().getValue().getVIS().getParentSample().getTime());
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}

@@ -89,9 +89,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = experimentReference.m != null
+			boolean imageAnalysis = header.getDatabaseId() == null || (experimentReference.m != null
 					|| header.getDatabaseId().startsWith("hsm:")
-					|| header.getDatabaseId().startsWith("lemnatec:");
+					|| header.getDatabaseId().startsWith("lemnatec:"));
 			getDefaultActions(
 					actions,
 					experimentReference,
@@ -105,7 +105,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 							experimentReference.m), src.getGUIsetting()));
 		}
 		
-		if (header != null
+		if (header != null && header.getDatabaseId() != null
 				&& !header.getDatabaseId().startsWith("lemnatec:")
 				&& (header.getImportusername() == null
 						|| header.getImportusername().equals("tomcat") || header
@@ -241,7 +241,9 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		ExperimentHeaderInterface header = experimentReference.getHeader();
 		long t = header.getStorageTime() != null ? header.getStorageTime().getTime() : header.getImportdate().getTime();
 		String add = "updated";
-		if (header.getStorageTime() != null && header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString())) {
+		if (header.getStorageTime() != null &&
+				(header.getExperimentType() != null &&
+				header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString()))) {
 			add = "input age " + SystemAnalysis.getWaitTime(
 					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>analysis";
 			t = header.getStorageTime().getTime();

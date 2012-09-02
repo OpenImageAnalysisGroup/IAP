@@ -87,7 +87,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			result = clearSides(result, width);
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (options.isBarley() && options.isHighResMaize()) {
+			if (options.isBarley() && options.isHigherResVisCamera()) {
 				int width = input().masks().vis().getWidth();
 				clearSides(result, width, 10);
 			}
@@ -147,7 +147,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 				result = clearSides(result, width, 10);
 			}
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (options.isBarley() && options.isHighResMaize()) {
+			if (options.isBarley() && options.isHigherResVisCamera()) {
 				int width = input().masks().fluo().getWidth();
 				clearSides(result, width, 10);
 			}
@@ -200,7 +200,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		}
 		FlexibleImage res = input().masks().nir();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			if (options.isBarley() && options.isHighResMaize()) {
+			if (options.isBarley() && options.isHigherResVisCamera()) {
 				int width = input().masks().nir().getWidth();
 				clearSides(res, width, 10);
 			}
