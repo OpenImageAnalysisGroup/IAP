@@ -8,8 +8,10 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
-import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootScannDetectZoom;
-import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsRemoveDarkBoxBorder;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootScanDetectZoom;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsAnalyzeSeparation;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsRemoveBoxAndNoise;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsSkeletonize;
 
 /**
  * Roots / Waterscan Pipeline
@@ -25,8 +27,10 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images.class);
 		p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
-		p.add(BlRootScannDetectZoom.class);
-		p.add(BlRootsRemoveDarkBoxBorder.class);
+		p.add(BlRootScanDetectZoom.class);
+		p.add(BlRootsRemoveBoxAndNoise.class);
+		p.add(BlRootsSkeletonize.class);
+		p.add(BlRootsAnalyzeSeparation.class);
 		return p;
 	}
 	

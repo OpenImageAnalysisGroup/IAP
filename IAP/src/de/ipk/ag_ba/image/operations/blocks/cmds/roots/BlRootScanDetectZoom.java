@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.roots;
 
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -12,20 +13,29 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlRootScannDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
-	boolean debug = false;
+public class BlRootScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
+	boolean debug = true;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage img = input().masks().vis();
 		options.setHigherResVisCamera(false);
 		if (img != null) {
-			int grayPixels = img.copy().io().invert().thresholdBlueHigherThan(10).countFilledPixels();
+			ResultsTableWithUnits rt = new ResultsTableWithUnits();
+			rt.incrementCounter();
+			
+			int whitePixels = img.copy().io().invert().thresholdBlueHigherThan(3).print("WHITE AREA", debug).countFilledPixels();
 			int allPixels = img.getWidth() * img.getHeight();
-			if (grayPixels / (double) allPixels > 0.85d) {
+			
+			if (whitePixels / (double) allPixels < 0.15d) {
 				options.setHigherResVisCamera(true);
-			}
+				rt.addValue("roots.zoom", 1);
+			} else
+				rt.addValue("roots.zoom", 0);
+			
+			getProperties().storeResults("RESULT_scan.", rt, getBlockPosition());
 		}
+		
 		return super.processVISmask();
 	}
 	

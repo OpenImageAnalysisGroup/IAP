@@ -46,7 +46,7 @@ public class RootScannAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Root Scann Analysis";
+		return "Root Scan Analysis";
 	}
 	
 	@Override
