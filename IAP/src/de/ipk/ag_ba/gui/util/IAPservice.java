@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -90,6 +91,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentCalculationService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -1029,6 +1031,7 @@ public class IAPservice {
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
+			c.add("# example config: 1116BA, auto, 10,30, klukas@ipk-gatersleben.de   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
 			LemnaTecDataExchange lde = new LemnaTecDataExchange();
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
@@ -1052,7 +1055,8 @@ public class IAPservice {
 				if (ehi.getImportdate() != null)
 					if (System.currentTimeMillis() - ehi.getImportdate().getTime() < 24 * 60 * 60 * 1000)
 						if (ehi.getExperimentName() != null) {
-							String s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",0:00,23:59,0:00,23:59,30," + (String) inp[0];
+							String s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",auto,10,30" + (String) inp[0];
+							// s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",0:00,23:59,0:00,23:59,30," + (String) inp[0];
 							c.add(s);
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">ADD WATCH ENTRY: " + s);
 						}
@@ -1062,6 +1066,10 @@ public class IAPservice {
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
 		long startTime = System.currentTimeMillis();
+		
+		boolean containsAutoTimingSetting = true;
+		HashMap<String, BitSet> experimentId2minutesWithDataFromLastDay = new HashMap<String, BitSet>();
+		int autoTimeingLastInfoDay = -1;
 		while (true) {
 			boolean createVideo = true;
 			if (createVideo) {
@@ -1081,7 +1089,11 @@ public class IAPservice {
 			boolean foundSomeError = false;
 			ArrayList<String> errorMessages = new ArrayList<String>();
 			if (smallestTimeFrame == Integer.MAX_VALUE) {
-				AttributeHelper.showInBrowser(experimentListFileName);
+				try {
+					AttributeHelper.showInFileBrowser(ReleaseInfo.getAppSubdirFolder("watch"), "watch.txt");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} else {
 				LemnaTecDataExchange lde = new LemnaTecDataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
@@ -1113,6 +1125,31 @@ public class IAPservice {
 				for (ExperimentHeaderInterface ehi : el) {
 					for (WatchConfig wc : configList) {
 						if (ehi.getExperimentName() != null && ehi.getExperimentName().equals(wc.getExperimentName())) {
+							if (wc.grace > 0) {
+								GregorianCalendar gc = new GregorianCalendar();
+								int currentDay = gc.get(GregorianCalendar.DAY_OF_YEAR);
+								if (containsAutoTimingSetting) {
+									if (autoTimeingLastInfoDay != currentDay) {
+										try {
+											experimentId2minutesWithDataFromLastDay.put(ehi.getDatabaseId(), new BitSet(24 * 3600));
+											ExperimentInterface experimentData = new ExperimentReference(ehi).getData((MongoDB) null);
+											BitSet lastDaysMinutes = experimentId2minutesWithDataFromLastDay.get(ehi.getDatabaseId());
+											for (SampleInterface sample : new ExperimentCalculationService(experimentData).getSamplesFromYesterDay()) {
+												Sample3D s3d = (Sample3D) sample;
+												int sampleMinuteOfDay = ExperimentCalculationService.getMinuteOfDayFromSampleTime(s3d.getTime(),
+														s3d.getSampleFineTimeOrRowId());
+												for (int offset = -wc.grace; offset <= wc.grace; offset++) {
+													lastDaysMinutes.set(sampleMinuteOfDay + offset);
+												}
+											}
+											autoTimeingLastInfoDay = currentDay;
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								}
+							}
+							
 							String lastUpdateText = (ehi.getImportdate() != null ?
 									" (last update " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK " + ehi.getExperimentName() +

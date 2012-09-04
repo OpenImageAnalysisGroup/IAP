@@ -421,4 +421,13 @@ public class ExperimentCalculationService {
 				res.add(idx2day.get(idx));
 		return res;
 	}
+	
+	public ArrayList<SampleInterface> getSamplesFromYesterDay() {
+		return null;
+	}
+	
+	public static int getMinuteOfDayFromSampleTime(int time, Long sampleFineTimeOrRowId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
