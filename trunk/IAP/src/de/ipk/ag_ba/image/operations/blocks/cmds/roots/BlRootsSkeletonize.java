@@ -3,6 +3,9 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.roots;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -34,8 +37,15 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			ImageOperation inp = img.io().print("INPUT FOR SKEL", debug);
 			
 			rt.addValue("roots.filled.pixels", inp.countFilledPixels());
+			ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
+			{
+				int width = 1;
+				int pixelCnt = 0;
+				ImageOperation image = binary.copy();
+				widthHistogram(rt, image);
+			}
 			
-			inp = inp.binary(Color.BLACK.getRGB(), background).skeletonize().print("INPUT FOR BRANCH DETECTION", debug);
+			inp = binary.skeletonize().print("INPUT FOR BRANCH DETECTION", debug);
 			
 			rt.addValue("roots.skeleton.length", inp.countFilledPixels());
 			
@@ -51,6 +61,47 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			getProperties().storeResults("RESULT_scan.", rt, getBlockPosition());
 		}
 		return img;
+	}
+	
+	private void widthHistogram(ResultsTableWithUnits rt, ImageOperation image) {
+		HashMap<Integer, Integer> width2len = new HashMap<Integer, Integer>();
+		double area = 80;
+		int width = 1;
+		int pixelCnt;
+		do {
+			area -= Math.random() * 20d;
+			pixelCnt = (int) area;
+			if (pixelCnt > 0) {
+				width2len.put(width, pixelCnt);
+				image = image.erode();
+				width++;
+			}
+		} while (pixelCnt > 0);
+		width--;
+		int over19 = 0;
+		for (int w = 1; w <= width; w++) {
+			Integer len = width2len.get(w);
+			if (len == null)
+				len = 0;
+			Integer subtract = 0;
+			if (w < width) {
+				subtract = width2len.get(w + 1);
+				if (subtract == null)
+					subtract = 0;
+			}
+			int realLen = len - subtract;
+			int www = width - w + 1;
+			if (w == 1 && www < 19) {
+				for (int wm = www + 1; wm <= 19; wm++)
+					rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(wm, "00") + ".length", 0);
+			}
+			if (www > 19)
+				over19 += realLen;
+			else
+				rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(www, "00") + ".length", realLen);
+			subtract += len;
+		}
+		rt.addValue("roots.skeleton.width.20.length", over19);
 	}
 	
 	/**

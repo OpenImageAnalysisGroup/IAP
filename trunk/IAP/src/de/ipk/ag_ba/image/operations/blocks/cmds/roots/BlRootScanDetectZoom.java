@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @author klukas
  */
 public class BlRootScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	protected FlexibleImage processVISmask() {

@@ -5,32 +5,46 @@ import java.util.Date;
 public class WatchConfig {
 	String database, label;
 	int h1_st, h2_st, h1_end, h2_end, minute1_st, minute2_st, minute1_end, minute2_end, lastMinutes;
-	
+	int grace;
 	String mails;
 	
 	WatchConfig(String conf) {
 		String[] parts = conf.split(",");
-		if (parts.length != 8)
-			throw new UnsupportedOperationException("Invalid config entry (" + conf + "), needs 6 defined parts");
+		if (parts.length != 8 && parts.length != 5)
+			throw new UnsupportedOperationException("Invalid config entry (" + conf + "), needs 8 or 5 defined parts");
 		int i = 0;
 		
 		database = parts[i++].trim();
 		label = parts[i++].trim();
 		
-		h1_st = Integer.parseInt(parts[i].trim().split(":")[0]);
-		minute1_st = Integer.parseInt(parts[i++].trim().split(":")[1]);
-		
-		h1_end = Integer.parseInt(parts[i].trim().split(":")[0]);
-		minute1_end = Integer.parseInt(parts[i++].trim().split(":")[1]);
-		
-		h2_st = Integer.parseInt(parts[i].trim().split(":")[0]);
-		minute2_st = Integer.parseInt(parts[i++].trim().split(":")[1]);
-		
-		h2_end = Integer.parseInt(parts[i].trim().split(":")[0]);
-		minute2_end = Integer.parseInt(parts[i++].trim().split(":")[1]);
-		
+		if (parts[i].trim().equalsIgnoreCase("auto")) {
+			i++;
+			grace = Integer.parseInt(parts[i++].trim().split(":")[0]);
+			h1_st = -1;
+			minute1_st = -1;
+			
+			h1_end = -1;
+			minute1_end = -1;
+			
+			h2_st = -1;
+			minute2_st = -1;
+			
+			h2_end = -1;
+			minute2_end = -1;
+		} else {
+			h1_st = Integer.parseInt(parts[i].trim().split(":")[0]);
+			minute1_st = Integer.parseInt(parts[i++].trim().split(":")[1]);
+			
+			h1_end = Integer.parseInt(parts[i].trim().split(":")[0]);
+			minute1_end = Integer.parseInt(parts[i++].trim().split(":")[1]);
+			
+			h2_st = Integer.parseInt(parts[i].trim().split(":")[0]);
+			minute2_st = Integer.parseInt(parts[i++].trim().split(":")[1]);
+			
+			h2_end = Integer.parseInt(parts[i].trim().split(":")[0]);
+			minute2_end = Integer.parseInt(parts[i++].trim().split(":")[1]);
+		}
 		lastMinutes = Integer.parseInt(parts[i++].trim());
-		
 		mails = parts[i++];
 	}
 	
