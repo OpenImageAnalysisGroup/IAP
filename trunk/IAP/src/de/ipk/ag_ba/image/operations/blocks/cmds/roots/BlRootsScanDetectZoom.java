@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * 
  * @author klukas
  */
-public class BlRootScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override

@@ -3075,12 +3075,12 @@ public class MongoDB {
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
 					final ArrayList<String> ids = new ArrayList<String>();
 					for (String condID : dbIdsOfConditions) {
-						n.addInt(0);
 						ids.add(condID);
 						if (ids.size() >= 5000) {
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
+									n.addInt(1);
 									BasicDBList list = new BasicDBList();
 									synchronized (ids) {
 										for (String coID : ids)
@@ -3138,42 +3138,42 @@ public class MongoDB {
 							ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
 							// no changes in between
 							DBCursor fl = gridfs.getFileList();
-							int n = 0;
 							while (fl.hasNext()) {
 								DBObject dbo = fl.next();
 								GridFSDBFile f = (GridFSDBFile) dbo;
 								String md5 = f.getFilename();
-								n++;
-								status.setCurrentStatusText2("Check " + n + ": " + md5);
-								if (!linkedHashes.contains(md5))
+								if (!linkedHashes.contains(md5)) {
 									toBeRemoved.add(f);
+									status.setCurrentStatusText2("Not linked files " + toBeRemoved.size());
+								}
 							}
 							System.out.println("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
 									+ SystemAnalysis.getCurrentTime());
 							res.append("REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
 									+ SystemAnalysis.getCurrentTime() + "<br>");
-							long free = 0;
-							int fIdx = 0;
-							int fN = toBeRemoved.size();
+							final ThreadSafeOptions free = new ThreadSafeOptions();
+							final ThreadSafeOptions fIdx = new ThreadSafeOptions();
+							final int fN = toBeRemoved.size();
 							for (final GridFSDBFile f : toBeRemoved) {
-								free += f.getLength();
 								executor.submit(new Runnable() {
 									@Override
 									public void run() {
 										gridfs.remove(f);
+										free.addLong(f.getLength());
+										fIdx.addInt(1);
+										status.setCurrentStatusText1("File " + fIdx.getInt() +
+												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)");
+										status.setCurrentStatusText2("Removed: " + free.getLong() / 1024 / 1024 + " MB");
+										status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
 									}
 								});
-								fIdx++;
-								status.setCurrentStatusText1("File " + fIdx + "/" + fN + " (" + (int) (100d * fIdx / fN) + "%)");
-								status.setCurrentStatusText2("Removed: " + free / 1024 / 1024 + " MB");
-								status.setCurrentStatusValueFine(fIdx * 100d / fN);
 							}
-							System.out.println("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
+							System.out.println("REORGANIZATION: Deleted MB (" + mgfs + "): " + free.getLong() / 1024 / 1024 + " // "
 									+ SystemAnalysis.getCurrentTime());
-							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free / 1024 / 1024 + " // "
+							res.append("REORGANIZATION: Deleted MB (" + mgfs + "): " + free.getLong() / 1024 / 1024 + " // "
 									+ SystemAnalysis.getCurrentTime() + "<br>");
 							
-							freeAll += free;
+							freeAll += free.getLong();
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);
 					}
