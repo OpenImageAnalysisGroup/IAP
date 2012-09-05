@@ -1,13 +1,23 @@
 package de.ipk.ag_ba.gui.util;
 
+import java.awt.AWTException;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.imageio.ImageIO;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -20,6 +30,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.AttributeHelper;
 import org.ReleaseInfo;
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.mongo.HttpBasicAuth;
@@ -49,11 +60,10 @@ public class IAPmail {
 						);
 			message.setSubject(aSubject);
 			
+			Multipart mp = new MimeMultipart();
 			if (optImageSource != null && !optImageSource.isEmpty()) {
 				// load remote image and add it to the mail
 				try {
-					Multipart mp = new MimeMultipart();
-					
 					MimeBodyPart img = new MimeBodyPart();
 					img.setDataHandler(new DataHandler(new DataSource() {
 						
@@ -92,21 +102,80 @@ public class IAPmail {
 					}));
 					img.setFileName(fileName);
 					mp.addBodyPart(img);
-					MimeBodyPart txt = new MimeBodyPart();
-					txt.setText("\n" + aBody);
-					mp.addBodyPart(txt);
-					message.setContent(mp);
 				} catch (Exception e) {
 					message.setText(aBody + "\n\nWebcam-Image could not be loaded. Eventually the Webcam is turned off.\nError: " + e.getMessage());
 				}
-			} else {
-				message.setText(aBody);
 			}
+			try {
+				boolean takeScreenShot = true;
+				if (takeScreenShot) {
+					if (!GraphicsEnvironment.isHeadless()) {
+						createScreenshotAndAttachToMail(mp);
+						
+					}
+				}
+			} catch (Exception e) {
+				System.err.println("Could not create desktop screenshot!");
+				e.printStackTrace();
+			}
+			MimeBodyPart txt = new MimeBodyPart();
+			txt.setText("\n" + aBody);
+			mp.addBodyPart(txt);
+			message.setContent(mp);
+			
+			// } else {
+			// message.setText(aBody);
+			// }
 			
 			Transport.send(message);
 		} catch (MessagingException ex) {
 			System.err.println("Cannot send email. " + ex);
 		}
+	}
+	
+	private void createScreenshotAndAttachToMail(Multipart mp) throws AWTException, MessagingException {
+		Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+		final BufferedImage capture = new Robot().createScreenCapture(screenRect);
+		String fileN;
+		try {
+			fileN = SystemAnalysis.getLocalHost().getCanonicalHostName() + " (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+			fileN = "unknown host (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
+		}
+		final String fileName = fileN;
+		MimeBodyPart img = new MimeBodyPart();
+		img.setDataHandler(new DataHandler(new DataSource() {
+			
+			@Override
+			public OutputStream getOutputStream() throws IOException {
+				return null;
+			}
+			
+			@Override
+			public String getName() {
+				return fileName;
+			}
+			
+			@Override
+			public InputStream getInputStream() throws IOException {
+				try {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ImageIO.write(capture, "png", baos);
+					InputStream is = new ByteArrayInputStream(baos.toByteArray());
+					return is;
+				} catch (Exception e) {
+					throw new IOException(e.getMessage());
+				}
+			}
+			
+			@Override
+			public String getContentType() {
+				return "image/png";
+			}
+		}));
+		img.setFileName(fileName);
+		mp.addBodyPart(img);
 	}
 	
 	private static Properties fMailServerConfig = new Properties();
