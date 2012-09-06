@@ -3066,7 +3066,7 @@ public class MongoDB {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS");
 				}
 				{
-					executor = Executors.newFixedThreadPool(1);
+					executor = Executors.newFixedThreadPool(2);
 					final ThreadSafeOptions n = new ThreadSafeOptions();
 					final long max = dbIdsOfConditions.size();
 					final DBCollection conditions = db.getCollection("conditions");
@@ -3080,7 +3080,7 @@ public class MongoDB {
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
-									n.addInt(1);
+									n.addInt(5000);
 									BasicDBList list = new BasicDBList();
 									synchronized (ids) {
 										for (String coID : ids)
@@ -3114,6 +3114,9 @@ public class MongoDB {
 						conditions.remove(
 								new BasicDBObject("_id", new BasicDBObject("$in", list)),
 								WriteConcern.NONE);
+						n.addInt(list.size());
+						status.setCurrentStatusValueFine(100d / max * n.getInt());
+						status.setCurrentStatusText2(n.getInt() + "/" + max);
 					}
 					
 					status.setCurrentStatusValueFine(100d / max * n.getInt());
