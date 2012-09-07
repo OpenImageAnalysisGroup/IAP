@@ -114,7 +114,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					if ((firstStatusProgress < 0.1 || firstStatusUpdate < 0 || firstStatusProgress > finishedJobs) && part_cnt != 0 && firstSubmission != null) {
 						firstStatusUpdate = ct;
 						firstStatusProgress = finishedJobs;
-						System.out.println(">progress init");
+						// System.out.println(">progress init");
 					}
 					
 					if (ct > firstStatusUpdate && firstSubmission != null) {

@@ -129,9 +129,16 @@ public class CloudComputingService {
 			System.out.println("System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#"));
 			System.exit(0);
 		} else
-			if (args.length > 0 && args[0].toLowerCase().startsWith("watch") ||
-					(args.length > 1 && args[1].startsWith("watch"))) {
-				System.out.println(": watch - monitoring the experiment data progress");
+			if ((args.length > 0 && args[0].toLowerCase().startsWith("watch")) ||
+					(args.length > 1 && args[1].startsWith("watch")) ||
+					(args.length > 0 && args[0].toLowerCase().startsWith("watch-cmd")) ||
+					(args.length > 1 && args[1].startsWith("watch-cmd"))) {
+				if ((args.length > 0 && args[0].toLowerCase().startsWith("watch-cmd")) ||
+						(args.length > 1 && args[1].startsWith("watch-cmd"))) {
+					System.out.println(": watch-cmd - monitoring the experiment data progress (auto-closing at 2 AM)");
+					IAPservice.autoCloseAt(2);
+				} else
+					System.out.println(": watch - monitoring the experiment data progress");
 				try {
 					IAPservice.monitorExperimentDataProgress();
 				} catch (Exception e) {
@@ -244,6 +251,8 @@ public class CloudComputingService {
 																System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
 																System.out
 																		.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
+																System.out
+																		.println("   'watch-cmd' - same as watch, but auto-closing at 2 AM in the morning (for scripted execution)");
 															}
 														}
 								}

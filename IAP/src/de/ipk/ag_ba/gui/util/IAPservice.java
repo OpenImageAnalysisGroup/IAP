@@ -113,6 +113,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class IAPservice {
+	static boolean createVideo = false;
+	
 	public static boolean isReachable(String host) {
 		InetAddress address;
 		try {
@@ -1033,7 +1035,8 @@ public class IAPservice {
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
-			c.add("# example config: 1116BA, auto, 10,30, klukas@ipk-gatersleben.de   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
+			c.add("# Remark: If the email-address klukas@ipk-gatersleben.de is missing, it is automatically included in the send-command.");
+			// c.add("# example config: 1116BA, auto, 10,30, klukas@ipk-gatersleben.de   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
 			LemnaTecDataExchange lde = new LemnaTecDataExchange();
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
@@ -1047,6 +1050,8 @@ public class IAPservice {
 				}
 			}
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Hint 1: To input multiple addresses, split them with ':', don't add spaces.");
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Hint 2: The email-address of the developer (klukas@...) is automatically included.");
 			Object[] inp = MyInputHelper.getInput("Please enter the desired mail-addresses:", "Target Mail", new Object[] {
 					"Mail 1:Mail 2", "klukas@ipk-gatersleben.de"
 			});
@@ -1057,8 +1062,9 @@ public class IAPservice {
 				if (ehi.getImportdate() != null)
 					if (System.currentTimeMillis() - ehi.getImportdate().getTime() < 24 * 60 * 60 * 1000)
 						if (ehi.getExperimentName() != null) {
-							String s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",auto,10,30" + (String) inp[0];
-							// s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",0:00,23:59,0:00,23:59,30," + (String) inp[0];
+							String
+							// s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",auto,10,30" + (String) inp[0];
+							s = ehi.getDatabase() + "," + ehi.getExperimentName() + ",0:00,23:59,0:00,23:59,30," + (String) inp[0];
 							c.add(s);
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">ADD WATCH ENTRY: " + s);
 						}
@@ -1069,11 +1075,10 @@ public class IAPservice {
 		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
 		long startTime = System.currentTimeMillis();
 		
-		boolean containsAutoTimingSetting = true;
+		boolean containsAutoTimingSetting = false;
 		HashMap<String, BitSet> experimentId2minutesWithDataFromLastDay = new HashMap<String, BitSet>();
 		int autoTimeingLastInfoDay = -1;
 		while (true) {
-			boolean createVideo = true;
 			if (createVideo) {
 				storeImages(cam2lastSnapshot);
 			}
@@ -1446,5 +1451,32 @@ public class IAPservice {
 					}
 			}
 		return executionTrayCount;
+	}
+	
+	public static void autoCloseAt(final int hour) {
+		Thread autoClose = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					// wait 5 minutes, this wait prevents that the app is closed immediately upon restart
+					Thread.sleep(5 * 60 * 1000);
+					// start monitoring
+					int timeHour, timeMinute;
+					do {
+						Thread.sleep(5 * 1000); // wait 5 seconds
+						timeHour = SystemAnalysis.getCurrentTimeHour();
+						timeMinute = SystemAnalysis.getCurrentTimeMinute();
+					} while (timeHour != hour && timeMinute != 0);
+					MongoDB.saveSystemMessage("TIMED AUTO-CLOSE (host " + SystemAnalysisExt.getHostNameNiceNoError() +
+							"): SYSTEM.EXIT(0)");
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">TIMED AUTO-CLOSE: SYSTEM.EXIT(0)");
+					System.exit(0);
+				} catch (InterruptedException e) {
+					// empty
+				}
+			}
+		});
+		autoClose.setName("Auto close at " + hour + ":00");
+		autoClose.start();
 	}
 }

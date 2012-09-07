@@ -394,4 +394,14 @@ public class SystemAnalysis {
 		}
 		return iAddresses;
 	}
+	
+	@SuppressWarnings("deprecation")
+	public static int getCurrentTimeHour() {
+		return new Date().getHours();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static int getCurrentTimeMinute() {
+		return new Date().getMinutes();
+	}
 }
