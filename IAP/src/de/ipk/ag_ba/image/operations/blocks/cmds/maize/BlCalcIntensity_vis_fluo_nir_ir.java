@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
-import ij.measure.ResultsTable;
-
 import org.SystemAnalysis;
 import org.graffiti.plugin.parameter.Parameter;
 
@@ -86,7 +84,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 		
 		ResultsTableWithUnits rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 				options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS);
-		getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".vis.", rt1, getBlockPosition());
+		getProperties().storeResults(resultPrefix + ".vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
@@ -142,7 +140,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 				double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
 				getProperties().setNumericProperty(
-						getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average", 
+						getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average",
 						avgNir, null);
 				boolean wetnessAnalysis = false;
 				if (wetnessAnalysis) {
@@ -166,7 +164,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 							weightOfPlant += 1 / 7d + (1 - 1 / 7d) * realF / 100d;
 						}
 					}
-					getProperties().setNumericProperty(getBlockPosition(), 
+					getProperties().setNumericProperty(getBlockPosition(),
 							"RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant,
 							null);
 					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
@@ -183,7 +181,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 				if (options == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
-					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.", 
+					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.",
 							rt, getBlockPosition());
 			}
 			return io.getImage();
@@ -201,7 +199,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 			int irSkeletonFilledPixels = irSkel.io().countFilledPixels();
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgIrSkel = 1 - irSkeletonIntensitySum / irSkeletonFilledPixels;
-			getProperties().setNumericProperty(getBlockPosition(), 
+			getProperties().setNumericProperty(getBlockPosition(),
 					"RESULT_" + options.getCameraPosition() + ".ir.skeleton.intensity.average", avgIrSkel, null);
 		}
 		
@@ -211,7 +209,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 				int irFilledPixels = input().masks().ir().io().countFilledPixels();
 				double irIntensitySum = input().masks().ir().io().intensitySumOfChannel(false, true, false, false);
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
-				getProperties().setNumericProperty(getBlockPosition(), 
+				getProperties().setNumericProperty(getBlockPosition(),
 						"RESULT_" + options.getCameraPosition() + ".ir.intensity.average", avgIr, null);
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_IR_ANALYSIS); // markerDistanceHorizontally
