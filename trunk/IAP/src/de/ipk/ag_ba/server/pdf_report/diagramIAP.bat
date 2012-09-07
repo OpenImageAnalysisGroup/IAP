@@ -20,6 +20,18 @@ echo Split Cond1?  : %9
 shift /8
 echo Split Cond2?  : %9
 
+
+rem The delete option is important at the development phase
+rem del /s report.aux
+rem del /s report.out
+rem del /s report.toc
+rem del /s report.tex
+rem del /s report.pdf
+rem rd /s /q plots
+rem rd /s /q plotTex
+rem rd /s /q section
+
+
 IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6
 
 rem In the R Skript the first Value is report.csv so the %1 is in the R-Script args[3]
@@ -27,11 +39,6 @@ Rscript --encoding=UTF-8 createDiagrams.R report.csv pdf %*
 Rscript --encoding=UTF-8 createMissingFiles.R
 
 rem IF NOT EXIST noValues.pdf Rscript --encoding=UTF-8 createMissingFiles.R
-
-rem The delete option is important at the development phase
-rem del /s report.aux
-rem del /s report.out
-rem del /s report.toc
 
 pdflatex report.tex -interaction batchmode
 pdflatex report.tex -interaction batchmode
