@@ -6,8 +6,12 @@ echo *                                                       *
 echo *        Developed by Dr Christian Klukas, RG IA        *
 echo *                                                       *
 echo *********************************************************
+echo If needed, the config path is created...
+mkdir "%APPDATA%\IAP\watch"
+echo Opening config folder...
+explorer.exe /select,"%APPDATA%\IAP\watch"
 echo Config file 'watch.txt' will be created and saved as
-echo %APPDATA%\IAP\watch\watch.txt
+echo %APPDATA%\IAP\watch\experiments.txt
 cd /d %~dp0
 echo Current path:
 cd
