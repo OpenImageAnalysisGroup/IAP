@@ -595,8 +595,6 @@ public class IAPservice {
 		if (experiment != null) {
 			double ggd_baseline = 10;
 			String type = experiment.getHeader().getExperimentType();
-			if (type==null)
-				type = "";
 			if (type.equals("Barley")) {
 				ggd_baseline = 5.5;
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Barley, 5.5°C");

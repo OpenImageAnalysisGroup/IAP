@@ -36,7 +36,6 @@ CHECK.FOR.UPDATE <- FALSE
 ########## Constants ###########
 
 ERROR <- "error"
-CATCH.ERROR <- FALSE
 
 ## value typs
 GET.OVERALL.FILE.NAME <- "overallFileName"
@@ -3215,36 +3214,16 @@ testfunction <- function(parameter) {
 	sum(abs(numbers - x) < 1e-6)
 }
 
-checkIfOnePlotTypeHasLessThanNumberValues <- function(overallResult, whichColumShouldUse, number, remove = FALSE) {
-	
-	bool <- FALSE
-	
-	if(whichColumShouldUse == X.AXIS) {
-		sumOfXAxis <- table(overallResult[,c(whichColumShouldUse,X.AXIS)])
-		if(any(sumOfXAxis < number & sumOfXAxis > 0)) {
-			if(remove) {
-				if(length(dim(sumOfXAxis)) == 1) {
-					sumOfXAxis <- t(sumOfXAxis)
-				}
-				overallResult <- overallResult[!(overallResult[,X.AXIS] == colnames(sumOfXAxis)[apply(sumOfXAxis < number & sumOfXAxis > 0, 2, "any")]),]
-			}
-				bool <- TRUE
+checkIfOnePlotTypeHasLessThanThreeValues <- function(overallResult, whichColumShouldUse) {
+
+	dataTableOverallResult <- data.table(overallResult)
+	sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), sum, na.rm=TRUE), by=c(whichColumShouldUse, "xAxis")])
+	for(n in sumOfXAxis[,whichColumShouldUse]) {
+		if(sum(sumOfXAxis[,whichColumShouldUse] == as.character(n)) < 3) {
+			return(TRUE)
 		}
-	} else {
-		removeVector <- rep.int(TRUE, nrow(overallResult))
-		dataTableOverallResult <- data.table(overallResult)
-		sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), sum, na.rm=TRUE), by= c(whichColumShouldUse, X.AXIS)])
-		for(n in unique(sumOfXAxis[,whichColumShouldUse])) {
-			if(sum(as.character(sumOfXAxis[,whichColumShouldUse]) == as.character(n)) < number) {			
-				if(remove) {
-					removeVector <- removeVector & !(as.character(sumOfXAxis[,whichColumShouldUse]) == as.character(n))
-				} 			
-				bool <- TRUE
-			}
-		}
-		overallResult <- overallResult[removeVector,]
 	}
-	return(list(overallResult = overallResult, bool = bool))
+	return(FALSE)
 }
 
 makeStressDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
@@ -3300,7 +3279,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 		#print(whichColumShouldUse)
 			overallResult <- cbind(overallResult, ymin=overallResult$mean-overallResult$se, ymax=overallResult$mean+overallResult$se)
 			
-			hasLessThanThreeValues <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, whichColumShouldUse, 3)$bool
+			hasLessThanThreeValues <- checkIfOnePlotTypeHasLessThanThreeValues(overallResult, whichColumShouldUse)
 			
 			reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 			overallResult <- reorderList$overallResult
@@ -3954,7 +3933,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		options <- overallList$spiderOptions
 
-		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName,  overallResult[c(X.AXIS, VALUES)], VALUES, options) 
+		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName,  overallResult[c("xAxis","values")], "values", options)
 		overallResult <- na.omit(overallResult)
 		overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 		overallResult <- normalizeEachDescriptor(overallResult)	
@@ -3962,14 +3941,12 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
-		overallResult <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, X.AXIS, 2, TRUE)$overallResult
 		histVec <- levels(overallResult$hist)
 		for(kk in seq(along=histVec)) {
 			histVec[kk] <- paste(kk,histVec[kk])
 		}
 		overallResult$hist <- factor((overallResult$hist), levels((overallResult$hist)), seq(along=unique(overallResult$hist)))
 		nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
-	
 #		print(histVec)
 #		print(usedoverallColor)
 		for (positionType in options$typOfGeomBar) {			
@@ -3981,9 +3958,9 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 #				#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #			} else {
 				#print(head(overallResult))
-				plot <- ggplot(overallResult, aes_string(x="hist", y=VALUES, group=whichColumShouldUse, shape=whichColumShouldUse, color=whichColumShouldUse, fill="hist")) +
+				plot <- ggplot(overallResult, aes_string(x="hist", y="values", group=whichColumShouldUse, shape=whichColumShouldUse, color=whichColumShouldUse, fill="hist")) +
 						geom_point(size=3) +
-						geom_line()
+						geom_line()  
 			#}
 
 		#	print(plot)
@@ -4017,7 +3994,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 				#	scale_colour_manual(name="Condition", values=usedoverallColor)
 					scale_colour_manual(values=overallColor[[imagesIndex]], name="Property") + 
 					scale_fill_manual(values=rep.int("black",length(histVec)), name="Condition", breaks=unique(overallResult$hist), labels=histVec)
-			print(plot)
+			#print(plot)
 			if (positionType == "x") {			
 				#plot <- plot + coord_polar(theta="x", expand=TRUE)
 				plot <- plot + coord_polar(theta="x")
@@ -4029,36 +4006,35 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 				plot <- plot + 
 						scale_y_continuous() +
 						theme_bw() +
-						theme(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
-								axis.title.x = element_blank(), 
-								axis.title.y = element_blank(),
+						opts(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
+								axis.title.x = theme_blank(), 
+								axis.title.y = theme_blank(),
 #								axis.title.y = theme_text(face="bold", size=11, angle=90), 
-								panel.grid.minor = element_blank(), 
-								panel.border = element_rect(colour="Grey", size=0.1)
+								panel.grid.minor = theme_blank(), 
+								panel.border = theme_rect(colour="Grey", size=0.1)
 								#axis.text.x = theme_blank(),
 								#axis.text.y = theme_blank()
-						)
-				print(plot)
+						) 
 			if (positionType == "y") {
 				plot <- plot + 
-						Theme(axis.text.y = element_blank(),
-								axis.ticks	= element_blank()	
+						opts(axis.text.y = theme_blank(),
+								axis.ticks	= theme_blank()	
 						)
 			}	
 				
 			if (!legende) {
-				plot = plot + theme(legend.position=NONE)
+				plot = plot + opts(legend.position="none")
 			} else {
 				plot = plot + 
-					   theme(#legend.justifiownCation = 'bottom', 
+					   opts(#legend.justifiownCation = 'bottom', 
 							   legend.direction="horizontal",
 							   legend.position="bottom",
 							   legend.box = "vertical",
 							   #legend.position=c(0.5,0),
 							  # legend.title = theme_blank(),
-							   legend.key = element_blank()
+							   legend.key = theme_blank()
 			   			)			
-			
+				
 			
 #				if(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && overallList$secondTreatment == "none") {
 #					plot <-  plot + guides(fill=guide_legend(title.position= "top", 
@@ -4077,7 +4053,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 				#}
 				
 			}		
-			print(plot)
+			
 #			if (title != "") {
 #				plot = plot + opts(title = title)
 #			}
@@ -4100,7 +4076,7 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 #				}
 
 #			print("drinne")
-			print(plot)
+			#print(plot)
 			
 			subtitle <- ""
 			if (positionType == options$typOfGeomBar[1] || length(options$typOfGeomBar) == 1) {
@@ -5109,8 +5085,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 	}
 	
 	for (imagesIndex in names(overallDescriptor)) {
-		if (all(!is.na(overallDescriptor[[imagesIndex]]))) {
-		#if (!is.na(overallDescriptor[[imagesIndex]][1])) {
+		if (!is.na(overallDescriptor[[imagesIndex]][1])) {
 			plot <- TRUE
 			if(DO.MODELLING.OF.STRESS && length(descriptorStressVector) > 0) {
 				if(!(overallDescriptor[[imagesIndex]] %in% descriptorStressVector)) {
@@ -5141,26 +5116,15 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 						overallResult[overallResult$xAxis == 2147483647,X.AXIS] <- 1
 					}
 				}
-					
-				if(CATCH.ERROR) {
-					if (INNER.THREADED && DO.PARALLELISATION) {
 						
-						error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
-									stopOnError=FALSE), silent = !overallList$debug)
-					} else {
-						error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
-					}
-				
-					checkOfTryError(error, overallList, imagesIndex, typOfPlot)
+				if (INNER.THREADED && DO.PARALLELISATION) {
+					error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
+								stopOnError=FALSE), silent = !overallList$debug)
 				} else {
-					if (INNER.THREADED && DO.PARALLELISATION) {
-						
-						sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
-								stopOnError=FALSE)
-					} else {
-						makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot)
-					}
+					error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
 				}
+			
+				checkOfTryError(error, overallList, imagesIndex, typOfPlot)
 			}
 		}
 	}
@@ -5906,7 +5870,6 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#treatment <- "Species"
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
-		#treatment <- "none"
 		treatment <- "Treatment"
 		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
@@ -5919,8 +5882,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#secondTreatment <- "none"
 		#filterSecondTreatment  <- "none"
 		
-		secondTreatment <- "none"
-		#secondTreatment <- "Genotype"
+		secondTreatment <- "Genotype"
 		filterSecondTreatment  <- "none"
 		#filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
@@ -5944,14 +5906,14 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		yAxisName <- "test2"
 		
 		# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
-		stressStart <- -1
-		stressEnd <- -1
+		stressStart <- 27
+		stressEnd <- 44
 		stressTyp <- "001"
 		stressLabel <- "-1"
 		
 		splitTreatmentFirst <- FALSE
 		splitTreatmentSecond <- FALSE
-		isRatio <- FALSE
+		isRatio <- TRUE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet = workingDataSet
@@ -6177,7 +6139,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	#overallList = overallOutlierDetection(overallList)
 #	overallList = overallGetResultDataFrame(overallList)
 #	overallList = setColor(overallList) 
-##	makeDiagrams(overallList)
+#	makeDiagrams(overallList)
 	#######
 	
 	if (!overallList$stoppTheCalculation) {
