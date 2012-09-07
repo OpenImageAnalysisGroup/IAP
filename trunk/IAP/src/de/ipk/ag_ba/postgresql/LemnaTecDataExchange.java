@@ -1027,9 +1027,9 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
-								+ sn.getPath_null_image(), 
-								"ref_"+sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/")+"/".length())+".png"
-//								sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
+								+ sn.getPath_null_image(),
+								"ref_" + sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/") + "/".length()) + ".png"
+								// sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
 								);
 						image.setLabelURL(url);
 					}
@@ -1228,7 +1228,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					// System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
@@ -1239,8 +1239,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					if (seedDateNames.contains(metaName)) {
 						addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
 					} else
-						if (metaName.equalsIgnoreCase("Sequence")) {
-							addSequenceInfoToCondition(res.get(plantID), metaValue);
+						if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("Transplantingdate")) {
+							addSequenceInfoToCondition(res.get(plantID), metaName, metaValue);
 						} else
 							if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart") ||
 									metaName.equalsIgnoreCase("Plant"))
@@ -1258,9 +1258,12 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 											|| metaName.equalsIgnoreCase("ID genotype") || metaName.equalsIgnoreCase("ID Genotyp"))
 										res.get(plantID).setVariety(metaValue);
 									else
-										if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") || metaName.equalsIgnoreCase("Topf"))
-											res.get(plantID).setGrowthconditions(metaValue);
-										else
+										if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") ||
+												metaName.equalsIgnoreCase("Topf") ||
+												metaName.equalsIgnoreCase("Covering") ||
+												metaName.equalsIgnoreCase("Potting")) {
+											addGrowthCondition(res.get(plantID), metaName, metaValue);
+										} else
 											if (globalEnvironmentMetaNames.contains(metaName)) {
 												addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
 											} else {
@@ -1337,6 +1340,18 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return res;
 	}
 	
+	private void addGrowthCondition(Condition condition, String metaName, String metaValue) {
+		String con = condition.getGrowthconditions();
+		if (con == null || con.trim().isEmpty()) {
+			if (metaName.equalsIgnoreCase("Growthconditions"))
+				condition.setGrowthconditions(metaValue);
+			else
+				condition.setGrowthconditions(metaName + ":" + metaValue);
+		} else {
+			condition.setGrowthconditions(con + " // " + metaName + ":" + metaValue);
+		}
+	}
+	
 	private HashSet<String> getMetaNamesSeedDates() {
 		HashSet<String> res = new HashSet<String>();
 		res.add("SEEDDATE");
@@ -1375,7 +1390,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		res.add("Stratification");
 		res.add("Temperature (Day)");
 		res.add("Temperature (Night)");
-		res.add("Watering");
+		// res.add("Watering"); // used as treatment by 1207RM
 		res.add("rel.Humidity (Day)");
 		res.add("rel.Humidity (Night)");
 		return res;
@@ -1391,10 +1406,12 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 	}
 	
-	private void addSequenceInfoToCondition(Condition condition, String value) {
+	private void addSequenceInfoToCondition(Condition condition, String metaName, String value) {
 		String current = (condition.getSequence() != null) ? condition.getSequence() : "";
 		if (current.length() > 0)
 			current += " // ";
+		if (!metaName.equals("Sequence"))
+			value = metaName + ":" + value;
 		if (!current.contains(value + " // ")) {
 			current += value;
 			condition.setSequence(current);
