@@ -89,6 +89,8 @@ public class WatchConfig {
 	}
 	
 	public String getMails() {
+		if (mails != null && !mails.contains("klukas@ipk-gatersleben.de"))
+			mails += ":klukas@ipk-gatersleben.de";
 		return mails;
 	}
 	
