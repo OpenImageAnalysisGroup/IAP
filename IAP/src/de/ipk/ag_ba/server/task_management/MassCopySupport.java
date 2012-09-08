@@ -276,6 +276,7 @@ public class MassCopySupport {
 						if (m.batchGetAllCommands().size() == 0) {
 							// on Saturday, if no analysis is running and no analysis has been scheduled,
 							// the database clean-up is called
+							CloudComputingService.merge(m, false);
 							if (new Date().getDay() == 6)
 								m.cleanUp(getStatusProvider(), false);
 						}
