@@ -2107,7 +2107,7 @@ public class MongoDB {
 			});
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
-			return null;
+			return new ArrayList<BatchCmd>();
 		}
 		return res;
 	}

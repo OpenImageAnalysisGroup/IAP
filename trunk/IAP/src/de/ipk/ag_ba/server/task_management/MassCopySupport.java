@@ -40,6 +40,9 @@ public class MassCopySupport {
 	public static synchronized MassCopySupport getInstance() {
 		if (instance == null)
 			instance = new MassCopySupport();
+		
+		instance.scheduleMassCopy();
+		
 		return instance;
 	}
 	
@@ -124,13 +127,14 @@ public class MassCopySupport {
 	}
 	
 	private void print(String msg) {
-		MongoDB.saveSystemMessage(msg);
+		MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": " + msg);
 		msg = SystemAnalysis.getCurrentTime() + ">" + msg;
 		history.add(msg);
 		System.out.println(msg);
 		status.setCurrentStatusText2(msg);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void makeCopyInnerCall() {
 		// if false, analysis is performed after copying all new experiments
 		// if true, only the newly copied experiments are analyzed
@@ -260,7 +264,7 @@ public class MassCopySupport {
 			}
 			status.setPrefix1(null);
 			status.setCurrentStatusText1("Copy complete (" + done + " finished)");
-			status.setCurrentStatusText2("Next sync at 8 PM");
+			status.setCurrentStatusText2("Next sync at 1 AM");
 			status.setCurrentStatusValueFine(100d);
 			s.printTime();
 			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
@@ -269,6 +273,12 @@ public class MassCopySupport {
 					if (m.batchGetAllCommands().size() == 0) {
 						ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
 						all.performActionCalculateResults(null);
+						if (m.batchGetAllCommands().size() == 0) {
+							// on Saturday, if no analysis is running and no analysis has been scheduled,
+							// the database clean-up is called
+							if (new Date().getDay() == 6)
+								m.cleanUp(getStatusProvider(), false);
+						}
 					}
 				}
 			}
@@ -278,10 +288,18 @@ public class MassCopySupport {
 		}
 	}
 	
+	private boolean scheduled = false;
+	
 	public void scheduleMassCopy() {
+		if (scheduled)
+			return;
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 20:00");
+			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			if (en)
+				print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 01:00");
+			else
+				print("AUTOMATIC MASS COPY STATUS (CURRENTLY DISABLED) FROM LT TO MongoDB (" + hsmFolder + ") WILL BE CHECKED EVERY DAY AT 01:00");
 			Timer t = new Timer("IAP 24h-Backup-Timer");
 			long period = 1000 * 60 * 60 * 24; // 24 Hours
 			TimerTask tT = new TimerTask() {
@@ -295,18 +313,18 @@ public class MassCopySupport {
 						
 						Thread.sleep(1000);
 						
-						MassCopySupport sb = MassCopySupport.getInstance();
-						sb.performMassCopy();
+						performMassCopy();
 					} catch (InterruptedException e) {
 						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 					}
 				}
 			};
 			Date startTime = new Date(); // current day at 20:00:00
-			startTime.setHours(20);
+			startTime.setHours(10);
 			startTime.setMinutes(00);
 			startTime.setSeconds(00);
 			t.scheduleAtFixedRate(tT, startTime, period);
+			scheduled = true;
 		} else {
 			print("WARNING: NO AUTOMATIC MASS COPY SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
 		}
