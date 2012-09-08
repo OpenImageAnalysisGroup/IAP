@@ -308,8 +308,10 @@ public class MassCopySupport {
 					try {
 						Thread.sleep(1000);
 						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
-						if (!en)
+						if (!en) {
+							print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");
 							return;
+						}
 						
 						Thread.sleep(1000);
 						
