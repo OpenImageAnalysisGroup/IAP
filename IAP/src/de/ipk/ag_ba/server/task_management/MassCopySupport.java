@@ -263,26 +263,41 @@ public class MassCopySupport {
 				Thread.sleep(1000);
 			}
 			status.setPrefix1(null);
-			status.setCurrentStatusText1("Copy complete (" + done + " finished)");
+			status.setCurrentStatusText1("Copy complete (" + done + " finished) (" + SystemAnalysis.getCurrentTime() + ")");
 			status.setCurrentStatusText2("Next sync at 1 AM");
 			status.setCurrentStatusValueFine(100d);
 			s.printTime();
 			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
 			if (analyzeAllExperiments) {
 				for (MongoDB m : MongoDB.getMongos()) {
+					status.setCurrentStatusText2("Merge task results");
+					CloudComputingService.merge(m, false);
+					status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
 					if (m.batchGetAllCommands().size() == 0) {
 						ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
+						status.setCurrentStatusText2("Schedule analysis tasks for new data");
 						all.performActionCalculateResults(null);
 						if (m.batchGetAllCommands().size() == 0) {
+							status.setCurrentStatusText2("All analyis results are up-to-date");
 							// on Saturday, if no analysis is running and no analysis has been scheduled,
 							// the database clean-up is called
-							CloudComputingService.merge(m, false);
-							if (new Date().getDay() == 6)
+							if (new Date().getDay() == 6) {
+								MongoDB.saveSystemMessage("Database reorganization started (" + m.getDatabaseName() + ")");
+								long startTime = System.currentTimeMillis();
 								m.cleanUp(getStatusProvider(), false);
-						}
+								long processingTime = System.currentTimeMillis() - startTime;
+								status.setCurrentStatusText2("Database reorganization finished (took " +
+										SystemAnalysis.getWaitTime(processingTime) + ")");
+								MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
+										+ SystemAnalysis.getWaitTime(processingTime));
+							}
+						} else
+							status.setCurrentStatusText2("Scheduled analysis tasks (" + SystemAnalysis.getCurrentTime() + ")");
 					}
 				}
 			}
+			status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")</html>");
+			status.setCurrentStatusText2("Next sync at 1 AM");
 		} catch (Exception e1) {
 			print("ERROR: MASS COPY INNER-CALL ERROR (" + e1.getMessage() + ")");
 			MongoDB.saveSystemErrorMessage("MASS COPY INNER-CALL ERROR", e1);
