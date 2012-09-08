@@ -19,9 +19,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
-import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
-import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -125,6 +124,7 @@ public class MassCopySupport {
 	}
 	
 	private void print(String msg) {
+		MongoDB.saveSystemMessage(msg);
 		msg = SystemAnalysis.getCurrentTime() + ">" + msg;
 		history.add(msg);
 		System.out.println(msg);
@@ -132,6 +132,9 @@ public class MassCopySupport {
 	}
 	
 	private void makeCopyInnerCall() {
+		// if false, analysis is performed after copying all new experiments
+		// if true, only the newly copied experiments are analyzed
+		boolean analyzeEachCopiedExperiment = false;
 		try {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
 			status.setCurrentStatusText1("Start sync...");
@@ -239,24 +242,20 @@ public class MassCopySupport {
 				if (!simulate)
 					copyAction.performActionCalculateResults(null);
 				print("Copied " + it.Id + " to " + m.getDatabaseName());
+				MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + it.Id + " to " + m.getDatabaseName());
 				done++;
 				status.setCurrentStatusValueFine(100d * done / toSave.size());
 				
-				IAPexperimentTypes experimentType = IAPexperimentTypes.getExperimentTypeFromExperimentTypeName(er.getHeader().getExperimentType());
-				NavigationAction analysisAction = null;
-				switch (experimentType) {
-					case BarleyGreenhouse:
-					case MaizeGreenhouse:
-					case Phytochamber:
-					case PhytochamberBlueRubber:
+				if (analyzeEachCopiedExperiment) {
+					String id = er.getHeader().getDatabaseId();
+					ArrayList<ExperimentHeaderInterface> experimentList = m.getExperimentList(null);
+					for (ExperimentHeaderInterface ehi : experimentList) {
+						if (ehi.getDatabaseId().equals(id)) {
+							print("Add compute tasks to analyze experiment " + id + ".");
+							ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi, experimentList);
+						}
+					}
 				}
-				if (analysisAction != null) {
-					// submit analysis action analysis tasks to target cloud
-					
-					// available result data should be checked upon analysis start (based on experiment header date info)
-					// only snapshots with a date newer than the given last newest time should be analysed
-				}
-				
 				Thread.sleep(1000);
 			}
 			status.setPrefix1(null);
@@ -264,8 +263,18 @@ public class MassCopySupport {
 			status.setCurrentStatusText2("Next sync at 8 PM");
 			status.setCurrentStatusValueFine(100d);
 			s.printTime();
+			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
+			if (analyzeAllExperiments) {
+				for (MongoDB m : MongoDB.getMongos()) {
+					if (m.batchGetAllCommands().size() == 0) {
+						ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
+						all.performActionCalculateResults(null);
+					}
+				}
+			}
 		} catch (Exception e1) {
 			print("ERROR: MASS COPY INNER-CALL ERROR (" + e1.getMessage() + ")");
+			MongoDB.saveSystemErrorMessage("MASS COPY INNER-CALL ERROR", e1);
 		}
 	}
 	
