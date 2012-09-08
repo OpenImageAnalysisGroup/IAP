@@ -231,7 +231,7 @@ public class CloudComputingService {
 															if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
 																for (MongoDB m : MongoDB.getMongos()) {
 																	System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
-																	merge(m);
+																	merge(m, true);
 																	System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
 																}
 																
@@ -313,7 +313,7 @@ public class CloudComputingService {
 		cloudTaskManager.setDisableProcess(!enableCloudComputing);
 	}
 	
-	private static void merge(MongoDB m) {
+	public static void merge(MongoDB m, boolean interactive) {
 		try {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
@@ -367,32 +367,37 @@ public class CloudComputingService {
 				boolean addNewTasksIfMissing = false;
 				
 				Object[] res;
-				if (SystemAnalysis.isHeadless()) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
-							+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
-							+ ", FINISHED: "
-							+ knownResults.size());
-					System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
-					String in = SystemAnalysis.getCommandLineInput();
-					if (in == null)
-						res = null;
-					else
-						if (in.toUpperCase().contains("Y"))
-							res = new Object[] { true };
+				if (interactive) {
+					if (SystemAnalysis.isHeadless()) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
+								+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
+								+ ", FINISHED: "
+								+ knownResults.size());
+						System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
+						String in = SystemAnalysis.getCommandLineInput();
+						if (in == null)
+							res = null;
 						else
-							res = new Object[] { false };
-				} else
-					res = MyInputHelper.getInput("<html>Process incomplete data sets? "
-							+
-							(knownResults.size() > 0 ?
-									"<br>Analyzed experiment: "
-											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
-									: "")
-							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
-							+ knownResults.size(), "Add compute tasks?", new Object[] {
-							"Add compute tasks for missing data?", addNewTasksIfMissing
-					});
+							if (in.toUpperCase().contains("Y"))
+								res = new Object[] { true };
+							else
+								res = new Object[] { false };
+					} else
+						res = MyInputHelper.getInput("<html>Process incomplete data sets? "
+								+
+								(knownResults.size() > 0 ?
+										"<br>Analyzed experiment: "
+												+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
+										: "")
+								+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
+								+ knownResults.size(), "Add compute tasks?", new Object[] {
+								"Add compute tasks for missing data?", addNewTasksIfMissing
+						});
+				} else {
+					// non-interactive
+					res = new Object[] { false };
+				}
 				if (res == null) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 					System.exit(1);
@@ -436,9 +441,9 @@ public class CloudComputingService {
 				} else
 					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 						try {
-							doMerge(m, tempDataSetDescription, knownResults);
+							doMerge(m, tempDataSetDescription, knownResults, interactive);
 						} catch (Exception e) {
-							e.printStackTrace();
+							MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
 						}
 					}
 			}
@@ -449,7 +454,7 @@ public class CloudComputingService {
 	
 	private static void doMerge(MongoDB m,
 			TempDataSetDescription tempDataSetDescription,
-			ArrayList<ExperimentHeaderInterface> knownResults) throws Exception {
+			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive) throws Exception {
 		System.out.println("*****************************");
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
@@ -537,17 +542,21 @@ public class CloudComputingService {
 		m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
 		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
 		// System.out.println("> DELETE TEMP DATA...");
-		System.out.println("> MARK TEMP DATA AS TRASHED...");
+		if (interactive)
+			System.out.println("> MARK TEMP DATA AS TRASHED...");
+		else
+			System.out.println("> DELETE TEMP DATA...");
 		for (ExperimentHeaderInterface i : knownResults) {
 			try {
 				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
 					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
-					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-					
-					// m.deleteExperiment(experiment2id.get(i));
+					if (interactive)
+						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+					else
+						m.deleteExperiment(i.getDatabaseId());
 				}
-				
 			} catch (Exception err) {
+				MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
 				System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
 						err.getMessage() + ")");
 			}
