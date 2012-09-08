@@ -35,10 +35,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implements NavigationAction {
 	
-	private final MongoDB m;
 	private final ArrayList<ExperimentHeaderInterface> experimentList;
 	private int n = 0;
 	private String names = "";
+	private final MongoDB m;
 	
 	public ActionAnalyzeAllExperiments(MongoDB m, ArrayList<ExperimentHeaderInterface> experimentList) {
 		super("(Re)analyze all experiments");
@@ -64,7 +64,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		names = StringManipulationTools.getStringList("<li>", nn, "");
 	}
 	
-	private AnalysisStatus knownAnalysis(ExperimentHeaderInterface eh, ArrayList<ExperimentHeaderInterface> experimentList2) {
+	private static AnalysisStatus knownAnalysis(ExperimentHeaderInterface eh, ArrayList<ExperimentHeaderInterface> experimentList2) {
 		if (eh == null || experimentList2 == null || experimentList2.size() == 0 || eh.getDatabaseId() == null || eh.getDatabaseId().length() == 0)
 			return AnalysisStatus.NOT_FOUND;
 		if (eh.getImportusergroup() != null && eh.getImportusergroup().equals("Analysis Results"))
@@ -110,40 +110,47 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		StringBuilder res = new StringBuilder();
 		res.append("Experiments:<ul>");
 		for (ExperimentHeaderInterface eh : experimentList) {
-			if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
-				continue;
-			if (knownAnalysis(eh, experimentList) == AnalysisStatus.CURRENT) {
-				res.append("<li>Analysis result with current image analysis pipeline (" + IAP_RELEASE.getReleaseFromDescription(eh) + ") available for "
-						+ eh.getExperimentName());
-				continue;
-			}
-			NavigationAction navigationAction = null;
-			System.out.println("Experiment-type: " + eh.getExperimentType());
-			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
-				navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
-				navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
-				navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
-				navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
-				navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
-			
-			if (navigationAction != null) {
-				Thread.sleep(100);
-				RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
-				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), null, false);
-				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
-						new NavigationButton(ra, src.getGUIsetting()));
-				navigationAction.performActionCalculateResults(src);
-				
-				res.append("<li>Analyze " + eh.getExperimentName() + " with analysis method " +
-						StringManipulationTools.removeHTMLtags(rca.getDefaultTitle()));
-			}
+			processExperimentHeader(m, res, eh, experimentList);
 		}
 		res.append("</ul>");
 		result = res.toString();
+	}
+	
+	public static void processExperimentHeader(MongoDB m, StringBuilder res,
+			ExperimentHeaderInterface eh,
+			ArrayList<ExperimentHeaderInterface> experimentList) throws InterruptedException,
+			Exception {
+		if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
+			return;
+		if (knownAnalysis(eh, experimentList) == AnalysisStatus.CURRENT) {
+			res.append("<li>Analysis result with current image analysis pipeline (" + IAP_RELEASE.getReleaseFromDescription(eh) + ") available for "
+					+ eh.getExperimentName());
+			return;
+		}
+		NavigationAction navigationAction = null;
+		System.out.println("Experiment-type: " + eh.getExperimentType());
+		if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
+			navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
+		if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
+			navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
+		if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
+			navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
+		if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
+			navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
+		if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
+			navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
+		
+		if (navigationAction != null) {
+			Thread.sleep(100);
+			RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
+			CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), null, false);
+			navigationAction = new RemoteExecutionWrapperAction(navigationAction,
+					new NavigationButton(ra, null));
+			navigationAction.performActionCalculateResults(null);
+			
+			res.append("<li>Analyze " + eh.getExperimentName() + " with analysis method " +
+					StringManipulationTools.removeHTMLtags(rca.getDefaultTitle()));
+		}
 	}
 	
 	@Override

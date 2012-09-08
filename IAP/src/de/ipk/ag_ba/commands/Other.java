@@ -197,6 +197,7 @@ public class Other {
 									MassCopySupport.getInstance().performMassCopy();
 								} catch (InterruptedException e) {
 									e.printStackTrace();
+									MongoDB.saveSystemErrorMessage("Mass Copy Execution Error", e);
 								}
 							}
 						}, "mass copy sync");
