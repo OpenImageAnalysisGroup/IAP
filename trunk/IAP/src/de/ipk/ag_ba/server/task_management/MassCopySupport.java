@@ -338,7 +338,7 @@ public class MassCopySupport {
 				}
 			};
 			Date startTime = new Date(); // current day at 20:00:00
-			startTime.setHours(10);
+			startTime.setHours(01);
 			startTime.setMinutes(00);
 			startTime.setSeconds(00);
 			t.scheduleAtFixedRate(tT, startTime, period);
