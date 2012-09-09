@@ -56,7 +56,7 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public int getNumberOfJobs() {
-		int snapshotsPerJob = 1000;
+		int snapshotsPerJob = 500;
 		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 		
 		return numberOfJobs;
