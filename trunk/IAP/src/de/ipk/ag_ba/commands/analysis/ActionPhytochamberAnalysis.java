@@ -49,7 +49,7 @@ public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction 
 	
 	@Override
 	public int getNumberOfJobs() {
-		int snapshotsPerJob = 1000;
+		int snapshotsPerJob = 500;
 		try {
 			snapshotsPerJob = snapshotsPerJob / IAPservice.getMaxTrayCount(experiment.getData(m));
 		} catch (Exception e) {
