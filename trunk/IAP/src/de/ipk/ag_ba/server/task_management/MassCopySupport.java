@@ -20,6 +20,7 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
+import de.ipk.ag_ba.commands.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -273,9 +274,18 @@ public class MassCopySupport {
 					status.setCurrentStatusText2("Merge task results");
 					CloudComputingService.merge(m, false);
 					status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
+					
+					status.setCurrentStatusText2("Delete Experiment History");
+					ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
+					delete.setStatusProvider(getStatusProvider());
+					delete.performActionCalculateResults(null);
+					status.setCurrentStatusText2("Deleted Experiment History (" + SystemAnalysis.getCurrentTime() + ")");
+					MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
+					
 					if (m.batchGetAllCommands().size() == 0) {
 						ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
 						status.setCurrentStatusText2("Schedule analysis tasks for new data");
+						all.setStatusProvider(getStatusProvider());
 						all.performActionCalculateResults(null);
 						if (m.batchGetAllCommands().size() == 0) {
 							status.setCurrentStatusText2("All analyis results are up-to-date");
