@@ -87,6 +87,7 @@ import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
+import de.ipk.ag_ba.server.task_management.MassCopySupport;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -597,7 +598,7 @@ public class IAPservice {
 		if (experiment != null) {
 			double ggd_baseline = 10;
 			String type = experiment.getHeader().getExperimentType();
-			if (type==null)
+			if (type == null)
 				type = "";
 			if (type.equals("Barley")) {
 				ggd_baseline = 5.5;
@@ -1478,5 +1479,9 @@ public class IAPservice {
 		});
 		autoClose.setName("Auto close at " + hour + ":00");
 		autoClose.start();
+	}
+	
+	public MassCopySupport getMassCopySupport() {
+		return MassCopySupport.getInstance();
 	}
 }
