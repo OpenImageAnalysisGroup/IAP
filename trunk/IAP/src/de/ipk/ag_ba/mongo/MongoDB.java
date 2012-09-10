@@ -2094,7 +2094,7 @@ public class MongoDB {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection("schedule");
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
+					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
@@ -2131,7 +2131,7 @@ public class MongoDB {
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
 							if (addCnt < maxTasks)
-								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("submission", -1)).limit(maxTasks)) {
+								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("part_cnt", 1)).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getCpuTargetUtilization() < maxTasks) {
 										if (batch.getExperimentHeader() == null)
@@ -2150,7 +2150,7 @@ public class MongoDB {
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks && claimed < maxTasks) {
 								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString())).sort(
-										new BasicDBObject("submission", -1))) {
+										new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
@@ -2183,7 +2183,7 @@ public class MongoDB {
 						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
-								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("submission", -1))) {
+								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -2200,7 +2200,7 @@ public class MongoDB {
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
 								for (DBObject dbo : collection.find(sm).sort(
-										new BasicDBObject("submission", -1))) {
+										new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
