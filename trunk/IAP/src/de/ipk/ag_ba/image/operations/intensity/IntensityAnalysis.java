@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.intensity;
 
-import ij.measure.ResultsTable;
-
 import java.awt.Color;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -289,38 +287,34 @@ public class IntensityAnalysis {
 			if (plantImagePixelCnt > 0)
 				result.addValue("intensity.average", sumOfIntensityChlorophyl / plantImagePixelCnt / 255d);
 			
-			if (addNormalizedHistogramValues) {
-				if (optDistHorizontal != null && optRealMarkerDistance != null) {
+			if (addNormalizedHistogramValues && optDistHorizontal != null && optRealMarkerDistance != null) {
+				double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+				for (int i = 0; i < this.n; i++) {
+					result.addValue(
+							"normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+							histChlorophyl.getFreqAt(i) * normalize);
+				}
+			} else
+				for (int i = 0; i < this.n; i++) {
+					result.addValue(
+							"histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+							histChlorophyl.getFreqAt(i));
+				}
+			
+			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
+				if (addNormalizedHistogramValues && optDistHorizontal != null && optRealMarkerDistance != null) {
 					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
 					for (int i = 0; i < this.n; i++) {
 						result.addValue(
-								"normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
-								histChlorophyl.getFreqAt(i) * normalize);
+								"normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+								histPhenol.getFreqAt(i) * normalize);
 					}
-				}
-			}
-			for (int i = 0; i < this.n; i++) {
-				result.addValue(
-						"histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
-						histChlorophyl.getFreqAt(i));
-			}
-			
-			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
-				if (addNormalizedHistogramValues) {
-					if (optDistHorizontal != null && optRealMarkerDistance != null) {
-						double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
-						for (int i = 0; i < this.n; i++) {
-							result.addValue(
-									"normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
-									histPhenol.getFreqAt(i) * normalize);
-						}
+				} else
+					for (int i = 0; i < this.n; i++) {
+						result.addValue(
+								"histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+								histPhenol.getFreqAt(i));
 					}
-				}
-				for (int i = 0; i < this.n; i++) {
-					result.addValue(
-							"histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
-							histPhenol.getFreqAt(i));
-				}
 			}
 		}
 		return result;
