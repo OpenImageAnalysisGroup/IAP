@@ -2370,7 +2370,9 @@ public class MongoDB {
 			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
-		
+		if (s3d.getName() != null && s3d.getName().contains("..")) {
+			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
+		}
 		boolean speedupLoading = false;
 		if (speedupLoading)
 			if (experiment.getName().startsWith("Unit Test "))
