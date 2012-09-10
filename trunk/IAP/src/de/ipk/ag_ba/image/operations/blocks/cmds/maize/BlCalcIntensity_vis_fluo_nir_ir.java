@@ -57,12 +57,12 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getBottom(r, regions).print("Side Part " + r + "/" + regions, debugRegionParts),
-								pre + ".section_" + (r + 1) + "_" + regions);
+								pre + ".section_" + (r + 1) + "_" + regions + ".");
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getInnerCircle(r, regions).print("Top Part " + r + "/" + regions, debugRegionParts),
-								pre + ".section_" + (r + 1) + "_" + regions);
+								pre + ".section_" + (r + 1) + "_" + regions + ".");
 				}
 			}
 			processVisibleImage(io, pre + ".");
@@ -84,7 +84,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 		
 		ResultsTableWithUnits rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 				options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS);
-		getProperties().storeResults(resultPrefix + ".vis.", rt1, getBlockPosition());
+		getProperties().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
