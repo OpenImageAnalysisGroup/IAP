@@ -271,9 +271,9 @@ public class MassCopySupport {
 			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
 			if (analyzeAllExperiments) {
 				for (MongoDB m : MongoDB.getMongos()) {
-					status.setCurrentStatusText2("Merge task results");
-					CloudComputingService.merge(m, false);
-					status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
+					// status.setCurrentStatusText2("Merge task results");
+					// CloudComputingService.merge(m, false);
+					// status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
 					
 					status.setCurrentStatusText2("Delete Experiment History");
 					ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
