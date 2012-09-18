@@ -264,7 +264,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		boolean hasCorrelationTableData = correlationInfo != null;
 		
 		if (hasCorrelationTableData) {
-			setLayout(new TableLayout(new double[][] { { 0, 750 /* TableLayout.PREFERRED */, 0 },
+			setLayout(new TableLayout(new double[][] { { 0, 950 /* TableLayout.PREFERRED */, 0 },
 					{ 0, TableLayout.PREFERRED, 5, TableLayout.PREFERRED, 0 } }));
 			add(correlationInfo, "1,3");
 		} else
