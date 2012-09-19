@@ -3082,7 +3082,7 @@ public class MongoDB {
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
-									n.addInt(5000);
+									n.addLong(5000);
 									BasicDBList list = new BasicDBList();
 									synchronized (ids) {
 										for (String coID : ids)
@@ -3092,8 +3092,8 @@ public class MongoDB {
 									conditions.remove(
 											new BasicDBObject("_id", new BasicDBObject("$in", list)),
 											WriteConcern.NONE);
-									status.setCurrentStatusValueFine(100d / max * n.getInt());
-									status.setCurrentStatusText2(n.getInt() + "/" + max);
+									status.setCurrentStatusValueFine(100d / max * n.getLong());
+									status.setCurrentStatusText2(n.getLong() + "/" + max);
 								}
 							});
 						}
@@ -3116,12 +3116,12 @@ public class MongoDB {
 						conditions.remove(
 								new BasicDBObject("_id", new BasicDBObject("$in", list)),
 								WriteConcern.NONE);
-						n.addInt(list.size());
-						status.setCurrentStatusValueFine(100d / max * n.getInt());
-						status.setCurrentStatusText2(n.getInt() + "/" + max);
+						n.addLong(list.size());
+						status.setCurrentStatusValueFine(100d / max * n.getLong());
+						status.setCurrentStatusText2(n.getLong() + "/" + max);
 					}
 					
-					status.setCurrentStatusValueFine(100d / max * n.getInt());
+					status.setCurrentStatusValueFine(100d / max * n.getLong());
 					status.setCurrentStatusText2(n + "/" + max);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS");
 				}
