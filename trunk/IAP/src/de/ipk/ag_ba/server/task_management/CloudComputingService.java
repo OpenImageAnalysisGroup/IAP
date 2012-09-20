@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -231,7 +232,7 @@ public class CloudComputingService {
 															if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
 																for (MongoDB m : MongoDB.getMongos()) {
 																	System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
-																	merge(m, true);
+																	merge(m, true, null);
 																	System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
 																}
 																
@@ -313,7 +314,7 @@ public class CloudComputingService {
 		cloudTaskManager.setDisableProcess(!enableCloudComputing);
 	}
 	
-	public static void merge(MongoDB m, boolean interactive) {
+	public static void merge(MongoDB m, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		try {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
@@ -441,7 +442,7 @@ public class CloudComputingService {
 				} else
 					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 						try {
-							doMerge(m, tempDataSetDescription, knownResults, interactive);
+							doMerge(m, tempDataSetDescription, knownResults, interactive, optStatus);
 						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
 						}
@@ -454,7 +455,7 @@ public class CloudComputingService {
 	
 	private static void doMerge(MongoDB m,
 			TempDataSetDescription tempDataSetDescription,
-			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive) throws Exception {
+			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		System.out.println("*****************************");
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
@@ -469,6 +470,8 @@ public class CloudComputingService {
 		String originName = null;
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
+			if (optStatus != null)
+				optStatus.setCurrentStatusText2("Process " + ii.getExperimentName());
 			if (originName == null) {
 				String ori = ii.getOriginDbId();
 				ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
@@ -476,7 +479,8 @@ public class CloudComputingService {
 				String ana = cc[0];
 				ana = ana.substring(ana.lastIndexOf(".") + ".".length());
 				originName = ana + ": " + oriH.getExperimentName();
-				
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Merge " + knownResults.size() + " parts (" + originName + ")");
 				MongoDB.saveSystemMessage("Start combining analysis results for " + originName + " (" + knownResults.size() + " parts)");
 			}
 			System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
@@ -495,6 +499,8 @@ public class CloudComputingService {
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
 			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / (double) wl);
 			// for (String c : condS)
 			// System.out.println(">Condition: " + c);
 			
@@ -542,8 +548,12 @@ public class CloudComputingService {
 		System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
 		
 		System.out.println("> SAVE COMBINED EXPERIMENT...");
-		m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
+		m.saveExperiment(e, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true);
 		System.out.println("> COMBINED EXPERIMENT HAS BEEN SAVED");
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Saved combined experiment " + e.getName());
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Merge-time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		MongoDB.saveSystemMessage("Saved combined experiment " + e.getName() +
 				" merging data took " +
 				SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
@@ -559,6 +569,7 @@ public class CloudComputingService {
 					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
 					// if (interactive)
 					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+					
 					// else
 					// m.deleteExperiment(i.getDatabaseId());
 				}
@@ -570,6 +581,12 @@ public class CloudComputingService {
 						err.getMessage() + ")");
 			}
 		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Saved combined experiment " + e.getName());
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Time to completion: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
+		if (optStatus != null)
+			optStatus.setCurrentStatusValueFine(100d);
 		System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 	}
 	
