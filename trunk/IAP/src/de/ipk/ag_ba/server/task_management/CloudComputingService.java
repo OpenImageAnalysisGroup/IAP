@@ -458,6 +458,7 @@ public class CloudComputingService {
 		System.out.println("*****************************");
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
+		
 		Experiment e = new Experiment();
 		long tFinish = System.currentTimeMillis();
 		final int wl = knownResults.size();
@@ -475,6 +476,8 @@ public class CloudComputingService {
 				String ana = cc[0];
 				ana = ana.substring(ana.lastIndexOf(".") + ".".length());
 				originName = ana + ": " + oriH.getExperimentName();
+				
+				MongoDB.saveSystemMessage("Start combining analysis results for " + originName + " (" + knownResults.size() + " parts)");
 			}
 			System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
 					/ 1024
