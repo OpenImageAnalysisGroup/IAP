@@ -468,10 +468,12 @@ public class CloudComputingService {
 		HashMap<ExperimentHeaderInterface, String> experiment2id =
 				new HashMap<ExperimentHeaderInterface, String>();
 		String originName = null;
+		int nnii = 1;
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
 			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Process " + ii.getExperimentName());
+				optStatus.setCurrentStatusText2("Process " + ii.getExperimentName() + " (" + nnii + "/" + tempDataSetDescription.getPartCntI() + ")");
+			nnii++;
 			if (originName == null) {
 				String ori = ii.getOriginDbId();
 				ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
