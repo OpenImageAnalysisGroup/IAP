@@ -446,7 +446,7 @@ public class ImageOperation {
 	 */
 	public ImageOperation applyMask(FlexibleImage mask, int background) {
 		
-		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
+		 copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
 		
 		int[][] maskPixels = mask.getAs2A();
 		int[][] originalImage = getImageAs2dArray();
