@@ -3441,7 +3441,8 @@ public class MongoDB {
 	
 	public static void saveSystemMessage(String msg) {
 		try {
-			MongoDB.getDefaultCloud().addNewsItem(msg, "system");
+			MongoDB.getDefaultCloud().addNewsItem(msg,
+					"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
