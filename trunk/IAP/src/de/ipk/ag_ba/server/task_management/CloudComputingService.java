@@ -540,23 +540,29 @@ public class CloudComputingService {
 		
 		System.out.println("> SAVE COMBINED EXPERIMENT...");
 		m.saveExperiment(e, new BackgroundTaskConsoleLogger("", "", true), true);
+		System.out.println("> COMBINED EXPERIMENT HAS BEEN SAVED");
+		MongoDB.saveSystemMessage("Saved combined experiment " + e.getName() +
+				" merging data took " +
+				SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
 		// System.out.println("> DELETE TEMP DATA...");
-		if (interactive)
-			System.out.println("> MARK TEMP DATA AS TRASHED...");
-		else
-			System.out.println("> DELETE TEMP DATA...");
+		// if (interactive)
+		System.out.println("> MARK TEMP DATA AS TRASHED...");
+		// else
+		// System.out.println("> DELETE TEMP DATA...");
 		for (ExperimentHeaderInterface i : knownResults) {
 			try {
 				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
 					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
-					if (interactive)
-						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-					else
-						m.deleteExperiment(i.getDatabaseId());
+					// if (interactive)
+					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+					// else
+					// m.deleteExperiment(i.getDatabaseId());
 				}
 			} catch (Exception err) {
-				MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
+				MongoDB.saveSystemErrorMessage("Could not mark experiment " + i.getExperimentName() +
+						" as trashed", err);
+				// MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
 				System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
 						err.getMessage() + ")");
 			}
