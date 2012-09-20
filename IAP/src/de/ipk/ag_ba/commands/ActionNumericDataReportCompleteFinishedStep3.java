@@ -611,7 +611,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
 				
-				if (!adjusted && rowNum >= 5) {
+				if (!adjusted && rowNum >= 4) {
 					adjustColumnWidths(sheet, excelColumnHeaders, status);
 					adjusted = true;
 					if (status != null)

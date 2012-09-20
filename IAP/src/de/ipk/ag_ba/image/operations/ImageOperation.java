@@ -446,27 +446,29 @@ public class ImageOperation {
 	 */
 	public ImageOperation applyMask(FlexibleImage mask, int background) {
 		
-		 copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
+		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
 		
 		int[][] maskPixels = mask.getAs2A();
 		int[][] originalImage = getImageAs2dArray();
 		int mW = mask.getWidth();
 		int mH = mask.getHeight();
-		
+		int del = 0;
 		for (int x = 0; x < getWidth(); x++) {
 			for (int y = 0; y < getHeight(); y++) {
 				int maskPixel;
-				if (x > 0 && y > 0 && x < mW && y < mH)
+				if (x >= 0 && y >= 0 && x < mW && y < mH)
 					maskPixel = maskPixels[x][y];
 				else
 					maskPixel = background;
 				
-				if (maskPixel == background)
+				if (maskPixel == background) {
 					originalImage[x][y] = background;
+					del++;
+				}
 			}
 		}
 		
-		return new ImageOperation(originalImage).setType(getType());
+		return new ImageOperation(originalImage).print("HHHH (deleted " + del + ")").setType(getType());
 	}
 	
 	/**
@@ -1022,7 +1024,13 @@ public class ImageOperation {
 				(ByteProcessor) processor2);
 		byteProcessor.skeletonize();
 		
-		return new ImageOperation(byteProcessor.getBufferedImage());
+		int[][] res = new FlexibleImage(byteProcessor.getBufferedImage()).getAs2A();
+		for (int x = 0; x < res.length; x++)
+			for (int y = 0; y < res[0].length; y++)
+				if (res[x][y] == -768)
+					res[x][y] = -1;
+		
+		return new ImageOperation(res);
 	}
 	
 	public SkeletonizeProcessor skel() {

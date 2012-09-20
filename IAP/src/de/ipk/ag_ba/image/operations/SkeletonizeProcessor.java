@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operations;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -8,13 +7,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
 public class SkeletonizeProcessor {
-
+	
 	private final ImageOperation image;
-
+	
 	public SkeletonizeProcessor(ImageOperation image) {
 		this.image = image;
 	}
-
+	
 	/**
 	 * @author klukas The "fire" burns down each solid voxel with fixed speed.
 	 * @return A image where each int value is either BACKGROUND_COLORint (no
@@ -25,26 +24,26 @@ public class SkeletonizeProcessor {
 	 */
 	public ImageOperation calculateDistanceToBorder(
 			boolean calcDistanceTrueOrNormalColoredSkeletonFalse, int back) {
-
+		
 		int[][] img = image.getImageAs2dArray();
-
+		
 		int fire = back;
 		HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton = new HashMap<Integer, HashMap<Integer, Integer>>();
 		boolean foundBorderVoxel = false;
 		int loop = 1;
-
+		
 		int voxelresolutionX = img.length;
 		int voxelresolutionY = img[0].length;
-
-		boolean debug = true;
-
+		
+		boolean debug = false;
+		
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
-
+		
 		do {
 			foundBorderVoxel = false;
 			LinkedList<Integer> borderX = new LinkedList<Integer>();
 			LinkedList<Integer> borderY = new LinkedList<Integer>();
-
+			
 			for (int x = 1; x < voxelresolutionX - 1; x++) {
 				for (int y = 1; y < voxelresolutionY - 1; y++) {
 					int c = img[x][y];
@@ -54,12 +53,12 @@ public class SkeletonizeProcessor {
 						boolean right = img[x + 1][y] != fire;
 						boolean above = img[x][y - 1] != fire;
 						boolean below = img[x][y + 1] != fire;
-
-						boolean tl = img[x - 1][y - 1] != fire;
-						boolean tr = img[x + 1][y - 1] != fire;
-						boolean bl = img[x - 1][y + 1] != fire;
-						boolean br = img[x + 1][y + 1] != fire;
-
+						
+						// boolean tl = img[x - 1][y - 1] != fire;
+						// boolean tr = img[x + 1][y - 1] != fire;
+						// boolean bl = img[x - 1][y + 1] != fire;
+						// boolean br = img[x + 1][y + 1] != fire;
+						
 						int filledSurrounding = 0;
 						int horizontal = 0;
 						int vertical = 0;
@@ -80,33 +79,26 @@ public class SkeletonizeProcessor {
 							filledSurrounding++;
 							vertical++;
 						}
-//						if (tl) {
-//							filledSurrounding++;
-//						}
-//						if (tr) {
-//							filledSurrounding++;
-//						}
-//						if (bl) {
-//							filledSurrounding++;
-//						}
-//						if (br) {
-//							filledSurrounding++;
-//						}
+						// if (tl) {
+						// filledSurrounding++;
+						// }
+						// if (tr) {
+						// filledSurrounding++;
+						// }
+						// if (bl) {
+						// filledSurrounding++;
+						// }
+						// if (br) {
+						// filledSurrounding++;
+						// }
 						if (filledSurrounding < 4) {
 							if (!calcDistanceTrueOrNormalColoredSkeletonFalse) {
 								addSkeleton(x2y2colorSkeleton, x, y, c);
 							} else {
-								addSkeleton(x2y2colorSkeleton, x, y,
-										new Color(loop % 255, loop % 255,
-												loop % 255).getRGB());
+								addSkeleton(x2y2colorSkeleton, x, y, loop);
 							}
-						}
-						if (filledSurrounding < 4) {
-							if (filledSurrounding == 5
-									&& ((vertical == 2 && horizontal == 1) || (vertical == 1 && horizontal == 2))) {
-								// System.out.println("**************");
-								// continue;
-							}
+							// }
+							// if (filledSurrounding < 4) {
 							foundBorderVoxel = true;
 							borderX.add(x);
 							borderY.add(y);
@@ -142,7 +134,7 @@ public class SkeletonizeProcessor {
 		}
 		return new ImageOperation(img);
 	}
-
+	
 	private void addSkeleton(
 			HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton,
 			int x, int y, int c) {
@@ -150,13 +142,13 @@ public class SkeletonizeProcessor {
 			x2y2colorSkeleton.put(x, new HashMap<Integer, Integer>());
 		x2y2colorSkeleton.get(x).put(y, c);
 	}
-
+	
 	private boolean filled(int x, int y,
 			HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton) {
 		return x2y2colorSkeleton.containsKey(x)
 				&& x2y2colorSkeleton.get(x).containsKey(y);
 	}
-
+	
 	static int[] table =
 	// 0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1
 	{ 0, 0, 0, 1, 0, 0, 1, 3, 0, 0, 3, 1, 1, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -171,7 +163,7 @@ public class SkeletonizeProcessor {
 			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 2, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 1,
 			0, 0, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0 };
-
+	
 	/**
 	 * Uses a lookup table to repeatably removes pixels from the edges of
 	 * objects in a binary image, reducing them to single pixel wide skeletons.
@@ -183,7 +175,7 @@ public class SkeletonizeProcessor {
 	 * by the table is available at
 	 * "http://imagej.nih.gov/ij/images/skeletonize-table.gif".
 	 */
-
+	
 	public ImageOperation skeletonize(int bgColor) {
 		int pass = 0;
 		int pixelsRemoved;
@@ -194,10 +186,10 @@ public class SkeletonizeProcessor {
 		} while (pixelsRemoved > 0);
 		return new ImageOperation(pixels2, image.getWidth(), image.getHeight());
 	}
-
+	
 	int thin(int pass, int[] table, int[] pixels2, int bgColor) {
 		int p1, p2, p3, p4, p5, p6, p7, p8, p9;
-
+		
 		int v, index, code;
 		int offset, rowOffset = image.getWidth();
 		int pixelsRemoved = 0;
@@ -258,5 +250,5 @@ public class SkeletonizeProcessor {
 		}
 		return pixelsRemoved;
 	}
-
+	
 }
