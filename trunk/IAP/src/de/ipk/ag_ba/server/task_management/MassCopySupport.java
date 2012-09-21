@@ -4,6 +4,7 @@ import info.StopWatch;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -89,9 +90,10 @@ public class MassCopySupport {
 		print("INFO: MASS COPY SUPPORT READY");
 	}
 	
-	public void performMassCopy() throws InterruptedException {
+	public void performMassCopy(boolean onlyMerge) throws InterruptedException {
 		if (massCopyRunning) {
-			print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
+			if (!onlyMerge)
+				print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
 			return;
 		}
 		massCopyRunning = true;
@@ -101,7 +103,10 @@ public class MassCopySupport {
 			return;
 		for (int i = 30; i >= 0; i--) {
 			status.setCurrentStatusText1("Countdown");
-			status.setCurrentStatusText2("Start sync in " + i + " seconds...");
+			if (onlyMerge)
+				status.setCurrentStatusText2("Start result merge in " + i + " seconds...");
+			else
+				status.setCurrentStatusText2("Start sync in " + i + " seconds...");
 			Thread.sleep(1000);
 			en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
 			if (!en) {
@@ -121,7 +126,7 @@ public class MassCopySupport {
 		Thread.sleep(1000);
 		
 		try {
-			makeCopyInnerCall();
+			makeCopyInnerCall(onlyMerge);
 		} finally {
 			massCopyRunning = false;
 		}
@@ -136,138 +141,13 @@ public class MassCopySupport {
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void makeCopyInnerCall() {
+	private void makeCopyInnerCall(boolean onlyMerge) {
 		// if false, analysis is performed after copying all new experiments
 		// if true, only the newly copied experiments are analyzed
 		boolean analyzeEachCopiedExperiment = false;
 		try {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
-			status.setCurrentStatusText1("Start sync...");
-			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to MongoDBs (MASS COPY)", false);
-			
-			LemnaTecDataExchange lt = new LemnaTecDataExchange();
-			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
-			ArrayList<IdTime> mongoIdsArr = new ArrayList<IdTime>();
-			final ArrayList<IdTime> toSave = new ArrayList<IdTime>();
-			
-			for (String db : lt.getDatabases()) {
-				if (db.endsWith("11"))
-					continue;
-				try {
-					for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
-						ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
-								ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
-					}
-				} catch (Exception e) {
-					if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-						print("Cant process DB " + db + ": " + e.getMessage());
-				}
-			}
-			
-			boolean useOnlyMainDatabase = true;
-			ArrayList<MongoDB> checkM;
-			if (useOnlyMainDatabase) {
-				checkM = new ArrayList<MongoDB>();
-				checkM.add(MongoDB.getDefaultCloud());
-			} else
-				checkM = MongoDB.getMongos();
-			for (MongoDB m : checkM) {
-				try {
-					print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
-					for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
-						if (hsmExp.getOriginDbId() != null)
-							mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(),
-									hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
-						else
-							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
-					}
-				} catch (Exception e) {
-					print("Cant process mongo DB " + m.getDatabaseName() + ": " + e.getMessage());
-				}
-			}
-			
-			for (IdTime it : ltIdArr) {
-				String db = it.getExperimentHeader().getDatabase();
-				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
-					// print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-					continue;
-				} else
-					if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
-						// print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-						continue;
-					}
-				
-				boolean found = false;
-				for (IdTime h : mongoIdsArr) {
-					if (h.equals(it)) {
-						if (it.time.getTime() - h.time.getTime() > 1000) {
-							print("MASS COPY INTENDED (MORE CURRENT DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-							toSave.add(it);
-						} else
-							if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
-								print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
-										", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
-								toSave.add(it);
-							}
-						found = true;
-						break;
-					}
-				}
-				
-				if (!found) {
-					toSave.add(it);
-					print("MASS COPY INTENDED (NEW EXPERIMENT): " + it.Id + " (DB: "
-							+ it.getExperimentHeader().getDatabase() + ")");
-				}
-			}
-			
-			print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
-			status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
-			int done = 0;
-			for (final IdTime it : toSave) {
-				boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
-				if (!en)
-					continue;
-				status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
-				MongoDB m = it.getMongoDB();
-				if (m == null) {
-					// new data set, copy to last mongo instance
-					if (useOnlyMainDatabase)
-						m = MongoDB.getDefaultCloud();
-					else
-						m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
-				}
-				ExperimentHeaderInterface src = it.getExperimentHeader();
-				print("Copy " + it.Id + " to " + m.getDatabaseName());
-				ExperimentReference er = new ExperimentReference(src);
-				ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-				status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
-				copyAction.setStatusProvider(status);
-				boolean simulate = false;
-				if (!simulate)
-					copyAction.performActionCalculateResults(null);
-				print("Copied " + it.Id + " to " + m.getDatabaseName());
-				MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + it.Id + " to " + m.getDatabaseName());
-				done++;
-				status.setCurrentStatusValueFine(100d * done / toSave.size());
-				
-				if (analyzeEachCopiedExperiment) {
-					String id = er.getHeader().getDatabaseId();
-					ArrayList<ExperimentHeaderInterface> experimentList = m.getExperimentList(null);
-					for (ExperimentHeaderInterface ehi : experimentList) {
-						if (ehi.getDatabaseId().equals(id)) {
-							print("Add compute tasks to analyze experiment " + id + ".");
-							ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi, experimentList);
-						}
-					}
-				}
-				Thread.sleep(1000);
-			}
-			status.setPrefix1(null);
-			status.setCurrentStatusText1("Copy complete (" + done + " finished) (" + SystemAnalysis.getCurrentTime() + ")");
-			status.setCurrentStatusText2("Next sync at 1 AM");
-			status.setCurrentStatusValueFine(100d);
-			s.printTime();
+			if (!onlyMerge)
+				copyMissingOrNewData(analyzeEachCopiedExperiment);
 			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
 			if (analyzeAllExperiments) {
 				for (MongoDB m : MongoDB.getMongos()) {
@@ -275,14 +155,16 @@ public class MassCopySupport {
 					CloudComputingService.merge(m, false, getStatusProvider());
 					status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
 					
-					status.setCurrentStatusText2("Delete Experiment History");
-					ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
-					delete.setStatusProvider(getStatusProvider());
-					delete.performActionCalculateResults(null);
-					status.setCurrentStatusText2("Deleted Experiment History (" + SystemAnalysis.getCurrentTime() + ")");
-					MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
+					if (!onlyMerge) {
+						status.setCurrentStatusText2("Delete Experiment History");
+						ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
+						delete.setStatusProvider(getStatusProvider());
+						delete.performActionCalculateResults(null);
+						status.setCurrentStatusText2("Deleted Experiment History (" + SystemAnalysis.getCurrentTime() + ")");
+						MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
+					}
 					
-					if (m.batchGetAllCommands().size() == 0) {
+					if (m.batchGetAllCommands().size() == 0 && !onlyMerge) {
 						// on Saturday, if no analysis is running and no analysis has been scheduled,
 						// the database clean-up is called
 						if (new Date().getDay() == 6) {
@@ -308,12 +190,147 @@ public class MassCopySupport {
 					}
 				}
 			}
-			status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")</html>");
-			status.setCurrentStatusText2("Next sync at 1 AM");
+			if (!onlyMerge) {
+				status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")</html>");
+				status.setCurrentStatusText2("Next sync at 1 AM");
+			} else {
+				status.setCurrentStatusText2("<html>Result-check completed<br>(" + new Date() + ")</html>");
+				status.setCurrentStatusText2("Next sync at 1 AM");
+			}
 		} catch (Exception e1) {
 			print("ERROR: MASS COPY INNER-CALL ERROR (" + e1.getMessage() + ")");
 			MongoDB.saveSystemErrorMessage("MASS COPY INNER-CALL ERROR", e1);
 		}
+	}
+	
+	private void copyMissingOrNewData(boolean analyzeEachCopiedExperiment) throws SQLException, ClassNotFoundException, Exception, InterruptedException {
+		System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
+		status.setCurrentStatusText1("Start sync...");
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to MongoDBs (MASS COPY)", false);
+		
+		LemnaTecDataExchange lt = new LemnaTecDataExchange();
+		ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
+		ArrayList<IdTime> mongoIdsArr = new ArrayList<IdTime>();
+		final ArrayList<IdTime> toSave = new ArrayList<IdTime>();
+		
+		for (String db : lt.getDatabases()) {
+			if (db.endsWith("11"))
+				continue;
+			try {
+				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
+					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
+							ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
+				}
+			} catch (Exception e) {
+				if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+					print("Cant process DB " + db + ": " + e.getMessage());
+			}
+		}
+		
+		boolean useOnlyMainDatabase = true;
+		ArrayList<MongoDB> checkM;
+		if (useOnlyMainDatabase) {
+			checkM = new ArrayList<MongoDB>();
+			checkM.add(MongoDB.getDefaultCloud());
+		} else
+			checkM = MongoDB.getMongos();
+		for (MongoDB m : checkM) {
+			try {
+				print("MongoDB: " + m.getDatabaseName() + "@" + m.getDefaultHost());
+				for (ExperimentHeaderInterface hsmExp : m.getExperimentList(null)) {
+					if (hsmExp.getOriginDbId() != null)
+						mongoIdsArr.add(new IdTime(m, hsmExp.getOriginDbId(),
+								hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
+					else
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN MongoDB (" + m.getDatabaseName() + ")!");
+				}
+			} catch (Exception e) {
+				print("Cant process mongo DB " + m.getDatabaseName() + ": " + e.getMessage());
+			}
+		}
+		
+		for (IdTime it : ltIdArr) {
+			String db = it.getExperimentHeader().getDatabase();
+			if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
+				// print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+				continue;
+			} else
+				if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
+					// print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+					continue;
+				}
+			
+			boolean found = false;
+			for (IdTime h : mongoIdsArr) {
+				if (h.equals(it)) {
+					if (it.time.getTime() - h.time.getTime() > 1000) {
+						print("MASS COPY INTENDED (MORE CURRENT DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+						toSave.add(it);
+					} else
+						if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
+							print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
+									", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
+							toSave.add(it);
+						}
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				toSave.add(it);
+				print("MASS COPY INTENDED (NEW EXPERIMENT): " + it.Id + " (DB: "
+						+ it.getExperimentHeader().getDatabase() + ")");
+			}
+		}
+		
+		print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
+		status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
+		int done = 0;
+		for (final IdTime it : toSave) {
+			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			if (!en)
+				continue;
+			status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
+			MongoDB m = it.getMongoDB();
+			if (m == null) {
+				// new data set, copy to last mongo instance
+				if (useOnlyMainDatabase)
+					m = MongoDB.getDefaultCloud();
+				else
+					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
+			}
+			ExperimentHeaderInterface src = it.getExperimentHeader();
+			print("Copy " + it.Id + " to " + m.getDatabaseName());
+			ExperimentReference er = new ExperimentReference(src);
+			ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
+			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
+			copyAction.setStatusProvider(status);
+			boolean simulate = false;
+			if (!simulate)
+				copyAction.performActionCalculateResults(null);
+			print("Copied " + it.Id + " to " + m.getDatabaseName());
+			MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + it.Id + " to " + m.getDatabaseName());
+			done++;
+			status.setCurrentStatusValueFine(100d * done / toSave.size());
+			
+			if (analyzeEachCopiedExperiment) {
+				String id = er.getHeader().getDatabaseId();
+				ArrayList<ExperimentHeaderInterface> experimentList = m.getExperimentList(null);
+				for (ExperimentHeaderInterface ehi : experimentList) {
+					if (ehi.getDatabaseId().equals(id)) {
+						print("Add compute tasks to analyze experiment " + id + ".");
+						ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi, experimentList);
+					}
+				}
+			}
+			Thread.sleep(1000);
+		}
+		status.setPrefix1(null);
+		status.setCurrentStatusText1("Copy complete (" + done + " finished) (" + SystemAnalysis.getCurrentTime() + ")");
+		status.setCurrentStatusText2("Next sync at 1 AM");
+		status.setCurrentStatusValueFine(100d);
+		s.printTime();
 	}
 	
 	private boolean scheduled = false;
@@ -329,27 +346,31 @@ public class MassCopySupport {
 			else
 				print("AUTOMATIC MASS COPY STATUS (CURRENTLY DISABLED) FROM LT TO MongoDB (" + hsmFolder + ") WILL BE CHECKED EVERY DAY AT 01:00");
 			Timer t = new Timer("IAP 24h-Backup-Timer");
-			long period = 1000 * 60 * 60 * 24; // 24 Hours
+			long period = 1000 * 60 * 15; // every 15 minutes
 			TimerTask tT = new TimerTask() {
 				@Override
 				public void run() {
 					try {
 						Thread.sleep(1000);
+						boolean onlyMerge = false;
+						if (new Date().getHours() != 1 || new Date().getMinutes() != 0)
+							onlyMerge = true;
 						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
 						if (!en) {
-							print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");
+							if (!onlyMerge)
+								print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");
 							return;
 						}
 						
 						Thread.sleep(1000);
 						
-						performMassCopy();
+						performMassCopy(onlyMerge);
 					} catch (InterruptedException e) {
 						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 					}
 				}
 			};
-			Date startTime = new Date(); // current day at 20:00:00
+			Date startTime = new Date(); // current day at 01:00:00
 			startTime.setHours(01);
 			startTime.setMinutes(00);
 			startTime.setSeconds(00);
