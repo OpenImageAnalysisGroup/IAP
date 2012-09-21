@@ -194,7 +194,7 @@ public class Other {
 							@Override
 							public void run() {
 								try {
-									MassCopySupport.getInstance().performMassCopy();
+									MassCopySupport.getInstance().performMassCopy(false);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 									MongoDB.saveSystemErrorMessage("Mass Copy Execution Error", e);
