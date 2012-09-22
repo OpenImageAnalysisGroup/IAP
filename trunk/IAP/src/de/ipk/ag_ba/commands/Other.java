@@ -187,14 +187,14 @@ public class Other {
 				resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 				
 				BackgroundTaskStatusProviderSupportingExternalCall copyToHsmStatus = MassCopySupport.getInstance().getStatusProvider();
-				Runnable startAction = new Runnable() {
+				Runnable startActionMassCopy = new Runnable() {
 					@Override
 					public void run() {
 						Thread t = new Thread(new Runnable() {
 							@Override
 							public void run() {
 								try {
-									MassCopySupport.getInstance().performMassCopy(false);
+									MassCopySupport.getInstance().performMassCopy(true);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 									MongoDB.saveSystemErrorMessage("Mass Copy Execution Error", e);
@@ -205,7 +205,7 @@ public class Other {
 					}
 				};
 				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(copyToHsmStatus,
-						startAction,
+						startActionMassCopy,
 						"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
 						"Automatic DB-Copy",
 						"sync"), src.getGUIsetting()));
