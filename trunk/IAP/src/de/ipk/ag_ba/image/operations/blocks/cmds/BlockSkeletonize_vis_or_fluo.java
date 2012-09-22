@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import ij.measure.ResultsTable;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -159,7 +157,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	
 	public synchronized FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize().getImage()));
+		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).getImage()));
 		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
 		
@@ -519,14 +517,14 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					Double[] lca = lc.toArray(new Double[] {});
 					Arrays.sort(lca);
 					Double median = lca[lca.length / 2];
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.leaf.count.median", median, null);
 				}
 				if (maxLeaflength != null && maxLeaflength > 0)
 					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
 				if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-					summaryResult.setNumericProperty(getBlockPosition(), 
+					summaryResult.setNumericProperty(getBlockPosition(),
 							"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
 				
 			}

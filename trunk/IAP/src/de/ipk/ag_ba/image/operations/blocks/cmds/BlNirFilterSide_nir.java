@@ -41,7 +41,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 				}
 				input().masks().setNir(nirMask);
 				if (useNirSkeleton) {
-					FlexibleImage sk = nirMask.io().skeletonize().getImage();
+					FlexibleImage sk = nirMask.io().skeletonize(false).getImage();
 					if (sk != null) {
 						sk = mapOriginalOnSkel(sk, nirMask, options.getBackground());
 						getProperties().setImage("nir_skeleton", sk.print("SKELETON", debug));
@@ -56,7 +56,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 			if (useNirSkeleton) {
 				FlexibleImage nirMask = input().masks().nir();
 				if (nirMask != null) {
-					FlexibleImage sk = nirMask.io().skeletonize().getImage();
+					FlexibleImage sk = nirMask.io().skeletonize(false).getImage();
 					if (sk != null) {
 						sk = mapOriginalOnSkel(sk, nirMask, options.getBackground());
 						getProperties().setImage("nir_skeleton", sk.print("SKELETON", debug));

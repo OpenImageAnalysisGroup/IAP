@@ -365,8 +365,22 @@ public class CloudComputingService {
 				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
 						+ knownResults.size());
 				
-				boolean addNewTasksIfMissing = false;
+				ExperimentReference eRef = new ExperimentReference(knownResults.iterator().next().getOriginDbId());
+				ExperimentHeaderInterface eRefHeader = eRef.getHeader();
+				if (eRefHeader == null) {
+					// source data set has been deleted meanwhile
+					// therefore the analysis results will be deleted, too
+					String msg = "Source data set for analysis results has been deleted, about to delete non-relevant result data (" + knownResults.size() + "/" +
+							tempDataSetDescription.getPartCntI() + " parts)";
+					System.out.println(msg);
+					MongoDB.saveSystemMessage(msg);
+					for (ExperimentHeaderInterface r : knownResults) {
+						m.deleteExperiment(r.getDatabaseId());
+					}
+					continue;
+				}
 				
+				boolean addNewTasksIfMissing = false;
 				Object[] res;
 				if (interactive) {
 					if (SystemAnalysis.isHeadless()) {
@@ -502,7 +516,7 @@ public class CloudComputingService {
 			tso.addInt(1);
 			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
 			if (optStatus != null)
-				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / (double) wl);
+				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 			// for (String c : condS)
 			// System.out.println(">Condition: " + c);
 			

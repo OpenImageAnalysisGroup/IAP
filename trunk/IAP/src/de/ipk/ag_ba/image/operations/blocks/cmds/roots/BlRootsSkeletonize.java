@@ -45,7 +45,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 				widthHistogram(rt, image);
 			}
 			
-			inp = binary.skeletonize().print("INPUT FOR BRANCH DETECTION", debug);
+			inp = binary.skeletonize(false).print("INPUT FOR BRANCH DETECTION", debug);
 			
 			rt.addValue("roots.skeleton.length", inp.countFilledPixels());
 			
