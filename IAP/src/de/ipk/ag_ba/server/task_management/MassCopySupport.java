@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Stack;
@@ -370,10 +371,18 @@ public class MassCopySupport {
 					}
 				}
 			};
-			Date startTime = new Date(); // current day at 01:00:00
-			startTime.setHours(01);
-			startTime.setMinutes(00);
-			startTime.setSeconds(00);
+			
+			Date now = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(now);
+			cal.add(Calendar.DAY_OF_YEAR, 1);
+			cal.set(Calendar.HOUR_OF_DAY, 1);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			Date tomorrow = cal.getTime();
+			
+			Date startTime = tomorrow; // next day at 01:00:00
 			t.scheduleAtFixedRate(tT, startTime, period);
 			scheduled = true;
 		} else {
