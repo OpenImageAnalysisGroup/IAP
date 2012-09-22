@@ -194,7 +194,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 		FlexibleImage irSkel = null;
 		// getProperties().getImage("ir_skeleton");
 		if (input().masks().ir() != null)
-			irSkel = input().masks().ir().io().skeletonize().getImage();
+			irSkel = input().masks().ir().io().skeletonize(false).getImage();
 		if (irSkel != null) {
 			int irSkeletonFilledPixels = irSkel.io().countFilledPixels();
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);

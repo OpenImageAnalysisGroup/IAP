@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
-import ij.measure.ResultsTable;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -84,7 +82,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 	
 	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize().getImage()));
+		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).getImage()));
 		skel2d.findEndpointsAndBranches2();
 		skel2d.print("endpoints and branches", debug);
 		
@@ -158,7 +156,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				leafWidthInPixels = 0d;
 				int skeletonLength;
 				do {
-					skeletonLength = temp.io().skeletonize().print("SKELETON", false).countFilledPixels();
+					skeletonLength = temp.io().skeletonize(false).print("SKELETON", false).countFilledPixels();
 					if (skeletonLength > 0)
 						leafWidthInPixels++;
 					temp = temp.io().erode().getImage();
@@ -211,7 +209,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			int skeletonLength;
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 			do {
-				skeletonLength = inputImage.io().skeletonize().print("SKELETON2", false).countFilledPixels();
+				skeletonLength = inputImage.io().skeletonize(false).print("SKELETON2", false).countFilledPixels();
 				if (skeletonLength > 0)
 					leafWidthInPixels2++;
 				if (fis != null)
@@ -413,7 +411,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 									cnt = v.getValue();
 							}
 							if (cnt != null && summaryResult != null) {
-								summaryResult.setNumericProperty(getBlockPosition(), 
+								summaryResult.setNumericProperty(getBlockPosition(),
 										"RESULT_side.leaf.count.best", cnt, null);
 								// System.out.println("Leaf count for best side image: " + cnt);
 							}
@@ -447,14 +445,14 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 						Double[] lca = lc.toArray(new Double[] {});
 						Arrays.sort(lca);
 						Double median = lca[lca.length / 2];
-						summaryResult.setNumericProperty(getBlockPosition(), 
+						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_side.leaf.count.median", median, null);
 					}
 					if (maxLeaflength != null && maxLeaflength > 0)
-						summaryResult.setNumericProperty(getBlockPosition(), 
+						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
 					if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-						summaryResult.setNumericProperty(getBlockPosition(), 
+						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
 				}
 		}

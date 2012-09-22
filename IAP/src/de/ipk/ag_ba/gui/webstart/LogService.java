@@ -2,6 +2,7 @@ package de.ipk.ag_ba.gui.webstart;
 
 import java.util.Stack;
 
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -11,7 +12,7 @@ public class LogService {
 	
 	private static boolean ba13reachable = IAPservice.isMongoReachable();
 	
-	public String getLatestNews(int n, String pre, final String preLine, String lineBreak, String follow) {
+	public String getLatestNews(final int n, String pre, final String preLine, String lineBreak, String follow) {
 		StringBuilder res = new StringBuilder();
 		final Stack<String> news = new Stack<String>();
 		if (!ba13reachable) {
@@ -23,11 +24,11 @@ public class LogService {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-							MongoDB dc = MongoDB.getDefaultCloud();
-							if (dc != null)
-								for (String item : dc.getNews(5)) {
-									news.push(preLine + item);
-								}
+						MongoDB dc = MongoDB.getDefaultCloud();
+						if (dc != null)
+							for (String item : dc.getNews(n)) {
+								news.push(preLine + StringManipulationTools.removeHTMLtags(item));
+							}
 					}
 				};
 				Thread t = new Thread(r, "Read MonogDB news");
