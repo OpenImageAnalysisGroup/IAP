@@ -376,7 +376,6 @@ public class MassCopySupport {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(now);
 			cal.add(Calendar.MINUTE, 15 - (cal.get(Calendar.MINUTE) % 15));
-			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
 			Date next_15_30_45_60 = cal.getTime();
