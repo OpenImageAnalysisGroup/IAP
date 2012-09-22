@@ -375,14 +375,13 @@ public class MassCopySupport {
 			Date now = new Date();
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(now);
-			cal.add(Calendar.DAY_OF_YEAR, 1);
-			cal.set(Calendar.HOUR_OF_DAY, 1);
+			cal.add(Calendar.MINUTE, 15 - (cal.get(Calendar.MINUTE) % 15));
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
-			Date tomorrow = cal.getTime();
+			Date next_15_30_45_60 = cal.getTime();
 			
-			Date startTime = tomorrow; // next day at 01:00:00
+			Date startTime = next_15_30_45_60;
 			t.scheduleAtFixedRate(tT, startTime, period);
 			scheduled = true;
 		} else {
