@@ -43,7 +43,7 @@ public class Snapshot {
 	}
 	
 	public void setId_tag(String id_tag) {
-		System.out.println(id_tag);
+		// System.out.println(id_tag);
 		if (id_tag.contains("/"))
 			id_tag = StringManipulationTools.stringReplace(id_tag, "/", "_");
 		this.id_tag = id_tag;

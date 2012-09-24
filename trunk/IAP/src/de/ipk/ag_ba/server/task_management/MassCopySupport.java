@@ -346,12 +346,19 @@ public class MassCopySupport {
 				print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 01:00");
 			else
 				print("AUTOMATIC MASS COPY STATUS (CURRENTLY DISABLED) FROM LT TO MongoDB (" + hsmFolder + ") WILL BE CHECKED EVERY DAY AT 01:00");
+			
+			final ThreadSafeOptions lastExecutionTime = new ThreadSafeOptions();
+			
 			Timer t = new Timer("IAP 24h-Backup-Timer");
 			long period = 1000 * 60 * 15; // every 15 minutes
 			TimerTask tT = new TimerTask() {
+				@SuppressWarnings("deprecation")
 				@Override
 				public void run() {
 					try {
+						if (System.currentTimeMillis() - lastExecutionTime.getLong() < 60000)
+							return; // process timer call at most once per minute
+						lastExecutionTime.setLong(System.currentTimeMillis());
 						Thread.sleep(1000);
 						boolean onlyMerge = false;
 						if (new Date().getHours() != 1 || new Date().getMinutes() != 0)
