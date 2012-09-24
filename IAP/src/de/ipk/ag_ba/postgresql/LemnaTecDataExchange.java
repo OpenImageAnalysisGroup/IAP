@@ -300,8 +300,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				names.clear();
 				while (rs.next()) {
 					String name = rs.getString(1);
-					names.add(name);
+					names.add(getNiceNameFromLoginName(name));
 					people.get(ehi).add(name);
+				}
+				if (names.size() > 1) {
+					names.remove(getNiceNameFromLoginName("muecke"));
 				}
 				rs.close();
 				String importers = StringManipulationTools.getStringList(names, ";");
@@ -338,6 +341,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private HashMap<String, String> login2niceName = null;
 	
 	private String getNiceNameFromLoginName(String name) {
+		System.out.println("Request nice name for " + name);
 		if (login2niceName == null) {
 			login2niceName = new HashMap<String, String>();
 			login2niceName.put("Fernando", "Arana, Dr. Fernando (HET)");
@@ -345,7 +349,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
 			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
 			login2niceName.put("entzian", "Entzian, Dr. Alexander (BA)");
-			login2niceName.put("neumannk", "Neumann, Kerstin (GED)");
+			login2niceName.put("Neumannk", "Neumann, Dr. Kerstin (GED)");
+			login2niceName.put("neumannk", "Neumann, Dr. Kerstin (GED)");
 			login2niceName.put("hartmann", "Hartmann, Anja (PBI)");
 			login2niceName.put("mary", "Ziems, Mary (GED");
 			login2niceName.put("Ziems", "Ziems, Mary (GED");
@@ -361,6 +366,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			login2niceName.put("klukas", "Klukas, Dr. Christian (BA)");
 		}
 		String res = login2niceName.get(name);
+		System.out.println("Result: " + res);
 		if (res != null)
 			return res;
 		else
@@ -1062,7 +1068,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		
-		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(measurements, true, false, true, optStatus);
+		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(
+				measurements, true, false, true, optStatus);
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
@@ -1216,6 +1223,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			String species = IAPexperimentTypes.getSpeciesFromExperimentType(expType);
 			
 			ps.setString(1, header.getExperimentName());
+			HashSet<String> printedMetaData = new HashSet<String>();
 			try {
 				ResultSet rs = ps.executeQuery();
 				
@@ -1228,7 +1236,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					System.out.println("plantID: " + plantID + " metaName: " + metaName + " metaValue: " + metaValue);
+					String info = "metaName: " + metaName + " metaValue: " + metaValue;
+					if (!printedMetaData.contains(info)) {
+						System.out.println(info);
+						printedMetaData.add(info);
+					}
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
