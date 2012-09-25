@@ -239,7 +239,10 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public String getDefaultTitle() {
 		ExperimentHeaderInterface header = experimentReference.getHeader();
-		long t = header.getStorageTime() != null ? header.getStorageTime().getTime() : header.getImportdate().getTime();
+		long t = header.getStorageTime() != null ? header.getStorageTime().getTime() :
+				(header.getImportdate() != null ? header.getImportdate().getTime() :
+						0);
+		long startTime = t;
 		String add = "updated";
 		if (header.getStorageTime() != null &&
 				(header.getExperimentType() != null &&
@@ -248,8 +251,12 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>analysis";
 			t = header.getStorageTime().getTime();
 		}
-		String age = "<br><small><font color='gray'>" + add + " " + SystemAnalysis.getWaitTime(
-				System.currentTimeMillis() - t, 1) + " ago</font></small>";
+		String time = SystemAnalysis.getWaitTime(System.currentTimeMillis() - t, 1);
+		if (time.trim().equals(""))
+			System.out.println("ERRR");
+		String age = "<br><small><font color='gray'>" + add + " " + time + " ago</font></small>";
+		if (startTime == 0)
+			age = "<br><small><font color='gray'>(start or end time could not be properly processed)</font></small>";
 		if (displayName != null)
 			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "") + age;
 		else
