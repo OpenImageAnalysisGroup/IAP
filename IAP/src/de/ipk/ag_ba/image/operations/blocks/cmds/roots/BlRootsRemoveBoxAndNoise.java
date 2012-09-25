@@ -22,7 +22,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		FlexibleImage img = input().masks().vis();
 		if (img != null) {
-			boolean printEachStep = true;
+			boolean printEachStep = debug;
 			img = img.copy().print("1", printEachStep);
 			ImageOperation io = img.io().border(2).print("2", printEachStep);
 			io = io.invert().thresholdBlueHigherThan(3).print("3", printEachStep);
