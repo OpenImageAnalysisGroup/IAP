@@ -201,4 +201,8 @@ public class FileNameScanner {
 	public String getSpecies() {
 		return species;
 	}
+	
+	public void setSpecies(String species) {
+		this.species = species;
+	}
 }

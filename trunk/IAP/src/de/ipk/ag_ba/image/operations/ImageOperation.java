@@ -4209,6 +4209,14 @@ public class ImageOperation {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
+	public ImageOperation binary(int currentBackground, int foreground, int background) {
+		int[] res = getImageAs1dArray();
+		int i = 0;
+		for (int c : res)
+			res[i++] = c != currentBackground ? foreground : background;
+		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
 	/**
 	 * @return The combined image (a and b where a pixels are background).
 	 */
@@ -4683,5 +4691,13 @@ public class ImageOperation {
 	
 	public SkeletonProcessor2d skel2d() {
 		return new SkeletonProcessor2d(getImage());
+	}
+	
+	/**
+	 * Warning: input image is modified.
+	 */
+	public ImageOperation sharpen() {
+		image.getProcessor().sharpen();
+		return this;
 	}
 }

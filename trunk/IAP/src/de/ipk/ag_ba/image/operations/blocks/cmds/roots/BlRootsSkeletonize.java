@@ -5,11 +5,13 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.Colors;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -28,53 +30,79 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		int background = options.getBackground();
-		
 		FlexibleImage img = input().masks().vis();
 		if (img != null) {
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			
-			ImageOperation inp = img.io().print("INPUT FOR SKEL", debug);
+			FlexibleImage inImage = img.copy();
 			
-			rt.addValue("roots.filled.pixels", inp.countFilledPixels());
-			ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
+			img = processRootsInVisibleImage("", background, img, rt);
+			
 			{
-				int width = 1;
-				int pixelCnt = 0;
-				ImageOperation image = binary.copy();
-				widthHistogram(rt, image);
+				// analyze separate sections of the roots
+				// img = processRootsInVisibleImage("root_"+i+"_"+n, background, img, rt);
+				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(8).print("Dilated image for section detection", true /* debug */);
+				ClusterDetection cd = new ClusterDetection(in.getImage(), ImageOperation.BACKGROUND_COLORint);
+				cd.detectClusters();
+				int clusters = cd.getClusterCount();
+				rt.addValue("roots.cluster.count", clusters);
+				ImageOperation io = new FlexibleImage(in.getWidth(), in.getHeight(), cd.getImageClusterIdMask()).io();
+				ArrayList<Color> cols = Colors.get(clusters);
+				for (int i = 0; i < cols.size(); i++) {
+					io = io.replaceColor(0, cols.get(i).getRGB());
+				}
+				io.print("CLUSTERS");
 			}
-			
-			inp = binary.skeletonize(false).print("INPUT FOR BRANCH DETECTION", debug);
-			
-			rt.addValue("roots.skeleton.length", inp.countFilledPixels());
-			
-			SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
-			skel.findEndpointsAndBranches();
-			
-			img = skel.getAsFlexibleImage().print("THE SKELETON", debug);
-			
-			ArrayList<Point> branchPoints = skel.getBranches();
-			rt.addValue("roots.skeleton.branchpoints", branchPoints.size());
-			rt.addValue("roots.skeleton.endpoints", skel.getEndpoints().size());
 			
 			getProperties().storeResults("RESULT_scan.", rt, getBlockPosition());
 		}
 		return img;
 	}
 	
+	private FlexibleImage processRootsInVisibleImage(
+			String pre,
+			int background, FlexibleImage img, ResultsTableWithUnits rt) {
+		ImageOperation inp = img.io().print("INPUT FOR SKEL", debug);
+		
+		rt.addValue(pre + "roots.filled.pixels", inp.countFilledPixels());
+		ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
+		{
+			ImageOperation image = binary.copy();
+			widthHistogram(rt, image);
+		}
+		
+		inp = binary.skeletonize(false).print("INPUT FOR BRANCH DETECTION", debug);
+		
+		rt.addValue(pre + "roots.skeleton.length", inp.countFilledPixels());
+		
+		SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
+		skel.findEndpointsAndBranches();
+		
+		img = skel.getAsFlexibleImage().print("THE SKELETON", debug);
+		
+		ArrayList<Point> branchPoints = skel.getBranches();
+		
+		rt.addValue(pre + "roots.skeleton.branchpoints", branchPoints.size());
+		rt.addValue(pre + "roots.skeleton.endpoints", skel.getEndpoints().size());
+		
+		return img;
+	}
+	
 	private void widthHistogram(ResultsTableWithUnits rt, ImageOperation image) {
 		HashMap<Integer, Integer> width2len = new HashMap<Integer, Integer>();
-		double area = 80;
+		// double area = 80;
 		int width = 1;
 		int pixelCnt;
+		image = image.resize(2);
 		do {
-			area -= Math.random() * 20d;
-			pixelCnt = (int) area;
+			// area -= Math.random() * 20d;
+			// pixelCnt = (int) area;
+			pixelCnt = image.skeletonize(false).countFilledPixels();
 			if (pixelCnt > 0) {
 				width2len.put(width, pixelCnt);
 				image = image.erode();
-				width++;
+				width += 1;
 			}
 		} while (pixelCnt > 0);
 		width--;

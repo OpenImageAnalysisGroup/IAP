@@ -264,6 +264,7 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 								// type 1: Ep2-C1-3-P2428.jpg
 								s = new FileNameScanner("X-V-G-R", fn);
 							}
+						s.setSpecies("Barley");
 					} else
 						if (elements != null && elements.length == 1) {
 							if (fn.endsWith("Grad.png")) {

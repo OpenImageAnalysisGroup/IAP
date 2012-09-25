@@ -8,9 +8,10 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
-import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsScanDetectZoom;
-import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsAnalyzeSeparation;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsAddBorderAroundImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsRemoveBoxAndNoise;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsScanDetectZoom;
+import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsSharpenImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsSkeletonize;
 
 /**
@@ -26,11 +27,12 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images.class);
+		p.add(BlRootsAddBorderAroundImage.class);
 		p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
+		p.add(BlRootsSharpenImage.class);
 		p.add(BlRootsScanDetectZoom.class);
 		p.add(BlRootsRemoveBoxAndNoise.class);
 		p.add(BlRootsSkeletonize.class);
-		p.add(BlRootsAnalyzeSeparation.class);
 		return p;
 	}
 	
