@@ -307,6 +307,9 @@ public class BlConvexHull_fluo extends AbstractSnapshotAnalysisBlockFIS {
 						double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
 						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_volume.lt", volume_lt, "px^3");
+						double area = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + avgTopArea;
+						summaryResult.setNumericProperty(getBlockPosition(),
+								"RESULT_volume.area090T", area, "px^2");
 					}
 					
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {

@@ -63,7 +63,6 @@ public class TestFileNameScanner {
 		assertEquals(s1.getDateDay(), 4);
 		assertEquals(s1.getSubstance(), "FLUOSide");
 		assertEquals(90, s1.getRotation(), 0.001);
-		assertEquals(s1.getReplicateID(), 1);
 		
 		FileNameScanner s2 = new FileNameScanner("G_X_R_S_A_X_X_D_X", "H13_02_1020_RgbSide_0_Grad_HL2_2010-06-28_07_44_49.png");
 		assertEquals(s2.getGenotype(), "H13");
@@ -73,6 +72,32 @@ public class TestFileNameScanner {
 		assertEquals(s2.getDateDay(), 28);
 		assertEquals(s2.getSubstance(), "RgbSide");
 		assertEquals(s2.getRotation(), 0 / 180d * Math.PI, 0.001);
-		assertEquals(s2.getReplicateID(), 1020);
+		
+		/*
+		 * G = genotype, R = replicate ID, X = ignore, A = rotation (degree), D =
+		 * date (yyyy-mm-dd), 'some string' = some string (ignored, but may be used
+		 * to divide strings), S = substance, V = variety, P = species
+		 * Examples: "R_D X_X_X_X_S_S_A'Grad'", "G_X_R_S_A_X_X_D_X", "G_X_R_S_S_D_X"
+		 */
+		
+		FileNameScanner s8 = new FileNameScanner("X_?-T_D_R_C_X_X", "0024 calibration wheat_000668-LETL_2010-09-18_01-20-19_27426_FLUO TV_0_0.png");
+		assertEquals(s8.getGenotype(), "H13");
+		assertEquals(s8.getTreatment(), "LETL");
+		assertEquals(s8.getReplicateID(), 27426);
+		assertEquals(s8.getDateYear(), 2010);
+		assertEquals(s8.getDateMonth(), 9);
+		assertEquals(s8.getDateDay(), 18);
+		assertEquals(s8.getSubstance(), "fluo.top");
+		assertEquals(s8.getRotation(), 0 / 180d * Math.PI, 0.001);
+		
+		FileNameScanner s9 = new FileNameScanner("G_X_R_S_A_X_X_D_X", "0024 calibration wheat_000668-LETL_2010-09-18_01-20-19_27426_FLUO TV_0_0.png");
+		assertEquals(s9.getGenotype(), "H13");
+		assertEquals(s9.getTreatment(), "LETL");
+		assertEquals(s9.getReplicateID(), 1020);
+		assertEquals(s9.getDateYear(), 2010);
+		assertEquals(s9.getDateMonth(), 9);
+		assertEquals(s9.getDateDay(), 18);
+		assertEquals(s9.getSubstance(), "fluo.top");
+		assertEquals(s9.getRotation(), 0 / 180d * Math.PI, 0.001);
 	}
 }

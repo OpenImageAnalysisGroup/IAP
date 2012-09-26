@@ -274,11 +274,23 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 							}
 						} else
 							if (elements != null && elements.length == 8) {
-								// 001
-								try {
-									s = new FileNameScanner("R_D X_X_X_X_S_S_A'Grad'", fn);
-								} catch (Exception er) {
-									s = new FileNameScanner("G_X_R_S_D_X", fn);
+								if (fn.endsWith("0_0.png")) {
+									// 0024 calibration wheat_000668-LETL_2010-09-18_01-20-19_27426_FLUO TV_0_0.png
+									// 0024 calibration wheat_001428-WW_2010-09-30_12-00-09_32390_FLUO SV2_0_0.png
+									/*
+									 * G = genotype, R = replicate ID, X = ignore, A = rotation (degree), D =
+									 * date (yyyy-mm-dd), 'some string' = some string (ignored, but may be used
+									 * to divide strings), S = substance, V = variety, P = species
+									 * Examples: "R_D X_X_X_X_S_S_A'Grad'", "G_X_R_S_A_X_X_D_X", "G_X_R_S_S_D_X"
+									 */
+									s = new FileNameScanner("X_X-", fn);
+								} else {
+									// 001
+									try {
+										s = new FileNameScanner("R_D X_X_X_X_S_S_A'Grad'", fn);
+									} catch (Exception er) {
+										s = new FileNameScanner("G_X_R_S_D_X", fn);
+									}
 								}
 							} else {
 								boolean transferGerste = false;
