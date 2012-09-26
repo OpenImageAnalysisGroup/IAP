@@ -29,11 +29,11 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (whitePixels / (double) allPixels < 0.15d) {
 				options.setHigherResVisCamera(true);
-				rt.addValue("roots.zoom", 1);
+				rt.addValue("zoom", 1);
 			} else
-				rt.addValue("roots.zoom", 0);
+				rt.addValue("zoom", 0);
 			
-			getProperties().storeResults("RESULT_scan.", rt, getBlockPosition());
+			getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		}
 		
 		return super.processVISmask();

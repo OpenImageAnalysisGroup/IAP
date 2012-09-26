@@ -468,7 +468,7 @@ public class ImageOperation {
 			}
 		}
 		
-		return new ImageOperation(originalImage).print("HHHH (deleted " + del + ")").setType(getType());
+		return new ImageOperation(originalImage).print("HHHH (deleted " + del + ")", false).setType(getType());
 	}
 	
 	/**
