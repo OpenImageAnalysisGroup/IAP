@@ -308,6 +308,8 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			c.setSpecies("Arabidopsis");
 		c.setGenotype(rId.getGenotype());
 		c.setVariety(rId.getVariety());
+		if (rId.getTreatment() != null)
+			c.setTreatment(rId.getTreatment());
 		return c;
 	}
 	

@@ -17,7 +17,7 @@ public class BlRootsSharpenImage extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		FlexibleImage img = input().images().vis();
 		if (img != null)
-			img = img.io().copy().blur(2).sharpen().sharpen().sharpen().getImage().print("RES");
+			img = img.io().copy().blur(2).sharpen().sharpen().sharpen().getImage().print("RES", false);
 		return img;
 	}
 }

@@ -29,7 +29,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class FileNameScanner {
 	
 	private int replicateID;
-	private String species, genotype, variety;
+	private String species, genotype, variety, treatment;
 	private int dateYear;
 	private int dateMonth;
 	private int dateDay;
@@ -55,7 +55,7 @@ public class FileNameScanner {
 	/**
 	 * G = genotype, R = replicate ID, X = ignore, A = rotation (degree), D =
 	 * date (yyyy-mm-dd), 'some string' = some string (ignored, but may be used
-	 * to divide strings), S = substance, V = variety, P = species
+	 * to divide strings), S = substance, V = variety, P = species, T = treatment
 	 * Examples: "R_D X_X_X_X_S_S_A'Grad'", "G_X_R_S_A_X_X_D_X", "G_X_R_S_S_D_X"
 	 * 
 	 * @param fn
@@ -115,6 +115,9 @@ public class FileNameScanner {
 			}
 			if (currType == 'V') {
 				variety = input;
+			}
+			if (currType == 'T') {
+				treatment = input;
 			}
 			if (currType == 'S') {
 				if (substance == null)
@@ -204,5 +207,13 @@ public class FileNameScanner {
 	
 	public void setSpecies(String species) {
 		this.species = species;
+	}
+	
+	public String getTreatment() {
+		return treatment;
+	}
+	
+	public void setTreatment(String treatment) {
+		this.treatment = treatment;
 	}
 }

@@ -47,11 +47,28 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 				cd.detectClusters();
 				int clusters = cd.getClusterCount();
 				rt.addValue("roots.cluster.count", clusters);
+				
+				int[] rootPixels = img.getAs1A();
+				
 				ImageOperation io = new FlexibleImage(in.getWidth(), in.getHeight(), cd.getImageClusterIdMask()).io();
+				
 				ArrayList<Color> cols = Colors.get(clusters);
-				for (int i = 0; i < cols.size(); i++) {
-					io = io.replaceColor(0, cols.get(i).getRGB());
+				for (int i = 1; i < cols.size(); i++) {
+					io = io.replaceColor(i, cols.get(i).getRGB());
 				}
+				
+				int[] clusterIDsPixels = io.getImageAs1dArray();
+				
+				int nnn = 0;
+				for (int i = 0; i < rootPixels.length; i++)
+					if (rootPixels[i] == -16777216)
+						clusterIDsPixels[i] = background;
+					else
+						nnn++;
+				System.out.println("KJADFHDHFL: " + nnn);
+				
+				io = new ImageOperation(clusterIDsPixels, io.getWidth(), io.getHeight());
+				
 				io.print("CLUSTERS");
 			}
 			
