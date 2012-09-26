@@ -46,6 +46,11 @@ public class TestFileNameScanner {
 		assertEquals(s4.getGenotype(), "3");
 		assertEquals(s4.getReplicateID(), 2428);
 		
+		FileNameScanner s10 = new FileNameScanner("X-V-G-R", "Ep2-C1-185-P1044.jpg");
+		assertEquals(s10.getVariety(), "C1");
+		assertEquals(s10.getGenotype(), "185");
+		assertEquals(s10.getReplicateID(), 1044);
+		
 		FileNameScanner s5 = new FileNameScanner("V-G-R", "C1-1-P1056.jpg");
 		assertEquals(s5.getVariety(), "C1");
 		assertEquals(s5.getGenotype(), "1");

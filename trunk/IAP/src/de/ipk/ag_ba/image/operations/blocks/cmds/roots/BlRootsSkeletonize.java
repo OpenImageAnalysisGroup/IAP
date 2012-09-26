@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import org.Colors;
 import org.StringManipulationTools;
@@ -12,6 +13,7 @@ import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
+import de.ipk.ag_ba.image.operations.skeleton.SkeletonGraph;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
@@ -42,37 +44,68 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			{
 				// analyze separate sections of the roots
 				// img = processRootsInVisibleImage("root_"+i+"_"+n, background, img, rt);
-				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(8).print("Dilated image for section detection", true /* debug */);
+				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).print("Dilated image for section detection", false);
+				
+				boolean graphAnalysis = false;
+				if (graphAnalysis) {
+					SkeletonProcessor2d skel = new SkeletonProcessor2d(in.copy().getImage());
+					int[] saf = in.getImageAs1dArray();
+					skel.background = -1;
+					skel.findEndpointsAndBranches();
+					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
+					sg.createGraph();
+					// MainFrame.getInstance().showGraph(sg.getGraph(), null);
+				}
+				
 				ClusterDetection cd = new ClusterDetection(in.getImage(), ImageOperation.BACKGROUND_COLORint);
 				cd.detectClusters();
 				int clusters = cd.getClusterCount();
-				rt.addValue("roots.cluster.count", clusters);
+				rt.addValue("roots.part.count", clusters);
 				
 				int[] rootPixels = img.getAs1A();
 				
 				ImageOperation io = new FlexibleImage(in.getWidth(), in.getHeight(), cd.getImageClusterIdMask()).io();
 				
-				ArrayList<Color> cols = Colors.get(clusters);
+				ArrayList<Color> cols = Colors.get(clusters + 1);
 				for (int i = 1; i < cols.size(); i++) {
 					io = io.replaceColor(i, cols.get(i).getRGB());
 				}
 				
 				int[] clusterIDsPixels = io.getImageAs1dArray();
 				
-				int nnn = 0;
-				for (int i = 0; i < rootPixels.length; i++)
-					if (rootPixels[i] == -16777216)
-						clusterIDsPixels[i] = background;
-					else
-						nnn++;
-				System.out.println("KJADFHDHFL: " + nnn);
-				
-				io = new ImageOperation(clusterIDsPixels, io.getWidth(), io.getHeight());
-				
-				io.print("CLUSTERS");
+				boolean thinClusterSkel = true;
+				if (thinClusterSkel) {
+					for (int i = 0; i < rootPixels.length; i++)
+						if (rootPixels[i] == -16777216)
+							clusterIDsPixels[i] = background;
+					
+					HashMap<Integer, Integer> color2clusterId = new HashMap<Integer, Integer>();
+					int[] clusterSize = new int[clusters + 1];
+					int idx = 0;
+					for (int p : clusterIDsPixels) {
+						if (!color2clusterId.containsKey(p))
+							color2clusterId.put(p, idx++);
+						clusterSize[color2clusterId.get(p)] += 1;
+					}
+					
+					TreeSet<Integer> sizes = new TreeSet<Integer>();
+					for (int s : clusterSize)
+						sizes.add(s);
+					idx = 0;
+					for (Integer size : sizes) {
+						int cluster = clusters - idx;
+						// first cluster is background, is ignored
+						if (cluster != 0)
+							rt.addValue("roots.part." + StringManipulationTools.formatNumber(cluster, "00") + ".skeleton.length", size);
+						idx++;
+					}
+					
+					io = new ImageOperation(clusterIDsPixels, io.getWidth(), io.getHeight());
+				}
+				io.print("CLUSTERS", false);
 			}
 			
-			getProperties().storeResults("RESULT_scan.", rt, getBlockPosition());
+			getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		}
 		return img;
 	}

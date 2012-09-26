@@ -10,12 +10,13 @@ import org.Vector2i;
 import org.graffiti.attributes.ObjectAttribute;
 import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Edge;
+import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonGraph {
-	private static final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	private final int w;
 	private final int h;
 	private final int[][] skelImg;
@@ -28,6 +29,12 @@ public class SkeletonGraph {
 		this.w = w;
 		this.h = h;
 		this.skelImg = skelImg;
+	}
+	
+	public SkeletonGraph(int w, int h, int[] skelImg1a) {
+		this.w = w;
+		this.h = h;
+		this.skelImg = new FlexibleImage(w, h, skelImg1a).getAs2A();
 	}
 	
 	public void createGraph() {
@@ -280,5 +287,9 @@ public class SkeletonGraph {
 			skelImg[x][y] = background;
 		skelImg[xMem][yMem] = cMem;
 		return result;
+	}
+	
+	public Graph getGraph() {
+		return graph;
 	}
 }

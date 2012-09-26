@@ -22,7 +22,7 @@ public class SkeletonProcessor2d {
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();
-	public static final int background = Color.BLACK.getRGB(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
+	public static int background = Color.BLACK.getRGB(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
