@@ -51,10 +51,10 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 				continue;
 			AnalysisStatus status = knownAnalysis(eh, this.experimentList);
 			
-			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + "") ||
+			if (eh.getExperimentType() != null && (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + "") ||
 					eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + "") ||
 					eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + "") ||
-					eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + "")) {
+					eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))) {
 				if (status != AnalysisStatus.CURRENT) {
 					nn.add(eh.getExperimentName() + " (" + status + ")");
 					n++;
@@ -128,17 +128,19 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			return;
 		}
 		NavigationAction navigationAction = null;
-		System.out.println("Experiment-type: " + eh.getExperimentType());
-		if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
-			navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
-		if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
-			navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
-		if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
-			navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
-		if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
-			navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
-		if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
-			navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
+		System.out.println("Experiment-type: " + eh.getExperimentType() + ", experiment: " + eh.getExperimentName());
+		if (eh.getExperimentType() != null) {
+			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
+				navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
+			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
+				navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
+			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
+				navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
+			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
+				navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
+			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
+				navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
+		}
 		
 		if (navigationAction != null) {
 			Thread.sleep(100);
