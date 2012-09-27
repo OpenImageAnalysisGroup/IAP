@@ -7,6 +7,7 @@ import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
 import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsAddBorderAroundImage;
 import de.ipk.ag_ba.image.operations.blocks.cmds.roots.BlRootsRemoveBoxAndNoise;
@@ -33,6 +34,7 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlRootsScanDetectZoom.class);
 		p.add(BlRootsRemoveBoxAndNoise.class);
 		p.add(BlRootsSkeletonize.class);
+		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		return p;
 	}
 	
