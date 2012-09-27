@@ -21,6 +21,7 @@ public class BinaryFileInfo {
 	private final boolean primary;
 	final MappingDataEntity entity;
 	private String additionalItemInfo;
+	private boolean isAttachment;
 	
 	public BinaryFileInfo(IOurl fileNameMain, IOurl fileNameLabel, boolean primary, MappingDataEntity entity, String additionalItemInfo) {
 		this(fileNameMain, fileNameLabel, primary, entity);
@@ -39,7 +40,7 @@ public class BinaryFileInfo {
 	}
 	
 	public String getHashLabel() {
-		if (((BinaryMeasurement) entity).getLabelURL() != null)
+		if ((entity instanceof BinaryMeasurement) && ((BinaryMeasurement) entity).getLabelURL() != null)
 			return ((BinaryMeasurement) entity).getLabelURL().getDetail();
 		else
 			return null;
@@ -71,5 +72,13 @@ public class BinaryFileInfo {
 	
 	public String getAdditionalFileNameInfo() {
 		return additionalItemInfo;
+	}
+	
+	public void setIsAttachment(boolean isAttachment) {
+		this.isAttachment = isAttachment;
+	}
+	
+	public boolean isAttachment() {
+		return isAttachment;
 	}
 }

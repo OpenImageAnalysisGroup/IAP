@@ -6,6 +6,7 @@ import ij.io.Opener;
 import ij.io.TiffDecoder;
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -547,6 +548,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	JLabel mmlbl;
 	private boolean primary;
 	private String additionalFileNameInfo;
+	private boolean attachment;
 	
 	public void updateLayout(String label, MyImageIcon icon,
 			ImageIcon previewImage) {
@@ -589,16 +591,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				"<html><body><b>"
 						+ getMaxString(strip(
 								imageResult.getFileNameMain(),
-								((NumericMeasurement3D) imageResult
-										.getBinaryFileInfo().entity)
-										.getQualityAnnotation()
-										+ "<br>("
-										+ (((NumericMeasurement3D) imageResult
+								((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
+										"(Attachment)" :
+										((NumericMeasurement3D) imageResult
 												.getBinaryFileInfo().entity)
-												.getPosition() != null ? ((NumericMeasurement3D) imageResult
-												.getBinaryFileInfo().entity)
-												.getPosition().intValue()
-												+ ")" : "0)")))
+												.getQualityAnnotation()
+												+ "<br>("
+												+ (((NumericMeasurement3D) imageResult
+														.getBinaryFileInfo().entity)
+														.getPosition() != null ? ((NumericMeasurement3D) imageResult
+														.getBinaryFileInfo().entity)
+														.getPosition().intValue()
+														+ ")" : "0)"))))
 						+ "</b></body></html>", null, previewImage);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
@@ -902,9 +906,15 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		if (evt.getSource() == showImageCmdMain) {
 			try {
-				FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
-				fi.print("Image View - "
-						+ myImage.fileURLmain.getFileNameDecoded());
+				if (myImage.fileURLmain == null)
+					JOptionPane.showMessageDialog(null,
+							"Error: Main URL is undefined. Image can not be shown.",
+							"Unknown Image Format",
+							JOptionPane.INFORMATION_MESSAGE);
+				else {
+					FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
+					fi.print("Image View - " + myImage.fileURLmain.getFileNameDecoded());
+				}
 			} catch (Exception e) {
 				JOptionPane
 						.showMessageDialog(null,
@@ -1241,6 +1251,19 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			mmlbl.setText(mmlbl.getText());
 		}
 		this.primary = true;
+		validate();
+	}
+	
+	public void setIsAttachment() {
+		this.readOnly = false;
+		if (mmlbl != null) {
+			mmlbl.setBorder(BorderFactory.createEtchedBorder());
+			mmlbl.setText(mmlbl.getText());
+			mmlbl.setOpaque(true);
+			mmlbl.setBackground(new Color(220, 220, 250));
+		}
+		this.attachment = true;
+		validate();
 	}
 	
 	public void setDownloadNeeded(boolean b) {

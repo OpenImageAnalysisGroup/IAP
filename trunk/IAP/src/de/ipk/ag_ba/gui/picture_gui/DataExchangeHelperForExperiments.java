@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -28,6 +29,7 @@ import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.MeasurementFilter;
+import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -42,6 +44,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import de.ipk.ag_ba.commands.MySnapshotFilter;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -217,7 +220,7 @@ public class DataExchangeHelperForExperiments {
 					ImageData id = (ImageData) mde;
 					primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
 							true, id);
-				} else
+				} else {
 					if (mde instanceof VolumeData) {
 						VolumeData id = (VolumeData) mde;
 						primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
@@ -307,6 +310,20 @@ public class DataExchangeHelperForExperiments {
 								}
 							}
 					}
+				}
+				String files = mde.getFiles();
+				if (m != null && files != null && !files.isEmpty()) {
+					for (String f : files.split(";")) {
+						String md5 = f.split(":", 2)[0];
+						String fileName = f.split(":", 2)[1];
+						MongoDBhandler h = (MongoDBhandler) m.getHandlers()[0];
+						String prefix = h.getPrefix();
+						IOurl url = new IOurl(prefix, md5, fileName);
+						BinaryFileInfo bfi = new BinaryFileInfo(url, null, false, mde);
+						bfi.setIsAttachment(true);
+						bbb.add(bfi);
+					}
+				}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -390,6 +407,8 @@ public class DataExchangeHelperForExperiments {
 						mt, imageResult, previewImage, mt.isReadOnly());
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
+				if (binaryFileInfo.isAttachment())
+					imageButton.setIsAttachment();
 				imageButton.setAdditionalFileNameInfo(binaryFileInfo.getAdditionalFileNameInfo());
 				imageButton.setDownloadNeeded(!FileSystemHandler
 						.isFileUrl(binaryFileInfo.getFileNameMain()));
@@ -558,6 +577,21 @@ public class DataExchangeHelperForExperiments {
 		} catch (InvocationTargetException e2) {
 			SupplementaryFilePanelMongoDB.showError(
 					"InvocationTargetException", e2);
+		}
+	}
+	
+	public static void attachFileToEntity(MappingDataEntity targetEntity, DatabaseStorageResult md5, String name) {
+		if (name.contains(":"))
+			name = StringManipulationTools.stringReplace(name, ";", "_");
+		String currentValue = targetEntity.getFiles();
+		if (currentValue == null || currentValue.isEmpty())
+			targetEntity.setFiles(md5.getMD5() + ":" + name);
+		else {
+			LinkedHashSet<String> values = new LinkedHashSet<String>();
+			for (String s : currentValue.split(";"))
+				values.add(s);
+			values.add(md5.getMD5() + ":" + name);
+			targetEntity.setFiles(StringManipulationTools.getStringList(values, ";"));
 		}
 	}
 	
