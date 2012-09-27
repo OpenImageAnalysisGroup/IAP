@@ -86,7 +86,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								}
 							else
 								try {
-									targetDropTarget.addImageToDatabase(file, false);
+									targetDropTarget.addImageOrFileToDatabase(file, false);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
