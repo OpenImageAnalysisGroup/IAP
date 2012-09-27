@@ -3,7 +3,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import org.jdom.Attribute;
 import org.jdom.Element;
 
-public interface MappingDataEntity extends AttributeValuePairSupport {
+public interface MappingDataEntity extends AttributeValuePairSupport, FileAttachmentSupport {
 	
 	static final String ANNO_DIV = "|";
 	

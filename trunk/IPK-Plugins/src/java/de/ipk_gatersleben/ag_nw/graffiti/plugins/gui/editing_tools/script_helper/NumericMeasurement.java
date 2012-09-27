@@ -14,6 +14,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	private SampleInterface parentSample;
 	private String unit;
 	private String quality;
+	private String files;
 	
 	public NumericMeasurement(SampleInterface parent) {
 		this.parentSample = parent;
@@ -29,6 +30,8 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 			setValue((Double) attributemap.get("value"));
 		if (attributemap.containsKey("quality"))
 			setQualityAnnotation((String) attributemap.get("quality"));
+		if (attributemap.containsKey("files"))
+			setFiles((String) attributemap.get("files"));
 	}
 	
 	/**
@@ -53,6 +56,8 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		series.setParent(md);
 		parentSample = copyFrom.getParentSample().clone(series);
 		parentSample.setParent(series);
+		
+		setFiles(copyFrom.getFiles());
 	}
 	
 	@Override
@@ -67,9 +72,9 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, new String[] {
-				"replicates", "unit", "quality"
+				"replicates", "unit", "quality", "files"
 		}, new Object[] {
-				replicateID, unit, quality
+				replicateID, unit, quality, files
 		});
 	}
 	
@@ -146,9 +151,12 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 				if (attr.getName().equals("id")) {
 					// ignore ID
 				} else
-					if (attr.getName().equals("quality")) {
-						setQualityAnnotation(attr.getValue());
-					}
+					if (attr.getName().equals("files")) {
+						setFiles(attr.getValue());
+					} else
+						if (attr.getName().equals("quality")) {
+							setQualityAnnotation(attr.getValue());
+						}
 		// } else
 		// System.err.println("Internal Error: Unknown Data Attribute: " + attr.getName());
 	}
@@ -194,6 +202,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		attributes.put("unit", getUnit());
 		attributes.put("value", getValue());
 		attributes.put("quality", getQualityAnnotation());
+		attributes.put("files", getFiles());
 	}
 	
 	@Override
@@ -203,7 +212,17 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		m.setReplicateID(getReplicateID());
 		m.setUnit(getUnit());
 		m.setQualityAnnotation(getQualityAnnotation());
+		m.setFiles(getFiles());
 		return m;
 	}
 	
+	@Override
+	public String getFiles() {
+		return files;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		this.files = files;
+	}
 }

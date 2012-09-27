@@ -1076,4 +1076,14 @@ public class Experiment implements ExperimentInterface {
 	public ExperimentCalculationService calc() {
 		return new ExperimentCalculationService(this);
 	}
+	
+	@Override
+	public String getFiles() {
+		return header != null ? header.getFiles() : null;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		header.setFiles(files);
+	}
 }

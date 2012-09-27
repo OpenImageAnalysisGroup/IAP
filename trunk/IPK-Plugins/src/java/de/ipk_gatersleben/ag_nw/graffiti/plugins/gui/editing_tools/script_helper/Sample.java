@@ -24,6 +24,7 @@ public class Sample implements SampleInterface {
 	private int time = -1;
 	private String timeUnit = "-1";
 	private TtestInfo ttestInfo = TtestInfo.EMPTY;
+	String files;
 	
 	private final Collection<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 	
@@ -39,7 +40,7 @@ public class Sample implements SampleInterface {
 		return timeUnit + " " + time;
 	}
 	
-	private static final String[] attributeNames = new String[] { "id", "measurementtool", "time", "unit", "ttest" };
+	private static final String[] attributeNames = new String[] { "id", "measurementtool", "time", "unit", "ttest", "files" };
 	
 	@Override
 	public void getString(StringBuilder r) {
@@ -61,7 +62,7 @@ public class Sample implements SampleInterface {
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getSampleFineTimeOrRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
-				getTtestInfo().toString() };
+				getTtestInfo().toString(), getFiles() };
 	}
 	
 	@Override
@@ -210,17 +211,20 @@ public class Sample implements SampleInterface {
 				if (attr.getName().equals("ttest"))
 					setTtestInfo(TtestInfo.getValueFromString(attr.getValue()));
 				else
-					if (attr.getName().equals("unit"))
-						setTimeUnit(attr.getValue());
+					if (attr.getName().equals("files"))
+						setFiles(attr.getValue());
 					else
-						if (attr.getName().equals("time"))
-							try {
-								setTime(Integer.parseInt(attr.getValue()));
-							} catch (Exception e) {
-								ErrorMsg.addErrorMessage(e);
-							}
+						if (attr.getName().equals("unit"))
+							setTimeUnit(attr.getValue());
 						else
-							System.err.println("Internal Error: Unknown Sample Attribute: " + attr.getName());
+							if (attr.getName().equals("time"))
+								try {
+									setTime(Integer.parseInt(attr.getValue()));
+								} catch (Exception e) {
+									ErrorMsg.addErrorMessage(e);
+								}
+							else
+								System.err.println("Internal Error: Unknown Sample Attribute: " + attr.getName());
 	}
 	
 	@Override
@@ -439,6 +443,7 @@ public class Sample implements SampleInterface {
 		s.setTime(getTime());
 		s.setTimeUnit(getTimeUnit());
 		s.setTtestInfo(getTtestInfo());
+		s.setFiles(getFiles());
 		return s;
 	}
 	
@@ -455,5 +460,15 @@ public class Sample implements SampleInterface {
 		if (unit != null && unit.length() > 0)
 			sub += " (" + unit + ")";
 		return sub;
+	}
+	
+	@Override
+	public String getFiles() {
+		return files;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		this.files = files;
 	}
 }
