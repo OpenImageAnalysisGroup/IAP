@@ -25,7 +25,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private Date startDate;
 	private Date storageTime;
 	private Integer imageFiles = new Integer(0);
-	private String experimentType, sequence;
+	private String experimentType, sequence, files;
 	private long sizekb;
 	private int experimentID = -1;
 	private String database, originDatabaseId, globalOutliers;
@@ -48,6 +48,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		storageTime = copyFrom.getExperimentStorageDate();
 		experimentType = copyFrom.getExperimentType();
 		sequence = copyFrom.getSequence();
+		files = copyFrom.getFiles();
 		database = copyFrom.getDatabase();
 		originDatabaseId = copyFrom.getExperimentOriginDbId();
 		globalOutliers = copyFrom.getExperimentGlobalOutlierInfo();
@@ -164,6 +165,16 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
+	public String getFiles() {
+		return files;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		this.files = files;
+	}
+	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		toString(sb, -1);
@@ -176,12 +187,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
 				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
-				"origin", "outlier"
+				"origin", "outlier", "files"
 		}, new Object[] {
 				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
-				originDatabaseId, globalOutliers
+				originDatabaseId, globalOutliers, files
 		}, true);
 		r.append("</experiment>");
 	}
@@ -207,6 +218,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setCoordinator((String) map.get("coordinator"));
 		setExperimenttype((String) map.get("experimenttype"));
 		setSequence((String) map.get("sequence"));
+		setFiles((String) map.get("files"));
 		setImportusername((String) map.get("importusername"));
 		setImportusergroup((String) map.get("importusergroup"));
 		if (map.get("importdate") != null && map.get("importdate") instanceof String) {
@@ -272,6 +284,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("coordinator", getCoordinator());
 		attributeValueMap.put("experimenttype", experimentType);
 		attributeValueMap.put("sequence", sequence);
+		attributeValueMap.put("files", files);
 		attributeValueMap.put("excelfileid", databaseId);
 		attributeValueMap.put("importusername", importUserName);
 		attributeValueMap.put("importusergroup", importUserGroup);
@@ -376,12 +389,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
 					+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
 					+ (startDate != null ? startDate.getTime() : "")
-					+ ";" + originDatabaseId + ";" + globalOutliers;
+					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + files;
 			String s2 = e.getExperimentName() + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
 					+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
 					+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
 					+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
-					+ ";" + originDatabaseId + ";" + globalOutliers;
+					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + e.files;
 			return s1.equals(s2);
 		}
 	}

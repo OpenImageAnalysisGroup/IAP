@@ -27,7 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 public class Substance implements SubstanceInterface {
 	
 	private String rowId, name, funcat, info, formula, substancegroup, cluster_id, spot, new_blast, new_blast_e_val,
-			new_blast_score, affy_hit, score, secure;
+			new_blast_score, affy_hit, score, secure, files;
 	
 	HashMap<Integer, String> synonyms = null; // new HashMap<Integer, String>()
 	
@@ -227,7 +227,7 @@ public class Substance implements SubstanceInterface {
 	
 	private static final String[] attributeNames = new String[] { "id", "name", "funcat", "info", "formula",
 			"substancegroup", "cluster_id", "spot", "new_blast", "new_blast_e_val", "new_blast_score", "affy_hit",
-			"score", "secure" };
+			"score", "secure", "files" };
 	
 	private void getString(StringBuilder s) {
 		s.append("<substance");
@@ -246,7 +246,7 @@ public class Substance implements SubstanceInterface {
 	private Object[] getAttributeValues() {
 		return new Object[] { getRowId(), getName(), getFuncat(), getInfo(), getFormula(), getSubstancegroup(),
 				getClusterId(), getSpot(), getNewBlast(), getNewBlastEval(), getNewBlastScore(), getAffyHit(), getScore(),
-				getSecure() };
+				getSecure(), getFiles() };
 	}
 	
 	@Override
@@ -476,21 +476,24 @@ public class Substance implements SubstanceInterface {
 														if (attr.getName().equals("secure"))
 															setSecure(attr.getValue());
 														else
-															if (attr.getName().equals("formula"))
-																setFormula(attr.getValue());
+															if (attr.getName().equals("files"))
+																setFiles(attr.getValue());
 															else
-																if (attr.getName().startsWith("name")) {
-																	String index = attr.getName().substring("name".length());
-																	try {
-																		int idx = Integer.parseInt(index);
-																		if (synonyms == null)
-																			synonyms = new HashMap<Integer, String>();
-																		synonyms.put(idx, attr.getValue());
-																	} catch (Exception err) {
-																		ErrorMsg.addErrorMessage(err);
-																	}
-																} else
-																	System.err.println("Internal Error: Unknown Substance Attribute: " + attr.getName());
+																if (attr.getName().equals("formula"))
+																	setFormula(attr.getValue());
+																else
+																	if (attr.getName().startsWith("name")) {
+																		String index = attr.getName().substring("name".length());
+																		try {
+																			int idx = Integer.parseInt(index);
+																			if (synonyms == null)
+																				synonyms = new HashMap<Integer, String>();
+																			synonyms.put(idx, attr.getValue());
+																		} catch (Exception err) {
+																			ErrorMsg.addErrorMessage(err);
+																		}
+																	} else
+																		System.err.println("Internal Error: Unknown Substance Attribute: " + attr.getName());
 	}
 	
 	@Override
@@ -656,6 +659,16 @@ public class Substance implements SubstanceInterface {
 	@Override
 	public String getSecure() {
 		return secure;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		this.files = files;
+	}
+	
+	@Override
+	public String getFiles() {
+		return files;
 	}
 	
 	public static void validate(Document doc) throws Exception {
@@ -831,6 +844,7 @@ public class Substance implements SubstanceInterface {
 		s.setAffyHit(getAffyHit());
 		s.setScore(getScore());
 		s.setSecure(getSecure());
+		s.setFiles(getFiles());
 		s.setSynonyme(getSynonymMap() == null ? null : new HashMap<Integer, String>(getSynonymMap()));
 		return s;
 	}

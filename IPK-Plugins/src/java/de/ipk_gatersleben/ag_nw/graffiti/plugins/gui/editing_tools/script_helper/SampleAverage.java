@@ -322,4 +322,14 @@ public class SampleAverage implements SampleAverageInterface {
 		attributeValueMap.put("value", getValue());
 	}
 	
+	@Override
+	public String getFiles() {
+		throw new UnsupportedOperationException("Not implemented for this data type");
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		throw new UnsupportedOperationException("Not implemented for this data type");
+	}
+	
 }

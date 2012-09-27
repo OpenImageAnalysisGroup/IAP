@@ -22,7 +22,7 @@ public class Condition implements ConditionInterface {
 	
 	public enum ConditionInfo {
 		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"), GROWTHCONDITIONS(
-				"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence");
+				"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence"), FILES("Files");
 		
 		private String desc;
 		
@@ -47,7 +47,7 @@ public class Condition implements ConditionInterface {
 	 * If list of state variables is modified/extended, check and modify equals,
 	 * hashCode and eventually compareTo method implementation.
 	 */
-	private String species, genotype, growthconditions, treatment, variety, sequence;
+	private String species, genotype, growthconditions, treatment, variety, sequence, files;
 	private int rowId;
 	
 	private final Set<SampleInterface> samples = new LinkedHashSet<SampleInterface>();
@@ -57,10 +57,10 @@ public class Condition implements ConditionInterface {
 	private static final String[] attributeNames = new String[] { "experimentname", "database", "experimenttype",
 			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
 			"growthconditions", "id", "name", "treatment",
-			"variety", "sequence" };
+			"variety", "sequence", "files" };
 	
 	private static final String[] attributeNamesForDocument = new String[] { "genotype", "growthconditions", "id",
-			"name", "treatment", "variety", "sequence" };
+			"name", "treatment", "variety", "sequence", "files" };
 	
 	public Condition(SubstanceInterface md) {
 		parent = md;
@@ -111,7 +111,7 @@ public class Condition implements ConditionInterface {
 	private Object[] getAttributeValues() {
 		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
 				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(), getExperimentRemark(), getGenotype(),
-				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence() };
+				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence(), getFiles() };
 	}
 	
 	@Override
@@ -487,7 +487,11 @@ public class Condition implements ConditionInterface {
 																								if (attr.getName().equals("sequence"))
 																									setSequence(attr.getValue());
 																								else
-																									System.err.println("Internal Error: Unknown Condition Attribute: " + attr.getName());
+																									if (attr.getName().equals("files"))
+																										setFiles(attr.getValue());
+																									else
+																										System.err.println("Internal Error: Unknown Condition Attribute: "
+																												+ attr.getName());
 	}
 	
 	@Override
@@ -597,6 +601,16 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
+	public String getFiles() {
+		return files;
+	}
+	
+	@Override
+	public void setFiles(String files) {
+		this.files = files;
+	}
+	
+	@Override
 	public void setVariety(String variety) {
 		this.variety = variety != null ? variety.intern() : null;
 	}
@@ -629,7 +643,7 @@ public class Condition implements ConditionInterface {
 	@Override
 	public void getXMLAttributeStringForDocument(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNamesForDocument, new Object[] { getGenotype(), getGrowthconditions(),
-				getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence() });
+				getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence(), getFiles() });
 	}
 	
 	@Override
@@ -814,6 +828,8 @@ public class Condition implements ConditionInterface {
 				setTreatment(value);
 			case SEQUENCE:
 				setSequence(value);
+			case FILES:
+				setFiles(value);
 			case IGNORED_FIELD:
 				// intentionally empty
 				break;
@@ -826,7 +842,8 @@ public class Condition implements ConditionInterface {
 			return false;
 		if (!(obj instanceof Condition))
 			return false;
-		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + sequence + ";" + rowId;
+		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + sequence + ";"
+				+ rowId;
 		Condition c = (Condition) obj;
 		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";" + c.sequence + ";"
 				+ c.rowId;
@@ -835,7 +852,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public int hashCode() {
-		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + rowId;
+		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + rowId + ";" + files;
 		return s1.hashCode();
 	}
 	
@@ -851,6 +868,7 @@ public class Condition implements ConditionInterface {
 		c.setVariety(getVariety());
 		c.setRowId(getRowId());
 		c.setSequence(getSequence());
+		c.setFiles(getFiles());
 		return c;
 	}
 	

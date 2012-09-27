@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import unit_test_support.TestValueRequired;
 
 @TestValueRequired("experimentname")
-public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderInterface>, Cloneable {
+public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderInterface>, Cloneable, FileAttachmentSupport {
 	
 	@Override
 	public boolean equals(Object obj);
