@@ -957,7 +957,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			}
 		}
 		if (evt.getSource() == openFileCmdMain) {
-			if (imageResult.getFileNameMain().contains(File.separator))
+			if (imageResult != null && imageResult.getFileNameMain().contains(File.separator))
 				AttributeHelper.showInBrowser(imageResult.getFileNameMain());
 			else
 				AttributeHelper.showInBrowser(myImage.fileURLmain.toString());
@@ -1057,19 +1057,21 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		
 		// if (imageResult != null && imageResult.downloadedFileMain != null) {
 		if (getIsJavaImage() > 0
-				|| imageResult.getFileNameMain().contains(File.separator))
+				|| (imageResult != null &&
+						imageResult.getFileNameMain() != null &&
+				imageResult.getFileNameMain().contains(File.separator)))
 			myPopup.add(showImageCmdMain);
-		if ((getIsJavaImage() > 0 && imageResult.getFileNameLabel() != null)
-				|| (imageResult.getFileNameLabel() != null && imageResult
+		if ((getIsJavaImage() > 0 && imageResult != null && imageResult.getFileNameLabel() != null)
+				|| (imageResult != null && imageResult.getFileNameLabel() != null && imageResult
 						.getFileNameLabel().contains(File.separator)))
 			myPopup.add(showImageCmdLabel);
-		if (imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
+		if (imageResult != null && imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
 			myPopup.add(showVolumeCmd);
 		myPopup.add(openFileCmdMain);
-		if (imageResult.getBinaryFileInfo().getHashLabel() != null)
+		if (imageResult != null && imageResult.getBinaryFileInfo().getHashLabel() != null)
 			myPopup.add(openFileCmdLabel);
 		myPopup.add(saveFileCmdMain);
-		if (imageResult.getBinaryFileInfo().getHashLabel() != null)
+		if (imageResult != null && imageResult.getBinaryFileInfo().getHashLabel() != null)
 			myPopup.add(saveFileCmdLabel);
 		if (!readOnly) {
 			// myPopup.add(new JSeparator());
