@@ -71,6 +71,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					io = io.replaceColor(i, cols.get(i).getRGB());
 				}
 				
+				img = io.getImage();
+				
 				int[] clusterIDsPixels = io.getImageAs1dArray();
 				
 				boolean thinClusterSkel = true;
