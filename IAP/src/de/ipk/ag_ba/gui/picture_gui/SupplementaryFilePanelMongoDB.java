@@ -129,7 +129,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		ToolTipManager.sharedInstance().setDismissDelay(30000);
 		
 		// todo if mongo knows this ID as an experiment ID
-		boolean readOnly = doc != null && doc.getHeader() != null && doc.getHeader().getDatabaseId() != null;
+		boolean readOnly = !(doc != null && doc.getHeader() != null
+				&& doc.getHeader().getDatabaseId() != null);
 		
 		expTree = new JTree(new ExperimentTreeModel(this, m, doc, readOnly));
 		

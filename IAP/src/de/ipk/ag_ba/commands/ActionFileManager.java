@@ -54,7 +54,7 @@ public class ActionFileManager extends AbstractNavigationAction {
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		if (m != null)
-			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
+			res.add(new NavigationButton("Save Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
 		
 		return res;
 	}
