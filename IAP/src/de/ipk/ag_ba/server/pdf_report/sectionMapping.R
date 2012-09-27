@@ -16,12 +16,18 @@ RESET.PAGE.NO		<- ""
 BEGIN.ITEM <- paste("\\begin{itemize}", NEWLINE.TEX, sep="")
 LINE.ITEM <- "\\item"
 END.ITEM <- paste("\\end{itemize}", NEWLINE.TEX, sep="")
-
 BEGIN.TINY <- paste("\\begin{tiny}", NEWLINE.TEX, sep="")
 END.TINY <- paste("\\end{tiny}", NEWLINE.TEX, sep="")
+BEGIN.LOAD.IMAGE <- "\\loadImage{"
+END.LOAD.IMAGE <- "}"
 BEGIN.URL <- "\\url{"
 END.URL <- "}"
 SEPARATOR.ITEM <- " "
+
+FLUO.BIN.PNG <- "fluo_bin.png"
+NIR.BIN.PNG <- "nir_bin.png"
+HSB.PNG <- "HSB.png"
+
 
 sectionMappingList <- list(
 		section = list(
@@ -63,7 +69,7 @@ sectionMappingList <- list(
 				
 				"20" = list(
 						newSection = 5,
-						title = "Modelling of stress",
+						title = "Biomass and water use efficiency",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
@@ -107,13 +113,24 @@ sectionMappingList <- list(
 						title = "Visible light color analysis",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
-						text = paste(BEGIN.ITEM,
-								LINE.ITEM, "In this section the plant pixels color shade values are investigated in detail. 
-											The color components color hue, color saturation or brightness are analyzed independently.", NEWLINE.TEX,
-								LINE.ITEM, "The following statistical analysis is performed for each color component of
-											the plant pixel values: average, standard deviation, skewness and kurtosis.", NEWLINE.TEX,
-								END.ITEM,
+						text = paste(
+								"In this section the plant pixels color shade values are investigated in detail. 
+								 The color components color hue, color saturation or brightness are analyzed independently.", NEWLINE.TEX,
+						 
+						 		"The three components based on the HSB color model, following classifications were made:", NEWLINE.TEX,
+								
+						 		paste(BEGIN.LOAD.IMAGE, HSB.PNG, END.LOAD.IMAGE, NEWLINE.TEX, sep=""), NEWLINE.TEX, 		 
+						 
+								"The following statistical analysis is performed for each color component of
+								 the plant pixel values: average, standard deviation, skewness and kurtosis.", NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
+#						text = paste(BEGIN.ITEM,
+#								LINE.ITEM, "In this section the plant pixels color shade values are investigated in detail. 
+#											The color components color hue, color saturation or brightness are analyzed independently.", NEWLINE.TEX,
+#								LINE.ITEM, "The following statistical analysis is performed for each color component of
+#											the plant pixel values: average, standard deviation, skewness and kurtosis.", NEWLINE.TEX,
+#								END.ITEM,
+#								sep = SEPARATOR.ITEM)
 				),
 				
 				"60" = list(
@@ -126,9 +143,15 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
-								LINE.ITEM, "Average and histogram of observed fluorescence colors (Fluo)", NEWLINE.TEX,
+								LINE.ITEM,"Average and histogram of observed fluorescence colors (Fluo)", NEWLINE.TEX,
 								END.ITEM,
+								"Following classifications were made for the histogram:", NEWLINE.TEX,
+								paste(BEGIN.LOAD.IMAGE, FLUO.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
+#						text = paste(BEGIN.ITEM,
+#								LINE.ITEM, "Average and histogram of observed fluorescence colors (Fluo)", NEWLINE.TEX,
+#								END.ITEM,
+#								sep = SEPARATOR.ITEM)
 				),
 				
 				"61" = list(
@@ -141,9 +164,11 @@ sectionMappingList <- list(
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
 						text = paste(BEGIN.ITEM,
-								LINE.ITEM, "Average intensity of near infrared (NIR)", NEWLINE.TEX,
+								LINE.ITEM, "Average and histogram intensity of near infrared (NIR)", NEWLINE.TEX,
 								LINE.ITEM, "Represents the water content of the plant", NEWLINE.TEX,
 								END.ITEM,
+								"Following classifications were made for the histogram:", NEWLINE.TEX,
+								paste(BEGIN.LOAD.IMAGE, NIR.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
 				),
 				
@@ -237,7 +262,7 @@ sectionMappingList <- list(
 				
 				"1.1" = list(
 						newSection = 1,
-						title = "Weights (before and after watering",
+						title = "Weights", #(before and after watering)
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.NO,
 						text = paste(BEGIN.ITEM,
@@ -288,7 +313,7 @@ sectionMappingList <- list(
 				),
 				
 				"2.1" = list(
-						newSection = 2,
+						newSection = 3,
 						title = "Zoom changes",
 						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
@@ -330,8 +355,9 @@ sectionMappingList <- list(
 				"20.1" = list(
 						newSection = 1,
 						title = "IAP formula",
-						typOfReset = RESET.PAGE.NO,
+						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN,
+						#typOfClear = CLEAR.PAGE.NO,
 						text = paste(BEGIN.ITEM,
 									LINE.ITEM, "Equation: $Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}$", NEWLINE.TEX,
 									LINE.ITEM, "Column name: volume.iap", NEWLINE.TEX,
@@ -346,13 +372,12 @@ sectionMappingList <- list(
 				"20.2" = list(
 						newSection = 2,
 						title = "LemnaTec formula",
-						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Equation: $Biomass_{LemnaTec}=\\sqrt{side.area_{0^{\\circ}}*side.area_{90^{\\circ}}*top.area}$", NEWLINE.TEX,
 								LINE.ITEM, "Column name: volume.lt", NEWLINE.TEX,
 								END.ITEM,
-								sep = SEPARATOR.ITEM)
+								sep = SEPARATOR.ITEM),
+						takeRestValuesFrom = "20.1"
 				),
 				
 				"4.2" = list(
@@ -362,7 +387,7 @@ sectionMappingList <- list(
 				"4.3" = list(
 						newSection = 3,
 						title = "Water use efficiency",
-						typOfReset = RESET.PAGE.NO,
+						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Ratio of daily plant growth, determined by increasing projected side
@@ -374,8 +399,10 @@ sectionMappingList <- list(
 				"21.1" = list(
 						newSection = 1,
 						title = "Height (zoom corrected)",
-						typOfReset = RESET.PAGE.NO,
+						#typOfReset = RESET.PAGE.NO,
+						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN,
+						#typOfClear = CLEAR.PAGE.NO,
 						text = paste(BEGIN.ITEM,
 								LINE.ITEM, "Plant height (mm) (normalized to distance of left and right marker)", NEWLINE.TEX,
 								LINE.ITEM, "Column name: side.height.norm", NEWLINE.TEX,
@@ -761,7 +788,36 @@ sectionMappingList <- list(
 				
 		),
 		subsubsection = list(
-								
+				
+				"1.1.1" = list(
+						newSection = 1,
+						title = "before watering",
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						text = ""
+				),
+				
+				"1.1.2" = list(
+						newSection = 2,
+						title = "after watering",
+						takeRestValuesFrom = "1.1.1"
+				),
+				
+				"2.1.1" = list(
+						newSection = 1,
+						title = "top marker",
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						text = ""
+				),
+				
+				"2.1.1" = list(
+						newSection = 2,
+						title = "bottom marker",
+						takeRestValuesFrom = "2.1.1"
+				),
+				
+				
 				"3.1.1" = list(
 						newSection = 1,
 						title = "ratio",
@@ -802,6 +858,10 @@ sectionMappingList <- list(
 						text = ""
 				),
 				
+				
+				#### 3.2. noch fertig machen
+				
+				
 				"3.3.1" = list(
 						newSection = 1,
 						title = "Starting point",
@@ -817,6 +877,33 @@ sectionMappingList <- list(
 						typOfClear = CLEAR.PAGE.OWN.SUB,
 						text = ""
 				),
+				
+				
+				
+				#### 3.3 noch fertig machen
+				
+				"20.1.1" = list(
+						newSection = 1,
+						title = "Fluctuation at special days",
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						text = ""
+				),
+				
+				
+				"4.1.1" = list(
+						title = "value over the time",
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"20.2.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"4.2.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
 				
 				"4.3.1" = list(
 						newSection = 1,
@@ -841,6 +928,71 @@ sectionMappingList <- list(
 								END.ITEM,
 								sep = SEPARATOR.ITEM)
 				),
+				
+				"21.1.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.2.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.3.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.4.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.5.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.6.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.7.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"21.8.1" = list(
+						takeRestValuesFrom = "20.1.1"
+				),
+				
+				"5.1.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.2.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.3.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.4.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.5.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.6.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.7.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
+				"5.8.1" = list(
+						takeRestValuesFrom = "4.1.1"
+				),
+				
 				
 				"7.1.1" = list(
 						newSection = 1,

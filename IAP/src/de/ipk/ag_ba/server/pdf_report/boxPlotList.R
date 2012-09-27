@@ -9,47 +9,57 @@ boxPlotList <- list(
 		"volume.iap (px^3)" = list(
 								plotName = "digital biomass (visible light images, IAP formula) (px^3)", 
 								section = 20,
-								subsection = 1), 
+								subsection = 1,
+								subsubsection = 1), 
 		"volume.lt (px^3)" = list(
 								plotName = "digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
 								section = 20,
-								subsection = 2), 
+								subsection = 2,
+								subsubsection = 1), 
 		
 		"side.height.norm (mm)" = list(
 				plotName = "height (zoom corrected) (mm)", 
 				section = 21,
-				subsection = 1),
+				subsection = 1,
+				subsubsection = 1),
 		"side.height (px)" = list(
 				plotName = "height (px)", 
 				section = 21,
-				subsection = 2),
+				subsection = 2,
+				subsubsection = 1),
 		
 		"side.width.norm (mm)" = list(
 				plotName = "width (zoom corrected) (mm)", 
 				section = 21,
-				subsection = 3),
+				subsection = 3,
+				subsubsection = 1),
 		"side.width (px)" = list(
 				plotName = "width (px)", 
 				section = 21,
-				subsection = 4),
+				subsection = 4,
+				subsubsection = 1),
 		
 		"side.area.norm (mm^2)" = list(
 				plotName = "side area (zoom corrected) (mm^2)", 
 				section = 21,
-				subsection = 5),
+				subsection = 5,
+				subsubsection = 1),
 		"side.area (px)" = list(
 				plotName = "side area (px)", 
 				section = 21,
-				subsection = 6),
+				subsection = 6,
+				subsubsection = 1),
 		
 		"top.area.norm (mm^2)" = list(
 				plotName = "top area (zoom corrected) (mm^2)", 
 				section = 21,
-				subsection = 7), 
+				subsection = 7,
+				subsubsection = 1), 
 		"top.area (px)" = list(
 				plotName = "top area (px)", 
 				section = 21,
-				subsection = 8)	
+				subsection = 8,
+				subsubsection = 1)	
 		
 #		"volume.fluo.iap" = list(plotName = "digital biomass (fluorescence images, IAP formula) (px^3)", section = 6)
 	

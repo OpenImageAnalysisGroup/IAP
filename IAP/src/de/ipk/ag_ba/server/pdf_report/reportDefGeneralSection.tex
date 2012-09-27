@@ -101,6 +101,17 @@ of the group image analysis.
 	}{}
 }{}
 
+\resetBoolean
+\checkFileNoReset{unitTable.tex}
+\ifthenelse{\boolean{isFile1}}{
+	\subsection{Units of the used descriptors}
+	
+	\begin{center}
+	\loadTex{unitTable}
+	\end{center}
+}{}
+
+
 \subsection{Full list of experiment factors}
 \begin{center}
 	\begin{longtable}{|p{0.7cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
