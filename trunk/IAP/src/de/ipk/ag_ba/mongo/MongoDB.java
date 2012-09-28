@@ -2131,8 +2131,12 @@ public class MongoDB {
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
 							if (addCnt < maxTasks)
-								for (DBObject dbo : collection.find(rm).sort(new BasicDBObject("part_cnt", 1)).limit(maxTasks)) {
+								for (DBObject dbo : collection.find(rm)
+										.sort(new BasicDBObject("part_idx", 1))
+										.sort(new BasicDBObject("part_cnt", 1)).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
+									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
+										continue;
 									if (batch.getCpuTargetUtilization() < maxTasks) {
 										if (batch.getExperimentHeader() == null)
 											continue;
@@ -2149,9 +2153,12 @@ public class MongoDB {
 						int claimed = 0;
 						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 							if (addCnt < maxTasks && claimed < maxTasks) {
-								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString())).sort(
-										new BasicDBObject("part_cnt", 1))) {
+								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString()))
+										.sort(new BasicDBObject("part_idx", 1))
+										.sort(new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
+									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
+										continue;
 									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
 											// after 5 minutes tasks are taken away from other systems
@@ -2183,9 +2190,13 @@ public class MongoDB {
 						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
-								for (DBObject dbo : collection.find(sm).sort(new BasicDBObject("part_cnt", 1))) {
+								for (DBObject dbo : collection.find(sm)
+										.sort(new BasicDBObject("part_idx", 1))
+										.sort(new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
+										continue;
+									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
 									if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
 										res.add(batch);
@@ -2199,9 +2210,12 @@ public class MongoDB {
 						}
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
-								for (DBObject dbo : collection.find(sm).sort(
-										new BasicDBObject("part_cnt", 1))) {
+								for (DBObject dbo : collection.find(sm)
+										.sort(new BasicDBObject("part_idx", 1))
+										.sort(new BasicDBObject("part_cnt", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
+									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
+										continue;
 									if (batch.getExperimentHeader() == null)
 										continue;
 									if (batch.getCpuTargetUtilization() <= maxTasks && hostName.equals("" + batch.getOwner())) {
@@ -3468,7 +3482,7 @@ public class MongoDB {
 	
 	public static void saveSystemMessage(String msg) {
 		try {
-			MongoDB.getDefaultCloud().addNewsItem(msg,
+			MongoDB.getDefaultCloud().addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
 					"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 		} catch (Exception e1) {
 			e1.printStackTrace();

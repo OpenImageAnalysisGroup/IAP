@@ -323,7 +323,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (ExperimentHeaderInterface exp : experiments) {
 					String n = exp.getExperimentName();
-					if (n.replaceAll("§", "").length() == n.length() - 3)
+					if (n.replaceAll("§", "").length() == n.length() - 4
+							|| n.replaceAll("§", "").length() == n.length() - 3)
 						tempResults.add(exp);
 					else {
 						ExperimentReference e = new ExperimentReference(exp, m);

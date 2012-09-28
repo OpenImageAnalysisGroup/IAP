@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.navigation_model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -23,6 +24,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	private final NavigationAction action;
 	private final NavigationButton cm;
 	private NavigationButton src;
+	private Date newestImportDate;
+	private String databaseIdOfNewestResultData;
 	
 	public RemoteExecutionWrapperAction(NavigationAction navigationAction, NavigationButton cm) {
 		this.remoteAction = (RemoteCapableAnalysisAction) navigationAction;
@@ -65,6 +68,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			cmd.setExperimentMongoID(experimentInputMongoID);
 			cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
 			cmd.setCompatibleImageAnalysisPipelineName(remoteAction.getVersionTag());
+			cmd.setNewstAvailableData(newestImportDate, databaseIdOfNewestResultData);
 			MongoDB m = remoteAction.getMongoDB();
 			if (m == null)
 				m = MongoDB.getDefaultCloud();
@@ -173,6 +177,11 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	
 	@Override
 	public void setSource(NavigationAction navigationAction, GUIsetting guiSetting) {
+	}
+	
+	public void setNewestAvailableData(Date newestImportDate, String databaseIdOfNewestResultData) {
+		this.newestImportDate = newestImportDate;
+		this.databaseIdOfNewestResultData = databaseIdOfNewestResultData;
 	}
 	
 }

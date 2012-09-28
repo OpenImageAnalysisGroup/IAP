@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
+import java.util.Date;
+
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -16,7 +18,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
  * @author klukas
  */
 public interface RemoteCapableAnalysisAction extends NavigationAction {
-	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver);
+	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver,
+			Date optProcessOnlySampleDataNewerThanThisDate);
 	
 	public void setParams(ExperimentReference inputExperiment, MongoDB m, String params);
 	

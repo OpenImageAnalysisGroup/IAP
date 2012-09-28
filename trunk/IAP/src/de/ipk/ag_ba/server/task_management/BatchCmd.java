@@ -7,10 +7,12 @@
 package de.ipk.ag_ba.server.task_management;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemAnalysis;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -211,5 +213,39 @@ public class BatchCmd extends BasicDBObject {
 	
 	public void setCpuTargetUtilization(int cpu_util) {
 		put("cpu_utilization", cpu_util);
+	}
+	
+	/**
+	 * See and use SystemAnalysis.getOperatingSystem()
+	 */
+	public void setOperatingSystem(String operatingSystemOrNullForEvery) {
+		put("operating_system", operatingSystemOrNullForEvery);
+	}
+	
+	/**
+	 * See and use SystemAnalysis.getOperatingSystem()
+	 */
+	public String getDesiredOperatingSystem() {
+		return getString("operating_system", null);
+	}
+	
+	public void setNewstAvailableData(Date newestImportDate, String databaseIdOfNewestResultData) {
+		if (newestImportDate != null && databaseIdOfNewestResultData != null && !databaseIdOfNewestResultData.isEmpty()) {
+			put("available_result_part_db_id", databaseIdOfNewestResultData);
+			put("available_result_import_date", newestImportDate);
+		}
+	}
+	
+	public Date getAvailableResultImportDate() {
+		return getDate("available_result_import_date", null);
+	}
+	
+	public String getAvailableResultDatabaseId() {
+		return getString("available_result_part_db_id", null);
+	}
+	
+	public boolean desiredOperatingSystemMatchesCurrentOperatingSystem() {
+		return getDesiredOperatingSystem() == null
+				|| getDesiredOperatingSystem().equals(SystemAnalysis.getOperatingSystem());
 	}
 }
