@@ -270,7 +270,6 @@ public class MongoDB {
 						if (optHosts == null || optHosts.length() == 0) {
 							StopWatch s = new StopWatch("INFO: new Mongo()", false);
 							m.put(key, new Mongo());
-							m.get(key).slaveOk();
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
@@ -280,7 +279,6 @@ public class MongoDB {
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
 							m.put(key, new Mongo(seeds));
-							m.get(key).slaveOk();
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime(1000);
