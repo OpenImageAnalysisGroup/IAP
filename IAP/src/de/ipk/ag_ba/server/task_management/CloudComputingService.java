@@ -325,15 +325,16 @@ public class CloudComputingService {
 				if ((i.getExperimentType() + "").contains("Trash"))
 					continue;
 				String[] cc = i.getExperimentName().split("§");
-				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") && cc.length == 4) {
+				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") && cc.length == 5) {
 					String className = cc[0];
 					String idxCnt = cc[1];
 					String partCnt = cc[2];
 					String submTime = cc[3];
+					String mergeWithDBid = cc[4];
 					if (!processedSubmissionTimes.contains(submTime))
 						availableTempDatasets.add(new TempDataSetDescription(
 								className, partCnt, submTime, i.getOriginDbId(),
-								IAP_RELEASE.getReleaseFromDescription(i)));
+								IAP_RELEASE.getReleaseFromDescription(i), mergeWithDBid));
 					processedSubmissionTimes.add(submTime);
 				}
 			}
@@ -343,18 +344,21 @@ public class CloudComputingService {
 				for (ExperimentHeaderInterface i : el) {
 					if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
 						String[] cc = i.getExperimentName().split("§");
-						if (i.getImportusergroup().equals("Temp") && cc.length == 4) {
+						if (i.getImportusergroup().equals("Temp") && cc.length == 5) {
 							String className = cc[0];
 							String partIdx = cc[1];
 							String partCnt = cc[2];
 							String submTime = cc[3];
+							String mergeWithDBid = cc[4];
 							String bcn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 							String bpn = tempDataSetDescription.getPartCnt();
 							String bst = tempDataSetDescription.getSubmissionTime();
+							String bmw = tempDataSetDescription.getMergeWithDBid();
 							if (className.equals(bcn)
 									&& partCnt.equals(bpn)
 									&& submTime.equals(bst)
-									&& !added.contains(partIdx)) {
+									&& !added.contains(partIdx)
+									&& mergeWithDBid.equals(bmw)) {
 								knownResults.add(i);
 								added.add(partIdx);
 							}
@@ -364,20 +368,47 @@ public class CloudComputingService {
 				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
 				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
 						+ knownResults.size());
-				
-				ExperimentReference eRef = new ExperimentReference(knownResults.iterator().next().getOriginDbId());
-				ExperimentHeaderInterface eRefHeader = eRef.getHeader();
-				if (eRefHeader == null) {
-					// source data set has been deleted meanwhile
-					// therefore the analysis results will be deleted, too
-					String msg = "Source data set for analysis results has been deleted, about to delete non-relevant result data (" + knownResults.size() + "/" +
-							tempDataSetDescription.getPartCntI() + " parts)";
-					System.out.println(msg);
-					MongoDB.saveSystemMessage(msg);
-					for (ExperimentHeaderInterface r : knownResults) {
-						m.deleteExperiment(r.getDatabaseId());
+				{
+					// check if source data is still available
+					ExperimentReference eRef = new ExperimentReference(knownResults.iterator().next().getOriginDbId());
+					ExperimentHeaderInterface eRefHeader = eRef.getHeader();
+					if (eRefHeader == null) {
+						// source data set has been deleted meanwhile
+						// therefore the analysis results will be deleted, too
+						String msg = "Source data set for analysis results has been deleted, about to delete non-relevant result data (" + knownResults.size() + "/" +
+								tempDataSetDescription.getPartCntI() + " parts)";
+						System.out.println(msg);
+						MongoDB.saveSystemMessage(msg);
+						for (ExperimentHeaderInterface r : knownResults) {
+							m.deleteExperiment(r.getDatabaseId());
+						}
+						continue;
 					}
-					continue;
+				}
+				ExperimentReference optPreviousResultsToBeMerged = null;
+				{
+					// check if result data needs to be merged with previous calculation results
+					String[] cc = knownResults.iterator().next().getExperimentName().split("§");
+					String mergeWithDBid = cc[4];
+					if (!mergeWithDBid.isEmpty() && !mergeWithDBid.equals("null")) {
+						ExperimentReference eRef = new ExperimentReference(mergeWithDBid);
+						ExperimentHeaderInterface eRefHeader = eRef.getHeader();
+						if (eRefHeader == null) {
+							// source data set has been deleted meanwhile
+							// therefore the analysis results will be deleted, too
+							String msg = "Result data set to be merged with analysis results has been deleted, about to delete non-relevant result data ("
+									+ knownResults.size() + "/" +
+									tempDataSetDescription.getPartCntI() + " parts)";
+							System.out.println(msg);
+							MongoDB.saveSystemMessage(msg);
+							for (ExperimentHeaderInterface r : knownResults) {
+								m.deleteExperiment(r.getDatabaseId());
+							}
+							continue;
+						} else {
+							optPreviousResultsToBeMerged = eRef;
+						}
+					}
 				}
 				
 				boolean addNewTasksIfMissing = false;
@@ -456,7 +487,7 @@ public class CloudComputingService {
 				} else
 					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 						try {
-							doMerge(m, tempDataSetDescription, knownResults, interactive, optStatus);
+							doMerge(m, tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
 						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
 						}
@@ -469,12 +500,23 @@ public class CloudComputingService {
 	
 	private static void doMerge(MongoDB m,
 			TempDataSetDescription tempDataSetDescription,
-			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			ExperimentReference optPreviousResultsToBeMerged) throws Exception {
 		System.out.println("*****************************");
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
 		
-		Experiment e = new Experiment();
+		ExperimentInterface e = new Experiment();
+		
+		if (optPreviousResultsToBeMerged != null) {
+			String msg = "Previous analysis results, to be merged with current result, will no be loaded (" + optPreviousResultsToBeMerged.getExperimentName()
+					+ ","
+					+ optPreviousResultsToBeMerged.getHeader().getImportdate() + ")";
+			System.out.println(msg);
+			MongoDB.saveSystemMessage(msg);
+			e = optPreviousResultsToBeMerged.getData(m);
+		}
+		
 		long tFinish = System.currentTimeMillis();
 		final int wl = knownResults.size();
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -540,7 +582,7 @@ public class CloudComputingService {
 			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
 			e.clear();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-			e = (Experiment) MappingData3DPath.merge(mdpl, false);
+			e = MappingData3DPath.merge(mdpl, false);
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
 		}
 		long tStart = tempDataSetDescription.getSubmissionTimeL();

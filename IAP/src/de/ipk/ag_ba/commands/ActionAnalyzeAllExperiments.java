@@ -79,8 +79,10 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 					if (e.getImportusergroup() != null && e.getImportusergroup().equals("Temp")) {
 						// temporary results are available, so an analysis is probably already running
 						return AnalysisStatus.CURRENT;
-					} else
+					} else {
 						res = AnalysisStatus.NON_CURRENT;
+						res.setNewestKnownDatapoint(e.getImportdate(), e.getDatabaseId());
+					}
 				}
 			}
 		}
@@ -122,12 +124,13 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			Exception {
 		if (eh.getRemark() != null && eh.getRemark().contains("IAP image analysis"))
 			return;
-		if (knownAnalysis(eh, experimentList) == AnalysisStatus.CURRENT) {
+		AnalysisStatus stat = knownAnalysis(eh, experimentList);
+		if (stat == AnalysisStatus.CURRENT) {
 			res.append("<li>Analysis result with current image analysis pipeline (" + IAP_RELEASE.getReleaseFromDescription(eh) + ") available for "
 					+ eh.getExperimentName());
 			return;
 		}
-		NavigationAction navigationAction = null;
+		RemoteCapableAnalysisAction navigationAction = null;
 		System.out.println("Experiment-type: " + eh.getExperimentType() + ", experiment: " + eh.getExperimentName());
 		if (eh.getExperimentType() != null) {
 			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
@@ -144,11 +147,14 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		
 		if (navigationAction != null) {
 			Thread.sleep(100);
-			RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
+			RemoteCapableAnalysisAction rca = navigationAction;
 			CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), null, false);
-			navigationAction = new RemoteExecutionWrapperAction(navigationAction,
+			RemoteExecutionWrapperAction remoteAction = new RemoteExecutionWrapperAction(navigationAction,
 					new NavigationButton(ra, null));
-			navigationAction.performActionCalculateResults(null);
+			
+			remoteAction.setNewestAvailableData(stat.getNewestImportDate(), stat.getDatabaseIdOfNewestResultData());
+			
+			remoteAction.performActionCalculateResults(null);
 			
 			res.append("<li>Analyze " + eh.getExperimentName() + " with analysis method " +
 					StringManipulationTools.removeHTMLtags(rca.getDefaultTitle()));

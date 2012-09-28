@@ -59,6 +59,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected int workOnSubset;
 	protected int numberOfSubsets;
 	protected String mongoDatasetID;
+	private Date optProcessOnlySampleDataNewerThanThisDate;
 	
 	public AbstractPhenotypeAnalysisAction(String tooltip) {
 		super(tooltip);
@@ -135,6 +136,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 								}
 							}
 						}
+						if (optProcessOnlySampleDataNewerThanThisDate != null && sd3.getSampleFineTimeOrRowId() != null)
+							if (sd3.getSampleFineTimeOrRowId() <= optProcessOnlySampleDataNewerThanThisDate.getTime())
+								continue;
 						if (filterTime) {
 							if (sd3.getTime() != 48)
 								continue;
@@ -317,10 +321,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	}
 	
 	@Override
-	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
+	public void setWorkingSet(int workOnSubset, int numberOfSubsets,
+			RunnableWithMappingData resultReceiver,
+			Date optProcessOnlySampleDataNewerThanThisDate) {
 		this.setResultReceiver(resultReceiver);
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
+		this.optProcessOnlySampleDataNewerThanThisDate = optProcessOnlySampleDataNewerThanThisDate;
 	}
 	
 	@Override

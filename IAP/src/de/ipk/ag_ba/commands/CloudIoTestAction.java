@@ -2,6 +2,7 @@ package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
@@ -41,6 +42,7 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 	private int workOnSubset;
 	private int numberOfSubsets;
 	private String datasetID;
+	private Date optProcessOnlySampleDataNewerThanThisDate;
 	
 	public CloudIoTestAction(MongoDB m, ExperimentReference experiment) {
 		super("Test performance by reading experiment content");
@@ -158,10 +160,13 @@ public class CloudIoTestAction extends AbstractNavigationAction implements Remot
 	}
 	
 	@Override
-	public void setWorkingSet(int workOnSubset, int numberOfSubsets, RunnableWithMappingData resultReceiver) {
+	public void setWorkingSet(int workOnSubset, int numberOfSubsets,
+			RunnableWithMappingData resultReceiver,
+			Date optProcessOnlySampleDataNewerThanThisDate) {
 		this.resultReceiver = resultReceiver;
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
+		this.optProcessOnlySampleDataNewerThanThisDate = optProcessOnlySampleDataNewerThanThisDate;
 	}
 	
 	@Override
