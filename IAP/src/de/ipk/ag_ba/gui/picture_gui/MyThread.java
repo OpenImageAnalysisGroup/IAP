@@ -44,11 +44,13 @@ public class MyThread extends Thread implements Runnable {
 		try {
 			started = true;
 			// super.run();
-			runCode.run();
-			// } catch (Error err1) {
-			// err1.printStackTrace();
-			// } catch (Exception err2) {
-			// err2.printStackTrace();
+			try {
+				runCode.run();
+			} catch (Error err1) {
+				err1.printStackTrace();
+			} catch (Exception err2) {
+				err2.printStackTrace();
+			}
 		} finally {
 			finished = true;
 			sem.release();
