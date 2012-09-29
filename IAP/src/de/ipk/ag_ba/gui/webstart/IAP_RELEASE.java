@@ -49,6 +49,8 @@ public enum IAP_RELEASE {
 	}
 	
 	public static IAP_RELEASE getReleaseFromDescription(ExperimentHeaderInterface e) {
+		if (e == null)
+			return null;
 		String rem = e.getRemark();
 		if (rem != null)
 			for (IAP_RELEASE ir : values()) {

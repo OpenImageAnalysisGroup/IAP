@@ -55,6 +55,8 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		String time = new Date(cmd.getSubmissionTime()).toString();
 		sb.append("Compute job start time: " + time + "<br>");
 		sb.append("Target IPs: " + cmd.getTargetIPs() + "<br>");
+		sb.append("Partial Dataset: " + cmd.getAvailableResultDatabaseId() + "<br>");
+		sb.append("Newest available data from: " + cmd.getAvailableResultImportDate() + "<br>");
 		sb.append("Processing Experiment: " + experimentName);
 		return sb.toString();
 	}
