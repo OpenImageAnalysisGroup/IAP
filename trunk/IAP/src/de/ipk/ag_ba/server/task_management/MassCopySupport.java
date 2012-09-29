@@ -321,7 +321,8 @@ public class MassCopySupport {
 				for (ExperimentHeaderInterface ehi : experimentList) {
 					if (ehi.getDatabaseId().equals(id)) {
 						print("Add compute tasks to analyze experiment " + id + ".");
-						ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi, experimentList);
+						ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi,
+								ActionAnalyzeAllExperiments.knownAnalysis(ehi, experimentList));
 					}
 				}
 			}
