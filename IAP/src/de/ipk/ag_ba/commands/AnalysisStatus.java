@@ -25,7 +25,7 @@ public enum AnalysisStatus {
 	}
 	
 	public void setNewestKnownDatapoint(Date importdate, String databaseId, ExperimentHeaderInterface res) {
-		if (this.importdate == null || importdate.compareTo(this.importdate) > 0) {
+		if (this.importdate == null || importdate == null || importdate.compareTo(this.importdate) > 0) {
 			this.importdate = importdate;
 			this.databaseId = databaseId;
 			this.res = res;

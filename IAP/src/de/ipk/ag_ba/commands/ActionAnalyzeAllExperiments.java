@@ -69,6 +69,9 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 	public static AnalysisStatus knownAnalysis(
 			ExperimentHeaderInterface eh,
 			ArrayList<ExperimentHeaderInterface> experimentList2) {
+		AnalysisStatus.CURRENT.setNewestKnownDatapoint(null, null, null);
+		AnalysisStatus.NON_CURRENT.setNewestKnownDatapoint(null, null, null);
+		AnalysisStatus.NOT_FOUND.setNewestKnownDatapoint(null, null, null);
 		if (eh == null || experimentList2 == null || experimentList2.size() == 0 ||
 				eh.getDatabaseId() == null || eh.getDatabaseId().length() == 0)
 			return AnalysisStatus.NOT_FOUND;
@@ -80,7 +83,8 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		for (ExperimentHeaderInterface e : experimentList2) {
 			if (e.getOriginDbId() != null && e.getOriginDbId().equals(dbID)) {
 				if (IAPservice.isAnalyzedWithCurrentRelease(e)) {
-					res = AnalysisStatus.CURRENT;
+					if (res != AnalysisStatus.CURRENT)
+						res = AnalysisStatus.CURRENT;
 					res.setNewestKnownDatapoint(e.getImportdate(), e.getDatabaseId(), e);
 					return res;
 				} else {
@@ -88,7 +92,8 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 						// temporary results are available, so an analysis is probably already running
 						return AnalysisStatus.CURRENT;
 					} else {
-						res = AnalysisStatus.NON_CURRENT;
+						if (res != AnalysisStatus.NON_CURRENT)
+							res = AnalysisStatus.NON_CURRENT;
 						res.setNewestKnownDatapoint(e.getImportdate(), e.getDatabaseId(), e);
 					}
 				}
@@ -99,7 +104,8 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 				dbID = eh.getHistory().get(time).getDatabaseId();
 				for (ExperimentHeaderInterface e : experimentList2) {
 					if (e.getOriginDbId() != null && e.getOriginDbId().equals(dbID)) {
-						res = AnalysisStatus.NON_CURRENT;
+						if (res != AnalysisStatus.NON_CURRENT)
+							res = AnalysisStatus.NON_CURRENT;
 						res.setNewestKnownDatapoint(e.getImportdate(), e.getDatabaseId(), e);
 					}
 				}
@@ -112,7 +118,8 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 					String probableExperimentName = (e.getExperimentName().split(": ", 2)[1]).trim();
 					if (probableExperimentName.equals(eh.getExperimentName())) {
 						e.setOriginDbId(eh.getDatabaseId());
-						res = AnalysisStatus.NON_CURRENT;
+						if (res != AnalysisStatus.NON_CURRENT)
+							res = AnalysisStatus.NON_CURRENT;
 						res.setNewestKnownDatapoint(e.getImportdate(), e.getDatabaseId(), e);
 					}
 				}
