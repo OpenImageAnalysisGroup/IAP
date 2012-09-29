@@ -325,12 +325,13 @@ public class CloudComputingService {
 				if ((i.getExperimentType() + "").contains("Trash"))
 					continue;
 				String[] cc = i.getExperimentName().split("§");
-				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") && cc.length == 5) {
+				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") &&
+						(cc.length == 4 || cc.length == 5)) {
 					String className = cc[0];
 					String idxCnt = cc[1];
 					String partCnt = cc[2];
 					String submTime = cc[3];
-					String mergeWithDBid = cc[4];
+					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 					if (!processedSubmissionTimes.contains(submTime))
 						availableTempDatasets.add(new TempDataSetDescription(
 								className, partCnt, submTime, i.getOriginDbId(),
@@ -344,12 +345,13 @@ public class CloudComputingService {
 				for (ExperimentHeaderInterface i : el) {
 					if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
 						String[] cc = i.getExperimentName().split("§");
-						if (i.getImportusergroup().equals("Temp") && cc.length == 5) {
+						if (i.getImportusergroup().equals("Temp") &&
+								(cc.length == 4 || cc.length == 5)) {
 							String className = cc[0];
 							String partIdx = cc[1];
 							String partCnt = cc[2];
 							String submTime = cc[3];
-							String mergeWithDBid = cc[4];
+							String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 							String bcn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 							String bpn = tempDataSetDescription.getPartCnt();
 							String bst = tempDataSetDescription.getSubmissionTime();
@@ -389,7 +391,7 @@ public class CloudComputingService {
 				{
 					// check if result data needs to be merged with previous calculation results
 					String[] cc = knownResults.iterator().next().getExperimentName().split("§");
-					String mergeWithDBid = cc[4];
+					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 					if (!mergeWithDBid.isEmpty() && !mergeWithDBid.equals("null")) {
 						ExperimentReference eRef = new ExperimentReference(mergeWithDBid);
 						ExperimentHeaderInterface eRefHeader = eRef.getHeader();
