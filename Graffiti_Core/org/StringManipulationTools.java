@@ -583,12 +583,15 @@ public class StringManipulationTools implements HelperClass {
 			char curChar = characters[i];
 			if (curChar < 128 && Character.isLetterOrDigit(curChar)) {
 				result.append(curChar);
-			} else {
-				String html = "&#" + new Integer(curChar).toString() + ";";
-				while (html.length() < 8)
-					html = stringReplace(html, "&#", "&#0");
-				result.append(html);
-			}
+			} else
+				if (curChar == 13)
+					result.append("<br>");
+				else {
+					String html = "&#" + new Integer(curChar).toString() + ";";
+					while (html.length() < 8)
+						html = stringReplace(html, "&#", "&#0");
+					result.append(html);
+				}
 		}
 		return result.toString();
 	}

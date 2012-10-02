@@ -1021,6 +1021,12 @@ public class Experiment implements ExperimentInterface {
 		});
 	}
 	
+	public void sortConditions() {
+		for (SubstanceInterface s : md) {
+			s.sortConditions();
+		}
+	}
+	
 	public static ExperimentInterface loadFromFile(String fileName)
 			throws FileNotFoundException, IOException, ParserConfigurationException, SAXException {
 		InputStream in = new FileInputStream(fileName);
