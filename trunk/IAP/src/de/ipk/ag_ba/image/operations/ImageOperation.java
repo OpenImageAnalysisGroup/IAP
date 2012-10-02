@@ -3984,11 +3984,11 @@ public class ImageOperation {
 		return new ImageCanvas(getImage());
 	}
 	
-	public ImageOperation drawSkeleton(FlexibleImage image2, boolean doItReally) {
-		return drawSkeleton2(image2, 1, doItReally);
+	public ImageOperation drawSkeleton(FlexibleImage image2, boolean doItReally, int background) {
+		return drawSkeleton2(image2, 1, doItReally, background);
 	}
 	
-	public ImageOperation drawSkeleton2(FlexibleImage image2, int size, boolean doItReally) {
+	public ImageOperation drawSkeleton2(FlexibleImage image2, int size, boolean doItReally, int background) {
 		int[][] res = getImageAs2dArray();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
@@ -3996,7 +3996,7 @@ public class ImageOperation {
 		if (doItReally)
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
-					if (skelImg[x][y] != SkeletonProcessor2d.background) {
+					if (skelImg[x][y] != background) {
 						int v = skelImg[x][y];
 						int r = size;
 						if (v == SkeletonProcessor2d.colorEndpoints)
@@ -4699,5 +4699,9 @@ public class ImageOperation {
 	public ImageOperation sharpen() {
 		image.getProcessor().sharpen();
 		return this;
+	}
+	
+	public Integer getPixel(int x, int y) {
+		return getImageAs1dArray()[x + y * getWidth()];
 	}
 }
