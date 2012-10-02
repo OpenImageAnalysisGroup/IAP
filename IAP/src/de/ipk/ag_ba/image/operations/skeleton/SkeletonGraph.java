@@ -66,7 +66,7 @@ public class SkeletonGraph {
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
-				if (p != SkeletonProcessor2d.background) {
+				if (p != SkeletonProcessor2d.getDefaultBackground()) {
 					nEdgePoints++;
 				}
 			}
@@ -201,7 +201,7 @@ public class SkeletonGraph {
 			for (int xd = -2; xd <= 2; xd++) {
 				int p = skelImg2[x + xd][y + yd];
 				String s = "";
-				if (p == SkeletonProcessor2d.background)
+				if (p == SkeletonProcessor2d.getDefaultBackground())
 					s = "---";
 				else
 					if (p == SkeletonProcessor2d.colorBranches)

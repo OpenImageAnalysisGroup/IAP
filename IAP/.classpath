@@ -26,5 +26,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/IAP Transfer"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/mongo.jar"/>
+	<classpathentry kind="lib" path="lib/flanagan.java6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -77,7 +77,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 							if (sk != null) {
 								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-								res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
+								res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							}
 						}
 				}
@@ -94,7 +94,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 							if (sk != null) {
 								boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-								res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
+								res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							}
 						}
 				}
@@ -126,7 +126,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-							res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
+							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							if (res != null)
 								getProperties().setImage("skeleton_fluo", sk);
 						}
@@ -144,7 +144,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
 							boolean drawSkeleton = options.getBooleanSetting(Setting.DRAW_SKELETON);
-							res = res.io().drawSkeleton(sk, drawSkeleton).getImage();
+							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							if (res != null)
 								getProperties().setImage("skeleton_fluo", sk);
 						}
@@ -240,7 +240,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
-		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.background);
+		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
 		leafcount -= bloomLimbCount;
 		
 		// ***Out***

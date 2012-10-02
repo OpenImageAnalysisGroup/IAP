@@ -20,7 +20,7 @@ public class Limb {
 	}
 	
 	public Limb() {
-		// TODO Auto-generated constructor stub
+		// empty
 	}
 	
 	public void setInitialpoint(Point initialpoint) {
@@ -32,6 +32,10 @@ public class Limb {
 	}
 	
 	public void addPoint(Point inp) {
-		this.points.add(inp);
+		points.add(inp);
+	}
+	
+	public ArrayList<Point> getPoints() {
+		return points;
 	}
 }

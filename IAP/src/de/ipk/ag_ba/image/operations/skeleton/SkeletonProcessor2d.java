@@ -22,7 +22,7 @@ public class SkeletonProcessor2d {
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();
-	public static int background = Color.BLACK.getRGB(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
+	public int background = getDefaultBackground(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
@@ -865,5 +865,9 @@ public class SkeletonProcessor2d {
 	
 	public ArrayList<Point> getEndpoints() {
 		return endpoints;
+	}
+	
+	public static int getDefaultBackground() {
+		return Color.BLACK.getRGB();
 	}
 }

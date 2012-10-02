@@ -377,4 +377,5 @@ public class FlexibleImage {
 		ImageIO.write(getAsBufferedImage(), "PNG", output);
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
+	
 }
