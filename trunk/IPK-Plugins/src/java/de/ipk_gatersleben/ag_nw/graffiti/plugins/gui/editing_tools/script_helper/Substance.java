@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -927,6 +929,17 @@ public class Substance implements SubstanceInterface {
 	@Override
 	public int getNumberOfMeasurements() {
 		return getDataPointCount(false);
+	}
+	
+	@Override
+	public void sortConditions() {
+		Collections.sort(conditions, new Comparator<ConditionInterface>() {
+			@Override
+			public int compare(ConditionInterface o1, ConditionInterface o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		
 	}
 	
 }

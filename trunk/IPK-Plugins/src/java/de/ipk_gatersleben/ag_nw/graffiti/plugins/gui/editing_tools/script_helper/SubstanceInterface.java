@@ -198,4 +198,5 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	
 	String getHTMLdescription();
 	
+	public void sortConditions();
 }
