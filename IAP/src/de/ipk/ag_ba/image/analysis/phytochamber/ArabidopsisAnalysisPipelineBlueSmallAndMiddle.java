@@ -45,7 +45,7 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	@Override
-	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
+	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
 		BlockPipeline p = new BlockPipeline();

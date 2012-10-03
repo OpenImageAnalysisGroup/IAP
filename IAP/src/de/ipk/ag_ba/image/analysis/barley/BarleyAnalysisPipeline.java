@@ -28,6 +28,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fl
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
@@ -51,7 +52,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	@Override
-	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
+	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
 		boolean skelet = true;
@@ -76,6 +77,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlockClosing_vis.class);
 		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
 		// p.add(BlMedianFilter_vis.class);
+		p.add(BlLeafCurlingAnalysis_vis.class);
 		p.add(BlIntensityConversion_fluo.class);
 		p.add(BlTranslateMatch_vis_fluo_nir.class);
 		p.add(BlockClearNirPot_nir.class);

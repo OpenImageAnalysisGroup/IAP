@@ -101,7 +101,6 @@ public class FlexibleImage {
 	}
 	
 	public FlexibleImage(Image image) {
-		// this(GravistoService.getBufferedImage(image));999999999999999999999999
 		this(new ImagePlus("Image", image));
 	}
 	
@@ -134,6 +133,10 @@ public class FlexibleImage {
 	
 	public FlexibleImage(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
 		this(grayR.getWidth(), grayR.getHeight(), getImgFromRGB(grayR, grayG, grayB));
+	}
+	
+	public FlexibleImage(Object ref, String name) {
+		this(IAPservice.getImage(ref, name));
 	}
 	
 	private static int[] getImgFromRGB(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
