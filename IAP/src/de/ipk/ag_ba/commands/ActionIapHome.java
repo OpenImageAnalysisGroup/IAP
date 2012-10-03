@@ -128,7 +128,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 							+ "partly with contributions from the group Bioinformatics and Information Technology. "
 							+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links."
 					);
-			ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://bioinformatics.ipk-gatersleben.de",
+			ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton("Website", "http://bioinformatics.ipk-gatersleben.de",
 					"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);

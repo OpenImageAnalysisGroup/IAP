@@ -91,7 +91,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 						new NavigationButton(
 								new ActionCloudClusterHostInformation(m),
 								guiSetting));
-				res.add(WebFolder.getURLentity("Analyze Cluster Status",
+				res.add(WebFolder.getURLactionButtton("Analyze Cluster Status",
 						"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4",
 						IAPimages.getComputerConsole(), src.getGUIsetting()));
 				
