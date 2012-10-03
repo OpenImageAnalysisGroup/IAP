@@ -13,6 +13,7 @@ import info.StopWatch;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -42,6 +43,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -57,6 +59,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
+import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.LoadSetting;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
@@ -1486,6 +1489,15 @@ public class IAPservice {
 	
 	public MassCopySupport getMassCopySupport() {
 		return MassCopySupport.getInstance();
+	}
+	
+	public static Image getImage(Object ref, String name) {
+		URL url = GravistoService.getResource(ref.getClass(), name);
+		if (url == null)
+			return null;
+		else {
+			return new ImageIcon(url).getImage();
+		}
 	}
 	
 	public static String getURLfromWeblocFile(String referenceURL) throws IOException {

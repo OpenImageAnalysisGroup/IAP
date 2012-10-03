@@ -79,7 +79,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		return settings;
 	}
 	
-	protected abstract BlockPipeline getPipeline(ImageProcessorOptions options);
+	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
 	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResults(

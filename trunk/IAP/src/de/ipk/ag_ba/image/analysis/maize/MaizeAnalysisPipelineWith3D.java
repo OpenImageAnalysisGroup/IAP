@@ -35,7 +35,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	}
 	
 	@Override
-	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
+	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		BlockPipeline p = super.getPipeline(options);
 		if (options != null)
 			options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, false);

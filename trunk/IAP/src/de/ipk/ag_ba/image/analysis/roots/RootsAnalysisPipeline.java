@@ -25,7 +25,7 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	@Override
-	protected BlockPipeline getPipeline(ImageProcessorOptions options) {
+	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images.class);
 		p.add(BlRootsAddBorderAroundImage.class);

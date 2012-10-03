@@ -81,7 +81,7 @@ public class BlockPipeline {
 	
 	public HashMap<Integer, FlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
 			FlexibleMaskAndImageSet input, HashMap<Integer, FlexibleImageStack> debugStack,
-			HashMap<Integer, BlockResultSet> settings,
+			HashMap<Integer, BlockResultSet> blockResults,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		// normally each image is analyzed once (i.e. one plant per image)
@@ -108,19 +108,19 @@ public class BlockPipeline {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
 			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
-			BlockResultSet set = new BlockResults();
+			BlockResultSet results = new BlockResults();
 			options.setTrayCnt(idx, executionTrayCount);
-			res.put(idx, executeInnerCall(options, input, ds, set, status));
+			res.put(idx, executeInnerCall(options, input, ds, results, status));
 			if (debugStack != null)
 				debugStack.put(idx, ds);
-			settings.put(idx, set);
+			blockResults.put(idx, results);
 		}
 		return res;
 	}
 	
 	private FlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
 			FlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
-			BlockResultSet settings,
+			BlockResultSet results,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		
@@ -148,7 +148,7 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(input, options, settings, index++,
+			block.setInputAndOptions(input, options, results, index++,
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
@@ -220,7 +220,7 @@ public class BlockPipeline {
 			};
 		}
 		
-		settings.clearStore();
+		results.clearStore();
 		
 		long b = System.currentTimeMillis();
 		
