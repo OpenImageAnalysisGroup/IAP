@@ -23,11 +23,11 @@ public class IAPnewsLinksSource extends HTTPfolderSource {
 	
 	public IAPnewsLinksSource() {
 		super(getLib(),
-							"News and Links", "http://ba-13.ipk-gatersleben.de/links/", new String[] { ".webloc" },
-							IAPmain.loadIcon("img/public.png"), IAPmain.loadIcon("img/dataset.png"));
+				"News and Links", "http://ba-13.ipk-gatersleben.de/links/", new String[] { ".webloc" },
+				IAPmain.loadIcon("img/public.png"), IAPmain.loadIcon("img/dataset.png"));
 		setDescription("<h2>Bookmarks</h2>"
-							+ "At this place interesting links regarding interesting bioinformatics " +
-								"research activities are listed.");
+				+ "At this place interesting links regarding interesting bioinformatics " +
+				"research activities are listed.");
 	}
 	
 	private static Library getLib() {
@@ -37,14 +37,21 @@ public class IAPnewsLinksSource extends HTTPfolderSource {
 		return libIAPnews;
 	}
 	
+	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
-		EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Sino/German Network",
-								"Sino/German Network of Computational & Integrative Biology", "img/CIB_logo.png", "img/CIB_logo.png");
-		ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("Website", "http://www.imbio.de/forschung2/",
-								"img/browser.png", src != null ? src.getGUIsetting() : null));
+		EmptyNavigationAction ipkBioInf = new EmptyNavigationAction(
+				"Sino/German Network",
+				"Sino/German Network of Computational & Integrative Biology",
+				"img/CIB_logo.png", "img/CIB_logo.png");
+		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
+				"Website",
+				"http://www.imbio.de/forschung2/",
+				"img/browser.png", src != null ? src.getGUIsetting() : null));
 		
-		ipkBioInf.addAdditionalEntity(WebFolder.getURLentity("MyBioNet", "http://bis.zju.edu.cn/mybionet/",
-					"img/ext/MyBioNet48.png", src != null ? src.getGUIsetting() : null));
+		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
+				"MyBioNet",
+				"http://bis.zju.edu.cn/mybionet/",
+				"img/ext/MyBioNet48.png", src != null ? src.getGUIsetting() : null));
 		
 		Collection<NavigationButton> nbl = new ArrayList<NavigationButton>();
 		nbl.add(new NavigationButton(ipkBioInf, src.getGUIsetting()));

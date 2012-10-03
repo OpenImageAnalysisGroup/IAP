@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
@@ -14,6 +15,8 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
@@ -48,7 +51,7 @@ public class Book {
 	}
 	
 	public String getTitle() {
-		return title;
+		return StringManipulationTools.stringReplace(title, ".webloc", "");
 	}
 	
 	public String getUrl() {
@@ -65,9 +68,23 @@ public class Book {
 	
 	public NavigationButton getNavigationButton(NavigationButton src, String icon) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
+			String trueURL = null;
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
-				AttributeHelper.showInBrowser(Book.this.getUrl());
+				String referenceURL = Book.this.getUrl();
+				if (trueURL == null)
+					if (referenceURL.endsWith(".webloc"))
+						try {
+							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
+						} catch (IOException e) {
+							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
+							AttributeHelper.showInBrowser(referenceURL);
+							return;
+						}
+					else
+						trueURL = referenceURL;
+				AttributeHelper.showInBrowser(trueURL);
 			}
 			
 			@Override
@@ -82,11 +99,22 @@ public class Book {
 			
 			@Override
 			public String getURL() {
-				return Book.this.getUrl();
+				String referenceURL = Book.this.getUrl();
+				if (trueURL == null)
+					if (referenceURL.endsWith(".webloc"))
+						try {
+							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
+						} catch (IOException e) {
+							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
+							return trueURL;
+						}
+					else
+						trueURL = referenceURL;
+				return trueURL;
 			}
 		};
 		NavigationButton website = new NavigationButton(action, getTitle(), icon,
-							src.getGUIsetting());
+				src.getGUIsetting());
 		website.setToolTipText("Open " + getUrl());
 		return website;
 	}

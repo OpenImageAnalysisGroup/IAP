@@ -9,6 +9,7 @@ package de.ipk.ag_ba.gui.util;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.TabMetaCrop;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.WebDirectoryFileListAccess;
@@ -328,12 +330,25 @@ public class WebFolder {
 		}
 	}
 	
-	public static NavigationButton getURLentity(String title, final String referenceURL, String image,
+	public static NavigationButton getURLactionButtton(String title, final String referenceURL, String image,
 			GUIsetting guiSetting) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
+			String trueURL = null;
+			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
-				AttributeHelper.showInBrowser(referenceURL);
+				if (trueURL == null)
+					if (referenceURL.endsWith(".webloc"))
+						try {
+							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
+						} catch (IOException e) {
+							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
+							AttributeHelper.showInBrowser(referenceURL);
+							return;
+						}
+					else
+						trueURL = referenceURL;
+				AttributeHelper.showInBrowser(trueURL);
 			}
 			
 			@Override
@@ -348,7 +363,17 @@ public class WebFolder {
 			
 			@Override
 			public String getURL() {
-				return referenceURL;
+				if (trueURL == null)
+					if (referenceURL.endsWith(".webloc"))
+						try {
+							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
+						} catch (IOException e) {
+							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
+							return trueURL;
+						}
+					else
+						trueURL = referenceURL;
+				return trueURL;
 			}
 		};
 		NavigationButton website = new NavigationButton(action, title, image, guiSetting);
