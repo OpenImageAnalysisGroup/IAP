@@ -56,7 +56,10 @@ public class ActionShowXML extends AbstractNavigationAction {
 				} catch (JDOMException e1) {
 					xml = "(" + e1.getMessage() + ")";
 				}
-				xmlOutput.add(StringManipulationTools.UnicodeToHtml(xml));
+				xmlOutput.add(
+						StringManipulationTools.stringReplace(
+								StringManipulationTools.UnicodeToHtml(xml),
+								" ", "&nbsp;"));
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
