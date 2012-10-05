@@ -26,23 +26,26 @@ stackedPlotList <- list(
 		"top.vis.hsv.v.normalized.histogram.bin." = list(plotName = "top visible light brightnesses (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 3, paragraph = 1),
 		"top.vis.hsv.v.histogram.bin." = list(plotName = "top visible light brightnesses (%)", section = 60, subsection = 2, subsubsection = 3, paragraph = 2),
 		
-		"side.fluo.normalized.histogram.bin." = list(plotName = "side fluorescence color spectra (zoom corrected) (%)", section = 61, subsection = 1),
-		"side.fluo.histogram.bin." = list(plotName = "side fluorescence color spectra (%)", section = 61, subsection = 2), 
 		
-		"top.fluo.normalized.histogram.bin." = list(plotName = "top fluorescence color spectra (zoom corrected) (%)", section = 61, subsection = 3), 
-		"top.fluo.histogram.bin." = list(plotName = "top fluorescence color spectra (%)", section = 61, subsection = 4), 
 		
-		"side.nir.normalized.histogram.bin." = list(plotName = "side near-infrared intensities (zoom corrected) (%)", section = 62, subsection = 1), 
-		"side.nir.histogram.bin." = list(plotName = "side near-infrared intensities (%)", section = 62, subsection = 2),
 		
-		"top.nir.normalized.histogram.bin." = list(plotName = "top near-infrared intensities (zoom corrected) (%)", section = 62, subsection = 3),
-		"top.nir.histogram.bin." = list(plotName = "top near-infrared intensities (%)", section = 62, subsection = 4), 
+		"side.fluo.normalized.histogram.bin." = list(plotName = "side fluorescence color spectra (zoom corrected) (%)", section = 61, subsection = 1, subsubsection = 1),
+		"side.fluo.histogram.bin." = list(plotName = "side fluorescence color spectra (%)", section = 61, subsection = 1, subsubsection = 2), 
 		
-		"side.ir.normalized.histogram.bin." = list(plotName = "side infrared intensities (zoom corrected) (%)", section = 63, subsection = 1),
-		"side.ir.histogram.bin." = list(plotName = "side infrared light intensities (%)", section = 63, subsection = 2),
+		"top.fluo.normalized.histogram.bin." = list(plotName = "top fluorescence color spectra (zoom corrected) (%)", section = 61, subsection = 2, subsubsection = 1), 
+		"top.fluo.histogram.bin." = list(plotName = "top fluorescence color spectra (%)", section = 61, subsection = 2, subsubsection = 2), 
 		
-		"top.ir.normalized.histogram.bin." = list(plotName = "top infrared light intensities (zoom corrected) (%)", section = 63, subsection = 3),
-		"top.ir.histogram.bin." = list(plotName = "top infrared light intensities (%)", section = 63, subsection = 4)
+		"side.nir.normalized.histogram.bin." = list(plotName = "side near-infrared intensities (zoom corrected) (%)", section = 62, subsection = 1, subsubsection = 1), 
+		"side.nir.histogram.bin." = list(plotName = "side near-infrared intensities (%)", section = 62, subsection = 1, subsubsection = 2),
+		
+		"top.nir.normalized.histogram.bin." = list(plotName = "top near-infrared intensities (zoom corrected) (%)", section = 62, subsection = 2, subsubsection = 1),
+		"top.nir.histogram.bin." = list(plotName = "top near-infrared intensities (%)", section = 62, subsection = 2, subsubsection = 2), 
+		
+		"side.ir.normalized.histogram.bin." = list(plotName = "side infrared intensities (zoom corrected) (%)", section = 63, subsection = 1, subsubsection = 1),
+		"side.ir.histogram.bin." = list(plotName = "side infrared light intensities (%)", section = 63, subsection = 1, subsubsection = 2),
+		
+		"top.ir.normalized.histogram.bin." = list(plotName = "top infrared light intensities (zoom corrected) (%)", section = 63, subsection = 2, subsubsection = 1),
+		"top.ir.histogram.bin." = list(plotName = "top infrared light intensities (%)", section = 63, subsection = 2, subsubsection = 2)
 
 		
 		

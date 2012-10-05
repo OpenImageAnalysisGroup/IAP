@@ -7,15 +7,24 @@ boxOptions= NULL
 
 boxPlotList <- list(
 		"volume.iap (px^3)" = list(
-								plotName = "digital biomass (visible light images, IAP formula) (px^3)", 
+								plotName = "digital biomass (visible light images, IAP formula) sqrt(px^3)", 
 								section = 20,
 								subsection = 1,
-								subsubsection = 1), 
+								subsubsection = 1,
+								paragraph = 1), 
 		"volume.lt (px^3)" = list(
-								plotName = "digital biomass (visible light, LemnaTec 0,90 formula) (px^3)", 
+								plotName = "digital biomass (visible light, LemnaTec 0,90 formula) sqrt(px^3)", 
 								section = 20,
 								subsection = 2,
 								subsubsection = 1), 
+						
+		"volume.fluo.iap" = list(
+				plotName = "digital biomass (fluorescence images, IAP formula) sqrt(px^3)", 
+				section = 20,
+				subsection = 1,
+				subsubsection = 2,
+				paragraph = 1),				
+		
 		
 		"side.height.norm (mm)" = list(
 				plotName = "height (zoom corrected) (mm)", 
@@ -59,6 +68,18 @@ boxPlotList <- list(
 				plotName = "top area (px)", 
 				section = 21,
 				subsection = 8,
+				subsubsection = 1),
+		
+		"side.border.length.norm (mm)" = list(
+				plotName = "side border length (zoom corrected) (mm)", 
+				section = 21,
+				subsection = 9,
+				subsubsection = 1),
+		
+		"side.border.length (px)" = list(
+				plotName = "side border length (px)", 
+				section = 21,
+				subsection = 10,
 				subsubsection = 1)	
 		
 #		"volume.fluo.iap" = list(plotName = "digital biomass (fluorescence images, IAP formula) (px^3)", section = 6)
