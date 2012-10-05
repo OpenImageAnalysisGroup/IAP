@@ -18,8 +18,10 @@ LINE.ITEM <- "\\item"
 END.ITEM <- paste("\\end{itemize}", NEWLINE.TEX, sep="")
 BEGIN.TINY <- paste("\\begin{tiny}", NEWLINE.TEX, sep="")
 END.TINY <- paste("\\end{tiny}", NEWLINE.TEX, sep="")
-BEGIN.LOAD.IMAGE <- "\\loadImage{"
-END.LOAD.IMAGE <- "}"
+BEGIN.LOAD.IMAGE <- paste(NEWLINE.TEX, "\\loadImage{", sep="")
+#BEGIN.LOAD.IMAGE <- paste(NEWLINE.TEX, "\\loadImageCap{", sep="")
+MIDDLE.LOAD.IMAGE <- ", \""
+END.LOAD.IMAGE <- paste("}", NEWLINE.TEX, sep="")
 BEGIN.URL <- "\\url{"
 END.URL <- "}"
 SEPARATOR.ITEM <- " "
@@ -29,6 +31,7 @@ NIR.BIN.PNG <- "nir_bin.png"
 HSB.PNG <- "HSB.png"
 SECTION.PNG <- "section.png"
 LAB.A.B.BIN.PNG <- "lab_a_b_bin.png"
+HUE.BIN.PNG <- "hue_bin.png"
 
 sectionMappingList <- list(
 		section = list(
@@ -114,7 +117,8 @@ sectionMappingList <- list(
 								"In this section the plant pixels color shade values are investigated in detail. 
 								 The color components color hue, color saturation or brightness are analyzed independently.", NEWLINE.TEX,
 						 		"The three components based on the HSB color model, following classifications were made:", NEWLINE.TEX,
-						 		paste(BEGIN.LOAD.IMAGE, HSB.PNG, END.LOAD.IMAGE, NEWLINE.TEX, sep=""), NEWLINE.TEX, 		 
+#						 		paste(BEGIN.LOAD.IMAGE, HSB.PNG, MIDDLE.LOAD.IMAGE, "HSB color space" , END.LOAD.IMAGE, NEWLINE.TEX, sep=""), NEWLINE.TEX, 	
+								paste(BEGIN.LOAD.IMAGE, HSB.PNG, END.LOAD.IMAGE, NEWLINE.TEX, sep=""), NEWLINE.TEX, 	
 								"The following statistical analysis is performed for each color component of
 								 the plant pixel values:", NEWLINE.TEX,
 						 		BEGIN.ITEM,
@@ -153,6 +157,7 @@ sectionMappingList <- list(
 								
 								"Following classifications were made for the histogram (420 – 750 nm):", NEWLINE.TEX,
 								paste(BEGIN.LOAD.IMAGE, FLUO.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+#								paste(BEGIN.LOAD.IMAGE, FLUO.BIN.PNG, MIDDLE.LOAD.IMAGE, "Fluorescence activity range and bins",END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
 #						text = paste(BEGIN.ITEM,
 #								LINE.ITEM, "Average and histogram of observed fluorescence colors (Fluo)", NEWLINE.TEX,
@@ -173,6 +178,7 @@ sectionMappingList <- list(
 								"The water content of a plant is analysed with IR-B subspectrum (1450 – 1550 nm) of the NIR.", NEWLINE.TEX,
 								"Following classifications were made for the histogram:", NEWLINE.TEX,
 								paste(BEGIN.LOAD.IMAGE, NIR.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+#								paste(BEGIN.LOAD.IMAGE, NIR.BIN.PNG, MIDDLE.LOAD.IMAGE, "plant water content",END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
 				),
 				
@@ -204,25 +210,59 @@ sectionMappingList <- list(
 						title = "Detailed Section analysis",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
-						text = paste("The plant is separated in 5 Sections. The plant on the side image is divided from the lowest 20 % up to the highest 20 %. 
+						text = paste("The plant is separated in 5 Sections. The plant on the side image is divided from the lowest 20 \\% up to the highest 20 \\%. 
 									  At the top image the sections represents circles based on the plant middle.", NEWLINE.TEX,
-								paste(BEGIN.LOAD.IMAGE, SECTION.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+									  paste(BEGIN.LOAD.IMAGE, SECTION.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+#									  paste(BEGIN.LOAD.IMAGE, SECTION.PNG, MIDDLE.LOAD.IMAGE, "Sections of the plant; right: top view; left: side view" ,END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+									  "Different properties are calculated for this sections:", NEWLINE.TEX,
+									 
+									 					
+										  "NDVI stand for \"Normalized Differenced Vegetation Index\" and can be used to make a statement on the health of the plant.
+												  Healthy plants reflect few light in the visible and much in the near infrared spectrum. The value can be calculated as follows:", NEWLINE.TEX,
+										  "$NDVI = \\frac{(average NIR intensity - average RGB intensity)}{(average NIR intensity + average RGB intensity)}$", NEWLINE.TEX,
+										  BEGIN.ITEM,
+										  LINE.ITEM, "1 = rainforest", NEWLINE.TEX,
+										  LINE.ITEM, "0.5 = grassland", NEWLINE.TEX,
+										  LINE.ITEM, "0 = rock, sand or snow", NEWLINE.TEX,
+										  LINE.ITEM, "-1 = water", NEWLINE.TEX,
+										  END.ITEM,
+								
 								sep = SEPARATOR.ITEM)
+
 				),
 				
 				"14" = list(
 						newSection = 13,
-						title = "Relationships between specific color groups",
+						title = "Relationships of stress related color groups",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
-						text = paste("All pixels from one color group (e.g. \"brown\") are divided by an other color group (e.g. \"green\"). The groups are sums based of the showing bins:", NEWLINE.TEX,
-								paste(BEGIN.LOAD.IMAGE, LAB.A.B.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+						text = paste("All pixels from one color group (e.g. \"brown\", bin  ) are divided by an other color group (e.g. \"green\"). The groups are sums based of the showing bins:", NEWLINE.TEX,
+								paste(BEGIN.LOAD.IMAGE, HUE.BIN.PNG, END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
+#								paste(BEGIN.LOAD.IMAGE, HUE.BIN.PNG, MIDDLE.LOAD.IMAGE, "color shade of the HSB color space" ,END.LOAD.IMAGE, sep=""), NEWLINE.TEX,
 								sep = SEPARATOR.ITEM)
 				),
 				
+				"15" = list(
+						newSection = 14,
+						title = "Leaf curling",
+						typOfReset = RESET.PAGE,
+						typOfClear = CLEAR.PAGE,
+						text = paste(
+								"The \"wave of the leafs\" is described under leaf curling. For this the fast Fourier transform (FFT) is used. Following was calculated:", NEWLINE.TEX,
+							BEGIN.ITEM,
+							LINE.ITEM, "the number of leaf segments", NEWLINE.TEX,
+								"Only segment larger than 100 pixels count.",
+							LINE.ITEM, "Average frequency of “leaf curling waves” for leaf segments", NEWLINE.TEX,
+								"The higher the frequency the bigger is the \"wave\".",
+							LINE.ITEM, "Standard deviation of frequencies of \"leaf curling waves\" for the different leaf segments", NEWLINE.TEX,
+							LINE.ITEM, "Average amplitude of \"leaf curling waves\" for leaf segments", NEWLINE.TEX,
+								"The higher the amplitude the higher the \"wave\".",
+							LINE.ITEM, "Standard deviation of amplitudes of “leaf curling waves” for the different leaf segments", NEWLINE.TEX,
+								sep = SEPARATOR.ITEM)
+				),
 				
 				"11" = list(
-						newSection = 14,
+						newSection = 15,
 						title = "Plant structures",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
@@ -230,7 +270,7 @@ sectionMappingList <- list(
 				),
 				
 				"12" = list(
-						newSection = 15,
+						newSection = 16,
 						title = "Wetness",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
@@ -238,7 +278,7 @@ sectionMappingList <- list(
 				),
 				
 				"13" = list(
-						newSection = 16,
+						newSection = 17,
 						title = "Convex hull",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
@@ -684,6 +724,17 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "14.1"
 				),	
 				
+				
+				"15.1" = list(
+						newSection = 1,
+						takeRestValuesFrom = "14.1"
+					
+				),
+				
+				"15.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "14.2"
+				),	
 				
 				
 				"11.1" = list(
@@ -1226,15 +1277,7 @@ sectionMappingList <- list(
 						title = "NDVI",
 						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN.SUB,
-						text = paste(
-								"NDVI stand for \"Normalized Differenced Vegetation Index\" and can be used to make a statement on the health of the plant.
-								 Healthy plants reflect few light in the visible and much in the near infrared spectrum. The value can be calculated as follows:", NEWLINE.TEX,
-								 BEGIN.ITEM,
-								 LINE.ITEM, "$\\frac{(average NIR intensity - average RGB intensity)}{(average NIR intensity + average RGB intensity)}$", NEWLINE.TEX,
-								 LINE.ITEM, "~ 1  = healthy plant", NEWLINE.TEX,
-								 LINE.ITEM, "~ -1 = diseased plant", NEWLINE.TEX,
-								 END.ITEM,
-								sep = SEPARATOR.ITEM)
+						text = ""
 				),
 				"80.2.1" = list(
 						takeRestValuesFrom = "80.1.1"
@@ -1275,6 +1318,60 @@ sectionMappingList <- list(
 				),
 				
 				
+				
+				"15.1.1" = list(
+						newSection = 1,
+						title = "Number of leaf segments ",
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						text = ""
+				),
+				
+				"15.1.2" = list(
+						newSection = 2,
+						title = "Average frequency of \"leaf curling waves\"",
+						takeRestValuesFrom = "15.1.1"
+				),
+				
+				"15.1.3" = list(
+						newSection = 3,
+						title = "Standard deviation of frequencies of \"leaf curling waves\"",
+						takeRestValuesFrom = "15.1.1"
+				),
+				
+				"15.1.4" = list(
+						newSection = 4,
+						title = "Average amplitude of \"leaf curling waves\"",
+						takeRestValuesFrom = "15.1.1"
+				),
+				
+				"15.1.5" = list(
+						newSection = 5,
+						title = "Standard deviation of amplitudes of \"leaf curling waves\"",
+						takeRestValuesFrom = "15.1.1"
+				),
+				
+				"15.2.1" = list(
+						takeRestValuesFrom = "15.1.1"
+				),
+				
+				"15.2.2" = list(
+						takeRestValuesFrom = "15.1.2"
+				),
+				
+				"15.2.3" = list(
+						takeRestValuesFrom = "15.1.3"
+				),
+				
+				"15.2.4" = list(
+						takeRestValuesFrom = "15.1.4s"
+				),
+				
+				
+				"15.2.5" = list(
+						takeRestValuesFrom = "15.1.5"
+				),
+
 				
 				"13.1.1" = list(
 						newSection = 1,
