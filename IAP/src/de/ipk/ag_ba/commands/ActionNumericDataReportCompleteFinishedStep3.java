@@ -464,15 +464,21 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						"reportDefGeneralSection.tex",
 						"reportDefHead.tex",
 						"reportFooter.tex",
-						"HSV_Farbtonskala.png",
+						// "HSV_Farbtonskala.png",
 						"linearPlotList.R",
+						"linearMultiPlotList.R",
 						"violinPlotList.R",
 						"stackedPlotList.R",
 						"boxPlotList.R",
 						"spiderPlotList.R",
 						"linerangePlotList.R",
 						"sectionMapping.R",
-						"createMissingFiles.R"
+						// "createMissingFiles.R",
+						"HSB.png",
+						"fluo_bin.png",
+						"nir_bin.png",
+						"section.png",
+						"lab_a_b_bin.png"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
