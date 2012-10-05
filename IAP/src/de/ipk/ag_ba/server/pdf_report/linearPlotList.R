@@ -467,7 +467,19 @@ nBoxPlotList <- list(
 		
 		"top.vis.stress.hue.brown2green" = list(plotName = "ratio between the brown and green top values", section = 14, subsection = 2, subsubsection = 1),
 		"top.vis.stress.hue.red2green" = list(plotName = "ratio between the red and green top values", section = 14, subsection = 2, subsubsection = 2),
-		"top.vis.stress.hue.yellow2green" = list(plotName = "ratio between the yellow and green top values", section = 14, subsection = 2, subsubsection = 3)
+		"top.vis.stress.hue.yellow2green" = list(plotName = "ratio between the yellow and green top values", section = 14, subsection = 2, subsubsection = 3),
+		
+		"side.leaf.curling.n" = list(plotName = "number of leaf segments (> 100 px)", section = 15, subsection = 1, subsubsection = 1),
+		"side.leaf.curling.frequency.avg" = list(plotName = "Average frequency of leaf curling waves", section = 15, subsection = 1, subsubsection = 2),
+		"side.leaf.curling.frequency.stddev" = list(plotName = "Standard deviation of frequencies of leaf curling waves", section = 15, subsection = 1, subsubsection = 3),
+		"side.leaf.curling.amplitude.avg" = list(plotName = "Average amplitude of leaf curling waves", section = 15, subsection = 1, subsubsection = 4),
+		"side.leaf.curling.amplitude.stddev" = list(plotName = "– Standard deviation of amplitudes of leaf curling waves", section = 15, subsection = 1, subsubsection = 5),
+		
+		"top.leaf.curling.n" = list(plotName = "number of leaf segments (> 100 px)", section = 15, subsection = 2, subsubsection = 1),
+		"top.leaf.curling.frequency.avg" = list(plotName = "Average frequency of leaf curling waves", section = 15, subsection = 2, subsubsection = 2),
+		"top.leaf.curling.frequency.stddev" = list(plotName = "Standard deviation of frequencies of leaf curling waves", section = 15, subsection = 2, subsubsection = 3),
+		"top.leaf.curling.amplitude.avg" = list(plotName = "Average amplitude of leaf curling waves", section = 15, subsection = 2, subsubsection = 4),
+		"top.leaf.curling.amplitude.stddev" = list(plotName = "– Standard deviation of amplitudes of leaf curling waves", section = 15, subsection = 2, subsubsection = 5)
 		
 #		"side.fluo.intensity.chlorophyl.average (relative)" = list(plotName = "chlorophyll intensity (relative intensity/pixel)", section = 2), 
 #		"side.fluo.intensity.phenol.average (relative)" = list(plotName = "fluorescence intensity (relative intensity/pixel)", section = 2), 													

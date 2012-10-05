@@ -1143,6 +1143,7 @@ getUnitList <- function(column = NULL) {
 			 ".g.",
 			 ".relative...pix.",
 			 ".relative.",
+			 "sqrt.px.3.",
 			 ".px.3.",
 			 ".px.",
 			 ".tassel.",
@@ -1154,12 +1155,13 @@ getUnitList <- function(column = NULL) {
 			 ),
 		unitTex =
 			c("%",
-			  "mm\\^2",
+			  "mm^2",
 			 "mm",
 			 "g",
 			 "relative/px",
 			 "relative",
-			 "px\\^3",
+			 "sqrt(px^3)",
+			 "px^3",
 			 "px",
 			 "tassel",
 			 "g",
@@ -3270,7 +3272,7 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, lengthForPoints) {
 		
 	if (nchar(n) > (numberCharAfterSeparate + lengthForPoints)) {
-		return(paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep=""))
+		return(paste(seq, ". ", substr(n,1,numberCharAfterSeparate), "...", sep=""))
 	} else {
 		return(paste(seq, ". ", n, sep=""))
 	}	
@@ -4187,67 +4189,80 @@ setFontSize <- function(plot, value, typOfPlot, first = FALSE, second = FALSE) {
 		} else {
 			numerOfDescriptors <- length(unique(value[[NAME]]))
 		}
-	} else if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+	} else if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == BOX.PLOT) {
 		numerOfDescriptors <- length(value)
 	}
 	#print(numerOfDescriptors)
 	
+	legendSize <- numeric()
+	unitSize <- numeric()
+	textSize <- numeric()
+	
 	if(numerOfDescriptors > 40) {
 		if(typOfPlot == STACKBOX.PLOT) {
-			plot <- plot + 
-					theme(strip.text.x = element_text(size=5))
+			textSize <- 5
 		} else if(typOfPlot == NBOX.PLOT) {
-			plot = plot + 
-					theme(legend.text = element_text(size=4),
-							legend.key.size = unit(0.1, "lines"),
-							strip.text.x = element_text(size= 4)
-					)
-			
-			#grid.gedit(size=unit(3, "mm"), "key.points", grep=T) 
+			legendSize <- 4
+			unitSize <- 0.1
+			textSize <- 4
 		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
 			if((first && second)) {
-				plot <- plot + 
-						theme(strip.text.x = element_text(size=5),
-								strip.text.y = element_text(size=5))
+				textSize <- 5
 			}
+		} else if(typOfPlot == BOX.PLOT) {
+			textSize <- 5
 		}
 	} else if(numerOfDescriptors > 30) {
 		if(typOfPlot == STACKBOX.PLOT) {
-			plot <- plot + 
-					theme(strip.text.x = element_text(size=6))
+			textSize <- 6
 		} else if(typOfPlot == NBOX.PLOT) {
-			plot = plot + 
-					theme(legend.text = element_text(size=5),
-						 legend.key.size = unit(0.5, "lines"),
-						 strip.text.x = element_text(size=6)
-					)
+			legendSize <- 5
+			unitSize <- 0.5
+			textSize <- 6
 		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
 			if((first && second)) {
-				plot <- plot + 
-						theme(strip.text.x = element_text(size=6),
-								strip.text.y = element_text(size=6))
+				textSize <- 6
 			}
+		} else if(typOfPlot == BOX.PLOT) {
+			textSize <- 6
 		}
 	} else if(numerOfDescriptors > 12 && numerOfDescriptors <= 30) {
 		if(typOfPlot == STACKBOX.PLOT) {
+			textSize <- 8
+		} else if(typOfPlot == NBOX.PLOT) {
+			legendSize <- 6
+			unitSize <- 0.7
+			textSize <- 8
+		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+			if((first && second)) {
+				textSize <- 8
+			}
+		} else if(typOfPlot == BOX.PLOT) {
+			textSize <- 8
+		}
+	} 
+	
+	if(length(textSize) != 0) {
+		if(typOfPlot == STACKBOX.PLOT) {
 			plot <- plot + 
 					theme(strip.text.x = element_text(size=8))
-		} else if(typOfPlot == NBOX.PLOT) {
+		} else if(typOfPlot == NBOX.PLOT) { 
 			plot = plot + 
-					theme(legend.text = element_text(size=6),
-						 legend.key.size = unit(0.7, "lines"),
-						 strip.text.x = element_text(size=8)
+					theme(legend.text = element_text(size=legendSize),
+							legend.key.size = unit(unitSize, "lines"),
+							strip.text.x = element_text(size=textSize)
 					)
 		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
 			if((first && second)) {
 				plot <- plot + 
-						theme(strip.text.x = element_text(size=8),
-								strip.text.y = element_text(size=8))
+						theme(strip.text.x = element_text(size=textSize),
+							  strip.text.y = element_text(size=textSize))
 			}
+		} else if(typOfPlot == BOX.PLOT) {	
+			plot <- plot +
+					theme(axis.text.x = element_text(size=textSize, angle=90))	
 		}
-	} 
-	
-
+	}
 	return(plot)
 }
 
@@ -5787,10 +5802,10 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	#					plot = plot +
 	#							theme(axis.text.x =element_blank())
 	#				} else {
-						plot = plot + 
-								theme(axis.text.x = element_text(size=5, angle=90))	
+						plot <- setFontSize(plot, colorReorder, typOfPlot)
+#						plot = plot + 
+#								theme(axis.text.x = element_text(size=11, angle=90))	#size= 5
 					#}
-	
 	#				if(length(unique(overallResult$xAxisfactor)) > 1) {
 	#					plot = plot +	
 	#							facet_wrap(~ xAxisfactor, drop=TRUE)
