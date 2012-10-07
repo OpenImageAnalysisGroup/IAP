@@ -195,6 +195,23 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			RemoteExecutionWrapperAction remoteAction = new RemoteExecutionWrapperAction(navigationAction,
 					new NavigationButton(ra, null));
 			
+			try {
+				if (stat.getRes() != null) {
+					String remark = stat.getRes().getRemark();
+					if (remark == null)
+						remark = "";
+					boolean found = false;
+					for (IAP_RELEASE ir : IAP_RELEASE.values())
+						if (remark.contains(ir.toString()))
+							found = true;
+					if (!found)
+						stat.setNewestKnownDatapoint(null, null, null);
+				}
+			} catch (Exception e) {
+				stat.setNewestKnownDatapoint(null, null, null);
+				MongoDB.saveSystemErrorMessage("Could not analyse previous known result data set IAP release information.", e);
+			}
+			
 			remoteAction.setNewestAvailableData(stat.getNewestImportDate(), stat.getDatabaseIdOfNewestResultData());
 			
 			remoteAction.performActionCalculateResults(null);
