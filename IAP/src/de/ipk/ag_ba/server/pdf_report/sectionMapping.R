@@ -138,7 +138,7 @@ sectionMappingList <- list(
 								
 								NEW.PAR.INDENT, NEWLINE.TEX,
 								"The \"Digital Biomass\" can be described as following:", PAR.TEXT, NEWLINE.TEX, 
-								"It is based on the projected side and top area of the plant. We use two equation:", NEWLINE.TEX,
+								"It is based on the projected side and top area of the plant. We use two equations:", NEWLINE.TEX,
 								
 								BEGIN.ITEM,
 								LINE.ITEM, "$Biomass_{IAP}=\\sqrt{side.area_{average}^{2}*top.area}$", NEWLINE.TEX,
