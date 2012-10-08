@@ -478,7 +478,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						"fluo_bin.png",
 						"nir_bin.png",
 						"section.png",
-						"lab_a_b_bin.png"
+						"lab_a_b_bin.png",
+						"hue_bin.png"
 				});
 			
 			if (!exportIndividualAngles && !xlsx) {
