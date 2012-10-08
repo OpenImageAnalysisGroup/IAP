@@ -175,13 +175,13 @@ nBoxPlotList <- list(
 		#############################  new Section ##############################
 		
 		"volume.iap (px^3)" = list(
-				plotName = "digital biomass (visible light images, IAP formula) sqrt(px^3)", 
+				plotName = "digital biomass (visible light images, IAP formula) px^3", 
 				section = 4,
 				subsection = 1,
 				subsubsection = 1,
 				paragraph = 1), 
 		"volume.lt (px^3)" = list(
-				plotName = "digital biomass (visible light, LemnaTec 0,90 formula) sqrt(px^3)", 
+				plotName = "digital biomass (visible light, LemnaTec 0,90 formula) px^3", 
 				section = 4,
 				subsection = 2,
 				subsubsection = 1), 
@@ -198,7 +198,7 @@ nBoxPlotList <- list(
 				subsubsection = 2),	
 		
 		"volume.fluo.iap" = list(
-				plotName = "digital biomass (fluorescence images, IAP formula) sqrt(px^3)", 
+				plotName = "digital biomass (fluorescence images, IAP formula) px^3", 
 				section = 4,
 				subsection = 1,
 				subsubsection = 2,

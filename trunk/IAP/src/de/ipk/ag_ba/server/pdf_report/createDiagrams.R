@@ -1865,41 +1865,45 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 			addValue <- 0
 			newDataSet <- data.frame()
 			for(nn in seq(along=descriptorList)) {
-				tempDesMorThanOne <- character()
-				actualDataSet <- overallResult[,c(getPrimAndOrName(colnames(overallResult)),colNames$colOfXaxis,getVector(descriptorList[nn]), paste(colNames$colOfSD, getVector(descriptorList[nn]), sep=""))]
-				newDataSetKK <- data.frame()
-				for(kk in seq(along=descriptorList[[nn]])) {		
-					usedColumn <- c(as.character(descriptorList[[nn]][kk]), paste(colNames$colOfSD, as.character(descriptorList[[nn]][kk]), sep=""))
+				if(!is.na(descriptorList[[nn]][1])) {
+					tempDesMorThanOne <- character()
+					actualDataSet <- overallResult[,c(getPrimAndOrName(colnames(overallResult)),colNames$colOfXaxis,getVector(descriptorList[nn]), paste(colNames$colOfSD, getVector(descriptorList[nn]), sep=""))]
+					newDataSetKK <- data.frame()
+					for(kk in seq(along=descriptorList[[nn]])) {
+						if(!is.na(descriptorList[[nn]][kk][1])){
+							usedColumn <- c(as.character(descriptorList[[nn]][kk]), paste(colNames$colOfSD, as.character(descriptorList[[nn]][kk]), sep=""))
+							if(nn == 1) {
+								additionalColumns <- c(getPrimAndOrName(colnames(overallResult)), colNames$colOfXaxis)
+							} else {
+								additionalColumns <- NULL
+							}
+							usedColumn <- c(additionalColumns, usedColumn)
+							
+							newDataSetTemp <- actualDataSet[,usedColumn]
+							
+							if(str_detect(descriptorList[[nn]][kk], fixed("section_"))) {
+								newName <- str_split(descriptorList[[nn]][kk], fixed("section_"))[[1]][2]
+								newName <- str_split(newName, fixed("_"))[[1]][1]
+								newName <- paste("Section", newName, sep=" ")
+							} else {
+								newName <- descriptorList[[nn]][kk]
+							}
+							newDataSetTemp <- cbind(newDataSetTemp, column = rep.int(newName, nrow(actualDataSet))) # as.character(descriptorList[[nn]][kk])
+							colnames(newDataSetTemp) <- c(additionalColumns, paste(MEAN,nn, sep=""), paste(SE, nn, sep=""), paste(COLUMN, nn, sep=""))
+						
+							if(kk == 1) {
+								newDataSetKK <- newDataSetTemp
+							} else {	
+								newDataSetKK <- rbind(newDataSetKK, newDataSetTemp)
+							}
+						}
+					}
 					if(nn == 1) {
-						additionalColumns <- c(getPrimAndOrName(colnames(overallResult)), colNames$colOfXaxis)
+						newDataSet <- newDataSetKK
 					} else {
-						additionalColumns <- NULL
-					}
-					usedColumn <- c(additionalColumns, usedColumn)
-					
-					newDataSetTemp <- actualDataSet[,usedColumn]
-					
-					if(str_detect(descriptorList[[nn]][kk], fixed("section_"))) {
-						newName <- str_split(descriptorList[[nn]][kk], fixed("section_"))[[1]][2]
-						newName <- str_split(newName, fixed("_"))[[1]][1]
-						newName <- paste("Section", newName, sep=" ")
-					} else {
-						newName <- descriptorList[[nn]][kk]
-					}
-					newDataSetTemp <- cbind(newDataSetTemp, column = rep.int(newName, nrow(actualDataSet))) # as.character(descriptorList[[nn]][kk])
-					colnames(newDataSetTemp) <- c(additionalColumns, paste(MEAN,nn, sep=""), paste(SE, nn, sep=""), paste(COLUMN, nn, sep=""))
-				
-					if(kk == 1) {
-						newDataSetKK <- newDataSetTemp
-					} else {	
-						newDataSetKK <- rbind(newDataSetKK, newDataSetTemp)
+						newDataSet <- cbind(newDataSet, newDataSetKK)
 					}
 				}
-				if(nn == 1) {
-					newDataSet <- newDataSetKK
-				} else {
-					newDataSet <- cbind(newDataSet, newDataSetKK)
-				}	
 			}
 			overallResult <- newDataSet
 		}
@@ -3101,7 +3105,11 @@ conact <- function(data, whichColumShouldUse) {
 
 getPrimAndOrName <- function(colNames) {
 	if (PRIMAER.TREATMENT %in% colNames) {
-		return(c(PRIMAER.TREATMENT, NAME))
+		if(NAME %in% colNames) {
+			return(c(PRIMAER.TREATMENT, NAME))
+		} else {
+			return(PRIMAER.TREATMENT)
+		}
 	} else {
 		return(c(NAME))
 	}
