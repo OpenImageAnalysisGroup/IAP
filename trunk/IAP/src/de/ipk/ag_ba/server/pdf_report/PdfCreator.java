@@ -249,8 +249,12 @@ public class PdfCreator {
 		
 		c = StringManipulationTools.stringReplace(c, "--experimentnameShort--", experimentName);
 		c = StringManipulationTools.stringReplace(c, "--coordinator--", safe(experiment.getCoordinator()));
-		c = StringManipulationTools.stringReplace(c, "--StartExp--", safe(SystemAnalysis.getCurrentTime(experiment.getStartDate()!=null ? experiment.getStartDate().getTime() : 0)));
-		c = StringManipulationTools.stringReplace(c, "--EndExp--", safe(SystemAnalysis.getCurrentTime(experiment.getImportDate()!=null ? experiment.getImportDate().getTime() : 0)));
+		c = StringManipulationTools.stringReplace(c, "--EndExp--",
+				safe(SystemAnalysis.getCurrentTime(experiment.getImportDate() != null ? experiment.getImportDate().getTime() : 0)));
+		c = StringManipulationTools.stringReplace(c, "--StorageDate--",
+				safe(SystemAnalysis.getCurrentTime(experiment.getHeader().getStorageTime() != null ? experiment.getHeader().getStorageTime().getTime() : 0)));
+		c = StringManipulationTools.stringReplace(c, "--StartExp--",
+				safe(SystemAnalysis.getCurrentTime(experiment.getStartDate() != null ? experiment.getStartDate().getTime() : 0)));
 		c = StringManipulationTools.stringReplace(c, "--NumExp--", safe(experiment.getNumberOfMeasurementValues() + ""));
 		c = StringManipulationTools.stringReplace(c, "--Outliers--",
 				safe(experiment.getHeader().getGlobalOutlierInfo() != null ?
