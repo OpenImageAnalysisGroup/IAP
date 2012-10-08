@@ -663,6 +663,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	private static void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		for (int i = 0; i < excelColumnHeaders.size(); i++) {
+			if (i >= 100)
+				continue;
 			if (status != null)
 				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
 			sheet.autoSizeColumn(i);
