@@ -2385,8 +2385,10 @@ public class MongoDB {
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
-		boolean speedupLoading = false;
-		if (speedupLoading)
+		boolean speedupLoading = true;
+		if (speedupLoading){
+			if (s3d.getName().contains("histogram.bin") && s3d.getName().contains("section"))
+				return;
 			if (experiment.getName().startsWith("Unit Test "))
 				if (s3d.getName().contains("histogram")
 						|| s3d.getName().contains(".angles")
@@ -2400,7 +2402,8 @@ public class MongoDB {
 					if (optStatusProvider != null)
 						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
 					return;
-				}
+				}			
+		}
 		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("" + idxS + "/" + n + ": " + s3d.getName());
