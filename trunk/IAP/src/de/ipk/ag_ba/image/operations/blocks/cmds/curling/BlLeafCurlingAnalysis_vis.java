@@ -15,7 +15,7 @@ import flanagan.math.FourierTransform;
 
 public class BlLeafCurlingAnalysis_vis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
-	protected synchronized FlexibleImage processVISmask() {
+	protected FlexibleImage processVISmask() {
 		
 		boolean debug = false;
 		
