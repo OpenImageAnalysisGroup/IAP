@@ -130,6 +130,8 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 				result.add(nb);
 			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 			
+			result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
+			
 			HTTPfolderSource doku = new LemnaTecDokuSource();
 			NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
 			result.add(dokuButton);
