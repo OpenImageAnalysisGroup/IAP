@@ -152,4 +152,12 @@ public class IAPimages {
 	public static String getWLAN() {
 		return "img/ext/gpl2/Gnome-Network-Wireless-64.png";
 	}
+	
+	public static String getBookIcon() {
+		return "img/ext/gpl2/Gnome-Applications-Office-64.png";
+	}
+	
+	public static String getAdressBookClearFront() {
+		return "img/ext/gpl2/Gnome-X-Office-Address-Book-64_metaData.png";
+	}
 }

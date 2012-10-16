@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -341,7 +342,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private HashMap<String, String> login2niceName = null;
 	
 	private String getNiceNameFromLoginName(String name) {
-		System.out.println("Request nice name for " + name);
+		// System.out.println("Request nice name for " + name);
 		if (login2niceName == null) {
 			login2niceName = new HashMap<String, String>();
 			login2niceName.put("Fernando", "Arana, Dr. Fernando (HET)");
@@ -366,7 +367,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			login2niceName.put("klukas", "Klukas, Dr. Christian (BA)");
 		}
 		String res = login2niceName.get(name);
-		System.out.println("Result: " + res);
+		// System.out.println("Result: " + res);
 		if (res != null)
 			return res;
 		else
@@ -1479,5 +1480,103 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	@Override
 	public boolean canHandle(String databaseId) {
 		return databaseId.startsWith(LemnaTecFTPhandler.PREFIX + ":");
+	}
+	
+	public ArrayList<String> getMetaDataMeasurementLabels(String db) throws ClassNotFoundException, SQLException {
+		ArrayList<String> measureLabels = new ArrayList<String>();
+		Connection connection = openConnectionToDatabase(db);
+		try {
+			String sqlText = "SELECT distinct(measure_label) FROM  meta_info_src";
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				measureLabels.add(rs.getString(1));
+			}
+			rs.close();
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
+		}
+		return measureLabels;
+	}
+	
+	public ArrayList<MetaDataType> getMetaDataIdsForMeasureLabel(String db, String ml) throws Exception {
+		ArrayList<MetaDataType> measureLabels = new ArrayList<MetaDataType>();
+		Connection connection = openConnectionToDatabase(db);
+		try {
+			String sqlText = "SELECT distinct(meta_data_name), meta_data_type FROM  meta_info_src "
+					+ "WHERE measure_label = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ps.setString(1, ml);
+			
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				measureLabels.add(new MetaDataType(rs.getString(1), rs.getString(2)));
+			}
+			rs.close();
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
+		}
+		return measureLabels;
+	}
+	
+	public ArrayList<String> getMetaDataValues(String db, String ml, String meta_data_name, boolean includeNumberInResult) throws Exception {
+		ArrayList<String> res = new ArrayList<String>();
+		Connection connection = openConnectionToDatabase(db);
+		try {
+			String sqlText = "SELECT meta_data_value FROM  meta_info_src "
+					+ "WHERE measure_label = ? AND meta_data_name = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ps.setString(1, ml);
+			ps.setString(2, meta_data_name);
+			
+			TreeMap<String, Integer> value2cnt = new TreeMap<String, Integer>();
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				String val = rs.getString(1);
+				if (!value2cnt.containsKey(val))
+					value2cnt.put(val, 0);
+				value2cnt.put(val, value2cnt.get(val) + 1);
+			}
+			rs.close();
+			ps.close();
+			
+			for (String key : value2cnt.keySet()) {
+				if (includeNumberInResult)
+					res.add(key + " (" + value2cnt.get(key) + ")");
+				else
+					res.add(key);
+			}
+		} finally {
+			closeDatabaseConnection(connection);
+		}
+		return res;
+	}
+	
+	public ArrayList<String> getMetaDataPlantIDs(String db, String ml) throws Exception {
+		ArrayList<String> res = new ArrayList<String>();
+		Connection connection = openConnectionToDatabase(db);
+		try {
+			String sqlText = "SELECT distinct(id_tag) FROM  meta_info_src "
+					+ "WHERE measure_label = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(sqlText);
+			ps.setString(1, ml);
+			
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				String val = rs.getString(1);
+				res.add(val);
+			}
+			rs.close();
+			ps.close();
+		} finally {
+			closeDatabaseConnection(connection);
+		}
+		return res;
+		
 	}
 }
