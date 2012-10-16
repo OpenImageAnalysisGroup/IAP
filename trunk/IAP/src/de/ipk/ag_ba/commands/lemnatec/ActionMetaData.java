@@ -70,7 +70,7 @@ public class ActionMetaData extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Check MetaData Status";
+		return "View Meta-Data";
 	}
 	
 	@Override

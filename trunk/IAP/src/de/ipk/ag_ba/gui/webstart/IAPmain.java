@@ -396,7 +396,7 @@ public class IAPmain extends JApplet {
 			// these may be changed for interactive applet version !!!
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return true;
+					return false;
 				case SAVE_DEBUG_STACK:
 					return false;
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
