@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import org.SystemAnalysis;
+import org.Vector2d;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
@@ -65,6 +66,17 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 								pre + ".section_" + (r + 1) + "_" + regions + ".");
 				}
 			}
+			
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				// calculate average distance to center
+				Vector2d gravityCenter = io.getCentroid(options.getBackground());
+				if (gravityCenter != null) {
+					double averageDistance = io.calculateAverageDistanceTo(gravityCenter);
+					if (!Double.isNaN(averageDistance))
+						getProperties().setNumericProperty(0, pre + ".avg_distance_to_center", averageDistance, "px");
+				}
+			}
+			
 			processVisibleImage(io, pre + ".");
 			
 			return input().masks().vis();

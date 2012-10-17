@@ -37,7 +37,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Database Management";
+		return "Database Management & Tools";
 	}
 	
 	@Override
@@ -57,6 +57,8 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		result.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDbCompact(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionDeleteHistoryOfAllExperiments(m), src.getGUIsetting()));
+		result.add(new NavigationButton(new ActionDataExportCSVfileList(m, experimentList), src.getGUIsetting()));
+		
 		return result;
 	}
 	

@@ -26,6 +26,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
@@ -41,8 +42,11 @@ public class PdfCreator {
 	
 	private ArrayList<String> lastOutput;
 	
+	private boolean useIndividualReportNames;
+	
 	public PdfCreator(File optTargetDirectoryOrTargetFile) {
 		this.optTargetDirectoryOrTargetFile = optTargetDirectoryOrTargetFile;
+		this.tempDirectory = optTargetDirectoryOrTargetFile;
 	}
 	
 	public void prepareTempDirectory() throws IOException {
@@ -60,8 +64,8 @@ public class PdfCreator {
 		output.put(System.nanoTime(), "INFO: Temp directory existing?: " + tempDirectory.canRead());
 	}
 	
-	public void saveReportToFile(byte[] result, boolean xlsx) throws IOException {
-		File report = getTargetFile(xlsx);
+	public void saveReportToFile(byte[] result, boolean xlsx, ExperimentHeaderInterface optEH) throws IOException {
+		File report = getTargetFile(xlsx, optEH);
 		FileOutputStream fos = new FileOutputStream(report);
 		fos.write(result);
 		fos.close();
@@ -74,9 +78,16 @@ public class PdfCreator {
 		fos.close();
 	}
 	
-	public File getTargetFile(boolean xlsx) {
-		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
-		return report;
+	public File getTargetFile(boolean xlsx, ExperimentHeaderInterface optExpHeader) {
+		if (optExpHeader != null && useIndividualReportNames) {
+			String en = optExpHeader.getExperimentName();
+			en = StringManipulationTools.getFileSystemName(en);
+			File report = new File(tempDirectory.getAbsoluteFile() + File.separator + en + "." + (xlsx ? "xlsx" : "csv"));
+			return report;
+		} else {
+			File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
+			return report;
+		}
 	}
 	
 	public File getTargetFileClustering(boolean xlsx) {
@@ -399,5 +410,13 @@ public class PdfCreator {
 	
 	public String getOutput() {
 		return "<html>" + StringManipulationTools.getStringList(output.values(), "<br>");
+	}
+	
+	public File getTempDirectory() {
+		return tempDirectory;
+	}
+	
+	public void setUseIndividualReportNames(boolean useIndividualReportNames) {
+		this.useIndividualReportNames = useIndividualReportNames;
 	}
 }

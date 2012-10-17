@@ -2838,20 +2838,20 @@ public class ImageOperation {
 		int black = backgroundColor;
 		
 		int area = 0;
-		int positionx = 0;
-		int positiony = 0;
+		long positionx = 0;
+		long positiony = 0;
 		
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				if (image2d[x][y] != black) {
-					positionx = positionx + x;
-					positiony = positiony + y;
+					positionx += x;
+					positiony += y;
 					area++;
 				}
 			}
 		}
 		if (area > 0)
-			return new Vector2d(positionx / area, positiony / area);
+			return new Vector2d(positionx / (double) area, positiony / (double) area);
 		else
 			return null;
 	}
@@ -4607,6 +4607,8 @@ public class ImageOperation {
 	}
 	
 	/**
+	 * The center of the image is calculated according to the center of mass.
+	 * 
 	 * @param idx
 	 *           0..(n-1)
 	 * @param parts
@@ -4617,8 +4619,27 @@ public class ImageOperation {
 		// make list of foreground pixels and their distances to the center
 		ArrayList<DoublePixel> distances = new ArrayList<DoublePixel>();
 		int[][] pix = getImageAs2dArray();
+		
+		int n = 0;
+		long wSum = 0, hSum = 0;
+		
+		for (int x = 0; x < getWidth(); x++) {
+			for (int y = 0; y < getHeight(); y++) {
+				int c = pix[x][y];
+				if (c != BACKGROUND_COLORint) {
+					wSum += x;
+					hSum += y;
+					n++;
+				}
+			}
+		}
+		
 		double cx = getWidth() / 2d;
 		double cy = getHeight() / 2d;
+		if (n > 0) {
+			cx = wSum / (double) n;
+			cy = hSum / (double) n;
+		}
 		for (int x = 0; x < getWidth(); x++) {
 			for (int y = 0; y < getHeight(); y++) {
 				int c = pix[x][y];
@@ -4703,5 +4724,33 @@ public class ImageOperation {
 	
 	public Integer getPixel(int x, int y) {
 		return getImageAs1dArray()[x + y * getWidth()];
+	}
+	
+	public double calculateAverageDistanceTo(Vector2d p) {
+		if (p == null)
+			return java.lang.Double.NaN;
+		
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		int[][] image2d = getImageAs2dArray();
+		
+		int black = BACKGROUND_COLORint;
+		
+		int area = 0;
+		double distanceSum = 0;
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (image2d[x][y] != black) {
+					distanceSum += Math.sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y));
+					area++;
+				}
+			}
+		}
+		if (area > 0)
+			return distanceSum / area;
+		else
+			return java.lang.Double.NaN;
 	}
 }

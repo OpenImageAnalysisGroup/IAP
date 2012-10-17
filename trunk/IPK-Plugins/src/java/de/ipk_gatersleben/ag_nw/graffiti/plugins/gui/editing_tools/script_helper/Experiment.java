@@ -539,7 +539,7 @@ public class Experiment implements ExperimentInterface {
 	 */
 	
 	@Override
-	public boolean isEmpty() {
+	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
 			for (ConditionInterface c : s)
 				return c == null;

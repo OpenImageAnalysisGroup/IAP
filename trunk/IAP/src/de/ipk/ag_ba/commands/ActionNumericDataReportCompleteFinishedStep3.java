@@ -64,6 +64,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	private boolean clustering;
 	private ArrayList<ThreadSafeOptions> togglesInterestingProperties;
 	private ThreadSafeOptions tsoBootstrapN, tsoSplitFirst, tsoSplitSecond;
+	private boolean useIndividualReportNames;
 	
 	public ActionNumericDataReportCompleteFinishedStep3(String tooltip,
 			boolean exportIndividualAngles,
@@ -83,13 +84,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
 			ThreadSafeOptions tsoBootstrapN,
 			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
-		this("Create report" +
-				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF ("
-								+ StringManipulationTools.getStringList(
-										getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1, experimentReference.getHeader().getSequence(),
-												tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
-												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true), ", ") + ")"),
+		this(getToolTipInfo(experimentReference, divideDatasetBy,
+				exportIndividualAngles, xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
 		this.m = m;
@@ -97,15 +93,29 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		this.togglesFiltering = togglesFiltering;
 		this.togglesInterestingProperties = togglesInterestingProperties;
 		this.tsoBootstrapN = tsoBootstrapN;
-		for (ThreadSafeOptions tso : divideDatasetBy) {
-			String s = (String) tso.getParam(0, "");
-			if (tso.getBval(0, false)) {
-				if (s.equals("Clustering"))
-					clustering = true;
+		if (divideDatasetBy != null)
+			for (ThreadSafeOptions tso : divideDatasetBy) {
+				String s = (String) tso.getParam(0, "");
+				if (tso.getBval(0, false)) {
+					if (s.equals("Clustering"))
+						clustering = true;
+				}
 			}
-		}
 		this.tsoSplitFirst = tsoSplitFirst;
 		this.tsoSplitSecond = tsoSplitSecond;
+	}
+	
+	private static String getToolTipInfo(ExperimentReference experimentReference, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean exportIndividualAngles,
+			boolean xlsx, ThreadSafeOptions tsoBootstrapN, ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
+		if (divideDatasetBy == null)
+			return null;
+		return "Create report" +
+				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
+						: " PDF ("
+								+ StringManipulationTools.getStringList(
+										getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1, experimentReference.getHeader().getSequence(),
+												tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
+												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true), ", ") + ")");
 	}
 	
 	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition, Boolean splitFirst,
@@ -280,7 +290,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		ExperimentInterface experiment = experimentReference.getData(m);
+		ExperimentInterface experiment = experimentReference.getData(m, false, getStatusProvider());
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
@@ -289,13 +299,14 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			boolean ratio = false;
 			boolean clustering = false;
 			System.out.println();
-			for (ThreadSafeOptions tso : divideDatasetBy) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">TOGGLE: " + tso.getParam(0, "") + ":" + tso.getBval(0, false));
-				if (((String) tso.getParam(0, "")).equals("Ratio"))
-					ratio = tso.getBval(0, false);
-				if (((String) tso.getParam(0, "")).equals("Clustering"))
-					clustering = tso.getBval(0, false);
-			}
+			if (divideDatasetBy != null)
+				for (ThreadSafeOptions tso : divideDatasetBy) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">TOGGLE: " + tso.getParam(0, "") + ":" + tso.getBval(0, false));
+					if (((String) tso.getParam(0, "")).equals("Ratio"))
+						ratio = tso.getBval(0, false);
+					if (((String) tso.getParam(0, "")).equals("Clustering"))
+						clustering = tso.getBval(0, false);
+				}
 			ConditionFilter cf = this;
 			if (ratio) {
 				if (status != null)
@@ -369,7 +380,12 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			}
 			
 			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
-			
+			if (targetDirectoryOrTargetFile == null && useIndividualReportNames) {
+				p.prepareTempDirectory();
+				targetDirectoryOrTargetFile = p.getTempDirectory();
+			}
+			if (useIndividualReportNames)
+				p.setUseIndividualReportNames(true);
 			if (xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
@@ -398,7 +414,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
 				p.prepareTempDirectory();
 				if (targetDirectoryOrTargetFile == null)
-					wb.write(new FileOutputStream(p.getTargetFile(xlsx), xlsx));
+					wb.write(new FileOutputStream(p.getTargetFile(xlsx, experimentReference.getHeader()), xlsx));
 				else
 					wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
@@ -406,12 +422,15 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					status.setCurrentStatusText2("File saved");
 			}
 			else {
-				byte[] csvFileContent = csv.toString().getBytes();
-				csv = null;
-				if (status != null)
-					status.setCurrentStatusText2("Save CSV file");
-				p.prepareTempDirectory();
-				p.saveReportToFile(csvFileContent, xlsx);
+				{
+					byte[] csvFileContent = csv.toString().getBytes();
+					csv = null;
+					if (status != null)
+						status.setCurrentStatusText2("Save CSV file");
+					if (p.getTempDirectory() == null)
+						p.prepareTempDirectory();
+					p.saveReportToFile(csvFileContent, xlsx, experimentReference.getHeader());
+				}
 				if (clustering) {
 					DatasetFormatForClustering transform = new DatasetFormatForClustering();
 					HashSet<Integer> singleFactorCol = findGroupingColumns(csvHeader);
@@ -453,7 +472,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					status.setCurrentStatusText2("Clustering input created");
 			}
 			
-			if (!xlsx)
+			if (!xlsx && !useIndividualReportNames)
 				p.saveScripts(new String[] {
 						"createDiagrams.R",
 						"calcClusters.R",
@@ -482,32 +501,33 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						"hue_bin.png"
 				});
 			
-			if (!exportIndividualAngles && !xlsx) {
-				if (status != null)
-					status.setCurrentStatusText2("Generate report images and PDF");
-				int timeoutMinutes = 30;
-				if (tsoBootstrapN.getInt() > 100)
-					timeoutMinutes = 60 * 12; // 12 h
-				if (tsoBootstrapN.getInt() > 100)
-					timeoutMinutes = 60 * 24 * 7; // 7*24h
-				p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
-						experimentReference.getHeader().getSequence(),
-						tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
-						experiment, status,
-						lastOutput, timeoutMinutes);
-				p.getOutput();
-				boolean ok = p.hasPDFcontent();
-				if (ok)
-					AttributeHelper.showInBrowser(p.getPDFurl());
-				else
-					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No output file available");
-				if (status != null)
-					status.setCurrentStatusText2("Processing finished");
-				
-				// p.deleteDirectory();
-			} else {
-				p.openTargetDirectory();
-			}
+			if (tsoBootstrapN != null)
+				if (!exportIndividualAngles && !xlsx) {
+					if (status != null)
+						status.setCurrentStatusText2("Generate report images and PDF");
+					int timeoutMinutes = 30;
+					if (tsoBootstrapN.getInt() > 100)
+						timeoutMinutes = 60 * 12; // 12 h
+					if (tsoBootstrapN.getInt() > 100)
+						timeoutMinutes = 60 * 24 * 7; // 7*24h
+					p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
+							experimentReference.getHeader().getSequence(),
+							tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
+							experiment, status,
+							lastOutput, timeoutMinutes);
+					p.getOutput();
+					boolean ok = p.hasPDFcontent();
+					if (ok)
+						AttributeHelper.showInBrowser(p.getPDFurl());
+					else
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No output file available");
+					if (status != null)
+						status.setCurrentStatusText2("Processing finished");
+					
+					// p.deleteDirectory();
+				} else {
+					p.openTargetDirectory();
+				}
 		}
 	}
 	
@@ -771,7 +791,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		if (xlsx)
 			return prepareCommandLineExecutionFile();
 		else
-			return prepareCommandLineExecutionDirectory();
+			return prepareCommandLineExecutionDirectory(true);
 	}
 	
 	@Override
@@ -779,7 +799,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		if (xlsx)
 			postProcessCommandLineExecutionFile();
 		else
-			postProcessCommandLineExecutionDirectory();
+			postProcessCommandLineExecutionDirectory(false);
 	}
 	
 	public boolean prepareCommandLineExecutionFile() throws Exception {
@@ -820,7 +840,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				"t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000));
 	}
 	
-	public boolean prepareCommandLineExecutionDirectory() throws Exception {
+	public boolean prepareCommandLineExecutionDirectory(boolean createTempDirectory) throws Exception {
 		System.out.println();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Current directory is " + (new File("").getAbsolutePath()));
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Command requires specification of an empty output directory name.");
@@ -862,15 +882,31 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		}
 	}
 	
-	public void postProcessCommandLineExecutionDirectory() {
+	public void postProcessCommandLineExecutionDirectory(boolean openDirectory) {
 		// long fs = written.getLong();
 		// double mbps = fs / 1024d / 1024d / ((System.currentTimeMillis() - startTime) / 1000d);
 		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " +
 		// "Overall size of files is " + fs / 1024 / 1024 + " MB, " +
 		// "t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000) + ", " +
 		// "speed=" + StringManipulationTools.formatNumber(mbps, "#.#") + " MB/s");
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Data processing complete, target directory contains "
-				+ targetDirectoryOrTargetFile.list().length + " files.");
+		if (targetDirectoryOrTargetFile != null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Data processing complete, " +
+					"target directory contains " +
+					targetDirectoryOrTargetFile.list().length + " files.");
+		if (openDirectory & targetDirectoryOrTargetFile != null)
+			try {
+				AttributeHelper.showInFileBrowser(targetDirectoryOrTargetFile.getCanonicalPath(), null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
+	
+	public void setExperimentReference(ExperimentReference er) {
+		experimentReference = er;
+	}
+	
+	public void setUseIndividualReportNames(boolean useIndividualReportNames) {
+		this.useIndividualReportNames = useIndividualReportNames;
 	}
 	
 }
