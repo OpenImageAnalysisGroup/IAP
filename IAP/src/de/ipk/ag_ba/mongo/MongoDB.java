@@ -2385,17 +2385,20 @@ public class MongoDB {
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
-		boolean speedupLoading = true;
+		boolean speedupLoading = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
 		if (speedupLoading) {
-			if (s3d.getName().contains("histogram") &&
-					s3d.getName().contains("bin") &&
-					s3d.getName().contains("section")) {
+			if (s3d.getName().contains("histogram")) {
 				System.out.println("Skip substance loading of substance " + s3d.getName());
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
 				return;
 			}
-			
+			if (s3d.getName().contains("histogram.bin") && s3d.getName().contains("section")) {
+				System.out.println("Skip substance loading of substance " + s3d.getName());
+				if (optStatusProvider != null)
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
+				return;
+			}
 			if (experiment.getName().startsWith("Unit Test "))
 				if (s3d.getName().contains("histogram")
 						|| s3d.getName().contains(".angles")
@@ -2411,6 +2414,7 @@ public class MongoDB {
 					return;
 				}
 		}
+		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("" + idxS + "/" + n + ": " + s3d.getName());
 		synchronized (experiment) {
