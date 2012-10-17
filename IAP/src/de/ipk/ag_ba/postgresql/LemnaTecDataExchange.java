@@ -826,12 +826,25 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			}
 			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
-			sequence = conditionTemplate != null ? conditionTemplate.getSequence() : "";
-			species = conditionTemplate != null ? conditionTemplate.getSpecies() : "not specified";
-			genotype = conditionTemplate != null ? conditionTemplate.getGenotype() : "not specified";
-			variety = conditionTemplate != null ? conditionTemplate.getVariety() : "";
-			growthconditions = conditionTemplate != null ? conditionTemplate.getGrowthconditions() : "";
-			treatment = conditionTemplate != null ? conditionTemplate.getTreatment() : "";
+			if (conditionTemplate == null) {
+				Condition ct = new Condition(null);
+				ct.setSequence("");
+				ct.setSpecies("not specified");
+				ct.setGenotype("not specified (random " +
+						StringManipulationTools.formatNumber(Math.floor(Math.random() * 10 + 1d), "00") + ")");
+				ct.setVariety("");
+				ct.setGrowthconditions("");
+				ct.setSequence("");
+				ct.setTreatment("");
+				idtag2condition.put(sn.getId_tag(), ct);
+				conditionTemplate = idtag2condition.get(sn.getId_tag());
+			}
+			sequence = conditionTemplate.getSequence();
+			species = conditionTemplate.getSpecies();
+			genotype = conditionTemplate.getGenotype();
+			variety = conditionTemplate.getVariety();
+			growthconditions = conditionTemplate.getGrowthconditions();
+			treatment = conditionTemplate.getTreatment();
 			
 			{
 				String lbl = sn.getCamera_label();
