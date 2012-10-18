@@ -394,7 +394,7 @@ sectionMappingList <- list(
 							LINE.ITEM, "Standard deviation of frequencies of \"leaf curling waves\" for the different leaf segments", NEWLINE.TEX,
 							LINE.ITEM, "Average amplitude of \"leaf curling waves\" for leaf segments", NEWLINE.TEX,
 							LINE.ITEM, "Standard deviation of amplitudes of “leaf curling waves” for the different leaf segments", NEWLINE.TEX,
-								
+							END.ITEM,	
 				
 							NEW.PAR.INDENT, NEWLINE.TEX,
 							"The \"The number of leaf segments\" can be described as following:", PAR.TEXT, NEWLINE.TEX, 
@@ -1608,7 +1608,7 @@ sectionMappingList <- list(
 				),
 				
 				"15.2.4" = list(
-						takeRestValuesFrom = "15.1.4s"
+						takeRestValuesFrom = "15.1.4"
 				),
 				
 				
