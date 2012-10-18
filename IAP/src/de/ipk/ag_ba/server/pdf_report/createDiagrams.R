@@ -3837,11 +3837,11 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	
 	
 	#overallColor <- overallList$color_nBox
-	if(typOfPlot == NBOX.MULTI.PLOT) {
-		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)[[imagesIndex]]
-	} else {
-		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
-	}
+#	if(typOfPlot == NBOX.MULTI.PLOT) {
+#		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)[[imagesIndex]]
+#	} else {
+	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
+	#}
 	#color <- overallColor[[imagesIndex]]
 	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 
@@ -6209,7 +6209,7 @@ getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = 
 				if(typOfPlot == NBOX.PLOT) {
 					return(overallList$imageFileNames_nBoxplots[[imagesIndex]])
 				} else if (typOfPlot == NBOX.MULTI.PLOT) {
-					return(overallList$imageFileNames_nBoxMultiPlots)
+					return(overallList$imageFileNames_nBoxMultiPlots[[imagesIndex]])
 				}
 			}
 		} else if(typOfValues == GET.SECTION.VALUE) {
@@ -6281,7 +6281,7 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 	
 	if(isTRUE(all.equal(class(error), "try-error"))) {
 		if(!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {
-			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)[1]
+			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 			filename <- checkFileName(preFilename, typOfPlot)
 			filenamePlot <- getPlotFileName(filename)
 			createErrorPlot(filenamePlot, filename)
