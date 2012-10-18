@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
+debug <- TRUE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -5087,7 +5087,8 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 #isOnlyOneValue <- TRUE
 #######
 	overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
-	if(typOfPlot == NBOX.PLOT) {
+	prePlot <- FALSE
+	if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	#	overallColor <- overallList$color_nBox
 		
@@ -6043,6 +6044,7 @@ makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesI
 		##extraPlot <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)
 		extraPlot <- getExtraPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult))
 		for(nn in unique(as.character(overallResult[[extraPlot]]))) {
+			overallList$debug %debug% paste("... subplot: ", nn, sep= "") 
 			optionListForGetBoolean <- list(value = nn)
 			names(optionListForGetBoolean) <- extraPlot
 			booleanVector <- getBooleanVectorForFilterValues(overallResult, optionListForGetBoolean)
@@ -6279,7 +6281,7 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 	
 	if(isTRUE(all.equal(class(error), "try-error"))) {
 		if(!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {
-			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
+			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)[1]
 			filename <- checkFileName(preFilename, typOfPlot)
 			filenamePlot <- getPlotFileName(filename)
 			createErrorPlot(filenamePlot, filename)
@@ -6694,6 +6696,9 @@ changeXAxisName <- function(overallList) {
 createErrorPlot <- function(file, name) {
 	
 	library("Cairo")
+	if(length(file) == 0) {
+		file <- paste(DIRECTORY.PLOTS, paste("errorTempFile", format(Sys.time(), "%d%H%M%S%Y"),sep=""), sep=DIRECTORY.SEPARATOR)
+	}
 	ownCat(paste("Create error plot '", file, "'", sep=""))
 	Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
 	par(mar = c(0, 0, 0, 0))
@@ -7087,7 +7092,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		
 		splitTreatmentFirst <- FALSE
-		splitTreatmentSecond <- FALSE
+		splitTreatmentSecond <- TRUE
 		isRatio <- FALSE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
