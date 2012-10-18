@@ -1,7 +1,9 @@
 package de.ipk.ag_ba.server.gwt;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
@@ -420,9 +422,25 @@ public class SnapshotDataIAP {
 		String waterAmount = enDe(numberFormat_deTrue_enFalse, s.getWholeDayWaterAmount() != null ? s.getWholeDayWaterAmount() + "" : "");
 		String sumBA = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null && s.getWeightOfWatering() != null ?
 				(s.getWeightBefore() + s.getWeightOfWatering()) + "" : "");
+		
+		Double fineTime;
+		if (s.getSnapshotTime() != null) {
+			Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTime(new Date(s.getSnapshotTime()));
+			
+			fineTime = new Double(Integer.parseInt(StringManipulationTools.getNumbersFromString(s.getTimePoint())) +
+					calendar.get(Calendar.HOUR_OF_DAY) / 24d +
+					calendar.get(Calendar.MINUTE) / 60d / 24d +
+					calendar.get(Calendar.SECOND) / 60d / 60d / 24d +
+					calendar.get(Calendar.MILLISECOND) / 60d / 60d / 1000d / 24d);
+		} else {
+			fineTime = Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()));
+		}
+		
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return "-720" + separator + replaceNull(s.getPlantId()) + separator
+			return "-720" + separator
+					+ replaceNull(s.getPlantId()) + separator
 					+ replaceNull(s.getCondition()) + separator
 					+ replaceNull(s.getSpecies()) + separator
 					+ replaceNull(s.getGenotype()) + separator
@@ -430,13 +448,17 @@ public class SnapshotDataIAP {
 					+ replaceNull(s.getGrowthCondition()) + separator
 					+ replaceNull(s.getTreatment()) + separator
 					+ replaceNull(s.getSequence()) + separator
-					+ s.getTimePoint() + separator + new Date(s.getSnapshotTime()).toString() + separator
-					+ StringManipulationTools.getNumbersFromString(s.getTimePoint())
-					+ separator + weightBeforeWatering + separator + sumBA + separator
-					+ waterWeight + separator + waterAmount
-					+ separator + s.getRgbUrlCnt() + separator + s.getFluoUrlCnt()
-					+ separator + s.getNirUrlCnt() + separator + s.getUnknownUrlCnt()
-					+ "\r\n";
+					+ s.getTimePoint() + separator
+					+ (s.getSnapshotTime() != null ? new Date(s.getSnapshotTime()).toString() : "") + separator
+					+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
+					+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
+					+ weightBeforeWatering + separator
+					+ sumBA + separator
+					+ waterWeight + separator + waterAmount + separator
+					+ s.getRgbUrlCnt() + separator
+					+ s.getFluoUrlCnt() + separator
+					+ s.getNirUrlCnt() + separator
+					+ s.getUnknownUrlCnt() + "\r\n";
 		} else {
 			StringBuilder result = new StringBuilder();
 			int nmax = 0;
@@ -469,9 +491,10 @@ public class SnapshotDataIAP {
 						+ replaceNull(s.getGrowthCondition()) + separator
 						+ replaceNull(s.getTreatment()) + separator
 						+ replaceNull(s.getSequence()) + separator
-						+ s.getTimePoint() + separator +
-						new Date(s.getSnapshotTime() != null ? s.getSnapshotTime() : 0).toString() + separator
+						+ s.getTimePoint() + separator
+						+ (s.getSnapshotTime() != null ? new Date(s.getSnapshotTime()).toString() : "") + separator
 						+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
+						+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
 						+ weightBeforeWatering + separator
 						+ sumBA + separator
 						+ waterWeight + separator
@@ -480,8 +503,7 @@ public class SnapshotDataIAP {
 						+ s.getFluoUrlCnt() + separator
 						+ s.getNirUrlCnt() + separator
 						+ s.getUnknownUrlCnt()
-						+ columnData
-						+ "\r\n";
+						+ columnData + "\r\n";
 				result.append(res);
 			}
 			return result.toString();
@@ -594,6 +616,19 @@ public class SnapshotDataIAP {
 	public ArrayList<ArrayList<DateDoubleString>> getCSVobjects() {
 		SnapshotDataIAP s = this;
 		
+		Double fineTime;
+		if (s.getSnapshotTime() != null) {
+			Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTime(new Date(s.getSnapshotTime()));
+			
+			fineTime = new Double(Integer.parseInt(StringManipulationTools.getNumbersFromString(s.getTimePoint())) +
+					calendar.get(Calendar.HOUR_OF_DAY) / 24d +
+					calendar.get(Calendar.MINUTE) / 60d / 24d +
+					calendar.get(Calendar.SECOND) / 60d / 60d / 24d +
+					calendar.get(Calendar.MILLISECOND) / 60d / 60d / 1000d / 24d);
+		} else {
+			fineTime = Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()));
+		}
 		ArrayList<ArrayList<DateDoubleString>> result = new ArrayList<ArrayList<DateDoubleString>>();
 		if (position2store == null) {
 			ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
@@ -609,6 +644,7 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getTimePoint()));
 			row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
 			row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
+			row.add(new DateDoubleString(fineTime));
 			row.add(new DateDoubleString(s.getWeightBefore()));
 			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 			row.add(new DateDoubleString(s.getWeightOfWatering()));
@@ -633,6 +669,7 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getTimePoint()));
 				row.add(s.getSnapshotTime() != null ? new DateDoubleString(new Date(s.getSnapshotTime())) : null);
 				row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
+				row.add(new DateDoubleString(fineTime));
 				row.add(new DateDoubleString(s.getWeightBefore()));
 				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 				row.add(new DateDoubleString(s.getWeightOfWatering()));

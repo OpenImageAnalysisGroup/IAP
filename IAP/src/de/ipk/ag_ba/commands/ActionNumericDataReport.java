@@ -169,7 +169,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 	public String getCSVheader() {
 		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator +
 				"Variety" + separator + "GrowthCondition" + separator + "Treatment" + separator + "Sequence" + separator +
-				"Day" + separator + "Time" + separator + "Day (Int)" + separator + "Weight A (g)" + separator +
+				"Day" + separator + "Time" + separator + "Day (Int)" + separator + "Day (Float)" + separator + "Weight A (g)" + separator +
 				"Weight B (g)" + separator + "Water (weight-diff)" + separator + "RGB" + separator + "Fluo" + separator + "Nir"
 				+ separator + "Other\r\n";
 	}
