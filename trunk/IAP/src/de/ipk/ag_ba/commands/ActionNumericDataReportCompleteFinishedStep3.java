@@ -776,6 +776,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		return "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator
 				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
+				+ separator + "Day (Float)"
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
 				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
