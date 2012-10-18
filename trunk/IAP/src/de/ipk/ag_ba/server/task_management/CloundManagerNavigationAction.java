@@ -59,21 +59,20 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		GUIsetting guiSetting = src.getGUIsetting();
 		NavigationButton startOrStopServerMode = new NavigationButton(
 				new EnableOrDisableServerModeAction(m), guiSetting);
-		res.add(startOrStopServerMode);
+		if (IAPmain.getRunMode() != IAPrunMode.WEB)
+			res.add(startOrStopServerMode);
 		
-		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
-			try {
-				NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
-				res.add(jobStatus);
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
+		try {
+			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
+			res.add(jobStatus);
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
 		}
 		
-		// if (en != null) {
-		// for (NavigationButton r : en.getResultNewActionSet())
-		// res.add(r);
-		// }
+		if (en != null) {
+			for (NavigationButton r : en.getResultNewActionSet())
+				res.add(r);
+		}
 		
 		try {
 			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(3 * 60 * 1000);
