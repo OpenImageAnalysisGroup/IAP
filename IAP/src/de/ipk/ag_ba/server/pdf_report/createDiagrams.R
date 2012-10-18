@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- TRUE
+debug <- FALSE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
