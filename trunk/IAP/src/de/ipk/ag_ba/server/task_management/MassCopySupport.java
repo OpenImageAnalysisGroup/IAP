@@ -267,12 +267,16 @@ public class MassCopySupport {
 					if (it.time.getTime() - h.time.getTime() > 1000) {
 						print("MASS COPY INTENDED (MORE CURRENT DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 						toSave.add(it);
-					} else
-						if (it.getNumberOfFiles() != h.getNumberOfFiles()) {
+					} else {
+						// it seems sometimes some images can not be copied
+						// then a repeated try on these data sets makes no real sense
+						boolean copyIfMoreImagesAreAvailable = false;
+						if (it.getNumberOfFiles() != h.getNumberOfFiles() && copyIfMoreImagesAreAvailable) {
 							print("MASS COPY INTENDED (MORE IMAGES INSIDE EXPERIMENT): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() +
 									", LT:" + it.getNumberOfFiles() + " != M:" + h.getNumberOfFiles() + ")");
 							toSave.add(it);
 						}
+					}
 					found = true;
 					break;
 				}
