@@ -20,6 +20,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamBarleyGH;
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamMaizeGH;
@@ -190,11 +191,13 @@ public class Other {
 				Runnable startActionMassCopy = new Runnable() {
 					@Override
 					public void run() {
+						final ThreadSafeOptions tso = new ThreadSafeOptions();
 						Thread t = new Thread(new Runnable() {
 							@Override
 							public void run() {
 								try {
-									MassCopySupport.getInstance().performMassCopy(true);
+									MassCopySupport.getInstance().performMassCopy(tso.getBval(0, false));
+									tso.setBval(0, !tso.getBval(0, false));
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 									MongoDB.saveSystemErrorMessage("Mass Copy Execution Error", e);

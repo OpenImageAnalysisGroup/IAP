@@ -25,6 +25,11 @@ public class LogService {
 					@Override
 					public void run() {
 						MongoDB dc = MongoDB.getDefaultCloud();
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						if (dc != null)
 							for (String item : dc.getNews(n)) {
 								news.push(preLine + StringManipulationTools.removeHTMLtags(item));
