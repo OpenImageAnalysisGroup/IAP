@@ -37,6 +37,8 @@ public class ExperimentCalculationService {
 			// omit color histogram values in the blue range
 			// only bins < 11 are OK
 			try {
+				if (si.getName().contains(".histogram."))
+						continue;
 				if (si.getName().contains(".vis.hue.histogram.ratio.bin.") || si.getName().contains(".vis.hue.histogram.bin.")
 						|| si.getName().contains(".vis.normalized.histogram.ratio.bin.")) {
 					String b = si.getName().substring(si.getName().indexOf(".bin.") + ".bin.".length());
