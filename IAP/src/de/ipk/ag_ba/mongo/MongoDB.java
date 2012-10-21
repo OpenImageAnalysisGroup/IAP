@@ -2467,6 +2467,8 @@ public class MongoDB {
 			return;
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
+		if (optStatusProvider!=null)
+			optStatusProvider.setCurrentStatusText1("Process "+s3d.getName());
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		if (condList != null)
 			for (Object co : condList) {
@@ -3050,7 +3052,19 @@ public class MongoDB {
 							ii.addInt(1);
 							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName()
 									+ " (" + ii.getInt() + "/" + nn + ")");
-							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger();
+							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger() {
+
+								@Override
+								public void setCurrentStatusText1(String st) {
+									status.setCurrentStatusText1(st);
+								}
+
+								@Override
+								public void setCurrentStatusText2(String st) {
+									status.setCurrentStatusText2(st);
+								}
+								
+							};
 							ss.setEnabled(false);
 							visitExperiment(
 									ehii,
@@ -3094,20 +3108,22 @@ public class MongoDB {
 					saveSystemMessage(msg);
 					status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
 					final ThreadSafeOptions n = new ThreadSafeOptions();
-					final ArrayList<String> ids = new ArrayList<String>();
+					ArrayList<String> ids = new ArrayList<String>();
 					for (String subID : dbIdsOfSubstances) {
 						ids.add(subID);
 						substances.remove(new BasicDBObject("_id", new ObjectId(subID)), WriteConcern.NONE);
 						if (ids.size() >= 5000) {
+							final ArrayList<String> ids2 = new ArrayList<String>(ids);
+							ids.clear();
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
 									n.addLong(5000);
 									BasicDBList list = new BasicDBList();
-									synchronized (ids) {
-										for (String coID : ids)
+									synchronized (ids2) {
+										for (String coID : ids2)
 											list.add(new ObjectId(coID));
-										ids.clear();
+										ids2.clear();
 									}
 									substances.remove(
 											new BasicDBObject("_id", new BasicDBObject("$in", list)),
@@ -3157,19 +3173,21 @@ public class MongoDB {
 					System.out.println(msg);
 					saveSystemMessage(msg);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
-					final ArrayList<String> ids = new ArrayList<String>();
+					ArrayList<String> ids = new ArrayList<String>();
 					for (String condID : dbIdsOfConditions) {
 						ids.add(condID);
 						if (ids.size() >= 5000) {
+							final ArrayList<String> ids2 = new ArrayList<String>(ids);
+							ids.clear();
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
 									n.addLong(5000);
 									BasicDBList list = new BasicDBList();
-									synchronized (ids) {
-										for (String coID : ids)
+									synchronized (ids2) {
+										for (String coID : ids2)
 											list.add(new ObjectId(coID));
-										ids.clear();
+										ids2.clear();
 									}
 									conditions.remove(
 											new BasicDBObject("_id", new BasicDBObject("$in", list)),
