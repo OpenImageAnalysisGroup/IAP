@@ -3056,7 +3056,9 @@ public class MongoDB {
 
 								@Override
 								public void setCurrentStatusText1(String st) {
-									status.setCurrentStatusText1(st);
+									status.setCurrentStatusText1("<html>" +
+											"Analyze " + ehii.getExperimentName()
+											+ " (" + ii.getInt() + "/" + nn + "):<br>"+st);
 								}
 
 								@Override
