@@ -26,7 +26,7 @@ public class LogService {
 					public void run() {
 						MongoDB dc = MongoDB.getDefaultCloud();
 						try {
-							Thread.sleep(100);
+							Thread.sleep(20);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -42,7 +42,7 @@ public class LogService {
 				do {
 					Thread.sleep(10);
 					long current = System.currentTimeMillis();
-					if (current - start > 2000) {
+					if (current - start > 10000) {
 						news.add(preLine
 								+ SystemAnalysis.getCurrentTime()
 								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
@@ -51,6 +51,7 @@ public class LogService {
 					}
 				} while (t.isAlive());
 			} catch (Exception e) {
+				e.printStackTrace();
 				news.add(preLine
 						+ SystemAnalysis.getCurrentTime()
 						+ ": Could not access latest news (" + e.getMessage()
