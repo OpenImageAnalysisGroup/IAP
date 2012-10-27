@@ -2,7 +2,6 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import org.HelperClass;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.attributes.AttributeTypesManager;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -117,6 +117,7 @@ public class GravistoMainHelper implements HelperClass {
 			if (pluginLocation != null && pluginLocation.length() > 0) {
 				final String fpluginLocation = pluginLocation.substring(2);
 				Runnable r = new Runnable() {
+					@Override
 					public void run() {
 						try {
 							String pluginLocation = StringManipulationTools.stringReplace(fpluginLocation, "\\", "/");
@@ -201,10 +202,8 @@ public class GravistoMainHelper implements HelperClass {
 		String os = (String) p.get("os.name");
 		
 		try {
-			if (new File(ReleaseInfo.getAppFolderWithFinalSep() + "setting_java_look_and_feel").exists()) {
-				TextFile tf = new TextFile(new FileReader(new File(ReleaseInfo.getAppFolderWithFinalSep()
-						+ "setting_java_look_and_feel")));
-				String look = tf.get(0);
+			if (SystemOptions.getInstance().getString("VANTED", "LnF", null) != null) {
+				String look = SystemOptions.getInstance().getString("VANTED", "LnF", null);
 				
 				System.out.print("Look and feel " + look);
 				
@@ -270,19 +269,23 @@ public class GravistoMainHelper implements HelperClass {
 	
 	private static void installDragAndDropHandler(MainFrame mainFrame) {
 		new FileDrop(mainFrame, new FileDrop.Listener() {
+			@Override
 			public void filesDropped(final File[] files) {
 				BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+					@Override
 					public void run() {
 						processDroppedFiles(files, true);
 					}
 				});
 			}
 		}, new Runnable() {
+			@Override
 			public void run() {
 				MainFrame.showMessage("<html><b>Drag &amp; Drop action detected:</b> release mouse button to load file",
 						MessageType.INFO);
 			}
 		}, new Runnable() {
+			@Override
 			public void run() {
 				// MainFrame.showMessage("Drag & Drop action canceled",
 				// MessageType.INFO);
@@ -410,6 +413,7 @@ public class GravistoMainHelper implements HelperClass {
 		
 		if (!ReleaseInfo.isRunningAsApplet()) {
 			Thread t = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					JMenu dummyScipt = new JMenu("Dummy Script");
 					DefaultContextMenuManager.returnScriptMenu(dummyScipt);
@@ -460,6 +464,7 @@ public class GravistoMainHelper implements HelperClass {
 		if (!ReleaseInfo.isRunningAsApplet())
 			if (ReleaseInfo.isFirstRun()) {
 				Runnable r = new Runnable() {
+					@Override
 					public void run() {
 						try {
 							Thread.sleep(5000);
@@ -467,6 +472,7 @@ public class GravistoMainHelper implements HelperClass {
 							ErrorMsg.addErrorMessage(e);
 						}
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								int res = JOptionPane
 										.showConfirmDialog(
@@ -496,6 +502,7 @@ public class GravistoMainHelper implements HelperClass {
 						.getOldVersionIfAppHasBeenUpdated(DBEgravistoHelper.DBE_GRAVISTO_VERSION);
 				if (lastVersion != null) {
 					Runnable r = new Runnable() {
+						@Override
 						public void run() {
 							try {
 								Thread.sleep(2000);
@@ -503,6 +510,7 @@ public class GravistoMainHelper implements HelperClass {
 								ErrorMsg.addErrorMessage(e);
 							}
 							SwingUtilities.invokeLater(new Runnable() {
+								@Override
 								public void run() {
 									if (!ReleaseInfo.getIsAllowedFeature(FeatureSet.ADDON_LOADING))
 										return;
@@ -537,6 +545,7 @@ public class GravistoMainHelper implements HelperClass {
 		if (dh instanceof ExperimentDataDragAndDropHandler) {
 			ExperimentDataDragAndDropHandler ddh = (ExperimentDataDragAndDropHandler) dh;
 			ddh.setExperimentDataReceiver(new ExperimentDataPresenter() {
+				@Override
 				public void processReceivedData(TableData td, String experimentName, ExperimentInterface doc, JComponent gui) {
 					if (processor == null)
 						ExperimentDataProcessingManager.getInstance().processIncomingData(doc);
@@ -572,6 +581,7 @@ public class GravistoMainHelper implements HelperClass {
 		
 		if (includeGraphFileLoaders)
 			myList.add(new DragAndDropHandler() {
+				@Override
 				public boolean process(List<File> files) {
 					for (File f : files)
 						GravistoService.getInstance().loadFile(f.getAbsolutePath()); // load
@@ -579,6 +589,7 @@ public class GravistoMainHelper implements HelperClass {
 					return true;
 				}
 				
+				@Override
 				public boolean canProcess(File f) {
 					return MainFrame.getInstance().isInputSerializerKnown(f);
 				}
@@ -588,6 +599,7 @@ public class GravistoMainHelper implements HelperClass {
 					return "Load graph";
 				}
 				
+				@Override
 				public boolean hasPriority() {
 					return true;
 				}
@@ -648,6 +660,7 @@ public class GravistoMainHelper implements HelperClass {
 					processData(processor2files, dh, processor);
 			}
 			Thread t = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					while (MainFrame.getInstance().isGraphLoadingInProgress()) {
 						try {
@@ -657,6 +670,7 @@ public class GravistoMainHelper implements HelperClass {
 						}
 					}
 					BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+						@Override
 						public void run() {
 							// execute normal handlers
 							for (DragAndDropHandler dh : processor2files.keySet()) {

@@ -8,6 +8,8 @@
             <fileset dir="../Graffiti_Core/build/classes"/>
             
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/flanagan.java6.jar"/>
+        	
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/ini4j-0.5.2.jar"/>
             
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-beanutils.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-digester.jar"/>

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
@@ -74,7 +75,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlMedianFilter_fluo.class);
 		// p.add(BlockClosingForYellowVisMask.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class); // requires lab filter before
-		boolean doBambooRemoval = false;
+		boolean doBambooRemoval = options.getBooleanSetting(Setting.REMOVE_BAMBOO_STICK);
 		if (doBambooRemoval)
 			p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
 		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
@@ -86,7 +87,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		// "skelton" image is saved in the following block
 		// "beforeBloomEnhancement" is restored by the following block
 		
-		boolean doSkeletonize = false;
+		boolean doSkeletonize = options.getBooleanSetting(Setting.SKELETONIZE);
 		if (doSkeletonize)
 			p.add(BlockSkeletonize_vis_or_fluo.class);
 		
@@ -129,9 +130,17 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
+		SystemOptions so = SystemOptions.getInstance();
+		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		
+		options.setSystemOptionStorage(so, g);
+		
 		options.setIsMaize(true);
-		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
-		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
+		options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
+		options.clearAndAddBooleanSetting(Setting.SKELETONIZE, true);
+		options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, true);
+		
+		options.clearAndAddBooleanSetting(Setting.REMOVE_BAMBOO_STICK, false);
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 50 * 255 / 100);
@@ -175,6 +184,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1448);
 		options.clearAndAddIntSetting(Setting.CLOSING_REPEAT, 2);
+		
+		options.setSystemOptionStorage(null, null);
 	}
 	
 	@Override

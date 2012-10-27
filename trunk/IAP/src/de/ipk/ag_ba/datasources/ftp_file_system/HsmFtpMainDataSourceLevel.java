@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -65,9 +66,9 @@ public class HsmFtpMainDataSourceLevel implements DataSourceLevel {
 	@Override
 	public String getName() {
 		if (n > 0)
-			return "HSM Archive (" + n + ")";
+			return IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive") + " (" + n + ")";
 		else
-			return "HSM Archive";
+			return IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive");
 	}
 	
 	@Override
