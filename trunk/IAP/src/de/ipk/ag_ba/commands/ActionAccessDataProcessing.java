@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaTecNavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -48,11 +48,14 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 					"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
 			phenoDBcommands.add(uploadDataEntity);
 		}
-		NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
-		NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
-				: guiSetting);
-		if (IAPservice.isReachable("lemna-db.ipk-gatersleben.de"))
+		
+		boolean lt = IAPoptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", true);
+		if (lt) {
+			NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
+			NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
+					: guiSetting);
 			phenoDBcommands.add(lemnaEntity);
+		}
 		
 		for (MongoDB m : MongoDB.getMongos()) {
 			NavigationAction mongoExperiments = new ActionMongoExperimentsNavigation(m, false, false);

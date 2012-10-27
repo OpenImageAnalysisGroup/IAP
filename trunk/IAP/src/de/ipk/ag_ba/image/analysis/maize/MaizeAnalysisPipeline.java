@@ -51,67 +51,70 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
+		String[] defaultBlockList = new String[] {
+				BlLoadImagesIfNeeded_images_masks.class.getCanonicalName(),
+				BlCreateDummyReferenceIfNeeded_vis.class.getCanonicalName(),
+				BlColorBalancing_vis.class.getCanonicalName(),
+				BlFindBlueMarkers_vis.class.getCanonicalName(),
+				BlockClearSmallBorderAroundImagesAndMasks.class.getCanonicalName(),
+				BlBalancing_fluo.class.getCanonicalName(),
+				BlockColorBalancing_vertical_nir.class.getCanonicalName(),
+				BlBalancing_fluo.class.getCanonicalName(),
+				BlClearBackgroundByRefComparison_vis_fluo_nir.class.getCanonicalName(),
+				BlIntensityConversion_fluo.class.getCanonicalName(),
+				BlockClearNirPot_nir.class.getCanonicalName(),
+				BlockClearMasksBasedOnMarkers_vis_fluo_nir.class.getCanonicalName(),
+				BlLabFilter_vis.class.getCanonicalName(),
+				BlockClosing_vis.class.getCanonicalName(),
+				// "beforeBloomEnhancement" image is saved in the following block
+				// BlockClosingForMaizeBloom_vis_stores_image.class.getCanonicalName(),
+				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(),
+				BlockRemoveSmallStructuresUsingOpening_top_vis.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				// BlockClosingForYellowVisMask.class.getCanonicalName(),
+				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // requires lab filter before
+				BlockRemoveMaizeBambooStick_vis.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
+																								// noise)
+				BlockRemoveLevitatingObjects_vis_fluo.class.getCanonicalName(),
+				// BlTranslateMatch_vis_fluo_nir.class.getCanonicalName(),
+				BlUseFluoMaskToClear_vis_nir.class.getCanonicalName(),
+				
+				BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class.getCanonicalName(),
+				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // 2nd run
+				
+				BlockSkeletonize_vis_or_fluo.class.getCanonicalName(),
+				
+				// BlockRemoveSmallClusters_vis.class.getCanonicalName(),
+				// BlockRemoveMaizeBambooStick_vis.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
+				// noise)
+				// BlockRemoveLevitatingObjects_vis.class.getCanonicalName(),
+				// BlockRemoveVerticalAndHorizontalStructures_vis.class.getCanonicalName(),
+				// BlockRemoveSmallClusters_vis.class.getCanonicalName(), // 2nd run
+				// BlUseFluoMaskToClear_vis_nir.class.getCanonicalName(),
+				
+				BlNirFilterSide_nir.class.getCanonicalName(),
+				
+				// BlockLabFilterVis.class.getCanonicalName(),
+				BlCopyImagesApplyMask_vis_fluo.class.getCanonicalName(), // without nir
+				
+				// calculation of numeric values
+				BlCalcWidthAndHeight_vis.class.getCanonicalName(),
+				BlCalcMainAxis_vis.class.getCanonicalName(),
+				BlLeafCurlingAnalysis_vis.class.getCanonicalName(),
+				BlCalcIntensity_vis_fluo_nir_ir.class.getCanonicalName(),
+				BlConvexHull_fluo.class.getCanonicalName(),
+				
+				// postprocessing
+				BlockRunPostProcessors.class.getCanonicalName(),
+				BlockDrawSkeleton_vis_fluo.class.getCanonicalName(),
+				BlMoveMasksToImageSet_vis_fluo_nir.class.getCanonicalName(),
+				BlCrop_images_vis_fluo_nir_ir.class.getCanonicalName(),
+				BlReplaceEmptyOriginalImages_vis_fluo_nir.class.getCanonicalName()
+		};
+		
 		modifySettings(options);
 		
-		BlockPipeline p = new BlockPipeline();
-		p.add(BlLoadImagesIfNeeded_images_masks.class);
-		p.add(BlCreateDummyReferenceIfNeeded_vis.class);
-		p.add(BlColorBalancing_vis.class);
-		p.add(BlFindBlueMarkers_vis.class);
-		p.add(BlockClearSmallBorderAroundImagesAndMasks.class);
-		p.add(BlBalancing_fluo.class);
-		p.add(BlockColorBalancing_vertical_nir.class);
-		p.add(BlBalancing_fluo.class);
-		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
-		p.add(BlIntensityConversion_fluo.class);
-		p.add(BlockClearNirPot_nir.class);
-		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
-		p.add(BlLabFilter_vis.class);
-		p.add(BlockClosing_vis.class);
-		// "beforeBloomEnhancement" image is saved in the following block
-		// p.add(BlockClosingForMaizeBloom_vis_stores_image.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		p.add(BlockRemoveSmallStructuresUsingOpening_top_vis.class);
-		p.add(BlMedianFilter_fluo.class);
-		// p.add(BlockClosingForYellowVisMask.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class); // requires lab filter before
-		p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
-		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
-		// p.add(BlTranslateMatch_vis_fluo_nir.class);
-		p.add(BlUseFluoMaskToClear_vis_nir.class);
-		
-		p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class); // 2nd run
-		
-		p.add(BlockSkeletonize_vis_or_fluo.class);
-		
-		// p.add(BlockRemoveSmallClusters_vis.class);
-		// p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
-		// p.add(BlockRemoveLevitatingObjects_vis.class);
-		// p.add(BlockRemoveVerticalAndHorizontalStructures_vis.class);
-		// p.add(BlockRemoveSmallClusters_vis.class); // 2nd run
-		// p.add(BlUseFluoMaskToClear_vis_nir.class);
-		
-		p.add(BlNirFilterSide_nir.class);
-		
-		// p.add(BlockLabFilterVis.class);
-		p.add(BlCopyImagesApplyMask_vis_fluo.class); // without nir
-		
-		// calculation of numeric values
-		p.add(BlCalcWidthAndHeight_vis.class);
-		p.add(BlCalcMainAxis_vis.class);
-		p.add(BlLeafCurlingAnalysis_vis.class);
-		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
-		p.add(BlConvexHull_fluo.class);
-		
-		// postprocessing
-		p.add(BlockRunPostProcessors.class);
-		p.add(BlockDrawSkeleton_vis_fluo.class);
-		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
-		p.add(BlCrop_images_vis_fluo_nir_ir.class);
-		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
-		
-		return p;
+		return getPipelineFromBlockList(defaultBlockList);
 	}
 	
 	/**

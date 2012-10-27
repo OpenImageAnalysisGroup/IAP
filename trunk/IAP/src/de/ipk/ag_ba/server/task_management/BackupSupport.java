@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.ReleaseInfo;
-import org.SettingsHelperDefaultIsFalse;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -99,7 +98,7 @@ public class BackupSupport {
 	}
 	
 	public void makeBackup() {
-		if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+		if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
 			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE BACKUP OPERATION IS DISABLED");
 			return;
 		}
@@ -151,7 +150,7 @@ public class BackupSupport {
 						IAPmain.loadIcon("img/ext/folder-remote.png"));
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
-					if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+					if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
 						print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
 						return;
 					}
@@ -197,7 +196,7 @@ public class BackupSupport {
 			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
 			MongoDB m = MongoDB.getDefaultCloud();
 			for (IdTime it : toSave) {
-				if (!new SettingsHelperDefaultIsFalse().isEnabled("backup")) {
+				if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
 					print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
 					return;
 				}
@@ -232,7 +231,7 @@ public class BackupSupport {
 						Thread.sleep(1000);
 						
 						String hsmFolder = IAPmain.getHSMfolder();
-						if (!new SettingsHelperDefaultIsFalse().isEnabled("backup"))
+						if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false))
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
 						else {
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
