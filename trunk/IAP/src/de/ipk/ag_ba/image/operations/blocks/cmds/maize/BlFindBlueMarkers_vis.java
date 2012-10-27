@@ -6,8 +6,8 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.MarkerPair;
+import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;

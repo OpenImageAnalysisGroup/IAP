@@ -109,7 +109,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
 		SystemOptions so = SystemOptions.getInstance();
-		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);
 		

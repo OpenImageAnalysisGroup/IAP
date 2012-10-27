@@ -30,6 +30,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
@@ -52,58 +53,78 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
-		boolean skelet = options.getBooleanSetting(Setting.SKELETONIZE);
+		String[] defaultBlockList = new String[] {
+				BlLoadImagesIfNeeded_images_masks.class.getCanonicalName(),
+				BlCutZoomedImages.class.getCanonicalName(),
+				BlBalancing_fluo.class.getCanonicalName(),
+				BlCreateDummyReferenceIfNeeded_vis.class.getCanonicalName(),
+				BlColorBalancing_vis.class.getCanonicalName(),
+				BlockColorBalancing_vertical_nir.class.getCanonicalName(),
+				BlColorBalancingRoundCamera_vis_nir.class.getCanonicalName(),
+				BlockColorBalancing_vertical_nir.class.getCanonicalName(),
+				BlFindBlueMarkers_vis.class.getCanonicalName(),
+				BlBalancing_fluo.class.getCanonicalName(),
+				BlClearBackgroundByRefComparison_vis_fluo_nir.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlLabFilter_vis.class.getCanonicalName(),
+				BlockClosing_vis.class.getCanonicalName(),
+				BlockClearMasksBasedOnMarkers_vis_fluo_nir.class.getCanonicalName(),
+				// BlMedianFilter_vis.class.getCanonicalName(),
+				BlLeafCurlingAnalysis_vis.class.getCanonicalName(),
+				BlIntensityConversion_fluo.class.getCanonicalName(),
+				BlTranslateMatch_vis_fluo_nir.class.getCanonicalName(),
+				BlockClearNirPot_nir.class.getCanonicalName(),
+				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(),
+				BlUseFluoMaskToClear_vis_nir.class.getCanonicalName(),
+				BlNirFilterSide_nir.class.getCanonicalName(),
+				BlCopyImagesApplyMask_vis_fluo.class.getCanonicalName(),
+				
+				BlockSkeletonize_vis_or_fluo.class.getCanonicalName(),
+				
+				// calculation of numeric values
+				BlCalcMainAxis_vis.class.getCanonicalName(),
+				BlCalcWidthAndHeight_vis.class.getCanonicalName(),
+				BlCalcIntensity_vis_fluo_nir_ir.class.getCanonicalName(),
+				BlConvexHull_fluo.class.getCanonicalName(),
+				// postprocessing
+				BlockRunPostProcessors.class.getCanonicalName(),
+				
+				BlockDrawSkeleton_vis_fluo.class.getCanonicalName(),
+				
+				BlMoveMasksToImageSet_vis_fluo_nir.class.getCanonicalName(),
+				BlCrop_images_vis_fluo_nir_ir.class.getCanonicalName(),
+				BlReplaceEmptyOriginalImages_vis_fluo_nir.class.getCanonicalName()
+		};
+		
+		defaultBlockList = SystemOptions.getInstance().getStringAll(
+				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + getClass().getCanonicalName(),
+				"block",
+				defaultBlockList);
 		
 		BlockPipeline p = new BlockPipeline();
-		p.add(BlLoadImagesIfNeeded_images_masks.class);
-		p.add(BlCutZoomedImages.class);
-		p.add(BlBalancing_fluo.class);
-		p.add(BlCreateDummyReferenceIfNeeded_vis.class);
-		p.add(BlColorBalancing_vis.class);
-		p.add(BlockColorBalancing_vertical_nir.class);
-		p.add(BlColorBalancingRoundCamera_vis_nir.class);
-		p.add(BlockColorBalancing_vertical_nir.class);
-		p.add(BlFindBlueMarkers_vis.class);
-		p.add(BlBalancing_fluo.class);
-		p.add(BlClearBackgroundByRefComparison_vis_fluo_nir.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlLabFilter_vis.class);
-		p.add(BlockClosing_vis.class);
-		p.add(BlockClearMasksBasedOnMarkers_vis_fluo_nir.class);
-		// p.add(BlMedianFilter_vis.class);
-		p.add(BlLeafCurlingAnalysis_vis.class);
-		p.add(BlIntensityConversion_fluo.class);
-		p.add(BlTranslateMatch_vis_fluo_nir.class);
-		p.add(BlockClearNirPot_nir.class);
-		p.add(BlMedianFilter_fluo.class);
-		p.add(BlockRemoveSmallClusters_vis_fluo.class);
-		p.add(BlUseFluoMaskToClear_vis_nir.class);
-		p.add(BlNirFilterSide_nir.class);
-		p.add(BlCopyImagesApplyMask_vis_fluo.class);
-		
-		if (skelet)
-			p.add(BlockSkeletonize_vis_or_fluo.class);
-		
-		// calculation of numeric values
-		p.add(BlCalcMainAxis_vis.class);
-		p.add(BlCalcWidthAndHeight_vis.class);
-		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
-		p.add(BlConvexHull_fluo.class);
-		// postprocessing
-		p.add(BlockRunPostProcessors.class);
-		if (skelet)
-			p.add(BlockDrawSkeleton_vis_fluo.class);
-		
-		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
-		p.add(BlCrop_images_vis_fluo_nir_ir.class);
-		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
+		for (String b : defaultBlockList) {
+			if (b != null && !b.startsWith("#")) {
+				try {
+					Class<?> c = Class.forName(b);
+					if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
+						p.add((Class<? extends ImageAnalysisBlockFIS>) c);
+					else
+						System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
+								+ "! (block is not added to pipeline!)");
+				} catch (ClassNotFoundException cnfe) {
+					System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
+				}
+			}
+		}
 		
 		return p;
 	}
@@ -123,7 +144,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.setIsMaize(false);
 		
 		SystemOptions so = SystemOptions.getInstance();
-		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);
 		

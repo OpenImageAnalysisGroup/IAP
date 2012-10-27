@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations;
+package de.ipk.ag_ba.image.operation;
 
 /**
  * DoublePixel: distance to "something" (center of image, or nearest 4 pot center), x,y of pixel, color of pixel

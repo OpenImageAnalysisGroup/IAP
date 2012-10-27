@@ -23,7 +23,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Vector;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /** Implements the Image/Color/Color Picker command. */
 public class ColorPicker extends PlugInFrame {

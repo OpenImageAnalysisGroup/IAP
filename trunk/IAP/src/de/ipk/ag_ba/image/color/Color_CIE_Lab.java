@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.color;
 
 import java.awt.Color;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /*
  * Created on Feb 24, 2010 by Christian Klukas

@@ -66,7 +66,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public void setBoolean(String group, String setting, boolean value) {
+	public synchronized void setBoolean(String group, String setting, boolean value) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
@@ -81,7 +81,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public int getInteger(String group, String setting, int defaultValue) {
+	public synchronized int getInteger(String group, String setting, int defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
@@ -101,7 +101,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public double getDouble(String group, String setting, double defaultValue) {
+	public synchronized double getDouble(String group, String setting, double defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
@@ -121,7 +121,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public String getString(String group, String setting, String defaultValue) {
+	public synchronized String getString(String group, String setting, String defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
@@ -145,7 +145,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public void setString(String group, String setting, String value) {
+	public synchronized void setString(String group, String setting, String value) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
@@ -160,12 +160,16 @@ public class SystemOptions {
 		}
 	}
 	
-	public String[] getStringAll(String group, String setting, String[] defaultValue) {
+	public synchronized String[] getStringAll(String group, String setting, String[] defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
 			Ini.Section section = ini.get(group);
+			if (section == null) {
+				getString(group, "hint", "Start a block name with '#' to disable it.");
+				section = ini.get(group);
+			}
 			String[] r = section.getAll(setting, String[].class);
 			if (r == null || r.length == 0) {
 				int idx = 0;

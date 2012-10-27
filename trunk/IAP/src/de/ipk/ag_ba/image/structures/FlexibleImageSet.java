@@ -10,7 +10,7 @@ package de.ipk.ag_ba.image.structures;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**

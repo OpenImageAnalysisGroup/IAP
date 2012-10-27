@@ -14,7 +14,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 

@@ -44,7 +44,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.WebCamHandler;
-import de.ipk.ag_ba.image.operations.ImageConverter;
+import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
 import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;

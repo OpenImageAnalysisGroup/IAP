@@ -14,9 +14,9 @@ import java.util.HashSet;
 import org.Vector2d;
 import org.Vector2i;
 
-import de.ipk.ag_ba.image.operations.ImageConverter;
-import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.Position;
+import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.Position;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**

@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations;
+package de.ipk.ag_ba.image.operation;
 
 import ij.measure.ResultsTable;
 import ij.plugin.filter.MaximumFinder;

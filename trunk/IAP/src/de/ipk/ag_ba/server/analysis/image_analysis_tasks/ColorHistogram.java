@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
  * @author klukas
