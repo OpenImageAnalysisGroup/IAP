@@ -80,7 +80,6 @@ import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.commands.SnapshotFilter;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -434,16 +433,6 @@ public class IAPservice {
 		return new SimpleDateFormat().format(new Date());
 	}
 	
-	public static boolean getSetting(IAPoptions groupByCoordinator) {
-		switch (groupByCoordinator) {
-			case GROUP_BY_COORDINATOR:
-				return true;
-			case GROUP_BY_EXPERIMENT_TYPE:
-				return true;
-		}
-		return false;
-	}
-	
 	public static ConditionInterface[] sort(ConditionInterface[] array) {
 		Arrays.sort(array, new Comparator<ConditionInterface>() {
 			@Override
@@ -550,12 +539,6 @@ public class IAPservice {
 		res.put("top.area (px)", "Top area");
 		res.put("volume.fluo.iap (px^3)", "Digital biomass (fluo)");
 		return res;
-	}
-	
-	public static boolean isMongoReachable() {
-		if (mainMongoDBreachable == null)
-			mainMongoDBreachable = isReachable(MongoDB.getDefaultCloudHostName());
-		return mainMongoDBreachable;
 	}
 	
 	public static ArrayList<SnapshotDataIAP> getSnapshotsFromExperiment(

@@ -60,45 +60,25 @@ public class SkeletonizeProcessor {
 						// boolean br = img[x + 1][y + 1] != fire;
 						
 						int filledSurrounding = 0;
-						int horizontal = 0;
-						int vertical = 0;
 						// border voxel
 						if (left) {
 							filledSurrounding++;
-							horizontal++;
 						}
 						if (right) {
 							filledSurrounding++;
-							horizontal++;
 						}
 						if (above) {
 							filledSurrounding++;
-							vertical++;
 						}
 						if (below) {
 							filledSurrounding++;
-							vertical++;
 						}
-						// if (tl) {
-						// filledSurrounding++;
-						// }
-						// if (tr) {
-						// filledSurrounding++;
-						// }
-						// if (bl) {
-						// filledSurrounding++;
-						// }
-						// if (br) {
-						// filledSurrounding++;
-						// }
 						if (filledSurrounding < 4) {
 							if (!calcDistanceTrueOrNormalColoredSkeletonFalse) {
 								addSkeleton(x2y2colorSkeleton, x, y, c);
 							} else {
 								addSkeleton(x2y2colorSkeleton, x, y, loop);
 							}
-							// }
-							// if (filledSurrounding < 4) {
 							foundBorderVoxel = true;
 							borderX.add(x);
 							borderY.add(y);
@@ -141,12 +121,6 @@ public class SkeletonizeProcessor {
 		if (!x2y2colorSkeleton.containsKey(x))
 			x2y2colorSkeleton.put(x, new HashMap<Integer, Integer>());
 		x2y2colorSkeleton.get(x).put(y, c);
-	}
-	
-	private boolean filled(int x, int y,
-			HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton) {
-		return x2y2colorSkeleton.containsKey(x)
-				&& x2y2colorSkeleton.get(x).containsKey(y);
 	}
 	
 	static int[] table =

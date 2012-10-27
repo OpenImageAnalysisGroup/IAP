@@ -32,6 +32,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.datasources.ExperimentLoader;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -62,24 +63,30 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private static final String driver = "org.postgresql.Driver";
 	
 	public LemnaTecDataExchange() {
-		// TODO SETTING
-		user = "postgres";
-		password = "LemnaTec";
-		port = "5432";
-		host = "lemna-db.ipk-gatersleben.de";
+		user = IAPoptions.getInstance().getString("LemnaTec-DB", "user", "postgres");
+		password = IAPoptions.getInstance().getString("LemnaTec-DB", "password", "LemnaTec");
+		port = IAPoptions.getInstance().getString("LemnaTec-DB", "port", "5432");
+		host = IAPoptions.getInstance().getString("LemnaTec-DB", "host", "lemna-db.ipk-gatersleben.de");
 	}
 	
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
 		HashSet<String> invalidDBs = new HashSet<String>();
-		invalidDBs.add("template1");
-		invalidDBs.add("template0");
-		invalidDBs.add("postgres");
-		invalidDBs.add("LTSystem");
-		invalidDBs.add("bacula");
-		invalidDBs.add("LTTestDB");
-		invalidDBs.add("LemnaTest");
-		invalidDBs.add("CornTest2");
-		invalidDBs.add("CornTest3");
+		
+		String[] def = new String[] {
+				"postgres",
+				"bacula",
+				"LTSystem",
+				"LTTestDB",
+				"template0",
+				"template1",
+				"LemnaTest",
+				"CornTest2",
+				"CornTest3"
+		};
+		
+		for (String invalid : IAPoptions.getInstance().getStringAll("LemnaTec-DB", "ignore_db", def)) {
+			invalidDBs.add(invalid);
+		}
 		
 		String sqlText = "SELECT datname FROM pg_database";
 		

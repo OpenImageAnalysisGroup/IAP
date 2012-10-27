@@ -395,11 +395,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
+				ImageProcessorOptions options = new ImageProcessorOptions();
+				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 				postprocessingResults = getImageProcessor()
 						.postProcessPipelineResults(
 								plandID2time2waterData2,
 								inSamples, analysisInput,
-								analysisResults, status);
+								analysisResults, status,
+								options);
 				processStatisticalOutputOnGlobalLevel(inSamples, postprocessingResults);
 			} catch (Exception e) {
 				e.printStackTrace();

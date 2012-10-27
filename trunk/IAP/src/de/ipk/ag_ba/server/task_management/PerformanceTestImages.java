@@ -20,29 +20,29 @@ public class PerformanceTestImages {
 	public enum ImageNames {
 		// TestImageGeneral.class
 		RGB_TOP_DAY_0_WT01_1385, FLU_TOP_DAY_0_WT01_1385, NIR_TOP_DAY_0_WT01_1385, RGB_TOP_DAY_2_H31_02_1229, FLU_TOP_DAY_2_H31_02_1229, NIR_TOP_DAY_2_H31_02_1229, REMOVE_SMALL_CLUSTER_TEST_IMAGE_FLUO_TOP, REMOVE_SMALL_CLUSTER_TEST_IMAGE_VIS_TOP, REMOVE_SMALL_CLUSTER_TEST_IMAGE_NIR_TOP,
-
+		
 		// TestImagePhyto.class
 		VIS_TOP_JUNITIMAGE3, FLUO_TOP_JUNITIMAGE3, NIR_TOP_JUNITIMAGE3, VIS_TOP_IMAGETEST, FLU_TOP_IMAGETEST, NIR_TOP_IMAGETEST,
-
+		
 		// TestImageBarley.class
 		I1036CS109_VIS_SIDE, I1036CS109_FLUO_SIDE, I1036CS109_NIR_SIDE,
-
+		
 		// FindBlueMarkers.class
 		MAIZE_VIS_SIDE_0, MAIZE_VIS_SIDE_1,
-
+		
 		// TestFindCentroid.class
 		MAIZE_VIS_Top_0, MAIZE_VIS_TOP_1,
-
+		
 		// Pollen
 		SCHALE1,
 		SCHALE4,
 		SCHALE5,
-
+		
 		// Maize
 		MAIZE_VIS_1116BA_DAY_63_SIDE,
 		MAIZE_FLUO_1116BA_DAY_63_SIDE,
 		MAIZE_NIR_1116BA_DAY_63_SIDE,
-
+		
 		// TestSubtractImages
 		MAIZE_VIS_REFERENCE_0,
 		MAIZE_VIS_BELONG_TO_REFERENCE_0,
@@ -58,23 +58,23 @@ public class PerformanceTestImages {
 		MAIZE_TOP_NIR_BELONG_TO_REFERENCE_0,
 		MAIZE_TOP_FLU_REFERENCE_0,
 		MAIZE_TOP_FLU_BELONG_TO_REFERENCE_0,
-
+		
 		MAIZE_TOP_VIS_REFERENCE_1,
 		MAIZE_TOP_VIS_BELONG_TO_REFERENCE_1,
-
+		
 		MAIZE_VIS_SIDE_REFERENCE_1386,
 		MAIZE_VIS_SIDE_BELONG_TO_REFERENCE_1386,
 		MAIZE_FLU_SIDE_REFERENCE_1386,
 		MAIZE_FLU_SIDE_BELONG_TO_REFERENCE_1386,
 		MAIZE_NIR_SIDE_REFERENCE_1386,
 		MAIZE_NIR_SIDE_BELONG_TO_REFERENCE_1386,
-
+		
 		MAIZE_TOP_GREEN_BACK0,
 		MAIZE_TOP_GREEN_BACK1,
 	}
 	
 	enum ServerTyp {
-		MONGO_SERVER, LOCAL_SEVER, LOCAL_FILE
+		MONGO_SERVER, LOCAL_FILE
 	}
 	
 	private static HashMap<ImageNames, String> imageMap = new HashMap<ImageNames, String>() {
@@ -195,7 +195,7 @@ public class PerformanceTestImages {
 		Class ref = null;
 		
 		switch (imageName) {
-			
+		
 			case VIS_TOP_JUNITIMAGE3:
 			case FLUO_TOP_JUNITIMAGE3:
 			case NIR_TOP_JUNITIMAGE3:
@@ -205,7 +205,7 @@ public class PerformanceTestImages {
 			case REMOVE_SMALL_CLUSTER_TEST_IMAGE_VIS_TOP:
 			case REMOVE_SMALL_CLUSTER_TEST_IMAGE_FLUO_TOP:
 			case REMOVE_SMALL_CLUSTER_TEST_IMAGE_NIR_TOP:
-
+				
 				// ref = TestImageGeneral.class;
 				break;
 			
@@ -215,7 +215,7 @@ public class PerformanceTestImages {
 			case RGB_TOP_DAY_0_WT01_1385:
 			case FLU_TOP_DAY_0_WT01_1385:
 			case NIR_TOP_DAY_0_WT01_1385:
-
+				
 				// ref = TestImagePhyto.class;
 				break;
 			
@@ -289,18 +289,7 @@ public class PerformanceTestImages {
 	}
 	
 	private static MongoDB getMongoServer(ServerTyp server) {
-		
-		MongoDB dc = null;
-		
-		switch (server) {
-			case MONGO_SERVER:
-				dc = MongoDB.getDefaultCloud();
-				break;
-			case LOCAL_SEVER:
-				dc = MongoDB.getLocalDB();
-				break;
-		}
-		
+		MongoDB dc = MongoDB.getDefaultCloud();
 		return dc;
 	}
 	
