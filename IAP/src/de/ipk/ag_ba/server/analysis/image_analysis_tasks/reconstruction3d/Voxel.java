@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
  * @author klukas

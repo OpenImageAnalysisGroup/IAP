@@ -13,8 +13,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
-import de.ipk.ag_ba.image.operations.ImageCanvas;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageCanvas;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -41,6 +41,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected synchronized FlexibleImage processVISmask() {
 		FlexibleImage vis = input().masks().vis();
+		if (!options.getBooleanSetting(Setting.SKELETONIZE))
+			return vis;
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMaskBeforSkeleton.png");
 		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		FlexibleImage res = vis;
@@ -107,6 +109,8 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected synchronized FlexibleImage processFLUOmask() {
 		FlexibleImage vis = input().masks().vis();
+		if (!options.getBooleanSetting(Setting.SKELETONIZE))
+			return input().masks().fluo();
 		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;

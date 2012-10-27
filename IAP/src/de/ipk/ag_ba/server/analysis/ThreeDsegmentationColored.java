@@ -17,7 +17,7 @@ import qmwi.kseg.som.Tools;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.ColorXYZ;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
 

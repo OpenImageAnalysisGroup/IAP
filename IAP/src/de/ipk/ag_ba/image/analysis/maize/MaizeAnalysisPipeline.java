@@ -75,21 +75,15 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		p.add(BlMedianFilter_fluo.class);
 		// p.add(BlockClosingForYellowVisMask.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class); // requires lab filter before
-		boolean doBambooRemoval = options.getBooleanSetting(Setting.REMOVE_BAMBOO_STICK);
-		if (doBambooRemoval)
-			p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
+		p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
 		p.add(BlockRemoveLevitatingObjects_vis_fluo.class);
 		// p.add(BlTranslateMatch_vis_fluo_nir.class);
 		p.add(BlUseFluoMaskToClear_vis_nir.class);
 		
 		p.add(BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class);
 		p.add(BlockRemoveSmallClusters_vis_fluo.class); // 2nd run
-		// "skelton" image is saved in the following block
-		// "beforeBloomEnhancement" is restored by the following block
 		
-		boolean doSkeletonize = options.getBooleanSetting(Setting.SKELETONIZE);
-		if (doSkeletonize)
-			p.add(BlockSkeletonize_vis_or_fluo.class);
+		p.add(BlockSkeletonize_vis_or_fluo.class);
 		
 		// p.add(BlockRemoveSmallClusters_vis.class);
 		// p.add(BlockRemoveMaizeBambooStick_vis.class); // requires remove small clusters before (the processing would vertically stop at any noise)
@@ -112,8 +106,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// postprocessing
 		p.add(BlockRunPostProcessors.class);
-		if (doSkeletonize)
-			p.add(BlockDrawSkeleton_vis_fluo.class);
+		p.add(BlockDrawSkeleton_vis_fluo.class);
 		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
 		p.add(BlCrop_images_vis_fluo_nir_ir.class);
 		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
@@ -131,7 +124,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
 		SystemOptions so = SystemOptions.getInstance();
-		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);
 		

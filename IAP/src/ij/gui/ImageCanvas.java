@@ -38,7 +38,7 @@ import java.awt.image.IndexColorModel;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /** This is a Canvas used to display images in a Window. */
 public class ImageCanvas extends Canvas implements MouseListener, MouseMotionListener, Cloneable {

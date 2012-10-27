@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;

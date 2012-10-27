@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operations;
+package de.ipk.ag_ba.image.operation;
 
 import org.Vector2d;
 

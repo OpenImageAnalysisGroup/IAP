@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.mongo.HttpBasicAuth;
 

@@ -6,8 +6,9 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 import java.awt.Color;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -23,6 +24,9 @@ public class BlockRemoveMaizeBambooStick_vis extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+		boolean doBambooRemoval = options.getBooleanSetting(Setting.REMOVE_BAMBOO_STICK);
+		if (!doBambooRemoval)
+			return;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			if (processedMasks.vis() != null && processedMasks.fluo() != null) {
 				int background = options.getBackground();
@@ -41,6 +45,9 @@ public class BlockRemoveMaizeBambooStick_vis extends AbstractSnapshotAnalysisBlo
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		boolean doBambooRemoval = options.getBooleanSetting(Setting.REMOVE_BAMBOO_STICK);
+		if (!doBambooRemoval)
+			return input().masks().vis();
 		if (input().masks().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				return clearBamboo(input().masks().vis());

@@ -27,11 +27,11 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
-import de.ipk.ag_ba.image.operations.Channel;
-import de.ipk.ag_ba.image.operations.ImageConverter;
-import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.PrintImage;
-import de.ipk.ag_ba.image.operations.TopBottomLeftRight;
+import de.ipk.ag_ba.image.operation.Channel;
+import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.PrintImage;
+import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 
 /**
  * @author klukas

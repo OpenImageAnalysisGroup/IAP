@@ -34,7 +34,7 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;

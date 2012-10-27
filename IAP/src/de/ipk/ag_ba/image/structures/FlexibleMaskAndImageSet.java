@@ -3,8 +3,8 @@ package de.ipk.ag_ba.image.structures;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
-import de.ipk.ag_ba.image.operations.PrintImage;
+import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.PrintImage;
 
 public class FlexibleMaskAndImageSet {
 	private FlexibleImageSet images;

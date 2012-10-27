@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**

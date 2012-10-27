@@ -1,8 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.operations.FluoAnalysis;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.FluoAnalysis;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;

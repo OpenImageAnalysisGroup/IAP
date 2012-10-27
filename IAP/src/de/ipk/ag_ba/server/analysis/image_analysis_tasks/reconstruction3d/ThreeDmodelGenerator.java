@@ -15,7 +15,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.image.color.ColorUtil;
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas

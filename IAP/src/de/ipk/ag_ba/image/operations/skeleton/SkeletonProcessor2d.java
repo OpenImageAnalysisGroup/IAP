@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonProcessor2d {

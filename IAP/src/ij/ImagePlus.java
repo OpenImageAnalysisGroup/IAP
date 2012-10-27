@@ -52,7 +52,7 @@ import java.util.Vector;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
  * An ImagePlus contain an ImageProcessor (2D image) or an ImageStack (3D, 4D or 5D image).

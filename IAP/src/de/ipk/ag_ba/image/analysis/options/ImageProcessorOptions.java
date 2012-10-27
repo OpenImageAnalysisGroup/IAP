@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 import org.SystemOptions;
 
-import de.ipk.ag_ba.image.operations.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 
 /**
