@@ -183,7 +183,7 @@ public class Other {
 						null, null,
 						"Enable or disable the automated backup of LT data sets to the HSM file system",
 						"Automatic Backup to HSM",
-						"backup"), src.getGUIsetting()));
+						"ARCHIVE|auto_daily_backup"), src.getGUIsetting()));
 				
 				resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 				
@@ -211,7 +211,7 @@ public class Other {
 						startActionMassCopy,
 						"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
 						"Automatic DB-Copy",
-						"sync"), src.getGUIsetting()));
+						"GRID-STORAGE|auto_daily_fetch"), src.getGUIsetting()));
 				
 				resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
 				

@@ -99,7 +99,7 @@ public class MassCopySupport {
 		}
 		massCopyRunning = true;
 		
-		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
 		if (!en)
 			return;
 		for (int i = 30; i >= 0; i--) {
@@ -109,7 +109,7 @@ public class MassCopySupport {
 			else
 				status.setCurrentStatusText2("Start sync in " + i + " seconds...");
 			Thread.sleep(1000);
-			en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
 			if (!en) {
 				massCopyRunning = false;
 				status.setCurrentStatusText1("Sync cancelled");
@@ -293,7 +293,7 @@ public class MassCopySupport {
 		status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
 		int done = 0;
 		for (final IdTime it : toSave) {
-			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
 			if (!en)
 				continue;
 			status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
@@ -346,7 +346,7 @@ public class MassCopySupport {
 			return;
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
 			if (en)
 				print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 01:00");
 			else
@@ -368,7 +368,7 @@ public class MassCopySupport {
 						boolean onlyMerge = false;
 						if (new Date().getHours() != 1 || new Date().getMinutes() != 0)
 							onlyMerge = true;
-						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("sync");
+						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
 						if (!en) {
 							if (!onlyMerge)
 								print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");

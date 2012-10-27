@@ -7,10 +7,12 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -104,4 +106,28 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		this.debugValidTrays = debugValidTrays;
 	}
 	
+	@SuppressWarnings("unchecked")
+	protected BlockPipeline getPipelineFromBlockList(String[] defaultBlockList) {
+		defaultBlockList = SystemOptions.getInstance().getStringAll(
+				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + this.getClass().getCanonicalName(),
+				"block",
+				defaultBlockList);
+		
+		BlockPipeline p = new BlockPipeline();
+		for (String b : defaultBlockList) {
+			if (b != null && !b.startsWith("#")) {
+				try {
+					Class<?> c = Class.forName(b);
+					if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
+						p.add((Class<? extends ImageAnalysisBlockFIS>) c);
+					else
+						System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
+								+ "! (block is not added to pipeline!)");
+				} catch (ClassNotFoundException cnfe) {
+					System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
+				}
+			}
+		}
+		return p;
+	}
 }

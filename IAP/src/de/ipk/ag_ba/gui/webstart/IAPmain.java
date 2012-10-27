@@ -96,7 +96,7 @@ public class IAPmain extends JApplet {
 	public static void main(String[] args) {
 		setRunMode(IAPrunMode.SWING_MAIN);
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
-				"IAP - The Integreted Analysis Platform") + "";
+				"IAP - The Integrated Analysis Platform") + "";
 		JFrame jf = new JFrame(title);
 		jf.add("Center", new IAPmain().getContentPane());
 		jf.pack();

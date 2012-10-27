@@ -30,7 +30,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
@@ -53,11 +52,8 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
-		modifySettings(options);
-		
 		String[] defaultBlockList = new String[] {
 				BlLoadImagesIfNeeded_images_masks.class.getCanonicalName(),
 				BlCutZoomedImages.class.getCanonicalName(),
@@ -105,28 +101,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlReplaceEmptyOriginalImages_vis_fluo_nir.class.getCanonicalName()
 		};
 		
-		defaultBlockList = SystemOptions.getInstance().getStringAll(
-				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + getClass().getCanonicalName(),
-				"block",
-				defaultBlockList);
+		modifySettings(options);
 		
-		BlockPipeline p = new BlockPipeline();
-		for (String b : defaultBlockList) {
-			if (b != null && !b.startsWith("#")) {
-				try {
-					Class<?> c = Class.forName(b);
-					if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
-						p.add((Class<? extends ImageAnalysisBlockFIS>) c);
-					else
-						System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
-								+ "! (block is not added to pipeline!)");
-				} catch (ClassNotFoundException cnfe) {
-					System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
-				}
-			}
-		}
-		
-		return p;
+		return getPipelineFromBlockList(defaultBlockList);
 	}
 	
 	/**
