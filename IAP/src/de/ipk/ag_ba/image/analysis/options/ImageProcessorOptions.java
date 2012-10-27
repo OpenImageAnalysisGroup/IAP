@@ -148,8 +148,8 @@ public class ImageProcessorOptions {
 	public void clearAndAddIntSetting(Setting s, int value) {
 		clearSetting(s);
 		
-		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
-			value = optSystemOptionStorage.getInteger(optSystemOptionStorageGroup, s.name(), value);
+		if (getOptSystemOptionStorage() != null && getOptSystemOptionStorageGroup() != null) {
+			value = getOptSystemOptionStorage().getInteger(getOptSystemOptionStorageGroup(), s.name(), value);
 		}
 		
 		addIntSetting(s, value);
@@ -158,8 +158,8 @@ public class ImageProcessorOptions {
 	public void clearAndAddDoubleSetting(Setting s, double value) {
 		clearSetting(s);
 		
-		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
-			value = optSystemOptionStorage.getDouble(optSystemOptionStorageGroup, s.name(), value);
+		if (getOptSystemOptionStorage() != null && getOptSystemOptionStorageGroup() != null) {
+			value = getOptSystemOptionStorage().getDouble(getOptSystemOptionStorageGroup(), s.name(), value);
 		}
 		
 		addDoubleSetting(s, value);
@@ -168,8 +168,8 @@ public class ImageProcessorOptions {
 	public void clearAndAddBooleanSetting(Setting s, boolean value) {
 		clearSetting(s);
 		
-		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
-			value = optSystemOptionStorage.getBoolean(optSystemOptionStorageGroup, s.name(), value);
+		if (getOptSystemOptionStorage() != null && getOptSystemOptionStorageGroup() != null) {
+			value = getOptSystemOptionStorage().getBoolean(getOptSystemOptionStorageGroup(), s.name(), value);
 		}
 		
 		addBooleanSetting(s, value);
@@ -420,7 +420,27 @@ public class ImageProcessorOptions {
 	}
 	
 	public void setSystemOptionStorage(SystemOptions systemOptionStorage, String systemOptionStorageGroup) {
-		this.optSystemOptionStorage = systemOptionStorage;
-		this.optSystemOptionStorageGroup = systemOptionStorageGroup;
+		this.setOptSystemOptionStorage(systemOptionStorage);
+		this.setOptSystemOptionStorageGroup(systemOptionStorageGroup);
+	}
+	
+	private String getOptSystemOptionStorageGroup() {
+		if (getCameraPosition() == CameraPosition.UNKNOWN)
+			return null;
+		return optSystemOptionStorageGroup + "-" + getCameraPosition();
+	}
+	
+	private void setOptSystemOptionStorageGroup(String optSystemOptionStorageGroup) {
+		this.optSystemOptionStorageGroup = optSystemOptionStorageGroup;
+	}
+	
+	private SystemOptions getOptSystemOptionStorage() {
+		if (getCameraPosition() == CameraPosition.UNKNOWN)
+			return null;
+		return optSystemOptionStorage;
+	}
+	
+	private void setOptSystemOptionStorage(SystemOptions optSystemOptionStorage) {
+		this.optSystemOptionStorage = optSystemOptionStorage;
 	}
 }
