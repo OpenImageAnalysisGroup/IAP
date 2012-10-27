@@ -5,14 +5,16 @@ import java.util.Stack;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {
 	
-	private static boolean ba13reachable = IAPservice.isMongoReachable();
+	private static boolean ba13reachable = MongoDB.getDefaultCloud().isDbHostReachable();
 	
 	public String getLatestNews(final int n, String pre, final String preLine, String lineBreak, String follow) {
+		if (n < 1)
+			return "";
 		StringBuilder res = new StringBuilder();
 		final Stack<String> news = new Stack<String>();
 		if (!ba13reachable) {
@@ -26,7 +28,7 @@ public class LogService {
 					public void run() {
 						MongoDB dc = MongoDB.getDefaultCloud();
 						try {
-							Thread.sleep(20);
+							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -42,7 +44,7 @@ public class LogService {
 				do {
 					Thread.sleep(10);
 					long current = System.currentTimeMillis();
-					if (current - start > 10000) {
+					if (current - start > IAPoptions.getInstance().getInteger("NEWS", "read_time_out_ms", 2000)) {
 						news.add(preLine
 								+ SystemAnalysis.getCurrentTime()
 								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
@@ -51,7 +53,6 @@ public class LogService {
 					}
 				} while (t.isAlive());
 			} catch (Exception e) {
-				e.printStackTrace();
 				news.add(preLine
 						+ SystemAnalysis.getCurrentTime()
 						+ ": Could not access latest news (" + e.getMessage()

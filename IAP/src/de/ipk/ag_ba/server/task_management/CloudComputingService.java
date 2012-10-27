@@ -27,6 +27,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -275,7 +276,9 @@ public class CloudComputingService {
 		if (hsm != null && new File(hsm).exists()) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">HSM Folder: " + hsm);
 			Library lib = new Library();
-			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
+			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
+					IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
+					hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/folder-remote.png"));

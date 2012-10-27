@@ -26,6 +26,7 @@ import org.ReleaseInfo;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.ActionIapHome;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
@@ -144,7 +145,7 @@ public class IAPgui {
 				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
 				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
 				"IAP Image Analysis - Pipeline-Versions: <br>" + vs + "<br><br>" +
-				new LogService().getLatestNews(10,
+				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",
 						"<li>", "", "<br><br>");

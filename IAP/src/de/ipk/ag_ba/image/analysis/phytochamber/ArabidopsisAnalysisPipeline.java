@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis.phytochamber;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
@@ -107,6 +108,11 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
+		SystemOptions so = SystemOptions.getInstance();
+		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		
+		options.setSystemOptionStorage(so, g);
+		
 		options.setIsBarley(false);
 		options.setIsMaize(false);
 		options.setIsArabidopsis(true);
@@ -164,8 +170,10 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, 40);
 			options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS, 120);
 		}
-		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
-		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
+		options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
+		options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, true);
+		
+		options.setSystemOptionStorage(null, null);
 	}
 	
 	@Override

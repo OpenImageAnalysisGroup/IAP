@@ -50,13 +50,11 @@ public class BlLeafCurlingAnalysis_vis extends AbstractSnapshotAnalysisBlockFIS 
 				distances.add(result.getPixel(p.x, p.y));
 			}
 			int nPoints = points.size(); // number of points
-			double[] tdata = new double[nPoints];
 			double[] ydata = new double[nPoints];
 			
 			// Create wave form
 			for (int i = 0; i < nPoints; i++) {
 				ydata[i] = distances.get(i);
-				tdata[i] = i;
 			}
 			
 			FourierTransform ft0 = new FourierTransform(ydata);

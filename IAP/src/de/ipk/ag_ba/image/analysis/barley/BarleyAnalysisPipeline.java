@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis.barley;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
@@ -55,7 +56,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		modifySettings(options);
 		
-		boolean skelet = true;
+		boolean skelet = options.getBooleanSetting(Setting.SKELETONIZE);
 		
 		BlockPipeline p = new BlockPipeline();
 		p.add(BlLoadImagesIfNeeded_images_masks.class);
@@ -121,6 +122,11 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.setIsBarley(true);
 		options.setIsMaize(false);
 		
+		SystemOptions so = SystemOptions.getInstance();
+		String g = "IMAGE-ANALYSIS-PIPELINE-" + getClass().getCanonicalName();
+		
+		options.setSystemOptionStorage(so, g);
+		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 100);
 			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
@@ -172,11 +178,16 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO, cut);
 		options.clearAndAddDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS,
 				cut * 0.1);
-		options.addBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
-		options.addBooleanSetting(Setting.DRAW_SKELETON, true);
+		
+		options.clearAndAddBooleanSetting(Setting.SKELETONIZE, true);
+		
+		options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
+		options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, true);
 		
 		// barley in Maize sytem
 		options.clearAndAddIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS, 150);
+		
+		options.setSystemOptionStorage(null, null);
 	}
 	
 	@Override

@@ -13,6 +13,8 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.SystemOptions;
+
 import de.ipk.ag_ba.image.operations.ImageOperation;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 
@@ -72,7 +74,9 @@ public class ImageProcessorOptions {
 		
 		INPUT_VIS_IMAGE_ROTATION_ANGLE, L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
 		
-		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL, DRAW_SKELETON, FIXED_CROP_BOTTOM_POT_POSITION_VIS;
+		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE, DRAW_CONVEX_HULL, DRAW_SKELETON,
+		FIXED_CROP_BOTTOM_POT_POSITION_VIS,
+		SKELETONIZE, REMOVE_BAMBOO_STICK;
 	}
 	
 	public ImageProcessorOptions() {
@@ -143,16 +147,31 @@ public class ImageProcessorOptions {
 	
 	public void clearAndAddIntSetting(Setting s, int value) {
 		clearSetting(s);
+		
+		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
+			value = optSystemOptionStorage.getInteger(optSystemOptionStorageGroup, s.name(), value);
+		}
+		
 		addIntSetting(s, value);
 	}
 	
 	public void clearAndAddDoubleSetting(Setting s, double value) {
 		clearSetting(s);
+		
+		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
+			value = optSystemOptionStorage.getDouble(optSystemOptionStorageGroup, s.name(), value);
+		}
+		
 		addDoubleSetting(s, value);
 	}
 	
 	public void clearAndAddBooleanSetting(Setting s, boolean value) {
 		clearSetting(s);
+		
+		if (optSystemOptionStorage != null && optSystemOptionStorageGroup != null) {
+			value = optSystemOptionStorage.getBoolean(optSystemOptionStorageGroup, s.name(), value);
+		}
+		
 		addBooleanSetting(s, value);
 	}
 	
@@ -329,6 +348,8 @@ public class ImageProcessorOptions {
 	private int tray_cnt;
 	private int unit_test_idx;
 	private int unit_test_steps;
+	private SystemOptions optSystemOptionStorage;
+	private String optSystemOptionStorageGroup;
 	
 	public void setIsMaize(boolean isMaize) {
 		this.isMaize = isMaize;
@@ -396,5 +417,10 @@ public class ImageProcessorOptions {
 	
 	public double getUnitTestSteps() {
 		return unit_test_steps;
+	}
+	
+	public void setSystemOptionStorage(SystemOptions systemOptionStorage, String systemOptionStorageGroup) {
+		this.optSystemOptionStorage = systemOptionStorage;
+		this.optSystemOptionStorageGroup = systemOptionStorageGroup;
 	}
 }

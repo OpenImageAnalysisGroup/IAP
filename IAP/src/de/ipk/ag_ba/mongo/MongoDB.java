@@ -72,6 +72,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -125,6 +126,8 @@ public class MongoDB {
 	
 	private final boolean multiThreadedStorage = false;
 	
+	private boolean enabled;
+	
 	public static ArrayList<MongoDB> getMongos() {
 		return mongos;
 	}
@@ -140,7 +143,13 @@ public class MongoDB {
 		
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de") || IAPservice.isReachable("ba-24.ipk-gatersleben.de")) {
 		// if (IAPservice.isReachable("ba-13.ipk-gatersleben.de"))
-		res.add(getDefaultCloud());
+		
+		int n = IAPoptions.getInstance().getInteger("GRID-STORAGE", "n", 1);
+		for (int i = 0; i < n; i++) {
+			MongoDB c = getCloud(i);
+			if (c.enabled)
+				res.add(c);
+		}
 		// if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
 		// res.add(new MongoDB("Storage 2 (BA-24)", "cloud3", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
@@ -154,29 +163,37 @@ public class MongoDB {
 		return res;
 	}
 	
-	public static MongoDB getLocalDB() {
-		if (defaultLocalInstance == null)
-			defaultLocalInstance = new MongoDB("Local DB", "localCloud1", "localhost", null, null, HashType.MD5);
-		return defaultLocalInstance;
-	}
-	
 	private static MongoDB defaultCloudInstance = null;
-	private static MongoDB defaultLocalInstance = null;
-	
-	public static String getDefaultCloudHostName() {
-		return "ba-13.ipk-gatersleben.de";
-	}
 	
 	public static MongoDB getDefaultCloud() {
-		if (defaultCloudInstance == null) {
-			defaultCloudInstance = new MongoDB("Storage 1 (BA-13)", "cloud1", getDefaultCloudHostName(), "iap", "iap#2011", HashType.MD5);
-		}
-		return defaultCloudInstance;
-		// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+		return getCloud(0);
 	}
 	
-	public static MongoDB getLocalUnitTestsDB() {
-		return new MongoDB("Unit Tests local", "localUnitTests", "ba-13", "iap", "iap#2011", HashType.MD5);
+	public static MongoDB getCloud(int idx) {
+		String sec = "GRID-STORAGE-" + (idx + 1);
+		
+		boolean enabled = IAPoptions.getInstance().getBoolean(sec,
+				"enabled", idx == 0 ? true : false);
+		String displayName = IAPoptions.getInstance().getString(sec,
+				"title", idx == 0 ? "Storage 1 (BA-13)" : "Storage " + (idx + 1));
+		String databaseName = IAPoptions.getInstance().getString(sec,
+				"database_name", "cloud" + (idx + 1));
+		String hostName = IAPoptions.getInstance().getString(sec,
+				"host", "ba-13.ipk-gatersleben.de");
+		String login = IAPoptions.getInstance().getString(sec,
+				"login", idx == 0 ? "iap" : null);
+		String password = IAPoptions.getInstance().getString(sec,
+				"password", idx == 0 ? "iap#2011" : null);
+		if (idx == 0) {
+			if (defaultCloudInstance == null) {
+				defaultCloudInstance = new MongoDB(displayName, databaseName, hostName, login, password, HashType.MD5);
+			}
+			defaultCloudInstance.enabled = enabled;
+			return defaultCloudInstance;
+		} else {
+			// return new MongoDB("Data Processing", "cloud1", "ba-13.ipk-gatersleben.de,ba-24.ipk-gatersleben.de", "iap", "iap#2011", HashType.MD5);
+			return null;
+		}
 	}
 	
 	private final MongoDBhandler mh;
@@ -3101,72 +3118,26 @@ public class MongoDB {
 				}
 				
 				{
-					executor = Executors.newFixedThreadPool(1);
-					final DBCollection substances = db.getCollection("substances");
+					DBCollection substances = db.getCollection("substances");
 					long cnt = substances.count();
-					final long max = dbIdsOfSubstances.size();
+					long max = dbIdsOfSubstances.size();
 					msg = SystemAnalysis.getCurrentTimeInclSec() + ">Remove stale substances: " + max + "/" + cnt;
 					System.out.println(msg);
 					saveSystemMessage(msg);
 					status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
-					final ThreadSafeOptions n = new ThreadSafeOptions();
-					ArrayList<String> ids = new ArrayList<String>();
+					int n = 0;
 					for (String subID : dbIdsOfSubstances) {
-						ids.add(subID);
+						n++;
 						substances.remove(new BasicDBObject("_id", new ObjectId(subID)), WriteConcern.NONE);
-						if (ids.size() >= 5000) {
-							final ArrayList<String> ids2 = new ArrayList<String>(ids);
-							ids.clear();
-							executor.submit(new Runnable() {
-								@Override
-								public void run() {
-									n.addLong(5000);
-									BasicDBList list = new BasicDBList();
-									synchronized (ids2) {
-										for (String coID : ids2)
-											list.add(new ObjectId(coID));
-										ids2.clear();
-									}
-									substances.remove(
-											new BasicDBObject("_id", new BasicDBObject("$in", list)),
-											WriteConcern.NONE);
-									status.setCurrentStatusValueFine(100d / max * n.getLong());
-									status.setCurrentStatusText2(n.getLong() + "/" + max);
-								}
-							});
-						}
+						status.setCurrentStatusValueFine(100d / max * n);
+						status.setCurrentStatusText2(n + "/" + max);
 					}
-					executor.shutdown();
-					while (!executor.isTerminated()) {
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException e) {
-							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
-						}
-					}
-					if (ids.size() > 0) {
-						BasicDBList list = new BasicDBList();
-						synchronized (ids) {
-							for (String suID : ids)
-								list.add(new ObjectId(suID));
-							ids.clear();
-						}
-						substances.remove(
-								new BasicDBObject("_id", new BasicDBObject("$in", list)),
-								WriteConcern.NONE);
-						n.addLong(list.size());
-						status.setCurrentStatusValueFine(100d / max * n.getLong());
-						status.setCurrentStatusText2(n.getLong() + "/" + max);
-					}
-					
-					status.setCurrentStatusValueFine(100d / max * n.getLong());
-					status.setCurrentStatusText2(n + "/" + max);
 					msg = SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - substances.count()) + " SUBSTANCE OBJECTS";
 					System.out.println(msg);
 					saveSystemMessage(msg);
 				}
 				{
-					executor = Executors.newFixedThreadPool(1);
+					executor = Executors.newFixedThreadPool(2);
 					final ThreadSafeOptions n = new ThreadSafeOptions();
 					final long max = dbIdsOfConditions.size();
 					final DBCollection conditions = db.getCollection("conditions");
@@ -3175,21 +3146,19 @@ public class MongoDB {
 					System.out.println(msg);
 					saveSystemMessage(msg);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
-					ArrayList<String> ids = new ArrayList<String>();
+					final ArrayList<String> ids = new ArrayList<String>();
 					for (String condID : dbIdsOfConditions) {
 						ids.add(condID);
 						if (ids.size() >= 5000) {
-							final ArrayList<String> ids2 = new ArrayList<String>(ids);
-							ids.clear();
 							executor.submit(new Runnable() {
 								@Override
 								public void run() {
 									n.addLong(5000);
 									BasicDBList list = new BasicDBList();
-									synchronized (ids2) {
-										for (String coID : ids2)
+									synchronized (ids) {
+										for (String coID : ids)
 											list.add(new ObjectId(coID));
-										ids2.clear();
+										ids.clear();
 									}
 									conditions.remove(
 											new BasicDBObject("_id", new BasicDBObject("$in", list)),
@@ -3570,5 +3539,9 @@ public class MongoDB {
 				".<br>Stack-trace:<br>" +
 				e.getStackTrace() != null ?
 				StringManipulationTools.getStringList(e.getStackTrace(), "<br>") : "(no stacktrace)");
+	}
+	
+	public boolean isDbHostReachable() {
+		return IAPservice.isReachable(databaseHost);
 	}
 }

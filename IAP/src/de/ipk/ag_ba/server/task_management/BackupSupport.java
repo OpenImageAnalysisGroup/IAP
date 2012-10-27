@@ -21,6 +21,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -140,9 +141,11 @@ public class BackupSupport {
 			
 			String hsmFolder = IAPmain.getHSMfolder();
 			if (hsmFolder != null && new File(hsmFolder).exists()) {
-				print("HSM Folder: " + hsmFolder);
+				print("Archive Folder: " + hsmFolder);
 				Library lib = new Library();
-				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsmFolder,
+				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
+						IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
+						hsmFolder,
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 						IAPmain.loadIcon("img/ext/folder-remote.png"));

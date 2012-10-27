@@ -25,6 +25,7 @@ import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,6 +42,7 @@ import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.WebCamHandler;
 import de.ipk.ag_ba.image.operations.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -61,6 +63,8 @@ public class IAPmain extends JApplet {
 	private static final long serialVersionUID = 1L;
 	
 	static MainFrame mainFrame1;
+	
+	private static Runnable vantedDelayedRunnable;
 	
 	// static MainFrame mainFrame2;
 	
@@ -91,7 +95,9 @@ public class IAPmain extends JApplet {
 	
 	public static void main(String[] args) {
 		setRunMode(IAPrunMode.SWING_MAIN);
-		JFrame jf = new JFrame("IAP Main");
+		String title = IAPoptions.getInstance().getString("IAP", "window_title",
+				"IAP - The Integreted Analysis Platform") + "";
+		JFrame jf = new JFrame(title);
 		jf.add("Center", new IAPmain().getContentPane());
 		jf.pack();
 		jf.setVisible(true);
@@ -114,8 +120,8 @@ public class IAPmain extends JApplet {
 		GravistoPreferences prefs = GravistoPreferences.userNodeForPackage(IAPmain.class);
 		
 		GravistoPreferences uiPrefs = prefs.node("ui");
-		uiPrefs.put("showPluginManagerMenuOptions", "false");
-		uiPrefs.put("showPluginMenu", "false");
+		uiPrefs.put("showPluginManagerMenuOptions", getOptions().getBoolean("VANTED", "showPluginManagerMenuOptions", false) + "");
+		uiPrefs.put("showPluginMenu", getOptions().getBoolean("VANTED", "showPluginMenu", false) + "");
 		JPanel statusPanel = new JPanel();
 		
 		mainFrame1 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
@@ -172,7 +178,7 @@ public class IAPmain extends JApplet {
 		ResourceIOManager.registerIOHandler(new WebCamHandler());
 	}
 	
-	public void myAppletLoad(MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public void myAppletLoad(final MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
@@ -196,9 +202,11 @@ public class IAPmain extends JApplet {
 				+ name
 				+ "!<br>"
 				+ "<small>"
-				+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various features of this application.<br>"
+				+ "&nbsp;&nbsp;&nbsp;In the <b>Help menu</b> you find a <b>tutorial section</b> which quickly gives an overview on the various "
+				+ "features of this application.<br>"
 				+ "&nbsp;&nbsp;&nbsp;Furthermore you will find <b>[?] buttons</b> throughout the system which point directly to topics of interest.<br>"
-				+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the <b>Send feedback command</b> in the Help menu!<br>&nbsp;";
+				+ "&nbsp;&nbsp;&nbsp;If you experience problems or would like to suggest enhancements, feel free to use the "
+				+ "<b>Send feedback command</b> in the Help menu!<br>&nbsp;";
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
@@ -267,7 +275,7 @@ public class IAPmain extends JApplet {
 		
 		splashScreen.setText("Read plugin information...");
 		
-		ArrayList<String> locations = new ArrayList<String>();
+		final ArrayList<String> locations = new ArrayList<String>();
 		try {
 			locations.addAll(new TextFile(r1));
 			locations.addAll(new TextFile(r2));
@@ -324,13 +332,30 @@ public class IAPmain extends JApplet {
 			System.exit(1);
 		}
 		
-		splashScreen.setText("Load plugins...");
-		try {
-			GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
-		} catch (PluginManagerException pme) {
-			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
+		final boolean onStartup = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", true);
+		final boolean onDemand = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_demand", true);
+		if (onStartup) {
+			try {
+				splashScreen.setText("Load plugins...");
+				GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
+			} catch (PluginManagerException pme) {
+				ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
+			}
+		} else {
+			vantedDelayedRunnable = new Runnable() {
+				@Override
+				public void run() {
+					if (onDemand) {
+						try {
+							splashScreen.setText("Load plugins...");
+							GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
+						} catch (PluginManagerException pme) {
+							ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
+						}
+					}
+				}
+			};
 		}
-		
 		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveInDatabaseDataProcessor());
 		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveAsCsvDataProcessor());
 		
@@ -340,7 +365,17 @@ public class IAPmain extends JApplet {
 		ErrorMsg.setAppLoadingCompleted(ApplicationStatus.PROGRAM_LOADING_FINISHED);
 	}
 	
+	public static void prepareVantedPlugins() {
+		if (vantedDelayedRunnable != null) {
+			vantedDelayedRunnable.run();
+			vantedDelayedRunnable = null;
+		}
+	}
+	
 	public static JComponent showVANTED(boolean inline) {
+		
+		prepareVantedPlugins();
+		
 		// inline = false;
 		// JFrame jf = (JFrame) ErrorMsg.findParentComponent(MainFrame.getInstance(), JFrame.class);
 		
@@ -384,31 +419,44 @@ public class IAPmain extends JApplet {
 			// see
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return true;
+					return getOptions().getBoolean("HEADLESS_GRID", "remote_execution", true);
 				case SAVE_DEBUG_STACK:
-					return false;
+					return getOptions().getBoolean("HEADLESS_DEBUG", "save_stack", false);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return false;
+					return getOptions().getBoolean("HEADLESS_HSM", "auto_copy", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return false;
+					return getOptions().getBoolean("HEADLESS_GRID", "delete_jobs_when_grid_node_becomes_active", false);
 			}
 		} else {
 			// these may be changed for interactive applet version !!!
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return false;
+					return getOptions().getBoolean("GRID-COMPUTING", "remote_execution", true);
 				case SAVE_DEBUG_STACK:
-					return false;
+					return getOptions().getBoolean("DEBUG", "save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return false;
+					return getOptions().getBoolean("ARCHIVE", "auto_copy", false);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return false;
+					return getOptions().getBoolean("GRID-COMPUTING", "delete_jobs_when_grid_node_becomes_active", false);
 			}
 		}
 		return false;
 	}
 	
+	private static SystemOptions getOptions() {
+		return IAPoptions.getInstance();
+	}
+	
 	public static String getHSMfolder() {
+		boolean enabled = getOptions().getBoolean("ARCHIVE", "enabled", true);
+		String folder = getOptions().getString("ARCHIVE", "folder", getHSMfolderDefault());
+		if (enabled)
+			return folder;
+		else
+			return null;
+	}
+	
+	private static String getHSMfolderDefault() {
 		try {
 			if (new File("/media/nfs/hsm").exists())
 				return "/media/nfs/hsm";
@@ -421,7 +469,8 @@ public class IAPmain extends JApplet {
 					else
 						return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
 		} catch (Exception e) {
-			System.out.println("INFO: HSM file system folder not accessible: " + e.getMessage());
+			System.out.println("ERROR: HSM file system folder not accessible: " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
