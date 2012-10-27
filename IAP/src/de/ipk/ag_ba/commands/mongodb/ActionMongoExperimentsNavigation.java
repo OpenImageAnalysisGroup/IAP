@@ -34,7 +34,6 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -115,10 +114,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 				LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 				for (ExperimentHeaderInterface eh : experimentList) {
-					String type = IAPservice.getSetting(IAPoptions.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
+					String type = IAPoptions.getSetting(IAPoptions.IAPoptionFields.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
 					if (type == null || type.length() == 0)
 						type = "[no type]";
-					String user = IAPservice.getSetting(IAPoptions.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
+					String user = IAPoptions.getSetting(IAPoptions.IAPoptionFields.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
 					if (user == null || user.length() == 0)
 						user = "[no user]";
 					if (eh.inTrash()) {

@@ -50,6 +50,7 @@ import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsFalse;
 import org.SettingsHelperDefaultIsTrue;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.event.AttributeEvent;
@@ -140,11 +141,11 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		res.setOpaque(false);
 		double border = 5;
 		double[][] size = {
-							{ border, TableLayoutConstants.FILL, border }, // Columns
+				{ border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, 2 * border, TableLayoutConstants.PREFERRED, 2 * border,
-												TableLayoutConstants.PREFERRED, 2 * border, TableLayoutConstants.PREFERRED, 2 * border,
-												TableLayoutConstants.PREFERRED, 2 * border, TableLayoutConstants.PREFERRED, 5 * border,
-												TableLayoutConstants.PREFERRED, border } }; // Rows
+						TableLayoutConstants.PREFERRED, 2 * border, TableLayoutConstants.PREFERRED, 2 * border,
+						TableLayoutConstants.PREFERRED, 2 * border, TableLayoutConstants.PREFERRED, 5 * border,
+						TableLayoutConstants.PREFERRED, border } }; // Rows
 		res.setLayout(new TableLayout(size));
 		
 		JCheckBox helpEnabler = new JCheckBox("<html><font color='gray'>Help Functions (not yet available)");
@@ -170,7 +171,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		// }
 		
 		ThemedLookAndFeelInfo info = new ThemedLookAndFeelInfo("VANTED", "de.muntjak.tinylookandfeel.TinyLookAndFeel",
-							"VANTED");
+				"VANTED");
 		lookSelection.addItem(new LookAndFeelWrapper(info));
 		
 		try {
@@ -189,8 +190,10 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			ErrorMsg.addErrorMessage(e);
 		}
 		lookSelection.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						LookAndFeelWrapper po = (LookAndFeelWrapper) lookSelection.getSelectedItem();
 						if (po == null)
@@ -222,14 +225,14 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		});
 		
 		saveLook.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				LookAndFeelWrapper op = (LookAndFeelWrapper) lookSelection.getSelectedItem();
 				if (op == null)
 					return;
 				
 				try {
-					new File(ReleaseInfo.getAppFolderWithFinalSep() + "setting_java_look_and_feel").delete();
-					TextFile.write(ReleaseInfo.getAppFolderWithFinalSep() + "setting_java_look_and_feel", op.getClassName());
+					SystemOptions.getInstance().setString("VANTED", "LnF", op.getClassName());
 					saveLook.setText("saved");
 					saveLook.setEnabled(false);
 					lookSelection.requestFocus();
@@ -244,7 +247,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		boolean auto = ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp);
 		helpEnabler.setSelected(auto);
 		res.add(TableLayout.get3Split(new JLabel("Look and feel: "), lookSelection, saveLook, TableLayout.PREFERRED,
-							TableLayout.FILL, TableLayout.PREFERRED), "1,1");
+				TableLayout.FILL, TableLayout.PREFERRED), "1,1");
 		
 		keggEnabler = new JCheckBox("KEGG access");
 		keggEnabler.setOpaque(false);
@@ -255,6 +258,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			ErrorMsg.addErrorMessage(e);
 		}
 		keggEnabler.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 				if (keggEnabler.isSelected()) {
 					keggEnabler.setSelected(false);
@@ -308,14 +312,14 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		// helpEnabler
 		res.add(getPluginConfigurationPanel(null, keggEnabler), "1,3");
 		res.add(TableLayout.get3Split(getAddOnManagerButton(), null, getPreferencesFolderButton(), TableLayout.FILL, 4,
-							TableLayout.FILL, 0, 0), "1,5");
+				TableLayout.FILL, 0, 0), "1,5");
 		
 		res.add(TableLayout.getSplit(getGridSettingEditor(), null, TableLayout.FILL, TableLayout.PREFERRED), "1,7");
 		
 		res.add(TableLayout.getSplit(null, null, TableLayout.PREFERRED, TableLayout.FILL), "1,9");
 		
 		res.add(new JLabel("<html>"
-							+ "<font color='#BB22222'>After restarting the program the changed settings will be fully active."), "1,11");
+				+ "<font color='#BB22222'>After restarting the program the changed settings will be fully active."), "1,11");
 		
 		// final JLabel memLabel = GravistoService.getMemoryInfoLabel(false);
 		// res.add(memLabel, "1,13");
@@ -328,33 +332,37 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		MegaMoveTool.gridEnabled = enabled;
 		
 		Runnable enableGrid = new Runnable() {
+			@Override
 			public void run() {
 				MegaMoveTool.gridEnabled = true;
 			}
 			
 		};
 		Runnable disableGrid = new Runnable() {
+			@Override
 			public void run() {
 				MegaMoveTool.gridEnabled = false;
 			}
 		};
 		Runnable enableZoom = new Runnable() {
+			@Override
 			public void run() {
 				MegaTools.MouseWheelZoomEnabled = true;
 			}
 			
 		};
 		Runnable disableZoom = new Runnable() {
+			@Override
 			public void run() {
 				MegaTools.MouseWheelZoomEnabled = false;
 			}
 		};
 		JComponent gridCheckBox = new SettingsHelperDefaultIsTrue().getBooleanSettingsEditor("Enable Grid",
-							"graph_view_grid", enableGrid, disableGrid);
+				"graph_view_grid", enableGrid, disableGrid);
 		settings.addGuiComponentRow(null, gridCheckBox, false);
 		
 		JComponent databaseCheckBox = new SettingsHelperDefaultIsFalse().getBooleanSettingsEditor(
-							"Database-based node statusbar-infos", "grav_view_database_node_status", enableGrid, disableGrid);
+				"Database-based node statusbar-infos", "grav_view_database_node_status", enableGrid, disableGrid);
 		settings.addGuiComponentRow(null, databaseCheckBox, false);
 		
 		// Database-based node statusbar-infos
@@ -365,7 +373,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 					"<html>Mouse Wheel Zoom<br>(disable to scroll instead)", "graph_view_wheel_zoom", enableZoom, disableZoom);
 		} else {
 			zoomCheckBox = new SettingsHelperDefaultIsTrue().getBooleanSettingsEditor(
-							"<html>Mouse Wheel Zoom<br>(disable to scroll instead)", "graph_view_wheel_zoom", enableZoom, disableZoom);
+					"<html>Mouse Wheel Zoom<br>(disable to scroll instead)", "graph_view_wheel_zoom", enableZoom, disableZoom);
 		}
 		settings.addGuiComponentRow(null, zoomCheckBox, false);
 		// settings.addGuiComponentRow(new JLabel("Move nodes/bends"), gridSize,
@@ -389,11 +397,12 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		}
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				AddonManagerPlugin p = AddonManagerPlugin.getInstance();
 				if (p == null)
 					MainFrame.showMessageDialog("Addon-Manager Plugin not loaded on startup. Please restart application.",
-										"Internal Error");
+							"Internal Error");
 				else
 					p.showManageAddonDialog();
 			}
@@ -402,12 +411,14 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		final String oldText = result.getText();
 		
 		FileDrop.Listener fdl = new FileDrop.Listener() {
+			@Override
 			public void filesDropped(File[] files) {
 				if (files != null && files.length > 0) {
 					for (File f : files)
 						if (!f.getName().toLowerCase().endsWith(".jar")) {
 							result.setText("<html>Some Files are not a valid Add-on!");
 							Timer t = new Timer(5000, new ActionListener() {
+								@Override
 								public void actionPerformed(ActionEvent e) {
 									result.setText(oldText);
 								}
@@ -424,12 +435,14 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		};
 		
 		Runnable dragdetected = new Runnable() {
+			@Override
 			public void run() {
 				result.setText("<html><br><b>Drop file to install Add-on<br><br>");
 			}
 		};
 		
 		Runnable dragenddetected = new Runnable() {
+			@Override
 			public void run() {
 				if (!result.getText().contains("!"))
 					result.setText(oldText);
@@ -445,6 +458,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				showPreferencesFolder();
 			}
@@ -453,28 +467,35 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 	}
 	
 	private JComponent getPluginConfigurationPanel(final JComponent additionalSetting1,
-						final JComponent additionalSetting2) {
+			final JComponent additionalSetting2) {
 		
 		JLabel button = new JLabel("Loading of optional program features (");
 		JLabel bt3 = new JLabel("):");
 		JLabelHTMLlink bt2 = new JLabelHTMLlink("Reset", "Resets all settings to their default state. Restart needed!",
-							new Runnable() {
+				new Runnable() {
+					@Override
+					public void run() {
+						if (SettingsHelperDefaultIsTrue.oldStyle) {
+							FilenameFilter filter = new FilenameFilter() {
 								@Override
-								public void run() {
-									FilenameFilter filter = new FilenameFilter() {
-										public boolean accept(File dir, String name) {
-											return name.startsWith("feature_disabled") || name.startsWith("feature_enabled");
-										}
-									};
-									for (String settingsFile : new File(HomeFolder.getHomeFolder()).list(filter))
-										new File(HomeFolder.getHomeFolder() + "/" + settingsFile).delete();
+								public boolean accept(File dir, String name) {
+									return name.startsWith("feature_disabled") || name.startsWith("feature_enabled");
 								}
-							});
+							};
+							for (String settingsFile : new File(HomeFolder.getHomeFolder()).list(filter))
+								new File(HomeFolder.getHomeFolder() + "/" + settingsFile).delete();
+						} else {
+							SettingsHelperDefaultIsTrue.resetAllKnown();
+							SettingsHelperDefaultIsFalse.resetAllKnown();
+						}
+					}
+				});
 		
 		final FolderPanel features = new FolderPanel(null, false, false, false, null);
 		features.setBackground(null);
 		features.setFrameColor(null, null, 0, 5);
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
+			@Override
 			public void run() {
 				features.clearGuiComponentList();
 				if (additionalSetting1 != null)
@@ -488,7 +509,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			}
 		});
 		return TableLayout.getSplitVertical(TableLayout.get3Split(button, bt2, bt3, TableLayout.PREFERRED,
-							TableLayout.PREFERRED, TableLayout.PREFERRED), features, TableLayout.PREFERRED, TableLayout.PREFERRED);
+				TableLayout.PREFERRED, TableLayout.PREFERRED), features, TableLayout.PREFERRED, TableLayout.PREFERRED);
 	}
 	
 	private Collection<JComponent> getOptionalSettingsPanels() {
@@ -496,7 +517,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		for (PluginEntry pe : MainFrame.getInstance().getPluginManager().getPluginEntries()) {
 			if (pe.getDescription().isOptional()) {
 				result.add(TableLayout.getSplit(getEnableDisableOption(pe), new JLabel(""), TableLayout.PREFERRED,
-									TableLayout.FILL));
+						TableLayout.FILL));
 			}
 		}
 		return result;
@@ -506,10 +527,10 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		JComponent setting;
 		if (pe.getDescription().isOptionalDefaultTrue())
 			setting = new SettingsHelperDefaultIsTrue().getBooleanSettingsEditor(pe.getDescription().getName(), pe
-								.getDescription().getName(), null, null);
+					.getDescription().getName(), null, null);
 		else
 			setting = new SettingsHelperDefaultIsFalse().getBooleanSettingsEditor(pe.getDescription().getName(), pe
-								.getDescription().getName(), null, null);
+					.getDescription().getName(), null, null);
 		try {
 			String desc = PluginInfoHelper.getSummaryInfo(false, pe.getDescription(), pe.getPlugin());
 			setting.setToolTipText("<html>" + desc);
@@ -534,6 +555,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 	
 	private ActionListener getHelpEnabledSettingActionListener(final JCheckBox helpEnabler) {
 		ActionListener res = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (helpEnabler.isSelected())
@@ -556,41 +578,41 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		help1.setBackground(null);
 		double border = 5;
 		double[][] size = {
-							{ border, TableLayoutConstants.FILL, border }, // Columns
+				{ border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, border } }; // Rows
+						TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, border } }; // Rows
 		help1.setLayout(new TableLayout(size));
 		
 		FolderPanel intro = new FolderPanel("Introduction", false, true, false, null);
 		intro.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		intro
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small>"
-																						+ "In this side panel you find an outline of a possible workflow for data analysis and visualization with this application.<br>"
-																						+ "Please click onto the heading of a workflow-step or this introduction to show or hide details. "
-																						+ "In case the desired worfklow step is still not fully visible, move the slider next to this side panel (left side) more to the left, or increase the window size.<br><br>"
-																						+ "<i>I hope you will enjoy the work with this program!</i> - C. Klukas")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("main"), Color.WHITE), false, 5);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small>"
+										+ "In this side panel you find an outline of a possible workflow for data analysis and visualization with this application.<br>"
+										+ "Please click onto the heading of a workflow-step or this introduction to show or hide details. "
+										+ "In case the desired worfklow step is still not fully visible, move the slider next to this side panel (left side) more to the left, or increase the window size.<br><br>"
+										+ "<i>I hope you will enjoy the work with this program!</i> - C. Klukas")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("main"), Color.WHITE), false, 5);
 		intro.layoutRows();
 		
 		/* new JLabel() */
-
+		
 		FolderPanel step1 = new FolderPanel("1. Create / Load Input Form", true, true, false, null);
 		step1.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step1
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small><ol>"
-																						+ "<li>Save a new input template using the &quot;Experiments&quot; side-panel and open it in MS Excel or another compatible spreadsheet application."
-																						+ "<li>Fill the input template as described in the help. Certain input fields need to contain data in a specific format, so be carefully and consult the linked documentation (? button). Later with your own existing templates this task will be much easier as when done for the first time."
-																						+ "<li>Load the template in the &quot;Experiments&quot side panel. In case of error, carefully check the input template."
-																						+ "<li>Compare the numer of datapoints with the number of datapoints shown in the appearing experiment tab. If not all data is loaded, check the input format."
-																						+ "</ol>Hint: For mapping data onto graph edges instead of graph nodes, specify target and end node of an edge in your input template as follows &quot;A^B&quot;. "
-																						+ "The mapping will then be performed onto the edge pointing from A to B. You could also add edge labels to the graph and then use these "
-																						+ "labels in the input forms.")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("inputformats"), Color.WHITE), false, 5);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small><ol>"
+										+ "<li>Save a new input template using the &quot;Experiments&quot; side-panel and open it in MS Excel or another compatible spreadsheet application."
+										+ "<li>Fill the input template as described in the help. Certain input fields need to contain data in a specific format, so be carefully and consult the linked documentation (? button). Later with your own existing templates this task will be much easier as when done for the first time."
+										+ "<li>Load the template in the &quot;Experiments&quot side panel. In case of error, carefully check the input template."
+										+ "<li>Compare the numer of datapoints with the number of datapoints shown in the appearing experiment tab. If not all data is loaded, check the input format."
+										+ "</ol>Hint: For mapping data onto graph edges instead of graph nodes, specify target and end node of an edge in your input template as follows &quot;A^B&quot;. "
+										+ "The mapping will then be performed onto the edge pointing from A to B. You could also add edge labels to the graph and then use these "
+										+ "labels in the input forms.")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("inputformats"), Color.WHITE), false, 5);
 		
 		// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
 		// "inputformats"
@@ -598,116 +620,116 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		step1.layoutRows();
 		
 		FolderPanel step2 = new FolderPanel("2. Create / Load Pathway", true, true, false, null
-							// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
-							// "inputformats"
-							);
+				// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
+				// "inputformats"
+				);
 		step2.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step2.addGuiComponentRow(
-							getCustomizedLabel(new JLabel(
-												"<html>Either create a graph from scratch"
-																	+ "<small><ul><li>Create a new file: Menu File/New"
-																	+ "<li>Add network nodes and edges, representing the desired entities like enzymes, compounds and reactions"
-																	+ "<li>Name the nodes with the same substance names like the names you use for your experimental data"
-																	+ "</ul>")),
-							FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("editcommands"), Color.WHITE), false, 5);
+				getCustomizedLabel(new JLabel(
+						"<html>Either create a graph from scratch"
+								+ "<small><ul><li>Create a new file: Menu File/New"
+								+ "<li>Add network nodes and edges, representing the desired entities like enzymes, compounds and reactions"
+								+ "<li>Name the nodes with the same substance names like the names you use for your experimental data"
+								+ "</ul>")),
+				FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("editcommands"), Color.WHITE), false, 5);
 		step2.addGuiComponentRow(getCustomizedLabel(new JLabel("<html>Or use a existing network" + "<small><ul>"
-							+ "<li>Load a existing network file: Menu File/Open: "
-							+ "Supported file formats are GML (VANTED's native file format), SBML, Pajek and KGML files."
-							+ "<li>Use the side panel &quot;Pathways/KEGG&quot; to load (organism specific) pathways. "
-							+ "Hint: Create the network with the new system KGML-ED (http://kgml-ed.ipk-gatersleben.de), "
-							+ "if you would like to perform advanced KEGG Pathway editing operations." + "</ul>")),
-							FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("networkloading"), Color.WHITE), false,
-							5);
+				+ "<li>Load a existing network file: Menu File/Open: "
+				+ "Supported file formats are GML (VANTED's native file format), SBML, Pajek and KGML files."
+				+ "<li>Use the side panel &quot;Pathways/KEGG&quot; to load (organism specific) pathways. "
+				+ "Hint: Create the network with the new system KGML-ED (http://kgml-ed.ipk-gatersleben.de), "
+				+ "if you would like to perform advanced KEGG Pathway editing operations." + "</ul>")),
+				FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("networkloading"), Color.WHITE), false,
+				5);
 		step2
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html>Then modify the network"
-																						+ "<small><ul>"
-																						+ "<li>Change node titles, to fit your data naming conventions"
-																						+ "<li>Remove not needed nodes / edges, or add new ones"
-																						+ "<li>Change the drawing style (use the Network, Node and Edge side panels, to change the style of the selected graph elements)"
-																						+ "</ul>"
-																						+ "Hint: You may also ommit this step and just perform the data mapping, without opening a graph window. All measurement data "
-																						+ "will be shown in a new graph window, using different newly created graph nodes or graph edges, displaying data for the measured substances. "
-																						+ "You could then use this as the basis for the manual creation of a network. You could also perform a n:n correlation analysis to "
-																						+ "create a correlation network. If your data input form specifies a mapping onto graph edges, the corresponding network will be automatically "
-																						+ "derived from the data.")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("editcommands"), Color.WHITE), false, 5);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html>Then modify the network"
+										+ "<small><ul>"
+										+ "<li>Change node titles, to fit your data naming conventions"
+										+ "<li>Remove not needed nodes / edges, or add new ones"
+										+ "<li>Change the drawing style (use the Network, Node and Edge side panels, to change the style of the selected graph elements)"
+										+ "</ul>"
+										+ "Hint: You may also ommit this step and just perform the data mapping, without opening a graph window. All measurement data "
+										+ "will be shown in a new graph window, using different newly created graph nodes or graph edges, displaying data for the measured substances. "
+										+ "You could then use this as the basis for the manual creation of a network. You could also perform a n:n correlation analysis to "
+										+ "create a correlation network. If your data input form specifies a mapping onto graph edges, the corresponding network will be automatically "
+										+ "derived from the data.")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("editcommands"), Color.WHITE), false, 5);
 		
 		step2.layoutRows();
 		
 		FolderPanel step3 = new FolderPanel("3. Perform Data Mapping", true, true, false, null);
 		step3.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step3
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small>Use the data mapping command from a experiment-tab created for a loaded experimental dataset (&quot;Experiments&quot; side-panel)")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("combine"), Color.WHITE), false, 5);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small>Use the data mapping command from a experiment-tab created for a loaded experimental dataset (&quot;Experiments&quot; side-panel)")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("combine"), Color.WHITE), false, 5);
 		step3.layoutRows();
 		
 		FolderPanel step4 = new FolderPanel("4. Modify Charts and Graph-Layout", true, true, false, null);
 		step4.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step4
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small>You may change the charting display for all nodes or edges showing mapped experimental data "
-																						+ "from the &quot;Network&quot; "
-																						+ "side panel. For the currently selected graph elements additional specific settings may be changed from the &quot;Node&quot; "
-																						+ "and &quot;Edge&quot; side panels. "
-																						+ "The sub category &quot;Charting&quot; contains many options for changing bar or line colors, line widths, "
-																						+ "the type of diagram (bar/line/pie), the node size, label position and font and much more.<br><br>Certain options "
-																						+ "for these diagrams are not visible, in case graph elements are part of the selection, which do not contain "
-																						+ "mapping data. You may use the menu command Edit/Select Nodes and Edit/Select Edges, to select the "
-																						+ "specifically only those elements, which have experimental data assigned.")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("sidepanels"), Color.WHITE), false, 6);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small>You may change the charting display for all nodes or edges showing mapped experimental data "
+										+ "from the &quot;Network&quot; "
+										+ "side panel. For the currently selected graph elements additional specific settings may be changed from the &quot;Node&quot; "
+										+ "and &quot;Edge&quot; side panels. "
+										+ "The sub category &quot;Charting&quot; contains many options for changing bar or line colors, line widths, "
+										+ "the type of diagram (bar/line/pie), the node size, label position and font and much more.<br><br>Certain options "
+										+ "for these diagrams are not visible, in case graph elements are part of the selection, which do not contain "
+										+ "mapping data. You may use the menu command Edit/Select Nodes and Edit/Select Edges, to select the "
+										+ "specifically only those elements, which have experimental data assigned.")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("sidepanels"), Color.WHITE), false, 6);
 		step4.layoutRows();
 		
 		FolderPanel step5 = new FolderPanel("5. Statistic Analysis", true, true, false, null);
 		step5.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		
 		step5
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html>Identify outliers in the dataset"
-																						+ "<small><ul><li>The identification of outliers is a difficult task, which may only in some cases be performed automatically. "
-																						+ "The more replikate measurements are done, the more easy it is to identify outliers. "
-																						+ "In case of more than about 10-30 replikates, the grubbs test from the Analysis menu may be used to "
-																						+ "automatically identify or remove outliers in the experimental data." + "</ul>")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("analysismenu_david"), Color.WHITE),
-												false, 6);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html>Identify outliers in the dataset"
+										+ "<small><ul><li>The identification of outliers is a difficult task, which may only in some cases be performed automatically. "
+										+ "The more replikate measurements are done, the more easy it is to identify outliers. "
+										+ "In case of more than about 10-30 replikates, the grubbs test from the Analysis menu may be used to "
+										+ "automatically identify or remove outliers in the experimental data." + "</ul>")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("analysismenu_david"), Color.WHITE),
+						false, 6);
 		
 		step5
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html>Recognize the sample data distribution"
-																						+ "<small><ul><li>The assumption of normal distribution of data samples is important for several analysis tasks. "
-																						+ "The so called &quot;David Quicktest&quot; may be used to identify not normally distributed data samples. "
-																						+ "But with few replikates, a sample data distribution is difficult to recognize." + "</ul>")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("analysismenu_david"), Color.WHITE),
-												false, 6);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html>Recognize the sample data distribution"
+										+ "<small><ul><li>The assumption of normal distribution of data samples is important for several analysis tasks. "
+										+ "The so called &quot;David Quicktest&quot; may be used to identify not normally distributed data samples. "
+										+ "But with few replikates, a sample data distribution is difficult to recognize." + "</ul>")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("analysismenu_david"), Color.WHITE),
+						false, 6);
 		
 		step5.addGuiComponentRow(getCustomizedLabel(new JLabel(
-							"<html>Use the &quot;Statistics&quot; side-panel to perform statistical analysis" + "<small><ul>"
-												+ "<li>For comparing different plant lines, a t-Test or U-Test may be performed"
-												+ "<li>Correlations between different substances may be found by using the "
-												+ "correlation analysis commands. It is possible to either correlate a single "
-												+ "substance with the remaining ones (&quot;Correlate 1:n&quot;), or you may "
-												+ "correlate a number of selected substances against each other with a &quot;"
-												+ "Scatter Matrix&quot; or with the &quot;Correlate n:n&quot; command." + "</ul>")),
-							FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("panel_statistics"), Color.WHITE),
-							false, 6);
+				"<html>Use the &quot;Statistics&quot; side-panel to perform statistical analysis" + "<small><ul>"
+						+ "<li>For comparing different plant lines, a t-Test or U-Test may be performed"
+						+ "<li>Correlations between different substances may be found by using the "
+						+ "correlation analysis commands. It is possible to either correlate a single "
+						+ "substance with the remaining ones (&quot;Correlate 1:n&quot;), or you may "
+						+ "correlate a number of selected substances against each other with a &quot;"
+						+ "Scatter Matrix&quot; or with the &quot;Correlate n:n&quot; command." + "</ul>")),
+				FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("panel_statistics"), Color.WHITE),
+				false, 6);
 		step5.layoutRows();
 		
 		FolderPanel step6 = new FolderPanel("6. Save / Export Work", true, true, false, null);
 		step6.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step6
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small>During work with the program, and before closing it, it is recommended to save your work to disk (menu File). "
-																						+ "The preferred and native data format for VANTED is GML, a standard graph format. You may also export the data to other graph formats, but "
-																						+ "in this case not all network specifics like mapped data or node colors will be saved. You may create a image file of the graph view, for usage in presentations or papers by "
-																						+ "using the according commands from the File menu (create JPEG, PNG, ...).")),
-												FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("filemenu"), Color.WHITE), false, 6);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small>During work with the program, and before closing it, it is recommended to save your work to disk (menu File). "
+										+ "The preferred and native data format for VANTED is GML, a standard graph format. You may also export the data to other graph formats, but "
+										+ "in this case not all network specifics like mapped data or node colors will be saved. You may create a image file of the graph view, for usage in presentations or papers by "
+										+ "using the according commands from the File menu (create JPEG, PNG, ...).")),
+						FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("filemenu"), Color.WHITE), false, 6);
 		step6.layoutRows();
 		int b = 3;
 		
@@ -732,10 +754,12 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 	
 	private static FolderPanel workflowFolderPanel;
 	
+	@Override
 	public void postWorkflowStep(String title, final String[] imports, final String[] commands) {
 		final String name = title;
 		JButton jb = new JMButton(name);
 		jb.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Interpreter interpr = new Interpreter(); // Construct an
 				// interpreter
@@ -756,10 +780,12 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		updateStatus();
 	}
 	
+	@Override
 	public void postWorkflowStep(Action action) {
 		final String name = (String) action.getValue("name");
 		JButton jb = new JMButton(name);
 		jb.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				GraffitiAction.performAction(name);
 			}
@@ -768,6 +794,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		updateStatus();
 	}
 	
+	@Override
 	public void postWorkflowStep(final Algorithm algorithm, final Parameter[] params) {
 		if (workflowFolderPanel != null) {
 			JButton jb = new JMButton(algorithm.getName());
@@ -786,10 +813,11 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			final String algName = algorithm.getName();
 			
 			jb.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						GravistoService.getInstance().runPlugin(algName,
-											MainFrame.getInstance().getActiveEditorSession().getGraph(), e);
+								MainFrame.getInstance().getActiveEditorSession().getGraph(), e);
 						//
 						// Algorithm algo = (Algorithm)
 						// Class.forName(algClass).newInstance();
@@ -851,9 +879,9 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		help1.setBackground(null);
 		double border = 5;
 		double[][] size = {
-							{ border, TableLayoutConstants.FILL, border }, // Columns
+				{ border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
-												border } }; // Rows
+						border } }; // Rows
 		help1.setLayout(new TableLayout(size));
 		
 		recordStatus = new JLabel("No active recording");
@@ -861,22 +889,22 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		FolderPanel control = new FolderPanel("Control", false, true, false, null);
 		control.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		control
-							.addGuiComponentRow(
-												getCustomizedLabel(new JLabel(
-																	"<html><small>"
-																						+ "Click <b>Record</b> to start recording a workflow.<br>"
-																						+ "As the workflow is completed, click <b>Pause</b> and then <b>Save</b> "
-																						+ "to save the workflow steps for later reuse. You may use the created application menu entries (or context menu items) to duplicate a workflow at a later time. Use the Library section below to inspect/modify the created source code.")),
-												// FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("main"),
-									// Color.WHITE
-									null, false, 5);
+				.addGuiComponentRow(
+						getCustomizedLabel(new JLabel(
+								"<html><small>"
+										+ "Click <b>Record</b> to start recording a workflow.<br>"
+										+ "As the workflow is completed, click <b>Pause</b> and then <b>Save</b> "
+										+ "to save the workflow steps for later reuse. You may use the created application menu entries (or context menu items) to duplicate a workflow at a later time. Use the Library section below to inspect/modify the created source code.")),
+						// FolderPanel.getHelpButton(JLabelJavaHelpLink.getHelpActionListener("main"),
+						// Color.WHITE
+						null, false, 5);
 		control.addGuiComponentRow(TableLayout.get4Split(getRecordButton(), getWorkflowPauseButton(), getSaveButton(),
-							recordStatus, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL, 5, 0),
-							null, false, 5);
+				recordStatus, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.FILL, 5, 0),
+				null, false, 5);
 		control.layoutRows();
 		
 		/* new JLabel() */
-
+		
 		FolderPanel active = new FolderPanel("Active Recording", false, true, false, null);
 		workflowFolderPanel = active;
 		ScenarioService.setGUI(this);
@@ -899,9 +927,9 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		active.layoutRows();
 		
 		library = new FolderPanel("Library", false, true, false, null
-							// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
-							// "inputformats"
-							);
+				// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
+				// "inputformats"
+				);
 		library.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		for (Scenario s : ScenarioService.getAvailableScnenarios())
 			library.addGuiComponentRow(new MyScenarioEditor(s), null, false, 2);
@@ -923,14 +951,15 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		res.setToolTipText("Save workflow recording (create menu command)");
 		res.setIcon(myGetIcon("images/save.png"));
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (ScenarioService.getCurrentScenario() == null)
 					MainFrame.showMessageDialog("No active recording", "Error");
 				else {
 					Scenario ss = ScenarioService.getCurrentScenario();
 					Object[] res = MyInputHelper
-										.getInput("<html>" + "Please specify menu group and<br>" + "menu command title:", "Save Macro",
-															"Menu Group", "Workflow", "Menu Title", "Recorded Workflow");
+							.getInput("<html>" + "Please specify menu group and<br>" + "menu command title:", "Save Macro",
+									"Menu Group", "Workflow", "Menu Title", "Recorded Workflow");
 					if (res != null) {
 						int i = 0;
 						String group = (String) res[i++];
@@ -943,7 +972,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 							String fileName = ss.getFileName();
 							if (new File(fileName).exists()) {
 								String warning = "<b>Warning: Exisiting file " + fileName + "<br>"
-													+ "will be overwritten. If desired, click Cancel to abort.<b></br><br>";
+										+ "will be overwritten. If desired, click Cancel to abort.<b></br><br>";
 								Object[] resss = MyInputHelper.getInput(warning, "Information", new Object[] {});
 								if (resss == null)
 									return;
@@ -971,6 +1000,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		result.setIcon(myGetIcon("images/record.png"));
 		result.setToolTipText("Start new workflow recording");
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				Scenario s = new Scenario("", "");
 				ScenarioService.setCurrentScenario(s);
@@ -1001,6 +1031,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		result.setToolTipText("Pause/continue workflow recording");
 		result.setIcon(myGetIcon("images/pause.png"));
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (ScenarioService.isRecording()) {
 					ScenarioService.recordStop();
@@ -1052,18 +1083,20 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		return instance;
 	}
 	
+	@Override
 	public JTabbedPane getTabbedPane() {
 		return hc;
 	}
 	
 	public static void showPreferencesFolder() {
 		MainFrame.showMessageDialog("<html>" + "The application preferences folder will be opened in a moment.<br>"
-							+ "This folder contains downloaded database files, stored quick-searches,<br>"
-							+ "network download cache files, and program settings files.<br>"
-							+ "Quick searches (created with 'Edit/Search...': 'Create new menu command')<br>"
-							+ "are stored as files the file name extension '.bsh'. Such a file may be<br>"
-							+ "deleted, in case the custom search command is not needed any more.", "Information");
+				+ "This folder contains downloaded database files, stored quick-searches,<br>"
+				+ "network download cache files, and program settings files.<br>"
+				+ "Quick searches (created with 'Edit/Search...': 'Create new menu command')<br>"
+				+ "are stored as files the file name extension '.bsh'. Such a file may be<br>"
+				+ "deleted, in case the custom search command is not needed any more.", "Information");
 		BackgroundTaskHelper.executeLaterOnSwingTask(2000, new Runnable() {
+			@Override
 			public void run() {
 				AttributeHelper.showInBrowser(ReleaseInfo.getAppFolder());
 			}

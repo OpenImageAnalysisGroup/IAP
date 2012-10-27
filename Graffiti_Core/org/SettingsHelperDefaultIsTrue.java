@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -14,25 +15,36 @@ import javax.swing.Timer;
  */
 public class SettingsHelperDefaultIsTrue implements HelperClass {
 	
-	public boolean isEnabled(String name) {
-		// if (ReleaseInfo.isRunningAsApplet())
-		// return true;
-		return !new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).exists();
+	public static boolean oldStyle = false;
+	
+	private static HashSet<String> trueSettings = new HashSet<String>();
+	
+	public synchronized boolean isEnabled(String name) {
+		trueSettings.add(name);
+		if (oldStyle)
+			return !new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).exists();
+		else
+			return SystemOptions.getInstance().getBoolean("VANTED", name, true);
 	}
 	
 	public static String encode(String name) {
 		return StringManipulationTools.removeHTMLtags(name).replaceAll(" ", "_").replaceAll("/", "_");
 	}
 	
-	public void setEnabled(String name, boolean b) {
-		if (!b)
-			try {
-				new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).createNewFile();
-			} catch (IOException e) {
-				ErrorMsg.addErrorMessage(e);
+	public synchronized void setEnabled(String name, boolean b) {
+		trueSettings.add(name);
+		if (oldStyle) {
+			if (!b)
+				try {
+					new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).createNewFile();
+				} catch (IOException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			else {
+				new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).delete();
 			}
-		else {
-			new File(ReleaseInfo.getAppFolderWithFinalSep() + "feature_disabled_" + encode(name)).delete();
+		} else {
+			SystemOptions.getInstance().setBoolean("VANTED", name, b);
 		}
 	}
 	
@@ -66,4 +78,8 @@ public class SettingsHelperDefaultIsTrue implements HelperClass {
 		return result;
 	}
 	
+	public synchronized static void resetAllKnown() {
+		for (String n : trueSettings)
+			new SettingsHelperDefaultIsTrue().setEnabled(n, true);
+	}
 }

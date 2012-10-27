@@ -18,8 +18,13 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
  */
 public final class ActionLemnaCamBarleyGH extends AbstractUrlNavigationAction {
 	
-	public ActionLemnaCamBarleyGH() {
-		super("Show Barley Greenhouse");
+	private final String url;
+	private final String title;
+	
+	public ActionLemnaCamBarleyGH(String tooltip, String url, String title) {
+		super(tooltip);
+		this.url = url;
+		this.title = title;
 	}
 	
 	/**
@@ -27,8 +32,12 @@ public final class ActionLemnaCamBarleyGH extends AbstractUrlNavigationAction {
 	 * @return
 	 */
 	public static NavigationButton getLemnaCamButton(GUIsetting guiSetting) {
-		NavigationAction navigationAction = new ActionLemnaCamBarleyGH();
-		NavigationButton res = new NavigationButton(navigationAction, "CCTV (Barley)",
+		String tooltip = "Show Barley Greenhouse";
+		String title = "CCTV (Barley)";
+		String url = "http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg";
+		NavigationAction navigationAction = new ActionLemnaCamBarleyGH(
+				tooltip, url, title);
+		NavigationButton res = new NavigationButton(navigationAction, title,
 				IAPimages.getWebCam(),
 				guiSetting);
 		return res;
@@ -36,7 +45,7 @@ public final class ActionLemnaCamBarleyGH extends AbstractUrlNavigationAction {
 	
 	@Override
 	public String getURL() {
-		return "http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg";
+		return url;
 	}
 	
 	@Override
@@ -60,7 +69,7 @@ public final class ActionLemnaCamBarleyGH extends AbstractUrlNavigationAction {
 		if (!IAPmain.getRunMode().isSwing())
 			return super.getDefaultTitle();
 		else
-			return "<html><center>CCTV (Barley)<br>" + status.getCurrentStatusMessage1();
+			return "<html><center>" + title + "<br>" + status.getCurrentStatusMessage1();
 	}
 	
 	@Override

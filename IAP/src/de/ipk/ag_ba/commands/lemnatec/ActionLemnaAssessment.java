@@ -45,7 +45,7 @@ public class ActionLemnaAssessment extends AbstractNavigationAction implements N
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("This command has no function when using the applet version of IAP.");
+		return new MainPanelComponent("This command has no function when using the desktop-mode of IAP.");
 	}
 	
 	@Override

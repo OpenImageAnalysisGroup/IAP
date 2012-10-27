@@ -47,18 +47,18 @@ public class SystemAnalysis {
 	public static int getNumberOfCPUs() {
 		if (fixedCPUload > 0)
 			return fixedCPUload;
-		boolean useHalfCPUpower = Runtime.getRuntime().availableProcessors() > 6;
-		// useHalfCPUpower = false;
+		int cpus = SystemOptions.getInstance().getInteger(
+				"SYSTEM", "cpu_n", Runtime.getRuntime().availableProcessors());
+		boolean useHalfCPUpower = SystemOptions.getInstance().getBoolean(
+				"SYSTEM", "cpu_use_half_n", cpus > 6);
 		if (fullPower)
 			useHalfCPUpower = false;
 		if (halfPower)
 			useHalfCPUpower = true;
-		int cpus = Runtime.getRuntime().availableProcessors();
 		if (useHalfCPUpower)
 			return (int) (cpus / 2d > 0 ? cpus / 2d : 1);
 		else
 			return cpus;
-		// return (int) (cpus * 4d / 5d) > 1 ? (int) (cpus * 4d / 5d) : cpus;
 	}
 	
 	public static int getNumberOfCPUs(

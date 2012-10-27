@@ -15,6 +15,7 @@ import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.nav.RimasNav;
@@ -76,7 +77,9 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		if (hsm != null && new File(hsm).exists()) {
 			// add HSM entry
 			Library lib = new Library();
-			DataSource dataSourceHsm = new HsmFileSystemSource(lib, "HSM Archive", hsm,
+			DataSource dataSourceHsm = new HsmFileSystemSource(lib,
+					IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
+					hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/folder-remote.png"));
@@ -85,7 +88,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			homePrimaryActions.add(hsmSrc);
 		}
 		
-		boolean vfs = false;
+		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
 		if (vfs) {
 			// add VFS entries
 			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
@@ -118,9 +121,18 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			}
 		}
 		
-		{
+		boolean ipk_bioinf = IAPoptions.getInstance().getBoolean("IPK-Tools", "show_icon", true);
+		if (ipk_bioinf) {
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
-					"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png");
+					"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png") {
+				
+				@Override
+				public void performActionCalculateResults(NavigationButton src) throws Exception {
+					IAPmain.prepareVantedPlugins();
+					super.performActionCalculateResults(src);
+				}
+				
+			};
 			ipkBioInf.setIntroductionText(
 					"<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
 							+ "developed at the IPK. The included data sources and tools have been "
@@ -132,10 +144,13 @@ public final class ActionIapHome extends AbstractNavigationAction {
 					"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);
+			
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
 		}
 		
-		homePrimaryActions.add(new NavigationButton(new ActionShowVANTED(), guiSetting));
+		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
+		if (vanted)
+			homePrimaryActions.add(new NavigationButton(new ActionShowVANTED(), guiSetting));
 	}
 	
 	ArrayList<NavigationButton> bookmarks;

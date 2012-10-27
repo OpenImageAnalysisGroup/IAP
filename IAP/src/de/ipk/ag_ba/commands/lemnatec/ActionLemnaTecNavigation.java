@@ -16,8 +16,11 @@ import de.ipk.ag_ba.commands.DataSourceNavigationAction;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.LemnaTecDokuSource;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -132,11 +135,14 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
-			HTTPfolderSource doku = new LemnaTecDokuSource();
-			NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
-			result.add(dokuButton);
+			if (IAPoptions.getInstance().getBoolean("LemnaTec-DB-Site-Documentation", "show_icon", true)) {
+				HTTPfolderSource doku = new LemnaTecDokuSource();
+				NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
+				result.add(dokuButton);
+			}
 			
-			result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
+			if (IAPmain.getRunMode() == IAPrunMode.WEB)
+				result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
 			
 			result.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
 			
