@@ -46,7 +46,6 @@ public class PipelineDesc {
 			@Override
 			public boolean accept(File f, String name) {
 				boolean a = name.endsWith(".pipeline.ini") && !name.equals(barleyFN);
-				System.out.println("FN=" + name + ", accept=" + a);
 				return a;
 			}
 		};
