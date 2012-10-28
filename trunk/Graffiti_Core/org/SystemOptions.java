@@ -3,6 +3,7 @@ package org;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.ini4j.Ini;
 
@@ -194,6 +195,61 @@ public class SystemOptions {
 				return defaultValue;
 			} else
 				return r;
+		}
+	}
+	
+	public synchronized ArrayList<String> getSectionTitles() {
+		ArrayList<String> res = new ArrayList<String>();
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			return res;
+		} else {
+			for (String s : ini.keySet())
+				res.add(s);
+		}
+		return res;
+	}
+	
+	public synchronized ArrayList<String> getSectionSettings(String section) {
+		ArrayList<String> res = new ArrayList<String>();
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			return res;
+		} else {
+			for (String s : ini.get(section).keySet())
+				res.add(s);
+		}
+		return res;
+	}
+	
+	public synchronized String getObject(String section, String setting) {
+		return StringManipulationTools.getStringList(ini.get(section).getAll(setting), ", ");
+	}
+	
+	public synchronized boolean isBooleanSetting(String section, String setting) {
+		String v = ini.get(section).get(setting);
+		return v != null && (v.equals("true") || v.equals("false"));
+	}
+	
+	public synchronized boolean isIntegerSetting(String section, String setting) {
+		String v = ini.get(section).get(setting);
+		Integer i = null;
+		try {
+			i = Integer.parseInt(v);
+			return i != Integer.MAX_VALUE;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public synchronized boolean isFloatSetting(String section, String setting) {
+		String v = ini.get(section).get(setting);
+		Double d = null;
+		try {
+			d = Double.parseDouble(v);
+			return !Double.isNaN(d);
+		} catch (Exception e) {
+			return false;
 		}
 	}
 }

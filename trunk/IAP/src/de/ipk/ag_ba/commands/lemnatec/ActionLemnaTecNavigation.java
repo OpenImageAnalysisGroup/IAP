@@ -136,7 +136,7 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
-			if (IAPoptions.getInstance().getBoolean("LemnaTec-DB-Site-Documentation", "show_icon", true)) {
+			if (IAPoptions.getInstance().getBoolean("LemnaTec-Site-Documentation", "show_icon", true)) {
 				HTTPfolderSource doku = new LemnaTecDokuSource();
 				NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
 				result.add(dokuButton);

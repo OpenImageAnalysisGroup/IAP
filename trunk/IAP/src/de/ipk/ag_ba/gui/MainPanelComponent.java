@@ -60,6 +60,7 @@ public class MainPanelComponent {
 			jep.setBackground(Colors.brighten(MyNavigationPanel.getTabColor(), 0.8, 1.2));
 			
 			jep.addHyperlinkListener(new HyperlinkListener() {
+				@Override
 				public void hyperlinkUpdate(HyperlinkEvent e) {
 					if (e.getEventType() == HyperlinkEvent.EventType.ENTERED)
 						jep.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -113,6 +114,18 @@ public class MainPanelComponent {
 		} else {
 			this.component = ip;
 		}
+	}
+	
+	public MainPanelComponent(ArrayList<JComponent> res, int border) {
+		JComponent jp = new JPanel(new FlowLayoutImproved(FlowLayout.LEFT, border, border));
+		jp.setOpaque(false);
+		
+		for (JComponent jc : res)
+			jp.add(jc);
+		
+		jp.validate();
+		
+		this.component = jp;
 	}
 	
 	private static ArrayList<String> getList(String htmlTextPanel) {

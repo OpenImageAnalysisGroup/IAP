@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -3601,7 +3601,7 @@ public class AttributeHelper implements HelperClass {
 		if (SystemAnalysis.isWindowsRunning()) {
 			// explorer.exe /select,"file" ==> select in file explorer
 			Runtime r = Runtime.getRuntime();
-			r.exec(new String[] { "explorer.exe", "/select,+\"" + folder + fn + "\"" }, null, null);
+			r.exec(new String[] { System.getenv("windir") + "\\explorer.exe", "/select,\"" + fileName + "\"" }, null, new File(folder));
 		} else {
 			if (SystemAnalysis.isMacRunning()) {
 				// open -R ==> reveal in Finder
