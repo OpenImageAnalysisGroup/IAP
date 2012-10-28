@@ -179,7 +179,7 @@ public class MassCopySupport {
 							MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
 									+ SystemAnalysis.getWaitTime(processingTime));
 						}
-						if (SystemOptions.getInstance().getBoolean("GRID-COMPUTING", "remote_execution", true)) {
+						if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true)) {
 							ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
 							status.setCurrentStatusText2("Schedule analysis tasks for new data");
 							all.setStatusProvider(getStatusProvider());

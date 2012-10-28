@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
@@ -146,11 +147,17 @@ public final class ActionIapHome extends AbstractNavigationAction {
 				ipkBioInf.addAdditionalEntity(nge);
 			
 			homePrimaryActions.add(new NavigationButton(ipkBioInf, guiSetting));
+			
 		}
 		
 		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
 		if (vanted)
 			homePrimaryActions.add(new NavigationButton(new ActionShowVANTED(), guiSetting));
+		
+		boolean showSetting = SystemOptions.getInstance().getBoolean("IAP", "show_settings_icon", true);
+		if (showSetting) {
+			homePrimaryActions.add(new NavigationButton(new ActionSetup("Configure the system"), guiSetting));
+		}
 	}
 	
 	ArrayList<NavigationButton> bookmarks;

@@ -120,8 +120,8 @@ public class IAPmain extends JApplet {
 		GravistoPreferences prefs = GravistoPreferences.userNodeForPackage(IAPmain.class);
 		
 		GravistoPreferences uiPrefs = prefs.node("ui");
-		uiPrefs.put("showPluginManagerMenuOptions", getOptions().getBoolean("VANTED", "showPluginManagerMenuOptions", false) + "");
-		uiPrefs.put("showPluginMenu", getOptions().getBoolean("VANTED", "showPluginMenu", false) + "");
+		uiPrefs.put("showPluginManagerMenuOptions", getOptions().getBoolean("VANTED", "debug show plugin_manager_menu_options", false) + "");
+		uiPrefs.put("showPluginMenu", getOptions().getBoolean("VANTED", "debug show plugin_menu", false) + "");
 		JPanel statusPanel = new JPanel();
 		
 		mainFrame1 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
@@ -419,25 +419,25 @@ public class IAPmain extends JApplet {
 			// see
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return getOptions().getBoolean("HEADLESS_GRID", "remote_execution", true);
+					return getOptions().getBoolean("HEADLESS", "grid_remote_execution", true);
 				case SAVE_DEBUG_STACK:
-					return getOptions().getBoolean("HEADLESS_DEBUG", "save_stack", false);
+					return getOptions().getBoolean("HEADLESS", "debug_save_stack", false);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return getOptions().getBoolean("HEADLESS_HSM", "auto_copy", false);
+					return getOptions().getBoolean("HEADLESS", "hsm_auto_copy", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return getOptions().getBoolean("HEADLESS_GRID", "delete_jobs_when_grid_node_becomes_active", false);
+					return getOptions().getBoolean("HEADLESS", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}
 		} else {
 			// these may be changed for interactive applet version !!!
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return getOptions().getBoolean("GRID-COMPUTING", "remote_execution", true);
+					return getOptions().getBoolean("IAP", "grid_remote_execution", true);
 				case SAVE_DEBUG_STACK:
-					return getOptions().getBoolean("DEBUG", "save_stack", false);
+					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
 					return getOptions().getBoolean("ARCHIVE", "auto_copy", false);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return getOptions().getBoolean("GRID-COMPUTING", "delete_jobs_when_grid_node_becomes_active", false);
+					return getOptions().getBoolean("IAP", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}
 		}
 		return false;

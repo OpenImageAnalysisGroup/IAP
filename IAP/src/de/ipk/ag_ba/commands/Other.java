@@ -152,7 +152,7 @@ public class Other {
 				
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
-				if (SystemOptions.getInstance().getBoolean("GRID-COMPUTING", "remote_execution", true)) {
+				if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true)) {
 					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 					for (MongoDB m : MongoDB.getMongos()) {
 						try {
