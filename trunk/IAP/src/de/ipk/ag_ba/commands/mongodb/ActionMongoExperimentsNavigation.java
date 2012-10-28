@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.TreeMap;
 
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.mongodb.BasicDBObject;
@@ -34,6 +35,8 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -83,7 +86,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			res.add(Other.getServerStatusEntity(false, "<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
 		} else {
 			if (!limitToResuls) {
-				res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
+				if (IAPmain.getRunMode() == IAPrunMode.WEB)
+					res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 				
 				if (!SystemAnalysis.isHeadless())
 					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
@@ -134,11 +138,12 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				
 				if (!limitToResuls)
 					if (currentUser == null || !currentUser.equals("public"))
-						res.add(new NavigationButton(
-								new CloundManagerNavigationAction(m,
-										new ActionMongoExperimentsNavigation(m, false, true),
-										false),
-								src.getGUIsetting()));
+						if (SystemOptions.getInstance().getBoolean("GRID-COMPUTING", "remote_execution", true))
+							res.add(new NavigationButton(
+									new CloundManagerNavigationAction(m,
+											new ActionMongoExperimentsNavigation(m, false, true),
+											false),
+									src.getGUIsetting()));
 				
 				if (!limitToResuls)
 					if (currentUser == null || !currentUser.equals("public"))

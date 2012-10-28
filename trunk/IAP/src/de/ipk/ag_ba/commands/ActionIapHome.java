@@ -88,7 +88,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			homePrimaryActions.add(hsmSrc);
 		}
 		
-		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
+		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", false);
 		if (vfs) {
 			// add VFS entries
 			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {

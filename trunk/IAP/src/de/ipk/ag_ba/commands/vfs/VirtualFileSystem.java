@@ -1,15 +1,20 @@
 package de.ipk.ag_ba.commands.vfs;
 
+import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ReleaseInfo;
+import org.StringManipulationTools;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.vanted.plugin.VfsFileProtocol;
 
 /**
  * @author klukas
@@ -20,6 +25,41 @@ public abstract class VirtualFileSystem {
 	
 	public static ArrayList<VirtualFileSystem> getKnown() {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>(knownFileSystems);
+		
+		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", false);
+		int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
+		int realN = n;
+		if (n < 1)
+			n = 1;
+		
+		for (int idx = 1; idx <= n; idx++) {
+			boolean en = SystemOptions.getInstance().getBoolean("VFS-" + idx, "enabled", false);
+			String url_prefix = SystemOptions.getInstance().getString("VFS-" + idx, "url_prefix", "desktop");
+			String desc = SystemOptions.getInstance().getString("VFS-" + idx, "description",
+					"File storage on a folder on the desktop");
+			VfsFileProtocol vfs_type = VfsFileProtocol.LOCAL;
+			String types = VfsFileProtocol.LOCAL + "";
+			if (idx > 1) {
+				String s = StringManipulationTools.getStringList(VfsFileProtocol.values(), ",");
+				types = "#valid: " + s;
+			}
+			try {
+				String s = SystemOptions.getInstance().getString("VFS-" + idx, "vfs_type", types);
+				vfs_type = VfsFileProtocol.valueOf(s);
+			} catch (Exception e) {
+				SystemOptions.getInstance().setString("VFS-" + idx, "vfs_type", types);
+			}
+			String protocol_desc = SystemOptions.getInstance().getString("VFS-" + idx, "protocol_description",
+					idx < 2 ? "local file I/O" : "#protocol description");
+			String host = SystemOptions.getInstance().getString("VFS-" + idx, "host", idx < 2 ? "" : "#IP/hostname");
+			String user = SystemOptions.getInstance().getString("VFS-" + idx, "user", idx < 2 ? "null" : "");
+			String pass = SystemOptions.getInstance().getString("VFS-" + idx, "pass", idx < 2 ? "null" : "");
+			String dir = SystemOptions.getInstance().getString("VFS-" + idx, "directory",
+					idx < 2 ? ReleaseInfo.getDesktopFolder() + File.separator + "IAP" : "#/subdir");
+			VirtualFileSystemVFS2 v = new VirtualFileSystemVFS2(url_prefix, vfs_type, desc, protocol_desc, host, user, pass, dir);
+			if (en && enabled && idx <= realN)
+				res.add(v);
+		}
 		// res.add(new VirtualFileSystemFolderStorage(
 		// "file-desktop",
 		// "File I/O",
