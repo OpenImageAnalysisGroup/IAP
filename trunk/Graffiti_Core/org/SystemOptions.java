@@ -125,6 +125,21 @@ public class SystemOptions {
 		}
 	}
 	
+	public synchronized void setInteger(String group, String setting, Integer value) {
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
+			return;
+		} else {
+			ini.put(group, setting, value);
+			try {
+				ini.store();
+			} catch (IOException e) {
+				e.printStackTrace();
+				ErrorMsg.addErrorMessage(e);
+			}
+		}
+	}
+	
 	public synchronized double getDouble(String group, String setting, double defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
@@ -142,6 +157,21 @@ public class SystemOptions {
 				return defaultValue;
 			} else
 				return r;
+		}
+	}
+	
+	public synchronized void setDouble(String group, String setting, Double value) {
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
+			return;
+		} else {
+			ini.put(group, setting, value);
+			try {
+				ini.store();
+			} catch (IOException e) {
+				e.printStackTrace();
+				ErrorMsg.addErrorMessage(e);
+			}
 		}
 	}
 	
@@ -236,8 +266,14 @@ public class SystemOptions {
 		return res;
 	}
 	
-	public synchronized String getObject(String section, String setting) {
-		return StringManipulationTools.getStringList(ini.get(section).getAll(setting), ", ");
+	public synchronized String getObject(String section, String setting, int returnMax) {
+		ArrayList<String> items = new ArrayList<String>(ini.get(section).getAll(setting));
+		if (returnMax > 0 && items.size() > returnMax) {
+			while (items.size() > returnMax)
+				items.remove(returnMax);
+			items.add("...");
+		}
+		return StringManipulationTools.getStringList(items, ", ");
 	}
 	
 	public synchronized boolean isBooleanSetting(String section, String setting) {
@@ -265,5 +301,12 @@ public class SystemOptions {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public void setStringArray(String group, String setting, ArrayList<String> newValues) {
+		Ini.Section section = ini.get(group);
+		section.remove(setting);
+		for (String nv : newValues)
+			section.add(setting, nv);
 	}
 }
