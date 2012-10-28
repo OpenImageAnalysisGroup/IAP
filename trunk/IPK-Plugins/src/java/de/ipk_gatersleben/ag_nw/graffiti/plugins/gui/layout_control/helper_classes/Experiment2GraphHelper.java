@@ -175,6 +175,8 @@ public class Experiment2GraphHelper implements BackgroundTaskStatusProviderSuppo
 			Collection<org.graffiti.graph.GraphElement> targetGraphElements, Graph addNewGraphElementsToThisGraph,
 			boolean doUserMapping, String diagramStyle, int minimumLines, int diagramsPerRow, boolean considerCompoundDb,
 			boolean considerEnzymeDb, boolean considerKoDb, boolean considerMappingToKEGGmapNodes, boolean selectResult) {
+		if (mappingData == null)
+			return null;
 		MapResult mapResult = new MapResult();
 		progressValue = -1;
 		pleaseStop = false;

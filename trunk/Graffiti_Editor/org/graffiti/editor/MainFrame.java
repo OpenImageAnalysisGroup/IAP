@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.7 2012-08-01 19:53:33 klukas Exp $
+// $Id: MainFrame.java,v 1.8 2012-10-28 20:35:57 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -186,7 +186,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 		UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -2819,6 +2819,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 					JFileChooser fc = new JFileChooser();
 					fc.showOpenDialog(null);
 					File selFile = fc.getSelectedFile();
+					if (selFile == null)
+						return;
 					String err = null;
 					try {
 						Preferences.importPreferences(new FileInputStream(selFile));
@@ -2847,6 +2849,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 					JFileChooser fc = new JFileChooser();
 					fc.showSaveDialog(null);
 					File selFile = fc.getSelectedFile();
+					if (selFile == null)
+						return;
 					String err = null;
 					try {
 						Preferences prefs = Preferences.userNodeForPackage(GraffitiEditor.class);

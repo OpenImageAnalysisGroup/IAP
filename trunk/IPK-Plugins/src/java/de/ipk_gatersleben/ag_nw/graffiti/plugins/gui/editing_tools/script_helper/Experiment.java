@@ -831,15 +831,16 @@ public class Experiment implements ExperimentInterface {
 	
 	public static String[] getTimes(ExperimentInterface experimentData) {
 		TreeSet<String> times = new TreeSet<String>();
-		for (SubstanceInterface md : experimentData) {
-			for (ConditionInterface sd : md) {
-				for (SampleInterface s : sd) {
-					String t = s.getSampleTime();
-					if (!t.equals("-1 -1"))
-						times.add(t);
+		if (experimentData != null)
+			for (SubstanceInterface md : experimentData) {
+				for (ConditionInterface sd : md) {
+					for (SampleInterface s : sd) {
+						String t = s.getSampleTime();
+						if (!t.equals("-1 -1"))
+							times.add(t);
+					}
 				}
 			}
-		}
 		if (times.size() > 0)
 			return times.toArray(new String[] {});
 		else
@@ -849,11 +850,12 @@ public class Experiment implements ExperimentInterface {
 	public static String[] getConditionsAsString(
 			ExperimentInterface experimentData) {
 		TreeSet<String> plants = new TreeSet<String>();
-		for (SubstanceInterface md : experimentData) {
-			for (ConditionInterface sd : md) {
-				plants.add(sd.getConditionName());
+		if (experimentData != null)
+			for (SubstanceInterface md : experimentData) {
+				for (ConditionInterface sd : md) {
+					plants.add(sd.getConditionName());
+				}
 			}
-		}
 		if (plants.size() > 0)
 			return plants.toArray(new String[] {});
 		else

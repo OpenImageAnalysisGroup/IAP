@@ -100,6 +100,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		setExperimentData(null);
 	}
 	
+	@Override
 	public boolean activeForView(View v) {
 		activeView = v;
 		return true;
@@ -108,13 +109,13 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 	@Override
 	public String getDescription() {
 		return "<html>" + "Data mapping is performed, by connecting measured data with<br>"
-							+ "corresponding network nodes or eges of the current graph.<br><br><small>"
-							+ "If no graph window is open, a new graph will be created.<br><br>"
-							+ "By default the connection is established, in case a substance name<br>"
-							+ "is equal to a node label. Optionally additional data annotations<br>"
-							+ "or build-in synonyme databases may be used to connect data.<br>"
-							+ "To map data to edges, edge labels could be specified, or experiment data<br>"
-							+ "substance names specify source and target node label, divided by '^'.<br><br>" + "";
+				+ "corresponding network nodes or eges of the current graph.<br><br><small>"
+				+ "If no graph window is open, a new graph will be created.<br><br>"
+				+ "By default the connection is established, in case a substance name<br>"
+				+ "is equal to a node label. Optionally additional data annotations<br>"
+				+ "or build-in synonyme databases may be used to connect data.<br>"
+				+ "To map data to edges, edge labels could be specified, or experiment data<br>"
+				+ "substance names specify source and target node label, divided by '^'.<br><br>" + "";
 	}
 	
 	@Override
@@ -124,9 +125,9 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		
 		if (activeView != null)
 			parameters.add(new BooleanParameter(true,
-								"<html>Create new nodes or edges for measured<br>substances that can not be mapped", "<html>"
-													+ "Hint: Use substance IDs like A^B to specify edge datamapping<br>"
-													+ "for edges with no edge label, connecting node A and B."));
+					"<html>Create new nodes or edges for measured<br>substances that can not be mapped", "<html>"
+							+ "Hint: Use substance IDs like A^B to specify edge datamapping<br>"
+							+ "for edges with no edge label, connecting node A and B."));
 		
 		if (activeView != null) {
 			parameters.add(new BooleanParameter(true, "<html>Consider compound synonyms", null));
@@ -137,12 +138,12 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 				parameters.add(new BooleanParameter(false, "<html>Consider KO database IDs, Gene IDs", null));
 				
 				parameters.add(new BooleanParameter(false, "<html>Map to KEGG map nodes (requires SOAP access)", "<html>"
-									+ "If enabled, KO, Compound and Enzyme elements of a map link node<br>"
-									+ "are retrieved via KEGG SOAP API, to enable mapping onto map nodes."));
+						+ "If enabled, KO, Compound and Enzyme elements of a map link node<br>"
+						+ "are retrieved via KEGG SOAP API, to enable mapping onto map nodes."));
 			}
 		}
 		parameters.add(new IntegerParameter(0, "Minimum condition count", "<html>"
-							+ "Omit mapping in case minimum<br>condition count is not met."));
+				+ "Omit mapping in case minimum<br>condition count is not met."));
 		
 		dropDownChartStyle = new JComboBox();
 		dropDownChartStyle.setOpaque(false);
@@ -193,7 +194,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		cc.remove(GraffitiCharts.LEGEND_ONLY);
 		
 		ObjectListParameter chartOption = new ObjectListParameter(initChartStyle, "Initial charting-style",
-							"You may later use the Node-/Edge-Sidepanels to modify the charting style.", cc);
+				"You may later use the Node-/Edge-Sidepanels to modify the charting style.", cc);
 		
 		chartOption.setRenderer(new MyChartCellRenderer());
 		
@@ -205,8 +206,8 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 				if (i != 0)
 					validOptions.add(i);
 			ObjectListParameter chartNumbers = new ObjectListParameter(numberOfChartsInRow, "<html>"
-								+ "Number of charts in a row inside drawing area<br>" + "(in case of multiple data mappings)",
-								"Specifies the display configuration for multiple data mappings.", validOptions);
+					+ "Number of charts in a row inside drawing area<br>" + "(in case of multiple data mappings)",
+					"Specifies the display configuration for multiple data mappings.", validOptions);
 			MyDiagramPlacementSettingCellRenderer rr2 = new MyDiagramPlacementSettingCellRenderer();
 			chartNumbers.setRenderer(rr2);
 			parameters.add(chartNumbers);
@@ -252,7 +253,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		boolean doLayoutP = graph == null;
 		final boolean doLayout = doLayoutP;
 		final Collection<GraphElement> selectedGraphElements = selection != null ? selection.getElements()
-							: new ArrayList<GraphElement>();
+				: new ArrayList<GraphElement>();
 		final int diagramsPerRow = numberOfChartsInRow;
 		
 		Graph workGraph = this.graph;
@@ -262,23 +263,24 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		
 		final Experiment2GraphHelper mappingService = new Experiment2GraphHelper();
 		BackgroundTaskHelper bth = new BackgroundTaskHelper(getMappingTask(experimentData,
-							addNewNodesForNotMappedSubstances, doLayout, selectedGraphElements, mappingService, minimumLineCount,
-							diagramsPerRow, considerCompoundDb, considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes,
-							workGraph), mappingService, "Data Mapping", "Data Mapping Task", true, false);
+				addNewNodesForNotMappedSubstances, doLayout, selectedGraphElements, mappingService, minimumLineCount,
+				diagramsPerRow, considerCompoundDb, considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes,
+				workGraph), mappingService, "Data Mapping", "Data Mapping Task", true, false);
 		bth.startWork(this);
 	}
 	
 	private Runnable getMappingTask(final ExperimentInterface doc, final boolean createNodesIfNotMapped,
-						final boolean doLayout, final Collection<GraphElement> selectedGraphElements,
-						final Experiment2GraphHelper mappingService, final int minimumLineCount, final int diagramsPerRow,
-						final boolean considerCompoundDb, final boolean considerEnzymeDb, final boolean considerKoDb,
-						final boolean considerMappingToKEGGmapNodes, final Graph workGraph) {
+			final boolean doLayout, final Collection<GraphElement> selectedGraphElements,
+			final Experiment2GraphHelper mappingService, final int minimumLineCount, final int diagramsPerRow,
+			final boolean considerCompoundDb, final boolean considerEnzymeDb, final boolean considerKoDb,
+			final boolean considerMappingToKEGGmapNodes, final Graph workGraph) {
 		return new Runnable() {
+			@Override
 			public void run() {
 				doMapping(doc, createNodesIfNotMapped,
-									doLayout,// workSession,
+						doLayout,// workSession,
 						selectedGraphElements, mappingService, minimumLineCount, diagramsPerRow, considerCompoundDb,
-									considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes, workGraph);
+						considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes, workGraph);
 			}
 		};
 	}
@@ -306,6 +308,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 		return res;
 	}
 	
+	@Override
 	public String getName() {
 		if (activeView != null)
 			return "<html><center>Perform data mapping<br><small>(integrate data into network)";
@@ -329,10 +332,10 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 	}
 	
 	private synchronized void doMapping(final ExperimentInterface md, final boolean createNodesIfNotMapped,
-						final boolean doLayout, final Collection<GraphElement> selectedGraphElements,
-						final Experiment2GraphHelper mappingService, final int minimumLineCount, final int diagramsPerRow,
-						final boolean considerCompoundDb, final boolean considerEnzymeDb, final boolean considerKoDb,
-						final boolean considerMappingToKEGGmapNodes, Graph workGraph) {
+			final boolean doLayout, final Collection<GraphElement> selectedGraphElements,
+			final Experiment2GraphHelper mappingService, final int minimumLineCount, final int diagramsPerRow,
+			final boolean considerCompoundDb, final boolean considerEnzymeDb, final boolean considerKoDb,
+			final boolean considerMappingToKEGGmapNodes, Graph workGraph) {
 		final EditorSession newlyCreatedWorkSession;
 		if (workGraph == null && showResult() != ShowMappingResults.MAP_WITHOUT_VIEW) {
 			newlyCreatedWorkSession = GravistoService.getInstance().getMainFrame().createNewSession();
@@ -344,8 +347,8 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 			workGraph.getListenerManager().transactionStarted(this);
 			
 			final MapResult mapResult = mappingService.mapDataToGraphElements(true, md, selectedGraphElements,
-								(createNodesIfNotMapped ? workGraph : null), false, diagramStyleRef.getName(), minimumLineCount,
-								diagramsPerRow, considerCompoundDb, considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes, true);
+					(createNodesIfNotMapped ? workGraph : null), false, diagramStyleRef.getName(), minimumLineCount,
+					diagramsPerRow, considerCompoundDb, considerEnzymeDb, considerKoDb, considerMappingToKEGGmapNodes, true);
 			
 			boolean colorize = true;
 			
@@ -368,7 +371,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 							int rgb = Color.HSBtoRGB(hue, saturation, brightness);
 							// AttributeHelper.setFillColor(n, new Color(rgb));
 							AttributeHelper.setAttribute(n, "charting", "background_color", ColorUtil
-												.getHexFromColor(new Color(rgb)));
+									.getHexFromColor(new Color(rgb)));
 							AttributeHelper.setOutlineColor(n, new Color(rgb));
 							AttributeHelper.setSize(n, 80, 120);
 						}
@@ -400,8 +403,8 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 							if (ge instanceof Node) {
 								Node n = (Node) ge;
 								Collection<GraphElement> shortestPathNodesAndEdges = WeightedShortestPathSelectionAlgorithm
-													.getShortestPathElements(rg.getGraphElements(), n, mappedNodes, false, false, false,
-																		Double.MAX_VALUE, null, false, false, false);
+										.getShortestPathElements(rg.getGraphElements(), n, mappedNodes, false, false, false,
+												Double.MAX_VALUE, null, false, false, false);
 								elements.addAll(shortestPathNodesAndEdges);
 							}
 						}
@@ -419,34 +422,36 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 					sel.addAll(selectedGraphElements);
 					if (showResult() == ShowMappingResults.NORMAL)
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								MainFrame.getInstance().setActiveSession(newlyCreatedWorkSession, activeView);
 								MainFrame.getInstance().showViewChooserDialog(newlyCreatedWorkSession, false, ae);
 								MainFrame.showMessageDialog("<html>" + mapResult.substanceCount
-													+ " substance IDs have been used to create a new target graph.<br>"
-													+ "Mapping Details:<ul>" + "<li>" + mapResult.newNodes + " new nodes and "
-													+ mapResult.newEdges + " edges have been created.<br>" + "<li>"
-													+ mapResult.targetCountNodes + " nodes and " + mapResult.targetCountEdges
-													+ " edges contain data mappings from this operation.<br>" + "<li>At least "
-													+ mapResult.minMappingCount + " and at most " + mapResult.maxMappingCount + " substance"
-													+ (mapResult.maxMappingCount > 1 ? "s" : "") + " map"
-													+ (mapResult.maxMappingCount > 1 ? "" : "s") + " to a single graph element." + "</ul>",
-													"Results of Data Mapping");
+										+ " substance IDs have been used to create a new target graph.<br>"
+										+ "Mapping Details:<ul>" + "<li>" + mapResult.newNodes + " new nodes and "
+										+ mapResult.newEdges + " edges have been created.<br>" + "<li>"
+										+ mapResult.targetCountNodes + " nodes and " + mapResult.targetCountEdges
+										+ " edges contain data mappings from this operation.<br>" + "<li>At least "
+										+ mapResult.minMappingCount + " and at most " + mapResult.maxMappingCount + " substance"
+										+ (mapResult.maxMappingCount > 1 ? "s" : "") + " map"
+										+ (mapResult.maxMappingCount > 1 ? "" : "s") + " to a single graph element." + "</ul>",
+										"Results of Data Mapping");
 							}
 						});
 				} else {
 					if (showResult() == ShowMappingResults.NORMAL)
-						MainFrame.showMessageDialog("<html>" + mapResult.substanceCount
-											+ " substances have been mapped onto graph " + workGraph.getName() + ".<br>" + "<br>"
-											+ "Mapping Details:<ul>" + "<li>" + mapResult.newNodes + " new nodes and " + mapResult.newEdges
-											+ " edges have been created." + "<li>" + mapResult.targetCountNodes + " nodes and "
-											+ mapResult.targetCountEdges + " edges contain data mappings from this operation.<br>"
-											+ "<li>At least " + mapResult.minMappingCount + " and at most " + mapResult.maxMappingCount
-											+ " substance" + (mapResult.maxMappingCount > 1 ? "s" : "") + " map"
-											+ (mapResult.maxMappingCount > 1 ? "" : "s") + " to a single graph element." + "</ul><br>"
-											+ "Graph elements with a new data mapping have been selected.<br><br>"
-											+ "Hint: To limit the target scope of this operation you may select graph<br>"
-											+ "elements before performing the data mapping.", "Data Mapping Results");
+						if (mapResult != null)
+							MainFrame.showMessageDialog("<html>" + mapResult.substanceCount
+									+ " substances have been mapped onto graph " + workGraph.getName() + ".<br>" + "<br>"
+									+ "Mapping Details:<ul>" + "<li>" + mapResult.newNodes + " new nodes and " + mapResult.newEdges
+									+ " edges have been created." + "<li>" + mapResult.targetCountNodes + " nodes and "
+									+ mapResult.targetCountEdges + " edges contain data mappings from this operation.<br>"
+									+ "<li>At least " + mapResult.minMappingCount + " and at most " + mapResult.maxMappingCount
+									+ " substance" + (mapResult.maxMappingCount > 1 ? "s" : "") + " map"
+									+ (mapResult.maxMappingCount > 1 ? "" : "s") + " to a single graph element." + "</ul><br>"
+									+ "Graph elements with a new data mapping have been selected.<br><br>"
+									+ "Hint: To limit the target scope of this operation you may select graph<br>"
+									+ "elements before performing the data mapping.", "Data Mapping Results");
 				}
 			}
 		} catch (NullPointerException e) {

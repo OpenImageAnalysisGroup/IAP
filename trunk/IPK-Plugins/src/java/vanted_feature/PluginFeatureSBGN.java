@@ -14,11 +14,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.IPK_PluginAdapter;
  * @author Christian Klukas
  */
 public class PluginFeatureSBGN
-					extends IPK_PluginAdapter {
+		extends IPK_PluginAdapter {
 	
 	public PluginFeatureSBGN() {
-		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR)
-			ReleaseInfo.enableFeature(FeatureSet.SBGN);
+		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.SBGN))
+			if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR)
+				ReleaseInfo.enableFeature(FeatureSet.SBGN);
 	}
 	
 	/*

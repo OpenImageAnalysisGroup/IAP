@@ -63,7 +63,7 @@ public class ReleaseInfo implements HelperClass {
 				if (ReleaseInfo.isRunningAsApplet())
 					return false;
 				else
-					return true;
+					return SystemOptions.getInstance().getBoolean("VANTED", "debug_enable_addon_loading", false);
 			case KEGG_ACCESS:
 				if ((new File(getAppFolderWithFinalSep() + "license_kegg_accepted")).exists())
 					return true;
@@ -79,11 +79,12 @@ public class ReleaseInfo implements HelperClass {
 				else
 					return false;
 			case TRANSPATH_ACCESS:
-				if (currentRelease == Release.DEBUG
-						|| currentRelease == Release.RELEASE_IPK)
-					return true;
-				else
-					return false;
+				return false;
+				// if (currentRelease == Release.DEBUG
+				// || currentRelease == Release.RELEASE_IPK)
+				// return true;
+				// else
+				// return false;
 			case URL_HELPTEXT:
 				if (currentRelease == Release.DEBUG
 						|| currentRelease == Release.RELEASE_IPK)
@@ -157,7 +158,10 @@ public class ReleaseInfo implements HelperClass {
 			case FUNCAT_ACCESS:
 				return true;
 			case SBGN:
-				return false;
+				if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
+					return false;
+				else
+					return SystemOptions.getInstance().getBoolean("VANTED", "legacy_sbgn_support", true);
 			case URL_NODE_ANNOTATION:
 				if (currentRelease == Release.KGML_EDITOR)
 					return false;

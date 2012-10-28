@@ -393,7 +393,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		result.setIcon(GenericPluginAdapter.getAddonIcon());
 		if (AddonManagerPlugin.getInstance() == null) {
 			result.setEnabled(false);
-			result.setText("<html>" + result.getText() + "<br>(Add-on manager plugin not available)");
+			result.setText("<html>" + result.getText() + "<br>(Add-on manager disabled)<br>&nbsp;");
 		}
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {

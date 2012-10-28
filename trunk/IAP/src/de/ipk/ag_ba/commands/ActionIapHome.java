@@ -150,7 +150,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			
 		}
 		
-		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
+		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", false);
 		if (vanted)
 			homePrimaryActions.add(new NavigationButton(new ActionShowVANTED(), guiSetting));
 		

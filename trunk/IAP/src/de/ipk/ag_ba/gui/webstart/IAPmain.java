@@ -108,7 +108,8 @@ public class IAPmain extends JApplet {
 		if (getRunMode() == IAPrunMode.UNKNOWN)
 			setRunMode(IAPrunMode.SWING_APPLET);
 		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
-		ReleaseInfo.setRunningAsApplet(this);
+		if (getRunMode() == IAPrunMode.SWING_APPLET)
+			ReleaseInfo.setRunningAsApplet(this);
 		
 		setupLogger();
 		
@@ -332,7 +333,7 @@ public class IAPmain extends JApplet {
 			System.exit(1);
 		}
 		
-		final boolean onStartup = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", true);
+		final boolean onStartup = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", false);
 		final boolean onDemand = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_demand", true);
 		if (onStartup) {
 			try {
