@@ -7,6 +7,7 @@ import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 public class ActionSettingsEditor extends AbstractNavigationAction {
 	
@@ -41,7 +42,81 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 						boolean enabled = SystemOptions.getInstance(iniFileName).getBoolean(section, setting, false);
 						enabled = !enabled;
 						SystemOptions.getInstance(iniFileName).setBoolean(section, setting, enabled);
-					}
+					} else
+						if (isInteger) {
+							Object[] inp = MyInputHelper.getInput("Please enter a whole number:",
+									"Modify "
+											+ setting,
+									setting, SystemOptions.getInstance(iniFileName).getInteger(section, setting, 0));
+							if (inp != null) {
+								if (inp.length == 1) {
+									Object o = inp[0];
+									if (o != null && o instanceof Integer) {
+										SystemOptions.getInstance(iniFileName).setInteger(section, setting, (Integer) o);
+									}
+								}
+							}
+						} else
+							if (isFloat) {
+								Object[] inp = MyInputHelper.getInput("Please enter a (floating point) number:",
+										"Modify "
+												+ setting,
+										setting, SystemOptions.getInstance(iniFileName).getDouble(section, setting, 0d));
+								if (inp != null) {
+									if (inp.length == 1) {
+										Object o = inp[0];
+										if (o != null && o instanceof Double) {
+											SystemOptions.getInstance(iniFileName).setDouble(section, setting, (Double) o);
+										}
+									}
+								}
+							} else {
+								String[] ss = SystemOptions.getInstance(iniFileName).getStringAll(section, setting, new String[] {});
+								boolean isString = ss.length == 1;
+								boolean isStringArray = ss.length > 1;
+								if (isString) {
+									Object[] inp = MyInputHelper.getInput("You may modify the text:",
+											"Modify "
+													+ setting,
+											setting, SystemOptions.getInstance(iniFileName).getString(section, setting, ""));
+									if (inp != null) {
+										if (inp.length == 1) {
+											Object o = inp[0];
+											if (o != null && o instanceof String) {
+												SystemOptions.getInstance(iniFileName).setString(section, setting, (String) o);
+											}
+										}
+									}
+								} else
+									if (isStringArray) {
+										ArrayList<String> entries = new ArrayList<String>();
+										int line = 1;
+										for (String sl : ss) {
+											entries.add("Item " + (line++));
+											entries.add(sl);
+										}
+										Object[] inp = MyInputHelper.getInput(
+												"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
+														"If an item contains '//', the entry is split into two items.<br>",
+												"Modify "
+														+ setting, entries.toArray());
+										if (inp != null) {
+											if (inp.length > 0) {
+												ArrayList<String> newValues = new ArrayList<String>();
+												for (Object o : inp) {
+													if (o != null && o instanceof String) {
+														String es = (String) o;
+														for (String nn : es.split("//")) {
+															nn = nn.trim();
+															newValues.add(nn);
+														}
+													}
+												}
+												SystemOptions.getInstance(iniFileName).setStringArray(section, setting, newValues);
+											}
+										}
+									}
+							}
 				}
 				
 				@Override
@@ -71,7 +146,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 						return s;
 					else {
 						if (setting.equalsIgnoreCase("password")) {
-							String sv = SystemOptions.getInstance(iniFileName).getObject(section, setting);
+							String sv = SystemOptions.getInstance(iniFileName).getObject(section, setting, -1);
 							StringBuilder sb = new StringBuilder();
 							while (sb.length() < sv.length())
 								sb.append("*");
@@ -79,7 +154,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 									"&nbsp;" + sb + "&nbsp;" + "</center></html>";
 						} else
 							return "<html><center><b>" + s + "</b><br>" +
-									"&nbsp;" + SystemOptions.getInstance(iniFileName).getObject(section, setting) + "&nbsp;" + "</center></html>";
+									"&nbsp;" + SystemOptions.getInstance(iniFileName).getObject(section, setting, 2) + "&nbsp;" + "</center></html>";
 					}
 				}
 				
