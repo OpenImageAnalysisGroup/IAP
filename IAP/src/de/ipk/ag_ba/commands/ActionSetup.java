@@ -63,7 +63,7 @@ public class ActionSetup extends AbstractNavigationAction {
 		ArrayList<String> ss = SystemOptions.getInstance(iniFileName).getSectionTitles();
 		Collections.sort(ss);
 		for (String s : ss) {
-			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, "Change settings for " + s, s), src.getGUIsetting()));
+			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, "Change settings of section " + s, s), src.getGUIsetting()));
 		}
 		if (iniFileName == null)
 			for (PipelineDesc pd : PipelineDesc.getKnownPipelines())

@@ -122,7 +122,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return section;
+		return WordUtils.capitalizeFully(section, ' ');
 	}
 	
 	@Override
