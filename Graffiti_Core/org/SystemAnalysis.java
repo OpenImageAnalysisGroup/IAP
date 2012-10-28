@@ -395,13 +395,15 @@ public class SystemAnalysis {
 		return iAddresses;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static int getCurrentTimeHour() {
-		return new Date().getHours();
+		Calendar c = new GregorianCalendar();
+		c.setTime(new Date(System.currentTimeMillis()));
+		return c.get(Calendar.HOUR_OF_DAY);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static int getCurrentTimeMinute() {
-		return new Date().getMinutes();
+		Calendar c = new GregorianCalendar();
+		c.setTime(new Date(System.currentTimeMillis()));
+		return c.get(Calendar.MINUTE);
 	}
 }
