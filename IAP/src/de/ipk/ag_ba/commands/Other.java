@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -151,41 +152,48 @@ public class Other {
 				
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
-				ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
-				for (MongoDB m : MongoDB.getMongos()) {
-					try {
-						m.batchGetWorkTasksScheduledForStart(0);
-						CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
-								null,
-								true);
+				if (SystemOptions.getInstance().getBoolean("GRID-COMPUTING", "remote_execution", true)) {
+					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
+					for (MongoDB m : MongoDB.getMongos()) {
 						try {
-							cmna.performActionCalculateResults(src);
-							for (NavigationButton o : cmna.getResultNewActionSet())
-								cloudHostList.add(o.getAction());
+							m.batchGetWorkTasksScheduledForStart(0);
+							CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
+									null,
+									true);
+							try {
+								cmna.performActionCalculateResults(src);
+								for (NavigationButton o : cmna.getResultNewActionSet())
+									cloudHostList.add(o.getAction());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						} catch (Exception e) {
-							e.printStackTrace();
+							System.out.println(m.getDatabaseName() + " is not accessible!");
 						}
-					} catch (Exception e) {
-						System.out.println(m.getDatabaseName() + " is not accessible!");
+					}
+					
+					if (cloudHostList.size() > 0) {
+						ActionFolder cloudHosts = new ActionFolder(
+								"Cloud Hosts", "Show overview of cloud computing hosts",
+								cloudHostList.toArray(new NavigationAction[] {}), src.getGUIsetting());
+						resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
 					}
 				}
 				
-				if (cloudHostList.size() > 0) {
-					ActionFolder cloudHosts = new ActionFolder(
-							"Cloud Hosts", "Show overview of cloud computing hosts",
-							cloudHostList.toArray(new NavigationAction[] {}), src.getGUIsetting());
-					resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
-				}
+				boolean showLTstorageTimeCheckIcon = SystemOptions.getInstance().getBoolean("LemnaTec-DB", "system_status_show_storage_time_check_icon", false);
+				if (showLTstorageTimeCheckIcon)
+					resultNavigationButtons.add(new NavigationButton(new CheckLtTimesAction(null), src.getGUIsetting()));
 				
-				resultNavigationButtons.add(new NavigationButton(new CheckLtTimesAction(null), src.getGUIsetting()));
+				boolean showLT = SystemOptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", false);
+				if (showLT)
+					resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
+							null, null,
+							"Enable or disable the automated backup of LT data sets to the HSM file system",
+							"Automatic Backup to HSM",
+							"ARCHIVE|auto_daily_backup"), src.getGUIsetting()));
 				
-				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
-						null, null,
-						"Enable or disable the automated backup of LT data sets to the HSM file system",
-						"Automatic Backup to HSM",
-						"ARCHIVE|auto_daily_backup"), src.getGUIsetting()));
-				
-				resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
+				if (showLT)
+					resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 				
 				BackgroundTaskStatusProviderSupportingExternalCall copyToHsmStatus = MassCopySupport.getInstance().getStatusProvider();
 				Runnable startActionMassCopy = new Runnable() {
@@ -207,14 +215,17 @@ public class Other {
 						t.start();
 					}
 				};
-				resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(copyToHsmStatus,
-						startActionMassCopy,
-						"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
-						"Automatic DB-Copy",
-						"GRID-STORAGE|auto_daily_fetch"), src.getGUIsetting()));
 				
-				resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
-				
+				if (MongoDB.getMongos().size() > 0) {
+					
+					resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(copyToHsmStatus,
+							startActionMassCopy,
+							"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
+							"Automatic DB-Copy",
+							"GRID-STORAGE|auto_daily_fetch"), src.getGUIsetting()));
+					
+					resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
+				}
 				if (includeLemnaTecStatus) {
 					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
 					

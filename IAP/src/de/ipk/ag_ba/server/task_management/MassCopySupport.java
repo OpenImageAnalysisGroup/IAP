@@ -17,6 +17,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsFalse;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -178,16 +179,18 @@ public class MassCopySupport {
 							MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
 									+ SystemAnalysis.getWaitTime(processingTime));
 						}
-						ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
-						status.setCurrentStatusText2("Schedule analysis tasks for new data");
-						all.setStatusProvider(getStatusProvider());
-						all.performActionCalculateResults(null);
-						int nn = m.batchGetAllCommands().size();
-						if (nn == 0)
-							status.setCurrentStatusText2("All analyis results are up-to-date");
-						else
-							status.setCurrentStatusText2("Scheduled " + nn +
-									" analysis tasks (" + SystemAnalysis.getCurrentTime() + ")");
+						if (SystemOptions.getInstance().getBoolean("GRID-COMPUTING", "remote_execution", true)) {
+							ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
+							status.setCurrentStatusText2("Schedule analysis tasks for new data");
+							all.setStatusProvider(getStatusProvider());
+							all.performActionCalculateResults(null);
+							int nn = m.batchGetAllCommands().size();
+							if (nn == 0)
+								status.setCurrentStatusText2("All analyis results are up-to-date");
+							else
+								status.setCurrentStatusText2("Scheduled " + nn +
+										" analysis tasks (" + SystemAnalysis.getCurrentTime() + ")");
+						}
 					}
 				}
 			}
@@ -350,7 +353,7 @@ public class MassCopySupport {
 			if (en)
 				print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 01:00");
 			else
-				print("AUTOMATIC MASS COPY STATUS (CURRENTLY DISABLED) FROM LT TO MongoDB (" + hsmFolder + ") WILL BE CHECKED EVERY DAY AT 01:00");
+				print("Copy function is disabled");
 			
 			final ThreadSafeOptions lastExecutionTime = new ThreadSafeOptions();
 			

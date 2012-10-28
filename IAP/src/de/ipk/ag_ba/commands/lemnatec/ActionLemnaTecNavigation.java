@@ -75,7 +75,8 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 		this.src = src;
 		result.clear();
 		try {
-			result.add(new NavigationButton(new ActionLemnaTecLogout(), src.getGUIsetting()));
+			if (IAPmain.getRunMode() == IAPrunMode.WEB)
+				result.add(new NavigationButton(new ActionLemnaTecLogout(), src.getGUIsetting()));
 			
 			result.add(new NavigationButton(new ActionLemnaTecUserNavigation(login), src.getGUIsetting()));
 			
