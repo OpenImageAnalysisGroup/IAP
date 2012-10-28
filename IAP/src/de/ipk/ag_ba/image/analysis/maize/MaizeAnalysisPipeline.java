@@ -47,6 +47,12 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProces
  */
 public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	
+	private final String pipelineName;
+	
+	public MaizeAnalysisPipeline(String pipelineName) {
+		this.pipelineName = pipelineName;
+	}
+	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	@Override
@@ -114,7 +120,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(defaultBlockList);
+		return getPipelineFromBlockList(pipelineName, defaultBlockList);
 	}
 	
 	/**
@@ -126,7 +132,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
-		SystemOptions so = SystemOptions.getInstance();
+		SystemOptions so = SystemOptions.getInstance(pipelineName + ".pipeline.ini");
 		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);

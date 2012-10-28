@@ -84,7 +84,7 @@ public class PerformanceTest {
 		options.setCameraPosition(CameraPosition.SIDE);
 		options.setIsMaize(true);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
-		MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
+		MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline("Maize Phenotyping");
 		
 		debugStack = null;// new FlexibleImageStack();
 		
@@ -112,7 +112,7 @@ public class PerformanceTest {
 				ImageProcessorOptions options = new ImageProcessorOptions(scale);
 				options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 				options.setCameraPosition(CameraPosition.SIDE);
-				MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline();
+				MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline("Maize Phenotyping");
 				debugStack = new HashMap<Integer, FlexibleImageStack>();
 				try {
 					res = pipeline.pipeline(options, input, ref_input, 2, debugStack);
@@ -148,7 +148,7 @@ public class PerformanceTest {
 		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.TOP);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
-		MaizeAnalysisPipeline maize = new MaizeAnalysisPipeline();
+		MaizeAnalysisPipeline maize = new MaizeAnalysisPipeline("Maize Phenotyping");
 		
 		debugStack = new HashMap<Integer, FlexibleImageStack>();
 		

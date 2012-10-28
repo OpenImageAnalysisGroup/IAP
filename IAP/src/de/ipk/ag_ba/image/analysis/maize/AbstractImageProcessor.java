@@ -107,8 +107,8 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected BlockPipeline getPipelineFromBlockList(String[] defaultBlockList) {
-		defaultBlockList = SystemOptions.getInstance().getStringAll(
+	protected BlockPipeline getPipelineFromBlockList(String pipelineName, String[] defaultBlockList) {
+		defaultBlockList = SystemOptions.getInstance(pipelineName + ".pipeline.ini").getStringAll(
 				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + this.getClass().getCanonicalName(),
 				"block",
 				defaultBlockList);
