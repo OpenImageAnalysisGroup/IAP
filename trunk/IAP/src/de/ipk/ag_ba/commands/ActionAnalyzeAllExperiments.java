@@ -13,10 +13,11 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.commands.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.commands.analysis.ActionPhytochamberBlueRubberAnalysis;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.maize.ImageAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.roots.RootScannAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -177,7 +178,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
 				navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
 			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
-				navigationAction = new BarleyAnalysisAction(m, new ExperimentReference(eh));
+				navigationAction = new ImageAnalysisAction(PipelineDesc.getPipelineDefault(), m, new ExperimentReference(eh));
 			if (eh.getExperimentType().equals(IAPexperimentTypes.Raps + ""))
 				navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
 			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))

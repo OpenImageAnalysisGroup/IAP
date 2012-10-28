@@ -24,7 +24,7 @@ public class MaizeAnalysisTask extends AbstractPhenotypingTask {
 	
 	@Override
 	protected ImageProcessor getImageProcessor() {
-		return new MaizeAnalysisPipeline();
+		return new MaizeAnalysisPipeline("Maize Phenotyping");
 	}
 	
 	@Override

@@ -38,7 +38,7 @@ import javax.swing.event.ChangeListener;
 import de.ipk.ag_ba.commands.analysis.ActionPhytochamberAnalysis;
 import de.ipk.ag_ba.commands.analysis.ActionPhytochamberBlueRubberAnalysis;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.maize.BarleyAnalysisAction;
+import de.ipk.ag_ba.gui.navigation_actions.maize.ImageAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.Maize3DanalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.roots.RootScannAnalysisAction;
@@ -85,11 +85,11 @@ public class ImageAnalysis {
 		return resultTaskButton;
 	}
 	
-	public static NavigationButton getBarleyEntity(final MongoDB m,
-			final ExperimentReference experiment, final double epsilon, final double epsilon2, GUIsetting guiSetting) {
-		
-		NavigationAction barleyAnalysisAction = new BarleyAnalysisAction(m, experiment);
-		NavigationButton resultTaskButton = new NavigationButton(barleyAnalysisAction, guiSetting);
+	public static NavigationButton getPipelineEntity(PipelineDesc pd,
+			final MongoDB m, final ExperimentReference experiment,
+			final double epsilon, final double epsilon2, GUIsetting guiSetting) {
+		NavigationAction imageAnalysisAction = new ImageAnalysisAction(pd, m, experiment);
+		NavigationButton resultTaskButton = new NavigationButton(imageAnalysisAction, guiSetting);
 		return resultTaskButton;
 	}
 	
@@ -265,4 +265,5 @@ public class ImageAnalysis {
 		lbl.setText("Zoom (" + val + "%)");
 		zoomedImage.setInt(val);
 	}
+	
 }

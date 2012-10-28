@@ -115,10 +115,10 @@ public class ImageAnalysisCommandManager {
 			actions.add(ImageAnalysis.getPhytochamberEntityBlueRubber(m, experimentReference, 10, 15, guiSetting));
 			
 			actions.add(ImageAnalysis.getMaizeEntity(m, experimentReference, 10, 15, guiSetting));
-			actions.add(ImageAnalysis.getBarleyEntity(m, experimentReference, 10, 15, guiSetting));
+			for (PipelineDesc pd : PipelineDesc.getKnownPipelines())
+				actions.add(ImageAnalysis.getPipelineEntity(pd, m, experimentReference, 10, 15, guiSetting));
 			
 			actions.add(ImageAnalysis.getRootScannEntity(m, experimentReference, guiSetting));
-			
 			actions.add(ImageAnalysis.getMaize3dEntity(m, experimentReference, 10, 15, guiSetting));
 			
 			// actions.add(ActionThreeDreconstruction.getThreeDreconstructionTaskEntity(m, experimentReference,

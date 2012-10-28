@@ -29,6 +29,10 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
+	public MaizeAnalysisPipelineWith3D(String pipelineName) {
+		super(pipelineName);
+	}
+	
 	@Override
 	public IAP_RELEASE getVersionTag() {
 		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_3D;

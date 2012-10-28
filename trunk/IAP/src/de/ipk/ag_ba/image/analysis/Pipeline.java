@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.analysis.barley;
+package de.ipk.ag_ba.image.analysis;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
@@ -42,15 +42,20 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMar
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
- * Comprehensive barley image analysis pipeline, processing VIS, FLUO and NIR
+ * Comprehensive image analysis pipeline, processing VIS, FLUO and NIR
  * images. Depends on reference images for initial comparison and foreground /
  * background separation.
  * 
  * @author klukas, pape, entzian
  */
-public class BarleyAnalysisPipeline extends AbstractImageProcessor {
+public class Pipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
+	private final String pipelineName;
+	
+	public Pipeline(String pipelineName) {
+		this.pipelineName = pipelineName;
+	}
 	
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
@@ -103,13 +108,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(defaultBlockList);
+		return getPipelineFromBlockList(pipelineName, defaultBlockList);
 	}
 	
-	/**
-	 * Modify default LAB filter options according to the Maize analysis
-	 * requirements.
-	 */
 	private void modifySettings(ImageProcessorOptions options) {
 		if (options == null)
 			return;
@@ -120,7 +121,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		options.setIsBarley(true);
 		options.setIsMaize(false);
 		
-		SystemOptions so = SystemOptions.getInstance();
+		SystemOptions so = SystemOptions.getInstance(pipelineName + ".pipeline.ini");
 		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);

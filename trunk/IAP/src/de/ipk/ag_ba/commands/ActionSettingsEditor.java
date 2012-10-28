@@ -14,30 +14,33 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 	
+	private String iniFileName;
+	
 	public ActionSettingsEditor(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionSettingsEditor(String tooltip, String section) {
+	public ActionSettingsEditor(String iniFileName, String tooltip, String section) {
 		this(tooltip);
+		this.iniFileName = iniFileName;
 		this.section = section;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		res.clear();
-		for (final String setting : SystemOptions.getInstance().getSectionSettings(section)) {
+		for (final String setting : SystemOptions.getInstance(iniFileName).getSectionSettings(section)) {
 			res.add(new NavigationButton(new AbstractNavigationAction("Change setting " + section + "/" + setting) {
-				boolean isBoolean = SystemOptions.getInstance().isBooleanSetting(section, setting);
-				boolean isInteger = !isBoolean && SystemOptions.getInstance().isIntegerSetting(section, setting);
-				boolean isFloat = !isBoolean && !isInteger && SystemOptions.getInstance().isFloatSetting(section, setting);
+				boolean isBoolean = SystemOptions.getInstance(iniFileName).isBooleanSetting(section, setting);
+				boolean isInteger = !isBoolean && SystemOptions.getInstance(iniFileName).isIntegerSetting(section, setting);
+				boolean isFloat = !isBoolean && !isInteger && SystemOptions.getInstance(iniFileName).isFloatSetting(section, setting);
 				
 				@Override
 				public void performActionCalculateResults(NavigationButton src) throws Exception {
 					if (isBoolean) {
-						boolean enabled = SystemOptions.getInstance().getBoolean(section, setting, false);
+						boolean enabled = SystemOptions.getInstance(iniFileName).getBoolean(section, setting, false);
 						enabled = !enabled;
-						SystemOptions.getInstance().setBoolean(section, setting, enabled);
+						SystemOptions.getInstance(iniFileName).setBoolean(section, setting, enabled);
 					}
 				}
 				
@@ -68,7 +71,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 						return s;
 					else {
 						if (setting.equalsIgnoreCase("password")) {
-							String sv = SystemOptions.getInstance().getObject(section, setting);
+							String sv = SystemOptions.getInstance(iniFileName).getObject(section, setting);
 							StringBuilder sb = new StringBuilder();
 							while (sb.length() < sv.length())
 								sb.append("*");
@@ -76,7 +79,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 									"&nbsp;" + sb + "&nbsp;" + "</center></html>";
 						} else
 							return "<html><center><b>" + s + "</b><br>" +
-									"&nbsp;" + SystemOptions.getInstance().getObject(section, setting) + "&nbsp;" + "</center></html>";
+									"&nbsp;" + SystemOptions.getInstance(iniFileName).getObject(section, setting) + "&nbsp;" + "</center></html>";
 					}
 				}
 				
@@ -88,7 +91,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				@Override
 				public String getDefaultImage() {
 					if (isBoolean) {
-						boolean enabled = SystemOptions.getInstance().getBoolean(section, setting, false);
+						boolean enabled = SystemOptions.getInstance(iniFileName).getBoolean(section, setting, false);
 						if (enabled)
 							return "img/ext/gpl2/Dialog-Apply-64.png";// gtcf.png";
 						else

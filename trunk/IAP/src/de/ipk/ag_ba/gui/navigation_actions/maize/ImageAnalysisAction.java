@@ -3,18 +3,22 @@ package de.ipk.ag_ba.gui.navigation_actions.maize;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.commands.ImageConfiguration;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.ImageAnalysisPipelineTask;
 
 /**
  * @author klukas
  */
-public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
-	public BarleyAnalysisAction(MongoDB m, ExperimentReference experiment) {
-		super("Analyze Phenotype (Barley)");
+public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
+	private final PipelineDesc pd;
+	
+	public ImageAnalysisAction(PipelineDesc pd, MongoDB m, ExperimentReference experiment) {
+		super(pd.getTooltip());
+		this.pd = pd;
 		this.m = m;
 		this.experiment = experiment;
 		this.experimentResult = null;
@@ -22,13 +26,9 @@ public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
 	}
 	
-	public BarleyAnalysisAction() {
-		super("Analyze Phenotype (Barley)");
-	}
-	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new BarleyAnalysisTask();
+		return new ImageAnalysisPipelineTask(pd.getName(), pd.getTooltip());
 	}
 	
 	@Override
@@ -46,7 +46,7 @@ public class BarleyAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Barley Analysis";
+		return pd.getName();
 	}
 	
 	@Override

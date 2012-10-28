@@ -8,24 +8,31 @@ import org.ReleaseInfo;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 public class ActionSetup extends AbstractNavigationAction {
 	
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+	private final String iniFileName;
+	private final String title;
 	
-	public ActionSetup(String tooltip) {
+	public ActionSetup(String iniFileName, String tooltip, String title) {
 		super(tooltip);
+		this.iniFileName = iniFileName;
+		this.title = title;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		res.clear();
-		res.add(new NavigationButton(new AbstractNavigationAction("Opens the settings-folder in the systems file manage") {
+		res.add(new NavigationButton(new AbstractNavigationAction(
+				"Open file explorer and show settings file (" +
+						(iniFileName == null ? "iap.ini" : iniFileName) + ")") {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
-				AttributeHelper.showInFileBrowser(ReleaseInfo.getAppFolder(), "iap.ini");
+				AttributeHelper.showInFileBrowser(ReleaseInfo.getAppFolder(), iniFileName == null ? "iap.ini" : iniFileName);
 			}
 			
 			@Override
@@ -53,11 +60,18 @@ public class ActionSetup extends AbstractNavigationAction {
 				return null;
 			}
 		}, src.getGUIsetting()));
-		ArrayList<String> ss = SystemOptions.getInstance().getSectionTitles();
+		ArrayList<String> ss = SystemOptions.getInstance(iniFileName).getSectionTitles();
 		Collections.sort(ss);
 		for (String s : ss) {
-			res.add(new NavigationButton(new ActionSettingsEditor("Change settings for " + s, s), src.getGUIsetting()));
+			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, "Change settings for " + s, s), src.getGUIsetting()));
 		}
+		if (iniFileName == null)
+			for (PipelineDesc pd : PipelineDesc.getKnownPipelines())
+				res.add(new NavigationButton(
+						new ActionSetup(pd.getIniFileName(),
+								"Change settings of " + pd.getName() + " analysis pipeline",
+								"Settings of " + pd.getName() + ""),
+						src.getGUIsetting()));
 	}
 	
 	@Override
@@ -74,11 +88,14 @@ public class ActionSetup extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Settings";
+		return title;
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getToolbox();
+		if (iniFileName == null)
+			return IAPimages.getToolbox();
+		else
+			return "img/ext/gpl2/Gnome-Applications-Science-64.png";
 	}
 }

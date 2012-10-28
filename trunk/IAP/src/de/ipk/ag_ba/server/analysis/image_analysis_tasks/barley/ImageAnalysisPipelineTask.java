@@ -1,31 +1,35 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley;
 
-import de.ipk.ag_ba.image.analysis.barley.BarleyAnalysisPipeline;
+import de.ipk.ag_ba.image.analysis.Pipeline;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 /**
  * @author klukas
  */
-public class BarleyAnalysisTask extends AbstractPhenotypingTask {
+public class ImageAnalysisPipelineTask extends AbstractPhenotypingTask {
 	
-	public BarleyAnalysisTask() {
-		// empty
+	private final String name;
+	private final String desc;
+	
+	public ImageAnalysisPipelineTask(String name, String desc) {
+		this.name = name;
+		this.desc = desc;
 	}
 	
 	@Override
 	public String getTaskDescription() {
-		return "Analyse Barley Phenotype";
+		return desc;
 	}
 	
 	@Override
 	public String getName() {
-		return "Barley Phenotyping";
+		return name;
 	}
 	
 	@Override
 	protected ImageProcessor getImageProcessor() {
-		return new BarleyAnalysisPipeline();
+		return new Pipeline(name);
 	}
 	
 	@Override

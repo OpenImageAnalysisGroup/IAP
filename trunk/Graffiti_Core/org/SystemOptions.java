@@ -4,27 +4,41 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.ini4j.Ini;
 
+/**
+ * @author klukas
+ */
 public class SystemOptions {
 	
-	protected SystemOptions() {
-		instance = this;
+	private final String iniFileName;
+	private final Ini ini;
+	
+	private SystemOptions(String iniFileName) {
+		this.iniFileName = iniFileName;
+		instances.put(iniFileName, this);
+		ini = readIni();
 	}
 	
-	protected static SystemOptions instance;
+	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
 	
-	public synchronized static SystemOptions getInstance() {
+	public synchronized static SystemOptions getInstance(String iniFileName) {
+		if (iniFileName == null)
+			iniFileName = "iap.ini";
+		SystemOptions instance = instances.get(iniFileName);
 		if (instance == null)
-			instance = new SystemOptions();
+			instance = new SystemOptions(iniFileName);
 		return instance;
 	}
 	
-	Ini ini = readIni();
+	public synchronized static SystemOptions getInstance() {
+		return getInstance(null);
+	}
 	
 	private Ini readIni() {
-		String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap.ini";
+		String fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
 		try {
 			return new Ini(new File(fn));
 		} catch (FileNotFoundException fne) {
