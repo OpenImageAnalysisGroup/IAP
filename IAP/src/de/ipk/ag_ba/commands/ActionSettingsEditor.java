@@ -75,10 +75,18 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 								boolean isString = ss.length == 1;
 								boolean isStringArray = ss.length > 1;
 								if (isString) {
+									if (setting.equalsIgnoreCase("password")) {
+										Object[] i = MyInputHelper.getInput(
+												"WARNING: The <u>password will be shown now and saved as clear text</u> in the settings-ini-file!" +
+														"<br>Click 'Cancel' to interrupt the process of displaying and " +
+														"editing the password.", "WARNING");
+										if (i == null)
+											return;
+									}
 									Object[] inp = MyInputHelper.getInput("You may modify the text:",
 											"Modify "
 													+ setting,
-											setting, SystemOptions.getInstance(iniFileName).getString(section, setting, ""));
+											setting, SystemOptions.getInstance(iniFileName).getString(section, setting, "") + "");
 									if (inp != null) {
 										if (inp.length == 1) {
 											Object o = inp[0];
@@ -93,7 +101,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 										int line = 1;
 										for (String sl : ss) {
 											entries.add("Item " + (line++));
-											entries.add(sl);
+											entries.add(sl + "");
 										}
 										Object[] inp = MyInputHelper.getInput(
 												"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
