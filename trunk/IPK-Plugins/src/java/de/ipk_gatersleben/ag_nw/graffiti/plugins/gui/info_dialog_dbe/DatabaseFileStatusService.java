@@ -10,14 +10,11 @@ import javax.swing.JLabel;
 import org.FolderPanel;
 import org.GuiRow;
 import org.HelperClass;
-import org.Release;
-import org.ReleaseInfo;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.FileDownloadStatusInformationProvider;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_brite.BriteService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeService;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.transpath.TranspathService;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class DatabaseFileStatusService implements HelperClass {
@@ -37,8 +34,8 @@ public class DatabaseFileStatusService implements HelperClass {
 		// statusProviders.add(new CompoundService());
 		// statusProviders.add(new KoService());
 		// if (ReleaseInfo.getRunningReleaseStatus()!=Release.KGML_EDITOR)
-		if (ReleaseInfo.getRunningReleaseStatus() == Release.DEBUG)
-			statusProviders.add(new TranspathService());
+		// if (ReleaseInfo.getRunningReleaseStatus() == Release.DEBUG)
+		// statusProviders.add(new TranspathService());
 		
 		exp.setFrameColor(null, null, 0, 0);
 		exp.addGuiComponentRow(
@@ -53,6 +50,7 @@ public class DatabaseFileStatusService implements HelperClass {
 			exp.addGuiComponentRow(guiRow, true);
 			final FileDownloadStatusInformationProvider spf = sp;
 			Runnable r = new Runnable() {
+				@Override
 				public void run() {
 					try {
 						Thread.sleep(100);

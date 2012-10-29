@@ -28,7 +28,6 @@ import org.graffiti.plugin.tool.Tool;
 import org.graffiti.plugin.view.GraffitiShape;
 
 import de.ipk_gatersleben.ag_nw.graffiti.DBE_PluginAdapter;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.transpath.commands.TranspathPathwayLoader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms.AddDiagramLegendAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms.CreateDistanceMatrixAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms.ExtractMappingDataAlgorithm;
@@ -43,16 +42,16 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectEn
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectNodesWithExperimentalDataAlgorithm;
 
 public class DBEplugin
-					extends DBE_PluginAdapter
-					implements EditorPlugin {
+		extends DBE_PluginAdapter
+		implements EditorPlugin {
 	@SuppressWarnings("unchecked")
-	private HashMap valueEditComponents = new HashMap();
+	private final HashMap valueEditComponents = new HashMap();
 	
 	@SuppressWarnings("unchecked")
 	public DBEplugin() {
 		valueEditComponents.put(
-							JComponentParameter.class,
-							JComponentParameterEditor.class);
+				JComponentParameter.class,
+				JComponentParameterEditor.class);
 		
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.DATAMAPPING)) {
 			/*
@@ -61,36 +60,36 @@ public class DBEplugin
 			 * };
 			 */
 			algorithms = new Algorithm[] {
-								new InterpreteLabelNamesAlgorithm(),
-								// new ProcessHierarchynodesDepOnLeafNodes(),
+					new InterpreteLabelNamesAlgorithm(),
+					// new ProcessHierarchynodesDepOnLeafNodes(),
 					// new CreateKeggReactionNetworkAlgorithm(),
 					// new PruneTreeAlgorithm(),
 					// new CreateDirectChildrenClustersHistogramAlgorithm(),
 					new ExtractMappingDataAlgorithm(),
-								new RemoveMappingDataAlgorithm(),
-								new CombineMappingData(),
-								new AddDiagramLegendAlgorithm(),
-								new SetNumericAttributeFromDataAlgorithm(),
-								new RecolorEdgesAlgorithm(),
-								// new ColorScaleLegendAlgorithm(),
+					new RemoveMappingDataAlgorithm(),
+					new CombineMappingData(),
+					new AddDiagramLegendAlgorithm(),
+					new SetNumericAttributeFromDataAlgorithm(),
+					new RecolorEdgesAlgorithm(),
+					// new ColorScaleLegendAlgorithm(),
 					new CreateDistanceMatrixAlgorithm(),
-								new ShowOrHideImageAttributesAlgorithm(),
-								new SelectCompoundsAlgorithm(),
-								new SelectEnzymesAlgorithm(),
-								// new SelectReactionsAlgorithm(),
+					new ShowOrHideImageAttributesAlgorithm(),
+					new SelectCompoundsAlgorithm(),
+					new SelectEnzymesAlgorithm(),
+					// new SelectReactionsAlgorithm(),
 					new SplitNodeForSingleMappingData(),
-								new MergeNodes(),
-								new UserMappingAlgorithm(),
-								new TranspathPathwayLoader(),
+					new MergeNodes(),
+					new UserMappingAlgorithm(),
+					// new TranspathPathwayLoader(),
 					// new CreateHierarchyTree(),
 					// new HierarchyWizard()
-					};
+			};
 		} else {
 			algorithms = new Algorithm[] {
-								new InterpreteLabelNamesAlgorithm(),
-								new SelectNodesWithExperimentalDataAlgorithm(),
-								new SelectEdgesAlgorithm(),
-								new CreateKeggReactionNetworkAlgorithm()
+					new InterpreteLabelNamesAlgorithm(),
+					new SelectNodesWithExperimentalDataAlgorithm(),
+					new SelectEdgesAlgorithm(),
+					new CreateKeggReactionNetworkAlgorithm()
 			};
 		}
 	}
@@ -108,31 +107,38 @@ public class DBEplugin
 		}
 	}
 	
+	@Override
 	public Map<?, ?> getAttributeComponents() {
 		return null;
 	}
 	
+	@Override
 	public GraffitiComponent[] getGUIComponents() {
 		return null;
 	}
 	
+	@Override
 	public Mode[] getModes() {
 		return null;
 	}
 	
+	@Override
 	public GraffitiShape[] getShapes() {
 		return null;
 	}
 	
+	@Override
 	public Tool[] getTools() {
 		return null;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public Map<Class<JComponentParameter>, Class<JComponentParameterEditor>> getValueEditComponents() {
 		return valueEditComponents;
 	}
 	
+	@Override
 	public InspectorTab[] getInspectorTabs() {
 		return null;
 	}
