@@ -185,14 +185,15 @@ public class Other {
 					resultNavigationButtons.add(new NavigationButton(new CheckLtTimesAction(null), src.getGUIsetting()));
 				
 				boolean showLT = SystemOptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", false);
-				if (showLT)
+				boolean hsmEn = SystemOptions.getInstance().getBoolean("ARCHIVE", "enabled", true);
+				if (showLT && hsmEn)
 					resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
 							null, null,
 							"Enable or disable the automated backup of LT data sets to the HSM file system",
 							"Automatic Backup to HSM",
 							"ARCHIVE|auto_daily_backup"), src.getGUIsetting()));
 				
-				if (showLT)
+				if (showLT && hsmEn)
 					resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 				
 				BackgroundTaskStatusProviderSupportingExternalCall copyToHsmStatus = MassCopySupport.getInstance().getStatusProvider();

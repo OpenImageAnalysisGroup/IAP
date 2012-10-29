@@ -341,6 +341,22 @@ public class IAPmain extends JApplet {
 		
 		final boolean onStartup = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", false);
 		final boolean onDemand = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_demand", true);
+		ArrayList<String> remove = new ArrayList<String>();
+		ArrayList<String> importantForEditingSettingValues = new ArrayList<String>();
+		for (String ss : locations) {
+			if (ss.endsWith("attributes\\defaults\\plugin.xml") || ss.contains("editcomponents\\defaults\\plugin.xml")) {
+				remove.add(ss);
+				System.out.println(ss);
+				importantForEditingSettingValues.add(ss);
+			}
+		}
+		try {
+			GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), importantForEditingSettingValues, splashScreen);
+		} catch (PluginManagerException pme) {
+			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
+		}
+		for (String r : remove)
+			locations.remove(r);
 		if (onStartup) {
 			try {
 				splashScreen.setText("Load plugins...");
@@ -426,13 +442,13 @@ public class IAPmain extends JApplet {
 			// see
 			switch (feature) {
 				case REMOTE_EXECUTION:
-					return getOptions().getBoolean("HEADLESS", "grid_remote_execution", true);
+					return getOptions().getBoolean("IAP", "grid_remote_execution", true);
 				case SAVE_DEBUG_STACK:
-					return getOptions().getBoolean("HEADLESS", "debug_save_stack", false);
+					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return getOptions().getBoolean("HEADLESS", "hsm_auto_copy", false);
+					return getOptions().getBoolean("ARCHIVE", "auto_copy", false) && getOptions().getBoolean("ARCHIVE", "enabled", true);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return getOptions().getBoolean("HEADLESS", "grid_delete_jobs_when_grid_node_becomes_active", false);
+					return getOptions().getBoolean("IAP", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}
 		} else {
 			// these may be changed for interactive applet version !!!
@@ -442,7 +458,7 @@ public class IAPmain extends JApplet {
 				case SAVE_DEBUG_STACK:
 					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return getOptions().getBoolean("ARCHIVE", "auto_copy", false);
+					return getOptions().getBoolean("ARCHIVE", "auto_copy", false) && getOptions().getBoolean("ARCHIVE", "enabled", true);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
 					return getOptions().getBoolean("IAP", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}
