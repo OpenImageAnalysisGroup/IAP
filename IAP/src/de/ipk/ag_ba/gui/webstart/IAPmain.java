@@ -339,24 +339,24 @@ public class IAPmain extends JApplet {
 			System.exit(1);
 		}
 		
-		final boolean onStartup = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", false);
-		final boolean onDemand = IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_demand", true);
-		ArrayList<String> remove = new ArrayList<String>();
-		ArrayList<String> importantForEditingSettingValues = new ArrayList<String>();
-		for (String ss : locations) {
-			if (ss.endsWith("attributes\\defaults\\plugin.xml") || ss.contains("editcomponents\\defaults\\plugin.xml")) {
-				remove.add(ss);
-				System.out.println(ss);
-				importantForEditingSettingValues.add(ss);
-			}
-		}
-		try {
-			GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), importantForEditingSettingValues, splashScreen);
-		} catch (PluginManagerException pme) {
-			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
-		}
-		for (String r : remove)
-			locations.remove(r);
+		final boolean onStartup = true; // IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", false);
+		final boolean onDemand = false; // IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_demand", true);
+		// ArrayList<String> remove = new ArrayList<String>();
+		// ArrayList<String> importantForEditingSettingValues = new ArrayList<String>();
+		// for (String ss : locations) {
+		// if (ss.endsWith("attributes\\defaults\\plugin.xml") || ss.contains("editcomponents\\defaults\\plugin.xml")) {
+		// remove.add(ss);
+		// System.out.println(ss);
+		// importantForEditingSettingValues.add(ss);
+		// }
+		// }
+		// try {
+		// GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), importantForEditingSettingValues, splashScreen);
+		// } catch (PluginManagerException pme) {
+		// ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
+		// }
+		// for (String r : remove)
+		// locations.remove(r);
 		if (onStartup) {
 			try {
 				splashScreen.setText("Load plugins...");
