@@ -35,7 +35,7 @@ public class RSSFeedManager implements HelperClass {
 	private ArrayList<FolderPanel> newsComponents;
 	private ArrayList<String> date;
 	
-	private double border;
+	private final double border;
 	private int maxCol = 0;
 	
 	static RSSFeedManager instance = null;
@@ -78,21 +78,21 @@ public class RSSFeedManager implements HelperClass {
 	private String getStandardFeedDefinition(String text) {
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR) {
 			String url1 = "http://sourceforge.net/export/rss2_projnews.php?group_id=196037" + urlSeparator
-								+ "http://kgml-ed.ipk-gatersleben.de/KGML-ED/Notes/rss.xml";
+					+ "http://kgml-ed.ipk-gatersleben.de/KGML-ED/Notes/rss.xml";
 			if (text.indexOf(url1) <= 0)
 				text = "KGML-ED Notes" + System.getProperty("line.separator") +
-									url1 + System.getProperty("line.separator");
+						url1 + System.getProperty("line.separator");
 		} else {
-			String url2 = "http://sourceforge.net/export/rss2_projnews.php?group_id=196037" + urlSeparator
-								+ "http://kgml-ed.ipk-gatersleben.de/KGML-ED/VANTED%20news/rss.xml";
-			if (text.indexOf(url2) <= 0)
-				text = "Development Notes" + System.getProperty("line.separator") +
-									url2 + System.getProperty("line.separator");
+			// String url2 = "http://sourceforge.net/export/rss2_projnews.php?group_id=196037" + urlSeparator
+			// + "http://kgml-ed.ipk-gatersleben.de/KGML-ED/VANTED%20news/rss.xml";
+			// if (text.indexOf(url2) <= 0)
+			// text = "Development Notes" + System.getProperty("line.separator") +
+			// url2 + System.getProperty("line.separator");
 		}
 		String url3 = "http://vanted.ipk-gatersleben.de/literature.xml";
 		if (text.indexOf(url3) <= 0)
 			text += "Publications" + System.getProperty("line.separator") +
-								url3 + System.getProperty("line.separator");
+					url3 + System.getProperty("line.separator");
 		
 		return text;
 	}
@@ -165,7 +165,7 @@ public class RSSFeedManager implements HelperClass {
 			String name = def.getName() + pluginTag;
 			if (result.indexOf(url) <= 0)
 				result += name + "\n" +
-									url + "\n";
+						url + "\n";
 		}
 		return result;
 	}
@@ -252,8 +252,8 @@ public class RSSFeedManager implements HelperClass {
 		FolderPanel items = new FolderPanel("<html><font color='gray'>" + title, true, true, false, null);
 		items.setColumnStyle(TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL);
 		items.addGuiComponentRow(
-							getCustomizedLabel(new JLabel("<html><small>" +
-												"News have not been downloaded.")), null, false, 5);
+				getCustomizedLabel(new JLabel("<html><small>" +
+						"News have not been downloaded.")), null, false, 5);
 		items.enableSearch(true);
 		items.addDefaultTextSearchFilter();
 		items.setMaximumRowCount(1);
