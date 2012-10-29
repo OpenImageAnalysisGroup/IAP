@@ -34,10 +34,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.BookmarkAction;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
@@ -116,6 +118,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		addMouseListener(new PopupListener(popup));
 	}
 	
+	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
+	
 	private ActionListener getNewWindowListener() {
 		ActionListener res = new ActionListener() {
 			
@@ -129,6 +133,23 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
+				try {
+					int n = nWindows.getInt();
+					String w = "Application-Default-Icon-64.png";
+					if (n % 4 == 0)
+						w = "Gnome-Colors-Emblem-Desktop-64.png";
+					if (n % 4 == 1)
+						w = "Gnome-Colors-Emblem-Desktop-Orange-64.png";
+					if (n % 4 == 2)
+						w = "Gnome-Colors-Emblem-Desktop-Red-64.png";
+					if (n % 4 == 3)
+						w = "Gnome-Colors-Emblem-Green-64.png";
+					jff.setIconImage(GravistoService.loadImage(IAPmain.class, "img/ext/gpl2/" + w, 64, 64));
+					nWindows.addInt(1);
+				} catch (Exception err) {
+					err.printStackTrace();
+					ErrorMsg.addErrorMessage(err);
+				}
 				jff.setVisible(true);
 				jff.validate();
 				jff.repaint();

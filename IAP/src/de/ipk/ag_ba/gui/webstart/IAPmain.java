@@ -100,6 +100,12 @@ public class IAPmain extends JApplet {
 		JFrame jf = new JFrame(title);
 		jf.add("Center", new IAPmain().getContentPane());
 		jf.pack();
+		try {
+			jf.setIconImage(GravistoService.loadImage(IAPmain.class, "img/favicon.ico", 48, 48));
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
