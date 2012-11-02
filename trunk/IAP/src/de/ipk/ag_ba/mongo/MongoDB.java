@@ -2406,13 +2406,13 @@ public class MongoDB {
 		speedupLoading = false;
 		if (speedupLoading) {
 			if (s3d.getName().contains("histogram")) {
-				System.out.println("Skip substance loading of substance " + s3d.getName());
+				// System.out.println("Skip substance loading of substance " + s3d.getName());
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
 				return;
 			}
 			if (s3d.getName().contains("histogram.bin") && s3d.getName().contains("section")) {
-				System.out.println("Skip substance loading of substance " + s3d.getName());
+				// System.out.println("Skip substance loading of substance " + s3d.getName());
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
 				return;
@@ -2426,7 +2426,7 @@ public class MongoDB {
 						|| s3d.getName().contains(".lab.")
 						// || s3d.getName().contains(".percent.")
 						|| s3d.getName().contains("RESULT_")) {
-					System.out.println("Skip substance loading of substance " + s3d.getName());
+					// System.out.println("Skip substance loading of substance " + s3d.getName());
 					if (optStatusProvider != null)
 						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
 					return;
@@ -2999,8 +2999,8 @@ public class MongoDB {
 							.find(new BasicDBObject(), new BasicDBObject("_id", 1)).hint(new BasicDBObject("_id", 1))
 							.batchSize(100000);
 					while (condCur.hasNext()) {
-						DBObject condO = condCur.next();
-						dbIdsOfConditions.add(condO.get("_id") + "");
+						ObjectId condO = (ObjectId) condCur.next().get("_id");
+						dbIdsOfConditions.add(condO.toString());
 						nn++;
 						if (nn % 500 == 0) {
 							status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
@@ -3136,67 +3136,63 @@ public class MongoDB {
 					System.out.println(msg);
 					saveSystemMessage(msg);
 				}
+				executor = Executors.newFixedThreadPool(3);
 				{
-					executor = Executors.newFixedThreadPool(2);
+					final ArrayList<String> ids = new ArrayList<String>();
 					final ThreadSafeOptions n = new ThreadSafeOptions();
 					final long max = dbIdsOfConditions.size();
 					final DBCollection conditions = db.getCollection("conditions");
-					long cnt = conditions.count();
+					final long cnt = conditions.count();
 					msg = SystemAnalysis.getCurrentTimeInclSec() + ">Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt;
 					System.out.println(msg);
 					saveSystemMessage(msg);
 					status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
-					final ArrayList<String> ids = new ArrayList<String>();
-					for (String condID : dbIdsOfConditions) {
-						ids.add(condID);
-						if (ids.size() >= 5000) {
-							executor.submit(new Runnable() {
-								@Override
-								public void run() {
-									n.addLong(5000);
-									BasicDBList list = new BasicDBList();
-									synchronized (ids) {
-										for (String coID : ids)
-											list.add(new ObjectId(coID));
-										ids.clear();
-									}
-									conditions.remove(
-											new BasicDBObject("_id", new BasicDBObject("$in", list)),
-											WriteConcern.NONE);
-									status.setCurrentStatusValueFine(100d / max * n.getLong());
-									status.setCurrentStatusText2(n.getLong() + "/" + max);
+					executor.submit(new Runnable() {
+						@Override
+						public void run() {
+							for (String condID : dbIdsOfConditions) {
+								ids.add(condID);
+								if (ids.size() >= 100) {
+									final ArrayList<String> toBeDeleted = new ArrayList<String>(ids);
+									ids.clear();
+											n.addLong(100);
+											BasicDBList list = new BasicDBList();
+											synchronized (toBeDeleted) {
+												for (String coID : toBeDeleted)
+													list.add(new ObjectId(coID));
+												toBeDeleted.clear();
+											}
+											synchronized (conditions) {
+												conditions.remove(
+														new BasicDBObject("_id", new BasicDBObject("$in", list)),
+														WriteConcern.SAFE);
+											}
+											status.setCurrentStatusValueFine(100d / max * n.getLong());
+											status.setCurrentStatusText2(n.getLong() + "/" + max+" ("+100d / max * n.getLong()+")");
 								}
-							});
+							}
+							if (ids.size() > 0) {
+								BasicDBList list = new BasicDBList();
+								synchronized (ids) {
+									for (String coID : ids)
+										list.add(new ObjectId(coID));
+									ids.clear();
+								}
+								conditions.remove(
+										new BasicDBObject("_id", new BasicDBObject("$in", list)),
+										WriteConcern.NONE);
+								n.addLong(list.size());
+								status.setCurrentStatusValueFine(100d / max * n.getLong());
+								status.setCurrentStatusText2(n.getLong() + "/" + max);
+							}
+							
+							status.setCurrentStatusValueFine(100d / max * n.getLong());
+							status.setCurrentStatusText2(n + "/" + max);
+							String msg = SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS";
+							System.out.println(msg);
+							saveSystemMessage(msg);
 						}
-					}
-					executor.shutdown();
-					while (!executor.isTerminated()) {
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException e) {
-							MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
-						}
-					}
-					if (ids.size() > 0) {
-						BasicDBList list = new BasicDBList();
-						synchronized (ids) {
-							for (String coID : ids)
-								list.add(new ObjectId(coID));
-							ids.clear();
-						}
-						conditions.remove(
-								new BasicDBObject("_id", new BasicDBObject("$in", list)),
-								WriteConcern.NONE);
-						n.addLong(list.size());
-						status.setCurrentStatusValueFine(100d / max * n.getLong());
-						status.setCurrentStatusText2(n.getLong() + "/" + max);
-					}
-					
-					status.setCurrentStatusValueFine(100d / max * n.getLong());
-					status.setCurrentStatusText2(n + "/" + max);
-					msg = SystemAnalysis.getCurrentTime() + ">INFO: REMOVED " + (cnt - conditions.count()) + " CONDITION OBJECTS";
-					System.out.println(msg);
-					saveSystemMessage(msg);
+					});
 				}
 				
 				if (linkedHashes.size() >= 0) {
@@ -3210,7 +3206,6 @@ public class MongoDB {
 					status.setCurrentStatusValueFine(100d / 5 * 2);
 					
 					double stepSize = 100d / 5 * 3 / MongoGridFS.getFileCollectionsInclPreview().size();
-					executor = Executors.newFixedThreadPool(nThreads);
 					for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
 						final GridFS gridfs = new GridFS(db, mgfs);
 						int cnt = gridfs.getFileList().count();
@@ -3224,7 +3219,7 @@ public class MongoDB {
 								String md5 = f.getFilename();
 								if (!linkedHashes.contains(md5)) {
 									toBeRemoved.add(f);
-									status.setCurrentStatusText2("Not linked files " + toBeRemoved.size());
+									status.setCurrentStatusText1("Linked files: " + linkedHashes.size()+", Not linked files " + toBeRemoved.size());
 								}
 							}
 							msg = "REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
@@ -3244,8 +3239,7 @@ public class MongoDB {
 										free.addLong(f.getLength());
 										fIdx.addInt(1);
 										status.setCurrentStatusText1("File " + fIdx.getInt() +
-												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)");
-										status.setCurrentStatusText2("Removed: " + free.getLong() / 1024 / 1024 + " MB");
+												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)"+ ", removed: " + free.getLong() / 1024 / 1024 + " MB");
 										status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
 									}
 								});

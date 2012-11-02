@@ -1456,7 +1456,7 @@ public class IAPservice {
 						Thread.sleep(5 * 1000); // wait 5 seconds
 						timeHour = SystemAnalysis.getCurrentTimeHour();
 						timeMinute = SystemAnalysis.getCurrentTimeMinute();
-					} while (timeHour != hour && timeMinute != 0);
+					} while (!(timeHour== hour && timeMinute == 0));
 					MongoDB.saveSystemMessage("TIMED AUTO-CLOSE (host " + SystemAnalysisExt.getHostNameNiceNoError() +
 							"): SYSTEM.EXIT(0) // current time: " + SystemAnalysis.getCurrentTimeInclSec());
 					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">TIMED AUTO-CLOSE: SYSTEM.EXIT(0)");
