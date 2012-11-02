@@ -617,7 +617,7 @@ public class MongoDB {
 						gridfsExperimentStorage.remove(fffMain);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
 					String ss = experiment.toStringWithErrorThrowing();
-					byte[] bb = ss.getBytes(StandardCharsets.UTF_8);
+					byte[] bb = ss.getBytes("UTF-8");
 					ss = null;
 					ByteArrayInputStream in = new ByteArrayInputStream(bb);
 					bb = null;
