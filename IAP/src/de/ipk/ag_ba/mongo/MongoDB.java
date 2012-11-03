@@ -3164,10 +3164,10 @@ public class MongoDB {
 											synchronized (conditions) {
 												conditions.remove(
 														new BasicDBObject("_id", new BasicDBObject("$in", list)),
-														WriteConcern.SAFE);
+														WriteConcern.NONE);
 											}
 											status.setCurrentStatusValueFine(100d / max * n.getLong());
-											status.setCurrentStatusText2(n.getLong() + "/" + max+" ("+100d / max * n.getLong()+")");
+											status.setCurrentStatusText2(n.getLong() + "/" + max+" ("+(int)(100d / max * n.getLong())+"%)");
 								}
 							}
 							if (ids.size() > 0) {
