@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
@@ -35,7 +36,8 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		this.m = m;
 		actionProxy = (RemoteCapableAnalysisAction) Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
 		jobStatus = new MongoJobStatusProvider(cmd, this.m);
-		experimentName = cmd.getExperimentHeader().getExperimentName();
+		ExperimentHeaderInterface ehi = cmd.getExperimentHeader();
+		experimentName = ehi!=null ? ehi.getExperimentName(): "null";
 	}
 	
 	@Override
