@@ -3151,10 +3151,10 @@ public class MongoDB {
 						public void run() {
 							for (String condID : dbIdsOfConditions) {
 								ids.add(condID);
-								if (ids.size() >= 100) {
+								if (ids.size() >= 10) {
 									final ArrayList<String> toBeDeleted = new ArrayList<String>(ids);
 									ids.clear();
-											n.addLong(100);
+											n.addLong(10);
 											BasicDBList list = new BasicDBList();
 											synchronized (toBeDeleted) {
 												for (String coID : toBeDeleted)
@@ -3164,7 +3164,7 @@ public class MongoDB {
 											synchronized (conditions) {
 												conditions.remove(
 														new BasicDBObject("_id", new BasicDBObject("$in", list)),
-														WriteConcern.NONE);
+														WriteConcern.SAFE);
 											}
 											status.setCurrentStatusValueFine(100d / max * n.getLong());
 											status.setCurrentStatusText2(n.getLong() + "/" + max+" ("+(int)(100d / max * n.getLong())+"%)");
@@ -3177,9 +3177,12 @@ public class MongoDB {
 										list.add(new ObjectId(coID));
 									ids.clear();
 								}
-								conditions.remove(
+								WriteResult wr = conditions.remove(
 										new BasicDBObject("_id", new BasicDBObject("$in", list)),
 										WriteConcern.NONE);
+								String err = wr.getError();
+								if (err!=null && err.length()>0)
+									System.err.println("ERROR deleting a conditin object: "+err+" // "+SystemAnalysis.getCurrentTime());
 								n.addLong(list.size());
 								status.setCurrentStatusValueFine(100d / max * n.getLong());
 								status.setCurrentStatusText2(n.getLong() + "/" + max);
@@ -3235,6 +3238,10 @@ public class MongoDB {
 									@Override
 									public void run() {
 										gridfs.remove(f);
+										CommandResult le = db.getLastError(WriteConcern.SAFE);
+										String err = le.getErrorMessage();
+										if (err!=null && err.length()>0)
+											System.err.println("ERROR deleting a gridFS file: "+err+" // "+SystemAnalysis.getCurrentTime());
 										free.addLong(f.getLength());
 										fIdx.addInt(1);
 										status.setCurrentStatusText1("File " + fIdx.getInt() +
