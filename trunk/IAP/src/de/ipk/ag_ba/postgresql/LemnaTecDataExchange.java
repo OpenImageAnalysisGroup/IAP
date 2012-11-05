@@ -834,11 +834,25 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
 			if (conditionTemplate == null) {
+				Integer targetGroup = null;
+				try {
+					String s = sn.getId_tag();
+					s = StringManipulationTools.getNumbersFromString(s);
+					targetGroup = Integer.parseInt(s);
+					targetGroup = targetGroup% 10;
+				} catch(Exception e) {
+					// empty
+				}
 				Condition ct = new Condition(null);
 				ct.setSequence("");
 				ct.setSpecies("not specified");
+				if (targetGroup==null)
 				ct.setGenotype("not specified (random " +
 						StringManipulationTools.formatNumber(Math.floor(Math.random() * 10 + 1d), "00") + ")");
+				else
+					ct.setGenotype("not specified (group " +
+							StringManipulationTools.formatNumber(targetGroup.doubleValue(), "00") + ")");
+
 				ct.setVariety("");
 				ct.setGrowthconditions("");
 				ct.setSequence("");

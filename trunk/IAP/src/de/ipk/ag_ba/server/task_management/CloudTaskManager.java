@@ -201,6 +201,7 @@ public class CloudTaskManager {
 											try {
 												tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
 											} catch (Exception e) {
+												e.printStackTrace();
 												MongoDB.saveSystemErrorMessage("Error executing analysis batch task.", e);
 											}
 										}
