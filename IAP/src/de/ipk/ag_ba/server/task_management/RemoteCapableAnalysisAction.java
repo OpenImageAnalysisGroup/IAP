@@ -8,6 +8,7 @@ package de.ipk.ag_ba.server.task_management;
 
 import java.util.Date;
 
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
