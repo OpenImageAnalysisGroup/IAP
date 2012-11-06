@@ -38,6 +38,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	public static final String PREFIX = "lemnatec-ftp";
 	
 	private static boolean useSCP = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer", "Use SCP instead of FTP", false);
+	private static String ftpHost = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP host", "lemna-db.ipk-gatersleben.de");
 	private static String ftpLocalFolder = SystemOptions.getInstance()
 			.getString("LemnaTec - Image File Transfer", "FTP directory prefix", "/../../data0/pgftp/");
 	private static String ftpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP user", "lemnatec");
@@ -234,7 +235,8 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return c;
 	}
 	
-	public static IOurl getLemnaTecFTPurl(String host, String filename, String displayFileName) {
+	public static IOurl getLemnaTecFTPurl(String filename, String displayFileName) {
+		String host = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP host", "lemna-db.ipk-gatersleben.de");
 		if (filename.contains("/")) {
 			host += "/" + filename.substring(0, filename.lastIndexOf("/"));
 			filename = filename.substring(filename.lastIndexOf("/") + "/".length());
