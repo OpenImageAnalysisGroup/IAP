@@ -37,16 +37,51 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "lemnatec-ftp";
 	
+	private static boolean useSCP = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer", "Use SCP instead of FTP", false);
+	private static String ftpLocalFolder = SystemOptions.getInstance()
+			.getString("LemnaTec - Image File Transfer", "FTP directory prefix", "/../../data0/pgftp/");
+	private static String ftpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP user", "lemnatec");
+	private static String ftpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP password", "LemnaTec");
+	
+	private static String scpHost = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP host", "lemna-db.ipk-gatersleben.de");
+	private static String scpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP local storage folder", "/data0/pgftp/");
+	private static String scpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP user", "root");
+	private static String scpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP password", "LemnaTec");
+	
+	public static boolean useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
+			"Use MongoDB data if available", true);
+	
+	private static boolean useCachedLocalDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
+			"Use local file access if available", true);
+	
+	private static String cachedLocalDataDirectory = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer",
+			"Local copy or mount point", "/data0/pgftp/");
+	
 	@Override
 	public String getPrefix() {
 		return PREFIX;
 	}
 	
-	public static boolean useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
-			"Use MongoDB data if available", true); // TODO: use setting, in IAP-Data-Navigator änderbar
-	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
+		useSCP = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer", "Use SCP instead of FTP", false);
+		ftpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP directory prefix", "/../../data0/pgftp/");
+		ftpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP user", "lemnatec");
+		ftpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP password", "LemnaTec");
+		
+		scpHost = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP host", "lemna-db.ipk-gatersleben.de");
+		scpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP local storage folder", "/data0/pgftp/");
+		scpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP user", "root");
+		scpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP password", "LemnaTec");
+		
+		useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
+				"Use MongoDB data if available", true);
+		
+		useCachedLocalDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
+				"Use local file access if available", true);
+		cachedLocalDataDirectory = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer",
+				"Local copy or mount point", "/data0/pgftp/");
+		
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
 		}
@@ -67,9 +102,9 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			}
 		}
 		if (url.isEqualPrefix(getPrefix())) {
-			boolean lokalCache = true;
+			boolean lokalCache = useCachedLocalDataIfAvailable;
 			if (lokalCache) {
-				for (String path : new String[] { "/Volumes/3TB_1/pgftp/", "I:/", "J:/", "/data0/pgftp/" }) {
+				for (String path : cachedLocalDataDirectory.split(";")) {
 					String detail = url.getDetail();
 					detail = path + detail.split("/", 2)[1];
 					String fn = detail;
@@ -82,15 +117,6 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					}
 				}
 			}
-			boolean useSCP = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer", "Use SCP instead of FTP", false);
-			String ftpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP directory prefix", "/../../data0/pgftp/");
-			String ftpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP user", "lemnatec");
-			String ftpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP password", "LemnaTec");
-			
-			String scpHost = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP host", "lemna-db.ipk-gatersleben.de");
-			String scpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP local storage folder", "/data0/pgftp/");
-			String scpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP user", "root");
-			String scpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP password", "LemnaTec");
 			
 			if (useSCP) {
 				InputStream iss = null;
