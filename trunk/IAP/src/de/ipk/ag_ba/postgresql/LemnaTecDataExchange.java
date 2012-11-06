@@ -1040,7 +1040,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							} catch (NumberFormatException e) {
 								if (fn.contains("/"))
 									fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-								IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+								IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
 										+ sn.getPath_image_config_blob(), sn.getId_tag()
 										+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 								if (optStatus != null)
@@ -1060,14 +1060,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						image.setPositionUnit("degree");
 					}
 					
-					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
 							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(host, experimentReq.getDatabase() + "/"
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
 								+ sn.getPath_null_image(),
 								"ref_" + sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/") + "/".length()) + ".png"
 								// sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
