@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -41,7 +42,8 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return PREFIX;
 	}
 	
-	public static boolean useCachedCloudDataIfAvailable = true; // TODO: use setting, in IAP-Data-Navigator änderbar
+	public static boolean useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer",
+			"Use MongoDB data if available", true); // TODO: use setting, in IAP-Data-Navigator änderbar
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
@@ -80,14 +82,23 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 					}
 				}
 			}
-			boolean useSCP = false;
+			boolean useSCP = SystemOptions.getInstance().getBoolean("LemnaTec - Image File Transfer", "Use SCP instead of FTP", false);
+			String ftpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP directory prefix", "/../../data0/pgftp/");
+			String ftpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP user", "lemnatec");
+			String ftpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "FTP password", "LemnaTec");
+			
+			String scpHost = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP host", "lemna-db.ipk-gatersleben.de");
+			String scpLocalFolder = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP local storage folder", "/data0/pgftp/");
+			String scpUser = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP user", "root");
+			String scpPassword = SystemOptions.getInstance().getString("LemnaTec - Image File Transfer", "SCP password", "LemnaTec");
+			
 			if (useSCP) {
 				InputStream iss = null;
 				// synchronized (PREFIX) {
-				ChannelSftp c = getNewChannel();
+				ChannelSftp c = getNewChannel(scpUser, scpPassword, scpHost);
 				c.getSession().setTimeout(60 * 60 * 1000); // set timeout of 60 minutes
 				String detail = url.getDetail();
-				detail = "/data0/pgftp/" + detail.split("/", 2)[1];
+				detail = scpLocalFolder + detail.split("/", 2)[1];
 				String dir = detail.substring(0, detail.lastIndexOf("/"));
 				System.out.println(SystemAnalysis.getCurrentTime() + ">SCP change directory: " + dir);
 				c.cd(dir);
@@ -107,11 +118,11 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				boolean advancedFTP = true;
 				
 				String detail = url.getDetail();
-				detail = detail.split("/", 2)[0] + "/../../data0/pgftp/" + detail.split("/", 2)[1] + "/";
-				String ur = "ftp://lemnatec:LemnaTec@" + detail.substring(0, detail.length() - "/".length());
+				detail = detail.split("/", 2)[0] + ftpLocalFolder + detail.split("/", 2)[1] + "/";
+				String ur = "ftp://" + ftpUser + ":" + ftpPassword + "@" + detail.substring(0, detail.length() - "/".length());
 				
 				if (advancedFTP) {
-					System.out.print(SystemAnalysis.getCurrentTimeInclSec()+">"+url);
+					System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">" + url);
 					MyByteArrayOutputStream bos = new MyByteArrayOutputStream();
 					BackgroundTaskStatusProviderSupportingExternalCallImpl status = new CommandLineBackgroundTaskStatusProvider(
 							false);
@@ -161,16 +172,14 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	private Session session = null;
 	private Channel channel = null;
 	
-	private synchronized ChannelSftp getChannel() throws Exception {
+	private synchronized ChannelSftp getChannel(String user, String password, String host) throws Exception {
 		if (session == null || !session.isConnected()) {
 			JSch jsch = new JSch();
-			String host = "lemna-db.ipk-gatersleben.de";
-			String user = "root";
 			int port = 22;
 			session = jsch.getSession(user, host, port);
 			UserInfo ui = new MyStoredUserInfo();
 			session.setUserInfo(ui);
-			session.setPassword("LemnaTec");
+			session.setPassword(password);
 			session.connect();
 		}
 		
@@ -183,15 +192,13 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return c;
 	}
 	
-	private ChannelSftp getNewChannel() throws Exception {
+	private ChannelSftp getNewChannel(String user, String password, String host) throws Exception {
 		JSch jsch = new JSch();
-		String host = "lemna-db.ipk-gatersleben.de";
-		String user = "root";
 		int port = 22;
 		Session session = jsch.getSession(user, host, port);
 		UserInfo ui = new MyStoredUserInfo();
 		session.setUserInfo(ui);
-		session.setPassword("LemnaTec");
+		session.setPassword(password);
 		session.connect();
 		
 		Channel channel = session.openChannel("sftp");
