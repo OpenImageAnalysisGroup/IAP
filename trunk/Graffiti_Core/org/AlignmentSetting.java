@@ -9,6 +9,8 @@ import org.graffiti.graphics.GraphicAttributeConstants;
 public enum AlignmentSetting {
 	HIDDEN,
 	AUTO_OUTSIDE, BELOW, ABOVE, RIGHT, LEFT, INSIDEBOTTOM, INSIDETOP,
+	INSIDETOPLEFT, INSIDETOPRIGHT, INSIDEBOTTOMLEFT, INSIDEBOTTOMRIGHT,
+	INSIDELEFT, INSIDERIGHT,
 	CENTERED, BELOWRIGHT, BELOWLEFT, ABOVELEFT, ABOVERIGHT, NEARSOURCE,
 	NEARTARGET, BORDER_TOP_LEFT, BORDER_TOP_CENTER,
 	BORDER_TOP_RIGHT, BORDER_BOTTOM_LEFT, BORDER_BOTTOM_CENTER,
@@ -35,6 +37,18 @@ public enum AlignmentSetting {
 				return "inside, bottom";
 			case INSIDETOP:
 				return "inside, top";
+			case INSIDEBOTTOMLEFT:
+				return "inside, bottom-left";
+			case INSIDEBOTTOMRIGHT:
+				return "inside, bottom-right";
+			case INSIDETOPRIGHT:
+				return "inside, top-right";
+			case INSIDETOPLEFT:
+				return "inside, top-left";
+			case INSIDELEFT:
+				return "inside, left";
+			case INSIDERIGHT:
+				return "inside, right";
 			case CENTERED:
 				return "centered";
 			case BELOWRIGHT:
@@ -94,8 +108,20 @@ public enum AlignmentSetting {
 				return GraphicAttributeConstants.LEFT;
 			case INSIDEBOTTOM:
 				return GraphicAttributeConstants.INSIDEBOTTOM;
+			case INSIDEBOTTOMLEFT:
+				return GraphicAttributeConstants.INSIDEBOTTOMLEFT;
+			case INSIDEBOTTOMRIGHT:
+				return GraphicAttributeConstants.INSIDEBOTTOMRIGHT;
 			case INSIDETOP:
 				return GraphicAttributeConstants.INSIDETOP;
+			case INSIDELEFT:
+				return GraphicAttributeConstants.INSIDELEFT;
+			case INSIDERIGHT:
+				return GraphicAttributeConstants.INSIDERIGHT;
+			case INSIDETOPLEFT:
+				return GraphicAttributeConstants.INSIDETOPLEFT;
+			case INSIDETOPRIGHT:
+				return GraphicAttributeConstants.INSIDETOPRIGHT;
 			case CENTERED:
 				return GraphicAttributeConstants.CENTERED;
 			case BELOWRIGHT:

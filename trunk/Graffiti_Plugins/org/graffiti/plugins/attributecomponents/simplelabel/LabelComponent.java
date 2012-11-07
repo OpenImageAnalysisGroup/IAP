@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: LabelComponent.java,v 1.2 2011-10-16 12:06:01 klukas Exp $
+// $Id: LabelComponent.java,v 1.3 2012-11-07 14:42:20 klukas Exp $
 
 package org.graffiti.plugins.attributecomponents.simplelabel;
 
@@ -20,6 +20,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -60,10 +61,10 @@ import org.graffiti.util.Pair;
 /**
  * This component represents a label for a node or an edge.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class LabelComponent extends AbstractAttributeComponent implements
-					GraphicAttributeConstants {
+		GraphicAttributeConstants {
 	// ~ Instance fields ========================================================
 	
 	private static final long serialVersionUID = 1L;
@@ -104,6 +105,12 @@ public class LabelComponent extends AbstractAttributeComponent implements
 	}
 	
 	// ~ Methods ================================================================
+	
+	@Override
+	public void highlight(boolean value, MouseEvent e) {
+		super.highlight(value, e);
+		label.highlight(value);
+	}
 	
 	/**
 	 * obvious
@@ -204,10 +211,12 @@ public class LabelComponent extends AbstractAttributeComponent implements
 		
 		setLabelSettings(label, labelAttr.getTextcolor());
 		
+		label.setShow(labelAttr.getFontStyle().contains("mouse"));
+		
 		setLayout(new TableLayout(
-							new double[][] {
-												new double[] { TableLayoutConstants.PREFERRED },
-												new double[] { TableLayoutConstants.PREFERRED } }));
+				new double[][] {
+						new double[] { TableLayoutConstants.PREFERRED },
+						new double[] { TableLayoutConstants.PREFERRED } }));
 		
 		offx = 0;
 		offy = 0;
@@ -218,10 +227,12 @@ public class LabelComponent extends AbstractAttributeComponent implements
 		
 		add(label, "0,0");
 		
-		if (isShowing())
-			validate();
-		else
-			validate(); // JRE7 bug	validateTree();
+		synchronized (getTreeLock()) {
+			if (isShowing())
+				validate();
+			else
+				validate();
+		}
 	}
 	
 	private void updateBorderOrShadow(double strokeWidth) {
@@ -241,14 +252,15 @@ public class LabelComponent extends AbstractAttributeComponent implements
 	}
 	
 	private Border getBoxBorder(final int xo, final int yo, final int wo, final int ho,
-						final LabelFrameSetting frame, final double strokeWidth, final boolean fill) {
+			final LabelFrameSetting frame, final double strokeWidth, final boolean fill) {
 		Border result = new Border() {
 			
 			boolean empty = false;
 			
+			@Override
 			public Insets getBorderInsets(Component c) {
 				if (frame == LabelFrameSetting.ELLIPSE || frame == LabelFrameSetting.CIRCLE
-									|| frame == LabelFrameSetting.CIRCLE_FILLED || frame == LabelFrameSetting.CIRCLE_HALF_FILLED) {
+						|| frame == LabelFrameSetting.CIRCLE_FILLED || frame == LabelFrameSetting.CIRCLE_HALF_FILLED) {
 					ViewLabel vl = (ViewLabel) c;
 					JLabel ll = new JLabel(vl.getText());
 					ll.setFont(vl.getFont());
@@ -284,12 +296,14 @@ public class LabelComponent extends AbstractAttributeComponent implements
 				return c2 / 2;
 			}
 			
+			@Override
 			public boolean isBorderOpaque() {
 				return false;
 			}
 			
+			@Override
 			public void paintBorder(Component c, Graphics g, int x, int y,
-								int width, int height) {
+					int width, int height) {
 				if (empty)
 					return;
 				// paintRectangleOrOval(frame, g, x, y, width, height, false, strokeWidth);
@@ -309,19 +323,19 @@ public class LabelComponent extends AbstractAttributeComponent implements
 	private void setLabelSettings(JLabel label, Color c) {
 		label.setForeground(c);
 		String fontName = labelAttr.getFontName();
-		int fontStyleInt = labelAttr.getFontStyleJava();;
+		int fontStyleInt = labelAttr.getFontStyleJava();
 		int fontSize = labelAttr.getFontSize();
 		
 		setCachedFont(label, fontName, fontStyleInt, fontSize);
 		label.setOpaque(false);
 		label.setSize((int) label.getPreferredSize().getWidth(), (int) label
-							.getPreferredSize().getHeight());
+				.getPreferredSize().getHeight());
 	}
 	
 	private static final HashMap<String, Font> knownFontSettings = new HashMap<String, Font>();
 	
 	private void setCachedFont(JLabel label, String fontName, int fontStyleInt,
-						int fontSize) {
+			int fontSize) {
 		
 		String fontSettings = fontName + "/" + fontStyleInt + "/" + fontSize;
 		Font f = knownFontSettings.get(fontSettings);
@@ -383,7 +397,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 	 * @return DOCUMENT ME!
 	 */
 	protected Pair calculateDists(PathIterator pi, Point2D segStartPos,
-						Point2D segEndPos) {
+			Point2D segEndPos) {
 		double[] seg = new double[6];
 		
 		double dist = 0;
@@ -415,7 +429,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 				
 				switch (type) {
 					case java.awt.geom.PathIterator.SEG_MOVETO:
-
+						
 						if (!pi.isDone()) {
 							diffdist = Point2D.distance(lastx, lasty, seg[0], seg[1]);
 							firstdist = dist;
@@ -424,8 +438,8 @@ public class LabelComponent extends AbstractAttributeComponent implements
 							newy = seg[1];
 							
 							if (!foundStart
-												&& ((lastx - segStartPos.getX()) <= Double.MIN_VALUE)
-												&& ((lasty - segStartPos.getY()) <= Double.MIN_VALUE)) {
+									&& ((lastx - segStartPos.getX()) <= Double.MIN_VALUE)
+									&& ((lasty - segStartPos.getY()) <= Double.MIN_VALUE)) {
 								foundStart = true;
 								segnrdist = 0;
 							} else
@@ -434,7 +448,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 								}
 							
 							if (((newx - segEndPos.getX()) <= Double.MIN_VALUE)
-												&& ((newy - segEndPos.getY()) <= Double.MIN_VALUE)) {
+									&& ((newy - segEndPos.getY()) <= Double.MIN_VALUE)) {
 								haveFound = true;
 							}
 						}
@@ -448,8 +462,8 @@ public class LabelComponent extends AbstractAttributeComponent implements
 						
 						// System.out.println("diffStart = (" + (lastx-segStartPos.getX()) + ", " + (lasty-segStartPos.getY()) + ")");
 						if (!foundStart
-											&& (Math.abs(lastx - segStartPos.getX()) <= Double.MIN_VALUE)
-											&& (Math.abs(lasty - segStartPos.getY()) <= Double.MIN_VALUE)) {
+								&& (Math.abs(lastx - segStartPos.getX()) <= Double.MIN_VALUE)
+								&& (Math.abs(lasty - segStartPos.getY()) <= Double.MIN_VALUE)) {
 							foundStart = true;
 							
 							// System.out.println("found start");
@@ -465,7 +479,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 						
 						// System.out.println("diffEnd = (" + (newx-segStartPos.getX()) + ", " + (newy-segStartPos.getY()) + ")");
 						if ((Math.abs(newx - segEndPos.getX()) <= Double.MIN_VALUE)
-											&& (Math.abs(newy - segEndPos.getY()) <= Double.MIN_VALUE)) {
+								&& (Math.abs(newy - segEndPos.getY()) <= Double.MIN_VALUE)) {
 							// assert !foundStart :
 							haveFound = true;
 							
@@ -534,125 +548,169 @@ public class LabelComponent extends AbstractAttributeComponent implements
 			
 			align = processAutoAlignment(align);
 			label.setDefaultTextPositioning();
+			double cx = coordX + centerX - (labelWidth / 2.0d);
+			double cy = centerY - (labelHeight / 2.0d);
+			double belowy = coordY + sizeY + LABEL_DISTANCE;
+			double rightx = coordX + sizeX + LABEL_DISTANCE;
+			double leftx = coordX - labelWidth - LABEL_DISTANCE;
+			double abovey = coordY - LABEL_DISTANCE - labelHeight;
+			double insrx = coordX + sizeX - labelWidth - borderWidth / 2d;
+			double inslx = coordX - +borderWidth / 2d;
+			double insbotty = (coordY + sizeY) - labelHeight - LABEL_DISTANCE - borderWidth;
+			double bordboty = coordY + sizeY - labelHeight / 2d - borderWidth / 2d;
+			double bordercx = coordX + sizeX / 2d - (labelWidth / 2d);
+			double borderlx = bordercx - sizeX * (1d / 2d - 1d / 4d);
+			double borderrx = bordercx + sizeX * (1d / 2d - 1d / 4d);
+			double bortopy = coordY - labelHeight / 2d + borderWidth / 2d;
 			if (CENTERED.equals(align)) {
-				loc.setLocation(coordX + centerX - (labelWidth / 2.0d), centerY - (labelHeight / 2.0d));
-			} else
+				loc.setLocation(cx, cy);
+			} else {
 				if (BELOW.equals(align)) {
-					loc.setLocation(coordX + centerX - (labelWidth / 2.0d), coordY + sizeY + LABEL_DISTANCE);
-				} else
+					loc.setLocation(cx, belowy);
+				} else {
 					if (BELOWRIGHT.equals(align)) {
-						loc.setLocation(coordX + sizeX + LABEL_DISTANCE, coordY + sizeY + LABEL_DISTANCE);
-					} else
+						loc.setLocation(rightx, belowy);
+					} else {
 						if (BELOWLEFT.equals(align)) {
-							loc.setLocation(coordX - labelWidth - LABEL_DISTANCE, coordY + sizeY + LABEL_DISTANCE);
-						} else
+							loc.setLocation(leftx, belowy);
+						} else {
 							if (BORDER_BOTTOM_CENTER.equals(align)) {
-								loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d), coordY + sizeY - labelHeight / 2d - borderWidth / 2d);
-							} else
+								loc.setLocation(bordercx, bordboty);
+							} else {
 								if (BORDER_BOTTOM_LEFT.equals(align)) {
-									loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d) - sizeX * (1d / 2d - 1d / 4d), coordY + sizeY - labelHeight / 2d
-														- borderWidth / 2d);
-								} else
+									loc.setLocation(borderlx, bordboty);
+								} else {
 									if (BORDER_BOTTOM_RIGHT.equals(align)) {
-										loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d) + sizeX * (1d / 2d - 1d / 4d), coordY + sizeY - labelHeight / 2d
-															- borderWidth / 2d);
-									} else
+										loc.setLocation(borderrx, bordboty);
+									} else {
 										if (BORDER_TOP_CENTER.equals(align)) {
-											loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d), coordY - labelHeight / 2d + borderWidth / 2d);
+											loc.setLocation(bordercx, bortopy);
 										} else
 											if (BORDER_TOP_LEFT.equals(align)) {
-												loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d) - sizeX * (1d / 2d - 1d / 4d), coordY - labelHeight / 2d
-																	+ borderWidth / 2d);
+												loc.setLocation(borderlx, bortopy);
 											} else
 												if (BORDER_TOP_RIGHT.equals(align)) {
-													loc.setLocation(coordX + sizeX / 2d - (labelWidth / 2d) + sizeX * (1d / 2d - 1d / 4d), coordY - labelHeight / 2d
-																		+ borderWidth / 2d);
-												} else
+													loc.setLocation(borderrx, bortopy);
+												} else {
 													if (INSIDEBOTTOM.equals(align)) {
-														loc
-																			.setLocation(coordX + centerX - (labelWidth / 2.0d), (coordY + sizeY) - labelHeight - LABEL_DISTANCE
-																								- borderWidth);
-													} else
+														loc.setLocation(cx, insbotty);
+													} else {
 														if (ABOVE.equals(align)) {
-															loc.setLocation(coordX + centerX - (labelWidth / 2.0d), coordY - LABEL_DISTANCE - labelHeight);
+															loc.setLocation(cx, abovey);
 														} else
 															if (ABOVELEFT.equals(align)) {
-																loc.setLocation(coordX - labelWidth - LABEL_DISTANCE, coordY - LABEL_DISTANCE - labelHeight);
+																loc.setLocation(leftx, abovey);
 															} else
 																if (LEFT.equals(align)) {
-																	loc.setLocation(coordX - labelWidth - LABEL_DISTANCE/*-label.offX()*/, centerY - (labelHeight / 2.0d));
+																	loc.setLocation(leftx, cy);
 																} else
 																	if (BORDER_LEFT_TOP.equals(align)) {
 																		loc.setLocation(coordX - labelWidth / 2d + borderWidth / 2d, centerY - (labelHeight / 2.0d) - sizeY
-																							* (1d / 2d - 1d / 4d));
+																				* (1d / 2d - 1d / 4d));
 																	} else
 																		if (BORDER_LEFT_CENTER.equals(align)) {
-																			loc.setLocation(coordX - labelWidth / 2d + borderWidth / 2d, centerY - (labelHeight / 2.0d));
+																			loc.setLocation(coordX - labelWidth / 2d + borderWidth / 2d, cy);
 																		} else
 																			if (BORDER_LEFT_BOTTOM.equals(align)) {
-																				loc.setLocation(coordX - labelWidth / 2d + borderWidth / 2d, centerY - (labelHeight / 2.0d) + sizeY
-																									* (1d / 2d - 1d / 4d));
+																				loc.setLocation(coordX - labelWidth / 2d + borderWidth / 2d, cy + sizeY
+																						* (1d / 2d - 1d / 4d));
 																			} else
 																				if (BORDER_RIGHT_TOP.equals(align)) {
 																					loc.setLocation(coordX + sizeX - labelWidth / 2d - borderWidth / 2d, centerY
-																										- (labelHeight / 2.0d) - sizeY * (1d / 2d - 1d / 4d));
+																							- (labelHeight / 2.0d) - sizeY * (1d / 2d - 1d / 4d));
 																				} else
 																					if (BORDER_RIGHT_CENTER.equals(align)) {
-																						loc.setLocation(coordX + sizeX - labelWidth / 2d - borderWidth / 2d, centerY
-																											- (labelHeight / 2.0d));
+																						loc.setLocation(coordX + sizeX - labelWidth / 2d - borderWidth / 2d, cy);
 																					} else
 																						if (BORDER_RIGHT_BOTTOM.equals(align)) {
-																							loc.setLocation(coordX + sizeX - labelWidth / 2d - borderWidth / 2d, centerY
-																												- (labelHeight / 2.0d) + sizeY * (1d / 2d - 1d / 4d));
+																							loc.setLocation(coordX + sizeX - labelWidth / 2d - borderWidth / 2d, cy + sizeY
+																									* (1d / 2d - 1d / 4d));
 																						} else
 																							if (ABOVERIGHT.equals(align)) {
-																								loc.setLocation(coordX + sizeX + LABEL_DISTANCE, coordY - LABEL_DISTANCE - labelHeight);
+																								loc.setLocation(rightx, abovey);
 																							} else
 																								if (RIGHT.equals(align)) {
-																									loc.setLocation(coordX + sizeX + LABEL_DISTANCE, centerY - (labelHeight / 2.0d));
+																									loc.setLocation(rightx, cy);
 																								} else
-																									if (INSIDETOP.equals(align)) {
-																										loc.setLocation(coordX + centerX - (labelWidth / 2.0d), coordY + LABEL_DISTANCE
-																															+ borderWidth);
+																									if (INSIDETOPLEFT.equals(align)) {
+																										loc.setLocation(coordX + borderWidth / 2d, coordY
+																												+ LABEL_DISTANCE + borderWidth);
 																									} else {
-																										// no supported alignment constant: try to parse 'align' as x-y position
-																										String[] posarr = align.split(";");
-																										Vector2d pos = null;
-																										if (posarr.length == 2) {
-																											try {
-																												pos = new Vector2d(Double.parseDouble(posarr[0]),
-																														Double.parseDouble(posarr[1]));
-																											} catch (Exception err) {
-																												pos = null;
-																											}
-																										}
-																										if (pos != null) {
-																											loc.setLocation(pos.x - (labelWidth / 2.0d), pos.y - (labelHeight / 2.0d));
+																										if (INSIDETOPRIGHT.equals(align)) {
+																											loc.setLocation(insrx, coordY
+																													+ LABEL_DISTANCE + borderWidth);
 																										} else {
-																											// no supported alignment constant: use relative positions
-																											try {
-																												NodeLabelPositionAttribute posAttr = ((NodeLabelAttribute) this.labelAttr)
-																																.getPosition();
-																												
-																												if (posAttr == null) {
-																													posAttr = new NodeLabelPositionAttribute(POSITION);
-																												}
-																												
-																												loc.setLocation(centerX + ((posAttr.getRelHor() * sizeX) / 2d)
-																																+ ((posAttr.getLocalAlign() - 1d) * (labelWidth / 2d)),
-																																(centerY + ((posAttr.getRelVert() * sizeY) / 2d))
-																																					- (labelHeight / 2d));
-																											} catch (Exception err) {
-																												loc.setLocation(centerX - (labelWidth / 2.0d), centerY
-																														- (labelHeight / 2.0d));
-																											}
+																											if (INSIDELEFT.equals(align)) {
+																												loc.setLocation(inslx, cy);
+																											} else
+																												if (INSIDERIGHT.equals(align)) {
+																													loc.setLocation(insrx, cy);
+																												} else
+																													if (INSIDEBOTTOMLEFT.equals(align)) {
+																														loc.setLocation(inslx,
+																																insbotty);
+																													} else
+																														if (INSIDEBOTTOMRIGHT.equals(align)) {
+																															loc.setLocation(insrx, insbotty);
+																														} else
+																															if (INSIDETOP.equals(align)) {
+																																loc.setLocation(cx, coordY
+																																		+ LABEL_DISTANCE
+																																		+ borderWidth);
+																															} else {
+																																// no supported alignment constant: try to parse 'align' as x-y
+																																// position
+																																String[] posarr = align.split(";");
+																																Vector2d pos = null;
+																																if (posarr.length == 2) {
+																																	try {
+																																		pos = new Vector2d(Double.parseDouble(posarr[0]),
+																																				Double.parseDouble(posarr[1]));
+																																	} catch (Exception err) {
+																																		pos = null;
+																																	}
+																																}
+																																if (pos != null) {
+																																	loc.setLocation(pos.x - (labelWidth / 2.0d), pos.y
+																																			- (labelHeight / 2.0d));
+																																} else {
+																																	// no supported alignment constant: use relative positions
+																																	try {
+																																		NodeLabelPositionAttribute posAttr = ((NodeLabelAttribute) this.labelAttr)
+																																				.getPosition();
+																																		
+																																		if (posAttr == null) {
+																																			posAttr = new NodeLabelPositionAttribute(POSITION);
+																																		}
+																																		
+																																		loc
+																																				.setLocation(
+																																						centerX
+																																								+ ((posAttr.getRelHor() * sizeX) / 2d)
+																																								+ ((posAttr.getLocalAlign() - 1d) * (labelWidth / 2d)),
+																																						(centerY + ((posAttr.getRelVert() * sizeY) / 2d))
+																																								- (labelHeight / 2d));
+																																	} catch (Exception err) {
+																																		loc.setLocation(centerX - (labelWidth / 2.0d), cy);
+																																	}
+																																}
+																															}
 																										}
 																									}
+													}
+												}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		} else {
 			// System.out.println("recalculating edgelabel " + this);
 			// label is an edgelabel
 			EdgeLabelPositionAttribute posAttr = ((EdgeLabelAttribute) this.labelAttr)
-								.getPosition();
+					.getPosition();
 			
 			if (posAttr == null) {
 				posAttr = new EdgeLabelPositionAttribute(POSITION);
@@ -669,7 +727,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 				
 				pi = geShape.getPathIterator(null, flatness);
 				labelLoc = this.iterateTill(pi, new Double(posAttr.getRelAlign()
-									* dist));
+						* dist));
 			} else {
 				// calc pos rel to spec seg
 				PathIterator pi = geShape.getPathIterator(null);
@@ -685,26 +743,26 @@ public class LabelComponent extends AbstractAttributeComponent implements
 					
 					pi = geShape.getPathIterator(null, flatness);
 					labelLoc = this.iterateTill(pi, new Double(posAttr.getRelAlign()
-										* dist));
+							* dist));
 				} else {
 					pi = geShape.getPathIterator(null, flatness);
 					
 					Pair dists = this.calculateDists(pi, segPos.getFst(), segPos
-										.getSnd());
+							.getSnd());
 					
 					// move along path till correct pos
 					pi = geShape.getPathIterator(null, flatness);
 					labelLoc = this.iterateTill(pi, new Double((Double) dists.getFst()
-										+ (posAttr.getRelAlign() * (Double) dists.getSnd())));
+							+ (posAttr.getRelAlign() * (Double) dists.getSnd())));
 				}
 			}
 			
 			loc.setLocation(labelLoc.getX() - (labelWidth / 2.0d)
-								+ posAttr.getAbsHor(), labelLoc.getY() - (labelHeight / 2.0d)
-								+ posAttr.getAbsVert());
+					+ posAttr.getAbsHor(), labelLoc.getY() - (labelHeight / 2.0d)
+					+ posAttr.getAbsVert());
 		}
 		setLocation((int) (loc.getX() + shift.getX()), (int) (loc.getY() + shift
-							.getY()));
+				.getY()));
 		
 		// setLocation((int) loc.getX(), (int) loc.getY());
 		
@@ -836,7 +894,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 				
 				switch (type) {
 					case java.awt.geom.PathIterator.SEG_MOVETO:
-
+						
 						if (!pi.isDone()) {
 							newx = seg[0];
 							newy = seg[1];
@@ -928,7 +986,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 				
 				switch (type) {
 					case java.awt.geom.PathIterator.SEG_MOVETO:
-
+						
 						if (!pi.isDone()) {
 							dist += Point2D.distance(lastx, lasty, seg[0], seg[1]);
 							lastx = seg[0];
@@ -960,7 +1018,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 						break;
 					
 					case java.awt.geom.PathIterator.SEG_QUADTO:
-
+						
 						// unnecessary since this approximation uses only lines
 						// System.out.println(" quad");
 						dist += Point2D.distance(lastx, lasty, seg[2], seg[3]);
@@ -970,7 +1028,7 @@ public class LabelComponent extends AbstractAttributeComponent implements
 						break;
 					
 					case java.awt.geom.PathIterator.SEG_CUBICTO:
-
+						
 						// unnecessary since this approximation uses only lines
 						// System.out.println(" cube");
 						dist += Point2D.distance(lastx, lasty, seg[4], seg[5]);
@@ -991,8 +1049,8 @@ public class LabelComponent extends AbstractAttributeComponent implements
 	}
 	
 	static void paintRectangleOrOval(LabelFrameSetting frame,
-						Graphics gg, float x, float y, float width, float height, boolean fill,
-						double strokeWidth, Color borderColor, boolean emptyText) {
+			Graphics gg, float x, float y, float width, float height, boolean fill,
+			double strokeWidth, Color borderColor, boolean emptyText) {
 		
 		Graphics2D g2d = (Graphics2D) gg;
 		
@@ -1065,9 +1123,32 @@ public class LabelComponent extends AbstractAttributeComponent implements
 							gp.moveTo(x, y);
 							gp.lineTo(x + width, y);
 							gp.lineTo(x + width, y + height - c);
-							gp.quadTo(x + width, y + height, x + width - c, y + height);
+							// gp.quadTo(x + width, y + height, x + width - c, y + height);
+							
+							int roundingSimulationSteps = 10;
+							double xc = (x + width - c);
+							double yc = (y + height - c);
+							double singleStep = Math.PI / 2 / roundingSimulationSteps;
+							for (int k = 1; k < roundingSimulationSteps; k++) {
+								int step = roundingSimulationSteps - k;
+								double xp = xc - Math.sin(singleStep * step + Math.PI) * c;
+								double yp = yc - Math.cos(singleStep * step + Math.PI) * c;
+								gp.lineTo(xp, yp);
+							}
+							gp.lineTo(x + width - c, y + height);
+							
 							gp.lineTo(x + c, y + height);
-							gp.quadTo(x, y + height, x, y + height - c);
+							// gp.quadTo(x, y + height, x, y + height - c);
+							
+							xc = (x + c);
+							yc = (y + height) - c;
+							for (int k = 1; k < roundingSimulationSteps; k++) {
+								int step = roundingSimulationSteps - k;
+								double xp = xc - Math.cos(singleStep * step) * c;
+								double yp = yc + Math.sin(singleStep * step) * c;
+								gp.lineTo(xp, yp);
+							}
+							
 							gp.lineTo(x, y);
 							gp.closePath();
 							if (fill)
@@ -1085,8 +1166,8 @@ public class LabelComponent extends AbstractAttributeComponent implements
 									g2d.draw(new RoundRectangle2D.Double(x, y, width, height, mwh, mwh));
 							} else
 								if (frame == LabelFrameSetting.ELLIPSE || frame == LabelFrameSetting.CIRCLE ||
-													frame == LabelFrameSetting.CIRCLE_FILLED || frame == LabelFrameSetting.CIRCLE_HALF_FILLED ||
-													frame == LabelFrameSetting.PIN) {
+										frame == LabelFrameSetting.CIRCLE_FILLED || frame == LabelFrameSetting.CIRCLE_HALF_FILLED ||
+										frame == LabelFrameSetting.PIN) {
 									if (frame == LabelFrameSetting.PIN) {
 										float minR = width < height ? width : height;
 										float offX = (width - minR) / 2f;
@@ -1113,17 +1194,17 @@ public class LabelComponent extends AbstractAttributeComponent implements
 												GeneralPath triangle = new GeneralPath();
 												triangle.moveTo(-dx + minR / 30f + x + offX + minR / 2.5f, -dy + y + offY + minR / 3.5f - minR / 8f + minR / 4f);
 												triangle
-																	.lineTo(-dx - minR / 30f + x + offX + minR / 2.5f + minR / 5f, -dy + y + offY + minR / 3.5f - minR / 8f
-																						+ minR / 4f);
+														.lineTo(-dx - minR / 30f + x + offX + minR / 2.5f + minR / 5f, -dy + y + offY + minR / 3.5f - minR / 8f
+																+ minR / 4f);
 												triangle.lineTo(-dx + x + offX + minR / 2f, -dy + y + offY + minR / 1.2f);
 												triangle.closePath();
 												g2d.fill(triangle);
 											} else {
 												// draw "simplified pin" (two lines)
 												g2d.drawLine((int) (x + offX + minR / 8), (int) (y + offY + minR / 1.3), (int) (x + offX + minR * 0.75),
-																	(int) (y + offY + minR * 0.12));
+														(int) (y + offY + minR * 0.12));
 												g2d.drawLine((int) (x + offX + minR / 2 - 1), (int) (y + offY + minR / 2 - 1), (int) (x + offX + minR * 0.82 + 1), (int) (y
-																	+ offY + minR * 0.82 + 1));
+														+ offY + minR * 0.82 + 1));
 											}
 											g2d.setTransform(o);
 										}
@@ -1161,6 +1242,13 @@ public class LabelComponent extends AbstractAttributeComponent implements
 								}
 		g2d.setColor(oc);
 	}
+	
+	public LabelFrameSetting getLabelFrameSetting() {
+		
+		return frame;
+		
+	}
+	
 }
 
 // ------------------------------------------------------------------------------

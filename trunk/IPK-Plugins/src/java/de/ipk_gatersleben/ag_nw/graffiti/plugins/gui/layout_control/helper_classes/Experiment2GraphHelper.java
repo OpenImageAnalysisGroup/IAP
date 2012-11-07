@@ -45,7 +45,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.QuadNumbe
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.editcomponents.chart_settings.ChartsColumnAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.editcomponents.chart_settings.GraffitiCharts;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.editcomponents.xml_attribute.XMLAttribute;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent.MyComparableDataPoint;
@@ -141,7 +140,7 @@ public class Experiment2GraphHelper implements BackgroundTaskStatusProviderSuppo
 	// selectResult);
 	// }
 	
-	public MapResult mapDataToGraphElements(boolean mapAlsoInCaseOfEmptyDataset, Experiment md,
+	public MapResult mapDataToGraphElements(boolean mapAlsoInCaseOfEmptyDataset, ExperimentInterface md,
 			Collection<org.graffiti.graph.GraphElement> targetGraphElements, Graph addNewGraphElementsToThisGraph,
 			boolean doUserMapping, String diagramStyle, int minimumLines, boolean considerCompoundDb,
 			boolean considerEnzymeDb, boolean considerKoDb, boolean considerMappingToKEGGmapNodes, boolean selectResult) {

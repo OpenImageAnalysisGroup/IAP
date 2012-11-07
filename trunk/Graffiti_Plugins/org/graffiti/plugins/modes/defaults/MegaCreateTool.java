@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MegaCreateTool.java,v 1.2 2011-05-13 09:07:32 klukas Exp $
+// $Id: MegaCreateTool.java,v 1.3 2012-11-07 14:42:19 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
@@ -72,7 +72,7 @@ import org.graffiti.undo.GraphElementsDeletionEdit;
  * @author Holleis
  */
 public class MegaCreateTool
-					extends MegaTools {
+		extends MegaTools {
 	// ~ Instance fields ========================================================
 	
 	/** DOCUMENT ME! */
@@ -115,13 +115,13 @@ public class MegaCreateTool
 	protected int numOfBends = 0;
 	
 	/** Removes last bend while creating edges. */
-	private Action backAction;
+	private final Action backAction;
 	
 	/** Deletes all selected items (incl. undo support). */
-	private Action deleteAction;
+	private final Action deleteAction;
 	
 	/** Aborts creation of edges. */
-	private Action escapeAction;
+	private final Action escapeAction;
 	
 	// private boolean ctrlDown = false;
 	
@@ -145,6 +145,7 @@ public class MegaCreateTool
 		{
 			private static final long serialVersionUID = 3905528206759900217L;
 			
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				reset();
@@ -155,6 +156,7 @@ public class MegaCreateTool
 		{
 			private static final long serialVersionUID = 3257567308653081396L;
 			
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				if (numOfBends == 0)
@@ -162,12 +164,11 @@ public class MegaCreateTool
 					// no bends, just do the same as does escapeAction
 					reset();
 				}
-							else
+				else
 				{
-					numOfBends--;
-					dummyEdgeGraphAttr.getBends().remove("bend" +
-										numOfBends);
+					dummyEdgeGraphAttr.getBends().remove("bend" + numOfBends);
 					bends.remove("bend" + numOfBends);
+					numOfBends--;
 					
 					for (View view : session.getViews())
 					{
@@ -176,7 +177,7 @@ public class MegaCreateTool
 						{
 							gec.graphicAttributeChanged(dummyEdgeGraphAttr.getBends());
 						}
-							catch (ShapeNotFoundException snfe)
+						catch (ShapeNotFoundException snfe)
 						{
 						}
 					}
@@ -190,6 +191,7 @@ public class MegaCreateTool
 		{
 			private static final long serialVersionUID = 1L;
 			
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				// useful to check if the selection isn't empty
@@ -201,7 +203,7 @@ public class MegaCreateTool
 					else {
 						Graph graph = MainFrame.getInstance().getActiveSession().getGraph();
 						GraphElementsDeletionEdit edit = new GraphElementsDeletionEdit(selection.getElements(),
-											graph, geMap);
+								graph, geMap);
 						unmarkAll();
 						fireSelectionChanged();
 						edit.execute();
@@ -262,37 +264,37 @@ public class MegaCreateTool
 			
 			String deleteName = "delete";
 			view.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_DELETE, 0), deleteName);
+					java.awt.event.KeyEvent.VK_DELETE, 0), deleteName);
 			view.getActionMap().put(deleteName, deleteAction);
 			
 			String escName = "escape";
 			view.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_ESCAPE, 0), escName);
+					java.awt.event.KeyEvent.VK_ESCAPE, 0), escName);
 			view.getActionMap().put(escName, escapeAction);
 			
 			String backName = "back";
 			view.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_BACK_SPACE, 0), backName);
+					java.awt.event.KeyEvent.VK_BACK_SPACE, 0), backName);
 			view.getActionMap().put(backName, backAction);
 			MainFrame
-								.showMessage(
-													"<html>"
-																		+
-																		"Use the mouse to create nodes and/or edges and "
-																		+
-																		"use the DEL key to delete the last created element, "
-																		+
-																		"the BACK key to remove edge bends during edge creation or cancel active edge creation. "
-																		+
-																		"Press Ctrl while clicking on a larger node to create a new node instead of starting edge creation. The style (size, color, label, ...) is taken from the current node "
-																		+
-																		"selection.", // +
-													// "Double-click a node to edit the node-label.",
-										MessageType.INFO);
+					.showMessage(
+							"<html>"
+									+
+									"Use the mouse to create nodes and/or edges and "
+									+
+									"use the DEL key to delete the last created element, "
+									+
+									"the BACK key to remove edge bends during edge creation or cancel active edge creation. "
+									+
+									"Press Ctrl while clicking on a larger node to create a new node instead of starting edge creation. The style (size, color, label, ...) is taken from the current node "
+									+
+									"selection.", // +
+							// "Double-click a node to edit the node-label.",
+							MessageType.INFO);
 		} catch (ClassCastException cce) {
 			ErrorMsg.addErrorMessage(cce);
 			System.err.println("Failed to register a key for some action in " +
-								getClass().getName() + ", activate()");
+					getClass().getName() + ", activate()");
 		}
 	}
 	
@@ -312,11 +314,11 @@ public class MegaCreateTool
 		
 		if (keyComponent != null) {
 			keyComponent.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).remove(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_DELETE, 0));
+					java.awt.event.KeyEvent.VK_DELETE, 0));
 			keyComponent.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).remove(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_ESCAPE, 0));
+					java.awt.event.KeyEvent.VK_ESCAPE, 0));
 			keyComponent.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).remove(KeyStroke.getKeyStroke(
-								java.awt.event.KeyEvent.VK_BACK_SPACE, 0));
+					java.awt.event.KeyEvent.VK_BACK_SPACE, 0));
 		}
 	}
 	
@@ -343,7 +345,7 @@ public class MegaCreateTool
 		boolean doubleClickOK = false; // disable double click editing
 		
 		if (e.getClickCount() > 1 && (MegaTools.getLastMouseSrc() instanceof GraphElementComponent)
-							&& doubleClickOK) {
+				&& doubleClickOK) {
 			AdvancedLabelTool.processLabelEdit((GraphElementComponentInterface) MegaTools.getLastMouseSrc());
 			reset();
 			return;
@@ -366,14 +368,14 @@ public class MegaCreateTool
 			}
 			
 			if (src instanceof NodeComponent &&
-								((NodeComponent) src).getGraphElement().equals(dummyNode)) {
+					((NodeComponent) src).getGraphElement().equals(dummyNode)) {
 				src.setVisible(false);
 				src = findComponentAt(e, e.getX(), e.getY());
 				// src = getCorrectComp(src, (View) e.getComponent(), e);
 			}
 			
 			if (src instanceof EdgeComponent &&
-								((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
+					((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
 				tempEdgeComp = src;
 				tempEdgeComp.setVisible(false);
 				
@@ -397,7 +399,7 @@ public class MegaCreateTool
 			// clicked on background (or edge) => bend or new node
 			if (creatingEdge) {
 				if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR &&
-									src instanceof EdgeComponent) {
+						src instanceof EdgeComponent) {
 					Edge edge = (Edge) ((EdgeComponent) src).getGraphElement();
 					Node newNode = breakEdge(e, edge);
 					processEdgeCreation(e, newNode);
@@ -405,7 +407,7 @@ public class MegaCreateTool
 					addBend(e);
 			} else {
 				if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR &&
-									src instanceof EdgeComponent) {
+						src instanceof EdgeComponent) {
 					Edge edge = (Edge) ((EdgeComponent) src).getGraphElement();
 					
 					Node newNode = breakEdge(e, edge);
@@ -466,7 +468,7 @@ public class MegaCreateTool
 			JComponent compSrc = (JComponent) e.getSource();
 			
 			if (src instanceof EdgeComponent &&
-								((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
+					((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
 				tempEdgeComp = src;
 				tempEdgeComp.setVisible(false);
 				
@@ -477,7 +479,7 @@ public class MegaCreateTool
 			}
 			
 			if (src instanceof NodeComponent &&
-								((NodeComponent) src).getGraphElement().equals(dummyNode)) {
+					((NodeComponent) src).getGraphElement().equals(dummyNode)) {
 				src.setVisible(false);
 				
 				src = compSrc.findComponentAt((e.getPoint()));
@@ -485,7 +487,7 @@ public class MegaCreateTool
 			}
 			
 			if (src instanceof EdgeComponent &&
-								((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
+					((EdgeComponent) src).getGraphElement().equals(dummyEdge)) {
 				tempEdgeComp = src;
 				tempEdgeComp.setVisible(false);
 				
@@ -503,7 +505,7 @@ public class MegaCreateTool
 			}
 			
 			if (src instanceof NodeComponent &&
-								(((NodeComponent) src).getGraphElement() != dummyNode)) {
+					(((NodeComponent) src).getGraphElement() != dummyNode)) {
 				if (!selectedContain(src)) {
 					highlight(src, e);
 					src.getParent().repaint();
@@ -519,7 +521,7 @@ public class MegaCreateTool
 		
 		if (dummyNode != null) {
 			((NodeGraphicAttribute) dummyNode.getAttribute(GraphicAttributeConstants.GRAPHICS)).getCoordinate()
-								.setCoordinate(e.getPoint());
+					.setCoordinate(e.getPoint());
 		}
 		
 		if (creatingEdge) {
@@ -568,6 +570,10 @@ public class MegaCreateTool
 		}
 	}
 	
+	public boolean isCreatingEdge() {
+		return creatingEdge;
+	}
+	
 	private void startAddEdge(MouseEvent e, Node clickedNode) {
 		NodeGraphicAttribute dummyGraphics;
 		// start adding edge
@@ -588,13 +594,13 @@ public class MegaCreateTool
 		CollectionAttribute dummyEdgeCol = new HashMapAttribute("");
 		dummyEdgeGraphAttr = new EdgeGraphicAttribute();
 		dummyEdgeGraphAttr.setShape(
-							"org.graffiti.plugins.views.defaults.SmoothLineEdgeShape");
+				"org.graffiti.plugins.views.defaults.SmoothLineEdgeShape");
 		dummyEdgeCol.add(dummyEdgeGraphAttr, true);
 		dummyBends = null;
 		if (dummyEdge != null)
 			graph.deleteEdge(dummyEdge);
 		dummyEdge = graph.addEdge(clickedNode, dummyNode, true,
-							dummyEdgeCol);
+				dummyEdgeCol);
 		this.first = clickedNode;
 		sourceCA.setCoordinate(e.getPoint());
 	}
@@ -661,8 +667,8 @@ public class MegaCreateTool
 			tempGeComp = ((View) e.getComponent()).getComponentForElement(node);
 		if (tempGeComp == null) {
 			ErrorMsg.addErrorMessage("Internal Error: No graph element was created or found for a new node! " +
-								"Eventually an error occured before, leaving a open graph-transaction. Use" +
-								" Window/ReCreate-View to close this transaction.");
+					"Eventually an error occured before, leaving a open graph-transaction. Use" +
+					" Window/ReCreate-View to close this transaction.");
 		}
 		// tempGeComp.paintComponent(tempGeComp.getGraphics());
 		// getSelectedComps().add(tempGeComp);
@@ -698,6 +704,7 @@ public class MegaCreateTool
 			y = y - (y % 10);
 		}
 		
+		numOfBends++;
 		bends.add(new CoordinateAttribute("bend" + numOfBends, x, y));
 		// add a bend ... to dummy edge
 		if (dummyBends == null) {
@@ -706,15 +713,13 @@ public class MegaCreateTool
 			
 			// dummyBends = dummyEdgeGraphAttr.getBends();
 		}
-		dummyEdgeGraphAttr.getBends().add(new CoordinateAttribute(
-							"bend" + numOfBends, e.getPoint()), true);
+		dummyEdgeGraphAttr.getBends().add(new CoordinateAttribute("bend" + numOfBends, e.getPoint()), true);
 		// dummyEdgeGraphAttr.getBends().setValue(dummyBends.getCollection());
-		numOfBends++;
 		// HACK to make the view update the edge ...
 		Point pt = e.getPoint();
 		pt.setLocation((int) pt.getX() + 1, (int) pt.getY() + 1);
 		((NodeGraphicAttribute) dummyNode.getAttribute(GraphicAttributeConstants.GRAPHICS)).getCoordinate()
-							.setCoordinate(pt);
+				.setCoordinate(pt);
 	}
 	
 	private void processEdgeCreation(MouseEvent e, Node clickedNode) {
@@ -743,25 +748,21 @@ public class MegaCreateTool
 		int blue = fc.getInt("blue", 0);
 		int alpha = fc.getInt("alpha", 255);
 		graphics.getFramecolor().setColor(new Color(red, green, blue,
-							alpha));
+				alpha));
 		// setting the fillcolor
 		fc = prefs.node("fillcolor");
 		red = fc.getInt("red", 0);
 		green = fc.getInt("green", 0);
 		blue = fc.getInt("blue", 0);
 		alpha = fc.getInt("alpha", 255);
-		graphics.getFillcolor().setColor(new Color(red, green, blue,
-							alpha));
+		graphics.getFillcolor().setColor(new Color(red, green, blue, alpha));
 		if (numOfBends > 0) {
-			graphics.setShape(prefs.get("shape",
-								"org.graffiti.plugins.views.defaults.SmoothLineEdgeShape"));
+			graphics.setShape(prefs.get("shape", "org.graffiti.plugins.views.defaults.SmoothLineEdgeShape"));
 		} else {
-			graphics.setShape(prefs.get("shape",
-								"org.graffiti.plugins.views.defaults.StraightLineEdgeShape"));
+			graphics.setShape(prefs.get("shape", "org.graffiti.plugins.views.defaults.StraightLineEdgeShape"));
 		}
 		if (clickedNode.getGraph().isDirected())
-			graphics.setArrowhead(prefs.get("arrowhead",
-								"org.graffiti.plugins.views.defaults.StandardArrowShape"));
+			graphics.setArrowhead(prefs.get("arrowhead", "org.graffiti.plugins.views.defaults.StandardArrowShape"));
 		// setting the lineMode
 		GravistoPreferences da = prefs.node("dashArray");
 		String[] daEntries;
@@ -779,33 +780,41 @@ public class MegaCreateTool
 			graphics.getLineMode().setDashArray(newDA);
 		}
 		graphics.getLineMode().setDashPhase(prefs.getFloat(
-							"dashPhase", 0.0f));
+				"dashPhase", 0.0f));
 		if (numOfBends > 0) {
 			graphics.setBends(bends);
 			numOfBends = 0;
 			bends = null;
 		}
 		final Edge edge = clickedNode.getGraph().addEdge(
-							this.first, clickedNode,
-							clickedNode.getGraph().isDirected(),
-							col);
+				this.first, clickedNode,
+				clickedNode.getGraph().isDirected(),
+				col);
 		
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR) {
 			AttributeHelper.setLabel(edge, "?");
 		}
 		
 		this.first = null;
-		GraphElementComponent tempGeComp = ((View) e.getComponent()).getComponentForElement(edge);
-		if (tempGeComp == null)
+		View v = ((View) e.getComponent());
+		GraphElementComponent tempGeComp = v.getComponentForElement(edge);
+		// if edge visualisation is suppressed by a global view setting or isHidden of the view, suppress the error,
+		// because the edge will be created but not shown
+		boolean invisibleEdge = tempGeComp == null && v instanceof GraffitiView && (((GraffitiView) v).getBlockEdges() || ((GraffitiView) v).isHidden(edge));
+		if (tempGeComp == null && !invisibleEdge)
 			ErrorMsg.addErrorMessage("No GraphElement-Component is created. Internal Error!");
-		mark(tempGeComp, false, false, this, false);
+		if (!invisibleEdge)
+			mark(tempGeComp, false, false, this, false);
 		fireSelectionChanged();
-		tempGeComp.getParent().repaint();
+		if (!invisibleEdge)
+			tempGeComp.getParent().repaint();
+		
 		AddEdgeEdit edit = new AddEdgeEdit(edge, clickedNode.getGraph(), geMap);
 		undoSupport.postEdit(edit);
 		creatingEdge = false;
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR) {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					AdvancedLabelTool.processLabelEdit(edge);
 				}
@@ -881,7 +890,7 @@ public class MegaCreateTool
 		} else
 			if (src instanceof AttributeComponent) {
 				Component comp = view.getComponentForElement((GraphElement) ((AttributeComponent) src).getAttribute()
-									.getAttributable());
+						.getAttributable());
 				
 				if (comp == null) {
 					return (Component) me.getSource();
@@ -897,6 +906,7 @@ public class MegaCreateTool
 			}
 	}
 	
+	@Override
 	public String getToolName() {
 		return "MegaCreateTool";
 	}
@@ -968,9 +978,6 @@ public class MegaCreateTool
 						for (int k = 0; k < 100; k++)
 							if (AttributeHelper.hasAttribute(newNode, GraphicAttributeConstants.LABELGRAPHICS + String.valueOf(k)))
 								newNode.removeAttribute(GraphicAttributeConstants.LABELGRAPHICS + String.valueOf(k));
-						// remove sbgn attribute
-						if (AttributeHelper.hasAttribute(newNode, "sbgn", "role"))
-							newNode.removeAttribute("sbgn");
 					}
 					
 					// set new node position to a position on the old not broken edge
@@ -978,11 +985,11 @@ public class MegaCreateTool
 					// has old edge a docking at source node?
 					// if yes, pos1 has to be changed to docking position
 					docking = (String) AttributeHelper.getAttributeValue(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
-										GraphicAttributeConstants.SOURCE, "", new String(""), true);
+							GraphicAttributeConstants.SOURCE, "", new String(""), true);
 					if (docking.length() > 0) {
 						Vector2d size = AttributeHelper.getSize(newEdge1.getSource());
 						Vector2d dockingpos = new Vector2d(Double.parseDouble(docking.substring(0, docking.indexOf(";"))),
-											Double.parseDouble(docking.substring(docking.indexOf(";") + 1)));
+								Double.parseDouble(docking.substring(docking.indexOf(";") + 1)));
 						if (Math.abs(dockingpos.x) < 1.001)
 							pos1.x = pos1.x + size.x * 0.5 * dockingpos.x;
 						else
@@ -996,11 +1003,11 @@ public class MegaCreateTool
 					// has old edge a docking at target node?
 					// if yes, pos2 has to be changed to docking position
 					docking = (String) AttributeHelper.getAttributeValue(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
-										GraphicAttributeConstants.TARGET, "", new String(""), true);
+							GraphicAttributeConstants.TARGET, "", new String(""), true);
 					if (docking.length() > 0) {
 						Vector2d size = AttributeHelper.getSize(newEdge1.getTarget());
 						Vector2d dockingpos = new Vector2d(Double.parseDouble(docking.substring(0, docking.indexOf(";"))),
-											Double.parseDouble(docking.substring(docking.indexOf(";") + 1)));
+								Double.parseDouble(docking.substring(docking.indexOf(";") + 1)));
 						if (Math.abs(dockingpos.x) < 1.001)
 							pos2.x = pos2.x + size.x * 0.5 * dockingpos.x;
 						else
@@ -1060,7 +1067,7 @@ public class MegaCreateTool
 						else {
 							m = (pos2.y - edgebends.get(edgebends.size() - 1).y) / (pos2.x - edgebends.get(edgebends.size() - 1).x);
 							tmp_d = Math.abs((m * (pos3.x - edgebends.get(edgebends.size() - 1).x) - pos3.y + edgebends.get(edgebends.size() - 1).y)
-												/ Math.sqrt(m * m + 1));
+									/ Math.sqrt(m * m + 1));
 						}
 						if (tmp_d < d) {
 							lensrc = len;
@@ -1087,76 +1094,66 @@ public class MegaCreateTool
 						xs = pos1.x;
 						ys = pos3.y;
 					}
-							else {
-								double m = (pos2.y - pos1.y) / (pos2.x - pos1.x);
-								ys = (m * m * pos3.y + m * pos3.x - m * pos1.x + pos1.y) / (1 + m * m);
-								xs = m * (pos3.y - ys) + pos3.x;
-							}
-							AttributeHelper.setPosition(newNode, xs, ys);
-							
-							// add edge
-							oldTarget = newEdge1.getTarget();
-							oldSource = newEdge1.getSource();
-							newEdge1.setTarget(newNode);
-							if (creatingEdge)
-								// add graphics attribute to identify hyperedge node
-								AttributeHelper.setAttribute(newNode, GraphicAttributeConstants.GRAPHICS, "hyperedgenode", "");
-							else
-								// add graphics attribute to identify new node
-								AttributeHelper.setAttribute(newNode, GraphicAttributeConstants.GRAPHICS, "newnode", "");
-							newEdge2 = getGraph().addEdgeCopy(newEdge1, newNode, oldTarget);
-							if (creatingEdge)
-								AttributeHelper.deleteAttribute(newNode, GraphicAttributeConstants.GRAPHICS, "hyperedgenode");
-							else
-								AttributeHelper.deleteAttribute(newNode, GraphicAttributeConstants.GRAPHICS, "newnode");
-							
-							// change edge attributes
-							AttributeHelper.setArrowhead(newEdge1, false);
-							AttributeHelper.setArrowtail(newEdge2, false);
-							// labels
-							len = Math.sqrt(Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)) + len;
-							lensrc = Math.sqrt(Math.pow(pos3.x - pos1.x, 2) + Math.pow(pos3.y - pos1.y, 2)) + lensrc;
-							lentgt = Math.sqrt(Math.pow(pos2.x - pos3.x, 2) + Math.pow(pos2.y - pos3.y, 2)) + lentgt;
-							if (lensrc < len * 0.5 && AttributeHelper.hasAttribute(newEdge1, GraphicAttributeConstants.LABELGRAPHICS))
-								newEdge1.removeAttribute(GraphicAttributeConstants.LABELGRAPHICS);
-							if (lensrc < len * 0.333 && AttributeHelper.hasAttribute(newEdge1, "srcLabel"))
-								newEdge1.removeAttribute("srcLabel");
-							if (lensrc < len * 0.666 && AttributeHelper.hasAttribute(newEdge1, "tgtLabel"))
-								newEdge1.removeAttribute("tgtLabel");
-							if (lentgt < len * 0.5 && AttributeHelper.hasAttribute(newEdge2, GraphicAttributeConstants.LABELGRAPHICS))
-								newEdge2.removeAttribute(GraphicAttributeConstants.LABELGRAPHICS);
-							if (lentgt < len * 0.666 && AttributeHelper.hasAttribute(newEdge2, "srcLabel"))
-								newEdge2.removeAttribute("srcLabel");
-							if (lentgt < len * 0.333 && AttributeHelper.hasAttribute(newEdge2, "tgtLabel"))
-								newEdge2.removeAttribute("tgtLabel");
-							// docking
-							docking = (String) AttributeHelper.getAttributeValue(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
-												GraphicAttributeConstants.TARGET, "", new String(""), true);
-							if (docking.length() > 0)
-								AttributeHelper.setAttribute(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
-													GraphicAttributeConstants.TARGET, "");
-							docking = (String) AttributeHelper.getAttributeValue(newEdge2, GraphicAttributeConstants.DOCKING_PATH,
-												GraphicAttributeConstants.SOURCE, "", new String(""), true);
-							if (docking.length() > 0)
-								AttributeHelper.setAttribute(newEdge2, GraphicAttributeConstants.DOCKING_PATH,
-													GraphicAttributeConstants.SOURCE, "");
-							// bends
-							if (!edgebends.isEmpty()) {
-								AttributeHelper.removeEdgeBends(newEdge1);
-								if (bendsidx1 == -1)
-									AttributeHelper.setEdgeBendStyle(newEdge1, "Straight");
-								else
-									AttributeHelper.addEdgeBends(newEdge1, edgebends.subList(0, bendsidx1 + 1));
-								AttributeHelper.removeEdgeBends(newEdge2);
-								if (bendsidx2 == -1)
-									AttributeHelper.setEdgeBendStyle(newEdge2, "Straight");
-								else
-									AttributeHelper.addEdgeBends(newEdge2, edgebends.subList(bendsidx2, edgebends.size()));
-							}
-						} finally {
-							graph.getListenerManager().transactionFinished(this);
-						}
+					else {
+						double m = (pos2.y - pos1.y) / (pos2.x - pos1.x);
+						ys = (m * m * pos3.y + m * pos3.x - m * pos1.x + pos1.y) / (1 + m * m);
+						xs = m * (pos3.y - ys) + pos3.x;
 					}
+					AttributeHelper.setPosition(newNode, xs, ys);
+					
+					// add edge
+					oldTarget = newEdge1.getTarget();
+					oldSource = newEdge1.getSource();
+					newEdge1.setTarget(newNode);
+					newEdge2 = getGraph().addEdgeCopy(newEdge1, newNode, oldTarget);
+					
+					// change edge attributes
+					AttributeHelper.setArrowhead(newEdge1, false);
+					AttributeHelper.setArrowtail(newEdge2, false);
+					// labels
+					len = Math.sqrt(Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)) + len;
+					lensrc = Math.sqrt(Math.pow(pos3.x - pos1.x, 2) + Math.pow(pos3.y - pos1.y, 2)) + lensrc;
+					lentgt = Math.sqrt(Math.pow(pos2.x - pos3.x, 2) + Math.pow(pos2.y - pos3.y, 2)) + lentgt;
+					if (lensrc < len * 0.5 && AttributeHelper.hasAttribute(newEdge1, GraphicAttributeConstants.LABELGRAPHICS))
+						newEdge1.removeAttribute(GraphicAttributeConstants.LABELGRAPHICS);
+					if (lensrc < len * 0.333 && AttributeHelper.hasAttribute(newEdge1, "srcLabel"))
+						newEdge1.removeAttribute("srcLabel");
+					if (lensrc < len * 0.666 && AttributeHelper.hasAttribute(newEdge1, "tgtLabel"))
+						newEdge1.removeAttribute("tgtLabel");
+					if (lentgt < len * 0.5 && AttributeHelper.hasAttribute(newEdge2, GraphicAttributeConstants.LABELGRAPHICS))
+						newEdge2.removeAttribute(GraphicAttributeConstants.LABELGRAPHICS);
+					if (lentgt < len * 0.666 && AttributeHelper.hasAttribute(newEdge2, "srcLabel"))
+						newEdge2.removeAttribute("srcLabel");
+					if (lentgt < len * 0.333 && AttributeHelper.hasAttribute(newEdge2, "tgtLabel"))
+						newEdge2.removeAttribute("tgtLabel");
+					// docking
+					docking = (String) AttributeHelper.getAttributeValue(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
+							GraphicAttributeConstants.TARGET, "", new String(""), true);
+					if (docking.length() > 0)
+						AttributeHelper.setAttribute(newEdge1, GraphicAttributeConstants.DOCKING_PATH,
+								GraphicAttributeConstants.TARGET, "");
+					docking = (String) AttributeHelper.getAttributeValue(newEdge2, GraphicAttributeConstants.DOCKING_PATH,
+							GraphicAttributeConstants.SOURCE, "", new String(""), true);
+					if (docking.length() > 0)
+						AttributeHelper.setAttribute(newEdge2, GraphicAttributeConstants.DOCKING_PATH,
+								GraphicAttributeConstants.SOURCE, "");
+					// bends
+					if (!edgebends.isEmpty()) {
+						AttributeHelper.removeEdgeBends(newEdge1);
+						if (bendsidx1 == -1)
+							AttributeHelper.setEdgeBendStyle(newEdge1, "Straight");
+						else
+							AttributeHelper.addEdgeBends(newEdge1, edgebends.subList(0, bendsidx1 + 1));
+						AttributeHelper.removeEdgeBends(newEdge2);
+						if (bendsidx2 == -1)
+							AttributeHelper.setEdgeBendStyle(newEdge2, "Straight");
+						else
+							AttributeHelper.addEdgeBends(newEdge2, edgebends.subList(bendsidx2, edgebends.size()));
+					}
+				} finally {
+					graph.getListenerManager().transactionFinished(this);
+				}
+			}
 			
 			@Override
 			public void undo() throws CannotUndoException {

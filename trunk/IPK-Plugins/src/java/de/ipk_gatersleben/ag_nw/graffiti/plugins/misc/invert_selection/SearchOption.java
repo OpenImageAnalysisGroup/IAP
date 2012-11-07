@@ -48,6 +48,8 @@ public class SearchOption {
 			return considerSearchLogic(idxOfAttr >= 0 && idxOfAttr < searchAttributeInteger);
 		} else {
 			switch (searchType) {
+				// TODO: similar to mathString for integer, boolean etc (respect alternative paths), in order to be able
+				// to search also in the annotations for label-fontsize >= x
 				case searchString:
 					return considerSearchLogic(matchString(attr));
 				case searchBoolean:
@@ -66,7 +68,11 @@ public class SearchOption {
 		for (GraphElement ge : searchScope) {
 			switch (searchType) {
 				case searchString:
-					scope.add(new ValueAndGraphElement(getString(ge), ge));
+					String[] ss = getStringValues(ge);
+					if (ss == null || ss.length <= 0)
+						scope.add(new ValueAndGraphElement(null, ge));
+					else
+						scope.add(new ValueAndGraphElement(ss[0], ge));
 					break;
 				case searchBoolean:
 					scope.add(new ValueAndGraphElement(getBoolean(ge), ge));
@@ -268,37 +274,86 @@ public class SearchOption {
 		}
 	}
 	
-	private String getString(Attributable attr) {
-		Object val = AttributeHelper.getAttributeValue(attr, searchAttributePath, searchAttributeName, null, "", false);
-		if (val == null || !(val instanceof String))
-			return null;
-		else
-			return (String) val;
+	private String[] getStringValues(Attributable attr) {
+		if (attr instanceof Node) {
+			ArrayList<Object> result = new ArrayList<Object>();
+			ArrayList<String> paths = SearchDialog.getAlternativePaths((Node) attr, searchAttributePath);
+			paths.add(0, searchAttributePath);
+			for (String path : paths) {
+				String val = getValue(attr, path);
+				if (val != null && val instanceof String)
+					result.add(val);
+			}
+			return result.toArray(new String[] {});
+		} else {
+			String val = getValue(attr, searchAttributePath);
+			if (val == null || !(val instanceof String))
+				return null;
+			else
+				return new String[] { val };
+		}
+	}
+	
+	private String getValue(Attributable attr, String path) {
+		return (String) AttributeHelper.getAttributeValue(attr, path, searchAttributeName, null, "", false);
 	}
 	
 	private boolean matchString(Attributable attr) {
-		String s = getString(attr);
-		if (s == null)
+		String[] ss = getStringValues(attr);
+		if (ss == null || ss.length <= 0)
 			return false;
-		switch (searchOperation) {
-			case smaller:
-				return s.compareTo(searchAttributeString) < 0;
-			case greater:
-				return s.compareTo(searchAttributeString) > 0;
-			case equals:
-				return searchAttributeString.equalsIgnoreCase(s);
-			case startswith:
-				return s.toUpperCase().startsWith(searchAttributeString.toUpperCase());
-			case endswith:
-				return s.toUpperCase().endsWith(searchAttributeString.toUpperCase());
-			case include:
-				return s.toUpperCase().indexOf(searchAttributeString.toUpperCase()) >= 0;
-			case regexpsearch:
-				return s.matches(searchAttributeString);
-			default:
-				ErrorMsg.addErrorMessage("Invalid Search-Option: unexpected internal error!");
-				return false;
+		
+		boolean matches = false;
+		for (String s : ss) {
+			switch (searchOperation) {
+				case smaller:
+					matches = s.compareTo(searchAttributeString) < 0;
+					if (matches)
+						return true;
+					else
+						break;
+				case greater:
+					matches = s.compareTo(searchAttributeString) > 0;
+					if (matches)
+						return true;
+					else
+						break;
+				case equals:
+					matches = searchAttributeString.equalsIgnoreCase(s);
+					if (matches)
+						return true;
+					else
+						break;
+				case startswith:
+					matches = s.toUpperCase().startsWith(searchAttributeString.toUpperCase());
+					if (matches)
+						return true;
+					else
+						break;
+				case endswith:
+					matches = s.toUpperCase().endsWith(searchAttributeString.toUpperCase());
+					if (matches)
+						return true;
+					else
+						break;
+				case include:
+					matches = s.toUpperCase().indexOf(searchAttributeString.toUpperCase()) >= 0;
+					if (matches)
+						return true;
+					else
+						break;
+				case regexpsearch:
+					matches = s.matches(searchAttributeString);
+					if (matches)
+						return true;
+					else
+						break;
+				default:
+					ErrorMsg.addErrorMessage("Invalid Search-Option: unexpected internal error!");
+					return false;
+			}
 		}
+		return matches;
 	}
 	
 	public LogicConnection getLogicalConnection() {

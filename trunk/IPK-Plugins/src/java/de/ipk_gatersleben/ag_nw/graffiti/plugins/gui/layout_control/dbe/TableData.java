@@ -88,7 +88,7 @@ public class TableData {
 		// System.out.println("Transposed Data from row "+fromRow+". Source ["+mCol+" x "+mRow+"] -> Target ["+tCol+" x "+tRow+"]");
 	}
 	
-	protected int processAdditionaldentifiers(boolean processAllIDs, boolean processAllNewIDs,
+	public int processAdditionaldentifiers(boolean processAllIDs, boolean processAllNewIDs,
 			final ExperimentInterface substanceNodes, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			double optStartProgress, double optEndProgress, StringBuilder statusMessage, boolean skipFirstRow,
 			HashSet<Integer> ignoreColumns) {
@@ -676,6 +676,18 @@ public class TableData {
 		jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		MainFrame.showMessageDialog("Table Data", jsp);
+	}
+	
+	public JScrollPane getDataInScrollbars(HashMap<Integer, String> optHeaders) {
+		XlsTableModel xtm = new XlsTableModel(this, Integer.MAX_VALUE, Integer.MAX_VALUE);
+		// if (optHeaders != null)
+		xtm.setColumnNames(optHeaders);
+		JTable tbl = new MyDataJTable(xtm);
+		tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		JScrollPane jsp = new JScrollPane(tbl);
+		jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		return jsp;
 	}
 	
 	public int getMaximumRow(int column) {

@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SelectNod
  * should be ok for now.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class IPK_StandardTools
 					extends IPK_EditorPluginAdapter
@@ -50,7 +50,7 @@ public class IPK_StandardTools
 	/**
 	 * The <code>ImageBundle</code> of the main frame.
 	 */
-	private ImageBundle iBundle = ImageBundle.getInstance();
+	private final ImageBundle iBundle = ImageBundle.getInstance();
 	
 	/**
 	 * DOCUMENT ME!
@@ -60,12 +60,12 @@ public class IPK_StandardTools
 	/**
 	 * The tools this plugin provides.
 	 */
-	private Tool megaCreate;
+	private final Tool megaCreate;
 	
 	/**
 	 * DOCUMENT ME!
 	 */
-	private Tool megaMove;
+	private final Tool megaMove;
 	
 	/**
 	 * DOCUMENT ME!
@@ -85,7 +85,7 @@ public class IPK_StandardTools
 	/**
 	 * DOCUMENT ME!
 	 */
-	private ToolButton megaMoveButton;
+	private final ToolButton megaMoveButton;
 	
 	/**
 	 * Creates a new StandardTools object.
@@ -155,7 +155,8 @@ public class IPK_StandardTools
 												DefaultEditMode.sid,
 												iBundle.getImageIcon("tool.megaMove"));
 		
-		megaMoveButton.setToolTipText("Move/rotate selected Nodes and Edge-Bends, edit Edge/Node-Labels");
+		megaMoveButton.setToolTipText("<html>Select Nodes and Edges (press shift to change selection behaviour)<br>" +
+														"and move selected Nodes and Edge-Bends and edit Labels");
 		
 		megaCreateButton.addKeyListener(getLabelKeylistener());
 		megaMoveButton.addKeyListener(getLabelKeylistener());

@@ -510,19 +510,9 @@ public class NewsHelper implements HelperClass {
 							s = s.substring(pos + ":".length());
 							final String[] urls = s.split(RSSFeedManager.splitUrlSeparator);
 							JComponent b = null;
-							int type = 4; // default is 'download to user specified folder'
-							if (label.equalsIgnoreCase("addon"))
-								type = 0;
-							if (label.equalsIgnoreCase("preference"))
-								type = 1;
-							if (label.equalsIgnoreCase("url"))
-								type = 2;
-							if (label.equalsIgnoreCase("feed"))
-								type = 3;
-							if (label.equalsIgnoreCase("download"))
-								type = 4;
+							FeedDownloadType type = FeedDownloadType.getType(label);
 							switch (type) {
-								case 0: {
+								case ADDON: {
 									if (AddonManagerPlugin.getInstance() == null) {
 										b = new JButton("<html><small>Addon-Manager<br>not loaded");
 										b.setEnabled(false);
@@ -557,7 +547,7 @@ public class NewsHelper implements HelperClass {
 									}
 									break;
 								}
-								case 1: {
+								case PREFERENCE: {
 									b = GUIhelper.getWebsiteDownloadButton(title, null, ReleaseInfo.getAppFolderWithFinalSep(),
 														"<html>" +
 																			"Please manually download the following file(s):<br><br>" +
@@ -576,7 +566,7 @@ public class NewsHelper implements HelperClass {
 									((JButton) b).setText(title);
 									break;
 								}
-								case 2: {
+								case URL: {
 									b = new JMButton(title);
 									((JButton) b).addActionListener(new ActionListener() {
 										public void actionPerformed(ActionEvent e) {
@@ -586,7 +576,7 @@ public class NewsHelper implements HelperClass {
 									});
 									break;
 								}
-								case 3: {
+								case FEED: {
 									b = new JMButton("Subscribe to \"" + title + "\"");
 									
 									((JButton) b).addActionListener(new ActionListener() {
@@ -600,7 +590,7 @@ public class NewsHelper implements HelperClass {
 									});
 									break;
 								}
-								case 4: {
+								case DOWNLOAD: {
 									b = GUIhelper.getWebsiteDownloadButton(title, null, null,
 														"<html>" +
 																			"Please manually download the following file(s):<br><br>" +

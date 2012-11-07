@@ -17,6 +17,8 @@ import org.graffiti.plugin.editcomponent.ComboBoxEditComponent;
 public class EdgeArrowShapeEditComponent
 					extends ComboBoxEditComponent {
 	public static String standardArrow = "org.graffiti.plugins.views.defaults.StandardArrowShape";
+	public static String standardArrowLeft = "org.graffiti.plugins.views.defaults.StandardArrowShapeLeft";
+	public static String standardArrowRight = "org.graffiti.plugins.views.defaults.StandardArrowShapeRight";
 	public static String thinStandardArrow = "org.graffiti.plugins.views.defaults.ThinStandardArrowShape";
 	public static String circleArrow = "org.graffiti.plugins.views.defaults.CircleArrowShape";
 	public static String thinCircleArrow = "org.graffiti.plugins.views.defaults.ThinCircleArrowShape";
@@ -34,6 +36,8 @@ public class EdgeArrowShapeEditComponent
 		this.comboText = new String[]
 												{
 																	"-->",
+																	"--l>",
+																	"--r>",
 																	"-+>",
 																	"-<+>",
 																	"--<>",
@@ -49,7 +53,9 @@ public class EdgeArrowShapeEditComponent
 												};
 		this.comboValue = new String[]
 												{
-																	standardArrow,
+														standardArrow,
+														standardArrowLeft,
+														standardArrowRight,
 																	thinStandardArrow,
 																	thinDiamondArrow,
 																	diamondArrow,

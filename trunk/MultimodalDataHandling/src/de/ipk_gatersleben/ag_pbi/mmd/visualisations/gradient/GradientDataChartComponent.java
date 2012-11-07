@@ -111,10 +111,12 @@ public class GradientDataChartComponent extends JComponent {
 				add(prettifyChart(ge, co, jfChart, idx), currentXposition + "," + currentYposition);
 			}
 		}
-		if (isShowing())
-			validate();
-		else
-			validate();// JRE7 bug validateTree();
+		synchronized (getTreeLock()) {
+			if (isShowing())
+				validate();
+			else
+				validateTree();
+		}
 	}
 	
 	private JFreeChart createChart(GradientCharts gc, IntervalXYDataset dataset, ChartOptions co) {
@@ -216,10 +218,10 @@ public class GradientDataChartComponent extends JComponent {
 		}
 		
 		boolean useCustomDomainSteps = ((Boolean) AttributeHelper.getAttributeValue(
-							co.ge, "charting", "useCustomDomainSteps", new Boolean(false), new Boolean(false))).booleanValue();
+				co.ge, "charting", "useCustomDomainSteps", new Boolean(false), new Boolean(false))).booleanValue();
 		
 		double customStepSize = (Double) AttributeHelper.getAttributeValue(
-							co.ge, "charting", "customDomainStepSize", new Double(300d), new Double(300d));
+				co.ge, "charting", "customDomainStepSize", new Double(300d), new Double(300d));
 		
 		if (useCustomDomainSteps) {
 			NumberAxis na = (NumberAxis) xyplot.getDomainAxis();
@@ -229,12 +231,12 @@ public class GradientDataChartComponent extends JComponent {
 		
 		// specify lower and upper bounds
 		boolean useCustomRange = ((Boolean) AttributeHelper.getAttributeValue(
-							co.ge, "charting", "useCustomDomainBounds", new Boolean(false), new Boolean(false))).booleanValue();
+				co.ge, "charting", "useCustomDomainBounds", new Boolean(false), new Boolean(false))).booleanValue();
 		
 		double lowerBound = (Double) AttributeHelper.getAttributeValue(
-							co.ge, "charting", "minBoundDomain", new Double(0d), new Double(0d));
+				co.ge, "charting", "minBoundDomain", new Double(0d), new Double(0d));
 		double upperBound = (Double) AttributeHelper.getAttributeValue(
-							co.ge, "charting", "maxBoundDomain", new Double(100d), new Double(100d));
+				co.ge, "charting", "maxBoundDomain", new Double(100d), new Double(100d));
 		
 		if (!useCustomRange) {
 			lowerBound = Double.NaN;
@@ -284,9 +286,9 @@ public class GradientDataChartComponent extends JComponent {
 		xyplot.getDomainAxis().setVisible(co.showCategoryAxis);
 		
 		ChartColorAttribute chartColorAttribute = (ChartColorAttribute) AttributeHelper.getAttributeValue(
-							co.graph, ChartColorAttribute.attributeFolder,
-							ChartColorAttribute.attributeName,
-							new ChartColorAttribute(), new ChartColorAttribute());
+				co.graph, ChartColorAttribute.attributeFolder,
+				ChartColorAttribute.attributeName,
+				new ChartColorAttribute(), new ChartColorAttribute());
 		
 		// set the color series
 		List<String> names = new ArrayList<String>();
@@ -323,7 +325,7 @@ public class GradientDataChartComponent extends JComponent {
 		if (co.axisWidth >= 0) {
 			renderer.getPlot().getRangeAxis().setAxisLineStroke(new BasicStroke((float) co.axisWidth));
 			renderer.getPlot().getDomainAxis().setAxisLineStroke(
-								new BasicStroke((float) co.axisWidth));
+					new BasicStroke((float) co.axisWidth));
 		}
 		if (co.gridColor != null) {
 			renderer.getPlot().setRangeGridlinePaint(co.gridColor);
@@ -335,7 +337,7 @@ public class GradientDataChartComponent extends JComponent {
 		}
 		if (co.axisFontSize > 0) {
 			Font af = new Font(Axis.DEFAULT_AXIS_LABEL_FONT.getFontName(),
-								Axis.DEFAULT_AXIS_LABEL_FONT.getStyle(), co.axisFontSize);
+					Axis.DEFAULT_AXIS_LABEL_FONT.getStyle(), co.axisFontSize);
 			renderer.getPlot().getRangeAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setTickLabelFont(af);
 			renderer.getPlot().getDomainAxis().setLabelFont(af);
@@ -376,9 +378,9 @@ public class GradientDataChartComponent extends JComponent {
 				name2measurement.put(name, new ArrayList<NumericMeasurementInterface>());
 			name2measurement.get(name).add(m);
 			co.rangeAxis = (co.rangeAxis != null && co.rangeAxis.equals("[unit]")) ?
-								m.getUnit() : co.rangeAxis;
+					m.getUnit() : co.rangeAxis;
 			co.domainAxis = co.domainAxis != null && co.domainAxis.equals("[unit]") ?
-								((NumericMeasurement3D) m).getPositionUnit() : co.domainAxis;
+					((NumericMeasurement3D) m).getPositionUnit() : co.domainAxis;
 		}
 		
 		for (String name : name2measurement.keySet()) {
@@ -437,7 +439,7 @@ public class GradientDataChartComponent extends JComponent {
 	}
 	
 	public static JPanel prettifyChart(org.graffiti.graph.GraphElement ge,
-						ChartOptions co, JFreeChart jfChart, int idx) {
+			ChartOptions co, JFreeChart jfChart, int idx) {
 		if (jfChart.getTitle() != null) {
 			jfChart.getTitle().setFont(NodeTools.getChartTitleFont(ge));
 			jfChart.getTitle().setPaint(NodeTools.getChartTitleColor(ge));

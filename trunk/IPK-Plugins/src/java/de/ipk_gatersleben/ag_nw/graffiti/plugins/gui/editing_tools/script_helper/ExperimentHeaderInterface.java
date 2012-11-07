@@ -136,4 +136,6 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public void setGlobalOutlierInfo(String outliers);
 	
 	public String getGlobalOutlierInfo();
+	
+	public String getExperimentname();
 }

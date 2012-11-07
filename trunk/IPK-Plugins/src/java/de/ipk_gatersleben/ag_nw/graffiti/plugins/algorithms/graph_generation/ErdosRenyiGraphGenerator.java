@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import org.AttributeHelper;
+import org.ErrorMsg;
 import org.PositionGridGenerator;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.AdjListGraph;
@@ -21,6 +24,7 @@ import org.graffiti.selection.Selection;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.circle.CircleLayouterAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover.CenterLayouterAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 	
@@ -38,11 +42,11 @@ public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new IntegerParameter(numberOfNodes, "Number of nodes", "Number of nodes"),
-							new DoubleParameter(p, "Edge probability", "Edge-creation probability"),
-							new BooleanParameter(label, "Add node label", "If enabled, each node will be labeld (1,2,3,...)"),
-							new BooleanParameter(directed, "Create directed graph", "If enabled, a directed graph is created"),
-							new BooleanParameter(selfLoops, "Create self loops", "If enabled, self loops are created") };
+				new IntegerParameter(numberOfNodes, "Number of nodes", "Number of nodes"),
+				new DoubleParameter(p, "Edge probability", "Edge-creation probability"),
+				new BooleanParameter(label, "Add node label", "If enabled, each node will be labeld (1,2,3,...)"),
+				new BooleanParameter(directed, "Create directed graph", "If enabled, a directed graph is created"),
+				new BooleanParameter(selfLoops, "Create self loops", "If enabled, self loops are created") };
 	}
 	
 	@Override
@@ -65,6 +69,7 @@ public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 			throw new PreconditionException("Edge-creation-probability greater than 1 (100%) is not supported");
 	}
 	
+	@Override
 	public String getName() {
 		return "Generate Erdős–Rényi random graph";
 	}
@@ -72,15 +77,38 @@ public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"Using the G(n, p) model, a graph of given size is constructed by connecting <br>" +
-							"its nodes randomly. Each edge is included in the graph with probability p.";
+				"Using the G(n, p) model, a graph of given size is constructed by connecting <br>" +
+				"its nodes randomly. Each edge is included in the graph with probability p.";
 	}
 	
+	@Override
 	public void execute() {
+		BackgroundTaskHelper.issueSimpleTask("Generating random graph", "Generating random graph", new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final Graph rdg = createGraph(numberOfNodes, label, p, directed, selfLoops);
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainFrame.getInstance().showGraph(rdg, new ActionEvent(this, 1, getName()));
+							GraphHelper.issueCompleteRedrawForActiveView();
+						}
+					});
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				} catch (OutOfMemoryError e) {
+					ErrorMsg.addErrorMessage("Out of memory! Please choose to create a smaller graph or increase memory of Java VM!");
+				}
+			}
+		}, null);
 		
+	}
+	
+	public static Graph createGraph(int numberOfNodes, boolean label, double p, boolean directed, boolean selfLoops) {
 		Graph rdg = new AdjListGraph();
 		
-		rdg.getListenerManager().transactionStarted(this);
+		rdg.getListenerManager().transactionStarted(rdg);
 		try {
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			PositionGridGenerator pgg = new PositionGridGenerator(50, 50, 800);
@@ -103,7 +131,7 @@ public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 					double r = Math.random();
 					if (r <= p) {
 						rdg.addEdge(a, b, directed,
-											AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, directed));
+								AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, directed));
 					}
 				}
 			}
@@ -114,10 +142,8 @@ public class ErdosRenyiGraphGenerator extends AbstractAlgorithm {
 			ctr.attach(rdg, new Selection("empty"));
 			ctr.execute();
 		} finally {
-			rdg.getListenerManager().transactionFinished(this);
-			MainFrame.getInstance().showGraph(rdg, new ActionEvent(this, 1, getName()));
+			rdg.getListenerManager().transactionFinished(rdg);
 		}
-		GraphHelper.issueCompleteRedrawForActiveView();
-		
+		return rdg;
 	}
 }

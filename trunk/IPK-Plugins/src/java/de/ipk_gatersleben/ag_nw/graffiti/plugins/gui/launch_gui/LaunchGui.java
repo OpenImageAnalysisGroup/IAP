@@ -13,18 +13,20 @@ import javax.swing.JLabel;
 
 import org.FolderPanel;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.plugin.algorithm.AbstractEditorAlgorithm;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.plugin.algorithm.ProvidesAccessToOtherAlgorithms;
 import org.graffiti.plugin.view.View;
 import org.graffiti.selection.Selection;
+import org.graffiti.session.EditorSession;
 
 import scenario.ScenarioServiceIgnoreAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 public abstract class LaunchGui extends AbstractEditorAlgorithm implements ScenarioServiceIgnoreAlgorithm,
-					ProvidesAccessToOtherAlgorithms {
+		ProvidesAccessToOtherAlgorithms {
 	
 	/**
 	 * All returned algorithms with getName()==null will be converted into free
@@ -37,6 +39,7 @@ public abstract class LaunchGui extends AbstractEditorAlgorithm implements Scena
 	protected boolean modal = true;
 	protected ButtonSize algBTsize = ButtonSize.DYNAMIC;
 	
+	@Override
 	public void execute() {
 		String desc = getLaunchGuiDescription();
 		if (desc.equals("Select the command to be executed:") && !modal)
@@ -47,17 +50,19 @@ public abstract class LaunchGui extends AbstractEditorAlgorithm implements Scena
 		// ((JButton)commands[1]).doClick();
 		
 		MyInputHelper.getInput("[" + (modal ? "" : "nonmodal") + "]<html>" + (desc == null ? "" : "<br>" + getLaunchGuiDescription() + "<br><br>"), getName(),
-							commands);
+				commands);
 	}
 	
 	public String getLaunchGuiDescription() {
 		return "Select the command to be executed:";
 	}
 	
+	@Override
 	public String getName() {
 		return null;
 	}
 	
+	@Override
 	public Collection<Algorithm> getAlgorithmList() {
 		return getAlgorithms();
 	}
@@ -101,14 +106,24 @@ public abstract class LaunchGui extends AbstractEditorAlgorithm implements Scena
 		} else
 			res.setText("<html>" + sizetags + "<b>" + alg.getName() + sizetags + sizetags);
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (closeDialogBeforeExecution(alg))
 					FolderPanel.closeParentDialog((JButton) e.getSource());
+				
+				// fix for the special case when an algorithm called by the launch-gui does not need an active graph (e.g. random graph generators
+				EditorSession es = MainFrame.getInstance().getActiveEditorSession();
+				Graph g = null;
+				Selection s = null;
+				if (es != null) {
+					s = es.getSelectionModel().getActiveSelection();
+					g = es.getGraph();
+				}
 				GravistoService.getInstance().runAlgorithm(alg, g, s, true, e);
 			}
 		});
 		res.setToolTipText("<html>Click to execute algorithm,<br>dialog will " + (closeDialogBeforeExecution(alg) ? "" : "<b>not</b> ")
-							+ "be closed afterwards.");
+				+ "be closed afterwards.");
 		return TableLayout.getSplitVertical(res, null, TableLayout.PREFERRED, 5);
 	}
 	
@@ -124,6 +139,7 @@ public abstract class LaunchGui extends AbstractEditorAlgorithm implements Scena
 		SMALL, LARGE, DYNAMIC
 	}
 	
+	@Override
 	public boolean closeDialogBeforeExecution(Algorithm algorithm) {
 		return true;
 	}

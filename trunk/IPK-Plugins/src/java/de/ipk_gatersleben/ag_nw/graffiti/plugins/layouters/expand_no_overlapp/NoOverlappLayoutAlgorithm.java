@@ -60,6 +60,11 @@ public class NoOverlappLayoutAlgorithm extends AbstractAlgorithm {
 		return "Remove Node Overlaps (simple)";
 	}
 	
+	@Override
+	public String getDescription() {
+		return "<html>Simple algorithm to remove node overlap, which also works for nodes with the same position.";
+	}
+	
 	/**
 	 * Checks, if a graph was given and that the radius is positive.
 	 * 

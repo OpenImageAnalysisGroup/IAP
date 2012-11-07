@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -23,6 +25,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.plaf.basic.BasicDirectoryModel;
 import javax.swing.plaf.basic.BasicFileChooserUI;
+
+import sun.awt.shell.ShellFolder;
 
 /**
  * A copy of BasicDirectoryModel with access to the fileCache.
@@ -34,7 +38,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	private JFileChooser filechooser = null;
 	
 	// PENDING(jeff) pick the size more sensibly
-	private final Vector fileCache = new Vector(50);
+	private Vector fileCache = new Vector(50);
 	
 	private LoadFilesThread loadThread = null;
 	
@@ -55,14 +59,13 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		validateFileCache();
 	}
 	
-	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		String prop = e.getPropertyName();
 		if (prop == JFileChooser.DIRECTORY_CHANGED_PROPERTY
-							|| prop == JFileChooser.FILE_VIEW_CHANGED_PROPERTY
-							|| prop == JFileChooser.FILE_FILTER_CHANGED_PROPERTY
-							|| prop == JFileChooser.FILE_HIDING_CHANGED_PROPERTY
-							|| prop == JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY) {
+				|| prop == JFileChooser.FILE_VIEW_CHANGED_PROPERTY
+				|| prop == JFileChooser.FILE_FILTER_CHANGED_PROPERTY
+				|| prop == JFileChooser.FILE_HIDING_CHANGED_PROPERTY
+				|| prop == JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY) {
 			validateFileCache();
 		} else
 			if ("UI".equals(prop)) {
@@ -83,7 +86,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	/**
 	 * This method is used to interrupt file loading thread.
 	 */
-	@Override
 	public void invalidateFileCache() {
 		if (loadThread != null) {
 			loadThread.interrupt();
@@ -92,7 +94,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		}
 	}
 	
-	@Override
 	public Vector getDirectories() {
 		synchronized (fileCache) {
 			if (directories != null) {
@@ -103,7 +104,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		}
 	}
 	
-	@Override
 	public Vector getFiles() {
 		synchronized (fileCache) {
 			if (files != null) {
@@ -112,7 +112,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 			files = new Vector();
 			directories = new Vector();
 			directories.addElement(filechooser.getFileSystemView()
-								.createFileObject(filechooser.getCurrentDirectory(), ".."));
+					.createFileObject(filechooser.getCurrentDirectory(), ".."));
 			
 			for (int i = 0; i < getSize(); i++) {
 				File f = (File) fileCache.get(i);
@@ -126,7 +126,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		}
 	}
 	
-	@Override
 	public void validateFileCache() {
 		// Note: The super constructor will call this method
 		// but at this time filechooser is null
@@ -161,7 +160,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	 *         otherwise <code>false</code>
 	 * @since 1.4
 	 */
-	@Override
 	public boolean renameFile(File oldFile, File newFile) {
 		synchronized (fileCache) {
 			if (oldFile.renameTo(newFile)) {
@@ -172,28 +170,23 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		}
 	}
 	
-	@Override
 	public void fireContentsChanged() {
 		// System.out.println("TinyDirectoryModel: firecontentschanged");
 		fireContentsChanged(this, 0, getSize() - 1);
 	}
 	
-	@Override
 	public int getSize() {
 		return fileCache.size();
 	}
 	
-	@Override
 	public boolean contains(Object o) {
 		return fileCache.contains(o);
 	}
 	
-	@Override
 	public int indexOf(Object o) {
 		return fileCache.indexOf(o);
 	}
 	
-	@Override
 	public Object getElementAt(int index) {
 		return fileCache.get(index);
 	}
@@ -205,28 +198,107 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	/**
 	 * Obsolete - not used.
 	 */
-	@Override
 	public void intervalAdded(ListDataEvent e) {
 	}
 	
 	/**
 	 * Obsolete - not used.
 	 */
-	@Override
 	public void intervalRemoved(ListDataEvent e) {
 	}
 	
-	@Override
-	protected void sort(Vector v) {
-		// ShellFolder.sortFiles(v);
+	// ShellFolder.sortFiles renamed in Java 7 to ShellFolder.sort
+	// sort implemented manually with code form Shellfolder.java diff (see below)
+	// protected void sort(Vector v) {
+	// ShellFolder.sortFiles(v);
+	// }
+	
+	// code taken from ShellFolder.java diff
+	// http://hg.openjdk.java.net/jdk7/jsn/jdk/diff/f36f0f189064/src/share/classes/sun/awt/shell/ShellFolder.java
+	private void sort(List<? extends File> files) {
+		if (files == null || files.size() <= 1) {
+			return;
+			
+		}
+		// Check that we can use the ShellFolder.sortChildren() method:
+		// 1. All files have the same non-null parent
+		// 2. All files is ShellFolders
+		File commonParent = null;
+		
+		for (File file : files) {
+			File parent = file.getParentFile();
+			
+			if (parent == null || !(file instanceof ShellFolder)) {
+				commonParent = null;
+				
+				break;
+			}
+			
+			if (commonParent == null) {
+				commonParent = parent;
+			} else {
+				if (commonParent != parent && !commonParent.equals(parent)) {
+					commonParent = null;
+					
+					break;
+				}
+			}
+		}
+		
+		Collections.sort(files, FILE_COMPARATOR);
 	}
 	
+	// code taken from ShellFolder.java diff
+	// http://hg.openjdk.java.net/jdk7/jsn/jdk/diff/f36f0f189064/src/share/classes/sun/awt/shell/ShellFolder.java
+	private static final Comparator<File> FILE_COMPARATOR = new Comparator<File>() {
+		public int compare(File f1, File f2) {
+			ShellFolder sf1 = null;
+			ShellFolder sf2 = null;
+			
+			if (f1 instanceof ShellFolder) {
+				sf1 = (ShellFolder) f1;
+				if (sf1.isFileSystem()) {
+					sf1 = null;
+				}
+			}
+			if (f2 instanceof ShellFolder) {
+				sf2 = (ShellFolder) f2;
+				if (sf2.isFileSystem()) {
+					sf2 = null;
+				}
+			}
+			
+			if (sf1 != null && sf2 != null) {
+				return sf1.compareTo(sf2);
+			} else
+				if (sf1 != null) {
+					// Non-file shellfolders sort before files
+					return -1;
+				} else
+					if (sf2 != null) {
+						return 1;
+					} else {
+						String name1 = f1.getName();
+						String name2 = f2.getName();
+						
+						// First ignore case when comparing
+						int diff = name1.compareToIgnoreCase(name2);
+						if (diff != 0) {
+							return diff;
+						} else {
+							// May differ in case (e.g. "mail" vs. "Mail")
+							// We need this test for consistent sorting
+							return name1.compareTo(name2);
+						}
+					}
+		}
+	};
+	
 	// Obsolete - not used
-	@Override
 	protected boolean lt(File a, File b) {
 		// First ignore case when comparing
 		int diff = a.getName().toLowerCase().compareTo(
-							b.getName().toLowerCase());
+				b.getName().toLowerCase());
 		if (diff != 0) {
 			return diff < 0;
 		} else {
@@ -254,7 +326,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 			SwingUtilities.invokeLater(runnable);
 		}
 		
-		@Override
 		public void run() {
 			run0();
 			setBusy(false, fid);
@@ -264,7 +335,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 			FileSystemView fileSystem = filechooser.getFileSystemView();
 			
 			File[] list = fileSystem.getFiles(currentDirectory, filechooser
-								.isFileHidingEnabled());
+					.isFileHidingEnabled());
 			
 			Vector acceptsList = new Vector();
 			
@@ -326,14 +397,14 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 					}
 				}
 				if (start >= 0
-									&& end > start
-									&& newFileCache.subList(end, newSize).equals(
-														fileCache.subList(start, oldSize))) {
+						&& end > start
+						&& newFileCache.subList(end, newSize).equals(
+								fileCache.subList(start, oldSize))) {
 					if (isInterrupted()) {
 						return;
 					}
 					invokeLater(new DoChangeContents(newFileCache.subList(
-										start, end), start, null, 0, fid));
+							start, end), start, null, 0, fid));
 					newFileCache = null;
 				}
 			} else
@@ -349,14 +420,14 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 						}
 					}
 					if (start >= 0
-										&& end > start
-										&& fileCache.subList(end, oldSize).equals(
-															newFileCache.subList(start, newSize))) {
+							&& end > start
+							&& fileCache.subList(end, oldSize).equals(
+									newFileCache.subList(start, newSize))) {
 						if (isInterrupted()) {
 							return;
 						}
 						invokeLater(new DoChangeContents(null, 0, new Vector(
-											fileCache.subList(start, end)), start, fid));
+								fileCache.subList(start, end)), start, fid));
 						newFileCache = null;
 					}
 				}
@@ -365,7 +436,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 					cancelRunnables(runnables);
 				}
 				invokeLater(new DoChangeContents(newFileCache, 0, fileCache, 0,
-									fid));
+						fid));
 			}
 		}
 		
@@ -392,7 +463,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	 * @see #getPropertyChangeListeners
 	 * @since 1.6
 	 */
-	@Override
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		if (changeSupport == null) {
 			changeSupport = new PropertyChangeSupport(this);
@@ -411,7 +481,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	 * @see #getPropertyChangeListeners
 	 * @since 1.6
 	 */
-	@Override
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		if (changeSupport != null) {
 			changeSupport.removePropertyChangeListener(listener);
@@ -430,7 +499,6 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	 * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners
 	 * @since 1.6
 	 */
-	@Override
 	public PropertyChangeListener[] getPropertyChangeListeners() {
 		if (changeSupport == null) {
 			return new PropertyChangeListener[0];
@@ -453,7 +521,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	 * @since 1.6
 	 */
 	protected void firePropertyChange(String propertyName, boolean oldValue,
-						boolean newValue) {
+			boolean newValue) {
 		if (changeSupport != null) {
 			changeSupport.firePropertyChange(propertyName, oldValue, newValue);
 		}
@@ -482,13 +550,13 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 	
 	class DoChangeContents implements Runnable {
 		
-		private final List addFiles;
+		private List addFiles;
 		
-		private final List remFiles;
+		private List remFiles;
 		
 		private boolean doFire = true;
 		
-		private final int fid;
+		private int fid;
 		
 		private int addStart = 0;
 		
@@ -497,7 +565,7 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 		private int change;
 		
 		public DoChangeContents(List addFiles, int addStart, List remFiles,
-							int remStart, int fid) {
+				int remStart, int fid) {
 			this.addFiles = addFiles;
 			this.addStart = addStart;
 			this.remFiles = remFiles;
@@ -525,12 +593,12 @@ public class TinyDirectoryModel extends BasicDirectoryModel {
 				}
 				if (remSize > 0 && addSize == 0) {
 					fireIntervalRemoved(TinyDirectoryModel.this, remStart,
-										remStart + remSize - 1);
+							remStart + remSize - 1);
 				} else
 					if (addSize > 0 && remSize == 0
-										&& fileCache.size() > addSize) {
+							&& fileCache.size() > addSize) {
 						fireIntervalAdded(TinyDirectoryModel.this, addStart,
-											addStart + addSize - 1);
+								addStart + addSize - 1);
 					} else {
 						fireContentsChanged();
 					}

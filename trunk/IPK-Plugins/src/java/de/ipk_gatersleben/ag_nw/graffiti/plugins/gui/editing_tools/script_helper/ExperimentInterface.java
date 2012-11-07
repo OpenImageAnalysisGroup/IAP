@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.jdom.JDOMException;
 
 public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable, MappingDataEntity {
@@ -141,4 +142,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public TreeSet<String> getTreatmentList();
 	
 	public ExperimentCalculationService calc();
+	
+	public void mergeBiologicalReplicates(BackgroundTaskStatusProviderSupportingExternalCall status);
 }

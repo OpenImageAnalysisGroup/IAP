@@ -340,6 +340,18 @@ public class NodeTools {
 		return getSortedAverageOrDataSetValues(xmldata, "average", optTreatmentFilter);
 	}
 	
+	public static List<MyComparableDataPoint> getSortedAverageDataSetValues(SubstanceInterface xmldata, boolean removeEmptyConditions) {
+		return getSortedAverageOrDataSetValues(xmldata, "average", removeEmptyConditions);
+	}
+	
+	private static List<MyComparableDataPoint> getSortedAverageOrDataSetValues(SubstanceInterface xmldata,
+			String avgOrDataIdentifier, boolean removeEmptyConditions) {
+		boolean returnAvgValues = avgOrDataIdentifier.equals("average");
+		ArrayList<MyComparableDataPoint> ss = new ArrayList<MyComparableDataPoint>();
+		ss.addAll(xmldata.getDataPoints(returnAvgValues, removeEmptyConditions));
+		return ss;
+	}
+	
 	private static List<MyComparableDataPoint> getSortedAverageOrDataSetValues(SubstanceInterface xmldata,
 			String avgOrDataIdentifier, String optTreatmentFilter) {
 		

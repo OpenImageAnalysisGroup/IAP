@@ -73,7 +73,7 @@ public class DOTreader
 			if (pos != null && pos.length() > 0) {
 				if (pos.startsWith("e,"))
 					pos = pos.substring("e,".length());
-				//i dont know why, but some bend coordinates had an "\" in it
+				// i dont know why, but some bend coordinates had an "\" in it
 				pos = StringManipulationTools.stringReplace(pos, "\\", "");
 				ArrayList<Vector2d> bendsCol = new ArrayList<Vector2d>();
 				String[] bends = pos.split(" ");
@@ -104,6 +104,18 @@ public class DOTreader
 				AttributeHelper.addEdgeBends(e, bendsCol);
 				AttributeHelper.setEdgeBendStyle(e, "smooth");
 				// AttributeHelper.setEdgeBendStyle(e, "polyline");
+			}
+			String style = getEntry("style=", line, null);
+			if (style != null) {
+				if (style.contains("setlinewidth(")) {
+					String lineWidth = style.substring(style.indexOf("setlinewidth(") + 13);
+					lineWidth = lineWidth.substring(0, lineWidth.indexOf(")"));
+					try {
+						AttributeHelper.setFrameThickNess(e, Double.parseDouble(lineWidth));
+					} catch (NumberFormatException numberformatexception) {
+						ErrorMsg.addErrorMessage("Invalid Line Width: " + line);
+					}
+				}
 			}
 		} catch (Exception err) {
 			ErrorMsg.addErrorMessage(err);

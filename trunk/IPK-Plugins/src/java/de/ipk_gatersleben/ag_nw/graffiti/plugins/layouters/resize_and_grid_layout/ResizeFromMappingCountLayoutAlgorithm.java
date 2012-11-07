@@ -80,8 +80,7 @@ public class ResizeFromMappingCountLayoutAlgorithm extends AbstractAlgorithm {
 				nodes2newNodeSize.put(n, new Vector2d(targetSizeX, targetSizeY * mapCount));
 		}
 		GraphHelper.applyUndoableNodeSizeUpdate(nodes2newNodeSize, getName());
-		Selection sel = new Selection();
-		sel.addAll(nodes);
+		Selection sel = new Selection(nodes);
 	}
 	
 	/**

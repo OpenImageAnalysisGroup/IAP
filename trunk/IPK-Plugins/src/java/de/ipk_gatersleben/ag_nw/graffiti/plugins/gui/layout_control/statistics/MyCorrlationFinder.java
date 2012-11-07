@@ -282,7 +282,11 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 				}
 				for (Edge nE : newEdge) {
 					AttributeHelper.setAttribute(nE, "statistics", "correlation_r", new Double(r));
-					AttributeHelper.setAttribute(nE, "statistics", "correlation_prob", new Double(truecorrprob));
+					if (truecorrprob != Double.NaN)
+					{
+						double prob = 1d - truecorrprob;
+						AttributeHelper.setAttribute(nE, "statistics", "correlation_prob", prob);
+					}
 				}
 			}
 		}

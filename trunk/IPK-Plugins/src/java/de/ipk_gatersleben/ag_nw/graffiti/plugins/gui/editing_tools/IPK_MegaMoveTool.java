@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.zoomfit.ZoomFitChangeCompon
  * A modified editing tool
  * 
  * @author Christian Klukas
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class IPK_MegaMoveTool
 					extends MegaMoveTool
@@ -168,10 +168,13 @@ public class IPK_MegaMoveTool
 		} else {
 			try {
 				if (e.getModifiersEx() != 64 && e.getModifiersEx() != 128) {
-					if (e.getWheelRotation() < 0)
-						ZoomFitChangeComponent.zoomIn();
-					else
-						ZoomFitChangeComponent.zoomOut();
+					if (e.getWheelRotation() < 0){
+//						ZoomFitChangeComponent.zoomIn();
+						ZoomFitChangeComponent.zoomToPoint(MainFrame.getInstance().getActiveEditorSession().getActiveView(), e.getPoint(), 0.1);
+					} else {
+//						ZoomFitChangeComponent.zoomOut();
+						ZoomFitChangeComponent.zoomToPoint(MainFrame.getInstance().getActiveEditorSession().getActiveView(), e.getPoint(), -0.1);
+					}
 					e.consume();
 					return;
 				}

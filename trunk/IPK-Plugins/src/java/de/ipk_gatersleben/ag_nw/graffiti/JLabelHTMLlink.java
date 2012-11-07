@@ -132,4 +132,9 @@ public class JLabelHTMLlink extends JLabel {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public void setLabelText(String text) {
+		labelText = text;
+		setText(text);
+	}
+	
 }

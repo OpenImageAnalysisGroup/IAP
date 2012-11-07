@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: LineEdgeShape.java,v 1.1 2011-01-31 09:03:29 klukas Exp $
+// $Id: LineEdgeShape.java,v 1.2 2012-11-07 14:42:20 klukas Exp $
 
 package org.graffiti.plugins.views.defaults;
 
@@ -41,7 +41,7 @@ import org.graffiti.util.InstanceLoader;
 /**
  * Class representing an edge as one straight line.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class LineEdgeShape implements EdgeShape {
 	// ~ Instance fields ========================================================
@@ -424,11 +424,11 @@ public abstract class LineEdgeShape implements EdgeShape {
 			} catch (InstanceCreationException ie) {
 				throw new ShapeNotFoundException(ie.toString());
 			}
+			((AbstractArrowShape) tailShape).lineWidth = (float) edgeAttr.getFrameThickness();
 			if (tailShape instanceof SupportsHollowDrawing)
 				((SupportsHollowDrawing) tailShape).setHollow(hollowSourceArrowShape);
 			tailShape.updateSize(getEdgeThickness());
 			
-			((AbstractArrowShape) tailShape).lineWidth = (float) edgeAttr.getFrameThickness();
 			// glue arrow on the line at the correct spot and rotation
 			this.tailArrow = tailShape.affix(target, other, getEdgeThickness() + edgeAttr.getFrameThickness());
 			newTarget = tailShape.getAnchor();

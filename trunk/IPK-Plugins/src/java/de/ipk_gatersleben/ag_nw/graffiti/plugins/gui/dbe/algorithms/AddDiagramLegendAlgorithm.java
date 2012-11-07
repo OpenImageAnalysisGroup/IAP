@@ -9,6 +9,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.AlignmentSetting;
 import org.AttributeHelper;
@@ -19,12 +20,16 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.plugin.parameter.IntegerParameter;
+import org.graffiti.plugin.parameter.ObjectListParameter;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.editcomponents.chart_colors.ChartColorAttribute;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent.HeatMapOptions;
 
 /**
@@ -36,6 +41,7 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 	int nElements = 11;
 	int legendWidth = 10;
 	int legendHeight = 100;
+	private static LegendType type = LegendType.OLDSTYLE;
 	
 	/*
 	 * (non-Javadoc)
@@ -78,16 +84,18 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 	
 	@Override
 	public Parameter[] getParameters() {
+		
+		// nutzer fragen nach style (mit nummer und allem, mit allem, nur die wichtigen)
+		
 		if (AttributeHelper.hasAttribute(graph, "hm_gamma"))
 			return new Parameter[] {
-								new IntegerParameter(nElements, "Number of Color Shades", "Specify the number of color-shades (differently colored nodes)"), // number
-					// of
+					new IntegerParameter(nElements, "Number of Color Shades", "Specify the number of color-shades (differently colored nodes)"), // number of
 					// elements
 					new IntegerParameter(legendWidth, "Color-Scale Width", "Width of the colored network elements"), // width
 					new IntegerParameter(legendHeight, "Color-Scale Height", "Overall height of the color-scale") // height
 			};
 		else
-			return null;
+			return new Parameter[] { new ObjectListParameter(LegendType.COMPLETE, "Type", "", LegendType.values()) };
 	}
 	
 	@Override
@@ -97,7 +105,8 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 			nElements = ((IntegerParameter) params[i++]).getInteger().intValue();
 			legendWidth = ((IntegerParameter) params[i++]).getInteger().intValue();
 			legendHeight = ((IntegerParameter) params[i++]).getInteger().intValue();
-		}
+		} else
+			type = (LegendType) params[0].getValue();
 	}
 	
 	public void execute() {
@@ -117,6 +126,12 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 		startY = (int) maxxy.y + 40;
 		graph.getListenerManager().transactionStarted(this);
 		try {
+			HashMap<String, ConditionInterface> condname2cond = new HashMap<String, ConditionInterface>();
+			for (Node nd : graph.getNodes()) {
+				for (SubstanceInterface s : new NodeHelper(nd).getDataMappings())
+					for (ConditionInterface c : s)
+						condname2cond.put(c.getConditionName(), c);
+			}
 			ChartColorAttribute cca = ChartColorAttribute.getAttribute(graph);
 			int barCnt = cca.getDefinedBarCount();
 			for (int i = 0; i < barCnt; i++) {
@@ -124,7 +139,32 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 				Color fillc = cca.getSeriesColors(cca.getIdList(barCnt)).get(i);
 				Color framec = cca.getSeriesOutlineColors(cca.getIdList(barCnt)).get(i);
 				Node n = GraphHelper.addNodeToGraph(graph, startX, startY + step * i, 1, w, h, framec, fillc);
-				AttributeHelper.setLabel(n, id);
+				String lbl = null;
+				if (condname2cond.containsKey(id)) {
+					Condition cond = ((Condition) condname2cond.get(id));
+					switch (type) {
+						case COMPLETE:
+							lbl = cond.getExperimentName() + ", " + cond.getRowId() + ": " + getValue(cond.getSpecies()) + getValue(cond.getGenotype())
+									+ getValue(cond.getTreatment()) + getValue(cond.getGrowthconditions()) + getValue(cond.getVariety());
+							break;
+						case COMPLETE_WITHOUT_EXPERIMENT:
+							lbl = cond.getRowId() + ": " + getValue(cond.getSpecies()) + getValue(cond.getGenotype())
+									+ getValue(cond.getTreatment()) + getValue(cond.getGrowthconditions()) + getValue(cond.getVariety());
+							break;
+						case COMPLETE_WITHOUT_EXPERIMENT_AND_CONDITIONNUMBER:
+							lbl = getValue(cond.getSpecies()) + getValue(cond.getGenotype())
+									+ getValue(cond.getTreatment()) + getValue(cond.getGrowthconditions()) + getValue(cond.getVariety());
+							break;
+						default: // case OLDSTYLE:
+							lbl = id;
+							break;
+					}
+				} else
+					lbl = id;
+				
+				if (lbl.endsWith(" / "))
+					lbl = lbl.substring(0, lbl.length() - " / ".length());
+				AttributeHelper.setLabel(n, lbl);
 				AttributeHelper.setShapeEllipse(n);
 				// AttributeHelper.setRoundedEdges(n, 2);
 				AttributeHelper.setLabelAlignment(-1, n, AlignmentSetting.RIGHT);
@@ -136,6 +176,13 @@ public class AddDiagramLegendAlgorithm extends AbstractAlgorithm {
 		} finally {
 			graph.getListenerManager().transactionFinished(this);
 		}
+	}
+	
+	public String getValue(String s) {
+		if (s == null || s.length() <= 0)
+			return "";
+		else
+			return s + " / ";
 	}
 	
 	public void createHeatMapLegend() {

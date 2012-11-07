@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
@@ -760,6 +761,24 @@ public class Experiment implements ExperimentInterface {
 		// empty
 	}
 	
+	public void writeToFile(File targetDir, boolean asDocument) {
+		if (asDocument) {
+			int cnt = 1;
+			for (Document doc : getDocuments(this)) {
+				String name = "Omics-Data " + (cnt++);
+				Node temp = doc.getElementsByTagName("experimentname").item(0).getFirstChild();
+				if (temp != null)
+					name = temp.getNodeValue();
+				XMLHelper.writeXMLDataToFile(doc, targetDir.getAbsolutePath() + "/" + name + ".xml");
+			}
+		} else
+			try {
+				TextFile.write(targetDir.getAbsolutePath() + ReleaseInfo.getFileSeparator() + getName() + ".xml", toString());
+			} catch (IOException e) {
+				ErrorMsg.addErrorMessage(e);
+			}
+	}
+	
 	public void writeToFile(File targetDir) {
 		
 		int cnt = 1;
@@ -885,6 +904,21 @@ public class Experiment implements ExperimentInterface {
 			res += m.getDataPointCount(false);
 		}
 		return res;
+	}
+	
+	public static boolean isBiologicalAndTechnicalReplicateDataAvailable(ExperimentInterface md) {
+		for (SubstanceInterface m : md) {
+			ArrayList<String> condnames = new ArrayList<String>();
+			for (ConditionInterface c : m) {
+				String cname = c.getSpecies() + c.getGenotype() + c.getVariety() + c.getGrowthconditions() + c.getTreatment();
+				if (condnames.contains(cname))
+					return true;
+				else
+					condnames.add(cname);
+			}
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -1093,5 +1127,90 @@ public class Experiment implements ExperimentInterface {
 	@Override
 	public void setFiles(String files) {
 		header.setFiles(files);
+	}
+	
+	@Override
+	public void mergeBiologicalReplicates(BackgroundTaskStatusProviderSupportingExternalCall status) {
+		int cnt = 0, all = size();
+		for (SubstanceInterface m : this) {
+			if (status != null) {
+				status.setCurrentStatusText1("Processing substance " + m.getName());
+				status.setCurrentStatusValue(100 * (cnt++) / all);
+			}
+			HashMap<String, ArrayList<ConditionInterface>> condnames = new HashMap<String, ArrayList<ConditionInterface>>();
+			for (ConditionInterface c : m) {
+				String cname = c.getSpecies() + c.getGenotype() + c.getVariety() + c.getGrowthconditions() + c.getTreatment();
+				if (!condnames.containsKey(cname))
+					condnames.put(cname, new ArrayList<ConditionInterface>());
+				condnames.get(cname).add(c);
+				for (SampleInterface sam : c)
+					if (sam.size() > 0) {
+						double value = sam.getSampleAverage().getValue();
+						// remove all technical replicates and replace by mean value
+						NumericMeasurementInterface val = sam.iterator().next().clone(sam);
+						val.setValue(value);
+						sam.clear();
+						sam.add(val);
+					}
+			}
+			
+			for (Map.Entry<String, ArrayList<ConditionInterface>> entry : condnames.entrySet())
+				if (entry.getValue().size() > 1) {
+					Iterator<ConditionInterface> it = entry.getValue().iterator();
+					ConditionInterface firstcondition = it.next();
+					
+					while (it.hasNext()) {
+						ConditionInterface tobemerged = it.next();
+						SampleInterface savesamfirst = null;
+						
+						// temporary list of samples, that couldn't be found in the "master" condition
+						// used to later add to "firstcondition"
+						ArrayList<SampleInterface> tobelatermerged = new ArrayList<SampleInterface>();
+						for (SampleInterface sammerged : tobemerged) {
+							for (SampleInterface samfirst : firstcondition)
+								if (isSampleEqualForMerge(samfirst, sammerged)) {
+									savesamfirst = samfirst;
+									break;
+								}
+							
+							if (savesamfirst != null) {
+								if (sammerged.iterator().hasNext()) {
+									NumericMeasurementInterface val = sammerged.iterator().next();
+									val.setParentSample(savesamfirst);
+									savesamfirst.add(val);
+								}
+							} else {
+								savesamfirst = sammerged;
+								sammerged.setParent(firstcondition);
+								tobelatermerged.add(sammerged);
+							}
+						}
+						
+						firstcondition.addAll(tobelatermerged);
+						
+						if (tobemerged.getParentSubstance() != null)
+							tobemerged.getParentSubstance().remove(tobemerged);
+						tobemerged.setParent(null);
+					}
+					
+					for (SampleInterface sam : firstcondition)
+						sam.recalculateSampleAverage();
+					
+				}
+		}
+		if (status != null) {
+			status.setCurrentStatusText1("Processing finished!");
+			status.setCurrentStatusText2("All biological replicates were merged");
+		}
+		
+	}
+	
+	private boolean isSampleEqualForMerge(SampleInterface sample1, SampleInterface sample2) {
+		if (sample1 == null || sample2 == null)
+			return false;
+		String s1 = sample1.getMeasurementtool() + ";" + sample1.getTime() + ";" + sample1.getTimeUnit() + ";" + sample1.getTtestInfo().name();
+		String s2 = sample2.getMeasurementtool() + ";" + sample2.getTime() + ";" + sample2.getTimeUnit() + ";" + sample2.getTtestInfo().name();
+		return s1.equals(s2);
+		
 	}
 }

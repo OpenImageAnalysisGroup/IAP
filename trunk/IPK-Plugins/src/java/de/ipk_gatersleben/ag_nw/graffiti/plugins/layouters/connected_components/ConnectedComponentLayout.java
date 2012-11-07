@@ -1,5 +1,6 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.connected_components;
 
+import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -28,7 +29,12 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 	}
 	
 	public String getName() {
-		return "Arrange Unconnected Components";
+		return "Unconnected Subgraphs on Grid";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "<html>Layouts all subgraphs onto a grid, sorted by subgraph size";
 	}
 	
 	public void execute() {
@@ -44,7 +50,11 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void layoutConnectedComponents(Graph graph) {
+	public static void layoutConnectedComponents(Graph graph) {
+		
+		if (graph.getNumberOfNodes() < 2)
+			return;
+		
 		final double nodeSpacingMinimumX = 100;
 		final double nodeSpacingMinimumY = 100;
 		final double nodeSpacingFactorX = 0.1;
@@ -55,6 +65,10 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 		
 		// get node sets
 		Set<Set<Node>> nodeSetSet = ConnectedComponentLayout.getConnectedComponents(graph);
+		
+		if (nodeSetSet.size() <= 1)
+			return;
+		
 		Set<Node>[] nodeSetArray = nodeSetSet.toArray(new Set[nodeSetSet.size()]);
 		
 		// get node set bounds
@@ -139,7 +153,7 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 		
 	}
 	
-	private static Set<Set<Node>> getConnectedComponents(Graph graph) {
+	public static Set<Set<Node>> getConnectedComponents(Graph graph) {
 		Set<Set<Node>> nodeSetSet = new HashSet<Set<Node>>();
 		
 		// get all RefSets
@@ -200,34 +214,32 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 	 */
 	private static RectangleIn2dSpace getBoundsOfNodes(Set<Node> nodeList, double xSpacingFactor, double ySpacingFactor, double xSpacingMinimum,
 						double ySpacingMinimum) {
-		RectangleIn2dSpace rect = ConnectedComponentLayout.getBoundsOfNodes(nodeList);
+		Rectangle2D.Double rect = ConnectedComponentLayout.getBoundsOfNodes(nodeList);
 		
-		double xSpacing = rect.boundX * xSpacingFactor;
-		double ySpacing = rect.boundY * ySpacingFactor;
+		double xSpacing = rect.width * xSpacingFactor;
+		double ySpacing = rect.height * ySpacingFactor;
 		
 		xSpacing = (xSpacing < xSpacingMinimum) ? xSpacingMinimum : xSpacing;
 		ySpacing = (ySpacing < ySpacingMinimum) ? ySpacingMinimum : ySpacing;
 		
-		return new RectangleIn2dSpace(rect.offsetX - xSpacing, rect.offsetY - ySpacing, rect.boundX + 2 * xSpacing, rect.boundY + 2 * ySpacing);
+		return new RectangleIn2dSpace(rect.x - xSpacing, rect.y - ySpacing, rect.width + 2 * xSpacing, rect.height + 2 * ySpacing);
 	}
 	
-	/**
-	 * @param nodeList
-	 * @return the wrapped bounds of the nodes
-	 */
-	private static RectangleIn2dSpace getBoundsOfNodes(Set<Node> nodeList) {
+	private static Rectangle2D.Double getBoundsOfNodes(Set<Node> nodeList) {
 		double offsetX = Double.MAX_VALUE;
 		double offsetY = Double.MAX_VALUE;
 		double boundX = Double.NEGATIVE_INFINITY;
 		double boundY = Double.NEGATIVE_INFINITY;
 		
-		// get maxima
 		for (Node node : nodeList) {
 			double x = node.getDouble(GraphicAttributeConstants.COORDX_PATH);
 			double y = node.getDouble(GraphicAttributeConstants.COORDY_PATH);
 			double width = node.getDouble(GraphicAttributeConstants.DIMW_PATH);
 			double height = node.getDouble(GraphicAttributeConstants.DIMH_PATH);
 			
+			// get top-left point instead of center point
+			x = x - width / 2;
+			y = y - height / 2;
 			double xr = x + width;
 			double yb = y + height;
 			
@@ -237,14 +249,10 @@ public class ConnectedComponentLayout extends AbstractAlgorithm {
 			boundY = (yb > boundY) ? yb : boundY;
 		}
 		
-		// subtract offset from bounds
 		boundX -= offsetX;
 		boundY -= offsetY;
 		
-		// ready - box!
-		RectangleIn2dSpace ris = new RectangleIn2dSpace(offsetX, offsetY, boundX, boundY);
-		
-		return ris;
+		return new Rectangle2D.Double(offsetX, offsetY, boundX, boundY);
 	}
 	
 	/**

@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import org.AttributeHelper;
+import org.ErrorMsg;
 import org.PositionGridGenerator;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.AdjListGraph;
@@ -22,6 +25,7 @@ import org.graffiti.selection.Selection;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.circle.CircleLayouterAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover.CenterLayouterAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 	
@@ -38,10 +42,10 @@ public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new IntegerParameter(numberOfNodes, "Number of nodes", "Number of nodes"),
-							new IntegerParameter(initDegree, "Mean degree K", "Initial node degree"),
-							new DoubleParameter(p, "Swap probability", "Edge swap probability"),
-							new BooleanParameter(label, "Add node label", "If enabled, each node will be labeld (1,2,3,...)"), };
+				new IntegerParameter(numberOfNodes, "Number of nodes", "Number of nodes"),
+				new IntegerParameter(initDegree, "Mean degree K", "Initial node degree"),
+				new DoubleParameter(p, "Swap probability", "Edge swap probability"),
+				new BooleanParameter(label, "Add node label", "If enabled, each node will be labeld (1,2,3,...)"), };
 	}
 	
 	@Override
@@ -67,6 +71,7 @@ public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 			throw new PreconditionException("Edge-swap-probability greater than 1 (100%) is not supported");
 	}
 	
+	@Override
 	public String getName() {
 		return "Generate Watts and Strogatz random graph";
 	}
@@ -74,13 +79,38 @@ public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"Create small-world random graph according to Watts and Strogatz model.";
+				"Create small-world random graph according to Watts and Strogatz model.";
 	}
 	
+	@Override
 	public void execute() {
+		
+		BackgroundTaskHelper.issueSimpleTask("Generating random graph", "Generating random graph", new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final Graph rdg = createGraph(numberOfNodes, label, initDegree, p);
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainFrame.getInstance().showGraph(rdg, new ActionEvent(this, 1, getName()));
+							GraphHelper.issueCompleteRedrawForActiveView();
+						}
+					});
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				} catch (OutOfMemoryError e) {
+					ErrorMsg.addErrorMessage("Out of memory! Please choose to create a smaller graph or increase memory of Java VM!");
+				}
+			}
+		}, null);
+		
+	}
+	
+	public static Graph createGraph(int numberOfNodes, boolean label, int initDegree, double p) {
 		Graph rdg = new AdjListGraph();
 		
-		rdg.getListenerManager().transactionStarted(this);
+		rdg.getListenerManager().transactionStarted(rdg);
 		try {
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			PositionGridGenerator pgg = new PositionGridGenerator(50, 50, 800);
@@ -104,7 +134,7 @@ public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 					Node b = nodes.get(jj);
 					if (!a.getNeighbors().contains(b) && a != b) {
 						edges.add(rdg.addEdge(a, b, false,
-											AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, false)));
+								AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, false)));
 					}
 					created++;
 				}
@@ -130,10 +160,8 @@ public class WattsStrogatzGraphGenerator extends AbstractAlgorithm {
 			ctr.attach(rdg, new Selection("empty"));
 			ctr.execute();
 		} finally {
-			rdg.getListenerManager().transactionFinished(this);
-			MainFrame.getInstance().showGraph(rdg, new ActionEvent(this, 1, getName()));
+			rdg.getListenerManager().transactionFinished(rdg);
 		}
-		GraphHelper.issueCompleteRedrawForActiveView();
-		
+		return rdg;
 	}
 }

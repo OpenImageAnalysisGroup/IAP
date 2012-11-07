@@ -21,6 +21,7 @@ public class ExperimentDataAnnotation {
 	private LinkedHashSet<String> substances;
 	private LinkedHashSet<Double> positions;
 	private LinkedHashSet<String> positionUnits;
+	private boolean setAsDefault = false;
 	
 	public ExperimentDataAnnotation() {
 		super();
@@ -200,5 +201,13 @@ public class ExperimentDataAnnotation {
 	
 	public LinkedHashSet<String> getPositionUnits() {
 		return positionUnits;
+	}
+	
+	public void setSetAsDefault(boolean setAsDefault) {
+		this.setAsDefault = setAsDefault;
+	}
+	
+	public boolean isSetAsDefault() {
+		return setAsDefault;
 	}
 }

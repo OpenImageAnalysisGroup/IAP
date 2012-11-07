@@ -114,11 +114,12 @@ public class XmlDataChartComponent extends JComponent {
 			boolean SalsoUsedForPlottingStdDev = alsoUsedForPlottingStdDev;
 			boolean SshowOnlyHalfErrorBar = co.showOnlyHalfErrorBar && chartType.equals(GraffitiCharts.BAR_FLAT.getName());
 			boolean SfillTimeGaps = co.fillTimeGaps && chartType.equals(GraffitiCharts.LINE.getName());
+			boolean removeEmptyConditions = co.removeEmptyConditions;// && chartType.equals(GraffitiCharts.BAR_FLAT.getName());
 			
 			BioStatisticalCategoryDataset dataset = null;
 			
 			try {
-				dataset = getDataset(xmldata, graph, SalsoUsedForPlottingStdDev, SshowOnlyHalfErrorBar, SfillTimeGaps);
+				dataset = getDataset(xmldata, graph, SalsoUsedForPlottingStdDev, SshowOnlyHalfErrorBar, SfillTimeGaps, false);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 				continue;
@@ -177,10 +178,12 @@ public class XmlDataChartComponent extends JComponent {
 				}
 			}
 		}
-		if (isShowing())
-			validate();
-		else
-			validate(); // JRE7 bug validateTree();
+		synchronized (getTreeLock()) {
+			if (isShowing())
+				validate();
+			else
+				validateTree();
+		}
 	}
 	
 	public static JPanel prettifyChart(org.graffiti.graph.GraphElement ge,
@@ -739,13 +742,13 @@ public class XmlDataChartComponent extends JComponent {
 	}
 	
 	protected BioStatisticalCategoryDataset getDataset(SubstanceInterface xmldata, Graph g,
-			boolean alsoUsedForPlottingStdDev, boolean showOnlyHalfErrorBar, boolean fillTimeGaps) {
+			boolean alsoUsedForPlottingStdDev, boolean showOnlyHalfErrorBar, boolean fillTimeGaps, boolean removeEmptyConditions) {
 		Double markerSize = (Double) AttributeHelper.getAttributeValue(g, "", AttributeHelper.id_ttestCircleSize,
 				new Double(10.0d), new Double(10.0d));
 		boolean useStdErrInsteadOfStdDev = ((Boolean) AttributeHelper.getAttributeValue(g, "", "node_useStdErr",
 				new Boolean(false), new Boolean(false))).booleanValue();
 		BioStatisticalCategoryDataset dataset = new BioStatisticalCategoryDataset(markerSize.floatValue());
-		List<MyComparableDataPoint> ss = NodeTools.getSortedAverageDataSetValues(xmldata, null);
+		List<MyComparableDataPoint> ss = NodeTools.getSortedAverageDataSetValues(xmldata, removeEmptyConditions);
 		SortedSet<Integer> timePoints = null;
 		if (fillTimeGaps)
 			timePoints = new TreeSet<Integer>();

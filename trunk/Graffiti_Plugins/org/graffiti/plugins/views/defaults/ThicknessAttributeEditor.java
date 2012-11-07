@@ -86,7 +86,7 @@ public class ThicknessAttributeEditor extends AbstractValueEditComponent {
 	private void setGuiFromMode(ArrowHeadModes mode) {
 		if (mode == ArrowHeadModes.ABSOLUTE) {
 			double value = (Double) ((Attribute) getDisplayable()).getValue();
-			pan.add(TableLayout.getSplit(combo, spinner, TableLayout.PREFERRED, TableLayout.FILL), "0,0");
+			pan.add(TableLayout.getSplit(combo, spinner, TableLayout.FILL, TableLayout.FILL), "0,0");
 			if (Math.abs(value - 1d) < 0.0001d)
 				spinner.setValue(AttributeHelper.getFrameThickNess((GraphElement)
 									((Attribute) getDisplayable()).getAttributable()) * 3.5d);

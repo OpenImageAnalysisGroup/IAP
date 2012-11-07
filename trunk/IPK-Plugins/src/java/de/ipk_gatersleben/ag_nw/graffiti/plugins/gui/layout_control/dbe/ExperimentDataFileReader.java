@@ -229,10 +229,8 @@ public abstract class ExperimentDataFileReader
 					} else
 						cells = s.split(separator);
 					int col = 0;
-					int trueCol = 0;
 					for (String cell : cells) {
-						trueCol++;
-						if (!validColumn(col, optValidColumns)) {
+						if (col != 0 && !validColumn(col + 1, optValidColumns)) {
 							col++;
 							continue;
 						}
@@ -369,6 +367,8 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	private static boolean validColumn(int col, ArrayList<TextFileColumnInformation> optValidColumns) {
+		if (col == 0) // the first column will always be loaded; containing gene ids
+			return true;
 		
 		if (optValidColumns == null)
 			return true;
@@ -482,6 +482,13 @@ public abstract class ExperimentDataFileReader
 					}
 				}
 			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		} catch (OutOfMemoryError e) {
+			ErrorMsg.addErrorMessage("<html>Not enough memory to load such files! Please start the application with increased memory.<br>"
+					+ e.getLocalizedMessage());
+		} catch (Error e) {
+			ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 		} finally {
 			fin.close();
 		}

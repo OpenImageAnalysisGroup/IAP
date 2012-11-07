@@ -5,19 +5,21 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MegaMoveTool.java,v 1.2 2011-05-13 09:07:32 klukas Exp $
+// $Id: MegaMoveTool.java,v 1.3 2012-11-07 14:42:19 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.midi.SysexMessage;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -39,7 +44,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.AttributeHelper;
-import org.StringManipulationTools;
+import org.ErrorMsg;
 import org.Vector2d;
 import org.graffiti.attributes.Attribute;
 import org.graffiti.attributes.SortedCollectionAttribute;
@@ -72,7 +77,7 @@ import org.graffiti.undo.GraphElementsDeletionEdit;
  * A tool for creating and editing a graph.
  * 
  * @author Holleis, Klukas
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class MegaMoveTool extends MegaTools {
 	// ~ Static fields/initializers =============================================
@@ -86,9 +91,9 @@ public class MegaMoveTool extends MegaTools {
 	 */
 	protected boolean onlyIfCtrl = false;
 	
-	private Action deleteAction, leftAction, upAction, rightAction, downAction;
+	private final Action deleteAction, leftAction, upAction, rightAction, downAction;
 	
-	private Action leftActionFine, upActionFine, rightActionFine,
+	private final Action leftActionFine, upActionFine, rightActionFine,
 						downActionFine;
 	
 	/** Component that was last marked. */
@@ -126,13 +131,16 @@ public class MegaMoveTool extends MegaTools {
 	private Point2D lastPressedMousePointRel;
 	
 	/** The selection rectangle. */
-	private Rectangle selRect = new Rectangle();
+	private final Rectangle selRect = new Rectangle();
 	
 	/** Used to distinguish between simple move and drag. */
 	private boolean dragged = false;
 	
 	private static double lastDragX = 100;
 	private static double lastDragY = 100;
+	
+	private int prevPosX;
+	private int prevPosY;
 	
 	private boolean resizeHit = false;
 	private boolean resizeHitTl = false;
@@ -460,7 +468,68 @@ public class MegaMoveTool extends MegaTools {
 		}
 		super.mouseMoved(e);
 	}
-	
+	protected void processScrolling(MouseEvent e) {
+
+//		System.out.println("-scrolling");
+		Object o = e.getSource();
+		if (o != null && o instanceof JComponent) {
+			JComponent jc = (JComponent) o;
+			JScrollPane jsp = (JScrollPane) ErrorMsg.findParentComponent(jc, JScrollPane.class);
+			JScrollBar jsb = null;
+			float dx = prevPosX - e.getX();
+			float dy = prevPosY - e.getY();
+			
+			AffineTransform zoom = null;
+			if(o instanceof GraffitiView)
+				zoom = ((GraffitiView)o).getZoom();
+
+//			System.out.println("zoom: "+ zoom.toString()+" dx:"+dx+" dy:"+dy);
+//			System.out.println("prevDragX:"+prevPosX+" prevDragY:"+prevPosY);
+//			System.out.println(" mouseX:" + e.getX()+" mouseY:" + e.getY());
+//			System.out.println(" horSBpos:" + jsp.getHorizontalScrollBar().getValue());
+//			System.out.println(" verSBpos:" + jsp.getVerticalScrollBar().getValue());
+//			if(dx < 0 || dy < 0)
+//				System.out.println();
+//			if(Math.abs(dx) > 100 || Math.abs(dy) > 100)
+//			System.out.println();
+			if(dx != 0){
+				jsb = jsp.getHorizontalScrollBar();
+				
+				
+				int v = jsb.getValue();
+
+				v+=dx*zoom.getScaleX();
+				if (v < jsb.getMinimum())
+					v = jsb.getMinimum();
+				if (v > jsb.getMaximum())
+					v = jsb.getMaximum();
+				jsb.setValue(v);
+			}			
+			if(dy != 0){
+				jsb = jsp.getVerticalScrollBar();
+				
+				int v = jsb.getValue();
+
+				v+=dy*zoom.getScaleY();
+				if (v < jsb.getMinimum())
+					v = jsb.getMinimum();
+				if (v > jsb.getMaximum())
+					v = jsb.getMaximum();
+				jsb.setValue(v);
+			}
+
+			/*
+			 * adjust prev position to the new scroll position of the view
+			 * with respect to the changed dx values
+			 * Just setting the previous x/y coordinates results in flicker, due 
+			 * to the changed scroll position
+			 */
+			prevPosX = e.getX()+ (int)dx;
+			prevPosY = e.getY() +(int)dy;
+			
+		}
+//		System.out.println("--- finished scrolling");
+	}	
 	/**
 	 * Invoked when the mouse button has been pressed and dragged inside the
 	 * editor panel and handles what has to happen.
@@ -475,10 +544,6 @@ public class MegaMoveTool extends MegaTools {
 		lastDragX = e.getPoint().getX();
 		lastDragY = e.getPoint().getY();
 		
-		if (!SwingUtilities.isLeftMouseButton(e) && !SwingUtilities.isMiddleMouseButton(e)) {
-			dragged = true;
-			return;
-		}
 		View view;
 		if (e.getComponent() instanceof GraffitiInternalFrame) {
 			view = ((GraffitiInternalFrame) e.getComponent()).getView();
@@ -487,6 +552,22 @@ public class MegaMoveTool extends MegaTools {
 				view = (View) e.getComponent();
 			} else
 				view = findView(e.getComponent());
+		}
+		if(SwingUtilities.isRightMouseButton(e)){
+			if(selectedView == null)
+				if(view != null)
+					selectedView = view.getViewComponent();
+			if(selectedView != null){
+				processScrolling(e);
+				scrollpanemovement = true;
+				return;
+			}
+		}
+		super.mouseMoved(e);
+
+		if (!SwingUtilities.isLeftMouseButton(e) && !SwingUtilities.isMiddleMouseButton(e)) {
+			dragged = true;
+			return;
 		}
 		
 		if (lastBendHit == null && !dragged) {
@@ -877,9 +958,9 @@ public class MegaMoveTool extends MegaTools {
 					}
 					coord.setDimension(newW, newH);
 					String status = "Resize: w/h: " + resizeStartDimW + " / " + resizeStartDimH + " --> " +
-										StringManipulationTools.formatNumber(newW, "#") + " / " +
-										StringManipulationTools.formatNumber(newH, "#") + " ratio: " + StringManipulationTools.formatNumber(ratio, "#.###") + " --> "
-										+ StringManipulationTools.formatNumber(newW / newH, "#.###") +
+										AttributeHelper.formatNumber(newW, "#") + " / " +
+										AttributeHelper.formatNumber(newH, "#") + " ratio: " + AttributeHelper.formatNumber(ratio, "#.###") + " --> "
+										+ AttributeHelper.formatNumber(newW / newH, "#.###") +
 										(e.isShiftDown() ? "" : " - press Shift to disable grid point resize");
 					MainFrame.showMessage(status, MessageType.INFO);
 				}
@@ -1072,19 +1153,32 @@ public class MegaMoveTool extends MegaTools {
 		if (e.getWhen() <= lastClick)
 			return;
 		lastClick = e.getWhen();
+		
+		Component src = findComponentAt(e, e.getX(), e.getY());
+
+		/*
+		 * init stuff for view scrolling 
+		 */
+		prevPosX = e.getX();
+		prevPosY = e.getY();
+//		System.out.println("selected view: "+src.toString());
+		if(src instanceof View)
+			selectedView = src;
+		else
+			selectedView = null;
+		
 		if (!SwingUtilities.isLeftMouseButton(e) && !SwingUtilities.isMiddleMouseButton(e))
 			return;
 		
 		lastClickPoint = e.getPoint();
-		
+
 		dragged = false;
 		
 		GravistoService.ensureActiveViewAndSession(e);
 		
 		selection = session.getSelectionModel().getActiveSelection();
 		
-		Component src = findComponentAt(e, e.getX(), e.getY());
-		
+
 		resizeHit = false;
 		resizeHitTl = false;
 		resizeHitTr = false;
@@ -1258,6 +1352,16 @@ public class MegaMoveTool extends MegaTools {
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
+		/*
+		 * do nothing if we've moved the scrollpane with the right mouse button
+		 */
+		if(selectedView != null && SwingUtilities.isRightMouseButton(e)){
+			selectedView = null;
+			return;
+		}
+			
+		
 		// logger.info("MOUSE RELEASED");
 		if (selRectComp != null) {
 			SelectionRectangle r = (SelectionRectangle) selRectComp
@@ -1271,10 +1375,10 @@ public class MegaMoveTool extends MegaTools {
 			}
 		}
 		
-		if (!SwingUtilities.isLeftMouseButton(e) && !SwingUtilities.isMiddleMouseButton(e)) {
-			return;
-		}
-		
+//		if (!SwingUtilities.isLeftMouseButton(e) && !SwingUtilities.isMiddleMouseButton(e)) {
+//			return;
+//		}
+//		
 		super.mouseReleased(e);
 		
 		if (dragged && (lastPressedPoint != null) && (lastBendHit == null)) {
@@ -1415,12 +1519,20 @@ public class MegaMoveTool extends MegaTools {
 		// selection.clear();
 		// }
 		
-		for (int i = 0; i < allComps.length; i++) {
-			if (selRect.contains(allComps[i].getBounds())
-								&& allComps[i] instanceof GraphElementComponent) {
-				mark((GraphElementComponent) allComps[i], false, true, this, false);
+		if (me.isShiftDown())
+			for (int i = 0; i < allComps.length; i++) {
+				if (selRect.intersects(allComps[i].getBounds())
+									&& allComps[i] instanceof GraphElementComponent) {
+					mark((GraphElementComponent) allComps[i], false, true, this, false);
+				}
 			}
-		}
+		else
+			for (int i = 0; i < allComps.length; i++) {
+				if (selRect.contains(allComps[i].getBounds())
+									&& allComps[i] instanceof GraphElementComponent) {
+					mark((GraphElementComponent) allComps[i], false, true, this, false);
+				}
+			}
 	}
 	
 	/**

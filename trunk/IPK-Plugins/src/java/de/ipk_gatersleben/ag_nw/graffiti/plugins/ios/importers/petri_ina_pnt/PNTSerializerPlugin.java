@@ -19,9 +19,9 @@ public class PNTSerializerPlugin
 			this.outputSerializers = new OutputSerializer[] {
 								new PNTSerializer()
 			};
+			// this.inputSerializers = new InputSerializer[] {
+			// new PNTReader()
+			// };
 		}
-		// this.inputSerializers = new InputSerializer[] {
-		// new PNTReader()
-		// };
 	}
 }

@@ -5,11 +5,12 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: XMLHelper.java,v 1.2 2011-02-04 15:41:35 klukas Exp $
+// $Id: XMLHelper.java,v 1.3 2012-11-07 14:41:59 klukas Exp $
 
 package org.graffiti.plugin;
 
 // Java imports
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,10 @@ import javax.xml.validation.Validator;
 import org.ErrorMsg;
 import org.HelperClass;
 import org.StringManipulationTools;
+import org.jdom.JDOMException;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -91,7 +96,7 @@ public class XMLHelper implements HelperClass {
 		StreamResult streamResult = new StreamResult(resultStringWriter);
 		
 		Transformer outerXmlTransformer = TransformerFactory.newInstance()
-							.newTransformer();
+				.newTransformer();
 		// System.out.println("OutTransformer:"+outerXmlTransformer.getClass().getCanonicalName());
 		outerXmlTransformer.setOutputProperty("omit-xml-declaration", "yes");
 		outerXmlTransformer.transform(nodeSource, streamResult);
@@ -133,7 +138,7 @@ public class XMLHelper implements HelperClass {
 	// private static DocumentBuilderFactory dbf =
 	// DocumentBuilderFactory.newInstance();
 	private static DocumentBuilderFactory dbf =
-						new DocumentBuilderFactoryImpl();
+			new DocumentBuilderFactoryImpl();
 	
 	/**
 	 * @param res
@@ -156,19 +161,19 @@ public class XMLHelper implements HelperClass {
 			return doc;
 		} catch (NullPointerException e) {
 			ErrorMsg.addErrorMessage("Null Pointer Exception, data could not be retrieved.<br>"
-								+ e.getLocalizedMessage());
+					+ e.getLocalizedMessage());
 		} catch (SAXException e) {
 			ErrorMsg.addErrorMessage("SAX Exception while processing experimental data.<br>"
 					+ e.getLocalizedMessage());
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage("IO Exception while processing experimental data.<br>"
-								+ e.getLocalizedMessage());
+					+ e.getLocalizedMessage());
 		} catch (ParserConfigurationException e) {
 			ErrorMsg.addErrorMessage("Format Parser Configuration Exception while processing experimental data.<br>"
-								+ e.getLocalizedMessage());
+					+ e.getLocalizedMessage());
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage("Exception, data could not be processed.<br>"
-								+ e.getLocalizedMessage());
+					+ e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -191,20 +196,20 @@ public class XMLHelper implements HelperClass {
 			return doc;
 		} catch (NullPointerException e) {
 			ErrorMsg
-								.addErrorMessage("Null Pointer Exception, data could not be retrieved.<br>"
-													+ e.getLocalizedMessage());
+					.addErrorMessage("Null Pointer Exception, data could not be retrieved.<br>"
+							+ e.getLocalizedMessage());
 		} catch (SAXException e) {
 			ErrorMsg
-								.addErrorMessage("Format Parser (SAX) Exception while processing experimental data.<br>"
-													+ e.getLocalizedMessage());
+					.addErrorMessage("Format Parser (SAX) Exception while processing experimental data.<br>"
+							+ e.getLocalizedMessage());
 		} catch (IOException e) {
 			ErrorMsg
-								.addErrorMessage("IO Exception while processing experimental data.<br>"
-													+ e.getLocalizedMessage());
+					.addErrorMessage("IO Exception while processing experimental data.<br>"
+							+ e.getLocalizedMessage());
 		} catch (ParserConfigurationException e) {
 			ErrorMsg
-								.addErrorMessage("Format Parser Configuration Exception while processing experimental data.<br>"
-													+ e.getLocalizedMessage());
+					.addErrorMessage("Format Parser Configuration Exception while processing experimental data.<br>"
+							+ e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -227,6 +232,22 @@ public class XMLHelper implements HelperClass {
 		}
 	}
 	
+	public static String getOuterXmlPretty(Node n) throws IOException, TransformerException, JDOMException {
+		ByteArrayInputStream is = new ByteArrayInputStream(getOuterXml(n).getBytes("UTF-8"));
+		Document doc = getDocument(is);
+		StringWriter resultStringWriter = new StringWriter();
+		XMLOutputter serializer = new XMLOutputter();
+		serializer.setFormat(Format.getPrettyFormat());
+		serializer.output(getJDOMfromDOM(doc), resultStringWriter);
+		String result = resultStringWriter.toString();
+		result = StringManipulationTools.stringReplace(result, "'", "&apos;");
+		return result;
+	}
+	
+	public static org.jdom.Document getJDOMfromDOM(org.w3c.dom.Document doc) {
+		DOMBuilder db = new DOMBuilder();
+		return db.build(doc);
+	}
 }
 
 // ------------------------------------------------------------------------------

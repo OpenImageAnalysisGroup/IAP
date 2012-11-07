@@ -75,7 +75,7 @@ import org.graffiti.graphics.NodeLabelAttribute;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -3592,6 +3592,19 @@ public class AttributeHelper implements HelperClass {
 			date = new Date();
 		}
 		return new SimpleDateFormat().format(date);
+	}
+	
+	public static HashSet<String> getFuzzyLabels(String label) {
+		if (label == null)
+			return new HashSet<String>();
+		else {
+			HashSet<String> lbls = new HashSet<String>();
+			lbls.add(label);
+			lbls.add(label.trim());
+			lbls.add(StringManipulationTools.removeHTMLtags(label));
+			lbls.add(StringManipulationTools.removeHTMLtags(StringManipulationTools.stringReplace(label, "<br>", " ")));
+			return lbls;
+		}
 	}
 	
 	public static void showInFileBrowser(String folder, String fileName) throws Exception {

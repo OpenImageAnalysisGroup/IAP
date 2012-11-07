@@ -487,4 +487,10 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	public String getGlobalOutlierInfo() {
 		return globalOutliers;
 	}
+	
+	@Override
+	@Deprecated
+	public String getExperimentname() {
+		return getExperimentName();
+	}
 }

@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: ChangeAttributesEdit.java,v 1.1 2011-01-31 09:05:05 klukas Exp $
+// $Id: ChangeAttributesEdit.java,v 1.2 2012-11-07 14:41:59 klukas Exp $
 
 package org.graffiti.undo;
 
@@ -24,16 +24,16 @@ import org.graffiti.graph.GraphElement;
  * ChangeAttributesEdit
  * 
  * @author wirch
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ChangeAttributesEdit
-					extends GraffitiAbstractUndoableEdit {
+		extends GraffitiAbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
 	
 	// ~ Instance fields ========================================================
 	
 	/** map from an attribute to its old value */
-	private Map<Attribute, Object> attributeToOldValueMap;
+	private final Map<Attribute, Object> attributeToOldValueMap;
 	
 	private Graph g = null;
 	
@@ -69,7 +69,7 @@ public class ChangeAttributesEdit
 		super(geMap);
 		this.attributeToOldValueMap = new HashMap();
 		this.attributeToOldValueMap.put(attribute,
-							((Attribute) attribute.copy()).getValue());
+				((Attribute) attribute.copy()).getValue());
 		this.g = graph;
 	}
 	
@@ -84,7 +84,7 @@ public class ChangeAttributesEdit
 		
 		if (attributeToOldValueMap.size() == 1) {
 			name = sBundle.getString("undo.changeAttribute") + " " +
-								((Attribute) attributeToOldValueMap.keySet().iterator().next()).getName();
+					attributeToOldValueMap.keySet().iterator().next().getName();
 		} else
 			if (attributeToOldValueMap.size() > 1) {
 				name = sBundle.getString("undo.changeAttributes");
@@ -136,7 +136,10 @@ public class ChangeAttributesEdit
 			HashMap<Attribute, Attribute> attributesMap = new LinkedHashMap<Attribute, Attribute>();
 			
 			for (Iterator<Attribute> iter = attributeToOldValueMap.keySet().iterator(); iter.hasNext();) {
-				Attribute attribute = (Attribute) iter.next();
+				Attribute attribute = iter.next();
+				if (!(attribute.getAttributable() instanceof GraphElement))
+					continue;
+				
 				GraphElement newGraphElement = getNewGraphElement((GraphElement) attribute.getAttributable());
 				
 				Attribute newAttribute;
@@ -167,10 +170,10 @@ public class ChangeAttributesEdit
 			
 			if (!attributesMap.isEmpty()) {
 				for (Iterator<Attribute> iterator = attributesMap.keySet().iterator(); iterator.hasNext();) {
-					Attribute attribute = (Attribute) iterator.next();
+					Attribute attribute = iterator.next();
 					newValue = attributeToOldValueMap.get(attribute);
 					
-					Attribute newAttribute = (Attribute) attributesMap.get(attribute);
+					Attribute newAttribute = attributesMap.get(attribute);
 					
 					// TODO:fix finally the access to the attribute values
 					// over the getValue().

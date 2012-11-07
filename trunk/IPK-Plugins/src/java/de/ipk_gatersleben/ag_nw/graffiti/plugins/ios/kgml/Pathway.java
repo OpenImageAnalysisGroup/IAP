@@ -62,15 +62,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.gui.KGMLerrorWindow;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class Pathway {
-	private KeggId name;
-	private MapOrg org;
-	private MapNumber number;
-	private String title;
-	private Url image;
-	private Url link;
-	private Collection<Entry> entries;
-	private Collection<Reaction> reactions;
-	private Collection<Relation> relations;
+	private final KeggId name;
+	private final MapOrg org;
+	private final MapNumber number;
+	private final String title;
+	private final Url image;
+	private final Url link;
+	private final Collection<Entry> entries;
+	private final Collection<Reaction> reactions;
+	private final Collection<Relation> relations;
 	
 	public static void testLoadView() {
 		File f = new File("/Users/klukas/kegg/map/vanted_cache_kegg_map00010.xml");
@@ -119,6 +119,7 @@ public class Pathway {
 		
 		File d = new File("/home/klukas/kegg/61/map");
 		String[] files = d.list(new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String name) {
 				return name.endsWith(".xml");
 			}
@@ -171,7 +172,7 @@ public class Pathway {
 			}
 			for (Gml2PathwayErrorInformation error : errors)
 				System.out.println("ERROR: " + error.getError() + " Affected Graph Elements: " + error.getCausingGraphElements() + " Message: "
-									+ error.getDescription());
+						+ error.getDescription());
 			for (Gml2PathwayWarningInformation warning : warnings)
 				System.out.println("WARNING: " + warning.getWarning() + " Affected Graph Element: " + warning.getCausingGraphElement());
 			if (!batch)
@@ -225,9 +226,9 @@ public class Pathway {
 	public static void testShowPathwayInfo(Pathway p) {
 		String entriesDesc = testGetEntryTypes(p.entries);
 		BackgroundTaskHelper.showMessage(
-							"<html>Pathway: " + p.entries.size() + " entries,<br>" + testGetReactionDetailInfos(p.reactions) + ", " + p.relations.size()
-												+ " relations",
-							"<html>Entries:<br>" + entriesDesc);
+				"<html>Pathway: " + p.entries.size() + " entries,<br>" + testGetReactionDetailInfos(p.reactions) + ", " + p.relations.size()
+						+ " relations",
+				"<html>Entries:<br>" + entriesDesc);
 	}
 	
 	/**
@@ -287,28 +288,28 @@ public class Pathway {
 			lineBreak = "\n";
 		
 		String missingInB =
-							getMissingDetails("Entry IDs", entryIDsA, entryIDsB, lineBreak) +
-												getMissingDetails("Reaction IDs", reactionIDsA, reactionIDsB, lineBreak) +
-												getMissingDetails("Reaction Details", reactionDetailsA, reactionDetailsB, lineBreak) +
-												getMissingDetails("Relation Details", relationDetailsA, relationDetailsB, lineBreak) +
-												getMissingDetailCount("Entry/Entries", p1.getEntries().size(), p2.getEntries().size(), lineBreak) +
-												getMissingDetailCount("Reaction(s)", p1.getReactions().size(), p2.getReactions().size(), lineBreak) +
-												getMissingDetailCount("Relation(s)", p1.getRelations().size(), p2.getRelations().size(), lineBreak);
+				getMissingDetails("Entry IDs", entryIDsA, entryIDsB, lineBreak) +
+						getMissingDetails("Reaction IDs", reactionIDsA, reactionIDsB, lineBreak) +
+						getMissingDetails("Reaction Details", reactionDetailsA, reactionDetailsB, lineBreak) +
+						getMissingDetails("Relation Details", relationDetailsA, relationDetailsB, lineBreak) +
+						getMissingDetailCount("Entry/Entries", p1.getEntries().size(), p2.getEntries().size(), lineBreak) +
+						getMissingDetailCount("Reaction(s)", p1.getReactions().size(), p2.getReactions().size(), lineBreak) +
+						getMissingDetailCount("Relation(s)", p1.getRelations().size(), p2.getRelations().size(), lineBreak);
 		String addedInB =
-							getAddedDetails("Entry IDs", entryIDsA, entryIDsB, lineBreak) +
-												getAddedDetails("Reaction IDs", reactionIDsA, reactionIDsB, lineBreak) +
-												getAddedDetails("Reaction Details", reactionDetailsA, reactionDetailsB, lineBreak) +
-												getAddedDetails("Relation Details", relationDetailsA, relationDetailsB, lineBreak) +
-												getAddedDetailCount("Entry/Entries", p1.getEntries().size(), p2.getEntries().size(), lineBreak) +
-												getAddedDetailCount("Reaction(s)", p1.getReactions().size(), p2.getReactions().size(), lineBreak) +
-												getAddedDetailCount("Relation(s)", p1.getRelations().size(), p2.getRelations().size(), lineBreak);
+				getAddedDetails("Entry IDs", entryIDsA, entryIDsB, lineBreak) +
+						getAddedDetails("Reaction IDs", reactionIDsA, reactionIDsB, lineBreak) +
+						getAddedDetails("Reaction Details", reactionDetailsA, reactionDetailsB, lineBreak) +
+						getAddedDetails("Relation Details", relationDetailsA, relationDetailsB, lineBreak) +
+						getAddedDetailCount("Entry/Entries", p1.getEntries().size(), p2.getEntries().size(), lineBreak) +
+						getAddedDetailCount("Reaction(s)", p1.getReactions().size(), p2.getReactions().size(), lineBreak) +
+						getAddedDetailCount("Relation(s)", p1.getRelations().size(), p2.getRelations().size(), lineBreak);
 		
 		if (showMessage) {
 			MainFrame.showMessageDialogWithScrollBars("<html><b>Missing in Pathway 2:</b><br>" + missingInB +
-								"<hr><b>Added in Pathway 2:</b><br>" + addedInB, "Pathway Comparison");
+					"<hr><b>Added in Pathway 2:</b><br>" + addedInB, "Pathway Comparison");
 		} else {
 			System.out.println("### Missing in Pathway 2: ###\n" + missingInB +
-								"\n### Added in Pathway 2: ###\n" + addedInB);
+					"\n### Added in Pathway 2: ###\n" + addedInB);
 		}
 		return differences;
 	}
@@ -358,7 +359,7 @@ public class Pathway {
 			return ""; // "No differences for "+desc+" ("+infoA.size()+" --> "+infoB.size()+")"+lineBreak;
 		else {
 			return "### " + add + " added (" + desc + " / " + infoA.size() + " --> " + infoB.size() + ") ###" + lineBreak
-								+ added.toString().substring(0, added.length() - ", ".length()) + lineBreak;
+					+ added.toString().substring(0, added.length() - ", ".length()) + lineBreak;
 		}
 	}
 	
@@ -403,24 +404,24 @@ public class Pathway {
 				map++;
 		}
 		return "ortholog: " + ortholog + "<br>" +
-							"enzyme: " + enzyme + "<br>" +
-							"gene: " + gene + "<br>" +
-							"genes: " + genes + "<br>" +
-							"group: " + group + "<br>" +
-							"compound: " + compound + "<br>" +
-							"map: " + map;
+				"enzyme: " + enzyme + "<br>" +
+				"gene: " + gene + "<br>" +
+				"genes: " + genes + "<br>" +
+				"group: " + group + "<br>" +
+				"compound: " + compound + "<br>" +
+				"map: " + map;
 	}
 	
 	public Pathway(
-						KeggId name,
-						MapOrg org,
-						MapNumber number,
-						String title,
-						Url image,
-						Url link,
-						Collection<Entry> entries,
-						Collection<Reaction> reactions,
-						Collection<Relation> relations) {
+			KeggId name,
+			MapOrg org,
+			MapNumber number,
+			String title,
+			Url image,
+			Url link,
+			Collection<Entry> entries,
+			Collection<Reaction> reactions,
+			Collection<Relation> relations) {
 		// assert name!=null;
 		// assert org!=null;
 		// assert number!=null;
@@ -541,7 +542,7 @@ public class Pathway {
 	}
 	
 	private static Collection<Entry> getEntriesFromKgmlRootElement(
-						Element kgmlRoot, String sourcePathwayId) {
+			Element kgmlRoot, String sourcePathwayId) {
 		Collection<Entry> result = new ArrayList<Entry>();
 		List<?> entryElements = kgmlRoot.getChildren("entry");
 		Collection<IdRef> mapLinksWhichNeedToBeUpdated = new ArrayList<IdRef>();
@@ -551,10 +552,10 @@ public class Pathway {
 			Element entryElement = (Element) o;
 			try {
 				Entry e = Entry.getEntryFromKgmlEntryElement(
-									mapLinksWhichNeedToBeUpdated,
-									componentsWhichNeedToBeUpdated,
-									entryElement,
-									sourcePathwayId);
+						mapLinksWhichNeedToBeUpdated,
+						componentsWhichNeedToBeUpdated,
+						entryElement,
+						sourcePathwayId);
 				result.add(e);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
@@ -565,7 +566,7 @@ public class Pathway {
 	}
 	
 	private static void updateReferences(Collection<Entry> entries, Collection<IdRef> mapLinksWhichNeedToBeUpdated,
-						Collection<IdRef> componentsWhichNeedToBeUpdated) {
+			Collection<IdRef> componentsWhichNeedToBeUpdated) {
 		HashMap<String, Entry> id2entry = new HashMap<String, Entry>();
 		for (Entry e : entries)
 			id2entry.put(e.getId().getValue(), e);
@@ -577,7 +578,7 @@ public class Pathway {
 				ir.setRef(e);
 			} else {
 				ErrorMsg.addErrorMessage("Map Link reference " + ir.getValue() + " could not processed correctly. " +
-									"Corresponding map entry not found (map not found or entry not of type map).");
+						"Corresponding map entry not found (map not found or entry not of type map).");
 			}
 		}
 		// update Entry-Components IdRef values with entry reference
@@ -589,14 +590,14 @@ public class Pathway {
 				entryRef.setIsPartOfGroup(true);
 			} else {
 				ErrorMsg.addErrorMessage("Component reference " + entryId + " could not processed correctly. " +
-									"Corresponding entry not found.");
+						"Corresponding entry not found.");
 			}
 		}
 	}
 	
 	private static Collection<Relation> getRelationsFromKgmlRootElement(
-						Element kgmlRoot,
-						Collection<Entry> entryElements, String clusterIdForHiddenCompounds) {
+			Element kgmlRoot,
+			Collection<Entry> entryElements, String clusterIdForHiddenCompounds) {
 		Collection<Relation> result = new ArrayList<Relation>();
 		List<?> relationElements = kgmlRoot.getChildren("relation");
 		for (Object o : relationElements) {
@@ -608,16 +609,21 @@ public class Pathway {
 	}
 	
 	private static Collection<Reaction> getReactionsFromKgmlRootElement(
-						Element kgmlRoot,
-						Collection<Entry> entryElements,
-						String clusterIdForHiddenCompounds) {
+			Element kgmlRoot,
+			Collection<Entry> entryElements,
+			String clusterIdForHiddenCompounds) {
 		Collection<Reaction> result = new ArrayList<Reaction>();
+		HashMap<Reaction, String> hmReactionElementID = new HashMap<Reaction, String>();
 		List<?> reactionElements = kgmlRoot.getChildren("reaction");
 		for (Object o : reactionElements) {
 			Element reactionElement = (Element) o;
 			Reaction r = Reaction.getReactionFromKgmlReactionElement(reactionElement, entryElements, clusterIdForHiddenCompounds);
-			if (r != null)
+			if (r != null) {
 				result.add(r);
+				// store reaction element id from KGML file
+				if (KGMLhelper.getAttributeValue(reactionElement, "id", null) != null)
+					hmReactionElementID.put(r, KGMLhelper.getAttributeValue(reactionElement, "id", null));
+			}
 		}
 		// update corresponding reaction element references in entry elements!!!
 		for (Entry e : entryElements) {
@@ -626,7 +632,17 @@ public class Pathway {
 					for (Reaction r : result) {
 						if (r.getId().equals(reactionRef.getId())) {
 							reactionRef.setReference(r);
-						}
+						} else
+							// in KGML entry one can have an attribute reaction="rn:R####1 rn:R####2"
+							// this is stored as two ids (in reactionRef.getId(), two KEGG ids) rn:R####1 and rn:R####2
+							// in KGML file the according reaction has an attribute name="rn:R####1 rn:R####2"
+							// this is stored as one id (in r.getId()) rn:R####1 rn:R####2
+							// equal does not work here
+							// this kind of entries and reactions can occur several times
+							// compare also entry element id and reaction element id from KGML to get the right reference
+							if (r.getId().contains(reactionRef.getId()) &&
+									hmReactionElementID.get(r) != null && hmReactionElementID.get(r).equals(e.getId().getValue()))
+								reactionRef.setReference(r);
 					}
 				}
 		}
@@ -787,12 +803,12 @@ public class Pathway {
 				String substId = KeggGmlHelper.getKeggId(nc.getNodeA());
 				String prodId = KeggGmlHelper.getKeggId(nc.getNodeB());
 				ReactionAndInfo ri =
-									new ReactionAndInfo(
-														r,
-														isReactionProductRequest,
-														isReactionSubstrateRequest,
-														substId,
-														prodId);
+						new ReactionAndInfo(
+								r,
+								isReactionProductRequest,
+								isReactionSubstrateRequest,
+								substId,
+								prodId);
 				desiredNodeCombination2ReactionList.get(nc).add(ri);
 			}
 		}
@@ -810,7 +826,7 @@ public class Pathway {
 			NodeCombination del = null;
 			// search remaining node Combinations for inverse combination and delete it subsequently
 			for (Enumeration<NodeCombination> e = workStack.elements(); e.hasMoreElements();) {
-				NodeCombination n = (NodeCombination) e.nextElement();
+				NodeCombination n = e.nextElement();
 				if (n.getNodeA() == b && n.getNodeB() == a) {
 					del = n;
 					break;
@@ -929,10 +945,10 @@ public class Pathway {
 	}
 	
 	public static Pathway getPathwayFromGraph(
-						Graph graph,
-						Collection<Gml2PathwayWarningInformation> warnings,
-						Collection<Gml2PathwayErrorInformation> errors,
-						HashMap<Entry, Node> entry2graphNode) {
+			Graph graph,
+			Collection<Gml2PathwayWarningInformation> warnings,
+			Collection<Gml2PathwayErrorInformation> errors,
+			HashMap<Entry, Node> entry2graphNode) {
 		KeggId name = null;
 		MapOrg org = null;
 		MapNumber number = null;
@@ -992,7 +1008,7 @@ public class Pathway {
 		Collection<Edge> graphEdges = graph.getEdges();
 		reactionsWithoutEnzymes = Reaction.getReactionElementsFromGraphEdges(entries, graphEdges, warnings, errors);
 		if (reactionsWithEnzymes == null || reactionsWithoutEnzymes == null ||
-							(reactionsWithEnzymes.size() + reactionsWithoutEnzymes.size()) <= 0)
+				(reactionsWithEnzymes.size() + reactionsWithoutEnzymes.size()) <= 0)
 			warnings.add(new Gml2PathwayWarningInformation(Gml2PathwayWarning.NO_REACTION_ELEMENTS_DEFINED, graph));
 		Collection<Reaction> reactions = new ArrayList<Reaction>();
 		reactions.addAll(reactionsWithEnzymes);
@@ -1037,7 +1053,7 @@ public class Pathway {
 		if (relations != null)
 			for (Relation r : relations) {
 				if (r.getSourceEntry().getName().getId().equals(srcId) &&
-									r.getTargetEntry().getName().getId().equals(tgtId))
+						r.getTargetEntry().getName().getId().equals(tgtId))
 					result.add(r);
 			}
 		return result;

@@ -40,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class GravistoMain extends JApplet {
 	// ~ Static fields/initializers =============================================
@@ -66,7 +66,7 @@ public class GravistoMain extends JApplet {
 	public GravistoMain(final boolean showMainFrame, String applicationName) {
 		// URL config,
 		SplashScreenInterface splashScreen = new DBEsplashScreen(applicationName,
-				"", new Runnable() {
+				"", new RunnableWithSplashScreenReference() {
 					@Override
 					public void run() {
 						if (showMainFrame) {
@@ -78,6 +78,11 @@ public class GravistoMain extends JApplet {
 							mainFrame.setIconImage(icon.getImage());
 							mainFrame.setVisible(true);
 						}
+					}
+					
+					@Override
+					public void setSplashscreenInfo(SplashScreenInterface ss) {
+						// empty
 					}
 				});
 		ClassLoader cl = this.getClass().getClassLoader();
@@ -94,7 +99,7 @@ public class GravistoMain extends JApplet {
 		
 		GravistoPreferences prefs = GravistoPreferences
 				.userNodeForPackage(GravistoMain.class);
-		pluginManager = GravistoMainHelper.getNewPluginManager();
+		pluginManager = GravistoMainHelper.getPluginManager();
 		
 		splashScreen.setText("Read plugin information.");
 		
@@ -168,8 +173,9 @@ public class GravistoMain extends JApplet {
 					null,
 					"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
 							+ "Program execution can not continue.<br>"
-							+ "Don't forget to start createfilelist from the make folder.<br>"
-							+ "See make - intro.txt for details.<br>"
+							+ "Pleas check out the \"make\" project and execute<br>" +
+							"the createfilelist script from the make folder.<br>"
+							+ "See also the make - intro.txt in the make project for details.<br>"
 							+ "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
@@ -180,7 +186,7 @@ public class GravistoMain extends JApplet {
 		// printLocations(locations, "info");
 		splashScreen.setText("Load plugins...");
 		try {
-			GravistoMainHelper.loadPlugins(pluginManager, locations, splashScreen);
+			GravistoMainHelper.loadPlugins(locations, splashScreen);
 		} catch (PluginManagerException pme) {
 			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 		}
@@ -228,7 +234,7 @@ public class GravistoMain extends JApplet {
 		uiPrefs.put("showPluginMenu", "false");
 		
 		// statusPanel.
-		mainFrame = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, null, true);
+		mainFrame = new MainFrame(GravistoMainHelper.getPluginManager(), uiPrefs, null, true);
 		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
 		JMenuBar mb = mainFrame.getJMenuBar();
@@ -255,8 +261,8 @@ public class GravistoMain extends JApplet {
 		DBEgravistoHelper.DBE_GRAVISTO_NAME = "" + stS + "DBE-Gravisto" + stE + "<br><small>* "
 				+ stS + "D" + stE + "ata integration and analysis for " + stS + "B" + stE + "iological " + stS + "E" + stE + "xperiments<br>* "
 				+ stS + "Gra" + stE + "ph " + stS + "vis" + stE + "alisation " + stS + " to" + stE + "olkit<br></small>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator applet";
-		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "IAP - Integrated Analysis Platform";// CK 31.7.2011 //
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED applet";
+		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
 		
 		// AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
@@ -388,6 +394,9 @@ public class GravistoMain extends JApplet {
 					null,
 					"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
 							+ "Program execution can not continue.<br>"
+							+ "Pleas check out the \"make\" project and execute<br>" +
+							"the createfilelist script from the make folder.<br>"
+							+ "See also the make - intro.txt in the make project for details.<br>"
 							+ "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
@@ -395,7 +404,7 @@ public class GravistoMain extends JApplet {
 		
 		splashScreen.setText("Load plugins...");
 		try {
-			GravistoMainHelper.loadPlugins(pluginManager, locations, splashScreen);
+			GravistoMainHelper.loadPlugins(locations, splashScreen);
 		} catch (PluginManagerException pme) {
 			ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 		}

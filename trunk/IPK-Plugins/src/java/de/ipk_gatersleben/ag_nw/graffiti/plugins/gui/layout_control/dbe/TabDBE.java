@@ -156,6 +156,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	private ActionListener getLoadMAGElistener() {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					loadMAGEfile();
@@ -170,6 +171,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	private ActionListener getLoadInputFormListener() {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					loadExcelOrBinaryFiles();
@@ -236,20 +238,24 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 				return "VANTED Dataset";
 			}
 			
+			@Override
 			public boolean process(List<File> files) {
 				// GravistoMainHelper.processDroppedFiles(files.toArray(new File[]{}), false, (Class)PutIntoSidePanel.class);
-				ExperimentFileLoader.loadFile(files, receiver != null ? receiver : TabDBE.this);
+				ExperimentLoader.loadFile(files, receiver != null ? receiver : TabDBE.this);
 				return true;
 			}
 			
+			@Override
 			public boolean canProcess(File f) {
-				return ExperimentFileLoader.canLoadFile(f);
+				return ExperimentLoader.canLoadFile(f);
 			}
 			
+			@Override
 			public void setExperimentDataReceiver(ExperimentDataPresenter receiver) {
 				this.receiver = receiver;
 			}
 			
+			@Override
 			public boolean hasPriority() {
 				return false;
 			}
@@ -258,6 +264,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		// add handler for load dataset button
 		final String title = target.getText();
 		FileDrop.Listener fdl = new FileDrop.Listener() {
+			@Override
 			@SuppressWarnings("unchecked")
 			public void filesDropped(File[] files) {
 				if (files != null && files.length > 0) {
@@ -271,6 +278,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		};
 		
 		Runnable dragdetected = new Runnable() {
+			@Override
 			public void run() {
 				MainFrame.showMessage("<html><b>Drag &amp; Drop action detected:</b> release mouse button to load experiment data", MessageType.PERMANENT_INFO);
 				target.setText("<html><br>Drop file to load dataset<br><br>");
@@ -279,6 +287,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		};
 		
 		Runnable dragenddetected = new Runnable() {
+			@Override
 			public void run() {
 				// MainFrame.showMessage("Drag & Drop action canceled", MessageType.INFO);
 				target.setText(title);
@@ -384,6 +393,18 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		return loadedProjects;
 	}
 	
+	public synchronized static void addOrUpdateExperimentPane(ProjectEntity pe) {
+		for (ExperimentDataInfoPane expPane : shownExpPanes) {
+			if (
+			// expPane.getDocument()==pe.getDocument() ||
+			expPane.getExperimentName().equals(pe.getExperimentName())) {
+				expPane.updateGUIforUpdatedExperimentData(pe.getExperimentName(), pe.getDocumentData(), pe.getGUI());
+				return;
+			}
+		}
+		tabDbeInstance.processReceivedData(null, pe.getExperimentName(), pe.getDocumentData(), pe.getGUI());
+	}
+	
 	public synchronized static void addOrUpdateExperimentPane(MainFrame mainFrame, ProjectEntity pe) {
 		for (ExperimentDataInfoPane expPane : shownExpPanes) {
 			if (
@@ -420,6 +441,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		return v == null || v instanceof GraphView;
 	}
 	
+	@Override
 	public synchronized void processReceivedData(TableData td, String experimentName, ExperimentInterface doc, JComponent gui) {
 		ExperimentDataInfoPane expPane = new ExperimentDataInfoPane(td, doc, jTabbedPaneExperimentPanels, shownExpPanes, gui);
 		expPane.setOpaque(false);

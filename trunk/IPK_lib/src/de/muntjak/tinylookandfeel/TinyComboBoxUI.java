@@ -53,22 +53,19 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 		return new TinyComboBoxUI();
 	}
 	
-	@Override
 	public void paint(Graphics g, JComponent c) {
 	}
 	
-	@Override
 	protected ComboBoxEditor createEditor() {
 		return new TinyComboBoxEditor.UIResource();
 	}
 	
-	@Override
 	protected JButton createArrowButton() {
 		JButton button = new TinyComboBoxButton(comboBox,
-							null,
-							comboBox.isEditable(),
-							currentValuePane,
-							listBox);
+				null,
+				comboBox.isEditable(),
+				currentValuePane,
+				listBox);
 		
 		button.setMargin(DEFAULT_INSETS);
 		button.putClientProperty("isComboBoxButton", Boolean.TRUE);
@@ -76,7 +73,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 		return button;
 	}
 	
-	@Override
 	protected void installComponents() {
 		super.installComponents();
 		
@@ -85,7 +81,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 		}
 	}
 	
-	@Override
 	public PropertyChangeListener createPropertyChangeListener() {
 		return new TinyPropertyChangeListener();
 	}
@@ -96,7 +91,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	 * Instantiate it only within subclasses of <FooUI>.
 	 */
 	public class TinyPropertyChangeListener extends BasicComboBoxUI.PropertyChangeHandler {
-		@Override
 		public void propertyChange(PropertyChangeEvent e) {
 			super.propertyChange(e);
 			
@@ -133,11 +127,9 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	 * 
 	 * @deprecated As of Java 2 platform v1.4.
 	 */
-	@Deprecated
 	protected void editablePropertyChanged(PropertyChangeEvent e) {
 	}
 	
-	@Override
 	protected LayoutManager createLayoutManager() {
 		return new TinyComboBoxLayoutManager();
 	}
@@ -174,8 +166,8 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 			if (comboBox.isEditable()) {
 				if (arrowButton != null) {
 					arrowButton.setBounds(width -
-										COMBO_BUTTON_WIDTH, 0,
-										COMBO_BUTTON_WIDTH, height);
+							COMBO_BUTTON_WIDTH, 0,
+							COMBO_BUTTON_WIDTH, height);
 				}
 				
 				if (editor != null) {
@@ -199,15 +191,15 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 		}
 		if (comboBox.getComponentOrientation().isLeftToRight()) {
 			return new Rectangle(insets.left,
-								insets.top,
-								width - (insets.left + insets.right + buttonSize),
-								height - (insets.top + insets.bottom));
+					insets.top,
+					width - (insets.left + insets.right + buttonSize),
+					height - (insets.top + insets.bottom));
 		} else {
 			return new Rectangle(
-								insets.left + buttonSize,
-								insets.top,
-								width - (insets.left + insets.right + buttonSize),
-								height - (insets.top + insets.bottom));
+					insets.left + buttonSize,
+					insets.top,
+					width - (insets.left + insets.right + buttonSize),
+					height - (insets.top + insets.bottom));
 		}
 	}
 	
@@ -217,7 +209,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	 * 
 	 * @deprecated As of Java 2 platform v1.4.
 	 */
-	@Deprecated
 	protected void removeListeners() {
 		if (propertyChangeListener != null) {
 			comboBox.removePropertyChangeListener(propertyChangeListener);
@@ -228,7 +219,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	 * @param c
 	 *           the combo box
 	 */
-	@Override
 	public Dimension getMinimumSize(JComponent c) {
 		if (!isMinimumSizeDirty) {
 			isDisplaySizeDirty = true; // 1.3
@@ -260,7 +250,6 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	 * @return the size of the display area calculated from the combo box items
 	 * @see javax.swing.JComboBox#setPrototypeDisplayValue
 	 */
-	@Override
 	protected Dimension getDisplaySize() {
 		if (!isDisplaySizeDirty) {
 			return new Dimension(cachedDisplaySize);
@@ -277,7 +266,7 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 		if (prototypeValue != null) {
 			// Calculates the dimension based on the prototype value
 			result = getSizeForComponent(renderer.getListCellRendererComponent(
-								listBox, prototypeValue, -1, false, false));
+					listBox, prototypeValue, -1, false, false));
 		} else {
 			// Calculate the dimension by iterating over all the elements in the combo
 			// box list.
@@ -292,7 +281,7 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 					// Calculates the maximum height and width based on the largest
 					// element
 					d = getSizeForComponent(renderer.getListCellRendererComponent(
-										listBox, model.getElementAt(i), -1, false, false));
+							listBox, model.getElementAt(i), -1, false, false));
 					result.width = Math.max(result.width, d.width);
 					result.height = Math.max(result.height, d.height);
 				}
@@ -321,7 +310,7 @@ public class TinyComboBoxUI extends BasicComboBoxUI {
 	/*
 	 * Copied from BasicComboBoxUI.
 	 */
-	public Dimension getSizeForComponent(Component comp) {
+	protected Dimension getSizeForComponent(Component comp) {
 		currentValuePane.add(comp);
 		comp.setFont(comboBox.getFont());
 		Dimension d = comp.getPreferredSize();

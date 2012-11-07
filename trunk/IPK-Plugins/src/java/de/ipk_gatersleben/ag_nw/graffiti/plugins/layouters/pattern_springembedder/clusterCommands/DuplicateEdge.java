@@ -107,8 +107,7 @@ public class DuplicateEdge extends AbstractEditorAlgorithm {
 							newEdges.add(ne);
 						}
 					}
-					Selection sel = new Selection(getName());
-					sel.addAll(newEdges);
+					Selection sel = new Selection(getName(), newEdges);
 					
 					if (hasSelfLoops)
 						GravistoService.getInstance().runAlgorithm(new IntroduceSelfEdgeBends(), session.getGraph(), sel, false, getActionEvent());
@@ -126,7 +125,15 @@ public class DuplicateEdge extends AbstractEditorAlgorithm {
 	
 	@Override
 	public String getName() {
-		return "Duplicate Edge";
+		return "Multiply Edge";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "<html>This command will copy the edge with all attributes and<br>" +
+						"connect this copy to the interactively chosen source and<br>" +
+						"target node. If there are many nodes chosen the edge will<br>" +
+						"be multiplicated several times.";
 	}
 	
 	@Override

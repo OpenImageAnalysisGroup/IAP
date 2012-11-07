@@ -92,4 +92,25 @@ public class FileHelper implements HelperClass {
 						final String description) {
 		return getFileName(defaultExt, description, null);
 	}
+	
+	/**
+	 * Recursively deletes a directory
+	 * 
+	 * @param path
+	 *           the path of the directory to be deleted
+	 */
+	public static void deleteDirRecursively(File f) {
+		if (!f.exists())
+			return;
+		if (!f.isDirectory())
+			f.delete();
+		else {
+			for (File file : f.listFiles()) {
+				if (file.isDirectory())
+					deleteDirRecursively(file);
+				else
+					file.delete();
+			}
+		}
+	}
 }

@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="jdom.jar"/>
 	<classpathentry kind="lib" path="java-cup-v11a-runtime.jar" sourcepath="/home/klukas/workspace/grav/src/develop/src"/>
 	<classpathentry kind="lib" path="jh.jar"/>
-	<classpathentry kind="lib" path="commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="activation.jar"/>
 	<classpathentry kind="lib" path="axis.jar"/>
 	<classpathentry kind="lib" path="batik-awt-util.jar"/>
@@ -52,5 +51,6 @@
 	<classpathentry kind="lib" path="poi-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="poi-ooxml-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
+	<classpathentry kind="lib" path="commons-collections-3.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

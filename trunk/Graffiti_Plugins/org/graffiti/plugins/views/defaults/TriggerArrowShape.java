@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: TriggerArrowShape.java,v 1.1 2011-01-31 09:03:28 klukas Exp $
+// $Id: TriggerArrowShape.java,v 1.2 2012-11-07 14:42:20 klukas Exp $
 
 package org.graffiti.plugins.views.defaults;
 
@@ -15,7 +15,7 @@ import java.awt.geom.Point2D;
 /**
  * DOCUMENT ME!
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TriggerArrowShape
 					extends AbstractArrowShape
@@ -38,12 +38,25 @@ public class TriggerArrowShape
 		if (hollow && lineWidth > 1)
 			ns -= lineWidth;
 		GeneralPath arrow = new GeneralPath();
-		arrow.moveTo(-ns / 2, ns * 1.3f);
-		arrow.lineTo(-ns / 2, -ns * 0.3f);
+		// original version
+		// arrow.moveTo(-ns / 2, ns * 1.3f);
+		// arrow.lineTo(-ns / 2, -ns * 0.3f);
+		//
+		// arrow.moveTo(0f, 0f);
+		// arrow.lineTo(0f, ns);
+		// arrow.lineTo(ns, ns / 2f);
 		
-		arrow.moveTo(0f, 0f);
-		arrow.lineTo(0f, ns);
+		// new version to draw PowerPoint slides correctly
+		arrow.moveTo(-ns / 2f, ns / 2f);
+		arrow.lineTo(-ns / 2f, ns * 1.3f);
+		arrow.moveTo(-ns / 2f, ns / 2f);
+		arrow.lineTo(-ns / 2f, -ns * 0.3f);
+		
+		arrow.moveTo(0f, ns / 2f);
+		arrow.lineTo(0f, 0f);
 		arrow.lineTo(ns, ns / 2f);
+		arrow.lineTo(0f, ns);
+		arrow.lineTo(0f, ns / 2f);
 		
 		arrow.closePath();
 		

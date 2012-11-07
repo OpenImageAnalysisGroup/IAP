@@ -87,7 +87,7 @@ public class SplitNodeForSingleMappingData extends AbstractAlgorithm {
 	public Parameter[] getParameters() {
 		return new Parameter[] {
 							new ObjectListParameter(mCurrentMode, "Mode of operation", "Select one of the operation modes", optionList),
-							new IntegerParameter(mMinimumDegree, "Mode 2: Minimum node degree", "<html>"
+							new IntegerParameter(mMinimumDegree, "Mode 2", "<html>"
 												+ "If selected, only nodes with a degree over the specified threshold are processed.<br>"
 												+ "Only values greater than 1 are meaningful."),
 							new BooleanParameter(mProcessSelfLoops, "Mode 2: Process self-loops", "<html>"
@@ -111,6 +111,12 @@ public class SplitNodeForSingleMappingData extends AbstractAlgorithm {
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
 	public void execute() {
+		
+		if (mCurrentMode == option2 && mMinimumDegree <= 1) {
+			MainFrame.showMessageDialog("<html>Cannot split nodes!<br>Please specify a node degree > 1.", "Error");
+			return;
+		}
+		
 		Collection<Node> workNodes = new ArrayList<Node>(getSelectedOrAllNodes());
 		graph.getListenerManager().transactionStarted(this);
 		int newNodes = 0;

@@ -46,6 +46,14 @@ public class ArrowShapeCellRenderer implements ListCellRenderer {
 			icon = new ImageIcon(cl.getResource(path + "/StandardArrowShape.png"));
 			result.setText("");
 		}
+		if (value.equals("--l>")) {
+			icon = new ImageIcon(cl.getResource(path + "/StandardArrowShapeLeft.png"));
+			result.setText("");
+		}
+		if (value.equals("--r>")) {
+			icon = new ImageIcon(cl.getResource(path + "/StandardArrowShapeRight.png"));
+			result.setText("");
+		}
 		if (value.equals("-+>")) {
 			icon = new ImageIcon(cl.getResource(path + "/ThinStandardArrowShape.png"));
 			result.setText("");

@@ -93,30 +93,9 @@ public class LoadGraphFileAttributeAction implements URLattributeAction {
 		}
 		if (MainFrame.getInstance().lookUpAndSwitchToNamedSession(fileName))
 			return;
-		java.io.File file = new File(fileName);
-		if (!file.exists())
-			for (org.graffiti.session.Session s : MainFrame.getSessions()) {
-				if (s instanceof EditorSession) {
-					EditorSession es = (EditorSession) s;
-					if (es.getGraph() == g) {
-						String path = "";
-						if (es.getFileNameFull() != null)
-							path = es.getFileNameFull();
-						if (path.lastIndexOf('/') > 0)
-							path = path.substring(0, path.lastIndexOf('/')) + '/';
-						else
-							if (path.lastIndexOf('\\') > 0)
-								path = path.substring(0, path.lastIndexOf('\\')) + '\\';
-						File filet = new File(path + fileName);
-						if (filet.exists()) {
-							file = filet;
-							break;
-						} else
-							if (fileName.indexOf("/") < 0 && fileName.indexOf("\\") < 0)
-								file = filet;
-					}
-				}
-			}
+		File file = checkFile(g, fileName);
+		// check for graphs in the same directory
+		file = checkFile(g, new File(g.getName(true)).getParent() + "/" + fileName);
 		
 		if (!file.exists())
 			MainFrame.showMessageDialog("File " + file.getAbsolutePath() + " could not be found!", "Error");
@@ -133,6 +112,34 @@ public class LoadGraphFileAttributeAction implements URLattributeAction {
 				}
 			}
 		}
+	}
+	
+	private File checkFile(Graph g, String fileName) {
+		java.io.File file = new File(fileName);
+		
+		if (!file.exists() || !file.canRead())
+			for (org.graffiti.session.Session s : MainFrame.getSessions()) {
+				if (s instanceof EditorSession) {
+					EditorSession es = (EditorSession) s;
+					if (es.getGraph() == g) {
+						String path = "";
+						if (es.getFileNameFull() != null)
+							path = es.getFileNameFull();
+						if (path.lastIndexOf('/') > 0)
+							path = path.substring(0, path.lastIndexOf('/')) + '/';
+						else
+							if (path.lastIndexOf('\\') > 0)
+								path = path.substring(0, path.lastIndexOf('\\')) + '\\';
+						File filet = new File(path + fileName);
+						if (filet.exists()) {
+							return filet;
+						} else
+							if (fileName.indexOf("/") < 0 && fileName.indexOf("\\") < 0)
+								return filet;
+					}
+				}
+			}
+		return file;
 	}
 	
 	public String getCommandDescription(boolean shortDesc, boolean altDesc) {

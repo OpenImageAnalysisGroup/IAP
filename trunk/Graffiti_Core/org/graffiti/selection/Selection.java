@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: Selection.java,v 1.2 2011-02-04 15:41:35 klukas Exp $
+// $Id: Selection.java,v 1.3 2012-11-07 14:42:00 klukas Exp $
 
 package org.graffiti.selection;
 
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.graffiti.attributes.FieldAlreadySetException;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
@@ -45,7 +45,7 @@ import org.graffiti.graph.Node;
  * selectionChanged()</code>
  * </p>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Selection {
 	// ~ Instance fields ========================================================
@@ -86,8 +86,8 @@ public class Selection {
 	 */
 	@SuppressWarnings("unchecked")
 	public Selection() {
-		this.nodes = new LinkedHashSet<Node>();
-		this.edges = new LinkedHashSet<Edge>();
+		this.nodes = new ListOrderedSet();
+		this.edges = new ListOrderedSet();
 		this.newMarked = new HashMap<GraphElement, GraphElement>();
 		this.newUnmarked = new HashMap<GraphElement, GraphElement>();
 	}
@@ -100,11 +100,18 @@ public class Selection {
 	 */
 	@SuppressWarnings("unchecked")
 	public Selection(String name) {
+		this();
 		this.name = name;
-		this.nodes = new LinkedHashSet<Node>();
-		this.edges = new LinkedHashSet<Edge>();
-		this.newMarked = new HashMap<GraphElement, GraphElement>();
-		this.newUnmarked = new HashMap<GraphElement, GraphElement>();
+	}
+	
+	public Selection(String name, Collection<?> newElements) {
+		this(name);
+		addAll(newElements);
+	}
+	
+	public Selection(Collection<?> newElements) {
+		this();
+		addAll(newElements);
 	}
 	
 	// ~ Methods ================================================================
@@ -320,8 +327,8 @@ public class Selection {
 			newUnmarked.put(it.next(), null);
 		}
 		
-		nodes = new LinkedHashSet<Node>();
-		edges = new LinkedHashSet<Edge>();
+		nodes = new ListOrderedSet();
+		edges = new ListOrderedSet();
 		newMarked = new HashMap<GraphElement, GraphElement>();
 	}
 	

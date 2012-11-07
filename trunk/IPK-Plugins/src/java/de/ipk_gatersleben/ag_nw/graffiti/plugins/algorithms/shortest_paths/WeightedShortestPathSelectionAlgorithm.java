@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.1 2011-01-31 09:00:41 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.2 2012-11-07 14:47:54 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -24,6 +24,7 @@ import org.apache.commons.collections.set.ListOrderedSet;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
+import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.plugin.parameter.BooleanParameter;
 import org.graffiti.plugin.parameter.ObjectListParameter;
 import org.graffiti.plugin.parameter.Parameter;
@@ -53,6 +54,13 @@ public class WeightedShortestPathSelectionAlgorithm
 	 * Constructs a new instance.
 	 */
 	public WeightedShortestPathSelectionAlgorithm() {
+	}
+	
+	@Override
+	public void check() throws PreconditionException {
+		super.check();
+		if (selection == null || selection.getNumberOfNodes() < 2)
+			throw new PreconditionException("at least one start and one end node has to be selected");
 	}
 	
 	/**
