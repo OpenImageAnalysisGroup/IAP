@@ -5,5 +5,7 @@
 	<classpathentry exported="true" kind="src" path="/Graffiti_lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/ini4j-0.5.2.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

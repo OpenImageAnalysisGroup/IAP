@@ -45,6 +45,11 @@ public class NullLayoutAlgorithm extends AbstractAlgorithm {
 	}
 	
 	@Override
+	public String getDescription() {
+		return "<html>Does not change the graph layout at all. This command is only useful in some workflows";
+	}
+	
+	@Override
 	public boolean isLayoutAlgorithm() {
 		return true;
 	}

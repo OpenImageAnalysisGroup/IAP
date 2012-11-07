@@ -37,7 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.database.dbe.StringScanner;
 public class SIFreader
 					extends AbstractInputSerializer {
 	
-	private String fileNameExt = ".sif";
+	private final String fileNameExt = ".sif";
 	
 	/**
 	 *
@@ -86,18 +86,20 @@ public class SIFreader
 				String type = s.nextNotQuotedString();
 				String tgt = s.nextNotQuotedString();
 				s.nextDouble();
-				if (src != null && src.trim().length() > 0 &&
-									tgt != null && tgt.trim().length() > 0) {
+				if (src != null && src.trim().length() > 0) {
 					src = src.trim();
-					tgt = tgt.trim();
-					type = type.trim();
 					Node a = nodes.get(src);
-					Node b = nodes.get(tgt);
 					if (a == null)
 						a = addNode(g, nodes, positionGen, src);
-					if (b == null)
-						b = addNode(g, nodes, positionGen, tgt);
-					mode2dirEdge(g, a, b, type);
+					
+					if (tgt != null && tgt.trim().length() > 0) {
+						tgt = tgt.trim();
+						type = type.trim();
+						Node b = nodes.get(tgt);
+						if (b == null)
+							b = addNode(g, nodes, positionGen, tgt);
+						mode2dirEdge(g, a, b, type);
+					}
 				}
 			}
 			if (line % 1000 == 0) {
@@ -121,8 +123,10 @@ public class SIFreader
 	
 	private void mode2dirEdge(Graph g, Node a, Node b, String type) {
 		Edge newEdge = g.addEdge(a, b, true);
-		if (type != null && type.length() > 0)
+		if (type != null && type.length() > 0) {
 			NodeTools.setClusterID(newEdge, type);
+			AttributeHelper.setLabel(newEdge, type);
+		}
 	}
 	
 	/*

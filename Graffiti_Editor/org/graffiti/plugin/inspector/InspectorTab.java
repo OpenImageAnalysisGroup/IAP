@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: InspectorTab.java,v 1.1 2011-01-31 09:04:35 klukas Exp $
+// $Id: InspectorTab.java,v 1.2 2012-11-07 14:42:07 klukas Exp $
 
 package org.graffiti.plugin.inspector;
 
@@ -21,6 +21,7 @@ import javax.swing.border.Border;
 import org.ErrorMsg;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.view.View;
+import org.graffiti.selection.SelectionListener;
 
 /**
  * An <code>InspectorTab</code> is a generic component for an <code>InspectorPlugin</code>.
@@ -29,7 +30,7 @@ import org.graffiti.plugin.view.View;
  * @see InspectorPlugin
  */
 public abstract class InspectorTab
-					extends JComponent {
+		extends JComponent {
 	// ~ Instance fields ========================================================
 	
 	/**
@@ -96,6 +97,7 @@ public abstract class InspectorTab
 				setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 4), getTitle()));
 			repaint();
 			Runnable r = new Runnable() {
+				@Override
 				public void run() {
 					try {
 						try {
@@ -112,14 +114,14 @@ public abstract class InspectorTab
 								ContainsTabbedPane sh = (ContainsTabbedPane) whenFinishedHighlight;
 								if (cycleChildren) {
 									cycleHighlight(whenFinishedHighlight,
-														highlight, oldB, sh);
+											highlight, oldB, sh);
 								}
 							}
 						} else {
 							if (cycleChildren && fit instanceof SubtabHostTab) {
 								SubtabHostTab sh = (SubtabHostTab) fit;
 								cycleHighlight(sh,
-													highlight, oldB, sh);
+										highlight, oldB, sh);
 							}
 						}
 					} finally {
@@ -128,9 +130,9 @@ public abstract class InspectorTab
 				}
 				
 				private void cycleHighlight(
-									final InspectorTab tab,
-									final boolean highlight, final Border oldB,
-									ContainsTabbedPane sh) {
+						final InspectorTab tab,
+						final boolean highlight, final Border oldB,
+						ContainsTabbedPane sh) {
 					if (highlight)
 						tab.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 4), tab.getTitle()));
 					tab.repaint();
@@ -157,7 +159,7 @@ public abstract class InspectorTab
 	}
 	
 	public static void focusAndHighlightComponent(final JComponent thisss, final String title, final InspectorTab whenFinishedHighlight,
-						final boolean highlight, final boolean cycleChildren) {
+			final boolean highlight, final boolean cycleChildren) {
 		final int time = 800;
 		JTabbedPane tp = (JTabbedPane) thisss.getParent();
 		if (tp != null) {
@@ -170,6 +172,7 @@ public abstract class InspectorTab
 				thisss.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 4), title));
 			thisss.repaint();
 			Runnable r = new Runnable() {
+				@Override
 				public void run() {
 					try {
 						Thread.sleep(time);
@@ -185,22 +188,22 @@ public abstract class InspectorTab
 							ContainsTabbedPane sh = (ContainsTabbedPane) whenFinishedHighlight;
 							if (cycleChildren) {
 								cycleHighlight(whenFinishedHighlight,
-													highlight, oldB, sh);
+										highlight, oldB, sh);
 							}
 						}
 					} else {
 						if (cycleChildren && thisss instanceof SubtabHostTab) {
 							SubtabHostTab sh = (SubtabHostTab) thisss;
 							cycleHighlight(sh,
-												highlight, oldB, sh);
+									highlight, oldB, sh);
 						}
 					}
 				}
 				
 				private void cycleHighlight(
-									final InspectorTab tab,
-									final boolean highlight, final Border oldB,
-									ContainsTabbedPane sh) {
+						final InspectorTab tab,
+						final boolean highlight, final Border oldB,
+						ContainsTabbedPane sh) {
 					if (highlight)
 						tab.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 4), tab.getTitle()));
 					tab.repaint();
@@ -227,8 +230,8 @@ public abstract class InspectorTab
 	}
 	
 	public void setEditPanelInformation(
-						Map<?, ?> valueEditComponents,
-						Map<GraphElement, GraphElement> map) {
+			Map<?, ?> valueEditComponents,
+			Map<GraphElement, GraphElement> map) {
 		if (getEditPanel() != null) {
 			getEditPanel().setEditComponentMap(valueEditComponents);
 			getEditPanel().setGraphElementMap(map);
@@ -244,7 +247,7 @@ public abstract class InspectorTab
 	}
 	
 	public boolean isSelectionListener() {
-		return false;
+		return (this instanceof SelectionListener);
 	}
 }
 

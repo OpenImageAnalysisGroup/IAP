@@ -30,7 +30,8 @@ import org.graffiti.plugin.editcomponent.AbstractValueEditComponent;
 public class LabelAlignmentAttributeEditor extends AbstractValueEditComponent {
 	
 	JComponent alignmentSelection;
-	PositionButton left, right, above, below, insideTop, insideCenter, insideBottom;
+	PositionButton left, right, above, below, insideTop, insideTopLeft, insideTopRight, insideCenter, insideBottom, insideBottomLeft, insideBottomRight,
+			insideLeft, insideRight;
 	
 	PositionButton
 						leftBorderT, leftBorderC, leftBorderB,
@@ -58,8 +59,14 @@ public class LabelAlignmentAttributeEditor extends AbstractValueEditComponent {
 		above = new PositionButton(this, AlignmentSetting.ABOVE, "Above", false);
 		below = new PositionButton(this, AlignmentSetting.BELOW, "Below", false);
 		insideTop = new PositionButton(this, AlignmentSetting.INSIDETOP, "Inside, top", false);
+		insideTopLeft = new PositionButton(this, AlignmentSetting.INSIDETOPLEFT, "Inside, top-left", false);
+		insideTopRight = new PositionButton(this, AlignmentSetting.INSIDETOPRIGHT, "Inside, top-right", false);
 		insideCenter = new PositionButton(this, AlignmentSetting.CENTERED, "Center", false);
 		insideBottom = new PositionButton(this, AlignmentSetting.INSIDEBOTTOM, "Inside, bottom", false);
+		insideBottomLeft = new PositionButton(this, AlignmentSetting.INSIDEBOTTOMLEFT, "Inside, bottom-left", false);
+		insideBottomRight = new PositionButton(this, AlignmentSetting.INSIDEBOTTOMRIGHT, "Inside, bottom-right", false);
+		insideLeft = new PositionButton(this, AlignmentSetting.INSIDELEFT, "Inside, left", false);
+		insideRight = new PositionButton(this, AlignmentSetting.INSIDERIGHT, "Inside, right", false);
 		
 		leftBorderT = new PositionButton(this, AlignmentSetting.BORDER_LEFT_TOP, "Left border, top", true);
 		leftBorderC = new PositionButton(this, AlignmentSetting.BORDER_LEFT_CENTER, "Left border, center", true);
@@ -109,11 +116,13 @@ public class LabelAlignmentAttributeEditor extends AbstractValueEditComponent {
 								TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED));
 		buttonsCenterCol.add(TableLayout.get3Split(topBorderL, topBorderC, topBorderR, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
 							TableLayoutConstants.PREFERRED));
-		buttonsCenterCol.add(TableLayout.get3Split(getFillerN(h), check(insideTop, h), getFillerN(h), TableLayoutConstants.PREFERRED,
+		buttonsCenterCol.add(TableLayout.get3Split(check(insideTopLeft, h), check(insideTop, h), check(insideTopRight, h), TableLayoutConstants.PREFERRED,
 							TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED));
-		buttonsCenterCol.add(TableLayout.get3Split(getFillerN(h), insideCenter, getFillerN(h), TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
+		buttonsCenterCol.add(TableLayout.get3Split(check(insideLeft, h), insideCenter, check(insideRight, h), TableLayoutConstants.PREFERRED,
+				TableLayoutConstants.PREFERRED,
 							TableLayoutConstants.PREFERRED));
-		buttonsCenterCol.add(TableLayout.get3Split(getFillerN(h), check(insideBottom, h), getFillerN(h), TableLayoutConstants.PREFERRED,
+		buttonsCenterCol.add(TableLayout.get3Split(check(insideBottomLeft, h), check(insideBottom, h), check(insideBottomRight, h),
+				TableLayoutConstants.PREFERRED,
 							TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED));
 		buttonsCenterCol.add(TableLayout.get3Split(bottomBorderL, bottomBorderC, bottomBorderR, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED,
 							TableLayoutConstants.PREFERRED));
@@ -204,6 +213,7 @@ public class LabelAlignmentAttributeEditor extends AbstractValueEditComponent {
 	void updateButtonState() {
 		for (PositionButton button : new PositionButton[] {
 							left, right, above, below, insideTop, insideCenter, insideBottom,
+							insideTopLeft, insideTopRight, insideLeft, insideRight, insideBottomLeft, insideBottomRight,
 							aboveLeft, aboveRight, belowLeft, belowRight,
 							topBorderL, topBorderC, topBorderR,
 							leftBorderT, leftBorderC, leftBorderB,

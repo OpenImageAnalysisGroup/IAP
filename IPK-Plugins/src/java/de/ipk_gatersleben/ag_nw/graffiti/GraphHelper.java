@@ -85,7 +85,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static Graph createClusterReferenceGraph(Graph graph,
-						HashMap<String, Integer> clusterNodeIDandNumberOfContainingNodes) {
+			HashMap<String, Integer> clusterNodeIDandNumberOfContainingNodes) {
 		if (clusterNodeIDandNumberOfContainingNodes == null)
 			clusterNodeIDandNumberOfContainingNodes = new LinkedHashMap<String, Integer>();
 		Graph clusterReferenceGraph = new AdjListGraph(new ListenerManager());
@@ -129,7 +129,7 @@ public class GraphHelper implements HelperClass {
 				continue;
 			String cid = cluster;
 			clusterNodeIDandNumberOfContainingNodes.put(cid, new Integer(clusterNodeIDandNumberOfContainingNodes.get(cid)
-								.intValue() + 1));
+					.intValue() + 1));
 			if (!cluster.equals(""))
 				for (Iterator<?> itOutN = graphNode.getOutNeighborsIterator(); itOutN.hasNext();) {
 					Node graphNodeNeighbor = (Node) itOutN.next();
@@ -156,14 +156,14 @@ public class GraphHelper implements HelperClass {
 							
 							if (knownEdge == null) {
 								Edge newEdge = clusterReferenceGraph.addEdge(clusterNodeA, clusterNodeB, true, AttributeHelper
-													.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
+										.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
 								knownEdges.put(id, newEdge);
 								knownEdge = newEdge;
 							}
 							Integer edgeDoublingCount = (Integer) AttributeHelper.getAttributeValue(knownEdge, "cluster",
-												"edgecount", new Integer(0), null);
+									"edgecount", new Integer(0), null);
 							AttributeHelper.setAttribute(knownEdge, "cluster", "edgecount", new Integer(edgeDoublingCount
-												.intValue() + 1));
+									.intValue() + 1));
 						}
 					}
 				}
@@ -281,7 +281,7 @@ public class GraphHelper implements HelperClass {
 				for (Edge e : n.getEdges()) {
 					if (connectedNodes.contains(e.getSource()) || connectedNodes.contains(e.getTarget()))
 						connectedComponentGraph.addEdgeCopy(e, sourceGraphNode2connectedGraphNode.get(e.getSource()),
-											sourceGraphNode2connectedGraphNode.get(e.getTarget()));
+								sourceGraphNode2connectedGraphNode.get(e.getTarget()));
 				}
 			}
 			graphList.add(connectedComponentGraph);
@@ -394,7 +394,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	private final static String SHAPE = GraphicAttributeConstants.GRAPHICS + Attribute.SEPARATOR
-						+ GraphicAttributeConstants.SHAPE;
+			+ GraphicAttributeConstants.SHAPE;
 	
 	/**
 	 * Add new bends to a graph
@@ -404,7 +404,7 @@ public class GraphHelper implements HelperClass {
 	 * @author klukas
 	 */
 	public static void introduceNewBends(Graph graph, HashSet<Edge> edges, int percent, String shape, int bends,
-						boolean massCenterFromSelection, String description, boolean enableUndo) {
+			boolean massCenterFromSelection, String description, boolean enableUndo) {
 		edges = filterSelfEdges(edges);
 		removeBends(graph, edges, enableUndo);
 		
@@ -434,7 +434,7 @@ public class GraphHelper implements HelperClass {
 				EdgeShapeAttribute edgeShape = (EdgeShapeAttribute) (edge.getAttribute(SHAPE));
 				
 				if ((Math.abs(srcP.x - tgtP.x) < Math.abs(srcP.y - tgtP.y) * (percent / 100d))
-									|| (Math.abs(srcP.y - tgtP.y) < Math.abs(srcP.x - tgtP.x) * (percent / 100d))) {
+						|| (Math.abs(srcP.y - tgtP.y) < Math.abs(srcP.x - tgtP.x) * (percent / 100d))) {
 					// AttributeHelper.setLabel(edge, "S");
 					edgeShape.setValue("org.graffiti.plugins.views.defaults.StraightLineEdgeShape");
 					continue;
@@ -454,7 +454,7 @@ public class GraphHelper implements HelperClass {
 						
 					} else {
 						ErrorMsg
-											.addErrorMessage("Internal Error: Invalid Bend count parameter (only 1 or 2 bends are possible).");
+								.addErrorMessage("Internal Error: Invalid Bend count parameter (only 1 or 2 bends are possible).");
 					}
 				edgeShape.setValue(shape);
 				
@@ -466,8 +466,8 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	private static void applyUndoableBendAddOperation(final Graph graph,
-						final HashMap<LinkedHashMapAttribute, Collection<Vector2d>> bendAttribute2newPoints, final String description,
-						boolean enableUndo) {
+			final HashMap<LinkedHashMapAttribute, Collection<Vector2d>> bendAttribute2newPoints, final String description,
+			boolean enableUndo) {
 		/*
 		 * lhma.add(new CoordinateAttribute("bend", targetPoint.x,
 		 * targetPoint.y)); lhma.add(new CoordinateAttribute("bend1",
@@ -527,7 +527,7 @@ public class GraphHelper implements HelperClass {
 				graph.getListenerManager().transactionStarted(this);
 				try {
 					for (Entry<LinkedHashMapAttribute, Collection<CoordinateAttribute>> entry : edge2newBendAttributes
-										.entrySet()) {
+							.entrySet()) {
 						Collection<CoordinateAttribute> removeThese = entry.getValue();
 						for (CoordinateAttribute ca : removeThese)
 							entry.getKey().getCollectionNoClone().remove(ca);
@@ -559,7 +559,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void introduceNewBends(Graph graph, HashSet<Edge> workEdges, int minPercent, String edgeShape, int i,
-						String description, boolean enableUndo) {
+			String description, boolean enableUndo) {
 		introduceNewBends(graph, workEdges, minPercent, edgeShape, i, false, description, enableUndo);
 	}
 	
@@ -577,8 +577,11 @@ public class GraphHelper implements HelperClass {
 			LinkedHashMapAttribute lhma = (LinkedHashMapAttribute) edge.getAttribute(AttributeConstants.BENDS);
 			EdgeShapeAttribute edgeShape = (EdgeShapeAttribute) (edge.getAttribute(SHAPE));
 			
-			for (Vector2d targetPoint : bendPoints)
-				lhma.add(new CoordinateAttribute("bend1", targetPoint.x, targetPoint.y));
+			int cnt = 0;
+			for (Vector2d targetPoint : bendPoints) {
+				cnt++;
+				lhma.add(new CoordinateAttribute("bend" + cnt, targetPoint.x, targetPoint.y));
+			}
 			
 			edgeShape.setValue(shape);
 			
@@ -721,10 +724,10 @@ public class GraphHelper implements HelperClass {
 	 *           Fill-Color. Default was <code>new Color(0,100,250,100)</code>.
 	 */
 	public static Node addNodeToGraph(Graph graph, double posx, double posy, double frameThickness_3, double width_25,
-						double height_25, Color frameColor_0_0_0_255, Color fillColor_0_100_250_100) {
+			double height_25, Color frameColor_0_0_0_255, Color fillColor_0_100_250_100) {
 		CollectionAttribute col = new HashMapAttribute("");
 		AttributeHelper.setNodeGraphicsAttribute(posx, posy, frameThickness_3, width_25, height_25, frameColor_0_0_0_255,
-							fillColor_0_100_250_100, col);
+				fillColor_0_100_250_100, col);
 		
 		Node node = graph.addNode(col);
 		return node;
@@ -851,7 +854,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void setClusterGraphNodeSizeAndPositionFromReferenceGraph(Graph mainGraph,
-						Graph clusterBackgroundGraph, BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+			Graph clusterBackgroundGraph, BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		if (clusterBackgroundGraph == null)
 			return;
 		Collection<String> clusters = getClusters(mainGraph.getNodes());
@@ -919,12 +922,12 @@ public class GraphHelper implements HelperClass {
 			Vector2d position = AttributeHelper.getPositionVec2d(n);
 			Vector2d size = AttributeHelper.getSize(n);
 			System.out.println("Node " + n.getID() + " [" + AttributeHelper.getLabel(n, "no label") + "]: " + "P["
-								+ (int) position.x + ":" + (int) position.y + "] " + "S[" + (int) size.x + ":" + (int) size.y + "]");
+					+ (int) position.x + ":" + (int) position.y + "] " + "S[" + (int) size.x + ":" + (int) size.y + "]");
 		}
 	}
 	
 	public static void exchangePositions(List<Node> nodes, final NodeSortCommand sortCommand,
-						final boolean sortConsiderCluster) {
+			final boolean sortConsiderCluster) {
 		if (sortCommand == NodeSortCommand.dontSort)
 			return;
 		SortedSet<NodeHelper> sortedNodes = new TreeSet<NodeHelper>(new Comparator<NodeHelper>() {
@@ -967,7 +970,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void exchangePositionsNHL(List<NodeHelper> nodes, final NodeSortCommand sortCommand,
-						final boolean sortConsiderCluster) {
+			final boolean sortConsiderCluster) {
 		if (sortCommand == NodeSortCommand.dontSort)
 			return;
 		ArrayList<Node> todo = new ArrayList<Node>();
@@ -977,7 +980,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static Collection<NodeHelper> getSortedNodeHelpers(Collection<Node> nodes, final NodeSortCommand sortCommand,
-						final boolean sortConsiderCluster) {
+			final boolean sortConsiderCluster) {
 		if (sortCommand == NodeSortCommand.dontSort) {
 			ArrayList<NodeHelper> result = new ArrayList<NodeHelper>();
 			for (Node n : nodes) {
@@ -1021,7 +1024,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static Collection<NodeHelper> getSortedNodeHelpersNHL(Collection<NodeHelper> nodes,
-						final NodeSortCommand sortCommand, final boolean sortConsiderCluster) {
+			final NodeSortCommand sortCommand, final boolean sortConsiderCluster) {
 		if (sortCommand == NodeSortCommand.dontSort) {
 			ArrayList<NodeHelper> result = new ArrayList<NodeHelper>();
 			for (Node n : nodes) {
@@ -1185,7 +1188,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableNodePositionUpdate(final HashMap<Node, Vector2d> nodes2newPositions,
-						final String description) {
+			final String description) {
 		if (nodes2newPositions == null || nodes2newPositions.size() <= 0)
 			return;
 		
@@ -1286,7 +1289,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableNodeSizeUpdate(final HashMap<Node, Vector2d> nodes2newNodeSize,
-						final String description) {
+			final String description) {
 		if (nodes2newNodeSize == null || nodes2newNodeSize.size() <= 0)
 			return;
 		
@@ -1387,9 +1390,9 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableNodeAndBendPositionUpdate(final HashMap<Node, Vector2d> nodes2newPositions,
-						final HashMap<CoordinateAttribute, Vector2d> bends2newPositions, final String description) {
+			final HashMap<CoordinateAttribute, Vector2d> bends2newPositions, final String description) {
 		if (nodes2newPositions == null || bends2newPositions == null
-							|| (nodes2newPositions.size() == 0 && bends2newPositions.size() == 0))
+				|| (nodes2newPositions.size() == 0 && bends2newPositions.size() == 0))
 			return;
 		
 		AbstractUndoableEdit updateCmd = new AbstractUndoableEdit() {
@@ -1440,7 +1443,7 @@ public class GraphHelper implements HelperClass {
 						if (entry.getValue() != null) {
 							if (!oldPositionsOfBends.containsKey(entry.getKey()))
 								oldPositionsOfBends.put(entry.getKey(), new Vector2d(entry.getKey().getX(), entry.getKey()
-													.getY()));
+										.getY()));
 							entry.getKey().setX(entry.getValue().x);
 							entry.getKey().setY(entry.getValue().y);
 						}
@@ -1527,7 +1530,7 @@ public class GraphHelper implements HelperClass {
 				}
 			}
 		if (MainFrame.getInstance().getActiveSession() != null
-							&& myGraph == MainFrame.getInstance().getActiveSession().getGraph()) {
+				&& myGraph == MainFrame.getInstance().getActiveSession().getGraph()) {
 			UndoableEditSupport undo = MainFrame.getInstance().getUndoSupport();
 			undo.beginUpdate();
 			undo.postEdit(updateCmd);
@@ -1536,9 +1539,9 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableNodePositionAndSizeUpdate(final HashMap<Node, Vector2d> nodes2newPositions,
-						final HashMap<Node, Vector2d> nodes2newNodeSize, final String description) {
+			final HashMap<Node, Vector2d> nodes2newNodeSize, final String description) {
 		if (nodes2newPositions == null || nodes2newNodeSize == null
-							|| (nodes2newNodeSize.size() == 0 && nodes2newPositions.size() == 0))
+				|| (nodes2newNodeSize.size() == 0 && nodes2newPositions.size() == 0))
 			return;
 		
 		AbstractUndoableEdit updateCmd = new AbstractUndoableEdit() {
@@ -1676,10 +1679,10 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void postUndoableChanges(final Graph myGraph,
-						final HashMap<CoordinateAttribute, Vector2d> coordinates2oldPositions,
-						final HashMap<CoordinateAttribute, Vector2d> coordinates2newPositions, final String description) {
+			final HashMap<CoordinateAttribute, Vector2d> coordinates2oldPositions,
+			final HashMap<CoordinateAttribute, Vector2d> coordinates2newPositions, final String description) {
 		if (myGraph == null || coordinates2oldPositions == null || coordinates2newPositions == null
-							|| coordinates2newPositions.size() <= 0)
+				|| coordinates2newPositions.size() <= 0)
 			return;
 		
 		AbstractUndoableEdit updateCmd = new AbstractUndoableEdit() {
@@ -1740,7 +1743,7 @@ public class GraphHelper implements HelperClass {
 		};
 		
 		if (MainFrame.getInstance().getActiveSession() != null
-							&& myGraph == MainFrame.getInstance().getActiveSession().getGraph()) {
+				&& myGraph == MainFrame.getInstance().getActiveSession().getGraph()) {
 			UndoableEditSupport undo = MainFrame.getInstance().getUndoSupport();
 			undo.beginUpdate();
 			undo.postEdit(updateCmd);
@@ -1751,10 +1754,10 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void postUndoableChanges3d(final Graph myGraph,
-						final HashMap<CoordinateAttribute, Vector3d> coordinates2oldPositions,
-						final HashMap<CoordinateAttribute, Vector3d> coordinates2newPositions, final String description) {
+			final HashMap<CoordinateAttribute, Vector3d> coordinates2oldPositions,
+			final HashMap<CoordinateAttribute, Vector3d> coordinates2newPositions, final String description) {
 		if (myGraph == null || coordinates2oldPositions == null || coordinates2newPositions == null
-							|| coordinates2newPositions.size() <= 0)
+				|| coordinates2newPositions.size() <= 0)
 			return;
 		
 		AbstractUndoableEdit updateCmd = new AbstractUndoableEdit() {
@@ -1839,7 +1842,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableClusterIdAssignment(final Graph graph,
-						final HashMap<GraphElement, String> ge2newClusterID, final String description, boolean enableUndo) {
+			final HashMap<GraphElement, String> ge2newClusterID, final String description, boolean enableUndo) {
 		if (graph == null || ge2newClusterID == null || ge2newClusterID.size() <= 0)
 			return;
 		
@@ -1914,7 +1917,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void postUndoableNodeAndEdgeAdditions(final Graph graph, final HashSet<Node> newNodes,
-						final HashSet<Edge> newEdges, final String description) {
+			final HashSet<Edge> newEdges, final String description) {
 		if (graph == null || newNodes == null || newEdges == null || (newNodes.size() + newEdges.size() <= 0))
 			return;
 		
@@ -2037,11 +2040,11 @@ public class GraphHelper implements HelperClass {
 	
 	public static void moveGraph(Graph graph, double offX, double offY) {
 		CenterLayouterAlgorithm.moveGraph(graph, "graph movement (" + (int) offX + "/" + (int) offY + ")", false, offX,
-							offY);
+				offY);
 	}
 	
 	public static void getShortestDistances(HashMap<Node, Integer> result, HashSet<Node> from, boolean directed,
-						int currentDistance) {
+			int currentDistance) {
 		HashSet<Node> todo = new HashSet<Node>();
 		for (Node n : from) {
 			result.put(n, currentDistance);
@@ -2068,7 +2071,7 @@ public class GraphHelper implements HelperClass {
 	}
 	
 	public static void applyUndoableEdgeReversal(final Graph graph, final Collection<Edge> edges,
-						final String description) {
+			final String description) {
 		
 		if (graph == null || edges == null || edges.size() <= 0)
 			return;
@@ -2146,7 +2149,7 @@ public class GraphHelper implements HelperClass {
 					GraphHelper.selectGraphElements((Collection) newEdges);
 					if (missing > 0)
 						MainFrame.showMessageDialog("<html>In the meantime " + missing
-											+ " edges have been removed from the graph.", "Processing incomplete");
+								+ " edges have been removed from the graph.", "Processing incomplete");
 				} finally {
 					myGraph.getListenerManager().transactionFinished(this, true);
 					GraphHelper.issueCompleteRedrawForGraph(myGraph);
@@ -2204,7 +2207,7 @@ public class GraphHelper implements HelperClass {
 					GraphHelper.selectGraphElements((Collection) edges);
 					if (missing > 0)
 						MainFrame.showMessageDialog("<html>In the meantime " + missing
-											+ " edges have been removed from the graph.", "Processing incomplete");
+								+ " edges have been removed from the graph.", "Processing incomplete");
 				} finally {
 					myGraph.getListenerManager().transactionFinished(this, true);
 					GraphHelper.issueCompleteRedrawForGraph(myGraph);

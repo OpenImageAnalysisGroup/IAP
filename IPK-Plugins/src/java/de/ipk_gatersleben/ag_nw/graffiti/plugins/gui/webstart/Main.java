@@ -29,10 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
-import org.graffiti.editor.ManagerManager;
 import org.graffiti.editor.SplashScreenInterface;
-import org.graffiti.managers.pluginmgr.PluginManager;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
@@ -41,7 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -70,158 +67,120 @@ public class Main {
 	}
 	
 	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon) {
-		this(showMainFrame, applicationName, args, addon, null);
-	}
-	
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen) {
-		setupLogger();
-		final ClassLoader cl = this.getClass().getClassLoader();
-		if (showMainFrame) {
-			final ThreadSafeOptions tso = new ThreadSafeOptions();
-			splashScreen = new DBEsplashScreen(applicationName,
-					"", new Runnable() {
-						@Override
-						public void run() {
-							if (showMainFrame) {
-								String path = this.getClass().getPackage().getName()
-										.replace('.', '/');
-								ImageIcon icon = new ImageIcon(cl.getResource(path
-										+ "/ipklogo16x16_5.png"));
-								final MainFrame mainFrame = MainFrame.getInstance();
-								if (icon != null && mainFrame != null)
-									mainFrame.setIconImage(icon.getImage());
-								if (mainFrame == null)
-									System.err.println("Internal Error: MainFrame is NULL");
-								else {
-									Thread t = new Thread(new Runnable() {
-										@Override
-										public void run() {
-											long waitTime = 0;
-											long start = System.currentTimeMillis();
-											do {
-												if (ErrorMsg.getAppLoadingStatus() == ApplicationStatus.ADDONS_LOADED)
-													break;
-												try {
-													Thread.sleep(50);
-												} catch (InterruptedException e) {
-												}
-												waitTime = System.currentTimeMillis() - start;
-											} while (waitTime < 2000);
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													SplashScreenInterface ss = (SplashScreenInterface) tso.getParam(0, null);
-													ss.setVisible(false);
-													mainFrame.setVisible(true);
-												}
-											});
-										}
-									}, "wait for add-on initialization");
-									t.start();
-								}
+		this(showMainFrame, applicationName, args, addon, new DBEsplashScreen(applicationName,
+				"", new RunnableWithSplashScreenReference() {
+					private SplashScreenInterface ss;
+					
+					@Override
+					public void run() {
+						if (showMainFrame) {
+							ClassLoader cl = this.getClass().getClassLoader();
+							String path = this.getClass().getPackage().getName()
+									.replace('.', '/');
+							ImageIcon icon = new ImageIcon(cl.getResource(path
+									+ "/vanted_logo.png"));
+							final MainFrame mainFrame = MainFrame.getInstance();
+							if (icon != null && mainFrame != null)
+								mainFrame.setIconImage(icon.getImage());
+							if (mainFrame == null)
+								System.err.println("Internal Error: MainFrame is NULL");
+							else {
+								Thread t = new Thread(new Runnable() {
+									@Override
+									public void run() {
+										long waitTime = 0;
+										long start = System.currentTimeMillis();
+										do {
+											if (ErrorMsg.getAppLoadingStatus() == ApplicationStatus.ADDONS_LOADED)
+												break;
+											try {
+												Thread.sleep(50);
+											} catch (InterruptedException e) {
+											}
+											waitTime = System.currentTimeMillis() - start;
+										} while (waitTime < 2000);
+										SwingUtilities.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												ss.setVisible(false);
+												mainFrame.setVisible(true);
+											}
+										});
+									}
+								}, "wait for add-on initialization");
+								t.start();
 							}
 						}
-					});
-			
-			tso.setParam(0, splashScreen);
-			String path = this.getClass().getPackage().getName()
-					.replace('.', '/');
-			ImageIcon icon = new ImageIcon(cl.getResource(path
-					+ "/ipklogo16x16_5.png"));
-			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
-			
-			splashScreen.setVisible(showMainFrame);
-		} else
-			if (splashScreen == null)
-				splashScreen = new SplashScreenInterface() {
-					
-					@Override
-					public int getMaximum() {
-						return 10;
 					}
 					
 					@Override
-					public void setVisible(boolean b) {
+					public void setSplashscreenInfo(SplashScreenInterface ss) {
+						this.ss = ss;
 					}
-					
-					@Override
-					public void setValue(int value) {
-					}
-					
-					@Override
-					public void setText(String text) {
-						System.out.println(text);
-					}
-					
-					@Override
-					public void setMaximum(int maximum) {
-						
-					}
-					
-					@Override
-					public void setInitialisationFinished() {
-						
-					}
-					
-					@Override
-					public int getValue() {
-						return 0;
-					}
-				};
-		if (!ReleaseInfo.isRunningAsApplet())
-			if (splashScreen != null)
-				GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
+				}) {});
+	}
+	
+	/**
+	 * Constructs a new instance of the editor.
+	 */
+	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen) {
 		
-		if (!ReleaseInfo.isRunningAsApplet())
-			if (!showMainFrame && !(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
-					!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) { // command line version automatically rejects
-				// kegg
+		setupLogger();
+		
+		ClassLoader cl = this.getClass().getClassLoader();
+		String path = this.getClass().getPackage().getName()
+				.replace('.', '/');
+		ImageIcon icon = new ImageIcon(cl.getResource(path
+				+ "/vanted_logo.png"));
+		((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
+		
+		splashScreen.setVisible(showMainFrame);
+		
+		GravistoMainHelper.createApplicationSettingsFolder(splashScreen);
+		
+		if (!showMainFrame && !(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
+				!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) { // command line version automatically rejects
+			// kegg
+			try {
+				new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
+				!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) {
+			
+			ReleaseInfo.setIsFirstRun(true);
+			
+			splashScreen.setVisible(false);
+			splashScreen.setText("Request KEGG License Status");
+			int result = askForEnablingKEGG();
+			if (result == JOptionPane.YES_OPTION) {
+				try {
+					new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted").createNewFile();
+				} catch (IOException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+			if (result == JOptionPane.NO_OPTION) {
 				try {
 					new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (IOException e) {
+					ErrorMsg.addErrorMessage(e);
 				}
 			}
-		
-		if (!ReleaseInfo.isRunningAsApplet())
-			if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted")).exists() &&
-					!(new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected")).exists()) {
-				
-				ReleaseInfo.setIsFirstRun(true);
-				
-				if (splashScreen != null) {
-					splashScreen.setVisible(false);
-					splashScreen.setText("Request KEGG License Status");
-				}
-				int result = askForEnablingKEGG();
-				if (result == JOptionPane.YES_OPTION) {
-					try {
-						new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted").createNewFile();
-					} catch (IOException e) {
-						ErrorMsg.addErrorMessage(e);
-					}
-				}
-				if (result == JOptionPane.NO_OPTION) {
-					try {
-						new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_rejected").createNewFile();
-					} catch (IOException e) {
-						ErrorMsg.addErrorMessage(e);
-					}
-				}
-				if (result == JOptionPane.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(
-							null,
-							"Startup of VANTED is aborted.", "VANTED Program Features Initialization",
-							JOptionPane.INFORMATION_MESSAGE);
-					System.exit(0);
-				}
-				if (splashScreen != null)
-					splashScreen.setVisible(true);
+			if (result == JOptionPane.CANCEL_OPTION) {
+				JOptionPane.showMessageDialog(
+						null,
+						"Startup of VANTED is aborted.", "VANTED Program Features Initialization",
+						JOptionPane.INFORMATION_MESSAGE);
+				System.exit(0);
 			}
+			splashScreen.setVisible(true);
+		}
 		
-		PluginManager pm = GravistoMainHelper.getNewPluginManager();
-		ManagerManager.getInstance(pm);
-		GravistoMainHelper.initApplicationExt(pm, args, splashScreen, cl, null, addon);
+		GravistoMainHelper.initApplicationExt(args, splashScreen, cl, null, addon);
 	}
 	
 	public static boolean doEnableKEGGaskUser() {
@@ -297,8 +256,9 @@ public class Main {
 		
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
-		String name = stS + "IAP-Data-Navigator" + stE + " - "
-				+ stS + "I" + stE + "ntegrated " + stS + "A" + stE + "nalysis " + stS + "P" + stE + "latform";
+		String name = stS + "VANTED" + stE + " - "
+				+ stS + "V" + stE + "isualization and " + stS + "A" + stE + "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE
+				+ "works <br>containing " + stS + "E" + stE + "xperimental " + stS + "D" + stE + "ata";
 		JComponent result = new JPanel();
 		result.setLayout(TableLayout.getLayout(TableLayoutConstants.FILL, TableLayoutConstants.FILL));
 		
@@ -324,17 +284,19 @@ public class Main {
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
-		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "IAP-Data-Navigator " + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
-		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "IAP-Data-Navigator" + stE + "&nbsp;-&nbsp;"
+		DBEgravistoHelper.DBE_GRAVISTO_VERSION = "VANTED V" + DBEgravistoHelper.DBE_GRAVISTO_VERSION_CODE;
+		DBEgravistoHelper.DBE_GRAVISTO_NAME = stS + "VANTED" + stE + "&nbsp;-&nbsp;"
 				+ stS + "V" + stE + "isualization&nbsp;and&nbsp;" + stS + "A" + stE + "nalysis&nbsp;of&nbsp;" + stS + "N" + stE + "e" + stS + "t" + stE
 				+ "works&nbsp;<br>containing&nbsp;" + stS + "E" + stE + "xperimental&nbsp;" + stS + "D" + stE + "ata<br>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
-		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "IAP - Integrated Analysis Platform";// CK 31.7.2011 //
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "VANTED";
+		DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME = "";
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		new Main(true,
+		Main e = new Main(true,
 				DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon);
+		if (e == null)
+			System.err.println("MainFrame not created.");
 	}
 	
 	public static void startVanted(String[] args, String adn) {

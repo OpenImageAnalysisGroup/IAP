@@ -27,7 +27,7 @@ import org.graffiti.plugin.view.ShapeNotFoundException;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.viewcomponents.EdgeComponentHelper;
 
 public class ChartAttributeComponent extends AbstractAttributeComponent
-					implements GraphicAttributeConstants {
+		implements GraphicAttributeConstants {
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -35,7 +35,7 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 	 * labels.
 	 */
 	protected final double flatness = 1.0d;
-	private Point loc = new Point();
+	private final Point loc = new Point();
 	
 	@Override
 	public void attributeChanged(Attribute attr) throws ShapeNotFoundException {
@@ -100,16 +100,18 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 				sy = defaultSizeForEdges;
 			setSize(sx, sy);
 			EdgeComponentHelper.updatePositionForEdgeMapping(getAttribute(), geShape,
-								ChartAttribute.CHARTPOSITION,
-								"mapping",
-								flatness, getWidth(), getHeight(), loc);
+					ChartAttribute.CHARTPOSITION,
+					"mapping",
+					flatness, getWidth(), getHeight(), loc);
 			setLocation((int) (loc.getX() + shift.getX()), (int) (loc.getY() + shift.getY()));
 		}
 		
-		if (isShowing())
-			validate();
-		else
-			validate(); // JRE7 bug		validateTree();
+		synchronized (getTreeLock()) {
+			if (isShowing())
+				validate();
+			else
+				validateTree();
+		}
 	}
 	
 	private boolean isLabelTop() {
@@ -128,8 +130,8 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 	
 	private Dimension getLabelTransformedSize(Dimension sizeD) {
 		Dimension result = new Dimension(sizeD.width,
-							sizeD.height - getCurrentLabelHeight(isLabelTopOrBottom()
-												));
+				sizeD.height - getCurrentLabelHeight(isLabelTopOrBottom()
+						));
 		return result;
 	}
 	
@@ -148,14 +150,14 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 	}
 	
 	private void changeParameters(Object graphicsAttr, GraphElement n)
-						throws ShapeNotFoundException {
+			throws ShapeNotFoundException {
 		if ((graphicsAttr != null)
-							&& (graphicsAttr instanceof CollectionAttribute)) {
+				&& (graphicsAttr instanceof CollectionAttribute)) {
 			CollectionAttribute cAttr = (CollectionAttribute) graphicsAttr;
 			Object annotationObject = cAttr.getCollection().get("component");
 			
 			if ((annotationObject != null)
-								&& (annotationObject instanceof ChartAttribute)) {
+					&& (annotationObject instanceof ChartAttribute)) {
 				recreate();
 			}
 			
@@ -163,7 +165,7 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 			Object dimensionObject = cAttr.getCollection().get(DIMENSION);
 			
 			if (((coordinateObject != null) && (coordinateObject instanceof CoordinateAttribute))
-								|| ((dimensionObject != null) && (dimensionObject instanceof DimensionAttribute))) {
+					|| ((dimensionObject != null) && (dimensionObject instanceof DimensionAttribute))) {
 				setLocation(shift.x, shift.y + getCurrentLabelShift());
 			}
 		} else {

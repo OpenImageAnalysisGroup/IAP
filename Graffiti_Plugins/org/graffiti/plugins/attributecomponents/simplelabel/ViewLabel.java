@@ -25,10 +25,16 @@ public class ViewLabel extends JLabel {
 	
 	double strokeWidth = 1d;
 	
-	private Color shadowColor, borderColor;
+	private Color shadowColor;
+	
+	private final Color borderColor;
 	
 	private int offShadowX;
 	private int offShadowY;
+	
+	private boolean mouseoverActivated = true;
+	
+	private boolean highlight;
 	
 	public ViewLabel(String labelText, LabelFrameSetting frame, final double strokeWidth, boolean isDrop, boolean usesDrop, Color borderColor) {
 		super(labelText);
@@ -53,6 +59,8 @@ public class ViewLabel extends JLabel {
 	
 	@Override
 	public void paint(Graphics g) {
+		if (mouseoverActivated && !highlight)
+			return;
 		boolean emptyText = getText() == null || getText().trim().length() == 0;
 		if (frame != LabelFrameSetting.NO_FRAME)
 			LabelComponent.paintRectangleOrOval(frame, g, getX(), getY(), getWidth(), getHeight(), true, strokeWidth, borderColor, emptyText);
@@ -127,6 +135,14 @@ public class ViewLabel extends JLabel {
 	public void setShadowOffset(int offx, int offy) {
 		this.offShadowX = offx;
 		this.offShadowY = offy;
+	}
+	
+	public void setShow(boolean mouseoverActivated) {
+		this.mouseoverActivated = mouseoverActivated;
+	}
+	
+	public void highlight(boolean highlight) {
+		this.highlight = highlight;
 	}
 	
 	// public double offX() {

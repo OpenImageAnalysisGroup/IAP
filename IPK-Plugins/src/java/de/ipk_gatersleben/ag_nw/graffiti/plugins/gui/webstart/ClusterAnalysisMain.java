@@ -37,7 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ClusterAnalysisMain {
 	// ~ Static fields/initializers =============================================
@@ -45,13 +45,13 @@ public class ClusterAnalysisMain {
 	// ~ Instance fields ========================================================
 	
 	/** The editor's attribute types manager. */
-	private AttributeTypesManager attributeTypesManager;
+	private final AttributeTypesManager attributeTypesManager;
 	
 	/** The editor's main frame. */
 	MainFrame mainFrame;
 	
 	/** The editor's plugin manager. */
-	private PluginManager pluginManager;
+	private final PluginManager pluginManager;
 	
 	public static boolean isClusterAnalysisRunning() {
 		return ReleaseInfo.getRunningReleaseStatus() == Release.RELEASE_CLUSTERVIS;
@@ -105,10 +105,11 @@ public class ClusterAnalysisMain {
 			JOptionPane.showMessageDialog(
 								null,
 								"<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-													+ "Program execution can not continue.<br>"
-													+ "Don't forget to start createfilelist from the make folder.<br>"
-													+ "See make - intro.txt for details.<br>"
-													+ "The application needs to be closed.</html>");
+										+ "Program execution can not continue.<br>"
+										+ "Pleas check out the \"make\" project and execute<br>" +
+										"the createfilelist script from the make folder.<br>"
+										+ "See also the make - intro.txt in the make project for details.<br>"
+										+ "The application needs to be closed.</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 		}
@@ -199,7 +200,7 @@ public class ClusterAnalysisMain {
 			String msg = "";
 			
 			for (Iterator<String> itr = messages.iterator(); itr.hasNext();) {
-				msg += ((String) itr.next() + "\n");
+				msg += (itr.next() + "\n");
 			}
 			
 			throw new PluginManagerException("exception.loadStartup\n", msg.trim());

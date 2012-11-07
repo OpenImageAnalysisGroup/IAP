@@ -14,7 +14,10 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -107,8 +110,8 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 							}
 							if (oldv != null && cnt > 0)
 								showManageAddonDialog("<html>Application has been updated (" + oldv + " -> " + currv
-													+ ").<br> Incompatible Add-ons were deactivated.<br>"
-													+ "Use the 'Find Updates' function to look for updates.", true);
+										+ ").<br> Incompatible Add-ons were deactivated.<br>"
+										+ "Use the 'Find Updates' function to look for updates.", true);
 							startupAddonsLoaded = true;
 							break waitLoop;
 						}
@@ -124,7 +127,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			ErrorMsg.addErrorMessage(err.getLocalizedMessage());
 		}
 		synchronized (AddonManagerPlugin.class) {
-			AddonManagerPlugin.class.notifyAll();
+			AddonManagerPlugin.class.notify();
 		}
 	}
 	
@@ -282,7 +285,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	 */
 	private void expandClasspathByJarfile(URL[] files) {
 		URLClassLoader loader = new URLClassLoader(files, InstanceLoader
-							.getCurrentLoader());
+				.getCurrentLoader());
 		InstanceLoader.overrideLoader(loader);
 	}
 	
@@ -317,7 +320,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 				boolean incompatibleDeactivated = false;
 				
 				if (onStartup && ReleaseInfo.isUpdated() == UpdateInfoResult.UPDATED
-									&& !new Addon(f, xmlURL, pd, isactive, getInactiveIcon()).isTestedWithRunningVersion()) {
+						&& !new Addon(f, xmlURL, pd, isactive, getInactiveIcon()).isTestedWithRunningVersion()) {
 					isactive = false;
 					incompatibleDeactivated = true;
 				}
@@ -438,7 +441,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		
 		try {
 			TextFile.write(ADDON_DIRECTORY
-								+ "deactivated.txt", content);
+					+ "deactivated.txt", content);
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e);
 			e.printStackTrace();
@@ -464,19 +467,19 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 				String sup = addons.get(number).getDescription().getCompatibleVersion();
 				if (sup == null)
 					sup = "Add-on contains no compatibility information.<br>" +
-										"Check Add-on website for compatible program version(s).";
+							"Check Add-on website for compatible program version(s).";
 				else
 					sup = "Incompatible with " + DBEgravistoHelper.DBE_GRAVISTO_VERSION + ",<br>but works with " + sup + ".";
 				Object[] res = MyInputHelper.getInput("" +
-									"[" +
-									"<html><center>Force Activation<br><small>(override version check);" +
-									"<html><center>Cancel<br><small>(use 'Find Update' button)]" +
-									StringManipulationTools.getWordWrap("This Add-on has not been tested with " + DBEgravistoHelper.DBE_GRAVISTO_VERSION + ". " +
-														"To ensure stable operation of the application and the Add-on functions, it is recommended " +
-														"to use the 'Find Updates' function to look for an updated version of this Add-on.", 45) + "<br><br>" +
-									StringManipulationTools.getWordWrap("You may also opt for downloading and installing an older version of this application:", 45) +
-									"<br><br>" + sup + "<br><br>",
-									"Add-on may be incompatible", new Object[] {});
+						"[" +
+						"<html><center>Force Activation<br><small>(override version check);" +
+						"<html><center>Cancel<br><small>(use 'Find Update' button)]" +
+						StringManipulationTools.getWordWrap("This Add-on has not been tested with " + DBEgravistoHelper.DBE_GRAVISTO_VERSION + ". " +
+								"To ensure stable operation of the application and the Add-on functions, it is recommended " +
+								"to use the 'Find Updates' function to look for an updated version of this Add-on.", 45) + "<br><br>" +
+						StringManipulationTools.getWordWrap("You may also opt for downloading and installing an older version of this application:", 45) +
+						"<br><br>" + sup + "<br><br>",
+						"Add-on may be incompatible", new Object[] {});
 				if (res == null) {
 					return false;
 				}
@@ -507,8 +510,11 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			public void run() {
-				MainFrame.getInstance().setActiveSession(
-									MainFrame.getInstance().getActiveSession(), null);
+				Session s = MainFrame.getInstance().getActiveSession();
+				if (s == null)
+					MainFrame.getInstance().setActiveSession(null, null);
+				else
+					MainFrame.getInstance().setActiveSession(s, s.getActiveView());
 			}
 		});
 		
@@ -525,7 +531,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	private ImageIcon getIcon(PluginDescription desc) {
 		try {
 			return MainFrame.getInstance().getPluginManager()
-								.getPluginInstance(desc.getName()).getIcon();
+					.getPluginInstance(desc.getName()).getIcon();
 		} catch (Exception e) {
 			ClassLoader cl = GenericPluginAdapter.class.getClassLoader();
 			String path = GenericPluginAdapter.class.getPackage().getName().replace('.', '/');
@@ -570,7 +576,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			
 			expandClasspathByJarfile(new URL[] { jarfileurl });
 			URL xmlURL = Addon
-								.getXMLURL(InstanceLoader.getCurrentLoader(), toBeInstalledAddonJarfile);
+					.getXMLURL(InstanceLoader.getCurrentLoader(), toBeInstalledAddonJarfile);
 			
 			// check if the to be installed addon is correct
 			if (xmlURL != null) {
@@ -595,31 +601,49 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 						hideNewComponents();
 						
 						showManageAddonDialog("<html>Addon \"" + jarname
-											+ "\" was correctly installed and may be used.", false);
+								+ "\" was correctly installed and may be used.", false);
 						return true;
 					case Updated:
 						showManageAddonDialog("<html>Addon \"" + jarname
-											+ "\" will be updated when application is restarted.", false);
+								+ "\" will be updated when application is restarted.", false);
 						return true;
 					case InstalledAndIncompatible:
 						showManageAddonDialog("<html>Addon \"" + jarname
-											+ "\" is installed but is deactivated (compatibility error).", false);
+								+ "\" is installed but is deactivated (compatibility error).", false);
 						return true;
 					case NotAnAddon:
 						return false;
 					case Error:
 						showManageAddonDialog("<html>Addon \"" + jarname
-											+ "\" could not be installed.", false);
+								+ "\" could not be installed.", false);
 						return false;
 				}
 				
 			} else {
-				MainFrame
-									.showMessageDialog(
-														"<html>Add-on file \""
-																			+ jarname
-																			+ "\"<br>is not valid due to missing or incorrect<br>internal xml-file.<br>Please compile or download again!",
-														"Error installing Add-on");
+				String xmlString = null;
+				JarFile jarFile = new JarFile(toBeInstalledAddonJarfile);
+				Enumeration<JarEntry> e = jarFile.entries();
+				while (e.hasMoreElements()) {
+					JarEntry entry = e.nextElement();
+					if (entry.getName().endsWith(".xml")) {
+						xmlString = entry.getName();
+						break;
+					}
+				}
+				
+				String text = "";
+				if (xmlString == null || xmlString.contains("/"))
+					text += "is not valid due to missing internal xml-file!<br>Please compile a new version together with the xml!";
+				else {
+					if (xmlString.replace(".xml", "").equals(jarname.replace(".jar", "")))
+						text += "is not valid due to incorrect internal xml-file!<br>Please correct it and compile a new version!";
+					else
+						text += "is not valid, because the internal<br>xml-file \"" + xmlString + "\" must have the same name<br>" +
+								"as the jar-file. Please check the correct name,<br>" +
+								"maybe you or your browser renamed the jar.";
+				}
+				MainFrame.showMessageDialog("<html>Add-on file \"" + jarname + "\" " + text,
+						"Error installing Add-on");
 				return false;
 			}
 		} catch (Exception e) {
@@ -639,7 +663,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	 *            Signals that an I/O exception has occurred.
 	 */
 	public void removeAddon(File file) throws FileNotFoundException,
-						IOException {
+			IOException {
 		
 		Addon delete = null;
 		// don't deleted, rename instead

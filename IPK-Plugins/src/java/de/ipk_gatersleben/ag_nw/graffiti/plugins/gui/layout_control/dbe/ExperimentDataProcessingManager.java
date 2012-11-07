@@ -65,8 +65,10 @@ public class ExperimentDataProcessingManager {
 						final JComponent optSupplementaryPanel, List<Class> optIgnoredProcessors,
 						final HashMap<Class, List<Runnable>> postprocessors,
 						Class<ExperimentDataProcessor> optUseOnlyThisSpecificProcessor) {
-		if (mdsOrDocuments == null || mdsOrDocuments.size() == 0)
+		if (mdsOrDocuments == null || mdsOrDocuments.size() == 0) {
+			MainFrame.showMessageDialog("Processing canceled, because experiment is empty.", "Processing Canceled");
 			return;
+		}
 		if (processors == null)
 			return;
 		

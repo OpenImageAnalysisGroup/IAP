@@ -4,6 +4,7 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedder.clusterCommands;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.AttributeHelper;
@@ -15,6 +16,7 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.plugin.parameter.Parameter;
+import org.graffiti.selection.Selection;
 
 public class IntroduceParallelEdgeBends extends AbstractAlgorithm {
 	
@@ -52,10 +54,11 @@ public class IntroduceParallelEdgeBends extends AbstractAlgorithm {
 	public void execute() {
 		this.graph.getListenerManager().transactionStarted(this);
 		try {
-			int count = 0;
 			
 			this.graph.numberGraphElements();
 			List<Node> nodes = this.graph.getNodes();
+			
+			HashSet<Edge> changed = new HashSet<Edge>();
 			
 			for (int s = 0; s < nodes.size(); s++)
 				for (int t = s + 1; t < nodes.size(); t++) {
@@ -67,7 +70,6 @@ public class IntroduceParallelEdgeBends extends AbstractAlgorithm {
 					if (edgeSet == null || edgeSet.size() <= 1)
 						continue;
 					
-					count++;
 					Edge[] edges = edgeSet.toArray(new Edge[edgeSet.size()]);
 					
 					// node positions
@@ -91,6 +93,7 @@ public class IntroduceParallelEdgeBends extends AbstractAlgorithm {
 						overhead++;
 						
 						adjustEdge(edges[0], middlePoint);
+						changed.add(edges[0]);
 					}
 					
 					for (int i = 0; i < edges.length - overhead; i += 2) {
@@ -104,10 +107,15 @@ public class IntroduceParallelEdgeBends extends AbstractAlgorithm {
 						
 						this.adjustEdge(edgeOne, bend1);
 						this.adjustEdge(edgeTwo, bend2);
+						changed.add(edgeOne);
+						changed.add(edgeTwo);
 					}
 				}
 			
-			MainFrame.showMessage(count + " node pairs have been detected and processed.", MessageType.INFO);
+			MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(new Selection("changed edges", changed));
+			MainFrame.getInstance().getActiveEditorSession().getSelectionModel().selectionChanged();
+			
+			MainFrame.showMessage(changed.size() + " edges have been processed and selected.", MessageType.INFO);
 		} finally {
 			this.graph.getListenerManager().transactionFinished(this);
 		}

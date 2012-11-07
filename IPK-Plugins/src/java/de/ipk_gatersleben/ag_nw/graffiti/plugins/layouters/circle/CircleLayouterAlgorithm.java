@@ -25,14 +25,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.AlgorithmServices;
 /**
  * Places all nodes on a circle with a user specified radius.
  * 
- * @author Dirk Kosch�tzki, Christian Klukas
+ * @author Dirk Koschützki, Christian Klukas, Matthias Klapperstueck
  */
 public class CircleLayouterAlgorithm extends AbstractAlgorithm {
 	
 	private double defaultRadius = 150;
 	private boolean minimzeCrossings;
 	private boolean useSelection;
-	
+	private boolean equalize = true;
+	private boolean averageCenterLength = true;
 	/**
 	 * Creates a new CircleLayouterAlgorithm object.
 	 */
@@ -172,25 +173,132 @@ public class CircleLayouterAlgorithm extends AbstractAlgorithm {
 							});
 	}
 	
-	public static void layoutOnCircles(Collection<Node> workNodes, double defaultRadius, String operationname) {
+	public void layoutOnCircles(Collection<Node> workNodes, double defaultRadius, String operationname) {
 		
+
 		workNodes = GraphHelper.getVisibleNodes(workNodes);
-		
+
 		int numberOfNodes = workNodes.size();
-		double singleStep = 2 * Math.PI / numberOfNodes;
+		if(numberOfNodes < 2)
+			return;
 		
+		double singleStep = 2 * Math.PI / numberOfNodes;
+
 		Vector2d ctr = NodeTools.getCenter(workNodes);
 		HashMap<Node, Vector2d> nodes2newPositions = new HashMap<Node, Vector2d>();
 		
+		
+		double avgDist = 0;
 		int i = 0;
-		for (Node n : workNodes) {
-			double newX = Math.sin(Math.PI + singleStep * i) * defaultRadius + ctr.x;
-			double newY = Math.cos(Math.PI + singleStep * i) * defaultRadius + ctr.y;
-			nodes2newPositions.put(n, new Vector2d(newX, newY));
-			i++;
+		if(averageCenterLength){
+			for (Node n : workNodes) {
+				avgDist += getDistance(ctr.x, ctr.y, n);
+				i++;
+			}
+			avgDist /= i;
 		}
-		GraphHelper.applyUndoableNodePositionUpdate(nodes2newPositions, operationname);
+		else
+			avgDist = defaultRadius;
+		
+		if( equalize ){
+			i = 0;
+			Collection<Node> orderedNodes = createCircleOrder(workNodes);
+			Node startNode = orderedNodes.iterator().next();
+			double startangle = getAngle(ctr, startNode);
+			for(Node n : orderedNodes){
+//				double x = AttributeHelper.getPositionX(n); //debugging
+//				double y = AttributeHelper.getPositionY(n); //debugging
+				double newX = Math.cos(startangle + singleStep * i) * avgDist + ctr.x;
+				double newY = Math.sin(startangle + singleStep * i) * avgDist + ctr.y;
+				nodes2newPositions.put(n, new Vector2d(newX, newY));
+				i++;
+			}
+		} else {
+			for (Node n : workNodes) {
+				double x = AttributeHelper.getPositionX(n);
+				double y = AttributeHelper.getPositionY(n);
+				double dist = getDistance(ctr.x, ctr.y, n);
+				double factor = avgDist / dist;
+				Vector2d direction = new Vector2d(x-ctr.x , y- ctr.y);
+				double newX = ctr.x + factor*direction.x;
+				double newY = ctr.y + factor*direction.y;
+				nodes2newPositions.put(n, new Vector2d(newX, newY));
+				i++;
+			}
+		}
+		/* correct node positions, if graph is in negative view space */
+		double minx = 0;
+		double miny = 0;
+		for(Node n : nodes2newPositions.keySet()){
+			Vector2d curVector = nodes2newPositions.get(n);
+			if(curVector.x - AttributeHelper.getWidth(n) < minx)
+				minx = curVector.x - AttributeHelper.getWidth(n);
+			if(curVector.y - AttributeHelper.getWidth(n)< miny)
+				miny = curVector.y - AttributeHelper.getWidth(n);
+			
+		}
+		if(minx < 0 || miny < 0){
+			/* abs. values of minx and miny */
+			minx = Math.abs(minx);
+			miny = Math.abs(miny);
+			for(Node n : nodes2newPositions.keySet()){
+				Vector2d curVector = nodes2newPositions.get(n);
+				curVector.x += minx;
+				curVector.y += miny;
+				
+			}
+		}
+		GraphHelper.applyUndoableNodePositionUpdate(nodes2newPositions,
+							getName());
 	}
+
+	public static Collection<Node> createCircleOrder(Collection<Node> nodes){
+		Vector2d ctr = NodeTools.getCenter(nodes);
+		
+		ArrayList<Node> orderedNodes = new ArrayList<Node>();
+		ArrayList<AngleNode> angleNodes = new ArrayList<AngleNode>();
+		
+//		Vector2d baseVector = new Vector2d(100,0);
+		for (Node n : nodes) {
+			String label = AttributeHelper.getLabel(n, null);
+			double angle = getAngle(ctr, n);
+			if(angleNodes.size() == 0)
+				angleNodes.add(new AngleNode(angle, n));
+			else {
+				int c = 0;
+				for(; c < angleNodes.size(); c++){
+					if(angleNodes.get(c).angle >= angle)
+						break;
+				}
+				if(c < angleNodes.size())
+					angleNodes.add(c, new AngleNode(angle, n));
+				else
+					angleNodes.add(new AngleNode(angle, n));
+			}
+		}
+		for(AngleNode an : angleNodes)
+			orderedNodes.add(an.node);
+		return orderedNodes;
+	}
+	
+	static double getAngle(Vector2d ctr, Node n){
+		double x = AttributeHelper.getPositionX(n);
+		double y = AttributeHelper.getPositionY(n);
+		double lengthNodeToCenter = getDistance(ctr.x, ctr.y, n);
+		Vector2d direction = new Vector2d(x-ctr.x , y- ctr.y);
+		double angle;
+		if(direction.y <0 )
+			angle = -Math.acos(direction.x / lengthNodeToCenter);
+		else
+			angle = Math.acos(direction.x / lengthNodeToCenter);
+		return angle;
+	}
+	static double getDotProduct(Vector2d a, Vector2d b){
+		double val = 0;
+		val = a.x*b.x + a.y* b.y;
+		return val;
+	}
+
 	
 	public static double energyOfNode(Node node, double newX, double newY) {
 		double distanceToOtherNodes = 0;
@@ -221,11 +329,18 @@ public class CircleLayouterAlgorithm extends AbstractAlgorithm {
 		BooleanParameter useSelectionParam = new BooleanParameter(useSelection,
 							"Work on Selection", "Do the layout for the selected nodes");
 		
+		BooleanParameter equalizeParam = new BooleanParameter(true, "Equalize", "Equalize distance between nodes on the circle");
+		BooleanParameter avgDistBoolean = new BooleanParameter(false, "Average Radius", "This parameter overrules the 'Radius' parameter. It calculates the center of all nodes, \n" +
+				"selected for layout and calculates then the average distance to every node,\n" +
+				"which is then taken as final radius for the circle");
+
 		// BooleanParameter useSelectionParam = new BooleanParameter(useSelection,
 		// "Work on Selection", "Do the layout for the selected nodes");
 		//
 		return new Parameter[] { radiusParam, useSelectionParam,
-							new BooleanParameter(minimzeCrossings, "Minimize Crossings", "If checked, the edge crossings will be minimzed") };
+							new BooleanParameter(minimzeCrossings, "Minimize Crossings", "If checked, the edge crossings will be minimzed"),
+							equalizeParam,
+							avgDistBoolean};
 	}
 	
 	/**
@@ -240,6 +355,8 @@ public class CircleLayouterAlgorithm extends AbstractAlgorithm {
 		defaultRadius = ((DoubleParameter) params[0]).getDouble().doubleValue();
 		useSelection = ((BooleanParameter) params[1]).getBoolean();
 		minimzeCrossings = ((BooleanParameter) params[2]).getBoolean();
+		equalize = ((BooleanParameter) params[3]).getBoolean().booleanValue();
+		averageCenterLength = ((BooleanParameter) params[4]).getBoolean().booleanValue();
 	}
 	
 	/*
@@ -264,5 +381,15 @@ public class CircleLayouterAlgorithm extends AbstractAlgorithm {
 	
 	public void setPatternNodeDistance(double patternNodeDistance) {
 		this.patternNodeDistance = patternNodeDistance;
+	}
+	
+	static class AngleNode{
+		public double angle;
+		public Node node;
+		
+		public AngleNode(double angle, Node node) {
+			this.angle = angle;
+			this.node = node;
+		}
 	}
 }

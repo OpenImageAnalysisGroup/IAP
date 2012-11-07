@@ -76,7 +76,6 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
-	@Override
 	public String getName() {
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.FUNCAT_ACCESS))
 			return "Create Data-Specific Hierarchy Tree";
@@ -87,17 +86,17 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>"
-				+ "This command creates a hierarchy-tree. The hierarchy information may be given by the node labels,<br>"
-				+ "by alternative substance identifiers (for nodes with mapped data) or by a data annotation, provided<br>"
-				+ "directly in the input template (type 2)."
-				+ "<br>"
-				+ "The hierarchy information may be evaluated directly, in case it is given by a '.' or ';' divided text<br>"
-				+ "annotation. It is also possible to look-up a KEGG Pathway hierarchy, in case the selected identifier<br>"
-				+ "is recognized as a enzyme name or ID and it is found in the KO database. Another possibility is to<br>"
-				+ "lookup and interpret the given identifers as gene names, listed in the KO database. In this case the<br>"
-				+ "gene data is also put in context to the KEGG Pathway hierarchy.<br>"
-				+ "<br><small>Hint: The hierarchy menu provides a additional command for the interpretation of gene IDs in order to create a Gene Ontogy<br>"
-				+ "network from the data.<br><br>";
+							+ "This command creates a hierarchy-tree. The hierarchy information may be given by the node labels,<br>"
+							+ "by alternative substance identifiers (for nodes with mapped data) or by a data annotation, provided<br>"
+							+ "directly in the input template (type 2)."
+							+ "<br>"
+							+ "The hierarchy information may be evaluated directly, in case it is given by a '.' or ';' divided text<br>"
+							+ "annotation. It is also possible to look-up a KEGG Pathway hierarchy, in case the selected identifier<br>"
+							+ "is recognized as a enzyme name or ID and it is found in the KO database. Another possibility is to<br>"
+							+ "lookup and interpret the given identifers as gene names, listed in the KO database. In this case the<br>"
+							+ "gene data is also put in context to the KEGG Pathway hierarchy.<br>"
+							+ "<br><small>Hint: The hierarchy menu provides a additional command for the interpretation of gene IDs in order to create a Gene Ontogy<br>"
+							+ "network from the data.<br><br>";
 	}
 	
 	@Override
@@ -112,7 +111,7 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 		HashMap<Integer, String> exampleValues = new HashMap<Integer, String>();
 		ArrayList<String> selvals = new ArrayList<String>();
 		maxID = ReplaceLabelFromAlternativeSubstanceNames.enumerateExistingAlternativeSubstanceIDsAndTheirExamples(
-				(Collection) getSelectedOrAllNodes(), maxID, exampleValues);
+							(Collection) getSelectedOrAllNodes(), maxID, exampleValues);
 		if (maxID == 0) {
 			selvals.add(settingUseAllIdx);
 		} else {
@@ -143,14 +142,14 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 		possibleEvaluations.add(settingKOdbLinkLookup);
 		
 		return new Parameter[] {
-				new ObjectListParameter(currentInformationProvider, "Hierarchy Information Provider",
-						"Select the property which provides the hierarchy information", possibleValues),
-				new ObjectListParameter(currentAlternativeSubstanceIDindex, "<html>" + "Index of Alternative ID<br><small>"
-						+ "(used only for provider setting 2)", "<html>"
-						+ "In case the alternative substance IDs should be processed, "
-						+ "this setting specifies, which identifer should be used.", selvals),
-				new ObjectListParameter(currentInformationProcessingSetting, "Hierarchy Information Processing",
-						"Select the way the hierarchy data should be interpreted", possibleEvaluations) };
+							new ObjectListParameter(currentInformationProvider, "Hierarchy Information Provider",
+												"Select the property which provides the hierarchy information", possibleValues),
+							new ObjectListParameter(currentAlternativeSubstanceIDindex, "<html>" + "Index of Alternative ID<br><small>"
+												+ "(used only for provider setting 2)", "<html>"
+												+ "In case the alternative substance IDs should be processed, "
+												+ "this setting specifies, which identifer should be used.", selvals),
+							new ObjectListParameter(currentInformationProcessingSetting, "Hierarchy Information Processing",
+												"Select the way the hierarchy data should be interpreted", possibleEvaluations) };
 	}
 	
 	@Override
@@ -165,7 +164,6 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
-	@Override
 	public void execute() {
 		final Collection<Node> workNodes = new ArrayList<Node>(getSelectedOrAllNodes());
 		final HashSet<Node> newNodes = new HashSet<Node>();
@@ -173,9 +171,8 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 		final HashMap<String, ArrayList<String>> specialRmap = new HashMap<String, ArrayList<String>>();
 		if (currentInformationProvider.equals(settingSpecialR)) {
 			try {
-				String fileName = OpenFileDialogService.getFile(
-						new String[] { ".txt" }, "Special R output file",
-						"Process File").getAbsolutePath();
+				String fileName = OpenFileDialogService.getFile(new String[] { ".txt" }, "Special R output file",
+									"Process File").getAbsolutePath();
 				TextFile tf = new TextFile(fileName);
 				for (String s : tf) {
 					String[] l = s.split("\\.");
@@ -204,9 +201,8 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 		final Graph fgraph = graph;
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-				"Create Hierarchy", "");
+							"Create Hierarchy", "");
 		Runnable task = new Runnable() {
-			@Override
 			public void run() {
 				int startX = 100;
 				int stepX = 200;
@@ -220,7 +216,7 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 					for (Node graphNode : workNodes) {
 						nn++;
 						status.setCurrentStatusText1("Created " + newNodes.size() + " nodes and " + newEdges.size()
-								+ " edges ");
+											+ " edges ");
 						status.setCurrentStatusText2("Process node " + nn + " / " + nn_max);
 						if (status.wantsToStop())
 							break;
@@ -274,7 +270,7 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 						if (currentInformationProvider.equals(settingDataAnnotation)) {
 							if (Experiment2GraphHelper.getMappedDataListFromGraphElement(graphNode) != null) {
 								for (SubstanceInterface mappingData : Experiment2GraphHelper
-										.getMappedDataListFromGraphElement(graphNode)) {
+													.getMappedDataListFromGraphElement(graphNode)) {
 									String funcat_desc = mappingData.getFuncat();
 									checkTheseIds.add(funcat_desc);
 								}
@@ -331,18 +327,18 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 								hierarchyInformation = StringManipulationTools.htmlToUnicode(hierarchyInformation);
 								if (hierarchyInformation.indexOf("§") >= 0) {
 									ErrorMsg
-											.addErrorMessage("Internal error: funcat/ko definition should not contain character § (problematic: '"
-													+ hierarchyInformation + "')");
+														.addErrorMessage("Internal error: funcat/ko definition should not contain character § (problematic: '"
+																			+ hierarchyInformation + "')");
 								} else {
 									if (hierarchyInformation.startsWith("KO Classes;")) {
 										hierarchyInformation = StringManipulationTools.stringReplace(hierarchyInformation, ";",
-												"§");
+															"§");
 									} else {
 										hierarchyInformation = StringManipulationTools.stringReplace(hierarchyInformation, ".",
-												"§");
+															"§");
 										if (hierarchyInformation.indexOf(";") >= 0)
 											hierarchyInformation = StringManipulationTools.stringReplace(hierarchyInformation,
-													";", "§");
+																";", "§");
 									}
 									String[] graphH = hierarchyInformation.split("§");
 									Node lastNode = null;
@@ -353,15 +349,15 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 										if (!hierarchy_tree_itemName2node.containsKey(hierarchyEntityName)) {
 											// System.out.println("not found: "+hierarchyEntityName);
 											Node n = GraphHelper.addNodeToGraph(fgraph, startX
-													+ hierarchy_tree_itemName2node.size() * stepX, startY
-													+ hierarchy_tree_itemName2node.size() * stepY, 1, 150, 30, Color.BLACK,
-													Color.WHITE);
+																+ hierarchy_tree_itemName2node.size() * stepX, startY
+																+ hierarchy_tree_itemName2node.size() * stepY, 1, 150, 30, Color.BLACK,
+																Color.WHITE);
 											AttributeHelper.setLabel(n, hierarchyEntityNameLE);
 											if (hierarchyEntityNameLE.toLowerCase().indexOf("path:") >= 0) {
 												// this should be a map-node
 												String id = hierarchyEntityNameLE.substring(hierarchyEntityNameLE.toLowerCase()
-														.indexOf("path:"), hierarchyEntityNameLE.indexOf("]", hierarchyEntityNameLE
-														.toLowerCase().indexOf("path:")));
+																	.indexOf("path:"), hierarchyEntityNameLE.indexOf("]", hierarchyEntityNameLE
+																	.toLowerCase().indexOf("path:")));
 												if (organismInfo == null) {
 													KeggGmlHelper.setKeggId(n, id.toLowerCase());
 												} else {
@@ -381,7 +377,7 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 											// connect nodes
 											if (!lastNode.getNeighbors().contains(hierarchy_tree_node)) {
 												Edge edge = fgraph.addEdge(lastNode, hierarchy_tree_node, true, AttributeHelper
-														.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
+																	.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
 												newEdges.add(edge);
 											}
 										}
@@ -392,7 +388,7 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 										// data
 										if (!lastNode.getNeighbors().contains(graphNode)) {
 											Edge edge = fgraph.addEdge(lastNode, graphNode, true, AttributeHelper
-													.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
+																.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
 											newEdges.add(edge);
 										}
 									}
@@ -405,17 +401,15 @@ public class CreateFuncatGraphAlgorithm extends AbstractAlgorithm {
 					if (!status.wantsToStop()) {
 						fgraph.getListenerManager().transactionFinished(this, false);
 						status.setCurrentStatusText1("Created " + newNodes.size() + " nodes and " + newEdges.size()
-								+ " edges ");
+											+ " edges ");
 						status.setCurrentStatusText2("Update view. Please wait.");
 						MainFrame.showMessage("Added " + newNodes.size() + " nodes and " + newEdges.size()
-								+ " edges to the graph", MessageType.INFO);
+											+ " edges to the graph", MessageType.INFO);
 						GraphHelper.postUndoableNodeAndEdgeAdditions(fgraph, newNodes, newEdges, getName());
 						if (newNodes.size() > 0) {
 							// layout new nodes using tree layout
 							RTTreeLayout tree = new RTTreeLayout();
-							Selection sel = new Selection();
-							sel.addAll(newNodes);
-							tree.attach(fgraph, sel);
+							tree.attach(fgraph, new Selection(newNodes));
 							tree.execute();
 							
 							// layout gene nodes using grid layout (no resize)

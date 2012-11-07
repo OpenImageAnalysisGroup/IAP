@@ -32,17 +32,20 @@ public enum GraffitiCharts implements ChartComponent {
 		this.iconname = iconname;
 	}
 	
+	@Override
 	public JComponent getChart(GraphElement ge) {
 		return new XmlDataChartComponent(name, ge.getGraph(), ge);
 	}
 	
+	@Override
 	public ImageIcon getIcon() {
 		if (iconname == null)
-			return new ImageIcon(new BufferedImage(72, 20, BufferedImage.TYPE_INT_ARGB), "");// empty image
+			return new ImageIcon(new BufferedImage(72, 35, BufferedImage.TYPE_INT_ARGB), "");// empty image
 		else
 			return new ImageIcon(GravistoService.getResource(getClass(), iconname, "png"));
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -52,10 +55,12 @@ public enum GraffitiCharts implements ChartComponent {
 		return getName();
 	}
 	
+	@Override
 	public String getShortDescription() {
 		return desc;
 	}
 	
+	@Override
 	public String getComboboxText() {
 		switch (this) {
 			case LINE:

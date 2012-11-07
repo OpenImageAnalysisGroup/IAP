@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
@@ -32,6 +31,7 @@ import org.graffiti.plugin.algorithm.ProvidesGeneralContextMenu;
 
 import de.ipk_gatersleben.ag_nw.graffiti.AttributeConstants;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.EdgeHelper;
 
 /**
  * DOCTODO: Include class header
@@ -117,10 +117,7 @@ public class CenterLayouterAlgorithm
 				continue;
 			LinkedHashMapAttribute ha = null;
 			try {
-				ha =
-									((LinkedHashMapAttribute)
-									e.getAttribute(
-														AttributeConstants.BENDS));
+				ha = ((LinkedHashMapAttribute) e.getAttribute(AttributeConstants.BENDS));
 			} catch (Exception err) {
 				// empty
 			}
@@ -152,33 +149,21 @@ public class CenterLayouterAlgorithm
 		
 		for (Edge e : graph.getEdges()) {
 			if (moveToTop)
-				moveBends(e, -minX + offX, -minY + offY, bends2newPositions);
+				EdgeHelper.moveBends(e, -minX + offX, -minY + offY, bends2newPositions);
 			else
-				moveBends(e, offX, offY, bends2newPositions);
+				EdgeHelper.moveBends(e, offX, offY, bends2newPositions);
 		}
 		
 		GraphHelper.applyUndoableNodeAndBendPositionUpdate(nodes2newPositions, bends2newPositions, nameOfOperation);
 	}
 	
+	/**
+	 * @deprecated Use {@link EdgeHelper#moveBends(Edge,double,double,HashMap<CoordinateAttribute, Vector2d>)} instead
+	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
-	private static void moveBends(Edge e, double moveX, double moveY, HashMap<CoordinateAttribute, Vector2d> bends2newPositions) {
-		LinkedHashMapAttribute ha = null;
-		try {
-			ha = ((LinkedHashMapAttribute)
-								e.getAttribute(
-													AttributeConstants.BENDS));
-		} catch (Exception err) {
-			// empty
-		}
-		if (ha == null)
-			return;
-		Map<?, ?> m = ha.getCollection();
-		for (Iterator<?> bi = m.entrySet().iterator(); bi.hasNext();) {
-			// transform bends
-			Map.Entry en = (Entry<?, ?>) bi.next();
-			CoordinateAttribute co = (CoordinateAttribute) en.getValue();
-			bends2newPositions.put(co, new Vector2d(co.getX() + moveX, co.getY() + moveY));
-		}
+	public static void moveBends(Edge e, double moveX, double moveY, HashMap<CoordinateAttribute, Vector2d> bends2newPositions) {
+		EdgeHelper.moveBends(e, moveX, moveY, bends2newPositions);
 	}
 	
 	/*

@@ -101,7 +101,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author Christian Klukas
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class TabStatistics extends InspectorTab implements ActionListener,
 		ContainsTabbedPane {
@@ -1384,11 +1384,13 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			AttributeHelper.setBorderWidth(n, 1);
 			AttributeHelper.setFillColor(n, Color.WHITE);
 			AttributeHelper.setToolTipText(n, "");
+			AttributeHelper.deleteAttribute(n, "statistics", "correlation_r");
 		}
 		for (Edge e : graph.getEdges()) {
 			AttributeHelper.setBorderWidth(e, 1);
 			AttributeHelper.setFillColor(e, Color.BLACK);
 			AttributeHelper.setToolTipText(e, "");
+			AttributeHelper.deleteAttribute(e, "statistics", "correlation_r");
 		}
 		graph.getListenerManager().transactionFinished(this);
 	}
@@ -1992,7 +1994,7 @@ public class TabStatistics extends InspectorTab implements ActionListener,
 			int probab_123) {
 		ArrayList<Node> result = new ArrayList<Node>();
 		for (Node node : nodes) {
-			String resultForNode = "Not normally distributed {pg=r/s, r=max-min}: ";
+			String resultForNode = "";// "Not normally distributed {pg=r/s, r=max-min}: ";
 			XMLAttribute xa = null;
 			try {
 				CollectionAttribute ca = (CollectionAttribute) node

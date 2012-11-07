@@ -144,8 +144,7 @@ public class ArrayLayout extends AbstractAlgorithm {
 			nodes2newSize.put(n, new Vector2d(targetSizeX, targetSizeY));
 		}
 		GraphHelper.applyUndoableNodePositionAndSizeUpdate(nodes2newPositions, nodes2newSize, "Array Layout");
-		Selection sel = new Selection();
-		sel.addAll(validNodes);
+		//Selection sel = new Selection(validNodes);
 		MainFrame.showMessage("Info annotation found and processed from " + validNodes.size()
 							+ " nodes (out of working set of " + nodes.size() + " nodes)", MessageType.INFO);
 	}

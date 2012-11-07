@@ -37,8 +37,8 @@ public class CorrelationResult {
 	}
 	
 	public void addR(float r,
-						double significantProbability, int dataset2offset, String calculationHistory, String seriesName,
-						double corrprobability) {
+			double significantProbability, int dataset2offset, String calculationHistory, String seriesName,
+			double corrprobability) {
 		this.r.add(new FloatAndDesc(r, seriesName));
 		this.corrprobs.add(new Double(corrprobability));
 		if (Math.abs(corrprobability) >= significantProbability) {
@@ -61,7 +61,7 @@ public class CorrelationResult {
 		boolean result;
 		
 		result = isAnyOneSignificant
-							&& ((Math.abs(maxR) >= Math.abs(minimumR)));
+				&& ((Math.abs(maxR) >= Math.abs(minimumR)));
 		return result;
 	}
 	
@@ -70,10 +70,10 @@ public class CorrelationResult {
 		// double alpha = 1d - significantProbability;
 		if (isAnyOneSignificant)
 			res1 = "Significant corr. (" +
-								dataset1 + " - " + dataset2 + "): ";
+					dataset1 + " - " + dataset2 + "): ";
 		else
 			res1 = "Not significant corr. (" +
-								dataset1 + " - " + dataset2 + "): ";
+					dataset1 + " - " + dataset2 + "): ";
 		
 		for (Iterator<FloatAndDesc> it = this.r.iterator(); it.hasNext();) {
 			FloatAndDesc fad;
@@ -116,7 +116,11 @@ public class CorrelationResult {
 	}
 	
 	public String getMaxOrMinProb() {
-		double r = corrprobs.get(indexOfMaxOrMin);
+		double r;
+		if (indexOfMaxOrMin > corrprobs.size() && corrprobs.size() == 1)
+			r = corrprobs.get(0);
+		else
+			r = corrprobs.get(indexOfMaxOrMin);
 		return outputBase.format(r);
 	}
 }

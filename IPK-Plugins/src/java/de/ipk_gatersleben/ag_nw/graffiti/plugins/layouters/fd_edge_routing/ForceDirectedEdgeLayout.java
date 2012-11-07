@@ -133,8 +133,7 @@ public class ForceDirectedEdgeLayout extends AbstractAlgorithm {
 			for (ArrayList<Node> nodeList : oldEdge2newNodes.values())
 				bendNodes.addAll(nodeList);
 			
-			Selection selection = new Selection("bend layout");
-			selection.addAll(bendNodes);
+			Selection selection = new Selection("bend layout", bendNodes);
 			try {
 				ThreadSafeOptions tso = MyNonInteractiveSpringEmb.getNewThreadSafeOptionsWithDefaultSettings();
 				tso.temp_alpha = 0.96;

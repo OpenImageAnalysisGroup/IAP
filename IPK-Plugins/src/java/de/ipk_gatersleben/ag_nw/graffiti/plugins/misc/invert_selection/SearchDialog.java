@@ -59,13 +59,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.DefaultContextMenuManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.zoomfit.ZoomFitChangeComponent;
 
 public class SearchDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	
-	private Collection<AttributePathNameSearchType> possibleAttributes;
+	private final Collection<AttributePathNameSearchType> possibleAttributes;
 	
-	private boolean isFindReplaceDialog;
+	private final boolean isFindReplaceDialog;
 	
 	public SearchDialog(Frame owner, Collection<AttributePathNameSearchType> possibleAttributes, boolean isFindReplaceDialog) {
 		super(owner);
@@ -80,10 +81,8 @@ public class SearchDialog extends JDialog {
 				SearchDialog.this.dispose();
 			}
 		});
-		getRootPane()
-							.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-							.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false),
-												"escapeAction");
+		getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+							.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "escapeAction");
 		
 	}
 	
@@ -182,6 +181,7 @@ public class SearchDialog extends JDialog {
 							searchOptions.add(((SearchOptionEditorGUI) gr.right).getSearchOption());
 					}
 					if (!isFindReplaceDialog) {
+						// complex search dialog
 						doSearch(searchOptions.toArray(new SearchOption[] {}));
 						
 						if (ScenarioService.isRecording()) {
@@ -189,6 +189,11 @@ public class SearchDialog extends JDialog {
 						}
 						
 					} else {
+						// replace text ind find/replace dialog
+						// we allow to search for empty strings, but we don't want to replace empty strings...
+						if (searchText.getText() == null || searchText.getText().length() <= 0)
+							return;
+						
 						SearchOption so = searchOptions.get(0);
 						String path = so.getSearchAttributePath();
 						String id = so.getSearchAttributeName();
@@ -209,6 +214,7 @@ public class SearchDialog extends JDialog {
 			
 			public void actionPerformed(ActionEvent e) {
 				try {
+					// find text
 					ArrayList<SearchOption> searchOptions = new ArrayList<SearchOption>();
 					for (GuiRow gr : options.getVisibleGuiRows()) {
 						if (gr.left instanceof SearchOptionEditorGUI)
@@ -226,16 +232,24 @@ public class SearchDialog extends JDialog {
 					ArrayList<GraphElement> foundElements = new ArrayList<GraphElement>();
 					
 					String findtext = searchText.getText();
-					if (findtext != null && findtext.length() > 0) {
+					if (findtext != null && findtext.length() >= 0) {
 						if (so.getSearchNodeOrEdge() == NodeOrEdge.Nodes || so.getSearchNodeOrEdge() == NodeOrEdge.NodesAndEdges)
 							foundElements.addAll(searchNodeText(findtext, path, id));
 						if (so.getSearchNodeOrEdge() == NodeOrEdge.Edges || so.getSearchNodeOrEdge() == NodeOrEdge.NodesAndEdges)
 							foundElements.addAll(searchEdgeText(findtext, path, id));
 						
-						Selection selection = new Selection("search " + searchText.getText());
-						selection.addAll(foundElements);
-						MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(selection);
+						MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(
+								new Selection("search " + searchText.getText(), foundElements));
 						MainFrame.getInstance().getActiveEditorSession().getSelectionModel().selectionChanged();
+						
+						if (isFindReplaceDialog && foundElements.size() > 0)
+							if (foundElements.size() == 1)
+								ZoomFitChangeComponent.zoomRegion(true, MainFrame.getInstance().getActiveEditorSession().getActiveView(), foundElements, 1);
+							else
+								ZoomFitChangeComponent.zoomRegion(true, MainFrame.getInstance().getActiveEditorSession().getActiveView(), foundElements);
+						
+						MainFrame.showMessage(foundElements.size() + " nodes and edges selected", MessageType.INFO);
+						
 					}
 				} catch (Exception err) {
 					ErrorMsg.addErrorMessage(err);
@@ -327,11 +341,8 @@ public class SearchDialog extends JDialog {
 		JComponent topPanel = TableLayout.getSplitVertical(helpText, options, TableLayout.PREFERRED, TableLayout.PREFERRED);
 		
 		double border = 5;
-		double[][] size = {
-							{ border, TableLayoutConstants.PREFERRED, border }, // Columns
-				{ border,
-												TableLayout.PREFERRED,
-												border } }; // Rows
+		double[][] size = { { border, TableLayoutConstants.PREFERRED, border }, // Columns
+				{ border, TableLayout.PREFERRED, border } }; // Rows
 		setLayout(new TableLayout(size));
 		add(TableLayout.get3SplitVertical(
 							topPanel,
@@ -356,10 +367,21 @@ public class SearchDialog extends JDialog {
 		List<GraphElement> foundnodes = new ArrayList<GraphElement>();
 		if (nodes != null && nodes.size() > 0) {
 			try {
-				for (Node nd : nodes) {
+				allnodes: for (Node nd : nodes) {
 					String currentValue = (String) AttributeHelper.getAttributeValue(nd, path, id, null, "", false);
-					if (currentValue != null && currentValue.contains(find))
+					if (currentValue != null && currentValue.toLowerCase().contains(find.toLowerCase())) {
 						foundnodes.add(nd);
+						continue allnodes;
+					}
+					
+					// search all attributes with the same path, but ending with a different number (eg labelgraphics3 -> search also in labelgraphics1, ...)
+					for (String newpath : getAlternativePaths(nd, path)) {
+						currentValue = (String) AttributeHelper.getAttributeValue(nd, newpath, id, null, "", false);
+						if (currentValue != null && currentValue.toLowerCase().contains(find.toLowerCase())) {
+							foundnodes.add(nd);
+							continue allnodes;
+						}
+					}
 				}
 				return foundnodes;
 			} catch (Exception ex) {
@@ -369,11 +391,36 @@ public class SearchDialog extends JDialog {
 		return new ArrayList<GraphElement>();
 	}
 	
+	public static ArrayList<String> getAlternativePaths(Node nd, String path) {
+		if (path.length() <= 0)
+			return new ArrayList<String>();
+		
+		int index = path.length() - 1;
+		while (Character.isDigit(path.charAt(index)))
+			index--;
+		
+		ArrayList<String> ap = new ArrayList<String>();
+		
+		if (index != path.length() - 1) {
+			String shortPath = path.substring(0, index + 1);
+			int actualNumber = Integer.parseInt(path.substring(index + 1));
+			for (int i = 0; i < actualNumber; i++) {
+				if (AttributeHelper.hasAttribute(nd, shortPath + i))
+					ap.add(shortPath + i);
+			}
+			int i = actualNumber + 1;
+			while (AttributeHelper.hasAttribute(nd, shortPath + i))
+				ap.add(shortPath + (i++));
+		}
+		return ap;
+	}
+	
 	private List<GraphElement> searchEdgeText(String find, String path, String id) {
 		Collection<Edge> edges = GraphHelper.getSelectedOrAllEdges();
 		List<GraphElement> foundedges = new ArrayList<GraphElement>();
 		if (edges != null && edges.size() > 0) {
 			try {
+				// edges have no annotation labels or similar, so we dont want to search for alternative paths
 				for (Edge ed : edges) {
 					String currentValue = (String) AttributeHelper.getAttributeValue(ed, path, id, null, "", false);
 					if (currentValue != null && currentValue.contains(find))
@@ -407,8 +454,8 @@ public class SearchDialog extends JDialog {
 							newValue = newValue.replaceAll(find, replace);
 						else {
 							newValue = StringManipulationTools.stringReplace(newValue, find, replace);
-							if (newValue.equals(currentValue))
-								newValue = replace + currentValue;
+							// if (newValue.equals(currentValue))
+							// newValue = replace + currentValue;
 						}
 						if (!newValue.equals(currentValue)) {
 							nh.setAttributeValue(path, id, newValue);
@@ -567,11 +614,7 @@ public class SearchDialog extends JDialog {
 	
 	public static void doSearch(final SearchOption[] searchOptions, boolean trueAddfalseRemove) {
 		final ArrayList<GraphElement> validGraphElements = new ArrayList<GraphElement>();
-		final EditorSession session =
-							GravistoService
-												.getInstance()
-												.getMainFrame()
-												.getActiveEditorSession();
+		final EditorSession session = GravistoService.getInstance().getMainFrame().getActiveEditorSession();
 		ArrayList<GraphElement> gel = null;
 		try {
 			gel = new ArrayList<GraphElement>(session.getGraph().getGraphElements());

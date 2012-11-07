@@ -15,6 +15,7 @@ public class PutIntoSidePanel extends AbstractExperimentDataProcessor {
 	private ExperimentInterface md;
 	private JComponent optGui;
 	
+	@Override
 	public String getName() {
 		return "Put data in 'Experiments' tab";
 	}
@@ -30,9 +31,10 @@ public class PutIntoSidePanel extends AbstractExperimentDataProcessor {
 		if (tabtitle == null || tabtitle.equals(""))
 			tabtitle = ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME;
 		
-		TabDBE.addOrUpdateExperimentPane(getMainFrame(), new ProjectEntity(tabtitle, md, optGui));
+		TabDBE.addOrUpdateExperimentPane(new ProjectEntity(tabtitle, md, optGui));
 	}
 	
+	@Override
 	public boolean activeForView(View v) {
 		return true;
 	}

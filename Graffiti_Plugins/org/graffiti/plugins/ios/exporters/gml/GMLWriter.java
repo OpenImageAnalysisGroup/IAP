@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: GMLWriter.java,v 1.1 2011-01-31 09:03:39 klukas Exp $
+// $Id: GMLWriter.java,v 1.2 2012-11-07 14:42:20 klukas Exp $
 
 package org.graffiti.plugins.ios.exporters.gml;
 
@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.graffiti.attributes.LongAttribute;
 import org.graffiti.attributes.ShortAttribute;
 import org.graffiti.attributes.SortedCollectionAttribute;
 import org.graffiti.attributes.StringAttribute;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
@@ -52,7 +54,7 @@ import org.graffiti.plugins.editcomponents.defaults.EdgeArrowShapeEditComponent;
  * Provides a GML writer. This writer does not yet support all GML features
  * yet. See http://infosun.fmi.uni-passau.de/Graphlet/GML/ for more details
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class GMLWriter
 					implements OutputSerializer, SupportsWriterOutput {
@@ -77,14 +79,14 @@ public class GMLWriter
 	 * something like a filter and a mapping from graffiti collection
 	 * attributes to GML attributes.
 	 */
-	private Map<String, String> attMapping;
+	private final Map<String, String> attMapping;
 	
 	/**
 	 * A map of collection attributes, which should be written to the stream.
 	 * This is something like a filter and a mapping from graffiti collection
 	 * attributes to GML (hierarchial) attributes.
 	 */
-	private Map<String, String> colMapping;
+	private final Map<String, String> colMapping;
 	
 	// ~ Constructors ===========================================================
 	
@@ -152,6 +154,12 @@ public class GMLWriter
 	
 	public void write(Writer o, Graph g) throws IOException {
 		// write the graph's open tag
+		
+		String name = "";
+		if (MainFrame.getInstance() != null)
+			name = " with " + MainFrame.getInstance().getTitle();
+		o.append("# generated" + name + " at " + new Date() + eol);
+		
 		o.append("graph [" + eol);
 		
 		// write the graph
@@ -180,6 +188,11 @@ public class GMLWriter
 			ErrorMsg.addErrorMessage(e);
 			p = new PrintStream(o, false);
 		}
+		String name = "";
+		if (MainFrame.getInstance() != null)
+			name = " with " + MainFrame.getInstance().getTitle();
+		p.println("# generated" + name + " at " + new Date());
+		
 		// write the graph's open tag
 		p.println("graph [");
 		
@@ -453,6 +466,10 @@ public class GMLWriter
 		String style = "";
 		if (classInfo.equals(EdgeArrowShapeEditComponent.circleArrow))
 			style = "circle";
+		if (classInfo.equals(EdgeArrowShapeEditComponent.standardArrowLeft))
+			style = "halfleft";
+		if (classInfo.equals(EdgeArrowShapeEditComponent.standardArrowRight))
+			style = "halfright";
 		if (classInfo.equals(EdgeArrowShapeEditComponent.circleConnectArrow))
 			style = "narrowCircle";
 		if (classInfo.equals(EdgeArrowShapeEditComponent.diamondArrow))
@@ -485,6 +502,10 @@ public class GMLWriter
 		String res = EdgeArrowShapeEditComponent.standardArrow;
 		if (arrowStyle.equals("circle"))
 			res = EdgeArrowShapeEditComponent.circleArrow;
+		if (arrowStyle.equals("halfleft"))
+			res = EdgeArrowShapeEditComponent.standardArrowLeft;
+		if (arrowStyle.equals("halfright"))
+			res = EdgeArrowShapeEditComponent.standardArrowRight;
 		if (arrowStyle.equals("narrowCircle"))
 			res = EdgeArrowShapeEditComponent.circleConnectArrow;
 		if (arrowStyle.equals("diamond"))

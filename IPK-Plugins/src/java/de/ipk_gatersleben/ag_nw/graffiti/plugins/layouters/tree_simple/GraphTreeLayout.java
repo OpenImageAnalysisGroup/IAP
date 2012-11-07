@@ -49,33 +49,33 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	 * Dynamical defined edge bend attribute.
 	 */
 	private final String BENDS =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.BENDS;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.BENDS;
 	
 	/**
 	 * Dynamical defined edge shape attribute.
 	 */
 	private final String SHAPE =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.SHAPE;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.SHAPE;
 	
 	/**
 	 * Dynamical defined node coordinate attribute.
 	 */
 	private final String COORDSTR =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.COORDINATE;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.COORDINATE;
 	
 	/**
 	 * Dynamical defined node dimension attribute.
 	 */
 	private final String DIMENSIONSTR =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.DIMENSION;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.DIMENSION;
 	
 	/**
 	 * The minimum x spanning of the actual tree
@@ -253,12 +253,12 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				/* check circle connection by using the depth of each node */
 				computeAppropriateDepth(sourceNode);
 				sourceNodes.put(
-									sourceNode,
-									new TreeContainer(
-														depthOffsets,
-														bfsNum,
-														maxNodeHeight,
-														bfsNumUpsideDown));
+						sourceNode,
+						new TreeContainer(
+								depthOffsets,
+								bfsNum,
+								maxNodeHeight,
+								bfsNumUpsideDown));
 				
 				if (!rootedTree(sourceNode)) {
 					throw new PreconditionException("The given graph is not a tree.");
@@ -273,12 +273,12 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 			/* check circle connection by using the depth of each node */
 			computeAppropriateDepth(sourceNode);
 			sourceNodes.put(
-								sourceNode,
-								new TreeContainer(
-													depthOffsets,
-													bfsNum,
-													maxNodeHeight,
-													bfsNumUpsideDown));
+					sourceNode,
+					new TreeContainer(
+							depthOffsets,
+							bfsNum,
+							maxNodeHeight,
+							bfsNumUpsideDown));
 			
 			if (!rootedTree(sourceNode)) {
 				throw new PreconditionException("The given graph is not a tree.");
@@ -301,12 +301,12 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 					
 					computeAppropriateDepth(sourceNode);
 					sourceNodes.put(
-										sourceNode,
-										new TreeContainer(
-															depthOffsets,
-															bfsNum,
-															maxNodeHeight,
-															bfsNumUpsideDown));
+							sourceNode,
+							new TreeContainer(
+									depthOffsets,
+									bfsNum,
+									maxNodeHeight,
+									bfsNumUpsideDown));
 					
 					break;
 				}
@@ -454,7 +454,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				/* Not all neighbours, just the neighbours not visited yet */
 				if (!bfsNum.containsKey(neighbour)) {
 					Integer depth =
-										new Integer(((Integer) bfsNum.get(v)).intValue() + 1);
+							new Integer(((Integer) bfsNum.get(v)).intValue() + 1);
 					
 					forest.remove(neighbour);
 					isLeaf = false;
@@ -482,9 +482,9 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				
 				if (((Integer) bfsNum.get(v)).intValue() > ((Integer) bfsNum.get(neighbor)).intValue()) {
 					Integer depth =
-										new Integer(
-															((Integer) bfsNumUpsideDown.get(v)).intValue()
-															+ 1);
+							new Integer(
+									((Integer) bfsNumUpsideDown.get(v)).intValue()
+									+ 1);
 					if (!((bfsNumUpsideDown.containsKey(neighbor)) && ((Integer) bfsNumUpsideDown.get(neighbor)).intValue() > depth.intValue())) {
 						
 						leaves.add(neighbor);
@@ -498,7 +498,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 			Node node = (Node) iterator.next();
 			
 			Integer depth =
-								new Integer(((Integer) bfsNumUpsideDown.get(node)).intValue());
+					new Integer(((Integer) bfsNumUpsideDown.get(node)).intValue());
 			
 			double nodeHeight = getNodeHeight(node);
 			
@@ -506,11 +506,11 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 			Double maxNodeHeightValue = (Double) maxNodeHeight.get(depth);
 			if (maxNodeHeightValue != null) {
 				maxNodeHeight.put(
-									depth,
-									new Double(
-														Math.max(
-																			maxNodeHeightValue.doubleValue(),
-																			nodeHeight)));
+						depth,
+						new Double(
+								Math.max(
+										maxNodeHeightValue.doubleValue(),
+										nodeHeight)));
 			} else {
 				maxNodeHeight.put(depth, new Double(nodeHeight));
 			}
@@ -519,27 +519,27 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		
 		/* Compute the maximum height of the root node */
 		depthOffsets.put(
-							new Integer(maxNodeHeight.size() - 1),
-							new Double(getNodeHeight(sourceNode) / 2.0));
+				new Integer(maxNodeHeight.size() - 1),
+				new Double(getNodeHeight(sourceNode) / 2.0));
 		maxNodeHeight.put(
-							new Integer(maxNodeHeight.size() - 1),
-							new Double(getNodeHeight(sourceNode)));
+				new Integer(maxNodeHeight.size() - 1),
+				new Double(getNodeHeight(sourceNode)));
 		
 		for (int depth = maxNodeHeight.size() - 2; depth >= 0; depth--) {
 			
 			double nodeHeight =
-								((Double) maxNodeHeight.get(new Integer(depth))).doubleValue();
+					((Double) maxNodeHeight.get(new Integer(depth))).doubleValue();
 			double nodeHeightAncestor =
-								((Double) maxNodeHeight.get(new Integer(depth + 1)))
-													.doubleValue();
+					((Double) maxNodeHeight.get(new Integer(depth + 1)))
+							.doubleValue();
 			double yOffsetAncestor =
-								((Double) depthOffsets.get(new Integer(depth + 1)))
-													.doubleValue();
+					((Double) depthOffsets.get(new Integer(depth + 1)))
+							.doubleValue();
 			double yOffset =
-								yOffsetAncestor
-													+ nodeHeight / 2.0
-													+ yNodeDistance
-													+ nodeHeightAncestor / 2.0;
+					yOffsetAncestor
+							+ nodeHeight / 2.0
+							+ yNodeDistance
+							+ nodeHeightAncestor / 2.0;
 			
 			depthOffsets.put(new Integer(depth), new Double(yOffset));
 		}
@@ -566,11 +566,11 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		
 		/* Compute the maximum height of the root node */
 		depthOffsets.put(
-							new Integer(0),
-							new Double(getNodeHeight(sourceNode) / 2.0));
+				new Integer(0),
+				new Double(getNodeHeight(sourceNode) / 2.0));
 		maxNodeHeight.put(
-							new Integer(0),
-							new Double(getNodeHeight(sourceNode)));
+				new Integer(0),
+				new Double(getNodeHeight(sourceNode)));
 		
 		/* BreadthFirstSearch algorithm which calculates the depth of the tree */
 		while (!queue.isEmpty()) {
@@ -584,20 +584,20 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				/* Not all neighbours, just the neighbours not visited yet */
 				if (!bfsNum.containsKey(neighbour)) {
 					Integer depth =
-										new Integer(((Integer) bfsNum.get(v)).intValue() + 1);
+							new Integer(((Integer) bfsNum.get(v)).intValue() + 1);
 					
 					double nodeHeight = getNodeHeight(neighbour);
 					
 					/* Compute the maximum height of nodes in each level of the tree */
 					Double maxNodeHeightValue =
-										(Double) maxNodeHeight.get(depth);
+							(Double) maxNodeHeight.get(depth);
 					if (maxNodeHeightValue != null) {
 						maxNodeHeight.put(
-											depth,
-											new Double(
-																Math.max(
-																					maxNodeHeightValue.doubleValue(),
-																					nodeHeight)));
+								depth,
+								new Double(
+										Math.max(
+												maxNodeHeightValue.doubleValue(),
+												nodeHeight)));
 					} else {
 						maxNodeHeight.put(depth, new Double(nodeHeight));
 					}
@@ -613,18 +613,18 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		for (int depth = 1; depth < maxNodeHeight.size(); depth++) {
 			
 			double nodeHeight =
-								((Double) maxNodeHeight.get(new Integer(depth))).doubleValue();
+					((Double) maxNodeHeight.get(new Integer(depth))).doubleValue();
 			double nodeHeightAncestor =
-								((Double) maxNodeHeight.get(new Integer(depth - 1)))
-													.doubleValue();
+					((Double) maxNodeHeight.get(new Integer(depth - 1)))
+							.doubleValue();
 			double yOffsetAncestor =
-								((Double) depthOffsets.get(new Integer(depth - 1)))
-													.doubleValue();
+					((Double) depthOffsets.get(new Integer(depth - 1)))
+							.doubleValue();
 			double yOffset =
-								yOffsetAncestor
-													+ nodeHeight / 2.0
-													+ yNodeDistance
-													+ nodeHeightAncestor / 2.0;
+					yOffsetAncestor
+							+ nodeHeight / 2.0
+							+ yNodeDistance
+							+ nodeHeightAncestor / 2.0;
 			
 			depthOffsets.put(new Integer(depth), new Double(yOffset));
 		}
@@ -642,60 +642,60 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		} catch (NoSuchElementException nse) {/* empty */
 		}
 		NodeParameter nodeParam =
-							new NodeParameter(
-												graph, initNode,
-												"Start-Node",
-												"Tree layouter will start only with a selected node.");
+				new NodeParameter(
+						graph, initNode,
+						"Start-Node",
+						"Tree layouter will start only with a selected node.");
 		
 		DoubleParameter xDistanceParam =
-							new DoubleParameter(
-												"X distance",
-												"The distance between nodes in horizontal direction.");
+				new DoubleParameter(
+						"X distance",
+						"The distance between nodes in horizontal direction.");
 		
 		DoubleParameter yDistanceParam =
-							new DoubleParameter(
-												"Y distance",
-												"The distance between nodes in vertical direction.");
+				new DoubleParameter(
+						"Y distance",
+						"The distance between nodes in vertical direction.");
 		
 		DoubleParameter xStartParam =
-							new DoubleParameter(
-												"X base",
-												"The x coordinate of the starting point of the grid horizontal direction.");
+				new DoubleParameter(
+						"X base",
+						"The x coordinate of the starting point of the grid horizontal direction.");
 		
 		DoubleParameter yStartParam =
-							new DoubleParameter(
-												"Y base",
-												"The y coordinate of the starting point of the grid horizontal direction.");
+				new DoubleParameter(
+						"Y base",
+						"The y coordinate of the starting point of the grid horizontal direction.");
 		
 		BooleanParameter horizontalParam =
-							new BooleanParameter(
-												horizontalLayout,
-												"Place Trees in a Row",
-												"Place all trees in a row");
+				new BooleanParameter(
+						horizontalLayout,
+						"Place Trees in a Row",
+						"Place all trees in a row");
 		
 		IntegerParameter treeDirectionParam =
-							new IntegerParameter(
-												treeDirection,
-												"Tree Direction (0,90,180,270)",
-												"Move all trees in 0, 90, 180 or 270 degree");
+				new IntegerParameter(
+						treeDirection,
+						"Tree Direction (0,90,180,270)",
+						"Move all trees in 0, 90, 180 or 270 degree");
 		
 		BooleanParameter zeroLeavesParam =
-							new BooleanParameter(
-												zeroLeaves,
-												"Bottom Weighted",
-												"Place all leaves on the same level");
+				new BooleanParameter(
+						zeroLeaves,
+						"Bottom Weighted",
+						"Place all leaves on the same level");
 		
 		BooleanParameter busLayoutParam =
-							new BooleanParameter(
-												isBusLayout,
-												"Bus Layout",
-												"Layout the trees in bus format");
+				new BooleanParameter(
+						isBusLayout,
+						"Bus Layout",
+						"Layout the trees in bus format");
 		
 		BooleanParameter removeBendParam =
-							new BooleanParameter(
-												isRemoveBends,
-												"Remove Bends",
-												"Remove all bends in the forest");
+				new BooleanParameter(
+						isRemoveBends,
+						"Remove Bends",
+						"Remove all bends in the forest");
 		
 		xDistanceParam.setDouble(xNodeDistance);
 		yDistanceParam.setDouble(yNodeDistance);
@@ -703,16 +703,16 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		yStartParam.setDouble(this.yStartParam);
 		
 		return new Parameter[] {
-							nodeParam,
-							xDistanceParam,
-							yDistanceParam,
-							xStartParam,
-							yStartParam,
-							horizontalParam,
-							zeroLeavesParam,
-							removeBendParam,
-							busLayoutParam,
-							treeDirectionParam };
+				nodeParam,
+				xDistanceParam,
+				yDistanceParam,
+				xStartParam,
+				yStartParam,
+				horizontalParam,
+				zeroLeavesParam,
+				removeBendParam,
+				busLayoutParam,
+				treeDirectionParam };
 	}
 	
 	/**
@@ -727,21 +727,21 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		selection = ts;
 		
 		xNodeDistance =
-							((DoubleParameter) params[1]).getDouble().doubleValue();
+				((DoubleParameter) params[1]).getDouble().doubleValue();
 		yNodeDistance =
-							((DoubleParameter) params[2]).getDouble().doubleValue();
+				((DoubleParameter) params[2]).getDouble().doubleValue();
 		xStart = ((DoubleParameter) params[3]).getDouble().doubleValue();
 		yStart = ((DoubleParameter) params[4]).getDouble().doubleValue();
 		xStartParam = ((DoubleParameter) params[3]).getDouble().doubleValue();
 		yStartParam = ((DoubleParameter) params[4]).getDouble().doubleValue();
 		horizontalLayout =
-							((BooleanParameter) params[5]).getBoolean().booleanValue();
+				((BooleanParameter) params[5]).getBoolean().booleanValue();
 		zeroLeaves =
-							((BooleanParameter) params[6]).getBoolean().booleanValue();
+				((BooleanParameter) params[6]).getBoolean().booleanValue();
 		isRemoveBends =
-							((BooleanParameter) params[7]).getBoolean().booleanValue();
+				((BooleanParameter) params[7]).getBoolean().booleanValue();
 		isBusLayout =
-							((BooleanParameter) params[8]).getBoolean().booleanValue();
+				((BooleanParameter) params[8]).getBoolean().booleanValue();
 		treeDirection = ((IntegerParameter) params[9]).getInteger().intValue();
 		if (!((treeDirection == 0) || (treeDirection == 180) || (treeDirection == 270) || (treeDirection == 90))) {
 			treeDirection = 0;
@@ -762,14 +762,14 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 			sourceNode = (Node) iterator.next();
 			
 			depthOffsets =
-								((TreeContainer) sourceNodes.get(sourceNode)).getDepthOffset();
+					((TreeContainer) sourceNodes.get(sourceNode)).getDepthOffset();
 			bfsNum = ((TreeContainer) sourceNodes.get(sourceNode)).getBfsNum();
 			bfsNumUpsideDown =
-								((TreeContainer) sourceNodes.get(sourceNode))
-													.getBfsNumUpsideDown();
+					((TreeContainer) sourceNodes.get(sourceNode))
+							.getBfsNumUpsideDown();
 			maxNodeHeight =
-								((TreeContainer) sourceNodes.get(sourceNode))
-													.getMaxNodeHeight();
+					((TreeContainer) sourceNodes.get(sourceNode))
+							.getMaxNodeHeight();
 			
 			/* Define a queue q which enables the algorithm to traverse the tree. */
 			LinkedList q = new LinkedList();
@@ -845,22 +845,22 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				}
 				
 				xSpanningMax =
-									Math.max(
-														xSpanningMax,
-														leftBrotherCoord
-																			+ nodeWidth
-																			+ leftBrotherWidth / 2.0
-																			+ xNodeDistance
-																			- xStart
-																			+ (maxNodeSizeWidth - minNodeSizeWidth) / 2);
+						Math.max(
+								xSpanningMax,
+								leftBrotherCoord
+										+ nodeWidth
+										+ leftBrotherWidth / 2.0
+										+ xNodeDistance
+										- xStart
+										+ (maxNodeSizeWidth - minNodeSizeWidth) / 2);
 				
 				setX(
-									node,
-									leftBrotherCoord
-														+ nodeWidth / 2.0
-														+ leftBrotherWidth / 2.0
-														+ xNodeDistance
-														+ (maxNodeSizeWidth - minNodeSizeWidth) / 2);
+						node,
+						leftBrotherCoord
+								+ nodeWidth / 2.0
+								+ leftBrotherWidth / 2.0
+								+ xNodeDistance
+								+ (maxNodeSizeWidth - minNodeSizeWidth) / 2);
 			}
 			
 			/* Define a queue q which enables the algorithm to traverse the tree. */
@@ -885,16 +885,16 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 					int level = ((Integer) bfs.get(n)).intValue();
 					
 					setY(
-										n,
-										yStart
-															+ ((Double) depthOffsets.get(new Integer(level)))
-																				.doubleValue());
+							n,
+							yStart
+									+ ((Double) depthOffsets.get(new Integer(level)))
+											.doubleValue());
 					
 					ySpanningMax =
-										Math.max(
-															ySpanningMax,
-															((Double) depthOffsets.get(new Integer(level)))
-																				.doubleValue());
+							Math.max(
+									ySpanningMax,
+									((Double) depthOffsets.get(new Integer(level)))
+											.doubleValue());
 					
 				}
 			}
@@ -911,11 +911,11 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 					if (calculated.containsKey(neighbour)) {
 						if (rect == null) {
 							rect =
-												new Rectangle(
-																	(int) (getX(neighbour) - getNodeWidth(neighbour) / 2),
-																	0,
-																	0,
-																	0);
+									new Rectangle(
+											(int) (getX(neighbour) - getNodeWidth(neighbour) / 2),
+											0,
+											0,
+											0);
 						}
 						rect.add(getX(neighbour) + getNodeWidth(neighbour) / 2, 0);
 					}
@@ -923,18 +923,18 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 				calculated.put(node, null);
 				
 				xSpanningMax =
-									Math.max(
-														xSpanningMax,
-														(rect.x + (rect.width >> 1))
-																			+ getNodeWidth(node) / 2.0
-																			- xStart);
+						Math.max(
+								xSpanningMax,
+								(rect.x + (rect.width >> 1))
+										+ getNodeWidth(node) / 2.0
+										- xStart);
 				
 				xSpanningMin =
-									Math.min(
-														xSpanningMin,
-
-														((rect.x + (rect.width >> 1))
-																			- getNodeWidth(node) / 2.0) - xStart);
+						Math.min(
+								xSpanningMin,
+								
+								((rect.x + (rect.width >> 1))
+										- getNodeWidth(node) / 2.0) - xStart);
 				
 				/*
 				 * Rectangle subTree = null;
@@ -1021,7 +1021,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		 * }
 		 * graph.getListenerManager().transactionFinished(this);
 		 */
-
+		
 	}
 	
 	/**
@@ -1045,82 +1045,46 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 			if (bfs.get(node1) != null) {
 				Node node2 = edge.getTarget();
 				double yCoord1 =
-									((Double) (depthOffsets.get(bfs.get(node1))))
-														.doubleValue()
-														+ ((Double) (maxNodeHeight.get(bfs.get(node1))))
-																			.doubleValue()
-														/ 2
-														+ yNodeDistance / 2;
+						((Double) (depthOffsets.get(bfs.get(node1))))
+								.doubleValue()
+								+ ((Double) (maxNodeHeight.get(bfs.get(node1))))
+										.doubleValue()
+								/ 2
+								+ yNodeDistance / 2;
 				double yCoord2 =
-									((Double) (depthOffsets.get(bfs.get(node2))))
-														.doubleValue()
-														+ ((Double) (maxNodeHeight.get(bfs.get(node2))))
-																			.doubleValue()
-														/ 2
-														+ yNodeDistance / 2;
+						((Double) (depthOffsets.get(bfs.get(node2))))
+								.doubleValue()
+								+ ((Double) (maxNodeHeight.get(bfs.get(node2))))
+										.doubleValue()
+								/ 2
+								+ yNodeDistance / 2;
 				
 				double yCoord = yStart + Math.min(yCoord1, yCoord2);
 				
 				double xCoord1 = getX(node1);
 				double xCoord2 = getX(node2);
 				
-				EdgeShapeAttribute edgeShape =
-									(EdgeShapeAttribute) (edge.getAttribute(SHAPE));
-				edgeShape.setValue(
-									"org.graffiti.plugins.views.defaults.PolyLineEdgeShape");
+				EdgeShapeAttribute edgeShape = (EdgeShapeAttribute) (edge.getAttribute(SHAPE));
+				edgeShape.setValue("org.graffiti.plugins.views.defaults.PolyLineEdgeShape");
 				
 				HashMap bends = new HashMap();
 				if (treeDirection == 270) {
-					bends.put(
-										"bend0",
-										new CoordinateAttribute("bend0", yCoord, xCoord1));
-					
-					bends.put(
-										"bend1",
-										new CoordinateAttribute("bend1", yCoord, xCoord2));
+					bends.put("bend1", new CoordinateAttribute("bend1", yCoord, xCoord1));
+					bends.put("bend2", new CoordinateAttribute("bend2", yCoord, xCoord2));
 				} else
 					if (treeDirection == 0) {
-						bends.put(
-											"bend0",
-											new CoordinateAttribute("bend0", xCoord1, yCoord));
-						
-						bends.put(
-											"bend1",
-											new CoordinateAttribute("bend1", xCoord2, yCoord));
+						bends.put("bend1", new CoordinateAttribute("bend1", xCoord1, yCoord));
+						bends.put("bend2", new CoordinateAttribute("bend2", xCoord2, yCoord));
 					} else
 						if (treeDirection == 90) {
-							bends.put(
-												"bend0",
-												new CoordinateAttribute(
-																	"bend0",
-																	ySpanningMax + yStart * 2 - yCoord,
-																	xCoord1));
-							
-							bends.put(
-												"bend1",
-												new CoordinateAttribute(
-																	"bend1",
-																	ySpanningMax + yStart * 2 - yCoord,
-																	xCoord2));
+							bends.put("bend1", new CoordinateAttribute("bend1", ySpanningMax + yStart * 2 - yCoord, xCoord1));
+							bends.put("bend2", new CoordinateAttribute("bend2", ySpanningMax + yStart * 2 - yCoord, xCoord2));
 						} else {
-							bends.put(
-												"bend0",
-												new CoordinateAttribute(
-																	"bend0",
-																	xCoord1,
-																	ySpanningMax + yStart * 2 - yCoord));
-							
-							bends.put(
-												"bend1",
-												new CoordinateAttribute(
-																	"bend1",
-																	xCoord2,
-																	ySpanningMax + yStart * 2 - yCoord));
+							bends.put("bend1", new CoordinateAttribute("bend1", xCoord1, ySpanningMax + yStart * 2 - yCoord));
+							bends.put("bend2", new CoordinateAttribute("bend2", xCoord2, ySpanningMax + yStart * 2 - yCoord));
 						}
 				
-				((LinkedHashMapAttribute) edge.getAttribute(
-									BENDS)).setCollection(
-										bends);
+				((LinkedHashMapAttribute) edge.getAttribute(BENDS)).setCollection(bends);
 			}
 			
 		}
@@ -1148,7 +1112,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		for (Iterator iterator = graph.getEdgesIterator(); iterator.hasNext();) {
 			try {
 				((LinkedHashMapAttribute) ((Edge) iterator.next()).getAttribute(BENDS)).setCollection(
-									new HashMap());
+						new HashMap());
 			} catch (AttributeNotFoundException atnfe) {
 			};
 		}
@@ -1156,8 +1120,8 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 		for (Iterator iterator = tempEdges.iterator(); iterator.hasNext();) {
 			try {
 				((LinkedHashMapAttribute) ((Edge) iterator.next()).getAttribute(
-									BENDS)).setCollection(
-										new HashMap());
+						BENDS)).setCollection(
+						new HashMap());
 			} catch (AttributeNotFoundException atnfe) {
 			};
 		}
@@ -1173,7 +1137,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	 */
 	private double getNodeWidth(Node n) {
 		DimensionAttribute dimAttr =
-							(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
+				(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
 		double result = 0.0;
 		
 		if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1194,7 +1158,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	 */
 	private double getNodeHeight(Node n) {
 		DimensionAttribute dimAttr =
-							(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
+				(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
 		
 		double result = 0.0;
 		
@@ -1217,7 +1181,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	private double getX(Node n) {
 		double res = 0;
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1239,7 +1203,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	private double getY(Node n) {
 		double res = 0;
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1261,7 +1225,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	 */
 	private void setY(Node n, double y) {
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1282,7 +1246,7 @@ public class GraphTreeLayout extends AbstractAlgorithm {
 	 */
 	private void setX(Node n, double x) {
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {

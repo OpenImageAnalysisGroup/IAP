@@ -8,7 +8,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-beanutils.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-cli-1.0.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-digester.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/itext-1.4.5.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/java-cup-v11a-runtime.jar" sourcepath="/home/klukas/workspace/grav/src/develop/src"/>
@@ -48,5 +47,19 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="src" path="/Graffiti_Core"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
+	
+	<classpathentry kind="lib" path="/Graffiti_lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/core-1.8.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/staxmate-2.0.0.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/woodstox-core-lgpl-4.0.9.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/stax2-api-3.0.3.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jigsaw-2.2.6.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/xstream-1.3.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/bytecode-1.8.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-dbcp-1.2.2.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-pool-1.3.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/xpp3_min-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

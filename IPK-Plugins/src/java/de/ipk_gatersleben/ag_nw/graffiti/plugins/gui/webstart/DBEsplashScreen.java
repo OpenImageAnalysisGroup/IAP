@@ -35,7 +35,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 public class DBEsplashScreen implements SplashScreenInterface {
 	
 	CenterFrame splash = null;
-	private String applicationName;
+	private final String applicationName;
 	private JProgressBar progressBar = null;
 	private JLabel statusLabel = null;
 	private Runnable endTask = null;
@@ -52,6 +52,8 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	public DBEsplashScreen(String applicationName, String copyright, Runnable endTask) {
 		this.applicationName = applicationName;
 		this.endTask = endTask;
+		if (endTask instanceof RunnableWithSplashScreenReference)
+			((RunnableWithSplashScreenReference) endTask).setSplashscreenInfo(this);
 		splash = new CenterFrame(applicationName);
 		splash.setUndecorated(true);
 		
@@ -82,7 +84,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 		border = 2;
 		double sizeParent[][] =
 		{ { border, 240, TableLayoutConstants.PREFERRED, border },
-							{ border, TableLayoutConstants.PREFERRED, border }
+				{ border, TableLayoutConstants.PREFERRED, border }
 		}; // Rows
 		
 		border = 0;
@@ -126,8 +128,8 @@ public class DBEsplashScreen implements SplashScreenInterface {
 		// splash.setBounds(0, 0, 600, 200);
 		
 		splash.setBounds(0, 0,
-							(int) (parent.getPreferredSize().width + border * 2),
-							(int) (parent.getPreferredSize().height + border * 2));
+				(int) (parent.getPreferredSize().width + border * 2),
+				(int) (parent.getPreferredSize().height + border * 2));
 		
 		// splash.centerFrame();
 		
@@ -204,15 +206,16 @@ public class DBEsplashScreen implements SplashScreenInterface {
 			nn.append(blackB);
 		
 		return "<html>" +
-							"<br><br>" +
-							"<h2>" + nn.toString() + "</h2>" +
-							"<p>" + DBEgravistoHelper.DBE_GRAVISTO_NAME + "<br><br><br>";
+				"<br><br>" +
+				"<h2>" + nn.toString() + "</h2>" +
+				"<p>" + DBEgravistoHelper.DBE_GRAVISTO_NAME + "<br><br><br>";
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#setMaximum(int)
 	 */
+	@Override
 	public void setMaximum(int maximum) {
 		progressBar.setMaximum(maximum);
 	}
@@ -221,6 +224,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#setText(java.lang.String)
 	 */
+	@Override
 	public void setText(String text) {
 		statusLabel.setText(text);
 	}
@@ -231,6 +235,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#setValue(int)
 	 */
+	@Override
 	public void setValue(final int value) {
 		if (!infoLabel.isShowing()) {
 			if (value * 43 / getMaximum() > outputlen) {
@@ -243,6 +248,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 		progressBar.setValue(value);
 		if (infoLabel != null) {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					infoLabel.setText(getSplashScreenlabel(applicationName, value));
 					infoLabel.repaint();
@@ -255,6 +261,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#getValue()
 	 */
+	@Override
 	public int getValue() {
 		return progressBar.getValue();
 	}
@@ -263,6 +270,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.SplashScreenInterface#setVisible(boolean)
 	 */
+	@Override
 	public void setVisible(boolean visible) {
 		splash.setVisible(visible);
 	}
@@ -271,6 +279,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.SplashScreenInterface#setInitialisationFinished()
 	 */
+	@Override
 	public void setInitialisationFinished() {
 		if (endTask != null)
 			SwingUtilities.invokeLater(endTask);
@@ -286,6 +295,7 @@ public class DBEsplashScreen implements SplashScreenInterface {
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#getMaximum()
 	 */
+	@Override
 	public int getMaximum() {
 		return progressBar.getMaximum();
 	}

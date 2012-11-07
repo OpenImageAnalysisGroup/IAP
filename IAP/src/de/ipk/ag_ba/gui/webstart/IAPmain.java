@@ -131,7 +131,7 @@ public class IAPmain extends JApplet {
 		uiPrefs.put("showPluginMenu", getOptions().getBoolean("VANTED", "debug show plugin_menu", false) + "");
 		JPanel statusPanel = new JPanel();
 		
-		mainFrame1 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
+		mainFrame1 = new MainFrame(GravistoMainHelper.getPluginManager(), uiPrefs, statusPanel, true);
 		// mainFrame2 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
 		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
@@ -360,7 +360,7 @@ public class IAPmain extends JApplet {
 		if (onStartup) {
 			try {
 				splashScreen.setText("Load plugins...");
-				GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
+				GravistoMainHelper.loadPlugins(locations, splashScreen);
 			} catch (PluginManagerException pme) {
 				ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 			}
@@ -371,7 +371,7 @@ public class IAPmain extends JApplet {
 					if (onDemand) {
 						try {
 							splashScreen.setText("Load plugins...");
-							GravistoMainHelper.loadPlugins(statusPanel.getPluginManager(), locations, splashScreen);
+							GravistoMainHelper.loadPlugins(locations, splashScreen);
 						} catch (PluginManagerException pme) {
 							ErrorMsg.addErrorMessage(pme.getLocalizedMessage());
 						}

@@ -6,7 +6,7 @@
 // Copyright (c) 2003-2009 IPK-Gatersleben
 //
 // ==============================================================================
-// $Id: GraffitiView.java,v 1.3 2011-10-16 12:06:01 klukas Exp $
+// $Id: GraffitiView.java,v 1.4 2012-11-07 14:42:20 klukas Exp $
 
 package org.graffiti.plugins.views.defaults;
 
@@ -53,7 +53,6 @@ import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
-import org.ReleaseInfo;
 import org.color.ColorUtil;
 import org.graffiti.attributes.Attributable;
 import org.graffiti.attributes.Attribute;
@@ -104,8 +103,8 @@ import org.graffiti.session.Session;
  * @see org.graffiti.plugin.view.View2D
  */
 public class GraffitiView extends AbstractView implements View2D, GraphView,
-					GraphListener, AttributeListener, NodeListener,
-					EdgeListener, TransactionListener {
+		GraphListener, AttributeListener, NodeListener,
+		EdgeListener, TransactionListener {
 	// ~ Instance fields ========================================================
 	
 	private static final long serialVersionUID = 3257849887318882097L;
@@ -131,7 +130,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	
 	private boolean blockEdges = false;
 	
-	public boolean threadedRedraw = !ReleaseInfo.isRunningAsApplet();
+	public boolean threadedRedraw = true;
 	
 	protected CoordinateSystem coordinateSystem = CoordinateSystem.XY;
 	
@@ -257,7 +256,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	@Override
 	public void addMouseMotionListener(MouseMotionListener l) {
 		ZoomedMouseMotionListener zoomedListener = new ZoomedMouseMotionListener(
-							l);
+				l);
 		zoomedMouseMotionListeners.put(l, zoomedListener);
 		super.addMouseMotionListener(zoomedListener);
 	}
@@ -363,8 +362,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			} catch (ShapeNotFoundException e) {
 				nc.createStandardShape();
 				informMessageListener(
-									"statusbar.error.graphelement.ShapeNotFoundException",
-									MessageType.ERROR);
+						"statusbar.error.graphelement.ShapeNotFoundException",
+						MessageType.ERROR);
 			}
 			nsc++;
 		}
@@ -383,8 +382,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			} catch (ShapeNotFoundException snf) {
 				ec.createStandardShape();
 				informMessageListener(
-									"statusbar.error.graphelement.ShapeNotFoundException",
-									MessageType.ERROR);
+						"statusbar.error.graphelement.ShapeNotFoundException",
+						MessageType.ERROR);
 			}
 			esc++;
 		}
@@ -418,7 +417,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		
 		final JComponent finishElement = new JLabel("Ende...");
 		
-		Runnable r = new Runnable() {
+		final Thread t = new Thread(new Runnable() {
 			public void run() {
 				if (getGraph() == null)
 					return;
@@ -466,8 +465,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 									if (getGraph() == null)
 										return;
 									createGUIcomponentElements(
-														addShapesAndAttributeComponentsTogether, workF,
-														result, ttt, gecm);
+											addShapesAndAttributeComponentsTogether, workF,
+											result, ttt, gecm);
 									curr.addInt(workF.size());
 									long ttt2 = System.currentTimeMillis();
 									if (ttt2 == ttt)
@@ -490,10 +489,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 						}
 					}
 					try {
-						if (threadedRedraw) {
-							run.shutdown();
-							run.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-						}
+						run.shutdown();
+						run.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 						JComponent sp2 = (JComponent) ErrorMsg.findParentComponent(getViewComponent(), JInternalFrame.class);
 						if (sp2 != null)
 							sp2.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -511,13 +508,13 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
 									MainFrame.showMessage("Creation of graph element attribute GUI components finished (" + ges.length + "): T=" + (ttt2f - tttf)
-														+ " ms. " + (int) speed + " elements per second. Add elements to view. Please wait.", MessageType.INFO);
+											+ " ms. " + (int) speed + " elements per second. Add elements to view. Please wait.", MessageType.INFO);
 									// System.out.println("Creation of graph element attribute GUI components finished ("+ges.length+"): T="+(ttt2f-tttf)+" ms. "+(int)speed+" elements per second. Add elements to view. Please wait.");
 								}
 							});
 						else {
 							MainFrame.showMessage("Creation of graph element attribute GUI components finished (" + ges.length + "): T=" + (ttt2f - tttf) + " ms. "
-												+ (int) speed + " elements per second. Add elements to view. Please wait.", MessageType.INFO);
+									+ (int) speed + " elements per second. Add elements to view. Please wait.", MessageType.INFO);
 							// System.out.println("Creation of graph element attribute GUI components finished ("+ges.length+"): T="+(ttt2f-tttf)+" ms. "+(int)speed+" elements per second. Add elements to view. Please wait.");
 						}
 						
@@ -535,15 +532,13 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				}
 				MainFrame.showMessage("", MessageType.INFO);
 			}
-		};
-		if (threadedRedraw) {
-			final Thread t = new Thread(r);
-			t.setName("Attribute GUI Component Creation");
-			t.setPriority(Thread.NORM_PRIORITY);
+		});
+		t.setName("Attribute GUI Component Creation");
+		t.setPriority(Thread.NORM_PRIORITY);
+		if (threadedRedraw)
 			t.start();
-		} else {
-			r.run();
-		}
+		else
+			t.run();
 		if (!isThreadedF) {
 			addElements(result, finishElement, startTime, isThreadedF);
 		}
@@ -592,8 +587,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	}
 	
 	private void addElements(final BlockingQueue<JComponent> result,
-						final JComponent finishElement,
-						final long startTime, boolean nonBlock) {
+			final JComponent finishElement,
+			final long startTime, boolean nonBlock) {
 		JComponent sp = (JComponent) ErrorMsg.findParentComponent(this, JInternalFrame.class);
 		if (sp != null)
 			sp.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -616,10 +611,12 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				break;
 		}
 		
-		if (isShowing())
-			validate();
-		else
-			validate(); //JRE7 bug	validateTree();
+		synchronized (getTreeLock()) {
+			if (isShowing())
+				validate();
+			else
+				validateTree();
+		}
 		
 		adjustPreferredSize(true);
 		
@@ -654,14 +651,14 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 */
 	@Override
 	public Component findComponentAt(
-						int x, int y) {
+			int x, int y) {
 		Component c = myFindComponent(x, y);
 		while (c != null && (c.getParent() != null) && (
-							!(
-							c instanceof AttributeComponent ||
-												c instanceof NodeComponent ||
-												c instanceof GraffitiView ||
-							c instanceof EdgeComponent))) {
+				!(
+				c instanceof AttributeComponent ||
+						c instanceof NodeComponent ||
+						c instanceof GraffitiView ||
+				c instanceof EdgeComponent))) {
 			c = c.getParent();
 		}
 		return c;
@@ -675,7 +672,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			if (c.isVisible()) {
 				if (c instanceof NodeComponent)
 					if ((c.getWidth() < 50 && c.getHeight() < 50 && x >= c.getX()) && (y >= c.getY()) &&
-										(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
+							(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
 						result = c;
 						break;
 					}
@@ -688,7 +685,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 					if (c instanceof EdgeComponentInterface) {
 						EdgeComponent ec = (EdgeComponent) c;
 						if ((x >= c.getX()) && (y >= c.getY()) &&
-											(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
+								(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
 							if (ec.getShape().contains(x - c.getX(), y - c.getY())) {
 								result = c;
 								break;
@@ -715,7 +712,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 						}
 					} else {
 						if ((x >= c.getX()) && (y >= c.getY()) &&
-											(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
+								(x <= (c.getX() + c.getWidth())) && (y <= (c.getY() + c.getHeight()))) {
 							result = c;
 							break;
 						}
@@ -761,11 +758,12 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				// gec.validate();
 			} catch (ShapeNotFoundException snfe) {
 				informMessageListener(
-									"statusbar.error.attribute.ShapeNotFoundException",
-									MessageType.ERROR);
+						"statusbar.error.attribute.ShapeNotFoundException",
+						MessageType.ERROR);
 			}
 		}
 		repaint();
+		getGraph().setModified(true);
 	}
 	
 	/**
@@ -796,10 +794,12 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			}
 		} catch (ShapeNotFoundException snfe) {
 			informMessageListener(
-								"statusbar.error.attribute.ShapeNotFoundException",
-								MessageType.ERROR);
+					"statusbar.error.attribute.ShapeNotFoundException",
+					MessageType.ERROR);
 		}
 		repaint();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -830,8 +830,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			gec.invalidate();
 		} catch (ShapeNotFoundException snfe) {
 			informMessageListener(
-								"statusbar.error.attribute.ShapeNotFoundException",
-								MessageType.ERROR);
+					"statusbar.error.attribute.ShapeNotFoundException",
+					MessageType.ERROR);
 		}
 		
 		if (ac != null) {
@@ -840,6 +840,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		}
 		
 		repaint();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -858,6 +860,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		ec.updateShape();
 		
 		repaint();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -877,7 +881,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			return;
 		
 		EdgeComponent component = createEdgeComponent(
-							getGraphElementComponentMap(), edge);
+				getGraphElementComponentMap(), edge);
 		if (component == null)
 			return;
 		// graphElementComponents.put(edge, component);
@@ -886,8 +890,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		} catch (ShapeNotFoundException snfe) {
 			component.createStandardShape();
 			informMessageListener(
-								"statusbar.error.graphelement.ShapeNotFoundException",
-								MessageType.ERROR);
+					"statusbar.error.graphelement.ShapeNotFoundException",
+					MessageType.ERROR);
 		}
 		
 		// Node node1 = edge.getSource();
@@ -902,6 +906,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		
 		validate();
 		// repaint(edge);
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -917,6 +923,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		
 		Edge edge = e.getEdge();
 		processEdgeRemoval(edge);
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	protected void processEdgeRemoval(Edge edge) {
@@ -934,6 +942,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			// adjustPreferredSize();
 			repaint();
 		}
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -951,6 +961,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		EdgeComponent ec = (EdgeComponent) getGraphElementComponent(edge);
 		
 		ec.updateShape();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -968,6 +980,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		clearGraphElementComponentMap();
 		removeAll();
 		validate();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -993,8 +1007,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		} catch (ShapeNotFoundException snfe) {
 			component.createStandardShape();
 			informMessageListener(
-								"statusbar.error.graphelement.ShapeNotFoundException",
-								MessageType.ERROR);
+					"statusbar.error.graphelement.ShapeNotFoundException",
+					MessageType.ERROR);
 		}
 		
 		add(component, 0);
@@ -1002,6 +1016,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		
 		validate();
 		// repaint(node);
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -1024,6 +1040,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		// adjustPreferredSize();
 		// repaint();
 		// }
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	protected void processNodeRemoval(Node node) {
@@ -1069,6 +1087,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		nc.addDependentComponent(ec);
 		
 		ec.updateShape();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -1090,6 +1110,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		nc.addDependentComponent(ec);
 		
 		ec.updateShape();
+		if (getGraph() != null)
+			getGraph().setModified(true);
 	}
 	
 	/**
@@ -1187,7 +1209,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		// must add edges AFTER nodes ...
 		Set<Edge> edgesToAdd = new HashSet<Edge>();
 		
-		Collection<Object> changed = event != null ? event.getChangedObjects().values() : new ArrayList<Object>();
+		Collection<Object> changed = event != null ? new ArrayList<Object>(event.getChangedObjects().values()) : new ArrayList<Object>();
 		String s1 = null, s2 = null;
 		if (status != null)
 			s1 = status.getCurrentStatusMessage1();
@@ -1299,8 +1321,8 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 					}
 				} catch (ShapeNotFoundException snfe) {
 					informMessageListener(
-										"statusbar.error.attribute.ShapeNotFoundException",
-										MessageType.ERROR);
+							"statusbar.error.attribute.ShapeNotFoundException",
+							MessageType.ERROR);
 				}
 			}
 		}
@@ -1391,7 +1413,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * @see #completeRedraw() for an example.
 	 */
 	protected NodeComponent createNodeComponent(
-						Map<GraphElement, GraphElementComponent> gecMap, Node node) {
+			Map<GraphElement, GraphElementComponent> gecMap, Node node) {
 		
 		NodeComponent nodeComponent = (NodeComponent) gecMap.get(node);
 		
@@ -1438,9 +1460,9 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		}
 		
 		MouseEvent newME = new MouseEvent((Component) e.getSource(), e.getID(), e
-							.getWhen(), e.getModifiers(), (int) (invZoomedPoint.getX()),
-							(int) (invZoomedPoint.getY()), e.getClickCount(), e
-												.isPopupTrigger());
+				.getWhen(), e.getModifiers(), (int) (invZoomedPoint.getX()),
+				(int) (invZoomedPoint.getY()), e.getClickCount(), e
+						.isPopupTrigger());
 		
 		return newME;
 	}
@@ -1463,9 +1485,9 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 		}
 		
 		MouseEvent newME = new MouseEvent((Component) e.getSource(), e.getID(), e
-							.getWhen(), e.getModifiers(), (int) (invZoomedPoint.getX()),
-							(int) (invZoomedPoint.getY()), e.getClickCount(), e
-												.isPopupTrigger());
+				.getWhen(), e.getModifiers(), (int) (invZoomedPoint.getX()),
+				(int) (invZoomedPoint.getY()), e.getClickCount(), e
+						.isPopupTrigger());
 		
 		return newME;
 	}
@@ -1477,7 +1499,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * @param gec
 	 */
 	private void addAttributeComponents(GraphElement ge,
-						GraphElementComponent gec) {
+			GraphElementComponent gec) {
 		recurseAttributes(ge.getAttributes(), gec);
 	}
 	
@@ -1510,7 +1532,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			
 			compDownRightY = (components[i].getY() + components[i].getHeight());
 			maxPos.setLocation(Math.max(compDownRightX, maxPos.x), Math.max(
-								compDownRightY, maxPos.y));
+					compDownRightY, maxPos.y));
 			
 			// zoom.transform(maxPos, maxPos);
 		}
@@ -1519,7 +1541,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 			// shrink if necessary
 			Point2D zoomedMax = zoom.transform(maxPos, null);
 			Dimension minSize = new Dimension((int) zoomedMax.getX(),
-								(int) zoomedMax.getY());
+					(int) zoomedMax.getY());
 			this.setSize(minSize);
 			this.setPreferredSize(minSize);
 		}
@@ -1542,7 +1564,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * @see #completeRedraw() for an example.
 	 */
 	protected EdgeComponent createEdgeComponent(
-						Map<GraphElement, GraphElementComponent> gecMap, Edge edge) {
+			Map<GraphElement, GraphElementComponent> gecMap, Edge edge) {
 		
 		if (blockEdges || gecMap == null)
 			return null;
@@ -1586,7 +1608,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * @return boolean
 	 */
 	private boolean maybeAddAttrComponent(Attribute attribute,
-						GraphElementComponent gec) {
+			GraphElementComponent gec) {
 		if (acm == null || !acm.hasAttributeComponent(attribute.getClass()))
 			return false;
 		try {
@@ -1608,7 +1630,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				attrComp.setShift(gec.getLocation());
 			} catch (ShapeNotFoundException snfe) {
 				throw new RuntimeException(
-									"Should not happen since no shape is used here" + snfe);
+						"Should not happen since no shape is used here" + snfe);
 			}
 			if (gec.getGraphElement() != null && attrComp != null) {
 				if (!graphElementAttributeComponents.containsKey(gec.getGraphElement()))
@@ -1624,7 +1646,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	}
 	
 	private boolean maybeCreateAttributeComponent(Queue<JComponent> result, Attribute attribute,
-						GraphElementComponent gec) {
+			GraphElementComponent gec) {
 		AttributeComponentManager acm = this.acm;
 		if (acm == null) {
 			return false;
@@ -1649,7 +1671,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 				attrComp.setShift(gec.getLocation());
 			} catch (ShapeNotFoundException snfe) {
 				throw new RuntimeException(
-									"Should not happen since no shape is used here" + snfe);
+						"Should not happen since no shape is used here" + snfe);
 			}
 			if (attrComp != null) {
 				GraphElement ge = gec.getGraphElement();
@@ -1706,7 +1728,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.3 $ $Date: 2011-10-16 12:06:01 $
+	 * @version $Revision: 1.4 $ $Date: 2012-11-07 14:42:20 $
 	 */
 	class ZoomedMouseListener implements MouseListener {
 		/** DOCUMENT ME! */
@@ -1762,7 +1784,7 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.3 $ $Date: 2011-10-16 12:06:01 $
+	 * @version $Revision: 1.4 $ $Date: 2012-11-07 14:42:20 $
 	 */
 	class ZoomedMouseMotionListener implements MouseMotionListener {
 		/** DOCUMENT ME! */
@@ -1828,9 +1850,9 @@ public class GraffitiView extends AbstractView implements View2D, GraphView,
 	}
 	
 	private int createGUIcomponentElements(
-						final boolean addShapesAndAttributeComponentsTogether,
-						final Collection<GraphElement> ges, final BlockingQueue<JComponent> result,
-						long ttt, Map<GraphElement, GraphElementComponent> gecm) {
+			final boolean addShapesAndAttributeComponentsTogether,
+			final Collection<GraphElement> ges, final BlockingQueue<JComponent> result,
+			long ttt, Map<GraphElement, GraphElementComponent> gecm) {
 		
 		int curr = 0;
 		

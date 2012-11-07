@@ -12,12 +12,12 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
-import org.graffiti.plugin.algorithm.AbstractEditorAlgorithm;
+import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.parameter.BooleanParameter;
 import org.graffiti.plugin.parameter.Parameter;
-import org.graffiti.plugin.view.View;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author Christian Klukas
  *         (c) 2005 IPK Gatersleben, Group Network Analysis
  */
-public class ExtractMappingDataAlgorithm extends AbstractEditorAlgorithm {
+public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 	
 	public String getName() {
 		return "Extract Mapped Data";
@@ -39,8 +39,8 @@ public class ExtractMappingDataAlgorithm extends AbstractEditorAlgorithm {
 	
 	@Override
 	public String getDescription() {
-		return "<html>Will extract all data from the selected graph elements<br>" +
-							"and put this data in the \"Experiments\" tab.";
+		return "<html>Gathers all experimental data from the selected<br>" +
+				"graph elements and put this data in the \"Experiments\" tab.";
 	}
 	
 	@Override
@@ -83,8 +83,14 @@ public class ExtractMappingDataAlgorithm extends AbstractEditorAlgorithm {
 						status.setCurrentStatusText2("Getting mapped data from elements");
 						status.setCurrentStatusValue(0);
 						
-						for (ExperimentInterface e : getExperiments(workNodes, onlyOne, status))
-							TabDBE.addOrUpdateExperimentPane(getMainFrame(), new ProjectEntity(e.getName(), e));
+						for (ExperimentInterface e : getExperiments(workNodes, onlyOne, status)) {
+							String expname = e.getName();
+							if (expname == null) {
+								ErrorMsg.addErrorMessage("Error occured: could not determine experiment name!");
+								expname = "unknown";
+							}
+							TabDBE.addOrUpdateExperimentPane(new ProjectEntity(expname, e));
+						}
 						
 						status.setCurrentStatusValue(-1);
 					} finally {
@@ -136,11 +142,6 @@ public class ExtractMappingDataAlgorithm extends AbstractEditorAlgorithm {
 	@Override
 	public boolean mayWorkOnMultipleGraphs() {
 		return true;
-	}
-	
-	@Override
-	public boolean activeForView(View v) {
-		return v != null;
 	}
 	
 }

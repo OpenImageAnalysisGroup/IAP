@@ -49,7 +49,9 @@ public class DockingAttributeEditor extends AbstractValueEditComponent {
 		});
 		combo.setRenderer(new EdgeDockingRenderer());
 		spinnerx = new JSpinner(new SpinnerNumberModel(1d, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1d));
+		spinnerx.setToolTipText("Specify x-value");
 		spinnery = new JSpinner(new SpinnerNumberModel(1d, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1d));
+		spinnery.setToolTipText("Specify y-value");
 		textcustom = new JTextField();
 		pan = new JPanel();
 		pan.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));

@@ -51,14 +51,14 @@ public class SelectNodesComponent extends JToolBar implements GraffitiComponent,
 					SessionListener, ViewListener {
 	
 	private static final long serialVersionUID = 1L;
-	private ArrayList<Node> initSelection = new ArrayList<Node>();
+	private final ArrayList<Node> initSelection = new ArrayList<Node>();
 	// private Selection selection;
-	private String prefComp;
+	private final String prefComp;
 	private static Session activeSession;
 	
-	private JTextField searchText;
-	private JLabel searchDesc;
-	private JButton okButton;
+	private final JTextField searchText;
+	private final JLabel searchDesc;
+	private final JButton okButton;
 	
 	private static SelectNodesComponent instance;
 	
@@ -165,8 +165,7 @@ public class SelectNodesComponent extends JToolBar implements GraffitiComponent,
 							// if (searchText.getText().length() > 0) {
 							// activeSession.getGraph().getListenerManager().transactionStarted(this);
 							// Selection selection = ((EditorSession)activeSession).getSelectionModel().getActiveSelection();
-							Selection newSelection = new Selection("id");
-							newSelection.addAll(getFilteredGraphElementList(searchText.getText()));
+							Selection newSelection = new Selection("id", getFilteredGraphElementList(searchText.getText()));
 							((EditorSession) activeSession).getSelectionModel().setActiveSelection(newSelection);
 							// activeSession.getGraph().getListenerManager().transactionFinished(this);
 							// }

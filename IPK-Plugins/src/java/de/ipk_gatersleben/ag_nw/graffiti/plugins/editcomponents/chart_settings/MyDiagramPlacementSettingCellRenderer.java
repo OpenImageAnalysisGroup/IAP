@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import org.ErrorMsg;
+
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
@@ -66,8 +68,14 @@ public class MyDiagramPlacementSettingCellRenderer implements ListCellRenderer {
 			icon = new ImageIcon(cl.getResource(path + "/grid/fourcolumns.png"));
 			result.setText("Four columns, flexible no. of rows");
 		}
-		if ((Integer) value > 4) {
-			result.setText(value + " columns, flexible no. of rows");
+		try {
+			if (value instanceof String)
+				value = Integer.parseInt(((String) value).trim());
+			if (value instanceof Integer && (Integer) value > 4) {
+				result.setText(value + " columns, flexible no. of rows");
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
 		}
 		if (icon != null)
 			result.setIcon(icon);

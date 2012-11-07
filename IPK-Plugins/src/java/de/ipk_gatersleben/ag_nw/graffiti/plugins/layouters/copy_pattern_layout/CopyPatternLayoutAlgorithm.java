@@ -107,7 +107,7 @@ public class CopyPatternLayoutAlgorithm extends AbstractAlgorithm {
 							.getPatternGraphs();
 		
 		if (listOfPatterns == null || listOfPatterns.size() == 0) {
-			errors.add("The list of patterns is empty.");
+			errors.add("The list of patterns is empty. Use tab \"Tools\"&rarr;\"Search Subgraph\" to create some.");
 		} else {
 			/* Just to make sure we use the correct graph... */
 			for (Graph gtest : listOfPatterns) {

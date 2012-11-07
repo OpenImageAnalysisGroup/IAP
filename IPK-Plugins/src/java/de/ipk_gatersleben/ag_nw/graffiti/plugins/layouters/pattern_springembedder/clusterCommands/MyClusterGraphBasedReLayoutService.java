@@ -23,11 +23,13 @@ import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
+import org.graffiti.graphics.CoordinateAttribute;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.selection.Selection;
 
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.EdgeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.RelationType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover.CenterLayouterAlgorithm;
@@ -297,6 +299,19 @@ public class MyClusterGraphBasedReLayoutService
 				}
 			}
 		}
+		// Move also edge bends
+		final HashMap<CoordinateAttribute, Vector2d> bends2newPositions = new HashMap<CoordinateAttribute, Vector2d>();
+		for (Edge e : mainGraph.getEdges()) {
+			String clusterId = NodeTools.getClusterID(e, null);
+			if (clusterId != null && clusterId.length() > 0) {
+				Vector2d clusterBefore = clusterLocationsBeforeLayout.get(clusterId);
+				Vector2d clusterAfter = clusterLocationsAfterLayout.get(clusterId);
+				if (clusterAfter == null)
+					error = true;
+				else
+					EdgeHelper.moveBends(e, (clusterAfter.x - clusterBefore.x), (clusterAfter.y - clusterBefore.y), bends2newPositions);
+			}
+		}
 		final boolean errorF = error;
 		final Graph mainGraphF = mainGraph;
 		BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
@@ -310,7 +325,9 @@ public class MyClusterGraphBasedReLayoutService
 									"source graph. It is recommended, to first modify the overview-graph layout. Then<br>" +
 									"continue the re-layout operation by clicking onto the OK button in the progress panel.<br>" +
 									"Then you may close the overview-graph window.", "Error");
-				GraphHelper.applyUndoableNodePositionUpdate(nodes2newPositions, "Overview-Graph based layout");
+				// GraphHelper.applyUndoableNodePositionUpdate(nodes2newPositions, "Overview-Graph based layout");
+				GraphHelper.applyUndoableNodeAndBendPositionUpdate(nodes2newPositions, bends2newPositions, "Overview-Graph based layout");
+				
 				for (Node n : mainGraphF.getNodes()) {
 					String clusterId = NodeTools.getClusterID(n, "no cluster");
 					if (clusterId.equals("no cluster"))

@@ -73,15 +73,17 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 			if (!SystemInfo.isLinux() && !SystemInfo.isMac()) {
 				// assume windows
 				// get program path
-				String path = System.getenv("ProgramFiles");
-				if (path != null && path.length() > 0) {
-					File f = new File(path);
-					if (f.exists()) {
-						for (String app : f.list()) {
-							if (app.startsWith("Graphviz")) {
-								String found = path + "\\" + app + "\\bin";
-								if (new File(found).exists()) {
-									return found + "\\";
+				String[] ps = { System.getenv("ProgramFiles"), System.getenv("ProgramFiles") + " (x86)" };
+				for (String path : ps) {
+					if (path != null && path.length() > 0) {
+						File f = new File(path);
+						if (f.exists()) {
+							for (String app : f.list()) {
+								if (app.startsWith("Graphviz")) {
+									String found = path + "\\" + app + "\\bin";
+									if (new File(found).exists()) {
+										return found + "\\";
+									}
 								}
 							}
 						}

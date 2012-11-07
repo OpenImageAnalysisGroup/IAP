@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: GraphicAttributeConstants.java,v 1.1 2011-01-31 09:04:46 klukas Exp $
+// $Id: GraphicAttributeConstants.java,v 1.2 2012-11-07 14:41:59 klukas Exp $
 
 package org.graffiti.graphics;
 
@@ -118,9 +118,15 @@ public interface GraphicAttributeConstants {
 	
 	/** Constant used to specify the position of a label according to a node. */
 	public static final String INSIDEBOTTOM = "b";
+	public static final String INSIDEBOTTOMLEFT = "ibl";
+	public static final String INSIDEBOTTOMRIGHT = "ibr";
 	
 	/** Constant used to specify the position of a label according to a node. */
 	public static final String INSIDETOP = "t";
+	public static final String INSIDETOPLEFT = "itl";
+	public static final String INSIDETOPRIGHT = "itr";
+	public static final String INSIDELEFT = "il";
+	public static final String INSIDERIGHT = "ir";
 	
 	/** Constant used to specify the position of a label according to a node. */
 	public static final String CENTERED = "c";
@@ -179,58 +185,58 @@ public interface GraphicAttributeConstants {
 	
 	/** Path to x-coordinate attribute */
 	public static final String COORDX_PATH = COORD_PATH + Attribute.SEPARATOR +
-						X;
+			X;
 	
 	/** Path to y-coordinate attribute */
 	public static final String COORDY_PATH = COORD_PATH + Attribute.SEPARATOR +
-						Y;
+			Y;
 	
 	/** Path to dimension attribute */
 	public static final String DIM_PATH = GRAPHICS + Attribute.SEPARATOR + DIMENSION;
 	
 	/** Path to width attribute */
 	public static final String DIMW_PATH = DIM_PATH + Attribute.SEPARATOR +
-						WIDTH;
+			WIDTH;
 	
 	/** Path to height attribute */
 	public static final String DIMH_PATH = DIM_PATH + Attribute.SEPARATOR +
-						HEIGHT;
+			HEIGHT;
 	
 	/** Path to fill color attribute */
 	public static final String FILLCOLOR_PATH = GRAPHICS + Attribute.SEPARATOR +
-						FILLCOLOR;
+			FILLCOLOR;
 	
 	/** Path to outline color attribute */
 	public static final String OUTLINE_PATH = GRAPHICS + Attribute.SEPARATOR +
-						FRAMECOLOR;
+			FRAMECOLOR;
 	
 	/** Path to line width attribute */
 	public static final String LINEWIDTH_PATH = GRAPHICS + Attribute.SEPARATOR +
-						FRAMETHICKNESS;
+			FRAMETHICKNESS;
 	
 	/** Path to shape attribute */
 	public static final String SHAPE_PATH = GRAPHICS + Attribute.SEPARATOR +
-						SHAPE;
+			SHAPE;
 	
 	/** Path to shape description attribute */
 	public static final String SHAPE_DESC_PATH = GRAPHICS +
-						Attribute.SEPARATOR + SHAPEDESCRIPTION;
+			Attribute.SEPARATOR + SHAPEDESCRIPTION;
 	
 	/** Path to bends attribute */
 	public static final String BENDS_PATH = GRAPHICS + Attribute.SEPARATOR +
-						BENDS;
+			BENDS;
 	
 	/** Path to ports attribute */
 	public static final String PORTS_PATH = GRAPHICS + Attribute.SEPARATOR +
-						PORTS;
+			PORTS;
 	
 	/** Path to docking attribute */
 	public static final String DOCKING_PATH = GRAPHICS + Attribute.SEPARATOR +
-						DOCKING;
+			DOCKING;
 	
 	/** Path to frame thickness attribute */
 	public static final String FRAMETHICKNESS_PATH = GRAPHICS +
-						Attribute.SEPARATOR + FRAMETHICKNESS;
+			Attribute.SEPARATOR + FRAMETHICKNESS;
 	
 	/** rectangle node shape class name */
 	public static final String RECTANGLE_CLASSNAME = "org.graffiti.plugins.views.defaults.RectangleNodeShape";

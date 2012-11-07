@@ -45,32 +45,32 @@ public class RTTreeLayout extends AbstractAlgorithm {
 	 * Dynamical defined edge bend attribute.
 	 */
 	private final String BENDS =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.BENDS;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.BENDS;
 	/**
 	 * Dynamical defined edge shape attribute.
 	 */
 	private final String SHAPE =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.SHAPE;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.SHAPE;
 	
 	/**
 	 * Dynamical defined node coordinate attribute.
 	 */
 	private final String COORDSTR =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.COORDINATE;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.COORDINATE;
 	
 	/**
 	 * Dynamical defined node dimension attribute.
 	 */
 	private final String DIMENSIONSTR =
-						GraphicAttributeConstants.GRAPHICS
-											+ Attribute.SEPARATOR
-											+ GraphicAttributeConstants.DIMENSION;
+			GraphicAttributeConstants.GRAPHICS
+					+ Attribute.SEPARATOR
+					+ GraphicAttributeConstants.DIMENSION;
 	
 	/**
 	 * Holds the tree in a linkedlist which is used by getLeftBrother
@@ -229,7 +229,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		 * }
 		 * g.getListenerManager().transactionFinished(this);
 		 */
-
+		
 	}
 	
 	@Override
@@ -266,7 +266,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				}
 				
 				/* any links from upper level nodes more than once ? */
-
+				
 				if (bfsNum.get(neighbour) != null)
 					if (bfsNum.get(node).intValue() > bfsNum.get(neighbour).intValue()) {
 						ancestors++;
@@ -306,61 +306,61 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		 * "Tree layouter will start only with a selected node.");
 		 */
 		DoubleParameter xDistanceParam =
-							new DoubleParameter(
-												"X distance",
-												"The distance between nodes in horizontal direction.");
+				new DoubleParameter(
+						"X distance",
+						"The distance between nodes in horizontal direction.");
 		
 		DoubleParameter yDistanceParam =
-							new DoubleParameter(
-												"Y distance",
-												"The distance between nodes in vertical direction.");
+				new DoubleParameter(
+						"Y distance",
+						"The distance between nodes in vertical direction.");
 		
 		DoubleParameter xStartParam =
-							new DoubleParameter(100,
-												"X base",
-												"The x coordinate of the starting point of the grid horizontal direction.");
+				new DoubleParameter(100,
+						"X base",
+						"The x coordinate of the starting point of the grid horizontal direction.");
 		
 		DoubleParameter yStartParam =
-							new DoubleParameter(100,
-												"Y base",
-												"The y coordinate of the starting point of the grid horizontal direction.");
+				new DoubleParameter(100,
+						"Y base",
+						"The y coordinate of the starting point of the grid horizontal direction.");
 		
 		BooleanParameter horizontalParam =
-							new BooleanParameter(
-												horizontalLayout,
-												"Place Trees in a Row",
-												"Place all trees in a row");
+				new BooleanParameter(
+						horizontalLayout,
+						"Place Trees in a Row",
+						"Place all trees in a row");
 		
 		IntegerParameter treeDirectionParam =
-							new IntegerParameter(
-												treeDirection,
-												"Tree Direction (0,90,180,270)",
-												"Move all trees in 0, 90, 180 or 270 degree");
+				new IntegerParameter(
+						treeDirection,
+						"Tree Direction (0,90,180,270)",
+						"Move all trees in 0, 90, 180 or 270 degree");
 		
 		BooleanParameter removeBendParam =
-							new BooleanParameter(
-												isRemoveBends,
-												"Remove Bends",
-												"Remove all bends in the forest");
+				new BooleanParameter(
+						isRemoveBends,
+						"Remove Bends",
+						"Remove all bends in the forest");
 		
 		BooleanParameter busLayoutParam =
-							new BooleanParameter(
-												isBusLayout,
-												"Bus Layout",
-												"Layout the trees in bus format");
+				new BooleanParameter(
+						isBusLayout,
+						"Bus Layout",
+						"Layout the trees in bus format");
 		
 		xDistanceParam.setDouble(xNodeDistance);
 		yDistanceParam.setDouble(yNodeDistance);
 		
 		return new Parameter[] {
-							xDistanceParam,
-							yDistanceParam,
-							xStartParam,
-							yStartParam,
-							horizontalParam,
-							removeBendParam,
-							busLayoutParam,
-							treeDirectionParam };
+				xDistanceParam,
+				yDistanceParam,
+				xStartParam,
+				yStartParam,
+				horizontalParam,
+				removeBendParam,
+				busLayoutParam,
+				treeDirectionParam };
 	}
 	
 	/**
@@ -371,17 +371,17 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		this.parameters = params;
 		int i = 0;
 		xNodeDistance =
-							((DoubleParameter) params[i++]).getDouble().doubleValue();
+				((DoubleParameter) params[i++]).getDouble().doubleValue();
 		yNodeDistance =
-							((DoubleParameter) params[i++]).getDouble().doubleValue();
+				((DoubleParameter) params[i++]).getDouble().doubleValue();
 		xStart = ((DoubleParameter) params[i++]).getDouble().doubleValue();
 		yStart = ((DoubleParameter) params[i++]).getDouble().doubleValue();
 		horizontalLayout =
-							((BooleanParameter) params[i++]).getBoolean().booleanValue();
+				((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		isRemoveBends =
-							((BooleanParameter) params[i++]).getBoolean().booleanValue();
+				((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		isBusLayout =
-							((BooleanParameter) params[i++]).getBoolean().booleanValue();
+				((BooleanParameter) params[i++]).getBoolean().booleanValue();
 		treeDirection = ((IntegerParameter) params[i++]).getInteger().intValue();
 		if (!((treeDirection == 0) || (treeDirection == 180) || (treeDirection == 270) || (treeDirection == 90))) {
 			treeDirection = 0;
@@ -504,7 +504,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		
 		if (pos != 0) {
 			leftBrother =
-								(Node) ((LinkedList) treeMap.get(depth)).get(pos - 1);
+					(Node) ((LinkedList) treeMap.get(depth)).get(pos - 1);
 		}
 		
 		return leftBrother;
@@ -546,12 +546,12 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				/* check circle connection by using the depth of each node */
 				computeDepth(n);
 				sourceNodes.put(
-									n,
-									new TreeContainer(
-														treeMap,
-														depthOffsets,
-														bfsNum,
-														maxNodeHeight));
+						n,
+						new TreeContainer(
+								treeMap,
+								depthOffsets,
+								bfsNum,
+								maxNodeHeight));
 				
 				if (!rootedTree(n)) {
 					ErrorMsg.addErrorMessage("The given graph is not a tree.");
@@ -567,12 +567,12 @@ public class RTTreeLayout extends AbstractAlgorithm {
 			/* check circle connection by using the depth of each node */
 			computeDepth(sourceNode);
 			sourceNodes.put(
-								sourceNode,
-								new TreeContainer(
-													treeMap,
-													depthOffsets,
-													bfsNum,
-													maxNodeHeight));
+					sourceNode,
+					new TreeContainer(
+							treeMap,
+							depthOffsets,
+							bfsNum,
+							maxNodeHeight));
 			
 			if (!rootedTree(sourceNode)) {
 				ErrorMsg.addErrorMessage("The given graph is not a tree.");
@@ -590,12 +590,12 @@ public class RTTreeLayout extends AbstractAlgorithm {
 					
 					computeDepth(sourceNode);
 					sourceNodes.put(
-										sourceNode,
-										new TreeContainer(
-															treeMap,
-															depthOffsets,
-															bfsNum,
-															maxNodeHeight));
+							sourceNode,
+							new TreeContainer(
+									treeMap,
+									depthOffsets,
+									bfsNum,
+									maxNodeHeight));
 					
 					break;
 				}
@@ -616,8 +616,8 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				depthOffsets = sourceNodes.get(sourceNode).getDepthOffset();
 				bfsNum = sourceNodes.get(sourceNode).getBfsNum();
 				maxNodeHeight =
-									(sourceNodes.get(sourceNode))
-														.getMaxNodeHeight();
+						(sourceNodes.get(sourceNode))
+								.getMaxNodeHeight();
 				
 				initTreeMap(sourceNode);
 				
@@ -696,19 +696,19 @@ public class RTTreeLayout extends AbstractAlgorithm {
 			if (bfsNum.get(node1) != null) {
 				Node node2 = edge.getTarget();
 				double yCoord1 =
-									((depthOffsets.get(bfsNum.get(node1))))
-														.doubleValue()
-														+ ((maxNodeHeight.get(bfsNum.get(node1))))
-																			.doubleValue()
-														/ 2
-														+ yNodeDistance / 2;
+						((depthOffsets.get(bfsNum.get(node1))))
+								.doubleValue()
+								+ ((maxNodeHeight.get(bfsNum.get(node1))))
+										.doubleValue()
+								/ 2
+								+ yNodeDistance / 2;
 				double yCoord2 =
-									((depthOffsets.get(bfsNum.get(node2))))
-														.doubleValue()
-														+ ((maxNodeHeight.get(bfsNum.get(node2))))
-																			.doubleValue()
-														/ 2
-														+ yNodeDistance / 2;
+						((depthOffsets.get(bfsNum.get(node2))))
+								.doubleValue()
+								+ ((maxNodeHeight.get(bfsNum.get(node2))))
+										.doubleValue()
+								/ 2
+								+ yNodeDistance / 2;
 				
 				double yCoord = yStart + Math.min(yCoord1, yCoord2);
 				
@@ -716,61 +716,27 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				double xCoord2 = getX(node2);
 				
 				EdgeShapeAttribute edgeShape =
-									(EdgeShapeAttribute) (edge.getAttribute(SHAPE));
+						(EdgeShapeAttribute) (edge.getAttribute(SHAPE));
 				edgeShape.setValue(
-									"org.graffiti.plugins.views.defaults.PolyLineEdgeShape");
+						"org.graffiti.plugins.views.defaults.PolyLineEdgeShape");
 				HashMap bends = new LinkedHashMap();
 				
 				if (treeDirection == 270) {
-					bends.put(
-										"bend0",
-										new CoordinateAttribute("bend0", yCoord, xCoord1));
-					
-					bends.put(
-										"bend1",
-										new CoordinateAttribute("bend1", yCoord, xCoord2));
+					bends.put("bend1", new CoordinateAttribute("bend1", yCoord, xCoord1));
+					bends.put("bend2", new CoordinateAttribute("bend2", yCoord, xCoord2));
 				} else
 					if (treeDirection == 0) {
-						bends.put(
-											"bend0",
-											new CoordinateAttribute("bend0", xCoord1, yCoord));
-						
-						bends.put(
-											"bend1",
-											new CoordinateAttribute("bend1", xCoord2, yCoord));
+						bends.put("bend1", new CoordinateAttribute("bend1", xCoord1, yCoord));
+						bends.put("bend2", new CoordinateAttribute("bend2", xCoord2, yCoord));
 					} else
 						if (treeDirection == 90) {
-							bends.put(
-												"bend0",
-												new CoordinateAttribute(
-																	"bend0",
-																	ySpanningMax + yStart * 2 - yCoord,
-																	xCoord1));
-							
-							bends.put(
-												"bend1",
-												new CoordinateAttribute(
-																	"bend1",
-																	ySpanningMax + yStart * 2 - yCoord,
-																	xCoord2));
+							bends.put("bend1", new CoordinateAttribute("bend1", ySpanningMax + yStart * 2 - yCoord, xCoord1));
+							bends.put("bend2", new CoordinateAttribute("bend2", ySpanningMax + yStart * 2 - yCoord, xCoord2));
 						} else {
-							bends.put(
-												"bend0",
-												new CoordinateAttribute(
-																	"bend0",
-																	xCoord1,
-																	ySpanningMax + yStart * 2 - yCoord));
-							
-							bends.put(
-												"bend1",
-												new CoordinateAttribute(
-																	"bend1",
-																	xCoord2,
-																	ySpanningMax + yStart * 2 - yCoord));
+							bends.put("bend1", new CoordinateAttribute("bend1", xCoord1, ySpanningMax + yStart * 2 - yCoord));
+							bends.put("bend2", new CoordinateAttribute("bend2", xCoord2, ySpanningMax + yStart * 2 - yCoord));
 						}
-				((LinkedHashMapAttribute) edge.getAttribute(
-									BENDS)).setCollection(
-										bends);
+				((LinkedHashMapAttribute) edge.getAttribute(BENDS)).setCollection(bends);
 				
 			}
 		}
@@ -799,11 +765,11 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		
 		/* Compute the maximum height of the root node */
 		depthOffsets.put(
-							new Integer(0),
-							new Double(getNodeHeight(startNode) / 2.0));
+				new Integer(0),
+				new Double(getNodeHeight(startNode) / 2.0));
 		maxNodeHeight.put(
-							new Integer(0),
-							new Double(getNodeHeight(startNode)));
+				new Integer(0),
+				new Double(getNodeHeight(startNode)));
 		
 		/* BreadthFirstSearch algorithm which calculates the depth of the tree */
 		while (!queue.isEmpty()) {
@@ -815,20 +781,20 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				/* Not all neighbours, just the neighbours not visited yet */
 				if (!bfsNum.containsKey(neighbour)) {
 					Integer depth =
-										new Integer((bfsNum.get(v)).intValue() + 1);
+							new Integer((bfsNum.get(v)).intValue() + 1);
 					
 					double nodeHeight = getNodeHeight(neighbour);
 					
 					/* Compute the maximum height of nodes in each level of the tree */
 					Double maxNodeHeightValue =
-										maxNodeHeight.get(depth);
+							maxNodeHeight.get(depth);
 					if (maxNodeHeightValue != null) {
 						maxNodeHeight.put(
-											depth,
-											new Double(
-																Math.max(
-																					maxNodeHeightValue.doubleValue(),
-																					nodeHeight)));
+								depth,
+								new Double(
+										Math.max(
+												maxNodeHeightValue.doubleValue(),
+												nodeHeight)));
 					} else {
 						maxNodeHeight.put(depth, new Double(nodeHeight));
 					}
@@ -848,18 +814,18 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		for (int depth = 1; depth < maxNodeHeight.size(); depth++) {
 			
 			double nodeHeight =
-								(maxNodeHeight.get(new Integer(depth))).doubleValue();
+					(maxNodeHeight.get(new Integer(depth))).doubleValue();
 			double nodeHeightAncestor =
-								(maxNodeHeight.get(new Integer(depth - 1)))
-													.doubleValue();
+					(maxNodeHeight.get(new Integer(depth - 1)))
+							.doubleValue();
 			double yOffsetAncestor =
-								(depthOffsets.get(new Integer(depth - 1)))
-													.doubleValue();
+					(depthOffsets.get(new Integer(depth - 1)))
+							.doubleValue();
 			double yOffset =
-								yOffsetAncestor
-													+ nodeHeight / 2.0
-													+ yNodeDistance
-													+ nodeHeightAncestor / 2.0;
+					yOffsetAncestor
+							+ nodeHeight / 2.0
+							+ yNodeDistance
+							+ nodeHeightAncestor / 2.0;
 			
 			depthOffsets.put(new Integer(depth), new Double(yOffset));
 		}
@@ -891,23 +857,23 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				int level = (bfsNum.get(n)).intValue();
 				
 				ySpanningMax =
-									Math.max(
-														ySpanningMax,
-														(depthOffsets.get(new Integer(level))).doubleValue()
-																			+ getNodeHeight(n) / 2.0);
+						Math.max(
+								ySpanningMax,
+								(depthOffsets.get(new Integer(level))).doubleValue()
+										+ getNodeHeight(n) / 2.0);
 				
 				ySpanningMin =
-									Math.min(
-														ySpanningMin,
-														(depthOffsets.get(new Integer(level)))
-																			.doubleValue()
-																			- getNodeHeight(n) / 2.0);
+						Math.min(
+								ySpanningMin,
+								(depthOffsets.get(new Integer(level)))
+										.doubleValue()
+										- getNodeHeight(n) / 2.0);
 				
 				setY(
-									n,
-									yStart
-														+ (depthOffsets.get(new Integer(level)))
-																			.doubleValue());
+						n,
+						yStart
+								+ (depthOffsets.get(new Integer(level)))
+										.doubleValue());
 			}
 		}
 		
@@ -959,37 +925,37 @@ public class RTTreeLayout extends AbstractAlgorithm {
 					double nodeWidth = getNodeWidth(node);
 					/* compute relative coordinates from neighbour */
 					relativeCoord =
-										leftOrientedCoordinates(leftBrother)
-															+ (leftBrotherWidth / 2.0
-																				+ localXdist
-															+ nodeWidth / 2.0);
+							leftOrientedCoordinates(leftBrother)
+									+ (leftBrotherWidth / 2.0
+											+ localXdist
+											+ nodeWidth / 2.0);
 				}
 				/* no left brother, set relative coordinates to 0, modifier 0 */
 			} else {
 				/* Compute the relative coordinates from children's center. */
 				Node leftMost = (Node) nodeSuccessors.next();
 				double leftMostCoord =
-									((Double) relativeCoords.get(leftMost)).doubleValue();
+						((Double) relativeCoords.get(leftMost)).doubleValue();
 				double leftMostModif =
-									((Double) modifierField.get(leftMost)).doubleValue();
+						((Double) modifierField.get(leftMost)).doubleValue();
 				Node rightMost = leftMost;
 				while (nodeSuccessors.hasNext()) {
 					rightMost = (Node) nodeSuccessors.next();
 				}
 				double rightMostCoord =
-									((Double) relativeCoords.get(rightMost)).doubleValue();
+						((Double) relativeCoords.get(rightMost)).doubleValue();
 				double rightMostModif =
-									((Double) modifierField.get(rightMost)).doubleValue();
+						((Double) modifierField.get(rightMost)).doubleValue();
 				relativeCoord =
-									((leftMostCoord + leftMostModif)
-									+ (rightMostCoord + rightMostModif))
-									/ 2;
+						((leftMostCoord + leftMostModif)
+						+ (rightMostCoord + rightMostModif))
+						/ 2;
 				Node leftBrother = getLeftBrother(node);
 				/* Has left brother ? */
 				if (leftBrother != null) {
 					/* yes left brother, set relative coordinates to center of children's position */
 					double leftBrothCoord =
-										leftOrientedCoordinates(leftBrother);
+							leftOrientedCoordinates(leftBrother);
 					double leftBrotherWidth = getNodeWidth(leftBrother);
 					double nodeWidth = getNodeWidth(node);
 					
@@ -998,19 +964,19 @@ public class RTTreeLayout extends AbstractAlgorithm {
 					 * tree on the left. In this case, compute how much the tree needs to be adjusted
 					 * (to the right) and adjust both relative coordinates and modifier fields.
 					 */
-
+					
 					double localXdist = xNodeDistance;
 					
 					if (AttributeHelper.isHiddenGraphElement(leftBrother))
 						localXdist = 0;
 					
 					modifier =
-										Math.max(
-															0.0,
-															(leftBrotherWidth / 2.0
-																				+ localXdist
-																				+ nodeWidth / 2.0)
-																				- (relativeCoord - leftBrothCoord));
+							Math.max(
+									0.0,
+									(leftBrotherWidth / 2.0
+											+ localXdist
+											+ nodeWidth / 2.0)
+											- (relativeCoord - leftBrothCoord));
 				}
 				/* no left brother, set relative coordinates to center of children's position, modifier 0 */
 			}
@@ -1032,19 +998,19 @@ public class RTTreeLayout extends AbstractAlgorithm {
 		while (nodesIterator.hasNext()) {
 			Node node = (Node) nodesIterator.next();
 			double nodeModif =
-								((Double) modifierField.get(node)).doubleValue();
+					((Double) modifierField.get(node)).doubleValue();
 			double nodeCumulModif =
-								((Double) cumulModifier.get(node)).doubleValue();
+					((Double) cumulModifier.get(node)).doubleValue();
 			
 			double nodeXCoord =
-								((Double) relativeCoords.get(node)).doubleValue()
-													+ nodeCumulModif
-													+ nodeModif;
+					((Double) relativeCoords.get(node)).doubleValue()
+							+ nodeCumulModif
+							+ nodeModif;
 			
 			xSpanningMax =
-								Math.max(xSpanningMax, nodeXCoord + getNodeWidth(node) / 2.0);
+					Math.max(xSpanningMax, nodeXCoord + getNodeWidth(node) / 2.0);
 			xSpanningMin =
-								Math.min(xSpanningMin, nodeXCoord - getNodeWidth(node) / 2.0);
+					Math.min(xSpanningMin, nodeXCoord - getNodeWidth(node) / 2.0);
 			
 			/* Setting the computed x position */
 			setX(node, nodeXCoord + xStart);
@@ -1055,8 +1021,8 @@ public class RTTreeLayout extends AbstractAlgorithm {
 				Node succ = (Node) nodeSuccessors.next();
 				((Double) cumulModifier.get(succ)).doubleValue();
 				cumulModifier.put(
-									succ,
-									new Double(nodeModif + nodeCumulModif));
+						succ,
+						new Double(nodeModif + nodeCumulModif));
 			}
 		}
 		
@@ -1102,7 +1068,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 			return 0;
 		
 		DimensionAttribute dimAttr =
-							(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
+				(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
 		double result = 0.0;
 		
 		if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1126,7 +1092,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 			return 0;
 		
 		DimensionAttribute dimAttr =
-							(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
+				(DimensionAttribute) n.getAttribute(DIMENSIONSTR);
 		
 		double result = 0.0;
 		
@@ -1149,7 +1115,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 	 */
 	private void setX(Node n, double x) {
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1170,7 +1136,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 	private double getX(Node n) {
 		double res = 0;
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1192,7 +1158,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 	private double getY(Node n) {
 		double res = 0;
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {
@@ -1214,7 +1180,7 @@ public class RTTreeLayout extends AbstractAlgorithm {
 	 */
 	private void setY(Node n, double y) {
 		CoordinateAttribute coordAttr =
-							(CoordinateAttribute) n.getAttribute(COORDSTR);
+				(CoordinateAttribute) n.getAttribute(COORDSTR);
 		
 		if (coordAttr != null) {
 			if ((treeDirection == 90) || (treeDirection == 270)) {

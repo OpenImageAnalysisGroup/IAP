@@ -35,11 +35,13 @@ public class Reaction {
 	private Collection<Entry> allPossibleSubstrates;
 	private Collection<Entry> allPossibleProducts;
 	
+	private String elementID;
+	
 	public Reaction(
-						String name,
-						ReactionType type,
-						Collection<Entry> substrates,
-						Collection<Entry> products) {
+			String name,
+			ReactionType type,
+			Collection<Entry> substrates,
+			Collection<Entry> products) {
 		assert name != null;
 		assert type != null;
 		
@@ -66,6 +68,46 @@ public class Reaction {
 		for (Entry product : products) {
 			assert product.hasCompoundName() || product.hasGlycanName();
 		}
+		
+		this.elementID = null;
+		
+	}
+	
+	public Reaction(
+			String name,
+			ReactionType type,
+			Collection<Entry> substrates,
+			Collection<Entry> products,
+			String elementID) {
+		assert name != null;
+		assert type != null;
+		
+		assert substrates != null;
+		assert products != null;
+		// if (substrates.size() <= 0)
+		// System.out.println("WARNING: No valid substrate IDs for Reaction " + name + "!");
+		// if (products.size() <= 0)
+		// System.out.println("WARNING: No valid product IDs for Reaction " + name + "!");
+		// assert substrates.size()>0;
+		// assert products.size()>0;
+		if (type == null) {
+			ErrorMsg.addErrorMessage("Invalid Reaction Type for Reaction " + getId() + "!");
+		}
+		
+		this.name = name;
+		this.type = type;
+		this.allPossibleSubstrates = substrates;
+		this.allPossibleProducts = products;
+		
+		for (Entry substrate : substrates) {
+			assert substrate.hasCompoundName() || substrate.hasGlycanName();
+		}
+		for (Entry product : products) {
+			assert product.hasCompoundName() || product.hasGlycanName();
+		}
+		
+		this.elementID = elementID;
+		
 	}
 	
 	public String getId() {
@@ -88,9 +130,13 @@ public class Reaction {
 		return allPossibleProducts;
 	}
 	
+	public String getElementID() {
+		return this.elementID;
+	}
+	
 	public static Reaction getReactionFromKgmlReactionElement(
-						Element reactionElement,
-						Collection<Entry> entryElements, String clusterIdForHiddenCompounds) {
+			Element reactionElement,
+			Collection<Entry> entryElements, String clusterIdForHiddenCompounds) {
 		String nameValue = KGMLhelper.getAttributeValue(reactionElement, "name", null);
 		String typeValue = KGMLhelper.getAttributeValue(reactionElement, "type", null);
 		
@@ -161,13 +207,24 @@ public class Reaction {
 			}
 		}
 		
-		Reaction result = new Reaction(name, type, substrates, products);
+		Reaction result = new Reaction(name, type, substrates, products, KGMLhelper.getAttributeValue(reactionElement, "id", null));
+		
 		for (Entry e : entryElements) {
 			if (e.getReactions() != null) {
 				for (KeggId r : e.getReactions()) {
 					if (r.getId().equals(result.getId())) {
 						r.setReference(result);
-					}
+					} else
+						// in KGML entry one can have an attribute reaction="rn:R####1 rn:R####2"
+						// this is stored as two ids (in reactionRef.getId(), two KEGG ids) rn:R####1 and rn:R####2
+						// in KGML file the according reaction has an attribute name="rn:R####1 rn:R####2"
+						// this is stored as one id (in r.getId()) rn:R####1 rn:R####2
+						// equal does not work here
+						// this kind of entries and reactions can occur several times
+						// compare also entry element id and reaction element id from KGML to get the right reference
+						if (result.getId().contains(r.getId()) &&
+								result.getElementID() != null && result.getElementID().equals(e.getId().getValue()))
+							r.setReference(result);
 				}
 			}
 		}
@@ -212,7 +269,8 @@ public class Reaction {
 				for (KeggId r : e.getReactions()) {
 					for (String gid : getId().split(" "))
 						for (String rid : r.getId().split(" "))
-							if (rid.equals(gid) || r.getReferenceReaction() == this) {
+							if ((rid.equals(gid) || r.getReferenceReaction() == this) &&
+									(this.elementID != null && this.elementID.equals(e.getId().getValue()))) {
 								entriesRepresentingThisReaction.add(e);
 							}
 				}
@@ -222,10 +280,10 @@ public class Reaction {
 	}
 	
 	public Collection<NodeCombination> getDesiredNodeCombinations(
-						HashMap<Entry, Node> entry2graphNode,
-						Collection<Entry> entryElements,
-						Collection<Relation> relationElements,
-						Collection<NodeCombination> relationNodeCombinations) {
+			HashMap<Entry, Node> entry2graphNode,
+			Collection<Entry> entryElements,
+			Collection<Relation> relationElements,
+			Collection<NodeCombination> relationNodeCombinations) {
 		Collection<NodeCombination> result = new ArrayList<NodeCombination>();
 		Collection<Entry> entriesRepresentingThisReaction = getEntriesRepresentingThisReaction(entryElements);
 		if (entriesRepresentingThisReaction.size() > 0) {
@@ -354,9 +412,9 @@ public class Reaction {
 	}
 	
 	public static void processEdgeReactionInformation(
-						Edge e,
-						ArrayList<ReactionAndInfo> reactionsRequestingThisNodeCombination,
-						ArrayList<ReactionAndInfo> reactionsRequestingThisInverseNodeCombination) {
+			Edge e,
+			ArrayList<ReactionAndInfo> reactionsRequestingThisNodeCombination,
+			ArrayList<ReactionAndInfo> reactionsRequestingThisInverseNodeCombination) {
 		if (reactionsRequestingThisNodeCombination == null)
 			reactionsRequestingThisNodeCombination = new ArrayList<ReactionAndInfo>();
 		if (reactionsRequestingThisInverseNodeCombination == null)
@@ -385,10 +443,10 @@ public class Reaction {
 	
 	@SuppressWarnings("unchecked")
 	public static Collection<Reaction> getReactionElementsFromGraphEdges(
-						Collection<Entry> entries,
-						Collection<Edge> graphEdges,
-						Collection<Gml2PathwayWarningInformation> warnings,
-						Collection<Gml2PathwayErrorInformation> errors) {
+			Collection<Entry> entries,
+			Collection<Edge> graphEdges,
+			Collection<Gml2PathwayWarningInformation> warnings,
+			Collection<Gml2PathwayErrorInformation> errors) {
 		
 		ArrayList<String> allReactionIDs = new ArrayList<String>();
 		ArrayList<ReactionType> allReactionTypes = new ArrayList<ReactionType>();
@@ -418,7 +476,7 @@ public class Reaction {
 							errors.add(new Gml2PathwayErrorInformation(Gml2PathwayError.REACTION_SUBSTRATE_INVALID, e));
 						if (substrateReactionId != null && substrateReactionValue != null)
 							if (productInfo.getIndex() == substrateInfo.getIndex()
-												&& productReactionId.equals(substrateReactionId)) {
+									&& productReactionId.equals(substrateReactionId)) {
 								String reactionTypeValue = KeggGmlHelper.getKeggReactionType(e, productInfo.getIndex());
 								if (reactionTypeValue != null && reactionTypeValue.length() > 0) {
 									ReactionType reactionType = ReactionType.getReactiontype(reactionTypeValue);
@@ -501,7 +559,7 @@ public class Reaction {
 			if (irrever && revers) {
 				errors.add(new Gml2PathwayErrorInformation(Gml2PathwayError.REACTION_TYPE_DIFFERS_AMONG_NODES, (ArrayList) relevantGraphEdges));
 				ErrorMsg.addErrorMessage("No unique reaction type (reversible/irreversible) for reaction " + uniqueReactionID
-									+ "! Using setting of reversible reaction instead.");
+						+ "! Using setting of reversible reaction instead.");
 				irrever = false;
 				revers = true;
 			}
@@ -516,10 +574,10 @@ public class Reaction {
 	}
 	
 	public static Collection<Reaction> getReactionElementsFromGraphNodes(
-						Collection<Entry> entries,
-						List<Node> graphNodes,
-						Collection<Gml2PathwayWarningInformation> warnings,
-						Collection<Gml2PathwayErrorInformation> errors) {
+			Collection<Entry> entries,
+			List<Node> graphNodes,
+			Collection<Gml2PathwayWarningInformation> warnings,
+			Collection<Gml2PathwayErrorInformation> errors) {
 		ArrayList<String> allReactionIDs = new ArrayList<String>();
 		ArrayList<String> allReactionTypes = new ArrayList<String>();
 		ArrayList<Node> allReactionGraphNodes = new ArrayList<Node>();
@@ -578,20 +636,20 @@ public class Reaction {
 		// reaction ids and their products and substrates are enumerated
 		// now create reaction elements
 		Collection<Reaction> result = processAndGetReactionElements(entries,
-							errors, allReactionIDs, allReactionTypes,
-							allReactionGraphNodes, reactionId2substrates,
-							reactionId2products);
+				errors, allReactionIDs, allReactionTypes,
+				allReactionGraphNodes, reactionId2substrates,
+				reactionId2products);
 		return result;
 	}
 	
 	private static Collection<Reaction> processAndGetReactionElements(
-						Collection<Entry> entries,
-						Collection<Gml2PathwayErrorInformation> errors,
-						ArrayList<String> allReactionIDs,
-						ArrayList<String> allReactionTypes,
-						ArrayList<Node> allReactionGraphNodes,
-						HashMap<String, HashSet<String>> reactionId2substrates,
-						HashMap<String, HashSet<String>> reactionId2products) {
+			Collection<Entry> entries,
+			Collection<Gml2PathwayErrorInformation> errors,
+			ArrayList<String> allReactionIDs,
+			ArrayList<String> allReactionTypes,
+			ArrayList<Node> allReactionGraphNodes,
+			HashMap<String, HashSet<String>> reactionId2substrates,
+			HashMap<String, HashSet<String>> reactionId2products) {
 		Collection<Reaction> result = new ArrayList<Reaction>();
 		
 		HashSet<String> condensedReactionIds = new HashSet<String>();
@@ -601,8 +659,8 @@ public class Reaction {
 			ArrayList<ReactionType> reactionTypes = new ArrayList<ReactionType>();
 			ArrayList<Node> relevantGraphNodes = new ArrayList<Node>();
 			ReactionType reactionType = processAndGetReactionType(errors,
-								allReactionIDs, allReactionTypes, allReactionGraphNodes,
-								uniqueReactionID, reactionTypes, relevantGraphNodes);
+					allReactionIDs, allReactionTypes, allReactionGraphNodes,
+					uniqueReactionID, reactionTypes, relevantGraphNodes);
 			
 			HashSet<String> substrateIds = reactionId2substrates.get(uniqueReactionID);
 			HashSet<String> productIds = reactionId2products.get(uniqueReactionID);
@@ -614,7 +672,7 @@ public class Reaction {
 			ArrayList<Entry> substrates = new ArrayList<Entry>();
 			ArrayList<Entry> products = new ArrayList<Entry>();
 			processSubstrateAndProductIds(entries, errors, relevantGraphNodes,
-								substrateIds, productIds, substrates, products);
+					substrateIds, productIds, substrates, products);
 			
 			Reaction r = new Reaction(uniqueReactionID, reactionType, substrates, products);
 			for (Entry e : entries) {
@@ -631,12 +689,12 @@ public class Reaction {
 	}
 	
 	private static ReactionType processAndGetReactionType(
-						Collection<Gml2PathwayErrorInformation> errors,
-						ArrayList<String> allReactionIDs,
-						ArrayList<String> allReactionTypes,
-						ArrayList<Node> allReactionGraphNodes, String uniqueReactionID,
-						ArrayList<ReactionType> reactionTypes,
-						ArrayList<Node> relevantGraphNodes) {
+			Collection<Gml2PathwayErrorInformation> errors,
+			ArrayList<String> allReactionIDs,
+			ArrayList<String> allReactionTypes,
+			ArrayList<Node> allReactionGraphNodes, String uniqueReactionID,
+			ArrayList<ReactionType> reactionTypes,
+			ArrayList<Node> relevantGraphNodes) {
 		for (int i = 0; i < allReactionIDs.size(); i++) {
 			String reactionID = allReactionIDs.get(i);
 			if (reactionID.equals(uniqueReactionID)) {
@@ -670,7 +728,7 @@ public class Reaction {
 		if (irrever && revers) {
 			errors.add(new Gml2PathwayErrorInformation(Gml2PathwayError.REACTION_TYPE_DIFFERS_AMONG_NODES, (Attributable) relevantGraphNodes));
 			ErrorMsg.addErrorMessage("No unique reaction type (reversible/irreversible) for reaction " + uniqueReactionID
-								+ "! Using setting of reversible reaction instead.");
+					+ "! Using setting of reversible reaction instead.");
 			irrever = false;
 			revers = true;
 		}
@@ -682,11 +740,11 @@ public class Reaction {
 	}
 	
 	private static void processSubstrateAndProductIds(
-						Collection<Entry> entries,
-						Collection<Gml2PathwayErrorInformation> errors,
-						ArrayList<Node> relevantGraphNodes, HashSet<String> substrateIds,
-						HashSet<String> productIds, ArrayList<Entry> substrates,
-						ArrayList<Entry> products) {
+			Collection<Entry> entries,
+			Collection<Gml2PathwayErrorInformation> errors,
+			ArrayList<Node> relevantGraphNodes, HashSet<String> substrateIds,
+			HashSet<String> productIds, ArrayList<Entry> substrates,
+			ArrayList<Entry> products) {
 		for (Entry e : entries) {
 			if (substrateIds.contains(e.getName().getId()))
 				substrates.add(e);
@@ -715,7 +773,7 @@ public class Reaction {
 	 * @return A subset of the neighbourNodes
 	 */
 	private static Collection<Node> getSubSetValidSubstratesOrProducts(boolean includeSubstrates, Node graphNode, String reactionID,
-						Collection<Node> neighbourNodes) {
+			Collection<Node> neighbourNodes) {
 		ArrayList<Node> result = new ArrayList<Node>();
 		for (Node nN : neighbourNodes) {
 			boolean found = false;
@@ -746,16 +804,16 @@ public class Reaction {
 		if (html) {
 			if (fullHtml)
 				return "<html><b>" + name + "</b> (" + type.toString() + ")" +
-									"<br>&nbsp;" +
-									"substrates: " + allPossibleSubstrates.toString() + "" +
-									"<br>&nbsp;" +
-									"products: " + allPossibleProducts.toString();
+						"<br>&nbsp;" +
+						"substrates: " + allPossibleSubstrates.toString() + "" +
+						"<br>&nbsp;" +
+						"products: " + allPossibleProducts.toString();
 			else
 				return "<html><b>" + name + "</b> (" + type.toString() + ")" +
-									"<br>&nbsp;" +
-									allPossibleSubstrates.size() + " substrate(s)" +
-									"<br>&nbsp;" +
-									allPossibleProducts.size() + " product(s)";
+						"<br>&nbsp;" +
+						allPossibleSubstrates.size() + " substrate(s)" +
+						"<br>&nbsp;" +
+						allPossibleProducts.size() + " product(s)";
 		} else {
 			if (fullHtml)
 				return name + " (" + type.toString() + "), sub: " + allPossibleSubstrates.toString() + ", prod: " + allPossibleProducts.toString();

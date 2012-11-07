@@ -11,24 +11,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
+import javax.swing.JButton;
+
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+
 /**
  * @author klukas
  */
 public interface AnnotationProvider {
 	
-	/**
-	 * @return
-	 */
 	String getTitle();
 	
-	/**
-	 * @param workload
-	 */
 	LinkedHashMap<String, LinkedHashSet<String>> processWorkload(ArrayList<String> workload);
 	
-	/**
-	 * @return
-	 */
-	boolean requestUserData();
+	boolean requestUserData(ExperimentInterface expdata);
+	
+	JButton getButton(ExperimentInterface md, ExperimentDataInfoPane resultPane);
 	
 }

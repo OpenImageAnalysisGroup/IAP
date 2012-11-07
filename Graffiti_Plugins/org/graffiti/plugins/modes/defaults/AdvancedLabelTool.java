@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: AdvancedLabelTool.java,v 1.1 2011-01-31 09:03:34 klukas Exp $
+// $Id: AdvancedLabelTool.java,v 1.2 2012-11-07 14:42:19 klukas Exp $
 
 package org.graffiti.plugins.modes.defaults;
 
@@ -43,6 +43,7 @@ import org.graffiti.editor.dialog.DefaultParameterDialog;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
+import org.graffiti.graphics.GraphicAttributeConstants;
 import org.graffiti.graphics.LabelAttribute;
 import org.graffiti.graphics.NodeLabelAttribute;
 import org.graffiti.plugin.view.GraphElementComponent;
@@ -52,7 +53,7 @@ import org.graffiti.plugin.view.GraphElementComponentInterface;
  * A tool for creating and editing labels of graphelements.
  * 
  * @author Wirch
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AdvancedLabelTool extends MegaTools {
 	// ~ Static fields/initializers =============================================
@@ -178,10 +179,11 @@ public class AdvancedLabelTool extends MegaTools {
 			fp.addCollapseListenerDialogSizeUpdate();
 			fp.setCondensedState(!hasAnno);
 			fp.layoutRows();
-			if (AttributeHelper.isLabelAlignmentKnownConstant(-1, n)) {
+			if (!AttributeHelper.hasAttribute(n, GraphicAttributeConstants.LABELGRAPHICS) ||
+					AttributeHelper.isLabelAlignmentKnownConstant(-1, n)) {
 				nodeMainLabelAlignmentEditor = getAlignmentEditor(-1, n);
 			} else {
-				nodeMainLabelAlignmentEditor = new JLabel("<html><font color='gray'>Absolute Position (" +
+				nodeMainLabelAlignmentEditor = new JLabel("<html><font color='gray'>Relative Position (" +
 						AttributeHelper.getLabelPosition(n) + ")");
 			}
 			nodeMainLabelFrameEditor = getFrameEditor(-1, n);
@@ -198,8 +200,7 @@ public class AdvancedLabelTool extends MegaTools {
 			}
 		Object[] input = DefaultParameterDialog
 							.getInput(
-												"<html>"
-																	+ "Edit the node or edge labels.<small><br><br>"
+									"<html>Edit the node or edge labels.<small><br><br>"
 																	+ "Hint: To display special characters or line breaks, start the label text with &quot;&lt;html&gt;&quot;.<br>"
 																	+ "Use HTML codes for special characters such as &alpha;, &beta;, &gamma; (&quot;&amp;alpha;&quot, &quot;&amp;beta;&quot, &quot;&amp;gamma;&quot) "
 																	+ "or line breaks (&quot;&lt;br&gt;&quot;).<br></small>", "Edit Label", param);

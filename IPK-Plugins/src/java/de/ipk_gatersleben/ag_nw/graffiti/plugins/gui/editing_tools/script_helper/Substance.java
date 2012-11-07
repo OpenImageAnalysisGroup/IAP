@@ -333,6 +333,69 @@ public class Substance implements SubstanceInterface {
 		return result;
 	}
 	
+	@Override
+	public Collection<MyComparableDataPoint> getDataPoints(boolean returnAvgValues, boolean removeEmptyConditions) {
+		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
+		if (removeEmptyConditions) {
+			for (ConditionInterface c : conditions)
+				if (returnAvgValues)
+					result.addAll(c.getMeanMCDPs());
+				else
+					result.addAll(c.getMCDPs());
+		} else {
+			// collect all timepoints of this substance
+			HashSet<SampleTimeAndUnit> timesandtimeunits = new HashSet<SampleTimeAndUnit>();
+			for (ConditionInterface c : this)
+				for (SampleInterface s : c)
+					timesandtimeunits.add(new SampleTimeAndUnit(s.getSampleTime(), s.getTime(), s.getTimeUnit()));
+			
+			Collection<MyComparableDataPoint> resultPerCond = new ArrayList<MyComparableDataPoint>();
+			for (ConditionInterface c : conditions) {
+				resultPerCond.clear();
+				if (returnAvgValues)
+					resultPerCond = c.getMeanMCDPs();
+				else
+					resultPerCond = c.getMCDPs();
+				
+				// add a bar for all conditions without measurements, do this for all timepoints of the substance
+				if (resultPerCond.size() <= 0) {
+					for (SampleTimeAndUnit ms : timesandtimeunits) {
+						result.add(new MyComparableDataPoint(!returnAvgValues,
+								Double.NaN, Double.NaN, c.getConditionName(),
+								ms.sampleTime, "[no unit]", ms.time, ms.time,
+								false,
+								false, ms.timeUnit, c.getConditionId(), -1, new NumericMeasurement(new Sample(new Condition(new Substance())))));
+					}
+				}
+				
+				result.addAll(resultPerCond);
+			}
+		}
+		
+		return result;
+	}
+	
+	private class SampleTimeAndUnit {
+		
+		private final String sampleTime;
+		private final int time;
+		private final String timeUnit;
+		
+		public SampleTimeAndUnit(String sampleTime, int time, String timeUnit) {
+			this.sampleTime = sampleTime;
+			this.time = time;
+			this.timeUnit = timeUnit;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof SampleTimeAndUnit))
+				return false;
+			return sampleTime.equals(((SampleTimeAndUnit) obj).sampleTime);
+		}
+		
+	}
+	
 	// public Collection<Condition> getConditions() {
 	// return conditions;
 	// }

@@ -32,7 +32,7 @@ public class ChartColorAttribute extends StringAttribute {
 	public static String attributeName = "chart_colors";
 	public static String attributeFolder = "";
 	
-	private String notSet = "undefined"; // "0,0,0,255:255,255,255,255;255,0,0,255:0,255,255,255;50,50,0,255:255,55,55,255";
+	private final String notSet = "undefined"; // "0,0,0,255:255,255,255,255;255,0,0,255:0,255,255,255;50,50,0,255:255,55,55,255";
 	
 	public ChartColorAttribute() {
 		super(attributeName);
@@ -152,8 +152,16 @@ public class ChartColorAttribute extends StringAttribute {
 		StringBuilder sb = new StringBuilder();
 		for (String v : innerIdsAL)
 			sb.append(v + ";");
-		if (getAttributable() != null)
-			AttributeHelper.setAttribute(getAttributable(), "", "chart_color_line_names", sb.toString());
+		if (getAttributable() != null) {
+			if (getAttributable() instanceof Graph) {
+				boolean mod = ((Graph) getAttributable()).isModified();
+				AttributeHelper.setAttribute(getAttributable(), "", "chart_color_line_names", sb.toString());
+				if (!mod)
+					((Graph) getAttributable()).setModified(false);
+			} else
+				AttributeHelper.setAttribute(getAttributable(), "", "chart_color_line_names", sb.toString());
+		}
+		
 		return result;
 	}
 	

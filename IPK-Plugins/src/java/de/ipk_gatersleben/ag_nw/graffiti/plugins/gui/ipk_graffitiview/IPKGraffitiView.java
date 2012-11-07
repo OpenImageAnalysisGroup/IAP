@@ -8,7 +8,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: IPKGraffitiView.java,v 1.1 2011-01-31 09:00:42 klukas Exp $
+// $Id: IPKGraffitiView.java,v 1.2 2012-11-07 14:47:56 klukas Exp $
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview;
 
@@ -356,8 +356,10 @@ public class IPKGraffitiView
 	
 	@Override
 	public JPopupMenu getComponentPopupMenu() {
-		return new DefaultContextMenuManager().getContextMenu(
+		if(!MegaTools.wasScrollPaneMovement())
+			return new DefaultContextMenuManager().getContextMenu(
 							MegaTools.getLastMouseE());
+		return  null;
 	}
 	
 	/*
