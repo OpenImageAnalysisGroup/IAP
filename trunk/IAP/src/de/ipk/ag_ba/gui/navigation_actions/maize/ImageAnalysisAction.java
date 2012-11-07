@@ -14,7 +14,12 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.ImageAnalysisPip
  * @author klukas
  */
 public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
-	private final PipelineDesc pd;
+	private PipelineDesc pd;
+	
+	public ImageAnalysisAction() {
+		super(null);
+		// empty
+	}
 	
 	public ImageAnalysisAction(PipelineDesc pd, MongoDB m, ExperimentReference experiment) {
 		super(pd.getTooltip());
@@ -28,7 +33,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new ImageAnalysisPipelineTask(pd.getName(), pd.getTooltip());
+		return new ImageAnalysisPipelineTask(pd!=null ? pd.getName() : null, pd!=null ? pd.getTooltip() : null);
 	}
 	
 	@Override
@@ -46,7 +51,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return pd.getName();
+		return pd!=null? pd.getName() : null;
 	}
 	
 	@Override
