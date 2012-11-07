@@ -391,7 +391,7 @@ public class NavigationButton implements StyleAware {
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
-					if (n1.getText().indexOf("Please wait") >= 0)
+					if (n1.getText()!=null && n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
 						if (!n1.getText().contains("[REMOVE FROM UPDATE]"))
