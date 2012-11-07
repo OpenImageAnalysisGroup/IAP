@@ -5,13 +5,13 @@
    "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
 
 <plugin>
-	<author>Christian Klukas</author>
+	<author>Dagmar Kutz, Matthias Klapperstück</author>
 	<description>SBML-XML-Reader</description>
 
 	<plugindesc>
 	    <name>SBML-XML-Reader</name>
         <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.sbml.SBML_XML_ReaderPlugin</main>
         <version>1.0.0</version>
-        <available>mailto:klukas@ipk-gatersleben.de</available>
+        <available>mailto:klapper@ipk-gatersleben.de</available>
     </plugindesc>
 </plugin>

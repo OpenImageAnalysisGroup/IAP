@@ -1,400 +1,355 @@
-/*******************************************************************************
- * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
- *******************************************************************************/
+/**
+ * This class reads in SBML files
+ */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.sbml;
 
-import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
-import org.AttributeHelper;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.xml.stream.XMLStreamException;
+
 import org.ErrorMsg;
-import org.PositionGridGenerator;
-import org.graffiti.graph.Edge;
+import org.apache.log4j.Logger;
+import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
-import org.graffiti.graph.GraphElement;
-import org.graffiti.graph.Node;
 import org.graffiti.plugin.io.AbstractInputSerializer;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLError;
+import org.sbml.jsbml.SBMLErrorLog;
+import org.sbml.jsbml.SBMLReader;
+import org.sbml.jsbml.validator.SBMLValidator.CHECK_CATEGORY;
 
-import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml.SBML_XML_ReaderWriterPlugin;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskGUIprovider;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskPanelEntry;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
-@SuppressWarnings("unchecked")
 public class SBML_XML_Reader extends AbstractInputSerializer {
 	
-	private String fileNameExt = ".sbml";
-	
-	// set to 0 in order to create always an reaction node
-	public static int minReacOrProdCntForReactionCreation = 0; // set to "1" for V1.0 compatibility
+	static Logger logger = Logger.getLogger(SBML_XML_Reader.class);
 	
 	public SBML_XML_Reader() {
-		super();
+		// System.out.println("SBML_XML_Reader with layout constructor");
+		// TODO Auto-generated constructor stub
 	}
 	
-	@Override
-	public void read(String filename, Graph g) throws IOException {
-		super.read(filename, g);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.graffiti.plugin.io.AbstractInputSerializer#read(java.io.InputStream, org.graffiti.graph.Graph)
+	/**
+	 * Method controls the import of the SBML document.
+	 * 
+	 * @param document
+	 *           contains the data to be imported.
+	 * @param g
+	 *           is the data structure for reading in the information.
 	 */
-	@Override
-	public void read(InputStream in, Graph g) throws IOException {
+	
+	public void read(final SBMLDocument document, Graph g,
+			BackgroundTaskStatusProviderSupportingExternalCallImpl status) {
+		
 		try {
-			readSBML(in, g);
+			
+			boolean readIn = false;
+			URL url = new URL("http://sbml.org/Facilities/Validator/");
+			URLConnection connection = url.openConnection();
+			InputStream is = null;
+			try {
+				is = connection.getInputStream();
+			} catch (Exception e) {
+				// ErrorMsg.addErrorMessage("No internet connection");
+				readIn = true;
+				/*
+				 * JOptionPane.showMessageDialog(null,
+				 * "Online validation not possible.");
+				 */
+			}
+			
+			if (null != is) {
+				
+				int validate = 1;
+				if (!SBML_XML_ReaderWriterPlugin.isTestintMode)
+					validate = JOptionPane
+							.showConfirmDialog(
+									null,
+									"Do you want to validate the SBML file against the Level 3 Version 1 specification?");
+				if (validate == 0) {
+					
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.GENERAL_CONSISTENCY, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.IDENTIFIER_CONSISTENCY, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.UNITS_CONSISTENCY, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.MATHML_CONSISTENCY, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.MODELING_PRACTICE, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.SBO_CONSISTENCY, true);
+					document.setConsistencyChecks(
+							CHECK_CATEGORY.OVERDETERMINED_MODEL, true);
+					
+					int numberOfErrors = document.checkConsistency();
+					if (numberOfErrors > 0) {
+						SBMLErrorLog errorLog = document.getListOfErrors();
+						for (int i = 0; i < numberOfErrors; i++) {
+							ErrorMsg.addErrorMessage(errorLog.getError(i));
+						}
+					}
+					if (numberOfErrors > 0) {
+						int load = JOptionPane
+								.showConfirmDialog(null,
+										"The online validator detected mistakes in the file. Load anyway?");
+						if (load == 0) {
+							readIn = true;
+						}
+					}
+					if (numberOfErrors == 0) {
+						readIn = true;
+					}
+				}
+				if (validate == 1) {
+					readIn = true;
+				}
+			} else {
+				readIn = true;
+				JOptionPane.showMessageDialog(null,
+						"Online validation not possible.");
+			}
+			
+			// to indicate an possible Exception - for example
+			// NullPointerException
+			
+			if (readIn) {
+				SBML_SBML_Reader readSBML = new SBML_SBML_Reader();
+				readSBML.addSBML(document, g);
+				SBML_Model_Reader readModel = new SBML_Model_Reader();
+				readModel.controlImport(document, g, status);
+				SBMLErrorLog errors = document.getListOfErrors();
+				List<SBMLError> validationErrors = errors.getValidationErrors();
+				for (SBMLError sbmlError : validationErrors) {
+					ErrorMsg.addErrorMessage(sbmlError.getMessage() + ": at "
+							+ sbmlError.getLocation().toString()
+							+ "\n near by: " + sbmlError.getExcerpt());
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e.getMessage());
+		}
+	}
+	
+	public void read(final Reader reader, final Graph g) throws Exception {
+		long starttime = System.currentTimeMillis();
+		
+		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+				"Load SBML", "");
+		final BackgroundTaskGUIprovider taskWindow;
+		taskWindow = new BackgroundTaskPanelEntry(false);
+		taskWindow.setStatusProvider(status, "SBML Loader",
+				"loading from reader");
+		
+		final MainFrame mf = GravistoService.getInstance().getMainFrame();
+		if (mf != null)
+			mf.addStatusPanel((JPanel) taskWindow);
+		
+		try {
+			
+			status.setCurrentStatusText2("Please wait. This may take a few moments.");
+			
+			SAXBuilder builder = new SAXBuilder();
+			Document document;
+			
+			SBMLDocument sbmlDocument;
+			
+			document = builder.build(reader);
+			if (status.wantsToStop()) {
+				logger.debug("aborting load");
+				taskWindow.setTaskFinished(true, 0);
+				return;
+			}
+			SBMLReader sbmlReader = new SBMLReader();
+			status.setCurrentStatusText1("loading SBML document");
+			status.setCurrentStatusValue(30);
+			try {
+				logger.info("start parsing sbml documet (Reader)");
+				sbmlDocument = sbmlReader.readSBMLFromString(document
+						.toString());
+				
+				if (sbmlDocument != null) {
+					if (status.wantsToStop()) {
+						logger.debug("aborting load");
+						taskWindow.setTaskFinished(true, 0);
+						return;
+					}
+					status.setCurrentStatusText1("creating SBML graph");
+					status.setCurrentStatusValue(60);
+					read(sbmlDocument, g, status);
+					if (status.wantsToStop()) {
+						logger.debug("aborting load");
+						taskWindow.setTaskFinished(true, 0);
+						return;
+					}
+					status.setCurrentStatusText1("adding graph to window");
+					status.setCurrentStatusValue(90);
+					
+					status.setCurrentStatusText1("building graph");
+				} else {
+					ErrorMsg
+							.addErrorMessage("Document can not be loaded. Check the document manually with the online validator (http://sbml.org/Facilities/Validator/).");
+				}
+			} catch (XMLStreamException e) {
+				ErrorMsg.addErrorMessage(e);
+			}
 		} catch (JDOMException e) {
 			ErrorMsg.addErrorMessage(e);
-			e.printStackTrace();
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e);
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		long endtime = System.currentTimeMillis();
+		taskWindow.setTaskFinished(true, endtime - starttime);
+		
+	}
+	
+	public void read(final InputStream in, final Graph g) throws IOException {
+		
+		long starttime = System.currentTimeMillis();
+		
+		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+				"Load SBML", "");
+		final BackgroundTaskGUIprovider taskWindow;
+		taskWindow = new BackgroundTaskPanelEntry(false);
+		taskWindow.setStatusProvider(status, "SBML Loader",
+				"loading from stream");
+		
+		final MainFrame mf = GravistoService.getInstance().getMainFrame();
+		if (mf != null)
+			mf.addStatusPanel((JPanel) taskWindow);
+		
+		try {
+			status.setCurrentStatusText2("Please wait. This may take a few moments.");
+			
+			SBMLReader reader = new SBMLReader();
+			SBMLDocument document = null;
+			status.setCurrentStatusText1("loading SBML document");
+			status.setCurrentStatusValue(30);
+			logger.info("start parsing sbml documet  (InputStream)");
+			document = reader.readSBMLFromStream(in);
+			if (document != null) {
+				if (status.wantsToStop()) {
+					logger.debug("aborting load");
+					taskWindow.setTaskFinished(true, 0);
+					return;
+				}
+				read(document, g, status);
+				if (status.wantsToStop()) {
+					logger.debug("aborting load");
+					taskWindow.setTaskFinished(true, 0);
+					return;
+				}
+				logger.debug("done reading graph");
+				status.setCurrentStatusText1("adding graph to window");
+				status.setCurrentStatusValue(100);
+			} else {
+				logger.info("the sbml document is not valid.");
+				ErrorMsg
+						.addErrorMessage("Document can not be loaded. Check the document manually with the online validator (http://sbml.org/Facilities/Validator/).");
+			}
+		} catch (XMLStreamException error) {
+			
+			ErrorMsg.addErrorMessage(error);
+			
+			logger.error(error.getMessage());
+			try {
+				error.printStackTrace(new PrintWriter("stack_trace.txt"));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			error.printStackTrace();
+		}
+		try {
+			in.close();
+		} catch (IOException e) {
 			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
 		}
-		in.close();
-	}
-	
-	private void readSBML(InputStream in, Graph g) throws JDOMException,
-						IOException {
+		long endtime = System.currentTimeMillis();
+		taskWindow.setTaskFinished(true, endtime - starttime);
 		
-		SAXBuilder builder = new SAXBuilder();
-		Document doc;
-		InputStream inpStream = null;
-		inpStream = in;
-		doc = builder.build(inpStream);
-		// Lesen des Wurzelelements des JDOM-Dokuments doc
-		read(g, doc);
-	}
-	
-	private void read(Graph g, Document doc) {
-		Element sbml = doc.getRootElement();
-		List<Element> models = sbml.getChildren("model", sbml.getNamespace());
-		PositionGridGenerator pgg = new PositionGridGenerator(100, 100, 1000);
-		for (Element model : models) {
-			String modelID = model.getAttributeValue("id");
-			String modelName = model.getAttributeValue("name");
-			if (modelID == null || modelID.length() <= 0)
-				modelID = modelName;
-			// read compounds ("species" in SBML!)
-			HashMap<String, org.graffiti.graph.Node> species2graphNode =
-								processSpecies(g, pgg, sbml, model, "listOfSpecies", "species", modelID);
-			HashMap<String, org.graffiti.graph.Node> specie2graphNode =
-								processSpecies(g, pgg, sbml, model, "listOfSpecies", "specie", modelID);
-			
-			species2graphNode.putAll(specie2graphNode);
-			
-			// compIDs=processCompounds()
-			
-			// This HashMap stores information about species nodes and possible
-			// layoutIDs. This is neccessary as strangly the layout of a species
-			// is defined in the reaction elements and not directly in the species
-			// definition. A lot of the layout specification is not straight forward,
-			// but let it be, let's try to process it as good as possible
-			HashMap<GraphElement, String> graphNode2possibleLayoutID =
-								new HashMap<GraphElement, String>();
-			
-			// read reactions
-			// HashMap<String,GraphElement> reaction2graphNode =
-			processReactions(g, pgg, sbml, model, "listOfReactions", "reaction", modelID,
-								species2graphNode, graphNode2possibleLayoutID);
-			
-			// read layout information (select one if many)
-			// todo --> result: layout-ids
-		}
-	}
-	
-	private HashMap<String, org.graffiti.graph.Node> processSpecies(
-						Graph g,
-						PositionGridGenerator pgg,
-						Element sbml,
-						Element model,
-						String tagList,
-						String tagItem,
-						String modelID) {
-		HashMap<String, org.graffiti.graph.Node> result = new HashMap<String, org.graffiti.graph.Node>();
-		List<Element> speciesLists = model.getChildren(tagList, sbml.getNamespace());
-		for (Element speciesList : speciesLists) {
-			List<Element> speciesEntries = speciesList.getChildren(tagItem, sbml.getNamespace());
-			for (Element species : speciesEntries) {
-				org.graffiti.graph.Node speciesGraphNode = g.addNode();
-				AttributeHelper.setDefaultGraphicsAttribute(speciesGraphNode, pgg.getNextPosition());
-				String speciesID = species.getAttributeValue("id");
-				String speciesName = species.getAttributeValue("name");
-				if (speciesID == null || speciesID.length() <= 0)
-					speciesID = speciesName;
-				if (speciesName == null || speciesName.length() <= 0)
-					speciesName = speciesID;
-				String speciesCompartment = species.getAttributeValue("compartment");
-				NodeTools.setClusterID(speciesGraphNode, speciesCompartment);
-				AttributeHelper.setFillColor(speciesGraphNode, Color.WHITE);
-				AttributeHelper.setBorderWidth(speciesGraphNode, 1d);
-				AttributeHelper.setLabel(speciesGraphNode, speciesName);
-				AttributeHelper.setSBMLmodelID(speciesGraphNode, modelID);
-				AttributeHelper.setSBMLid(speciesGraphNode, speciesID);
-				AttributeHelper.setShapeEllipse(speciesGraphNode);
-				AttributeHelper.setSize(speciesGraphNode, 60d, 20d);
-				setStyleFromAnnotation(speciesGraphNode, species);
-				result.put(speciesID, speciesGraphNode);
-			}
-		}
-		return result;
-	}
-	
-	private void setStyleFromAnnotation(Node speciesGraphNode, Element species) {
-		List<Element> annotations = species.getChildren("annotations", species.getNamespace());
-		for (Element annotation : annotations) {
-			List<Element> jd_displays = annotation.getChildren("display", annotation.getNamespace("jd"));
-			for (Element jd_display : jd_displays) {
-				String x = jd_display.getAttributeValue("x");
-				String y = jd_display.getAttributeValue("y");
-				if (x != null && y != null) {
-					try {
-						double xd = Double.parseDouble(x);
-						double yd = Double.parseDouble(y);
-						AttributeHelper.setPosition(speciesGraphNode, xd, yd);
-					} catch (Exception e) {
-						//
-					}
-				}
-			}
-		}
-	}
-	
-	private HashMap<String, GraphElement> processReactions(
-						Graph g,
-						PositionGridGenerator pgg,
-						Element sbml,
-						Element model,
-						String tagList,
-						String tagItem,
-						String modelID,
-						HashMap<String, Node> speciesGraphNodes,
-						HashMap<GraphElement, String> graphNode2possibleLayoutID) {
-		HashMap<String, GraphElement> result = new HashMap<String, GraphElement>();
-		// create a reaction node in case more than one "Reactant" is found or in case
-		// more than one Product for a reaction is found
-		// otherwise only a edge is created
-		List<Element> listsOfReactions = model.getChildren(tagList, sbml.getNamespace());
-		for (Element reactionList : listsOfReactions) {
-			List<Element> listOfReaction = reactionList.getChildren(tagItem, sbml.getNamespace());
-			for (Element reaction : listOfReaction) {
-				String reactionID = reaction.getAttributeValue("id");
-				String reactionName = reaction.getAttributeValue("name");
-				if (reactionID == null || reactionID.length() <= 0)
-					reactionID = reactionName;
-				if (reactionName == null || reactionName.length() <= 0)
-					reactionName = reactionID;
-				String reactionReversible = reaction.getAttributeValue("reversible");
-				// read Reactants
-				List<Element> reactantsSpeciesReferences = new ArrayList<Element>();
-				List<Element> reactantLists = reaction.getChildren("listOfReactants", sbml.getNamespace());
-				for (Element listOfReactants : reactantLists) {
-					List<Element> speciesRefs = listOfReactants.getChildren("speciesReference", sbml.getNamespace());
-					List<Element> specieRefs = listOfReactants.getChildren("specieReference", sbml.getNamespace());
-					reactantsSpeciesReferences.addAll(speciesRefs);
-					reactantsSpeciesReferences.addAll(specieRefs);
-				}
-				// read Products
-				List<Element> productSpeciesReferences = new ArrayList<Element>();
-				List<Element> productLists = reaction.getChildren("listOfProducts", sbml.getNamespace());
-				for (Element listOfProducts : productLists) {
-					List<Element> speciesRefs = listOfProducts.getChildren("speciesReference", sbml.getNamespace());
-					List<Element> specieRefs = listOfProducts.getChildren("specieReference", sbml.getNamespace());
-					productSpeciesReferences.addAll(speciesRefs);
-					productSpeciesReferences.addAll(specieRefs);
-				}
-				// read Modifiers
-				List<Element> modifierSpeciesReferences = new ArrayList<Element>();
-				List<Element> modifiersLists = reaction.getChildren("listOfModifiers", sbml.getNamespace());
-				for (Element listOfModifiers : modifiersLists) {
-					List<Element> speciesRefs = listOfModifiers.getChildren("modifierSpeciesReference", sbml.getNamespace());
-					List<Element> specieRefs = listOfModifiers.getChildren("modifierSpecieReference", sbml.getNamespace());
-					modifierSpeciesReferences.addAll(speciesRefs);
-					modifierSpeciesReferences.addAll(specieRefs);
-				}
-				if (reactantsSpeciesReferences.size() > minReacOrProdCntForReactionCreation
-									|| productSpeciesReferences.size() > minReacOrProdCntForReactionCreation
-									|| reactantsSpeciesReferences.size() == 0
-									|| productSpeciesReferences.size() == 0
-									|| modifierSpeciesReferences.size() > 0) {
-					// create Reaction Node
-					Node newReactionNode = g.addNode();
-					AttributeHelper.setDefaultGraphicsAttribute(newReactionNode, pgg.getNextPosition());
-					AttributeHelper.setFillColor(newReactionNode, Color.WHITE);
-					AttributeHelper.setBorderWidth(newReactionNode, 1d);
-					AttributeHelper.setLabel(newReactionNode, reactionName);
-					AttributeHelper.setSBMLmodelID(newReactionNode, modelID);
-					AttributeHelper.setSBMLid(newReactionNode, reactionID);
-					AttributeHelper.setSBMLreversibleReaction(newReactionNode, reactionReversible);
-					// SBML spec: Default is reversible = true, if nothing is defined
-					boolean reversibleReaction = (reactionReversible != null && reactionReversible.equalsIgnoreCase("false")) ? false : true;
-					result.put(reactionID, newReactionNode);
-					boolean isReactantElement;
-					boolean isProductElement;
-					boolean isModifierElement;
-					// A) connect Reactants to the Reaction Node with new Edges
-					// B) connect Reaction Node to Products with new Edges
-					// C) connect Modifier Node to Reaction Node
-					for (int i = 0; i < 3; i++) {
-						assert (i == 0 || i == 1 || i == 2);
-						List<Element> workList = null;
-						isReactantElement = false;
-						isProductElement = false;
-						isModifierElement = false;
-						// A)
-						if (i == 0) {
-							isReactantElement = true;
-							workList = reactantsSpeciesReferences;
-						}
-						// B)
-						if (i == 1) {
-							isProductElement = true;
-							workList = productSpeciesReferences;
-						}
-						// C)
-						if (i == 2) {
-							isModifierElement = true;
-							workList = modifierSpeciesReferences;
-						}
-						for (Element reactantORproduct : workList) {
-							String reactantORproductID = reactantORproduct.getAttributeValue("species");
-							if (reactantORproductID == null || reactantORproductID.length() <= 0)
-								reactantORproductID = reactantORproduct.getAttributeValue("specie");
-							String stoichiometry = reactantORproduct.getAttributeValue("stoichiometry");
-							// System.out.println("Connect: "+reactantORproductID);
-							Node reactORproductNode = speciesGraphNodes.get(reactantORproductID);
-							String speciesLayoutAnnotation4react = null;
-							if (speciesLayoutAnnotation4react != null)
-								graphNode2possibleLayoutID.put(reactORproductNode, speciesLayoutAnnotation4react);
-							if (reactORproductNode == null)
-								ErrorMsg.addErrorMessage("Inconsistency found: Graph Node for Species " + reactantORproductID + " was not created as a graph node.");
-							else {
-								Edge newReactionEdge = null;
-								if (isReactantElement) {
-									newReactionEdge = g.addEdge(reactORproductNode, newReactionNode, true,
-														AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
-									AttributeHelper.setSBMLrole(newReactionEdge, "reactant");
-									if (reversibleReaction)
-										AttributeHelper.setArrowtail(newReactionEdge, true);
-								} else
-									if (isProductElement) {
-										newReactionEdge = g.addEdge(newReactionNode, reactORproductNode, true,
-															AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
-										AttributeHelper.setSBMLrole(newReactionEdge, "product");
-										if (reversibleReaction)
-											AttributeHelper.setArrowtail(newReactionEdge, true);
-									}
-								if (isModifierElement) {
-									newReactionEdge = g.addEdge(reactORproductNode, newReactionNode, false,
-														AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.DARK_GRAY, Color.DARK_GRAY, true));
-									AttributeHelper.setSBMLrole(newReactionEdge, "modifier");
-									AttributeHelper.setDashInfo(newReactionEdge, 5, 5);
-									AttributeHelper.setBorderWidth(newReactionEdge, 1d);
-									AttributeHelper.setArrowtail(newReactionEdge, true);
-								}
-								assert (newReactionEdge != null);
-								AttributeHelper.setSBMLmodelID(newReactionEdge, modelID);
-								if (stoichiometry != null && stoichiometry.length() > 0)
-									AttributeHelper.setLabel(newReactionEdge, stoichiometry);
-								AttributeHelper.setSBMLreversibleReaction(newReactionEdge, reactionReversible);
-								AttributeHelper.setSBMLid(newReactionEdge, reactionID);
-								// AttributeHelper.setArrowtail(newReactionEdge, true);
-								result.put(reactionID, newReactionEdge);
-							}
-						}
-					}
-				} else {
-					processSingleReactionEdge(g, modelID, speciesGraphNodes, graphNode2possibleLayoutID, result,
-										reactionID, reactionReversible, reactantsSpeciesReferences, productSpeciesReferences);
-				}
-			}
-		}
-		return result;
-	}
-	
-	private void processSingleReactionEdge(
-						Graph g,
-						String modelID,
-						HashMap<String, Node> speciesGraphNodes,
-						HashMap<GraphElement, String> graphNode2possibleLayoutID,
-						HashMap<String, GraphElement> result,
-						String reactionID,
-						String reactionReversible,
-						List<Element> reactantsSpeciesReferences,
-						List<Element> productSpeciesReferences) {
-		
-		// just Create a Reaction Edge
-		// create a single Edge from the 1 Reactant to the 1 Product
-		Element reactant = reactantsSpeciesReferences.get(0);
-		Element product = productSpeciesReferences.get(0);
-		String reactantID = reactant.getAttributeValue("species");
-		String productID = product.getAttributeValue("species");
-		Node reactNode = speciesGraphNodes.get(reactantID);
-		Node productNode = speciesGraphNodes.get(productID);
-		String speciesLayoutAnnotation4react = null;
-		String speciesLayoutAnnotation4prod = null;
-		if (speciesLayoutAnnotation4react != null)
-			graphNode2possibleLayoutID.put(reactNode, speciesLayoutAnnotation4react);
-		if (speciesLayoutAnnotation4prod != null)
-			graphNode2possibleLayoutID.put(productNode, speciesLayoutAnnotation4prod);
-		if (reactNode == null || productNode == null)
-			ErrorMsg.addErrorMessage("Inconsistency found: Graph Node for Species " + reactantID + ", or " + productID + " was not created as a graph node.");
-		else {
-			Edge newReactionEdge = g.addEdge(reactNode, productNode, true,
-								AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK, true));
-			AttributeHelper.setSBMLmodelID(newReactionEdge, modelID);
-			AttributeHelper.setSBMLreversibleReaction(newReactionEdge, reactionReversible);
-			AttributeHelper.setSBMLid(newReactionEdge, reactionID);
-			result.put(reactionID, newReactionEdge);
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.graffiti.plugin.io.Serializer#getExtensions()
-	 */
-	public String[] getExtensions() {
-		return new String[] { fileNameExt, ".xml" };
 	}
 	
 	@Override
 	public boolean validFor(InputStream reader) {
+		return validSBML(reader);
+	}
+	
+	Boolean validSBML(InputStream in) {
+		InputStreamReader reader = new InputStreamReader(in);
+		
+		BufferedReader bufferedReader = new BufferedReader(reader);
+		StringBuffer finalString = new StringBuffer();
 		try {
-			int maxAnalyze = 5;
-			TextFile tf = new TextFile(reader, maxAnalyze);
-			for (String line : tf) {
-				if (line.toUpperCase().indexOf("<SBML") >= 0)
-					return true;
-				maxAnalyze--;
-				if (maxAnalyze == 0)
-					break;
+			while (bufferedReader.ready()) {
+				finalString = finalString.append(bufferedReader.readLine());
 			}
 		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return false;
+		String content = finalString.toString();
+		content = content.trim();
+		try {
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			bufferedReader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (content.contains("sbml") && content.contains("model")
+				&& content.contains("version") && content.contains("level")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.graffiti.plugin.io.Serializer#getFileTypeDescriptions()
+	/**
+	 * Implemented method of interface InputSerializer.java Returns the
+	 * extension of files that can be read in with the SBML importer
+	 */
+	public String[] getExtensions() {
+		
+		String[] ext = new String[] { ".sbml", ".xml" };
+		return ext;
+	}
+	
+	/**
+	 * Implemented method of interface InputSerializer.java Returns the
+	 * description of the input format
 	 */
 	public String[] getFileTypeDescriptions() {
-		return new String[] { "SBML2 File", "SBML2 File" };
+		String[] desc = new String[] { "SBML", "SBML" };
+		return desc;
 	}
 	
-	public void read(Reader reader, Graph newGraph) throws Exception {
-		SAXBuilder builder = new SAXBuilder();
-		Document doc;
-		doc = builder.build(reader);
-		read(newGraph, doc);
-	}
 }
