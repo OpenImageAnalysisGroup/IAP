@@ -2038,13 +2038,18 @@ public class MongoDB {
 		return (CloudHost) r.getObject();
 	}
 	
-	public void batchClearJobs() throws Exception {
+	/**
+	 * @return Number of deleted compute jobs.
+	 * @throws Exception
+	 */
+	public long batchClearJobs() throws Exception {
+		final ThreadSafeOptions res = new ThreadSafeOptions();
 		processDB(new RunnableOnDB() {
-			
 			private DB db;
 			
 			@Override
 			public void run() {
+				res.setLong(db.getCollection("schedule").count());
 				db.getCollection("schedule").drop();
 			}
 			
@@ -2053,6 +2058,7 @@ public class MongoDB {
 				this.db = db;
 			}
 		});
+		return res.getLong();
 	}
 	
 	// /**
@@ -2483,8 +2489,8 @@ public class MongoDB {
 			return;
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
-		if (optStatusProvider!=null)
-			optStatusProvider.setCurrentStatusText1("Process "+s3d.getName());
+		if (optStatusProvider != null)
+			optStatusProvider.setCurrentStatusText1("Process " + s3d.getName());
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		if (condList != null)
 			for (Object co : condList) {
@@ -3069,14 +3075,14 @@ public class MongoDB {
 							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName()
 									+ " (" + ii.getInt() + "/" + nn + ")");
 							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger() {
-
+								
 								@Override
 								public void setCurrentStatusText1(String st) {
 									status.setCurrentStatusText1("<html>" +
 											"Analyze " + ehii.getExperimentName()
-											+ " (" + ii.getInt() + "/" + nn + "):<br>"+st);
+											+ " (" + ii.getInt() + "/" + nn + "):<br>" + st);
 								}
-
+								
 								@Override
 								public void setCurrentStatusText2(String st) {
 									status.setCurrentStatusText2(st);
@@ -3154,20 +3160,20 @@ public class MongoDB {
 								if (ids.size() >= 10) {
 									final ArrayList<String> toBeDeleted = new ArrayList<String>(ids);
 									ids.clear();
-											n.addLong(10);
-											BasicDBList list = new BasicDBList();
-											synchronized (toBeDeleted) {
-												for (String coID : toBeDeleted)
-													list.add(new ObjectId(coID));
-												toBeDeleted.clear();
-											}
-											synchronized (conditions) {
-												conditions.remove(
-														new BasicDBObject("_id", new BasicDBObject("$in", list)),
-														WriteConcern.SAFE);
-											}
-											status.setCurrentStatusValueFine(100d / max * n.getLong());
-											status.setCurrentStatusText2(n.getLong() + "/" + max+" ("+(int)(100d / max * n.getLong())+"%)");
+									n.addLong(10);
+									BasicDBList list = new BasicDBList();
+									synchronized (toBeDeleted) {
+										for (String coID : toBeDeleted)
+											list.add(new ObjectId(coID));
+										toBeDeleted.clear();
+									}
+									synchronized (conditions) {
+										conditions.remove(
+												new BasicDBObject("_id", new BasicDBObject("$in", list)),
+												WriteConcern.SAFE);
+									}
+									status.setCurrentStatusValueFine(100d / max * n.getLong());
+									status.setCurrentStatusText2(n.getLong() + "/" + max + " (" + (int) (100d / max * n.getLong()) + "%)");
 								}
 							}
 							if (ids.size() > 0) {
@@ -3181,8 +3187,8 @@ public class MongoDB {
 										new BasicDBObject("_id", new BasicDBObject("$in", list)),
 										WriteConcern.NONE);
 								String err = wr.getError();
-								if (err!=null && err.length()>0)
-									System.err.println("ERROR deleting a conditin object: "+err+" // "+SystemAnalysis.getCurrentTime());
+								if (err != null && err.length() > 0)
+									System.err.println("ERROR deleting a conditin object: " + err + " // " + SystemAnalysis.getCurrentTime());
 								n.addLong(list.size());
 								status.setCurrentStatusValueFine(100d / max * n.getLong());
 								status.setCurrentStatusText2(n.getLong() + "/" + max);
@@ -3221,7 +3227,7 @@ public class MongoDB {
 								String md5 = f.getFilename();
 								if (!linkedHashes.contains(md5)) {
 									toBeRemoved.add(f);
-									status.setCurrentStatusText1("Linked files: " + linkedHashes.size()+", Not linked files " + toBeRemoved.size());
+									status.setCurrentStatusText1("Linked files: " + linkedHashes.size() + ", Not linked files " + toBeRemoved.size());
 								}
 							}
 							msg = "REORGANIZATION: Binary files that are not linked (" + mgfs + "): " + toBeRemoved.size() + " // "
@@ -3240,12 +3246,12 @@ public class MongoDB {
 										gridfs.remove(f);
 										CommandResult le = db.getLastError(WriteConcern.SAFE);
 										String err = le.getErrorMessage();
-										if (err!=null && err.length()>0)
-											System.err.println("ERROR deleting a gridFS file: "+err+" // "+SystemAnalysis.getCurrentTime());
+										if (err != null && err.length() > 0)
+											System.err.println("ERROR deleting a gridFS file: " + err + " // " + SystemAnalysis.getCurrentTime());
 										free.addLong(f.getLength());
 										fIdx.addInt(1);
 										status.setCurrentStatusText1("File " + fIdx.getInt() +
-												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)"+ ", removed: " + free.getLong() / 1024 / 1024 + " MB");
+												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)" + ", removed: " + free.getLong() / 1024 / 1024 + " MB");
 										status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
 									}
 								});

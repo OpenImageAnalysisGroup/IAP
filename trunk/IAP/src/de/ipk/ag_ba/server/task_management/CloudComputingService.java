@@ -26,7 +26,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
-import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -88,7 +87,7 @@ public class CloudComputingService {
 		if (active)
 			return "Shutdown This Node";
 		else
-			return "Join Compute Cloud";
+			return "Join Compute Grid";
 	}
 	
 	public static void main(String[] args) {
@@ -657,13 +656,6 @@ public class CloudComputingService {
 		if (!active) {
 			// enable server mode
 			try {
-				if (IAPmain.isSettingEnabled(IAPfeature.DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START)) {
-					m.batchClearJobs();
-					for (ExperimentHeaderInterface ei : m.getExperimentList(null)) {
-						if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§"))
-							m.deleteExperiment(ei.getDatabaseId());
-					}
-				}
 				cloudTaskManager.setHostName(SystemAnalysisExt.getHostName());
 				cloudTaskManager.startWork(m);
 			} catch (UnknownHostException e) {
