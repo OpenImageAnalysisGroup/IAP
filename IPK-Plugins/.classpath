@@ -25,7 +25,6 @@
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/bsh-2.0b4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-beanutils.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-cli-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-collections-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-digester.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-discovery.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/itext-1.4.5.jar"/>
@@ -55,5 +54,7 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-scratchpad-3.7-20101029.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
