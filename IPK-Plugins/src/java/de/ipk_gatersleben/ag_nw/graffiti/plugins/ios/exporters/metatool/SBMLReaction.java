@@ -43,13 +43,13 @@ public class SBMLReaction {
 			notEnoughMetabolites = true;
 		
 		if (reactants.size() <= 0 || products.size() <= 0)
-			System.err.println("Reaction of enzyme " + enzymename + " detected with no products or reactants");
+			notEnoughMetabolites = true;// System.err.println("Reaction of enzyme " + enzymename + " detected with no products or reactants");
 	}
 	
 	private void checkEdge(Edge ed) {
 		if (stoiWrong)
 			return;
-		String label = AttributeHelper.getLabel(-1, ed).getLabel();
+		String label = MetatoolWriter.getEdgeLabel(ed);
 		if (label == null || label.equals(""))
 			return;
 		
@@ -80,14 +80,14 @@ public class SBMLReaction {
 		for (Map.Entry<Node, Edge> entry : reactants.entrySet()) {
 			text += MetatoolWriter.getEdgeLabel(entry.getValue()) + " " + MetatoolWriter.getNodeLabel(entry.getKey()) + " + ";
 		}
-		
-		text = text.substring(0, text.length() - " + ".length()) + " = ";
+		if (reactants.size() > 0)
+			text = text.substring(0, text.length() - " + ".length()) + " = ";
 		
 		for (Map.Entry<Node, Edge> entry : products.entrySet()) {
 			text += MetatoolWriter.getEdgeLabel(entry.getValue()) + " " + MetatoolWriter.getNodeLabel(entry.getKey()) + " + ";
 		}
-		
-		text = text.substring(0, text.length() - " + ".length()) + " .";
+		if (reactants.size() > 0)
+			text = text.substring(0, text.length() - " + ".length());
 		
 		return text;
 	}
