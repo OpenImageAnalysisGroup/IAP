@@ -17,11 +17,11 @@ import org.graffiti.plugin.io.OutputSerializer;
 public class MetatoolWriter implements OutputSerializer {
 	
 	public static String getNodeLabel(Node nd) {
-		return AttributeHelper.getLabel(nd, "<no label>");
+		return StringManipulationTools.removeHTMLtags(AttributeHelper.getLabel(nd, "<no label>"));
 	}
 	
 	public static String getEdgeLabel(Edge ed) {
-		String label = AttributeHelper.getLabel(-1, ed).getLabel();
+		String label = StringManipulationTools.removeHTMLtags(AttributeHelper.getLabel(-1, ed).getLabel());
 		if (label == null || label.equals("1"))
 			label = "";
 		return label;
@@ -40,7 +40,7 @@ public class MetatoolWriter implements OutputSerializer {
 		for (Node nd : g.getNodes()) {
 			MetatoolNodeType type = getNodeType(nd);
 			if (type == null)
-				ErrorMsg.addErrorMessage("Could not determine node type of node " + nd);
+				ErrorMsg.addErrorMessage("Could not determine type of node \"" + nd + "\"!");
 			else {
 				switch (type) {
 					case REVERSIBLE_REACTION:
@@ -77,27 +77,52 @@ public class MetatoolWriter implements OutputSerializer {
 			p = new PrintStream(stream, false);
 		}
 		
+		HashSet<String> unique = new HashSet<String>();
 		p.println("-ENZREV");
-		for (Node nd : reversibles)
-			p.print(getNodeLabel(nd) + " ");
+		for (Node nd : reversibles) {
+			String lbl = getNodeLabel(nd);
+			if (!unique.contains(lbl)) {
+				p.print(lbl + " ");
+				unique.add(lbl);
+			}
+		}
 		p.println();
 		p.println();
 		
 		p.println("-ENZIRREV");
-		for (Node nd : irreversibles)
-			p.print(getNodeLabel(nd) + " ");
+		unique.clear();
+		for (Node nd : irreversibles) {
+			String lbl = getNodeLabel(nd);
+			if (!unique.contains(lbl)) {
+				p.print(lbl + " ");
+				unique.add(lbl);
+			}
+		}
 		p.println();
 		p.println();
 		
 		p.println("-METINT");
-		for (Node nd : internalMetab)
-			p.print(getNodeLabel(nd) + " ");
+		unique.clear();
+		for (Node nd : internalMetab) {
+			String lbl = getNodeLabel(nd);
+			if (!unique.contains(lbl)) {
+				p.print(lbl + " ");
+				unique.add(lbl);
+			}
+		}
 		p.println();
 		p.println();
 		
 		p.println("-METEXT");
-		for (Node nd : externalMetab)
-			p.print(getNodeLabel(nd) + " ");
+		unique.clear();
+		for (Node nd : externalMetab) {
+			String lbl = getNodeLabel(nd);
+			if (!unique.contains(lbl)) {
+				p.print(lbl + " ");
+				unique.add(lbl);
+			}
+		}
+		
 		p.println();
 		p.println();
 		
@@ -113,10 +138,11 @@ public class MetatoolWriter implements OutputSerializer {
 		p.println();
 		
 		if (stoiwrong)
-			ErrorMsg.addErrorMessage("Stoichiometric coefficient is not of type number in some reaction");
+			ErrorMsg.addErrorMessage("Stoichiometric coefficient is not a number in some reaction");
 		
 		if (wronmgmetabolites)
-			ErrorMsg.addErrorMessage("No products or reactants defined! Unable to write some reaction");
+			ErrorMsg.addErrorMessage("<html>Some products or reactants not well defined! It is inevitable to assign SBML-roles to the edges.<br>" +
+					"This may be achieved using the FBASimVis command \"Create SBML-file\".");
 		
 	}
 	
@@ -140,13 +166,13 @@ public class MetatoolWriter implements OutputSerializer {
 	
 	private boolean isExternalMetabolite(String lbl) {
 		// TODO: or something else? errorcheck!
-		return lbl.endsWith("_ex");
+		return lbl != null && lbl.endsWith("_ex");
 	}
 	
 	private boolean isEnzyme(Node nd) {
-		// TODO: or something else?
-		// perhaps: if node has attribute reversible, as metabolites dont have any reversibility
-		return AttributeHelper.getShape(nd).equals("org.graffiti.plugins.views.defaults.RectangleNodeShape");
+		String shape = AttributeHelper.getShape(nd);
+		// Vanted may have nodes without a shape-attribute, which will be visualised as rectangles
+		return shape == null || shape.length() <= 0 || shape.contains("Rectangle") || shape.contains("rectangle");
 	}
 	
 	@Override
