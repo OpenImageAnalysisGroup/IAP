@@ -160,4 +160,8 @@ public class IAPimages {
 	public static String getAdressBookClearFront() {
 		return "img/ext/gpl2/Gnome-X-Office-Address-Book-64_metaData.png";
 	}
+	
+	public static String getCloseCross() {
+		return "img/ext/gpl2/Gnome-Window-Close-64.png";
+	}
 }

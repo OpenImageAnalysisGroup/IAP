@@ -9,6 +9,7 @@ package de.ipk.ag_ba.server.task_management;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudClusterHostInformation;
@@ -57,10 +58,20 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		GUIsetting guiSetting = src.getGUIsetting();
-		NavigationButton startOrStopServerMode = new NavigationButton(
-				new EnableOrDisableServerModeAction(m), guiSetting);
-		if (IAPmain.getRunMode() != IAPrunMode.WEB)
+		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
+			NavigationButton startOrStopServerMode = new NavigationButton(
+					new EnableOrDisableServerModeAction(m), guiSetting);
 			res.add(startOrStopServerMode);
+		}
+		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
+			boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
+			if (showDeleteCloudJobsIcon) {
+				NavigationButton deleteCloudJobs = new NavigationButton(
+						new DeleteCloudJobsAction(m), guiSetting);
+				res.add(deleteCloudJobs);
+			}
+			
+		}
 		
 		try {
 			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
@@ -89,15 +100,18 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 				} else
 					clusterAvailable = true;
 			}
+			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
+					"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4");
 			if (clusterAvailable) {
 				res.add(
 						new NavigationButton(
 								new ActionCloudClusterHostInformation(m),
 								guiSetting));
-				res.add(WebFolder.getURLactionButtton("Analyze Cluster Status",
-						"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4",
-						IAPimages.getComputerConsole(), src.getGUIsetting()));
-				
+				if (clusterStatusURL != null && !clusterStatusURL.isEmpty()) {
+					res.add(WebFolder.getURLactionButtton("Analyze Cluster Status",
+							clusterStatusURL,
+							IAPimages.getComputerConsole(), src.getGUIsetting()));
+				}
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
