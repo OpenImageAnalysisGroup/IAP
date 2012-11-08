@@ -35,6 +35,8 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.pdf_report.PdfCreator;
@@ -420,6 +422,14 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
+				
+				if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
+					File f = targetDirectoryOrTargetFile;
+					if (f == null)
+						f = p.getTargetFile(xlsx, experimentReference.getHeader());
+					String tempDirectory = f.getParent();
+					AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
+				}
 			}
 			else {
 				{
