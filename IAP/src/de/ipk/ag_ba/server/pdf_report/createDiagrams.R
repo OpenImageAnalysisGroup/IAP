@@ -46,7 +46,7 @@ LONG.UNIT.TABLE <- "unitTable"
 ## value typs
 GET.OVERALL.FILE.NAME <- "overallFileName"
 GET.SECTION.VALUE <- "section"
-
+GET.OVERALL.RESULT.RESET <- "overallResultReset"
 
 ## plot typs
 NBOX.PLOT <- "nboxplot"
@@ -1459,9 +1459,9 @@ getRealNameAndPrintSection <- function(descriptorSet) {
 reduceWorkingDataSize <- function(overallList) {
 	overallList$debug %debug% "reduceWorkingDataSize()"
 	if (overallList$isRatio) {
-		overallList$iniDataSet = overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$nBoxMultiDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(getVector(overallList$linerangeDes)), check(getVector(overallList$violinBoxDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
+		overallList$iniDataSet <- overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$nBoxMultiDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(getVector(overallList$linerangeDes)), check(getVector(overallList$violinBoxDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
 	} else {
-		overallList$iniDataSet = overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$nBoxMultiDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(getVector(overallList$linerangeDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
+		overallList$iniDataSet <- overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$nBoxMultiDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(getVector(overallList$linerangeDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
 	}
 	return(overallList)
 }
@@ -1651,10 +1651,10 @@ overallGetResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "overallGetResultDataFrame()"	
 
 	if (!calculateNothing) {	
-			groupBy = groupByFunction(list(overallList$treatment, overallList$secondTreatment))
-			colNames = list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
-			booleanVectorList = buildList(overallList, colNames$colOfXaxis)
-			columnsStandard = c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
+			groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
+			colNames <- list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
+			booleanVectorList <- buildList(overallList, colNames$colOfXaxis)
+			columnsStandard <- c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
 			contactTheValues <- FALSE
 			
 			if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) && overallList$secondTreatment != NONE) {
@@ -1729,6 +1729,10 @@ overallGetResultDataFrame <- function(overallList) {
 				overallList$overallResult_violinBoxDes = getResultDataFrame(VIOLIN.PLOT, overallList$violinBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
 			}
 			
+			
+			if(overallList$deleteNboxplot) {
+				overallList$iniDataSet <- NULL
+			}
 			
 			if (is.null(overallList$boxStackDes) && 
 				is.null(overallList$nBoxMultiDes) &&
@@ -3055,9 +3059,13 @@ saveImageFile <- function(overallList, plot, fileName, newHeight = "") {
 	} else {
 		height <- newHeight
 	}
+
 	#print(filename)
 	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
 	fileName <- getPlotFileName(fileName)
+#	print(paste("before Max Memory: ",memory.size(TRUE), sep=""))
+#	print(paste("before actually used Memory: ",memory.size(FALSE), sep=""))
+
 #print(filename)
 	ggsave (filename=paste(fileName, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
 
@@ -3640,14 +3648,14 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 	if (subSectionTitel != "") {
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
-	
+#print("fileName gecheckt")
 #	if(typOfPlot == LINERANGE.PLOT || (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond && typOfPlot == SPIDER.PLOT)) {
 	if(typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
 		saveImageFile(overallList, plot, fileName)
 	}
-
+#print("bild gespeichert")
 	if(typOfPlot != STRESS.PLOT) {
 		if (makeOverallImage) {
 			if (subSectionTitel != "") {
@@ -3657,6 +3665,7 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 			}
 		}
 	}
+#print("latexFile geschrieben")
 
 #	else {
 #		writeLatexFile(fileName, writeLatexFileSecondValue)	
@@ -3983,8 +3992,11 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 								ylab(overallDesName[[imagesIndex]])
 					}
 								
-			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 && (length(colorReorder) - length(stressArea)) == 1) {
-				colorReorder <- c(colorReorder, colorReorder)
+			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
+				if ((length(colorReorder) - length(stressArea)) == 1) {
+					colorReorder <- c(colorReorder, colorReorder)
+				}
+				
 				shapeReorder <- c(1:2)
 			}
 			
@@ -6191,87 +6203,95 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 			}
 		}
 	}
+	
+	if(!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
+		overallList <- reduceOverallListForMemorySave(overallList, typOfPlot)
+		gc()
+	}
+}
+
+
+reduceOverallListForMemorySave <- function(overallList, typOfPlot) {
+	overallList[[getOverallValuesPerType(typOfPlot, GET.OVERALL.RESULT.RESET)]] <- NULL
+	return(overallList)
+}
+
+
+getOverallValuesPerType <- function(typOfPlot, typOfValues) {
+	if(typOfPlot == NBOX.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_nBoxplots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("nBoxSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_nBoxDes")
+		}
+	} else if (typOfPlot == NBOX.MULTI.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_nBoxMultiPlots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("nBoxMultiSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_nBoxMultiDes")
+		}
+	} else if (typOfPlot == STRESS.PLOT) {
+		if(typOfValues == GET.SECTION.VALUE) {
+			return(STRESS)
+		}	
+	} else if (typOfPlot == BAR.PLOT) {	
+		#empty	
+	} else if (typOfPlot == BOX.PLOT) {	
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_Boxplots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("boxSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_boxDes")
+		}
+	} else if (typOfPlot == STACKBOX.PLOT) {	
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_StackedPlots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("boxStackSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_boxStackDes")
+		}
+	} else if (typOfPlot == SPIDER.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_SpiderPlots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("boxSpiderSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_boxSpiderDes")
+		}		
+	} else if (typOfPlot == LINERANGE.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_LinerangePlots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("linerangeSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_linerangeDes")
+		}		
+	} else if (typOfPlot == VIOLIN.PLOT) {
+		if(typOfValues == GET.OVERALL.FILE.NAME) {
+			return("imageFileNames_violinPlots")
+		} else if(typOfValues == GET.SECTION.VALUE) {
+			return("violinBoxSection")
+		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+			return("overallResult_violinBoxDes")
+		}		
+	}
 }
 
 
 getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = -1) {
 	overallList$debug %debug% "getOverallValues()"
 
-	if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT || typOfPlot == BAR.PLOT || typOfPlot == STRESS.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				if(typOfPlot == NBOX.PLOT) {
-					return(overallList$imageFileNames_nBoxplots)
-				} else if(typOfPlot == NBOX.MULTI.PLOT) {
-					return(overallList$imageFileNames_nBoxMultiPlots)
-				}
-			} else {
-				if(typOfPlot == NBOX.PLOT) {
-					return(overallList$imageFileNames_nBoxplots[[imagesIndex]])
-				} else if (typOfPlot == NBOX.MULTI.PLOT) {
-					return(overallList$imageFileNames_nBoxMultiPlots[[imagesIndex]])
-				}
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			if(typOfPlot == STRESS.PLOT) {
-				return(STRESS)
-			} else if (typOfPlot == NBOX.PLOT){			
-				return(overallList$nBoxSection)
-			} else if (typOfPlot == NBOX.MULTI.PLOT) {
-				return(overallList$nBoxMultiSection)
-			}
-		}
-	} else if(typOfPlot == BOX.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				return(overallList$imageFileNames_Boxplots)
-			} else {
-				return(overallList$imageFileNames_Boxplots[[imagesIndex]])
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			return(overallList$boxSection)
-		}
-	} else if(typOfPlot == STACKBOX.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				return(overallList$imageFileNames_StackedPlots)
-			} else {
-				return(overallList$imageFileNames_StackedPlots[[imagesIndex]])
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			return(overallList$boxStackSection)
-		}
-	} else if(typOfPlot == SPIDER.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				return(overallList$imageFileNames_SpiderPlots)
-			} else {
-				return(overallList$imageFileNames_SpiderPlots[[imagesIndex]])
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			return(overallList$boxSpiderSection)
-		}
-	} else if(typOfPlot == LINERANGE.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				return(overallList$imageFileNames_LinerangePlots)
-			} else {
-				return(overallList$imageFileNames_LinerangePlots[[imagesIndex]])
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			return(overallList$linerangeSection)
-		}
-	} else if(typOfPlot == VIOLIN.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
-			if(imagesIndex == -1) {
-				return(overallList$imageFileNames_violinPlots)
-			} else {
-				return(overallList$imageFileNames_violinPlots[[imagesIndex]])
-			}
-		} else if(typOfValues == GET.SECTION.VALUE) {
-			return(overallList$violinBoxSection)
-		}
-	} 	
+	if(imagesIndex == -1 || typOfValues == GET.SECTION.VALUE) {
+		return(overallList[[getOverallValuesPerType(typOfPlot, typOfValues)]])
+	} else {
+		return(overallList[[getOverallValuesPerType(typOfPlot, typOfValues)]][[imagesIndex]])
+	}
 }
 
 checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOfPlot = NULL) {
@@ -6421,8 +6441,8 @@ if(!plotOnlySpider) {
 if(!plotOnlyLineRange) {
 if(!plotOnlyStacked) {
 if(!plotOnlyBoxplot) {
-if(!plotOnlyNBox) {
 if(!plotOnlyNBoxMulti) {
+if(!plotOnlyNBox) {
 
 		if (sum(!is.na(overallList$stressDes)) > 0 && DO.MODELLING.OF.STRESS) {
 			if (overallList$debug) {ownCat("stress modelling...")}
@@ -6430,7 +6450,7 @@ if(!plotOnlyNBoxMulti) {
 		} else {
 			ownCat("All values for stress modelling are 'NA'")
 		}
-
+}
 if(!plotOnlyStressValues) {
 		if (sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxplot...")}
@@ -6439,7 +6459,7 @@ if(!plotOnlyStressValues) {
 			ownCat("All values for nBoxplot are 'NA'")
 		}
 }}
-
+if(!plotOnlyNBox) {
 		if (sum(!is.na(overallList$nBoxMultiDes)) > 0) {
 			if (overallList$debug) {ownCat("nBoxMultiPlot...")}
 			startDiagramming(overallList, overallList$overallResult_nBoxMultiDes,  overallList$nBoxMultiDes, overallList$nBoxMultiDesName, NBOX.MULTI.PLOT)
@@ -6816,6 +6836,9 @@ initRfunction <- function(debug) {
 	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
 	#Sys.setlocale(locale="de_DE.ISO8859-15")
 	#Sys.setlocale("LC_ALL", "en_US.UTF-8")
+	#gcinfo(TRUE)
+	#gc()
+	
 	debug %debug% "initRfunction()"
 	if (debug) {
 		options(error = quote({
@@ -6839,8 +6862,8 @@ initRfunction <- function(debug) {
 		options(warn = -1)
 		options(show.error.messages = FALSE)
 	}
-	if (memory.limit() < 10000) {
-		memory.limit(size=10000)
+	if (memory.limit() < 15000) {
+		memory.limit(size=15000)
 	}
 	
 	while(!is.null(dev.list())) {
@@ -7052,8 +7075,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#secondTreatment <- "none"
 		#filterSecondTreatment  <- "none"
 		
-		#secondTreatment <- "none"
-		secondTreatment <- "Genotype"
+		secondTreatment <- "none"
+		#secondTreatment <- "Genotype"
 		filterSecondTreatment  <- "none"
 		#filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
@@ -7078,7 +7101,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
 		
-		if(TRUE) {
+		if(FALSE) {
 			stressStart <- -1
 			stressEnd <- -1
 			stressTyp <- "001"
@@ -7092,11 +7115,11 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		
 		splitTreatmentFirst <- FALSE
-		splitTreatmentSecond <- TRUE
+		splitTreatmentSecond <- FALSE
 		isRatio <- FALSE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
-		iniDataSet = workingDataSet
+		iniDataSet <- workingDataSet
 		
 		
 		loadFiles(path = ".", pattern = "PlotList\\.[Rr]$")
@@ -7178,6 +7201,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		linerangeSection <- descriptorSection_linerangeplot
 		
 		appendix <- FALSE
+		deleteNboxplot <- !appendix
 		if (appendix) {
 			blacklist <- buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
 			descriptorSetAppendix <- colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
@@ -7247,22 +7271,23 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 												xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio,
 												filterTreatmentRename = renameList$filterTreatmentRename, secondFilterTreatmentRename = renameList$secondFilterTreatmentRename,
 												stressStart=stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
-												splitTreatmentFirst=splitTreatmentFirst, splitTreatmentSecond=splitTreatmentSecond)
+												splitTreatmentFirst=splitTreatmentFirst, splitTreatmentSecond=splitTreatmentSecond, 
+												deleteNboxplot = !secondRun)
 					if (secondRun) {
-						appendix = TRUE
-						secondRun = FALSE
-						descriptorSet_nBoxplot = descriptorSetAppendix
-						descriptorSetName_nBoxplot = descriptorSetNameAppendix
+						appendix <- TRUE
+						secondRun <- FALSE
+						descriptorSet_nBoxplot <- descriptorSetAppendix
+						descriptorSetName_nBoxplot <- descriptorSetNameAppendix
 						descriptorSection_nBoxplot <- descriptorSectionAppendix
 						#diagramTypVector = diagramTypVectorAppendix
 						descriptorSet_nBoxMultiplot <- NULL
 						descriptorSetName_nBoxMultiplot <- NULL
 						descriptorSection_nBoxMultiplot <- NULL
-						descriptorSet_boxplot = NULL
-						descriptorSetName_boxplot = NULL
-						descriptorSection_boxplot = NULL
-						descriptorSet_boxplotStacked = NULL
-						descriptorSetName_boxplotStacked = NULL
+						descriptorSet_boxplot <- NULL
+						descriptorSetName_boxplot <- NULL
+						descriptorSection_boxplot <- NULL
+						descriptorSet_boxplotStacked <- NULL
+						descriptorSetName_boxplotStacked <- NULL
 						descriptorSection_boxplotStacked <- NULL
 						descriptorSet_spiderplot <- NULL
 						descriptorSetName_spiderplot <- NULL
@@ -7310,9 +7335,10 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		xAxisName = NONE, debug = FALSE, appendix = FALSE, stoppTheCalculation = FALSE, isRatio = FALSE,
 		filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
 		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1,
-		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE) {		
+		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE,
+		deleteNboxplot = TRUE) {		
 
-	overallList = list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
+	overallList <- list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
 						nBoxDes = nBoxDes, nBoxMultiDes = nBoxMultiDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes, linerangeDes = linerangeDes,
 						imageFileNames_nBoxplots = nBoxDes, imageFileNames_nBoxMultiPlots = nBoxMultiDes, imageFileNames_Boxplots = boxDes, imageFileNames_StackedPlots = boxStackDes, imageFileNames_SpiderPlots = boxSpiderDes, imageFileNames_violinPlots = violinBoxDes, imageFileNames_LinerangePlots = linerangeDes,
 						nBoxDesName = nBoxDesName, nBoxMultiDesName = nBoxMultiDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName, boxSpiderDesName = boxSpiderDesName, violinBoxDesName=violinBoxDesName, linerangeDesName = linerangeDesName, 
@@ -7327,7 +7353,8 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 						user=NONE, typ=NONE,
 						filterTreatmentRename = filterTreatmentRename, secondFilterTreatmentRename = secondFilterTreatmentRename,
 						stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
-						splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond
+						splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond,
+						deleteNboxplot = deleteNboxplot
 						)	
 	
 	overallList$debug %debug% "Start"
@@ -7434,5 +7461,9 @@ ownCat("Completing diagram creation ...")
 if(DO.PARALLELISATION) {
 	stopSnow()
 }
-
+if(debug) {
+	ownCat("Print all warnings:")
+	warnings()
+}
+#gcinfo(FALSE)
 rm(list=ls(all=TRUE))

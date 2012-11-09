@@ -278,9 +278,9 @@ sectionMappingList <- list(
 								"\"Fluorescence is the emission of light by a substance that has absorbed light or other electromagnetic radiation. 
 								   It is a form of luminescence. In most cases, the emitted light has a longer wavelength, and therefore lower energy, than the absorbed radiation.\"",NEWLINE.TEX,
 								BEGIN.TINY, NEWLINE.TEX,
-								"Wikipedia contributors, \"Convex hull\",", NEWLINE.TEX,
+								"Wikipedia contributors, \"Fluorescence\",", NEWLINE.TEX,
 								"Wikipedia, The Free Encyclopedia,", NEWLINE.TEX,
-								paste(BEGIN.URL, "http://en.wikipedia.org/w/index.php?title=Convex_hull&oldid=482955324", END.URL, sep=""), NEWLINE.TEX,
+								paste(BEGIN.URL, "http://en.wikipedia.org/w/index.php?title=Fluorescence&oldid=519374378", END.URL, sep=""), NEWLINE.TEX,
 								"(accessed March 30, 2012).", END.TINY, NEWLINE.TEX,
 								
 								"Following classifications were made for the histogram (420 – 750 nm):", PAR.TEXT, NEWLINE.TEX,
@@ -355,7 +355,7 @@ sectionMappingList <- list(
 										NEW.PAR.INDENT,	NEWLINE.TEX,
 										"The term \"Normalized Differenced Vegetation Index\" (NDVI) is described as following:", PAR.TEXT,  NEWLINE.TEX,
 										  "NDVI can be used to make a statement on the health of the plant.
-										   Healthy plants reflect few light in the visible and much in the near infrared spectrum. The value can be calculated as follows:", NEWLINE.TEX,
+										   Healthy plants reflect few lights in the visible and much in the near infrared spectrum. The value can be calculated as follows:", NEWLINE.TEX,
 										  "$NDVI = \\frac{(average NIR intensity - average RGB intensity)}{(average NIR intensity + average RGB intensity)}$", NEWLINE.TEX,
 										  BEGIN.ITEM,
 										  LINE.ITEM, "1 = rainforest", NEWLINE.TEX,
