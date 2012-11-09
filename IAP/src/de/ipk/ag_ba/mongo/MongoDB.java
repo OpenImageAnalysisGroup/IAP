@@ -3163,7 +3163,7 @@ public class MongoDB {
 					}
 				};
 				
-				int nThreads = 1;
+				int nThreads = 2;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
 				for (final ExperimentHeaderInterface ehii : todo) {
