@@ -36,7 +36,7 @@ public class DeleteCloudJobsAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Delete Tasks";
+		return "Delete Analysis Tasks";
 	}
 	
 	@Override

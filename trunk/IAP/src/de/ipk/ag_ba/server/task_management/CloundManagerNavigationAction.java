@@ -62,16 +62,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			NavigationButton startOrStopServerMode = new NavigationButton(
 					new EnableOrDisableServerModeAction(m), guiSetting);
 			res.add(startOrStopServerMode);
-		}
-		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
-			boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
-			if (showDeleteCloudJobsIcon) {
-				NavigationButton deleteCloudJobs = new NavigationButton(
-						new DeleteCloudJobsAction(m), guiSetting);
-				res.add(deleteCloudJobs);
-			}
-			
-		}
+		}	
 		
 		try {
 			NavigationButton jobStatus = new NavigationButton(new ActionJobStatus(m), src.getGUIsetting());
