@@ -29,13 +29,22 @@ public class LogService {
 						MongoDB dc = MongoDB.getDefaultCloud();
 						try {
 							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						if (dc != null)
-							for (String item : dc.getNews(n)) {
-								news.push(preLine + StringManipulationTools.removeHTMLtags(item));
+							if (dc != null)
+								for (String item : dc.getNews(n)) {
+									news.push(preLine + StringManipulationTools.removeHTMLtags(item));
+								}
+						} catch (Exception e) {
+							try {
+								Thread.sleep(250);
+								e.printStackTrace();
+								if (dc != null)
+									for (String item : dc.getNews(n)) {
+										news.push(preLine + StringManipulationTools.removeHTMLtags(item));
+									}
+							} catch (Exception e2) {
+								e2.printStackTrace();
 							}
+						}
 					}
 				};
 				Thread t = new Thread(r, "Read MonogDB news");
