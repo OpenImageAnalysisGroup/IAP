@@ -98,6 +98,7 @@ public class MainPanelComponent {
 				this.component = jp;
 				
 			}
+		component.putClientProperty("isHTML", true);
 	}
 	
 	public MainPanelComponent(String htmlTextPanel) {
