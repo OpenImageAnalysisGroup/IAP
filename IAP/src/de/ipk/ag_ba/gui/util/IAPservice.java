@@ -1456,7 +1456,7 @@ public class IAPservice {
 						Thread.sleep(5 * 1000); // wait 5 seconds
 						timeHour = SystemAnalysis.getCurrentTimeHour();
 						timeMinute = SystemAnalysis.getCurrentTimeMinute();
-					} while (!(timeHour== hour && timeMinute == 0));
+					} while (!(timeHour == hour && timeMinute == 0));
 					MongoDB.saveSystemMessage("TIMED AUTO-CLOSE (host " + SystemAnalysisExt.getHostNameNiceNoError() +
 							"): SYSTEM.EXIT(0) // current time: " + SystemAnalysis.getCurrentTimeInclSec());
 					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">TIMED AUTO-CLOSE: SYSTEM.EXIT(0)");
@@ -1476,6 +1476,15 @@ public class IAPservice {
 	
 	public static Image getImage(Object ref, String name) {
 		URL url = GravistoService.getResource(ref.getClass(), name);
+		if (url == null)
+			return null;
+		else {
+			return new ImageIcon(url).getImage();
+		}
+	}
+	
+	public static Image getImage(Class ref, String name) {
+		URL url = GravistoService.getResource(ref, name);
 		if (url == null)
 			return null;
 		else {
