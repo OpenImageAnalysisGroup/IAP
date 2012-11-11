@@ -1,5 +1,10 @@
 package de.ipk.ag_ba.gui.images;
 
+import java.awt.Image;
+
+import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+
 public class IAPimages {
 	
 	private static boolean ns = false;
@@ -163,5 +168,9 @@ public class IAPimages {
 	
 	public static String getCloseCross() {
 		return "img/ext/gpl2/Gnome-Window-Close-64.png";
+	}
+	
+	public static Image getImage(String image) {
+		return IAPservice.getImage(IAPmain.class, image);
 	}
 }
