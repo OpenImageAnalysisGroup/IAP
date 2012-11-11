@@ -331,7 +331,8 @@ public class MongoDB {
 							}
 						}
 					
-					if (!dbsAnalyzedForCollectionSettings.contains(database)) {
+					boolean initStatusCollection = false;
+					if (initStatusCollection && !dbsAnalyzedForCollectionSettings.contains(database)) {
 						checkforCollectionsInitialization(db, "status_maize", 100, 50000);
 						checkforCollectionsInitialization(db, "status_barley", 100, 50000);
 						checkforCollectionsInitialization(db, "status_phyto", 100, 50000);
@@ -2510,7 +2511,7 @@ public class MongoDB {
 			for (Object o : l)
 				ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
-						new BasicDBObject("_id", new BasicDBObject("$in", ll))
+					new BasicDBObject("_id", new BasicDBObject("$in", ll))
 					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
 			for (DBObject cond : condL) {
 				try {
@@ -2625,12 +2626,12 @@ public class MongoDB {
 		for (Object o : l)
 			ll.add(new ObjectId(o + ""));
 		DBCursor condL = collCond.find(
-					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					, new BasicDBObject()
-							.append("_id", new Integer(1))
-							.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
-							.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
-							.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+				new BasicDBObject("_id", new BasicDBObject("$in", ll))
+				, new BasicDBObject()
+						.append("_id", new Integer(1))
+						.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
+						.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
+						.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
 				).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
 		for (DBObject cond : condL) {
 			// find objects in "condition" collection, but only fields images, volumes, networks
@@ -2924,32 +2925,28 @@ public class MongoDB {
 		return (GridFS) result.getObject();
 	}
 	
-	public Collection<String> getNews(final int limit) {
+	public Collection<String> getNews(final int limit) throws Exception {
 		final LinkedList<String> res = new LinkedList<String>();
-		try {
-			processDB(new RunnableOnDB() {
-				private DB db;
-				
-				@Override
-				public void run() {
-					SimpleDateFormat sdf = new SimpleDateFormat();
-					for (DBObject newsItem : db.getCollection("news").find().sort(new BasicDBObject("date", -1)).limit(limit)) {
-						Date l = (Date) newsItem.get("date");
-						String text = (String) newsItem.get("text");
-						String user = (String) newsItem.get("user");
-						res.add(sdf.format(l) + ": " + text + " (" + user + ")");
-					}
+		
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				SimpleDateFormat sdf = new SimpleDateFormat();
+				for (DBObject newsItem : db.getCollection("news").find().sort(new BasicDBObject("date", -1)).limit(limit)) {
+					Date l = (Date) newsItem.get("date");
+					String text = (String) newsItem.get("text");
+					String user = (String) newsItem.get("user");
+					res.add(sdf.format(l) + ": " + text + " (" + user + ")");
 				}
-				
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return null;
-		}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 		return res;
 	}
 	
@@ -3281,8 +3278,8 @@ public class MongoDB {
 									}
 									synchronized (conditions) {
 										conditions.remove(
-														new BasicDBObject("_id", new BasicDBObject("$in", list)),
-														WriteConcern.SAFE);
+												new BasicDBObject("_id", new BasicDBObject("$in", list)),
+												WriteConcern.SAFE);
 									}
 									status.setCurrentStatusValueFine(100d / max * n.getLong());
 									status.setCurrentStatusText2(n.getLong() + "/" + max + " (" + (int) (100d / max * n.getLong()) + "%)");
