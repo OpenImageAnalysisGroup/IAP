@@ -407,13 +407,20 @@ public class MongoDB {
 								DBRef subr = new DBRef(db, "substances", new ObjectId(so.toString()));
 								if (subr != null) {
 									DBObject substance = subr.fetch();
-									BasicDBList cl = (BasicDBList) substance.get("condition_ids");
-									if (cl != null) {
-										for (Object oo : cl) {
-											collCond.remove(new BasicDBObject("_id", new ObjectId(oo.toString())));
+									if (substance != null) {
+										BasicDBList cl = (BasicDBList) substance.get("condition_ids");
+										if (cl != null) {
+											for (Object oo : cl) {
+												collCond.remove(new BasicDBObject("_id", new ObjectId(oo.toString())));
+											}
 										}
 									}
-									collSubst.remove(substance);
+									if (substance != null)
+										try {
+											collSubst.remove(substance);
+										} catch (Exception err) {
+											err.printStackTrace();
+										}
 								}
 							}
 						}
@@ -3070,7 +3077,7 @@ public class MongoDB {
 				
 				ArrayList<ExperimentHeaderInterface> el = getExperimentList(null);
 				final HashSet<String> linkedHashes = new HashSet<String>();
-				final double smallStep = 100d / 5 * 1 / el.size();
+				final double smallStep = 1 / el.size();
 				final HashSet<String> dbIdsOfSubstances = new HashSet<String>();
 				final HashSet<String> dbIdsOfConditions = new HashSet<String>();
 				status.setCurrentStatusText2("Read list of substances");
@@ -3163,7 +3170,7 @@ public class MongoDB {
 					}
 				};
 				
-				int nThreads = 2;
+				int nThreads = 5;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
 				for (final ExperimentHeaderInterface ehii : todo) {
