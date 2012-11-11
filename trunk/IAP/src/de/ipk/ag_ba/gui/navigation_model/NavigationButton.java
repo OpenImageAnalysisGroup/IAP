@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
@@ -47,6 +48,7 @@ import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.OnlyVerticalScrollPanel;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -391,7 +393,7 @@ public class NavigationButton implements StyleAware {
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
-					if (n1.getText()!=null && n1.getText().indexOf("Please wait") >= 0)
+					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
 						if (!n1.getText().contains("[REMOVE FROM UPDATE]"))
@@ -515,9 +517,11 @@ public class NavigationButton implements StyleAware {
 										errors.add(e);
 									}
 									ErrorMsg.clearErrorMessages();
-									gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2), gui,
+									gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2),
+											gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui,
 											TableLayout.PREFERRED, TableLayout.FILL);
-								}
+								} else
+									gui = gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui;
 								graphPanel.add(gui, "0,0");
 								graphPanel.revalidate();
 								graphPanel.repaint();
