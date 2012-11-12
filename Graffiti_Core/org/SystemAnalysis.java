@@ -1,6 +1,8 @@
 package org;
 
+import java.awt.AWTException;
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
@@ -405,5 +407,9 @@ public class SystemAnalysis {
 		Calendar c = new GregorianCalendar();
 		c.setTime(new Date(System.currentTimeMillis()));
 		return c.get(Calendar.MINUTE);
+	}
+	
+	public static Screenshot getScreenshot() throws IOException, AWTException {
+		return new Screenshot();
 	}
 }

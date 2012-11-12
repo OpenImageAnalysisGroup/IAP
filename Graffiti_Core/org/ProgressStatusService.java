@@ -169,10 +169,10 @@ public class ProgressStatusService implements HelperClass {
 		}
 		lastRes = result;
 		if (result != null) {
-			// if (result.contains("years"))
-			// return "";
-			// else
-			return result;
+			if (result.contains("years"))
+				return "n/a";
+			else
+				return result;
 		} else
 			return "";
 	}

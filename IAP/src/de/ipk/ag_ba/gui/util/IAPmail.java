@@ -2,22 +2,14 @@ package de.ipk.ag_ba.gui.util;
 
 import java.awt.AWTException;
 import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.imageio.ImageIO;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -30,7 +22,9 @@ import javax.mail.internet.MimeMultipart;
 
 import org.AttributeHelper;
 import org.ReleaseInfo;
+import org.Screenshot;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.mongo.HttpBasicAuth;
@@ -107,11 +101,10 @@ public class IAPmail {
 				}
 			}
 			try {
-				boolean takeScreenShot = true;
+				boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in Attachment", true);
 				if (takeScreenShot) {
 					if (!GraphicsEnvironment.isHeadless()) {
 						createScreenshotAndAttachToMail(mp);
-						
 					}
 				}
 			} catch (Exception e) {
@@ -133,17 +126,9 @@ public class IAPmail {
 		}
 	}
 	
-	private void createScreenshotAndAttachToMail(Multipart mp) throws AWTException, MessagingException {
-		Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		final BufferedImage capture = new Robot().createScreenCapture(screenRect);
-		String fileN;
-		try {
-			fileN = SystemAnalysis.getLocalHost().getCanonicalHostName() + " (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-			fileN = "unknown host (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
-		}
-		final String fileName = fileN;
+	private void createScreenshotAndAttachToMail(Multipart mp) throws AWTException, MessagingException, IOException {
+		final Screenshot screenshot = SystemAnalysis.getScreenshot();
+		
 		MimeBodyPart img = new MimeBodyPart();
 		img.setDataHandler(new DataHandler(new DataSource() {
 			
@@ -154,19 +139,12 @@ public class IAPmail {
 			
 			@Override
 			public String getName() {
-				return fileName;
+				return screenshot.getScreenshotFileName();
 			}
 			
 			@Override
 			public InputStream getInputStream() throws IOException {
-				try {
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					ImageIO.write(capture, "png", baos);
-					InputStream is = new ByteArrayInputStream(baos.toByteArray());
-					return is;
-				} catch (Exception e) {
-					throw new IOException(e.getMessage());
-				}
+				return screenshot.getScreenshotImage();
 			}
 			
 			@Override
@@ -174,7 +152,7 @@ public class IAPmail {
 				return "image/png";
 			}
 		}));
-		img.setFileName(fileName);
+		img.setFileName(screenshot.getScreenshotFileName());
 		mp.addBodyPart(img);
 	}
 	
