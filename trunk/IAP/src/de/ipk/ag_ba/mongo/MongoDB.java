@@ -3167,7 +3167,7 @@ public class MongoDB {
 					}
 				};
 				
-				int nThreads = 5;
+				int nThreads = 100;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
 				for (final ExperimentHeaderInterface ehii : todo) {
@@ -3201,8 +3201,10 @@ public class MongoDB {
 									ss, visitSubstance, visitCondition, visitBinaryMeasurement,
 									invalid);
 							long b = System.currentTimeMillis();
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Visiting " + ehii.getExperimentname() + " took " +
-									StringManipulationTools.formatNumber((b - a) / 1000d, "#.#") + " seconds");
+							String msg = "Visiting " + ehii.getExperimentname() + " (" + r + "/" + nn + ") took " +
+									StringManipulationTools.formatNumber((b - a) / 1000d, "#.#") + "s";
+							System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
+							status.setCurrentStatusText1(msg);
 							status.setCurrentStatusValueFineAdd(smallStep);
 							if (invalid.getBval(0, false)) {
 								invalid.setParam(0, ehii.getDatabaseId());
