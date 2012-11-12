@@ -145,9 +145,6 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
 				result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
 			
-			result.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
-			
-			result.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
 			status.setCurrentStatusValueFine(100d);
 			status.setCurrentStatusText1("Found " + n + " experiments");
 			

@@ -152,6 +152,13 @@ public class Other {
 				
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
+				int numberOfCameras = SystemOptions.getInstance().getInteger("CCTV", "n", 2);
+				for (int idx = 0; idx<numberOfCameras; idx++) {
+					
+					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
+					resultNavigationButtons.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
+				}
+				
 				if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true)) {
 					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 					for (MongoDB m : MongoDB.getMongos()) {

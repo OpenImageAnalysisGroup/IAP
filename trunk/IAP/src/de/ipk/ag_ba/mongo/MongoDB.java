@@ -3169,6 +3169,7 @@ public class MongoDB {
 				
 				int nThreads = 100;
 				ExecutorService executor = Executors.newFixedThreadPool(nThreads);
+				final ThreadSafeOptions fc = new ThreadSafeOptions();
 				final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
 				for (final ExperimentHeaderInterface ehii : todo) {
 					executor.submit(new Runnable() {
@@ -3177,7 +3178,7 @@ public class MongoDB {
 							ThreadSafeOptions invalid = new ThreadSafeOptions();
 							invalid.setBval(0, false);
 							final int r = ii.addInt(1);
-							status.setCurrentStatusText2("Analyze " + ehii.getExperimentName()
+							status.setCurrentStatusText1("Analyze " + ehii.getExperimentName()
 									+ " (" + r + "/" + nn + ")");
 							BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger() {
 								
@@ -3201,10 +3202,11 @@ public class MongoDB {
 									ss, visitSubstance, visitCondition, visitBinaryMeasurement,
 									invalid);
 							long b = System.currentTimeMillis();
-							String msg = "Visiting " + ehii.getExperimentname() + " (" + r + "/" + nn + ") took " +
-									StringManipulationTools.formatNumber((b - a) / 1000d, "#.#") + "s";
+							fc.addInt(1);
+							String msg = "Visiting " + ehii.getExperimentname() + " (" + fc.getInt() + " finished) took " +
+									SystemAnalysis.getWaitTime(b - a);
 							System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
-							status.setCurrentStatusText1(msg);
+							status.setCurrentStatusText2(msg);
 							status.setCurrentStatusValueFineAdd(smallStep);
 							if (invalid.getBval(0, false)) {
 								invalid.setParam(0, ehii.getDatabaseId());

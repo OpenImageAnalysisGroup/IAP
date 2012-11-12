@@ -13,6 +13,7 @@ import info.StopWatch;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -55,8 +56,10 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
+import org.Screenshot;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.Vector2d;
 import org.graffiti.editor.ConfigureViewAction;
 import org.graffiti.editor.GravistoService;
@@ -1063,6 +1066,7 @@ public class IAPservice {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
+		
 		long startTime = System.currentTimeMillis();
 		
 		boolean containsAutoTimingSetting = false;
@@ -1072,6 +1076,9 @@ public class IAPservice {
 			if (createVideo) {
 				storeImages(cam2lastSnapshot);
 			}
+			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "storeCurrentDesktopScreenshot", true);
+			if (saveDesktopSnapshot)
+				storeDesktopImages();
 			
 			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
 			TextFile config = new TextFile(experimentListFileName);
@@ -1269,7 +1276,7 @@ public class IAPservice {
 		}
 	}
 	
-	private static void storeImages(final HashMap<IAPwebcam, Long> cam2lastSnapshot) {
+	private synchronized static void storeImages(final HashMap<IAPwebcam, Long> cam2lastSnapshot) {
 		if (!cam2lastSnapshot.containsKey(IAPwebcam.BARLEY))
 			cam2lastSnapshot.put(IAPwebcam.BARLEY, 0l);
 		if (!cam2lastSnapshot.containsKey(IAPwebcam.MAIZE))
@@ -1303,6 +1310,45 @@ public class IAPservice {
 			} catch (Exception e) {
 				System.err.println(SystemAnalysis.getCurrentTime() + ">COULD NOT SAVE VIDEO SNAPSHOT: " + e.getMessage());
 			}
+		}
+	}
+	
+	private static long lastScreenshotSaving = 0;
+	
+	private synchronized static void storeDesktopImages() {
+		long t = System.currentTimeMillis();
+		
+		try {
+			int interval = SystemOptions.getInstance().getInteger("Watch-Service", "interval_seconds", 5 * 60);
+			if (interval < 1) {
+				SystemOptions.getInstance().setInteger("Watch-Service", "interval_sconds", 1);
+				interval = 1;
+			}
+			if (!GraphicsEnvironment.isHeadless() && t - lastScreenshotSaving >= interval * 1000) {
+				final Screenshot screenshot = SystemAnalysis.getScreenshot();
+				MongoDB mm = MongoDB.getDefaultCloud();
+				mm.processDB(new RunnableOnDB() {
+					private DB db;
+					
+					@Override
+					public void run() {
+						GridFS gridfs_webcam_files = new GridFS(db, "fs_screenshots");
+						GridFSInputFile inputFile = gridfs_webcam_files.createFile(screenshot.getScreenshotImage(), screenshot.getScreenshotFileName());
+						inputFile.setMetaData(new BasicDBObject("time", screenshot.getTime()));
+						inputFile.setMetaData(new BasicDBObject("host", SystemAnalysisExt.getHostNameNoError()));
+						inputFile.save();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED DESKTOP SNAPSHOT IN DB " + db.getName());
+						lastScreenshotSaving = System.currentTimeMillis();
+					}
+					
+					@Override
+					public void setDB(DB db) {
+						this.db = db;
+					}
+				});
+			}
+		} catch (Exception e) {
+			System.err.println(SystemAnalysis.getCurrentTime() + ">COULD NOT SAVE CURRENT DESKTOP SCREENSHOT: " + e.getMessage());
 		}
 	}
 	
