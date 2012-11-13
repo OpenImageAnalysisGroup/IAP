@@ -25,7 +25,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcMainAxis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcWidthAndHeight_vis;
@@ -108,7 +108,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlCalcMainAxis_vis.class.getCanonicalName(),
 				BlLeafCurlingAnalysis_vis.class.getCanonicalName(),
 				BlCalcIntensity_vis_fluo_nir_ir.class.getCanonicalName(),
-				BlConvexHull_fluo.class.getCanonicalName(),
+				BlConvexHull_vis_fluo.class.getCanonicalName(),
 				
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),

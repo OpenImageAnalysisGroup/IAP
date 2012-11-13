@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
-import ij.measure.ResultsTable;
-
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -120,7 +118,7 @@ public class ConvexHullCalculator {
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
 			boolean drawHull, boolean drawCentroid, int borderColor,
 			int hullLineColor, int centroidColor, BlockProperty distHorizontal,
-			int realMarkerDist) {
+			Integer realMarkerDist) {
 		
 		calculate(borderColor);
 		
