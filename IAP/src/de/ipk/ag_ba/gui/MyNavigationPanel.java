@@ -249,7 +249,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne));
 							lbl.setToolTipText("Add bookmark");
 						}
-						lbl.setForeground(Color.GRAY);
+						// lbl.setForeground(Color.GRAY);
+						lbl.setForeground(Color.BLACK);
 						add(lbl);
 					}
 					add(NavigationButton.getNavigationButton(buttonStyleToUse, ne, getTarget(), this, getTheOther(), graphPanel));
@@ -269,7 +270,8 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					next.setObject(lbl);
 				}
 				lbl.setText("<html><font size='5'>" + Unicode.STAR);
-				lbl.setForeground(Color.GRAY);
+				// lbl.setForeground(Color.GRAY);
+				lbl.setForeground(Color.BLACK);
 				add(lbl);
 			}
 			if (actionPanelRight != null) {
