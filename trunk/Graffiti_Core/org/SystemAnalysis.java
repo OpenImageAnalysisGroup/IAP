@@ -252,6 +252,7 @@ public class SystemAnalysis {
 		if (System.console() == null) {
 			Scanner sc = new Scanner(System.in);
 			input = sc.next();
+			sc.close();
 		} else {
 			input = System.console().readLine();
 		}
