@@ -3663,4 +3663,44 @@ public class MongoDB {
 	public boolean isDbHostReachable() {
 		return IAPservice.isReachable(databaseHost);
 	}
+	
+	public Collection<GridFSDBFile> getSavedScreenshots() throws Exception {
+		final HashMap<String, Long> fn2newestStorageTime = new HashMap<String, Long>();
+		final HashMap<String, GridFSDBFile> fn2newestFile = new HashMap<String, GridFSDBFile>();
+		
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				GridFS gridfs_webcam_files = new GridFS(db, "fs_screenshots");
+				List<GridFSDBFile> files = gridfs_webcam_files.find(new BasicDBObject());
+				// inputFile.setMetaData(new BasicDBObject("time", screenshot.getTime()));
+				// inputFile.setMetaData(new BasicDBObject("host", SystemAnalysisExt.getHostNameNoError()));
+				long t = 0;
+				for (GridFSDBFile o : files) {
+					Long time = (Long) o.get("time");
+					if (time == null)
+						time = t++;
+					String fn = (String) o.get("_id");
+					fn2newestFile.put(fn, o);
+					fn2newestStorageTime.put(fn, time);
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		getDefaultCloud().processDB(runnableOnDB);
+		
+		return fn2newestFile.values();
+	}
+	
+	public void updateScreenshotObserver(String host, long currentTimeMillis) {
+		// TODO Auto-generated method stub
+		
+	}
 }

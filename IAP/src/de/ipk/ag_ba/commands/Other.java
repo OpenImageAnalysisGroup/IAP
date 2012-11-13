@@ -23,6 +23,9 @@ import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import com.mongodb.gridfs.GridFSDBFile;
+
+import de.ipk.ag_ba.commands.lemnatec.ActionGridFSscreenshotMonitoring;
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamBarleyGH;
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamMaizeGH;
 import de.ipk.ag_ba.commands.mongodb.ActionMassCopyHistory;
@@ -153,12 +156,22 @@ public class Other {
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
 				int numberOfCameras = SystemOptions.getInstance().getInteger("CCTV", "n", 2);
-				for (int idx = 0; idx<numberOfCameras; idx++) {
-					
+				for (int idx = 0; idx < numberOfCameras; idx++) {
 					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
 					resultNavigationButtons.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
 				}
 				
+				{
+					for (MongoDB dc : MongoDB.getMongos()) {
+						try {
+							for (GridFSDBFile sf : dc.getSavedScreenshots()) {
+								resultNavigationButtons.add(new NavigationButton(new ActionGridFSscreenshotMonitoring(dc, (String) sf.getId()), src.getGUIsetting()));
+							}
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+					}
+				}
 				if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true)) {
 					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 					for (MongoDB m : MongoDB.getMongos()) {

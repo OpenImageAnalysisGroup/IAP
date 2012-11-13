@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -77,6 +78,7 @@ import org.graffiti.session.EditorSession;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
@@ -1333,10 +1335,13 @@ public class IAPservice {
 					@Override
 					public void run() {
 						GridFS gridfs_webcam_files = new GridFS(db, "fs_screenshots");
-						GridFSInputFile inputFile = gridfs_webcam_files.createFile(screenshot.getScreenshotImage(), screenshot.getScreenshotFileName());
+						List<GridFSDBFile> oldFiles = gridfs_webcam_files.find(screenshot.getScreenshotStaticFileName());
+						GridFSInputFile inputFile = gridfs_webcam_files.createFile(screenshot.getScreenshotImage(), screenshot.getScreenshotStaticFileName());
 						inputFile.setMetaData(new BasicDBObject("time", screenshot.getTime()));
 						inputFile.setMetaData(new BasicDBObject("host", SystemAnalysisExt.getHostNameNoError()));
 						inputFile.save();
+						for (GridFSDBFile oldFile : oldFiles)
+							gridfs_webcam_files.remove(oldFile);
 						System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED DESKTOP SNAPSHOT IN DB " + db.getName());
 						lastScreenshotSaving = System.currentTimeMillis();
 					}
