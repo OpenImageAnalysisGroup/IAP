@@ -13,6 +13,8 @@ import org.ErrorMsg;
 import org.MarkComponent;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import com.mongodb.gridfs.GridFS;
+
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
@@ -23,7 +25,7 @@ public class PictureViewerFromDB extends JPanel implements HierarchyListener {
 	ThreadSafeOptions tso = new ThreadSafeOptions();
 	
 	public PictureViewerFromDB(final MongoDB dc, String filename,
-			final BackgroundTaskStatusProviderSupportingExternalCall status) {
+			final BackgroundTaskStatusProviderSupportingExternalCall status, GridFS gridfs_screenshots) {
 		setLayout(TableLayout.getLayout(650, 800));
 		final JLabel lbl = new JLabel("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&gt;" +
 				"Screenshot time: n/a" +
@@ -38,7 +40,8 @@ public class PictureViewerFromDB extends JPanel implements HierarchyListener {
 			}
 		};
 		
-		final UpdatingImagePanelForDB view = new UpdatingImagePanelForDB(dc, filename, stat);
+		final UpdatingImagePanelForDB view = new UpdatingImagePanelForDB(dc, filename, stat,
+				gridfs_screenshots);
 		final MarkComponent mark = new MarkComponent(view, true, 640, false, 480);
 		boolean markBothsides = false;
 		if (markBothsides)
@@ -64,7 +67,7 @@ public class PictureViewerFromDB extends JPanel implements HierarchyListener {
 					status.setCurrentStatusText1("connection closed");
 					Thread.sleep(3000);
 					status.setCurrentStatusText1("");
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 			}

@@ -9,6 +9,7 @@ package de.ipk.ag_ba.mongo;
 
 import info.StopWatch;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -72,12 +73,14 @@ import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -3683,7 +3686,7 @@ public class MongoDB {
 					Long time = (Long) o.get("time");
 					if (time == null)
 						time = t++;
-					String fn = (String) o.get("_id");
+					String fn = "" + o.get("_id");
 					fn2newestFile.put(fn, o);
 					fn2newestStorageTime.put(fn, time);
 				}
@@ -3694,13 +3697,54 @@ public class MongoDB {
 				this.db = db;
 			}
 		};
-		getDefaultCloud().processDB(runnableOnDB);
+		processDB(runnableOnDB);
 		
 		return fn2newestFile.values();
 	}
 	
-	public void updateScreenshotObserver(String host, long currentTimeMillis) {
-		// TODO Auto-generated method stub
-		
+	public void updateScreenshotObserver(String host, long currentTimeMillis) throws Exception {
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				// to do
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		processDB(runnableOnDB);
+	}
+	
+	public BufferedImage getSavedScreenshot(String filename, GridFS gridfs_webcam_files,
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
+		try {
+			GridFSDBFile f = gridfs_webcam_files.findOne(filename);
+			status.setCurrentStatusText1(""
+					+ f.getUploadDate());
+			return ImageIO.read(f.getInputStream());
+		} catch (Exception e) {
+			status.setCurrentStatusText1(" // ERROR: " + e.getMessage());
+			return ImageConverter.convertImage2BufferedImage(IAPimages.getImage(IAPimages.getComputerOffline()));
+		}
+	}
+	
+	public GridFS getScreenshotFS() throws Exception {
+		final ThreadSafeOptions dbs = new ThreadSafeOptions();
+		processDB(new RunnableOnDB() {
+			@Override
+			public void run() {
+				// empty
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				dbs.setParam(0, db);
+			}
+		});
+		return new GridFS((DB) dbs.getParam(0, null), "fs_screenshots");
 	}
 }
