@@ -1080,7 +1080,7 @@ public class IAPservice {
 			}
 			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "storeCurrentDesktopScreenshot", true);
 			if (saveDesktopSnapshot)
-				storeDesktopImages();
+				storeDesktopImage(false);
 			
 			ArrayList<WatchConfig> configList = new ArrayList<WatchConfig>();
 			TextFile config = new TextFile(experimentListFileName);
@@ -1317,7 +1317,7 @@ public class IAPservice {
 	
 	private static long lastScreenshotSaving = 0;
 	
-	private synchronized static void storeDesktopImages() {
+	public synchronized static void storeDesktopImage(boolean immediately) {
 		long t = System.currentTimeMillis();
 		
 		try {
@@ -1326,7 +1326,7 @@ public class IAPservice {
 				SystemOptions.getInstance().setInteger("Watch-Service", "interval_sconds", 1);
 				interval = 1;
 			}
-			if (!GraphicsEnvironment.isHeadless() && t - lastScreenshotSaving >= interval * 1000) {
+			if (!GraphicsEnvironment.isHeadless() && (t - lastScreenshotSaving >= interval * 1000 || immediately)) {
 				final Screenshot screenshot = SystemAnalysis.getScreenshot();
 				MongoDB mm = MongoDB.getDefaultCloud();
 				mm.processDB(new RunnableOnDB() {

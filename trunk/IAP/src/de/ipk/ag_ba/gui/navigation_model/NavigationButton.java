@@ -161,7 +161,8 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public String getTitle() {
-		return getTitle(false);
+		String res = getTitle(false);
+		return res != null ? res : res + "";
 	}
 	
 	public String getTitle(boolean forceProgressText) {

@@ -9,6 +9,10 @@ public class IAPimages {
 	
 	private static boolean ns = false;
 	
+	public static Image getImage(String image) {
+		return IAPservice.getImage(IAPmain.class, image);
+	}
+	
 	public static String saveAsArchive() {
 		return "img/ext/gpl2/Add-Files-To-Archive-64.png";
 	}
@@ -170,7 +174,7 @@ public class IAPimages {
 		return "img/ext/gpl2/Gnome-Window-Close-64.png";
 	}
 	
-	public static Image getImage(String image) {
-		return IAPservice.getImage(IAPmain.class, image);
+	public static String getComputerOffline() {
+		return "img/ext/gpl2/Gnome-Network-Offline-64.png";
 	}
 }

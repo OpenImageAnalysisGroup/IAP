@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.Timer;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -140,6 +141,9 @@ public class Other {
 		return getServerStatusEntity(includeLemnaTecStatus, "System Status", guIsetting);
 	}
 	
+	static Timer globalScreenshotTimer = null;
+	static ThreadSafeOptions globalScreenshotStorage = new ThreadSafeOptions();
+	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
 			GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
@@ -155,6 +159,10 @@ public class Other {
 				
 				// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
 				
+				if (MongoDB.getDefaultCloud() != null) {
+					resultNavigationButtons.add(new NavigationButton(new ActionScreenshotStorage("Enable/Disable Desktop Screenshot Sharing"), src.getGUIsetting()));
+				}
+				
 				int numberOfCameras = SystemOptions.getInstance().getInteger("CCTV", "n", 2);
 				for (int idx = 0; idx < numberOfCameras; idx++) {
 					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
@@ -165,7 +173,13 @@ public class Other {
 					for (MongoDB dc : MongoDB.getMongos()) {
 						try {
 							for (GridFSDBFile sf : dc.getSavedScreenshots()) {
-								resultNavigationButtons.add(new NavigationButton(new ActionGridFSscreenshotMonitoring(dc, (String) sf.getId()), src.getGUIsetting()));
+								resultNavigationButtons.add(
+										new NavigationButton(
+												new ActionGridFSscreenshotMonitoring(
+														dc, "" + sf.getId(),
+														sf.getFilename(),
+														dc.getScreenshotFS()),
+												src.getGUIsetting()));
 							}
 						} catch (Exception e) {
 							ErrorMsg.addErrorMessage(e);
