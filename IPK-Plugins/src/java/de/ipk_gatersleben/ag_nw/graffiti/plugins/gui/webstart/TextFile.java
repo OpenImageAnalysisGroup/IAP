@@ -132,9 +132,13 @@ public class TextFile extends ArrayList<String> {
 		}
 	}
 	
+	public TextFile(File f) throws IOException {
+		this(new InputStreamReader(new FileInputStream(f)));
+	}
+	
 	public void write(String fileName) throws IOException {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-							fileName)));
+				fileName)));
 		for (int i = 0; i < size(); i++)
 			out.println(get(i));
 		out.close();
@@ -156,21 +160,21 @@ public class TextFile extends ArrayList<String> {
 	
 	public static void write(String fileName, String text) throws IOException {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-							fileName)));
+				fileName)));
 		out.print(text);
 		out.close();
 	}
 	
 	public static void writeE(String fileName, String text, String encoding) throws IOException {
 		Writer out = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(fileName), encoding));
+				new FileOutputStream(fileName), encoding));
 		out.write(text);
 		out.close();
 	}
 	
 	public void writeE(String fileName, String encoding) throws IOException {
 		Writer out = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(fileName), encoding));
+				new FileOutputStream(fileName), encoding));
 		for (int i = 0; i < size(); i++)
 			out.write(get(i) + System.getProperty("line.separator"));
 		out.close();
@@ -178,17 +182,17 @@ public class TextFile extends ArrayList<String> {
 	
 	public void writeE(File file, String encoding) throws IOException {
 		Writer out = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(file), encoding));
+				new FileOutputStream(file), encoding));
 		for (int i = 0; i < size(); i++)
 			out.write(get(i) + System.getProperty("line.separator"));
 		out.close();
 	}
 	
 	public static void write(String fileName, String text,
-						ProgressManager pm) throws IOException {
+			ProgressManager pm) throws IOException {
 		pm.setStatus(83, "Create Cache (Writer)");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-							fileName)));
+				fileName)));
 		long sz = text.length() / 1024;
 		pm.setStatus(86, "Create Cache (Printing ~" + sz + "KB)");
 		out.print(text);
