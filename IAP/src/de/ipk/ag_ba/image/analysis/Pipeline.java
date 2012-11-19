@@ -29,6 +29,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fl
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.Bl_Arabidopsis_IRdiff_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlCalcIntensity_vis_fluo_nir_ir;
@@ -79,6 +80,7 @@ public class Pipeline extends AbstractImageProcessor {
 				BlockClosing_vis.class.getCanonicalName(),
 				BlockClearMasksBasedOnMarkers_vis_fluo_nir.class.getCanonicalName(),
 				// BlMedianFilter_vis.class.getCanonicalName(),
+				Bl_Arabidopsis_IRdiff_ir.class.getCanonicalName(),
 				BlLeafCurlingAnalysis_vis.class.getCanonicalName(),
 				BlIntensityConversion_fluo.class.getCanonicalName(),
 				BlTranslateMatch_vis_fluo_nir.class.getCanonicalName(),

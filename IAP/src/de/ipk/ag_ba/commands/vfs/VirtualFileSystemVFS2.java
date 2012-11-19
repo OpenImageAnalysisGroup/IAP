@@ -39,7 +39,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		this.user = user;
 		this.pass = pass;
 		this.folder = folder;
-		if (this.vfs_type==VfsFileProtocol.LOCAL) {
+		if (this.vfs_type == VfsFileProtocol.LOCAL) {
 			ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
 		}
 	}
@@ -113,6 +113,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		return VfsFileObjectUtil.createVfsFileObject(
 				vfs_type, host,
 				fileNameInclSubFolderPathName, user, pass);
+	}
+	
+	public VfsFileProtocol getProtocolType() {
+		return vfs_type;
 	}
 	
 }

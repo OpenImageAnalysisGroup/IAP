@@ -152,7 +152,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 			errorCount = 0;
 			String hsmFolder = "";
 			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
-					hsmFolder);
+					"udp", hsmFolder);
 			
 			long startTime = System.currentTimeMillis();
 			

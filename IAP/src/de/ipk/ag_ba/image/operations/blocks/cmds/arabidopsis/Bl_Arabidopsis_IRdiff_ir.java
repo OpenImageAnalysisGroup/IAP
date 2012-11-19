@@ -9,9 +9,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
- * Create a simulated, dummy reference image (in case the reference image is NULL).
- * 
- * @author pape, klukas
+ * @author klukas
  */
 public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -26,15 +24,21 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 			warmBack.io().intensitySumOfChannel(false, false, false, false, warmBackgroundValues);
 			Collections.sort(warmBackgroundValues);
 			double sum = 0;
-			for (int i = warmBackgroundValues.size() / 2; i < warmBackgroundValues.size(); i++)
+			for (int i = warmBackgroundValues.size() / 2; i < warmBackgroundValues.size() * 0.75d; i++)
 				sum += warmBackgroundValues.get(i);
-			double warmBackground = sum / (warmBackgroundValues.size() / 2);
+			double warmBackground = sum / (warmBackgroundValues.size() / 4);
 			int[] res = coldRef.copy().getAs1A();
 			for (int i = 0; i < res.length; i++)
 				res[i] = IAPservice.getIRintensityDifferenceColor(
 						IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
 						options.getBackground());
-			return new FlexibleImage(coldRef.getWidth(), coldRef.getHeight(), res);
+			FlexibleImage gray = new FlexibleImage(coldRef.getWidth(), coldRef.getHeight(), res);
+			boolean debug = false;
+			if (options.isBarley())
+				gray = gray.io().print("ADAPT IN", debug).
+						adaptiveThresholdForGrayscaleImage(50, 20,
+								options.getBackground(), 0.05).getImage().print("ADAPT OUT", debug);
+			return gray;
 		} else
 			return null;
 	}

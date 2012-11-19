@@ -133,11 +133,12 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		else {
 			try {
 				String rem = info.getParentSample().getParentCondition().getExperimentHeader().getRemark();
-				for (String r : rem.split("//")) {
-					r = r.trim();
-					if (r.startsWith(remarkID) && r.contains(":"))
-						return r.split(":", 2)[1].trim();
-				}
+				if (rem != null)
+					for (String r : rem.split("//")) {
+						r = r.trim();
+						if (r.startsWith(remarkID) && r.contains(":"))
+							return r.split(":", 2)[1].trim();
+					}
 				return defaultReturn;
 			} catch (Exception e) {
 				System.err.println(SystemAnalysis.getCurrentTime() + ">Error processing remark information:");

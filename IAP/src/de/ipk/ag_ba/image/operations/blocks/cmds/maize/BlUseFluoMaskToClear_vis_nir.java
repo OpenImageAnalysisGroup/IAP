@@ -100,6 +100,23 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 		return input().masks().nir();
 	}
 	
+	@Override
+	protected FlexibleImage processIRimage() {
+		if (input().images().ir() == null || input().masks().fluo() == null || options.isBarleyInBarleySystem())
+			return input().images().ir();
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			FlexibleImage input = input().images().ir();
+			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.001);
+		}
+		
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			FlexibleImage input = input().images().ir();
+			
+			return clearImageLeftAround(input, input().masks().fluo());
+		}
+		return input().masks().ir();
+	}
+	
 	private FlexibleImage clearImageSide(FlexibleImage inputToCut, FlexibleImage imageSource, double cutTop) {
 		if (inputToCut == null || imageSource == null)
 			return null;

@@ -153,7 +153,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			errorCount = 0;
 			
 			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
-					vfs.getTargetPathName());
+					vfs.getPrefix(), vfs.getTargetPathName());
 			
 			long startTime = System.currentTimeMillis();
 			
@@ -304,14 +304,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							InputStream is = null;
 							
 							byte[] previewData = ResourceIOManager.getPreviewImageContent(unchangedURL);
-							if (previewData==null || previewData.length==0)
-							if (fileContent != null) {
-								MyByteArrayInputStream bis = fileContent.get();
-								if (bis != null)
-									is = bis.getNewStream();
-							}
+							if (previewData == null || previewData.length == 0)
+								if (fileContent != null) {
+									MyByteArrayInputStream bis = fileContent.get();
+									if (bis != null)
+										is = bis.getNewStream();
+								}
 							try {
-								if (is == null && (previewData==null || previewData.length==0)) {
+								if (is == null && (previewData == null || previewData.length == 0)) {
 									is = ResourceIOManager
 											.getInputStreamMemoryCached(bm
 													.getURL());
@@ -323,7 +323,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								}
 								
 								MyByteArrayInputStream previewStream;
-								if (previewData==null || previewData.length==0) {
+								if (previewData == null || previewData.length == 0) {
 									BufferedImage bimage = ImageIO.read(is);
 									previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
 								} else {
@@ -338,8 +338,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									System.out
 											.println("ERROR: Preview could not be created or saved.");
 							} finally {
-								if (is!=null)
-								is.close();
+								if (is != null)
+									is.close();
 							}
 						}
 					} catch (Exception e) {
@@ -575,7 +575,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				try {
 					try {
 						if (!targetExists) {
-							in = url != null || optUrlContent==null ? ResourceIOManager
+							in = url != null || optUrlContent == null ? ResourceIOManager
 									.getInputStreamMemoryCached(url)
 									: optUrlContent;
 							synchronized (es) {
@@ -632,7 +632,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		});
 	}
 	
-	private String determineBinaryFileName(long t, final String substanceName,
+	public static String determineBinaryFileName(long t, final String substanceName,
 			NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();

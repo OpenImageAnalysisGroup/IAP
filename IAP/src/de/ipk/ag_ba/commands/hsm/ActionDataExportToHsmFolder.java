@@ -155,7 +155,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 			errorCount = 0;
 			
 			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
-					hsmFolder);
+					HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
 			
 			long startTime = System.currentTimeMillis();
 			
@@ -261,7 +261,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 							System.out
 									.println("ERROR: HSM TRANSFER AND DATA STORAGE: "
 											+ e.getMessage()
-											+ " // WILL RETRY IN 2 MINUTES // "
+											+ " // WILL RETRY IN 10 MINUTES // "
 											+ SystemAnalysis
 													.getCurrentTime());
 							Thread.sleep(10 * 60 * 1000);

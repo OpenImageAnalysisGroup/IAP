@@ -48,19 +48,21 @@ public class BlLoadImagesIfNeeded_images_masks extends
 				}
 				if (input().masks() != null) {
 					url = input().images().getVisInfo().getLabelURL();
-					try {
-						FlexibleImage fi = new FlexibleImage(url);
-						if (fi != null && fi.getWidth() > 1
-								&& fi.getHeight() > 1)
-							input().masks().setVis(fi);
-					} catch (Error e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: ERROR: VIS-REFERENCE: "
-								+ e.getMessage() + " // " + url);
-					} catch (Exception e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: VIS-REFERENCE: " + e.getMessage()
-								+ " // " + url);
+					if (url != null) {
+						try {
+							FlexibleImage fi = new FlexibleImage(url);
+							if (fi != null && fi.getWidth() > 1
+									&& fi.getHeight() > 1)
+								input().masks().setVis(fi);
+						} catch (Error e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: ERROR: VIS-REFERENCE: "
+									+ e.getMessage() + " // " + url);
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: VIS-REFERENCE: " + e.getMessage()
+									+ " // " + url);
+						}
 					}
 				}
 			}
@@ -83,19 +85,21 @@ public class BlLoadImagesIfNeeded_images_masks extends
 				}
 				if (input().masks() != null) {
 					url = input().images().getFluoInfo().getLabelURL();
-					try {
-						FlexibleImage fi = new FlexibleImage(url);
-						if (fi != null && fi.getWidth() > 1
-								&& fi.getHeight() > 1)
-							input().masks().setFluo(fi);
-					} catch (Error e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: ERROR: FLUO-REFERENCE: "
-								+ e.getMessage() + " // " + url);
-					} catch (Exception e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: FLUO-REFERENCE: " + e.getMessage()
-								+ " // " + url);
+					if (url != null) {
+						try {
+							FlexibleImage fi = new FlexibleImage(url);
+							if (fi != null && fi.getWidth() > 1
+									&& fi.getHeight() > 1)
+								input().masks().setFluo(fi);
+						} catch (Error e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: ERROR: FLUO-REFERENCE: "
+									+ e.getMessage() + " // " + url);
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: FLUO-REFERENCE: " + e.getMessage()
+									+ " // " + url);
+						}
 					}
 				}
 			}
@@ -118,19 +122,21 @@ public class BlLoadImagesIfNeeded_images_masks extends
 				}
 				if (input().masks() != null) {
 					url = input().images().getNirInfo().getLabelURL();
-					try {
-						FlexibleImage fi = new FlexibleImage(url);
-						if (fi != null && fi.getWidth() > 1
-								&& fi.getHeight() > 1)
-							input().masks().setNir(fi);
-					} catch (Error e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: ERROR: NIR-REFERENCE: "
-								+ e.getMessage() + " // " + url);
-					} catch (Exception e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: NIR-REFERENCE: " + e.getMessage()
-								+ " // " + url);
+					if (url != null) {
+						try {
+							FlexibleImage fi = new FlexibleImage(url);
+							if (fi != null && fi.getWidth() > 1
+									&& fi.getHeight() > 1)
+								input().masks().setNir(fi);
+						} catch (Error e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: ERROR: NIR-REFERENCE: "
+									+ e.getMessage() + " // " + url);
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: NIR-REFERENCE: " + e.getMessage()
+									+ " // " + url);
+						}
 					}
 				}
 			}
@@ -156,19 +162,21 @@ public class BlLoadImagesIfNeeded_images_masks extends
 			}
 			if (input().masks() != null) {
 				url = input().images().getIrInfo().getLabelURL();
-				try {
-					FlexibleImage fi = new FlexibleImage(url);
-					if (fi != null && fi.getWidth() > 1
-							&& fi.getHeight() > 1)
-						input().masks().setIr(fi);
-				} catch (Error e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">ERROR: ERROR: IR-REFERENCE: "
-							+ e.getMessage() + " // " + url);
-				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">ERROR: IR-REFERENCE: " + e.getMessage()
-							+ " // " + url);
+				if (url != null) {
+					try {
+						FlexibleImage fi = new FlexibleImage(url);
+						if (fi != null && fi.getWidth() > 1
+								&& fi.getHeight() > 1)
+							input().masks().setIr(fi);
+					} catch (Error e) {
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">ERROR: ERROR: IR-REFERENCE: "
+								+ e.getMessage() + " // " + url);
+					} catch (Exception e) {
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">ERROR: IR-REFERENCE: " + e.getMessage()
+								+ " // " + url);
+					}
 				}
 			}
 		}

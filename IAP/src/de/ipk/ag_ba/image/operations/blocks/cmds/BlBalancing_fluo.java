@@ -169,7 +169,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 			double[] pix;
 			if (markerPosY != -1)
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invert().getImage(), 0.08, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else { // nir - remove round shade
 					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
@@ -177,7 +177,7 @@ public class BlBalancing_fluo extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			else
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(), 0.08, bpleft, bpright);
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invert().getImage(), 0.08, bpleft, bpright);
 					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, 0.08, bpleft, bpright);

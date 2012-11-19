@@ -27,7 +27,10 @@ public class ImageResult {
 	public File downloadedFileMain, downloadedFileLabel;
 	
 	public String getFileNameMain() {
-		return bfi.getFileNameMain().getFileName();
+		String fn = bfi.getFileNameMain().getFileName();
+		if (fn != null && fn.indexOf("#") > 0)
+			return fn.substring(fn.indexOf("#") + 1);
+		return fn;
 	}
 	
 	public String getFileNameLabel() {

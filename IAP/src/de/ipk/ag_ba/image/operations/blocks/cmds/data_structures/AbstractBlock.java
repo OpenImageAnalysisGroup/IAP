@@ -35,6 +35,14 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
+	protected FlexibleImage processIRimage() {
+		if (input().images().nir() != null)
+			return processImage(input().images().ir());
+		else
+			return null;
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		if (input().masks().vis() != null)
 			return processMask(input().masks().vis());
@@ -54,6 +62,14 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processNIRmask() {
 		if (input().masks().nir() != null)
 			return processMask(input().masks().nir());
+		else
+			return null;
+	}
+	
+	@Override
+	protected FlexibleImage processIRmask() {
+		if (input().masks().ir() != null)
+			return processMask(input().masks().ir());
 		else
 			return null;
 	}
