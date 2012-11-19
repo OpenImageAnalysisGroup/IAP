@@ -200,6 +200,8 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@SuppressWarnings("unchecked")
 	public ExperimentHeader(Map map) {
 		this();
+		if (map == null)
+			return;
 		ArrayList<Object> del = new ArrayList<Object>();
 		for (Object key : map.keySet()) {
 			Object val = map.get(key);
