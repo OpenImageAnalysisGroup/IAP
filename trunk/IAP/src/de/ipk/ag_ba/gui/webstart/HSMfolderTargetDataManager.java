@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.webstart;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -13,11 +14,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
-import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
+import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -31,6 +35,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 
 /**
@@ -52,8 +57,10 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	private static final String CONDITION_FOLDER_NAME = "conditions";
 	
 	private final String path;
+	private String prefix;
 	
-	public HSMfolderTargetDataManager(String path) {
+	public HSMfolderTargetDataManager(String prefix, String path) {
+		this.prefix = prefix;
 		this.path = path;
 	}
 	
@@ -152,7 +159,8 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		// cd ..
 		hsmFolder = hsmFolder.substring(0, hsmFolder.lastIndexOf(File.separator));
 		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm
-		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(hsmFolder);
+		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(
+				HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
 		String experimentDirectory = hsm.getTargetDirectory(header, null);
 		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\ \(APH\)/klukas/WT_H3
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
@@ -224,16 +232,42 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	
 	@Override
 	public LoadedImage saveImage(LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
-		// everything should be safed in the HSM
-		if (keepRemoteURLs_safe_space)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: INTERNAL ERROR: HSM SAFE SHOULD ALSO PROCESS REMOTE DATA");
-		keepRemoteURLs_safe_space = false;
-		return null;
+		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
+		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
+		String desiredFileName = limg.getURL().getFileName();
+		if (desiredFileName != null && desiredFileName.contains("#"))
+			desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+		String substanceName = limg.getSubstanceName();
+		desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+		{
+			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, desiredFileName.split("#")[0]);
+			InputStream mainStream = limg.getInputStream();
+			ResourceIOManager.copyContent(mainStream, new FileOutputStream(new File(targetFileNameFullRes)));
+			
+			IOurl url = limg.getURL();
+			
+			String fullPath = new File(targetFileNameFullRes).getParent();
+			String subPath = fullPath.substring(getPath().length());
+			if (url != null) {
+				url.setPrefix(getPrefix());
+				url.setDetail(subPath);
+				url.setFileName(desiredFileName);
+			}
+		}
+		{
+			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, desiredFileName.split("#")[0]);
+			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
+			ResourceIOManager.copyContent(previewStream, new FileOutputStream(new File(targetFileNamePreview)));
+		}
+		if (!keepRemoteURLs_safe_space) {
+			// copy label and annotation files...
+		}
+		return limg;
 	}
 	
 	@Override
 	public String getPrefix() {
-		return "hsm:";
+		return prefix;
 	}
 	
 	@Override

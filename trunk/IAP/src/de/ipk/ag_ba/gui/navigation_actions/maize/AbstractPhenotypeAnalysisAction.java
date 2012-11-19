@@ -253,9 +253,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText1("Ready");
 					
 					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-					statisticsResult.getHeader().setExperimentname(
-							getImageAnalysisTask().getClass().getCanonicalName() + ": " +
-									experiment.getExperimentName());
+					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+							experiment.getExperimentName());
 					
 					statisticsResult.getHeader().setRemark(
 							statisticsResult.getHeader().getRemark() +
@@ -264,8 +263,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 									" // finished: " + SystemAnalysis.getCurrentTime() +
 									" // processing time: " +
 									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
-									" // finished: " + SystemAnalysis.getCurrentTime() +
-									" // direct mode analysis");
+									" // finished: " + SystemAnalysis.getCurrentTime());
 					
 					if (m != null)
 						m.saveExperiment(statisticsResult, getStatusProvider());
@@ -306,9 +304,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 				src != null ? src.getGUIsetting() : null));
 		
-		res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-				"Save Result", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); // PoweredMongoDBgreen.png"));
-		
+		if (m != null)
+			res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
+					"Save Result (db '" + m.getDatabaseName() + "')", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); // PoweredMongoDBgreen.png"));
+			
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
 				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);

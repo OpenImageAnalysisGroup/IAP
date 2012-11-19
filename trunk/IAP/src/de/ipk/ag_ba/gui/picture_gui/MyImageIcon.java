@@ -46,13 +46,13 @@ public class MyImageIcon extends ImageIcon {
 	// private File file;
 	
 	public MyImageIcon(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
-						throws MalformedURLException {
+			throws MalformedURLException {
 		initImageData(observer, width, height, fileMain, fileLabel, bfi);
 	}
 	
 	@SuppressWarnings({ "restriction" })
 	public synchronized void initImageData(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
-						throws MalformedURLException {
+			throws MalformedURLException {
 		this.bfi = bfi;
 		String description = fileMain.getFileName();
 		fileURLmain = fileMain;
@@ -86,7 +86,7 @@ public class MyImageIcon extends ImageIcon {
 				ImageIcon ic;
 				try {
 					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
-										FileSystemHandler.getFile(fileURLmain));
+							FileSystemHandler.getFile(fileURLmain));
 					if (ic == null) {
 						i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
 					} else

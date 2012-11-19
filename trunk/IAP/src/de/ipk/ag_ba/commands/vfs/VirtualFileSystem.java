@@ -180,4 +180,9 @@ public abstract class VirtualFileSystem {
 	public static void addItem(VirtualFileSystemVFS2 virtualFileSystemVFS2) {
 		knownFileSystems.add(virtualFileSystemVFS2);
 	}
+	
+	@Override
+	public String toString() {
+		return getTargetName();
+	}
 }

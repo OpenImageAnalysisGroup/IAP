@@ -222,15 +222,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										FlexibleImage fi = new FlexibleImage(s);
 										fi.print("Reference Image");
 									} catch (Exception err) {
-										JOptionPane
-												.showMessageDialog(
-														null,
-														"Error: "
-																+ err.getLocalizedMessage()
-																+ ". Command execution error.",
-														"Error",
-														JOptionPane.INFORMATION_MESSAGE);
-										ErrorMsg.addErrorMessage(err);
+										MainFrame.getInstance().showMessageDialog("Reference image could not be loaded: " + err.getMessage());
 										return;
 									}
 								}
@@ -257,10 +249,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												String oldRef = id
 														.getAnnotationField("oldreference");
 												
-												IOurl u = new IOurl(oldRef);
-												FlexibleImage fi = new FlexibleImage(
-														u);
-												fi.print("Annotation Image");
+												if (oldRef != null) {
+													IOurl u = new IOurl(oldRef);
+													FlexibleImage fi = new FlexibleImage(
+															u);
+													fi.print("Annotation Image");
+												} else
+													MainFrame.getInstance().showMessageDialog("Annotation image is undefined");
 											}
 										}
 									} catch (Exception err) {
@@ -707,21 +702,28 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							try {
 								IOurl urlMain = imageResult.getBinaryFileInfo()
 										.getFileNameMain();
-								System.out.println(urlMain);
+								System.out.println("Main URL: " + urlMain);
 								InputStream isMain = urlMain != null ? urlMain
 										.getInputStream() : null;
 								if (isMain == null)
-									System.out.println("Inputstream = null");
+									System.out.println("Main URL: Inputstream = null");
 								HomeFolder.copyFile(isMain, tfMain);
-								
 								IOurl urlLabel = imageResult
 										.getBinaryFileInfo().getFileNameLabel();
-								System.out.println(urlLabel);
-								InputStream isLabel = urlLabel != null ? urlLabel
-										.getInputStream() : null;
-								if (isLabel == null)
-									System.out.println("Inputstream = null");
-								HomeFolder.copyFile(isLabel, tfLabel);
+								if (urlLabel != null) {
+									try {
+										System.out.println("Label URL: " + urlLabel);
+										InputStream isLabel = urlLabel != null ? urlLabel
+												.getInputStream() : null;
+										if (isLabel == null)
+											System.out.println("Inputstream = null");
+										HomeFolder.copyFile(isLabel, tfLabel);
+									} catch (Exception e) {
+										if (urlLabel != null)
+											e.printStackTrace();
+										System.out.println("ERROR: could not process label URL: " + e.getMessage());
+									}
+								}
 							} catch (Exception e1) {
 								System.out.println("No valid input stream for "
 										+ imageResult.getBinaryFileInfo()

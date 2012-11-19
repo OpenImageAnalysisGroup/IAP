@@ -49,6 +49,14 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(uploadDataEntity);
 		}
 		
+		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("LemnaTec-DB", "show_load_exported_icon", true);
+		if (showLoadLTfileExport) {
+			NavigationButton ltl = new NavigationButton(
+					new ActionLoadLTexportFileHierarchy("Load LT exported image data from folder hierarchy"),
+					src != null ? src.getGUIsetting() : guiSetting);
+			phenoDBcommands.add(ltl);
+		}
+		
 		boolean lt = IAPoptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", true);
 		if (lt) {
 			NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();

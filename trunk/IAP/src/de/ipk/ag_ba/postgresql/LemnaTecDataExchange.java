@@ -3,6 +3,7 @@
  *************************************************************************/
 package de.ipk.ag_ba.postgresql;
 
+import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -27,6 +28,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -761,6 +763,13 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
+		return getExperiment(experimentReq, interactiveGetExperimentSize_notUsedHere, optStatus, null);
+	}
+	
+	private ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
+			boolean interactiveGetExperimentSize_notUsedHere,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			Collection<Snapshot> optSnapshots) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
 		String species = "";
@@ -775,8 +784,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(-1);
 		
-		Collection<Snapshot> snapshots = getSnapshotsOfExperiment(
-				experimentReq.getDatabase(), experimentReq.getExperimentName());
+		Collection<Snapshot> snapshots = optSnapshots;
+		if (optSnapshots == null)
+			snapshots = getSnapshotsOfExperiment(
+					experimentReq.getDatabase(), experimentReq.getExperimentName());
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 		
 		Timestamp earliest = null;
@@ -797,7 +808,35 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			}
 		}
 		
-		HashMap<String, Condition> idtag2condition = getPlantIdAnnotation(experimentReq);
+		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ? getPlantIdAnnotation(experimentReq)
+				: null;
+		if (idtag2condition == null) {
+			idtag2condition = new HashMap<String, Condition>();
+			for (Snapshot s : snapshots) {
+				if (s.getId_tag() != null && !s.getId_tag().isEmpty()) {
+					// derive genotype from plant ID information by removing trailing numbers until the first letter
+					// and by removing '-' from the result and by converting everything to upper case
+					String id = s.getId_tag();
+					if (idtag2condition.containsKey(id))
+						continue;
+					StringBuilder idPretty = new StringBuilder();
+					boolean numbersAllowed = false;
+					for (char c : id.toCharArray()) {
+						if (c == '-')
+							continue;
+						if (numbersAllowed || !(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9')) {
+							numbersAllowed = true;
+							idPretty.append(c);
+						}
+					}
+					if (idPretty.length() > 0) {
+						Condition ct = new Condition(null);
+						ct.setGenotype(idPretty.toString().toUpperCase());
+						idtag2condition.put(id, ct);
+					}
+				}
+			}
+		}
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Process snapshots (" + snapshots.size() + ")");
@@ -839,20 +878,20 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String s = sn.getId_tag();
 					s = StringManipulationTools.getNumbersFromString(s);
 					targetGroup = Integer.parseInt(s);
-					targetGroup = targetGroup% 10;
-				} catch(Exception e) {
+					targetGroup = targetGroup % 10;
+				} catch (Exception e) {
 					// empty
 				}
 				Condition ct = new Condition(null);
 				ct.setSequence("");
 				ct.setSpecies("not specified");
-				if (targetGroup==null)
-				ct.setGenotype("not specified (random " +
-						StringManipulationTools.formatNumber(Math.floor(Math.random() * 10 + 1d), "00") + ")");
+				if (targetGroup == null)
+					ct.setGenotype("not specified (random " +
+							StringManipulationTools.formatNumber(Math.floor(Math.random() * 10 + 1d), "00") + ")");
 				else
 					ct.setGenotype("not specified (group " +
 							StringManipulationTools.formatNumber(targetGroup.doubleValue(), "00") + ")");
-
+				
 				ct.setVariety("");
 				ct.setGrowthconditions("");
 				ct.setSequence("");
@@ -1022,19 +1061,19 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					Double position = null;
 					
 					fn = sn.getPath_image_config_blob();
-					if (fn != null) {
-						try {
-							String a = sn.getUserDefinedCameraLabel();
-							if (a != null && a.length() > 3)
-								a = a.substring(2);
-							String b = StringManipulationTools.getNumbersFromString(a);
-							if (b.length() == 0)
-								position = 0d;
-							else
-								position = Double.parseDouble(b);
-							if (position > 360)
-								throw new NumberFormatException("Number too large");
-						} catch (NumberFormatException nfe) {
+					try {
+						String a = sn.getUserDefinedCameraLabel();
+						if (a != null && a.length() > 3)
+							a = a.substring(2);
+						String b = StringManipulationTools.getNumbersFromString(a);
+						if (b.length() == 0)
+							position = 0d;
+						else
+							position = Double.parseDouble(b);
+						if (position > 360)
+							throw new NumberFormatException("Number too large");
+					} catch (NumberFormatException nfe) {
+						if (fn != null) {
 							try {
 								position = Double.parseDouble(fn);
 							} catch (NumberFormatException e) {
@@ -1060,8 +1099,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						image.setPositionUnit("degree");
 					}
 					
-					IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
-							+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+					IOurl url;
+					if (experimentReq.getDatabase() != null)
+						url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
+								+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+					else {
+						url = FileSystemHandler.getURL(new File(sn.getPath_image()));
+						url.setFileName(url.getFileName() + "#" + sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+					}
 					image.setURL(url);
 					fn = sn.getPath_null_image();
 					if (fn != null) {
@@ -1109,13 +1154,16 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Experiment created (" + numberOfImages + " images)");
-		experimentReq.setNumberOfFiles(numberOfImages);
-		String seq = experimentReq.getSequence();
+		if (experimentReq != null)
+			experimentReq.setNumberOfFiles(numberOfImages);
+		String seq = experimentReq != null ? experimentReq.getSequence() : null;
 		experiment.setHeader(new ExperimentHeader(experimentReq));
 		experiment.getHeader().setSequence(seq);
 		
-		experiment.getHeader().setDatabaseId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
-		experiment.getHeader().setOriginDbId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+		if (experimentReq != null) {
+			experiment.getHeader().setDatabaseId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+			experiment.getHeader().setOriginDbId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+		}
 		
 		if (seq != null && StringManipulationTools.containsAny(seq, getMetaNamesSeedDates())) {
 			String[] values = seq.split("//");
@@ -1612,5 +1660,9 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 		return res;
 		
+	}
+	
+	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh, ArrayList<Snapshot> snapshots) throws ClassNotFoundException, SQLException {
+		return new LemnaTecDataExchange().getExperiment(eh, false, null, snapshots);
 	}
 }

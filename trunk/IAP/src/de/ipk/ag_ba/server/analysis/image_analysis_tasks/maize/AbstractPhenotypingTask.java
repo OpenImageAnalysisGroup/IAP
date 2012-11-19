@@ -20,11 +20,16 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.commands.ImagePreProcessor;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
@@ -44,6 +49,8 @@ import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
+import de.ipk.vanted.plugin.VfsFileProtocol;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -98,6 +105,38 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.numberOfSubsets = numberOfSubsets;
 		this.m = m;
 		databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
+		if (databaseTarget == null) {
+			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown();
+			ArrayList<VirtualFileSystem> remove = new ArrayList<VirtualFileSystem>();
+			for (VirtualFileSystem v : vl) {
+				boolean ok = false;
+				if (v instanceof VirtualFileSystemVFS2) {
+					VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) v;
+					if (v2.getProtocolType() == VfsFileProtocol.LOCAL)
+						ok = true;
+				}
+				if (!ok)
+					remove.add(v);
+			}
+			vl.removeAll(remove);
+			if (IAPmain.getRunMode() != IAPrunMode.WEB) {
+				if (vl != null && vl.size() > 1) {
+					Object[] sel = MyInputHelper.getInput("Please select the target for the storage of the result images. <br>" +
+							"If no target is selected (or cancel is pressed), the numeric result will be<br>" +
+							"helt in memory, and result image data will be discarded.",
+							"Select target storage", "Target", vl);
+					if (sel != null) {
+						VirtualFileSystem sss = (VirtualFileSystem) sel[0];
+						if (sss != null)
+							databaseTarget = new HSMfolderTargetDataManager(sss.getPrefix(), sss.getTargetPathName());
+					}
+				} else
+					if (vl != null && vl.size() > 0) {
+						VirtualFileSystem sss = vl.iterator().next();
+						databaseTarget = new HSMfolderTargetDataManager(sss.getPrefix(), sss.getTargetPathName());
+					}
+			}
+		}
 	}
 	
 	@Override

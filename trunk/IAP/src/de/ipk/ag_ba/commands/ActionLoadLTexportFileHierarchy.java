@@ -1,18 +1,21 @@
 package de.ipk.ag_ba.commands;
 
 import java.io.File;
-import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashSet;
 
-import org.ErrorMsg;
 import org.OpenFileDialogService;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.Snapshot;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
@@ -23,12 +26,13 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	
 	private NavigationButton src;
 	private ExperimentReference loaded_experiment = null;
+	private ArrayList<String> messages = new ArrayList<String>();
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		loaded_experiment = null;
+		messages.clear();
 		File inp = OpenFileDialogService.getDirectoryFromUser("Select Input Folder");
-		HashSet<String> processedDirectories = new HashSet<String>();
 		if (inp != null && inp.isDirectory()) {
 			processDir(inp);
 		}
@@ -37,43 +41,112 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	
 	private void processDir(File inp) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Scanning input folder '" + inp.getPath() + "'...");
-		ArrayList<File> toBeProcessed = new ArrayList<File>();
-		for (String fn : inp.list()) {
-			File f = new File(fn);
-			if (f.isDirectory()) {
-				toBeProcessed.add(f);
-			} else {
-				if (f.getName().equals("info.txt")) {
-					try {
-						InfoFile fi = new InfoFile(new TextFile(f));
-						
-					} catch (IOException e) {
-						e.printStackTrace();
-						ErrorMsg.addErrorMessage("Could not process file " + f.getPath() + ": " + e.getMessage());
-					}
-					// this a info-file, e.g.:
-					/*
-					 * Example 1:
-					 * IdTag: 000668-LETL
-					 * Color: 0
-					 * Creator: Bettina
-					 * Comment:
-					 * Measurement: 0024 calibration wheat
-					 * Timestamp: 9/20/2010 2:26:09 PM
-					 * Weight before [g]: 5
-					 * Weight after [g]: 5
-					 * Water amount [ml]: 0
-					 */
-					/*
-					 * Example 2:
-					 * Camera label: FLUO SV1
-					 * MM pro pixel X: 0
-					 * MM pro pixel Y: 0
-					 */
-				} else {
-					// this could be an image file or anything else, now process image files
-				}
+		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
+		for (String snapshotDirName : inp.list()) {
+			File f = new File(inp.getPath() + File.separator + snapshotDirName);
+			snapshotDirName = f.getAbsolutePath();
+			File infoFile = new File(snapshotDirName + File.separator + "info.txt");
+			if (!infoFile.exists()) {
+				if (infoFile.isDirectory())
+					messages.add("ERROR: Skipping folder " + snapshotDirName + ", it contains no info.txt file!");
+				continue; // this sub folder contains no snapshot info
 			}
+			try {
+				InfoFile info = new InfoFile(new TextFile(infoFile));
+				if (info.containsKey("IdTag")) {
+					// this info file specifies the plant ID, timestamp, weight and watering info
+					Snapshot s = new Snapshot();
+					s.setId_tag(info.get("IdTag"));
+					s.setCreator(info.get("Creator"));
+					Integer wa = info.getWaterAmountData();
+					if (wa != null)
+						s.setWater_amount(wa);
+					Double web = info.getWeightBeforeData();
+					if (web != null)
+						s.setWeight_before(web);
+					Double wea = info.getWeightAfterData();
+					if (wea != null)
+						s.setWeight_before(wea);
+					s.setMeasurement_label(info.get("Measurement"));
+					s.setTime_stamp(new Timestamp(info.getTimestampTime()));
+					snapshots.add(s);
+					// the sub directories contain the image data
+					for (String cameraLabelSubDir : new File(snapshotDirName).list()) {
+						try {
+							File cameraSubDir = new File(snapshotDirName + File.separator + cameraLabelSubDir);
+							if (!cameraSubDir.isDirectory()) {
+								if (!cameraLabelSubDir.equals("info.txt"))
+									messages.add("ERROR: Folder " + snapshotDirName + " contains an unknown file '" + cameraLabelSubDir
+											+ "' which is not processed!");
+							} else {
+								// process camera label sub-dir
+								File imageSnapshotInfoFile = new File(snapshotDirName + File.separator +
+										cameraLabelSubDir + File.separator + "info.txt");
+								if (!imageSnapshotInfoFile.exists())
+									continue;
+								InfoFile infoForCameraSnapshot = new InfoFile(new TextFile(imageSnapshotInfoFile));
+								Snapshot imageSnapshot = new Snapshot();
+								imageSnapshot.setId_tag(s.getId_tag());
+								imageSnapshot.setCreator(s.getCreator());
+								imageSnapshot.setTime_stamp(s.getTimestamp());
+								imageSnapshot.setMeasurement_label(s.getMeasurement_label());
+								Double xf = infoForCameraSnapshot.getXfactor();
+								if (xf != null)
+									imageSnapshot.setXfactor(xf);
+								Double yf = infoForCameraSnapshot.getYfactor();
+								if (yf != null)
+									imageSnapshot.setXfactor(yf);
+								if (infoForCameraSnapshot.get("Camera label") == null) {
+									messages.add("INFO: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
+											+ "' contains no 'Camera label'! Using folder name!");
+									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
+								}
+								imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
+								if (imageSnapshot.getCamera_label().endsWith(" TV")) {
+									imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".top");
+									imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " tv.", "."));
+									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
+								} else
+									if (imageSnapshot.getCamera_label().endsWith(" SV1")) {
+										imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".side");
+										imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " sv1.", "."));
+										imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + ".0");
+									} else
+										if (imageSnapshot.getCamera_label().endsWith(" SV2")) {
+											imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".side");
+											imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " sv2.", "."));
+											imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + ".90");
+										}
+								String ffn = snapshotDirName + File.separator +
+										cameraLabelSubDir + File.separator + "0_0.png";
+								if (new File(ffn).exists()) {
+									imageSnapshot.setPath_image(ffn);
+									snapshots.add(imageSnapshot);
+								}
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							messages.add("ERROR: Could not process directory '" + cameraLabelSubDir + "': " + e.getMessage());
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				messages.add("ERROR: Could not process file '" + f.getPath() + "' or sub-directory info: " + e.getMessage());
+			}
+		}
+		messages.add("INFO: Snapshot-count: " + snapshots.size());
+		// get experiment from snapshot info...
+		ExperimentInterface e;
+		try {
+			Snapshot s = snapshots.get(0);
+			ExperimentHeader eh = new ExperimentHeader(s.getMeasurement_label());
+			eh.setCoordinator(s.getCreator());
+			e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, snapshots);
+			loaded_experiment = new ExperimentReference(e);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			messages.add("ERROR: Could not convert scnapshot info to Experiment structure: " + e1.getMessage());
 		}
 	}
 	
@@ -94,7 +167,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return super.getResultMainPanel();
+		return new MainPanelComponent("<b>Messages:</b><br><br>" + StringManipulationTools.getStringList(messages, "<br>"));
 	}
 	
 	@Override

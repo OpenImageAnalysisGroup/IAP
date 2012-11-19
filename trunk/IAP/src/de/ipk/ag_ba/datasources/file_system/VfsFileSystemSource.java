@@ -22,6 +22,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -107,7 +108,8 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		hsmFolder = hsmFolder.substring((url.getPrefix() + ":").length());
 		hsmFolder = hsmFolder.substring(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME.length());
 		
-		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(hsmFolder);
+		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(
+				HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
 		String experimentDirectory =
 				HSMfolderTargetDataManager.DATA_FOLDER_NAME + File.separator +
 						hsm.getTargetDirectory(header, null);
