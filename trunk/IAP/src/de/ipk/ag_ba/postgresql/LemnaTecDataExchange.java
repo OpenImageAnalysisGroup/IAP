@@ -791,15 +791,16 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		HashMap<String, Integer> idtag2replicateID = new HashMap<String, Integer>();
 		
 		Timestamp earliest = null;
+		Timestamp latest = null;
 		{
-			Timestamp ts = null;
 			TreeSet<String> ids = new TreeSet<String>();
 			for (Snapshot sn : snapshots) {
 				ids.add(sn.getId_tag());
-				if (ts == null || sn.getTimestamp().before(ts))
-					ts = sn.getTimestamp();
+				if (earliest == null || sn.getTimestamp().before(earliest))
+					earliest = sn.getTimestamp();
+				if (latest == null || sn.getTimestamp().after(latest))
+					latest = sn.getTimestamp();
 			}
-			earliest = ts;
 			int replID = 0;
 			for (String id : ids) {
 				replID++;
@@ -807,6 +808,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				// System.out.println(id + ";" + replID);
 			}
 		}
+		if (experimentReq.getStartdate() == null && earliest != null)
+			experimentReq.setStartdate(new Date(earliest.getTime()));
+		if (experimentReq.getImportdate() == null && earliest != null)
+			experimentReq.setImportdate(new Date(latest.getTime()));
 		
 		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ? getPlantIdAnnotation(experimentReq)
 				: null;

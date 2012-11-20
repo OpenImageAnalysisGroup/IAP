@@ -37,6 +37,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	
 	@Override
 	public LoadedImage saveImage(
+			final String[] optFileNameMainAndLabelPrefix,
 			final LoadedImage limg,
 			final boolean keepRemoteURLs_safe_space) throws Exception {
 		if (!store)
@@ -49,7 +50,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			public void run() {
 				try {
 					CollectionStorage cols = new CollectionStorage(db, MongoDB.ensureIndex);
-					DatabaseStorageResult dsr = m.saveImageFile(cols,db, limg, null, keepRemoteURLs_safe_space).get();
+					DatabaseStorageResult dsr = m.saveImageFile(cols, db, limg, null, keepRemoteURLs_safe_space).get();
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);

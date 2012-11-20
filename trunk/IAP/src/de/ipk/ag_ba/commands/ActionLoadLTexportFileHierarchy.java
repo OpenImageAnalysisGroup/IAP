@@ -10,12 +10,14 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.Snapshot;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
@@ -27,12 +29,15 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	private NavigationButton src;
 	private ExperimentReference loaded_experiment = null;
 	private ArrayList<String> messages = new ArrayList<String>();
+	private boolean getInput;
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		loaded_experiment = null;
 		messages.clear();
+		getInput = true;
 		File inp = OpenFileDialogService.getDirectoryFromUser("Select Input Folder");
+		getInput = false;
 		if (inp != null && inp.isDirectory()) {
 			processDir(inp);
 		}
@@ -42,7 +47,23 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	private void processDir(File inp) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Scanning input folder '" + inp.getPath() + "'...");
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
+		long overallStorageSizeInBytes = 0;
+		Timestamp storageTimeOfFirstInfoFile = null;
+		String metadataFileName = "metadata.csv";
+		boolean foundMetadata = false;
 		for (String snapshotDirName : inp.list()) {
+			if (snapshotDirName.equals(metadataFileName)) {
+				foundMetadata = true;
+				// messages.add("Column 1: Plant ID");
+				// messages.add("Column 2: Species Name");
+				// messages.add("Column 3: Genotype");
+				// messages.add("Column 4: Treatment");
+				// messages.add("Column 5: Sequence");
+				TableData td = TableData.getTableData(new File(inp.getParent() + File.separator + metadataFileName));
+				// for (TableDataStringRow tdsr : td.getRowsAsStringValues()) {
+				//
+				// }
+			}
 			File f = new File(inp.getPath() + File.separator + snapshotDirName);
 			snapshotDirName = f.getAbsolutePath();
 			File infoFile = new File(snapshotDirName + File.separator + "info.txt");
@@ -50,7 +71,9 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (infoFile.isDirectory())
 					messages.add("ERROR: Skipping folder " + snapshotDirName + ", it contains no info.txt file!");
 				continue; // this sub folder contains no snapshot info
-			}
+			} else
+				if (storageTimeOfFirstInfoFile == null || infoFile.lastModified() < storageTimeOfFirstInfoFile.getTime())
+					storageTimeOfFirstInfoFile = new Timestamp(infoFile.lastModified());
 			try {
 				InfoFile info = new InfoFile(new TextFile(infoFile));
 				if (info.containsKey("IdTag")) {
@@ -75,7 +98,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 						try {
 							File cameraSubDir = new File(snapshotDirName + File.separator + cameraLabelSubDir);
 							if (!cameraSubDir.isDirectory()) {
-								if (!cameraLabelSubDir.equals("info.txt"))
+								if (!cameraLabelSubDir.equals("info.txt") && !cameraLabelSubDir.equals(".DS_Store"))
 									messages.add("ERROR: Folder " + snapshotDirName + " contains an unknown file '" + cameraLabelSubDir
 											+ "' which is not processed!");
 							} else {
@@ -119,7 +142,9 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 										}
 								String ffn = snapshotDirName + File.separator +
 										cameraLabelSubDir + File.separator + "0_0.png";
-								if (new File(ffn).exists()) {
+								File ff = new File(ffn);
+								if (ff.exists()) {
+									overallStorageSizeInBytes += ff.length();
 									imageSnapshot.setPath_image(ffn);
 									snapshots.add(imageSnapshot);
 								}
@@ -136,12 +161,28 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			}
 		}
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
+		if (!foundMetadata) {
+			messages.add("<b>Found no metadata.csv file (" + metadataFileName + ") in the selected folder!</b>");
+			messages
+					.add("The metadata.csv file may contain up to 5 columns (or more, which would be ignored), which, if available, are processed in the following order:");
+			messages.add("Column 1: Plant ID");
+			messages.add("Column 2: Species Name");
+			messages.add("Column 3: Genotype");
+			messages.add("Column 4: Treatment");
+			messages.add("Column 5: Sequence");
+			messages.add("The CSV file should not contain column headers.");
+		}
 		// get experiment from snapshot info...
 		ExperimentInterface e;
 		try {
 			Snapshot s = snapshots.get(0);
 			ExperimentHeader eh = new ExperimentHeader(s.getMeasurement_label());
 			eh.setCoordinator(s.getCreator());
+			if (storageTimeOfFirstInfoFile != null)
+				eh.setStorageTime(storageTimeOfFirstInfoFile);
+			eh.setImportusername(SystemAnalysis.getUserName());
+			eh.setSizekb(overallStorageSizeInBytes / 1024);
+			eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
 			e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, snapshots);
 			loaded_experiment = new ExperimentReference(e);
 		} catch (Exception e1) {
@@ -172,7 +213,10 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Load LT File Export";
+		if (getInput)
+			return "Select Input Folder...";
+		else
+			return "Load LT File Export";
 	}
 	
 	@Override

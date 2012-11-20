@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 public class StopWatch {
 	
 	private long start = System.currentTimeMillis();
-	private final String desc;
+	private String desc;
 	
 	/**
 	 * @param desc
@@ -72,6 +72,10 @@ public class StopWatch {
 	
 	public static String getNiceTime() {
 		return IAPservice.getCurrentTimeAsNiceString();
+	}
+	
+	public void setDescription(String desc) {
+		this.desc = desc;
 	}
 	
 }

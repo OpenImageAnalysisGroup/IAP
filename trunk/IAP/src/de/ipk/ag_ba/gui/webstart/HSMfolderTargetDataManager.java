@@ -90,7 +90,10 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		String res = path + File.separator + DATA_FOLDER_NAME + File.separator + subPath;
 		if (!new File(res).exists())
 			new File(res).mkdirs();
-		return res + File.separator + filterBadChars(zefn);
+		if (zefn.contains("#"))
+			return res + File.separator + filterBadChars(zefn.split("#", 2)[0]) + "#" + zefn.split("#", 2)[1];
+		else
+			return res + File.separator + filterBadChars(zefn);
 	}
 	
 	public String prepareAndGetPreviewFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
@@ -231,7 +234,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	}
 	
 	@Override
-	public LoadedImage saveImage(LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
+	public LoadedImage saveImage(
+			String[] optFileNameMainAndLabelPrefix,
+			LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
 		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
 		String desiredFileName = limg.getURL().getFileName();
@@ -239,8 +244,11 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
 		String substanceName = limg.getSubstanceName();
 		desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+		String pre = "";
+		if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0)
+			pre = optFileNameMainAndLabelPrefix[0];
 		{
-			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, desiredFileName.split("#")[0]);
+			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			InputStream mainStream = limg.getInputStream();
 			ResourceIOManager.copyContent(mainStream, new FileOutputStream(new File(targetFileNameFullRes)));
 			
@@ -255,7 +263,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			}
 		}
 		{
-			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, desiredFileName.split("#")[0]);
+			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
 			ResourceIOManager.copyContent(previewStream, new FileOutputStream(new File(targetFileNamePreview)));
 		}

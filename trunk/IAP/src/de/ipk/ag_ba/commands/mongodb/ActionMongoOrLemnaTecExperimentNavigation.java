@@ -89,9 +89,11 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = header.getDatabaseId() == null || (experimentReference.m != null
-					|| header.getDatabaseId().startsWith("hsm:")
-					|| header.getDatabaseId().startsWith("lemnatec:"));
+			boolean imageAnalysis = true;/*
+													 * header.getDatabaseId() == null || (experimentReference.m != null
+													 * || header.getDatabaseId().startsWith("hsm:")
+													 * || header.getDatabaseId().startsWith("lemnatec:"));
+													 */
 			getDefaultActions(
 					actions,
 					experimentReference,

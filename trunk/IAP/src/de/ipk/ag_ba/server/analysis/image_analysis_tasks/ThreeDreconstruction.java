@@ -262,7 +262,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 								
 								// limg = PhenotypeAnalysisTask.clearBackground(limg, 1);
 								
-								limg = storeResultInDatabase.saveImage(limg, false);
+								limg = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, limg, false);
 								
 								if (limg == null) {
 									ErrorMsg.addErrorMessage("Could not store processed input image in database target.");

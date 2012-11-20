@@ -6,6 +6,7 @@
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -86,6 +87,10 @@ public class TableData {
 		// int tCol = getMaximumCol();
 		// int tRow = getMaximumRow();
 		// System.out.println("Transposed Data from row "+fromRow+". Source ["+mCol+" x "+mRow+"] -> Target ["+tCol+" x "+tRow+"]");
+	}
+	
+	public static TableData getTableData(File file) {
+		return ExperimentDataFileReader.getExcelTableData(file, -1, null, null);
 	}
 	
 	public int processAdditionaldentifiers(boolean processAllIDs, boolean processAllNewIDs,
@@ -984,5 +989,9 @@ public class TableData {
 			}
 			return StringManipulationTools.getStringList(varr, div);
 		}
+	}
+	
+	public TableDataStringRow getRowsAsStringValues() {
+		return null;
 	}
 }
