@@ -183,16 +183,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		TreeSet<String> typeset = new TreeSet<String>();
 		if (experimentType != null)
 			typeset.add(experimentType);
-		typeset.add(IAPexperimentTypes.Phytochamber + "");
-		typeset.add(IAPexperimentTypes.PhytochamberBlueRubber + "");
-		typeset.add(IAPexperimentTypes.BarleyGreenhouse + "");
-		typeset.add(IAPexperimentTypes.MaizeGreenhouse + "");
-		typeset.add(IAPexperimentTypes.RootWaterScan + "");
-		typeset.add("Analysis Results");
-		typeset.add("Imported Analysis Results");
-		typeset.add("Climate");
-		typeset.add("Imported Dataset");
-		typeset.add("Test (Delete OK)");
+		for (IAPexperimentTypes et : IAPexperimentTypes.values())
+			typeset.add(et + "");
 		String[] types = typeset.toArray(new String[] {});
 		// if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {
 		// // try {

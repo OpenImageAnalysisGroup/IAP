@@ -247,7 +247,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
 						final VfsFileObject targetFile = vfs.newVfsFile(
 								hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t, zefn));
+										experiment.getHeader(), t, zefn.contains("#") ? zefn.split("#")[0] : zefn));
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
@@ -392,7 +392,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									+ fn.substring(fn.lastIndexOf("/")
 											+ "/".length())
 									+ getFileExtension(bm.getLabelURL()
-											.getFileName());;
+											.getFileName());
 						} else
 							zefn = "label_"
 									+ determineBinaryFileName(t, substanceName, nm,
@@ -502,6 +502,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private String extractLastFileName(String fileName) {
 		if (fileName.contains(File.separator))
 			fileName = fileName.substring(fileName.lastIndexOf(File.separator));
+		if (fileName.contains("#"))
+			fileName = fileName.substring(fileName.lastIndexOf("#") + 1);
 		return fileName;
 	}
 	
@@ -604,12 +606,15 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							}
 						}
 						if (url != null) {
+							// System.out.println("Current URL: " + url);
+							// System.out.println("Target File Name: " + targetFile.getName());
 							url.setPrefix(vfs.getPrefix());
 							url.setDetail("");
 							String path = hsmManager
 									.prepareAndGetDataFileNameAndPath(
 											experiment.getHeader(), t,
-											targetFile.getName());
+											targetFile.getName().split("#", 2)[0]);
+							// System.out.println("Path: " + path);
 							path = path.substring(hsmManager.getPath().length() + File.separator.length());
 							url.setDetail(path.substring(0, path.lastIndexOf(File.separator)));
 							path = path.substring(path.lastIndexOf(File.separator) + File.separator.length());
@@ -675,8 +680,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ "_"
 					+ HSMfolderTargetDataManager.digit2(gc
 							.get(GregorianCalendar.SECOND))
-					+ " "
-					+ id.getURL().getFileName();
+					+ id.getURL().getFileNameExtension();
 			
 		} else {
 			zefn = bm.getURL().getFileName();

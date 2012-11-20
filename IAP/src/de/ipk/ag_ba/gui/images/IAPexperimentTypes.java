@@ -6,11 +6,15 @@ public enum IAPexperimentTypes {
 	BarleyGreenhouse("Barley", "Hordeum vulgare"),
 	BarleyGreenhouseGray("Barley (gray support)", "Hordeum vulgare"),
 	MaizeGreenhouse("Maize", "Zea"),
-	UnknownGreenhouse("LemnaTec (Other)", "Unknown"),
+	UnknownGreenhouse("Generic Greenhouse", "Unknown"),
 	AnalysisResults("Analysis Results", "Unknown"),
 	Raps("Rapeseed", "Canola"),
 	ManualMeasurements("Manual Measurements", "Unknown"),
-	RootWaterScan("Roots (Scann)", "Barley Roots");
+	RootWaterScan("Roots (Scann)", "Barley Roots"),
+	ImportedAnalysisResults("Imported Analysis Results", "Unknown"),
+	ClimateData("Climate", "Unknown"),
+	ImportedDataset("Imported Dataset", "Unknown"),
+	Test("Test (can be deleted)", "Unknown");
 	
 	private String title, species;
 	

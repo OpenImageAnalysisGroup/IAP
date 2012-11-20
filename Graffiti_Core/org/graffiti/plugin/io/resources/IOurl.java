@@ -108,4 +108,13 @@ public class IOurl {
 	public IOurl copy() {
 		return new IOurl(prefix, detail, filename);
 	}
+	
+	public String getFileNameExtension() {
+		String fn = getFileName();
+		if (fn.contains("#"))
+			fn = fn.split("#")[0];
+		if (fn.contains("."))
+			fn = fn.substring(fn.lastIndexOf("."));
+		return fn;
+	}
 }

@@ -95,10 +95,23 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			String dbID = experiment.getHeader().getDatabaseId();
 			
 			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
-			
 			sw.printTime();
 			if (status != null)
 				status.setCurrentStatusText2("Load time: " + sw.getTimeString());
+			if (m == null) {
+				if (status != null)
+					status.setCurrentStatusText2("Clone data set and set title...");
+				sw.setDescription("Experiment cloning");
+				sw.reset();
+				experimentToBeAnalysed = experimentToBeAnalysed.clone();
+				experimentToBeAnalysed.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+				experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+						experiment.getExperimentName());
+				experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
+				sw.printTime();
+				if (status != null)
+					status.setCurrentStatusText2("Cloning time: " + sw.getTimeString());
+			}
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
@@ -253,8 +266,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText1("Ready");
 					
 					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
-							experiment.getExperimentName());
+					if (m != null)
+						statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+								experiment.getExperimentName());
 					
 					statisticsResult.getHeader().setRemark(
 							statisticsResult.getHeader().getRemark() +
@@ -267,6 +281,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					
 					if (m != null)
 						m.saveExperiment(statisticsResult, getStatusProvider());
+					// else
+					// TODO Save data in VFS target, if defined
 					
 					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
