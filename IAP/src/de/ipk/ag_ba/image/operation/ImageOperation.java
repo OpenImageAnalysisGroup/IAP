@@ -4717,8 +4717,10 @@ public class ImageOperation {
 	/**
 	 * Warning: input image is modified.
 	 */
-	public ImageOperation sharpen() {
-		image.getProcessor().sharpen();
+	public ImageOperation sharpen(int numberOfRuns) {
+		for (int ii = 0; ii < numberOfRuns; ii++) {
+			image.getProcessor().sharpen();
+		}
 		return this;
 	}
 	

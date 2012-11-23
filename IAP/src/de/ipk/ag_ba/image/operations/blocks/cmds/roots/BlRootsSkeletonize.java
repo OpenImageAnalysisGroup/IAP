@@ -25,10 +25,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
-	int white = Color.WHITE.getRGB();
-	int black = Color.BLACK.getRGB();
-	int blue = Color.BLUE.getRGB();
-	
 	@Override
 	protected FlexibleImage processVISmask() {
 		int background = options.getBackground();

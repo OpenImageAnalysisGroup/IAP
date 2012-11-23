@@ -31,6 +31,33 @@ public class ImageProcessorOptions {
 	private NeighbourhoodSetting neighbourhood;
 	
 	public enum Setting {
+		
+		// for root pipeline only --> for homepage delete all other parameters
+		
+		// Block 1
+		TV_TEST_IMAGE_WIDTH_VIS, TV_TEST_IMAGE_WIDTH_FLUO, TV_TEST_IMAGE_WIDTH_NIR, TV_TEST_IMAGE_WIDTH_IR,
+		TV_TEST_IMAGE_HEIGHT_VIS, TV_TEST_IMAGE_HEIGHT_FLUO, TV_TEST_IMAGE_HEIGHT_NIR, TV_TEST_IMAGE_HEIGHT_IR,
+		
+		// Block 2
+		ROOT_BORDER_SIZE_VIS, ROOT_BORDER_COLOR,
+		ROOT_TRANSLATE_X, ROOT_TRANSLATE_Y,
+		
+		// Block 3
+		ROOT_BLUR_RADIUS,
+		ROOT_NUMBER_OF_RUNS_SHARPEN,
+		
+		// Block 5
+		ROOT_BORDER_WIDTH,
+		ROOT_TRESHOLD_BLUE,
+		ROOT_REMOVE_SMALL_ELEMENTS_AREA, ROOT_REMOVE_SMALL_ELEMENTS_DIM,
+		ROOT_ADAPTIVE_TRESHOLD_SIZE_OF_REGION,
+		ROOT_ADAPTIVE_TRESHOLD_ASSUMED_BACKGROUND_COLOR,
+		ROOT_ADAPTIVE_TRESHOLD_NEW_FORGROUND_COLOR,
+		ROOT_ADAPTIVE_TRESHOLD_K,
+		ROOT_NUMBER_OF_RUNS_ERODE,
+		
+		// other pipelines
+		
 		TRANSLATE_X, TRANSLATE_Y,
 		RGB_SIDE_NUMBER_OF_ERODE_LOOPS, RGB_SIDE_NUMBER_OF_DILATE_LOOPS,
 		FLUO_SIDE_NUMBER_OF_ERODE_LOOPS, FLUO_SIDE_NUMBER_OF_DILATE_LOOPS,
@@ -195,6 +222,49 @@ public class ImageProcessorOptions {
 	}
 	
 	public void initStandardValues(double scale) {
+		
+		// root pipeline
+		// Block 1
+		addIntSetting(Setting.TV_TEST_IMAGE_WIDTH_VIS, 768);
+		addIntSetting(Setting.TV_TEST_IMAGE_WIDTH_FLUO, 768);
+		addIntSetting(Setting.TV_TEST_IMAGE_WIDTH_NIR, 768);
+		addIntSetting(Setting.TV_TEST_IMAGE_WIDTH_IR, 768);
+		addIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_VIS, 576);
+		addIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_FLUO, 576);
+		addIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_NIR, 576);
+		addIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_IR, 576);
+		
+		// Block 2
+		addIntSetting(Setting.ROOT_BORDER_SIZE_VIS, 100);
+		addIntSetting(Setting.ROOT_BORDER_COLOR, new Color(255, 255, 255).getRGB());
+		addIntSetting(Setting.ROOT_TRANSLATE_X, 50);
+		addIntSetting(Setting.ROOT_TRANSLATE_Y, 50);
+		
+		// Block 3
+		// no options
+		
+		// Block 4
+		addIntSetting(Setting.ROOT_BLUR_RADIUS, 2);
+		addIntSetting(Setting.ROOT_NUMBER_OF_RUNS_SHARPEN, 3);
+		
+		// Block 5
+		addIntSetting(Setting.ROOT_BORDER_WIDTH, 2);
+		addIntSetting(Setting.ROOT_TRESHOLD_BLUE, 3);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA, 50);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM, 50);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA, (800 * 800));
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM, 800);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA, 10);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM, 10);
+		addIntSetting(Setting.ROOT_NUMBER_OF_RUNS_ERODE, 60);
+		addIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_SIZE_OF_REGION, 5);
+		addIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_ASSUMED_BACKGROUND_COLOR, Color.BLACK.getRGB());
+		addIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_NEW_FORGROUND_COLOR, Color.WHITE.getRGB());
+		addDoubleSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_K, 0.02);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA, 10);
+		addIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM, 10);
+		
+		// other pipelines
 		
 		setCameraPosition(CameraPosition.UNKNOWN);
 		setNeighbourhood(NeighbourhoodSetting.NB4);

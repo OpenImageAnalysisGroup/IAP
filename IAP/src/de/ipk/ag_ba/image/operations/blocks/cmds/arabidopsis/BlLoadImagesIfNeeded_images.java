@@ -3,12 +3,13 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 
 /**
- * @author klukas
+ * @author klukas, entzian
  */
 
 public class BlLoadImagesIfNeeded_images extends
@@ -26,9 +27,9 @@ public class BlLoadImagesIfNeeded_images extends
 			if (input().images() != null)
 				input().setImages(
 						new FlexibleImageSet(input().images()));
-			if (input().masks() != null)
+			if (input().masks() != null) {
 				input().setMasks(new FlexibleImageSet(input().masks()));
-			
+			}
 			if (input().images().vis() == null
 					&& input().images().getVisInfo() != null) {
 				IOurl url = input().images().getVisInfo().getURL();
@@ -109,7 +110,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().vis() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().vis();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_VIS)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_VIS)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -119,7 +121,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().fluo() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().fluo();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_FLUO)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_FLUO)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -129,7 +132,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().nir() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().nir();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_NIR)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_NIR)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -139,7 +143,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().vis() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().vis();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_VIS)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_VIS)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -149,7 +154,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().fluo() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().fluo();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_FLUO)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_FLUO)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -159,7 +165,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().nir() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().nir();
-			if (i.getWidth() == 768 && i.getHeight() == 576) {
+			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_NIR)
+					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_NIR)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -168,16 +175,16 @@ public class BlLoadImagesIfNeeded_images extends
 		}
 	}
 	
-	@Override
-	protected void postProcess(FlexibleImageSet processedImages,
-			FlexibleImageSet processedMasks) {
-		super.postProcess(processedImages, processedMasks);
-		if (options != null) // && !options.isMaize()
-			if (processedImages != null
-					&& processedImages.vis() != null
-					&& processedImages.fluo() != null
-					&& processedImages.vis().getHeight() > processedImages
-							.fluo().getHeight())
-				options.setHigherResVisCamera(true);
-	}
+	// @Override
+	// protected void postProcess(FlexibleImageSet processedImages,
+	// FlexibleImageSet processedMasks) {
+	// super.postProcess(processedImages, processedMasks);
+	// if (options != null) // && !options.isMaize()
+	// if (processedImages != null
+	// && processedImages.vis() != null
+	// && processedImages.fluo() != null
+	// && processedImages.vis().getHeight() > processedImages
+	// .fluo().getHeight())
+	// options.setHigherResVisCamera(true);
+	// }
 }
