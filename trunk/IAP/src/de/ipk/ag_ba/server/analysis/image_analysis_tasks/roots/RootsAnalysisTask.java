@@ -25,7 +25,7 @@ public class RootsAnalysisTask extends AbstractPhenotypingTask {
 	
 	@Override
 	protected ImageProcessor getImageProcessor() {
-		return new RootsAnalysisPipeline();
+		return new RootsAnalysisPipeline(getName());
 	}
 	
 	@Override
