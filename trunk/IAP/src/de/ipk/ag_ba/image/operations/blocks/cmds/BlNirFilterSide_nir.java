@@ -26,7 +26,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 								getInt("Adaptive_Threshold_Region_Size", 150),
 								average,
 								options.getBackground(),
-								getDouble("Adaptive_Threshold_F", 0.10)).getImage().print("ADAPT OUT", debug);
+								getDouble("Adaptive_Threshold_K", 0.10)).getImage().print("ADAPT OUT", debug);
 			else {
 				double f;
 				int regionSize;
