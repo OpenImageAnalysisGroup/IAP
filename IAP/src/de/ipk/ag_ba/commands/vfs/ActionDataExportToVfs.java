@@ -315,17 +315,19 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									is = ResourceIOManager
 											.getInputStreamMemoryCached(bm
 													.getURL());
-									if (is.available() <= 0) {
+									if (is == null || is.available() <= 0) {
 										System.out
 												.println("ERROR: Input stream contains no content for image with URL "
 														+ bm.getURL());
 									}
 								}
 								
-								MyByteArrayInputStream previewStream;
+								MyByteArrayInputStream previewStream = null;
 								if (previewData == null || previewData.length == 0) {
-									BufferedImage bimage = ImageIO.read(is);
-									previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+									if (is != null) {
+										BufferedImage bimage = ImageIO.read(is);
+										previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+									}
 								} else {
 									previewStream = new MyByteArrayInputStream(previewData, previewData.length);
 								}
@@ -580,29 +582,33 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							in = url != null || optUrlContent == null ? ResourceIOManager
 									.getInputStreamMemoryCached(url)
 									: optUrlContent;
-							synchronized (es) {
-								VfsFileObject f = vfs.newVfsFile(hsmManager
-										.prepareAndGetDataFileNameAndPath(
-												experiment.getHeader(), t,
-												"in_progress_"
-														+ UUID.randomUUID()
-																.toString()));
-								BufferedOutputStream bos = new BufferedOutputStream(
-										f.getOutputStream());
-								try {
-									if (in.getCount() > 0)
-										bos.write(in.getBuff(), 0,
-												in.getCount());
-								} finally {
-									bos.close();
+							if (in == null)
+								System.out.println("No input for " + url);
+							else {
+								synchronized (es) {
+									VfsFileObject f = vfs.newVfsFile(hsmManager
+											.prepareAndGetDataFileNameAndPath(
+													experiment.getHeader(), t,
+													"in_progress_"
+															+ UUID.randomUUID()
+																	.toString()));
+									BufferedOutputStream bos = new BufferedOutputStream(
+											f.getOutputStream());
+									try {
+										if (in.getCount() > 0)
+											bos.write(in.getBuff(), 0,
+													in.getCount());
+									} finally {
+										bos.close();
+									}
+									written.addLong(in.getCount());
+									in.close();
+									if (t != null)
+										f.setLastModified(t);
+									f.setWritable(false);
+									f.setExecutable(false);
+									f.renameTo(targetFile, true);
 								}
-								written.addLong(in.getCount());
-								in.close();
-								if (t != null)
-									f.setLastModified(t);
-								f.setWritable(false);
-								f.setExecutable(false);
-								f.renameTo(targetFile, true);
 							}
 						}
 						if (url != null) {

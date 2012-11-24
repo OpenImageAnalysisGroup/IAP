@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import org.ErrorMsg;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -117,10 +118,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			MySnapshotFilter sf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), experiment.getHeader().getGlobalOutlierInfo());
 			
-			boolean filterTop = false; // process only top images?
-			boolean filterTime = false; // process only one day? (day 48, see below)
-			boolean filterPlant = false; // process only one plant?
-			String plantFilter = "1107BA1350"; // "1121KN063";
+			boolean filterTop = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-TOP", false); // process only top images?
+			boolean filterTime = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-ONE-DAY", false); // process only one day? (day 48, see
+																																									// below)
+			int DEBUG_SINGLE_DAY = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "DEBUG-SINGLE-DAY", 48);
+			boolean filterPlant = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-SINGLE-PLANT", false); // process only one plant?
+			String plantFilter = SystemOptions.getInstance().getString("Pipeline-Debugging", "DEBUG-SINGLE-PLANT-ID", "001447-D1"); // "1107BA1350"; //
+																																											// "1121KN063";
 			
 			for (SubstanceInterface m : experimentToBeAnalysed) {
 				Substance3D m3 = (Substance3D) m;
@@ -153,7 +157,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 							if (sd3.getSampleFineTimeOrRowId() <= optProcessOnlySampleDataNewerThanThisDate.getTime())
 								continue;
 						if (filterTime) {
-							if (sd3.getTime() != 48)
+							if (sd3.getTime() != DEBUG_SINGLE_DAY)
 								continue;
 						}
 						if (filterPlant) {

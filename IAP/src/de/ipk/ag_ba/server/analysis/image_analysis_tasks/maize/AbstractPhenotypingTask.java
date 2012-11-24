@@ -14,6 +14,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -33,7 +34,6 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -168,7 +168,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		status.setCurrentStatusValue(-1);
 		status.setCurrentStatusText1("Wait for execution time slot");
 		final Semaphore maxInst = BackgroundTaskHelper.lockGetSemaphore(
-				AbstractPhenotypingTask.class, 1);
+				AbstractPhenotypingTask.class, SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1));
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
@@ -923,9 +923,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 		
-		if (inVis != null && inVis.getPosition() != null)
-			options.addDoubleSetting(Setting.ROTATION_ANGLE,
-					inVis.getPosition());
 		if (side)
 			options.setCameraPosition(CameraPosition.SIDE);
 		else

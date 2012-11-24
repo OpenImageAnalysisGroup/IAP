@@ -803,10 +803,10 @@ public class ImageOperation {
 		return this;
 	}
 	
-	public ImageOperation closing(int m, int n) { // es wird der 3x3 Minimum-Filter genutzt
-		for (int i = 0; i < m; i++)
+	public ImageOperation closing(int dilate, int erode) { // es wird der 3x3 Minimum-Filter genutzt
+		for (int i = 0; i < dilate; i++)
 			image.getProcessor().dilate();
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < erode; j++)
 			image.getProcessor().erode();
 		
 		return new ImageOperation(image);
@@ -3538,10 +3538,10 @@ public class ImageOperation {
 		return new ImageOperation(pixL).flipHor().print("merged balanced", false);
 	}
 	
-	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d) {
-		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
-		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
-		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d).getImage();
+	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps) {
+		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
+		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
+		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
 		return new FlexibleImage(r, g, b).io();
 	}
 	
@@ -3605,7 +3605,7 @@ public class ImageOperation {
 		return new FlexibleImage(getWidth(), getHeight(), img).io();
 	}
 	
-	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d) {
+	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps) {
 		int[][] img = getImageAs2dArray();
 		int w = img.length;
 		int h = img[0].length;
@@ -3614,7 +3614,6 @@ public class ImageOperation {
 		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
 		int distToCenter, pix;
 		double fac;
-		int steps = whiteLevel_180d < 200 ? 180 : 50;
 		
 		double[] calibrationCurveFromTopLeftToCenter = new double[steps];
 		double[] indexArray = new double[steps];
@@ -4712,6 +4711,14 @@ public class ImageOperation {
 	
 	public SkeletonProcessor2d skel2d() {
 		return new SkeletonProcessor2d(getImage());
+	}
+	
+	/**
+	 * Warning: input image is modified.
+	 */
+	public ImageOperation sharpen() {
+		image.getProcessor().sharpen();
+		return this;
 	}
 	
 	/**
