@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import org.ini4j.Ini;
 
@@ -16,7 +18,7 @@ public class SystemOptions {
 	private final String iniFileName;
 	private Ini ini;
 	
-	private ArrayList<Runnable> changeListeners = new ArrayList<Runnable>();
+	private LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
 	
 	private long lastModificationTime = 0;
 	
@@ -38,11 +40,13 @@ public class SystemOptions {
 								SystemOptions.this.lastModificationTime = mt;
 								ini = readIni();
 								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName + " has been changed and has been reloaded.");
-								for (Runnable r : changeListeners) {
-									try {
-										r.run();
-									} catch (Exception e) {
-										e.printStackTrace();
+								for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+									for (Runnable r : rr) {
+										try {
+											r.run();
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
 									}
 								}
 							}
@@ -110,7 +114,7 @@ public class SystemOptions {
 			Boolean r = ini.get(group, setting, Boolean.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				store();
+				store(group, setting);
 				return defaultValue;
 			} else
 				return r;
@@ -127,7 +131,7 @@ public class SystemOptions {
 				setting = setting.split("\\|", 2)[1];
 			}
 			ini.put(group, setting, value);
-			store();
+			store(group, setting);
 		}
 	}
 	
@@ -139,7 +143,7 @@ public class SystemOptions {
 			Integer r = ini.get(group, setting, Integer.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				store();
+				store(group, setting);
 				return defaultValue;
 			} else
 				return r;
@@ -152,7 +156,7 @@ public class SystemOptions {
 			return;
 		} else {
 			ini.put(group, setting, value);
-			store();
+			store(group, setting);
 		}
 	}
 	
@@ -164,7 +168,7 @@ public class SystemOptions {
 			Double r = ini.get(group, setting, Double.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				store();
+				store(group, setting);
 				return defaultValue;
 			} else
 				return r;
@@ -177,7 +181,7 @@ public class SystemOptions {
 			return;
 		} else {
 			ini.put(group, setting, value);
-			store();
+			store(group, setting);
 		}
 	}
 	
@@ -189,7 +193,7 @@ public class SystemOptions {
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue + "");
-				store();
+				store(group, setting);
 				return defaultValue;
 			} else {
 				if (r == null || r.equals("null"))
@@ -200,10 +204,15 @@ public class SystemOptions {
 		}
 	}
 	
-	protected void store() {
+	protected void store(String srcSection, String srcSetting) {
 		try {
 			ini.store();
 			lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
+			if (rr != null)
+				for (Runnable r : new ArrayList<Runnable>(rr)) {
+					r.run();
+				}
 		} catch (IOException e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
@@ -216,7 +225,7 @@ public class SystemOptions {
 			return;
 		} else {
 			ini.put(group, setting, value + "");
-			store();
+			store(group, setting);
 		}
 	}
 	
@@ -236,7 +245,7 @@ public class SystemOptions {
 				for (String v : defaultValue)
 					section.add(setting, v, idx++);
 				ini.put(group, section);
-				store();
+				store(group, setting);
 				return defaultValue;
 			} else
 				return r;
@@ -311,7 +320,19 @@ public class SystemOptions {
 			section.add(setting, nv);
 	}
 	
-	public void addChangeListener(Runnable runnable) {
-		changeListeners.add(runnable);
+	public void addChangeListener(String section, String setting, Runnable runnable) {
+		String key = getKey(section, setting);
+		if (!changeListeners.containsKey(key))
+			changeListeners.put(key, new LinkedHashSet<Runnable>());
+		changeListeners.get(key).add(runnable);
+	}
+	
+	private String getKey(String section, String setting) {
+		return section + ":" + setting;
+	}
+	
+	public void removeChangeListener(Runnable runnable) {
+		for (LinkedHashSet<Runnable> cl : changeListeners.values())
+			cl.remove(runnable);
 	}
 }

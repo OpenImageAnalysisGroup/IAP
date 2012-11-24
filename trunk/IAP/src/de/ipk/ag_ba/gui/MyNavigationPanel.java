@@ -16,6 +16,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -37,6 +39,7 @@ import javax.swing.UIManager;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -125,7 +128,9 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFrame jff = new JFrame("IAP Cloud Storage, Analysis and Visualization System");
+				String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
+						"IAP Cloud Storage, Analysis and Visualization System");
+				final JFrame jff = new JFrame(tt);
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 						"", "");
@@ -153,6 +158,25 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				jff.setVisible(true);
 				jff.validate();
 				jff.repaint();
+				final Runnable rr = new Runnable() {
+					@Override
+					public void run() {
+						if (!jff.isDisplayable())
+							SystemOptions.getInstance().removeChangeListener(this);
+						else {
+							String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
+									"IAP Cloud Storage, Analysis and Visualization System");
+							jff.setTitle(tt);
+						}
+					}
+				};
+				SystemOptions.getInstance().addChangeListener("IAP", "MDI-Window-Title", rr);
+				jff.addHierarchyListener(new HierarchyListener() {
+					@Override
+					public void hierarchyChanged(HierarchyEvent e) {
+						SystemOptions.getInstance().removeChangeListener(rr);
+					}
+				});
 			}
 		};
 		return res;
