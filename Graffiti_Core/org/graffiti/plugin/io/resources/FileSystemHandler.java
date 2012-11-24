@@ -78,10 +78,18 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 				path = StringManipulationTools.stringReplace(path, File.separator + "data" + File.separator, File.separator + "icons" + File.separator);
 			else
 				path = "icons" + File.separator + path;
-			fn = folder + File.separator + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
+			if (fn.contains("#"))
+				fn = folder + File.separator + path + File.separator + fn.substring(0, fn.lastIndexOf("#"));
+			else
+				fn = folder + File.separator + path + File.separator + fn;
 			if (!new File(fn).exists()) {
-				final byte[] rrr = ((MyByteArrayInputStream) super.getPreviewInputStream(url)).getBuffTrimmed();
-				return new MyByteArrayInputStream(rrr, rrr.length);
+				MyByteArrayInputStream ins = (MyByteArrayInputStream) super.getPreviewInputStream(url);
+				if (ins == null)
+					return null;
+				else {
+					final byte[] rrr = ins.getBuffTrimmed();
+					return new MyByteArrayInputStream(rrr, rrr.length);
+				}
 			} else {
 				return new FileInputStream(new File(fn));
 			}

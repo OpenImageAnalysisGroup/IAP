@@ -11,10 +11,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlockClearNirPot_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = false;
-	
 	@Override
 	protected FlexibleImage processNIRimage() {
+		
+		boolean debug = getBoolean("debug", false);
+		
 		FlexibleImage nir = input().images().nir();
 		
 		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10 || options.isBarleyInBarleySystem())

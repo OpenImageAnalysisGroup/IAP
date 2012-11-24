@@ -590,18 +590,25 @@ public class IAPservice {
 		TreeMap<Long, Double> timeDay2averageTemp = new TreeMap<Long, Double>();
 		
 		if (experiment != null) {
-			double ggd_baseline = 10;
 			String type = experiment.getHeader().getExperimentType();
 			if (type == null)
 				type = "";
+			double ggd_baseline;
 			if (type.equals("Barley")) {
-				ggd_baseline = 5.5;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Barley, 5.5°C");
-			}
-			if (type.equals("Maize")) {
-				ggd_baseline = 10;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Maize, 10°C");
-			}
+				ggd_baseline = SystemOptions.getInstance().getDouble("Growing-Degree-Days", "Barley-Baseline", 5.5);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Barley, "
+						+ ggd_baseline + " °C");
+			} else
+				if (type.equals("Maize")) {
+					ggd_baseline = SystemOptions.getInstance().getDouble("Growing-Degree-Days", "Maize-Baseline", 10);
+					ggd_baseline = 10;
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Maize, "
+							+ ggd_baseline + " °C");
+				} else {
+					ggd_baseline = SystemOptions.getInstance().getDouble("Growing-Degree-Days", "Default-Baseline", 10);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using default baseline (type is neither Maize nor Barley), "
+							+ ggd_baseline + " °C");
+				}
 			GregorianCalendar gc = new GregorianCalendar();
 			for (SubstanceInterface substance : experiment) {
 				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {

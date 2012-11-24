@@ -16,6 +16,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -48,8 +49,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class BlockPipeline {
-	
-	private final boolean debug = false;
 	
 	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
@@ -134,6 +133,9 @@ public class BlockPipeline {
 		if (status != null)
 			status.setCurrentStatusValueFine(0);
 		
+		boolean debug = SystemOptions.getInstance().getBoolean("IAP", "Debug-Pipeline-Execution", false);
+		int tPrintBlockTime = SystemOptions.getInstance().getInteger("IAP", "Info-Print-Block-Execution-Time", 30);
+		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;
@@ -180,7 +182,7 @@ public class BlockPipeline {
 			
 			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
-				if (seconds >= (debug ? 0 : 30))
+				if (seconds >= (debug ? 0 : tPrintBlockTime))
 					System.out.println("Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "

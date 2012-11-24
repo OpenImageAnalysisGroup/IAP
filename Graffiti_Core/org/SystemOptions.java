@@ -14,12 +14,48 @@ import org.ini4j.Ini;
 public class SystemOptions {
 	
 	private final String iniFileName;
-	private final Ini ini;
+	private Ini ini;
 	
-	private SystemOptions(String iniFileName) {
+	private ArrayList<Runnable> changeListeners = new ArrayList<Runnable>();
+	
+	private long lastModificationTime = 0;
+	
+	private SystemOptions(final String iniFileName) {
 		this.iniFileName = iniFileName;
 		instances.put(iniFileName, this);
 		ini = readIni();
+		
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				SystemOptions.this.lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+				try {
+					do {
+						Thread.sleep(1000);
+						synchronized (SystemOptions.this) {
+							long mt = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+							if (mt != SystemOptions.this.lastModificationTime) {
+								SystemOptions.this.lastModificationTime = mt;
+								ini = readIni();
+								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName + " has been changed and has been reloaded.");
+								for (Runnable r : changeListeners) {
+									try {
+										r.run();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+					} while (true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		t.setName("File Change Monitor " + iniFileName);
+		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
 	}
 	
 	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
@@ -37,7 +73,7 @@ public class SystemOptions {
 		return getInstance(null);
 	}
 	
-	private Ini readIni() {
+	private synchronized Ini readIni() {
 		String fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
 		try {
 			return new Ini(new File(fn));
@@ -74,12 +110,7 @@ public class SystemOptions {
 			Boolean r = ini.get(group, setting, Boolean.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				try {
-					ini.store();
-				} catch (IOException e) {
-					e.printStackTrace();
-					ErrorMsg.addErrorMessage(e);
-				}
+				store();
 				return defaultValue;
 			} else
 				return r;
@@ -96,12 +127,7 @@ public class SystemOptions {
 				setting = setting.split("\\|", 2)[1];
 			}
 			ini.put(group, setting, value);
-			try {
-				ini.store();
-			} catch (IOException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			store();
 		}
 	}
 	
@@ -113,12 +139,7 @@ public class SystemOptions {
 			Integer r = ini.get(group, setting, Integer.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				try {
-					ini.store();
-				} catch (IOException e) {
-					e.printStackTrace();
-					ErrorMsg.addErrorMessage(e);
-				}
+				store();
 				return defaultValue;
 			} else
 				return r;
@@ -131,12 +152,7 @@ public class SystemOptions {
 			return;
 		} else {
 			ini.put(group, setting, value);
-			try {
-				ini.store();
-			} catch (IOException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			store();
 		}
 	}
 	
@@ -148,12 +164,7 @@ public class SystemOptions {
 			Double r = ini.get(group, setting, Double.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
-				try {
-					ini.store();
-				} catch (IOException e) {
-					e.printStackTrace();
-					ErrorMsg.addErrorMessage(e);
-				}
+				store();
 				return defaultValue;
 			} else
 				return r;
@@ -166,12 +177,7 @@ public class SystemOptions {
 			return;
 		} else {
 			ini.put(group, setting, value);
-			try {
-				ini.store();
-			} catch (IOException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			store();
 		}
 	}
 	
@@ -183,12 +189,7 @@ public class SystemOptions {
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue + "");
-				try {
-					ini.store();
-				} catch (IOException e) {
-					e.printStackTrace();
-					ErrorMsg.addErrorMessage(e);
-				}
+				store();
 				return defaultValue;
 			} else {
 				if (r == null || r.equals("null"))
@@ -199,18 +200,23 @@ public class SystemOptions {
 		}
 	}
 	
+	protected void store() {
+		try {
+			ini.store();
+			lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+		} catch (IOException e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
+	}
+	
 	public synchronized void setString(String group, String setting, String value) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
 			ini.put(group, setting, value + "");
-			try {
-				ini.store();
-			} catch (IOException e) {
-				e.printStackTrace();
-				ErrorMsg.addErrorMessage(e);
-			}
+			store();
 		}
 	}
 	
@@ -230,12 +236,7 @@ public class SystemOptions {
 				for (String v : defaultValue)
 					section.add(setting, v, idx++);
 				ini.put(group, section);
-				try {
-					ini.store();
-				} catch (IOException e) {
-					e.printStackTrace();
-					ErrorMsg.addErrorMessage(e);
-				}
+				store();
 				return defaultValue;
 			} else
 				return r;
@@ -308,5 +309,9 @@ public class SystemOptions {
 		section.remove(setting);
 		for (String nv : newValues)
 			section.add(setting, nv);
+	}
+	
+	public void addChangeListener(Runnable runnable) {
+		changeListeners.add(runnable);
 	}
 }

@@ -16,11 +16,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = false;
+	private boolean debug = false;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
+		
+		debug = getBoolean("debug", false);
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (input().masks().vis() != null) {
@@ -36,7 +38,7 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 					tm.calcOffsetVerticalY(fluo);
 					tm.calcOffsetHorizontalX(fluo);
 					
-					boolean dontMoveDown = true;;
+					boolean dontMoveDown = getBoolean("Dont_Move_Down", true);
 					if (tm.getOffsetVerticalY() < 0 && dontMoveDown) {
 						if (input().images().fluo() != null)
 							input().images().setFluo(tm.translate(input().images().fluo()));
@@ -84,7 +86,7 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 					else
 						tm.calcOffsetHorizontalX(null);
 					
-					boolean dontMoveUp = false;
+					boolean dontMoveUp = getBoolean("Dont_Move_NIR_Pot_Up", false);
 					if (dontMoveUp) {
 						// don't move NIR pot up, only down
 						if (tm.getOffsetVerticalY() < 0)
@@ -103,9 +105,15 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 			if (options.isBarleyInBarleySystem()) {
 				if (input().masks().vis() != null || input().masks().vis() != null) {
 					FlexibleImage vis = input().masks().vis();
-					input().masks().setVis(vis.io().translate(-18, -8).getImage());
+					input().masks().setVis(vis.io()
+							.translate(
+									getInt("Move_Top_Vis_X", -18),
+									getInt("Move_Top_Vis_Y", -8)).getImage());
 					vis = input().images().vis();
-					input().images().setVis(vis.io().translate(-18, -8).getImage());
+					input().images().setVis(vis.io()
+							.translate(
+									getInt("Move_Top_Vis_X", -18),
+									getInt("Move_Top_Vis_Y", -8)).getImage());
 				}
 			}
 		}

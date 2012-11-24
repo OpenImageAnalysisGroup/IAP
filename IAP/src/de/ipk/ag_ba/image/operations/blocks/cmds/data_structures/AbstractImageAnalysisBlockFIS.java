@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -29,6 +29,22 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public AbstractImageAnalysisBlockFIS() {
 		// empty
+	}
+	
+	protected boolean getBoolean(String setting, boolean defaultValue) {
+		return options.getBooleanSetting(this, setting, defaultValue);
+	}
+	
+	protected boolean getBoolean(ImageAnalysisBlockFIS block, String setting, boolean defaultValue) {
+		return options.getBooleanSetting(block, setting, defaultValue);
+	}
+	
+	protected int getInt(String setting, int defaultValue) {
+		return options.getIntSetting(this, setting, defaultValue);
+	}
+	
+	protected double getDouble(String setting, double defaultValue) {
+		return options.getDoubleSetting(this, setting, defaultValue);
 	}
 	
 	@Override
@@ -54,9 +70,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null && isChangingImages())
-			debugStack.addImage("Input for " + task, input().getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
-		if (options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES)) {
-			if (options.getBooleanSetting(Setting.IS_DEBUG_PRINT_EACH_STEP))
+			debugStack.addImage("Input for " + task, input().getOverviewImage(
+					SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
+					));
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", true)) {
+			if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
 				if (input().masks() != null)
 					input().masks().fluo().print("Mask-Input for step: " + task);
 				else

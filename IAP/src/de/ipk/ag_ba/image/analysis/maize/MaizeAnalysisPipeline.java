@@ -5,7 +5,6 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
@@ -22,7 +21,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vi
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
@@ -74,11 +73,11 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlockClosing_vis.class.getCanonicalName(),
 				// "beforeBloomEnhancement" image is saved in the following block
 				// BlockClosingForMaizeBloom_vis_stores_image.class.getCanonicalName(),
-				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(),
+				BlRemoveSmallClusters_vis_fluo.class.getCanonicalName(),
 				BlockRemoveSmallStructuresUsingOpening_top_vis.class.getCanonicalName(),
 				BlMedianFilter_fluo.class.getCanonicalName(),
 				// BlockClosingForYellowVisMask.class.getCanonicalName(),
-				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // requires lab filter before
+				BlRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // requires lab filter before
 				BlockRemoveMaizeBambooStick_vis.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
 																								// noise)
 				BlockRemoveLevitatingObjects_vis_fluo.class.getCanonicalName(),
@@ -86,7 +85,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlUseFluoMaskToClear_vis_nir.class.getCanonicalName(),
 				
 				BlockRemoveVerticalAndHorizontalStructures_vis_fluo.class.getCanonicalName(),
-				BlockRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // 2nd run
+				BlRemoveSmallClusters_vis_fluo.class.getCanonicalName(), // 2nd run
 				
 				BlockSkeletonize_vis_or_fluo.class.getCanonicalName(),
 				
@@ -138,41 +137,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.setSystemOptionStorage(so, g);
 		
 		options.setIsMaize(true);
-		options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, true);
-		options.clearAndAddBooleanSetting(Setting.SKELETONIZE, true);
-		options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, true);
 		
-		options.clearAndAddBooleanSetting(Setting.REMOVE_BAMBOO_STICK, false);
-		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 50 * 255 / 100);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0); // green
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 120);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 125); // 130
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255); // all yellow
-			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 80); // 98 // 130 gerste wegen topf
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 125);// 125
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
-		} else {
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_VIS, 0);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_VIS, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_VIS, 122);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_VIS, 255);
-			
-			options.clearAndAddIntSetting(Setting.LAB_MIN_L_VALUE_FLUO, 100);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_L_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_A_VALUE_FLUO, 98);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_A_VALUE_FLUO, 255);
-			options.clearAndAddIntSetting(Setting.LAB_MIN_B_VALUE_FLUO, 130);
-			options.clearAndAddIntSetting(Setting.LAB_MAX_B_VALUE_FLUO, 255);
-		}
 		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20);
 		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20);
 		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 20);
@@ -185,9 +150,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		options.clearAndAddIntSetting(Setting.W_Diff_NIR_TOP, 33);// 33); // 23
 		
 		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1448);
-		options.clearAndAddIntSetting(Setting.CLOSING_REPEAT, 2);
-		
-		options.setSystemOptionStorage(null, null);
+		// options.setSystemOptionStorage(null, null);
 	}
 	
 	@Override

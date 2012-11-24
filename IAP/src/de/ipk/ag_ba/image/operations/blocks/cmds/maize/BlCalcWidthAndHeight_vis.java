@@ -30,6 +30,12 @@ public class BlCalcWidthAndHeight_vis extends
 	boolean debug = false;
 	
 	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+	}
+	
+	@Override
 	protected boolean isChangingImages() {
 		return false;
 	}
@@ -51,8 +57,8 @@ public class BlCalcWidthAndHeight_vis extends
 		int vertYsoilLevel = -1;
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && options.isHigherResVisCamera() && options.isBarley()
-				&& options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS) > 0) {
-			vertYsoilLevel = visRes.getHeight() - options.getIntSetting(Setting.FIXED_CROP_BOTTOM_POT_POSITION_VIS);
+				&& getInt("fixed_pot_cut_off_vis", 150) > 0) {
+			vertYsoilLevel = visRes.getHeight() - getInt("fixed_pot_cut_off_vis", 150);
 		} else
 			if (!options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE) {
 				if (useFluo) {

@@ -16,7 +16,9 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = input().images().vis();
 		
-		return input.io().rmCircleShadeFixedRGB(255d).getImage();
+		int steps = getInt("Shade-Steps-Vis", 50);
+		
+		return input.io().rmCircleShadeFixedRGB(255d, steps).getImage();
 	}
 	
 	@Override
@@ -26,7 +28,9 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = input().masks().vis();
 		
-		return input.io().rmCircleShadeFixedRGB(255d).getImage();
+		int steps = getInt("Shade-Steps-Vis", 50);
+		
+		return input.io().rmCircleShadeFixedRGB(255d, steps).getImage();
 	}
 	
 	@Override
@@ -36,8 +40,10 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = input().images().nir();
 		
+		int steps = getInt("Shade-Steps-NIR", 180);
+		
 		return input.io().// rmCircleShadeFixedGray(180d).
-				flipVert().rmCircleShadeFixedGray(180d).flipVert().getImage();
+				flipVert().rmCircleShadeFixedGray(180d, steps).flipVert().getImage();
 	}
 	
 	@Override
@@ -47,8 +53,10 @@ public class BlColorBalancingRoundCamera_vis_nir extends AbstractSnapshotAnalysi
 		
 		FlexibleImage input = input().masks().nir();
 		
+		int steps = getInt("Shade-Steps-NIR", 180);
+		
 		return input.io().
-				flipVert().rmCircleShadeFixedGray(180d).flipVert().
+				flipVert().rmCircleShadeFixedGray(180d, steps).flipVert().
 				// rmCircleShadeFixedGray(180d).
 				getImage();
 	}

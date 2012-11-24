@@ -57,7 +57,7 @@ public class BlConvexHull_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		Integer realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 		if (distHorizontal == null)
 			realDist = null;
-		boolean drawHull = options.getBooleanSetting(Setting.DRAW_CONVEX_HULL);
+		boolean drawHull = getBoolean("draw_convex_hull", true);
 		res = new ImageOperation(image).hull().find(true, false, drawHull, drawHull, Color.RED.getRGB(),
 				Color.CYAN.getRGB(),
 				Color.RED.getRGB(), distHorizontal, realDist);

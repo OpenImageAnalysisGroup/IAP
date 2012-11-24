@@ -22,6 +22,7 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 	@Override
 	protected void prepare() {
 		super.prepare();
+		debug = getBoolean("debug", false);
 	}
 	
 	@Override

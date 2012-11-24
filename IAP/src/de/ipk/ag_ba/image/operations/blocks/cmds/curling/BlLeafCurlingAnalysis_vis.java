@@ -17,19 +17,21 @@ public class BlLeafCurlingAnalysis_vis extends AbstractSnapshotAnalysisBlockFIS 
 	@Override
 	protected FlexibleImage processVISmask() {
 		
-		boolean debug = false;
+		boolean debug = getBoolean("debug", false);
 		
 		if (input().masks().vis() == null) {
 			return null;
 		}
+		
+		if (!getBoolean("enabled", false))
+			return input().masks().vis();
+		
 		FlexibleImage img1 = input().masks().vis().copy();
 		
 		ImageOperation dist = img1.io().skel()
 				.calculateDistanceToBorder(true, ImageOperation.BACKGROUND_COLORint)
 				.print("Distance", debug);
-		// img1.copy().io().skel().skeletonize(Color.WHITE.getRGB()).print("INCORRECT RESULT 2");
-		// img1.io().copy().skeletonize().print("CORRECT RESULT 1");
-		// img2.io().copy().skeletonize().print("CORRECT RESULT 2");
+		
 		ImageOperation skel = img1.io().copy().skeletonize(true)
 				.print("Skeleton", debug);
 		
@@ -42,7 +44,7 @@ public class BlLeafCurlingAnalysis_vis extends AbstractSnapshotAnalysisBlockFIS 
 		DescriptiveStatistics statsFFTfrequency = new DescriptiveStatistics();
 		DescriptiveStatistics statsFFTamplitude = new DescriptiveStatistics();
 		for (Limb l : limbs) {
-			if (l.length() < 100)
+			if (l.length() < getInt("Minimum-Limb-Length", 100))
 				continue;
 			ArrayList<Point> points = l.getPoints();
 			ArrayList<Integer> distances = new ArrayList<Integer>(points.size());

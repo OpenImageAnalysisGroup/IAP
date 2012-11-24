@@ -17,9 +17,12 @@ public class BlMedianFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 		if (input().masks().vis() == null)
 			return null;
 		
-		FlexibleImage medianMask = new ImageOperation(input().masks().vis()).medianFilter32Bit().dilate(4).border(2).getImage();
+		FlexibleImage medianMask = new ImageOperation(input().masks().vis()).medianFilter32Bit()
+				.dilate(getInt("dilate-cnt", 4))
+				.border(2).getImage();
 		
-		return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
+		return new ImageOperation(input().images().vis())
+				.applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
 	}
 	
 }
