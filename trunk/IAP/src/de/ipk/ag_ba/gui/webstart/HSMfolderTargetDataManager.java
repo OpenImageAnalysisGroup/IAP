@@ -239,15 +239,17 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
 		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
-		String desiredFileName = limg.getURL().getFileName();
-		if (desiredFileName != null && desiredFileName.contains("#"))
-			desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
-		String substanceName = limg.getSubstanceName();
-		desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
 		String pre = "";
-		if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0)
-			pre = optFileNameMainAndLabelPrefix[0];
-		{
+		String finalMainName = null;
+		{ // save main
+			String desiredFileName = limg.getURL().getFileName();
+			if (desiredFileName != null && desiredFileName.contains("#"))
+				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+			String substanceName = limg.getSubstanceName();
+			desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+			finalMainName = desiredFileName;
+			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0)
+				pre = optFileNameMainAndLabelPrefix[0];
 			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			InputStream mainStream = limg.getInputStream();
 			ResourceIOManager.copyContent(mainStream, new FileOutputStream(new File(targetFileNameFullRes)));
@@ -259,11 +261,40 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			if (url != null) {
 				url.setPrefix(getPrefix());
 				url.setDetail(subPath);
-				url.setFileName(desiredFileName);
+				if (!pre.isEmpty())
+					url.setFileName(pre + desiredFileName);
+				else
+					url.setFileName(desiredFileName);
+			}
+		}
+		if (limg.getLabelURL() != null) { // save label
+			String desiredFileName = limg.getLabelURL().getFileName();
+			if (desiredFileName != null && desiredFileName.contains("#"))
+				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 1) {
+				pre = optFileNameMainAndLabelPrefix[1];
+				String substanceName = limg.getSubstanceName();
+				desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+			}
+			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+			InputStream labelStream = limg.getLabelURL().getInputStream();
+			ResourceIOManager.copyContent(labelStream, new FileOutputStream(new File(targetFileNameFullRes)));
+			
+			IOurl url = limg.getLabelURL();
+			
+			String fullPath = new File(targetFileNameFullRes).getParent();
+			String subPath = fullPath.substring(getPath().length());
+			if (url != null) {
+				url.setPrefix(getPrefix());
+				url.setDetail(subPath);
+				if (!pre.isEmpty())
+					url.setFileName(pre + desiredFileName);
+				else
+					url.setFileName(desiredFileName);
 			}
 		}
 		{
-			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, pre + finalMainName.split("#")[0]);
 			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
 			ResourceIOManager.copyContent(previewStream, new FileOutputStream(new File(targetFileNamePreview)));
 		}
