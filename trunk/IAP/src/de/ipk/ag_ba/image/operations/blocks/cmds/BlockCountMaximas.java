@@ -5,7 +5,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import ij.measure.ResultsTable;
 import ij.plugin.filter.MaximumFinder;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
@@ -22,7 +21,8 @@ public class BlockCountMaximas extends AbstractSnapshotAnalysisBlockFIS {
 		// ImageOperation res = new ImageOperation(getInput().getMasks().getVis()).findMax(options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE),
 		// options.getIntSetting(Setting.FIND_MAXIMUM_TYP));
 		
-		ImageOperation res = new ImageOperation(input().masks().vis()).findMax(options.getDoubleSetting(Setting.FIND_MAXIMUM_TOLERANCE),
+		ImageOperation res = new ImageOperation(input().masks().vis()).findMax(
+				getInt("FIND_MAXIMUM_TOLERANCE", 50),
 				MaximumFinder.COUNT);
 		ResultsTable numericResult = res.getResultsTable();
 		

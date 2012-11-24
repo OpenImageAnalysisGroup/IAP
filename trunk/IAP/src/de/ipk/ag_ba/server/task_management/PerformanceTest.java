@@ -15,10 +15,9 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClustersOnFluo;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveSmallClusters_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -52,7 +51,7 @@ public class PerformanceTest {
 		boolean oldschool = false;
 		if (oldschool) {
 			BlockRemoveSmallClustersOnFluo.ngUse = false;
-			BlockRemoveSmallClusters_vis_fluo.ngUse = false;
+			BlRemoveSmallClusters_vis_fluo.ngUse = false;
 			FlexibleImage fc = imgFluo.copy();
 			FlexibleImage nc = imgFluoRef.copy();
 			school = new StopWatch("oldschool");
@@ -60,7 +59,7 @@ public class PerformanceTest {
 			school.printTime();
 		}
 		BlockRemoveSmallClustersOnFluo.ngUse = true;
-		BlockRemoveSmallClusters_vis_fluo.ngUse = true;
+		BlRemoveSmallClusters_vis_fluo.ngUse = true;
 		school = new StopWatch("newschool");
 		testSide("newschool", imgVis, imgVisRef, imgFluo, imgFluoRef, imgNir, imgNirRef, imgIr, imgIrRef, "1");
 		school.printTime();
@@ -80,7 +79,6 @@ public class PerformanceTest {
 		
 		ImageProcessorOptions options = new ImageProcessorOptions(scale);
 		
-		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.SIDE);
 		options.setIsMaize(true);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
@@ -110,7 +108,6 @@ public class PerformanceTest {
 			@Override
 			public void run() {
 				ImageProcessorOptions options = new ImageProcessorOptions(scale);
-				options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 				options.setCameraPosition(CameraPosition.SIDE);
 				MaizeAnalysisPipeline pipeline = new MaizeAnalysisPipeline("Maize Phenotyping");
 				debugStack = new HashMap<Integer, FlexibleImageStack>();
@@ -145,7 +142,6 @@ public class PerformanceTest {
 		
 		ImageProcessorOptions options = new ImageProcessorOptions(scale);
 		
-		options.clearAndAddBooleanSetting(Setting.DEBUG_OVERLAY_RESULT_IMAGE, true);
 		options.setCameraPosition(CameraPosition.TOP);
 		// options.clearAndAddDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 0.5);
 		MaizeAnalysisPipeline maize = new MaizeAnalysisPipeline("Maize Phenotyping");

@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -19,8 +18,9 @@ public class BlockRemoveSmallClustersOnFluo extends AbstractSnapshotAnalysisBloc
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {
-		return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse, options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
-				(input().masks().fluo().getWidth() / 100) * 2,
+		return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
+				getDouble("Noise-Size-Fluo-Area", (0.001d) / 20),
+				getDouble("Noise-Size-Fluo-Dimension", (input().masks().fluo().getWidth() / 100) * 2),
 				options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 	}
 	

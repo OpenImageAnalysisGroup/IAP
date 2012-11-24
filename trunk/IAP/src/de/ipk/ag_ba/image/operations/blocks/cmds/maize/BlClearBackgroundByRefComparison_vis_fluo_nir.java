@@ -25,6 +25,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	boolean debug = false;
 	
 	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+	}
+	
+	@Override
 	protected FlexibleImage processVISmask() {
 		// getInput().getImages().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVisMask2.png");
 		if (input().images().vis() != null && input().masks().vis() == null) {
@@ -45,7 +51,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				FlexibleImage visImg = input().images().vis().print("In VIS", false);
 				FlexibleImage visMsk = input().masks().vis().print("In Mask", false);
 				FlexibleImage cleared = visImg.io().compare() // medianFilter32Bit().
-						.compareImages("vis", visMsk.io().blur(2).print("Blurred Mask", false).getImage(),
+						.compareImages("vis", visMsk.io().blur(getDouble("blur_vis_mask", 2d)).print("Blurred Mask", false).getImage(),
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 								options.getIntSetting(Setting.L_Diff_VIS_SIDE),
 								options.getIntSetting(Setting.abDiff_VIS_SIDE),
@@ -101,7 +107,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 						leftRightBorder = 0;
 					
 					FlexibleImage result = new ImageOperation(fluo.io().copy()
-							.blur(1d).print("Blurred 1.5 fluo image", false)
+							.blur(getDouble("blur_fluo_mask", 1d)).print("Blurred fluo image", false)
 							.medianFilter32Bit()
 							.getImage()).compare()
 							.compareImages("fluo", input().masks().fluo().io()

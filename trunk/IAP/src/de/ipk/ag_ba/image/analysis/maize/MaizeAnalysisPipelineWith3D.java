@@ -7,7 +7,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
@@ -41,10 +40,10 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		BlockPipeline p = super.getPipeline(options);
-		if (options != null)
-			options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, false);
-		if (options != null)
-			options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, false);
+		// if (options != null)
+		// options.clearAndAddBooleanSetting(Setting.DRAW_CONVEX_HULL, false);
+		// if (options != null)
+		// options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, false);
 		p.remove(BlCrop_images_vis_fluo_nir_ir.class);
 		p.remove(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
 		p.add(BlockThreeDgeneration.class);

@@ -7,7 +7,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapsho
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
-	protected int closeOperations = -1;
 	
 	@Override
 	protected FlexibleImage processVISmask() {
@@ -17,9 +16,11 @@ public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
-		int n = 3;
+		int n;
 		if (options.isHigherResVisCamera())
-			n = 5;
+			n = getInt("Closing-Cnt", 5);
+		else
+			n = getInt("Closing-Cnt", 3);
 		FlexibleImage workImage = closing(mask, image, options.getBackground(), n);
 		return workImage;
 	}

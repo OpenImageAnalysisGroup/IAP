@@ -66,7 +66,8 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		
 		if (debugStack != null)
 			for (Integer key : debugStack.keySet()) {
-				debugStack.get(key).addImage("RESULT", result.get(key).getOverviewImage(options.getIntSetting(Setting.DEBUG_STACK_WIDTH)));
+				debugStack.get(key).addImage("RESULT", result.get(key).getOverviewImage(
+						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)));
 			}
 		
 		return result;

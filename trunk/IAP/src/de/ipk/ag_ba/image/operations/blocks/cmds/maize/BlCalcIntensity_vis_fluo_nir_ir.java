@@ -25,10 +25,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debugRegionParts = false;
+	private boolean debug = false;
+	private boolean debugRegionParts = false;
 	
-	private final boolean calculateValuesAlsoForDifferentRegions = false;
-	private final boolean addHistogramValues = false;
+	private boolean calculateValuesAlsoForDifferentRegions = false;
+	private boolean addHistogramValues = false;
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -41,6 +42,11 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 	protected void prepare() {
 		super.prepare();
 		
+		debug = getBoolean("debug", false);
+		debugRegionParts = getBoolean("Debug-Show-Region-Images", false);
+		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", false);
+		addHistogramValues = getBoolean("Add_Histogram_Values", false);
+		
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
 			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
 	}
@@ -49,9 +55,9 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 	protected FlexibleImage processVISmask() {
 		if (input().masks().vis() != null) {
 			
-			ImageOperation io = new ImageOperation(input().masks().vis().copy()).print("BEFORE TRIMM", false).erode(2);
+			ImageOperation io = new ImageOperation(input().masks().vis().copy()).print("BEFORE TRIMM", debug).erode(getInt("Erode-Cnt-Vis", 2));
 			io = input().masks().vis().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
-					.print("AFTER ERODE", false);
+					.print("AFTER ERODE", debug);
 			
 			String pre = "RESULT_" + options.getCameraPosition();
 			int regions = 5;
@@ -95,7 +101,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 		double averageVisG = visibleIntensitySumG / visibleFilledPixels;
 		double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 		
-		ResultsTableWithUnits rt1 = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(markerDistanceHorizontally,
 				options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS, addHistogramValues);
 		getProperties().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
@@ -121,11 +127,11 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (input().masks().fluo() != null) {
-			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).print("BEFORE TRIMM", false).
-					erode(2);
+			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).print("BEFORE TRIMM", debug).
+					erode(getInt("Erode-Cnt-Fluo", 2));
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
-					.print("AFTER ERODE", false);
-			ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+					.print("AFTER ERODE", debug);
+			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
 					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
@@ -162,6 +168,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 					double fSum = 0;
 					int b = ImageOperation.BACKGROUND_COLORint;
 					double weightOfPlant = 0; // fully wet: 1 unit, fully dry: 1/7 unit
+					double dwf = getDouble("Dry-Weight-Factor", 1 / 7d);
 					for (int x : nirImg) {
 						// Feuchtigkeit (%) = -7E-05x^3 + 0,0627x^2 - 15,416x + 1156,1 // Formel: E-Mail Alex 10.8.2011
 						if (x != b) {
@@ -174,7 +181,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 							filled++;
 							double realF = 1 - (x - 80d) / (160d - 80d);
 							realF *= 100;
-							weightOfPlant += 1 / 7d + (1 - 1 / 7d) * realF / 100d;
+							weightOfPlant += dwf + (1 - dwf) * realF / 100d;
 						}
 					}
 					getProperties().setNumericProperty(getBlockPosition(),
@@ -188,7 +195,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 					} else
 						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d, null);
 				}
-				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20)).calculateHistorgram(markerDistanceHorizontally,
 						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
 				
 				if (options == null)

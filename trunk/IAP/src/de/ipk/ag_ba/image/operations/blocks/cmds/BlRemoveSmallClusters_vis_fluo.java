@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -14,7 +13,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
  */
-public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
 	public static boolean ngUse = true;
 	
 	@Override
@@ -26,30 +25,33 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 			if (options.isMaize()) {
 				// not for barley
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 100) * 2,
+						getDouble("Noise-Size-Vis-Area", (0.001d) / 4d / 2d),
+						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) * 2),
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
-				if (options.isArabidopsis())
-					res = new ImageOperation(mask).removeSmallClusters(ngUse,
-							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS),
-							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS).intValue(),
+				if (options.isArabidopsis()) {
+					Double cs = getDouble("REMOVE_SMALL_CLUSTER_SIZE_VIS", options.getCameraPosition() == CameraPosition.SIDE ? 30 : 25);
+					res = new ImageOperation(mask).removeSmallClusters(ngUse, cs, cs.intValue(),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-				else
+				} else
 					// barley
 					res = new ImageOperation(mask).removeSmallClusters(ngUse,
-							options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS) / 2d, (mask.getWidth() / 300) * 2,
+							getDouble("Noise-Size-Vis-Area", (0.001d) / 2000d),
+							getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 300) * 2),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
 		} else {
 			if (options.isMaize()) {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_VIS), (mask.getWidth() / 100) * 1,
+						getDouble("Noise-Size-Vis-Area", (0.001d) / 4d),
+						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) * 1),
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				
 			} else {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						2, (mask.getWidth() / 100) / 2,
+						getDouble("Noise-Size-Vis-Area", 2),
+						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) / 2),
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
 			return res;
@@ -66,28 +68,27 @@ public class BlockRemoveSmallClusters_vis_fluo extends AbstractSnapshotAnalysisB
 				return new ImageOperation(input().masks().fluo()).
 						dilate().
 						removeSmallClusters(ngUse,
-								options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
-								(input().masks().fluo().getWidth() / 100) * 1,
+								getDouble("Noise-Size-Fluo-Area", (0.001d) / 20 / 2d),
+								getInt("Noise-Size-Fluo-Dimension-Absolute", (input().masks().fluo().getWidth() / 100) * 1),
 								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			} else {
 				if (options.isArabidopsis()) {
 					return new ImageOperation(input().masks().fluo()).
 							removeSmallClusters(ngUse,
-									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO),
-									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO).intValue(),
+									getDouble("Noise-Size-Fluo-Area", 20),
+									getInt("Noise-Size-Fluo-Dimension-Absolute", 20),
 									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 				} else
 					return new ImageOperation(input().masks().fluo()).copy().dilate().dilate().dilate().
 							removeSmallClusters(ngUse,
-									options.getDoubleSetting(Setting.REMOVE_SMALL_CLUSTER_SIZE_FLUO) / 2d,
-									(input().masks().fluo().getWidth() / 300) * 3,
+									getDouble("Noise-Size-Fluo-Area", (0.001d) / 20 / 2d),
+									getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 300) * 3d)),
 									options.getNeighbourhood(), options.getCameraPosition(), null, true).getImage();
 			}
 		} else {
-			int cut2 = (int) ((input().masks().fluo().getWidth() / 100) * 0.5);
-			double cut = 3;
 			return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
-					cut, cut2,
+					getDouble("Noise-Size-Fluo-Area", 3),
+					getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 100) * 0.5)),
 					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 		}
 	}
