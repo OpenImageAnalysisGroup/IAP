@@ -2,7 +2,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.roots;
 
 import java.awt.Color;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -13,41 +12,44 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  * @author klukas, entzian
  */
 public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlockFIS {
-	// boolean debug = false;
 	
-	// int white = Color.WHITE.getRGB();
-	// int black = Color.BLACK.getRGB();
+	int white = Color.WHITE.getRGB();
+	int black = Color.BLACK.getRGB();
 	int blue = Color.BLUE.getRGB();
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		boolean debug = getBoolean("debug", false);
 		FlexibleImage img = input().masks().vis();
-		if (img != null) {
-			// boolean printEachStep = debug;
-			img = img.copy(); // .print("1", printEachStep);
-			ImageOperation io = img.io().border(options.getIntSetting(Setting.ROOT_BORDER_WIDTH)); // .print("2", printEachStep);
-			io = io.invert().thresholdBlueHigherThan(options.getIntSetting(Setting.ROOT_TRESHOLD_BLUE)); // .print("3", printEachStep);
-			// remove pure white area inside the box
-			io = io
-					.erode()
-					.removeSmallElements(options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA),
-							options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM)); // .print("REMOVE WHITE AREA INSIDE THE BOX", debug).print("4",
-																													// printEachStep);
-			io = io.replaceColor(options.getBackground(), blue); // .print("5", printEachStep);
-			io = io.threshold(10, options.getBackground(), blue); // .print("6", printEachStep);
-			io = io.erode(options.getIntSetting(Setting.ROOT_NUMBER_OF_RUNS_ERODE)); // .print("7", printEachStep);
-			io = io.erode().removeSmallElements(options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA),
-					options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM)); // .print("REMOVE NOISE OUTSIDE THE BOX", debug).print("8", printEachStep);
-			ImageOperation r = input().images().vis().io().applyMask(io.getImage(), options.getBackground()); // .print("FINAL", debug).print("9", printEachStep);
-			r = r.adaptiveThresholdForGrayscaleImage(options.getIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_SIZE_OF_REGION),
-					options.getIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_ASSUMED_BACKGROUND_COLOR),
-					options.getIntSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_NEW_FORGROUND_COLOR), options.getDoubleSetting(Setting.ROOT_ADAPTIVE_TRESHOLD_K)); // .print("ROOTS",
-																																																			// debug).print("10",
-																																																			// printEachStep);
-			return r.removeSmallElements(options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_AREA),
-					options.getIntSetting(Setting.ROOT_REMOVE_SMALL_ELEMENTS_DIM)).getImage(); // .print("11", printEachStep);
-		}
-		return null;
+		if (img == null)
+			return null;
+		
+		img = img.copy().print("1", debug);
+		ImageOperation io = img.io().border(getInt("BORDER_WIDTH", 2)).print("2", debug);
+		io = io.invert().thresholdBlueHigherThan(getInt("TRESHOLD_BLUE", 3)).print("3", debug);
+		// remove pure white area inside the box
+		io = io
+				.erode()
+				.removeSmallElements(
+						getInt("Remove-Pure-White_Noise-Size-Area", 50),
+						getInt("Remove-Pure-White_Noise-Size-Dimension", 50))
+				.print("REMOVED WHITE AREA INSIDE THE BOX - 4", debug);
+		io = io.replaceColor(options.getBackground(), blue).print("5", debug);
+		io = io.threshold(getInt("Background-Threshold", 10), options.getBackground(), blue).print("6", debug);
+		io = io.erode(getInt("Reduce-Area-Ignore-Border_erode-cnt", 60)).print("7", debug);
+		io = io.erode().removeSmallElements(
+				getInt("Remove-All-Outside-Box_Noise-Size-Area", 800 * 800),
+				getInt("Remove-All-Outside-Box_Noise-Size-Dimension", 800))
+				.print("REMOVED NOISE OUTSIDE THE BOX - 8", debug);
+		ImageOperation r = input().images().vis().io().applyMask(io.getImage(), options.getBackground()).print("FINAL - 9", debug);
+		r = r.adaptiveThresholdForGrayscaleImage(
+				getInt("Adaptive_Threshold_Region_Size", 5),
+				black, white,
+				getDouble("Adaptive_Threshold_K", 0.02)).print("10", debug);
+		return r.removeSmallElements(
+				getInt("Final_Noise-Size-Area", 10),
+				getInt("Final_Noise-Size-Dimension", 10))
+				.getImage().print("11", debug);
 	}
 	
 }
