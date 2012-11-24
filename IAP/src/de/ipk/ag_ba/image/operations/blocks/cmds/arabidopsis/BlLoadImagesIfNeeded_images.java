@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
@@ -110,8 +109,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().vis() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().vis();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_VIS)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_VIS)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -121,8 +120,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().fluo() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().fluo();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_FLUO)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_FLUO)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -132,8 +131,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().images().nir() != null) {
 			// check for TV test image
 			FlexibleImage i = input().images().nir();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_NIR)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_NIR)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -143,8 +142,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().vis() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().vis();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_VIS)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_VIS)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -154,8 +153,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().fluo() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().fluo();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_FLUO)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_FLUO)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -165,8 +164,8 @@ public class BlLoadImagesIfNeeded_images extends
 		if (input().masks().nir() != null) {
 			// check for TV test image
 			FlexibleImage i = input().masks().nir();
-			if (i.getWidth() == options.getIntSetting(Setting.TV_TEST_IMAGE_WIDTH_NIR)
-					&& i.getHeight() == options.getIntSetting(Setting.TV_TEST_IMAGE_HEIGHT_NIR)) {
+			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
+					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime()
 								+ ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
