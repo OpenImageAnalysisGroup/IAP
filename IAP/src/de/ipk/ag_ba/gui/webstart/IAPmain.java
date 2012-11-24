@@ -109,7 +109,7 @@ public class IAPmain extends JApplet {
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		SystemOptions.getInstance().addChangeListener(new Runnable() {
+		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
 			@Override
 			public void run() {
 				String newTitle = IAPoptions.getInstance().getString("IAP", "window_title", "IAP - The Integrated Analysis Platform");
