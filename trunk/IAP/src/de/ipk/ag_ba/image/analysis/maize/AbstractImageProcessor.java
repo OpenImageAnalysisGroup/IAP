@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -109,7 +109,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	
 	@SuppressWarnings("unchecked")
 	protected BlockPipeline getPipelineFromBlockList(String pipelineName, String[] defaultBlockList) {
-		defaultBlockList = SystemOptions.getInstance(pipelineName + ".pipeline.ini").getStringAll(
+		defaultBlockList = SystemOptions.getInstance(StringManipulationTools.getFileSystemName(pipelineName) + ".pipeline.ini").getStringAll(
 				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + this.getClass().getCanonicalName(),
 				"block",
 				defaultBlockList);

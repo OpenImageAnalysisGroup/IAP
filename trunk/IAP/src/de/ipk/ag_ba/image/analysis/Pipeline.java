@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -21,10 +22,11 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlLoadImagesIfNeeded_images_mas
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveBlackBelt_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.Barley.BlTranslateMatch_vis_fluo_nir;
@@ -56,7 +58,7 @@ public class Pipeline extends AbstractImageProcessor {
 	
 	public Pipeline(String pipelineName) {
 		this.pipelineName = pipelineName;
-		so = SystemOptions.getInstance(pipelineName + ".pipeline.ini");
+		so = SystemOptions.getInstance(StringManipulationTools.getFileSystemName(pipelineName) + ".pipeline.ini");
 	}
 	
 	@Override
@@ -77,6 +79,7 @@ public class Pipeline extends AbstractImageProcessor {
 				BlMedianFilter_fluo.class.getCanonicalName(),
 				BlMedianFilter_fluo.class.getCanonicalName(),
 				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlRemoveBlackBelt_vis_fluo.class.getCanonicalName(),
 				BlLabFilter_vis.class.getCanonicalName(),
 				BlockClosing_vis.class.getCanonicalName(),
 				BlockClearMasksBasedOnMarkers_vis_fluo_nir.class.getCanonicalName(),

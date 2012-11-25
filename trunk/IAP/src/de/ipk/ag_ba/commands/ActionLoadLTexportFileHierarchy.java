@@ -59,7 +59,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				// messages.add("Column 3: Genotype");
 				// messages.add("Column 4: Treatment");
 				// messages.add("Column 5: Sequence");
-				TableData td = TableData.getTableData(new File(inp.getParent() + File.separator + metadataFileName));
+				TableData td = TableData.getTableData(new File(inp + File.separator + metadataFileName));
 				// for (TableDataStringRow tdsr : td.getRowsAsStringValues()) {
 				//
 				// }

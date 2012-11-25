@@ -48,6 +48,9 @@ public class ErrorMsg implements HelperClass {
 	public synchronized static void addErrorMessage(String errorMsg) {
 		if (rethrowErrorMessages)
 			throw new Error(errorMsg);
+		else
+			Thread.dumpStack();
+		
 		synchronized (errorMessages) {
 			StackTraceElement[] stack = Java_1_5_compatibility.getStackFrame();
 			String res;

@@ -125,6 +125,8 @@ public class IAPmain extends JApplet {
 		if (getRunMode() == IAPrunMode.SWING_APPLET)
 			ReleaseInfo.setRunningAsApplet(this);
 		
+		ErrorMsg.setRethrowErrorMessages(false);
+		
 		setupLogger();
 		
 		registerIOhandlers();
