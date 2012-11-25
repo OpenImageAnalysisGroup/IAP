@@ -17,6 +17,7 @@ public class ActionSetup extends AbstractNavigationAction {
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 	private final String iniFileName;
 	private final String title;
+	private NavigationButton src;
 	
 	public ActionSetup(String iniFileName, String tooltip, String title) {
 		super(tooltip);
@@ -26,6 +27,7 @@ public class ActionSetup extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		this.src = src;
 		res.clear();
 		res.add(new NavigationButton(new AbstractNavigationAction(
 				"Open file explorer and show settings file (" +
@@ -76,14 +78,23 @@ public class ActionSetup extends AbstractNavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return res;
+		ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>(res);
+		Book book = new Book(null, "Help", "http://iap.ipk-gatersleben.de/", "img/dataset.png");
+		rr.add(0, book.getNavigationButton(src));
+		return rr;
 	}
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("Click on a action button above to edit the corresponding setting.<br><br>" +
+		ArrayList<String> descs = new ArrayList<String>();
+		descs.add("<b>Click on a action button above to open a settings-group or to edit the corresponding setting.</b><br><br>" +
 				"Most settings are active immediately, but some " +
 				"options may require a restart of the progam upon setting change.");
+		descs.add("<b>The values within a specific group may be removed/reverted to their defaults:</b><br><br>" +
+				"The &quot;Defaults (delayed)&quot; command, shown for a selected settings-group, removes the shown settings and their values.<br>" +
+				"The settings will re-appear as soon as they are needed, and will be reverted to the " +
+				"programmed defaults.");
+		return new MainPanelComponent(descs);
 	}
 	
 	@Override

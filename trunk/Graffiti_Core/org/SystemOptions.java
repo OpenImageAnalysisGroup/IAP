@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 import org.ini4j.Ini;
+import org.ini4j.Profile.Section;
 
 /**
  * @author klukas
@@ -204,7 +205,7 @@ public class SystemOptions {
 		}
 	}
 	
-	protected void store(String srcSection, String srcSetting) {
+	protected synchronized void store(String srcSection, String srcSetting) {
 		try {
 			ini.store();
 			lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
@@ -313,14 +314,14 @@ public class SystemOptions {
 		}
 	}
 	
-	public void setStringArray(String group, String setting, ArrayList<String> newValues) {
-		Ini.Section section = ini.get(group);
-		section.remove(setting);
+	public synchronized void setStringArray(String section, String setting, ArrayList<String> newValues) {
+		Ini.Section sec = ini.get(section);
+		sec.remove(setting);
 		for (String nv : newValues)
-			section.add(setting, nv);
+			sec.add(setting, nv);
 	}
 	
-	public void addChangeListener(String section, String setting, Runnable runnable) {
+	public synchronized void addChangeListener(String section, String setting, Runnable runnable) {
 		String key = getKey(section, setting);
 		if (!changeListeners.containsKey(key))
 			changeListeners.put(key, new LinkedHashSet<Runnable>());
@@ -331,8 +332,34 @@ public class SystemOptions {
 		return section + ":" + setting;
 	}
 	
-	public void removeChangeListener(Runnable runnable) {
+	public synchronized void removeChangeListener(Runnable runnable) {
 		for (LinkedHashSet<Runnable> cl : changeListeners.values())
 			cl.remove(runnable);
+	}
+	
+	public synchronized void removeValuesOfSectionAndGroup(String section, String group) {
+		Section sec = ini.get(section);
+		if (sec != null) {
+			// remove only the right "group"-values
+			ArrayList<String> del = new ArrayList<String>();
+			for (String setting : sec.keySet()) {
+				String ggroup = "";
+				if (setting != null && setting.contains("//")) {
+					ggroup = setting.split("//")[0];
+				}
+				if (ggroup.equals(group)) {
+					del.add(setting);
+				}
+			}
+			for (String d : del)
+				sec.remove(d);
+			for (String d : del) {
+				LinkedHashSet<Runnable> rr = changeListeners.get(getKey(section, d));
+				if (rr != null)
+					for (Runnable r : new ArrayList<Runnable>(rr)) {
+						r.run();
+					}
+			}
+		}
 	}
 }

@@ -6,8 +6,12 @@ import java.util.LinkedHashMap;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
+/**
+ * @author klukas
+ */
 public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	String section;
@@ -27,7 +31,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public void performActionCalculateResults(NavigationButton src) throws Exception {
+	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		res.clear();
 		final LinkedHashMap<String, ArrayList<NavigationButton>> group2button = new LinkedHashMap<String, ArrayList<NavigationButton>>();
 		for (final String setting : SystemOptions.getInstance(iniFileName).getSectionSettings(section)) {
@@ -43,6 +47,12 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 		for (final String group : group2button.keySet()) {
 			System.out.println("Group: " + group);
 			if (group.length() == 0) {
+				NavigationAction resetSettingsAction = new ActionResetActions(SystemOptions.getInstance(iniFileName), section, group);
+				NavigationButton restSettingsButton = new NavigationButton(
+						resetSettingsAction, src.getGUIsetting());
+				restSettingsButton.setRightAligned(true);
+				res.add(0, restSettingsButton);
+				
 				for (NavigationButton r : group2button.get(group))
 					res.add(r);
 			} else {
@@ -74,7 +84,13 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 					
 					@Override
 					public ArrayList<NavigationButton> getResultNewActionSet() {
-						return group2button.get(group);
+						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(group2button.get(group));
+						NavigationAction resetSettingsAction = new ActionResetActions(SystemOptions.getInstance(iniFileName), section, group);
+						NavigationButton restSettingsButton = new NavigationButton(
+								resetSettingsAction, src.getGUIsetting());
+						restSettingsButton.setRightAligned(true);
+						res.add(0, restSettingsButton);
+						return res;
 					}
 				}, guiSetting));
 			}
