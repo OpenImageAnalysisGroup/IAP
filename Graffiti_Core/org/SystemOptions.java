@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
@@ -278,7 +279,10 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getObject(String section, String setting, int returnMax) {
-		ArrayList<String> items = new ArrayList<String>(ini.get(section).getAll(setting));
+		List<String> l = ini.get(section) != null ? ini.get(section).getAll(setting) : new ArrayList<String>();
+		if (l == null)
+			l = new ArrayList<String>();
+		ArrayList<String> items = new ArrayList<String>(l);
 		if (returnMax > 0 && items.size() > returnMax) {
 			while (items.size() > returnMax)
 				items.remove(returnMax);
