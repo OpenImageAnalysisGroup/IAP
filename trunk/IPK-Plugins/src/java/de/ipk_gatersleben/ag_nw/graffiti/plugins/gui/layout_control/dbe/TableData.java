@@ -991,7 +991,15 @@ public class TableData {
 		}
 	}
 	
-	public TableDataStringRow getRowsAsStringValues() {
-		return null;
+	public ArrayList<TableDataStringRow> getRowsAsStringValues() {
+		ArrayList<TableDataStringRow> res = new ArrayList<TableDataStringRow>();
+		for (int row = 1; row < getMaximumRow(); row++) {
+			TableDataStringRow r = new TableDataStringRow();
+			for (int col = 1; col < getMaximumCol(); col++) {
+				r.setValue(col, getCellData(col, row, null));
+			}
+			res.add(r);
+		}
+		return res;
 	}
 }

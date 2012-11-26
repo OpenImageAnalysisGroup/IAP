@@ -9,7 +9,6 @@ import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 
 /**
  * @author Klukas
@@ -27,30 +26,35 @@ public class BlRemoveBlackBelt_vis_fluo extends AbstractSnapshotAnalysisBlockFIS
 		
 		blackBeltMask = null;
 		if (input().masks().vis() != null && input().images().vis() != null) {
-			ImageOperation vis = input().masks().vis().io();
-			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
-			if (fis != null)
-				fis.addImage("start", vis.getImage());
+			ImageOperation vis = input().masks().vis().copy().io();
 			
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				// detect black belt
-				vis = vis.blur(getDouble("blur", 3))
+				vis = vis.print("Start image", debug).blur(getDouble("blur", 3)).print("blurred", debug)
 						.filterRemoveLAB(
 								getInt("belt-lab-l-min", 0), getInt("belt-lab-l-max", 130),
 								getInt("belt-lab-a-min", 110), getInt("belt-lab-a-max", 130),
 								getInt("belt-lab-b-min", 110), getInt("belt-lab-b-max", 140),
 								options.getBackground(),
-								false)
-						.erode(getInt("erode-cnt", 10))
-						.dilate(getInt("dilate-cnt", 23))
-						.grayscale()
+								false).print("LAB filtered", debug)
+						.erode(getInt("erode-cnt", 10)).print("eroded", debug)
+						.dilate(getInt("dilate-cnt", 23)).print("dilated", debug)
+						.grayscale().print("Gray scale for threshold 100", debug)
 						.threshold(100, options.getBackground(), new Color(100, 100, 100).getRGB()); // filter out black belt
 				
-				vis = vis.canvas().fillCircle(
-						getInt("small-circle-x", 325),
-						getInt("small-circle-y", 703),
-						getInt("small-circle-d", 30),
-						options.getBackground(), 0d).io()
+				vis = vis.canvas()
+						.fillRect(
+								getInt("ignore-pot-x", 325),
+								getInt("ignore-pot-y", 325),
+								getInt("ignore-pot-w", 100),
+								getInt("ignore-pot-h", 100),
+								new Color(150, 150, 150).getRGB()
+						)
+						.fillCircle(
+								getInt("small-circle-x", 325),
+								getInt("small-circle-y", 703),
+								getInt("small-circle-d", 30),
+								options.getBackground(), 0d).io()
 						.print("black belt region", debug);
 				
 				blackBeltMask = vis;
@@ -63,7 +67,7 @@ public class BlRemoveBlackBelt_vis_fluo extends AbstractSnapshotAnalysisBlockFIS
 		FlexibleImage vis = input().masks().vis();
 		if (blackBeltMask == null || vis == null)
 			return vis;
-		vis = input().images().vis().io().applyMask(blackBeltMask.getImage().copy(),
+		vis = input().masks().vis().io().applyMask(blackBeltMask.getImage().copy(),
 				options.getBackground()).getImage().print("Black belt removed from vis", debug);
 		return vis;
 	}
@@ -73,7 +77,7 @@ public class BlRemoveBlackBelt_vis_fluo extends AbstractSnapshotAnalysisBlockFIS
 		FlexibleImage fluo = input().masks().fluo();
 		if (blackBeltMask == null || fluo == null)
 			return fluo;
-		fluo = input().images().fluo().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
+		fluo = input().masks().fluo().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
 				options.getBackground()).getImage().print("Black belt removed from fluo", debug);
 		return fluo;
 	}
@@ -83,7 +87,7 @@ public class BlRemoveBlackBelt_vis_fluo extends AbstractSnapshotAnalysisBlockFIS
 		FlexibleImage nir = input().masks().nir();
 		if (blackBeltMask == null || nir == null)
 			return nir;
-		nir = input().images().nir().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
+		nir = input().masks().nir().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
 				options.getBackground()).getImage().print("Black belt removed from nir", debug);
 		return nir;
 	}

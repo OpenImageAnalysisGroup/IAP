@@ -1,12 +1,16 @@
 package de.ipk.ag_ba.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.ErrorMsg;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -15,9 +19,11 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.Snapshot;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDataStringRow;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
@@ -49,20 +55,39 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
 		long overallStorageSizeInBytes = 0;
 		Timestamp storageTimeOfFirstInfoFile = null;
-		String metadataFileName = "metadata.csv";
+		String metadataFileName = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Table-File-Name", "metadata.csv");
+		String zoomSettingsFileName = SystemOptions.getInstance().getString("File_Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
 		boolean foundMetadata = false;
+		ArrayList<TableDataStringRow> metadata = null;
+		
+		// initialize these setting, so that they show up in the settings GUI in good ordering
+		for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
+			SystemOptions.getInstance().getString("File_Import", "Camera Labels Side-View//Post-fix " + sideViewIndex,
+					" SV" + sideViewIndex);
+		}
+		for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
+			int def = 0;
+			if (sideViewIndex == 2)
+				def = 90;
+			SystemOptions.getInstance().getInteger("File_Import",
+					"Camera Labels Side-View//Post-fix " + sideViewIndex + " angle", def);
+		}
+		
+		String preferedZoomSetting = null;
+		
 		for (String snapshotDirName : inp.list()) {
 			if (snapshotDirName.equals(metadataFileName)) {
 				foundMetadata = true;
-				// messages.add("Column 1: Plant ID");
-				// messages.add("Column 2: Species Name");
-				// messages.add("Column 3: Genotype");
-				// messages.add("Column 4: Treatment");
-				// messages.add("Column 5: Sequence");
 				TableData td = TableData.getTableData(new File(inp + File.separator + metadataFileName));
-				// for (TableDataStringRow tdsr : td.getRowsAsStringValues()) {
-				//
-				// }
+				metadata = td.getRowsAsStringValues();
+			}
+			if (snapshotDirName.equals(zoomSettingsFileName)) {
+				try {
+					TextFile t = new TextFile(new File(inp + File.separator + zoomSettingsFileName));
+					preferedZoomSetting = t.get(0).trim();
+				} catch (IOException e1) {
+					ErrorMsg.addErrorMessage(e1);
+				}
 			}
 			File f = new File(inp.getPath() + File.separator + snapshotDirName);
 			snapshotDirName = f.getAbsolutePath();
@@ -125,21 +150,28 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
 								}
 								imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
-								if (imageSnapshot.getCamera_label().endsWith(" TV")) {
+								if (imageSnapshot.getCamera_label().endsWith(
+										SystemOptions.getInstance().getString("File_Import", "Camera Labels Top-View//Post-fix", " TV"))) {
 									imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".top");
 									imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " tv.", "."));
 									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
-								} else
-									if (imageSnapshot.getCamera_label().endsWith(" SV1")) {
-										imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".side");
-										imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " sv1.", "."));
-										imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + ".0");
-									} else
-										if (imageSnapshot.getCamera_label().endsWith(" SV2")) {
+								} else {
+									for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
+										if (imageSnapshot.getCamera_label().endsWith(
+												SystemOptions.getInstance().getString("File_Import", "Camera Labels Side-View//Post-fix " + sideViewIndex,
+														" SV" + sideViewIndex))) {
 											imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".side");
-											imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " sv2.", "."));
-											imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + ".90");
+											imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label().toUpperCase(), " SV"
+													+ sideViewIndex + ".", ".").toLowerCase());
+											int def = 0;
+											if (sideViewIndex == 2)
+												def = 90;
+											int degree = SystemOptions.getInstance().getInteger("File_Import",
+													"Camera Labels Side-View//Post-fix " + sideViewIndex + " angle", def);
+											imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + "." + degree);
 										}
+									}
+								}
 								String ffn = snapshotDirName + File.separator +
 										cameraLabelSubDir + File.separator + "0_0.png";
 								File ff = new File(ffn);
@@ -161,29 +193,46 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			}
 		}
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
-		if (!foundMetadata) {
+		HashMap<String, Condition> optIdTag2condition = null;
+		if (!foundMetadata || metadata == null) {
 			messages.add("<b>Found no metadata.csv file (" + metadataFileName + ") in the selected folder!</b>");
 			messages
 					.add("The metadata.csv file may contain up to 5 columns (or more, which would be ignored), which, if available, are processed in the following order:");
-			messages.add("Column 1: Plant ID");
-			messages.add("Column 2: Species Name");
-			messages.add("Column 3: Genotype");
-			messages.add("Column 4: Treatment");
-			messages.add("Column 5: Sequence");
+			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Plant-ID", 1) + ": Plant ID");
+			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Species", 2) + ": Species Name");
+			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Genotype", 3) + ": Genotype");
+			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Treatment", 4) + ": Treatment");
+			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Sequence", 5) + ": Sequence");
 			messages.add("The CSV file should not contain column headers.");
+		} else {
+			// process metadata
+			optIdTag2condition = new HashMap<String, Condition>();
+			for (TableDataStringRow tdsr : metadata) {
+				String id = tdsr.getPlantID();
+				if (id != null) {
+					Condition c = new Condition(null);
+					c.setSpecies(tdsr.getSpecies());
+					c.setGenotype(tdsr.getGenotype());
+					c.setTreatment(tdsr.getTreatment());
+					c.setSequence(tdsr.getSequence());
+					optIdTag2condition.put(id, c);
+				}
+			}
 		}
 		// get experiment from snapshot info...
 		ExperimentInterface e;
 		try {
-			Snapshot s = snapshots.get(0);
-			ExperimentHeader eh = new ExperimentHeader(s.getMeasurement_label());
-			eh.setCoordinator(s.getCreator());
+			Snapshot s = snapshots.size() > 0 ? snapshots.get(0) : null;
+			ExperimentHeader eh = new ExperimentHeader(s != null ? s.getMeasurement_label() : "(no data)");
+			if (s != null)
+				eh.setCoordinator(s.getCreator());
 			if (storageTimeOfFirstInfoFile != null)
 				eh.setStorageTime(storageTimeOfFirstInfoFile);
 			eh.setImportusername(SystemAnalysis.getUserName());
 			eh.setSizekb(overallStorageSizeInBytes / 1024);
 			eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
-			e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, snapshots);
+			eh.setGlobalOutlierInfo(preferedZoomSetting);
+			e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, snapshots, optIdTag2condition);
 			loaded_experiment = new ExperimentReference(e);
 		} catch (Exception e1) {
 			e1.printStackTrace();

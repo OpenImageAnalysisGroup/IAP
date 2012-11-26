@@ -155,10 +155,16 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					sb.append("*");
 				return "<html><center><b>" + s + "</b><br>" +
 						"&nbsp;" + sb + "&nbsp;" + "</center></html>";
-			} else
-				return "<html><center><b>" + s + "</b><br>" +
-						"&nbsp;" + SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getObject(this.actionSettingsEditor.section, setting, 2)
-						+ "&nbsp;" + "</center></html>";
+			} else {
+				SystemOptions o = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName);
+				if (o != null && this.actionSettingsEditor != null && this.actionSettingsEditor.section != null)
+					return "<html><center><b>" + s + "</b><br>" +
+							"&nbsp;" + o.getObject(this.actionSettingsEditor.section, setting, 2)
+							+ "&nbsp;" + "</center></html>";
+				else {
+					return "(not available)";
+				}
+			}
 		}
 	}
 	
