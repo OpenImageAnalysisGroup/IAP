@@ -74,6 +74,8 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 							else
 								if (g != null && g.indexOf(".") > 0)
 									g = g.substring(g.lastIndexOf(".") + ".".length());
+						if (g != null && g.startsWith("_"))
+							g = g.substring("_".length());
 						return g;
 					}
 					

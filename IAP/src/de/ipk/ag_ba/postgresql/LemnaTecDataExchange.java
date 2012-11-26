@@ -763,13 +763,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws SQLException, ClassNotFoundException {
-		return getExperiment(experimentReq, interactiveGetExperimentSize_notUsedHere, optStatus, null);
+		return getExperiment(experimentReq, interactiveGetExperimentSize_notUsedHere, optStatus, null, null);
 	}
 	
 	private ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			Collection<Snapshot> optSnapshots) throws SQLException, ClassNotFoundException {
+			Collection<Snapshot> optSnapshots, HashMap<String,
+			Condition> optIdTag2condition) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
 		String species = "";
@@ -815,6 +816,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		
 		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ? getPlantIdAnnotation(experimentReq)
 				: null;
+		
+		if (idtag2condition == null)
+			idtag2condition = optIdTag2condition;
+		
 		if (idtag2condition == null) {
 			idtag2condition = new HashMap<String, Condition>();
 			for (Snapshot s : snapshots) {
@@ -876,8 +881,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				continue;
 			}
 			
+			HashSet<String> printedInvalidIdTags = new HashSet<String>();
 			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
 			if (conditionTemplate == null) {
+				if (!printedInvalidIdTags.contains(sn.getId_tag())) {
+					System.out.println("No meta-data for ID " + sn.getId_tag());
+					printedInvalidIdTags.add(sn.getId_tag());
+					
+				}
 				Integer targetGroup = null;
 				try {
 					String s = sn.getId_tag();
@@ -1667,7 +1678,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		
 	}
 	
-	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh, ArrayList<Snapshot> snapshots) throws ClassNotFoundException, SQLException {
-		return new LemnaTecDataExchange().getExperiment(eh, false, null, snapshots);
+	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh,
+			ArrayList<Snapshot> snapshots, HashMap<String, Condition> optIdTag2condition) throws ClassNotFoundException, SQLException {
+		return new LemnaTecDataExchange().getExperiment(eh, false, null, snapshots, optIdTag2condition);
 	}
 }
