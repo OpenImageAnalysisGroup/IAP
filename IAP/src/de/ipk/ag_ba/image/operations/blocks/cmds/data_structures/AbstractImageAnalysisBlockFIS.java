@@ -47,6 +47,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return options.getDoubleSetting(this, setting, defaultValue);
 	}
 	
+	protected String getString(String setting, String defaultValue) {
+		return options.getStringSetting(this, setting, defaultValue);
+	}
+	
 	@Override
 	public void setInputAndOptions(FlexibleMaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
 			int blockPositionInPipeline,

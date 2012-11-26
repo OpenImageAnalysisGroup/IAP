@@ -7,6 +7,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * add border or cut outside
+ */
 public class BlCutZoomedImages extends AbstractBlock {
 	
 	private double[][] zoomLevels;
@@ -14,31 +17,30 @@ public class BlCutZoomedImages extends AbstractBlock {
 	@Override
 	protected void prepare() {
 		super.prepare();
-		String zoomID = "zoom-top:";
+		String zoomID = getString("zoomID-top", "zoom-top:");
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			zoomID = "zoom-side:";
-		
+			zoomID = getString("zoomID-side", "zoom-side:");
 		zoomLevels = getFillGradeFromOutlierString(zoomID);
 	}
 	
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
-		int w = 1624;
-		int h = 1234;
+		int w = getInt("cut-image-width", 1624);
+		int h = getInt("cut-image-height", 1234);
 		if (image.getWidth() < image.getHeight()) {
-			w = 1234;
-			h = 1624;
+			w = getInt("cut-image-height", 1234);
+			h = getInt("cut-image-width", 1624);
 		}
 		return cut(image.io().adjustWidthHeightRatio(w, h, 10));
 	}
 	
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
-		int w = 1624;
-		int h = 1234;
+		int w = getInt("cut-image-width", 1624);
+		int h = getInt("cut-image-height", 1234);
 		if (mask.getWidth() < mask.getHeight()) {
-			w = 1234;
-			h = 1624;
+			w = getInt("cut-image-height", 1234);
+			h = getInt("cut-image-width", 1624);
 		}
 		return cut(mask.io().adjustWidthHeightRatio(w, h, 10));
 	}
@@ -70,7 +72,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 				break;
 		}
 		int verticalTooTooMuch = (int) ((1d - zoom) * img.getHeight());
-		// add border or cut outside
 		int b = -verticalTooTooMuch / 2;
 		return img.addBorder(b, (int) (b / 2d + offX), (int) (b / 2d + offY), ImageOperation.BACKGROUND_COLORint).getImage();
 	}
@@ -86,26 +87,26 @@ public class BlCutZoomedImages extends AbstractBlock {
 			i = input().images().getNirInfo();
 		String outlierDef = i.getParentSample().getParentCondition().getExperimentGlobalOutlierInfo();
 		if (outlierDef != null && outlierDef.contains(zoomID)) {
-			for (String s : outlierDef.split("//")) {
+			for (String s : outlierDef.split(getString("outlier-separator", "//"))) {
 				s = s.trim();
 				if (s.startsWith(zoomID)) {
 					s = s.substring(zoomID.length());
-					String[] levels = s.split(";");
+					String[] levels = s.split(getString("zoomID-typ-separator", ";"));
 					double[][] res = new double[3][4];
-					res[0][0] = Double.parseDouble(levels[0].split(":")[0]) / 100d;
-					res[0][1] = Double.parseDouble(levels[1].split(":")[0]) / 100d;
-					res[0][2] = Double.parseDouble(levels[2].split(":")[0]) / 100d;
-					res[0][3] = Double.parseDouble(levels[3].split(":")[0]) / 100d;
+					res[0][0] = Double.parseDouble(levels[0].split(getString("zoomID-value-separator", ":"))[0]) / 100d;
+					res[0][1] = Double.parseDouble(levels[1].split(getString("zoomID-value-separator", ":"))[0]) / 100d;
+					res[0][2] = Double.parseDouble(levels[2].split(getString("zoomID-value-separator", ":"))[0]) / 100d;
+					res[0][3] = Double.parseDouble(levels[3].split(getString("zoomID-value-separator", ":"))[0]) / 100d;
 					
-					res[1][0] = Double.parseDouble(levels[0].split(":")[1]);
-					res[1][1] = Double.parseDouble(levels[1].split(":")[1]);
-					res[1][2] = Double.parseDouble(levels[2].split(":")[1]);
-					res[1][3] = Double.parseDouble(levels[3].split(":")[1]);
+					res[1][0] = Double.parseDouble(levels[0].split(getString("zoomID-value-separator", ":"))[1]);
+					res[1][1] = Double.parseDouble(levels[1].split(getString("zoomID-value-separator", ":"))[1]);
+					res[1][2] = Double.parseDouble(levels[2].split(getString("zoomID-value-separator", ":"))[1]);
+					res[1][3] = Double.parseDouble(levels[3].split(getString("zoomID-value-separator", ":"))[1]);
 					
-					res[2][0] = Double.parseDouble(levels[0].split(":")[2]);
-					res[2][1] = Double.parseDouble(levels[1].split(":")[2]);
-					res[2][2] = Double.parseDouble(levels[2].split(":")[2]);
-					res[2][3] = Double.parseDouble(levels[3].split(":")[2]);
+					res[2][0] = Double.parseDouble(levels[0].split(getString("zoomID-value-separator", ":"))[2]);
+					res[2][1] = Double.parseDouble(levels[1].split(getString("zoomID-value-separator", ":"))[2]);
+					res[2][2] = Double.parseDouble(levels[2].split(getString("zoomID-value-separator", ":"))[2]);
+					res[2][3] = Double.parseDouble(levels[3].split(getString("zoomID-value-separator", ":"))[2]);
 					
 					return res;
 				}
@@ -118,7 +119,5 @@ public class BlCutZoomedImages extends AbstractBlock {
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		// processedImages.fluo().io().crossfade(processedImages.nir(), 0.5d).print("overlay");
-		// processedImages.copy().equalize().print("debug");
 	}
 }

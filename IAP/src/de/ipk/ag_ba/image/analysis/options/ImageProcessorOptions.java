@@ -312,4 +312,12 @@ public class ImageProcessorOptions {
 				block.getClass().getCanonicalName() + "//" + title,
 				defaultValue);
 	}
+	
+	public String getStringSetting(ImageAnalysisBlockFIS block, String title, String defaultValue) {
+		return optSystemOptionStorage.getString(
+				getOptSystemOptionStorageGroup(),
+				block.getClass().getCanonicalName() + "//" + title,
+				defaultValue);
+	}
+	
 }
