@@ -558,12 +558,12 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 				if (!is.null(descriptorVector)) {
 					descriptorVector <- getVector(checkIfDescriptorIsNaOrAllZero(descriptorVector, workingDataSet, FALSE))
 					
-					if (!is.null(descriptorVector)) {
+					if (all(!is.na(descriptorVector))) { #!is.null(descriptorVector)
 						listOfTreat[[k]] <- descriptorVector
 					} 
 				} 
 				
-				if (is.null(descriptorVector)) {
+				if (all(is.na(descriptorVector))) { # is.null(descriptorVector)
 					ownCat(paste(k, " set to '",NONE,"'", sep=""))
 					
 					listOfTreat[[k]] <- NONE
@@ -1294,7 +1294,11 @@ getSingelFilter <- function(filter, treatment, dataSet) {
 	if (filter != NONE) {
 		return(strsplit(filter, "$", fixed=TRUE)[[1]])
 	} else {
-		return(as.character(unique(dataSet[treatment])[[1]]))
+		if(all(is.na(as.character(unique(dataSet[treatment])[[1]])))){
+			return("")
+		} else {
+			return(as.character(unique(dataSet[treatment])[[1]]))
+		}
 	}
 }
 
@@ -4849,7 +4853,9 @@ calculateLegendRowAndColNumber <- function(legendText, typOfPlot) {
 		ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
 		if (ncol == 0) {
 			ncol <- 1
-		}
+		} else if(ncol > length(legendText)) {
+			ncol <- length(legendText)
+		}	
 	}
 	return(ncol)
 } 
@@ -7063,8 +7069,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#treatment <- "none"
-		treatment <- "Treatment"
-		#treatment <- "Genotype"
+		#treatment <- "Treatment"
+		treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
 		filterTreatment <- "none"
 		#filterTreatment <- "control"
@@ -7075,8 +7081,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#secondTreatment <- "none"
 		#filterSecondTreatment  <- "none"
 		
-		secondTreatment <- "none"
+		#secondTreatment <- "none"
 		#secondTreatment <- "Genotype"
+		secondTreatment <- "Treatment"
 		filterSecondTreatment  <- "none"
 		#filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
