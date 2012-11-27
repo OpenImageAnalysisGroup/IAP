@@ -8,21 +8,19 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = false;
+	private final boolean debug = getBoolean("debug", false);
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
 		FlexibleImage nir = input().images().nir();
 		if (nir == null)
 			return null;
-		// if (options.getCameraPosition() == CameraPosition.TOP)
-		// return nir;
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.io().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.io().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
 		}
 	}
 	
@@ -31,15 +29,12 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		FlexibleImage nir = input().masks().nir();
 		if (nir == null)
 			return null;
-		// if (options.getCameraPosition() == CameraPosition.TOP)
-		// return nir;
 		if (options.isBarleyInBarleySystem()) {
 			double[] pix = getProbablyWhitePixels(nir);
-			// double[] pix = getProbablyWhitePixels(nir.getIO().copy().invert().getImage());
-			return nir.io().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
-			return nir.io().imageBalancing(180, pix).getImage();
+			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
 		}
 	}
 	
@@ -65,7 +60,8 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 		float[] values;
 		float[] valuesTop, valuesBottom = { 0f, 0f, 0f }, valuesBottomLeft, valuesBottomRight;
 		int left, right, scanHeight, scanWidth, startHTop;
-		int cutoff = -10;
+		int cutoffL = getInt("nir-vertical-balance-l-threshold", -10);
+		int cutoffAB = getInt("nir-vertical-balance-ab-threshold", 50);
 		
 		if (bpleftX == null || bprightX == null || bpleftY == null || bprightY == null) { // fall back to default
 			left = (int) (0.3 * width);
@@ -75,11 +71,11 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 			startHTop = (int) (height * 0.1 - scanHeight / 2);
 			left += scanWidth;
 			right -= scanWidth;
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, cutoff, 50, true, debug);
-			valuesBottomLeft = io.getRGBAverage(left / 3, height - (startHTop + scanHeight) - scanHeight, scanWidth / 2, scanHeight, cutoff, 50, true, debug);
-			valuesBottomRight = io
-					.getRGBAverage(width - (scanWidth / 3) - (left / 3), height - (startHTop + scanHeight) - scanHeight, scanWidth / 3, scanHeight, cutoff, 50,
-							true, debug);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, cutoffL, cutoffAB, true, debug);
+			valuesBottomLeft = io.getRGBAverage(left / 3, height - (startHTop + scanHeight) - scanHeight, scanWidth / 2,
+					scanHeight, cutoffL, cutoffAB, true, debug);
+			valuesBottomRight = io.getRGBAverage(width - (scanWidth / 3) - (left / 3), height - (startHTop + scanHeight) - scanHeight, scanWidth / 3,
+					scanHeight, cutoffL, cutoffAB, true, debug);
 			
 		} else { // use marker positions
 			left = (int) (bpleftX.getValue() * width);
@@ -91,10 +87,11 @@ public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBl
 			startHTop = (int) (height * 0.1 - scanHeight / 2);
 			int bottom = (int) ((bpleftY.getValue() + bprightY.getValue()) * height / 2);
 			bottom -= scanHeight;
-			valuesTop = io.getRGBAverage(width / 2 - (scanWidth * 2 / 2), startHTop, scanWidth * 2, scanHeight, cutoff, 50, true, debug);
-			valuesBottomLeft = io.getRGBAverage(left - (scanWidth / 2), bottom - scanHeight / 2, scanWidth, scanHeight, cutoff, 50, true, debug);
-			valuesBottomRight = io
-					.getRGBAverage(right - (scanWidth / 2), bottom - scanHeight / 2, scanWidth, scanHeight, cutoff, 50, true, debug);
+			valuesTop = io.getRGBAverage(width / 2 - (scanWidth * 2 / 2), startHTop, scanWidth * 2, scanHeight, cutoffL, cutoffAB, true, debug);
+			valuesBottomLeft = io.getRGBAverage(left - (scanWidth / 2), bottom - scanHeight / 2, scanWidth,
+					scanHeight, cutoffL, cutoffAB, true, debug);
+			valuesBottomRight = io.getRGBAverage(right - (scanWidth / 2), bottom - scanHeight / 2, scanWidth,
+					scanHeight, cutoffL, cutoffAB, true, debug);
 			
 		}
 		
