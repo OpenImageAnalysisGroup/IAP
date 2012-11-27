@@ -16,6 +16,17 @@ echo "Stress label? : ${10}"
 echo "Split Cond1?  : ${11}"
 echo "Split Cond2?  : ${12}"
 
+
+DEL /s report.aux
+DEL /s report.out
+DEL /s report.toc
+DEL /s report.tex
+DEL /s report.pdf
+RD /s /q plots
+RD /s /q plotTex
+RD /s /q section
+
+
 if [ -f report.clustering.csv ]
 then
 Rscript calcClusters.R $6
