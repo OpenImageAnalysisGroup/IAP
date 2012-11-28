@@ -25,24 +25,34 @@ public class BlCutZoomedImages extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
-		int w = getInt("cut-image-width", 1624);
-		int h = getInt("cut-image-height", 1234);
-		if (image.getWidth() < image.getHeight()) {
-			w = getInt("cut-image-height", 1234);
-			h = getInt("cut-image-width", 1624);
+		
+		if (image != null) {
+			int w = getInt("cut-image-width", 1624);
+			int h = getInt("cut-image-height", 1234);
+			if (image.getWidth() < image.getHeight()) {
+				w = getInt("cut-image-height", 1234);
+				h = getInt("cut-image-width", 1624);
+			}
+			return cut(image.io().adjustWidthHeightRatio(w, h, 10));
+		} else {
+			return null;
 		}
-		return cut(image.io().adjustWidthHeightRatio(w, h, 10));
 	}
 	
 	@Override
 	protected FlexibleImage processMask(FlexibleImage mask) {
-		int w = getInt("cut-image-width", 1624);
-		int h = getInt("cut-image-height", 1234);
-		if (mask.getWidth() < mask.getHeight()) {
-			w = getInt("cut-image-height", 1234);
-			h = getInt("cut-image-width", 1624);
+		
+		if (mask != null) {
+			int w = getInt("cut-image-width", 1624);
+			int h = getInt("cut-image-height", 1234);
+			if (mask.getWidth() < mask.getHeight()) {
+				w = getInt("cut-image-height", 1234);
+				h = getInt("cut-image-width", 1624);
+			}
+			return cut(mask.io().adjustWidthHeightRatio(w, h, 10));
+		} else {
+			return null;
 		}
-		return cut(mask.io().adjustWidthHeightRatio(w, h, 10));
 	}
 	
 	private FlexibleImage cut(ImageOperation img) {

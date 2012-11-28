@@ -20,7 +20,7 @@ public class SystemOptions {
 	private final String iniFileName;
 	private Ini ini;
 	
-	private LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
+	private final LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
 	
 	private long lastModificationTime = 0;
 	
@@ -195,6 +195,25 @@ public class SystemOptions {
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue + "");
+				store(group, setting);
+				return defaultValue;
+			} else {
+				if (r == null || r.equals("null"))
+					return null;
+				else
+					return r;
+			}
+		}
+	}
+	
+	public synchronized int[] getIntArray(String group, String setting, int[] defaultValue) {
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			return defaultValue;
+		} else {
+			int[] r = ini.get(group, setting, int[].class);
+			if (r == null) {
+				ini.put(group, setting, defaultValue);
 				store(group, setting);
 				return defaultValue;
 			} else {

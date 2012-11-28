@@ -5,7 +5,6 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
@@ -18,11 +17,17 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
  */
 public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = false;
+	boolean debug;
+	ArrayList<MarkerPair> numericResult;
+	FlexibleImage markerMask;
 	
-	ArrayList<MarkerPair> numericResult = new ArrayList<MarkerPair>();
-	
-	FlexibleImage markerMask = null;
+	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+		numericResult = new ArrayList<MarkerPair>();
+		markerMask = null;
+	}
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -104,8 +109,6 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		
 		int maxDist = max(distances);
-		// int maxDist = (int) Math.abs(getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X).getValue() - getProperties()
-		// .getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X).getValue() * imageWidth);
 		
 		if (maxDist > 0)
 			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
@@ -123,7 +126,7 @@ public class BlFindBlueMarkers_vis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private FlexibleImage getMarkers(FlexibleImage image, ArrayList<MarkerPair> result) {
-		double s = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
+		double s = getDouble("Scale-factor-decrease-img-and-mask", 1); // options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		ImageOperation io = image.io().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), options.isMaize(), true);
 		return io != null ? io.getImage() : null;
 	}
