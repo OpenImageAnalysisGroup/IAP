@@ -2089,6 +2089,10 @@ public class ImageOperation {
 			return null;
 	}
 	
+	public ImageOperation filterRemoveLAB(int[] values, int background, boolean getRemovedPixel) {
+		return filterRemoveLAB(values[0], values[1], values[2], values[3], values[4], values[5], background, getRemovedPixel);
+	}
+	
 	/**
 	 * @author klukas
 	 */

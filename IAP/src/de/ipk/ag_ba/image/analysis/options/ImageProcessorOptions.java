@@ -161,20 +161,20 @@ public class ImageProcessorOptions {
 	
 	public void initStandardValues(double scale) {
 		
-		addIntSetting(Setting.L_Diff_VIS_SIDE, 20); // 40
-		addIntSetting(Setting.abDiff_VIS_SIDE, 20); // 40
+		// addIntSetting(Setting.L_Diff_VIS_SIDE, 20); // 40
+		// addIntSetting(Setting.abDiff_VIS_SIDE, 20); // 40
+		//
+		// addIntSetting(Setting.L_Diff_VIS_TOP, 40); // 40
+		// addIntSetting(Setting.abDiff_VIS_TOP, 40); // 40
+		// addIntSetting(Setting.L_Diff_FLUO, 75);// 20
+		// addIntSetting(Setting.abDiff_FLUO, 40);// 30
+		// addIntSetting(Setting.B_Diff_NIR, 14); // 14
+		// addIntSetting(Setting.W_Diff_NIR, 20);
+		// addIntSetting(Setting.B_Diff_NIR_TOP, 14);
+		// addIntSetting(Setting.W_Diff_NIR_TOP, 20);
 		
-		addIntSetting(Setting.L_Diff_VIS_TOP, 40); // 40
-		addIntSetting(Setting.abDiff_VIS_TOP, 40); // 40
-		addIntSetting(Setting.L_Diff_FLUO, 75);// 20
-		addIntSetting(Setting.abDiff_FLUO, 40);// 30
-		addIntSetting(Setting.B_Diff_NIR, 14); // 14
-		addIntSetting(Setting.W_Diff_NIR, 20);
-		addIntSetting(Setting.B_Diff_NIR_TOP, 14);
-		addIntSetting(Setting.W_Diff_NIR_TOP, 20);
-		
-		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 1);
-		addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 1);
+		// addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK, 1);
+		// addDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK, 1);
 		
 		addIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 30);
 		addIntSetting(Setting.REAL_MARKER_DISTANCE, 1128);
@@ -315,6 +315,13 @@ public class ImageProcessorOptions {
 	
 	public String getStringSetting(ImageAnalysisBlockFIS block, String title, String defaultValue) {
 		return optSystemOptionStorage.getString(
+				getOptSystemOptionStorageGroup(),
+				block.getClass().getCanonicalName() + "//" + title,
+				defaultValue);
+	}
+	
+	public int[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, int[] defaultValue) {
+		return optSystemOptionStorage.getIntArray(
 				getOptSystemOptionStorageGroup(),
 				block.getClass().getCanonicalName() + "//" + title,
 				defaultValue);

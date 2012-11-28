@@ -15,7 +15,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
  */
 public class BlCreateDummyReferenceIfNeeded_vis extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = getBoolean("debug", false);
+	boolean debug;
+	
+	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+	}
 	
 	@Override
 	protected FlexibleImage processVISmask() {

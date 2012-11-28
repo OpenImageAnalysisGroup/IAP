@@ -19,7 +19,10 @@ public class BlMedianFilter_fluo extends AbstractSnapshotAnalysisBlockFIS {
 		if (input().masks().fluo() == null)
 			return null;
 		
-		FlexibleImage medianMask = new ImageOperation(input().masks().fluo()).medianFilter32Bit().border(2).getImage();
+		FlexibleImage medianMask = new ImageOperation(input().masks().fluo())
+				.medianFilter32Bit()
+				.border(getInt("Median-fluo-border", 2))
+				.getImage();
 		
 		return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
 	}

@@ -8,7 +8,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlockColorBalancing_vertical_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	private final boolean debug = getBoolean("debug", false);
+	boolean debug;
+	
+	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+	}
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
