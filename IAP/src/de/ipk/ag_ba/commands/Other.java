@@ -186,7 +186,7 @@ public class Other {
 						}
 					}
 				}
-				if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true)) {
+				if (SystemOptions.getInstance().getBoolean("IAP", "show_grid_status_icon", true)) {
 					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 					for (MongoDB m : MongoDB.getMongos()) {
 						try {
