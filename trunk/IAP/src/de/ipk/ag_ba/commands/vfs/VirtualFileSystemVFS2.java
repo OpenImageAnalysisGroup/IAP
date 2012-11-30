@@ -74,7 +74,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
 					host, path, user, pass);
 			if (!file.exists()) {
-				System.out.println(">>>>>>");
+				System.out.println(">>>>>> create directory " + path);
 				file.mkdir();
 			}
 			ArrayList<String> res = new ArrayList<String>();

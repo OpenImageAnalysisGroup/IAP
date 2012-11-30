@@ -106,7 +106,10 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 		try {
 			if (!read)
 				readDataSource();
-			return thisLevel.getPathways();
+			if (thisLevel == null)
+				return new ArrayList<PathwayWebLinkItem>();
+			else
+				return thisLevel.getPathways();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new ArrayList<PathwayWebLinkItem>();
