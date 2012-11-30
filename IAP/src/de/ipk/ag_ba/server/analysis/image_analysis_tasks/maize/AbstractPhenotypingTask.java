@@ -315,7 +315,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private void startThread(Thread t) {
 		t.setPriority(Thread.MIN_PRIORITY);
 		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * 0.6 && SystemAnalysis.getMemoryMB() > 4000) {
+				.getMemoryMB() * 0.6 && SystemAnalysis.getMemoryMB() > 4000
+				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", true)) {
 			System.out.println();
 			System.out
 					.print(SystemAnalysis.getCurrentTime()
