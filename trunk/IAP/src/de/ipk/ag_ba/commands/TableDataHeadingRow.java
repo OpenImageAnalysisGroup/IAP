@@ -50,7 +50,8 @@ public class TableDataHeadingRow {
 			possibleValues.add("Plant ID");
 			for (ConditionInfo ci : ConditionInfo.values())
 				if (ci != ConditionInfo.IGNORED_FIELD)
-					possibleValues.add(ci + "");
+					if (ci != ConditionInfo.FILES)
+						possibleValues.add(ci + "");
 			
 			HashMap<ConditionInfo, ArrayList<Integer>> ci2arr =
 					new HashMap<ConditionInfo, ArrayList<Integer>>();
@@ -65,12 +66,12 @@ public class TableDataHeadingRow {
 				String sel = SystemOptions.getInstance().getStringRadioSelection(
 						"File_Import",
 						"Named Columns//" + heading,
-						possibleValues, "Ignored Column");
-				if (sel != null && !sel.equals("Plant ID")) {
+						possibleValues, getDefaultSelection(col, heading, possibleValues), true);
+				if (sel != null && sel.equals("Plant ID")) {
 					plantIDcolARR.add(col);
 				} else
 					if (sel != null && !sel.equals("Ignored Column")) {
-						ConditionInfo ciSel = ConditionInfo.valueOf(sel);
+						ConditionInfo ciSel = ConditionInfo.valueOfString(sel);
 						if (ciSel != null) {
 							ArrayList<Integer> arr = ci2arr.get(ciSel);
 							arr.add(col);
@@ -85,6 +86,15 @@ public class TableDataHeadingRow {
 			varietyCol = varietyColARR.toArray(new Integer[] {});
 			growthconditionsCol = growthconditionsColARR.toArray(new Integer[] {});
 		}
+	}
+	
+	private String getDefaultSelection(Integer col, String heading, ArrayList<String> possibleValues) {
+		if (col == 1)
+			return possibleValues.get(1);
+		for (String p : possibleValues)
+			if (p.equalsIgnoreCase(heading))
+				return p;
+		return "Ignored Column";
 	}
 	
 	public String getPlantID(TableDataStringRow tdsr) {
