@@ -23,6 +23,8 @@ public class BlCutZoomedImages extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
+		if (image == null)
+			return image;
 		int w = 1624;
 		int h = 1234;
 		if (image.getWidth() < image.getHeight()) {
