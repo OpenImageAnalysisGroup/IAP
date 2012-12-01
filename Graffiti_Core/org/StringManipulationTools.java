@@ -666,6 +666,34 @@ public class StringManipulationTools implements HelperClass {
 		return namenew;
 	}
 	
+	/**
+	 * @return null, if no value is found to be added to the result. This is different
+	 *         to the other getStringList method calls!
+	 */
+	public static String getStringList(HashMap<Integer, String> elements,
+			Integer[] cols, String div) {
+		if (elements == null || elements.size() <= 0)
+			return null;
+		else {
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			if (cols != null)
+				for (Integer idx : cols) {
+					String v = elements.get(idx);
+					if (v == null)
+						continue;
+					sb.append(v);
+					if (i < elements.size() - 1)
+						sb.append(div);
+					i++;
+				}
+			return sb.toString();
+		}
+	}
+	
+	/**
+	 * @return An empty string, if no value is added to the result.
+	 */
 	public static String getStringList(Object[] elements, String div) {
 		ArrayList<Object> al = new ArrayList<Object>();
 		if (elements != null)

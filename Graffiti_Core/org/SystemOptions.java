@@ -206,12 +206,12 @@ public class SystemOptions {
 		}
 	}
 	
-	public synchronized int[] getIntArray(String group, String setting, int[] defaultValue) {
+	public synchronized Integer[] getIntArray(String group, String setting, Integer[] defaultValue) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			int[] r = ini.get(group, setting, int[].class);
+			Integer[] r = ini.get(group, setting, Integer[].class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
 				store(group, setting);
@@ -384,5 +384,29 @@ public class SystemOptions {
 					}
 			}
 		}
+	}
+	
+	public String getStringRadioSelection(String group, String setting,
+			ArrayList<String> possibleValues, String defaultSelection) {
+		String settingTemplateEmpty = possibleValues != null ? StringManipulationTools.getStringList(possibleValues, "//") : null;
+		String settingTemplateDefaultSelected = settingTemplateEmpty != null ? StringManipulationTools.stringReplace(
+				settingTemplateEmpty, defaultSelection, "[x]" + defaultSelection) : null;
+		String val = getString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
+		String valNoSeletion = val != null ? StringManipulationTools.stringReplace(val, "[x]", "") : null;
+		if (valNoSeletion == null)
+			return defaultSelection;
+		if ((settingTemplateEmpty != null && !settingTemplateEmpty.equals(valNoSeletion)) || !val.contains("[x]")) {
+			setString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
+			return defaultSelection;
+		} else {
+			for (String s : val.split("//"))
+				if (s.startsWith("[x]"))
+					return s.substring("[x]".length());
+		}
+		if (setting.endsWith("-radio-selection"))
+			System.out.println("TEST!!!");
+		if (settingTemplateDefaultSelected != null && !settingTemplateDefaultSelected.equals("null"))
+			setString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
+		return defaultSelection;
 	}
 }

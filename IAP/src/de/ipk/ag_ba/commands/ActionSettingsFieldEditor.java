@@ -2,6 +2,9 @@ package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
+
 import org.StringManipulationTools;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
@@ -12,6 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	private final ActionSettingsEditor actionSettingsEditor;
 	private final String setting;
+	boolean isRadioSelection;
 	boolean isBoolean;
 	boolean isInteger;
 	boolean isFloat;
@@ -20,104 +24,142 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 		super(tooltip);
 		this.actionSettingsEditor = actionSettingsEditor;
 		this.setting = setting;
-		isBoolean = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isBooleanSetting(this.actionSettingsEditor.section, setting);
-		isInteger = !isBoolean && SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isIntegerSetting(this.actionSettingsEditor.section, setting);
-		isFloat = !isBoolean && !isInteger
-				&& SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isFloatSetting(this.actionSettingsEditor.section, setting);
+		isRadioSelection = setting.endsWith("-radio-selection");
+		if (isRadioSelection) {
+			isBoolean = false;
+			isInteger = false;
+			isFloat = false;
+		} else {
+			isBoolean = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isBooleanSetting(this.actionSettingsEditor.section, setting);
+			isInteger = !isBoolean
+					&& SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isIntegerSetting(this.actionSettingsEditor.section, setting);
+			isFloat = !isBoolean && !isInteger
+					&& SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isFloatSetting(this.actionSettingsEditor.section, setting);
+		}
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		if (isBoolean) {
-			boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
-			enabled = !enabled;
-			SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setBoolean(this.actionSettingsEditor.section, setting, enabled);
-		} else
-			if (isInteger) {
-				Object[] inp = MyInputHelper.getInput("Please enter a whole number:",
-						"Modify "
-								+ setting,
-						setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getInteger(this.actionSettingsEditor.section, setting, 0));
-				if (inp != null) {
-					if (inp.length == 1) {
-						Object o = inp[0];
-						if (o != null && o instanceof Integer) {
-							SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setInteger(this.actionSettingsEditor.section, setting, (Integer) o);
-						}
-					}
+		if (isRadioSelection) {
+			ArrayList<Object> entries = new ArrayList<Object>();
+			String poss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, null);
+			
+			ButtonGroup group = new ButtonGroup();
+			for (String sl : poss.split("//")) {
+				entries.add("");
+				boolean enable = false;
+				if (sl.startsWith("[x]")) {
+					enable = true;
+					sl = sl.substring("[x]".length());
 				}
+				JRadioButton rb = new JRadioButton(sl);
+				rb.setSelected(enable);
+				group.add(rb);
+				entries.add(rb);
+			}
+			String s2 = setting.substring(0, setting.length() - "-radio-selection".length());
+			Object[] inp = MyInputHelper.getInput(
+					"Select the desired option from the listed entries:<br>",
+					s2, entries.toArray());
+			if (inp != null) {
+				if (inp.length > 0) {
+					
+					// SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setStringArray(this.actionSettingsEditor.section, setting,
+					// newValues);
+				}
+			}
+		} else
+			if (isBoolean) {
+				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
+				enabled = !enabled;
+				SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setBoolean(this.actionSettingsEditor.section, setting, enabled);
 			} else
-				if (isFloat) {
-					Object[] inp = MyInputHelper.getInput("Please enter a (floating point) number:",
+				if (isInteger) {
+					Object[] inp = MyInputHelper.getInput("Please enter a whole number:",
 							"Modify "
 									+ setting,
-							setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getDouble(this.actionSettingsEditor.section, setting, 0d));
+							setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getInteger(this.actionSettingsEditor.section, setting, 0));
 					if (inp != null) {
 						if (inp.length == 1) {
 							Object o = inp[0];
-							if (o != null && o instanceof Double) {
-								SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setDouble(this.actionSettingsEditor.section, setting, (Double) o);
+							if (o != null && o instanceof Integer) {
+								SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setInteger(this.actionSettingsEditor.section, setting, (Integer) o);
 							}
 						}
 					}
-				} else {
-					String[] ss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getStringAll(this.actionSettingsEditor.section, setting,
-							new String[] {});
-					boolean isString = ss.length == 1;
-					boolean isStringArray = ss.length > 1;
-					if (isString) {
-						if (setting.toLowerCase().contains("password")) {
-							Object[] i = MyInputHelper.getInput(
-									"WARNING: The <u>password will be shown now and saved as clear text</u> in the settings-ini-file!" +
-											"<br>Click 'Cancel' to interrupt the process of displaying and " +
-											"editing the password.", "WARNING");
-							if (i == null)
-								return;
-						}
-						Object[] inp = MyInputHelper.getInput("You may modify the text:",
+				} else
+					if (isFloat) {
+						Object[] inp = MyInputHelper.getInput("Please enter a (floating point) number:",
 								"Modify "
 										+ setting,
-								setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, "")
-										+ "");
+								setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getDouble(this.actionSettingsEditor.section, setting, 0d));
 						if (inp != null) {
 							if (inp.length == 1) {
 								Object o = inp[0];
-								if (o != null && o instanceof String) {
-									SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setString(this.actionSettingsEditor.section, setting, (String) o);
+								if (o != null && o instanceof Double) {
+									SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setDouble(this.actionSettingsEditor.section, setting, (Double) o);
 								}
 							}
 						}
-					} else
-						if (isStringArray) {
-							ArrayList<String> entries = new ArrayList<String>();
-							int line = 1;
-							for (String sl : ss) {
-								entries.add("Item " + (line++));
-								entries.add(sl + "");
+					} else {
+						String[] ss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getStringAll(this.actionSettingsEditor.section, setting,
+								new String[] {});
+						boolean isString = ss.length == 1;
+						boolean isStringArray = ss.length > 1;
+						if (isString) {
+							if (setting.toLowerCase().contains("password")) {
+								Object[] i = MyInputHelper.getInput(
+										"WARNING: The <u>password will be shown now and saved as clear text</u> in the settings-ini-file!" +
+												"<br>Click 'Cancel' to interrupt the process of displaying and " +
+												"editing the password.", "WARNING");
+								if (i == null)
+									return;
 							}
-							Object[] inp = MyInputHelper.getInput(
-									"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
-											"If an item contains '//', the entry is split into two items.<br>",
+							Object[] inp = MyInputHelper.getInput("You may modify the text:",
 									"Modify "
-											+ setting, entries.toArray());
+											+ setting,
+									setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, "")
+											+ "");
 							if (inp != null) {
-								if (inp.length > 0) {
-									ArrayList<String> newValues = new ArrayList<String>();
-									for (Object o : inp) {
-										if (o != null && o instanceof String) {
-											String es = (String) o;
-											for (String nn : es.split("//")) {
-												nn = nn.trim();
-												newValues.add(nn);
+								if (inp.length == 1) {
+									Object o = inp[0];
+									if (o != null && o instanceof String) {
+										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName)
+												.setString(this.actionSettingsEditor.section, setting, (String) o);
+									}
+								}
+							}
+						} else
+							if (isStringArray) {
+								ArrayList<String> entries = new ArrayList<String>();
+								int line = 1;
+								for (String sl : ss) {
+									entries.add("Item " + (line++));
+									entries.add(sl + "");
+								}
+								Object[] inp = MyInputHelper.getInput(
+										"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
+												"If an item contains '//', the entry is split into two items.<br>",
+										"Modify "
+												+ setting, entries.toArray());
+								if (inp != null) {
+									if (inp.length > 0) {
+										ArrayList<String> newValues = new ArrayList<String>();
+										for (Object o : inp) {
+											if (o != null && o instanceof String) {
+												String es = (String) o;
+												for (String nn : es.split("//")) {
+													nn = nn.trim();
+													newValues.add(nn);
+												}
 											}
 										}
+										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setStringArray(this.actionSettingsEditor.section, setting,
+												newValues);
 									}
-									SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setStringArray(this.actionSettingsEditor.section, setting,
-											newValues);
 								}
 							}
-						}
-				}
+					}
 	}
 	
 	@Override
@@ -145,6 +187,14 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			s = s.substring(s.indexOf("//") + "//".length());
 		s = StringManipulationTools.stringReplace(s, "_", "-");
 		s = WordUtils.capitalizeFully(s, '-', ' ');
+		if (isRadioSelection) {
+			String s2 = setting.substring(0, setting.length() - "-radio-selection".length());
+			String sel = SystemOptions.getInstance().getStringRadioSelection(
+					this.actionSettingsEditor.section, s2, null, null);
+			s = s.substring(0, s.length() - "-radio-selection".length());
+			return "<html><center><b>" + s + "</b><br>" +
+					"&nbsp;" + sel + "&nbsp;" + "</center></html>";
+		}
 		if (isBoolean)
 			return s;
 		else {
@@ -175,24 +225,27 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		if (isBoolean) {
-			boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
-			if (enabled)
-				return "img/ext/gpl2/Dialog-Apply-64.png";// gtcf.png";
-			else
-				return "img/ext/gpl2/Gnome-Emblem-Unreadable-64.png";// gtcd.png";
-		} else
-			if (isInteger) {
-				return "img/ext/gpl2/Gnome-Accessories-Calculator-64.png";
+		if (isRadioSelection)
+			return "img/ext/gpl2/Gnome-View-Sort-Selection-64.png";
+		else
+			if (isBoolean) {
+				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
+				if (enabled)
+					return "img/ext/gpl2/Dialog-Apply-64.png";// gtcf.png";
+				else
+					return "img/ext/gpl2/Gnome-Emblem-Unreadable-64.png";// gtcd.png";
 			} else
-				if (isFloat) {
+				if (isInteger) {
 					return "img/ext/gpl2/Gnome-Accessories-Calculator-64.png";
-				} else {
-					if (setting.equalsIgnoreCase("password"))
-						return "img/ext/gpl2/Gnome-Emblem-Readonly-64.png";
-					else
-						return "img/ext/gpl2/Gnome-Insert-Text-64.png";// Gnome-Accessories-Character-Map-64.png";
-				}
+				} else
+					if (isFloat) {
+						return "img/ext/gpl2/Gnome-Accessories-Calculator-64.png";
+					} else {
+						if (setting.equalsIgnoreCase("password"))
+							return "img/ext/gpl2/Gnome-Emblem-Readonly-64.png";
+						else
+							return "img/ext/gpl2/Gnome-Insert-Text-64.png";// Gnome-Accessories-Character-Map-64.png";
+					}
 		// Gnome-Applications-Accessories-64.png";
 	}
 }

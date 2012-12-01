@@ -94,43 +94,43 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 						.io()
 						.hq_thresholdLAB_multi_color_or_and_not(
 								// noise colors
-								new int[] {
+								new Integer[] {
 										215 - 5, 225, 146 - 5, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5, 110 - 5,
 										50 - 5,
 										146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5,
 										options.isBarleyInBarleySystem() ? 255 - 5 : 135 - 5,
 										options.isBarleyInBarleySystem() ? 120 - 5 : 120 - 5,
 										options.isBarleyInBarleySystem() ? 255 : 235 - 5 },
-								new int[] {
+								new Integer[] {
 										256, 256, 146 + 5, 257, 230 + 10, 151 + 4, 211 + 20, 220 + 5, 195 + 5, 218 + 5, 197 + 5, 91 + 5, 245 + 5, 144 + 5,
 										50 + 5,
 										146 + 5, 185 + 5, 155 + 5, 155 + 5, 199 + 5, 161 + 5, 172 + 5, 126 + 5, 168 + 5, 110 + 5, 161 + 5, 135 + 5,
 										250 + 5, 255 + 5 },
-								new int[] {
+								new Integer[] {
 										120 - 5, 120 - 5, 127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15, 120 - 5, 123 - 5, 124 - 5, 121 - 4, 126 - 5, 117 - 5,
 										120 - 5,
 										138 - 5, 125 - 5, 113 - 5, 121 - 5, 118 - 5, 116 - 5, 128 - 5, 120 - 5, 130 - 5, 121 - 5, 137 - 10, 122 - 5, 127 - 5,
 										105 - 5, 113 - 5 },
-								new int[] {
+								new Integer[] {
 										120 + 5, 120 + 6, 127 + 5, 118 + 10, 129 + 5, 129 + 4, 121 + 5, 120 + 5, 123 + 5, 137 + 5, 121 + 4, 132 + 5, 123 + 5,
 										122 + 5,
 										138 + 5, 125 + 5, 113 + 5, 121 + 5, 118 + 5, 121 + 5, 132 + 5, 136 + 5, 134 + 5, 121 + 5, 137 + 10, 122 + 5, 127 + 5,
 										134 + 5, 118 + 5 },
-								new int[] {
+								new Integer[] {
 										117 - 2, 122 - 14, 144 - 5, 124 - 10, 117 - 5, 114 - 4, 100 - 5, 120 - 5, 118 - 5, 121 - 5, 123 - 4, 117 - 5, 116 - 5,
 										106 - 5,
 										96 - 5, 100 - 5, 116 - 5, 109 - 5, 119 - 5, 116 - 5, 107 - 5, 110 - 5, 131 - 5, 105 - 5, 118 - 10, 103 - 5, 99 - 5,
 										95 - 5, 121 - 5 },
-								new int[] {
+								new Integer[] {
 										124, 122 + 5, 144 + 5, 124 + 10, 117 + 5, 114 + 4, 100 + 8, 120 + 5, 118 + 5, 126 + 5, 123 + 4, 128 + 5, 123 + 5,
 										113 + 5,
 										96 + 5, 100 + 5, 116 + 5, 109 + 5, 119 + 5, 119 + 5, 111 + 5, 114 + 5, 131 + 5, 105 + 5, 118 + 10, 103 + 5, 99 + 5,
 										128, 133 + 5 },
 								options.getBackground(), 1, false,
 								// plant colors
-								new int[] {}, new int[] {},
-								new int[] {}, new int[] {},
-								new int[] {}, new int[] {},
+								new Integer[] {}, new Integer[] {},
+								new Integer[] {}, new Integer[] {},
+								new Integer[] {}, new Integer[] {},
 								blueCurbWidthBarley0_1,
 								blueCurbHeightEndBarly0_8).
 						border_left_right((int) (options.isBarleyInBarleySystem() ? 0 : w * 0.05), Color.red.getRGB()).
@@ -140,21 +140,21 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 						.io()
 						.hq_thresholdLAB_multi_color_or_and_not(
 								// noise colors
-								new int[] { 215 - 5, 225, 0, 0, 135,
+								new Integer[] { 215 - 5, 225, 0, 0, 135,
 										-1, 250, 170 - 10, 151 - 20, 188 - 20, 220 - 5, 195 - 5, 100 - 5, 197 - 5, 47 - 5, 205 - 5,
 										110 - 5,
 										50 - 5,
 										146 - 5, 184 - 5, 155 - 5, 155 - 5, 171 - 5, 153 - 5, 116 - 5, 115 - 5, 168 - 5, 0, 161 - 5, 0,
 										80 - 5,
 										options.isBarleyInBarleySystem() ? 255 : 0, 160 },
-								new int[] { 256, 256, 255, 255, 188,
+								new Integer[] { 256, 256, 255, 255, 188,
 										146 + 5, 257, 230 + 10, 151 + 4, 211 + 20, 220 + 5, 195 + 5, 218 + 5, 197 + 5, 91 + 5, 245 + 5,
 										144 + 5,
 										50 + 5,
 										146 + 5, 185 + 5, 155 + 5, 155 + 5, 199 + 5, 161 + 5, 172 + 5, 126 + 5, 168 + 5, 110 + 5, 161 + 5, 135 + 5,
 										255, 255,
 										255 },
-								new int[] { 120 - 5, 120 - 5, 100, 120, 0,
+								new Integer[] { 120 - 5, 120 - 5, 100, 120, 0,
 										127 - 5, 118 - 10, 129 - 5, 129 - 4, 121 - 15, 120 - 5, 123 - 5, 124 - 5, 121 - 4,
 										126 - 5,
 										117 - 5,
@@ -162,14 +162,14 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 										138 - 5, 125 - 5, 113 - 5, 121 - 5, 118 - 5, 116 - 5, 128 - 5, 120 - 5, 130 - 5, 121 - 5, 137 - 10, 122 - 5, 127 - 5,
 										110 - 5, 115 - 5,
 										118 - 5 },
-								new int[] { 120 + 5, 130, 110, 135, 132,
+								new Integer[] { 120 + 5, 130, 110, 135, 132,
 										128, 118 + 10, 129 + 5, 129 + 4, 121 + 5, 120 + 5, 123 + 5, 137 + 5, 121 + 4, 132 + 5,
 										123 + 5,
 										122 + 5,
 										138 + 5, 125 + 5, 123 + 5, 121 + 5, 118 + 5, 121 + 5, 132 + 5, 136 + 5, 134 + 5, 121 + 5, 137 + 10, 122 + 5, 127 + 5,
 										127 + 5, 115 + 5,
 										135 + 5 },
-								new int[] { 117 - 2, 122 - 14, 100, 70, 110,
+								new Integer[] { 117 - 2, 122 - 14, 100, 70, 110,
 										144 - 5, 124 - 10, 117 - 5, 114 - 4, 100 - 5, 120 - 5, 118 - 5, 121 - 5, 123 - 4,
 										117 - 5,
 										116 - 5,
@@ -177,7 +177,7 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 										96 - 5, 100 - 5, 116 - 5, 109 - 5, 119 - 5, 116 - 5, 107 - 5, 110 - 5, 131 - 5, 105 - 5, 118 - 10, 103 - 5, 99 - 5,
 										90 - 5, 90 - 5,
 										80 - 5 },
-								new int[] { 125, 122 + 5, 139, 90, 120,
+								new Integer[] { 125, 122 + 5, 139, 90, 120,
 										110, 124 + 10, 117 + 5, 114 + 4, 100 + 8, 120 + 5, 118 + 5, 126 + 5, 123 + 4, 128 + 5,
 										123 + 5,
 										113 + 5,
@@ -186,12 +186,12 @@ public class BlLabFilter_Arabidopsis_vis extends AbstractSnapshotAnalysisBlockFI
 										102 + 5 },
 								options.getBackground(), Integer.MAX_VALUE, false,
 								// plant colors
-								new int[] {}, // 70 - 5
-								new int[] {}, // 160 + 5
-								new int[] {}, // 113 - 5
-								new int[] {}, // 120 + 5
-								new int[] {}, // 128 - 5
-								new int[] {}, // 148 + 5
+								new Integer[] {}, // 70 - 5
+								new Integer[] {}, // 160 + 5
+								new Integer[] {}, // 113 - 5
+								new Integer[] {}, // 120 + 5
+								new Integer[] {}, // 128 - 5
+								new Integer[] {}, // 148 + 5
 								blueCurbWidthBarley0_1,
 								blueCurbHeightEndBarly0_8).
 						// border_left_right(
