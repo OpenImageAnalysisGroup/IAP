@@ -35,6 +35,13 @@ public class Condition implements ConditionInterface {
 			return desc;
 		}
 		
+		public static ConditionInfo valueOfString(String v) {
+			for (ConditionInfo ci : values())
+				if (v.equals(ci + ""))
+					return ci;
+			return valueOf(v);
+		}
+		
 		public static ArrayList<ConditionInfo> getList() {
 			ArrayList<ConditionInfo> result = new ArrayList<ConditionInfo>();
 			for (ConditionInfo ci : ConditionInfo.values())
@@ -737,7 +744,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-	
+
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);

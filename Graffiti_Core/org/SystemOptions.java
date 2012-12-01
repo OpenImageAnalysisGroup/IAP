@@ -188,14 +188,20 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getString(String group, String setting, String defaultValue) {
+		return getString(group, setting, defaultValue, true);
+	}
+	
+	public synchronized String getString(String group, String setting, String defaultValue, boolean addDefaultIfNeeded) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
-				ini.put(group, setting, defaultValue + "");
-				store(group, setting);
+				if (addDefaultIfNeeded) {
+					ini.put(group, setting, defaultValue + "");
+					store(group, setting);
+				}
 				return defaultValue;
 			} else {
 				if (r == null || r.equals("null"))
@@ -383,15 +389,17 @@ public class SystemOptions {
 						r.run();
 					}
 			}
+			if (del.size() > 0)
+				store(section, section);
 		}
 	}
 	
 	public String getStringRadioSelection(String group, String setting,
-			ArrayList<String> possibleValues, String defaultSelection) {
+			ArrayList<String> possibleValues, String defaultSelection, boolean addDefaultIfNeeded) {
 		String settingTemplateEmpty = possibleValues != null ? StringManipulationTools.getStringList(possibleValues, "//") : null;
 		String settingTemplateDefaultSelected = settingTemplateEmpty != null ? StringManipulationTools.stringReplace(
 				settingTemplateEmpty, defaultSelection, "[x]" + defaultSelection) : null;
-		String val = getString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
+		String val = getString(group, setting + "-radio-selection", settingTemplateDefaultSelected, addDefaultIfNeeded);
 		String valNoSeletion = val != null ? StringManipulationTools.stringReplace(val, "[x]", "") : null;
 		if (valNoSeletion == null)
 			return defaultSelection;
@@ -403,8 +411,6 @@ public class SystemOptions {
 				if (s.startsWith("[x]"))
 					return s.substring("[x]".length());
 		}
-		if (setting.endsWith("-radio-selection"))
-			System.out.println("TEST!!!");
 		if (settingTemplateDefaultSelected != null && !settingTemplateDefaultSelected.equals("null"))
 			setString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
 		return defaultSelection;
