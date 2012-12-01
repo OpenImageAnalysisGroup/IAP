@@ -155,11 +155,17 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
 								}
 								imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
-								if (imageSnapshot.getCamera_label().endsWith(
-										SystemOptions.getInstance().getString("File_Import", "Camera Labels Top-View//Post-fix", " TV"))) {
+								boolean isTopView = false;
+								for (String topViewPostfix : SystemOptions.getInstance()
+										.getStringAll("File_Import", "Camera Labels Top-View//Post-fix", new String[] { " TV", "_Top" }))
+									if (imageSnapshot.getCamera_label().endsWith(topViewPostfix)) {
+										imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
+										imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), topViewPostfix, ""));
+										isTopView = true;
+									}
+								if (isTopView) {
 									imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".top");
 									imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " tv.", "."));
-									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
 								} else {
 									for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
 										if (imageSnapshot.getCamera_label().endsWith(

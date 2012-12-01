@@ -28,6 +28,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -662,7 +663,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					snapshot.setWeight_before(w);
 				
 				String camLbl = rs.getString("camera_label");
-				String lbl = getCompNameFromConfigLabel(camLbl);
+				String lbl = getIAPcameraNameFromConfigLabel(camLbl);
 				snapshot.setCamera_label(lbl);// rs.getString("compname"));
 				snapshot.setXfactor(0);// rs.getDouble("xfactor"));
 				snapshot.setYfactor(0);// rs.getDouble("yfactor"));
@@ -683,29 +684,38 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		
 	}
 	
-	private String getCompNameFromConfigLabel(String conf) {
+	public static String getIAPcameraNameFromConfigLabel(String conf) {
 		String res = "";
-		if (conf.toUpperCase().contains("NIR"))
-			res += "nir.";
-		else
-			if (conf.toUpperCase().contains("VIS"))
-				res += "vis.";
-			else
-				if (conf.toUpperCase().contains("RGB"))
+		for (String id : SystemOptions.getInstance().getStringAll("Import", "NIR-Camera-Config-Substrings", new String[] { "NIR" }))
+			if (conf.toUpperCase().contains(id.toUpperCase())) {
+				res += "nir.";
+				break;
+			}
+		if (res.isEmpty())
+			for (String id : SystemOptions.getInstance().getStringAll("Import", "VIS-Camera-Config-Substrings", new String[] { "VIS", "RGB" }))
+				if (conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "vis.";
-				else
-					if (conf.toUpperCase().contains("FLU"))
-						res += "fluo.";
-					else
-						if (conf.toUpperCase().contains("FLOU"))
-							res += "fluo.";
-						else
-							if (res.length() == 0)
-								res += "ir.";
-		if (conf.toUpperCase().contains("TOP"))
-			res += "top";
-		if (conf.toUpperCase().contains("SIDE"))
-			res += "side";
+					break;
+				}
+		if (res.isEmpty())
+			for (String id : SystemOptions.getInstance().getStringAll("Import", "FLUO-Camera-Config-Substrings", new String[] { "FLU" }))
+				if (conf.toUpperCase().contains(id.toUpperCase())) {
+					res += "fluo.";
+					break;
+				}
+		boolean topFound = false;
+		for (String id : SystemOptions.getInstance().getStringAll("Import", "Top-View-Camera-Config-Substrings", new String[] { "TOP", " TV" }))
+			if (conf.toUpperCase().contains(id)) {
+				res += "top";
+				topFound = true;
+				break;
+			}
+		if (!topFound)
+			for (String id : SystemOptions.getInstance().getStringAll("Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
+				if (conf.toUpperCase().contains(id)) {
+					res += "side";
+					break;
+				}
 		return res;
 	}
 	
