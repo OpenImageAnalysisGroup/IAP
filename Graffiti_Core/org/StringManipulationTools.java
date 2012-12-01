@@ -297,7 +297,7 @@ public class StringManipulationTools implements HelperClass {
 			{ "}", "\\}" },
 			{ "%", "\\%" },
 			{ "~", "\\textasciitilde" },
-			
+
 			{ "€", "\\texteuro" } };
 	
 	/**
@@ -509,14 +509,15 @@ public class StringManipulationTools implements HelperClass {
 	
 	public static String getNumbersFromString(String s) {
 		StringBuilder res = new StringBuilder();
-		for (Character c : s.toCharArray()) {
-			for (Character n : numberChars) {
-				if (n.equals(c)) {
-					res.append(n);
-					break;
+		if (s != null)
+			for (Character c : s.toCharArray()) {
+				for (Character n : numberChars) {
+					if (n.equals(c)) {
+						res.append(n);
+						break;
+					}
 				}
 			}
-		}
 		return res.toString();
 	}
 	

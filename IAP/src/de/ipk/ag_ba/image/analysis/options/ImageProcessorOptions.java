@@ -26,11 +26,11 @@ public class ImageProcessorOptions {
 	
 	public enum Setting {
 		SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
-		
+
 		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, B_Diff_NIR, W_Diff_NIR, B_Diff_NIR_TOP, W_Diff_NIR_TOP,
-		
+
 		L_Diff_VIS_SIDE, abDiff_VIS_SIDE,
-		
+
 		BOTTOM_CUT_OFFSET_VIS, REAL_MARKER_DISTANCE;
 	}
 	
@@ -293,38 +293,52 @@ public class ImageProcessorOptions {
 	}
 	
 	public boolean getBooleanSetting(ImageAnalysisBlockFIS block, String title, boolean defaultValue) {
-		return optSystemOptionStorage.getBoolean(
-				getOptSystemOptionStorageGroup(),
-				block.getClass().getCanonicalName() + "//" + title,
-				defaultValue);
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getBoolean(
+					getOptSystemOptionStorageGroup(),
+					block.getClass().getCanonicalName() + "//" + title,
+					defaultValue);
 	}
 	
 	public double getDoubleSetting(ImageAnalysisBlockFIS block, String title, double defaultValue) {
-		return optSystemOptionStorage.getDouble(
-				getOptSystemOptionStorageGroup(),
-				block.getClass().getCanonicalName() + "//" + title,
-				defaultValue);
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getDouble(
+					getOptSystemOptionStorageGroup(),
+					block.getClass().getCanonicalName() + "//" + title,
+					defaultValue);
 	}
 	
 	public int getIntSetting(ImageAnalysisBlockFIS block, String title, int defaultValue) {
-		return optSystemOptionStorage.getInteger(
-				getOptSystemOptionStorageGroup(),
-				block.getClass().getCanonicalName() + "//" + title,
-				defaultValue);
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getInteger(
+					getOptSystemOptionStorageGroup(),
+					block.getClass().getCanonicalName() + "//" + title,
+					defaultValue);
 	}
 	
 	public String getStringSetting(ImageAnalysisBlockFIS block, String title, String defaultValue) {
-		return optSystemOptionStorage.getString(
-				getOptSystemOptionStorageGroup(),
-				block.getClass().getCanonicalName() + "//" + title,
-				defaultValue);
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getString(
+					getOptSystemOptionStorageGroup(),
+					block.getClass().getCanonicalName() + "//" + title,
+					defaultValue);
 	}
 	
 	public int[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, int[] defaultValue) {
-		return optSystemOptionStorage.getIntArray(
-				getOptSystemOptionStorageGroup(),
-				block.getClass().getCanonicalName() + "//" + title,
-				defaultValue);
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getIntArray(
+					getOptSystemOptionStorageGroup(),
+					block.getClass().getCanonicalName() + "//" + title,
+					defaultValue);
 	}
-	
 }

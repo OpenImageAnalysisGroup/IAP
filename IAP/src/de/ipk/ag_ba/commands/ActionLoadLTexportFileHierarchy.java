@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.ErrorMsg;
 import org.OpenFileDialogService;
@@ -33,19 +34,21 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	}
 	
 	private NavigationButton src;
-	private ExperimentReference loaded_experiment = null;
+	private TreeMap<String, ExperimentReference> loaded_experiments = null;
 	private ArrayList<String> messages = new ArrayList<String>();
 	private boolean getInput;
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		loaded_experiment = null;
-		messages.clear();
-		getInput = true;
-		File inp = OpenFileDialogService.getDirectoryFromUser("Select Input Folder");
-		getInput = false;
-		if (inp != null && inp.isDirectory()) {
-			processDir(inp);
+		if (loaded_experiments == null || loaded_experiments.size() == 0) {
+			loaded_experiments = new TreeMap<String, ExperimentReference>();
+			messages.clear();
+			getInput = true;
+			File inp = OpenFileDialogService.getDirectoryFromUser("Select Input Folder");
+			getInput = false;
+			if (inp != null && inp.isDirectory()) {
+				processDir(inp);
+			}
 		}
 		this.src = src;
 	}
@@ -55,7 +58,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
 		long overallStorageSizeInBytes = 0;
 		Timestamp storageTimeOfFirstInfoFile = null;
-		String metadataFileName = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Table-File-Name", "metadata.csv");
+		String metadataFileExtension = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Table-File-Extension", ".csv");
 		String zoomSettingsFileName = SystemOptions.getInstance().getString("File_Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
 		boolean foundMetadata = false;
 		ArrayList<TableDataStringRow> metadata = null;
@@ -76,10 +79,12 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		String preferedZoomSetting = null;
 		
 		for (String snapshotDirName : inp.list()) {
-			if (snapshotDirName.equals(metadataFileName)) {
+			if (snapshotDirName.endsWith(metadataFileExtension)) {
 				foundMetadata = true;
-				TableData td = TableData.getTableData(new File(inp + File.separator + metadataFileName));
-				metadata = td.getRowsAsStringValues();
+				TableData td = TableData.getTableData(new File(inp + File.separator + snapshotDirName));
+				if (metadata == null)
+					metadata = new ArrayList<TableDataStringRow>();
+				metadata.addAll(td.getRowsAsStringValues());
 			}
 			if (snapshotDirName.equals(zoomSettingsFileName)) {
 				try {
@@ -195,9 +200,9 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
 		HashMap<String, Condition> optIdTag2condition = null;
 		if (!foundMetadata || metadata == null) {
-			messages.add("<b>Found no metadata.csv file (" + metadataFileName + ") in the selected folder!</b>");
+			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");
 			messages
-					.add("The metadata.csv file may contain up to 5 columns (or more, which would be ignored), which, if available, are processed in the following order:");
+					.add("The meta-data files may contain up to 5 columns (or more, which would be ignored), which, if available, are processed in the following order:");
 			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Plant-ID", 1) + ": Plant ID");
 			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Species", 2) + ": Species Name");
 			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Genotype", 3) + ": Genotype");
@@ -220,31 +225,43 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			}
 		}
 		// get experiment from snapshot info...
-		ExperimentInterface e;
-		try {
-			Snapshot s = snapshots.size() > 0 ? snapshots.get(0) : null;
-			ExperimentHeader eh = new ExperimentHeader(s != null ? s.getMeasurement_label() : "(no data)");
-			if (s != null)
-				eh.setCoordinator(s.getCreator());
-			if (storageTimeOfFirstInfoFile != null)
-				eh.setStorageTime(storageTimeOfFirstInfoFile);
-			eh.setImportusername(SystemAnalysis.getUserName());
-			eh.setSizekb(overallStorageSizeInBytes / 1024);
-			eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
-			eh.setGlobalOutlierInfo(preferedZoomSetting);
-			e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, snapshots, optIdTag2condition);
-			loaded_experiment = new ExperimentReference(e);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			messages.add("ERROR: Could not convert scnapshot info to Experiment structure: " + e1.getMessage());
+		HashMap<String, ArrayList<Snapshot>> measurementLabel2snapshots = new HashMap<String, ArrayList<Snapshot>>();
+		if (snapshots != null)
+			for (Snapshot s : snapshots) {
+				String ml = s.getMeasurement_label();
+				if (!measurementLabel2snapshots.containsKey(ml))
+					measurementLabel2snapshots.put(ml, new ArrayList<Snapshot>());
+				measurementLabel2snapshots.get(ml).add(s);
+			}
+		for (String ml : measurementLabel2snapshots.keySet()) {
+			ArrayList<Snapshot> sl = measurementLabel2snapshots.get(ml);
+			try {
+				ExperimentInterface e;
+				Snapshot s = snapshots.size() > 0 ? sl.get(0) : null;
+				ExperimentHeader eh = new ExperimentHeader(s != null ? s.getMeasurement_label() : "(no data)");
+				if (s != null)
+					eh.setCoordinator(s.getCreator());
+				if (storageTimeOfFirstInfoFile != null)
+					eh.setStorageTime(storageTimeOfFirstInfoFile);
+				eh.setImportusername(SystemAnalysis.getUserName());
+				eh.setSizekb(overallStorageSizeInBytes / 1024);
+				eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
+				eh.setGlobalOutlierInfo(preferedZoomSetting);
+				e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
+				loaded_experiments.put(e.getName(), new ExperimentReference(e));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				messages.add("ERROR: Could not convert scnapshot info to Experiment structure: " + e1.getMessage() + " (Experiment " + ml + ")");
+			}
 		}
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		if (loaded_experiment != null)
-			res.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(loaded_experiment), src.getGUIsetting()));
+		if (loaded_experiments != null && loaded_experiments.size() > 0)
+			for (ExperimentReference loaded_experiment : loaded_experiments.values())
+				res.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(loaded_experiment), src.getGUIsetting()));
 		return res;
 	}
 	
