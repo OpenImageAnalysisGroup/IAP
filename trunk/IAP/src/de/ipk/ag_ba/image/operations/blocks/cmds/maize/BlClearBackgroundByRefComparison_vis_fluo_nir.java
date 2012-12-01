@@ -139,16 +139,16 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					double blueCurbHeightEndBarly0_8 = 1;
 					FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
 							// black background and green pot (fluo of white pot)
-							getIntArray("Clear-background-fluo-min-l-array", new int[] { -1, 200 - 40, 50 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-l-array", new int[] { 115, 200 + 20, 50 + 4, 50 }),
-							getIntArray("Clear-background-fluo-min-a-array", new int[] { 80 - 5, 104 - 15, 169 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-a-array", new int[] { 140 + 5, 104 + 15, 169 + 4, 250 }),
-							getIntArray("Clear-background-fluo-min-b-array", new int[] { 116 - 5, 206 - 20, 160 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-b-array", new int[] { 175 + 5, 206 + 20, 160 + 4, 250 }),
+							getIntArray("Clear-background-fluo-min-l-array", new Integer[] { -1, 200 - 40, 50 - 4, 0 }),
+							getIntArray("Clear-background-fluo-max-l-array", new Integer[] { 115, 200 + 20, 50 + 4, 50 }),
+							getIntArray("Clear-background-fluo-min-a-array", new Integer[] { 80 - 5, 104 - 15, 169 - 4, 0 }),
+							getIntArray("Clear-background-fluo-max-a-array", new Integer[] { 140 + 5, 104 + 15, 169 + 4, 250 }),
+							getIntArray("Clear-background-fluo-min-b-array", new Integer[] { 116 - 5, 206 - 20, 160 - 4, 0 }),
+							getIntArray("Clear-background-fluo-max-b-array", new Integer[] { 175 + 5, 206 + 20, 160 + 4, 250 }),
 							options.getBackground(), Integer.MAX_VALUE, false,
-							new int[] {}, new int[] {},
-							new int[] {}, new int[] {},
-							new int[] {}, new int[] {},
+							new Integer[] {}, new Integer[] {},
+							new Integer[] {}, new Integer[] {},
+							new Integer[] {}, new Integer[] {},
 							blueCurbWidthBarley0_1,
 							blueCurbHeightEndBarly0_8).
 							print("removed noise", debug).getImage();

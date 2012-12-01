@@ -61,7 +61,8 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		String metadataFileExtension = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Table-File-Extension", ".csv");
 		String zoomSettingsFileName = SystemOptions.getInstance().getString("File_Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
 		boolean foundMetadata = false;
-		ArrayList<TableDataStringRow> metadata = null;
+		HashMap<String, ArrayList<TableDataStringRow>> metadata = new HashMap<String, ArrayList<TableDataStringRow>>();
+		HashMap<String, TableDataHeadingRow> metadataHeading = new HashMap<String, TableDataHeadingRow>();
 		
 		// initialize these setting, so that they show up in the settings GUI in good ordering
 		for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
@@ -81,10 +82,27 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		for (String snapshotDirName : inp.list()) {
 			if (snapshotDirName.endsWith(metadataFileExtension)) {
 				foundMetadata = true;
-				TableData td = TableData.getTableData(new File(inp + File.separator + snapshotDirName));
-				if (metadata == null)
-					metadata = new ArrayList<TableDataStringRow>();
-				metadata.addAll(td.getRowsAsStringValues());
+				String fn = inp + File.separator + snapshotDirName;
+				TableData td = TableData.getTableData(new File(fn));
+				if (metadata.get(fn) == null)
+					metadata.put(fn, new ArrayList<TableDataStringRow>());
+				ArrayList<TableDataStringRow> lines = td.getRowsAsStringValues();
+				if (lines.size() > 0) {
+					TableDataStringRow firstLine = lines.get(0);
+					boolean foundHeadingIndicator = false;
+					String headingIndicator = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Heading-Indicator", "Genotype");
+					for (String v : firstLine.getValues()) {
+						if (v != null && v.equalsIgnoreCase(headingIndicator)) {
+							foundHeadingIndicator = true;
+							break;
+						}
+					}
+					if (foundHeadingIndicator) {
+						lines.remove(0);
+						metadataHeading.put(fn, new TableDataHeadingRow(firstLine.getMap()));
+					}
+				}
+				metadata.get(fn).addAll(lines);
 			}
 			if (snapshotDirName.equals(zoomSettingsFileName)) {
 				try {
@@ -119,7 +137,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 						s.setWeight_before(web);
 					Double wea = info.getWeightAfterData();
 					if (wea != null)
-						s.setWeight_before(wea);
+						s.setWeight_after(wea);
 					s.setMeasurement_label(info.get("Measurement"));
 					s.setTime_stamp(new Timestamp(info.getTimestampTime()));
 					snapshots.add(s);
@@ -148,43 +166,16 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 									imageSnapshot.setXfactor(xf);
 								Double yf = infoForCameraSnapshot.getYfactor();
 								if (yf != null)
-									imageSnapshot.setXfactor(yf);
+									imageSnapshot.setYfactor(yf);
 								if (infoForCameraSnapshot.get("Camera label") == null) {
 									messages.add("INFO: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
 											+ "' contains no 'Camera label'! Using folder name!");
 									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
 								}
 								imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
-								boolean isTopView = false;
-								for (String topViewPostfix : SystemOptions.getInstance()
-										.getStringAll("File_Import", "Camera Labels Top-View//Post-fix", new String[] { " TV", "_Top" }))
-									if (imageSnapshot.getCamera_label().endsWith(topViewPostfix)) {
-										imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
-										imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), topViewPostfix, ""));
-										isTopView = true;
-									}
-								if (isTopView) {
-									imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".top");
-									imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label(), " tv.", "."));
-								} else {
-									for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
-										if (imageSnapshot.getCamera_label().endsWith(
-												SystemOptions.getInstance().getString("File_Import", "Camera Labels Side-View//Post-fix " + sideViewIndex,
-														" SV" + sideViewIndex))) {
-											imageSnapshot.setCamera_label(imageSnapshot.getCamera_label().toLowerCase() + ".side");
-											imageSnapshot.setCamera_label(StringManipulationTools.stringReplace(imageSnapshot.getCamera_label().toUpperCase(), " SV"
-													+ sideViewIndex + ".", ".").toLowerCase());
-											int def = 0;
-											if (sideViewIndex == 2)
-												def = 90;
-											int degree = SystemOptions.getInstance().getInteger("File_Import",
-													"Camera Labels Side-View//Post-fix " + sideViewIndex + " angle", def);
-											imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label() + "." + degree);
-										}
-									}
-								}
-								String ffn = snapshotDirName + File.separator +
-										cameraLabelSubDir + File.separator + "0_0.png";
+								imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
+								imageSnapshot.setCamera_label(LemnaTecDataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
+								String ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.png";
 								File ff = new File(ffn);
 								if (ff.exists()) {
 									overallStorageSizeInBytes += ff.length();
@@ -208,25 +199,28 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		if (!foundMetadata || metadata == null) {
 			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");
 			messages
-					.add("The meta-data files may contain up to 5 columns (or more, which would be ignored), which, if available, are processed in the following order:");
-			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Plant-ID", 1) + ": Plant ID");
-			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Species", 2) + ": Species Name");
-			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Genotype", 3) + ": Genotype");
-			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Treatment", 4) + ": Treatment");
-			messages.add("Column " + SystemOptions.getInstance().getInteger("File_Import", "File-Import-Columns//Sequence", 5) + ": Sequence");
-			messages.add("The CSV file should not contain column headers.");
+					.add("Check the 'File_Import'-Settings for the meta-data assignment of column-values!");
+			messages
+					.add("Modify the settings and repeat the loading, in case data is not assigned to the pre-defined fields as desired.");
 		} else {
 			// process metadata
 			optIdTag2condition = new HashMap<String, Condition>();
-			for (TableDataStringRow tdsr : metadata) {
-				String id = tdsr.getPlantID();
-				if (id != null) {
-					Condition c = new Condition(null);
-					c.setSpecies(tdsr.getSpecies());
-					c.setGenotype(tdsr.getGenotype());
-					c.setTreatment(tdsr.getTreatment());
-					c.setSequence(tdsr.getSequence());
-					optIdTag2condition.put(id, c);
+			for (String fn : metadata.keySet()) {
+				TableDataHeadingRow heading = metadataHeading.get(fn);
+				if (heading == null)
+					heading = new TableDataHeadingRow(null); // default heading info
+				for (TableDataStringRow tdsr : metadata.get(fn)) {
+					String id = heading.getPlantID(tdsr);
+					if (id != null) {
+						Condition c = new Condition(null);
+						c.setSpecies(heading.getSpecies(tdsr));
+						c.setGenotype(heading.getGenotype(tdsr));
+						c.setVariety(heading.getVariety(tdsr));
+						c.setSequence(heading.getSequence(tdsr));
+						c.setTreatment(heading.getTreatment(tdsr));
+						c.setGrowthconditions(heading.getGrowthconditions(tdsr));
+						optIdTag2condition.put(id, c);
+					}
 				}
 			}
 		}

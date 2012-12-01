@@ -72,21 +72,21 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 			
 			// very light yellow and green (background shadow, esp. in maize with 4 pot)
 			if (!austr && options.isHigherResVisCamera()) {
-				vis = vis.filterRemoveLAB(getIntArray("LAB-light-yellow-color", new int[] { 240, 255, 110, 120, 125, 135 }), options.getBackground(), true)
+				vis = vis.filterRemoveLAB(getIntArray("LAB-light-yellow-color", new Integer[] { 240, 255, 110, 120, 125, 135 }), options.getBackground(), true)
 						.print("LIGHT BACKGROUND", debug);
 				if (fis != null)
 					fis.addImage("removed light white/green background", vis.getImage());
 			}
 			// gray pot remainings
 			if (!austr && options.isBarleyInBarleySystem()) {
-				vis = vis.filterRemoveLAB(getIntArray("LAB-gray-pot-color", new int[] { 180, 220, 118, 120, 126, 128 }), options.getBackground(), true)
+				vis = vis.filterRemoveLAB(getIntArray("LAB-gray-pot-color", new Integer[] { 180, 220, 118, 120, 126, 128 }), options.getBackground(), true)
 						.print("LIGHT WHITE POT", debug);
 				if (fis != null)
 					fis.addImage("removed light white pot", vis.getImage());
 			}
 			// black pot
 			if (!austr && options.isHigherResVisCamera()) {
-				vis = vis.filterRemoveLAB(getIntArray("LAB-black-pot-color", new int[] { 0, 150, 122, 150, 100, 133 }), options.getBackground(), true)
+				vis = vis.filterRemoveLAB(getIntArray("LAB-black-pot-color", new Integer[] { 0, 150, 122, 150, 100, 133 }), options.getBackground(), true)
 						.print("BLACK POT", debug);
 				if (fis != null)
 					fis.addImage("removed black pot", vis.getImage());
@@ -104,7 +104,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 						LAB_MAX_B_VALUE_VIS,
 						options.getBackground(), false);
 			else
-				vis = vis.filterRemoveLAB(getIntArray("LAB-main-filter", new int[] { 179, 255, 122, 150, 109, 127 }), options.getBackground(), true);
+				vis = vis.filterRemoveLAB(getIntArray("LAB-main-filter", new Integer[] { 179, 255, 122, 150, 109, 127 }), options.getBackground(), true);
 			if (fis != null)
 				fis.addImage("main lab filter", vis.getImage());
 			

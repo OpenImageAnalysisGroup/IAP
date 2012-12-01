@@ -2089,7 +2089,7 @@ public class ImageOperation {
 			return null;
 	}
 	
-	public ImageOperation filterRemoveLAB(int[] values, int background, boolean getRemovedPixel) {
+	public ImageOperation filterRemoveLAB(Integer[] values, int background, boolean getRemovedPixel) {
 		return filterRemoveLAB(values[0], values[1], values[2], values[3], values[4], values[5], background, getRemovedPixel);
 	}
 	
@@ -2146,14 +2146,14 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation hq_thresholdLAB_multi_color_or_and_not(
-			int[] lowerValueOfL, int[] upperValueOfL,
-			int[] lowerValueOfA, int[] upperValueOfA,
-			int[] lowerValueOfB, int[] upperValueOfB,
+			Integer[] lowerValueOfL, Integer[] upperValueOfL,
+			Integer[] lowerValueOfA, Integer[] upperValueOfA,
+			Integer[] lowerValueOfB, Integer[] upperValueOfB,
 			int background, int potRemovalColorStartIndex,
 			boolean getRemovedPixel,
-			int[] plant_lowerValueOfL, int[] plant_upperValueOfL,
-			int[] plant_lowerValueOfA, int[] plant_upperValueOfA,
-			int[] plant_lowerValueOfB, int[] plant_upperValueOfB,
+			Integer[] plant_lowerValueOfL, Integer[] plant_upperValueOfL,
+			Integer[] plant_lowerValueOfA, Integer[] plant_upperValueOfA,
+			Integer[] plant_lowerValueOfB, Integer[] plant_upperValueOfB,
 			double blueCurbWidthBarley0_1,
 			double blueCurbHeightEndBarly0_8) {
 		int c, x, y = 0;
@@ -2202,8 +2202,8 @@ public class ImageOperation {
 	}
 	
 	private boolean hq_anyMatch(int Li, int ai, int bi,
-			int[] lowerValueOfAa, int[] lowerValueOfBa, int[] lowerValueOfLa,
-			int[] upperValueOfAa, int[] upperValueOfBa, int[] upperValueOfLa,
+			Integer[] lowerValueOfAa, Integer[] lowerValueOfBa, Integer[] lowerValueOfLa,
+			Integer[] upperValueOfAa, Integer[] upperValueOfBa, Integer[] upperValueOfLa,
 			int potRemovalColorStartIndex, int x, int y, int w, int h,
 			double blueCurbWidthBarley0_1,
 			double blueCurbHeightEndBarly0_8) {

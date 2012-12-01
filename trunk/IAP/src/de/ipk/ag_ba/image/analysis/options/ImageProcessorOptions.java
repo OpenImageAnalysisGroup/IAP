@@ -332,7 +332,7 @@ public class ImageProcessorOptions {
 					defaultValue);
 	}
 	
-	public int[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, int[] defaultValue) {
+	public Integer[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, Integer[] defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else

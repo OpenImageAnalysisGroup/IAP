@@ -51,7 +51,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return options.getStringSetting(this, setting, defaultValue);
 	}
 	
-	protected int[] getIntArray(String setting, int[] defaultValue) {
+	protected Integer[] getIntArray(String setting, Integer[] defaultValue) {
 		return options.getIntArraySetting(this, setting, defaultValue);
 	}
 	

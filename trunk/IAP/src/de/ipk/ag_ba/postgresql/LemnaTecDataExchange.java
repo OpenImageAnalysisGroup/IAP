@@ -686,32 +686,44 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	
 	public static String getIAPcameraNameFromConfigLabel(String conf) {
 		String res = "";
-		for (String id : SystemOptions.getInstance().getStringAll("Import", "NIR-Camera-Config-Substrings", new String[] { "NIR" }))
+		for (String id : SystemOptions.getInstance().getStringAll(
+				"Import", "NIR-Camera-Config-Substrings", new String[] { "NIR" }))
 			if (conf.toUpperCase().contains(id.toUpperCase())) {
 				res += "nir.";
 				break;
 			}
 		if (res.isEmpty())
-			for (String id : SystemOptions.getInstance().getStringAll("Import", "VIS-Camera-Config-Substrings", new String[] { "VIS", "RGB" }))
+			for (String id : SystemOptions.getInstance().getStringAll(
+					"Import", "VIS-Camera-Config-Substrings", new String[] { "VIS", "RGB" }))
 				if (conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "vis.";
 					break;
 				}
 		if (res.isEmpty())
-			for (String id : SystemOptions.getInstance().getStringAll("Import", "FLUO-Camera-Config-Substrings", new String[] { "FLU" }))
+			for (String id : SystemOptions.getInstance().getStringAll(
+					"Import", "FLUO-Camera-Config-Substrings", new String[] { "FLU" }))
 				if (conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "fluo.";
 					break;
 				}
+		if (res.isEmpty())
+			for (String id : SystemOptions.getInstance().getStringAll(
+					"Import", "IR-Camera-Config-Substrings", new String[] { "IR_" }))
+				if (conf.toUpperCase().contains(id.toUpperCase())) {
+					res += "ir.";
+					break;
+				}
 		boolean topFound = false;
-		for (String id : SystemOptions.getInstance().getStringAll("Import", "Top-View-Camera-Config-Substrings", new String[] { "TOP", " TV" }))
+		for (String id : SystemOptions.getInstance().getStringAll(
+				"Import", "Top-View-Camera-Config-Substrings", new String[] { "TOP", " TV", "_TV_" }))
 			if (conf.toUpperCase().contains(id)) {
 				res += "top";
 				topFound = true;
 				break;
 			}
 		if (!topFound)
-			for (String id : SystemOptions.getInstance().getStringAll("Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
+			for (String id : SystemOptions.getInstance().getStringAll(
+					"Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
 				if (conf.toUpperCase().contains(id)) {
 					res += "side";
 					break;
