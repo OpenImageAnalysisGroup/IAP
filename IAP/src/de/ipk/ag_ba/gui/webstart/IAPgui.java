@@ -135,8 +135,8 @@ public class IAPgui {
 	
 	public static String getIntroTxt() {
 		String vs = StringManipulationTools.getStringList(IAP_RELEASE.values(), ", ");
-		return "<html><h2>Welcome to IAP - the Integrated Analysis Platform!</h2>"
-				+ "The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
+		return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform!</font></h2>"
+				+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
 				+ "developed by the IPK research group Image Analysis.<br>"
 				+ "<br>"
 				+ "This information system is in beta-stage. "
@@ -148,7 +148,7 @@ public class IAPgui {
 				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",
-						"<li>", "", "<br><br>");
+						"<li>", "", "<br><br>")+"</font>";
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {
