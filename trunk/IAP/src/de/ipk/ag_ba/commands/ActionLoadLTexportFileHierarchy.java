@@ -35,7 +35,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 	
 	private NavigationButton src;
 	private TreeMap<String, ExperimentReference> loaded_experiments = null;
-	private ArrayList<String> messages = new ArrayList<String>();
+	private final ArrayList<String> messages = new ArrayList<String>();
 	private boolean getInput;
 	
 	@Override
@@ -66,7 +66,22 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		
 		String preferedZoomSetting = null;
 		
-		for (String snapshotDirName : inp.list()) {
+		String[] list = inp.list();
+		int todo = list.length;
+		int idx = 0;
+		boolean storageCheck = SystemOptions.getInstance().getBoolean("File Import", "Determine Storage Size", false);
+		for (String snapshotDirName : list) {
+			idx++;
+			getStatusProvider().setCurrentStatusValueFine(100d * idx / todo);
+			getStatusProvider().setCurrentStatusText1("Processing folder " + idx + "/" + todo);
+			String post = "";
+			if (storageCheck) {
+				if (overallStorageSizeInBytes / 1024 / 1024 < 1000 * 1000)
+					post = ", " + overallStorageSizeInBytes / 1024 / 1024 + " MB";
+				else
+					post = ", " + overallStorageSizeInBytes / 1024 / 1024 / 1024 + " GB";
+			}
+			getStatusProvider().setCurrentStatusText2("Found " + snapshots.size() + " snapshots" + post);
 			if (snapshotDirName.endsWith(metadataFileExtension)) {
 				foundMetadata = true;
 				String fn = inp + File.separator + snapshotDirName;
@@ -102,86 +117,94 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			File f = new File(inp.getPath() + File.separator + snapshotDirName);
 			snapshotDirName = f.getAbsolutePath();
 			File infoFile = new File(snapshotDirName + File.separator + "info.txt");
-			if (!infoFile.exists()) {
+			if (storageCheck && !infoFile.exists()) {
 				if (infoFile.isDirectory())
 					messages.add("ERROR: Skipping folder " + snapshotDirName + ", it contains no info.txt file!");
 				continue; // this sub folder contains no snapshot info
 			} else
-				if (storageTimeOfFirstInfoFile == null || infoFile.lastModified() < storageTimeOfFirstInfoFile.getTime())
-					storageTimeOfFirstInfoFile = new Timestamp(infoFile.lastModified());
-			try {
-				InfoFile info = new InfoFile(new TextFile(infoFile));
-				if (info.containsKey("IdTag")) {
-					// this info file specifies the plant ID, timestamp, weight and watering info
-					Snapshot s = new Snapshot();
-					s.setId_tag(info.get("IdTag"));
-					s.setCreator(info.get("Creator"));
-					Integer wa = info.getWaterAmountData();
-					if (wa != null)
-						s.setWater_amount(wa);
-					Double web = info.getWeightBeforeData();
-					if (web != null)
-						s.setWeight_before(web);
-					Double wea = info.getWeightAfterData();
-					if (wea != null)
-						s.setWeight_after(wea);
-					s.setMeasurement_label(info.get("Measurement"));
-					s.setTime_stamp(new Timestamp(info.getTimestampTime()));
-					snapshots.add(s);
-					// the sub directories contain the image data
-					for (String cameraLabelSubDir : new File(snapshotDirName).list()) {
-						try {
-							File cameraSubDir = new File(snapshotDirName + File.separator + cameraLabelSubDir);
-							if (!cameraSubDir.isDirectory()) {
-								if (!cameraLabelSubDir.equals("info.txt") && !cameraLabelSubDir.equals(".DS_Store"))
-									messages.add("ERROR: Folder " + snapshotDirName + " contains an unknown file '" + cameraLabelSubDir
-											+ "' which is not processed!");
-							} else {
-								// process camera label sub-dir
-								File imageSnapshotInfoFile = new File(snapshotDirName + File.separator +
-										cameraLabelSubDir + File.separator + "info.txt");
-								if (!imageSnapshotInfoFile.exists())
-									continue;
-								InfoFile infoForCameraSnapshot = new InfoFile(new TextFile(imageSnapshotInfoFile));
-								Snapshot imageSnapshot = new Snapshot();
-								imageSnapshot.setId_tag(s.getId_tag());
-								imageSnapshot.setCreator(s.getCreator());
-								imageSnapshot.setTime_stamp(s.getTimestamp());
-								imageSnapshot.setMeasurement_label(s.getMeasurement_label());
-								Double xf = infoForCameraSnapshot.getXfactor();
-								if (xf != null)
-									imageSnapshot.setXfactor(xf);
-								Double yf = infoForCameraSnapshot.getYfactor();
-								if (yf != null)
-									imageSnapshot.setYfactor(yf);
-								if (infoForCameraSnapshot.get("Camera label") == null) {
-									messages.add("WARNING: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
-											+ "' contains no 'Camera label'! Using folder name!");
-									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
+				try {
+					if (storageTimeOfFirstInfoFile == null || infoFile.lastModified() < storageTimeOfFirstInfoFile.getTime())
+						storageTimeOfFirstInfoFile = new Timestamp(infoFile.lastModified());
+					InfoFile info = new InfoFile(new TextFile(infoFile));
+					if (info.containsKey("IdTag")) {
+						// this info file specifies the plant ID, timestamp, weight and watering info
+						Snapshot s = new Snapshot();
+						s.setId_tag(info.get("IdTag"));
+						s.setCreator(info.get("Creator"));
+						Integer wa = info.getWaterAmountData();
+						if (wa != null)
+							s.setWater_amount(wa);
+						Double web = info.getWeightBeforeData();
+						if (web != null)
+							s.setWeight_before(web);
+						Double wea = info.getWeightAfterData();
+						if (wea != null)
+							s.setWeight_after(wea);
+						s.setMeasurement_label(info.get("Measurement"));
+						s.setTime_stamp(new Timestamp(info.getTimestampTime()));
+						snapshots.add(s);
+						// the sub directories contain the image data
+						for (String cameraLabelSubDir : new File(snapshotDirName).list()) {
+							try {
+								File cameraSubDir = new File(snapshotDirName + File.separator + cameraLabelSubDir);
+								if (!cameraSubDir.isDirectory()) {
+									if (!cameraLabelSubDir.equals("info.txt") && !cameraLabelSubDir.equals(".DS_Store"))
+										messages.add("ERROR: Folder " + snapshotDirName + " contains an unknown file '" + cameraLabelSubDir
+												+ "' which is not processed!");
+								} else {
+									// process camera label sub-dir
+									File imageSnapshotInfoFile = new File(snapshotDirName + File.separator +
+											cameraLabelSubDir + File.separator + "info.txt");
+									if (!imageSnapshotInfoFile.exists())
+										continue;
+									InfoFile infoForCameraSnapshot = new InfoFile(new TextFile(imageSnapshotInfoFile));
+									Snapshot imageSnapshot = new Snapshot();
+									imageSnapshot.setId_tag(s.getId_tag());
+									imageSnapshot.setCreator(s.getCreator());
+									imageSnapshot.setTime_stamp(s.getTimestamp());
+									imageSnapshot.setMeasurement_label(s.getMeasurement_label());
+									Double xf = infoForCameraSnapshot.getXfactor();
+									if (xf != null)
+										imageSnapshot.setXfactor(xf);
+									Double yf = infoForCameraSnapshot.getYfactor();
+									if (yf != null)
+										imageSnapshot.setYfactor(yf);
+									if (infoForCameraSnapshot.get("Camera label") == null) {
+										messages.add("WARNING: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
+												+ "' contains no 'Camera label'! Using folder name!");
+										infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
+									}
+									imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
+									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
+									imageSnapshot.setCamera_label(LemnaTecDataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
+									String ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.png";
+									if (storageCheck) {
+										File ff = new File(ffn);
+										if (ff.exists()) {
+											overallStorageSizeInBytes += ff.length();
+											imageSnapshot.setPath_image(ffn);
+											snapshots.add(imageSnapshot);
+										}
+									} else {
+										imageSnapshot.setPath_image(ffn);
+										snapshots.add(imageSnapshot);
+									}
 								}
-								imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
-								imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
-								imageSnapshot.setCamera_label(LemnaTecDataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
-								String ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.png";
-								File ff = new File(ffn);
-								if (ff.exists()) {
-									overallStorageSizeInBytes += ff.length();
-									imageSnapshot.setPath_image(ffn);
-									snapshots.add(imageSnapshot);
-								}
+							} catch (Exception e) {
+								e.printStackTrace();
+								messages.add("ERROR: Could not process directory '" + cameraLabelSubDir + "': " + e.getMessage());
 							}
-						} catch (Exception e) {
-							e.printStackTrace();
-							messages.add("ERROR: Could not process directory '" + cameraLabelSubDir + "': " + e.getMessage());
 						}
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					messages.add("ERROR: Could not process file '" + f.getPath() + "' or sub-directory info: " + e.getMessage());
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				messages.add("ERROR: Could not process file '" + f.getPath() + "' or sub-directory info: " + e.getMessage());
-			}
 		}
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
+		getStatusProvider().setCurrentStatusValueFine(0d);
+		getStatusProvider().setCurrentStatusText1("Found " + snapshots.size() + " snapshots");
+		getStatusProvider().setCurrentStatusText2("");
 		HashMap<String, Condition> optIdTag2condition = null;
 		if (!foundMetadata || metadata == null) {
 			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");
@@ -220,6 +243,11 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 					measurementLabel2snapshots.put(ml, new ArrayList<Snapshot>());
 				measurementLabel2snapshots.get(ml).add(s);
 			}
+		getStatusProvider().setCurrentStatusValueFine(0d);
+		getStatusProvider().setCurrentStatusText1("Found " + snapshots.size() + " snapshots");
+		getStatusProvider().setCurrentStatusText2("Create Experiment Structures...");
+		todo = measurementLabel2snapshots.size();
+		idx = 0;
 		for (String ml : measurementLabel2snapshots.keySet()) {
 			ArrayList<Snapshot> sl = measurementLabel2snapshots.get(ml);
 			try {
@@ -231,16 +259,24 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (storageTimeOfFirstInfoFile != null)
 					eh.setStorageTime(storageTimeOfFirstInfoFile);
 				eh.setImportusername(SystemAnalysis.getUserName());
-				eh.setSizekb(overallStorageSizeInBytes / 1024);
+				if (storageCheck)
+					eh.setSizekb(overallStorageSizeInBytes / 1024);
 				eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
 				eh.setGlobalOutlierInfo(preferedZoomSetting);
 				e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
+				getStatusProvider().setCurrentStatusText1("Created " + eh.getExperimentName() + ".");
+				getStatusProvider().setCurrentStatusText2("Create Experiment Structures...");
 				loaded_experiments.put(e.getName(), new ExperimentReference(e));
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				messages.add("ERROR: Could not convert scnapshot info to Experiment structure: " + e1.getMessage() + " (Experiment " + ml + ")");
 			}
+			idx++;
+			getStatusProvider().setCurrentStatusValueFine(100d * idx / todo);
 		}
+		getStatusProvider().setCurrentStatusValue(100);
+		getStatusProvider().setCurrentStatusText1("Processing finished");
+		getStatusProvider().setCurrentStatusText2("");
 	}
 	
 	@Override
