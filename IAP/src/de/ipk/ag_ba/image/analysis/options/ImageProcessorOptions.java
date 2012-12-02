@@ -25,8 +25,6 @@ public class ImageProcessorOptions {
 	private final HashMap<Setting, LinkedList<Double>> numericSettings = new HashMap<ImageProcessorOptions.Setting, LinkedList<Double>>();
 	
 	public enum Setting {
-		SCALE_FACTOR_DECREASE_MASK, SCALE_FACTOR_DECREASE_IMG_AND_MASK,
-
 		L_Diff_VIS_TOP, abDiff_VIS_TOP, L_Diff_FLUO, abDiff_FLUO, B_Diff_NIR, W_Diff_NIR, B_Diff_NIR_TOP, W_Diff_NIR_TOP,
 
 		L_Diff_VIS_SIDE, abDiff_VIS_SIDE,

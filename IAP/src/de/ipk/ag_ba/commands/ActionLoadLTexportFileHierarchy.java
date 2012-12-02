@@ -58,24 +58,11 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
 		long overallStorageSizeInBytes = 0;
 		Timestamp storageTimeOfFirstInfoFile = null;
-		String metadataFileExtension = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Table-File-Extension", ".csv");
-		String zoomSettingsFileName = SystemOptions.getInstance().getString("File_Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
+		String metadataFileExtension = SystemOptions.getInstance().getString("File Import", "Meta-Data-Table-File-Extension", ".csv");
+		String zoomSettingsFileName = SystemOptions.getInstance().getString("File Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
 		boolean foundMetadata = false;
 		HashMap<String, ArrayList<TableDataStringRow>> metadata = new HashMap<String, ArrayList<TableDataStringRow>>();
 		HashMap<String, TableDataHeadingRow> metadataHeading = new HashMap<String, TableDataHeadingRow>();
-		
-		// initialize these setting, so that they show up in the settings GUI in good ordering
-		for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
-			SystemOptions.getInstance().getString("File_Import", "Camera Labels Side-View//Post-fix " + sideViewIndex,
-					" SV" + sideViewIndex);
-		}
-		for (int sideViewIndex = 1; sideViewIndex <= 12; sideViewIndex++) {
-			int def = 0;
-			if (sideViewIndex == 2)
-				def = 90;
-			SystemOptions.getInstance().getInteger("File_Import",
-					"Camera Labels Side-View//Post-fix " + sideViewIndex + " angle", def);
-		}
 		
 		String preferedZoomSetting = null;
 		
@@ -90,7 +77,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (lines.size() > 0) {
 					TableDataStringRow firstLine = lines.get(0);
 					boolean foundHeadingIndicator = false;
-					String headingIndicator = SystemOptions.getInstance().getString("File_Import", "Meta-Data-Heading-Indicator", "Genotype");
+					String headingIndicator = SystemOptions.getInstance().getString("File Import", "Meta-Data-Heading-Indicator", "Genotype");
 					for (String v : firstLine.getValues()) {
 						if (v != null && v.equalsIgnoreCase(headingIndicator)) {
 							foundHeadingIndicator = true;
@@ -168,7 +155,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 								if (yf != null)
 									imageSnapshot.setYfactor(yf);
 								if (infoForCameraSnapshot.get("Camera label") == null) {
-									messages.add("INFO: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
+									messages.add("WARNING: Snapshot info file " + imageSnapshotInfoFile.getAbsolutePath()
 											+ "' contains no 'Camera label'! Using folder name!");
 									infoForCameraSnapshot.put("Camera label", cameraLabelSubDir);
 								}
@@ -199,7 +186,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		if (!foundMetadata || metadata == null) {
 			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");
 			messages
-					.add("Check the 'File_Import'-Settings for the meta-data assignment of column-values!");
+					.add("Check the 'File Import'-Settings for the meta-data assignment of column-values!");
 			messages
 					.add("Modify the settings and repeat the loading, in case data is not assigned to the pre-defined fields as desired.");
 		} else {

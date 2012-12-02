@@ -213,22 +213,19 @@ public class SystemOptions {
 	}
 	
 	public synchronized Integer[] getIntArray(String group, String setting, Integer[] defaultValue) {
-		if (ini == null) {
-			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
-			return defaultValue;
-		} else {
-			Integer[] r = ini.get(group, setting, Integer[].class);
-			if (r == null) {
-				ini.put(group, setting, defaultValue);
-				store(group, setting);
-				return defaultValue;
-			} else {
-				if (r == null || r.equals("null"))
-					return null;
-				else
-					return r;
+		String defS = StringManipulationTools.getStringList(defaultValue, "/");
+		String s = getString(group, setting, defS);
+		String[] os = s.split("/");
+		Integer[] res = new Integer[os.length];
+		try {
+			for (int i = 0; i < os.length; i++) {
+				res[i] = Integer.parseInt(os[i]);
 			}
+		} catch (Exception e) {
+			setString(group, setting, defS);
+			return defaultValue;
 		}
+		return res;
 	}
 	
 	protected synchronized void store(String srcSection, String srcSetting) {
@@ -271,6 +268,8 @@ public class SystemOptions {
 				int idx = 0;
 				for (String v : defaultValue)
 					section.add(setting, v, idx++);
+				if (defaultValue.length == 1)
+					section.add(setting, "", idx++);
 				ini.put(group, section);
 				store(group, setting);
 				return defaultValue;
@@ -348,6 +347,13 @@ public class SystemOptions {
 		sec.remove(setting);
 		for (String nv : newValues)
 			sec.add(setting, nv);
+		if (newValues.size() == 0) {
+			sec.add(setting, "");
+			sec.add(setting, "");
+		}
+		if (newValues.size() == 1) {
+			sec.add(setting, "");
+		}
 	}
 	
 	public synchronized void addChangeListener(String section, String setting, Runnable runnable) {
