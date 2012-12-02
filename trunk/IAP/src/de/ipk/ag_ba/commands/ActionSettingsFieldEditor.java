@@ -149,7 +149,6 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 											if (o != null && o instanceof String) {
 												String es = (String) o;
 												for (String nn : es.split("//")) {
-													nn = nn.trim();
 													newValues.add(nn);
 												}
 											}

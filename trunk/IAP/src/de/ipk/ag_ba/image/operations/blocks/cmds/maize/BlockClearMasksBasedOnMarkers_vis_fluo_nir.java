@@ -116,7 +116,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 		boolean fluoCutPosSet = false;
 		if (!options.isBarleyInBarleySystem())
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				double scaleFactor = options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_MASK);
+				double scaleFactor = 1d;
 				
 				if (hasThreeVerticalMarkerPositionsVisible) {
 					if (markerPosLeftY != null) {
@@ -179,8 +179,7 @@ public class BlockClearMasksBasedOnMarkers_vis_fluo_nir extends AbstractSnapshot
 			else
 				result = cutNir(input);
 			return result;
-		}
-		else
+		} else
 			return input().images().nir();
 	}
 	

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -805,12 +806,6 @@ public class Condition implements ConditionInterface {
 		return samples.iterator();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
-	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
-	 */
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		Object[] values = getAttributeValues();
@@ -897,5 +892,11 @@ public class Condition implements ConditionInterface {
 	@Override
 	public void setExperimentHeader(ExperimentHeaderInterface header) {
 		this.header = header;
+	}
+	
+	public Map<String, Object> getAttributeMap() {
+		Map<String, Object> attributeValueMap = new HashMap<String, Object>();
+		fillAttributeMap(attributeValueMap);
+		return attributeValueMap;
 	}
 }

@@ -683,7 +683,7 @@ public class StringManipulationTools implements HelperClass {
 					if (v == null)
 						continue;
 					sb.append(v);
-					if (i < elements.size() - 1)
+					if (i < cols.length - 1)
 						sb.append(div);
 					i++;
 				}

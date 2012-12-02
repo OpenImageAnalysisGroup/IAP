@@ -10,31 +10,28 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDat
 
 public class TableDataHeadingRow {
 	
-	private final HashMap<Integer, String> col2heading;
-	
 	private Integer[] plantIDcol, speciesCol, genotypeCol,
 			treatmentCol, sequenceCol, varietyCol, growthconditionsCol;
 	
 	private String separator;
 	
 	public TableDataHeadingRow(HashMap<Integer, String> col2heading) {
-		this.col2heading = col2heading;
-		separator = SystemOptions.getInstance().getString("File_Import",
+		separator = SystemOptions.getInstance().getString("File Import",
 				"Multiple-Value-Meta-Data-Connector", " // ");
 		if (col2heading == null) {
-			plantIDcol = SystemOptions.getInstance().getIntArray("File_Import",
+			plantIDcol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Plant-ID", new Integer[] { 1 });
-			speciesCol = SystemOptions.getInstance().getIntArray("File_Import",
+			speciesCol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Species", new Integer[] { 2 });
-			genotypeCol = SystemOptions.getInstance().getIntArray("File_Import",
+			genotypeCol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Genotype", new Integer[] { 3 });
-			treatmentCol = SystemOptions.getInstance().getIntArray("File_Import",
+			treatmentCol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Treatment", new Integer[] { 4 });
-			sequenceCol = SystemOptions.getInstance().getIntArray("File_Import",
+			sequenceCol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Sequence", new Integer[] { 5 });
-			varietyCol = SystemOptions.getInstance().getIntArray("File_Import",
-					"No Heading Row//Columns_Variety", new Integer[] { 6 });
-			growthconditionsCol = SystemOptions.getInstance().getIntArray("File_Import",
+			varietyCol = SystemOptions.getInstance().getIntArray("File Import",
+					"No Heading Row//Columns_Variety", new Integer[] { -1 });
+			growthconditionsCol = SystemOptions.getInstance().getIntArray("File Import",
 					"No Heading Row//Columns_Growthconditions", new Integer[] { 7 });
 		} else {
 			ArrayList<Integer> plantIDcolARR = new ArrayList<Integer>();
@@ -64,7 +61,7 @@ public class TableDataHeadingRow {
 			for (Integer col : col2heading.keySet()) {
 				String heading = col2heading.get(col);
 				String sel = SystemOptions.getInstance().getStringRadioSelection(
-						"File_Import",
+						"File Import",
 						"Named Columns//" + heading,
 						possibleValues, getDefaultSelection(col, heading, possibleValues), true);
 				if (sel != null && sel.equals("Plant ID")) {

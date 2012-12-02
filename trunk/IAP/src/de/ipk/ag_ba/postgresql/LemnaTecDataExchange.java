@@ -672,9 +672,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				snapshot.setPath_image(s1);
 				String s2 = id2path.get(rs.getLong("null_image_oid"));
 				snapshot.setPath_null_image(s2);
-				String s3 = getCompAngleFromConfigLabel(rs.getString("camera_label"));
-				// System.out.println(rs.getString("camera_label") + " ==> " + s3);
-				snapshot.setPath_image_config_blob(s3);
 				
 				result.add(snapshot);
 			}
@@ -688,35 +685,35 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		String res = "";
 		for (String id : SystemOptions.getInstance().getStringAll(
 				"Import", "NIR-Camera-Config-Substrings", new String[] { "NIR" }))
-			if (conf.toUpperCase().contains(id.toUpperCase())) {
+			if (!id.isEmpty() && conf.toUpperCase().contains(id.toUpperCase())) {
 				res += "nir.";
 				break;
 			}
 		if (res.isEmpty())
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "VIS-Camera-Config-Substrings", new String[] { "VIS", "RGB" }))
-				if (conf.toUpperCase().contains(id.toUpperCase())) {
+				if (!id.isEmpty() && conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "vis.";
 					break;
 				}
 		if (res.isEmpty())
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "FLUO-Camera-Config-Substrings", new String[] { "FLU" }))
-				if (conf.toUpperCase().contains(id.toUpperCase())) {
+				if (!id.isEmpty() && conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "fluo.";
 					break;
 				}
 		if (res.isEmpty())
 			for (String id : SystemOptions.getInstance().getStringAll(
-					"Import", "IR-Camera-Config-Substrings", new String[] { "IR_" }))
-				if (conf.toUpperCase().contains(id.toUpperCase())) {
+					"Import", "IR-Camera-Config-Substrings", new String[] { "IR ", "IR_" }))
+				if (!id.isEmpty() && conf.toUpperCase().contains(id.toUpperCase())) {
 					res += "ir.";
 					break;
 				}
 		boolean topFound = false;
 		for (String id : SystemOptions.getInstance().getStringAll(
 				"Import", "Top-View-Camera-Config-Substrings", new String[] { "TOP", " TV", "_TV_" }))
-			if (conf.toUpperCase().contains(id)) {
+			if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
 				res += "top";
 				topFound = true;
 				break;
@@ -724,19 +721,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		if (!topFound)
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
-				if (conf.toUpperCase().contains(id)) {
+				if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
 					res += "side";
 					break;
 				}
-		return res;
-	}
-	
-	private static HashMap<String, String> config2numbers = new HashMap<String, String>();
-	
-	private synchronized String getCompAngleFromConfigLabel(String conf) {
-		if (!config2numbers.containsKey(conf))
-			config2numbers.put(conf, StringManipulationTools.getNumbersFromString(conf));
-		String res = config2numbers.get(conf);
 		return res;
 	}
 	
@@ -795,13 +783,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			Condition> optIdTag2condition) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
-		String species = "";
-		String genotype = "";
-		String variety = "";
-		String growthconditions = "";
-		String treatment = "";
-		String sequence = "";
-		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Read database");
 		if (optStatus != null)
@@ -836,7 +817,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		if (experimentReq.getImportdate() == null && earliest != null)
 			experimentReq.setImportdate(new Date(latest.getTime()));
 		
-		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ? getPlantIdAnnotation(experimentReq)
+		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ?
+				getPlantIdAnnotation(experimentReq)
 				: null;
 		
 		if (idtag2condition == null)
@@ -904,10 +886,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			}
 			
 			HashSet<String> printedInvalidIdTags = new HashSet<String>();
-			Condition conditionTemplate = idtag2condition.get(sn.getId_tag());
+			Condition conditionTemplate = idtag2condition.get(idTag);
 			if (conditionTemplate == null) {
 				if (!printedInvalidIdTags.contains(sn.getId_tag())) {
-					System.out.println("No meta-data for ID " + sn.getId_tag());
+					System.out.println("No meta-data for ID " + idTag);
 					printedInvalidIdTags.add(sn.getId_tag());
 					
 				}
@@ -937,23 +919,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				idtag2condition.put(sn.getId_tag(), ct);
 				conditionTemplate = idtag2condition.get(sn.getId_tag());
 			}
-			sequence = conditionTemplate.getSequence();
-			species = conditionTemplate.getSpecies();
-			genotype = conditionTemplate.getGenotype();
-			variety = conditionTemplate.getVariety();
-			growthconditions = conditionTemplate.getGrowthconditions();
-			treatment = conditionTemplate.getTreatment();
-			
-			{
-				String lbl = sn.getCamera_label();
-				if (lbl != null && lbl.startsWith("imagingunits."))
-					lbl = lbl.substring("imagingunits.".length());
-				if (lbl != null && lbl.contains("#"))
-					lbl = lbl.substring(0, lbl.indexOf("#"));
-				// if (lbl != null && lbl.equals("top"))
-				// lbl = "ir.top";
-				sn.setCamera_label(lbl);
-			}
 			
 			int day = DateUtil.getElapsedDays(earliest, new Date(sn.getTimestamp().getTime())) + 1;
 			
@@ -966,14 +931,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				Substance s = new Substance();
 				s.setName("weight_before");
 				
-				Condition condition = new Condition(s);
+				Condition condition = new Condition(s, conditionTemplate.getAttributeMap());
 				condition.setExperimentInfo(experimentReq);
-				condition.setSpecies(species);
-				condition.setGenotype(genotype);
-				condition.setVariety(variety);
-				condition.setGrowthconditions(growthconditions);
-				condition.setTreatment(treatment);
-				condition.setSequence(sequence);
 				
 				Sample sample = new Sample(condition);
 				sample.setTime(day);
@@ -1010,14 +969,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							s.setName("water_weight");
 							s.setFormula("H2O");
 							
-							Condition condition = new Condition(s);
+							Condition condition = new Condition(s, conditionTemplate.getAttributeMap());
 							condition.setExperimentInfo(experimentReq);
-							condition.setSpecies(species);
-							condition.setGenotype(genotype);
-							condition.setVariety(variety);
-							condition.setGrowthconditions(growthconditions);
-							condition.setTreatment(treatment);
-							condition.setSequence(sequence);
 							
 							Sample sample = new Sample(condition);
 							sample.setTime(day);
@@ -1037,14 +990,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							s.setName("water_sum");
 							s.setFormula("H2O");
 							
-							Condition condition = new Condition(s);
+							Condition condition = new Condition(s, conditionTemplate.getAttributeMap());
 							condition.setExperimentInfo(experimentReq);
-							condition.setSpecies(species);
-							condition.setGenotype(genotype);
-							condition.setVariety(variety);
-							condition.setGrowthconditions(growthconditions);
-							condition.setTreatment(treatment);
-							condition.setSequence(sequence);
 							
 							Sample sample = new Sample(condition);
 							sample.setTime(day);
@@ -1071,14 +1018,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					Substance s = new Substance();
 					s.setName(sn.getCamera_label());
 					
-					Condition condition = new Condition(s);
+					Condition condition = new Condition(s, conditionTemplate.getAttributeMap());
 					condition.setExperimentInfo(experimentReq);
-					condition.setSpecies(species);
-					condition.setGenotype(genotype);
-					condition.setVariety(variety);
-					condition.setGrowthconditions(growthconditions);
-					condition.setTreatment(treatment);
-					condition.setSequence(sequence);
 					
 					Sample sample = new Sample(condition);
 					sample.setTime(day);
@@ -1092,40 +1033,36 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					image.setUnit("");
 					image.setQualityAnnotation(idTag);
 					
-					String fn = sn.getPath_image();
-					if (fn != null && fn.contains("/"))
-						fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-					
 					Double position = null;
-					
-					fn = sn.getPath_image_config_blob();
+					String pre = "Side";
+					if (sn.getCamera_label() != null && sn.getCamera_label().contains(".top"))
+						pre = "Top";
+					String a = sn.getUserDefinedCameraLabel();
 					try {
-						String a = sn.getUserDefinedCameraLabel();
-						if (a != null && a.length() > 3)
-							a = a.substring(2);
+						Double defPos = null;
 						String b = StringManipulationTools.getNumbersFromString(a);
 						if (b.length() == 0)
-							position = 0d;
+							defPos = 0d;
 						else
-							position = Double.parseDouble(b);
-						if (position > 360)
-							throw new NumberFormatException("Number too large");
-					} catch (NumberFormatException nfe) {
+							defPos = Double.parseDouble(b);
+						position = SystemOptions.getInstance().getDouble("Import", pre + " Rotation//" + a, defPos);
+					} catch (Exception e) {
+						if (a != null && !a.isEmpty())
+							position = SystemOptions.getInstance().getDouble("Import", pre + " Rotation//" + a, 0d);
+					}
+					if (position == null || position < 0) {
+						String fn = sn.getPath_image_config_blob();
 						if (fn != null) {
-							try {
-								position = Double.parseDouble(fn);
-							} catch (NumberFormatException e) {
-								if (fn.contains("/"))
-									fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-								IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
+							if (fn.contains("/"))
+								fn = fn.substring(fn.lastIndexOf("/") + "/".length());
+							IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
 										+ sn.getPath_image_config_blob(), sn.getId_tag()
 										+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
-								if (optStatus != null)
-									optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
-								position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
-								if (optStatus != null)
-									optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
-							}
+							if (optStatus != null)
+								optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
+							position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
+							if (optStatus != null)
+								optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ")");
 						}
 					}
 					
@@ -1146,7 +1083,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						url.setFileName(url.getFileName() + "#" + sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 					}
 					image.setURL(url);
-					fn = sn.getPath_null_image();
+					
+					String fn = sn.getPath_null_image();
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
@@ -1344,7 +1282,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			String species = IAPexperimentTypes.getSpeciesFromExperimentType(expType);
 			
 			ps.setString(1, header.getExperimentName());
-			HashSet<String> printedMetaData = new HashSet<String>();
+			// HashSet<String> printedMetaData = new HashSet<String>();
 			try {
 				ResultSet rs = ps.executeQuery();
 				
@@ -1357,11 +1295,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					String info = "metaName: " + metaName + " metaValue: " + metaValue;
-					if (!printedMetaData.contains(info)) {
-						System.out.println(info);
-						printedMetaData.add(info);
-					}
+					// String info = "metaName: " + metaName + " metaValue: " + metaValue;
+					// if (!printedMetaData.contains(info)) {
+					// System.out.println(info);
+					// printedMetaData.add(info);
+					// }
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
