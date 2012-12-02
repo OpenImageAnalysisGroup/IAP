@@ -142,7 +142,6 @@ public class Other {
 	}
 	
 	static Timer globalScreenshotTimer = null;
-	static ThreadSafeOptions globalScreenshotStorage = new ThreadSafeOptions();
 	
 	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
 			GUIsetting guIsetting) {
@@ -225,7 +224,7 @@ public class Other {
 							null, null,
 							"Enable or disable the automated backup of LT data sets to the HSM file system",
 							"Automatic Backup to HSM",
-							"ARCHIVE|auto_daily_backup"), src.getGUIsetting()));
+							"Watch-Service|Automatic Copy//enabled"), src.getGUIsetting()));
 				
 				if (showLT && hsmEn)
 					resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
@@ -257,7 +256,7 @@ public class Other {
 							startActionMassCopy,
 							"Enable or disable the automated copy of LT data sets to the MongoDB DBs",
 							"Automatic DB-Copy",
-							"GRID-STORAGE|auto_daily_fetch"), src.getGUIsetting()));
+							"Watch-Service|Automatic Copy//enabled"), src.getGUIsetting()));
 					
 					resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
 				}

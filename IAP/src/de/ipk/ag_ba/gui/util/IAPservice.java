@@ -1085,7 +1085,7 @@ public class IAPservice {
 			if (createVideo) {
 				storeImages(cam2lastSnapshot);
 			}
-			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "storeCurrentDesktopScreenshot", true);
+			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", true);
 			if (saveDesktopSnapshot)
 				storeDesktopImage(false);
 			
@@ -1328,9 +1328,10 @@ public class IAPservice {
 		long t = System.currentTimeMillis();
 		
 		try {
-			int interval = SystemOptions.getInstance().getInteger("Watch-Service", "interval_seconds", 5 * 60);
+			int interval =
+					SystemOptions.getInstance().getInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 60);
 			if (interval < 1) {
-				SystemOptions.getInstance().setInteger("Watch-Service", "interval_sconds", 1);
+				SystemOptions.getInstance().setInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 1);
 				interval = 1;
 			}
 			if (!GraphicsEnvironment.isHeadless() && (t - lastScreenshotSaving >= interval * 1000 || immediately)) {

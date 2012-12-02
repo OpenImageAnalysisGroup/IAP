@@ -455,9 +455,10 @@ public class IAPmain extends JApplet {
 					return getOptions().getBoolean("IAP", "grid_remote_execution", true);
 				case SAVE_DEBUG_STACK:
 					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
-				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
-					return getOptions().getBoolean("ARCHIVE", "auto_copy", false) && getOptions().getBoolean("ARCHIVE", "enabled", true);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
+					return getOptions().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)
+							&& getOptions().getBoolean("ARCHIVE", "enabled", true);
+				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
 					return getOptions().getBoolean("IAP", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}
 		} else {
@@ -468,7 +469,8 @@ public class IAPmain extends JApplet {
 				case SAVE_DEBUG_STACK:
 					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
-					return getOptions().getBoolean("ARCHIVE", "auto_copy", false) && getOptions().getBoolean("ARCHIVE", "enabled", true);
+					return getOptions().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)
+							&& getOptions().getBoolean("ARCHIVE", "enabled", true);
 				case DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START:
 					return getOptions().getBoolean("IAP", "grid_delete_jobs_when_grid_node_becomes_active", false);
 			}

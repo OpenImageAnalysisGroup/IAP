@@ -88,8 +88,14 @@ public class MassCopySupport {
 			}
 		};
 		tT.run();
-		t.scheduleAtFixedRate(tT, new Date(), 1 * 60 * 1000);
-		print("INFO: MASS COPY SUPPORT READY");
+		int tm = SystemOptions.getInstance().getInteger("Watch-Service", "Automatic Copy//update_check_intervall_min", 60);
+		if (tm > 0) {
+			t.scheduleAtFixedRate(tT, new Date(), 1 *
+					tm
+					* 1000);
+			print("INFO: MASS COPY SUPPORT READY");
+		} else
+			print("INFO: MASS COPY SUPPORT NOT STARTED, INVALID INTERVAL TIME (below 1 minute)");
 	}
 	
 	public void performMassCopy(boolean onlyMerge) throws InterruptedException {
