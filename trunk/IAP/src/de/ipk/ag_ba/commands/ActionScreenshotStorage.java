@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
+import org.SystemAnalysis;
+import org.SystemOptions;
+
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -18,7 +21,7 @@ class ActionScreenshotStorage extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		boolean enabled = Other.globalScreenshotStorage.getBval(0, false);
+		boolean enabled = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", false);
 		return enabled ? "Screenshot Storage Enabled" : "Screenshot Storage Disabled";
 	}
 	
@@ -34,7 +37,7 @@ class ActionScreenshotStorage extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		boolean enabled = Other.globalScreenshotStorage.getBval(0, false);
+		boolean enabled = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", false);
 		return enabled ? "img/ext/gpl2/Gnome-Camera-Web-64.png" : "img/ext/gpl2/Gnome-Camera-Web-64_off.png";
 	}
 	
@@ -60,17 +63,22 @@ class ActionScreenshotStorage extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		boolean enabled = Other.globalScreenshotStorage.getBval(0, false);
+		boolean enabled = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", false);
 		enabled = !enabled;
-		Other.globalScreenshotStorage.setBval(0, enabled);
+		SystemOptions.getInstance().setBoolean("Watch-Service", "Screenshot//Publish Desktop", enabled);
 		if (Other.globalScreenshotTimer == null) {
-			Timer t = new Timer(1000, new ActionListener() {
+			int intervall = 1000 * SystemOptions.getInstance().getInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 60);
+			if (intervall < 0) {
+				SystemOptions.getInstance().setInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 60);
+				intervall = 1000;
+			}
+			Timer t = new Timer(intervall, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					boolean enabled = Other.globalScreenshotStorage.getBval(0, false);
+					boolean enabled = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", false);
 					if (enabled) {
 						IAPservice.storeDesktopImage(true);
-						System.out.println("SCREENSHOT");
+						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCREENSHOT");
 					}
 				}
 			});

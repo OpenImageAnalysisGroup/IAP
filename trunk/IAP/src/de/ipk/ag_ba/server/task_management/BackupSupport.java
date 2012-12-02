@@ -98,7 +98,7 @@ public class BackupSupport {
 	}
 	
 	public void makeBackup() {
-		if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
+		if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)) {
 			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE BACKUP OPERATION IS DISABLED");
 			return;
 		}
@@ -150,7 +150,7 @@ public class BackupSupport {
 						IAPmain.loadIcon("img/ext/folder-remote.png"));
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
-					if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
+					if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
 						print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
 						return;
 					}
@@ -196,7 +196,7 @@ public class BackupSupport {
 			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
 			MongoDB m = MongoDB.getDefaultCloud();
 			for (IdTime it : toSave) {
-				if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false)) {
+				if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
 					print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
 					return;
 				}
@@ -221,9 +221,9 @@ public class BackupSupport {
 	public void scheduleBackup() {
 		String hsmFolder = IAPmain.getHSMfolder();
 		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT MIDNIGHT");
+			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED");
 			Timer t = new Timer("IAP 24h-Backup-Timer");
-			long period = 1000 * 60 * 60 * 24; // 24 Hours
+			long period = 1000 * 60 * 60 * IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_intervall_h", 24); // 24 Hours
 			TimerTask tT = new TimerTask() {
 				@Override
 				public void run() {
@@ -231,7 +231,7 @@ public class BackupSupport {
 						Thread.sleep(1000);
 						
 						String hsmFolder = IAPmain.getHSMfolder();
-						if (!IAPoptions.getInstance().getBoolean("ARCHIVE", "auto_daily_backup", false))
+						if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false))
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
 						else {
 							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
@@ -244,10 +244,18 @@ public class BackupSupport {
 				}
 			};
 			Date startTime = new Date(); // current day at 23:59:39
-			startTime.setHours(23);
-			startTime.setMinutes(59);
-			startTime.setSeconds(59);
-			t.scheduleAtFixedRate(tT, startTime, period);
+			int startHour = IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", 24);
+			if (startHour >= 0) {
+				if (startHour < 1 || startHour > 24) {
+					startHour = 24;
+					IAPoptions.getInstance().setInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", startHour);
+				}
+				startTime.setHours(startHour - 1);
+				startTime.setMinutes(59);
+				startTime.setSeconds(59);
+				t.scheduleAtFixedRate(tT, startTime, period);
+			} else
+				print("WARNING: INVALID STARTUP-TIME (below 0), BACKUP HAS NOT BEEN SCHEDULED!");
 		} else {
 			print("WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
 		}

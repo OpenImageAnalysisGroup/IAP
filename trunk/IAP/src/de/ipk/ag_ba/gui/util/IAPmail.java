@@ -101,7 +101,7 @@ public class IAPmail {
 				}
 			}
 			try {
-				boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in Attachment", true);
+				boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in e-Mail", true);
 				if (takeScreenShot) {
 					if (!GraphicsEnvironment.isHeadless()) {
 						createScreenshotAndAttachToMail(mp);
