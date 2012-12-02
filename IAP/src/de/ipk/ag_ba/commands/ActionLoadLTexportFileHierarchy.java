@@ -76,7 +76,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			getStatusProvider().setCurrentStatusText1("Processing folder " + idx + "/" + todo);
 			String post = "";
 			if (storageCheck) {
-				if (overallStorageSizeInBytes / 1024 / 1024 < 1000 * 1000)
+				if (overallStorageSizeInBytes / 1024 / 1024 < 10 * 1000)
 					post = ", " + overallStorageSizeInBytes / 1024 / 1024 + " MB";
 				else
 					post = ", " + overallStorageSizeInBytes / 1024 / 1024 / 1024 + " GB";
