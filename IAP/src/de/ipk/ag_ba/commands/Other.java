@@ -213,12 +213,13 @@ public class Other {
 					}
 				}
 				
-				boolean showLTstorageTimeCheckIcon = SystemOptions.getInstance().getBoolean("LemnaTec-DB", "system_status_show_storage_time_check_icon", false);
+				boolean showLTstorageTimeCheckIcon = SystemOptions.getInstance().getBoolean(
+						"LT-DB", "Debug//system_status_show_storage_time_check_icon", false);
 				if (showLTstorageTimeCheckIcon)
 					resultNavigationButtons.add(new NavigationButton(new CheckLtTimesAction(null), src.getGUIsetting()));
 				
-				boolean showLT = SystemOptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", false);
-				boolean hsmEn = SystemOptions.getInstance().getBoolean("ARCHIVE", "enabled", true);
+				boolean showLT = SystemOptions.getInstance().getBoolean("LT-DB", "show_icon", false);
+				boolean hsmEn = SystemOptions.getInstance().getBoolean("ARCHIVE", "enabled", false);
 				if (showLT && hsmEn)
 					resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(
 							null, null,

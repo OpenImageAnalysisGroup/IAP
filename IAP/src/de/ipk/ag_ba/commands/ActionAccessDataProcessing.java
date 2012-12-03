@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
 
+import org.SystemOptions;
+
 import de.ipk.ag_ba.commands.lemnatec.ActionLemnaTecNavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
@@ -41,7 +43,8 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> phenoDBcommands = new ArrayList<NavigationButton>();
 		boolean addFilesIconAtMainLevel = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
-		if (addFilesIconAtMainLevel) {
+		if (addFilesIconAtMainLevel &&
+				SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", false)) {
 			NavigationAction saveExperimentAction = new SaveExperimentInCloud(false);
 			NavigationButton uploadDataEntity = new NavigationButton(saveExperimentAction, "Process files",
 					"img/ext/user-desktop.png",
@@ -49,7 +52,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(uploadDataEntity);
 		}
 		
-		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("LemnaTec-DB", "show_load_exported_icon", true);
+		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "LT-DB//show_load_exported_icon", true);
 		if (showLoadLTfileExport) {
 			NavigationButton ltl = new NavigationButton(
 					new ActionLoadLTexportFileHierarchy("Load LT exported image data from folder hierarchy"),
@@ -57,7 +60,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(ltl);
 		}
 		
-		boolean lt = IAPoptions.getInstance().getBoolean("LemnaTec-DB", "show_icon", true);
+		boolean lt = IAPoptions.getInstance().getBoolean("LT-DB", "show_icon", true);
 		if (lt) {
 			NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
 			NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()

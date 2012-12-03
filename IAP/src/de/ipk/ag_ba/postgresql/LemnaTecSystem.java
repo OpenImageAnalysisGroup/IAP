@@ -6,11 +6,11 @@ public enum LemnaTecSystem {
 	Barley, Maize, Phytochamber, Unknown;
 	
 	public static LemnaTecSystem getTypeFromDatabaseName(String database) {
-		if (database.startsWith(IAPoptions.getInstance().getString("LemnaTec-DB", "db_prefix_Phytochamber", "APH_")))
+		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Phytochamber", "APH_")))
 			return Phytochamber;
-		if (database.startsWith(IAPoptions.getInstance().getString("LemnaTec-DB", "db_prefix_Barley", "BGH_")))
+		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Barley", "BGH_")))
 			return Barley;
-		if (database.startsWith(IAPoptions.getInstance().getString("LemnaTec-DB", "db_prefix_Maize", "CGH_")))
+		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Maize", "CGH_")))
 			return Maize;
 		return Unknown;
 	}

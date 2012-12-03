@@ -101,12 +101,13 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 							"Show database statistics", m, new BasicDBObject("dbstats", 1), "Database Statistics"), src.getGUIsetting()));
 				}
 				
-				SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
-				saveInCloudAction.setMongoDB(m);
-				NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Load Files", "img/ext/user-desktop.png",
-						"img/ext/user-desktop.png", src.getGUIsetting());
-				res.add(uploadFilesEntity);
-				
+				if (SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", false)) {
+					SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
+					saveInCloudAction.setMongoDB(m);
+					NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Load Files", "img/ext/user-desktop.png",
+							"img/ext/user-desktop.png", src.getGUIsetting());
+					res.add(uploadFilesEntity);
+				}
 				res.add(new NavigationButton(new ActionImportClimateData(
 						"Import greenhouse temperature data"), src.getGUIsetting()));
 			}
@@ -138,7 +139,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				
 				if (!limitToResuls)
 					if (currentUser == null || !currentUser.equals("public"))
-						if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true))
+						if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false))
 							res.add(new NavigationButton(
 									new CloundManagerNavigationAction(m,
 											new ActionMongoExperimentsNavigation(m, false, true),
