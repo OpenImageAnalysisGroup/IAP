@@ -58,7 +58,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 				"Show server status information", m, "serverStatus", "Server Status"), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDatabaseServerStatus(
 				"Show database statistics", m, new BasicDBObject("dbstats", 1), "Database Statistics"), src.getGUIsetting()));
-		if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", true))
+		if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false))
 			result.add(new NavigationButton(new ActionAnalyzeAllExperiments(m, experimentList), src.getGUIsetting()));
 		
 		if (IAPmain.getRunMode() != IAPrunMode.WEB) {

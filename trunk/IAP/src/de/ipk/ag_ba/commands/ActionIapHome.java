@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
@@ -122,7 +121,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			}
 		}
 		
-		boolean ipk_bioinf = IAPoptions.getInstance().getBoolean("IPK-Tools", "show_icon", true);
+		boolean ipk_bioinf = IAPoptions.getInstance().getBoolean("IPK-Tools", "show_icon", false);
 		if (ipk_bioinf) {
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction("Bioinformatics@IPK",
 					"General Bioinformatics Ressources", "img/dbelogo2.png", "img/dbelogo2.png") {

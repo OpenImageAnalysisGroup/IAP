@@ -66,10 +66,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private static final String driver = "org.postgresql.Driver";
 	
 	public LemnaTecDataExchange() {
-		user = IAPoptions.getInstance().getString("LemnaTec-DB", "user", "postgres");
-		password = IAPoptions.getInstance().getString("LemnaTec-DB", "password", "LemnaTec");
-		port = IAPoptions.getInstance().getString("LemnaTec-DB", "port", "5432");
-		host = IAPoptions.getInstance().getString("LemnaTec-DB", "host", "lemna-db.ipk-gatersleben.de");
+		user = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
+		password = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//password", "LemnaTec");
+		port = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
+		host = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
 	}
 	
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
@@ -87,7 +87,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				"CornTest3"
 		};
 		
-		for (String invalid : IAPoptions.getInstance().getStringAll("LemnaTec-DB", "ignore_db", def)) {
+		for (String invalid : IAPoptions.getInstance().getStringAll("LT-DB", "DBs//ignore_db", def)) {
 			invalidDBs.add(invalid);
 		}
 		
