@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
@@ -43,7 +44,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 		if (isRadioSelection) {
 			ArrayList<Object> entries = new ArrayList<Object>();
 			String poss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, null);
-			
+			LinkedHashMap<String, JRadioButton> value2button = new LinkedHashMap<String, JRadioButton>();
 			ButtonGroup group = new ButtonGroup();
 			for (String sl : poss.split("//")) {
 				entries.add("");
@@ -56,6 +57,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				rb.setSelected(enable);
 				group.add(rb);
 				entries.add(rb);
+				value2button.put(sl, rb);
 			}
 			String s2 = setting.substring(0, setting.length() - "-radio-selection".length());
 			Object[] inp = MyInputHelper.getInput(
@@ -63,9 +65,16 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					s2, entries.toArray());
 			if (inp != null) {
 				if (inp.length > 0) {
-					
-					// SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setStringArray(this.actionSettingsEditor.section, setting,
-					// newValues);
+					ArrayList<String> newValues = new ArrayList<String>();
+					for (String k : value2button.keySet()) {
+						if (((JRadioButton) value2button.get(k)).isSelected())
+							newValues.add("[x]" + k);
+						else
+							newValues.add(k);
+					}
+					SystemOptions.getInstance(this.actionSettingsEditor.iniFileName)
+							.setString(this.actionSettingsEditor.section, setting,
+									StringManipulationTools.getStringList(newValues, "//"));
 				}
 			}
 		} else
