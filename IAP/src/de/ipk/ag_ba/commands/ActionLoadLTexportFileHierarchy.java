@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -74,6 +75,8 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			idx++;
 			getStatusProvider().setCurrentStatusValueFine(100d * idx / todo);
 			getStatusProvider().setCurrentStatusText1("Processing folder " + idx + "/" + todo);
+			if (snapshotDirName.equals(".DS_Store"))
+				continue;
 			String post = "";
 			if (storageCheck) {
 				if (overallStorageSizeInBytes / 1024 / 1024 < 10 * 1000)
@@ -197,8 +200,12 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 						}
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
-					messages.add("ERROR: Could not process file '" + f.getPath() + "' or sub-directory info: " + e.getMessage());
+					if (e instanceof FileNotFoundException) {
+						// empty
+					} else {
+						e.printStackTrace();
+						messages.add("ERROR: Could not process file '" + f.getPath() + "' or sub-directory info: " + e.getMessage());
+					}
 				}
 		}
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
