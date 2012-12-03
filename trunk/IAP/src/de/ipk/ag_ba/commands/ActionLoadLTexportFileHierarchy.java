@@ -67,6 +67,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		
 		String preferedZoomSetting = null;
 		
+		getStatusProvider().setCurrentStatusText1("Get file list (" + inp.getPath() + ")");
 		String[] list = inp.list();
 		int todo = list.length;
 		int idx = 0;
@@ -84,7 +85,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				else
 					post = ", " + overallStorageSizeInBytes / 1024 / 1024 / 1024 + " GB";
 			}
-			getStatusProvider().setCurrentStatusText2("Found " + snapshots.size() + " snapshots" + post);
+			getStatusProvider().setCurrentStatusText2("Found " + snapshots.size() + " data points" + post);
 			if (snapshotDirName.endsWith(metadataFileExtension)) {
 				foundMetadata = true;
 				String fn = inp + File.separator + snapshotDirName;
@@ -210,8 +211,8 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		}
 		messages.add("INFO: Snapshot-count: " + snapshots.size());
 		getStatusProvider().setCurrentStatusValueFine(0d);
-		getStatusProvider().setCurrentStatusText1("Found " + snapshots.size() + " snapshots");
-		getStatusProvider().setCurrentStatusText2("");
+		getStatusProvider().setCurrentStatusText1("Found " + snapshots.size() + " data points");
+		getStatusProvider().setCurrentStatusText2("(images, weight or watering info)");
 		HashMap<String, Condition> optIdTag2condition = null;
 		if (!foundMetadata || metadata == null) {
 			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");

@@ -15,12 +15,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
  */
 public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
-	boolean debug = false;
-	
 	boolean multiTray = false;
+	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
+		debug = getBoolean("debug", false);
+		
 		super.prepare();
 		if (options.getTrayCnt() > 1) {
 			multiTray = true;

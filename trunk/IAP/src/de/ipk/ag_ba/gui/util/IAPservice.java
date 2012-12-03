@@ -1483,7 +1483,7 @@ public class IAPservice {
 	private static ImageJ ij = null;
 	
 	public static int getTrayCountFromCondition(ConditionInterface con) {
-		String t = con.getTreatment();
+		String t = con.getTreatment() + "/" + con.getSequence();
 		int executionTrayCount = 1;
 		if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
 			executionTrayCount = 6; // 2x3
