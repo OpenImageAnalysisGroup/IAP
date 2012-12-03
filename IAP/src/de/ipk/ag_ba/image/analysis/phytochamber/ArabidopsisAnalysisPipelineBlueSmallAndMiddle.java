@@ -12,15 +12,15 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCopyImagesApplyMask_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlLabFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlCutZoomedImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLabFilter_Arabidopsis_blue_rubber_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
@@ -56,7 +56,7 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 		boolean debug = false;
 		if (!debug) {
 			p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
-			p.add(BlLabFilter_Arabidopsis_blue_rubber_vis.class);
+			p.add(BlLabFilter_vis.class);
 			p.add(BlIntensityConversion_fluo.class);
 			p.add(BlMedianFilter_fluo.class);
 			p.add(BlRemoveSmallClusters_vis_fluo.class);

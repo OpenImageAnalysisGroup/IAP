@@ -32,7 +32,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	protected boolean getBoolean(String setting, boolean defaultValue) {
-		return options.getBooleanSetting(this, setting, defaultValue);
+		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
 	protected boolean getBoolean(ImageAnalysisBlockFIS block, String setting, boolean defaultValue) {
