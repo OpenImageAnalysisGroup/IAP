@@ -58,7 +58,6 @@ public class BlockClosing_vis extends AbstractSnapshotAnalysisBlockFIS {
 			op.closing();
 			cnt++;
 		} while (cnt < closingRepeat);
-		// op.print("MASKKKK");
 		
 		return flImage.io().and(op.getImage()).getImage();
 	}
