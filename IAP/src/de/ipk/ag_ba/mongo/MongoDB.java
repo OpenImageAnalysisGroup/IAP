@@ -64,7 +64,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
@@ -267,9 +267,9 @@ public class MongoDB {
 			throw (Exception) err.getParam(0, null);
 	}
 	
-	private static HashMap<String, Mongo> m = new HashMap<String, Mongo>();
+	private static HashMap<String, MongoClient> m = new HashMap<String, MongoClient>();
 	
-	WeakHashMap<Mongo, HashSet<String>> authenticatedDBs = new WeakHashMap<Mongo, HashSet<String>>();
+	WeakHashMap<MongoClient, HashSet<String>> authenticatedDBs = new WeakHashMap<MongoClient, HashSet<String>>();
 	
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
@@ -287,17 +287,17 @@ public class MongoDB {
 					String key = optHosts + ";" + database;
 					if (m.get(key) == null) {
 						if (optHosts == null || optHosts.length() == 0) {
-							StopWatch s = new StopWatch("INFO: new Mongo()", false);
-							m.put(key, new Mongo());
+							StopWatch s = new StopWatch("INFO: new MongoClient()", false);
+							m.put(key, new MongoClient());
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
 						} else {
-							StopWatch s = new StopWatch("INFO: new Mongo(seeds)", false);
+							StopWatch s = new StopWatch("INFO: new MongoClient(seeds)", false);
 							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
-							m.put(key, new Mongo(seeds));
+							m.put(key, new MongoClient(seeds));
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime(1000);
@@ -3285,8 +3285,7 @@ public class MongoDB {
 									}
 									synchronized (conditions) {
 										conditions.remove(
-												new BasicDBObject("_id", new BasicDBObject("$in", list)),
-												WriteConcern.SAFE);
+												new BasicDBObject("_id", new BasicDBObject("$in", list)));
 									}
 									status.setCurrentStatusValueFine(100d / max * n.getLong());
 									status.setCurrentStatusText2(n.getLong() + "/" + max + " (" + (int) (100d / max * n.getLong()) + "%)");
@@ -3360,15 +3359,15 @@ public class MongoDB {
 									@Override
 									public void run() {
 										gridfs.remove(f);
-										CommandResult le = db.getLastError(WriteConcern.SAFE);
-										String err = le.getErrorMessage();
-										if (err != null && err.length() > 0)
-											System.err.println("ERROR deleting a gridFS file: " + err + " // " + SystemAnalysis.getCurrentTime());
+										// CommandResult le = db.getLastError(WriteConcern.SAFE);
+										// String err = le.getErrorMessage();
+										// if (err != null && err.length() > 0)
+										// System.err.println("ERROR deleting a gridFS file: " + err + " // " + SystemAnalysis.getCurrentTime());
 										free.addLong(f.getLength());
 										fIdx.addInt(1);
 										status.setCurrentStatusText1("File " + fIdx.getInt() +
 												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)" + ", removed: " + free.getLong() / 1024 / 1024 + " MB");
-										// status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
+										status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
 									}
 								});
 							}
