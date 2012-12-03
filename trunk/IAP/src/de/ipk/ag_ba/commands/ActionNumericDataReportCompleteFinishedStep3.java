@@ -166,17 +166,18 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		String stressLabel = "(not defined)";
 		
 		try {
-			for (String s : stressDefinition.split("//")) {
-				s = s.trim();
-				if (s.toUpperCase().startsWith("STRESS:")) {
-					s = s.substring("Stress:".length());
-					String[] def = s.split(";");
-					stressLabel = def[3];
-					stressStart = def[0];
-					stressEnd = def[1];
-					stressType = def[2];
+			if (stressDefinition != null)
+				for (String s : stressDefinition.split("//")) {
+					s = s.trim();
+					if (s.toUpperCase().startsWith("STRESS:")) {
+						s = s.substring("Stress:".length());
+						String[] def = s.split(";");
+						stressLabel = def[3];
+						stressStart = def[0];
+						stressEnd = def[1];
+						stressType = def[2];
+					}
 				}
-			}
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not properly interpret stress definition: " + stressDefinition + ". Error: "
 					+ e.getMessage());
@@ -430,8 +431,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					String tempDirectory = f.getParent();
 					AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
 				}
-			}
-			else {
+			} else {
 				{
 					byte[] csvFileContent = csv.toString().getBytes();
 					csv = null;
