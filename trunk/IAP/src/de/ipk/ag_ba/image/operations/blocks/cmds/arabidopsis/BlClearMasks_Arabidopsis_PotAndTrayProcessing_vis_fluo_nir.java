@@ -174,13 +174,16 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir extends 
 		FlexibleImage img = input().images().ir();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io().rotate(getInt("IR image rotate", 270)).translate(
-						getInt("IR image translate-X", -3),
-						getInt("IR image translate-Y", 0)).
-						clearOutsideCircle(
+				return img.copy().io().print("prior rotation", debug)
+						.rotateWithNoRecoloring(getInt("IR image rotate", 270)).print("after rotation", debug)
+						.translate(
+								getInt("IR image translate-X", -3),
+								getInt("IR image translate-Y", 0)).print("after translation", debug)
+						.clearOutsideCircle(
 								img.getWidth() / 2,
 								img.getHeight() / 2,
-								(int) (img.getHeight() / 2.45d)).getImage();
+								(int) (img.getHeight() / 2.45d)).print("result", debug)
+								.getImage();
 			else
 				return img;
 			/*

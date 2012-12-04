@@ -35,7 +35,7 @@ public class BlUseFluoMaskToClear_Arabidopsis_ir extends AbstractSnapshotAnalysi
 				if (options.getCameraPosition() == CameraPosition.TOP && getBoolean("enabled", true)) {
 					processedMasks.setIr(
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io()
+									processedMasks.fluo().io().copy()
 											.scale(getDouble("fluo mask scale X", 0.65),
 													getDouble("fluo mask scale Y", 1.1))
 													.translate(-getInt("fluo mask translate X", 30),
