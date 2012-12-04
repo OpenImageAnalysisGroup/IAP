@@ -418,8 +418,19 @@ sectionMappingList <- list(
 						title = "Plant structures",
 						typOfReset = RESET.PAGE,
 						typOfClear = CLEAR.PAGE,
-						text = ""
+						text = paste(NEW.PAR.INDENT,
+								"Following data are calculated:", NEWLINE.TEX,
+								BEGIN.ITEM,
+								LINE.ITEM, "Number of leafs-tips", NEWLINE.TEX,
+								LINE.ITEM, "Average length of all leafs plus stem", NEWLINE.TEX,
+								LINE.ITEM, "Summed length of all leafs plus stem", NEWLINE.TEX,
+								LINE.ITEM, "Average leaf width of all leafs", NEWLINE.TEX,
+								LINE.ITEM, "Max leaf width of all leafs", NEWLINE.TEX,
+								END.ITEM,
+															
+								sep = SEPARATOR.ITEM)
 				),
+			
 				
 				"12" = list(
 						newSection = 16,
@@ -919,37 +930,19 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "14.2"
 				),	
 				
-				
 				"11.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.NO,
+						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN,
-						title = "Number of leafs",
-						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
-								LINE.ITEM, "Number of leafs-tips", NEWLINE.TEX,
-								END.ITEM,
-								sep = SEPARATOR.ITEM)
-				),		
+						title = "Side",
+						text = ""
+				),
 				
 				"11.2" = list(
 						newSection = 2,
-						title = "Leaf lengths",
-						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
-								LINE.ITEM, "Length of all leafs plus stem", NEWLINE.TEX,
-								END.ITEM,
-								sep = SEPARATOR.ITEM),
-						takeRestValuesFrom = "11.1"
-				),
-				
-				"11.3" = list(
-						newSection = 3,
-						title = "Flower detection",
-						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
-								LINE.ITEM, "Number of tassel florets", NEWLINE.TEX,
-								END.ITEM,
-								sep = SEPARATOR.ITEM),
-						takeRestValuesFrom = "11.1"
-				),
+						title = "Top",
+						takeRestValuesFrom = "11.2"
+				),	
 				
 				"12.1" = list(
 						newSection = 1,
@@ -1267,6 +1260,30 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "7.1.3"
 				),
 				
+				"7.1.4" = list(
+						newSection = 4,
+						title = "NDVI, RGB",
+						takeRestValuesFrom = "7.1.1"
+				),			
+				
+				"7.1.5" = list(
+						newSection = 5,
+						title = "LAB - Lightness (L)",
+						takeRestValuesFrom = "7.1.1"
+				),
+				
+				"7.1.6" = list(
+						newSection = 6,
+						title = "LAB - Green-Red-Values (A)",
+						takeRestValuesFrom = "7.1.1"
+				),
+				
+				"7.1.7" = list(
+						newSection = 7,
+						title = "LAB - Blue-Yellow-Values (B)",
+						takeRestValuesFrom = "7.1.1"
+				),				
+				
 				"7.2.1" = list(
 						newSection = 1,
 						takeRestValuesFrom = "7.1.1"
@@ -1290,10 +1307,30 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "7.1.3"
 				),
 				
+				
 				"60.2.3" = list(
 						takeRestValuesFrom = "7.2.3"
 				),
 				
+				"7.2.4" = list(
+						newSection = 4,
+						takeRestValuesFrom = "7.1.4"
+				),
+				
+				"7.2.5" = list(
+						newSection = 5,
+						takeRestValuesFrom = "7.1.5"
+				),
+				
+				"7.2.6" = list(
+						newSection = 6,
+						takeRestValuesFrom = "7.1.6"
+				),
+				
+				"7.2.7" = list(
+						newSection = 7,
+						takeRestValuesFrom = "7.1.7"
+				),	
 				
 				"8.1.1" = list(
 						newSection = 1,
@@ -1303,6 +1340,32 @@ sectionMappingList <- list(
 						text = ""
 				),
 				
+				"8.1.2" = list(
+						newSection = 3,
+						title = "Ratio of phenol and chlorophyll",
+						takeRestValuesFrom = "8.1.1"
+				),
+				
+				
+				"8.1.3" = list(
+						newSection = 4,
+						title = "Chlorophyll",
+						takeRestValuesFrom = "8.1.1"
+				),
+				
+				"8.1.4" = list(
+						newSection = 5,
+						title = "Classic",
+						takeRestValuesFrom = "8.1.1"
+				),
+				
+				"8.1.5" = list(
+						newSection = 6,
+						title = "Phenol",
+						takeRestValuesFrom = "8.1.1"
+				),
+				
+				
 				"9.1.1" = list(
 						newSection = 1,
 						takeRestValuesFrom = "8.1.1"
@@ -1310,13 +1373,29 @@ sectionMappingList <- list(
 				
 				"9.1.2" = list(
 						newSection = 2,
+						title = "Sum of the Intensity",
+						takeRestValuesFrom = "9.1.1"
+				),
+				
+				"9.1.3" = list(
+						newSection = 3,
 						title = "Intensity of the skeleton",
-						takeRestValuesFrom = "8.1.1"
+						takeRestValuesFrom = "9.1.1"
 				),
 				
 				"10.1.1" = list(
 						newSection = 1,
 						takeRestValuesFrom = "8.1.1"
+				),
+				
+				"10.1.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "9.1.2"
+				),
+				
+				"10.1.3" = list(
+						newSection = 3,
+						takeRestValuesFrom = "9.1.3"
 				),
 				
 				"61.1.1" = list(
@@ -1370,6 +1449,26 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "8.1.1"
 				),
 				
+				"8.2.2" = list(
+						newSection = 3,
+						takeRestValuesFrom = "8.1.2"
+				),
+				
+				"8.2.3" = list(
+						newSection = 4,
+						takeRestValuesFrom = "8.1.3"
+				),
+				
+				"8.2.4" = list(
+						newSection = 5,
+						takeRestValuesFrom = "8.1.4"
+				),
+				
+				"8.2.5" = list(
+						newSection = 6,
+						takeRestValuesFrom = "8.1.5"
+				),
+				
 				"9.2.1" = list(
 						newSection = 1,
 						takeRestValuesFrom = "8.2.1"
@@ -1379,9 +1478,23 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "9.1.2"
 				),
 				
+				"9.2.3" = list(
+						takeRestValuesFrom = "9.1.3"
+				),
+				
 				"10.2.1" = list(
 						newSection = 1,
 						takeRestValuesFrom = "8.2.1"
+				),
+				
+				"10.2.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "10.1.2"
+				),
+				
+				"10.2.3" = list(
+						newSection = 3,
+						takeRestValuesFrom = "10.1.3"
 				),
 				
 				"61.2.1" = list(
@@ -1527,6 +1640,68 @@ sectionMappingList <- list(
 				"80.2.11" = list(
 						takeRestValuesFrom = "80.1.11"
 				),
+#				
+#				"11.1" = list(
+#						newSection = 1,
+#						typOfReset = RESET.PAGE.NO,
+#						typOfClear = CLEAR.PAGE.OWN,
+#						title = "Number of leafs",
+#						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
+#								LINE.ITEM, "Number of leafs-tips", NEWLINE.TEX,
+#								END.ITEM,
+#								sep = SEPARATOR.ITEM)
+#				),		
+#				
+#				"11.2" = list(
+#						newSection = 2,
+#						title = "Leaf lengths",
+#						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
+#								LINE.ITEM, "Length of all leafs plus stem", NEWLINE.TEX,
+#								END.ITEM,
+#								sep = SEPARATOR.ITEM),
+#						takeRestValuesFrom = "11.1"
+#				),
+#				
+#				"11.3" = list(
+#						newSection = 3,
+#						title = "Flower detection",
+#						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
+#								LINE.ITEM, "Number of tassel florets", NEWLINE.TEX,
+#								END.ITEM,
+#								sep = SEPARATOR.ITEM),
+#						takeRestValuesFrom = "11.1"
+#				),
+#				
+
+
+				"11.1.1" = list(
+						newSection = 1,
+						typOfReset = RESET.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						title = "Leafs",
+						text = ""
+				),
+				
+				
+				"11.1.2" = list(
+						newSection = 2,
+						title = "Bloom",
+						takeRestValuesFrom = "11.1.1"
+				),
+				
+				"11.2.1" = list(
+						newSection = 1,
+						takeRestValuesFrom = "11.1.1"
+				),
+				
+				
+				"11.2.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "11.1.2"
+				),
+				
+				
+
 				
 				"14.1.1" = list(
 						newSection = 1,
@@ -2329,6 +2504,85 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "60.1.1.2"
 				),
 				
+				
+				"7.1.4.1" = list(
+						newSection = 1,
+						title = "NDVI value",
+						takeRestValuesFrom = "7.1.1.1"
+				),
+				
+				
+				"7.1.4.2" = list(
+						title = "Red intensity average",
+						takeRestValuesFrom = "7.1.4.1"
+				),
+				
+				"7.1.4.3" = list(
+						newSection = 3,
+						title = "Green intensity average",
+						takeRestValuesFrom = "7.1.4.1"
+				),
+				
+				"7.1.4.4" = list(
+						title = "Blue intensity average",
+						takeRestValuesFrom = "7.1.4.3"
+				),
+
+				
+				"7.1.5.1" = list(
+						newSection = 1,
+						title = "Mean value",
+						takeRestValuesFrom = "7.1.1.1"
+				),
+				
+				"7.1.5.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "7.1.1.3"
+				),
+				
+				"7.1.5.3" = list(
+						newSection = 3,
+						takeRestValuesFrom = "7.1.1.5"
+				),
+				
+				"7.1.5.4" = list(
+						newSection = 4,
+						takeRestValuesFrom = "7.1.1.7"
+				),
+				
+				"7.1.6.1" = list(
+						takeRestValuesFrom = "7.1.5.1"
+				),
+				
+				"7.1.6.2" = list(
+						takeRestValuesFrom = "7.1.5.2"
+				),
+				
+				"7.1.6.3" = list(
+						takeRestValuesFrom = "7.1.5.3"
+				),
+				
+				"7.1.6.4" = list(
+						takeRestValuesFrom = "7.1.5.4"
+				),
+				
+				"7.1.7.1" = list(
+						takeRestValuesFrom = "7.1.5.1"
+				),
+				
+				"7.1.7.2" = list(
+						takeRestValuesFrom = "7.1.5.2"
+				),
+				
+				"7.1.7.3" = list(
+						takeRestValuesFrom = "7.1.5.3"
+				),
+				
+				"7.1.7.4" = list(
+						takeRestValuesFrom = "7.1.5.4"
+				),
+					
+
 				"7.2.1.1" = list(
 						takeRestValuesFrom = "7.1.1.1"
 				),
@@ -2407,6 +2661,10 @@ sectionMappingList <- list(
 				
 				"7.2.1.20" = list(
 						takeRestValuesFrom = "7.1.1.20"
+				),
+				
+				"7.2.1.21" = list(
+						takeRestValuesFrom = "7.1.1.21"
 				),
 				
 				"60.2.1.1" = list(
@@ -2591,6 +2849,295 @@ sectionMappingList <- list(
 				
 				"60.2.3.2" = list(
 						takeRestValuesFrom = "60.1.3.2"
-				)			
+				),
+				
+				"7.2.4.1" = list(
+						takeRestValuesFrom = "7.1.4.1"
+				),
+				
+				"7.2.4.2" = list(
+						takeRestValuesFrom = "7.1.4.2"
+				),
+				
+				"7.2.4.3" = list(
+						takeRestValuesFrom = "7.1.4.3"
+				),
+				
+				"7.2.4.4" = list(
+						takeRestValuesFrom = "7.1.4.4"
+				),
+			
+				"7.2.5.1" = list(
+						takeRestValuesFrom = "7.1.5.1"
+				),
+				
+				"7.2.5.2" = list(
+						newSection = 2,
+						takeRestValuesFrom = "7.1.5.2"
+				),
+				
+				"7.2.5.3" = list(
+						newSection = 3,
+						takeRestValuesFrom = "7.1.5.3"
+				),
+				
+				"7.2.5.4" = list(
+						newSection = 4,
+						takeRestValuesFrom = "7.1.5.4"
+				),
+				
+				"7.2.6.1" = list(
+						takeRestValuesFrom = "7.1.6.1"
+				),
+				
+				"7.2.6.2" = list(
+						takeRestValuesFrom = "7.1.6.2"
+				),
+				
+				"7.2.6.3" = list(
+						takeRestValuesFrom = "7.1.6.3"
+				),
+				
+				"7.2.6.4" = list(
+						takeRestValuesFrom = "7.1.6.4"
+				),
+				
+				"7.2.7.1" = list(
+						takeRestValuesFrom = "7.1.7.1"
+				),
+				
+				"7.2.7.2" = list(
+						takeRestValuesFrom = "7.1.7.2"
+				),
+				
+				"7.2.7.3" = list(
+						takeRestValuesFrom = "7.1.7.3"
+				),
+				
+				"7.2.7.4" = list(
+						takeRestValuesFrom = "7.1.7.4"
+				),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#				"7.2.4.5" = list(
+#						takeRestValuesFrom = "7.1.4.5"
+#				),
+#				
+#				"7.2.4.6" = list(
+#						takeRestValuesFrom = "7.1.4.6"
+#				),
+#				
+#				"7.2.4.7" = list(
+#						takeRestValuesFrom = "7.1.4.7"
+#				),
+#				
+#				"7.2.4.8" = list(
+#						takeRestValuesFrom = "7.1.4.8"
+#				),
+#				
+#				"7.2.4.9" = list(
+#						takeRestValuesFrom = "7.1.4.9"
+#				),
+#				
+#				"7.2.4.10" = list(
+#						takeRestValuesFrom = "7.1.4.10"
+#				),
+
+				"8.1.3.1" = list(
+						newSection = 1,
+						title = "Average intensity",
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						text = ""
+				),
+				
+				"8.1.3.2" = list(
+						newSection = 4,
+						title = "Intensity sum",
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.1.3.3" = list(
+						newSection = 5,
+						title = "Plant weight",
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.1.3.4" = list(
+						newSection = 5,
+						title = "Weight loss by drought",
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				
+				"8.1.4.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.1.4.2" = list(
+						takeRestValuesFrom = "8.1.3.2"
+				),
+				
+				"8.1.4.3" = list(
+						takeRestValuesFrom = "8.1.3.3"
+				),
+				
+				"8.1.4.4" = list(
+						takeRestValuesFrom = "8.1.3.4"
+				),
+				
+				"8.1.5.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.1.5.2" = list(
+						takeRestValuesFrom = "8.1.3.2"
+				),
+				
+				"8.1.5.3" = list(
+						takeRestValuesFrom = "8.1.3.3"
+				),
+				
+				"8.1.5.4" = list(
+						takeRestValuesFrom = "8.1.3.4"
+				),
+				
+				
+				"8.2.3.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.2.3.2" = list(
+						takeRestValuesFrom = "8.1.3.2"
+				),
+				
+				"8.2.3.3" = list(
+						takeRestValuesFrom = "8.1.3.3"
+				),
+				
+				"8.2.3.4" = list(
+						takeRestValuesFrom = "8.1.3.4"
+				),
+				
+				"8.2.3.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.2.4.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.2.4.2" = list(
+						takeRestValuesFrom = "8.1.3.2"
+				),
+				
+				"8.2.4.3" = list(
+						takeRestValuesFrom = "8.1.3.3"
+				),
+				
+				"8.2.4.4" = list(
+						takeRestValuesFrom = "8.1.3.4"
+				),
+				
+				"8.2.5.1" = list(
+						takeRestValuesFrom = "8.1.3.1"
+				),
+				
+				"8.2.5.2" = list(
+						takeRestValuesFrom = "8.1.3.2"
+				),
+				
+				"8.2.5.3" = list(
+						takeRestValuesFrom = "8.1.3.3"
+				),
+				
+				"8.2.5.4" = list(
+						takeRestValuesFrom = "8.1.3.4"
+				),
+				
+				
+				"11.1.1.1" = list(
+						newSection = 1,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN.SUB,
+						title = "Number of leafs",
+						text = ""
+				),		
+				
+				"11.1.1.2" = list(
+						newSection = 2,
+						title = "Average leaf length",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.1.1.3" = list(
+						newSection = 3,
+						title = "Leaf lengths sum",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.1.1.4" = list(
+						newSection = 4,
+						title = "Average leaf width",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.1.1.5" = list(
+						newSection = 5,
+						title = "Whole max leaf width",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.1.1.6" = list(
+						newSection = 6,
+						title = "Outer region max leaf width",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.2.1.1" = list(
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.2.1.2" = list(
+						takeRestValuesFrom = "11.1.1.2"
+				),
+				
+				"11.2.1.3" = list(
+						takeRestValuesFrom = "11.1.1.3"
+				),
+				
+				"11.2.1.4" = list(
+						takeRestValuesFrom = "11.1.1.4"
+				),
+				
+				"11.2.1.5" = list(
+						takeRestValuesFrom = "11.1.1.5"
+				),
+				
+				"11.2.1.6" = list(
+						takeRestValuesFrom = "11.1.1.6"
+				),
+				
+				"11.1.2.1" = list(
+						newSection = 1,
+						title = "Flower detection",
+						takeRestValuesFrom = "11.1.1.1"
+				),
+				
+				"11.2.2.1" = list(
+						takeRestValuesFrom = "11.1.2.1"
+				)
 		)
 )

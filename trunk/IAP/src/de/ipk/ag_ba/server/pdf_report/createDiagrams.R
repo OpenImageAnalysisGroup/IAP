@@ -230,13 +230,15 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 		if (allCharacterSeparated["."] > allCharacterSeparated[","]) {
 			
 			ownCat("Read input (English number format)...")
-			
-			return(read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")) #encoding="UTF-8"
+			data <- read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")
+			colnames(data)[14:length(colnames(data))] <- replaceBrakesWithNothing(colnames(data)[14:length(colnames(data))], "..")
+			return(data) #encoding="UTF-8"
 		} else {
 			
 			ownCat("Read input (German number format)...")
-			
-			return(read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")) #, encoding="UTF-8"
+			data <- read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")
+			colnames(data) <- replaceBrakesWithNothing(colnames(data), "..")
+			return(data) #, encoding="UTF-8"
 		}
 	} else {
 		return(NULL)
@@ -1169,7 +1171,25 @@ getUnitList <- function(column = NULL) {
 			 "%/day",
 			 "%",  #entspricht (%)
 			 "c/p"
-			))
+			),
+		unitExcel =
+				c("(percent.",
+					"(mm^2)",
+					"(mm)",
+					"(g)",
+					"(relative / pix)",
+					"(relative)",
+					"sqrt(px^3)",
+					"(px^3)",
+					"(px)",
+					".tassel)",
+					"(sum of day)",
+					"(leafs)",
+					"(%/day)",
+					"(%)",  #entspricht (%)
+					"(c/p)"
+				)
+	)
 	if(is.null(column)) {
 		return(unitList)
 	} else {
@@ -1177,9 +1197,18 @@ getUnitList <- function(column = NULL) {
 	}
 }
 
-replaceUnits <- function(label) {
+replaceBrakesWithNothing <- function(label, unit="(") {
+	endValue <- str_locate(label, fixed(unit))[,"start"]-1
+	endValue[is.na(endValue)] <- -1L
+	label <- str_sub(label, 1L,endValue)
+	label <- str_trim(label)
+	return(label)
+}
+
+
+replaceUnits <- function(label, typ="unitR") {
 	
-	unitList <- getUnitList("unitR")
+	unitList <- getUnitList(typ)
 	
 	for(nn in unitList) {
 		label <- str_replace_all(label, fixed(nn),"")
@@ -1449,6 +1478,7 @@ getRealNameAndPrintSection <- function(descriptorSet) {
 ########
 
 	columName <- names(descriptorSet)
+	columName <- replaceBrakesWithNothing(columName)
 	plotName <- getVector(descriptorSet, "plotName")
 	
 	section <- getVector(descriptorSet, FIRST.SECTION)		
@@ -6776,7 +6806,7 @@ checkIfAllNecessaryFilesAreThere <- function() {
 
 buildBlacklist <- function(workingDataSet, descriptorSet) {
 	
-	additionalDescriptors <- c(descriptorSet, "Day (Int)", "Day", "Time", "Plant ID", "vis.side", "fluo.side", "nir.side", "vis.top", "fluo.top", "nir.top") #,"lm3s_nostress_ratio.side.nir.intensity.average (%)"
+	additionalDescriptors <- c(descriptorSet, "Day (Int)", "Day (Float)", "Day", "Time", "Plant ID", "vis.side", "fluo.side", "nir.side", "vis.top", "fluo.top", "nir.top") #,"lm3s_nostress_ratio.side.nir.intensity.average (%)"
 	
 	searchString <- c(".histogram.")
 	for(nn in seq(1:5)) {
@@ -6937,7 +6967,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	filterSecondTreatment = NONE
 	splitTreatmentSecond= FALSE
 	
-	xAxis = "Day (Int)" 
+	xAxis = "Day..Int." 
 	xAxisName = "DAS"
 	filterXaxis = NONE
 	
@@ -7338,7 +7368,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		nBoxSection = NULL, nBoxMultiSection= NULL, boxSection = NULL, boxStackSection = NULL, boxSpiderSection = NULL, violinBoxSection = NULL, linerangeSection = NULL,
 		nBoxOptions= NULL, nBoxMultiOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL, violinOptions = NULL, linerangeOptions = NULL,
 		treatment = "Treatment", filterTreatment = NONE, 
-		secondTreatment = NONE, filterSecondTreatment = NONE, filterXaxis = NONE, xAxis = "Day (Int)", 
+		secondTreatment = NONE, filterSecondTreatment = NONE, filterXaxis = NONE, xAxis = xAxis, 
 		xAxisName = NONE, debug = FALSE, appendix = FALSE, stoppTheCalculation = FALSE, isRatio = FALSE,
 		filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
 		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1,
@@ -7395,7 +7425,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 		overallList <- preprocessingOfSecondTreatment(overallList)
 		overallList <- renameOfTheTreatments(overallList)
 		overallList <- overallCheckIfDescriptorIsNaOrAllZero(overallList)
-		overallList <- getUnits(overallList)
+#		overallList <- getUnits(overallList)
 		if (!overallList$stoppTheCalculation) {
 			overallList <- reduceWorkingDataSize(overallList)
 			overallList <- setDefaultAxisNames(overallList)
