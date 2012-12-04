@@ -35,20 +35,22 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage vis = input().images().vis();
 		if (vis == null)
 			return null;
+		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE || !options.isArabidopsis()))
+			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true,
-					getInt("vis-side-balance-l-threshold", -10), getInt("vis-side-balance-ab-threshold", 50));
+					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
 		} else {
 			String remark = getRemarkSetting("vis.top.split.adjust", "");
 			if (remark != null && remark.length() > 0 && !remark.contains("n")) {
 				if (remark.contains("auto")) {
 					double[] pixLeft, pixRight;
 					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().print("left part", debug), false,
-							getInt("vis-top-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
 					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().print("right part", debug), false,
-							getInt("vis-top-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
 					return io.imageBalancing(255, pixLeft, pixRight).getImage().print("after", false);
 				} else {
 					try {
@@ -77,7 +79,7 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 					}
 				}
 			}
-			pix = getProbablyWhitePixels(vis, false, getInt("vis-top-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
 		}
 		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
@@ -87,13 +89,15 @@ public class BlColorBalancing_vis extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage vis = input().masks().vis();
 		if (vis == null)
 			return null;
+		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE || !options.isArabidopsis()))
+			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true,
-					getInt("vis-side-balance-l-threshold", -10), getInt("vis-side-balance-ab-threshold", 50));
+					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
 		else
-			pix = getProbablyWhitePixels(vis, false, getInt("vis-top-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
 		return io.imageBalancing(255, pix).getImage().print("after", false);
 	}
 	
