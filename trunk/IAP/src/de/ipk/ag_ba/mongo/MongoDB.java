@@ -1962,6 +1962,7 @@ public class MongoDB {
 					final long curr = System.currentTimeMillis();
 					while (cursor.hasNext()) {
 						CloudHost h = (CloudHost) cursor.next();
+						System.out.println("age: " + (curr - h.getLastUpdateTime()) / 1000 + "s: " + h.getHostName());
 						if (curr - h.getLastUpdateTime() < maxUpdate) {
 							res.add(h);
 						} else {
