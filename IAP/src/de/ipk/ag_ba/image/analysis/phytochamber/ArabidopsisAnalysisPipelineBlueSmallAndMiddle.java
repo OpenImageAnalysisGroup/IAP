@@ -15,7 +15,6 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlLabFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir;
@@ -64,7 +63,6 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 			p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
 			p.add(Bl_Arabidopsis_IRdiff_ir.class);
 			p.add(BlUseFluoMaskToClear_Arabidopsis_ir.class);
-			p.add(BlNirFilterSide_nir.class);
 			p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
 			p.add(BlCalcWidthAndHeight_vis.class);
 			p.add(BlCalcIntensity_vis_fluo_nir_ir.class);

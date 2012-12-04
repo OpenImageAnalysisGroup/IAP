@@ -211,13 +211,25 @@ public class ImageOperation {
 	
 	/**
 	 * Rotates the image content. New clear regions are recolored to the
-	 * background color.
+	 * background color. Warning: if the input image contains black areas,
+	 * they are turned into background color! Use rotateWithNoRecoloring in this case.
+	 * Does change the image itself and returns this.
 	 */
 	public ImageOperation rotate(double degree) {
 		image.getProcessor().rotate(degree);
 		return new ImageOperation(getImage())
 				.replaceColor(Color.BLACK.getRGB(),
 						ImageOperation.BACKGROUND_COLORint);
+	}
+	
+	/**
+	 * Rotates the image content. New clear regions are recolored to the
+	 * background color.
+	 * Does change the image itself and returns this.
+	 */
+	public ImageOperation rotateWithNoRecoloring(double degree) {
+		image.getProcessor().rotate(degree);
+		return this;
 	}
 	
 	/**
