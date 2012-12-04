@@ -46,9 +46,7 @@ nBoxMultiPlotList <- list(
 		"side.section#vis.lab.b.stddev" = list(plotName = "side sections - LA(B) stddev", section = 80, subsection = 1, subsubsection = 8, paragraph = 4),
 				
 		"side.section#vis.stress.hue.brown2green" = list(plotName = "side sections - brown bin divided by green bins", section = 80, subsection = 1, subsubsection = 9),
-		
-		"side.section#vis.stress.hue.red2green" = list(plotName = "side sections - red bins divided by green bins", section = 80, subsection = 1, subsubsection = 10),
-		
+		"side.section#vis.stress.hue.red2green" = list(plotName = "side sections - red bins divided by green bins", section = 80, subsection = 1, subsubsection = 10),	
 		"side.section#vis.stress.hue.yellow2green" = list(plotName = "side sections - yellow bins divided by green bins", section = 80, subsection = 1, subsubsection = 11),
 		
 			

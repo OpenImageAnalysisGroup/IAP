@@ -17,14 +17,33 @@ echo "Split Cond1?  : ${11}"
 echo "Split Cond2?  : ${12}"
 
 
-DEL /s report.aux
-DEL /s report.out
-DEL /s report.toc
-DEL /s report.tex
-DEL /s report.pdf
-RD /s /q plots
-RD /s /q plotTex
-RD /s /q section
+if[-f report.aux]; then
+	del /s report.aux
+fi
+
+if[-f report.out]; then
+	del /s report.out
+fi
+
+if[-f report.tex]; then
+	del /s report.tex
+fi
+
+if[-f report.pdf]; then
+	del /s report.pdf
+fi
+
+if[-d plots]; then
+	rd /s /q plots
+fi
+
+if[-d plotTex]; then
+	rd /s /q plotTex
+fi
+
+if[-d section]; then
+	rd /s /q section
+fi
 
 
 if [ -f report.clustering.csv ]

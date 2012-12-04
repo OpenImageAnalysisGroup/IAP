@@ -6,13 +6,13 @@
 boxOptions= NULL
 
 boxPlotList <- list(
-		"volume.iap (px^3)" = list(
+		"volume.vis.iap (px^3)" = list(
 								plotName = "digital biomass (visible light images, IAP formula) px^3", 
 								section = 20,
 								subsection = 1,
 								subsubsection = 1,
 								paragraph = 1), 
-		"volume.lt (px^3)" = list(
+		"volume.vis.lt (px^3)" = list(
 								plotName = "digital biomass (visible light, LemnaTec 0,90 formula) px^3", 
 								section = 20,
 								subsection = 2,
@@ -48,35 +48,35 @@ boxPlotList <- list(
 				subsection = 4,
 				subsubsection = 1),
 		
-		"side.area.norm (mm^2)" = list(
+		"side.vis.area.norm (mm^2)" = list(
 				plotName = "side area (zoom corrected) (mm^2)", 
 				section = 21,
 				subsection = 5,
 				subsubsection = 1),
-		"side.area (px)" = list(
+		"side.vis.area (px)" = list(
 				plotName = "side area (px)", 
 				section = 21,
 				subsection = 6,
 				subsubsection = 1),
 		
-		"top.area.norm (mm^2)" = list(
+		"top.vis.area.norm (mm^2)" = list(
 				plotName = "top area (zoom corrected) (mm^2)", 
 				section = 21,
 				subsection = 7,
 				subsubsection = 1), 
-		"top.area (px)" = list(
+		"top.vis.area (px)" = list(
 				plotName = "top area (px)", 
 				section = 21,
 				subsection = 8,
 				subsubsection = 1),
 		
-		"side.border.length.norm (mm)" = list(
+		"side.vis.border.length.norm (mm)" = list(
 				plotName = "side border length (zoom corrected) (mm)", 
 				section = 21,
 				subsection = 9,
 				subsubsection = 1),
 		
-		"side.border.length (px)" = list(
+		"side.vis.border.length (px)" = list(
 				plotName = "side border length (px)", 
 				section = 21,
 				subsection = 10,

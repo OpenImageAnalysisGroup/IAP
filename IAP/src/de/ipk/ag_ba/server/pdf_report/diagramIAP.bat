@@ -22,15 +22,13 @@ echo Split Cond2?  : %9
 
 
 rem The delete option is important at the development phase
-del /s report.aux
-del /s report.out
-del /s report.toc
-del /s report.tex
-del /s report.pdf
-rd /s /q plots
-rd /s /q plotTex
-rd /s /q section
-
+if exist report.aux del /s report.aux
+if exist report.out	del /s report.out
+if exist report.tex	del /s report.tex
+if exist report.pdf	del /s report.pdf
+if exist plots rd /s /q plots
+if exist plotTex rd /s /q plotTex
+if exist section rd /s /q section
 
 IF EXIST report.clustering.csv Rscript --encoding=UTF-8 calcClusters.R %6
 
