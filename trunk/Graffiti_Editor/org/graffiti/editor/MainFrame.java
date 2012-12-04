@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.9 2012-11-07 14:42:06 klukas Exp $
+// $Id: MainFrame.java,v 1.10 2012-12-04 17:14:14 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -191,7 +191,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 		UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -442,7 +442,6 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	 *           DOCUMENT ME!
 	 */
 	public MainFrame(PluginManager pluginmgr, GravistoPreferences prefs, JPanel progressPanel, boolean showVantedHelp) {
-		super();
 		ErrorMsg.setRethrowErrorMessages(false);
 		
 		instance = this;
@@ -1349,8 +1348,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	final ExecutorService loader = Executors.newFixedThreadPool(1);
 	
 	public void loadGraphInBackground(final File[] proposedFiles, final ActionEvent ae, boolean autoSwitch)
-			
-			throws IllegalAccessException, InstantiationException {
+
+	throws IllegalAccessException, InstantiationException {
 		final ArrayList<File> files = new ArrayList<File>();
 		
 		HashSet<File> filesToBeIgnored = new HashSet<File>();

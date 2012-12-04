@@ -38,7 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
 /**
  * Contains the graffiti editor.
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class Main {
 	// ~ Static fields/initializers =============================================
@@ -132,7 +132,10 @@ public class Main {
 				.replace('.', '/');
 		ImageIcon icon = new ImageIcon(cl.getResource(path
 				+ "/vanted_logo.png"));
-		((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
+		
+		if (splashScreen != null && (splashScreen instanceof DBEsplashScreen)) {
+			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
+		}
 		
 		splashScreen.setVisible(showMainFrame);
 		

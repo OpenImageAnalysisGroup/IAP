@@ -304,9 +304,12 @@ public class GravistoMainHelper implements HelperClass {
 		
 		JPanel statusPanel = new JPanel();
 		// statusPanel.
-		final MainFrame mainFrame = new MainFrame(getPluginManager(), uiPrefs, statusPanel, true);
-		
-		installDragAndDropHandler(mainFrame);
+		MainFrame mainFrameNF = null;
+		if (!SystemAnalysis.isHeadless()) {
+			mainFrameNF = new MainFrame(getPluginManager(), uiPrefs, statusPanel, true);
+			installDragAndDropHandler(mainFrameNF);
+		}
+		final MainFrame mainFrame = mainFrameNF;
 		
 		// ClassLoader cl = Main.class.getClassLoader();
 		URL r1 = cl.getResource("plugins1.txt");
@@ -425,20 +428,21 @@ public class GravistoMainHelper implements HelperClass {
 							BSHinfo info = new BSHinfo(url);
 							BSHscriptMenuEntry.executeScript(info, url.getFileName());
 						} else {
-							for (String ext : MainFrame.getInstance().getIoManager().getGraphFileExtensions())
-								if (url.getFileName().toLowerCase().endsWith(ext)) {
-									if (!canRead(url, "Cannot read file "))
-										continue;
-									final Graph g = mainFrame.getGraph(url, url.getFileName());
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											mainFrame.showGraph(g, new ActionEvent(mainFrame, 1,
-													"load graph passed with arguments"));
-										}
-									});
-									break;
-								}
+							if (!SystemAnalysis.isHeadless())
+								for (String ext : MainFrame.getInstance().getIoManager().getGraphFileExtensions())
+									if (url.getFileName().toLowerCase().endsWith(ext)) {
+										if (!canRead(url, "Cannot read file "))
+											continue;
+										final Graph g = mainFrame.getGraph(url, url.getFileName());
+										SwingUtilities.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												mainFrame.showGraph(g, new ActionEvent(mainFrame, 1,
+														"load graph passed with arguments"));
+											}
+										});
+										break;
+									}
 						}
 					}
 				} catch (Exception e) {
