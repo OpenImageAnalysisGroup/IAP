@@ -157,7 +157,7 @@ public class BlLabFilter_vis extends AbstractSnapshotAnalysisBlockFIS {
 					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
 					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
 					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 133);
+					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 120);
 					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 				} else {
 					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);

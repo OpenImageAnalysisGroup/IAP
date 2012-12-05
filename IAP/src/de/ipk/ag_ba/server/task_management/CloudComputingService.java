@@ -421,18 +421,22 @@ public class CloudComputingService {
 					if (SystemAnalysis.isHeadless()) {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
 								+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
-						System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
-								+ ", FINISHED: "
-								+ knownResults.size());
-						System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
-						String in = SystemAnalysis.getCommandLineInput();
-						if (in == null)
-							res = null;
-						else
-							if (in.toUpperCase().contains("Y"))
-								res = new Object[] { true };
+						if (tempDataSetDescription.getPartCntI() == knownResults.size()) {
+							res = new Object[] { false };
+						} else {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
+									+ ", FINISHED: "
+									+ knownResults.size());
+							System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
+							String in = SystemAnalysis.getCommandLineInput();
+							if (in == null)
+								res = null;
 							else
-								res = new Object[] { false };
+								if (in.toUpperCase().contains("Y"))
+									res = new Object[] { true };
+								else
+									res = new Object[] { false };
+						}
 					} else
 						res = MyInputHelper.getInput("<html>Process incomplete data sets? "
 								+
