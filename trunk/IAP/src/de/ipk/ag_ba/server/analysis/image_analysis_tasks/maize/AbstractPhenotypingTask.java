@@ -246,8 +246,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											status, tso, workloadSnapshots,
 											workloadEqualAngleSnapshotSets,
 											imageSetWithSpecificAngle_f, maxCon);
-									if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-										DownloadCache.getInstance().finished(plantIDf);
 								} catch (Exception err) {
 									printError(imageSetWithSpecificAngle_f, err);
 								} finally {
@@ -266,6 +264,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 				maxCon.acquire(nn);
 				maxCon.release(nn);
+				for (String plantID : workload_imageSetsWithSpecificAngles.keySet())
+					if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+						DownloadCache.getInstance().finished(plantID);
 			} finally {
 				runOK = true;
 			}
