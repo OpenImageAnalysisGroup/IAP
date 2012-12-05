@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 import org.ObjectRef;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -24,6 +25,8 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
+
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.DownloadCache;
 
 public class MongoDBhandler extends AbstractResourceIOHandler {
 	private final String prefix;
@@ -38,7 +41,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream srcIS, String targetFilename, ResourceIOConfigObject config)
-						throws Exception {
+			throws Exception {
 		MongoResourceIOConfigObject c = (MongoResourceIOConfigObject) config;
 		
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(srcIS);
@@ -64,6 +67,18 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			
 			@Override
 			public void run() {
+				if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true)) {
+					try {
+						InputStream is = DownloadCache.getInstance().getFileInputStream(url.getDetail());
+						if (is != null && is.available() > 0) {
+							or.setObject(is);
+							return;
+						}
+					} catch (Exception e) {
+						// empty
+					}
+				}
+				
 				// check all gridFS file collections and look for matching hash value...
 				boolean ensureIndex = false;
 				if (ensureIndex)
