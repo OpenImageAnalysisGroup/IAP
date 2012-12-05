@@ -288,7 +288,9 @@ public class MongoDB {
 					if (m.get(key) == null) {
 						if (optHosts == null || optHosts.length() == 0) {
 							StopWatch s = new StopWatch("INFO: new MongoClient()", false);
-							m.put(key, new MongoClient());
+							MongoClient mc = new MongoClient();
+							mc.setWriteConcern(WriteConcern.NONE);
+							m.put(key, mc);
 							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
 							s.printTime();
