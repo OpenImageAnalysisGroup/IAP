@@ -291,7 +291,7 @@ public class MongoDB {
 							MongoClient mc = new MongoClient();
 							mc.setWriteConcern(WriteConcern.NONE);
 							m.put(key, mc);
-							m.get(key).getMongoOptions().connectionsPerHost = 2;
+							m.get(key).getMongoOptions().connectionsPerHost = 1;
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
 							s.printTime();
 						} else {
@@ -300,7 +300,7 @@ public class MongoDB {
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
 							m.put(key, new MongoClient(seeds));
-							m.get(key).getMongoOptions().connectionsPerHost = 2;
+							m.get(key).getMongoOptions().connectionsPerHost = 1;
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
 							s.printTime(1000);
 						}

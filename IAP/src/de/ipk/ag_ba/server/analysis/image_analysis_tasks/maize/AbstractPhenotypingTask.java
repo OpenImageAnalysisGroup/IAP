@@ -181,7 +181,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			 * ____________TO ROTATION ANGLE TO
 			 * ________________IMAGE SNAPSHOT SET OF VIS/FLUO/NIR
 			 */
-			TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
+			final TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
 					new TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>>();
 			
 			addTopOrSideImagesToWorkset(workload_imageSetsWithSpecificAngles, 0, analyzeTopImages(),
@@ -224,6 +224,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			try {
 				int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 				int progress = 0;
+				BackgroundTaskHelper.issueSimpleTask("Download Images (Caching)", "", new Runnable() {
+					@Override
+					public void run() {
+						for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+							if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+								DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
+						}
+					}
+				}, null);
 				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 					if (status.wantsToStop())
 						continue;
@@ -232,8 +241,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					maxCon.acquire(1);
 					try {
 						progress++;
-						if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-							DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
 						final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
 						Thread t = new Thread(new Runnable() {
 							@Override
