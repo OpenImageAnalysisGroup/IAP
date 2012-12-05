@@ -2,7 +2,6 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -66,11 +65,11 @@ public class DownloadCache {
 		plant2cacheFiles.remove(plantID);
 	}
 	
-	public synchronized InputStream getFileInputStream(String detail) throws FileNotFoundException {
+	public synchronized InputStream getFileInputStream(String detail) throws Exception {
 		File cf = new File(ReleaseInfo.getAppSubdirFolderWithFinalSep("cache") + detail);
-		if (cf.exists())
-			return new FileInputStream(cf);
-		else
+		if (cf.exists()) {
+			return ResourceIOManager.getInputStreamMemoryCached(new FileInputStream(cf));
+		} else
 			return null;
 	}
 	
