@@ -291,8 +291,8 @@ public class MongoDB {
 							MongoClient mc = new MongoClient();
 							mc.setWriteConcern(WriteConcern.NONE);
 							m.put(key, mc);
-							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
-							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
+							m.get(key).getMongoOptions().connectionsPerHost = 2;
+							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
 							s.printTime();
 						} else {
 							StopWatch s = new StopWatch("INFO: new MongoClient(seeds)", false);
@@ -300,8 +300,8 @@ public class MongoDB {
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
 							m.put(key, new MongoClient(seeds));
-							m.get(key).getMongoOptions().connectionsPerHost = SystemAnalysis.getNumberOfCPUs();
-							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000;
+							m.get(key).getMongoOptions().connectionsPerHost = 2;
+							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
 							s.printTime(1000);
 						}
 						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
