@@ -64,8 +64,8 @@ public class FlexibleImage {
 		BufferedImage img = null;
 		// synchronized (url2image) {
 		img = url2image.get(url + "");
-		if (img != null)
-			System.out.println("o ~ " + url);
+		// if (img != null)
+		// System.out.println("o ~ " + url);
 		// else
 		// System.out.println("- ~ "+url);
 		if (img == null) {

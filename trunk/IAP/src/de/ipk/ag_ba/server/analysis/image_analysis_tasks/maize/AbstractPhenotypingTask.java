@@ -232,6 +232,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					maxCon.acquire(1);
 					try {
 						progress++;
+						if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+							DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
 						final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
 						Thread t = new Thread(new Runnable() {
 							@Override
@@ -244,6 +246,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											status, tso, workloadSnapshots,
 											workloadEqualAngleSnapshotSets,
 											imageSetWithSpecificAngle_f, maxCon);
+									if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+										DownloadCache.getInstance().finished(plantIDf);
 								} catch (Exception err) {
 									printError(imageSetWithSpecificAngle_f, err);
 								} finally {
