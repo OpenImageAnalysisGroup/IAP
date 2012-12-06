@@ -6,6 +6,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 ############## Flags for debugging ####################
 debug <- FALSE
 
+
 calculateNothing <- FALSE
 plotNothing <- FALSE
 
@@ -34,10 +35,12 @@ CPU.CNT <- 2
 CPU.ATUO.DETECTED <- TRUE
 CHECK.INPUT.FILE.IF.ENG.OR.GER <- FALSE
 CHECK.FOR.UPDATE <- FALSE
+INSTALL.PACKAGE <- FALSE
 
 ########## Constants ###########
 
 ERROR <- "error"
+LIB <- "lib"
 CATCH.ERROR <- TRUE
 
 ## long table name
@@ -150,6 +153,7 @@ START.TYP.STRESS <- "stress"
 REPORT <- "report"
 REPORT.FILE <- paste(REPORT, TEX, sep =".")
 ERROR.FILE <- paste(ERROR, TEX, sep =".")
+LIB.ERROR.FILE <- paste(LIB, ERROR, TEX, sep =".")
 ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep ="")
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
@@ -411,7 +415,7 @@ overallOutlierDetection <- function(overallList) {
 	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
 }
 
-loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE) {	
+loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE, debug=FALSE) {	
 #	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")	
 	repos <- c("http://cran.r-project.org","http://www.rforge.net/")
 	#libPath <- ".libPaths()[1]"
@@ -456,22 +460,42 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	
 	if (length(libraries) > 0) {
 		ownCat("Load libraries:")
-		for(n in libraries) {
-			ownCat(n)
-			if(DO.PARALLELISATION) {
-				if (sfParallel())
-					sfLibrary(n, character.only = TRUE)
-				else
-					library(n, character.only = TRUE)
+		libError <- FALSE
+		libErrorText <- NULL;
+		for(nn in libraries) {
+			ownCat(nn)
+			if(CATCH.ERROR) {
+				error <- try(iniLibrary(nn), silent = debug)
+				if(checkOfTryError(error, typ=LIB)) {
+					libError <- TRUE
+					libErrorText <- c(libErrorText, nn)
+				}
 			} else {
-				library(n, character.only = TRUE)
+				iniLibrary(nn)
 			}
 		}
-	
+		
+		if(libError) {
+			ckeckIfReportTexIsThere(libErrorText, typ = LIB)
+			stop("Error with the libs!", call. = FALSE)
+		}
+		
 		if (useDev) {
 			library("devtools")
 		}	
 	}	
+}
+
+
+iniLibrary <- function(lib) {
+	if(DO.PARALLELISATION) {
+		if (sfParallel())
+			sfLibrary(lib, character.only = TRUE)
+		else
+			library(lib, character.only = TRUE)
+	} else {
+		library(lib, character.only = TRUE)
+	}
 }
 
 buildDataSet <- function(workingDataSet, overallResult, colname, index, diagramTyp = "") {
@@ -555,7 +579,7 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 			if (listOfTreat[[k]] != NONE) {
 				#overallTreat = list(iniDataSet=workingDataSet, descriptor=listOfTreat[[k]], debug=debug, stoppTheCalculation = FALSE, errorDescriptor=character())
 				#overallTreat = list(iniDataSet=workingDataSet, descriptor=listOfTreat[[k]], debug=debug, stoppTheCalculation = FALSE)
-				descriptorVector <- getVector(preprocessingOfDescriptor(listOfTreat[[k]], workingDataSet))
+				descriptorVector <- getVector(preprocessingOfDescriptor(listOfTreat[[k]], workingDataSet, debug))
 				
 				if (!is.null(descriptorVector)) {
 					descriptorVector <- getVector(checkIfDescriptorIsNaOrAllZero(descriptorVector, workingDataSet, FALSE))
@@ -587,7 +611,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "nBoxplots..."));}
 		for (n in seq(along = overallList$nBoxDes)) {
 			if (!is.na(overallList$nBoxDes[[n]][1])) {
-				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet)
+				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 			}
 		}
 		names(overallList$nBoxDes) <- c(1:length(overallList$nBoxDes))
@@ -601,7 +625,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$nBoxMultiDes), "nBoxMultiPlots..."));}
 		for (n in seq(along = overallList$nBoxMultiDes)) {
 			if (!is.na(overallList$nBoxMultiDes[[n]][1])) {
-				overallList$nBoxMultiDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxMultiDes[[n]], overallList$iniDataSet)
+				overallList$nBoxMultiDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxMultiDes[[n]], overallList$iniDataSet, overallList$debug)
 			}
 		}
 		names(overallList$nBoxMultiDes) <- c(1:length(overallList$nBoxMultiDes))
@@ -614,7 +638,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxDes), "Boxplots..."))}
 		for (n in seq(along = overallList$boxDes)) {
 			if (!is.na(overallList$boxDes[[n]][1])) {
-				overallList$boxDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet)
+				overallList$boxDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet, overallList$debug)
 			}
 		}
 		names(overallList$boxDes) <- c(1:length(overallList$boxDes))
@@ -627,7 +651,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxStackDes), "stacked boxplots..."))}
 		for (n in seq(along = overallList$boxStackDes)) {
 			if (!is.na(overallList$boxStackDes[[n]][1])) {
-				overallList$boxStackDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet)
+				overallList$boxStackDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet, overallList$debug)
 			}
 		}
 		names(overallList$boxStackDes) <- c(1:length(overallList$boxStackDes))
@@ -641,7 +665,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		for (n in seq(along = overallList$boxSpiderDes)) {
 			if (!is.na(overallList$boxSpiderDes[[n]][1])) {
 				initDescriptor <- overallList$boxSpiderDes[[n]]
-				overallList$boxSpiderDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
+				overallList$boxSpiderDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet, overallList$debug)
 				booleanVector <- unlist(initDescriptor) %in% unlist(overallList$boxSpiderDes[[n]])
 				overallList$boxSpiderDesName[[n]] <- as.data.frame(overallList$boxSpiderDesName[[n]][booleanVector])
 				
@@ -659,7 +683,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		for (n in seq(along = overallList$linerangeDes)) {
 			if (!is.na(overallList$linerangeDes[[n]][1])) {
 				initDescriptor <- overallList$linerangeDes[[n]]
-				overallList$linerangeDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$linerangeDes[[n]], overallList$iniDataSet)
+				overallList$linerangeDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$linerangeDes[[n]], overallList$iniDataSet, overallList$debug)
 				booleanVector <- unlist(initDescriptor) %in% unlist(overallList$linerangeDes[[n]])
 				overallList$linerangeDesName[[n]] <- as.data.frame(overallList$linerangeDesName[[n]][booleanVector])
 				
@@ -676,7 +700,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$violinBoxDes), "violinplot..."))}
 		for (n in seq(along = overallList$violinBoxDes)) {
 			if (!is.na(overallList$violinBoxDes[[n]][1])) {
-				overallList$violinBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$violinBoxDes[[n]], overallList$iniDataSet)
+				overallList$violinBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$violinBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 			}
 		}
 		names(overallList$violinBoxDes) <- c(1:length(overallList$violinBoxDes))
@@ -700,7 +724,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 }
 
 
-checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescriptor = TRUE) {
+checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescriptor = TRUE, debug = FALSE) {
 #############
 #descriptorVector <- overallList$nBoxDes[[n]]
 #iniDataSet <- overallList$iniDataSet
@@ -719,7 +743,7 @@ checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescr
 	}
 	errorDescriptor <- tempDescriptor %GetDescriptorAfterCheckIfDescriptorNotExists% descriptorVector
 
-	if (length(errorDescriptor) > 0) {
+	if (length(errorDescriptor) > 0 && debug) {
 		errorDescriptor %errorReport% NOT.NUMERIC.OR.ALL.ZERO	
 	}
 	
@@ -914,7 +938,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	if (!is.null(overallList$nBoxDes)) {
 		if (overallList$debug) {ownCat(NBOX.PLOT)}
 		for (n in seq(along = overallList$nBoxDes)) {
-			overallList$nBoxDes[n] = preprocessingOfDescriptor(overallList$nBoxDes[[n]], overallList$iniDataSet)
+			overallList$nBoxDes[n] = preprocessingOfDescriptor(overallList$nBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 		}
 		overallList$nBoxDes <- checkOfNormalizedAndUnnormalized(overallList$nBoxDes)
 	} else {
@@ -925,7 +949,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	if (!is.null(overallList$nBoxMultiDes)) {
 		if (overallList$debug) {ownCat(NBOX.MULTI.PLOT)}
 		for (n in seq(along = overallList$nBoxMultiDes)) {
-			overallList$nBoxMultiDes[n] = preprocessingOfDescriptor(overallList$nBoxMultiDes[[n]], overallList$iniDataSet)
+			overallList$nBoxMultiDes[n] = preprocessingOfDescriptor(overallList$nBoxMultiDes[[n]], overallList$iniDataSet, overallList$debug)
 		}
 		overallList$nBoxMultiDes <- checkOfNormalizedAndUnnormalized(overallList$nBoxMultiDes)
 	} else {
@@ -936,7 +960,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	if (!is.null(overallList$boxDes)) {
 		if (overallList$debug) {ownCat(BOX.PLOT)}
 		for (n in seq(along = overallList$boxDes)) {
-			overallList$boxDes[n] = preprocessingOfDescriptor(overallList$boxDes[[n]], overallList$iniDataSet)
+			overallList$boxDes[n] = preprocessingOfDescriptor(overallList$boxDes[[n]], overallList$iniDataSet, overallList$debug)
 		}
 		overallList$boxDes <- checkOfNormalizedAndUnnormalized(overallList$boxDes)
 	} else {
@@ -947,7 +971,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	if (!is.null(overallList$boxStackDes)) {
 		if (overallList$debug) {ownCat(STACKBOX.PLOT)}
 		for (n in seq(along = overallList$boxStackDes)) {
-			overallList$boxStackDes[n] <- preprocessingOfDescriptor(overallList$boxStackDes[[n]], overallList$iniDataSet)
+			overallList$boxStackDes[n] <- preprocessingOfDescriptor(overallList$boxStackDes[[n]], overallList$iniDataSet, overallList$debug)
 		}	
 #		print("test_stacked")
 #		print(overallList$boxStackDes)
@@ -962,7 +986,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		if (overallList$debug) {ownCat(SPIDER.PLOT)}
 		for (n in seq(along = overallList$boxSpiderDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$boxSpiderDes[n], isColValue = TRUE)
-			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet)
+			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
 			#print(booleanVector)
 			#print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector]))
@@ -984,7 +1008,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		if (overallList$debug) {ownCat(LINERANGE.PLOT)}
 		for (n in seq(along = overallList$linerangeDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$linerangeDes[n], isColValue = TRUE)
-			overallList$linerangeDes[n] = preprocessingOfDescriptor(overallList$linerangeDes[[n]], overallList$iniDataSet)
+			overallList$linerangeDes[n] = preprocessingOfDescriptor(overallList$linerangeDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$linerangeDes[n][[1]]
 			if(sum(booleanVector) > 0) {
 				overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName=TRUE)[[1]][booleanVector])
@@ -1003,7 +1027,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		if (overallList$debug) {ownCat(VIOLIN.PLOT)}
 		for (n in seq(along = overallList$violinBoxDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$violinBoxDes[n], isColValue = TRUE)
-			overallList$violinBoxDes[n] = preprocessingOfDescriptor(overallList$violinBoxDes[[n]], overallList$iniDataSet)
+			overallList$violinBoxDes[n] = preprocessingOfDescriptor(overallList$violinBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$violinBoxDes[n][[1]]
 			if(sum(booleanVector) > 0) {
 				overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName=TRUE)[[1]][booleanVector])
@@ -1278,7 +1302,7 @@ checkOfNormalizedAndUnnormalized <- function(allDes) {
 }
 
 
-preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
+preprocessingOfDescriptor <- function(descriptorVector, iniDataSet, debug=FALSE) {
 ##############	
 #descriptorVector <- overallList$nBoxDes[[n]] 
 #descriptorVector <- overallList$boxStackDes[[n]]
@@ -1292,7 +1316,7 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet) {
 	errorDescriptor = descriptorVector %GetDescriptorAfterCheckIfDescriptorNotExists% iniDataSet 
 	descriptorVector = descriptorVector %GetDescriptorsAfterCheckIfDescriptorExists% iniDataSet
 		
-	if (length(errorDescriptor)>0) {
+	if (length(errorDescriptor)>0 && debug) {
 		errorDescriptor %errorReport% NOT.EXISTS
 	} 
 
@@ -3714,11 +3738,11 @@ writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFi
 	}
 }
 
-loadLibs <- function(installAndUpdate = FALSE) {
+loadLibs <- function(debug = FALSE) {
 	libraries  <- c(
 		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
 		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr") #, "mvoutlier")
-	loadInstallAndUpdatePackages(libraries, installAndUpdate, CHECK.FOR.UPDATE, FALSE)
+	loadInstallAndUpdatePackages(libraries, INSTALL.PACKAGE, CHECK.FOR.UPDATE, FALSE, debug)
 }
 
 myBreaks <- function(value){
@@ -6224,7 +6248,6 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 						} else {
 							error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
 						}
-					
 						checkOfTryError(error, overallList, imagesIndex, typOfPlot)
 					} else {
 						if (INNER.THREADED && DO.PARALLELISATION) {
@@ -6330,7 +6353,7 @@ getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = 
 	}
 }
 
-checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOfPlot = NULL) {
+checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOfPlot = NULL, typ = NULL) {
 	if(!is.null(overallList)) {
 		overallList$debug %debug% "checkOfTryError()"
 	}
@@ -6354,6 +6377,8 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 			#errorFile <- paste(ERROR, SECTION.TEX, ERROR, sep="")
 				  
 			writeOnlyALatexFile(text, getPlotFileName(ERROR), TRUE)
+		} else if(!is.null(typ) && typ == LIB) {
+			return(TRUE)
 		} else {
 #			if(!file.exists(REPORT.FILE)) {
 #				text <- "\\documentclass{article} \\newline
@@ -6366,7 +6391,11 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 			ckeckIfReportTexIsThere(errorText =  geterrmessage())
 			write(x="no Output! The whole script stops!", append=FALSE, file=ERROR.TOTAL.FILE)
 		}
-	} 
+	}
+	
+	if(!is.null(typ) && typ == LIB) {
+		return(FALSE)
+	}
 }
 
 
@@ -6480,7 +6509,7 @@ if(!plotOnlyBoxplot) {
 if(!plotOnlyNBoxMulti) {
 if(!plotOnlyNBox) {
 
-		if (sum(!is.na(overallList$stressDes)) > 0 && DO.MODELLING.OF.STRESS) {
+		if (DO.MODELLING.OF.STRESS && sum(!is.na(overallList$stressDes)) > 0) {
 			if (overallList$debug) {ownCat("stress modelling...")}
 			startDiagramming(overallList, overallList$overallResult_stressDes,  overallList$stressDes, overallList$stressDesName, STRESS.PLOT)				
 		} else {
@@ -6777,7 +6806,7 @@ ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
 	}
 }
 
-ckeckIfReportTexIsThere <- function(errorText = "", file = REPORT.FILE) {
+ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL) {
 	ownCat("Check if the report.tex file is there")
 	
 	if(!file.exists(REPORT.FILE)) {
@@ -6785,9 +6814,16 @@ ckeckIfReportTexIsThere <- function(errorText = "", file = REPORT.FILE) {
 				\\begin{document} \\newline
 				There was an error! \\newline"
 
-		if(errorText != "") {
-			text <- paste(text, errorText, sep="")
-		} 
+		if(!is.null(typ) && typ == LIB) {
+			text <- paste(text, "Please install the following packages (using the install.packages command): \\newline", sep="")
+			for(nn in seq(along=errorText)) {
+				text <- paste(text, nn, ". install.packages(\"", errorText[nn], "\") \\newline", sep="")
+			} 
+		} else {
+			if(errorText != "") {
+				text <- paste(text, errorText, sep="")
+			} 
+		}
 			text <- paste(text, "\\end{document}", sep="")
 		
 		write(x=text, append=FALSE, file=REPORT.FILE)
@@ -6898,15 +6934,15 @@ initRfunction <- function(debug) {
 		options(warn = -1)
 		options(show.error.messages = FALSE)
 	}
-	if (memory.limit() < 15000) {
-		memory.limit(size=15000)
-	}
+#	if (memory.limit() < 15000) {
+#		memory.limit(size=15000)
+#	}
 	
 	while(!is.null(dev.list())) {
 		dev.off()
 	}
 	if(debug) {
-		loadLibs(debug)
+		loadLibs(debug) #debug
 	} else {
 		suppressMessages(loadLibs(debug))
 	}

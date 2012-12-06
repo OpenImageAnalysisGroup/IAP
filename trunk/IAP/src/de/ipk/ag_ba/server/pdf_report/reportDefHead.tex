@@ -25,7 +25,46 @@
 \usepackage{fixltx2e}
 \usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre,
 % Kapitel …) und die richtige Silbentrennung
-\usepackage{hyperref}
+\usepackage[
+bookmarks=true,
+   % Lesezeichen erzeugen
+bookmarksopen=false,
+   % Lesezeichen nicht ausgeklappt
+bookmarksnumbered=true,
+   % Anzeige der Kapitelzahlen am Anfang der Namen der Lesezeichen
+pdfstartpage=1,
+   % Seite, welche automatisch geöffnet werden soll
+   % praktisch, wenn z.B. im Inhaltsverzeichnis gestartet
+   % werden soll oder eine Seite bearbeitet wird.
+baseurl=http://iap.ipk-gatersleben.de/,
+   % URL des PDF-Dokuments (oder Hintergrundinformationen)
+pdftitle={--experimentname--},
+   % Titel des PDF-Dokuments
+pdfauthor={A. Entzian, D. Chen, C. Klukas},
+   % Autor(Innen) des PDF-Dokuments
+%pdfsubject={Kurzbeschreibung als ein Satz},
+   % Inhaltsbeschreibung des PDF-Dokuments
+pdfkeywords={image analysis, phenotyping, Arabidopsis, barley, maize},
+   % Stichwortangabe zum PDF-Dokument
+breaklinks=true,
+   % ermöglicht einen Umbruch von URLs
+colorlinks=true,
+   % Einfärbung von Links
+linkcolor=black,
+   % Linkfarbe: schwarz
+anchorcolor=black,
+   % Ankerfarbe: schwarz
+citecolor=black,
+   % Literaturlinks: schwarz
+filecolor=black,
+   % Links zu lokalen Dateien: schwarz
+menucolor=black,
+   % Acrobat Menü Einträge: schwarz
+pagecolor=black,
+   % Links zu anderen Seiten im Text: schwarz
+urlcolor=black
+   % URL-Farbe: schwarz
+]{hyperref}
 \usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage{datetime}
 
