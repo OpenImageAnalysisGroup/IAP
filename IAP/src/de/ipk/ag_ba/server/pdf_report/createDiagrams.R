@@ -5,7 +5,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 ############## Flags for debugging ####################
 debug <- FALSE
-CATCH.ERROR <- TRUE
+
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -41,7 +41,7 @@ INSTALL.PACKAGE <- FALSE
 
 ERROR <- "error"
 LIB <- "lib"
-UPDATE <- "update"
+CATCH.ERROR <- TRUE
 
 ## long table name
 LONG.UNIT.TABLE <- "unitTable"
@@ -155,8 +155,6 @@ REPORT.FILE <- paste(REPORT, TEX, sep =".")
 ERROR.FILE <- paste(ERROR, TEX, sep =".")
 LIB.ERROR.FILE <- paste(LIB, ERROR, TEX, sep =".")
 ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep ="")
-
-LIB.UPDATE <- paste(LIB, UPDATE, sep ="")
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
@@ -463,8 +461,7 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 	if (length(libraries) > 0) {
 		ownCat("Load libraries:")
 		libError <- FALSE
-		libErrorText <- NULL
-		outOfDateLib <- NULL
+		libErrorText <- NULL;
 		for(nn in libraries) {
 			ownCat(nn)
 			if(CATCH.ERROR) {
@@ -472,8 +469,6 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 				if(checkOfTryError(error, typ=LIB)) {
 					libError <- TRUE
 					libErrorText <- c(libErrorText, nn)
-				} else {
-					outOfDateLib <- checkVersionsOfUsedPackages(nn, outOfDateLib)
 				}
 			} else {
 				iniLibrary(nn)
@@ -482,10 +477,7 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		
 		if(libError) {
 			ckeckIfReportTexIsThere(libErrorText, typ = LIB)
-			stop("Not all necessary libs are installed!", call. = FALSE)
-		} else if(length(outOfDateLib) > 0) {
-			ckeckIfReportTexIsThere(outOfDateLib, typ = LIB.UPDATE)
-			stop("Libs not up to date!", call. = FALSE)
+			stop("Error with the libs!", call. = FALSE)
 		}
 		
 		if (useDev) {
@@ -493,31 +485,6 @@ loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALS
 		}	
 	}	
 }
-
-
-checkVersionsOfUsedPackages <- function(lib, outOfDateLib) {
-	if(!is.null(sessionInfo()$otherPkgs[[lib]]) && !is.null(sessionInfo()$otherPkgs[[lib]]$Version)) {
-		localVersion <- sessionInfo()$otherPkgs[[lib]]$Version
-		
-		minVersion <- switch(lib,
-				Cairo = "1.5-3",
-				RColorBrewer = "1.0-5",
-				data.table = "1.8.6",
-				ggplot2 = "0.9.2.1",
-				fmsb = "0.3.4",
-				snow = "0.3-10",
-				snowfall = "1.84",
-				stringr = "0.6.1")
-		
-		if(localVersion >= minVersion) {
-			return(outOfDateLib)
-		} else {
-			return(c(outOfDateLib, nn))
-		}
-	}
-	return(outOfDateLib)
-}
-
 
 
 iniLibrary <- function(lib) {
@@ -3795,7 +3762,6 @@ myBreaks <- function(value){
 	return(breaks)
 }
 
-
 shapeTransparence <- function(column) {
 	
 	alpha <- 0.1
@@ -6849,16 +6815,10 @@ ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL) {
 				There was an error! \\newline"
 
 		if(!is.null(typ) && typ == LIB) {
-			text <- paste(text, "Please install the following packages (using the \"install.packages\" command): \\newline", sep="")
+			text <- paste(text, "Please install the following packages (using the install.packages command): \\newline", sep="")
 			for(nn in seq(along=errorText)) {
 				text <- paste(text, nn, ". install.packages(\"", errorText[nn], "\") \\newline", sep="")
 			} 
-		} else if (!is.null(typ) && typ == LIB.UPDATE) {
-			text <- paste(text, "Please updtae the following packages (using the \"update.packages\" command): \\newline", sep="")
-			for(nn in seq(along=errorText)) {
-				text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\") \\newline", sep="")
-			}
-			
 		} else {
 			if(errorText != "") {
 				text <- paste(text, errorText, sep="")
