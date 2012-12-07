@@ -28,11 +28,11 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 			ImageOperation wb = warmBack.copy().io();
 			
 			if (getBoolean("Use Center Bottom Position as Temperature Reference", options.isBarley())) {
-				int bx = (int) ((int) wb.getWidth() / 100d * getDouble("Pot Position X (percent)", 47.5));
-				int by = (int) ((int) wb.getHeight() / 100d * getDouble("Pot Position Y (percent)",
+				int bx = (int) (wb.getWidth() / 100d * getDouble("Pot Position X (percent)", 47.5));
+				int by = (int) (wb.getHeight() / 100d * getDouble("Pot Position Y (percent)",
 						options.getCameraPosition() == CameraPosition.SIDE ? 95 : 47.5));
-				int bw = (int) ((int) wb.getWidth() / 100d * getDouble("Pot Width (percent)", 5));
-				int bh = (int) ((int) wb.getHeight() / 100d * getDouble("Pot Height (percent)", 5));
+				int bw = (int) (wb.getWidth() / 100d * getDouble("Pot Width (percent)", 5));
+				int bh = (int) (wb.getHeight() / 100d * getDouble("Pot Height (percent)", 5));
 				if (debug) {
 					wb.copy().canvas()
 							.drawLine(bx, by, bx + bw, by + bh, Color.BLACK.getRGB(), 0, 2)
@@ -46,9 +46,13 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 					.intensitySumOfChannel(false, false, false, false, warmBackgroundValues);
 			Collections.sort(warmBackgroundValues);
 			double sum = 0;
-			for (int i = warmBackgroundValues.size() / 2; i < warmBackgroundValues.size() * 0.75d; i++)
+			int n = 0;
+			double perc = getDouble("reference top n percent", 10) / 100d;
+			for (int i = (int) (warmBackgroundValues.size() - warmBackgroundValues.size() * perc); i < warmBackgroundValues.size(); i++) {
 				sum += warmBackgroundValues.get(i);
-			double warmBackground = sum / (warmBackgroundValues.size() / 4);
+				n++;
+			}
+			double warmBackground = sum / n;
 			int[] res = coldRef.copy().getAs1A();
 			for (int i = 0; i < res.length; i++)
 				res[i] = IAPservice.getIRintensityDifferenceColor(
