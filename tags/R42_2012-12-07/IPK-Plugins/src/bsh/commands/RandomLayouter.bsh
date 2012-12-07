@@ -1,0 +1,23 @@
+// @Layout:Random Layout
+import org.graffiti.graph.Node;
+import org.graffiti.plugin.view.View;
+import org.graffiti.session.EditorSession;
+import java.awt.Dimension;
+import org.graffiti.editor.MainFrame;
+
+session = MainFrame.getInstance().getActiveEditorSession();
+nodes = session.getSelectionModel().getActiveSelection().getNodes();
+if (nodes.size()<=0)
+	nodes = graph.getNodes();
+theView = session.getActiveView();
+viewDimension = theView.getViewComponent().getSize();
+viewHeight = viewDimension.getHeight();
+viewWidth = viewDimension.getWidth();
+
+graph.getListenerManager().transactionStarted(this);
+for (n : nodes) {
+	newX = Math.random() * viewWidth;
+	newY = Math.random() * viewHeight;
+	org.AttributeHelper.setPosition(n, newX, newY);
+}
+graph.getListenerManager().transactionFinished(this);
