@@ -27,11 +27,14 @@ public class BlUseFluoMaskToClear_Arabidopsis_nir extends AbstractSnapshotAnalys
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io().addBorder(0, 00, 0, 0, options.getBackground()).blur(2).getImage(),
+									processedMasks.fluo().io().addBorder(0, 00, 0, 0, options.getBackground())
+											.blur(getDouble("blur fluo mask", 2d))
+											.getImage(),
 									back).print("FILTERED NIR IMAGE", debug).getImage());
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
-					double f = (double) processedMasks.nir().getWidth() / (double) processedMasks.fluo().getWidth() * 0.985d;
+					double f = (double) processedMasks.nir().getWidth() / (double) processedMasks.fluo().getWidth()
+							* getDouble("fluo scaling factor X", 0.98d);
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask(
 									processedMasks.fluo().io().resize(f, f).getImage(),
