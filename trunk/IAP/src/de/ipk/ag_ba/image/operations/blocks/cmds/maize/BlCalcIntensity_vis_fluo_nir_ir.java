@@ -44,7 +44,7 @@ public class BlCalcIntensity_vis_fluo_nir_ir extends AbstractSnapshotAnalysisBlo
 		
 		debug = getBoolean("debug", false);
 		debugRegionParts = getBoolean("Debug-Show-Region-Images", false);
-		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", false);
+		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", true);
 		addHistogramValues = getBoolean("Add_Histogram_Values", false);
 		
 		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
