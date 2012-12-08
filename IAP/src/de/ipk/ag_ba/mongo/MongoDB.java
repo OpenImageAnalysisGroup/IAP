@@ -153,7 +153,7 @@ public class MongoDB {
 				res.add(c);
 		}
 		// if (IAPservice.isReachable("ba-24.ipk-gatersleben.de"))
-		// res.add(new MongoDB("Storage 2 (BA-24)", "cloud3", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
+		res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", null, null, HashType.MD5));
 		// res.add(new MongoDB("Storage 2 (BA-24)", "cloud2", "ba-24.ipk-gatersleben.de", "iap24", "iap24", HashType.MD5));
 		// } else
 		// res.add(getLocalDB());
