@@ -303,7 +303,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					actionPanelRight.setBackground(new Color(255, 220, 220));
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
-					actionPanelRight.add(TableLayout.getMultiSplit(right, 100, 6, 6, 5, 5), "0,0");
+					actionPanelRight.add(TableLayout.getMultiSplit(right, TableLayout.PREFERRED, 6, 6, 5, 5), "0,0");
 				} else {
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();

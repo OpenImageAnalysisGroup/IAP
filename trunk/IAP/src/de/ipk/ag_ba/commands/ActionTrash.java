@@ -79,64 +79,80 @@ public class ActionTrash extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) {
 		message = "<html><ul>";
 		try {
-			if (getHeader() != null)
-				for (ExperimentHeaderInterface hhh : getHeader()) {
-					ExperimentInfo ei = null;
-					if (hhh == null)
-						return;
-					else
-						ei = new ExperimentInfo(hhh);
-					experimentName = hhh.getExperimentName();
-					message += "<li>Process Experiment " + experimentName + ": ";
-					if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
-						if (getHeader() != null) {
-							m.deleteExperiment(hhh.getDatabaseId());
-							message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
-						} else {
-							Object[] res = MyInputHelper.getInput("<html>"
-									+ "You are about to delete a dataset from the database.<br>"
-									+ "This action can not be undone.<br>"
-									+ "Connected binary files are not immediately removed, but only<br>"
-									+ "during the process of database maintanance procedures.",
-									"Confirm final deletion operation", new Object[] {
-											"Remove experiment " + ei.experimentName + " from database?", false });
-							if (res != null && (Boolean) res[0]) {
-								// CallDBE2WebService.setDeleteExperiment(login, pass,
-								// experimentName);
-								// message = "<html><b>" + "Experiment " +
-								// experimentName +
-								// " has been removed from the database.";
-								message += " Internal Error";
-							} else {
-								message += " has NOT been deleted.";
-							}
-						}
-					}
-					if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {
-						try {
-							m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-							message += "has been marked as trashed!";
-						} catch (Exception e) {
-							message += "Error: " + e.getMessage();
-						}
-					}
-					if (cmd == DeletionCommand.UNTRASH) {
-						try {
-							String type = hhh.getExperimentType();
-							if (type.contains("Trash;"))
-								type = StringManipulationTools.stringReplace(type, "Trash;", "");
-							if (type.contains("Trash"))
-								type = StringManipulationTools.stringReplace(type, "Trash", "");
-							m.setExperimentType(hhh, type);
-							message += "Experiment " + experimentName + " has been put out of trash!";
-						} catch (Exception e) {
-							message += "Error: " + e.getMessage();
-						}
-					}
+			Collection<ExperimentHeaderInterface> list = getHeader();
+			if (list != null && list.size() > 0) {
+				int idx = 0;
+				for (ExperimentHeaderInterface hhh : list) {
+					status.setCurrentStatusText1("Processing");
+					idx++;
+					status.setCurrentStatusText2(idx + "/" + list.size());
+					processExperiment(hhh);
+					status.setCurrentStatusValueFine(100d * idx / list.size());
 				}
+				status.setCurrentStatusText1("Finished");
+				status.setCurrentStatusText2("");
+				message = "Finished processing of " + list.size() + " experiments!";
+			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			message = "Error: " + e.getMessage();
+			status.setCurrentStatusText1("Error:");
+			status.setCurrentStatusText2(e.getMessage());
+		}
+	}
+	
+	private void processExperiment(ExperimentHeaderInterface hhh) throws Exception {
+		ExperimentInfo ei = null;
+		if (hhh == null)
+			return;
+		else
+			ei = new ExperimentInfo(hhh);
+		experimentName = hhh.getExperimentName();
+		message += "<li>Process Experiment " + experimentName + ": ";
+		if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
+			if (getHeader() != null) {
+				m.deleteExperiment(hhh.getDatabaseId());
+				message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
+			} else {
+				Object[] res = MyInputHelper.getInput("<html>"
+						+ "You are about to delete a dataset from the database.<br>"
+						+ "This action can not be undone.<br>"
+						+ "Connected binary files are not immediately removed, but only<br>"
+						+ "during the process of database maintanance procedures.",
+						"Confirm final deletion operation", new Object[] {
+								"Remove experiment " + ei.experimentName + " from database?", false });
+				if (res != null && (Boolean) res[0]) {
+					// CallDBE2WebService.setDeleteExperiment(login, pass,
+					// experimentName);
+					// message = "<html><b>" + "Experiment " +
+					// experimentName +
+					// " has been removed from the database.";
+					message += " Internal Error";
+				} else {
+					message += " has NOT been deleted.";
+				}
+			}
+		}
+		if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {
+			try {
+				m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+				message += "has been marked as trashed!";
+			} catch (Exception e) {
+				message += "Error: " + e.getMessage();
+			}
+		}
+		if (cmd == DeletionCommand.UNTRASH) {
+			try {
+				String type = hhh.getExperimentType();
+				if (type.contains("Trash;"))
+					type = StringManipulationTools.stringReplace(type, "Trash;", "");
+				if (type.contains("Trash"))
+					type = StringManipulationTools.stringReplace(type, "Trash", "");
+				m.setExperimentType(hhh, type);
+				message += "Experiment " + experimentName + " has been put out of trash!";
+			} catch (Exception e) {
+				message += "Error: " + e.getMessage();
+			}
 		}
 	}
 	
