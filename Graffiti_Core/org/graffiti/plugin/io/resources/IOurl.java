@@ -117,4 +117,8 @@ public class IOurl {
 			fn = fn.substring(fn.lastIndexOf("."));
 		return fn;
 	}
+	
+	public boolean endsWith(String postfix) {
+		return filename.endsWith(postfix);
+	}
 }

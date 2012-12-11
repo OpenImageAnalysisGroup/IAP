@@ -7,9 +7,9 @@
 
 package de.ipk.ag_ba.gui.nav;
 
-import java.util.HashMap;
-
 import javax.swing.ImageIcon;
+
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.commands.Library;
@@ -74,25 +74,28 @@ public class RimasNav {
 	
 	private static String getIntroTxt() {
 		String s = "<h2>RIMAS - Regulatory Interaction Maps of Arabidopsis Seed Development</h2>"
-							+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
-							+ "of transcription factor hierarchies, gene promoter elements, hormonal pathways, epigenetic "
-							+ "processes and chromatin remodelling and provides an easy access to the relevant references.<br><br>"
-							+ "IAP provides interactive access to the RIMAS pathways. RIMAS itself is a web-based information "
-							+ "portal with additional detailed descriptions and background information about the investigated "
-							+ "biological phenomena (please click the Website button above for access to detailed pathway descriptions).";
+				+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
+				+ "of transcription factor hierarchies, gene promoter elements, hormonal pathways, epigenetic "
+				+ "processes and chromatin remodelling and provides an easy access to the relevant references.<br><br>"
+				+ "IAP provides interactive access to the RIMAS pathways. RIMAS itself is a web-based information "
+				+ "portal with additional detailed descriptions and background information about the investigated "
+				+ "biological phenomena (please click the Website button above for access to detailed pathway descriptions).";
 		return s;
 	}
 	
 	public static NavigationButton getRimas(GUIsetting guiSetting) {
 		Library rimasDoku = new Library();
-		rimasDoku.add(new Book("", "Lit. Reference", "http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0"));
-		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(rimasDoku, "RIMAS", "img/rimas.png",
-							"http://rimas.ipk-gatersleben.de/Pathways/", "Website", "img/browser.png",
-							"http://rimas.ipk-gatersleben.de/", new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
+		rimasDoku.add(new Book("", "Lit. Reference",
+				new IOurl("http://www.cell.com/trends/plant-science/abstract/S1360-1385(10)00061-0")));
+		NavigationButton rimas = WebFolder.getBrowserNavigationEntity(
+				rimasDoku, "RIMAS", "img/rimas.png",
+				"http://rimas.ipk-gatersleben.de/Pathways/",
+				"Website", "img/browser.png",
+				new IOurl("http://rimas.ipk-gatersleben.de/"),
+				new String[] { ".gml", ".graphml" }, getIntroTxt(), null, guiSetting);
 		
 		return rimas;
 	}
-	
 	//
 	// protected JComponent getPathwayButton(final String url, final String
 	// title, String image) {

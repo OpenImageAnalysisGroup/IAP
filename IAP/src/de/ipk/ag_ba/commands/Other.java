@@ -23,12 +23,12 @@ import org.ObjectRef;
 import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import com.mongodb.gridfs.GridFSDBFile;
 
 import de.ipk.ag_ba.commands.lemnatec.ActionGridFSscreenshotMonitoring;
-import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamBarleyGH;
-import de.ipk.ag_ba.commands.lemnatec.ActionLemnaCamMaizeGH;
+import de.ipk.ag_ba.commands.lemnatec.ActionWebCamView;
 import de.ipk.ag_ba.commands.mongodb.ActionMassCopyHistory;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -136,14 +136,13 @@ public class Other {
 		return result;
 	}
 	
-	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus,
-			GUIsetting guIsetting) {
-		return getServerStatusEntity(includeLemnaTecStatus, "System Status", guIsetting);
+	public static NavigationButton getServerStatusEntity(GUIsetting guIsetting) {
+		return getServerStatusEntity("System Status", guIsetting);
 	}
 	
 	static Timer globalScreenshotTimer = null;
 	
-	public static NavigationButton getServerStatusEntity(final boolean includeLemnaTecStatus, String title,
+	public static NavigationButton getServerStatusEntity(String title,
 			GUIsetting guIsetting) {
 		NavigationAction serverStatusAction = new AbstractNavigationAction("Check service availability") {
 			private NavigationButton src;
@@ -164,8 +163,25 @@ public class Other {
 				
 				int numberOfCameras = SystemOptions.getInstance().getInteger("CCTV", "n", 2);
 				for (int idx = 0; idx < numberOfCameras; idx++) {
-					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
-					resultNavigationButtons.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
+					String tooltip = "Show Barley Greenhouse";
+					String title = "CCTV (Barley)";
+					String user = "";
+					String pass = "";
+					String auth = "";
+					if (user != null && pass != null && !user.isEmpty())
+						auth = user + ":" + pass + "@";
+					String ur = "http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg";
+					if (!auth.isEmpty())
+						ur = ur.replaceFirst("://", "://" + auth);
+					IOurl url = new IOurl(ur);
+					
+					// "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" +
+					// System.currentTimeMillis();
+					// imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";
+					
+					resultNavigationButtons.add(
+							ActionWebCamView.getLemnaCamButton(src.getGUIsetting(),
+									tooltip, title, url));
 				}
 				
 				{
@@ -260,16 +276,6 @@ public class Other {
 							"Watch-Service|Automatic Copy//enabled"), src.getGUIsetting()));
 					
 					resultNavigationButtons.add(new NavigationButton(new ActionMassCopyHistory("Show DB-Copy history"), src.getGUIsetting()));
-				}
-				if (includeLemnaTecStatus) {
-					resultNavigationButtons.add(ActionLemnaCamMaizeGH.getLemnaCamButton(src.getGUIsetting()));
-					
-					resultNavigationButtons.add(ActionLemnaCamBarleyGH.getLemnaCamButton(src.getGUIsetting()));
-					// if (!IAPservice.isReachable("http://lemnacam.ipk-gatersleben.de"))
-					// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
-					
-					// if (!IAPservice.isReachable("http://ba-10.ipk-gatersleben.de"))
-					// resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 				}
 				
 				boolean simpleIcons = true;

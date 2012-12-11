@@ -69,13 +69,14 @@ import org.graffiti.graphics.LabelAttribute;
 import org.graffiti.graphics.LineModeAttribute;
 import org.graffiti.graphics.NodeGraphicAttribute;
 import org.graffiti.graphics.NodeLabelAttribute;
+import org.graffiti.plugin.io.resources.IOurl;
 
 /**
  * Attribute Helper Class - Makes it more easy to work with graph/node
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -3628,5 +3629,9 @@ public class AttributeHelper implements HelperClass {
 				showInBrowser(folder + fn);
 			}
 		}
+	}
+	
+	public static void showInBrowser(IOurl url) {
+		showInBrowser(url + "");
 	}
 }

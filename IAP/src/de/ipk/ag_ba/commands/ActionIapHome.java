@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
@@ -70,7 +71,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
 		
-		NavigationButton serverStatusEntity = Other.getServerStatusEntity(false, src != null ? src.getGUIsetting() : null);
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
 		String hsm = IAPmain.getHSMfolder();
@@ -140,7 +141,8 @@ public final class ActionIapHome extends AbstractNavigationAction {
 							+ "partly with contributions from the group Bioinformatics and Information Technology. "
 							+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links."
 					);
-			ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton("Website", "http://bioinformatics.ipk-gatersleben.de",
+			ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton("Website",
+					new IOurl("http://bioinformatics.ipk-gatersleben.de"),
 					"img/browser.png", src != null ? src.getGUIsetting() : null));
 			for (NavigationButton nge : homeActions)
 				ipkBioInf.addAdditionalEntity(nge);

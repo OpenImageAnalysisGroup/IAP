@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.datasources.http_folder;
 
+import org.graffiti.plugin.io.resources.IOurl;
+
 import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -18,19 +20,19 @@ public class MetaCropDataSource extends HTTPfolderSource {
 	
 	public MetaCropDataSource() {
 		super(getLib(),
-							"MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
-							IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon("img/ext/folder-remote.png"));
+				"MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
+				IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon("img/ext/folder-remote.png"));
 		setDescription("<h2>MetaCrop</h2>"
-							+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
-							+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
-							+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
-							+ "For background information and further information please visit the MetaCrop website, accessible by using the "
-							+ "Website button, shown above.");
+				+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
+				+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
+				+ "IAP as well as VANTED provide access to the exported MetaCrop pathways in a graphical and interactive way.<br>"
+				+ "For background information and further information please visit the MetaCrop website, accessible by using the "
+				+ "Website button, shown above.");
 	}
 	
 	private static Library getLib() {
 		Library libMetaCrop = new Library();
-		libMetaCrop.add(new Book("MetaCrop", "Website", "http://metacrop.ipk-gatersleben.de", "img/browser.png"));
+		libMetaCrop.add(new Book("MetaCrop", "Website", new IOurl("http://metacrop.ipk-gatersleben.de"), "img/browser.png"));
 		return libMetaCrop;
 	}
 	
