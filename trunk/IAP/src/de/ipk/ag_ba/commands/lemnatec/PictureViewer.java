@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.MarkComponent;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.util.IAPwebcam;
 import de.ipk_gatersleben.ag_nw.graffiti.JLabelHTMLlink;
 
 public class PictureViewer extends JPanel implements HierarchyListener {
@@ -19,10 +19,10 @@ public class PictureViewer extends JPanel implements HierarchyListener {
 	
 	ThreadSafeOptions tso = new ThreadSafeOptions();
 	
-	public PictureViewer(final IAPwebcam webcam, String url,
+	public PictureViewer(IOurl url,
 			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		setLayout(TableLayout.getLayout(650, 800));
-		final UpdatingImagePanel view = new UpdatingImagePanel(webcam, status);
+		final UpdatingImagePanel view = new UpdatingImagePanel(url, status);
 		final MarkComponent mark = new MarkComponent(view, true, 640, false, 480);
 		boolean markBothsides = false;
 		if (markBothsides)
@@ -31,8 +31,8 @@ public class PictureViewer extends JPanel implements HierarchyListener {
 				
 				TableLayout.getSplitVertical(
 						new JLabelHTMLlink("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&gt;" +
-								"Click here, to load " + (webcam.hasVideoStream() ? "video" : "image") + " in web-browser" +
-								"<br>&nbsp;<br>", url, "Open " + url),
+								"Click here, to load the URL in the web-browser" +
+								"<br>&nbsp;<br>", url.toString(), "Open " + url.toString()),
 						mark,
 						TableLayout.PREFERRED, TableLayout.FILL)
 				, "0,0");
@@ -55,7 +55,7 @@ public class PictureViewer extends JPanel implements HierarchyListener {
 				}
 			}
 		});
-		t.setName("Webcam view update thread (" + webcam + ")");
+		t.setName("Webcam view update thread");
 		t.start();
 		
 		addHierarchyListener(this);

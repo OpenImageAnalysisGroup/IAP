@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.datasources.http_folder;
 
+import org.graffiti.plugin.io.resources.IOurl;
+
 import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -45,8 +47,8 @@ public class LemnaTecDokuSource extends HTTPfolderSource {
 							"title", "Documentation"), // warning: needs to be the same title as above
 					IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
 							"user_doc_title", "IPK Naming Standards"),
-					IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
-							"user_doc_url", "http://ba-13.ipk-gatersleben.de/standards.pdf"),
+					new IOurl(IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
+							"user_doc_url", "http://ba-13.ipk-gatersleben.de/standards.pdf")),
 					"img/ext/paper.png"));
 		}
 		return libLemnaTecDocu;

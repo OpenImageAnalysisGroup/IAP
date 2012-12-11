@@ -3,21 +3,21 @@ package de.ipk.ag_ba.commands.lemnatec;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-
-import de.ipk.ag_ba.gui.util.IAPwebcam;
+import org.graffiti.plugin.io.resources.IOurl;
 
 public class UpdatingImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image;
-	private final IAPwebcam webcam;
 	private final BackgroundTaskStatusProviderSupportingExternalCall status;
+	private IOurl url;
 	
-	public UpdatingImagePanel(IAPwebcam webcam,
+	public UpdatingImagePanel(IOurl url,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
-		this.webcam = webcam;
+		this.url = url;
 		this.status = status;
 		setSize(800, 600);
 	}
@@ -49,7 +49,7 @@ public class UpdatingImagePanel extends JPanel {
 			boolean doIt = false;
 			if (doIt)
 				status.setCurrentStatusText1(s + "");
-			img = webcam.getSnapshot().getAsBufferedImage();
+			img = ImageIO.read(url.getInputStream());
 			if (doIt)
 				status.setCurrentStatusText1(s.substring(0, s.length() - 1) + "#");
 			

@@ -10,6 +10,8 @@ package de.ipk.ag_ba.datasources.http_folder;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.graffiti.plugin.io.resources.IOurl;
+
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
@@ -45,12 +47,12 @@ public class IAPnewsLinksSource extends HTTPfolderSource {
 				"img/CIB_logo.png", "img/CIB_logo.png");
 		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
 				"Website",
-				"http://www.imbio.de/forschung2/",
+				new IOurl("http://www.imbio.de/forschung2/"),
 				"img/browser.png", src != null ? src.getGUIsetting() : null));
 		
 		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
 				"MyBioNet",
-				"http://bis.zju.edu.cn/mybionet/",
+				new IOurl("http://bis.zju.edu.cn/mybionet/"),
 				"img/ext/MyBioNet48.png", src != null ? src.getGUIsetting() : null));
 		
 		Collection<NavigationButton> nbl = new ArrayList<NavigationButton>();

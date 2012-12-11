@@ -83,7 +83,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		nVis = 0;
 		
 		if (error) {
-			res.add(Other.getServerStatusEntity(false, "<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
+			res.add(Other.getServerStatusEntity("<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
 		} else {
 			if (!limitToResuls) {
 				if (IAPmain.getRunMode() == IAPrunMode.WEB)
@@ -114,7 +114,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			// gruppe => user => experiment
 			
 			if (experimentList == null) {
-				res.add(Other.getServerStatusEntity(true, "Error Status", src.getGUIsetting()));
+				res.add(Other.getServerStatusEntity("Error Status", src.getGUIsetting()));
 			} else {
 				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 				LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();

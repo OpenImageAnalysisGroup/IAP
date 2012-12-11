@@ -43,7 +43,6 @@ import org.graffiti.util.InstanceLoader;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
-import de.ipk.ag_ba.gui.util.WebCamHandler;
 import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
@@ -191,8 +190,6 @@ public class IAPmain extends JApplet {
 		for (MongoDB m : MongoDB.getMongos())
 			for (ResourceIOHandler handler : m.getHandlers())
 				ResourceIOManager.registerIOHandler(handler);
-		
-		ResourceIOManager.registerIOHandler(new WebCamHandler());
 	}
 	
 	public void myAppletLoad(final MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {

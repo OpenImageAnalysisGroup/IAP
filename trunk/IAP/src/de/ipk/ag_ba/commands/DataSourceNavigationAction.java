@@ -61,13 +61,13 @@ public class DataSourceNavigationAction extends AbstractNavigationAction {
 			if (wl.isBookmark()) {
 				Book b = new Book(wl.getGroup1(),
 						makePretty(wl.getFileName()),
-						wl.getURL().toString());
+						wl.getURL());
 				actions.add(b.getNavigationButton(src, "img/browser.png"));
 			}
 			if (wl.isPDF()) {
 				Book b = new Book(wl.getGroup1(),
 						makePretty(wl.getFileName()),
-						wl.getURL().toString());
+						wl.getURL());
 				actions.add(b.getNavigationButton(src, "img/ext/paper.png"));
 			}
 		}

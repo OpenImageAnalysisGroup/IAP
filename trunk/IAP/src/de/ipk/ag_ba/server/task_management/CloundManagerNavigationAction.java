@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.ErrorMsg;
 import org.SystemOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudClusterHostInformation;
@@ -102,7 +103,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 								guiSetting));
 				if (clusterStatusURL != null && !clusterStatusURL.isEmpty()) {
 					res.add(WebFolder.getURLactionButtton("Analyze Cluster Status",
-							clusterStatusURL,
+							new IOurl(clusterStatusURL),
 							IAPimages.getComputerConsole(), src.getGUIsetting()));
 				}
 			}

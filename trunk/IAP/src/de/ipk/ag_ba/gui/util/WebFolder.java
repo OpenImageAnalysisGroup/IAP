@@ -9,7 +9,6 @@ package de.ipk.ag_ba.gui.util;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.geom.AffineTransform;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +26,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.graffiti.graph.Graph;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.view.ZoomListener;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -50,7 +50,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class WebFolder {
 	public static NavigationButton getBrowserNavigationEntity(final Library lib, String title,
 			String icon, final String url, final String referenceTitle, final String referenceImage,
-			final String referenceURL, final String[] valid, final String introTxt,
+			final IOurl referenceURL, final String[] valid, final String introTxt,
 			final String optSubFolderForFolderItems, GUIsetting guiSetting) {
 		
 		NavigationButton nav = new NavigationButton(new AbstractNavigationAction("Open web-folder content") {
@@ -89,7 +89,7 @@ public class WebFolder {
 						}
 						
 						@Override
-						public String getURL() {
+						public IOurl getURL() {
 							return referenceURL;
 						}
 					};
@@ -119,7 +119,7 @@ public class WebFolder {
 							}
 							
 							@Override
-							public String getURL() {
+							public IOurl getURL() {
 								return fp.getUrl();
 							}
 						};
@@ -162,7 +162,7 @@ public class WebFolder {
 						}
 					}
 				} catch (Exception e) {
-					NavigationButton ne = Other.getServerStatusEntity(false, src.getGUIsetting());
+					NavigationButton ne = Other.getServerStatusEntity(src.getGUIsetting());
 					ne.setTitle("- Connection Problem -");
 					actions.add(ne);
 					ErrorMsg.addErrorMessage(e);
@@ -330,10 +330,10 @@ public class WebFolder {
 		}
 	}
 	
-	public static NavigationButton getURLactionButtton(String title, final String referenceURL, String image,
+	public static NavigationButton getURLactionButtton(String title, final IOurl referenceURL, String image,
 			GUIsetting guiSetting) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
-			String trueURL = null;
+			IOurl trueURL = null;
 			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
@@ -341,7 +341,7 @@ public class WebFolder {
 					if (referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
-						} catch (IOException e) {
+						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
 							AttributeHelper.showInBrowser(referenceURL);
 							return;
@@ -362,12 +362,12 @@ public class WebFolder {
 			}
 			
 			@Override
-			public String getURL() {
+			public IOurl getURL() {
 				if (trueURL == null)
 					if (referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
-						} catch (IOException e) {
+						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
 							return trueURL;
 						}

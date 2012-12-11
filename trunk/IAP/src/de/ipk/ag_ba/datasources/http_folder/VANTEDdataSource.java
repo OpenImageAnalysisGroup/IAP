@@ -10,6 +10,8 @@ package de.ipk.ag_ba.datasources.http_folder;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.graffiti.plugin.io.resources.IOurl;
+
 import de.ipk.ag_ba.commands.Book;
 import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
@@ -102,10 +104,10 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	
 	private static Library getLibrary() {
 		Library liblVANTED = new Library();
-		liblVANTED.add(new Book(VANTED, "Website", "http://vanted.ipk-gatersleben.de/", "img/browser.png"));
-		liblVANTED.add(new Book(VANTED, "Source Code", "http://vanted.ipk-gatersleben.de/#ui-tabs-9"));
-		liblVANTED.add(new Book(VANTED, "Add-ons", "http://vanted.ipk-gatersleben.de/#ui-tabs-11"));
-		liblVANTED.add(new Book(VANTED, "Lit. References", "http://vanted.ipk-gatersleben.de/#ui-tabs-13"));
+		liblVANTED.add(new Book(VANTED, "Website", new IOurl("http://vanted.ipk-gatersleben.de/", "img/browser.png")));
+		liblVANTED.add(new Book(VANTED, "Source Code", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-9")));
+		liblVANTED.add(new Book(VANTED, "Add-ons", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-11")));
+		liblVANTED.add(new Book(VANTED, "Lit. References", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-13")));
 		return liblVANTED;
 	}
 	

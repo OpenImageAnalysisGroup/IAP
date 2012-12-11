@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.AttributeHelper;
 import org.ReleaseInfo;
 import org.SystemOptions;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.PipelineDesc;
@@ -79,7 +80,7 @@ public class ActionSetup extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>(res);
-		Book book = new Book(null, "Help", "http://iap.ipk-gatersleben.de/", "img/dataset.png");
+		Book book = new Book(null, "Help", new IOurl("http://iap.ipk-gatersleben.de/"), "img/dataset.png");
 		rr.add(0, book.getNavigationButton(src));
 		return rr;
 	}

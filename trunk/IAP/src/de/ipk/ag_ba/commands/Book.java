@@ -7,11 +7,11 @@
 
 package de.ipk.ag_ba.commands;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
 import org.StringManipulationTools;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -25,14 +25,14 @@ public class Book {
 	
 	private final String folder;
 	private final String title;
-	private final String url;
+	private final IOurl url;
 	private final String icon;
 	
-	public Book(String folder, String title, String url) {
+	public Book(String folder, String title, IOurl url) {
 		this(folder, title, url, "img/dataset.png");
 	}
 	
-	public Book(String folder, String title, String url, String icon) {
+	public Book(String folder, String title, IOurl url, String icon) {
 		this.folder = folder;
 		this.title = prettify(title);
 		this.url = url;
@@ -54,7 +54,7 @@ public class Book {
 		return StringManipulationTools.stringReplace(title, ".webloc", "");
 	}
 	
-	public String getUrl() {
+	public IOurl getUrl() {
 		return url;
 	}
 	
@@ -68,16 +68,16 @@ public class Book {
 	
 	public NavigationButton getNavigationButton(NavigationButton src, String icon) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
-			String trueURL = null;
+			IOurl trueURL = null;
 			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
-				String referenceURL = Book.this.getUrl();
+				IOurl referenceURL = Book.this.getUrl();
 				if (trueURL == null)
 					if (referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
-						} catch (IOException e) {
+						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
 							AttributeHelper.showInBrowser(referenceURL);
 							return;
@@ -98,13 +98,13 @@ public class Book {
 			}
 			
 			@Override
-			public String getURL() {
-				String referenceURL = Book.this.getUrl();
+			public IOurl getURL() {
+				IOurl referenceURL = Book.this.getUrl();
 				if (trueURL == null)
 					if (referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
-						} catch (IOException e) {
+						} catch (Exception e) {
 							MongoDB.saveSystemErrorMessage("Could not read webloc-file from " + referenceURL + ".", e);
 							return trueURL;
 						}

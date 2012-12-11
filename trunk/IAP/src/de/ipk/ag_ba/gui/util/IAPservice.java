@@ -124,7 +124,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class IAPservice {
-	static boolean createVideo = false;
 	
 	public static boolean isReachable(String host) {
 		InetAddress address;
@@ -152,8 +151,8 @@ public class IAPservice {
 			private final ObjectRef scrollpaneRef = new ObjectRef();
 			
 			@Override
-			public String getURL() {
-				return mmc.getURL().toString();
+			public IOurl getURL() {
+				return mmc.getURL();
 			}
 			
 			@Override
@@ -1074,15 +1073,17 @@ public class IAPservice {
 		} else
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
-		HashMap<IAPwebcam, Long> cam2lastSnapshot = new HashMap<IAPwebcam, Long>();
 		
 		long startTime = System.currentTimeMillis();
 		
 		boolean containsAutoTimingSetting = false;
+		HashMap<IOurl, Long> cam2lastSnapshot = new HashMap<IOurl, Long>();
 		HashMap<String, BitSet> experimentId2minutesWithDataFromLastDay = new HashMap<String, BitSet>();
 		int autoTimeingLastInfoDay = -1;
 		while (true) {
-			if (createVideo) {
+			cam2lastSnapshot = initWebCamURLlist(cam2lastSnapshot);
+			
+			if (SystemOptions.getInstance().getBoolean("Watch-Service", "IP cameras//Store Webcam Images", false)) {
 				storeImages(cam2lastSnapshot);
 			}
 			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", true);
@@ -1285,17 +1286,50 @@ public class IAPservice {
 		}
 	}
 	
-	private synchronized static void storeImages(final HashMap<IAPwebcam, Long> cam2lastSnapshot) {
-		if (!cam2lastSnapshot.containsKey(IAPwebcam.BARLEY))
-			cam2lastSnapshot.put(IAPwebcam.BARLEY, 0l);
-		if (!cam2lastSnapshot.containsKey(IAPwebcam.MAIZE))
-			cam2lastSnapshot.put(IAPwebcam.MAIZE, 0l);
+	private static String[] templateWebCamTitles = new String[] {
+			"Barley Cam",
+			"Maize Cam",
+			"Phytochamber Cam 1",
+			"Phytochamber Cam 2"
+	};
+	
+	private static String[] templateWebCamtURLs = new String[] {
+			"root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=[time]",
+			"http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity",
+			"http://ba-16.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity",
+			"http://ba-17.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity"
+	};
+	
+	protected static HashMap<IOurl, Long> initWebCamURLlist(HashMap<IOurl, Long> cam2lastSnapshot) {
+		ArrayList<String> urls = new ArrayList<String>();
+		for (int idx = 0; idx < SystemOptions.getInstance().getInteger("Watch-Service", "IP cameras//N", templateWebCamtURLs.length); idx++) {
+			String n = SystemOptions.getInstance().getString("Watch-Service",
+					"IP cameras//Title-" + (idx + 1), templateWebCamTitles[idx]);
+			String u = SystemOptions.getInstance().getString("Watch-Service",
+					"IP cameras//URL-" + (idx + 1), templateWebCamtURLs[idx]);
+			boolean e = SystemOptions.getInstance().getBoolean("Watch-Service",
+					"IP cameras//Webcam " + (idx + 1) + " enabled", true);
+			if (e && n != null && !n.isEmpty() && u != null && !u.isEmpty())
+				urls.add(u);
+		}
+		HashMap<IOurl, Long> newCam2lastSnapshot = new HashMap<IOurl, Long>(urls.size());
+		for (String u : urls) {
+			if (cam2lastSnapshot.containsKey(new IOurl(u)))
+				newCam2lastSnapshot.put(new IOurl(u), cam2lastSnapshot.get(new IOurl(u)));
+			else
+				newCam2lastSnapshot.put(new IOurl(u), 0l);
+		}
+		cam2lastSnapshot = newCam2lastSnapshot;
+		return cam2lastSnapshot;
+	}
+	
+	private synchronized static void storeImages(final HashMap<IOurl, Long> cam2lastSnapshot) {
 		long t = System.currentTimeMillis();
-		for (final IAPwebcam cam : cam2lastSnapshot.keySet()) {
+		for (final IOurl cam : cam2lastSnapshot.keySet()) {
 			try {
 				// at most every 5 minutes
 				if (t - cam2lastSnapshot.get(cam) >= 1000 * 60 * 5) {
-					final InputStream inp = cam.getSnapshotJPGdata();
+					final InputStream inp = cam.getInputStream();
 					MongoDB mm = MongoDB.getDefaultCloud();
 					mm.processDB(new RunnableOnDB() {
 						private DB db;
@@ -1543,9 +1577,8 @@ public class IAPservice {
 		}
 	}
 	
-	public static String getURLfromWeblocFile(String referenceURL) throws IOException {
-		URL url = new URL(referenceURL);
-		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+	public static IOurl getURLfromWeblocFile(IOurl referenceURL) throws Exception {
+		BufferedReader in = new BufferedReader(new InputStreamReader(referenceURL.getInputStream()));
 		String result = null;
 		String str;
 		while ((str = in.readLine()) != null) {
@@ -1556,6 +1589,6 @@ public class IAPservice {
 			}
 		}
 		in.close();
-		return result;
+		return new IOurl(result);
 	}
 }
