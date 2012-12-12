@@ -1301,7 +1301,21 @@ public class IAPservice {
 	};
 	
 	protected static HashMap<IOurl, Long> initWebCamURLlist(HashMap<IOurl, Long> cam2lastSnapshot) {
-		ArrayList<String> urls = new ArrayList<String>();
+		ArrayList<WebCamInfo> urls = getActiveWebCamURLs();
+		HashMap<IOurl, Long> newCam2lastSnapshot = new HashMap<IOurl, Long>(urls.size());
+		for (WebCamInfo wi : urls) {
+			String u = wi.getUrl();
+			if (cam2lastSnapshot.containsKey(new IOurl(u)))
+				newCam2lastSnapshot.put(new IOurl(u), cam2lastSnapshot.get(new IOurl(u)));
+			else
+				newCam2lastSnapshot.put(new IOurl(u), 0l);
+		}
+		cam2lastSnapshot = newCam2lastSnapshot;
+		return cam2lastSnapshot;
+	}
+	
+	public static ArrayList<WebCamInfo> getActiveWebCamURLs() {
+		ArrayList<WebCamInfo> urls = new ArrayList<WebCamInfo>();
 		for (int idx = 0; idx < SystemOptions.getInstance().getInteger("Watch-Service", "IP cameras//N", templateWebCamtURLs.length); idx++) {
 			String n = SystemOptions.getInstance().getString("Watch-Service",
 					"IP cameras//Title-" + (idx + 1), templateWebCamTitles[idx]);
@@ -1310,17 +1324,9 @@ public class IAPservice {
 			boolean e = SystemOptions.getInstance().getBoolean("Watch-Service",
 					"IP cameras//Webcam " + (idx + 1) + " enabled", true);
 			if (e && n != null && !n.isEmpty() && u != null && !u.isEmpty())
-				urls.add(u);
+				urls.add(new WebCamInfo(u, n));
 		}
-		HashMap<IOurl, Long> newCam2lastSnapshot = new HashMap<IOurl, Long>(urls.size());
-		for (String u : urls) {
-			if (cam2lastSnapshot.containsKey(new IOurl(u)))
-				newCam2lastSnapshot.put(new IOurl(u), cam2lastSnapshot.get(new IOurl(u)));
-			else
-				newCam2lastSnapshot.put(new IOurl(u), 0l);
-		}
-		cam2lastSnapshot = newCam2lastSnapshot;
-		return cam2lastSnapshot;
+		return urls;
 	}
 	
 	private synchronized static void storeImages(final HashMap<IOurl, Long> cam2lastSnapshot) {

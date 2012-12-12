@@ -38,6 +38,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.util.WebCamInfo;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
@@ -161,19 +162,8 @@ public class Other {
 					resultNavigationButtons.add(new NavigationButton(new ActionScreenshotStorage("Enable/Disable Desktop Screenshot Sharing"), src.getGUIsetting()));
 				}
 				
-				int numberOfCameras = SystemOptions.getInstance().getInteger("CCTV", "n", 2);
-				for (int idx = 0; idx < numberOfCameras; idx++) {
-					String tooltip = "Show Barley Greenhouse";
-					String title = "CCTV (Barley)";
-					String user = "";
-					String pass = "";
-					String auth = "";
-					if (user != null && pass != null && !user.isEmpty())
-						auth = user + ":" + pass + "@";
-					String ur = "http://lemnacam.ipk-gatersleben.de/mjpg/video.mjpg";
-					if (!auth.isEmpty())
-						ur = ur.replaceFirst("://", "://" + auth);
-					IOurl url = new IOurl(ur);
+				for (WebCamInfo ur : IAPservice.getActiveWebCamURLs()) {
+					IOurl url = new IOurl(ur.getUrl());
 					
 					// "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" +
 					// System.currentTimeMillis();
@@ -181,7 +171,7 @@ public class Other {
 					
 					resultNavigationButtons.add(
 							ActionWebCamView.getLemnaCamButton(src.getGUIsetting(),
-									tooltip, title, url));
+									"Show camera view (" + ur.getName() + ")", ur.getName(), url));
 				}
 				
 				{
