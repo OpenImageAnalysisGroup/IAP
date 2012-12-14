@@ -3225,7 +3225,7 @@ getPrimAndOrName <- function(colNames) {
 }
 
 
-CheckIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlot = NBOX.PLOT, first = FALSE, second = FALSE) {	
+checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlot = NBOX.PLOT, first = FALSE, second = FALSE) {	
 #########
 #first <- overallList$splitTreatmentFirst
 #second <- overallList$splitTreatmentSecond
@@ -3966,7 +3966,7 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
-		if (!CheckIfOneColumnHasOnlyValues(overallResult, typOfPlot = typOfPlot, first = overallList$splitTreatmentFirst, second = overallList$splitTreatmentSecond)) {
+		if (!checkIfOneColumnHasOnlyValues(overallResult, typOfPlot = typOfPlot, first = overallList$splitTreatmentFirst, second = overallList$splitTreatmentSecond)) {
 			overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
 			
 			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
@@ -5144,12 +5144,16 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 }
 
 lim <- function(value, newValue) {
-	limValue <- (newValue/value) + 0.1
-
-	if(limValue > 1.15 || limValue < 0.85) {
-		return(FALSE)
+	if(value != 0) {
+		limValue <- (newValue/value) + 0.1
+	
+		if(limValue > 1.15 || limValue < 0.85) {
+			return(FALSE)
+		} else {
+			return(TRUE)
+		}
 	} else {
-		return(TRUE)
+		return(FALSE)
 	}
 }
 
@@ -5187,10 +5191,10 @@ scallyAxis <- function(factor, overallResult) {
 	} else if(minValue > -middelBorder && maxValue < middelBorder) {
 		factor <- middelBorder
 	}
-	
+
 	yminValue <- floor(minValue / factor) * factor
 	ymaxValue <- ceiling(maxValue / factor) * factor
-	
+
 	if(lim(minValue, yminValue)) {
 		yminValue <- yminValue - factor
 	}
@@ -7190,8 +7194,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#treatment <- "Species"
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
-		treatment <- "none"
-		#treatment <- "Treatment"
+		#treatment <- "none"
+		treatment <- "Treatment"
 		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
 		filterTreatment <- "none"
@@ -7245,7 +7249,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		splitTreatmentFirst <- FALSE
 		splitTreatmentSecond <- FALSE
-		isRatio <- FALSE
+		isRatio <- TRUE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet <- workingDataSet
