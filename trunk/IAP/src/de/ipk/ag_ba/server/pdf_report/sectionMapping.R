@@ -906,7 +906,7 @@ sectionMappingList <- list(
 				
 				"14.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						title = "Side",
 						text = ""
@@ -932,7 +932,7 @@ sectionMappingList <- list(
 				
 				"11.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.OWN,
 						title = "Side",
 						text = ""
@@ -2107,8 +2107,8 @@ sectionMappingList <- list(
 				
 				"80.1.6.1" = list(
 						newSection = 1,
-						title = "Mean",
-						takeRestValuesFrom = "7.1.1.1"
+#						title = "Mean",
+						takeRestValuesFrom = "7.1.5.1"
 				),
 				
 				"80.1.6.2" = list(
@@ -2129,8 +2129,8 @@ sectionMappingList <- list(
 				
 				"80.1.7.1" = list(
 						newSection = 1,
-						title = "Mean",
-						takeRestValuesFrom = "7.1.1.1"
+#						title = "Mean",
+						takeRestValuesFrom = "7.1.5.1"
 				),
 				
 				"80.1.7.2" = list(
@@ -2151,8 +2151,8 @@ sectionMappingList <- list(
 				
 				"80.1.8.1" = list(
 						newSection = 1,
-						title = "Mean",
-						takeRestValuesFrom = "7.1.1.1"
+#						title = "Mean",
+						takeRestValuesFrom = "7.1.5.1"
 				),
 				
 				"80.1.8.2" = list(
