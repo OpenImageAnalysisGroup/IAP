@@ -89,7 +89,7 @@ nBoxMultiPlotList <- list(
 		
 		"top.section#vis.stress.hue.brown2green" = list(plotName = "top sections - brown bin divided by green bins", section = 80, subsection = 2, subsubsection = 9),
 		
-		"top.section#vis.stress.hue.red2green" = list(plotName = "top sections - red bins divided by green bins", section = 80, subsection = 2, subsubsection = 20),
+		"top.section#vis.stress.hue.red2green" = list(plotName = "top sections - red bins divided by green bins", section = 80, subsection = 2, subsubsection = 10),
 		
-		"top.section#vis.stress.hue.yellow2green" = list(plotName = "top sections - yellow bins divided by green bins", section = 80, subsection = 2, subsubsection = 21)
+		"top.section#vis.stress.hue.yellow2green" = list(plotName = "top sections - yellow bins divided by green bins", section = 80, subsection = 2, subsubsection = 11)
 )

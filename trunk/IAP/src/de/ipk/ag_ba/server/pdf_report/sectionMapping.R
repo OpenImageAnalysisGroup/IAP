@@ -2105,15 +2105,14 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "7.1.1.3"
 				),
 				
-				
 				"80.1.6.1" = list(
 						newSection = 1,
+						title = "Mean",
 						takeRestValuesFrom = "7.1.1.1"
 				),
 				
 				"80.1.6.2" = list(
 						newSection = 1,
-						title = "Mean",
 						takeRestValuesFrom = "7.1.1.7"
 				),
 				
@@ -2130,12 +2129,12 @@ sectionMappingList <- list(
 				
 				"80.1.7.1" = list(
 						newSection = 1,
+						title = "Mean",
 						takeRestValuesFrom = "7.1.1.1"
 				),
 				
 				"80.1.7.2" = list(
 						newSection = 1,
-						title = "Mean",
 						takeRestValuesFrom = "7.1.1.7"
 				),
 				
@@ -2152,12 +2151,12 @@ sectionMappingList <- list(
 				
 				"80.1.8.1" = list(
 						newSection = 1,
+						title = "Mean",
 						takeRestValuesFrom = "7.1.1.1"
 				),
 				
 				"80.1.8.2" = list(
 						newSection = 1,
-						title = "Mean",
 						takeRestValuesFrom = "7.1.1.7"
 				),
 				
@@ -2188,7 +2187,121 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "80.1.1.4"
 				),
 				
+				"80.2.2.1" = list(
+						takeRestValuesFrom = "80.1.2.1"
+				),
 				
+				"80.2.2.2" = list(
+						takeRestValuesFrom = "80.1.2.2"
+				),
+				
+				"80.2.2.3" = list(
+						takeRestValuesFrom = "80.1.2.3"
+				),
+				
+				"80.2.2.4" = list(
+						takeRestValuesFrom = "80.1.2.4"
+				),	
+				
+				"80.2.3.1" = list(
+						takeRestValuesFrom = "80.1.3.1"
+				),
+				
+				"80.2.3.2" = list(
+						takeRestValuesFrom = "80.1.3.2"
+				),
+				
+				"80.2.3.3" = list(
+						takeRestValuesFrom = "80.1.3.3"
+				),
+				
+				"80.2.3.4" = list(
+						takeRestValuesFrom = "80.1.3.4"
+				),
+				
+				
+				"80.2.4.1" = list(
+						takeRestValuesFrom = "80.1.4.1"
+				),
+				
+				"80.2.4.2" = list(
+						takeRestValuesFrom = "80.1.4.2"
+				),
+				
+				"80.2.4.3" = list(
+						takeRestValuesFrom = "80.1.4.3"
+				),
+				
+				"80.2.4.4" = list(
+						takeRestValuesFrom = "80.1.4.4"
+				),
+				
+				"80.2.5.1" = list(
+						takeRestValuesFrom = "80.1.5.1"
+				),
+				
+				"80.2.5.2" = list(
+						takeRestValuesFrom = "80.1.5.2"
+				),
+				
+				"80.2.5.3" = list(
+						takeRestValuesFrom = "80.1.5.3"
+				),
+				
+				"80.2.5.4" = list(
+						takeRestValuesFrom = "80.1.5.4"
+				),
+				
+				"80.2.6.1" = list(
+						title = "Mean",
+						takeRestValuesFrom = "80.1.6.1"
+				),
+				
+				"80.2.6.2" = list(
+						takeRestValuesFrom = "80.1.6.2"
+				),
+				
+				"80.2.6.3" = list(
+						takeRestValuesFrom = "80.1.6.3"
+				),
+				
+				"80.2.6.4" = list(
+						takeRestValuesFrom = "80.1.6.4"
+				),
+				
+				"80.2.7.1" = list(
+						title = "Mean",
+						takeRestValuesFrom = "80.1.7.1"
+				),
+				
+				"80.2.7.2" = list(
+						takeRestValuesFrom = "80.1.7.2"
+				),
+				
+				"80.2.7.3" = list(
+						takeRestValuesFrom = "80.1.7.3"
+				),
+				
+				"80.2.7.4" = list(
+						takeRestValuesFrom = "80.1.7.4"
+				),
+				
+				"80.2.8.1" = list(
+						title = "Mean",
+						takeRestValuesFrom = "80.1.8.1"
+				),
+				
+				"80.2.8.2" = list(
+						takeRestValuesFrom = "80.1.8.2"
+				),
+				
+				"80.2.8.3" = list(
+						takeRestValuesFrom = "80.1.8.3"
+				),
+				
+				"80.2.8.4" = list(
+						takeRestValuesFrom = "80.1.8.4"
+				),			
 				
 				"7.1.1.1" = list(
 						newSection = 1,
