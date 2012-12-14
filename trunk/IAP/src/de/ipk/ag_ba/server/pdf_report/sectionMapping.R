@@ -906,7 +906,7 @@ sectionMappingList <- list(
 				
 				"14.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.NO,
+						typOfReset = RESET.PAGE.OWN,
 						typOfClear = CLEAR.PAGE.OWN,
 						title = "Side",
 						text = ""
@@ -933,7 +933,7 @@ sectionMappingList <- list(
 				"11.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),

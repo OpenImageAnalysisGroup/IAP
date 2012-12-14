@@ -4760,9 +4760,11 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 #				overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 #			}
 			
-			overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
+			
 			
 			if (overallResult %checkRowLengthOfDataFrame% 0) {
+				overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
+				
 				histVec <- levels(overallResult$hist)
 				for(kk in seq(along=histVec)) {
 					histVec[kk] <- paste(kk,histVec[kk])
@@ -7188,9 +7190,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#treatment <- "Species"
 		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
 		
-		#treatment <- "none"
+		treatment <- "none"
 		#treatment <- "Treatment"
-		treatment <- "Genotype"
+		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
 		filterTreatment <- "none"
 		#filterTreatment <- "control"
@@ -7201,9 +7203,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#secondTreatment <- "none"
 		#filterSecondTreatment  <- "none"
 		
-		#secondTreatment <- "none"
+		secondTreatment <- "none"
 		#secondTreatment <- "Genotype"
-		secondTreatment <- "Treatment"
+		#secondTreatment <- "Treatment"
 		filterSecondTreatment  <- "none"
 		#filterSecondTreatment  <- "S 250$S 280"
 		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
