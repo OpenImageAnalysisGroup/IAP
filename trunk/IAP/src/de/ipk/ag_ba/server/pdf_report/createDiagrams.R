@@ -4,8 +4,8 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
-CATCH.ERROR <- TRUE
+debug <- TRUE
+CATCH.ERROR <- FALSE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
@@ -1959,15 +1959,18 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		if(diagramTyp == NBOX.MULTI.PLOT) {
 			addValue <- 0
 			newDataSet <- data.frame()
+			firstnewDataSet <- TRUE
+			firstAddColumn <- TRUE
 			for(nn in seq(along=descriptorList)) {
 				if(!is.na(descriptorList[[nn]][1])) {
 					tempDesMorThanOne <- character()
 					actualDataSet <- overallResult[,c(getPrimAndOrName(colnames(overallResult)),colNames$colOfXaxis,getVector(descriptorList[nn]), paste(colNames$colOfSD, getVector(descriptorList[nn]), sep=""))]
 					newDataSetKK <- data.frame()
-					for(kk in seq(along=descriptorList[[nn]])) {
+					firstNewDataSetTemp <- TRUE
+					for(kk in seq(along=descriptorList[[nn]])) {							
 						if(!is.na(descriptorList[[nn]][kk][1])){
 							usedColumn <- c(as.character(descriptorList[[nn]][kk]), paste(colNames$colOfSD, as.character(descriptorList[[nn]][kk]), sep=""))
-							if(nn == 1) {
+							if(firstAddColumn) {
 								additionalColumns <- c(getPrimAndOrName(colnames(overallResult)), colNames$colOfXaxis)
 							} else {
 								additionalColumns <- NULL
@@ -1986,15 +1989,22 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 							newDataSetTemp <- cbind(newDataSetTemp, column = rep.int(newName, nrow(actualDataSet))) # as.character(descriptorList[[nn]][kk])
 							colnames(newDataSetTemp) <- c(additionalColumns, paste(MEAN,nn, sep=""), paste(SE, nn, sep=""), paste(COLUMN, nn, sep=""))
 						
-							if(kk == 1) {
+							if(firstNewDataSetTemp) { #kk == 1
 								newDataSetKK <- newDataSetTemp
+								firstNewDataSetTemp <- FALSE
 							} else {	
 								newDataSetKK <- rbind(newDataSetKK, newDataSetTemp)
 							}
 						}
 					}
-					if(nn == 1) {
+					
+					if(length(newDataSetKK) != 0 ) {
+						firstAddColumn <- FALSE
+					}				
+					
+					if(firstnewDataSet) { # nn == 1
 						newDataSet <- newDataSetKK
+						firstnewDataSet <- FALSE
 					} else {
 						newDataSet <- cbind(newDataSet, newDataSetKK)
 					}
