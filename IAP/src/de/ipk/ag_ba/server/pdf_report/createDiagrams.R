@@ -4,8 +4,8 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- TRUE
-CATCH.ERROR <- FALSE
+debug <- FALSE
+CATCH.ERROR <- TRUE
 
 calculateNothing <- FALSE
 plotNothing <- FALSE
