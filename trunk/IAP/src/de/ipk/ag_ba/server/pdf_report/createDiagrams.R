@@ -4362,7 +4362,11 @@ setFontSize <- function(plot, value, typOfPlot, first = FALSE, second = FALSE) {
 		} else if(typOfPlot == BOX.PLOT) {
 			textSize <- 8
 		}
-	} 
+	} else if(numerOfDescriptors > 8 && numerOfDescriptors <= 12) {
+		if(typOfPlot == BOX.PLOT) {
+			textSize <- 8
+		}	
+	}
 	
 	if(length(textSize) != 0) {
 		if(typOfPlot == STACKBOX.PLOT) {
@@ -5901,7 +5905,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 							plot = plot + ggtitle(title)
 						}
 					}
-					plot = plot +
+					plot <- plot +
 							geom_boxplot() +
 							ylab(overallDesName[[imagesIndex]]) +
 							scale_fill_manual(values = colorReorder)
@@ -5913,7 +5917,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 		#						scale_fill_manual(values = overallColor[[imagesIndex]])
 		#			}
 							#stat_summary(fun.data = f, geom = "crossbar", height = 0.1, 	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
-					plot = plot +			
+					plot <- plot +			
 							theme_bw() +
 							theme(legend.position="none", 
 									#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
