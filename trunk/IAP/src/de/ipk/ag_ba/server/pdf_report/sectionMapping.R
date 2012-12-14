@@ -932,8 +932,8 @@ sectionMappingList <- list(
 				
 				"11.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.NO,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.OWN,
 						title = "Side",
 						text = ""
 				),
@@ -1677,7 +1677,7 @@ sectionMappingList <- list(
 				"11.1.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.OWN,
 						title = "Leafs",
 						text = ""
 				),
@@ -1795,7 +1795,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Area (zoom corrected)",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -3183,8 +3183,8 @@ sectionMappingList <- list(
 				
 				"11.1.1.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Number of leafs",
 						text = ""
 				),		
