@@ -36,10 +36,6 @@ public class BlUseFluoMaskToClear_Arabidopsis_ir extends AbstractSnapshotAnalysi
 					processedMasks.setIr(
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()
-											.scale(getDouble("fluo mask scale X", 0.6),
-													getDouble("fluo mask scale Y", 1.1))
-											.translate(-getInt("fluo mask translate X", 30),
-													-getInt("fluo mask translate Y", 20))
 											// .addBorder(0, 0, 0, 0, options.getBackground())
 											.blur(getDouble("mask blur", 2)).getImage(),
 									back).print("FILTERED IR IMAGE", debug).getImage());

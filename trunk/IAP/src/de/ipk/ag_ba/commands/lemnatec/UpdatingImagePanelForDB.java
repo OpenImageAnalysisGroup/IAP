@@ -68,7 +68,7 @@ public class UpdatingImagePanelForDB extends JPanel {
 				// load img
 				image = new FlexibleImage(dc.getSavedScreenshot(filename, gridfs_webcam_files, status)).io()
 						.blur(1)
-						.resize(getWidth(), getHeight()).sharpen().getImageAsBufferedImage();
+						.resize(getWidth(), getHeight()).sharpen().getAsBufferedImage();
 				repaint();
 				Thread.sleep(50);
 				mark.setMark(false);

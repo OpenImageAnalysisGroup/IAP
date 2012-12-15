@@ -194,11 +194,16 @@ public class FlexibleImageSet {
 	}
 	
 	public FlexibleImageSet copy() {
-		return new FlexibleImageSet(
+		FlexibleImageSet res = new FlexibleImageSet(
 				vis != null ? vis.copy() : null,
 				fluo != null ? fluo.copy() : null,
 				nir != null ? nir.copy() : null,
 				ir != null ? ir.copy() : null);
+		res.visInfo = visInfo;
+		res.fluoInfo = fluoInfo;
+		res.nirInfo = nirInfo;
+		res.irInfo = irInfo;
+		return res;
 	}
 	
 	public FlexibleImageSet resize(double scaleVis, double scaleFluo, double scaleNir, double scaleIr) {
@@ -334,5 +339,33 @@ public class FlexibleImageSet {
 		if (ir != null)
 			fis.addImage("ir", ir);
 		fis.print(title);
+	}
+	
+	public FlexibleImage getImage(FlexibleImageType inp) {
+		switch (inp) {
+			case VIS:
+				return vis;
+			case FLUO:
+				return fluo;
+			case NIR:
+				return nir;
+			case IR:
+				return ir;
+		}
+		return null;
+	}
+	
+	public ImageData getImageInfo(FlexibleImageType inp) {
+		switch (inp) {
+			case VIS:
+				return visInfo;
+			case FLUO:
+				return fluoInfo;
+			case NIR:
+				return nirInfo;
+			case IR:
+				return irInfo;
+		}
+		return null;
 	}
 }

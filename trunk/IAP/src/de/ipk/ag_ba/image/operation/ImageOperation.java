@@ -216,10 +216,15 @@ public class ImageOperation {
 	 * Does change the image itself and returns this.
 	 */
 	public ImageOperation rotate(double degree) {
+		return rotate(degree, true);
+	}
+	
+	public ImageOperation rotate(double degree, boolean replaceColor) {
 		image.getProcessor().rotate(degree);
-		return new ImageOperation(getImage())
-				.replaceColor(Color.BLACK.getRGB(),
-						ImageOperation.BACKGROUND_COLORint);
+		ImageOperation res = new ImageOperation(getImage());
+		res = res.replaceColor(Color.BLACK.getRGB(),
+				ImageOperation.BACKGROUND_COLORint);
+		return res;
 	}
 	
 	/**
@@ -238,10 +243,15 @@ public class ImageOperation {
 	 */
 	
 	public ImageOperation scale(double xScale, double yScale) {
+		return scale(xScale, yScale, true);
+	}
+	
+	public ImageOperation scale(double xScale, double yScale, boolean replaceColors) {
 		image.getProcessor().scale(xScale, yScale);
-		return new ImageOperation(getImage())
-				.replaceColor(Color.BLACK.getRGB(),
-						ImageOperation.BACKGROUND_COLORint);
+		ImageOperation res = new ImageOperation(getImage());
+		if (replaceColors)
+			res = res.replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint);
+		return res;
 	}
 	
 	/**
@@ -1291,7 +1301,7 @@ public class ImageOperation {
 		return ImageConverter.convertIJto2A(image);
 	}
 	
-	public BufferedImage getImageAsBufferedImage() {
+	public BufferedImage getAsBufferedImage() {
 		return ImageConverter.convertIJtoBI(image);
 	}
 	
@@ -1364,11 +1374,11 @@ public class ImageOperation {
 			BufferedImage imgV2, boolean saveImage) {
 		ImageOperation resizeImage1 = new ImageOperation(imgF2);
 		resizeImage1.resize(0.7);
-		imgF2 = resizeImage1.getImageAsBufferedImage();
+		imgF2 = resizeImage1.getAsBufferedImage();
 		
 		ImageOperation resizeImage2 = new ImageOperation(imgV2);
 		resizeImage2.resize(0.7);
-		imgV2 = resizeImage2.getImageAsBufferedImage();
+		imgV2 = resizeImage2.getAsBufferedImage();
 		showTwoImagesAsOne(imgF2, imgV2, saveImage);
 	}
 	
@@ -2962,6 +2972,9 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation addBorder(int bordersizeSides, int borderSizeTopBottom, int translatex, int translatey, int borderColor) {
+		if (bordersizeSides == 0 && borderSizeTopBottom == 0)
+			return this;
+		System.out.println(this);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -2979,7 +2992,14 @@ public class ImageOperation {
 						result[xt][yt] = img2d[xt - bordersizeSides - translatex][yt - borderSizeTopBottom - translatey];
 			}
 		}
-		return new ImageOperation(result);
+		ImageOperation res = new ImageOperation(result);
+		System.out.println(res);
+		return res;
+	}
+	
+	@Override
+	public String toString() {
+		return "IO W/H " + getWidth() + " / " + getHeight();
 	}
 	
 	public static int[][] fillArray(int[][] result, int background) {
@@ -4274,10 +4294,48 @@ public class ImageOperation {
 				if (x < bW && y < bH)
 					bpixel = ba[x][y];
 				// Cr = Cd*(1-t)+Cs*t;
-				if (((x * y) / 2) % 2 == 0)
+				if ((((x / 5))) % 2 < 1)
 					aa[x][y] = apixel; // ColorUtil.getAvgColor(apixel, bpixel);
 				else
 					aa[x][y] = bpixel;
+			}
+		return new FlexibleImage(aa).io();
+	}
+	
+	public ImageOperation crossfade(FlexibleImage b, FlexibleImage c) {
+		if (c == null)
+			return crossfade(b, 0.5d);
+		if (b == null || c == null)
+			return this;
+		System.out.println(this);
+		System.out.println(b);
+		System.out.println(c);
+		int[][] aa = getImageAs2dArray();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] ba = b.getAs2A();
+		int[][] ca = c.getAs2A();
+		int bW = b.getWidth();
+		int bH = b.getHeight();
+		int cW = b.getWidth();
+		int cH = b.getHeight();
+		int red = Color.RED.getRGB();
+		for (int x = 0; x < w; x++)
+			for (int y = 0; y < h; y++) {
+				int apixel = aa[x][y];
+				int bpixel = red;
+				if (x < bW && y < bH)
+					bpixel = ba[x][y];
+				int cpixel = red;
+				if (x < cW && y < cH)
+					cpixel = ca[x][y];
+				if ((((x * y / 2))) % 3 == 0)
+					aa[x][y] = apixel;
+				else
+					if ((((x * y / 2))) % 3 == 1)
+						aa[x][y] = bpixel;
+					else
+						aa[x][y] = cpixel;
 			}
 		return new FlexibleImage(aa).io();
 	}

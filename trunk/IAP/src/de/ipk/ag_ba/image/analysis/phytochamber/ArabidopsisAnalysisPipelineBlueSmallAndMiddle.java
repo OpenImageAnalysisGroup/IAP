@@ -20,6 +20,7 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vi
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlCutZoomedImages;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;
+import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlRotate;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
@@ -50,30 +51,28 @@ public class ArabidopsisAnalysisPipelineBlueSmallAndMiddle extends AbstractImage
 		p.add(BlLoadImagesIfNeeded_images.class);
 		p.add(BlBalancing_fluo.class);
 		p.add(BlColorBalancing_vis.class);
+		p.add(BlRotate.class);
 		p.add(BlCutZoomedImages.class);
 		p.add(BlClearMasks_Arabidopsis_PotAndTrayProcessing_vis_fluo_nir.class);
-		boolean debug = false;
-		if (!debug) {
-			p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
-			p.add(BlLabFilter_vis.class);
-			p.add(BlIntensityConversion_fluo.class);
-			p.add(BlMedianFilter_fluo.class);
-			p.add(BlRemoveSmallClusters_vis_fluo.class);
-			p.add(BlUseFluoMaskToClear_Arabidopsis_vis.class);
-			p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
-			p.add(Bl_Arabidopsis_IRdiff_ir.class);
-			p.add(BlUseFluoMaskToClear_Arabidopsis_ir.class);
-			p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
-			p.add(BlCalcWidthAndHeight_vis.class);
-			p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
-			p.add(BlConvexHull_vis_fluo.class);
-			// postprocessing
-			p.add(BlockRunPostProcessors.class);
-			p.add(BlockDrawSkeleton_vis_fluo.class);
-			p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
-			p.add(BlCrop_images_vis_fluo_nir_ir.class);
-			p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
-		}
+		p.add(BlMoveImagesToMasks_vis_fluo_nir.class);
+		p.add(BlLabFilter_vis.class);
+		p.add(BlIntensityConversion_fluo.class);
+		p.add(BlMedianFilter_fluo.class);
+		p.add(BlRemoveSmallClusters_vis_fluo.class);
+		p.add(BlUseFluoMaskToClear_Arabidopsis_vis.class);
+		p.add(BlUseFluoMaskToClear_Arabidopsis_nir.class);
+		p.add(Bl_Arabidopsis_IRdiff_ir.class);
+		p.add(BlUseFluoMaskToClear_Arabidopsis_ir.class);
+		p.add(BlockSkeletonize_Arabidopsis_vis_or_fluo.class);
+		p.add(BlCalcWidthAndHeight_vis.class);
+		p.add(BlCalcIntensity_vis_fluo_nir_ir.class);
+		p.add(BlConvexHull_vis_fluo.class);
+		// postprocessing
+		p.add(BlockRunPostProcessors.class);
+		p.add(BlockDrawSkeleton_vis_fluo.class);
+		p.add(BlMoveMasksToImageSet_vis_fluo_nir.class);
+		p.add(BlCrop_images_vis_fluo_nir_ir.class);
+		p.add(BlReplaceEmptyOriginalImages_vis_fluo_nir.class);
 		return p;
 	}
 	
