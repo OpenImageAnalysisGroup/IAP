@@ -66,7 +66,10 @@ public class IOurl {
 	public boolean isEqualPrefix(String prefix) {
 		if (getPrefix() == null)
 			return false;
-		return getPrefix().equals(prefix);
+		if (getPrefix() != null && getPrefix().contains("@"))
+			return getPrefix().split("@", 2)[1].equals(prefix);
+		else
+			return getPrefix().equals(prefix);
 	}
 	
 	public void setFileName(String filename) {

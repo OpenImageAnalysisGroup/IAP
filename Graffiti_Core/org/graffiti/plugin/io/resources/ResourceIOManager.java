@@ -54,6 +54,8 @@ public class ResourceIOManager {
 			return null;
 		}
 		ResourceIOHandler mh = getHandlerFromPrefix(url.getPrefix());
+		if (mh == null && url.getPrefix() != null && url.getPrefix().contains("@"))
+			mh = getHandlerFromPrefix(url.getPrefix().split("@", 2)[1]);
 		if (mh == null) {
 			System.err.println("Could not get handler from URL " + url.toString() + "!");
 			return null;
