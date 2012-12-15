@@ -20,10 +20,9 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processIRimage() {
-		debug = getBoolean("debug", false);
+		debug = getBoolean("debug", true);
 		FlexibleImage warmBack = input().images().ir();
-		FlexibleImage coldRef = input().masks().ir();
-		if (warmBack != null && coldRef != null) {
+		if (warmBack != null) {
 			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
 			ImageOperation wb = warmBack.copy().io();
 			
@@ -53,12 +52,12 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 				n++;
 			}
 			double warmBackground = sum / n;
-			int[] res = coldRef.copy().getAs1A();
+			int[] res = warmBack.copy().getAs1A();
 			for (int i = 0; i < res.length; i++)
 				res[i] = IAPservice.getIRintensityDifferenceColor(
 						IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
 						options.getBackground());
-			FlexibleImage gray = new FlexibleImage(coldRef.getWidth(), coldRef.getHeight(), res);
+			FlexibleImage gray = new FlexibleImage(warmBack.getWidth(), warmBack.getHeight(), res);
 			if (options.isBarley())
 				gray = gray.io().print("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(
@@ -75,8 +74,5 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		FlexibleImage f = processedImages.ir();
-		processedImages.setIr(processedMasks.ir());
-		processedMasks.setIr(f);
 	}
 }

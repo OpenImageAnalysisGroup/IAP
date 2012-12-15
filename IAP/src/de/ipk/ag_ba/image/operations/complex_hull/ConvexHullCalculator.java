@@ -246,7 +246,7 @@ public class ConvexHullCalculator {
 		// in = in.getCanvas().fillRectOutside(polygon.getRectangle(),
 		// ImageOperation.BACKGROUND_COLORint).getImage().getIO();
 		
-		BufferedImage bi = in.getImageAsBufferedImage();
+		BufferedImage bi = in.getAsBufferedImage();
 		
 		Graphics2D g2d = (Graphics2D) bi.getGraphics();
 		

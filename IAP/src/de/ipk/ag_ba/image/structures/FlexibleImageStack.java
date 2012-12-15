@@ -88,7 +88,7 @@ public class FlexibleImageStack {
 				}
 			});
 			win.add(jb);
-			win.doLayout();
+			win.pack();
 			IAPservice.showImageJ();
 		}
 	}

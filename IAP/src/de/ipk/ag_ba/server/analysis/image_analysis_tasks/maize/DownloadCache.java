@@ -59,10 +59,13 @@ public class DownloadCache {
 	}
 	
 	public synchronized void finished(String plantID) {
-		System.out.print(">Remove cached files for plant ID " + plantID + "");
-		for (File f : plant2cacheFiles.get(plantID))
-			f.delete();
-		plant2cacheFiles.remove(plantID);
+		if (plant2cacheFiles != null)
+			System.out.print(">Remove cached files for plant ID " + plantID + "");
+		if (plant2cacheFiles != null && plantID != null)
+			for (File f : plant2cacheFiles.get(plantID))
+				f.delete();
+		if (plant2cacheFiles != null)
+			plant2cacheFiles.remove(plantID);
 	}
 	
 	public synchronized InputStream getFileInputStream(String detail) throws Exception {

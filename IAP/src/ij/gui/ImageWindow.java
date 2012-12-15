@@ -392,6 +392,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	@Override
 	public void paint(Graphics g) {
 		// if (IJ.debugMode) IJ.log("wPaint: " + imp.getTitle());
+		super.paint(g);
 		drawInfo(g);
 		Rectangle r = ic.getBounds();
 		int extraWidth = MIN_WIDTH - r.width;
