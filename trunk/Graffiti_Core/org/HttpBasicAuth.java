@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.mongo;
+package org;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;

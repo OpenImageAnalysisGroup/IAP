@@ -21,13 +21,13 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.AttributeHelper;
+import org.HttpBasicAuth;
 import org.ReleaseInfo;
 import org.Screenshot;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.mongo.HttpBasicAuth;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
 public class IAPmail {
