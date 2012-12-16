@@ -293,6 +293,7 @@ public class MongoDB {
 							m.put(key, mc);
 							m.get(key).getMongoOptions().connectionsPerHost = 1;
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
+							m.get(key).getMongoOptions().socketTimeout = 24 * 60 * 60 * 1000;
 							s.printTime();
 						} else {
 							StopWatch s = new StopWatch("INFO: new MongoClient(seeds)", false);
@@ -302,6 +303,7 @@ public class MongoDB {
 							m.put(key, new MongoClient(seeds));
 							m.get(key).getMongoOptions().connectionsPerHost = 1;
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = 1000000;
+							m.get(key).getMongoOptions().socketTimeout = 24 * 60 * 60 * 1000;
 							s.printTime(1000);
 						}
 						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {

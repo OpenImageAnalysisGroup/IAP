@@ -19,7 +19,6 @@ import de.ipk.ag_ba.commands.MySnapshotFilter;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -50,7 +49,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
-	ArrayList<ZoomedImage> zoomedImages = new ArrayList<ZoomedImage>();
 	protected Experiment experimentResult;
 	
 	private long startTime;

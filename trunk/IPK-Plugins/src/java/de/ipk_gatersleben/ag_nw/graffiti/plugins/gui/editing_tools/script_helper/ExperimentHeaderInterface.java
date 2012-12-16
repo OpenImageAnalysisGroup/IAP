@@ -20,6 +20,10 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public String getRemark();
 	
+	public void setSettings(String settings);
+	
+	public String getSettings();
+	
 	public void setCoordinator(String coordinator);
 	
 	public String getCoordinator();
