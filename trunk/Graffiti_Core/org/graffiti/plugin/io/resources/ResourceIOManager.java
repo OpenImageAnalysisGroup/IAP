@@ -121,27 +121,30 @@ public class ResourceIOManager {
 		return new MyByteArrayInputStream(bos.toByteArray(), bos.size());
 	}
 	
-	public static void copyContent(InputStream intemp, OutputStream out) throws IOException {
-		copyContent(intemp, out, -1);
+	public static long copyContent(InputStream intemp, OutputStream out) throws IOException {
+		return copyContent(intemp, out, -1);
 	}
 	
-	public static void copyContent(InputStream in, OutputStream out, long maxIO) throws IOException {
-		
+	public static long copyContent(InputStream in, OutputStream out, long maxIO) throws IOException {
+		long written = 0;
 		if (maxIO <= 0) {
 			byte[] buffer = new byte[0xFFFF];
 			for (int len; (len = in.read(buffer)) != -1;) {
 				out.write(buffer, 0, len);
+				written += len;
 			}
 		} else {
 			long read = 0;
 			byte[] buffer = new byte[0xFFFF];
 			for (int len; (len = in.read(buffer)) != -1;) {
 				read += len;
-				if (read < maxIO)
+				if (read < maxIO) {
 					out.write(buffer, 0, len);
-				else {
+					written += len;
+				} else {
 					read -= len;
 					out.write(buffer, 0, (int) (maxIO - read));
+					written += maxIO - read;
 					break;
 				}
 			}
@@ -149,6 +152,8 @@ public class ResourceIOManager {
 		
 		in.close();
 		out.close();
+		
+		return written;
 	}
 	
 	public static ResourceIOHandler getHandlerFromPrefix(String prefix) {
