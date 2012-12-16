@@ -22,8 +22,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 public class Condition implements ConditionInterface {
 	
 	public enum ConditionInfo {
-		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"), GROWTHCONDITIONS(
-				"Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence"), FILES("Files");
+		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"),
+		GROWTHCONDITIONS("Growth Condititions"), TREATMENT("Treatment"),
+		SEQUENCE("Sequence"), FILES("Files");
 		
 		private String desc;
 		
@@ -62,12 +63,15 @@ public class Condition implements ConditionInterface {
 	private SubstanceInterface parent;
 	private ExperimentHeaderInterface header;
 	
-	private static final String[] attributeNames = new String[] { "experimentname", "database", "experimenttype",
+	private static final String[] attributeNames = new String[] {
+			"experimentname", "database",
+			"experimenttype",
 			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
 			"growthconditions", "id", "name", "treatment",
-			"variety", "sequence", "files" };
+			"variety", "sequence", "files", "settings" };
 	
-	private static final String[] attributeNamesForDocument = new String[] { "genotype", "growthconditions", "id",
+	private static final String[] attributeNamesForDocument = new String[] { "genotype",
+			"growthconditions", "id",
 			"name", "treatment", "variety", "sequence", "files" };
 	
 	public Condition(SubstanceInterface md) {
@@ -118,8 +122,10 @@ public class Condition implements ConditionInterface {
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
-				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(), getExperimentRemark(), getGenotype(),
-				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence(), getFiles() };
+				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(),
+				getExperimentRemark(), getGenotype(),
+				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(),
+				getSequence(), getFiles(), getExperimentSettings() };
 	}
 	
 	@Override
@@ -222,6 +228,11 @@ public class Condition implements ConditionInterface {
 	@Override
 	public int getConditionId() {
 		return getRowId();
+	}
+	
+	@Override
+	public String getExperimentSettings() {
+		return header.getSettings();
 	}
 	
 	@Override
@@ -567,6 +578,11 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
+	public void setExperimentSettings(String settings) {
+		header.setSettings(settings);
+	}
+	
+	@Override
 	public void setExperimentStorageDate(Date experimentStorageDate) {
 		header.setStorageTime(experimentStorageDate != null ? experimentStorageDate : null);
 	}
@@ -653,8 +669,11 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public void getXMLAttributeStringForDocument(StringBuilder r) {
-		Substance.getAttributeString(r, attributeNamesForDocument, new Object[] { getGenotype(), getGrowthconditions(),
-				getRowId(), getSpecies(), getTreatment(), getVariety(), getSequence(), getFiles() });
+		Substance.getAttributeString(r, attributeNamesForDocument,
+				new Object[] {
+						getGenotype(), getGrowthconditions(),
+						getRowId(), getSpecies(), getTreatment(),
+						getVariety(), getSequence(), getFiles() });
 	}
 	
 	@Override
@@ -745,7 +764,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);

@@ -122,6 +122,10 @@ public class IAPimages {
 		return "img/ext/gpl2/Gnome-Applications-System-64.png";
 	}
 	
+	public static String getApplications() {
+		return "img/ext/gpl2/Gnome-Applications-Other-64.png";
+	}
+	
 	public static String getTashWith2docs() {
 		return "img/ext/trash2.png";
 	}

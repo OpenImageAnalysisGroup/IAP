@@ -16,7 +16,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
@@ -30,7 +32,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 	BufferedImage image;
 	double scale = 1.0;
 	
-	private int maxUnitIncrement = 20;
+	private final int maxUnitIncrement = 20;
 	
 	public void setScale(double scale) {
 		this.scale = scale;
@@ -45,11 +47,12 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		setAutoscrolls(true);
 	}
 	
+	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-							RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+				RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		double x = (getWidth() - scale * image.getWidth()) / 2;
 		double y = (getHeight() - scale * image.getHeight()) / 2;
 		AffineTransform at = AffineTransform.getTranslateInstance(x, y);
@@ -57,6 +60,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		g2.drawRenderedImage(image, at);
 	}
 	
+	@Override
 	public Dimension getPreferredSize() {
 		int w = (int) (scale * image.getWidth());
 		int h = (int) (scale * image.getHeight());
@@ -86,6 +90,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		return getPreferredSize();
 	}
 	
+	@Override
 	public void mouseDragged(MouseEvent e) {
 		Rectangle r = new Rectangle(e.getX(), e.getY(), 1, 1);
 		scrollRectToVisible(r);
@@ -97,7 +102,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 	 */
 	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect,
-						int orientation, int direction) {
+			int orientation, int direction) {
 		if (orientation == SwingConstants.HORIZONTAL)
 			return visibleRect.width - maxUnitIncrement;
 		else
@@ -130,7 +135,7 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 	 */
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect,
-						int orientation, int direction) {
+			int orientation, int direction) {
 		// Get the current position.
 		int currentPosition = 0;
 		if (orientation == SwingConstants.HORIZONTAL) {
@@ -143,13 +148,13 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		// and the nearest tick mark in the indicated direction.
 		if (direction < 0) {
 			int newPosition = currentPosition -
-										(currentPosition / maxUnitIncrement)
-										* maxUnitIncrement;
+					(currentPosition / maxUnitIncrement)
+					* maxUnitIncrement;
 			return (newPosition == 0) ? maxUnitIncrement : newPosition;
 		} else {
 			return ((currentPosition / maxUnitIncrement) + 1)
-								* maxUnitIncrement
-								- currentPosition;
+					* maxUnitIncrement
+					- currentPosition;
 		}
 	}
 	
@@ -161,5 +166,16 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 	public void mouseMoved(MouseEvent e) {
 		//
 		
+	}
+	
+	public JComponent getZoomSlider() {
+		ArrayList<ZoomedImage> r = new ArrayList<ZoomedImage>();
+		r.add(this);
+		return ImageAnalysis.getImageZoomSlider(r);
+	}
+	
+	public void setImage(BufferedImage image) {
+		this.image = image;
+		repaint();
 	}
 }

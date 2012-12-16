@@ -28,7 +28,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private String experimentType, sequence, files;
 	private long sizekb;
 	private int experimentID = -1;
-	private String database, originDatabaseId, globalOutliers;
+	private String database, originDatabaseId, globalOutliers, settings;
 	
 	public ExperimentHeader() {
 		//
@@ -52,6 +52,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		database = copyFrom.getDatabase();
 		originDatabaseId = copyFrom.getExperimentOriginDbId();
 		globalOutliers = copyFrom.getExperimentGlobalOutlierInfo();
+		settings = copyFrom.getExperimentSettings();
 	}
 	
 	@Override
@@ -72,6 +73,16 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public String getRemark() {
 		return remark;
+	}
+	
+	@Override
+	public void setSettings(String settings) {
+		this.settings = settings;
+	}
+	
+	@Override
+	public String getSettings() {
+		return settings;
 	}
 	
 	@Override
@@ -187,12 +198,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
 				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
-				"origin", "outlier", "files"
+				"origin", "outlier", "files", "settings"
 		}, new Object[] {
 				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
-				originDatabaseId, globalOutliers, files
+				originDatabaseId, globalOutliers, files, settings
 		}, true);
 		r.append("</experiment>");
 	}
@@ -215,6 +226,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
+		setSettings((String) map.get("settings"));
 		setDatabaseId(map.get("_id") + ""); // (String)
 		// map.get("excelfileid"));
 		setCoordinator((String) map.get("coordinator"));
@@ -298,6 +310,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("sizekb", sizekb);
 		attributeValueMap.put("origin", originDatabaseId);
 		attributeValueMap.put("outliers", globalOutliers);
+		attributeValueMap.put("settings", settings);
 	}
 	
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {

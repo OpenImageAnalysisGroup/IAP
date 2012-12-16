@@ -6,18 +6,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -62,13 +58,10 @@ public class BlCutZoomedImages extends AbstractBlock {
 		FlexibleImage vis = input.images().getImage(inp);
 		FlexibleImageSet in = input.images().copy();
 		FlexibleImage visFluo = vis.io().copy().crossfade(in.fluo().copy().resize(vis.getWidth(), vis.getHeight()), 0.5d).getImage();
-		final ImageIcon ic = new ImageIcon(visFluo.getAsBufferedImage());
-		final JLabel label = new JLabel();
-		label.setIcon(ic);
-		final JScrollPane jsp = new JScrollPane(label);
+		final ZoomedImage ic = new ZoomedImage(visFluo.getAsBufferedImage());
+		final JScrollPane jsp = new JScrollPane(ic);
 		jsp.setBorder(BorderFactory.createLoweredBevelBorder());
 		
-		final SpinnerModel model = new SpinnerNumberModel(100d, 1, 1000, 1);
 		JButton okButton = new JButton();
 		final JTextField textField = new JTextField("");
 		textField.setText(input.images().getImageInfo(inp).getParentSample().getParentCondition().getExperimentHeader().getGlobalOutlierInfo());
@@ -102,12 +95,9 @@ public class BlCutZoomedImages extends AbstractBlock {
 											.resize(selImage.getWidth(), selImage.getHeight()),
 									in.vis() != null && in.vis() != selImage ? in.vis().copy()
 											.resize(selImage.getWidth(), selImage.getHeight()) : null);
-					double z = (Double) model.getValue();
-					visFluo = visFluo.resize(z / 100d, z / 100d);
-					System.out.println(visFluo);
-					ImageIcon ic = new ImageIcon(visFluo.getAsBufferedImage());
-					JLabel jl = new JLabel(ic);
-					jsp.setViewportView(jl);
+					
+					ic.setImage(visFluo.getAsBufferedImage());
+					jsp.setViewportView(ic);
 					jsp.revalidate();
 					jsp.getVerticalScrollBar().setValue(vs);
 					jsp.getHorizontalScrollBar().setValue(hs);
@@ -122,7 +112,8 @@ public class BlCutZoomedImages extends AbstractBlock {
 		JComponent editAndUpdate = TableLayout.get3Split(
 				textField,
 				null,
-				TableLayout.get3Split(new JSpinner(model), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+				TableLayout.get3Split(
+						ic.getZoomSlider(), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 				TableLayout.FILL, 5, TableLayout.PREFERRED);
 		JComponent v = TableLayout.get3SplitVertical(
 				jsp, null, editAndUpdate, TableLayout.FILL, 5, TableLayout.PREFERRED);
