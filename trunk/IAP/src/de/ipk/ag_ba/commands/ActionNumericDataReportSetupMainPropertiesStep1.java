@@ -90,7 +90,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 	@Override
 	public String getDefaultTitle() {
 		if (exportIndividualAngles)
-			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table";
+			return "Export Numeric Data (" + (xlsx ? "XLSX" : "CSV") + ")";
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg)");

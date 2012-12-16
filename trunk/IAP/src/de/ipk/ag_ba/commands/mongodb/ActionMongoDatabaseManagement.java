@@ -42,7 +42,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Database Management & Tools";
+		return "Database Tools";
 	}
 	
 	@Override

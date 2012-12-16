@@ -6,7 +6,6 @@ import java.util.TreeSet;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetupMainPropertiesStep1;
 import de.ipk.ag_ba.commands.ActionToggle;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -85,7 +84,7 @@ class ActionDataReport extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Data Report";
+		return "PDF Report";
 	}
 	
 	@Override
@@ -107,21 +106,6 @@ class ActionDataReport extends AbstractNavigationAction {
 		// actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		
 		ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
-		
-		// actions.add(new NavigationButton(new ActionNumericDataReportSetupInterestingTraitsStep2(
-		// m, experimentReference, true,
-		// toggles,
-		// true, null, false),
-		// guiSetting));
-		actions.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experimentReference,
-						toggles,
-						false,
-						true,
-						null, null, null, null, null),
-				guiSetting));
 		
 		actions.add(
 				new NavigationButton(

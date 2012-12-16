@@ -23,6 +23,16 @@ public class ActionCopyAndAssignAnalysisTemplate extends AbstractNavigationActio
 	}
 	
 	@Override
+	public String getDefaultTitle() {
+		return "Select Analysis Task";
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/ext/gpl2/Gnome-Insert-Object-64.png";
+	}
+	
+	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 	}
 	

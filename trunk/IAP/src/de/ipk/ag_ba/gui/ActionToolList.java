@@ -8,7 +8,6 @@ import de.ipk.ag_ba.commands.ActionSaveWebCamRange;
 import de.ipk.ag_ba.commands.ActionShowXML;
 import de.ipk.ag_ba.commands.ActionSortSubstances;
 import de.ipk.ag_ba.commands.CloudIoTestAction;
-import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -48,6 +47,6 @@ class ActionToolList extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getToolbox();
+		return "img/ext/gpl2/Gnome-System-Run-64.png";// IAPimages.getToolbox();
 	}
 }
