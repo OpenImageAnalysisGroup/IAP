@@ -69,7 +69,7 @@ public class ActionSetup extends AbstractNavigationAction {
 			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, "Change settings of section " + s, s), src.getGUIsetting()));
 		}
 		if (iniFileName == null)
-			for (PipelineDesc pd : PipelineDesc.getKnownPipelines())
+			for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
 				res.add(new NavigationButton(
 						new ActionSetup(pd.getIniFileName(),
 								"Change settings of " + pd.getName() + " analysis pipeline",

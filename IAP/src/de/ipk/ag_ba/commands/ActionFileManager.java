@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -53,9 +54,34 @@ public class ActionFileManager extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
-		if (m != null)
-			res.add(new NavigationButton("Save Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
-		
+		if (m != null) {
+			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
+			
+			ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+			
+			res.add(new NavigationButton(
+					new ActionNumericDataReportCompleteFinishedStep3(
+							m,
+							experiment,
+							toggles,
+							false,
+							true,
+							null, null, null, null, null),
+					guiSetting));
+			res.add(new NavigationButton(
+					new ActionNumericDataReportCompleteFinishedStep3(
+							m,
+							experiment,
+							toggles,
+							true,
+							false,
+							null, null, null, null, null),
+					guiSetting));
+			
+			res.add(new NavigationButton(new ActionDataExport(m, experiment), src.getGUIsetting()));
+			res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
+			res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		}
 		return res;
 	}
 	
@@ -67,7 +93,7 @@ public class ActionFileManager extends AbstractNavigationAction {
 	public static NavigationButton getFileManagerEntity(MongoDB m,
 			final ExperimentReference experimentRef, GUIsetting guiSetting) {
 		NavigationAction fileManagerAction = new ActionFileManager(m, experimentRef);
-		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View Data",
+		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View/Export Data",
 				"img/ext/user-desktop.png",
 				// "img/ext/applications-system.png",
 				guiSetting);

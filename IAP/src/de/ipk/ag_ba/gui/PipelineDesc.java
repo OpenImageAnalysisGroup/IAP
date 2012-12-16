@@ -39,9 +39,9 @@ public class PipelineDesc {
 				"Barley Analysis", "Analyze Phenotype (Barley)");
 	}
 	
-	public static ArrayList<PipelineDesc> getKnownPipelines() {
+	public static ArrayList<PipelineDesc> getSavedPipelineTemplates() {
 		ArrayList<PipelineDesc> res = new ArrayList<PipelineDesc>();
-		res.add(PipelineDesc.getPipelineDefault());
+		// res.add(PipelineDesc.getPipelineDefault());
 		FilenameFilter ff = new FilenameFilter() {
 			@Override
 			public boolean accept(File f, String name) {

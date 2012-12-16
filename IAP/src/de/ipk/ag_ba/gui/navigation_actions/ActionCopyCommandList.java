@@ -6,9 +6,6 @@ import org.SettingsHelperDefaultIsFalse;
 import org.SettingsHelperDefaultIsTrue;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionDataExport;
-import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
-import de.ipk.ag_ba.commands.ActionDataExportTar;
 import de.ipk.ag_ba.commands.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.commands.hsm.ActionDataUdpBroadcast;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
@@ -65,9 +62,6 @@ public class ActionCopyCommandList extends AbstractNavigationAction implements N
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		res.add(new NavigationButton(new ActionDataExport(m, experimentReference), guiSetting));
-		res.add(new NavigationButton(new ActionDataExportTar(m, experimentReference), guiSetting));
-		res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experimentReference), guiSetting));
 		for (MongoDB m : ml)
 			res.add(new NavigationButton(new ActionCopyToMongo(m, experimentReference), guiSetting));
 		for (VirtualFileSystem vx : vl) {
@@ -97,11 +91,11 @@ public class ActionCopyCommandList extends AbstractNavigationAction implements N
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getNetworkedServers();
+		return "img/ext/transfer2c.png";// IAPimages.getNetworkedServers();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy Dataset";
+		return "Copy";
 	}
 }

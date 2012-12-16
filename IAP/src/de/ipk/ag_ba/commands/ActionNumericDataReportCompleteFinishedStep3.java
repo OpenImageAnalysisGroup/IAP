@@ -31,7 +31,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -250,8 +249,12 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					add = "<br>[NO PROPERTY OVERVIEW]";
 			}
 		}
-		if (exportIndividualAngles || xlsx)
-			return "Save " + (xlsx ? "XLSX" : "CSV") + " Data Table" + add;
+		if (exportIndividualAngles || xlsx) {
+			if (!xlsx)
+				return "Create CSV File" + add;
+			else
+				return "Create Spreadsheet (" + (xlsx ? "XLSX" : "CSV") + ")" + add;
+		}
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
 					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
@@ -285,7 +288,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	@Override
 	public String getDefaultImage() {
 		if (exportIndividualAngles)
-			return IAPimages.getDownloadIcon();
+			return "img/ext/gpl2/Gnome-Text-X-Generic-64.png";// IAPimages.getDownloadIcon();
 		else
 			return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
 	}

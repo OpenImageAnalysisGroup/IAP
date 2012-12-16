@@ -19,7 +19,7 @@ public class ImageAnalysisTasks {
 	public ArrayList<AbstractPhenotypingTask> getKnownImageAnalysisTasks() {
 		ArrayList<AbstractPhenotypingTask> res = new ArrayList<AbstractPhenotypingTask>();
 		res.add(new MaizeAnalysisTask());
-		for (PipelineDesc pd : PipelineDesc.getKnownPipelines())
+		for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
 			res.add(new ImageAnalysisPipelineTask(pd.getName(), pd.getTooltip()));
 		res.add(new ArabidopsisAnalysisTask());
 		res.add(new ArabidopsisAnalysisSmallBlueRubberTask());
