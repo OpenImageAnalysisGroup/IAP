@@ -19,6 +19,7 @@ import de.ipk.ag_ba.commands.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.commands.ActionNumericDataReportSetupMainPropertiesStep1;
 import de.ipk.ag_ba.commands.ActionPerformanceTest;
+import de.ipk.ag_ba.commands.ActionSaveWebCamRange;
 import de.ipk.ag_ba.commands.ActionShowXML;
 import de.ipk.ag_ba.commands.ActionSortSubstances;
 import de.ipk.ag_ba.commands.ActionToggle;
@@ -85,6 +86,7 @@ public class ImageAnalysisCommandManager {
 				res.add(new NavigationButton(new ActionPerformanceTest(m, experimentReference), guiSetting));
 				res.add(new NavigationButton(new ActionSortSubstances(m, experimentReference), guiSetting));
 				res.add(new NavigationButton(new ActionShowXML(m, experimentReference), guiSetting));
+				res.add(new NavigationButton(new ActionSaveWebCamRange(m, experimentReference), guiSetting));
 				return res;
 			}
 			

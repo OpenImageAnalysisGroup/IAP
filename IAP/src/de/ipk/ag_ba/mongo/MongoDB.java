@@ -430,7 +430,9 @@ public class MongoDB {
 								}
 							}
 						}
-						collExps.remove(expRef);
+						WriteResult wr = collExps.remove(expRef);
+						System.out.println("Remove write result: " + wr);
+						
 					}
 				}
 			}
@@ -3306,7 +3308,7 @@ public class MongoDB {
 										WriteConcern.NONE);
 								String err = wr.getError();
 								if (err != null && err.length() > 0)
-									System.err.println("ERROR deleting a conditin object: " + err + " // " + SystemAnalysis.getCurrentTime());
+									System.err.println("ERROR deleting a condition object: " + err + " // " + SystemAnalysis.getCurrentTime());
 								n.addLong(list.size());
 								status.setCurrentStatusValueFine(100d / max * n.getLong());
 								status.setCurrentStatusText2(n.getLong() + "/" + max);
@@ -3319,6 +3321,14 @@ public class MongoDB {
 							saveSystemMessage(msg);
 						}
 					});
+				}
+				executor.shutdown();
+				while (!executor.isTerminated()) {
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException e) {
+						MongoDB.saveSystemErrorMessage("InterruptedException during reorganization.", e);
+					}
 				}
 				
 				if (linkedHashes.size() >= 0) {
@@ -3357,23 +3367,7 @@ public class MongoDB {
 							final ThreadSafeOptions free = new ThreadSafeOptions();
 							final ThreadSafeOptions fIdx = new ThreadSafeOptions();
 							final int fN = toBeRemoved.size();
-							for (final GridFSDBFile f : toBeRemoved) {
-								executor.submit(new Runnable() {
-									@Override
-									public void run() {
-										gridfs.remove(f);
-										// CommandResult le = db.getLastError(WriteConcern.SAFE);
-										// String err = le.getErrorMessage();
-										// if (err != null && err.length() > 0)
-										// System.err.println("ERROR deleting a gridFS file: " + err + " // " + SystemAnalysis.getCurrentTime());
-										free.addLong(f.getLength());
-										fIdx.addInt(1);
-										status.setCurrentStatusText1("File " + fIdx.getInt() +
-												"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)" + ", removed: " + free.getLong() / 1024 / 1024 + " MB");
-										status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
-									}
-								});
-							}
+							removeFiles(status, mgfs, gridfs, toBeRemoved, free, fIdx, fN, db);
 							msg = "REORGANIZATION: Deleted MB (" + mgfs + "): " + free.getLong() / 1024 / 1024 + " // "
 									+ SystemAnalysis.getCurrentTime();
 							System.out.println(msg);
@@ -3384,15 +3378,6 @@ public class MongoDB {
 							freeAll += free.getLong();
 						}
 						status.setCurrentStatusValueFineAdd(stepSize);
-					}
-					
-					executor.shutdown();
-					while (!executor.isTerminated()) {
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException e) {
-							MongoDB.saveSystemErrorMessage("InterruptedException during reorganization.", e);
-						}
 					}
 					
 					msg = "REORGANIZATION: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
@@ -3748,5 +3733,129 @@ public class MongoDB {
 			}
 		});
 		return new GridFS((DB) dbs.getParam(0, null), "fs_screenshots");
+	}
+	
+	private void removeFiles(final BackgroundTaskStatusProviderSupportingExternalCall status, String mgfs, final GridFS gridfs,
+			ArrayList<GridFSDBFile> toBeRemoved, final ThreadSafeOptions free, final ThreadSafeOptions fIdx, final int fN, DB db) {
+		DBCollection colFE = db.getCollection(mgfs + ".files");
+		DBCollection colFC = db.getCollection(mgfs + ".chunks");
+		// if (mgfs.endsWith("fs_images"))
+		// colFC.dropIndexes();
+		boolean rmList = true;
+		ArrayList<ObjectId> rList = new ArrayList<ObjectId>();
+		for (final GridFSDBFile f : toBeRemoved) {
+			free.addLong(f.getLength());
+			if (!rmList)
+				gridfs.remove(f.getFilename());
+			else
+				rList.add((ObjectId) f.getId());
+			if (rmList && rList.size() > 200) {
+				colFE.remove(
+						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+				colFC.remove(
+						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+				rList.clear();
+			}
+			fIdx.addInt(1);
+			status.setCurrentStatusText1("File " + fIdx.getInt() +
+					"/" + fN + " (" + (int) (100d * fIdx.getInt() / fN) + "%)" + ", removed: " + free.getLong() / 1024 / 1024 + " MB");
+			status.setCurrentStatusValueFine(fIdx.getInt() * 100d / fN);
+		}
+		if (rmList && rList.size() > 0) {
+			colFE.remove(
+					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+			colFC.remove(
+					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.FSYNCED);
+			rList.clear();
+		}
+	}
+	
+	public ArrayList<String> getWebCamStorageFileSystems() throws Exception {
+		final ArrayList<String> res = new ArrayList<String>();
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				for (String n : db.getCollectionNames())
+					if (n.startsWith("fs_webcam_") && n.endsWith(".files"))
+						res.add(n);
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		processDB(runnableOnDB);
+		return res;
+	}
+	
+	public long getWebCamStorageCount(final String fs, final Date startdate, final Date importdate) throws Exception {
+		final ThreadSafeOptions res = new ThreadSafeOptions();
+		res.setLong(-1);
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				res.setLong(db.getCollection(fs).count(
+						new BasicDBObject("uploadDate",
+								new BasicDBObject("$gt", startdate).append("$lt", importdate))));
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		processDB(runnableOnDB);
+		return res.getLong();
+	}
+	
+	public ArrayList<String> getWebCamStorageFileNames(final String fs, final Date startdate, final Date importdate) throws Exception {
+		final ArrayList<String> res = new ArrayList<String>();
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				for (DBObject o : db.getCollection(fs)
+						.find(new BasicDBObject("uploadDate",
+								new BasicDBObject("$gt", startdate).append("$lt", importdate)))) {
+					res.add((String) o.get("filename"));
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		processDB(runnableOnDB);
+		return res;
+	}
+	
+	public GridFS getGridFS(final String fileSystemName) throws Exception {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		RunnableOnDB runnableOnDB = new RunnableOnDB() {
+			
+			private DB db;
+			
+			@Override
+			public void run() {
+				tso.setParam(0, new GridFS(db, fileSystemName));
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		};
+		processDB(runnableOnDB);
+		return (GridFS) tso.getParam(0, null);
 	}
 }
