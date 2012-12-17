@@ -61,7 +61,7 @@ public class ActionLemnaUser extends AbstractNavigationAction implements Navigat
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/folder-remote-open.png";
+		return IAPimages.getFolderRemoteOpen();
 	}
 	
 	@Override

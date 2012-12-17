@@ -135,7 +135,7 @@ public class WebFolder {
 				NavigationAction subFolderAction = null;
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
 					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
-							"img/ext/folder.png", "img/ext/folder-drag-accept.png");
+							"img/ext/folder.png", "img/ext/folder-drag-accept_t.png");
 					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);
 				}
@@ -211,7 +211,7 @@ public class WebFolder {
 							website.setToolTipText("Open " + url);
 							res.add(website);
 							
-							// "img/ext/folder-drag-accept.png"
+							// "img/ext/folder-drag-accept_t.png"
 							
 							for (PathwayWebLinkItem mc : folder2file.get(ff)) {
 								NavigationButton j = IAPservice.getPathwayViewEntity(mc, guiSetting);
@@ -220,7 +220,9 @@ public class WebFolder {
 							
 							return res;
 						}
-					}, f, "img/ext/folder-remote-open.png", IAPimages.getFolderRemoteClosed(), src.getGUIsetting());
+					}, f,
+							IAPimages.getFolderRemoteOpen(),
+							IAPimages.getFolderRemoteClosed(), src.getGUIsetting());
 					
 					if (subFolderAction != null)
 						subFolderAction.addAdditionalEntity(ne);

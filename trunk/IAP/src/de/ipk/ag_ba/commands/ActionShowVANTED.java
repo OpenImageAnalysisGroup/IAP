@@ -7,6 +7,7 @@
 
 package de.ipk.ag_ba.commands;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -48,8 +49,10 @@ public class ActionShowVANTED extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		JComponent gui = IAPmain.showVANTED(showInline);
+		// if (gui != null)
+		// gui.setBorder(BorderFactory.createLoweredBevelBorder());
 		if (gui != null)
-			gui.setBorder(BorderFactory.createLoweredBevelBorder());
+			gui.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.DARK_GRAY));
 		return gui != null ? new MainPanelComponent(gui) : null;
 	}
 	

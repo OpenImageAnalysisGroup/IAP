@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.commands.experiment;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -49,7 +50,10 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
 				ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
 						optSupplementaryPanel, null);
 				JComponent gui = IAPmain.showVANTED(true);
-				gui.setBorder(BorderFactory.createLoweredBevelBorder());
+				// gui.setBorder(BorderFactory.createLoweredBevelBorder());
+				if (gui != null)
+					gui.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.DARK_GRAY));
+				
 				mpc = new MainPanelComponent(gui);
 				
 			}

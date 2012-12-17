@@ -67,7 +67,7 @@ public class IAPimages {
 	}
 	
 	public static String getFolderRemoteOpen() {
-		return "img/ext/folder-remote-open.png";
+		return "img/ext/folder-remote-open_t.png";
 	}
 	
 	public static String getFolderRemoteClosed() {

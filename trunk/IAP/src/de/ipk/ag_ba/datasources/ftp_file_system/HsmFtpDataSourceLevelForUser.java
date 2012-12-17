@@ -46,12 +46,12 @@ public class HsmFtpDataSourceLevelForUser implements DataSourceLevel {
 	
 	@Override
 	public NavigationImage getIconInactive() {
-		return IAPmain.loadIcon("img/ext/user-user.png");
+		return IAPmain.loadIcon("img/ext/user-user_t.png");
 	}
 	
 	@Override
 	public NavigationImage getIconActive() {
-		return IAPmain.loadIcon("img/ext/user-user.png");
+		return IAPmain.loadIcon("img/ext/user-user_t.png");
 	}
 	
 	@Override
