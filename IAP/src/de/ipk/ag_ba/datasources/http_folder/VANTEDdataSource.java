@@ -15,6 +15,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -32,7 +33,7 @@ public class VANTEDdataSource extends HTTPfolderSource {
 				"http://vanted.ipk-gatersleben.de/examplefiles/",
 				new String[] { ".gml", ".graphml" },
 				IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
-				IAPmain.loadIcon("img/ext/folder-remote.png"));
+				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		setDescription("<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
 				+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
 				+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
@@ -76,7 +77,7 @@ public class VANTEDdataSource extends HTTPfolderSource {
 			
 			@Override
 			public NavigationImage getIconInactive() {
-				return IAPmain.loadIcon("img/ext/folder-remote.png");
+				return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
 			}
 			
 			@Override

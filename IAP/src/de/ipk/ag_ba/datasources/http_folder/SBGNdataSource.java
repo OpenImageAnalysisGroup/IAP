@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**
@@ -20,7 +21,8 @@ public class SBGNdataSource extends HTTPfolderSource {
 	
 	public SBGNdataSource() {
 		super(getLibrary(), "SBGN-ED", "http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
-				new String[] { ".gml", ".graphml" }, IAPmain.loadIcon("img/sbgn.png"), IAPmain.loadIcon("img/ext/folder-remote.png"));
+				new String[] { ".gml", ".graphml" }, IAPmain.loadIcon("img/sbgn.png"),
+				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		setDescription("<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
 				+ ""
 				+ "SBGN-ED is a VANTED Add-on which allows to create and edit all three types of SBGN maps, "

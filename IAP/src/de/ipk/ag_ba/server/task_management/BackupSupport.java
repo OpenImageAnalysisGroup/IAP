@@ -21,6 +21,7 @@ import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -147,7 +148,7 @@ public class BackupSupport {
 						hsmFolder,
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-						IAPmain.loadIcon("img/ext/folder-remote.png"));
+						IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 				dataSourceHsm.readDataSource();
 				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
 					if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {

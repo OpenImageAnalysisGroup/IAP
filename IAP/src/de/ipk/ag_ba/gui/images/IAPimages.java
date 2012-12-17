@@ -71,7 +71,7 @@ public class IAPimages {
 	}
 	
 	public static String getFolderRemoteClosed() {
-		return "img/ext/folder-remote.png";
+		return "img/ext/folder-remote_t.png";
 	}
 	
 	public static String getCloudResult() {

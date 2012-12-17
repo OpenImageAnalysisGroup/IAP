@@ -28,6 +28,7 @@ import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -259,7 +260,7 @@ public class CloudComputingService {
 					hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-					IAPmain.loadIcon("img/ext/folder-remote.png"));
+					IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		}
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
