@@ -13,11 +13,10 @@ import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.cloud_computing.ActionEnableOrDisableGridComuputation;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudClusterHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionJobStatus;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
-import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -33,16 +32,13 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	private NavigationButton src;
 	private final MongoDB m;
-	private final ActionMongoExperimentsNavigation en;
 	private final boolean showMonitoringNodes;
 	
 	public CloundManagerNavigationAction(MongoDB m,
-			ActionMongoExperimentsNavigation mongoExperimentsNavigationAction,
 			boolean showMonitoringNodes) {
 		super("Task- and Server-Management");
 		this.showMonitoringNodes = showMonitoringNodes;
 		this.m = m != null ? m : MongoDB.getDefaultCloud();
-		this.en = mongoExperimentsNavigationAction;
 	}
 	
 	@Override
@@ -61,7 +57,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		GUIsetting guiSetting = src.getGUIsetting();
 		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
 			NavigationButton startOrStopServerMode = new NavigationButton(
-					new EnableOrDisableServerModeAction(m), guiSetting);
+					new ActionEnableOrDisableGridComuputation(m), guiSetting);
 			res.add(startOrStopServerMode);
 		}
 		
@@ -70,11 +66,6 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			res.add(jobStatus);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
-		}
-		
-		if (en != null) {
-			for (NavigationButton r : en.getResultNewActionSet())
-				res.add(r);
 		}
 		
 		try {
@@ -124,13 +115,6 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-		if (en != null) {
-			en.performActionCalculateResults(src);
-		}
 	}
 	
-	@Override
-	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(new CloudTaskAndServerOverviewComponent(), true);
-	}
 }

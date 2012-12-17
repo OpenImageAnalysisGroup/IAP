@@ -139,9 +139,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					if (currentUser == null || !currentUser.equals("public"))
 						if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false))
 							res.add(new NavigationButton(
-									new CloundManagerNavigationAction(m,
-											new ActionMongoExperimentsNavigation(m, false, true),
-											false),
+									new CloundManagerNavigationAction(m, false),
 									src.getGUIsetting()));
 				
 				if (!limitToResuls)

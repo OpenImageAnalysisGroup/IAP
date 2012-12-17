@@ -12,8 +12,6 @@ import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -61,15 +59,13 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false))
 			result.add(new NavigationButton(new ActionAnalyzeAllExperiments(m, experimentList), src.getGUIsetting()));
 		
-		if (IAPmain.getRunMode() != IAPrunMode.WEB) {
-			boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
-			if (showDeleteCloudJobsIcon) {
-				NavigationButton deleteCloudJobs = new NavigationButton(
+		boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
+		if (showDeleteCloudJobsIcon) {
+			NavigationButton deleteCloudJobs = new NavigationButton(
 						new ActionDeleteAnalysisJobs(m), guiSetting);
-				result.add(deleteCloudJobs);
-			}
-			
+			result.add(deleteCloudJobs);
 		}
+		
 		result.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDbCompact(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionDeleteHistoryOfAllExperiments(m), src.getGUIsetting()));
