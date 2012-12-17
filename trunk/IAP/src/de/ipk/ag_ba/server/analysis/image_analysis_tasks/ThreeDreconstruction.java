@@ -23,7 +23,6 @@ import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;
-import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -148,7 +147,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 							if (status != null)
 								status.setCurrentStatusText1("Storing result");
 							
-							storeResultInDatabase.saveVolume(volume, s3d, m, DBTable.SAMPLE, null, status);
+							storeResultInDatabase.saveVolume(volume, s3d, m, null, status);
 							if (status != null)
 								status.setCurrentStatusValue(100);
 							if (status != null)

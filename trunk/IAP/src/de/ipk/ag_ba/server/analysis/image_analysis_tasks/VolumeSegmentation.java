@@ -19,7 +19,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ThreeDsegmentationColored;
-import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -92,8 +91,9 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 							try {
 								status.setCurrentStatusText1("Saving (" + bytes / 1024 / 1024 + " MB)");
 								long t1 = System.currentTimeMillis();
-								storeResultInDatabase.saveVolume(volume, (Sample3D) volume.getParentSample(), m,
-										DBTable.SAMPLE, null, status);
+								storeResultInDatabase.saveVolume(volume,
+										(Sample3D) volume.getParentSample(), m,
+										null, status);
 								long t2 = System.currentTimeMillis();
 								if (t2 > t1)
 									System.out.println("Saved Volume ("

@@ -42,7 +42,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
-import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
@@ -463,7 +462,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
 						if (databaseTarget != null) {
 							databaseTarget.saveVolume((LoadedVolume) v, inSample,
-									m, DBTable.SAMPLE, null, null);
+									m, null, null);
 							VolumeData volumeInDatabase = new VolumeData(inSample,
 									v);
 							volumeInDatabase.getURL().setPrefix(
