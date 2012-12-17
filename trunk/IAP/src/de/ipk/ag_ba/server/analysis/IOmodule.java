@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -42,14 +41,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  * @author klukas
  */
 public class IOmodule {
-	
-	private final ArrayList<IOtask> todo = new ArrayList<IOtask>();
-	private final int processed = 0;
-	private final int lastKBperSecTransferSpeed = 0;
-	
-	public WorkerInfo getWorkerInfo() {
-		return new WorkerInfo(todo.size(), 0, processed, lastKBperSecTransferSpeed, "KB/s");
-	}
 	
 	public static LoadedImage loadImageFromFileOrMongo(ImageData id, boolean loadImage, boolean loadLabelField)
 			throws Exception {
@@ -110,32 +101,6 @@ public class IOmodule {
 	
 	public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
 	
-	// public static VolumeUploadData getThreeDvolumeInputStream(LoadedVolume volume) {
-	// System.out.println("Create InputStream representation for volume: " + volume.getDimensionX()
-	// * volume.getDimensionY() * volume.getDimensionZ() * 4 / 1024 / 1024 + " MB");
-	// VolumeInputStream stream = volume.getLoadedVolume().getInputStream();
-	// return new VolumeUploadData(stream, stream.getNumberOfBytes());
-	// }
-	
-	// public static LoadedVolume loadVolumeFromDBE(VolumeData md, String login,
-	// String pass) {
-	// Blob blo;
-	// LoadedVolume result = null;
-	// try {
-	// blo = CallDBE2WebService.getBlob(login, pass, md.getURL().getDetail());
-	// result = new LoadedVolume(md);
-	// int index = 0;
-	// int mx = md.getDimensionX();
-	// int my = md.getDimensionY();
-	// int mz = md.getDimensionZ();
-	// byte[] fileContent = blo.getBytes(index, mx * my * mz * 4);
-	// result.setVolume(fileContent);
-	// } catch (Exception e) {
-	// ErrorMsg.addErrorMessage(e);
-	// }
-	// return result;
-	// }
-	
 	public static LoadedVolume loadVolume(final VolumeData md) throws Exception {
 		DataInputStream is = new DataInputStream(md.getURL().getInputStream());
 		
@@ -153,8 +118,8 @@ public class IOmodule {
 	}
 	
 	public static LoadedNetwork loadNetwork(NetworkData nd) throws Exception {
-		Graph graph = MainFrame.getInstance().getGraph(nd.getURL());
-		Graph graphLabelField = MainFrame.getInstance().getGraph(nd.getLabelURL());
+		Graph graph = MainFrame.getGraph(nd.getURL());
+		Graph graphLabelField = MainFrame.getGraph(nd.getLabelURL());
 		return new LoadedNetwork(nd, graph, graphLabelField);
 	}
 	

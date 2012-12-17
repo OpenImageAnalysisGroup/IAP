@@ -18,7 +18,6 @@ import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.ThreeDsegmentationColored;
 import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -48,12 +47,6 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public ImageAnalysisType[] getInputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
-				ImageAnalysisType.IMAGE };
-	}
-	
-	@Override
 	public String getName() {
 		return "Segmentation";
 	}
@@ -61,12 +54,6 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	@Override
 	public Collection<NumericMeasurementInterface> getOutput() {
 		return output;
-	}
-	
-	@Override
-	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_IMAGE, ImageAnalysisType.GRAY_VOLUME,
-				ImageAnalysisType.IMAGE };
 	}
 	
 	@Override

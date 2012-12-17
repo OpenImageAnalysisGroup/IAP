@@ -19,7 +19,6 @@ import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
@@ -71,28 +70,6 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	@Override
 	public String getTaskDescription() {
 		return "Creates a 3-D volume model of the plant out of rotational side-view images.";
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
-	 * #getInputType()
-	 */
-	@Override
-	public ImageAnalysisType[] getInputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
-	 * #getResultType()
-	 */
-	@Override
-	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_VOLUME };
 	}
 	
 	/*

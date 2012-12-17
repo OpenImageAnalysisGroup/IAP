@@ -24,7 +24,6 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
@@ -61,16 +60,6 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;
 		this.workLoadSize = workLoadSize;
-	}
-	
-	@Override
-	public ImageAnalysisType[] getInputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
-	}
-	
-	@Override
-	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
 	}
 	
 	@Override
