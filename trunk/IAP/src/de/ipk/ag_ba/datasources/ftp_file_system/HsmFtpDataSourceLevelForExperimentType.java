@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
-import de.ipk.ag_ba.commands.Book;
+import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;

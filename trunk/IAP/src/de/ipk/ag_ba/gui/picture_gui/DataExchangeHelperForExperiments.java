@@ -41,7 +41,7 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import de.ipk.ag_ba.commands.MySnapshotFilter;
+import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoDBhandler;

@@ -9,8 +9,8 @@ package de.ipk.ag_ba.datasources.http_folder;
 
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.Book;
-import de.ipk.ag_ba.commands.Library;
+import de.ipk.ag_ba.commands.datasource.Book;
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**

@@ -21,7 +21,6 @@ import javax.swing.ImageIcon;
 
 import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.commands.Calendar2;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**
@@ -29,10 +28,10 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
  */
 public class MyCalendarIcon extends ImageIcon implements DynamicPaintingIcon {
 	private static final long serialVersionUID = 1L;
-	private final Calendar2 calendarEntity;
+	private final NavigationButtonCalendar2 calendarEntity;
 	private final int imgS;
 	
-	public MyCalendarIcon(ImageIcon icon, Calendar2 n, int imgS) {
+	public MyCalendarIcon(ImageIcon icon, NavigationButtonCalendar2 n, int imgS) {
 		super(icon.getImage());
 		this.calendarEntity = n;
 		this.imgS = imgS;

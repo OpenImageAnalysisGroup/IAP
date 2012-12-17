@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.commands.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -31,11 +30,11 @@ public class Calendar extends JComponent {
 	private static final long serialVersionUID = 1L;
 	GregorianCalendar cal;
 	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
-	private final Calendar2 calEnt;
+	private final NavigationButtonCalendar2 calEnt;
 	
 	ArrayList<DayComponent> days;
 	
-	public Calendar(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, Calendar2 action) {
+	public Calendar(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, NavigationButtonCalendar2 action) {
 		setOpaque(false);
 		calEnt = action;
 		cal = action.getCalendar();

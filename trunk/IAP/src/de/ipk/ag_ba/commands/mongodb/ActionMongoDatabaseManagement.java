@@ -7,8 +7,8 @@ import org.SystemOptions;
 import com.mongodb.BasicDBObject;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
-import de.ipk.ag_ba.commands.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;

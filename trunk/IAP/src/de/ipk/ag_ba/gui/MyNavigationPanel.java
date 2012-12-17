@@ -44,9 +44,9 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
-import de.ipk.ag_ba.commands.BookmarkAction;
-import de.ipk.ag_ba.commands.experiment.ActionClearClipboard;
-import de.ipk.ag_ba.commands.experiment.ActionMergeClipboard;
+import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
+import de.ipk.ag_ba.commands.experiment.clipboard.ActionClearClipboard;
+import de.ipk.ag_ba.commands.experiment.clipboard.ActionMergeClipboard;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

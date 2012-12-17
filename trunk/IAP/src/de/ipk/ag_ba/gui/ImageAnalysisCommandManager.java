@@ -13,12 +13,11 @@ import java.util.TreeSet;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.ActionAnalysisCommandList;
-import de.ipk.ag_ba.commands.experiment.ActionCopyCommandList;
-import de.ipk.ag_ba.commands.experiment.ActionCopyToClipboard;
-import de.ipk.ag_ba.commands.experiment.ActionDataReport;
-import de.ipk.ag_ba.commands.experiment.ActionFileManager;
+import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
+import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
+import de.ipk.ag_ba.commands.experiment.ActionPdfReport;
 import de.ipk.ag_ba.commands.experiment.ActionToolList;
+import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -42,11 +41,11 @@ public class ImageAnalysisCommandManager {
 		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		
-		actions.add(ActionFileManager.getFileManagerEntity(m, experimentReference, guiSetting));
+		actions.add(ActionViewExportData.getFileManagerEntity(m, experimentReference, guiSetting));
 		
 		if (analysis) {
 			actions.add(new NavigationButton(
-					new ActionAnalysisCommandList(
+					new ActionAnalysis(
 							"Analysis Tasks", m, experimentReference), guiSetting));
 		}
 		
@@ -55,19 +54,19 @@ public class ImageAnalysisCommandManager {
 		if (IAPmain.getRunMode() == IAPrunMode.WEB)
 			actions.add(new NavigationButton(new ActionNumericDataReport(m, experimentReference), guiSetting));
 		
-		actions.add(new NavigationButton(new ActionCopyCommandList(m, experimentReference, guiSetting), guiSetting));
+		actions.add(new NavigationButton(new ActionCopyExperiment(m, experimentReference, guiSetting), guiSetting));
 		
 		actions.add(new NavigationButton(
 				new ActionToolList(
 						"Performance test and sort substances tool commands",
 						m, experimentReference), guiSetting));
 		
-		actions.add(new NavigationButton(new ActionCopyToClipboard(m, experimentReference), guiSetting));
+		actions.add(new NavigationButton(new de.ipk.ag_ba.commands.experiment.clipboard.ActionCopyToClipboard(m, experimentReference), guiSetting));
 		return actions;
 	}
 	
 	private static AbstractNavigationAction getDataReportAction(final MongoDB m, final ExperimentReference experimentReference, final GUIsetting guiSetting) {
-		return new ActionDataReport("Create Report Files", experimentReference, m);
+		return new ActionPdfReport("Create Report Files", experimentReference, m);
 	}
 	
 	public static String getList(String heading, TreeSet<String> cs) {

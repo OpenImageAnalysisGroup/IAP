@@ -32,7 +32,6 @@ import org.Colors;
 import org.StringManipulationTools;
 import org.color.ColorUtil;
 
-import de.ipk.ag_ba.commands.Calendar2;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -46,7 +45,7 @@ public class DayComponent extends JComponent {
 	private ArrayList<Color> colors = Colors.get(12, colorIntensity);
 	boolean compact = false;
 	private GregorianCalendar calendar;
-	private Calendar2 calEnt;
+	private NavigationButtonCalendar2 calEnt;
 	
 	private static ArrayList<Color> userColors = Colors.get(9, colorIntensity * 2);
 	private final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei;
@@ -55,7 +54,7 @@ public class DayComponent extends JComponent {
 	private String day;
 	
 	public DayComponent(TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, boolean main,
-			boolean mark, GregorianCalendar calendar, Calendar2 calEnt) {
+			boolean mark, GregorianCalendar calendar, NavigationButtonCalendar2 calEnt) {
 		this.group2ei = group2ei;
 		this.main = main;
 		this.mark = mark;

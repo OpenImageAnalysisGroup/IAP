@@ -1,9 +1,9 @@
 package de.ipk.ag_ba.image.operations.blocks.cmds.post_process;
 
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
 public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	

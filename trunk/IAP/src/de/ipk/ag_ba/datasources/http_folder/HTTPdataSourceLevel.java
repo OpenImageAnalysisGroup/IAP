@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import de.ipk.ag_ba.commands.Book;
-import de.ipk.ag_ba.commands.Library;
+import de.ipk.ag_ba.commands.datasource.Book;
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;

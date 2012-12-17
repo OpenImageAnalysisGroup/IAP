@@ -14,7 +14,7 @@ import javax.swing.JTable;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ReportRow;
+import de.ipk.ag_ba.commands.experiment.process.report.ReportRow;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;

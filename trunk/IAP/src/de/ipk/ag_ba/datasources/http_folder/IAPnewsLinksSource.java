@@ -12,7 +12,7 @@ import java.util.Collection;
 
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.Library;
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
