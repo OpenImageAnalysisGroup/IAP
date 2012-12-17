@@ -318,7 +318,10 @@ public class MyExperimentInfoPanel extends JPanel {
 			fp.addGuiComponentRow(new JLabel("Storage Time"), disable(new JTextField(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime()))),
 					false);
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
-		if (optExperiment != null)
+		fp.addGuiComponentRow(new JLabel("Analysis Settings"),
+				disable(new JTextField(experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(undefined)" : "(available)")), false);
+		boolean showXMLbutton = false;
+		if (optExperiment != null && showXMLbutton)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
