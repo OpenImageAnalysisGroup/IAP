@@ -13,10 +13,13 @@ import java.util.TreeSet;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionFileManager;
-import de.ipk.ag_ba.commands.ActionNumericDataReport;
-import de.ipk.ag_ba.gui.navigation_actions.ActionCopyCommandList;
-import de.ipk.ag_ba.gui.navigation_actions.ActionCopyToClipboard;
+import de.ipk.ag_ba.commands.experiment.ActionAnalysisCommandList;
+import de.ipk.ag_ba.commands.experiment.ActionCopyCommandList;
+import de.ipk.ag_ba.commands.experiment.ActionCopyToClipboard;
+import de.ipk.ag_ba.commands.experiment.ActionDataReport;
+import de.ipk.ag_ba.commands.experiment.ActionFileManager;
+import de.ipk.ag_ba.commands.experiment.ActionToolList;
+import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -67,7 +70,7 @@ public class ImageAnalysisCommandManager {
 		return new ActionDataReport("Create Report Files", experimentReference, m);
 	}
 	
-	protected static String getList(String heading, TreeSet<String> cs) {
+	public static String getList(String heading, TreeSet<String> cs) {
 		StringBuilder res = new StringBuilder();
 		res.append(heading + " (" + cs.size() + ")" + "<ul>");
 		if (cs.size() == 0)

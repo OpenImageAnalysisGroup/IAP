@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.gui;
+package de.ipk.ag_ba.commands.experiment.process;
 
 import java.util.ArrayList;
 
@@ -7,16 +7,16 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 
-public class ActionCopyAndAssignAnalysisTemplate extends AbstractNavigationAction {
+public class ActionAssignAnalysisTemplate extends AbstractNavigationAction {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
 	
-	public ActionCopyAndAssignAnalysisTemplate(String tooltip) {
+	public ActionAssignAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionCopyAndAssignAnalysisTemplate(MongoDB m, ExperimentReference experimentReference) {
+	public ActionAssignAnalysisTemplate(MongoDB m, ExperimentReference experimentReference) {
 		super("Assign customizable analysis pipeline to this experiment");
 		this.m = m;
 		this.experimentReference = experimentReference;

@@ -1,10 +1,15 @@
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 
 import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionDataExport;
+import de.ipk.ag_ba.commands.ActionDataExportAsFilesAction;
+import de.ipk.ag_ba.commands.ActionDataExportTar;
+import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -24,7 +29,7 @@ public class ActionFileManager extends AbstractNavigationAction {
 	MainPanelComponent mpc;
 	
 	public ActionFileManager(MongoDB m, ExperimentReference experiment) {
-		super("Access primary and annotation files");
+		super("Show or export numeric or image data");
 		this.m = m;
 		this.experiment = experiment;
 	}

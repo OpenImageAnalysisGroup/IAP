@@ -3,7 +3,7 @@ package de.ipk.ag_ba.commands.mongodb;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionNumericDataReportCompleteFinishedStep3;
+import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;

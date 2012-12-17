@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.gui;
+package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 
@@ -12,11 +12,11 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 
-class ActionToolList extends AbstractNavigationAction {
+public class ActionToolList extends AbstractNavigationAction {
 	private final MongoDB m;
 	private final ExperimentReference experimentReference;
 	
-	ActionToolList(String tooltip, MongoDB m, ExperimentReference experimentReference) {
+	public ActionToolList(String tooltip, MongoDB m, ExperimentReference experimentReference) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;

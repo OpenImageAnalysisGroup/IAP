@@ -21,7 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.view.View;
 
-import de.ipk.ag_ba.commands.ActionNumericDataReportCompleteFinishedStep3;
+import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;

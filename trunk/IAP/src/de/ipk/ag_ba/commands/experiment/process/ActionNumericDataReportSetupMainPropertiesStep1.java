@@ -4,7 +4,7 @@
 /*
  * Created on Nov 9, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands;
+package de.ipk.ag_ba.commands.experiment.process;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +15,9 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionToggle;
+import de.ipk.ag_ba.commands.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;

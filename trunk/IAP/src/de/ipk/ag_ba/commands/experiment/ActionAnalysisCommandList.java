@@ -1,10 +1,13 @@
-package de.ipk.ag_ba.gui;
+package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionSetup;
 import de.ipk.ag_ba.commands.analysis.ActionPhytochamberAnalysis;
+import de.ipk.ag_ba.commands.experiment.process.ActionAssignAnalysisTemplate;
+import de.ipk.ag_ba.gui.ImageAnalysis;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -15,7 +18,7 @@ public class ActionAnalysisCommandList extends AbstractNavigationAction {
 	private final ExperimentReference experimentReference;
 	private NavigationButton src;
 	
-	ActionAnalysisCommandList(String tooltip, MongoDB m, ExperimentReference experimentReference) {
+	public ActionAnalysisCommandList(String tooltip, MongoDB m, ExperimentReference experimentReference) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -31,7 +34,7 @@ public class ActionAnalysisCommandList extends AbstractNavigationAction {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		
 		actions.add(new NavigationButton(
-				new ActionCopyAndAssignAnalysisTemplate(m, experimentReference), guiSetting));
+				new ActionAssignAnalysisTemplate(m, experimentReference), guiSetting));
 		
 		for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
 			actions.add(new NavigationButton(
