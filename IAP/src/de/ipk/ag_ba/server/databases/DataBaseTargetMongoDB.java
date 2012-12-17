@@ -81,7 +81,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	 * java.io.InputStream)
 	 */
 	@Override
-	public void saveVolume(final LoadedVolume volume, Sample3D s3d, final MongoDB m, DBTable sample,
+	public void saveVolume(final LoadedVolume volume, Sample3D s3d, final MongoDB m,
 			InputStream threeDvolumePreviewIcon, final BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		if (!store)
 			return;

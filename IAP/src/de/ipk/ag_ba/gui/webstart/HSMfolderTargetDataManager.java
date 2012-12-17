@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -310,7 +309,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	}
 	
 	@Override
-	public void saveVolume(LoadedVolume volume, Sample3D s3d, MongoDB m, DBTable sample, InputStream threeDvolumePreviewIcon,
+	public void saveVolume(LoadedVolume volume, Sample3D s3d, MongoDB m, InputStream threeDvolumePreviewIcon,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		throw new UnsupportedOperationException("Saving volumes using this method is not yet supported!");
 	}

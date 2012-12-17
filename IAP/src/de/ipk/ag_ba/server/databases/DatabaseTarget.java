@@ -26,7 +26,7 @@ public interface DatabaseTarget {
 	void saveVolume(
 			final LoadedVolume volume,
 			Sample3D s3d,
-			MongoDB m, DBTable sample,
+			MongoDB m,
 			InputStream threeDvolumePreviewIcon,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
 	
