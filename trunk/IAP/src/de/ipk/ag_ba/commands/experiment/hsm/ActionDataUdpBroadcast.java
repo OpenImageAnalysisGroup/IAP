@@ -41,7 +41,7 @@ import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
-import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
+import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;

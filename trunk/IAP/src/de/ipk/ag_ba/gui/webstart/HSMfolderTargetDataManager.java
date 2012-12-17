@@ -21,7 +21,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
-import de.ipk.ag_ba.hsm.HsmResourceIoHandler;
+import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;

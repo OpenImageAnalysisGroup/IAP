@@ -4,7 +4,7 @@
 /*
  * Created on Oct 12, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.hsm;
+package de.ipk.ag_ba.io_handler.hsm;
 
 import info.StopWatch;
 
