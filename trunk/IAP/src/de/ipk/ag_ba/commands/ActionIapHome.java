@@ -20,6 +20,7 @@ import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -85,7 +86,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 					hsm,
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
 					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-					IAPmain.loadIcon("img/ext/folder-remote.png"));
+					IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 			NavigationButton hsmSrc = new NavigationButton(new ActionHsmDataSourceNavigation(dataSourceHsm), guiSetting);
 			hsmSrc.setToolTipText("Target: " + hsm);
 			homePrimaryActions.add(hsmSrc);
@@ -96,13 +97,13 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			// add VFS entries
 			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
 				Library lib = new Library();
-				String ico = "img/ext/folder-remote.png";
+				String ico = IAPimages.getFolderRemoteClosed();
 				String ico2 = "img/ext/folder-remote-open.png";
-				String ico3 = "img/ext/folder-remote.png";
+				String ico3 = IAPimages.getFolderRemoteClosed();
 				if (entry.getTransferProtocolName().contains("UDP")) {
 					ico = "img/ext/network-workgroup.png";
 					ico2 = "img/ext/network-workgroup-power.png";
-					ico3 = "img/ext/folder-remote.png";
+					ico3 = IAPimages.getFolderRemoteClosed();
 				}
 				if (entry.getDesiredIcon() != null) {
 					ico = entry.getDesiredIcon();

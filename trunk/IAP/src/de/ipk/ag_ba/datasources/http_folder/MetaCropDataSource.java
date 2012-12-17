@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 /**
@@ -21,7 +22,7 @@ public class MetaCropDataSource extends HTTPfolderSource {
 	public MetaCropDataSource() {
 		super(getLib(),
 				"MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
-				IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon("img/ext/folder-remote.png"));
+				IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		setDescription("<h2>MetaCrop</h2>"
 				+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
 				+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"

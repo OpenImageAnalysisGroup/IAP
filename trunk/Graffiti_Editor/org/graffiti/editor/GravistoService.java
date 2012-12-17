@@ -3,6 +3,7 @@ package org.graffiti.editor;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -54,6 +55,8 @@ import org.HelperClass;
 import org.ObjectRef;
 import org.Release;
 import org.ReleaseInfo;
+import org.Scalr;
+import org.Scalr.Method;
 import org.StringManipulationTools;
 import org.graffiti.editor.actions.RunAlgorithm;
 import org.graffiti.editor.dialog.DefaultParameterDialog;
@@ -845,6 +848,12 @@ public class GravistoService implements HelperClass {
 			int destWidth = (int) (srcWidth * multiplier);
 			int destHeight = (int) (srcHeight * multiplier);
 			
+			boolean useNewCode = true;
+			
+			if (useNewCode) {
+				return Scalr.resize(icon, Method.ULTRA_QUALITY, destWidth, destHeight);
+			}
+			
 			double abc = 2d;
 			if (Math.abs(w) < 32)
 				abc = 2;
@@ -855,6 +864,7 @@ public class GravistoService implements HelperClass {
 			BufferedImage destImage = new BufferedImage(destWidth, destHeight, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D graphics = destImage.createGraphics();
 			AffineTransform affineTransform = AffineTransform.getScaleInstance(multiplier, multiplier);
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			graphics.drawImage(icon, affineTransform, null);
 			
 			return destImage;

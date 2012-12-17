@@ -11,6 +11,7 @@ import java.util.Collection;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -55,7 +56,7 @@ public class ActionLemnaUser extends AbstractNavigationAction implements Navigat
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/folder-remote.png";
+		return IAPimages.getFolderRemoteClosed();
 	}
 	
 	@Override

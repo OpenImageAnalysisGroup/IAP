@@ -35,6 +35,7 @@ import de.ipk.ag_ba.commands.datasource.AbstractUrlNavigationAction;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -219,7 +220,7 @@ public class WebFolder {
 							
 							return res;
 						}
-					}, f, "img/ext/folder-remote-open.png", "img/ext/folder-remote.png", src.getGUIsetting());
+					}, f, "img/ext/folder-remote-open.png", IAPimages.getFolderRemoteClosed(), src.getGUIsetting());
 					
 					if (subFolderAction != null)
 						subFolderAction.addAdditionalEntity(ne);
