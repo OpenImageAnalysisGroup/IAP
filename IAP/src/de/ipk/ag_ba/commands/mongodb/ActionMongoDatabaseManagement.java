@@ -8,13 +8,13 @@ import com.mongodb.BasicDBObject;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.task_management.DeleteCloudJobsAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
@@ -65,7 +65,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 			boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
 			if (showDeleteCloudJobsIcon) {
 				NavigationButton deleteCloudJobs = new NavigationButton(
-						new DeleteCloudJobsAction(m), guiSetting);
+						new ActionDeleteAnalysisJobs(m), guiSetting);
 				result.add(deleteCloudJobs);
 			}
 			

@@ -195,7 +195,7 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		if (navigationAction != null) {
 			Thread.sleep(100);
 			RemoteCapableAnalysisAction rca = navigationAction;
-			CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), null, false);
+			CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), false);
 			RemoteExecutionWrapperAction remoteAction = new RemoteExecutionWrapperAction(navigationAction,
 					new NavigationButton(ra, null));
 			

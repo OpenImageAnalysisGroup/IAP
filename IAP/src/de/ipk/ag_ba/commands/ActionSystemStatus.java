@@ -86,9 +86,7 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 			for (MongoDB m : MongoDB.getMongos()) {
 				try {
 					m.batchGetWorkTasksScheduledForStart(0);
-					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m,
-							null,
-							true);
+					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m, true);
 					try {
 						cmna.performActionCalculateResults(src);
 						for (NavigationButton o : cmna.getResultNewActionSet())
