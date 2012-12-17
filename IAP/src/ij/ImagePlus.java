@@ -1,6 +1,5 @@
 package ij;
 
-import ht_pheno.ImageAttribute;
 import ij.gui.Arrow;
 import ij.gui.EllipseRoi;
 import ij.gui.FreehandRoi;
@@ -128,17 +127,6 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	private Overlay overlay;
 	private boolean hideOverlay;
 	private static int default16bitDisplayRange;
-	
-	private ImageAttribute imageAttribute;
-	
-	// for obtaining an image attribute
-	public ImageAttribute getImageAttribute() {
-		return imageAttribute;
-	}
-	
-	public void setImageAttribute(ImageAttribute imageAttribute) {
-		this.imageAttribute = imageAttribute;
-	}
 	
 	/** Constructs an uninitialized ImagePlus. */
 	public ImagePlus() {
