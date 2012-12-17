@@ -13,7 +13,6 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
@@ -32,28 +31,6 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	private MongoDB m;
 	private int workLoadIndex;
 	private int workLoadSize;
-	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
-	 * #getInputType()
-	 */
-	@Override
-	public ImageAnalysisType[] getInputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.COLORED_VOLUME };
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_ba.graffiti.plugins.server.AbstractImageAnalysisTask
-	 * #getResultType()
-	 */
-	@Override
-	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.MEASUREMENT };
-	}
 	
 	/*
 	 * (non-Javadoc)

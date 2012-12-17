@@ -40,7 +40,6 @@ import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DBTable;
@@ -134,17 +133,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 			}
 		}
-	}
-	
-	@Override
-	public ImageAnalysisType[] getInputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE };
-	}
-	
-	@Override
-	public ImageAnalysisType[] getOutputTypes() {
-		return new ImageAnalysisType[] { ImageAnalysisType.IMAGE,
-				ImageAnalysisType.MEASUREMENT };
 	}
 	
 	public void debugOverrideAndEnableDebugStackStorage(boolean enable) {

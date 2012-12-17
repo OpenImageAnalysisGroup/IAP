@@ -22,10 +22,6 @@ public interface ImageAnalysisTask {
 	
 	public String getName();
 	
-	public ImageAnalysisType[] getInputTypes();
-	
-	public ImageAnalysisType[] getOutputTypes();
-	
 	public void setInput(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
