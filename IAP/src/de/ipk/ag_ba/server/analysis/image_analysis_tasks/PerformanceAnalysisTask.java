@@ -19,14 +19,13 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
-import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -470,10 +469,6 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "Performance Test";
-	}
-	
-	public void addPreprocessor(CutImagePreprocessor pre) {
-		// empty
 	}
 	
 	@Override

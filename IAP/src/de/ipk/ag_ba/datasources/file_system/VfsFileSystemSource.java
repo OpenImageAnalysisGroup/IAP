@@ -17,7 +17,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.Library;
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;

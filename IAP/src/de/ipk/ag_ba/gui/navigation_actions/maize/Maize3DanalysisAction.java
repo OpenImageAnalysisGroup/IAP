@@ -1,8 +1,5 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
-import java.util.HashSet;
-
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -29,14 +26,6 @@ public class Maize3DanalysisAction extends AbstractPhenotypeAnalysisAction {
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
 		return new Maize3DanalysisTask();
-	}
-	
-	@Override
-	protected HashSet<ImageConfiguration> getValidImageTypes() {
-		HashSet<ImageConfiguration> res = new HashSet<ImageConfiguration>();
-		res.addAll(ImageConfiguration.getTopImageTypes());
-		res.addAll(ImageConfiguration.getSideImageTypes());
-		return res;
 	}
 	
 	@Override

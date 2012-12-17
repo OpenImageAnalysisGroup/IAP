@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.commands.DateDoubleString;
+import de.ipk.ag_ba.commands.experiment.process.report.DateDoubleString;
 
 public class SnapshotDataIAP {
 	private static final Double NO_ANGLE = -720d;

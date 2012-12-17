@@ -1,8 +1,5 @@
 package de.ipk.ag_ba.gui.navigation_actions.roots;
 
-import java.util.HashSet;
-
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -30,13 +27,6 @@ public class RootScannAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
 		return new RootsAnalysisTask();
-	}
-	
-	@Override
-	protected HashSet<ImageConfiguration> getValidImageTypes() {
-		HashSet<ImageConfiguration> res = new HashSet<ImageConfiguration>();
-		res.addAll(ImageConfiguration.getTopImageTypes());
-		return res;
 	}
 	
 	@Override

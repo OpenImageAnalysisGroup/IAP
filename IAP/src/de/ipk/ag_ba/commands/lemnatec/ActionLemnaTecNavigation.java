@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.DataSourceNavigationAction;
+import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.LemnaTecDokuSource;
@@ -138,7 +138,7 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			if (IAPoptions.getInstance().getBoolean("LemnaTec-Site-Documentation", "show_icon", true)) {
 				HTTPfolderSource doku = new LemnaTecDokuSource();
-				NavigationButton dokuButton = new NavigationButton(new DataSourceNavigationAction(doku), src.getGUIsetting());
+				NavigationButton dokuButton = new NavigationButton(new ActionNavigateDataSource(doku), src.getGUIsetting());
 				result.add(dokuButton);
 			}
 			

@@ -18,8 +18,10 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.calendar.Calendar;
+import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
+import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.DateUtils;
@@ -65,7 +67,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		Calendar calGui = new Calendar(group2ei, (Calendar2) refCalEnt.getObject());
+		Calendar calGui = new Calendar(group2ei, (NavigationButtonCalendar2) refCalEnt.getObject());
 		refCalGui.setObject(calGui);
 		int b = 10;
 		calGui.setBorder(BorderFactory.createEmptyBorder(b, b, b, b));
@@ -107,7 +109,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
-				((Calendar2) refCalEnt.getObject()).setShowSpecificDay(false);
+				((NavigationButtonCalendar2) refCalEnt.getObject()).setShowSpecificDay(false);
 				Calendar c = (Calendar) refCalGui.getObject();
 				if (nextMonth)
 					c.getCalendar().add(GregorianCalendar.MONTH, 1);
@@ -216,7 +218,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 			res.add(scheduleExperiment);
 		}
 		
-		Calendar2 calEnt = (Calendar2) refCalEnt.getObject();
+		NavigationButtonCalendar2 calEnt = (NavigationButtonCalendar2) refCalEnt.getObject();
 		String dayInfo = DateUtils.getDayInfo(calEnt.getCalendar());
 		String monthInfo = DateUtils.getMonthInfo(calEnt.getCalendar());
 		for (String k : group2ei.keySet()) {
@@ -265,7 +267,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 	
 	@Override
 	public boolean prepareCommandLineExecution() throws Exception {
-		Calendar2 calEnt = (Calendar2) refCalEnt.getObject();
+		NavigationButtonCalendar2 calEnt = (NavigationButtonCalendar2) refCalEnt.getObject();
 		if (calEnt != null)
 			calEnt.setShowSpecificDay(false);
 		return true;

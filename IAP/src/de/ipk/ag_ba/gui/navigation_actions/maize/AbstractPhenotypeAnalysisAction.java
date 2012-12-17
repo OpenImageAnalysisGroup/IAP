@@ -5,7 +5,6 @@ import info.StopWatch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 
 import org.ErrorMsg;
 import org.SystemAnalysis;
@@ -13,9 +12,8 @@ import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ImageConfiguration;
-import de.ipk.ag_ba.commands.MySnapshotFilter;
-import de.ipk.ag_ba.commands.experiment.ActionFileManager;
+import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
+import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -319,7 +317,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		res.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(experimentResult),
+		res.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(experimentResult),
 				src != null ? src.getGUIsetting() : null));
 		
 		if (m != null)
@@ -364,8 +362,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	}
 	
 	protected abstract ImageAnalysisTask getImageAnalysisTask();
-	
-	protected abstract HashSet<ImageConfiguration> getValidImageTypes();
 	
 	private SampleFilter filter;
 	private int unit_test_idx = -1;

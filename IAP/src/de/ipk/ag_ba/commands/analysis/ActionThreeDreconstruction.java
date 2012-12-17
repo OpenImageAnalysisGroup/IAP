@@ -9,7 +9,7 @@ import org.ErrorMsg;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.ActionFileManager;
+import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.ImageAnalysis3D;
@@ -128,7 +128,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			ip.setExperimentInfo(m, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 			
-			storedActions.add(ActionFileManager.getFileManagerEntity(m,
+			storedActions.add(ActionViewExportData.getFileManagerEntity(m,
 					new ExperimentReference(statisticsResult), src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(

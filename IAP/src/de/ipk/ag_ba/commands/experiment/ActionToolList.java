@@ -3,11 +3,11 @@ package de.ipk.ag_ba.commands.experiment;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionPerformanceTest;
-import de.ipk.ag_ba.commands.ActionSaveWebCamRange;
-import de.ipk.ag_ba.commands.ActionShowXML;
-import de.ipk.ag_ba.commands.ActionSortSubstances;
-import de.ipk.ag_ba.commands.CloudIoTestAction;
+import de.ipk.ag_ba.commands.experiment.tools.ActionPerformanceTest;
+import de.ipk.ag_ba.commands.experiment.tools.ActionSaveWebCamImagesSelectSource;
+import de.ipk.ag_ba.commands.experiment.tools.ActionShowXML;
+import de.ipk.ag_ba.commands.experiment.tools.ActionSortSubstances;
+import de.ipk.ag_ba.commands.experiment.tools.ActionTestMongoIoReadSpeed;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -33,9 +33,9 @@ public class ActionToolList extends AbstractNavigationAction {
 		res.add(new NavigationButton(new ActionPerformanceTest(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionSortSubstances(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionShowXML(m, experimentReference), guiSetting));
-		res.add(new NavigationButton(new ActionSaveWebCamRange(m, experimentReference), guiSetting));
+		res.add(new NavigationButton(new ActionSaveWebCamImagesSelectSource(m, experimentReference), guiSetting));
 		if (false)
-			res.add(new NavigationButton(new CloudIoTestAction(m, experimentReference), guiSetting));
+			res.add(new NavigationButton(new ActionTestMongoIoReadSpeed(m, experimentReference), guiSetting));
 		
 		return res;
 	}

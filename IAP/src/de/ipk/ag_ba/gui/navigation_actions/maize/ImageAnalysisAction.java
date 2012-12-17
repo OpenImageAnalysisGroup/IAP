@@ -1,8 +1,5 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
-import java.util.HashSet;
-
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -33,15 +30,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new ImageAnalysisPipelineTask(pd!=null ? pd.getName() : null, pd!=null ? pd.getTooltip() : null);
-	}
-	
-	@Override
-	protected HashSet<ImageConfiguration> getValidImageTypes() {
-		HashSet<ImageConfiguration> res = new HashSet<ImageConfiguration>();
-		res.addAll(ImageConfiguration.getTopImageTypes());
-		res.addAll(ImageConfiguration.getSideImageTypes());
-		return res;
+		return new ImageAnalysisPipelineTask(pd != null ? pd.getName() : null, pd != null ? pd.getTooltip() : null);
 	}
 	
 	@Override
@@ -51,7 +40,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return pd!=null? pd.getName() : null;
+		return pd != null ? pd.getName() : null;
 	}
 	
 	@Override

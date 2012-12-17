@@ -5,10 +5,10 @@ import ij.measure.ResultsTable;
 import java.util.ArrayList;
 import java.util.Set;
 
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public interface BlockResultSet {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.AttributeHelper;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.AbstractUrlNavigationAction;
+import de.ipk.ag_ba.commands.datasource.AbstractUrlNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

@@ -34,17 +34,17 @@ import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.commands.BookmarkAction;
-import de.ipk.ag_ba.commands.Calendar2;
-import de.ipk.ag_ba.commands.ParameterOptions;
+import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
+import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
+import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -716,10 +716,10 @@ public class NavigationButton implements StyleAware {
 			}
 		});
 		
-		if (n instanceof Calendar2) {
+		if (n instanceof NavigationButtonCalendar2) {
 			if (style != ButtonDrawStyle.TEXT) {
-				icon = new MyCalendarIcon(icon, (Calendar2) n, imgS);
-				((Calendar2) n).setPostUpdateRunner(new Runnable() {
+				icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
+				((NavigationButtonCalendar2) n).setPostUpdateRunner(new Runnable() {
 					@Override
 					public void run() {
 						n1.repaint();

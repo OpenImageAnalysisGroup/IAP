@@ -7,7 +7,7 @@ import org.ErrorMsg;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.ActionFileManager;
+import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -100,7 +100,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			ip.setExperimentInfo(m, res.getHeader(), true, res);
 			mpc = new MainPanelComponent(ip, true);
 			
-			storedActions.add(ActionFileManager.getFileManagerEntity(m, new ExperimentReference(res),
+			storedActions.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(res),
 					src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,

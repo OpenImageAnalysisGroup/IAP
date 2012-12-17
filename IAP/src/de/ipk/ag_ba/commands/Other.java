@@ -18,6 +18,7 @@ import org.ObjectRef;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
+import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -68,11 +69,11 @@ public class Other {
 		return getServerStatusEntity("System Status", guIsetting);
 	}
 	
-	static Timer globalScreenshotTimer = null;
+	public static Timer globalScreenshotTimer = null;
 	
 	public static NavigationButton getServerStatusEntity(String title,
 			GUIsetting guIsetting) {
-		NavigationAction serverStatusAction = new ActionServerStatus("Check service availability");
+		NavigationAction serverStatusAction = new ActionSystemStatus("Check service availability");
 		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
 				IAPimages.getCheckstatus(),
 				guIsetting);
@@ -86,7 +87,7 @@ public class Other {
 		final ObjectRef refCalGui = new ObjectRef();
 		
 		NavigationAction calendarAction = new ActionCalendar(refCalEnt, refCalGui, group2ei, m);
-		Calendar2 calendarEntity = new Calendar2("Calendar", "img/ext/calendar48.png", calendarAction, guiSettings);
+		NavigationButtonCalendar2 calendarEntity = new NavigationButtonCalendar2("Calendar", "img/ext/calendar48.png", calendarAction, guiSettings);
 		calendarEntity.setShowSpecificDay(true);
 		refCalEnt.setObject(calendarEntity);
 		return calendarEntity;

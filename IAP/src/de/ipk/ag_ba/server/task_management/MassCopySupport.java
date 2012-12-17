@@ -22,8 +22,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.ActionAnalyzeAllExperiments;
-import de.ipk.ag_ba.commands.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;

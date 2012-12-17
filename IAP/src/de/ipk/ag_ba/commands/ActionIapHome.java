@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.hsm.ActionHsmDataSourceNavigation;
+import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
+import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
@@ -51,22 +53,22 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		}
 		
 		HTTPfolderSource news = new IAPnewsLinksSource();
-		NavigationButton newsButton = new NavigationButton(new DataSourceNavigationAction(news), guiSetting);
+		NavigationButton newsButton = new NavigationButton(new ActionNavigateDataSource(news), guiSetting);
 		homeActions.add(newsButton);
 		
 		NavigationButton rimas = RimasNav.getRimas(src != null ? src.getGUIsetting() : null);
 		homeActions.add(rimas);
 		
 		HTTPfolderSource dataSource = new MetaCropDataSource();
-		NavigationButton metaCrop = new NavigationButton(new DataSourceNavigationAction(dataSource), guiSetting);
+		NavigationButton metaCrop = new NavigationButton(new ActionNavigateDataSource(dataSource), guiSetting);
 		homeActions.add(metaCrop);
 		
 		HTTPfolderSource sbgn = new SBGNdataSource();
-		NavigationButton sbgned = new NavigationButton(new DataSourceNavigationAction(sbgn), guiSetting);
+		NavigationButton sbgned = new NavigationButton(new ActionNavigateDataSource(sbgn), guiSetting);
 		homeActions.add(sbgned);
 		
 		HTTPfolderSource van = new VANTEDdataSource();
-		NavigationButton vantedNB = new NavigationButton(new DataSourceNavigationAction(van), guiSetting);
+		NavigationButton vantedNB = new NavigationButton(new ActionNavigateDataSource(van), guiSetting);
 		// NavigationButton startVanted0 = new NavigationButton(new ShowVANTED(), guiSetting);
 		// vantedNB.getAction().addAdditionalEntity(startVanted0);
 		homeActions.add(vantedNB);
@@ -157,7 +159,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		
 		boolean showSetting = true;// SystemOptions.getInstance().getBoolean("IAP", "show_settings_icon", true);
 		if (showSetting) {
-			homePrimaryActions.add(new NavigationButton(new ActionSetup(null, "Configure the system", "Settings"), guiSetting));
+			homePrimaryActions.add(new NavigationButton(new ActionSettings(null, "Configure the system", "Settings"), guiSetting));
 		}
 	}
 	

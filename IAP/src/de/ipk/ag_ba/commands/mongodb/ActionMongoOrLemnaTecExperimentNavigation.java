@@ -16,8 +16,8 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.DeletionCommand;
-import de.ipk.ag_ba.commands.ExperimentHistoryNavigationAction;
 import de.ipk.ag_ba.commands.Other;
+import de.ipk.ag_ba.commands.experiment.ActionExperimentHistory;
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -103,7 +103,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		}
 		if (header.getHistory() != null && !header.getHistory().isEmpty()) {
 			actions.add(new NavigationButton(
-					new ExperimentHistoryNavigationAction(header.getHistory(),
+					new ActionExperimentHistory(header.getHistory(),
 							experimentReference.m), src.getGUIsetting()));
 		}
 		

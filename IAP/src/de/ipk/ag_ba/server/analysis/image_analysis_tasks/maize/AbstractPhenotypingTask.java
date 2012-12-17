@@ -19,8 +19,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
-import de.ipk.ag_ba.commands.ImageConfiguration;
-import de.ipk.ag_ba.commands.ImagePreProcessor;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
@@ -41,9 +39,9 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.CutImagePreprocessor;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisType;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DBTable;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
@@ -73,7 +71,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
-	ArrayList<ImagePreProcessor> preProcessors = new ArrayList<ImagePreProcessor>();
 	protected DatabaseTarget databaseTarget;
 	private int workOnSubset;
 	private int numberOfSubsets;
@@ -752,10 +749,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		output = null;
 		
 		return result;
-	}
-	
-	public void addPreprocessor(CutImagePreprocessor pre) {
-		preProcessors.add(pre);
 	}
 	
 	private void processStatisticalOutputImages(ImageData inVis, HashMap<Integer, BlockResultSet> analysisResults) {

@@ -30,10 +30,10 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.view.ZoomListener;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.AbstractUrlNavigationAction;
-import de.ipk.ag_ba.commands.Book;
-import de.ipk.ag_ba.commands.Library;
 import de.ipk.ag_ba.commands.Other;
+import de.ipk.ag_ba.commands.datasource.AbstractUrlNavigationAction;
+import de.ipk.ag_ba.commands.datasource.Book;
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;

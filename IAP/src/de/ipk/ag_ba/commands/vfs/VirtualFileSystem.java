@@ -11,7 +11,7 @@ import org.StringManipulationTools;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.commands.ActionToggleSettingDefaultIsFalse;
+import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.vanted.plugin.VfsFileProtocol;

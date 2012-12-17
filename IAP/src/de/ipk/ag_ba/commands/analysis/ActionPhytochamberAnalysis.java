@@ -1,10 +1,7 @@
 package de.ipk.ag_ba.commands.analysis;
 
-import java.util.HashSet;
-
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -32,14 +29,6 @@ public class ActionPhytochamberAnalysis extends AbstractPhenotypeAnalysisAction 
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
 		return new PhytochamberAnalysisTask();
-	}
-	
-	@Override
-	protected HashSet<ImageConfiguration> getValidImageTypes() {
-		HashSet<ImageConfiguration> res = new HashSet<ImageConfiguration>();
-		res.addAll(ImageConfiguration.getTopImageTypes());
-		res.addAll(ImageConfiguration.getSideImageTypes());
-		return res;
 	}
 	
 	@Override
