@@ -13,9 +13,9 @@ import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionFileManager;
 import de.ipk.ag_ba.commands.ImageConfiguration;
 import de.ipk.ag_ba.commands.MySnapshotFilter;
+import de.ipk.ag_ba.commands.experiment.ActionFileManager;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;

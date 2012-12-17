@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.gui.navigation_actions;
+package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 import java.util.Date;

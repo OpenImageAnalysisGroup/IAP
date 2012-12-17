@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.gui;
+package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -6,8 +6,10 @@ import java.util.TreeSet;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.ActionNumericDataReportSetupMainPropertiesStep1;
 import de.ipk.ag_ba.commands.ActionToggle;
+import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReportSetupMainPropertiesStep1;
+import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -15,7 +17,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
-class ActionDataReport extends AbstractNavigationAction {
+public class ActionDataReport extends AbstractNavigationAction {
 	private final ExperimentReference experimentReference;
 	private final MongoDB m;
 	private NavigationButton src;
@@ -26,7 +28,7 @@ class ActionDataReport extends AbstractNavigationAction {
 	TreeSet<String> gc = new TreeSet<String>();
 	TreeSet<String> ts = new TreeSet<String>();
 	
-	ActionDataReport(String tooltip, ExperimentReference experimentReference, MongoDB m) {
+	public ActionDataReport(String tooltip, ExperimentReference experimentReference, MongoDB m) {
 		super(tooltip);
 		this.experimentReference = experimentReference;
 		this.m = m;

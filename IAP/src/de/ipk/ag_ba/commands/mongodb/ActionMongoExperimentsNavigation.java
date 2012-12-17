@@ -24,7 +24,6 @@ import com.mongodb.BasicDBObject;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionDomainLogout;
 import de.ipk.ag_ba.commands.ActionTrash;
-import de.ipk.ag_ba.commands.AddNewsAction;
 import de.ipk.ag_ba.commands.DeletionCommand;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.clima.ActionImportClimateData;

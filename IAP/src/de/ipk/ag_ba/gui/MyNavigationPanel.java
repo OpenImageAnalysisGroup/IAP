@@ -45,12 +45,12 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.BookmarkAction;
+import de.ipk.ag_ba.commands.experiment.ActionClearClipboard;
+import de.ipk.ag_ba.commands.experiment.ActionMergeClipboard;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
-import de.ipk.ag_ba.gui.navigation_actions.ActionClearClipboard;
-import de.ipk.ag_ba.gui.navigation_actions.ActionMergeClipboard;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
