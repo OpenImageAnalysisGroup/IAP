@@ -82,7 +82,7 @@ public class VANTEDdataSource extends HTTPfolderSource {
 			
 			@Override
 			public NavigationImage getIconActive() {
-				return IAPmain.loadIcon("img/ext/folder-remote-open.png");
+				return IAPmain.loadIcon(IAPimages.getFolderRemoteOpen());
 			}
 			
 			@Override

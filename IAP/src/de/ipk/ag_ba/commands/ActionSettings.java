@@ -75,7 +75,7 @@ public class ActionSettings extends AbstractNavigationAction {
 				res.add(new NavigationButton(
 						new ActionSettings(pd.getIniFileName(),
 								"Change settings of " + pd.getName() + " analysis pipeline",
-								"Settings of " + pd.getName() + ""),
+								"Settings of " + pd.getName() + " template"),
 						src.getGUIsetting()));
 	}
 	

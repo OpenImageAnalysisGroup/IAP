@@ -205,8 +205,10 @@ public class IAPservice {
 					@Override
 					public MainPanelComponent getResultMainPanel() {
 						JComponent gui = IAPmain.showVANTED(true);
+						// if (gui != null)
+						// gui.setBorder(BorderFactory.createLoweredBevelBorder());
 						if (gui != null)
-							gui.setBorder(BorderFactory.createLoweredBevelBorder());
+							gui.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.DARK_GRAY));
 						if (g != null) {
 							MainFrame i = MainFrame.getInstance();
 							if (i != null)
@@ -407,7 +409,7 @@ public class IAPservice {
 				return null;
 			}
 			
-		}, mmc.toString(), "img/graphfile.png", guiSettings);
+		}, mmc.toString(), "img/graphfile_t.png", guiSettings);
 		
 		return ne;
 	}

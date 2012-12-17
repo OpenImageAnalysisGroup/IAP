@@ -173,12 +173,12 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/user-user.png";
+		return "img/ext/user-user_t.png";
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/user-user.png";
+		return "img/ext/user-user_t.png";
 	}
 	
 	@Override

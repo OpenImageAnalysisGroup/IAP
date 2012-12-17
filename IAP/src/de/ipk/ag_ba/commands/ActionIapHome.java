@@ -98,7 +98,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
 				Library lib = new Library();
 				String ico = IAPimages.getFolderRemoteClosed();
-				String ico2 = "img/ext/folder-remote-open.png";
+				String ico2 = IAPimages.getFolderRemoteOpen();
 				String ico3 = IAPimages.getFolderRemoteClosed();
 				if (entry.getTransferProtocolName().contains("UDP")) {
 					ico = "img/ext/network-workgroup.png";
