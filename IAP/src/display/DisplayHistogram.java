@@ -39,7 +39,6 @@ import javax.swing.JComponent;
 public class DisplayHistogram extends JComponent implements MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	// The histogram and its title.
-	@SuppressWarnings("restriction")
 	private Histogram histogramR;
 	private String title;
 	// Some data and hints for the histogram plot.
