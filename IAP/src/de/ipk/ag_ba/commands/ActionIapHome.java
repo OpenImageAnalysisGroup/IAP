@@ -193,7 +193,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "IAP";
+		return "Start";
 	}
 	
 	@Override
