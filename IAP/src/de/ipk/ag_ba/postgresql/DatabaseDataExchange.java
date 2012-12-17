@@ -78,53 +78,6 @@ public class DatabaseDataExchange {
 		return groups.toArray(new String[] {});
 	}
 	
-	public synchronized ArrayList<String> getAllKnownUserGroups(String user, String pass) throws Exception {
-		boolean result = false;
-		
-		if (!isConnected())
-			connectDB();
-		
-		PreparedStatement ps;
-		ps = conn.prepareStatement("select pdw_secure.check_password(?,?) from dual");
-		ps.setString(1, user);
-		ps.setString(2, pass);
-		if (ps.execute()) {
-			ResultSet r = ps.getResultSet();
-			if (r.next())
-				result = r.getInt(1) == 1;
-			r.close();
-		}
-		if (ps.getWarnings() != null) {
-			ps.close();
-			throw new Exception(ps.getWarnings().getMessage());
-		} else {
-			ps.close();
-		}
-		
-		if (result == false)
-			return new ArrayList<String>();
-		
-		ArrayList<String> groups = new ArrayList<String>();
-		
-		ps = conn.prepareStatement("select * from table(secure_util.getallgroups)");
-		if (ps.execute()) {
-			ResultSet r = ps.getResultSet();
-			while (r.next())
-				groups.add(r.getString(1));
-			r.close();
-		}
-		if (ps.getWarnings() != null) {
-			ps.close();
-			throw new Exception(ps.getWarnings().getMessage());
-		} else {
-			ps.close();
-		}
-		
-		disconnectDB();
-		
-		return groups;
-	}
-	
 	public synchronized boolean isValidDomainUser(String user, String pass) throws Exception {
 		boolean result = false;
 		

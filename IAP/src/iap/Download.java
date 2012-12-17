@@ -20,7 +20,7 @@ public class Download {
 			in.close();
 			System.exit(0);
 		} catch (Exception e) {
-			System.out.println("Help: call as follows java -jar iap.jar http://server/url target.file.name");
+			System.out.println("Help: call as following: java -jar iap.jar http://server/url target.file.name");
 			e.printStackTrace();
 			System.exit(1);
 		}
