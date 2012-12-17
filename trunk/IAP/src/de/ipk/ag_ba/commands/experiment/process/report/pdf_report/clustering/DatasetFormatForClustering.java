@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.server.pdf_report.clustering;
+package de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering;
 
 import java.util.ArrayList;
 import java.util.HashMap;

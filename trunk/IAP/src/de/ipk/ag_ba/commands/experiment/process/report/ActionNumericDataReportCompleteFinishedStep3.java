@@ -31,6 +31,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.PdfCreator;
+import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -40,8 +42,6 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
-import de.ipk.ag_ba.server.pdf_report.PdfCreator;
-import de.ipk.ag_ba.server.pdf_report.clustering.DatasetFormatForClustering;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -473,7 +473,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						HashMap<Integer, HashMap<Integer, Object>> transformed =
 								transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
 										otherFactorCols, valueCols);
-						p.saveClusterDataToFile(DatasetFormatForClustering.print(transformed, separator), xlsx);
+						p.saveClusterDataToFile(
+								de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering.print(transformed, separator), xlsx);
 					}
 				}
 				if (status != null)

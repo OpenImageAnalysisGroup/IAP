@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.server.pdf_report;
+package de.ipk.ag_ba.commands.experiment.process.report.pdf_report;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;

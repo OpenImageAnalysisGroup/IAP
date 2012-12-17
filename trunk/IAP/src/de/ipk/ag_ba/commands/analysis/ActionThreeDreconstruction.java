@@ -12,7 +12,6 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
-import de.ipk.ag_ba.gui.ImageAnalysis3D;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;

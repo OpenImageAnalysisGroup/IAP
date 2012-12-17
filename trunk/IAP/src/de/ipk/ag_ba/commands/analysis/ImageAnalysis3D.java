@@ -5,7 +5,7 @@
  * Created on May 13, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.gui;
+package de.ipk.ag_ba.commands.analysis;
 
 import info.clearthought.layout.TableLayout;
 
@@ -34,6 +34,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
