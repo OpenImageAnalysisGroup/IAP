@@ -93,15 +93,6 @@ public class SystemAnalysisExt {
 	
 	private static long physicalMemoryInGB = -1;
 	
-	public static NetworkIO getNetworkIoStats() {
-		NetworkIO res = new NetworkIO();
-		if (AttributeHelper.linuxRunning())
-			if (new File("/proc/cpuinfo").exists()) {
-				// res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "processor");
-			}
-		return res;
-	}
-	
 	public static long getPhysicalMemoryInGB() {
 		if (physicalMemoryInGB > 0)
 			return physicalMemoryInGB;
