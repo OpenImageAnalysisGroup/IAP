@@ -95,7 +95,8 @@ public class ActionAnalysis extends AbstractNavigationAction {
 					src.getGUIsetting()));
 			
 			actions.add(new NavigationButton(
-					new ActionPerformAnalysisLocally(ioStringProvider), src.getGUIsetting()));
+					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference),
+					src.getGUIsetting()));
 		}
 		
 		// actions.add(new NavigationButton(

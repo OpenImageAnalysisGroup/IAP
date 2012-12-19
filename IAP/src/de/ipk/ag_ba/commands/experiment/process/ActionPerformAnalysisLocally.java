@@ -1,14 +1,16 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
-import java.util.ArrayList;
-
 import org.IniIoProvider;
+import org.SystemAnalysis;
 import org.SystemOptions;
 
-import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.ImageAnalysisPipelineTask;
 
-public class ActionPerformAnalysisLocally extends AbstractNavigationAction {
+public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisAction {
 	
 	private IniIoProvider iniIO;
 	private SystemOptions so;
@@ -17,21 +19,11 @@ public class ActionPerformAnalysisLocally extends AbstractNavigationAction {
 		super(tooltip);
 	}
 	
-	public ActionPerformAnalysisLocally(IniIoProvider iniIO) {
+	public ActionPerformAnalysisLocally(IniIoProvider iniIO, ExperimentReference experiment) {
 		this("Perform Analysis (local execution)");
 		this.iniIO = iniIO;
 		so = SystemOptions.getInstance(null, iniIO);
-	}
-	
-	@Override
-	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		this.experiment = experiment;
 	}
 	
 	@Override
@@ -47,5 +39,27 @@ public class ActionPerformAnalysisLocally extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/gpl2/Gnome-Applications-Engineering-64.png";
+	}
+	
+	@Override
+	public int getCpuTargetUtilization() {
+		return SystemAnalysis.getNumberOfCPUs();
+	}
+	
+	@Override
+	public int getNumberOfJobs() {
+		return 1;
+	}
+	
+	@Override
+	protected ImageAnalysisTask getImageAnalysisTask() {
+		PipelineDesc pd = new PipelineDesc(
+				null, iniIO,
+				so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true),
+				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true));
+		return new ImageAnalysisPipelineTask(
+				pd != null ? pd.getName() : null,
+				pd != null ? pd.getIniIO() : null,
+				pd != null ? pd.getTooltip() : null);
 	}
 }
