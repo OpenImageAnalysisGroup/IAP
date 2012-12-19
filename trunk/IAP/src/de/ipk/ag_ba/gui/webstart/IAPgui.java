@@ -148,7 +148,7 @@ public class IAPgui {
 				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",
-						"<li>", "", "<br><br>")+"</font>";
+						"<li>", "", "<br><br>") + "</font>";
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {
@@ -186,6 +186,8 @@ public class IAPgui {
 			target = target.substring("Overview".length());
 		if (target.startsWith("IAP"))
 			target = target.substring("IAP".length());
+		if (target.startsWith("Start"))
+			target = target.substring("Start".length());
 		if (target.startsWith("."))
 			target = target.substring(".".length());
 		
