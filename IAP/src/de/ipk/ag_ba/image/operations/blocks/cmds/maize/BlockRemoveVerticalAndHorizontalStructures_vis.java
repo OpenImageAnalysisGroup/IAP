@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.analysis.maize;
+package de.ipk.ag_ba.image.operations.blocks.cmds.maize;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;

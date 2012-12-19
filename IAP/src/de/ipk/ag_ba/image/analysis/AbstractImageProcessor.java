@@ -1,7 +1,7 @@
 /*************************************************************************
  * Copyright (c) 2010 IPK Gatersleben, Group Image Analysis
  *************************************************************************/
-package de.ipk.ag_ba.image.analysis.maize;
+package de.ipk.ag_ba.image.analysis;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -11,8 +11,6 @@ import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;

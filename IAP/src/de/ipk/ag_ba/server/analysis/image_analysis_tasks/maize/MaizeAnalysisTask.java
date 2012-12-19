@@ -2,7 +2,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
 import org.IniIoProvider;
 
-import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
+import de.ipk.ag_ba.image.analysis.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 
 /**

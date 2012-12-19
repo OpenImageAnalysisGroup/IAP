@@ -4,9 +4,9 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.IniIoProvider;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.image.analysis.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
