@@ -5,7 +5,7 @@
  * Created on Nov 26, 2010 by Christian Klukas
  */
 
-package de.ipk.ag_ba.image.analysis.options;
+package de.ipk.ag_ba.image.analysis;
 
 import java.awt.Color;
 import java.util.HashMap;

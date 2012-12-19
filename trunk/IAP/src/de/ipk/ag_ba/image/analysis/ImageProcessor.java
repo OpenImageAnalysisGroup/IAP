@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.analysis.maize;
+package de.ipk.ag_ba.image.analysis;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -6,7 +6,6 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;

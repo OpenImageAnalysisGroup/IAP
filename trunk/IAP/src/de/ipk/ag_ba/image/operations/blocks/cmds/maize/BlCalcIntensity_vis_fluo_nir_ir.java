@@ -4,8 +4,8 @@ import org.SystemAnalysis;
 import org.Vector2d;
 import org.graffiti.plugin.parameter.Parameter;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;

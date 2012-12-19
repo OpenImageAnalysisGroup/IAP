@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PixelProcessor;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;

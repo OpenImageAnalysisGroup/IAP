@@ -10,8 +10,8 @@ import java.util.TreeSet;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;

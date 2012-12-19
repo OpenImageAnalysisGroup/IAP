@@ -11,7 +11,7 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.parameter.Parameter;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;

@@ -47,7 +47,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;

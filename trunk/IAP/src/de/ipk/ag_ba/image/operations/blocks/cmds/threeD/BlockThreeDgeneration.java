@@ -12,7 +12,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;

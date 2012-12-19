@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis;
 
 import java.awt.geom.Rectangle2D;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
