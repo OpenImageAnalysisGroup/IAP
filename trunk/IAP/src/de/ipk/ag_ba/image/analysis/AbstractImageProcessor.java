@@ -122,20 +122,21 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 				defaultBlockList);
 		
 		BlockPipeline p = new BlockPipeline();
-		for (String b : defaultBlockList) {
-			if (b != null && !b.startsWith("#")) {
-				try {
-					Class<?> c = Class.forName(b);
-					if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
-						p.add((Class<? extends ImageAnalysisBlockFIS>) c);
-					else
-						System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
-								+ "! (block is not added to pipeline!)");
-				} catch (ClassNotFoundException cnfe) {
-					System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
+		if (defaultBlockList != null)
+			for (String b : defaultBlockList) {
+				if (b != null && !b.startsWith("#")) {
+					try {
+						Class<?> c = Class.forName(b);
+						if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
+							p.add((Class<? extends ImageAnalysisBlockFIS>) c);
+						else
+							System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
+									+ "! (block is not added to pipeline!)");
+					} catch (ClassNotFoundException cnfe) {
+						System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
+					}
 				}
 			}
-		}
 		return p;
 	}
 }
