@@ -59,34 +59,34 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
-		if (m != null) {
-			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
-			
-			ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
-			
-			res.add(new NavigationButton(
-					new ActionNumericDataReportCompleteFinishedStep3(
-							m,
-							experiment,
-							toggles,
-							false,
-							true,
-							null, null, null, null, null),
-					guiSetting));
-			res.add(new NavigationButton(
-					new ActionNumericDataReportCompleteFinishedStep3(
-							m,
-							experiment,
-							toggles,
-							true,
-							false,
-							null, null, null, null, null),
-					guiSetting));
-			
-			res.add(new NavigationButton(new ActionDataExport(m, experiment), src.getGUIsetting()));
-			res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
-			res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
-		}
+		
+		res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
+		
+		ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+		
+		res.add(new NavigationButton(
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m,
+						experiment,
+						toggles,
+						false,
+						true,
+						null, null, null, null, null),
+				guiSetting));
+		res.add(new NavigationButton(
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m,
+						experiment,
+						toggles,
+						true,
+						false,
+						null, null, null, null, null),
+				guiSetting));
+		
+		res.add(new NavigationButton(new ActionDataExport(m, experiment), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		
 		return res;
 	}
 	
