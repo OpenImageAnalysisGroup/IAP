@@ -26,8 +26,12 @@ public class SystemOptions {
 	
 	private long lastModificationTime = 0;
 	
-	private SystemOptions(final String iniFileName) {
+	private SystemOptions(final String iniFileName, final IoStringProvider iniIO) throws Exception {
 		this.iniFileName = iniFileName;
+		if (iniIO != null) {
+			ini = new Ini(new StringReader(iniIO.getString()));
+			return;
+		}
 		instances.put(iniFileName, this);
 		ini = readIni();
 		
@@ -66,28 +70,34 @@ public class SystemOptions {
 		t.start();
 	}
 	
-	public SystemOptions(IoStringProvider iniIO) throws Exception {
-		ini = new Ini(new StringReader(iniIO.getString()));
-		iniFileName = null;
-	}
-	
 	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
 	
-	public synchronized static SystemOptions getInstance(String iniFileName) {
+	public synchronized static SystemOptions getInstance(String iniFileName, IoStringProvider iniIO) {
+		if (iniIO != null)
+			try {
+				return new SystemOptions(iniFileName, iniIO);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		
 		if (iniFileName == null)
 			iniFileName = "iap.ini";
 		SystemOptions instance = instances.get(iniFileName);
-		if (instance == null)
-			instance = new SystemOptions(iniFileName);
+		try {
+			if (instance == null)
+				instance = new SystemOptions(iniFileName, iniIO);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		return instance;
 	}
 	
-	public synchronized static SystemOptions getInstance(IoStringProvider iniIO) throws Exception {
-		return new SystemOptions(iniIO);
-	}
-	
 	public synchronized static SystemOptions getInstance() {
-		return getInstance((String) null);
+		try {
+			return getInstance(null, null);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private synchronized Ini readIni() {

@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.IoStringProvider;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -48,6 +49,11 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "Segmentation";
+	}
+	
+	@Override
+	public IoStringProvider getIniIo() {
+		return null;
 	}
 	
 	@Override

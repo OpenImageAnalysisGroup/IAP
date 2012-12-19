@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.IoStringProvider;
 import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -458,6 +459,11 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "Performance Test";
+	}
+	
+	@Override
+	public IoStringProvider getIniIo() {
+		return null;
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.IoStringProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
@@ -54,11 +55,15 @@ public class Pipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final String pipelineName;
-	private SystemOptions so;
+	private final SystemOptions so;
+	private final IoStringProvider iniIO;
 	
-	public Pipeline(String pipelineName) {
-		this.pipelineName = pipelineName;
-		so = SystemOptions.getInstance(StringManipulationTools.getFileSystemName(pipelineName) + ".pipeline.ini");
+	public Pipeline(String pipelineFileName, IoStringProvider iniIO) throws Exception {
+		this.pipelineName = pipelineFileName;
+		this.iniIO = iniIO;
+		so = SystemOptions.getInstance(
+				StringManipulationTools.getFileSystemName(pipelineFileName) + ".pipeline.ini",
+				iniIO);
 	}
 	
 	@Override
@@ -114,7 +119,7 @@ public class Pipeline extends AbstractImageProcessor {
 		
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(pipelineName, defaultBlockList);
+		return getPipelineFromBlockList(pipelineName, iniIO, defaultBlockList);
 	}
 	
 	private void modifySettings(ImageProcessorOptions options) {

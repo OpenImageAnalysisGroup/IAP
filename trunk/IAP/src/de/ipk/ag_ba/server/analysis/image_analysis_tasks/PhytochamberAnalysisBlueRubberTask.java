@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
+import org.IoStringProvider;
+
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.phytochamber.ArabidopsisAnalysisPipelineBlueSmallAndMiddle;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -21,6 +23,11 @@ public class PhytochamberAnalysisBlueRubberTask extends AbstractPhenotypingTask 
 	@Override
 	public String getName() {
 		return "Arabidopsis Phenotyping<br>(Small/Middle, Blue Rubber)";
+	}
+	
+	@Override
+	public IoStringProvider getIniIo() {
+		return null;
 	}
 	
 	@Override

@@ -30,7 +30,10 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new ImageAnalysisPipelineTask(pd != null ? pd.getName() : null, pd != null ? pd.getTooltip() : null);
+		return new ImageAnalysisPipelineTask(
+				pd != null ? pd.getName() : null,
+				pd != null ? pd.getIniIO() : null,
+				pd != null ? pd.getTooltip() : null);
 	}
 	
 	@Override

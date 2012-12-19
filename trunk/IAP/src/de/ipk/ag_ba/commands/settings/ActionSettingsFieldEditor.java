@@ -22,7 +22,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	boolean isInteger;
 	boolean isFloat;
 	
-	public ActionSettingsFieldEditor(ActionSettingsEditor actionSettingsEditor, String tooltip, String setting) {
+	public ActionSettingsFieldEditor(ActionSettingsEditor actionSettingsEditor,
+			String tooltip, String setting) {
 		super(tooltip);
 		this.actionSettingsEditor = actionSettingsEditor;
 		this.setting = setting;
@@ -32,11 +33,20 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			isInteger = false;
 			isFloat = false;
 		} else {
-			isBoolean = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isBooleanSetting(this.actionSettingsEditor.section, setting);
+			isBoolean = SystemOptions.getInstance(
+					this.actionSettingsEditor.iniFileName,
+					this.actionSettingsEditor.iniIO)
+					.isBooleanSetting(this.actionSettingsEditor.section, setting);
 			isInteger = !isBoolean
-					&& SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isIntegerSetting(this.actionSettingsEditor.section, setting);
+					&& SystemOptions.getInstance(
+							this.actionSettingsEditor.iniFileName,
+							this.actionSettingsEditor.iniIO)
+							.isIntegerSetting(this.actionSettingsEditor.section, setting);
 			isFloat = !isBoolean && !isInteger
-					&& SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).isFloatSetting(this.actionSettingsEditor.section, setting);
+					&& SystemOptions.getInstance(
+							this.actionSettingsEditor.iniFileName,
+							this.actionSettingsEditor.iniIO)
+							.isFloatSetting(this.actionSettingsEditor.section, setting);
 		}
 	}
 	
@@ -44,7 +54,10 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		if (isRadioSelection) {
 			ArrayList<Object> entries = new ArrayList<Object>();
-			String poss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, null);
+			String poss = SystemOptions.getInstance(
+					this.actionSettingsEditor.iniFileName,
+					this.actionSettingsEditor.iniIO)
+					.getString(this.actionSettingsEditor.section, setting, null);
 			LinkedHashMap<String, JRadioButton> value2button = new LinkedHashMap<String, JRadioButton>();
 			ButtonGroup group = new ButtonGroup();
 			for (String sl : poss.split("//")) {
@@ -68,32 +81,41 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				if (inp.length > 0) {
 					ArrayList<String> newValues = new ArrayList<String>();
 					for (String k : value2button.keySet()) {
-						if (((JRadioButton) value2button.get(k)).isSelected())
+						if (value2button.get(k).isSelected())
 							newValues.add("[x]" + k);
 						else
 							newValues.add(k);
 					}
-					SystemOptions.getInstance(this.actionSettingsEditor.iniFileName)
+					SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+							this.actionSettingsEditor.iniIO)
 							.setString(this.actionSettingsEditor.section, setting,
 									StringManipulationTools.getStringList(newValues, "//"));
 				}
 			}
 		} else
 			if (isBoolean) {
-				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
+				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+						this.actionSettingsEditor.iniIO)
+						.getBoolean(this.actionSettingsEditor.section, setting, false);
 				enabled = !enabled;
-				SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setBoolean(this.actionSettingsEditor.section, setting, enabled);
+				SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+						this.actionSettingsEditor.iniIO)
+						.setBoolean(this.actionSettingsEditor.section, setting, enabled);
 			} else
 				if (isInteger) {
 					Object[] inp = MyInputHelper.getInput("Please enter a whole number:",
 							"Modify "
 									+ setting,
-							setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getInteger(this.actionSettingsEditor.section, setting, 0));
+							setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+									this.actionSettingsEditor.iniIO)
+									.getInteger(this.actionSettingsEditor.section, setting, 0));
 					if (inp != null) {
 						if (inp.length == 1) {
 							Object o = inp[0];
 							if (o != null && o instanceof Integer) {
-								SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setInteger(this.actionSettingsEditor.section, setting, (Integer) o);
+								SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+										this.actionSettingsEditor.iniIO)
+										.setInteger(this.actionSettingsEditor.section, setting, (Integer) o);
 							}
 						}
 					}
@@ -102,18 +124,24 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 						Object[] inp = MyInputHelper.getInput("Please enter a (floating point) number:",
 								"Modify "
 										+ setting,
-								setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getDouble(this.actionSettingsEditor.section, setting, 0d));
+								setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+										this.actionSettingsEditor.iniIO)
+										.getDouble(this.actionSettingsEditor.section, setting, 0d));
 						if (inp != null) {
 							if (inp.length == 1) {
 								Object o = inp[0];
 								if (o != null && o instanceof Double) {
-									SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setDouble(this.actionSettingsEditor.section, setting, (Double) o);
+									SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+											this.actionSettingsEditor.iniIO)
+											.setDouble(this.actionSettingsEditor.section, setting, (Double) o);
 								}
 							}
 						}
 					} else {
-						String[] ss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getStringAll(this.actionSettingsEditor.section, setting,
-								new String[] {});
+						String[] ss = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+								this.actionSettingsEditor.iniIO)
+								.getStringAll(this.actionSettingsEditor.section, setting,
+										new String[] {});
 						boolean isString = ss.length == 1;
 						boolean isStringArray = ss.length > 1;
 						if (isString) {
@@ -128,13 +156,16 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 							Object[] inp = MyInputHelper.getInput("You may modify the text:",
 									"Modify "
 											+ setting,
-									setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getString(this.actionSettingsEditor.section, setting, "")
+									setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+											this.actionSettingsEditor.iniIO)
+											.getString(this.actionSettingsEditor.section, setting, "")
 											+ "");
 							if (inp != null) {
 								if (inp.length == 1) {
 									Object o = inp[0];
 									if (o != null && o instanceof String) {
-										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName)
+										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+												this.actionSettingsEditor.iniIO)
 												.setString(this.actionSettingsEditor.section, setting, (String) o);
 									}
 								}
@@ -163,8 +194,10 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 												}
 											}
 										}
-										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).setStringArray(this.actionSettingsEditor.section, setting,
-												newValues);
+										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+												this.actionSettingsEditor.iniIO)
+												.setStringArray(this.actionSettingsEditor.section, setting,
+														newValues);
 									}
 								}
 							}
@@ -208,14 +241,19 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			return s;
 		else {
 			if (setting.toLowerCase().contains("password")) {
-				String sv = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getObject(this.actionSettingsEditor.section, setting, -1);
+				String sv = SystemOptions.getInstance(
+						this.actionSettingsEditor.iniFileName,
+						this.actionSettingsEditor.iniIO)
+						.getObject(this.actionSettingsEditor.section, setting, -1);
 				StringBuilder sb = new StringBuilder();
 				while (sb.length() < sv.length())
 					sb.append("*");
 				return "<html><center><b>" + s + "</b><br>" +
 						"&nbsp;" + sb + "&nbsp;" + "</center></html>";
 			} else {
-				SystemOptions o = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName);
+				SystemOptions o = SystemOptions.getInstance(
+						this.actionSettingsEditor.iniFileName,
+						this.actionSettingsEditor.iniIO);
 				if (o != null && this.actionSettingsEditor != null && this.actionSettingsEditor.section != null)
 					return "<html><center><b>" + s + "</b><br>" +
 							"&nbsp;" + o.getObject(this.actionSettingsEditor.section, setting, 2)
@@ -238,7 +276,9 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			return "img/ext/gpl2/Gnome-View-Sort-Selection-64.png";
 		else
 			if (isBoolean) {
-				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName).getBoolean(this.actionSettingsEditor.section, setting, false);
+				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+						this.actionSettingsEditor.iniIO)
+						.getBoolean(this.actionSettingsEditor.section, setting, false);
 				if (enabled)
 					return "img/ext/gpl2/Dialog-Apply-64.png";// gtcf.png";
 				else

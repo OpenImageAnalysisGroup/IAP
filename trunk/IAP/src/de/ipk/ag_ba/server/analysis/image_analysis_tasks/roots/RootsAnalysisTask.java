@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.roots;
 
+import org.IoStringProvider;
+
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.roots.RootsAnalysisPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -24,8 +26,13 @@ public class RootsAnalysisTask extends AbstractPhenotypingTask {
 	}
 	
 	@Override
+	public IoStringProvider getIniIo() {
+		return null;
+	}
+	
+	@Override
 	protected ImageProcessor getImageProcessor() {
-		return new RootsAnalysisPipeline(getName());
+		return new RootsAnalysisPipeline(getName(), null);
 	}
 	
 	@Override

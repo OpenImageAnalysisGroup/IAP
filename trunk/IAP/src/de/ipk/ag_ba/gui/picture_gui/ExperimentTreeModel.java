@@ -218,22 +218,22 @@ public class ExperimentTreeModel implements TreeModel {
 	}
 	
 	MongoDB m;
-	private final ExperimentInterface document;
+	private final ExperimentInterface experiment;
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 	
-	public ExperimentTreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface doc,
+	public ExperimentTreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface exp,
 			boolean readOnly) {
 		this.m = m;
-		this.document = doc;
+		this.experiment = exp;
 		this.dataChangedListener = dataChangedListener;
 		this.isReadOnly = readOnly;
 	}
 	
 	@Override
 	public Object getRoot() {
-		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, document, document,
-				document == null ? "NULL" : document.getName(), isReadOnly);
+		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, experiment, experiment,
+				experiment == null ? "NULL" : experiment.getName(), isReadOnly);
 		expNode.setSizeDirty(true);
 		try {
 			expNode.updateSizeInfo(m, dataChangedListener);
@@ -244,18 +244,25 @@ public class ExperimentTreeModel implements TreeModel {
 		expNode.setIsLeaf(false);
 		
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		if (document != null)
-			document.fillAttributeMap(attributes);
+		if (experiment != null)
+			experiment.fillAttributeMap(attributes);
 		StringBuilder s = new StringBuilder();
 		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
 		for (String id : attributes.keySet()) {
 			String idC = id;
-			s.append("<tr><td>" + idC + "</td><td>" + attributes.get(id) + "</td></tr>");
+			String v = "" + attributes.get(id);
+			if (id.equals("settings"))
+				s.append("<tr><td>" + idC + "</td><td>"
+						+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")
+						+ "</td></tr>");
+			else
+				s.append("<tr><td>" + idC + "</td><td>" + v + "</td></tr>");
 		}
-		s.append("</table></html>");
-		expNode.setTooltipInfo(s.toString());
 		
-		expNode.setGetChildrenMethod(new GetSubstances(expNode, document, isReadOnly, dataChangedListener));
+		s.append("</table></html>");
+		expNode.setTooltipInfo(s.toString()); // "<html>" + experiment.toHTMLstring());//
+		
+		expNode.setGetChildrenMethod(new GetSubstances(expNode, experiment, isReadOnly, dataChangedListener));
 		return expNode;
 	}
 	

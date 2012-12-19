@@ -22,7 +22,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	String iniFileName;
 	
-	private IoStringProvider iniIO;
+	IoStringProvider iniIO;
 	
 	public ActionSettingsEditor(String tooltip) {
 		super(tooltip);
@@ -40,7 +40,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		res.clear();
 		final LinkedHashMap<String, ArrayList<NavigationButton>> group2button = new LinkedHashMap<String, ArrayList<NavigationButton>>();
-		for (final String setting : SystemOptions.getInstance(iniFileName).getSectionSettings(section)) {
+		for (final String setting : SystemOptions.getInstance(iniFileName, iniIO).getSectionSettings(section)) {
 			String group = "";
 			if (setting != null && setting.contains("//")) {
 				group = setting.split("//")[0];
@@ -53,7 +53,8 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 		for (final String group : group2button.keySet()) {
 			System.out.println("Group: " + group);
 			if (group.length() == 0) {
-				NavigationAction resetSettingsAction = new ActionResetActions(SystemOptions.getInstance(iniFileName), section, group);
+				NavigationAction resetSettingsAction = new ActionResetActions(
+						SystemOptions.getInstance(iniFileName, iniIO), section, group);
 				NavigationButton restSettingsButton = new NavigationButton(
 						resetSettingsAction, src.getGUIsetting());
 				restSettingsButton.setRightAligned(true);
@@ -93,7 +94,8 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 					@Override
 					public ArrayList<NavigationButton> getResultNewActionSet() {
 						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(group2button.get(group));
-						NavigationAction resetSettingsAction = new ActionResetActions(SystemOptions.getInstance(iniFileName), section, group);
+						NavigationAction resetSettingsAction = new ActionResetActions(
+								SystemOptions.getInstance(iniFileName, iniIO), section, group);
 						NavigationButton restSettingsButton = new NavigationButton(
 								resetSettingsAction, src.getGUIsetting());
 						restSettingsButton.setRightAligned(true);

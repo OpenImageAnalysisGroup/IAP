@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis.roots;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.IoStringProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -24,9 +25,11 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final String pipelineName;
+	private final IoStringProvider iniIO;
 	
-	public RootsAnalysisPipeline(String pipelineName) {
+	public RootsAnalysisPipeline(String pipelineName, IoStringProvider iniIO) {
 		this.pipelineName = pipelineName;
+		this.iniIO = iniIO;
 	}
 	
 	@Override
@@ -43,7 +46,7 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 		};
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(pipelineName, defaultBlockList);
+		return getPipelineFromBlockList(pipelineName, iniIO, defaultBlockList);
 	}
 	
 	@Override
@@ -66,7 +69,7 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		SystemOptions so = SystemOptions.getInstance(pipelineName + ".pipeline.ini");
+		SystemOptions so = SystemOptions.getInstance(pipelineName + ".pipeline.ini", iniIO);
 		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);
