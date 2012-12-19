@@ -3,8 +3,10 @@ package de.ipk.ag_ba.commands.experiment;
 import java.util.ArrayList;
 
 import org.IniIoProvider;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionSettings;
@@ -59,6 +61,19 @@ public class ActionAnalysis extends AbstractNavigationAction {
 			public void setString(String value) {
 				String ini = StringEscapeUtils.escapeXml(value);
 				experimentReference.getHeader().setSettings(ini);
+				
+				if (m != null)
+					try {
+						m.setExperimentInfo(experimentReference.getHeader());
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">Saved changed settings for "
+								+ experimentReference.getExperimentName()
+								+ " in storage location "
+								+ m.getDatabaseName() + ".");
+					} catch (Exception e) {
+						e.printStackTrace();
+						MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");
+					}
 			}
 			
 			@Override
@@ -80,7 +95,7 @@ public class ActionAnalysis extends AbstractNavigationAction {
 					src.getGUIsetting()));
 			
 			actions.add(new NavigationButton(
-					new ActionPerformAnalysisLocally("ToDo"), src.getGUIsetting()));
+					new ActionPerformAnalysisLocally(ioStringProvider), src.getGUIsetting()));
 		}
 		
 		// actions.add(new NavigationButton(

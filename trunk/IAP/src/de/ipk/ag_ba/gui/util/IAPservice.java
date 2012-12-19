@@ -1237,7 +1237,7 @@ public class IAPservice {
 													"INFO: " + ehi.getExperimentName()
 															+ " shows progress again " + lastUpdateText + " // " + SystemAnalysis.getUserName() + "@"
 															+ host + "\n\n" +
-															"After error condition new data has been found for experiment " + ehi.getExperimentName()
+															"New data has been found for experiment " + ehi.getExperimentName()
 															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
 													imageSrc, fileName);

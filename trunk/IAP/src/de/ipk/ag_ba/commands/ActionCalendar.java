@@ -185,17 +185,6 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 					@Override
 					public void run(ExperimentHeaderInterface newProperties) throws Exception {
 						experimentInfo.setExperimentInfo(newProperties);
-						
-						// Document doc = Experiment.getEmptyDocument(experimentInfo);
-						// try {
-						// CallDBE2WebService.setExperiment(l, p,
-						// info.getUserGroupVisibility(), experimentInfo
-						// .getExperimentName(), doc);
-						// } catch (Exception e) {
-						// MainFrame.showMessageDialogWithScrollBars2(e.getMessage(),
-						// "Error");
-						// throw e;
-						// }
 					}
 				});
 				JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);

@@ -3,27 +3,30 @@ package de.ipk.vanted.plugin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.provider.AbstractFileObject;
 
 public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	public VfsFileObjectImpl(FileObject file) {
-		this.file = file;
+		this.file = (AbstractFileObject) file;
 	}
 	
-	private FileObject file = null;
+	private AbstractFileObject file = null;
 	
+	@Override
 	public FileObject getFile() {
 		return file;
 	}
 	
 	public void setFile(FileObject file) {
-		this.file = file;
+		this.file = (AbstractFileObject) file;
 	}
 	
 	@Override
@@ -59,43 +62,23 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	}
 	
 	@Override
-	public boolean isDirectory() {
-		try {
-			return file.getType().equals(FileType.FOLDER);
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public boolean isDirectory() throws FileSystemException {
+		return file.getType().equals(FileType.FOLDER);
 	}
 	
 	@Override
-	public boolean isFile() {
-		try {
-			return file.getType().equals(FileType.FILE);
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public boolean isFile() throws FileSystemException {
+		return file.getType().equals(FileType.FILE);
 	}
 	
 	@Override
-	public boolean isReadable() {
-		try {
-			return file.isReadable();
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public boolean isReadable() throws FileSystemException {
+		return file.isReadable();
 	}
 	
 	@Override
-	public boolean isWriteable() {
-		try {
-			return file.isWriteable();
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public boolean isWriteable() throws FileSystemException {
+		return file.isWriteable();
 	}
 	
 	@Override
@@ -165,16 +148,26 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public void setExecutable(boolean executable) {
-		// todo
+		throw new UnsupportedOperationException("ToDo");
 	}
 	
 	@Override
 	public void setWritable(boolean writeable) {
-		// file.getFileSystem().setAttribute(arg0, arg1);
+		throw new UnsupportedOperationException("ToDo");
 	}
 	
 	@Override
-	public void setLastModified(long time) {
-		// todo
+	public void setLastModified(long time) throws Exception {
+		Method m = file.getClass().getDeclaredMethod("doSetLastModifiedTime", Long.class);
+		m.setAccessible(true);
+		m.invoke(file, time);
+	}
+	
+	@Override
+	public long getLastModified() throws Exception {
+		Method m = file.getClass().getDeclaredMethod("doGetLastModifiedTime", (Class[]) null);
+		m.setAccessible(true);
+		Object o = m.invoke(file, (Object[]) null);
+		return (Long) o;
 	}
 }
