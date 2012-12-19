@@ -777,7 +777,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		if (SystemAnalysis.isHeadless())
 			return new MainPanelComponent(new JLabel());
 		else
-			return new MainPanelComponent("The generated PDF report will be opened automatically in a moment.");
+			return new MainPanelComponent("The generated file will be shown or opened automatically in a moment.");
 	}
 	
 	public ExperimentReference getExperimentReference() {
