@@ -218,7 +218,7 @@ public class IAPservice {
 					}
 					
 					@Override
-					public boolean getProvidesActions() {
+					public boolean isProvidingActions() {
 						return false;
 					}
 					

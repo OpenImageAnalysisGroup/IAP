@@ -109,7 +109,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return true;
 	}
 	

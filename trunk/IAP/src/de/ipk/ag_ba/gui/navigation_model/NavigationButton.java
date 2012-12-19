@@ -340,7 +340,7 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public boolean willProvideActions() {
-		return action != null ? action.getProvidesActions() : false;
+		return action != null ? action.isProvidingActions() : false;
 	}
 	
 	public void performAction() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.AttributeHelper;
+import org.IoStringProvider;
 import org.ReleaseInfo;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -21,9 +22,11 @@ public class ActionSettings extends AbstractNavigationAction {
 	private final String iniFileName;
 	private final String title;
 	private NavigationButton src;
+	private final IoStringProvider iniIO;
 	
-	public ActionSettings(String iniFileName, String tooltip, String title) {
+	public ActionSettings(String iniFileName, IoStringProvider iniIO, String tooltip, String title) {
 		super(tooltip);
+		this.iniIO = iniIO;
 		this.iniFileName = iniFileName;
 		this.title = title;
 	}
@@ -32,51 +35,64 @@ public class ActionSettings extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		res.clear();
-		res.add(new NavigationButton(new AbstractNavigationAction(
-				"Open file explorer and show settings file (" +
-						(iniFileName == null ? "iap.ini" : iniFileName) + ")") {
-			@Override
-			public void performActionCalculateResults(NavigationButton src) throws Exception {
-				AttributeHelper.showInFileBrowser(ReleaseInfo.getAppFolder(), iniFileName == null ? "iap.ini" : iniFileName);
+		if (iniIO == null)
+			res.add(new NavigationButton(new AbstractNavigationAction(
+					"Open file explorer and show settings file (" +
+							(iniFileName == null ? "iap.ini" : iniFileName) + ")") {
+				@Override
+				public void performActionCalculateResults(NavigationButton src) throws Exception {
+					AttributeHelper.showInFileBrowser(ReleaseInfo.getAppFolder(), iniFileName == null ? "iap.ini" : iniFileName);
+				}
+				
+				@Override
+				public String getDefaultTitle() {
+					return "Show Config-File";
+				}
+				
+				@Override
+				public String getDefaultImage() {
+					return "img/ext/gpl2/Gnome-Document-Open-64.png";
+				}
+				
+				@Override
+				public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+					return currentSet;
+				}
+				
+				@Override
+				public boolean isProvidingActions() {
+					return false;
+				}
+				
+				@Override
+				public ArrayList<NavigationButton> getResultNewActionSet() {
+					return null;
+				}
+			}, src.getGUIsetting()));
+		
+		if (iniIO != null) {
+			ArrayList<String> ss = SystemOptions.getInstance(iniIO).getSectionTitles();
+			Collections.sort(ss);
+			for (String s : ss) {
+				res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
+						"Change settings of section " + s, s), src.getGUIsetting()));
 			}
-			
-			@Override
-			public String getDefaultTitle() {
-				return "Show Config-File";
+		} else {
+			ArrayList<String> ss = SystemOptions.getInstance(iniFileName).getSectionTitles();
+			Collections.sort(ss);
+			for (String s : ss) {
+				res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
+						"Change settings of section " + s, s), src.getGUIsetting()));
 			}
-			
-			@Override
-			public String getDefaultImage() {
-				return "img/ext/gpl2/Gnome-Document-Open-64.png";
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-				return currentSet;
-			}
-			
-			@Override
-			public boolean getProvidesActions() {
-				return false;
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewActionSet() {
-				return null;
-			}
-		}, src.getGUIsetting()));
-		ArrayList<String> ss = SystemOptions.getInstance(iniFileName).getSectionTitles();
-		Collections.sort(ss);
-		for (String s : ss) {
-			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, "Change settings of section " + s, s), src.getGUIsetting()));
 		}
-		if (iniFileName == null)
-			for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
-				res.add(new NavigationButton(
-						new ActionSettings(pd.getIniFileName(),
-								"Change settings of " + pd.getName() + " analysis pipeline",
-								"Settings of " + pd.getName() + " template"),
-						src.getGUIsetting()));
+		if (iniIO == null)
+			if (iniFileName == null)
+				for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
+					res.add(new NavigationButton(
+							new ActionSettings(pd.getIniFileName(), null,
+									"Change settings of " + pd.getName() + " analysis pipeline",
+									"Settings of " + pd.getName() + " template"),
+							src.getGUIsetting()));
 	}
 	
 	@Override
@@ -107,7 +123,7 @@ public class ActionSettings extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		if (iniFileName == null)
+		if (iniFileName == null && iniIO == null)
 			return IAPimages.getToolbox();
 		else
 			return "img/ext/gpl2/Gnome-Applications-Science-64.png";

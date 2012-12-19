@@ -3,6 +3,8 @@ package org;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -64,6 +66,11 @@ public class SystemOptions {
 		t.start();
 	}
 	
+	public SystemOptions(IoStringProvider iniIO) throws Exception {
+		ini = new Ini(new StringReader(iniIO.getString()));
+		iniFileName = null;
+	}
+	
 	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
 	
 	public synchronized static SystemOptions getInstance(String iniFileName) {
@@ -75,8 +82,12 @@ public class SystemOptions {
 		return instance;
 	}
 	
+	public synchronized static SystemOptions getInstance(IoStringProvider iniIO) throws Exception {
+		return new SystemOptions(iniIO);
+	}
+	
 	public synchronized static SystemOptions getInstance() {
-		return getInstance(null);
+		return getInstance((String) null);
 	}
 	
 	private synchronized Ini readIni() {
@@ -420,5 +431,11 @@ public class SystemOptions {
 		if (settingTemplateDefaultSelected != null && !settingTemplateDefaultSelected.equals("null"))
 			setString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
 		return defaultSelection;
+	}
+	
+	public String getIniValue() throws IOException {
+		StringWriter sw = new StringWriter();
+		ini.store(sw);
+		return sw.toString();
 	}
 }

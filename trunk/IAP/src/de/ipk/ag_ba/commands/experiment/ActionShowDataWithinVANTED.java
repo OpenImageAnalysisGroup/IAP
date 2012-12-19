@@ -81,7 +81,7 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return false;
 	}
 }

@@ -131,7 +131,7 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return false;
 	}
 	
