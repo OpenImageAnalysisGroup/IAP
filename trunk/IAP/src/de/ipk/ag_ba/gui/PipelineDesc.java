@@ -9,6 +9,12 @@ import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisBlueRubberTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.roots.RootsAnalysisTask;
+
 public class PipelineDesc {
 	
 	private final String iniFileName;
@@ -35,21 +41,23 @@ public class PipelineDesc {
 		return name;
 	}
 	
-	private static String barleyFN = StringManipulationTools.getFileSystemName("Barley Analysis") + ".pipeline.ini";
-	
-	public static PipelineDesc getPipelineDefault() {
-		return new PipelineDesc(
-				barleyFN, null,
-				"Barley Analysis", "Analyze Phenotype (Barley)");
-	}
+	// private static String barleyFN = "Barley_Analysis.pipeline.ini";
+	// public static PipelineDesc getPipelineDefault() {
+	// return new PipelineDesc(
+	// barleyFN, null,
+	// "Barley Analysis", "Analyze Phenotype (Barley)");
+	// }
 	
 	public static ArrayList<PipelineDesc> getSavedPipelineTemplates() {
+		
+		writePipelineInis();
+		
 		ArrayList<PipelineDesc> res = new ArrayList<PipelineDesc>();
 		// res.add(PipelineDesc.getPipelineDefault());
 		FilenameFilter ff = new FilenameFilter() {
 			@Override
 			public boolean accept(File f, String name) {
-				boolean a = name.endsWith(".pipeline.ini") && !name.equals(barleyFN);
+				boolean a = name.endsWith(".pipeline.ini");
 				return a;
 			}
 		};
@@ -60,8 +68,25 @@ public class PipelineDesc {
 		return res;
 	}
 	
+	private static void writePipelineInis() {
+		RootsAnalysisTask rt = new RootsAnalysisTask();
+		PipelineDesc pRoot = new PipelineDesc(rt.getName(), null, rt.getName(), rt.getTaskDescription());
+		
+		BarleyAnalysisTask bt = new BarleyAnalysisTask();
+		PipelineDesc pBarley = new PipelineDesc(bt.getName(), null, bt.getName(), bt.getTaskDescription());
+		
+		MaizeAnalysisTask mt = new MaizeAnalysisTask();
+		PipelineDesc pMaize = new PipelineDesc(mt.getName(), null, mt.getName(), mt.getTaskDescription());
+		
+		PhytochamberAnalysisTask pt = new PhytochamberAnalysisTask();
+		PipelineDesc pPhyto = new PipelineDesc(pt.getName(), null, pt.getName(), pt.getTaskDescription());
+		
+		PhytochamberAnalysisBlueRubberTask pbt = new PhytochamberAnalysisBlueRubberTask();
+		PipelineDesc pBrPhyto = new PipelineDesc(pbt.getName(), null, pbt.getName(), pbt.getTaskDescription());
+	}
+	
 	public String getIniFileName() {
-		return iniFileName;
+		return StringManipulationTools.getFileSystemName(iniFileName);
 	}
 	
 	public IniIoProvider getIniIO() {

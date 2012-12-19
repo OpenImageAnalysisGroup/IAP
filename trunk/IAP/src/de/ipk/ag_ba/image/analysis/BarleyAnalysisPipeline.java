@@ -51,14 +51,14 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProces
  * 
  * @author klukas, pape, entzian
  */
-public class Pipeline extends AbstractImageProcessor {
+public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final String pipelineName;
 	private final SystemOptions so;
 	private final IniIoProvider iniIO;
 	
-	public Pipeline(String pipelineFileName, IniIoProvider iniIO) throws Exception {
+	public BarleyAnalysisPipeline(String pipelineFileName, IniIoProvider iniIO) throws Exception {
 		this.pipelineName = pipelineFileName;
 		this.iniIO = iniIO;
 		so = SystemOptions.getInstance(
@@ -119,7 +119,7 @@ public class Pipeline extends AbstractImageProcessor {
 		
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(pipelineName, iniIO, defaultBlockList);
+		return getPipelineFromBlockList(pipelineName, null, defaultBlockList);
 	}
 	
 	private void modifySettings(ImageProcessorOptions options) {

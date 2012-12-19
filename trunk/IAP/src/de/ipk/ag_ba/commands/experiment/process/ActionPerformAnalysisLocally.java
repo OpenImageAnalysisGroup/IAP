@@ -8,7 +8,7 @@ import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.ImageAnalysisPipelineTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 
 public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisAction {
 	
@@ -57,7 +57,7 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 				null, iniIO,
 				so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true),
 				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true));
-		return new ImageAnalysisPipelineTask(
+		return new UserDefinedImageAnalysisPipelineTask(
 				pd != null ? pd.getName() : null,
 				pd != null ? pd.getIniIO() : null,
 				pd != null ? pd.getTooltip() : null);

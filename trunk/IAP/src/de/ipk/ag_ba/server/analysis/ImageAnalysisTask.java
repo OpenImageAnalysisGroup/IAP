@@ -35,5 +35,5 @@ public interface ImageAnalysisTask {
 	
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps);
 	
-	public IAP_RELEASE getVersionTag();
+	public IAP_RELEASE getVersionTag() throws Exception;
 }

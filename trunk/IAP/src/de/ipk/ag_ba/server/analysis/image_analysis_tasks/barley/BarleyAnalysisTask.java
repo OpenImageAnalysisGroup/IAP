@@ -1,38 +1,31 @@
-package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
+package de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley;
 
 import org.IniIoProvider;
 
+import de.ipk.ag_ba.image.analysis.BarleyAnalysisPipeline;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.phytochamber.ArabidopsisAnalysisPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
-/**
- * @author klukas
- */
-public class PhytochamberAnalysisTask extends AbstractPhenotypingTask {
+public class BarleyAnalysisTask extends AbstractPhenotypingTask {
 	
-	public PhytochamberAnalysisTask() {
-		// empty
+	@Override
+	public ImageProcessor getImageProcessor() throws Exception {
+		return new BarleyAnalysisPipeline(getName(), null);
 	}
 	
 	@Override
 	public String getTaskDescription() {
-		return "Analyse Arabidopsis Phenotype";
+		return "Analyse Barley Phenotype";
 	}
 	
 	@Override
 	public String getName() {
-		return "Arabidopsis Phenotyping";
+		return "Barley Analysis";
 	}
 	
 	@Override
 	public IniIoProvider getIniIo() {
 		return null;
-	}
-	
-	@Override
-	public ImageProcessor getImageProcessor() {
-		return new ArabidopsisAnalysisPipeline();
 	}
 	
 	@Override
@@ -44,5 +37,4 @@ public class PhytochamberAnalysisTask extends AbstractPhenotypingTask {
 	protected boolean analyzeSideImages() {
 		return true;
 	}
-	
 }
