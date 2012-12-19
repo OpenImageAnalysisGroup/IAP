@@ -512,8 +512,11 @@ public class Condition implements ConditionInterface {
 																									if (attr.getName().equals("files"))
 																										setFiles(attr.getValue());
 																									else
-																										System.err.println("Internal Error: Unknown Condition Attribute: "
-																												+ attr.getName());
+																										if (attr.getName().equals("settings"))
+																											setExperimentSettings(attr.getValue());
+																										else
+																											System.err.println("Internal Error: Unknown Condition Attribute: "
+																													+ attr.getName());
 	}
 	
 	@Override

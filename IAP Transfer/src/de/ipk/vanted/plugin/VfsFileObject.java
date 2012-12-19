@@ -6,19 +6,20 @@ import java.io.OutputStream;
 import java.net.URL;
 
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
 public interface VfsFileObject {
 	public boolean delete() throws IOException;
 	
 	public boolean exists() throws IOException;
 	
-	public boolean isFile();
+	public boolean isFile() throws FileSystemException;
 	
-	public boolean isDirectory();
+	public boolean isDirectory() throws FileSystemException;
 	
-	public boolean isReadable();
+	public boolean isReadable() throws FileSystemException;
 	
-	public boolean isWriteable();
+	public boolean isWriteable() throws FileSystemException;
 	
 	public boolean mkdir() throws IOException;
 	
@@ -47,5 +48,7 @@ public interface VfsFileObject {
 	
 	public void setWritable(boolean writeable);
 	
-	public void setLastModified(long time);
+	public void setLastModified(long time) throws Exception;
+	
+	public long getLastModified() throws Exception;
 }

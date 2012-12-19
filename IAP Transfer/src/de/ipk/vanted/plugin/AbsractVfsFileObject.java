@@ -6,90 +6,92 @@ import java.io.OutputStream;
 import java.net.URL;
 
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
 public abstract class AbsractVfsFileObject implements VfsFileObject {
-
+	
 	@Override
 	public boolean delete() throws IOException {
 		return false;
 	}
-
+	
 	@Override
 	public void download(VfsFileObject localFile) throws IOException {
-
+		
 	}
-
+	
 	@Override
 	public boolean exists() throws IOException {
 		return false;
 	}
-
+	
 	@Override
 	public InputStream getInputStream() throws IOException {
 		return null;
 	}
-
+	
 	@Override
 	public OutputStream getOutputStream() throws IOException {
 		return null;
 	}
-
+	
 	@Override
-	public boolean isDirectory() {
+	public boolean isDirectory() throws FileSystemException {
 		return false;
 	}
-
+	
 	@Override
-	public boolean isFile() {
+	public boolean isFile() throws FileSystemException {
 		return false;
 	}
-
+	
 	@Override
-	public boolean isReadable() {
+	public boolean isReadable() throws FileSystemException {
 		return false;
 	}
-
+	
 	@Override
-	public boolean isWriteable() {
+	public boolean isWriteable() throws FileSystemException {
 		return false;
 	}
-
+	
 	@Override
 	public long length() {
 		return -1;
 	}
-
+	
 	@Override
 	public String[] list() throws IOException {
 		return null;
 	}
-
+	
 	@Override
 	public boolean mkdir() throws IOException {
 		return false;
 	}
-
+	
 	@Override
 	public void renameTo(VfsFileObject target, boolean overWrite)
 			throws IOException {
-
+		
 	}
-
+	
 	@Override
 	public void upload(VfsFileObject remoteFile) throws IOException {
-
+		
 	}
-
+	
 	@Override
 	public String getName() {
 		return null;
 	}
-
+	
 	@Override
 	public URL getURL() throws IOException {
 		return null;
 	}
-
+	
+	@Override
 	public FileObject getFile() {
 		return null;
 	}
