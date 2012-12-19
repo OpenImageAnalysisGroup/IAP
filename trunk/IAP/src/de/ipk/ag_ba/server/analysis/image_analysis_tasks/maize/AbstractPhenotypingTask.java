@@ -562,10 +562,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			TreeSet<String> replicateIDandQualityList = new TreeSet<String>();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				for (ImageSet i : is.values()) {
-					if (i.getVIS() == null)
-						continue;
-					String val = i.getVIS().getReplicateID() + ";" + i.getVIS().getQualityAnnotation();
-					replicateIDandQualityList.add(val);
+					if (i.getVIS() != null) {
+						String val = i.getVIS().getReplicateID() + ";" + i.getVIS().getQualityAnnotation();
+						replicateIDandQualityList.add(val);
+					} else
+						if (i.getFLUO() != null) {
+							String val = i.getFLUO().getReplicateID() + ";" + i.getFLUO().getQualityAnnotation();
+							replicateIDandQualityList.add(val);
+						} else
+							if (i.getNIR() != null) {
+								String val = i.getNIR().getReplicateID() + ";" + i.getNIR().getQualityAnnotation();
+								replicateIDandQualityList.add(val);
+							} else
+								if (i.getIR() != null) {
+									String val = i.getIR().getReplicateID() + ";" + i.getIR().getQualityAnnotation();
+									replicateIDandQualityList.add(val);
+								}
 				}
 			}
 			HashMap<String, Integer> replicateIDandQualityList2positionIndex = new HashMap<String, Integer>();
@@ -585,10 +597,24 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)
 					continue;
-				if (is.firstEntry().getValue().getVIS() == null)
+				String val = null;
+				if (is.firstEntry().getValue().getVIS() != null)
+					val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
+							is.firstEntry().getValue().getVIS().getQualityAnnotation();
+				else
+					if (is.firstEntry().getValue().getFLUO() != null)
+						val = is.firstEntry().getValue().getFLUO().getReplicateID() + ";" +
+								is.firstEntry().getValue().getFLUO().getQualityAnnotation();
+					else
+						if (is.firstEntry().getValue().getNIR() != null)
+							val = is.firstEntry().getValue().getNIR().getReplicateID() + ";" +
+									is.firstEntry().getValue().getNIR().getQualityAnnotation();
+						else
+							if (is.firstEntry().getValue().getIR() != null)
+								val = is.firstEntry().getValue().getIR().getReplicateID() + ";" +
+										is.firstEntry().getValue().getIR().getQualityAnnotation();
+				if (val == null)
 					continue;
-				String val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
-						is.firstEntry().getValue().getVIS().getQualityAnnotation();
 				
 				int workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != workOnSubset)
@@ -599,9 +625,23 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				knownOutput.add(info);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
-				Long time = is.firstEntry().getValue().getVIS().getParentSample().getSampleFineTimeOrRowId();
+				Long time = null;
+				for (ImageData id : new ImageData[] {
+						is.firstEntry().getValue().getVIS(),
+						is.firstEntry().getValue().getFLUO(),
+						is.firstEntry().getValue().getNIR(),
+						is.firstEntry().getValue().getIR()
+				}) {
+					if (id == null)
+						continue;
+					time = id.getParentSample().getSampleFineTimeOrRowId();
+					if (time == null)
+						time = new Long(id.getParentSample().getTime());
+					if (time != null)
+						break;
+				}
 				if (time == null)
-					time = new Long(is.firstEntry().getValue().getVIS().getParentSample().getTime());
+					continue;
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
