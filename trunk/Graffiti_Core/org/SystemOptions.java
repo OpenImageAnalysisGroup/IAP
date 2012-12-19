@@ -25,9 +25,11 @@ public class SystemOptions {
 	private final LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
 	
 	private long lastModificationTime = 0;
+	private final IoStringProvider iniIO;
 	
 	private SystemOptions(final String iniFileName, final IoStringProvider iniIO) throws Exception {
 		this.iniFileName = iniFileName;
+		this.iniIO = iniIO;
 		if (iniIO != null) {
 			ini = new Ini(new StringReader(iniIO.getString()));
 			return;
@@ -251,6 +253,10 @@ public class SystemOptions {
 	
 	protected synchronized void store(String srcSection, String srcSetting) {
 		try {
+			if (iniIO != null) {
+				iniIO.setString(getIniValue());
+				return;
+			}
 			ini.store();
 			lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
 			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
