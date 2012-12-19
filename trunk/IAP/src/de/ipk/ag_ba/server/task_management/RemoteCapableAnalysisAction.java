@@ -36,6 +36,7 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	
 	/**
 	 * @return A version tag, used to ensure that the remote action is executed only with the current version of the code.
+	 * @throws Exception
 	 */
-	public IAP_RELEASE getVersionTag();
+	public IAP_RELEASE getVersionTag() throws Exception;
 }
