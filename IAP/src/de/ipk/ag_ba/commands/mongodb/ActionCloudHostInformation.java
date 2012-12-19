@@ -213,7 +213,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return true;
 	}
 	

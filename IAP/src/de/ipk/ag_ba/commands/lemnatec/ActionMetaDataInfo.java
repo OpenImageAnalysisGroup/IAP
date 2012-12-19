@@ -83,7 +83,7 @@ public class ActionMetaDataInfo extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return false;
 	}
 }

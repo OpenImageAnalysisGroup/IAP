@@ -160,7 +160,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		
 		boolean showSetting = true;// SystemOptions.getInstance().getBoolean("IAP", "show_settings_icon", true);
 		if (showSetting) {
-			homePrimaryActions.add(new NavigationButton(new ActionSettings(null, "Configure the system", "Settings"), guiSetting));
+			homePrimaryActions.add(new NavigationButton(new ActionSettings(null, null, "Configure the system", "Settings"), guiSetting));
 		}
 	}
 	

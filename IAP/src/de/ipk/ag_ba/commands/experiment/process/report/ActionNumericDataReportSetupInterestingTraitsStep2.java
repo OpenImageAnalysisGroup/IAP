@@ -193,7 +193,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 					}
 					
 					@Override
-					public boolean getProvidesActions() {
+					public boolean isProvidingActions() {
 						return false;
 					}
 					

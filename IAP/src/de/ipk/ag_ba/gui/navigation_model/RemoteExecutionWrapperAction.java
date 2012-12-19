@@ -140,7 +140,7 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return true;
 	}
 	

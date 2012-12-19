@@ -197,7 +197,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public boolean getProvidesActions() {
+	public boolean isProvidingActions() {
 		return true;
 	}
 	
