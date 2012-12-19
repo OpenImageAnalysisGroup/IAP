@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.IoStringProvider;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -103,6 +104,11 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "Volume Statistic";
+	}
+	
+	@Override
+	public IoStringProvider getIniIo() {
+		return null;
 	}
 	
 	@Override

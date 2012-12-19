@@ -32,7 +32,7 @@ public class ActionAssignSettings extends AbstractNavigationAction implements Na
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		String ini = SystemOptions.getInstance(iniFileName).getIniValue();
+		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
 		ini = StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
 	}

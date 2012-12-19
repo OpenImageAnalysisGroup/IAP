@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.IoStringProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -17,11 +18,11 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlLoadImagesIfNeeded_images_mas
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClosing_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockRemoveMaizeBambooStick_vis;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockSkeletonize_vis_or_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.curling.BlLeafCurlingAnalysis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.hull.BlConvexHull_vis_fluo;
@@ -46,10 +47,12 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProces
  */
 public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	
-	private final String pipelineName;
+	private final String pipelineFileName;
+	private final IoStringProvider iniIO;
 	
-	public MaizeAnalysisPipeline(String pipelineName) {
-		this.pipelineName = pipelineName;
+	public MaizeAnalysisPipeline(String pipelineFileName, IoStringProvider iniIO) {
+		this.pipelineFileName = pipelineFileName;
+		this.iniIO = iniIO;
 	}
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
@@ -119,7 +122,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		modifySettings(options);
 		
-		return getPipelineFromBlockList(pipelineName, defaultBlockList);
+		return getPipelineFromBlockList(pipelineFileName, iniIO, defaultBlockList);
 	}
 	
 	/**
@@ -131,7 +134,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		
 		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
 		
-		SystemOptions so = SystemOptions.getInstance(pipelineName + ".pipeline.ini");
+		SystemOptions so = SystemOptions.getInstance(pipelineFileName + ".pipeline.ini", iniIO);
 		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
 		
 		options.setSystemOptionStorage(so, g);

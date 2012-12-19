@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.IoStringProvider;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -372,6 +373,11 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "3D-Reconstruction";
+	}
+	
+	@Override
+	public IoStringProvider getIniIo() {
+		return null;
 	}
 	
 	public void setResolution(int voxelresolution, int widthFactor) {

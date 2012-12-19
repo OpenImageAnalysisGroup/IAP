@@ -70,21 +70,13 @@ public class ActionSettings extends AbstractNavigationAction {
 				}
 			}, src.getGUIsetting()));
 		
-		if (iniIO != null) {
-			ArrayList<String> ss = SystemOptions.getInstance(iniIO).getSectionTitles();
-			Collections.sort(ss);
-			for (String s : ss) {
-				res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
-						"Change settings of section " + s, s), src.getGUIsetting()));
-			}
-		} else {
-			ArrayList<String> ss = SystemOptions.getInstance(iniFileName).getSectionTitles();
-			Collections.sort(ss);
-			for (String s : ss) {
-				res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
-						"Change settings of section " + s, s), src.getGUIsetting()));
-			}
+		ArrayList<String> ss = SystemOptions.getInstance(iniFileName, iniIO).getSectionTitles();
+		Collections.sort(ss);
+		for (String s : ss) {
+			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
+					"Change settings of section " + s, s), src.getGUIsetting()));
 		}
+		
 		if (iniIO == null)
 			if (iniFileName == null)
 				for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())

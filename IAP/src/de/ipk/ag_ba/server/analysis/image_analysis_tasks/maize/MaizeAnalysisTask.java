@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
+import org.IoStringProvider;
+
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipeline;
 
@@ -23,8 +25,13 @@ public class MaizeAnalysisTask extends AbstractPhenotypingTask {
 	}
 	
 	@Override
+	public IoStringProvider getIniIo() {
+		return null;
+	}
+	
+	@Override
 	protected ImageProcessor getImageProcessor() {
-		return new MaizeAnalysisPipeline("Maize Phenotyping");
+		return new MaizeAnalysisPipeline("Maize Phenotyping", null);
 	}
 	
 	@Override
