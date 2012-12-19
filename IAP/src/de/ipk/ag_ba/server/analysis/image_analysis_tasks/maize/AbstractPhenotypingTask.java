@@ -76,8 +76,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private ArrayList<FlexibleImageStack> forcedDebugStacks;
 	private int prio;
 	private MongoDB m;
-	private Exception error;
-	private boolean runOK;
 	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
 	private int unit_test_idx;
 	private int unit_test_steps;
@@ -205,62 +203,58 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
-			try {
-				int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
-				int progress = 0;
-				BackgroundTaskHelper.issueSimpleTask("Download Images (Caching)", "", new Runnable() {
-					@Override
-					public void run() {
-						for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
-							if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-								DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
-						}
-					}
-				}, null);
-				for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
-					if (status.wantsToStop())
-						continue;
-					final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
-					final String plantIDf = plantID;
-					maxCon.acquire(1);
-					try {
-						progress++;
-						final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
-						Thread t = new Thread(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									processSnapshot(
-											plandID2time2waterData,
-											plantIDf, preThreadName,
-											maximumThreadCountOnImageLevel,
-											status, tso, workloadSnapshots,
-											workloadEqualAngleSnapshotSets,
-											imageSetWithSpecificAngle_f, maxCon);
-								} catch (Exception err) {
-									printError(imageSetWithSpecificAngle_f, err);
-								} finally {
-									maxCon.release(1);
-									freed.setBval(0, true);
-								}
-							}
-						}, preThreadName + ")");
-						startThread(t);
-					} catch (Exception eeee) {
-						error = eeee;
-						if (!freed.getBval(0, false))
-							maxCon.release(1);
-						throw new RuntimeException(eeee);
+			
+			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
+			int progress = 0;
+			BackgroundTaskHelper.issueSimpleTask("Download Images (Caching)", "", new Runnable() {
+				@Override
+				public void run() {
+					for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+						if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+							DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
 					}
 				}
-				maxCon.acquire(nn);
-				maxCon.release(nn);
-				for (String plantID : workload_imageSetsWithSpecificAngles.keySet())
-					if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-						DownloadCache.getInstance().finished(plantID);
-			} finally {
-				runOK = true;
+			}, null);
+			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+				if (status.wantsToStop())
+					continue;
+				final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
+				final String plantIDf = plantID;
+				maxCon.acquire(1);
+				try {
+					progress++;
+					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
+					Thread t = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								processSnapshot(
+										plandID2time2waterData,
+										plantIDf, preThreadName,
+										maximumThreadCountOnImageLevel,
+										status, tso, workloadSnapshots,
+										workloadEqualAngleSnapshotSets,
+										imageSetWithSpecificAngle_f, maxCon);
+							} catch (Exception err) {
+								printError(imageSetWithSpecificAngle_f, err);
+							} finally {
+								maxCon.release(1);
+								freed.setBval(0, true);
+							}
+						}
+					}, preThreadName + ")");
+					startThread(t);
+				} catch (Exception eeee) {
+					if (!freed.getBval(0, false))
+						maxCon.release(1);
+					throw new RuntimeException(eeee);
+				}
 			}
+			maxCon.acquire(nn);
+			maxCon.release(nn);
+			for (String plantID : workload_imageSetsWithSpecificAngles.keySet())
+				if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
+					DownloadCache.getInstance().finished(plantID);
 		} finally {
 			maxInst.release();
 		}
