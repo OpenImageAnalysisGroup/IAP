@@ -25,9 +25,9 @@ public class SystemOptions {
 	private final LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
 	
 	private long lastModificationTime = 0;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	private SystemOptions(final String iniFileName, final IoStringProvider iniIO) throws Exception {
+	private SystemOptions(final String iniFileName, final IniIoProvider iniIO) throws Exception {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
 		if (iniIO != null) {
@@ -74,10 +74,14 @@ public class SystemOptions {
 	
 	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
 	
-	public synchronized static SystemOptions getInstance(String iniFileName, IoStringProvider iniIO) {
+	public synchronized static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
 		if (iniIO != null)
 			try {
-				return new SystemOptions(iniFileName, iniIO);
+				if (iniIO.getInstance() != null)
+					return iniIO.getInstance();
+				SystemOptions i = new SystemOptions(iniFileName, iniIO);
+				iniIO.setInstance(i);
+				return i;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

@@ -2,7 +2,8 @@ package de.ipk.ag_ba.commands.experiment;
 
 import java.util.ArrayList;
 
-import org.IoStringProvider;
+import org.IniIoProvider;
+import org.SystemOptions;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -44,7 +45,9 @@ public class ActionAnalysis extends AbstractNavigationAction {
 		// "<html><center>Modify settings of " + pd.getName() + ""),
 		// src.getGUIsetting()));
 		
-		IoStringProvider ioStringProvider = new IoStringProvider() {
+		IniIoProvider ioStringProvider = new IniIoProvider() {
+			private SystemOptions i;
+			
 			@Override
 			public String getString() {
 				String ini = experimentReference.getHeader().getSettings();
@@ -56,6 +59,16 @@ public class ActionAnalysis extends AbstractNavigationAction {
 			public void setString(String value) {
 				String ini = StringEscapeUtils.escapeXml(value);
 				experimentReference.getHeader().setSettings(ini);
+			}
+			
+			@Override
+			public void setInstance(SystemOptions i) {
+				this.i = i;
+			}
+			
+			@Override
+			public SystemOptions getInstance() {
+				return i;
 			}
 		};
 		

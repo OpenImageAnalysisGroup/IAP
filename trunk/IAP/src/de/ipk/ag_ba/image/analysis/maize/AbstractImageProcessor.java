@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
@@ -111,7 +111,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	@SuppressWarnings("unchecked")
 	protected BlockPipeline getPipelineFromBlockList(
 			String pipelineName,
-			IoStringProvider iniIO,
+			IniIoProvider iniIO,
 			String[] defaultBlockList) {
 		defaultBlockList = SystemOptions.getInstance(
 				StringManipulationTools.getFileSystemName(pipelineName)

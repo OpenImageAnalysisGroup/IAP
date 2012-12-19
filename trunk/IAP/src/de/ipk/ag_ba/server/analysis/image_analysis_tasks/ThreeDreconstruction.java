@@ -9,7 +9,7 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -376,7 +376,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public IoStringProvider getIniIo() {
+	public IniIoProvider getIniIo() {
 		return null;
 	}
 	
