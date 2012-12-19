@@ -29,8 +29,8 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.Channel;
 import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.operation.ImageDisplay;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operation.PrintImage;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 
 /**
@@ -170,7 +170,7 @@ public class FlexibleImage {
 		return h;
 	}
 	
-	public FlexibleImage print(String title, boolean doIt) {
+	public FlexibleImage display(String title, boolean doIt) {
 		if (doIt)
 			return print(title);
 		else
@@ -179,8 +179,8 @@ public class FlexibleImage {
 	
 	public FlexibleImage print(String title) {
 		if (!SystemAnalysis.isHeadless()) {
-			PrintImage.printImage(
-					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage().image,
+			ImageDisplay.show(
+					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage(),
 					title);
 			IAPservice.showImageJ();
 		}
@@ -331,7 +331,7 @@ public class FlexibleImage {
 			}
 		}
 		if (res.length > 0)
-			return new FlexibleImage(res).print("DABA", false);
+			return new FlexibleImage(res).display("DABA", false);
 		else
 			return null;
 	}

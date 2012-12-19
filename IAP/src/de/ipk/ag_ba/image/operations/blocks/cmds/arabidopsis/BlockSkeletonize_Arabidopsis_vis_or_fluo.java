@@ -49,7 +49,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		boolean analyzeSide = false;
 		if (analyzeSide)
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = fluo.copy().print("fluo", debug);
+				FlexibleImage viswork = fluo.copy().display("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -64,7 +64,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 			}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
 			ImageOperation in = fluo.copy().io();
-			FlexibleImage viswork = in.blur(1).getImage().print("fluo", debug);
+			FlexibleImage viswork = in.blur(1).getImage().display("fluo", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
@@ -98,7 +98,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		int bloomLimbCount = 0;
 		if (bloomDetection) {
 			skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().print("blurf", false), 0.075f, h, 20).io().// blur(3).
+			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().display("blurf", false), 0.075f, h, 20).io().// blur(3).
 					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 			
 			probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
@@ -139,7 +139,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0).getImage();
-				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
+				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().display("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
@@ -172,9 +172,9 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
-		result.print("res", false);
+		result.display("res", false);
 		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
-		result2.print("res2", false);
+		result2.display("res2", false);
 		
 		// ***Saved***
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -182,7 +182,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			FlexibleImage inputImage = inpFLUOunchanged.copy().print(" inp img 2", false);
+			FlexibleImage inputImage = inpFLUOunchanged.copy().display(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -202,7 +202,7 @@ public class BlockSkeletonize_Arabidopsis_vis_or_fluo extends AbstractSnapshotAn
 				lw = 1;
 			for (Point p : branchPoints)
 				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
-			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
+			inputImage = canvas.getImage().display("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
 			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;

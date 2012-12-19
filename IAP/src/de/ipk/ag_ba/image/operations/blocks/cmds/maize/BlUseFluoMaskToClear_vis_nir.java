@@ -58,7 +58,7 @@ public class BlUseFluoMaskToClear_vis_nir extends AbstractSnapshotAnalysisBlockF
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().masks().vis();
 			
-			return clearImageSide(input, input().masks().fluo(), 0.1).print("cleared", debug);
+			return clearImageSide(input, input().masks().fluo(), 0.1).display("cleared", debug);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {

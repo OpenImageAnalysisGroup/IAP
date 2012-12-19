@@ -76,9 +76,9 @@ public class BlTranslateMatch_vis_fluo_nir extends AbstractSnapshotAnalysisBlock
 				
 				if (input().images().nir() != null && options.isBarleyInBarleySystem()) {
 					FlexibleImage nir = input().images().nir().copy().io().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.1).
-							applyMask_ResizeMaskIfNeeded(vis.blur(40).getImage().print("VIS IMAGE AS MASK", debug), Color.black.getRGB()).
+							applyMask_ResizeMaskIfNeeded(vis.blur(40).getImage().display("VIS IMAGE AS MASK", debug), Color.black.getRGB()).
 							replaceColor(Color.black.getRGB(), options.getBackground()).
-							getImage().print("NIR IMAGE FOR CALCULATION", debug);
+							getImage().display("NIR IMAGE FOR CALCULATION", debug);
 					
 					tm.calcOffsetVerticalY(nir);
 					if (options.isBarleyInBarleySystem())

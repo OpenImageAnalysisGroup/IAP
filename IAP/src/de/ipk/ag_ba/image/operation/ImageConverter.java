@@ -22,43 +22,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import javax.imageio.ImageIO;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.swing.ImageIcon;
 
 import org.Colors;
-import org.graffiti.editor.GravistoService;
-import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.picture_gui.MyImageIcon;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 
 public class ImageConverter {
-	public static void main(String[] args) {
-		
-		try {
-			IOurl url = new IOurl(
-					"http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg");
-			BufferedImage img = ImageIO.read(url.getInputStream());
-			
-			// ############ Skalierung Test ##############
-			GravistoService.showImage(img, "Ausgang");
-			GravistoService.showImage(scalingIJ(img), "Scaling IJ Faktor 2");
-			GravistoService
-					.showImage(
-							scalingJAI(new URL(
-									"http://www.spiegel.de/images/image-150632-panoV9free-hldq.jpg")),
-							"Scaling JAI Faktor 2");
-			GravistoService.showImage(scalingOWN(img), "Scaling OWN Faktor 2");
-			GravistoService.showImage(scalingAWT(img), "Scaling AWT Faktor 2");
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
 	
 	// ########## Rückgabe ImagePlus ##############
 	
@@ -349,39 +323,6 @@ public class ImageConverter {
 		System.out.println("Zeit JAI: " + (endTime - startTime));
 		
 		return time_temp;
-	}
-	
-	private static BufferedImage scalingOWN(BufferedImage img) {
-		int[][] imageBIto2A = convertBIto2A(img);
-		
-		long startTime = System.currentTimeMillis();
-		
-		ImageScaling scalingOwn = new ImageScaling(imageBIto2A);
-		scalingOwn.doZoom(2, Scaling.NEAREST_NEIGHBOUR);
-		// scalingOwn.doZoom(2, Scaling.BILINEAR);
-		
-		long endTime = System.currentTimeMillis();
-		System.out.println("Zeit OWN: " + (endTime - startTime));
-		
-		return convert2AtoBI(scalingOwn.getResultImage());
-	}
-	
-	private static BufferedImage scalingAWT(BufferedImage img) {
-		
-		long startTime = System.currentTimeMillis();
-		
-		Image scalingAWT_temp = img.getScaledInstance(2 * img.getWidth(),
-				2 * img.getHeight(), Image.SCALE_AREA_AVERAGING);
-		BufferedImage scalingAWT = new BufferedImage(2 * img.getWidth(),
-				2 * img.getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics g = scalingAWT.getGraphics();
-		g.drawImage(scalingAWT_temp, 0, 0, null);
-		
-		long endTime = System.currentTimeMillis();
-		System.out.println("Zeit AWT: " + (endTime - startTime));
-		
-		g.dispose();
-		return scalingAWT;
 	}
 	
 	public static BufferedImage copy(BufferedImage image) {

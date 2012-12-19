@@ -43,7 +43,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	protected FlexibleImage processVISimage() {
 		FlexibleImage fi = input().images() != null ? input().images().vis() : null;
 		if (fi != null) {
-			getProperties().setImage("img.vis.3D", fi.print("CLEARED", false));
+			getProperties().setImage("img.vis.3D", fi.display("CLEARED", false));
 			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_REAL_VALUE, options.getDoubleSetting(Setting.REAL_MARKER_DISTANCE));
 		} else {
 			System.out.println();
