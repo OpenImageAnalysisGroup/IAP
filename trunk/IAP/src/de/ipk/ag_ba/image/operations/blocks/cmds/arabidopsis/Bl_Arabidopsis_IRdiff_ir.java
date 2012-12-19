@@ -65,7 +65,7 @@ public class Bl_Arabidopsis_IRdiff_ir extends AbstractSnapshotAnalysisBlockFIS {
 								getInt("Adaptive_Threshold_Assumed_Background_Value", 00),
 								options.getBackground(),
 								getDouble("Adaptive_Threshold_K", 0.001)
-						).getImage().print("ADAPT OUT", debug);
+						).getImage().display("ADAPT OUT", debug);
 			return gray;
 		} else
 			return null;

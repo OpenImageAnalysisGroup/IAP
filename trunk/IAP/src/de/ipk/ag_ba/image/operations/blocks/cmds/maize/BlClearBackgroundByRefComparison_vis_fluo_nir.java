@@ -62,8 +62,8 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		
 		if (input().images().vis() != null && input().masks().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				FlexibleImage visImg = input().images().vis().print("In VIS", debug);
-				FlexibleImage visMsk = input().masks().vis().print("In Mask", debug);
+				FlexibleImage visImg = input().images().vis().display("In VIS", debug);
+				FlexibleImage visMsk = input().masks().vis().display("In Mask", debug);
 				FlexibleImage cleared = visImg
 						.io()
 						.compare()
@@ -212,7 +212,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				if (options.isMaize()) {
 					int blackDiff = getInt("Clear-background-nir-black-diff-top", 14) / 3;
 					int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20) / 3;
-					FlexibleImage msk = new ImageOperation(nir.print("NIR MSK", debug)).compare()
+					FlexibleImage msk = new ImageOperation(nir.display("NIR MSK", debug)).compare()
 							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
 							.print("result nir", debug).getImage();
 					msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
@@ -284,7 +284,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				}
 			}
 		}
-		FlexibleImage res = new FlexibleImage(in).print("DEBUG", debug);
+		FlexibleImage res = new FlexibleImage(in).display("DEBUG", debug);
 		return res;
 	}
 	

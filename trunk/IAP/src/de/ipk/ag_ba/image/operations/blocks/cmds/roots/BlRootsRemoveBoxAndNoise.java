@@ -24,7 +24,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlockFIS {
 		if (img == null)
 			return null;
 		
-		img = img.copy().print("1", debug);
+		img = img.copy().display("1", debug);
 		ImageOperation io = img.io().border(getInt("BORDER_WIDTH", 2)).print("2", debug);
 		io = io.invert().thresholdBlueHigherThan(getInt("TRESHOLD_BLUE", 3)).print("3", debug);
 		// remove pure white area inside the box
@@ -49,7 +49,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlockFIS {
 		return r.removeSmallElements(
 				getInt("Final_Noise-Size-Area", 10),
 				getInt("Final_Noise-Size-Dimension", 10))
-				.getImage().print("11", debug);
+				.getImage().display("11", debug);
 	}
 	
 }

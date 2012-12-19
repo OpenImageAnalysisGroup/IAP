@@ -62,7 +62,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						.border(5)
 						.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
 						.blur(getDouble("Blur-Vis", 1))
-						.getImage().print("vis", debug);
+						.getImage().display("vis", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -80,7 +80,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
 							.dilate(3)
 							.blur(1)
-							.getImage().print("vis", debug);
+							.getImage().display("vis", debug);
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
@@ -97,7 +97,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
 							.dilate(2)
 							.blur(1)
-							.getImage().print("vis", debug);
+							.getImage().display("vis", debug);
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
@@ -131,7 +131,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						.erode(getInt("Erode-Cnt-Fluo", 1))
 						.dilate(getInt("Dilate-Cnt-Fluo", 1))
 						.blur(getDouble("Blur-Fluo", 4))
-						.getImage().print("fluo", debug);
+						.getImage().display("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -149,7 +149,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 						// .erode(1)
 						.dilate(getInt("Dilate-Cnt-Fluo", 4))
 						// .blur(1)
-						.getImage().print("fluo", debug);
+						.getImage().display("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -191,7 +191,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		int bloomLimbCount = 0;
 		if (options.isMaize()) {
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().print("blurf", false), 0.075f, h, 20).io().// blur(3).
+			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().display("blurf", false), 0.075f, h, 20).io().// blur(3).
 					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 			
 			probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
@@ -231,7 +231,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0).getImage();
-				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().print("INNER HULL", debug);
+				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().display("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
@@ -267,9 +267,9 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
-		result.print("res", false);
+		result.display("res", false);
 		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
-		result2.print("res2", false);
+		result2.display("res2", false);
 		
 		// ***Saved***
 		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
@@ -277,7 +277,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			FlexibleImage inputImage = inpFLUOunchanged.copy().print(" inp img 2", false);
+			FlexibleImage inputImage = inpFLUOunchanged.copy().display(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -297,7 +297,7 @@ public class BlockSkeletonize_vis_or_fluo extends AbstractSnapshotAnalysisBlockF
 				lw = 1;
 			for (Point p : branchPoints)
 				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
-			inputImage = canvas.getImage().print("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
+			inputImage = canvas.getImage().display("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
 			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;

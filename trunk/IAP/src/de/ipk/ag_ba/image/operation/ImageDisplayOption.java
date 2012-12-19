@@ -4,9 +4,8 @@
 package de.ipk.ag_ba.image.operation;
 
 /**
- * @author entzian
+ * @author entzian, klukas
  */
-public enum PrintOption {
+public enum ImageDisplayOption {
 	GRAVISTO_SERVICE, IMAGEJ, CONSOLE
-	
 }

@@ -402,7 +402,7 @@ public class SkeletonProcessor2d {
 	 * Not Mask based
 	 */
 	public void findEndpointsAndBranches2() {
-		new FlexibleImage(skelImg).copy().print("TTTT", false);
+		new FlexibleImage(skelImg).copy().display("TTTT", false);
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
@@ -555,7 +555,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void print(String title, boolean show) {
-		new FlexibleImage(this.skelImg).print(title, show);
+		new FlexibleImage(this.skelImg).display(title, show);
 	}
 	
 	public FlexibleImage getAsFlexibleImage() {

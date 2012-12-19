@@ -3475,7 +3475,7 @@ public class ImageOperation {
 			}
 		}
 		if (debug)
-			canvas.getImage().print("region scan for white balance", debug);
+			canvas.getImage().display("region scan for white balance", debug);
 		
 		if (count < w * h * 0.1 && recursion < 30) {
 			if (searchWhiteTrue)

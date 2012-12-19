@@ -127,7 +127,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
 		skel.findEndpointsAndBranches();
 		
-		img = skel.getAsFlexibleImage().print("THE SKELETON", debug);
+		img = skel.getAsFlexibleImage().display("THE SKELETON", debug);
 		
 		ArrayList<Point> branchPoints = skel.getBranches();
 		

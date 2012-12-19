@@ -86,7 +86,7 @@ public class BlockRemoveVerticalAndHorizontalStructures_vis_fluo extends Abstrac
 			}
 		}
 		
-		return new FlexibleImage(w, h, img).print("TEST " + System.currentTimeMillis(), false);
+		return new FlexibleImage(w, h, img).display("TEST " + System.currentTimeMillis(), false);
 	}
 	
 	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {

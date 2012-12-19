@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operation.PrintImage;
+import de.ipk.ag_ba.image.operation.ImageDisplay;
 
 public class FlexibleMaskAndImageSet {
 	private FlexibleImageSet images;
@@ -38,7 +38,7 @@ public class FlexibleMaskAndImageSet {
 	public void print(String title, int width) {
 		FlexibleImage overview = getOverviewImage(width);
 		
-		PrintImage.printImage(overview, title);
+		ImageDisplay.show(overview, title);
 		
 	}
 	

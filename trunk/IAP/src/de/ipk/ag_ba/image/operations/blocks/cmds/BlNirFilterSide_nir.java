@@ -26,7 +26,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 								getInt("Adaptive_Threshold_Region_Size", 150),
 								average,
 								options.getBackground(),
-								getDouble("Adaptive_Threshold_K", 0.10)).getImage().print("ADAPT OUT", debug);
+								getDouble("Adaptive_Threshold_K", 0.10)).getImage().display("ADAPT OUT", debug);
 			else {
 				double f;
 				int regionSize;
@@ -43,14 +43,14 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 					}
 				nirMask = nirMask.io().print("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(regionSize, average,
-								options.getBackground(), f).getImage().print("ADAPT OUT", debug);
+								options.getBackground(), f).getImage().display("ADAPT OUT", debug);
 			}
 			input().masks().setNir(nirMask);
 			if (useNirSkeleton) {
 				FlexibleImage sk = nirMask.io().skeletonize(false).getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, options.getBackground());
-					getProperties().setImage("nir_skeleton", sk.print("SKELETON", debug));
+					getProperties().setImage("nir_skeleton", sk.display("SKELETON", debug));
 				}
 			}
 		}
