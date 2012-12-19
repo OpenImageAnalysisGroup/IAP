@@ -70,19 +70,24 @@ public class PipelineDesc {
 	
 	private static void writePipelineInis() {
 		RootsAnalysisTask rt = new RootsAnalysisTask();
-		PipelineDesc pRoot = new PipelineDesc(rt.getName(), null, rt.getName(), rt.getTaskDescription());
+		PipelineDesc pRoot = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(rt.getName() + ".pipeline.ini"), null, rt.getName(), rt.getTaskDescription());
 		
 		BarleyAnalysisTask bt = new BarleyAnalysisTask();
-		PipelineDesc pBarley = new PipelineDesc(bt.getName(), null, bt.getName(), bt.getTaskDescription());
+		PipelineDesc pBarley = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(bt.getName() + ".pipeline.ini"), null, bt.getName(), bt.getTaskDescription());
 		
 		MaizeAnalysisTask mt = new MaizeAnalysisTask();
-		PipelineDesc pMaize = new PipelineDesc(mt.getName(), null, mt.getName(), mt.getTaskDescription());
+		PipelineDesc pMaize = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(mt.getName() + ".pipeline.ini"), null, mt.getName(), mt.getTaskDescription());
 		
 		PhytochamberAnalysisTask pt = new PhytochamberAnalysisTask();
-		PipelineDesc pPhyto = new PipelineDesc(pt.getName(), null, pt.getName(), pt.getTaskDescription());
+		PipelineDesc pPhyto = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(pt.getName() + ".pipeline.ini"), null, pt.getName(), pt.getTaskDescription());
 		
 		PhytochamberAnalysisBlueRubberTask pbt = new PhytochamberAnalysisBlueRubberTask();
-		PipelineDesc pBrPhyto = new PipelineDesc(pbt.getName(), null, pbt.getName(), pbt.getTaskDescription());
+		PipelineDesc pBrPhyto = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(pbt.getName() + ".pipeline.ini"), null, pbt.getName(), pbt.getTaskDescription());
 	}
 	
 	public String getIniFileName() {

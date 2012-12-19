@@ -112,6 +112,7 @@ public class SystemOptions {
 			return new Ini(new File(fn));
 		} catch (FileNotFoundException fne) {
 			try {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Create settings file: " + fn);
 				Ini ini = new Ini();
 				File f = new File(fn);
 				f.createNewFile();
@@ -297,12 +298,14 @@ public class SystemOptions {
 			String[] r = section.getAll(setting, String[].class);
 			if (r == null || r.length == 0) {
 				int idx = 0;
-				for (String v : defaultValue)
-					section.add(setting, v, idx++);
-				if (defaultValue.length == 1)
-					section.add(setting, "", idx++);
-				ini.put(group, section);
-				store(group, setting);
+				if (defaultValue != null) {
+					for (String v : defaultValue)
+						section.add(setting, v, idx++);
+					if (defaultValue.length == 1)
+						section.add(setting, "", idx++);
+					ini.put(group, section);
+					store(group, setting);
+				}
 				return defaultValue;
 			} else
 				return r;

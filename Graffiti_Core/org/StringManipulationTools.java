@@ -297,7 +297,7 @@ public class StringManipulationTools implements HelperClass {
 			{ "}", "\\}" },
 			{ "%", "\\%" },
 			{ "~", "\\textasciitilde" },
-
+			
 			{ "€", "\\texteuro" } };
 	
 	/**
@@ -659,10 +659,13 @@ public class StringManipulationTools implements HelperClass {
 	
 	public static String getFileSystemName(String name) {
 		String namenew = stringReplace(name, "*", "");
+		namenew = stringReplace(namenew, "<br>", " ");
 		namenew = stringReplace(namenew, ":", "_");
 		namenew = stringReplace(namenew, " ", "_");
 		namenew = stringReplace(namenew, "/", "_");
 		namenew = stringReplace(namenew, "\\", "_");
+		namenew = stringReplace(namenew, "<", "_");
+		namenew = stringReplace(namenew, ">", "_");
 		return namenew;
 	}
 	
