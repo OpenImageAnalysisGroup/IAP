@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;

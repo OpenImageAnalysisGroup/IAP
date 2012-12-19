@@ -1,14 +1,14 @@
-package de.ipk.ag_ba.image.analysis.phytochamber;
+package de.ipk.ag_ba.image.analysis.arabidopsis;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_vertical_nir;
 import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancingRoundCamera_vis_nir;
@@ -19,10 +19,10 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMedianFilter_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlNirFilterSide_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlSmoothShape_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlockClearNirPot_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlRemoveSmallClusters_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlClearMasks_Arabidopsis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLabFilter_Arabidopsis_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlLoadImagesIfNeeded_images;

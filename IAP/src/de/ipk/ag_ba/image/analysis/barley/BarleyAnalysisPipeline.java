@@ -1,16 +1,15 @@
-package de.ipk.ag_ba.image.analysis;
+package de.ipk.ag_ba.image.analysis.barley;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_vertical_nir;
 import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancingRoundCamera_vis_nir;
@@ -56,14 +55,12 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final String pipelineName;
 	private final SystemOptions so;
-	private final IniIoProvider iniIO;
 	
-	public BarleyAnalysisPipeline(String pipelineFileName, IniIoProvider iniIO) throws Exception {
+	public BarleyAnalysisPipeline(String pipelineFileName) throws Exception {
 		this.pipelineName = pipelineFileName;
-		this.iniIO = iniIO;
 		so = SystemOptions.getInstance(
 				StringManipulationTools.getFileSystemName(pipelineFileName) + ".pipeline.ini",
-				iniIO);
+				null);
 	}
 	
 	@Override

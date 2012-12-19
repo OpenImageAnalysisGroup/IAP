@@ -5,8 +5,8 @@ import org.IniIoProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.Setting;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancing_vis;

@@ -2,8 +2,8 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks;
 
 import org.IniIoProvider;
 
-import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.phytochamber.ArabidopsisAnalysisPipeline;
+import de.ipk.ag_ba.image.analysis.ImageProcessor;
+import de.ipk.ag_ba.image.analysis.arabidopsis.ArabidopsisAnalysisPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 /**

@@ -11,7 +11,8 @@ import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessor;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;

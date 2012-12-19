@@ -7,7 +7,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.IniIoProvider;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;

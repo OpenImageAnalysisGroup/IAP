@@ -2,15 +2,15 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley;
 
 import org.IniIoProvider;
 
-import de.ipk.ag_ba.image.analysis.BarleyAnalysisPipeline;
-import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
+import de.ipk.ag_ba.image.analysis.ImageProcessor;
+import de.ipk.ag_ba.image.analysis.barley.BarleyAnalysisPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 public class BarleyAnalysisTask extends AbstractPhenotypingTask {
 	
 	@Override
 	public ImageProcessor getImageProcessor() throws Exception {
-		return new BarleyAnalysisPipeline(getName(), null);
+		return new BarleyAnalysisPipeline(getName());
 	}
 	
 	@Override

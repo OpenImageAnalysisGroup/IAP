@@ -21,8 +21,8 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;

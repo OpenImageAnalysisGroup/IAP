@@ -14,8 +14,8 @@ import javax.swing.JTextField;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions.CameraPosition;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.AbstractBlock;
 import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
