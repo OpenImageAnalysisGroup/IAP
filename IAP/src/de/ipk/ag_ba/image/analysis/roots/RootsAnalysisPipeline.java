@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.analysis.roots;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -25,9 +25,9 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final String pipelineName;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	public RootsAnalysisPipeline(String pipelineName, IoStringProvider iniIO) {
+	public RootsAnalysisPipeline(String pipelineName, IniIoProvider iniIO) {
 		this.pipelineName = pipelineName;
 		this.iniIO = iniIO;
 	}

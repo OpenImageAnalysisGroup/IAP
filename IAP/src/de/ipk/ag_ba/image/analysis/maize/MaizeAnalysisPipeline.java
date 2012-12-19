@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.analysis.maize;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
@@ -48,9 +48,9 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProces
 public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	
 	private final String pipelineFileName;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	public MaizeAnalysisPipeline(String pipelineFileName, IoStringProvider iniIO) {
+	public MaizeAnalysisPipeline(String pipelineFileName, IniIoProvider iniIO) {
 		this.pipelineFileName = pipelineFileName;
 		this.iniIO = iniIO;
 	}

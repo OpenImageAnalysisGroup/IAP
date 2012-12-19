@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IoStringProvider;
+import org.IniIoProvider;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -23,7 +23,7 @@ public interface ImageAnalysisTask {
 	
 	public String getName();
 	
-	public IoStringProvider getIniIo();
+	public IniIoProvider getIniIo();
 	
 	public void setInput(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,

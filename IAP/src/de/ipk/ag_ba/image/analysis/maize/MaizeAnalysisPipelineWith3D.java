@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IoStringProvider;
+import org.IniIoProvider;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.image.analysis.options.ImageProcessorOptions;
@@ -29,7 +29,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	
-	public MaizeAnalysisPipelineWith3D(String pipelineName, IoStringProvider iniIO) {
+	public MaizeAnalysisPipelineWith3D(String pipelineName, IniIoProvider iniIO) {
 		super(pipelineName, iniIO);
 	}
 	

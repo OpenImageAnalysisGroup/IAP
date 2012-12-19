@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.AttributeHelper;
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.ReleaseInfo;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -22,9 +22,9 @@ public class ActionSettings extends AbstractNavigationAction {
 	private final String iniFileName;
 	private final String title;
 	private NavigationButton src;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	public ActionSettings(String iniFileName, IoStringProvider iniIO, String tooltip, String title) {
+	public ActionSettings(String iniFileName, IniIoProvider iniIO, String tooltip, String title) {
 		super(tooltip);
 		this.iniIO = iniIO;
 		this.iniFileName = iniFileName;

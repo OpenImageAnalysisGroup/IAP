@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis;
 
-import org.IoStringProvider;
+import org.IniIoProvider;
 
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
 import de.ipk.ag_ba.image.analysis.phytochamber.ArabidopsisAnalysisPipelineBlueSmallAndMiddle;
@@ -26,7 +26,7 @@ public class ArabidopsisAnalysisSmallBlueRubberTask extends AbstractPhenotypingT
 	}
 	
 	@Override
-	public IoStringProvider getIniIo() {
+	public IniIoProvider getIniIo() {
 		return null;
 	}
 	

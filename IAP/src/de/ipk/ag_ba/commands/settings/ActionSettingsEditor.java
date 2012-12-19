@@ -3,7 +3,7 @@ package de.ipk.ag_ba.commands.settings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -22,13 +22,13 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	String iniFileName;
 	
-	IoStringProvider iniIO;
+	IniIoProvider iniIO;
 	
 	public ActionSettingsEditor(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionSettingsEditor(String iniFileName, IoStringProvider iniIO,
+	public ActionSettingsEditor(String iniFileName, IniIoProvider iniIO,
 			String tooltip, String section) {
 		this(tooltip);
 		this.iniFileName = iniFileName;

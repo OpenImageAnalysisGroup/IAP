@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
-import org.IoStringProvider;
+import org.IniIoProvider;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemOptions;
@@ -12,9 +12,9 @@ import org.SystemOptions;
 public class PipelineDesc {
 	
 	private final String iniFileName;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	public PipelineDesc(String iniFileName, IoStringProvider iniIO, String defName,
+	public PipelineDesc(String iniFileName, IniIoProvider iniIO, String defName,
 			String defDescription) {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
@@ -64,7 +64,7 @@ public class PipelineDesc {
 		return iniFileName;
 	}
 	
-	public IoStringProvider getIniIO() {
+	public IniIoProvider getIniIO() {
 		return iniIO;
 	}
 }

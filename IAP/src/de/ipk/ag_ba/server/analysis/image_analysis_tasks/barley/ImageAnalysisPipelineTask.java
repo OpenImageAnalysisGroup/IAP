@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley;
 
-import org.IoStringProvider;
+import org.IniIoProvider;
 
 import de.ipk.ag_ba.image.analysis.Pipeline;
 import de.ipk.ag_ba.image.analysis.maize.ImageProcessor;
@@ -13,9 +13,9 @@ public class ImageAnalysisPipelineTask extends AbstractPhenotypingTask {
 	
 	private final String pipelineFileName;
 	private final String desc;
-	private final IoStringProvider iniIO;
+	private final IniIoProvider iniIO;
 	
-	public ImageAnalysisPipelineTask(String name, IoStringProvider iniIO, String desc) {
+	public ImageAnalysisPipelineTask(String name, IniIoProvider iniIO, String desc) {
 		this.pipelineFileName = name;
 		this.iniIO = iniIO;
 		this.desc = desc;
@@ -32,7 +32,7 @@ public class ImageAnalysisPipelineTask extends AbstractPhenotypingTask {
 	}
 	
 	@Override
-	public IoStringProvider getIniIo() {
+	public IniIoProvider getIniIo() {
 		return iniIO;
 	}
 	
