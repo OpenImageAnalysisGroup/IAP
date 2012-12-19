@@ -5,8 +5,8 @@ import org.IniIoProvider;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.image.analysis.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveImagesToMasks_vis_fluo_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;

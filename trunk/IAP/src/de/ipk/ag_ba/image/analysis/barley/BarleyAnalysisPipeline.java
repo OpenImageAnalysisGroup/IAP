@@ -5,11 +5,9 @@ import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
+import de.ipk.ag_ba.image.analysis.AbstractImageProcessor;
 import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
 import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.Setting;
-import de.ipk.ag_ba.image.analysis.maize.AbstractImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.BlockColorBalancing_vertical_nir;
-import de.ipk.ag_ba.image.analysis.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlBalancing_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.BlColorBalancingRoundCamera_vis_nir;
@@ -41,6 +39,8 @@ import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlFindBlueMarkers_vis;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlIntensityConversion_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlUseFluoMaskToClear_vis_nir;
 import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockClearMasksBasedOnMarkers_vis_fluo_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockColorBalancing_vertical_nir;
+import de.ipk.ag_ba.image.operations.blocks.cmds.maize.BlockDrawSkeleton_vis_fluo;
 import de.ipk.ag_ba.image.operations.blocks.cmds.post_process.BlockRunPostProcessors;
 
 /**
