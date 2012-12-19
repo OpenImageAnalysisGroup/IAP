@@ -53,7 +53,7 @@ public class RootScannAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	}
 	
 	@Override
-	public IAP_RELEASE getVersionTag() {
+	public IAP_RELEASE getVersionTag() throws Exception {
 		return getImageAnalysisTask().getVersionTag();
 	}
 }

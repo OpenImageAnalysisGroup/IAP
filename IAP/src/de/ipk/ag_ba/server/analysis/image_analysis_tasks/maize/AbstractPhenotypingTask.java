@@ -84,7 +84,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int[] debugValidTrays;
 	
 	@Override
-	public IAP_RELEASE getVersionTag() {
+	public IAP_RELEASE getVersionTag() throws Exception {
 		return getImageProcessor().getVersionTag();
 	}
 	
@@ -659,7 +659,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	protected abstract boolean analyzeSideImages();
 	
-	protected abstract ImageProcessor getImageProcessor();
+	public abstract ImageProcessor getImageProcessor() throws Exception;
 	
 	private MyThread saveImage(
 			final int tray, final int tray_cnt,

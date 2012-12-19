@@ -31,7 +31,7 @@ public class PhytochamberAnalysisBlueRubberTask extends AbstractPhenotypingTask 
 	}
 	
 	@Override
-	protected ImageProcessor getImageProcessor() {
+	public ImageProcessor getImageProcessor() {
 		return new ArabidopsisAnalysisPipelineBlueSmallAndMiddle();
 	}
 	

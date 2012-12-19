@@ -114,8 +114,10 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			IniIoProvider iniIO,
 			String[] defaultBlockList) {
 		defaultBlockList = SystemOptions.getInstance(
-				StringManipulationTools.getFileSystemName(pipelineName)
-						+ ".pipeline.ini", iniIO).getStringAll(
+				pipelineName != null ?
+						StringManipulationTools.getFileSystemName(pipelineName) + ".pipeline.ini"
+						: null,
+				iniIO).getStringAll(
 				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + this.getClass().getCanonicalName(),
 				"block",
 				defaultBlockList);

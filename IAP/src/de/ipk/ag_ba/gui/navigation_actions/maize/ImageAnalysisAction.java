@@ -5,7 +5,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.ImageAnalysisPipelineTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 
 /**
  * @author klukas
@@ -30,7 +30,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new ImageAnalysisPipelineTask(
+		return new UserDefinedImageAnalysisPipelineTask(
 				pd != null ? pd.getName() : null,
 				pd != null ? pd.getIniIO() : null,
 				pd != null ? pd.getTooltip() : null);
@@ -60,7 +60,7 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	}
 	
 	@Override
-	public IAP_RELEASE getVersionTag() {
+	public IAP_RELEASE getVersionTag() throws Exception {
 		return getImageAnalysisTask().getVersionTag();
 	}
 	

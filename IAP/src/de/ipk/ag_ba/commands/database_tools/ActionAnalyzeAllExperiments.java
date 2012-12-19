@@ -16,11 +16,9 @@ import de.ipk.ag_ba.commands.analysis.ActionPhytochamberBlueRubberAnalysis;
 import de.ipk.ag_ba.commands.cloud_computing.AnalysisJob;
 import de.ipk.ag_ba.commands.cloud_computing.AnalysisStatus;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.maize.ImageAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.maize.MaizeAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_actions.roots.RootScannAnalysisAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -178,18 +176,20 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 		RemoteCapableAnalysisAction navigationAction = null;
 		System.out.println("Experiment-type: " + eh.getExperimentType() + ", experiment: " + eh.getExperimentName());
 		if (eh.getExperimentType() != null) {
-			if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
-				navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
-				navigationAction = new ImageAnalysisAction(PipelineDesc.getPipelineDefault(), m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.Raps + ""))
-				navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
-				navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
-				navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
-			if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
-				navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
+			if (false) {
+				if (eh.getExperimentType().equals(IAPexperimentTypes.RootWaterScan + ""))
+					navigationAction = new RootScannAnalysisAction(m, new ExperimentReference(eh));
+				// if (eh.getExperimentType().equals(IAPexperimentTypes.BarleyGreenhouse + ""))
+				// navigationAction = new ImageAnalysisAction(PipelineDesc.getPipelineDefault(), m, new ExperimentReference(eh));
+				if (eh.getExperimentType().equals(IAPexperimentTypes.Raps + ""))
+					navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
+				if (eh.getExperimentType().equals(IAPexperimentTypes.MaizeGreenhouse + ""))
+					navigationAction = new MaizeAnalysisAction(m, new ExperimentReference(eh));
+				if (eh.getExperimentType().equals(IAPexperimentTypes.Phytochamber + ""))
+					navigationAction = new ActionPhytochamberAnalysis(m, new ExperimentReference(eh));
+				if (eh.getExperimentType().equals(IAPexperimentTypes.PhytochamberBlueRubber + ""))
+					navigationAction = new ActionPhytochamberBlueRubberAnalysis(m, new ExperimentReference(eh));
+			}
 		}
 		
 		if (navigationAction != null) {
@@ -248,6 +248,6 @@ public class ActionAnalyzeAllExperiments extends AbstractNavigationAction implem
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Analyze " + n + " experiments";
+		return "Analyze " + n + " experiments (TODO ADAPT)";
 	}
 }

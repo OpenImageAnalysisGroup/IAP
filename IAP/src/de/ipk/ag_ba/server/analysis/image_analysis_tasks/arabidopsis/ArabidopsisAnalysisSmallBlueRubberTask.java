@@ -31,7 +31,7 @@ public class ArabidopsisAnalysisSmallBlueRubberTask extends AbstractPhenotypingT
 	}
 	
 	@Override
-	protected ImageProcessor getImageProcessor() {
+	public ImageProcessor getImageProcessor() {
 		return new ArabidopsisAnalysisPipelineBlueSmallAndMiddle();
 	}
 	
