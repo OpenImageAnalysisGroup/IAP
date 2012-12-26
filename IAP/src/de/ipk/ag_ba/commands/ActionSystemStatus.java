@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -125,16 +126,19 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 			resultNavigationButtons.add(new NavigationButton(new ActionBackupHistory("Show full backup history"), src.getGUIsetting()));
 		
 		BackgroundTaskStatusProviderSupportingExternalCall copyToHsmStatus = MassCopySupport.getInstance().getStatusProvider();
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		Runnable startActionMassCopy = new Runnable() {
 			@Override
 			public void run() {
-				final ThreadSafeOptions tso = new ThreadSafeOptions();
 				Thread t = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						try {
-							MassCopySupport.getInstance().performMassCopy(tso.getBval(0, false));
+							boolean mergeOnly = tso.getBval(0, false);
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Mass-Copy - only merge? " + mergeOnly + ", settings object: " +
+									tso);
 							tso.setBval(0, !tso.getBval(0, false));
+							MassCopySupport.getInstance().performMassCopy(mergeOnly);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 							MongoDB.saveSystemErrorMessage("Mass Copy Execution Error", e);
@@ -145,8 +149,8 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 			}
 		};
 		
-		if (MongoDB.getMongos().size() > 0) {
-			
+		if (MongoDB.getMongos().size() > 0 &&
+				SystemOptions.getInstance().getBoolean("LT-DB", "show_icon", false)) {
 			resultNavigationButtons.add(new NavigationButton(new ActionToggleSettingDefaultIsFalse(copyToHsmStatus,
 					startActionMassCopy,
 					"Enable or disable the automated copy of LT data sets to the MongoDB DBs",

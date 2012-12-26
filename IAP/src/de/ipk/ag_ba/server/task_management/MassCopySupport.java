@@ -2,7 +2,6 @@ package de.ipk.ag_ba.server.task_management;
 
 import info.StopWatch;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,8 +24,8 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -104,19 +103,20 @@ public class MassCopySupport {
 				print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
 			return;
 		}
-		massCopyRunning = true;
 		
-		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
-		if (!en)
+		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
+		if (!en) {
 			return;
+		}
+		massCopyRunning = true;
 		for (int i = 30; i >= 0; i--) {
 			status.setCurrentStatusText1("Countdown");
 			if (onlyMerge)
 				status.setCurrentStatusText2("Start result merge in " + i + " seconds...");
 			else
-				status.setCurrentStatusText2("Start sync in " + i + " seconds...");
+				status.setCurrentStatusText2("Start copy sync in " + i + " seconds...");
 			Thread.sleep(1000);
-			en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
+			en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
 			if (!en) {
 				massCopyRunning = false;
 				status.setCurrentStatusText1("Sync cancelled");
@@ -355,60 +355,57 @@ public class MassCopySupport {
 	public void scheduleMassCopy() {
 		if (scheduled)
 			return;
-		String hsmFolder = IAPmain.getHSMfolder();
-		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
-			if (en)
-				print("AUTOMATIC MASS COPY FROM LT TO MongoDB (" + hsmFolder + ") HAS BEEN SCHEDULED EVERY DAY AT 01:00");
-			else
-				print("Copy function is disabled");
-			
-			final ThreadSafeOptions lastExecutionTime = new ThreadSafeOptions();
-			
-			Timer t = new Timer("IAP 24h-Backup-Timer");
-			long period = 1000 * 60 * 15; // every 15 minutes
-			TimerTask tT = new TimerTask() {
-				@SuppressWarnings("deprecation")
-				@Override
-				public void run() {
-					try {
-						if (System.currentTimeMillis() - lastExecutionTime.getLong() < 60000)
-							return; // process timer call at most once per minute
-						lastExecutionTime.setLong(System.currentTimeMillis());
-						Thread.sleep(1000);
-						boolean onlyMerge = false;
-						if (new Date().getHours() != 1 || new Date().getMinutes() != 0)
-							onlyMerge = true;
-						boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
-						if (!en) {
-							if (!onlyMerge)
-								print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");
-							return;
-						}
-						
-						Thread.sleep(1000);
-						
-						performMassCopy(onlyMerge);
-					} catch (InterruptedException e) {
-						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
+		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
+		if (en)
+			print("Automaic Copy FROM LT TO MongoDB has ben scheduled according to execution time plan");
+		else
+			print("Copy function is disabled");
+		
+		final ThreadSafeOptions lastExecutionTime = new ThreadSafeOptions();
+		
+		Timer t = new Timer("IAP 15min-Copy-Check-Timer");
+		long period = 1000 * 60 * 15; // every 15 minutes
+		TimerTask tT = new TimerTask() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				try {
+					if (System.currentTimeMillis() - lastExecutionTime.getLong() < 60000)
+						return; // process timer call at most once per minute
+					lastExecutionTime.setLong(System.currentTimeMillis());
+					Thread.sleep(1000);
+					boolean onlyMerge = false;
+					int startHour =
+							IAPoptions.getInstance().getInteger("Watch-Service", "Automatic Copy//starttime_h", 1);
+					if (new Date().getHours() != startHour || new Date().getMinutes() != 0)
+						onlyMerge = true;
+					boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
+					if (!en) {
+						if (!onlyMerge)
+							print("SCHEDULED MASS COPY IS NOT PERFORMED, AS IT IS CURRENTLY DISABLED. WILL BE RE-CHECKED TOMORROW AT 01:00");
+						return;
 					}
+					
+					Thread.sleep(1000);
+					
+					performMassCopy(onlyMerge);
+				} catch (InterruptedException e) {
+					print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
 				}
-			};
-			
-			Date now = new Date();
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(now);
-			cal.add(Calendar.MINUTE, 15 - (cal.get(Calendar.MINUTE) % 15));
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			Date next_15_30_45_60 = cal.getTime();
-			
-			Date startTime = next_15_30_45_60;
-			t.scheduleAtFixedRate(tT, startTime, period);
-			scheduled = true;
-		} else {
-			print("WARNING: NO AUTOMATIC MASS COPY SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
-		}
+			}
+		};
+		
+		Date now = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(now);
+		cal.add(Calendar.MINUTE, 15 - (cal.get(Calendar.MINUTE) % 15));
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		Date next_15_30_45_60 = cal.getTime();
+		
+		Date startTime = next_15_30_45_60;
+		t.scheduleAtFixedRate(tT, startTime, period);
+		scheduled = true;
 	}
 	
 	public String getHistory(int maxLines, String pre, final String preLine, String lineBreak, String follow) {
