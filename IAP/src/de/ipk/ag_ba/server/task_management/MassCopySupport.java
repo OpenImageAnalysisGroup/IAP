@@ -237,7 +237,7 @@ public class MassCopySupport {
 			}
 		}
 		
-		boolean useOnlyMainDatabase = true;
+		boolean useOnlyMainDatabase = false;
 		ArrayList<MongoDB> checkM;
 		if (useOnlyMainDatabase) {
 			checkM = new ArrayList<MongoDB>();
@@ -302,7 +302,7 @@ public class MassCopySupport {
 		status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
 		int done = 0;
 		for (final IdTime it : toSave) {
-			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("GRID-STORAGE|auto_daily_fetch");
+			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
 			if (!en)
 				continue;
 			status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
