@@ -318,7 +318,7 @@ public class MassCopySupport {
 			print("Copy " + it.Id + " to " + m.getDatabaseName());
 			ExperimentReference er = new ExperimentReference(src);
 			ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ")<br>");
+			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ") to " + m.getDatabaseName() + "<br>");
 			copyAction.setStatusProvider(status);
 			boolean simulate = false;
 			if (!simulate)
