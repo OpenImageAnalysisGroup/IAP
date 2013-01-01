@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 
@@ -52,7 +53,35 @@ public class ActionMongoFileStorageCommands extends AbstractNavigationAction {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (VirtualFileSystem vfs : fsl) {
 			if (vfs instanceof VirtualFileSystemVFS2) {
-				VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) vfs;
+				final VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) vfs;
+				NavigationAction a = new AbstractNavigationAction("Move data to " + v2.getTargetName() + " (click to select amount to be moved)") {
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						// empty
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Move data to " + v2.getTargetName() + " ...";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/Gnome-Document-Send-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 10), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 50), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 250), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 500), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, -1), src.getGUIsetting()));
+						return result;
+					}
+				};
+				result.add(new NavigationButton(a, src.getGUIsetting()));
 			}
 			// move files from MongoDB GridFS to this location
 			// move from this location to MongoDB GridFS
@@ -60,5 +89,4 @@ public class ActionMongoFileStorageCommands extends AbstractNavigationAction {
 		}
 		return result;
 	}
-	
 }
