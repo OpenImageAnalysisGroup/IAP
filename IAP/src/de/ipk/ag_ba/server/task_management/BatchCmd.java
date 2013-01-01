@@ -55,7 +55,7 @@ public class BatchCmd extends BasicDBObject {
 	}
 	
 	public static void enqueueBatchCmd(MongoDB m, BatchCmd cmd) throws Exception {
-		m.batchEnqueue(cmd);
+		m.batch().enqueue(cmd);
 	}
 	
 	public String getRemoteCapableAnalysisActionClassName() {
@@ -98,12 +98,12 @@ public class BatchCmd extends BasicDBObject {
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
 			
 			if (statusProvider.getCurrentStatusValue() < 100) {
-				BatchCmd bcmd = m.batchGetCommand(this);
+				BatchCmd bcmd = m.batch().getCommand(this);
 				if (bcmd == null)
 					statusProvider.pleaseStop();
 			}
 		}
-		if (m.batchClaim(this, status, true)) {
+		if (m.batch().claim(this, status, true)) {
 			setRunStatus(status);
 			return true;
 		}

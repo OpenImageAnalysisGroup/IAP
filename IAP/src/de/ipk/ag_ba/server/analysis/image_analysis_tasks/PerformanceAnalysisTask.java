@@ -22,7 +22,6 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
@@ -72,12 +71,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status) {
 		synchronized (errors) {
 			errors.clear();
-			try {
-				LemnaTecFTPhandler.useCachedCloudDataIfAvailable = false;
-				performAnalysisIC(maximumThreadCountParallelImages, status);
-			} finally {
-				LemnaTecFTPhandler.useCachedCloudDataIfAvailable = true;
-			}
+			performAnalysisIC(maximumThreadCountParallelImages, status);
 			try {
 				errors.write(ReleaseInfo.getAppFolderWithFinalSep() + "performance_test_" + System.currentTimeMillis() + ".txt");
 			} catch (IOException e) {

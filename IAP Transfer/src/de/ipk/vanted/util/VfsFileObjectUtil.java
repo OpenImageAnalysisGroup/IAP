@@ -2,7 +2,6 @@ package de.ipk.vanted.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.VFS;
@@ -15,16 +14,6 @@ import de.ipk.vanted.plugin.VfsFileObjectImpl;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class VfsFileObjectUtil {
-	private static FileSystemManager fsm = null;
-	
-	// create a FileSystemManager object while loading this class
-	static {
-		try {
-			fsm = VFS.getManager();
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath) throws Exception {
@@ -39,7 +28,7 @@ public class VfsFileObjectUtil {
 				username, password, null);
 	}
 	
-	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
+	public synchronized static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath, String username, String password,
 			Integer port) throws Exception {
 		if (StringUtils.isBlank(host) && protocol != VfsFileProtocol.LOCAL) {
@@ -93,6 +82,7 @@ public class VfsFileObjectUtil {
 			DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(
 					opts, auth);
 		}
+		FileSystemManager fsm = VFS.getManager();
 		FileObject fo = fsm.resolveFile(con, opts);
 		VfsFileObject vfsFileObj = new VfsFileObjectImpl(fo);
 		return vfsFileObj;

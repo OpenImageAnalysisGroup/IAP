@@ -51,7 +51,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			@Override
 			public String getCurrentStatusMessage1() {
 				try {
-					ArrayList<CloudHost> hl = m.batchGetAvailableHosts(5 * 60 * 1000);
+					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
 					int tasksWithinLastMinute = 0;
 					int pipelinesPerHour = 0;
@@ -211,7 +211,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		ArrayList<CloudHost> hl;
 		try {
-			hl = m.batchGetAvailableHosts(5 * 60 * 1000);
+			hl = m.batch().getAvailableHosts(5 * 60 * 1000);
 			for (CloudHost ip : hl) {
 				if (ip.isClusterExecutionMode()) {
 					NavigationButton n = new NavigationButton(new ActionCloudHostInformation(m, ip), src.getGUIsetting());

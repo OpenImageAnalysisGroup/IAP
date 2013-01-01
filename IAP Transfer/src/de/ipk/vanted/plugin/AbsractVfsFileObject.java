@@ -12,73 +12,73 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	
 	@Override
 	public boolean delete() throws IOException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public void download(VfsFileObject localFile) throws IOException {
-		
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean exists() throws IOException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public InputStream getInputStream() throws IOException {
-		return null;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public OutputStream getOutputStream() throws IOException {
-		return null;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean isDirectory() throws FileSystemException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean isFile() throws FileSystemException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean isReadable() throws FileSystemException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean isWriteable() throws FileSystemException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public long length() {
-		return -1;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public String[] list() throws IOException {
-		return null;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public boolean mkdir() throws IOException {
-		return false;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public void renameTo(VfsFileObject target, boolean overWrite)
 			throws IOException {
-		
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public void upload(VfsFileObject remoteFile) throws IOException {
-		
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
@@ -88,11 +88,11 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	
 	@Override
 	public URL getURL() throws IOException {
-		return null;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 	
 	@Override
 	public FileObject getFile() {
-		return null;
+		throw new UnsupportedOperationException("Not implemented!");
 	}
 }

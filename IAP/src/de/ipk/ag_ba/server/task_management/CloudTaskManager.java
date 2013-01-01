@@ -109,7 +109,7 @@ public class CloudTaskManager {
 						MongoDB.saveSystemErrorMessage("Error processing running tasks.", e);
 					}
 					
-					m.batchPingHost(hostName,
+					m.batch().pingHost(hostName,
 							BlockPipeline.getBlockExecutionsWithinLastMinute(),
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
@@ -138,7 +138,7 @@ public class CloudTaskManager {
 					if (!fixedDisableProcess && cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
-						for (BatchCmd batch : m.batchGetWorkTasksScheduledForStart(maxTasks - cpuDesire)) {
+						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
 							if (header != null) {
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);

@@ -2,6 +2,7 @@ package de.ipk.ag_ba.commands.vfs;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
@@ -23,7 +24,7 @@ public abstract class VirtualFileSystem {
 	
 	private static LinkedHashSet<VirtualFileSystem> knownFileSystems = new LinkedHashSet<VirtualFileSystem>();
 	
-	public static ArrayList<VirtualFileSystem> getKnown() {
+	public static ArrayList<VirtualFileSystem> getKnown(boolean excludeNonUserItems) {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>(knownFileSystems);
 		
 		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", false);
@@ -56,81 +57,36 @@ public abstract class VirtualFileSystem {
 			String pass = SystemOptions.getInstance().getString("VFS-" + idx, "password", idx < 2 ? "null" : "");
 			String dir = SystemOptions.getInstance().getString("VFS-" + idx, "directory",
 					idx < 2 ? ReleaseInfo.getDesktopFolder() + File.separator + "IAP" : "#/subdir");
-			VirtualFileSystemVFS2 v = new VirtualFileSystemVFS2(url_prefix, vfs_type, desc, protocol_desc, host, user, pass, dir);
-			if (en && enabled && idx <= realN)
-				res.add(v);
+			boolean useForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Store Mongo-DB files", false);
+			boolean useOnlyForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Use only for Mongo-DB storage", false);
+			String useForMongoFileStorageCloudName = SystemOptions.getInstance().getString("VFS-" + idx, "Mongo-DB database name", "");
+			VirtualFileSystemVFS2 v = new VirtualFileSystemVFS2(
+					url_prefix, vfs_type,
+					desc, protocol_desc,
+					host,
+					user, pass,
+					dir,
+					useForMongoFileStorage,
+					useOnlyForMongoFileStorage,
+					useForMongoFileStorageCloudName);
+			if (excludeNonUserItems && useOnlyForMongoFileStorage) {
+				// don't add such item to the result
+			} else
+				if (en && enabled && idx <= realN)
+					res.add(v);
 		}
-		// res.add(new VirtualFileSystemFolderStorage(
-		// "file-desktop",
-		// "File I/O",
-		// "Desktop" + File.separator + "VFS",
-		// ReleaseInfo.getDesktopFolder() + File.separator + "VFS"));
 		
-		// res.add(new VirtualFileSystemVFS2(
-		// "zhejiang-sftp",
-		// VfsFileProtocol.SFTP,
-		// "Zhejiang SFTP",
-		// "SFTP",
-		// "10.71.115.165",
-		// "chendijun",
-		// "chendijun",
-		// "/ipk_test"
-		// ));
-		//
-		// res.add(new VirtualFileSystemVFS2(
-		// "localhost-sftp",
-		// VfsFileProtocol.SFTP,
-		// "Localhost SFTP",
-		// "SFTP",
-		// "localhost",
-		// "ssh",
-		// "ssh",
-		// "/VFS"
-		// ));
-		
-		// res.add(new VirtualFileSystemVFS2(
-		// "desktop-vfs",
-		// VfsFileProtocol.LOCAL,
-		// "Desktop/VFS",
-		// "File I/O",
-		// "",
-		// null,
-		// null,
-		// ReleaseInfo.getDesktopFolder() + File.separator + "VFS"
-		// ));
-		
-		// VirtualFileSystem vfsUdpInbox = new VirtualFileSystemFolderStorage(
-		// "udp-in",
-		// "Network UDP Receiver",
-		// "Desktop" + File.separator + "UDP" + File.separator + "Inbox",
-		// ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Inbox");
-		// vfsUdpInbox.setIcon(IAPimages.getWLAN());
-		//
-		// // VirtualFileSystem vfsUdpOutbox = new VirtualFileSystemUdp(
-		// // "udp-out",
-		// // "Network UDP Broadcaster",
-		// // "Desktop" + File.separator + "UDP" + File.separator + "Outbox",
-		// // ReleaseInfo.getDesktopFolder() + File.separator + "UDP" + File.separator + "Outbox");
-		// // res.add(vfsUdpOutbox);
-		//
-		// ActionToggleSettingDefaultIsFalse toggleUdpReceive = new ActionToggleSettingDefaultIsFalse(
-		// null, null,
-		// "Enable receiving of experiment data by opening a UDP port",
-		// "Receive Experiments (UDP)",
-		// TabAglet.ENABLE_BROADCAST_SETTING);
-		// vfsUdpInbox.addNavigationAction(toggleUdpReceive);
-		// res.add(vfsUdpInbox);
 		return res;
 	}
 	
-	private void setIcon(String icon) {
+	public void setIcon(String icon) {
 		this.desiredIcon = icon;
 	}
 	
 	private final ArrayList<NavigationAction> additionalNavigationActions = new ArrayList<NavigationAction>();
 	private String desiredIcon = null;
 	
-	private void addNavigationAction(ActionToggleSettingDefaultIsFalse navAction) {
+	public void addNavigationAction(ActionToggleSettingDefaultIsFalse navAction) {
 		additionalNavigationActions.add(navAction);
 	}
 	
@@ -148,8 +104,9 @@ public abstract class VirtualFileSystem {
 	
 	/**
 	 * @return List of file names found at root of VFS source
+	 * @throws Exception
 	 */
-	public abstract ArrayList<String> listFiles(String optSubDirectory);
+	public abstract ArrayList<String> listFiles(String optSubDirectory) throws Exception;
 	
 	public abstract IOurl getIOurlFor(String fileName);
 	
@@ -160,7 +117,7 @@ public abstract class VirtualFileSystem {
 		a.performActionCalculateResults(null);
 	}
 	
-	public String[] listFiles(String subdirectory, FilenameFilter optFilenameFilter) {
+	public String[] listFiles(String subdirectory, FilenameFilter optFilenameFilter) throws Exception {
 		ArrayList<String> files = new ArrayList<String>();
 		for (String s : listFiles(subdirectory)) {
 			if (optFilenameFilter == null || optFilenameFilter.accept(null, s))
@@ -185,4 +142,10 @@ public abstract class VirtualFileSystem {
 	public String toString() {
 		return getTargetName();
 	}
+	
+	public abstract InputStream getInputStream(IOurl url) throws Exception;
+	
+	public abstract InputStream getPreviewInputStream(IOurl url) throws Exception;
+	
+	public abstract long getFileLength(IOurl url) throws Exception;
 }

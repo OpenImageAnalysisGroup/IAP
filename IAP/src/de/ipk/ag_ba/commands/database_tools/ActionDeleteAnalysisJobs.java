@@ -64,7 +64,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		deleted = 0;
 		deletedTempDatasets = 0;
-		deleted = m.batchClearJobs();
+		deleted = m.batch().deleteAll();
 		
 		for (ExperimentHeaderInterface ei : m.getExperimentList(null)) {
 			if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {

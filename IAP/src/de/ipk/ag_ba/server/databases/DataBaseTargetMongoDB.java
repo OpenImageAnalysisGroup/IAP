@@ -16,6 +16,7 @@ import com.mongodb.DB;
 
 import de.ipk.ag_ba.mongo.CollectionStorage;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
+import de.ipk.ag_ba.mongo.ExperimentSaver;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -44,13 +45,17 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			return null;
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		m.processDB(new RunnableOnDB() {
+			
 			private DB db;
 			
 			@Override
 			public void run() {
 				try {
 					CollectionStorage cols = new CollectionStorage(db, MongoDB.ensureIndex);
-					DatabaseStorageResult dsr = m.saveImageFile(cols, db, limg, null, keepRemoteURLs_safe_space).get();
+					DatabaseStorageResult dsr =
+							ExperimentSaver.saveImageFileDirect(
+									cols, db, limg, null,
+									keepRemoteURLs_safe_space, m.getMongoHandler(), m.getHashType(), m);
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);
@@ -62,6 +67,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 				this.db = db;
 			}
 		});
+		
 		if (tso.getParam(1, null) != null)
 			throw (Exception) tso.getParam(1, null);
 		DatabaseStorageResult dsr = (DatabaseStorageResult) tso.getParam(0, DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG);
@@ -90,7 +96,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			
 			@Override
 			public void run() {
-				m.saveVolumeFile(db, volume, null, optStatus);
+				ExperimentSaver.saveVolumeFile(db, volume, null, optStatus, m.getHashType());
 			}
 			
 			@Override

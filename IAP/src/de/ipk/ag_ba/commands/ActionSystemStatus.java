@@ -86,7 +86,7 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 			ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
 			for (MongoDB m : MongoDB.getMongos()) {
 				try {
-					m.batchGetWorkTasksScheduledForStart(0);
+					m.batch().getScheduledForStart(0);
 					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m, true);
 					try {
 						cmna.performActionCalculateResults(src);

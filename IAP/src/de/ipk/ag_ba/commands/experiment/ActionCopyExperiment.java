@@ -49,7 +49,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 		ml = MongoDB.getMongos();
 		this.addUDPcopy = new SettingsHelperDefaultIsFalse().isEnabled(TabAglet.ENABLE_BROADCAST_SETTING);
 		this.addHSMcopy = new SettingsHelperDefaultIsTrue().isEnabled("ARCHIVE|enabled");
-		this.vl = VirtualFileSystemFolderStorage.getKnown();
+		this.vl = VirtualFileSystemFolderStorage.getKnown(true);
 	}
 	
 	@Override

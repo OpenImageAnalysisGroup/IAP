@@ -24,6 +24,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoDbCompact;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -98,6 +99,10 @@ public class MassCopySupport {
 	}
 	
 	public void performMassCopy(boolean onlyMerge) throws InterruptedException {
+		if (ActionMongoDbCompact.compactOperationRunning) {
+			if (!onlyMerge)
+				print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE DB COMPACT OPERATION IS STILL RUNNING");
+		}
 		if (massCopyRunning) {
 			if (!onlyMerge)
 				print("INFO: MASS COPY PROCEDURE IS SKIPPED, BECAUSE PREVIOUS MASS COPY OPERATION IS STILL RUNNING");
@@ -172,7 +177,7 @@ public class MassCopySupport {
 						MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
 					}
 					
-					if (m.batchGetAllCommands().size() == 0 && !onlyMerge) {
+					if (m.batch().getAll().size() == 0 && !onlyMerge) {
 						// on Saturday, if no analysis is running and no analysis has been scheduled,
 						// the database clean-up is called
 						if (new Date().getDay() == 6) {
@@ -190,7 +195,7 @@ public class MassCopySupport {
 							status.setCurrentStatusText2("Schedule analysis tasks for new data");
 							all.setStatusProvider(getStatusProvider());
 							all.performActionCalculateResults(null);
-							int nn = m.batchGetAllCommands().size();
+							int nn = m.batch().getAll().size();
 							if (nn == 0)
 								status.setCurrentStatusText2("All analyis results are up-to-date");
 							else

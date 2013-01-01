@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.ErrorMsg;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -88,11 +87,11 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			public String getCurrentStatusMessage1() {
 				CloudHost ch;
 				try {
-					ch = m.batchGetUpdatedHostInfo(ip);
+					ch = m.batch().getUpdatedHostInfo(ip);
 					if (ch != null) {
 						ActionCloudHostInformation.this.ip = ch;
 						lastStatus = ch.getTaskProgress();
-						hostInfo = "";// ch.getHostInfo();
+						hostInfo = ch.getHostInfo();
 						status3 = ch.getStatus3();
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
@@ -226,7 +225,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		try {
-			for (BatchCmd b : m.batchGetAllCommands()) {
+			for (BatchCmd b : m.batch().getAll()) {
 				if (b.getOwner() != null && b.getOwner().equals(ip.getHostName())) {
 					NavigationButton n;
 					n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
@@ -236,7 +235,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 				}
 			}
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
+			MongoDB.saveSystemErrorMessage("CloudHostInformation Error", e);
 		}
 		return res;
 	}

@@ -43,6 +43,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
+import de.ipk.ag_ba.mongo.ExperimentSaver;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
@@ -147,7 +148,7 @@ public class DataExchangeHelperForExperiments {
 						hash = GravistoService.getHashFromFile(file,
 								m.getHashType());
 						GridFS gridfs_annotation = new GridFS(db, "annotations");
-						m.saveAnnotationFile(gridfs_annotation, hash, file);
+						ExperimentSaver.saveAnnotationFile(gridfs_annotation, hash, file);
 						// GridFS gridfs_images = new GridFS(db, "images");
 						GridFSDBFile fff = gridfs_annotation.findOne(hash);
 						if (fff != null) {
@@ -158,7 +159,7 @@ public class DataExchangeHelperForExperiments {
 							return;
 						} else {
 							try {
-								m.saveAnnotationFile(gridfs_annotation, hash,
+								ExperimentSaver.saveAnnotationFile(gridfs_annotation, hash,
 										file);
 								tso.setParam(0,
 										DatabaseStorageResult.STORED_IN_DB);

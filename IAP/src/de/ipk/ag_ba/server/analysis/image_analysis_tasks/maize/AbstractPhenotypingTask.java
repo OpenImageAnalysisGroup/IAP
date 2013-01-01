@@ -99,7 +99,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.m = m;
 		databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
 		if (databaseTarget == null) {
-			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown();
+			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown(true);
 			ArrayList<VirtualFileSystem> remove = new ArrayList<VirtualFileSystem>();
 			for (VirtualFileSystem v : vl) {
 				boolean ok = false;
@@ -206,15 +206,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 			int progress = 0;
-			BackgroundTaskHelper.issueSimpleTask("Download Images (Caching)", "", new Runnable() {
-				@Override
-				public void run() {
-					for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
-						if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-							DownloadCache.getInstance().downloadSnapshots(plantID, workload_imageSetsWithSpecificAngles.values());
-					}
-				}
-			}, null);
+			
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
@@ -252,9 +244,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			maxCon.acquire(nn);
 			maxCon.release(nn);
-			for (String plantID : workload_imageSetsWithSpecificAngles.keySet())
-				if (SystemOptions.getInstance().getBoolean("IAP", "use local file cache", true))
-					DownloadCache.getInstance().finished(plantID);
 		} finally {
 			maxInst.release();
 		}
