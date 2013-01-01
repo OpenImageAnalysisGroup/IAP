@@ -59,7 +59,7 @@ public class FileSystemAccess {
 	}
 	
 	public static Collection<PathwayWebLinkItem> getWebDirectoryFileListItems(VirtualFileSystem webAddress,
-			String[] validExtensions, boolean showGraphExtensions) throws IOException {
+			String[] validExtensions, boolean showGraphExtensions) throws Exception {
 		ArrayList<PathwayWebLinkItem> result = new ArrayList<PathwayWebLinkItem>();
 		
 		// Create a URL for the desired page

@@ -95,7 +95,7 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", false);
 		if (vfs) {
 			// add VFS entries
-			for (VirtualFileSystem entry : VirtualFileSystem.getKnown()) {
+			for (VirtualFileSystem entry : VirtualFileSystem.getKnown(true)) {
 				Library lib = new Library();
 				String ico = IAPimages.getFolderRemoteClosed();
 				String ico2 = IAPimages.getFolderRemoteOpen();

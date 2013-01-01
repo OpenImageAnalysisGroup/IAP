@@ -15,7 +15,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -147,7 +146,7 @@ public class TaskDescription {
 								experiment.getHeader().getRemark());
 				// System.out.println("Received result: " + experiment.getName());
 				try {
-					BatchCmd bcmd = m.batchGetCommand(batch);
+					BatchCmd bcmd = m.batch().getCommand(batch);
 					if (bcmd != null)
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
@@ -156,10 +155,10 @@ public class TaskDescription {
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has completed analysis and saving of " + experiment.getName());
-							m.batchClaim(bcmd, CloudAnalysisStatus.FINISHED, false);
+							m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED, false);
 							boolean deleteCompletedJobs = true;
 							if (deleteCompletedJobs)
-								m.batchDeleteJob(batch);
+								m.batch().delete(batch);
 						} else {
 							MongoDB.saveSystemMessage("INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has been claimed by " + bcmd.getOwner()
@@ -170,8 +169,8 @@ public class TaskDescription {
 						}
 					finishedComplete = true;
 				} catch (Exception e) {
-					BatchCmd bcmd = m.batchGetCommand(batch);
-					m.batchClaim(bcmd, CloudAnalysisStatus.FINISHED_INCOMPLETE, false);
+					BatchCmd bcmd = m.batch().getCommand(batch);
+					m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED_INCOMPLETE, false);
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 					MongoDB.saveSystemErrorMessage("Could not merge result data set.", e);
 					ErrorMsg.addErrorMessage(e);

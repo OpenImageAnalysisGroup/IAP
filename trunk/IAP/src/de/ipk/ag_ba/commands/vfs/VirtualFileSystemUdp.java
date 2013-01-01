@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.vfs;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.SystemAnalysis;
@@ -71,7 +72,23 @@ public class VirtualFileSystemUdp extends VirtualFileSystem {
 		return FileSystemHandler.getURL(new File(path + File.separator + fileName));
 	}
 	
+	@Override
 	public String getDesiredIcon() {
 		return "img/ext/gpl2/Gnome-Network-Wireless-64.png";
+	}
+	
+	@Override
+	public InputStream getInputStream(IOurl url) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
+	@Override
+	public InputStream getPreviewInputStream(IOurl url) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
+	@Override
+	public long getFileLength(IOurl url) {
+		throw new UnsupportedOperationException("Not implemented");
 	}
 }

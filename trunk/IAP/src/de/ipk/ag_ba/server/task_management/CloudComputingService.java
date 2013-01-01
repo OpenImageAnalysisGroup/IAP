@@ -171,7 +171,7 @@ public class CloudComputingService {
 									if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 										try {
 											for (MongoDB m : MongoDB.getMongos()) {
-												m.batchClearJobs();
+												m.batch().deleteAll();
 												System.out.println(":clear - cleared scheduled jobs in database " + m.getDatabaseName());
 											}
 											return;
@@ -187,7 +187,7 @@ public class CloudComputingService {
 											if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 												{
 													System.out.println(SystemAnalysis.getCurrentTime()
-																+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
+															+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
 													for (MongoDB m : MongoDB.getMongos()) {
 														CloudComputingService cc = CloudComputingService.getInstance(m);
 														cc.setEnableCalculations(false);
@@ -231,9 +231,9 @@ public class CloudComputingService {
 															System.out.println("   'back'    - perform LemnaTec to HSM backup now");
 															System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
 															System.out
-																		.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
+																	.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
 															System.out
-																		.println("   'watch-cmd' - same as watch, but auto-closing at 2 AM in the morning (for scripted execution)");
+																	.println("   'watch-cmd' - same as watch, but auto-closing at 2 AM in the morning (for scripted execution)");
 														}
 													}
 								}

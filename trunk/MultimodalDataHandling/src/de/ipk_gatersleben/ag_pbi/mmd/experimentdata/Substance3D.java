@@ -198,6 +198,15 @@ public class Substance3D extends Substance {
 		return getAllFiles(mds, null);
 	}
 	
+	public static int countMeasurementValues(ExperimentInterface experiment,
+			MeasurementNodeType[] measurementNodeTypes) {
+		int res = 0;
+		for (MeasurementNodeType m : measurementNodeTypes) {
+			res += getAllFiles(experiment, m).size();
+		}
+		return res;
+	}
+	
 	public static List<NumericMeasurementInterface> getAllFiles(
 			ExperimentInterface mds, MeasurementNodeType type) {
 		List<NumericMeasurementInterface> list = new ArrayList<NumericMeasurementInterface>();

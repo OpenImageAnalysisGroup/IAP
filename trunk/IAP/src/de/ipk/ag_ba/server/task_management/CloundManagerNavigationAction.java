@@ -69,7 +69,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			ArrayList<CloudHost> hl = m.batchGetAvailableHosts(3 * 60 * 1000);
+			ArrayList<CloudHost> hl = m.batch().getAvailableHosts(3 * 60 * 1000);
 			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
 				if (!ip.isClusterExecutionMode()) {

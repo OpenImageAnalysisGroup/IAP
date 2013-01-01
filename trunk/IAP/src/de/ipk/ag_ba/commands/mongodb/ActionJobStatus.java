@@ -64,7 +64,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				Long firstSubmission = null;
 				try {
 					sss.clear();
-					for (BatchCmd b : ActionJobStatus.this.m.batchGetAllCommands()) {
+					for (BatchCmd b : ActionJobStatus.this.m.batch().getAll()) {
 						String jid = b.getString("_id");
 						// System.out.println(b.getRunStatus());
 						if (jid != null && b.getRunStatus() != CloudAnalysisStatus.FINISHED)
@@ -238,7 +238,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		try {
-			for (BatchCmd b : m.batchGetAllCommands()) {
+			for (BatchCmd b : m.batch().getAll()) {
 				NavigationButton n;
 				n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
 				n.setProcessing(true);

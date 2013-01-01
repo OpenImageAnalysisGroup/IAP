@@ -32,6 +32,8 @@ public class ActionMongoDbCompact extends AbstractNavigationAction implements Na
 	String result = "Internal Error";
 	private static boolean started = false;
 	
+	public static boolean compactOperationRunning;
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
@@ -49,7 +51,12 @@ public class ActionMongoDbCompact extends AbstractNavigationAction implements Na
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		started = true;
-		result = m.compact(status);
+		ActionMongoDbCompact.compactOperationRunning = true;
+		try {
+			result = m.compact(status);
+		} finally {
+			ActionMongoDbCompact.compactOperationRunning = false;
+		}
 	}
 	
 	@Override

@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.commands.vfs;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -21,6 +21,9 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	private final String pass;
 	private final String folder;
 	private final String prefix;
+	private final boolean useForMongoFileStorage;
+	private final boolean useOnlyForMongoFileStorage;
+	private final String useForMongoFileStorageCloudName;
 	
 	public VirtualFileSystemVFS2(
 			String prefix,
@@ -30,7 +33,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 			String host,
 			String user,
 			String pass,
-			String folder) {
+			String folder,
+			boolean useForMongoFileStorage,
+			boolean useOnlyForMongoFileStorage,
+			String useForMongoFileStorageCloudName) {
 		this.prefix = prefix;
 		this.vfs_type = vfs_type;
 		this.description = description;
@@ -39,9 +45,13 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		this.user = user;
 		this.pass = pass;
 		this.folder = folder;
+		this.useForMongoFileStorage = useForMongoFileStorage;
+		this.useOnlyForMongoFileStorage = useOnlyForMongoFileStorage;
+		this.useForMongoFileStorageCloudName = useForMongoFileStorageCloudName;
 		if (this.vfs_type == VfsFileProtocol.LOCAL) {
 			ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
-		}
+		} else
+			ResourceIOManager.registerIOHandler(new VirtualFileSystemHandler(this));
 	}
 	
 	@Override
@@ -65,45 +75,40 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	}
 	
 	@Override
-	public ArrayList<String> listFiles(String optSubDirectory) {
-		try {
-			String path = folder;
-			if (optSubDirectory != null)
-				path = path + "/" + optSubDirectory;
-			
-			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
-					host, path, user, pass);
-			if (!file.exists()) {
-				System.out.println(">>>>>> create directory " + path);
-				file.mkdir();
-			}
-			ArrayList<String> res = new ArrayList<String>();
-			for (String s : file.list()) {
-				res.add(s);
-			}
-			return res;
-		} catch (Exception e) {
-			throw new UnsupportedOperationException(e);
+	public ArrayList<String> listFiles(String optSubDirectory) throws Exception {
+		String path = folder;
+		if (optSubDirectory != null)
+			path = path + "/" + optSubDirectory;
+		
+		VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
+				host, path, user, pass);
+		if (!file.exists()) {
+			System.out.println(">>>>>> create directory " + path);
+			file.mkdir();
 		}
+		ArrayList<String> res = new ArrayList<String>();
+		for (String s : file.list()) {
+			res.add(s);
+		}
+		return res;
 	}
 	
 	@Override
-	public IOurl getIOurlFor(String fileName) {
+	public IOurl getIOurlFor(String fileNameInclSubFolderPathName) {
 		try {
-			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
-					host, folder + "/" + fileName, user, pass);
-			File tempFile = File.createTempFile("iap_vfs", ".tmp");
+			return new IOurl(prefix, folder, fileNameInclSubFolderPathName);
 			
-			String tmpFolder = tempFile.getParent();
-			String tempFileName = tempFile.getName();
+			// VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
+			// host, folder + "/" + fileName, user, pass);
+			// File tempFile = File.createTempFile("iap_vfs", ".tmp");
+			// String tmpFolder = tempFile.getParent();
+			// String tempFileName = tempFile.getName();
+			// VfsFileObject to = VfsFileObjectUtil.createVfsFileObject(
+			// VfsFileProtocol.LOCAL, tmpFolder,
+			// tempFileName);
+			// file.download(to);
+			// FileSystemHandler.getURL(tempFile);
 			
-			VfsFileObject to = VfsFileObjectUtil.createVfsFileObject(
-					VfsFileProtocol.LOCAL, tmpFolder,
-					tempFileName);
-			
-			file.download(to);
-			
-			return FileSystemHandler.getURL(tempFile);
 		} catch (Exception e) {
 			throw new UnsupportedOperationException(e);
 		}
@@ -112,11 +117,59 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	public VfsFileObject newVfsFile(String fileNameInclSubFolderPathName) throws Exception {
 		return VfsFileObjectUtil.createVfsFileObject(
 				vfs_type, host,
-				fileNameInclSubFolderPathName, user, pass);
+				folder + "/" + fileNameInclSubFolderPathName, user, pass);
 	}
 	
 	public VfsFileProtocol getProtocolType() {
 		return vfs_type;
 	}
 	
+	public boolean isUseForMongoFileStorage() {
+		return useForMongoFileStorage;
+	}
+	
+	public boolean isUseOnlyForMongoFileStorage() {
+		return useOnlyForMongoFileStorage;
+	}
+	
+	public String getUseForMongoFileStorageCloudName() {
+		return useForMongoFileStorageCloudName;
+	}
+	
+	public long saveStream(String fileNameInclSubFolderPathName, InputStream is) throws Exception {
+		VfsFileObject file = newVfsFile(fileNameInclSubFolderPathName);
+		return ResourceIOManager.copyContent(is, file.getOutputStream());
+	}
+	
+	@Override
+	public InputStream getInputStream(IOurl url) throws Exception {
+		VfsFileObject file = newVfsFile(url.getFileName());
+		if (file == null)
+			return null;
+		if (!file.exists())
+			return null;
+		InputStream is = file.getInputStream();
+		return is;
+	}
+	
+	@Override
+	public InputStream getPreviewInputStream(IOurl url) throws Exception {
+		VfsFileObject file = newVfsFile(url.getFileName());
+		if (file == null)
+			return null;
+		if (!file.exists())
+			return null;
+		InputStream is = file.getInputStream();
+		return is;
+	}
+	
+	@Override
+	public long getFileLength(IOurl url) throws Exception {
+		VfsFileObject file = newVfsFile(url.getFileName());
+		return file.length();
+	}
+	
+	public int countFiles(String optSubDirectory) throws Exception {
+		return listFiles(optSubDirectory).size();
+	}
 }

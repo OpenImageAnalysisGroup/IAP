@@ -951,21 +951,22 @@ public class GravistoService implements HelperClass {
 			return new ImageIcon(url);
 	}
 	
-	private static HashMap<String, ImageIcon> cachedIcons = new HashMap<String, ImageIcon>();
+	private static HashMap<String, BufferedImage> cachedIcons = new HashMap<String, BufferedImage>();
 	
 	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {
 		String id = class1.getCanonicalName() + ";" + name + ";" + w + ";" + h;
-		if (cachedIcons.containsKey(id) && cachedIcons.get(id) != null && cachedIcons.get(id).getImage() != null)
-			return new ImageIcon(cachedIcons.get(id).getImage());
+		if (cachedIcons.containsKey(id) && cachedIcons.get(id) != null)
+			return new ImageIcon(cachedIcons.get(id));
 		ImageIcon result = null;
 		URL url = getResource(class1, name);
+		BufferedImage img = url == null ? null : GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h);
 		if (url == null)
 			result = null;
 		else
-			result = new ImageIcon(GravistoService.getScaledImage(new ImageIcon(url).getImage(), w, h));
-		if (result != null)
-			cachedIcons.put(id, result);
+			result = new ImageIcon(img);
+		if (img != null)
+			cachedIcons.put(id, img);
 		else
 			System.out.println("Could not load icon " + name);
 		return result;

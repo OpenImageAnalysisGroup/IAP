@@ -40,7 +40,7 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	@Override
 	public double getCurrentStatusValueFine() {
 		double ret;
-		cmd = m.batchGetCommand(cmd);
+		cmd = m.batch().getCommand(cmd);
 		if (cmd == null)
 			ret = -2;
 		else

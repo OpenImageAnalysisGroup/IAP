@@ -60,10 +60,14 @@ public class GravistoServiceExt {
 							}
 						}
 						
-						byte[] md5sum = digest.digest();
-						BigInteger bigInt = new BigInteger(1, md5sum);
-						String output = bigInt.toString(16);
-						resultList.get(iii).setObject(output);
+						if (len > 0) {
+							byte[] md5sum = digest.digest();
+							BigInteger bigInt = new BigInteger(1, md5sum);
+							String output = bigInt.toString(16);
+							resultList.get(iii).setObject(output);
+						} else {
+							resultList.get(iii).setObject("noContent");
+						}
 					} finally {
 						sema.release(1);
 					}

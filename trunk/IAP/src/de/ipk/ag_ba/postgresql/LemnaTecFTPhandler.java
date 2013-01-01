@@ -14,7 +14,6 @@ import java.net.URL;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
-import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -27,7 +26,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -49,15 +47,6 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	private static String scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
 	private static String scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "LemnaTec");
 	
-	public static boolean useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean(
-			"LT-DB", "Image File Transfer//Use MongoDB data if available", true);
-	
-	private static boolean useCachedLocalDataIfAvailable = SystemOptions.getInstance().getBoolean(
-			"LT-DB", "Image File Transfer//Use local file access if available", true);
-	
-	private static String cachedLocalDataDirectory = SystemOptions.getInstance().getString(
-			"LT-DB", "Image File Transfer//Local copy or mount point", "/data0/pgftp/");
-	
 	@Override
 	public String getPrefix() {
 		return PREFIX;
@@ -75,50 +64,11 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
 		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "LemnaTec");
 		
-		useCachedCloudDataIfAvailable = SystemOptions.getInstance().getBoolean(
-				"LT-DB", "Image File Transfer//Use MongoDB data if available", true);
-		
-		useCachedLocalDataIfAvailable = SystemOptions.getInstance().getBoolean(
-				"LT-DB", "Image File Transfer//Use local file access if available", true);
-		cachedLocalDataDirectory = SystemOptions.getInstance().getString(
-				"LT-DB", "Image File Transfer//Local copy or mount point", "/data0/pgftp/");
-		
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
 		}
-		if (useCachedCloudDataIfAvailable) {
-			try {
-				for (MongoDB dc : MongoDB.getMongos()) {
-					IOurl urlForCopiedData = dc.getURLforStoredData(url);
-					if (urlForCopiedData != null) {
-						InputStream is = urlForCopiedData.getInputStream();
-						if (is != null) {
-							// System.out.println(SystemAnalysis.getCurrentTime() + ">Use cache for " + url);
-							return is;
-						}
-					}
-				}
-			} catch (Exception e) {
-				System.out.println("ERROR: Could not check mongodb for cached input stream data url " + url + ", message: " + e.getMessage());
-			}
-		}
+		
 		if (url.isEqualPrefix(getPrefix())) {
-			boolean lokalCache = useCachedLocalDataIfAvailable;
-			if (lokalCache) {
-				for (String path : cachedLocalDataDirectory.split(";")) {
-					String detail = url.getDetail();
-					detail = path + detail.split("/", 2)[1];
-					String fn = detail;
-					File fff = new File(fn);
-					if (fff.exists()) {
-						IOurl u = FileSystemHandler.getURL(fff);
-						MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(u);
-						if (is != null)
-							return is;
-					}
-				}
-			}
-			
 			if (useSCP) {
 				InputStream iss = null;
 				// synchronized (PREFIX) {
@@ -181,18 +131,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
 		}
-		if (useCachedCloudDataIfAvailable) {
-			try {
-				if (MongoDB.getDefaultCloud() != null) {
-					MongoDB dc = MongoDB.getDefaultCloud();
-					InputStream urlForCopiedDataStream = dc.getURLforStoredData_PreviewStream(url);
-					if (urlForCopiedDataStream != null)
-						return urlForCopiedDataStream;
-				}
-			} catch (Exception e) {
-				System.out.println("ERROR: Could not check default cloud for cached input stream data url: " + e.getMessage());
-			}
-		}
+		
 		return super.getPreviewInputStream(url);
 	}
 	
