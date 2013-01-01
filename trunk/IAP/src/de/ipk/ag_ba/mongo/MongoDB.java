@@ -1416,7 +1416,7 @@ public class MongoDB {
 			colFE.remove(
 					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
 			colFC.remove(
-					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.FSYNCED);
+					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
 			rList.clear();
 		}
 	}
@@ -1547,5 +1547,9 @@ public class MongoDB {
 	
 	public MongoDBhandler getMongoHandler() {
 		return mh;
+	}
+	
+	public DataBaseFileStorage fileStorage() {
+		return new DataBaseFileStorage(this);
 	}
 }
