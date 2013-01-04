@@ -140,9 +140,9 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 			// result = "<hr>eta: " + SystemAnalysis.getCurrentTime(finishTime) + ", runtime: "
 			// + SystemAnalysis.getWaitTimeShort((long) fullTime) + ", remain: "
 			// + SystemAnalysis.getWaitTimeShort((long) remainingTime);
-			result = "<hr>" + SystemAnalysis.getWaitTimeShort((long) remainingTime)
-					+ " / "
-					+ SystemAnalysis.getWaitTimeShort((long) fullTime);
+			result = SystemAnalysis.getWaitTimeShort((long) remainingTime)
+					+ " of "
+					+ SystemAnalysis.getWaitTimeShort((long) fullTime) + " remain";
 		} else
 			if (currPro > 0.1) {
 				firstProgressFineTime = System.currentTimeMillis();

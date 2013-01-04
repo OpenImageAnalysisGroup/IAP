@@ -170,7 +170,7 @@ public class ProgressStatusService implements HelperClass {
 		lastRes = result;
 		if (result != null) {
 			if (result.contains("years") && remainTimeYears > 1000)
-				return "n/a";
+				return "";
 			else
 				return result;
 		} else
