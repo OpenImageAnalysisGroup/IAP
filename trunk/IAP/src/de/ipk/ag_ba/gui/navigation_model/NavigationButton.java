@@ -243,16 +243,19 @@ public class NavigationButton implements StyleAware {
 				String eta = statusServer.getRemainTime((int) dp == -1, dp);
 				if (eta.length() > 0) {
 					if (line2.length() > 0 && sm3 != null)
-						line2 += sm3.length() == 0 ? ", " : "<br>";
+						line2 += sm3.length() == 0 ? ", " : "";
 					if (sm3 == null || sm3.length() == 0)
 						line2 += "" + eta;
 				}
 			}
-			if (line2.length() > 0)
-				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
+			line2 = "<br>" + line2;
+			// if (line2.length() > 0)
+			// line2 = "<br>&nbsp;" + line2 + "&nbsp;";
+			//
+			// line2 = StringManipulationTools.stringReplace(line2, "<br><hr>", "<hr>");
+			// line2 = StringManipulationTools.stringReplace(line2, "<p><hr>", "<hr>");
 			
-			line2 = StringManipulationTools.stringReplace(line2, "<br><hr>", "<hr>");
-			line2 = StringManipulationTools.stringReplace(line2, "<p><hr>", "<hr>");
+			System.out.println(line2);
 			
 			if (dp < -1.01) {
 				System.out.println("Command " + title + " has lost its connection to the status provider.");
