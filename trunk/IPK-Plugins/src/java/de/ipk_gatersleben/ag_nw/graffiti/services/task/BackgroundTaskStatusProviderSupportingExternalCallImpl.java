@@ -137,9 +137,12 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 			double fullTime = 100d / speed;
 			long finishTime = (long) (lastProgressUpdateTime + remainingTime);
 			
-			result = "<hr>eta: " + SystemAnalysis.getCurrentTime(finishTime) + ", runtime: "
-					+ SystemAnalysis.getWaitTimeShort((long) fullTime) + ", remain: "
-					+ SystemAnalysis.getWaitTimeShort((long) remainingTime);
+			// result = "<hr>eta: " + SystemAnalysis.getCurrentTime(finishTime) + ", runtime: "
+			// + SystemAnalysis.getWaitTimeShort((long) fullTime) + ", remain: "
+			// + SystemAnalysis.getWaitTimeShort((long) remainingTime);
+			result = "<hr>" + SystemAnalysis.getWaitTimeShort((long) remainingTime)
+					+ " / "
+					+ SystemAnalysis.getWaitTimeShort((long) fullTime);
 		} else
 			if (currPro > 0.1) {
 				firstProgressFineTime = System.currentTimeMillis();

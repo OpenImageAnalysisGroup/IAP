@@ -123,11 +123,16 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
 						if (progress > 0) {
 							long fullTime = (long) (processingTimePPP / progress);
-							remain = "eta: " + SystemAnalysis.getCurrentTime(ct + (long) (fullTime * (1d - value / 100d)))
-									+ ", overall: "
-									+ SystemAnalysis.getWaitTimeShort(fullTime)
-									+ ", remain: "
-									+ SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)));
+							remain =
+									// "eta: " + SystemAnalysis.getCurrentTime(ct + (long) (fullTime * (1d - value / 100d)))
+									// + ", overall: "
+									// + SystemAnalysis.getWaitTimeShort(fullTime)
+									// + ", remain: "
+									// + SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)));
+									SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)))
+											+ " / "
+											+ SystemAnalysis.getWaitTimeShort(fullTime);
+							
 							ArrayList<String> s = new ArrayList<String>();
 							for (String ss : submission2partCnt.keySet()) {
 								long l = Long.parseLong(ss.substring(ss.lastIndexOf("$")

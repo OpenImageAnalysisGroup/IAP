@@ -152,7 +152,7 @@ public class ProgressStatusService implements HelperClass {
 			result = res[0] + " " + res[1] + " " + res[2];
 		else
 			if (numberResults == 2)
-				result = res[0] + " and " + res[1];
+				result = res[0] + " " + res[1];
 			else
 				result = /* "~&nbsp;" + */res[0];
 		
