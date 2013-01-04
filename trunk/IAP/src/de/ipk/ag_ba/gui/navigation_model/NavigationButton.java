@@ -223,12 +223,12 @@ public class NavigationButton implements StyleAware {
 				
 				s = "<br>";
 				int len = 20;// (dots + " " + title + progress).length();
-				s += // "<font color='#000000'>" +
-				getProgress( // 585BA2
+				s += // "<font border-color='black' color='#000000'>" + // 585BA2 // bgcolor='#CCCCCC'
+				getProgress( //
 						(char) (0x25A0) + "",// "#",
 						(char) (0x25A1) + "",// "-",
 						len + 5, dp);
-				// + "</font>";
+				// + "</font>"; // &nbsp;
 			}
 			String line2 = "";
 			String sm1 = "", sm2 = "", sm3 = "";
@@ -260,7 +260,7 @@ public class NavigationButton implements StyleAware {
 			// line2 = StringManipulationTools.stringReplace(line2, "<br><hr>", "<hr>");
 			// line2 = StringManipulationTools.stringReplace(line2, "<p><hr>", "<hr>");
 			
-			System.out.println(line2);
+			// System.out.println(line2);
 			
 			if (dp < -1.01) {
 				System.out.println("Command " + title + " has lost its connection to the status provider.");
