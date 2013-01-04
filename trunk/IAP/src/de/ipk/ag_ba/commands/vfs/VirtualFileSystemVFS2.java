@@ -143,7 +143,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 			long l = file.length();
 			if (l > 0) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Skipping known file in VFS: " + fileNameInclSubFolderPathName);
-				return l;
+				return -l;
 			}
 		}
 		return ResourceIOManager.copyContent(is, file.getOutputStream());

@@ -227,7 +227,7 @@ public class NavigationButton implements StyleAware {
 				getProgress( //
 						(char) (0x25A0) + "",// "#",
 						(char) (0x25A1) + "",// "-",
-						len + 5, dp);
+						len, dp);
 				// + "</font>"; // &nbsp;
 			}
 			String line2 = "";

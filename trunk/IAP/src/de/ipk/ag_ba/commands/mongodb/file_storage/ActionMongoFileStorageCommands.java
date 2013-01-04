@@ -82,6 +82,36 @@ public class ActionMongoFileStorageCommands extends AbstractNavigationAction {
 					}
 				};
 				result.add(new NavigationButton(a, src.getGUIsetting()));
+				
+				NavigationAction b = new AbstractNavigationAction("Copy data to " + v2.getTargetName() + " (click to select amount to be copied)") {
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						// empty
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Copy data to " + v2.getTargetName() + " ...";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/Gnome-Document-Send-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 10), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 50), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 250), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 500), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, -1), src.getGUIsetting()));
+						return result;
+					}
+				};
+				result.add(new NavigationButton(b, src.getGUIsetting()));
+				
 			}
 			// move files from MongoDB GridFS to this location
 			// move from this location to MongoDB GridFS
