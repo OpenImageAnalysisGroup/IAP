@@ -25,6 +25,17 @@ public class DataBaseFileStorage {
 	
 	public void move(final VirtualFileSystemVFS2 vfs, final int gb, final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final StringBuilder messages) throws Exception {
+		copyOrMove(true, vfs, gb, status, messages);
+	}
+	
+	public void copy(final VirtualFileSystemVFS2 vfs, final int gb, final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final StringBuilder messages) throws Exception {
+		copyOrMove(false, vfs, gb, status, messages);
+	}
+	
+	private void copyOrMove(final boolean move, final VirtualFileSystemVFS2 vfs, final int gb,
+			final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final StringBuilder messages) throws Exception {
 		mongoDB.processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -56,22 +67,29 @@ public class DataBaseFileStorage {
 							String md5 = f.getFilename();
 							try {
 								long saved = vfs.saveStream(mgfs + "/" + md5, f.getInputStream(), true);
-								if (saved != f.getLength()) {
-									messages.append("Could not move file " + md5 + " from "
-											+ gridfs + " to " + vfs.getTargetName() + ", storage size differs from input size: "
+								long fl = f.getLength();
+								if (!move && saved == -fl)
+									continue;
+								saved = Math.abs(saved);
+								if (saved != fl) {
+									messages.append("Could not " + (move ? "move" : "copy") + " file " + md5 + " from "
+											+ mgfs + " to " + vfs.getTargetName() + ", storage size differs from input size: "
 											+ saved + " saved, " + f.getLength() + " input size.");
-									MongoDB.saveSystemMessage("Could not move file " + md5
-											+ " from " + gridfs + " to " + vfs.getTargetName()
+									MongoDB.saveSystemMessage("Could not " + (move ? "move" : "copy") + " file " + md5
+											+ " from " + mgfs + " to " + vfs.getTargetName()
 											+ ", storage size differs from input size: "
 											+ saved + " saved, " + f.getLength() + " input size.");
 									
 								} else {
-									ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
-									toBeRemoved.add(f);
-									mongoDB.removeFilesFromGridFS(delStatus, mgfs, gridfs, toBeRemoved, free, db);
+									if (move) {
+										ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
+										toBeRemoved.add(f);
+										mongoDB.removeFilesFromGridFS(delStatus, mgfs, gridfs, toBeRemoved, free, db);
+									} else
+										free.addLong(saved);
 									n++;
-									status.setCurrentStatusText1("Moving data from " + mgfs + " (" + n + ")");
-									status.setCurrentStatusText2(free.getLong() / 1024 / 1024 / 1024 + " GB moved ("
+									status.setCurrentStatusText1((move ? "Moving" : "Copying") + " data from " + mgfs + " (" + n + ")");
+									status.setCurrentStatusText2(free.getLong() / 1024 / 1024 / 1024 + " GB " + (move ? "moved" : "copied") + " ("
 											+ SystemAnalysis.getDataTransferSpeedString(free.getLong(), start, System.currentTimeMillis()) + ")");
 								}
 								if (gb > 0 && free.getLong() / 1024 / 1024 / 1024 >= gb)
@@ -81,20 +99,21 @@ public class DataBaseFileStorage {
 								else
 									status.setCurrentStatusValueFine(free.getLong() * 100d / 1024d / 1024d / 1024d / gb);
 							} catch (Exception e) {
-								messages.append("Could not move file " + md5 + " from " + gridfs + " to " + vfs.getTargetName());
-								MongoDB.saveSystemErrorMessage("Could not move file " + md5 + " from " + gridfs + " to " + vfs.getTargetName(), e);
+								messages.append("Could not " + (move ? "move" : "copy") + " file " + md5 + " from " + mgfs + " to " + vfs.getTargetName());
+								MongoDB.saveSystemErrorMessage(
+										"Could not " + (move ? "move" : "copy") + " file " + md5 + " from " + mgfs + " to " + vfs.getTargetName(), e);
 							}
 						}
 					} catch (Exception e) {
-						messages.append("Could not move file no " + n + " from "
-								+ gridfs + " to " + vfs.getTargetName() + ". Error: " + e.getMessage());
-						MongoDB.saveSystemErrorMessage("Could not move file  " + n
-								+ " from " + gridfs + " to " + vfs.getTargetName(), e);
+						messages.append("Could not " + (move ? "move" : "copy") + " file no " + n + " from "
+								+ mgfs + " to " + vfs.getTargetName() + ". Error: " + e.getMessage());
+						MongoDB.saveSystemErrorMessage("Could not " + (move ? "move" : "copy") + " file  " + n
+								+ " from " + mgfs + " to " + vfs.getTargetName(), e);
 					}
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing finished: GridFS " + mgfs + " contains " + nFiles + " files");
 				}
 				
-				messages.append("Moved " + n + " files: " + free.getLong() / 1024 / 1024 / 1024 + " GB");
+				messages.append("" + (move ? "Moved" : "Copied") + " " + n + " files: " + free.getLong() / 1024 / 1024 / 1024 + " GB");
 			}
 			
 			@Override
