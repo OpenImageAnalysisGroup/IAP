@@ -178,27 +178,35 @@ public class NavigationButton implements StyleAware {
 			return title;
 		else {
 			String dots = "";
+			String dots2 = "";
 			int speed = 500;
-			int ndots = (int) ((compTime % (speed * 4)) / speed);
+			int ndots = (int) ((compTime % (speed * 2)) / speed);
 			String cc = "*";
+			String cc2 = "*";
 			if (ndots == 0)
-				cc = "\\";
+				cc = (char) 0x25AE + "";// "\\";
 			if (ndots == 1)
-				cc = "|";
-			if (ndots == 2)
-				cc = "/";
-			if (ndots == 3)
-				cc = "-";
+				cc = (char) 0x25AF + "";// "|";
+			if (ndots == 0)
+				cc2 = (char) 0x25AF + "";// "\\";
+			if (ndots == 1)
+				cc2 = (char) 0x25AE + "";// "|";
+			// if (ndots == 2)
+			// cc = (char) 0x25C6 + "";// "/";
+			// if (ndots == 3)
+			// cc = (char) 0x25F3 + "";// "-";
+			// if (ndots == 4)
+			// cc = (char) 0x25CB + "";// "-";
 			
 			if (requestsTitleUpdates()) {
-				if (ndots < 2)
-					cc = "";
-				else
-					cc = "";
+				cc = "";
+				cc2 = "";
 			}
 			
 			while (dots.length() < 1 && cc.length() > 0)
 				dots += cc;
+			while (dots2.length() < 1 && cc2.length() > 0)
+				dots2 += cc2;
 			
 			String progress = "";
 			String s = "";
@@ -212,7 +220,10 @@ public class NavigationButton implements StyleAware {
 				
 				s = "<br>";
 				int len = 20;// (dots + " " + title + progress).length();
-				s += "[" + getProgress("#", "-", len + 5, dp) + "]";
+				s += /* "["+ */getProgress(
+						(char) (0x25A0) + "",// "#",
+						(char) (0x25A1) + "",// "-",
+						len + 5, dp) /* +"]" */;
 			}
 			String line2 = "";
 			String sm1 = "", sm2 = "", sm3 = "";
@@ -239,16 +250,15 @@ public class NavigationButton implements StyleAware {
 			}
 			if (line2.length() > 0)
 				line2 = "<br>&nbsp;" + line2 + "&nbsp;";
-			dots = "" + dots + "";
 			
 			line2 = StringManipulationTools.stringReplace(line2, "<br><hr>", "<hr>");
 			line2 = StringManipulationTools.stringReplace(line2, "<p><hr>", "<hr>");
 			
 			if (dp < -1.01) {
 				System.out.println("Command " + title + " has lost its connection to the status provider.");
-				return "<html><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots + "" + s + line2;
+				return "<html><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots2 + "" + s + line2;
 			} else
-				return "<html><center>" + dots + " " + title + progress + " " + dots + "" + s + line2;
+				return "<html><center>" + dots + " " + title + progress + " " + dots2 + "" + s + line2;
 		}
 	}
 	
