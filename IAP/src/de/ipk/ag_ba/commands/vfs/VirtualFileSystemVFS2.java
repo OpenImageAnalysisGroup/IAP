@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.vfs;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -136,8 +137,15 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		return useForMongoFileStorageCloudName;
 	}
 	
-	public long saveStream(String fileNameInclSubFolderPathName, InputStream is) throws Exception {
+	public long saveStream(String fileNameInclSubFolderPathName, InputStream is, boolean skipKnown) throws Exception {
 		VfsFileObject file = newVfsFile(fileNameInclSubFolderPathName);
+		if (skipKnown && file.exists()) {
+			long l = file.length();
+			if (l > 0) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Skipping known file in VFS: " + fileNameInclSubFolderPathName);
+				return l;
+			}
+		}
 		return ResourceIOManager.copyContent(is, file.getOutputStream());
 	}
 	
