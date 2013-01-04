@@ -208,6 +208,9 @@ public class NavigationButton implements StyleAware {
 			while (dots2.length() < 1 && cc2.length() > 0)
 				dots2 += cc2;
 			
+			// dots = "<font color='#585BA2'>" + dots + "</font>"; //
+			// dots2 = "<font color='#585BA2'>" + dots2 + "</font>";
+			
 			String progress = "";
 			String s = "";
 			double dp = action.getStatusProvider().getCurrentStatusValueFine();
@@ -220,10 +223,12 @@ public class NavigationButton implements StyleAware {
 				
 				s = "<br>";
 				int len = 20;// (dots + " " + title + progress).length();
-				s += /* "["+ */getProgress(
+				s += // "<font color='#000000'>" +
+				getProgress( // 585BA2
 						(char) (0x25A0) + "",// "#",
 						(char) (0x25A1) + "",// "-",
-						len + 5, dp) /* +"]" */;
+						len + 5, dp);
+				// + "</font>";
 			}
 			String line2 = "";
 			String sm1 = "", sm2 = "", sm3 = "";
