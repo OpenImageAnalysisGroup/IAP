@@ -45,6 +45,7 @@ public class DataBaseFileStorage {
 				BackgroundTaskStatusProviderSupportingExternalCall delStatus = new BackgroundTaskConsoleLogger("", "", false);
 				long n = 0;
 				long start = System.currentTimeMillis();
+				mainloop:
 				for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
 					final GridFS gridfs = new GridFS(db, mgfs);
 					int nFiles = gridfs.getFileList(new BasicDBObject()).count();
@@ -55,7 +56,7 @@ public class DataBaseFileStorage {
 						status.setCurrentStatusText2(mgfs + " (" + nFiles + ")");
 						status.setCurrentStatusValueFine(0);
 						for (DBObject dbo : gridfs.getFileList(new BasicDBObject())) {
-							String fn = (String) dbo.get("md5");
+							String fn = (String) dbo.get("filename");
 							md5s.add(fn);
 							status.setCurrentStatusValueFine(100d * md5s.size() / nFiles);
 						}
@@ -93,7 +94,7 @@ public class DataBaseFileStorage {
 											+ SystemAnalysis.getDataTransferSpeedString(free.getLong(), start, System.currentTimeMillis()) + ")");
 								}
 								if (gb > 0 && free.getLong() / 1024 / 1024 / 1024 >= gb)
-									break;
+									break mainloop;
 								if (gb <= 0)
 									status.setCurrentStatusValueFine(n * 100d / nFiles);
 								else
