@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.IniIoProvider;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
@@ -221,6 +222,7 @@ public class ExperimentReference {
 	}
 	
 	private final ArrayList<Runnable> todoOnceDataIsAvailable = new ArrayList<Runnable>();
+	private IniIoProvider storedIniProvider;
 	
 	public synchronized void runAsDataBecomesAvailable(Runnable r) {
 		synchronized (todoOnceDataIsAvailable) {
@@ -233,5 +235,13 @@ public class ExperimentReference {
 	
 	public ExperimentInterface getExperimentPeek() {
 		return experiment;
+	}
+	
+	public IniIoProvider getIniIoProvider() {
+		return storedIniProvider;
+	}
+	
+	public void setIniIoProvider(IniIoProvider iniProvider) {
+		storedIniProvider = iniProvider;
 	}
 }

@@ -180,7 +180,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getFileNameMain();
 										Collection<NumericMeasurementInterface> match = IAPservice
 												.getMatchFor(s, targetTreeNode
-														.getExperiment());
+														.getExperiment().getExperiment());
 										
 										for (NumericMeasurementInterface nmi : match) {
 											ImageData id = (ImageData) nmi;
@@ -240,7 +240,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getFileNameMain();
 										Collection<NumericMeasurementInterface> match = IAPservice
 												.getMatchFor(s, targetTreeNode
-														.getExperiment());
+														.getExperiment().getExperiment());
 										
 										for (NumericMeasurementInterface nmi : match) {
 											ImageData id = (ImageData) nmi;
@@ -283,7 +283,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										.getMatchFor(imageResult
 												.getBinaryFileInfo()
 												.getFileNameMain(),
-												targetTreeNode.getExperiment());
+												targetTreeNode.getExperiment().getExperiment());
 								if (match.size() > 0) {
 									FlexibleImageStack snapshot = new FlexibleImageStack();
 									for (NumericMeasurementInterface nmi : match) {
@@ -351,17 +351,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 					
 					JMenuItem debugPipelineTest5 = new JMenuItem(
-							"Maize 3-D Analysis (Snapshot Images+References)");
+							"Maize 3-D Analysis (Snapshot Images+References) (not from template file)");
 					debugPipelineTest5.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								MappingDataEntity img = imageResult
-										.getBinaryFileInfo().getEntity();
-								ImageData i = (ImageData) img;
-								
 								ExperimentInterface experiment = targetTreeNode
-										.getExperiment();
+										.getExperiment().getExperiment();
 								
 								Collection<NumericMeasurementInterface> match = IAPservice
 										.getMatchFor(imageResult
@@ -472,6 +468,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					sn.add(debugShowSnapshot);
 					jp.add(sn);
 					
+					JMenu ta = new JMenu("Test Analysis Template");
+					
 					for (final AbstractPhenotypingTask iat : new ImageAnalysisTasks().getKnownImageAnalysisTasks()) {
 						JMenuItem debugPipelineTest0a = new JMenuItem(
 								iat.getName() + " (Image+Reference)");
@@ -483,10 +481,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 											.getMatchFor(imageResult
 													.getBinaryFileInfo()
 													.getFileNameMain(),
-													targetTreeNode.getExperiment());
+													targetTreeNode.getExperiment().getExperiment());
 									
 									BlockPipeline.debugTryAnalysis(
-											targetTreeNode.getExperiment(),
+											targetTreeNode.getExperiment().getExperiment(),
 											match, m,
 											iat);
 								} catch (Exception err) {
@@ -511,11 +509,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 											.getMatchForReference(imageResult
 													.getBinaryFileInfo()
 													.getFileNameMain(),
-													targetTreeNode.getExperiment(),
+													targetTreeNode.getExperiment().getExperiment(),
 													m);
 									
 									BlockPipeline.debugTryAnalysis(
-											targetTreeNode.getExperiment(),
+											targetTreeNode.getExperiment().getExperiment(),
 											match, m,
 											iat);
 								} catch (Exception err) {
@@ -530,10 +528,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							}
 						});
 						
-						jp.add(debugPipelineTest0a);
-						jp.add(debugPipelineTest00a);
+						ta.add(debugPipelineTest0a);
+						ta.add(debugPipelineTest00a);
 					}
-					jp.add(debugPipelineTest5);
+					ta.add(debugPipelineTest5);
+					jp.add(ta);
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -1282,7 +1281,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					Collection<NumericMeasurementInterface> match = IAPservice
 							.getMatchFor(imageResult.getBinaryFileInfo()
 									.getFileNameMain(), targetTreeNode
-									.getExperiment());
+									.getExperiment().getExperiment());
 					if (match.size() > 0) {
 						NumericMeasurementInterface a = match.iterator().next();
 						String pre = "snapshot "

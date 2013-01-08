@@ -38,7 +38,8 @@ public class ActionViewExportData extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 		try {
-			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment.getData(m),
+			experiment.getData(m);
+			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment,
 					experiment.getExperimentName());
 			mpc = new MainPanelComponent(sfp);
 		} catch (Exception e) {

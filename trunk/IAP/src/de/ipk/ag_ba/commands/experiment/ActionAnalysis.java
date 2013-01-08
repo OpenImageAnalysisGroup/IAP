@@ -42,7 +42,10 @@ public class ActionAnalysis extends AbstractNavigationAction {
 		actions.add(new NavigationButton(
 				new ActionSelectAnalysisTemplate(m, experimentReference), guiSetting));
 		
-		IniIoProvider ioStringProvider = new ExperimentAnalysisSettingsIOprovder(experimentReference, m);
+		if (experimentReference.getIniIoProvider() == null)
+			experimentReference.setIniIoProvider(
+					new ExperimentAnalysisSettingsIOprovder(experimentReference, m));
+		IniIoProvider ioStringProvider = experimentReference.getIniIoProvider();
 		
 		if (experimentReference.getHeader().getSettings() != null &&
 				!experimentReference.getHeader().getSettings().isEmpty()) {

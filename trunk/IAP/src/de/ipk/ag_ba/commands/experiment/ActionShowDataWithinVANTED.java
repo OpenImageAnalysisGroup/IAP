@@ -45,7 +45,8 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
 			Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(ed);
 			ed = MappingData3DPath.merge(md, true);
 			if (ed != null) {
-				SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(m, ed,
+				SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(
+						m, experimentName,
 						experimentName.getExperimentName());
 				ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
 						optSupplementaryPanel, null);
@@ -55,7 +56,6 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
 					gui.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.DARK_GRAY));
 				
 				mpc = new MainPanelComponent(gui);
-				
 			}
 		} catch (Exception err) {
 			ErrorMsg.addErrorMessage(err);
