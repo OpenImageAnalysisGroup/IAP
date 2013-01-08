@@ -2,39 +2,36 @@ package de.ipk.ag_ba.commands.experiment.process;
 
 import java.util.ArrayList;
 
+import org.IniIoProvider;
 import org.SystemOptions;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
-public class ActionAssignSettings extends AbstractNavigationAction implements NavigationAction {
+public class ActionExportAssignedAnalysisTemplate extends AbstractNavigationAction implements NavigationAction {
 	
-	private String iniFileName;
 	private String title;
-	private ExperimentReference exp;
+	private IniIoProvider ini;
+	private String exportFileName;
 	
-	public ActionAssignSettings(String tooltip) {
+	public ActionExportAssignedAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionAssignSettings(MongoDB m, ExperimentReference exp,
-			String iniFileName, String tooltip, String title) {
+	public ActionExportAssignedAnalysisTemplate(IniIoProvider ini, String exportFileName,
+			String tooltip, String title) {
 		this(tooltip);
-		this.exp = exp;
-		this.iniFileName = iniFileName;
+		this.ini = ini;
+		this.exportFileName = exportFileName;
 		this.title = title;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
-		ini = StringEscapeUtils.escapeXml(ini);
-		exp.getHeader().setSettings(ini);
+		String iniContent = SystemOptions.getInstance(null, ini).getIniValue();
+		System.out.println(iniContent);
 	}
 	
 	@Override
@@ -44,8 +41,7 @@ public class ActionAssignSettings extends AbstractNavigationAction implements Na
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("Data from '" + iniFileName + "' has been assigned to experiment '"
-				+ exp.getExperimentName() + "'.");
+		return new MainPanelComponent("TODO // TODO // Data has been exported to '" + exportFileName + "'.");
 	}
 	
 	@Override
