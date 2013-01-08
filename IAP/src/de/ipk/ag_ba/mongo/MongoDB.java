@@ -390,10 +390,11 @@ public class MongoDB {
 	}
 	
 	/**
+	 * @param long1
 	 * @return -1 in case of error, 0 in case of existing storage, > 0 in case of new storage
 	 * @throws Exception
 	 */
-	public long saveStream(String hash, InputStream is, GridFS fs) throws Exception {
+	public long saveStream(String hash, InputStream is, GridFS fs, long expectedFileSize) throws Exception {
 		long result = -1;
 		
 		boolean stored_in_VFS = false;
@@ -404,7 +405,7 @@ public class MongoDB {
 					lastVFS = (VirtualFileSystemVFS2) v;
 			}
 			if (lastVFS != null) {
-				result = lastVFS.saveStream(fs.getBucketName() + "/" + hash, is, false);
+				result = lastVFS.saveStream(fs.getBucketName() + "/" + hash, is, false, expectedFileSize);
 				stored_in_VFS = true;
 			}
 		}

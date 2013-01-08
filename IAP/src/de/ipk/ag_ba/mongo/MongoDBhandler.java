@@ -47,7 +47,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		is = new MyByteArrayInputStream(is.getBuff(), is.available());
 		
 		GridFS fs = m.getGridFS(c);
-		long res = m.saveStream(hash, is, fs);
+		long res = m.saveStream(hash, is, fs, resultFileSize.getLong());
 		if (res >= 0)
 			return new IOurl(getPrefix(), hash, targetFilename);
 		else
@@ -185,7 +185,8 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 							m.saveStream(
 									url.getDetail(),
 									new MyByteArrayInputStream(rrr, rrr.length),
-									new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)));
+									new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)),
+									rrr.length);
 						} catch (Exception e) {
 							err.setObject(e);
 						}

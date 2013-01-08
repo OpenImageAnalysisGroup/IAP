@@ -1040,6 +1040,9 @@ public class ExperimentSaver implements RunnableOnDB {
 			}, cols.gridfs_images, cols.gridfs_label_files,
 					cols.gridfs_preview_files, image, hashMain,
 					hashLabel,
+					a != null ? a.getCount() : 0,
+					b != null ? b.getCount() : 0,
+					c != null ? c.getCount() : 0,
 					fffMain == null, fffLabel == null, m);
 			
 			if (saved) {
@@ -1086,6 +1089,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	
 	public static boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
 			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel,
+			long expectedLengthMain, long expectedLengthLabel, long expectedLengthPreview,
 			boolean storeMain, boolean storeLabel, MongoDB m) throws IOException {
 		boolean allOK = true;
 		
@@ -1097,28 +1101,32 @@ public class ExperimentSaver implements RunnableOnDB {
 					continue;
 				GridFS fs = null;
 				String hash = null;
+				long expLen = 0;
 				switch (idx) {
 					case 1:
 						if (storeMain) {
 							fs = gridfs_images;
 							hash = hashMain;
+							expLen = expectedLengthMain;
 						}
 						break;
 					case 2:
 						if (storeLabel && gridfs_label_images != null && hashLabel != null) {
 							fs = gridfs_label_images;
 							hash = hashLabel;
+							expLen = expectedLengthLabel;
 						}
 						break;
 					case 3:
 						if (storeMain) {
 							fs = gridfs_preview_files;
 							hash = hashMain;
+							expLen = expectedLengthPreview;
 						}
 						break;
 				}
 				if (fs != null && hash != null && is != null)
-					if (m.saveStream(hash, is, fs) < 0)
+					if (m.saveStream(hash, is, fs, expLen) < 0)
 						allOK = false;
 			}
 		} catch (Exception e) {

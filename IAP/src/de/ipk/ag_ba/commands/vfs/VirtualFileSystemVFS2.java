@@ -137,11 +137,11 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 		return useForMongoFileStorageCloudName;
 	}
 	
-	public long saveStream(String fileNameInclSubFolderPathName, InputStream is, boolean skipKnown) throws Exception {
+	public long saveStream(String fileNameInclSubFolderPathName, InputStream is, boolean skipKnown, long expectedLengthIfKnown) throws Exception {
 		VfsFileObject file = newVfsFile(fileNameInclSubFolderPathName);
 		if (skipKnown && file.exists()) {
 			long l = file.length();
-			if (l > 0) {
+			if (l > 0 && l == expectedLengthIfKnown) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Skipping known file in VFS: " + fileNameInclSubFolderPathName);
 				return -l;
 			}
