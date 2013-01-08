@@ -67,8 +67,8 @@ public class DataBaseFileStorage {
 								continue;
 							String md5 = f.getFilename();
 							try {
-								long saved = vfs.saveStream(mgfs + "/" + md5, f.getInputStream(), true);
 								long fl = f.getLength();
+								long saved = vfs.saveStream(mgfs + "/" + md5, f.getInputStream(), true, fl);
 								if (!move && saved == -fl)
 									continue;
 								saved = Math.abs(saved);
