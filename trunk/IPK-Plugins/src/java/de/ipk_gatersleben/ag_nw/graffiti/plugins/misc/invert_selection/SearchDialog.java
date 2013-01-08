@@ -77,12 +77,13 @@ public class SearchDialog extends JDialog {
 		getRootPane().getActionMap().put("escapeAction", new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 			
+			@Override
 			public void actionPerformed(ActionEvent event) {
 				SearchDialog.this.dispose();
 			}
 		});
 		getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-							.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "escapeAction");
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "escapeAction");
 		
 	}
 	
@@ -102,16 +103,19 @@ public class SearchDialog extends JDialog {
 			okDesc = "Replace Text";
 		
 		final FolderPanel replaceOption = new FolderPanel(
-							"Search (and replace) the following text...",
-							false, false, false, null);
+				"Search (and replace) the following text...",
+				false, false, false, null);
 		
 		final JTextField searchText = new JTextField();
 		final JTextField replaceText = new JTextField();
 		final JCheckBox doRegularExpr = new JCheckBox("Use regular expressions", false);
+		final JCheckBox setLabel = new JCheckBox("Set label", false);
 		doRegularExpr.setOpaque(false);
 		replaceOption.addGuiComponentRow(new JLabel("<html>Find&nbsp;&nbsp;&nbsp;"), searchText, false);
 		replaceOption.addGuiComponentRow(new JLabel("<html>Replace With&nbsp;&nbsp;&nbsp;"), replaceText, false);
 		replaceOption.addGuiComponentRow(new JLabel(), doRegularExpr, false);
+		if (isFindReplaceDialog)
+			replaceOption.addGuiComponentRow(new JLabel(), setLabel, false);
 		
 		replaceOption.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
 		replaceOption.layoutRows();
@@ -143,12 +147,13 @@ public class SearchDialog extends JDialog {
 		else
 			description = "Modify search attributes...";
 		final FolderPanel options = new FolderPanel(
-							description,
-							false, false, false,
-							isFindReplaceDialog ? null : JLabelJavaHelpLink.getHelpActionListener("editmenu_searchandselect"));
+				description,
+				false, false, false,
+				isFindReplaceDialog ? null : JLabelJavaHelpLink.getHelpActionListener("editmenu_searchandselect"));
 		
 		JButton removeFromSelButton = new JButton("<html>Remove matches<br>from selection");
 		removeFromSelButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					ArrayList<SearchOption> searchOptions = new ArrayList<SearchOption>();
@@ -171,6 +176,7 @@ public class SearchDialog extends JDialog {
 		
 		okButton.addActionListener(new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					ArrayList<SearchOption> searchOptions = new ArrayList<SearchOption>();
@@ -191,14 +197,15 @@ public class SearchDialog extends JDialog {
 					} else {
 						// replace text ind find/replace dialog
 						// we allow to search for empty strings, but we don't want to replace empty strings...
-						if (searchText.getText() == null || searchText.getText().length() <= 0)
-							return;
+						if (!setLabel.isSelected())
+							if (searchText.getText() == null || searchText.getText().length() <= 0)
+								return;
 						
 						SearchOption so = searchOptions.get(0);
 						String path = so.getSearchAttributePath();
 						String id = so.getSearchAttributeName();
 						if (so.getSearchNodeOrEdge() == NodeOrEdge.Nodes || so.getSearchNodeOrEdge() == NodeOrEdge.NodesAndEdges)
-							searchReplaceNodeText(searchText, replaceText, doRegularExpr, path, id);
+							searchReplaceNodeText(searchText, replaceText, doRegularExpr, path, id, setLabel.isSelected());
 						if (so.getSearchNodeOrEdge() == NodeOrEdge.Edges || so.getSearchNodeOrEdge() == NodeOrEdge.NodesAndEdges)
 							searchReplaceEdgeText(searchText, replaceText, doRegularExpr, path, id);
 						
@@ -212,6 +219,7 @@ public class SearchDialog extends JDialog {
 		
 		searchButton.addActionListener(new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					// find text
@@ -259,6 +267,7 @@ public class SearchDialog extends JDialog {
 		final JButton addRowButton = new JButton("+ add search option");
 		addRowButton.setOpaque(false);
 		addRowButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				JButton removeThisRowButton = new JButton("- remove");
 				removeThisRowButton.setOpaque(false);
@@ -266,6 +275,7 @@ public class SearchDialog extends JDialog {
 				JComponent soGUI = so.getSearchOptionEditorGUI(possibleAttributes, true);
 				final GuiRow guiRow = new GuiRow(soGUI, removeThisRowButton);
 				removeThisRowButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						options.removeGuiComponentRow(guiRow, true);
 						pack();
@@ -277,6 +287,7 @@ public class SearchDialog extends JDialog {
 		});
 		options.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				SearchOption so = new SearchOption();
 				JComponent soGUI = so.getSearchOptionEditorGUI(possibleAttributes, false, isFindReplaceDialog);
@@ -289,6 +300,7 @@ public class SearchDialog extends JDialog {
 		options.layoutRows();
 		JButton cancelButton = new JButton("Close");
 		cancelButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 				dispose();
@@ -297,12 +309,13 @@ public class SearchDialog extends JDialog {
 		
 		JButton clearSelectionButton = new JButton("Clear selection");
 		clearSelectionButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				EditorSession session =
-									GravistoService
-														.getInstance()
-														.getMainFrame()
-														.getActiveEditorSession();
+						GravistoService
+								.getInstance()
+								.getMainFrame()
+								.getActiveEditorSession();
 				Selection selection = session.getSelectionModel().getActiveSelection();
 				selection.clear();
 				session.getSelectionModel().selectionChanged();
@@ -311,15 +324,16 @@ public class SearchDialog extends JDialog {
 		});
 		
 		JComponent buttonPanel = TableLayout.get4Split(
-							isFindReplaceDialog ? TableLayout.get3Split(searchButton, null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED) : okButton,
-							isFindReplaceDialog ? null : removeFromSelButton,
-								isFindReplaceDialog ? null : clearSelectionButton,
-										cancelButton,
-										TableLayout.PREFERRED,
-										5, 2);
+				isFindReplaceDialog ? TableLayout.get3Split(searchButton, null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED) : okButton,
+				isFindReplaceDialog ? null : removeFromSelButton,
+				isFindReplaceDialog ? null : clearSelectionButton,
+				cancelButton,
+				TableLayout.PREFERRED,
+				5, 2);
 		
 		JButton saveButton = new JButton("<html><small>Create new<br>menu command");
 		saveButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<SearchOption> searchOptions = new ArrayList<SearchOption>();
 				for (GuiRow gr : options.getVisibleGuiRows()) {
@@ -345,15 +359,16 @@ public class SearchDialog extends JDialog {
 				{ border, TableLayout.PREFERRED, border } }; // Rows
 		setLayout(new TableLayout(size));
 		add(TableLayout.get3SplitVertical(
-							topPanel,
-							isFindReplaceDialog ? replaceTextPanel : null,
-							buttonBar,
-							TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED),
-							"1,1");
+				topPanel,
+				isFindReplaceDialog ? replaceTextPanel : null,
+				buttonBar,
+				TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED),
+				"1,1");
 		pack();
 		
 		if (isFindReplaceDialog)
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					searchText.requestFocusInWindow();
 				}
@@ -435,8 +450,9 @@ public class SearchDialog extends JDialog {
 	}
 	
 	private void searchReplaceNodeText(final JTextField searchText,
-						final JTextField replaceText,
-						final JCheckBox doRegularExpr, String path, String id) {
+			final JTextField replaceText,
+			final JCheckBox doRegularExpr, String path, String id,
+			boolean setLabelNotAttribute) {
 		List<NodeHelper> nodes = GraphHelper.getSelectedOrAllHelperNodes(MainFrame.getInstance().getActiveEditorSession());
 		if (nodes != null && nodes.size() > 0) {
 			Graph g = nodes.iterator().next().getGraph();
@@ -457,23 +473,30 @@ public class SearchDialog extends JDialog {
 							// if (newValue.equals(currentValue))
 							// newValue = replace + currentValue;
 						}
-						if (!newValue.equals(currentValue)) {
-							nh.setAttributeValue(path, id, newValue);
+						if (setLabelNotAttribute) {
+							nh.setLabel(newValue);
 							replaced++;
-						}
+						} else
+							if (!newValue.equals(currentValue)) {
+								nh.setAttributeValue(path, id, newValue);
+								replaced++;
+							}
 					}
 				}
 			} catch (Exception ex) {
 				ErrorMsg.addErrorMessage(ex);
 			}
 			g.getListenerManager().transactionFinished(this);
-			MainFrame.showMessage("Found and replaced " + replaced + " strings", MessageType.INFO);
+			if (setLabelNotAttribute)
+				MainFrame.showMessage("Set " + replaced + " labels", MessageType.INFO);
+			else
+				MainFrame.showMessage("Found and replaced " + replaced + " strings", MessageType.INFO);
 		}
 	}
 	
 	private void searchReplaceEdgeText(final JTextField searchText,
-						final JTextField replaceText,
-						final JCheckBox doRegularExpr, String path, String id) {
+			final JTextField replaceText,
+			final JCheckBox doRegularExpr, String path, String id) {
 		Collection<Edge> edges = GraphHelper.getSelectedOrAllEdges(MainFrame.getInstance().getActiveEditorSession());
 		if (edges != null && edges.size() > 0) {
 			Graph g = edges.iterator().next().getGraph();
@@ -507,22 +530,22 @@ public class SearchDialog extends JDialog {
 	
 	private void saveSearch(ArrayList<SearchOption> searchOptions) {
 		Object[] input = MyInputHelper.getInput(
-							"With this command a new menu item may be created,<br>" +
-												"which allows to perform the search and select operation<br>" +
-												"with the current search parameters quickly again.<br><br>" +
-												"Please specify the (new or existing) target menu<br>" +
-												"and the title of the newly created menu item.<br><br>" +
-												"The default menus <b>File</b>, <b>Edit</b> and <b>Window</b> may be used<br>" +
-												"as a target with the special menu titles \"menu.file\",<br>" +
-												"\"menu.edit\" and \"menu.window\".<br><br>",
-							"Create New Search-Command",
-							new Object[] {
-												"Target menu", new String("menu.edit"),
-												"Command name", new String("Quick-Search 1"),
-												"<html>" +
-																	"Add or remove results to selection?<br>" +
-																	"Selected = add to selection<br>" +
-																	"Deselected = remove from selection", new Boolean(true)
+				"With this command a new menu item may be created,<br>" +
+						"which allows to perform the search and select operation<br>" +
+						"with the current search parameters quickly again.<br><br>" +
+						"Please specify the (new or existing) target menu<br>" +
+						"and the title of the newly created menu item.<br><br>" +
+						"The default menus <b>File</b>, <b>Edit</b> and <b>Window</b> may be used<br>" +
+						"as a target with the special menu titles \"menu.file\",<br>" +
+						"\"menu.edit\" and \"menu.window\".<br><br>",
+				"Create New Search-Command",
+				new Object[] {
+						"Target menu", new String("menu.edit"),
+						"Command name", new String("Quick-Search 1"),
+						"<html>" +
+								"Add or remove results to selection?<br>" +
+								"Selected = add to selection<br>" +
+								"Deselected = remove from selection", new Boolean(true)
 				});
 		if (input != null) {
 			String menu = (String) input[0];
@@ -539,21 +562,21 @@ public class SearchDialog extends JDialog {
 					charOk = false;
 				if (!charOk) {
 					MainFrame.showMessageDialog(
-										"<html>The command name or menu item contains invalid characters!<br><br>" +
-															"Invalid characters: <b>@ : \\ \" ? *</b>", "Error");
+							"<html>The command name or menu item contains invalid characters!<br><br>" +
+									"Invalid characters: <b>@ : \\ \" ? *</b>", "Error");
 					saveSearch(searchOptions);
 				} else {
 					TextFile tf = new TextFile();
 					try {
 						String fileName =
-											ReleaseInfo.getAppFolderWithFinalSep() + title + ".bsh";
+								ReleaseInfo.getAppFolderWithFinalSep() + title + ".bsh";
 						System.out.println("Attempt to create " + fileName + "");
 						boolean ok = false;
 						if (new File(fileName).exists()) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(),
-												"<html>Do you want to overwrite the existing file <i>" +
-																	fileName + "</i>?</html>", "Overwrite File?",
-												JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+									"<html>Do you want to overwrite the existing file <i>" +
+											fileName + "</i>?</html>", "Overwrite File?",
+									JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 								ok = true;
 							}
 						} else
@@ -571,7 +594,7 @@ public class SearchDialog extends JDialog {
 							if (tm.equals("menu.window"))
 								tm = "Window";
 							MainFrame.showMessageDialog("<html>A new script command was created: <b>\"" + tm + "/" + title + "\"</b>!<br>" +
-												"Delete the newly created command file \"" + fileName + "\" to remove this command.", "New command created");
+									"Delete the newly created command file \"" + fileName + "\" to remove this command.", "New command created");
 						}
 					} catch (IOException e) {
 						ErrorMsg.addErrorMessage(e);
@@ -580,6 +603,7 @@ public class SearchDialog extends JDialog {
 			}
 		}
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				// add main menu scripts
 				JMenu dummyScipt = new JMenu("Dummy Script");
@@ -604,8 +628,8 @@ public class SearchDialog extends JDialog {
 		cmds.add("}");
 		String cmdDesc = (addIsTrue ? "add to" : "remove from");
 		ScenarioService.postWorkflowStep("Search graph elements - " + cmdDesc + " selection",
-							new String[] { SearchOption.getImportStatements() },
-							cmds.toArray(new String[] {}));
+				new String[] { SearchOption.getImportStatements() },
+				cmds.toArray(new String[] {}));
 	}
 	
 	public static void doSearch(final SearchOption[] searchOptions) {
@@ -655,6 +679,7 @@ public class SearchDialog extends JDialog {
 		if (sortCriteria.size() > 0) {
 			// sort selection elements...
 			Collections.sort(validGraphElements, new Comparator<GraphElement>() {
+				@Override
 				public int compare(GraphElement ge1, GraphElement ge2) {
 					for (SearchOption so : sortCriteria) {
 						HashMap<GraphElement, Integer> ge2idx = searchOption2positionMemory.get(so);
@@ -692,7 +717,7 @@ public class SearchDialog extends JDialog {
 		session.getSelectionModel().selectionChanged();
 		session.getGraph().getListenerManager().transactionFinished(MainFrame.getInstance());
 		MainFrame.showMessage(ndCnt + " node(s) and " + edCnt + " edges " + (trueAddfalseRemove ? "added to" : "removed from") +
-							" selection", MessageType.INFO);
+				" selection", MessageType.INFO);
 	}
 	
 }

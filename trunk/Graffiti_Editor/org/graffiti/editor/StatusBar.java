@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: StatusBar.java,v 1.3 2012-12-17 09:52:11 klukas Exp $
+// $Id: StatusBar.java,v 1.4 2013-01-08 13:10:22 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -71,7 +71,7 @@ import org.graffiti.session.SessionListener;
  * It also let's the user scroll through the selected nodes and edges, which will be zoomed into
  * the view
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class StatusBar
 		extends JPanel
@@ -125,7 +125,7 @@ public class StatusBar
 	/** current scroll index for nodes */
 	private List<Edge> scrollListEdges;
 	/** list of elements that will be zoomed into when scrolling */
-	private Collection<GraphElement> elements = new ArrayList<GraphElement>();
+	private final Collection<GraphElement> elements = new ArrayList<GraphElement>();
 	
 	/** current selection index for scrolling nodes */
 	private int idxScrollNodes;
@@ -525,20 +525,21 @@ public class StatusBar
 			status = val;
 		Timer timer = new Timer(0,
 				new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (isShowing())
 				{
-					if (statusLine.getText() == null)
-						statusLine.setText("");
-					// FIXED, CK: This avoids flickering
-					if (status == null || statusLine == null || statusLine.getText().equals(status))
-						clear();
-				}
-			}
-		});
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						if (isShowing())
+						{
+							if (statusLine.getText() == null)
+								statusLine.setText("");
+							// FIXED, CK: This avoids flickering
+							if (status == null || statusLine == null || statusLine.getText().equals(status))
+								clear();
+							MainFrame.lastStatusMessage = null;
+						}
+					}
+				});
 		
 		statusLine.setFont(BOLD_FONT);
 		statusLine.setForeground(Color.red);
@@ -574,20 +575,21 @@ public class StatusBar
 			message = val;
 		Timer timer = new Timer(timeMillis,
 				new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (isShowing())
 				{
-					// FIXED, CK: This avoids flickering
-					if (statusLine != null && statusLine.getText() == null)
-						statusLine.setText("");
-					if (statusLine != null && statusLine.getText() != null && message != null && statusLine.getText().equals(message))
-						clear();
-				}
-			}
-		});
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						if (isShowing())
+						{
+							// FIXED, CK: This avoids flickering
+							if (statusLine != null && statusLine.getText() == null)
+								statusLine.setText("");
+							if (statusLine != null && statusLine.getText() != null && message != null && statusLine.getText().equals(message))
+								clear();
+							MainFrame.lastStatusMessage = null;
+						}
+					}
+				});
 		
 		statusLine.setFont(PLAIN_FONT);
 		statusLine.setForeground(Color.black);
@@ -906,8 +908,8 @@ public class StatusBar
 		if (selWidth < scrollPaneSize.width && selHeight < scrollPaneSize.height) {
 			targetViewRect.x = (int) ((selX + selWidth / 2) - scrollPaneSize.width / 2);
 			targetViewRect.y = (int) ((selY + selHeight / 2) - scrollPaneSize.height / 2);
-			targetViewRect.width = (int) scrollPaneSize.width;
-			targetViewRect.height = (int) scrollPaneSize.height;
+			targetViewRect.width = scrollPaneSize.width;
+			targetViewRect.height = scrollPaneSize.height;
 		}
 		targetViewRect = selectionViewRect;
 		
