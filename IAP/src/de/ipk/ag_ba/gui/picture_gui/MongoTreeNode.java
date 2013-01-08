@@ -2,8 +2,8 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionListener;
 
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 
 /**
@@ -16,14 +16,15 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private boolean sizeDirty = true;
 	
 	private String size = "????????? kb";
-	private final ExperimentInterface experiment;
+	private final ExperimentReference experiment;
 	private final ActionListener sizeChangedListener;
 	private String tooltip;
 	
-	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener, ExperimentInterface doc,
+	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener,
+			ExperimentReference expRef,
 			MappingDataEntity tableName, String title, boolean readOnly) {
 		super(readOnly);
-		this.experiment = doc;
+		this.experiment = expRef;
 		this.projectNode = projectNode;
 		this.tableName = tableName;
 		this.title = title;
@@ -88,7 +89,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	
 	void getCurrentProjectSize(MongoDB m) {
 		try {
-			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(m, experiment);
+			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(m, experiment.getExperiment());
 			if (sz != -1) {
 				if (sz < 1024)
 					size = sz + " KB";
@@ -127,7 +128,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		return super.isLeaf();
 	}
 	
-	public ExperimentInterface getExperiment() {
+	public ExperimentReference getExperiment() {
 		return experiment;
 	}
 	

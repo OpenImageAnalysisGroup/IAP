@@ -30,8 +30,8 @@ import org.JMButton;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
 	private static final long serialVersionUID = 2171413300210427409L;
@@ -104,7 +104,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	DataSetFilePanel currentFilePanel = null;
 	
-	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentInterface doc,
+	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentReference doc,
 			String experimentName) {
 		
 		final SupplementaryFilePanelMongoDB thisPanel = this;

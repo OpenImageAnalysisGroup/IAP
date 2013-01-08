@@ -15,9 +15,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -30,11 +30,11 @@ public class ExperimentTreeModel implements TreeModel {
 	
 	private final class GetSubstances implements Runnable {
 		boolean readOnly;
-		private final ExperimentInterface experiment;
+		private final ExperimentReference experiment;
 		private final MongoTreeNode projectNode;
 		private final ActionListener dataChangedListener;
 		
-		private GetSubstances(MongoTreeNode projectNode, ExperimentInterface experiment, boolean readOnly,
+		private GetSubstances(MongoTreeNode projectNode, ExperimentReference experiment, boolean readOnly,
 				ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.experiment = experiment;
@@ -47,7 +47,7 @@ public class ExperimentTreeModel implements TreeModel {
 			int p = 0;
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			if (experiment != null)
-				for (SubstanceInterface substance : experiment) {
+				for (SubstanceInterface substance : experiment.getExperiment()) {
 					MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
 							substance, substance.getName(), readOnly); //$NON-NLS-1$//$NON-NLS-2$
 					
@@ -66,10 +66,10 @@ public class ExperimentTreeModel implements TreeModel {
 		boolean readOnly;
 		private final SubstanceInterface substance;
 		private final MongoTreeNode substNode;
-		private final ExperimentInterface experiment;
+		private final ExperimentReference experiment;
 		private final ActionListener dataChangedListener;
 		
-		private GetConditions(MongoTreeNode substNode, ExperimentInterface experiment, SubstanceInterface substance,
+		private GetConditions(MongoTreeNode substNode, ExperimentReference experiment, SubstanceInterface substance,
 				boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.substance = substance;
@@ -83,7 +83,9 @@ public class ExperimentTreeModel implements TreeModel {
 			int p = 0;
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (ConditionInterface condition : substance) {
-				final MongoTreeNode condNode = new MongoTreeNode(substNode, dataChangedListener, experiment, condition,
+				final MongoTreeNode condNode = new MongoTreeNode(
+						substNode, dataChangedListener,
+						experiment, condition,
 						condition.getConditionName(), readOnly);
 				
 				condNode.setIsLeaf(false);
@@ -101,10 +103,10 @@ public class ExperimentTreeModel implements TreeModel {
 		boolean readOnly;
 		private final ConditionInterface condition;
 		private final MongoTreeNode condNode;
-		private final ExperimentInterface experiment;
+		private final ExperimentReference experiment;
 		private final ActionListener dataChangedListener;
 		
-		private GetSamples(MongoTreeNode condNode, ExperimentInterface experiment, ConditionInterface condition,
+		private GetSamples(MongoTreeNode condNode, ExperimentReference experiment, ConditionInterface condition,
 				boolean readOnly, ActionListener dataChangedListener) {
 			this.readOnly = readOnly;
 			this.condition = condition;
@@ -136,7 +138,8 @@ public class ExperimentTreeModel implements TreeModel {
 					ArrayList<SampleInterface> sampleArray = samples.get(key);
 					sampleArray.add(sample);
 					
-					sampNode.setGetChildrenMethod(new GetMeasurements(sampNode, experiment, sampleArray, readOnly,
+					sampNode.setGetChildrenMethod(new GetMeasurements(sampNode,
+							experiment, sampleArray, readOnly,
 							dataChangedListener, sdf));
 					children.add(sampNode);
 					key2sampleNode.put(key, sampNode);
@@ -164,11 +167,12 @@ public class ExperimentTreeModel implements TreeModel {
 		boolean readOnly;
 		private final ArrayList<SampleInterface> samples;
 		private final MongoTreeNode sampNode;
-		private final ExperimentInterface experiment;
+		private final ExperimentReference experiment;
 		private final ActionListener dataChangedListener;
 		private final SimpleDateFormat sdf;
 		
-		private GetMeasurements(MongoTreeNode sampNode, ExperimentInterface experiment, ArrayList<SampleInterface> samples,
+		private GetMeasurements(MongoTreeNode sampNode,
+				ExperimentReference experiment, ArrayList<SampleInterface> samples,
 				boolean readOnly, ActionListener dataChangedListener, SimpleDateFormat sdf) {
 			this.readOnly = readOnly;
 			this.samples = samples;
@@ -184,7 +188,8 @@ public class ExperimentTreeModel implements TreeModel {
 			ArrayList<DBEtreeNodeModelHelper> children = new ArrayList<DBEtreeNodeModelHelper>();
 			for (SampleInterface sample : samples) {
 				for (Measurement meas : sample) {
-					MongoTreeNode measNode = new MongoTreeNode(sampNode, dataChangedListener, experiment, meas,
+					MongoTreeNode measNode = new MongoTreeNode(sampNode,
+							dataChangedListener, experiment, meas,
 							meas.toString(), readOnly);
 					measNode.setIsLeaf(true);
 					measNode.setIndex(p++);
@@ -218,11 +223,11 @@ public class ExperimentTreeModel implements TreeModel {
 	}
 	
 	MongoDB m;
-	private final ExperimentInterface experiment;
+	private final ExperimentReference experiment;
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 	
-	public ExperimentTreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentInterface exp,
+	public ExperimentTreeModel(ActionListener dataChangedListener, MongoDB m, ExperimentReference exp,
 			boolean readOnly) {
 		this.m = m;
 		this.experiment = exp;
@@ -232,8 +237,11 @@ public class ExperimentTreeModel implements TreeModel {
 	
 	@Override
 	public Object getRoot() {
-		final MongoTreeNode expNode = new MongoTreeNode(null, dataChangedListener, experiment, experiment,
-				experiment == null ? "NULL" : experiment.getName(), isReadOnly);
+		final MongoTreeNode expNode = new MongoTreeNode(
+				null, dataChangedListener,
+				experiment,
+				experiment.getExperiment(),
+				experiment == null ? "NULL" : experiment.getExperimentName(), isReadOnly);
 		expNode.setSizeDirty(true);
 		try {
 			expNode.updateSizeInfo(m, dataChangedListener);
@@ -245,7 +253,7 @@ public class ExperimentTreeModel implements TreeModel {
 		
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		if (experiment != null)
-			experiment.fillAttributeMap(attributes);
+			experiment.getExperiment().fillAttributeMap(attributes);
 		StringBuilder s = new StringBuilder();
 		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
 		for (String id : attributes.keySet()) {
