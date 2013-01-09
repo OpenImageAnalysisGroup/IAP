@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
  * 
  * @author Pape, Klukas
  */
-public class BlMedianFilter_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlMedianFilterFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processFLUOmask() {

@@ -1,7 +1,7 @@
 package iap.blocks;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
-import iap.blocks.maize.BlockDrawSkeleton_vis_fluo;
+import iap.blocks.maize.BlockDrawSkeleton;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import iap.pipelines.ImageProcessorOptions.Setting;
 
@@ -139,7 +139,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 					if (vis != null && fluo != null) {
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
-							boolean drawSkeleton = getBoolean(new BlockDrawSkeleton_vis_fluo(), "draw_skeleton", true);
+							boolean drawSkeleton = getBoolean(new BlockDrawSkeleton(), "draw_skeleton", true);
 							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							if (res != null)
 								getProperties().setImage("skeleton_fluo", sk);

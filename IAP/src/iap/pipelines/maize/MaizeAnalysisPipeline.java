@@ -7,7 +7,7 @@ import iap.blocks.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.BlCrop;
 import iap.blocks.BlLabFilter;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
-import iap.blocks.BlMedianFilter_fluo;
+import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
@@ -28,7 +28,7 @@ import iap.blocks.maize.BlUseFluoMaskToClearVisNir;
 import iap.blocks.maize.BlockClearMasksBasedOnMarkers;
 import iap.blocks.maize.BlockClearSmallBorderAroundImagesAndMasks;
 import iap.blocks.maize.BlockColorBalancingVertical;
-import iap.blocks.maize.BlockDrawSkeleton_vis_fluo;
+import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.maize.BlockRemoveLevitatingObjectsFromVisFluo;
 import iap.blocks.maize.BlockRemoveSmallStructuresUsingOpeningFromTopVis;
 import iap.blocks.maize.BlockRemoveVerticalAndHorizontalStructuresFromVisFluo;
@@ -79,7 +79,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				// BlockClosingForMaizeBloom_vis_stores_image.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockRemoveSmallStructuresUsingOpeningFromTopVis.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
 				// BlockClosingForYellowVisMask.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(), // requires lab filter before
 				BlockRemoveMaizeBambooStick.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
@@ -115,7 +115,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-				BlockDrawSkeleton_vis_fluo.class.getCanonicalName(),
+				BlockDrawSkeleton.class.getCanonicalName(),
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()

@@ -8,7 +8,7 @@ import iap.blocks.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.BlCrop;
 import iap.blocks.BlLabFilter;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
-import iap.blocks.BlMedianFilter_fluo;
+import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveBlackBelt;
@@ -31,7 +31,7 @@ import iap.blocks.maize.BlIntensityConversion;
 import iap.blocks.maize.BlUseFluoMaskToClearVisNir;
 import iap.blocks.maize.BlockClearMasksBasedOnMarkers;
 import iap.blocks.maize.BlockColorBalancingVertical;
-import iap.blocks.maize.BlockDrawSkeleton_vis_fluo;
+import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
@@ -72,10 +72,10 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlFindBlueMarkers.class.getCanonicalName(),
 				BlBalanceFluo.class.getCanonicalName(),
 				BlClearBackgroundByRefComparison_vis_fluo_nir.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveBlackBelt.class.getCanonicalName(),
 				BlLabFilter.class.getCanonicalName(),
 				BlockClosingVis.class.getCanonicalName(),
@@ -86,7 +86,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlIntensityConversion.class.getCanonicalName(),
 				BlTranslateMatch.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
@@ -102,7 +102,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				
-				BlockDrawSkeleton_vis_fluo.class.getCanonicalName(),
+				BlockDrawSkeleton.class.getCanonicalName(),
 				
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),

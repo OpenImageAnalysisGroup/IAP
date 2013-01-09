@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
-public class BlockDrawSkeleton_vis_fluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
