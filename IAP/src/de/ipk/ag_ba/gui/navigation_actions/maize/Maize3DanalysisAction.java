@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
+import org.StringManipulationTools;
+
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -25,7 +28,11 @@ public class Maize3DanalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new Maize3DanalysisTask();
+		PipelineDesc pd = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(Maize3DanalysisTask.DEFAULT_NAME) + ".pipeline.ini",
+				experiment.getIniIoProvider(),
+				Maize3DanalysisTask.DEFAULT_NAME, Maize3DanalysisTask.DEFAULT_DESC);
+		return new Maize3DanalysisTask(pd);
 	}
 	
 	@Override

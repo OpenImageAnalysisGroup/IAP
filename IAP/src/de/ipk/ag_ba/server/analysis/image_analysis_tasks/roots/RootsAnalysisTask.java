@@ -1,9 +1,8 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.roots;
 
-import org.IniIoProvider;
-
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.roots.RootsAnalysisPipeline;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.roots.RootsAnalysisPipeline;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 /**
@@ -11,28 +10,16 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
  */
 public class RootsAnalysisTask extends AbstractPhenotypingTask {
 	
-	public RootsAnalysisTask() {
-		// empty
-	}
+	public static final String DEFAULT_NAME = "Root Scan Analysis";
+	public static final String DEFAULT_DESC = "Analyse Root Scans";
 	
-	@Override
-	public String getTaskDescription() {
-		return "Analyse Root Scans";
-	}
-	
-	@Override
-	public String getName() {
-		return "Root Scan Analysis";
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
+	public RootsAnalysisTask(PipelineDesc pd) {
+		super(pd);
 	}
 	
 	@Override
 	public ImageProcessor getImageProcessor() {
-		return new RootsAnalysisPipeline(getName(), null);
+		return new RootsAnalysisPipeline(getSystemOptions());
 	}
 	
 	@Override

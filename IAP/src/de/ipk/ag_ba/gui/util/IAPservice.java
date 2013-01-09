@@ -89,7 +89,6 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
@@ -1509,10 +1508,11 @@ public class IAPservice {
 	}
 	
 	public static boolean isAnalyzedWithCurrentRelease(ExperimentHeaderInterface exp) {
-		for (IAP_RELEASE ir : IAP_RELEASE.values())
-			if (exp.getRemark().contains(ir.toString()))
-				return true;
-		return false;
+		// for (IAP_RELEASE ir : IAP_RELEASE.values())
+		// if (exp.getRemark().contains(ir.toString()))
+		// return true;
+		// return false;
+		return true;
 	}
 	
 	public static void showImageJ() {

@@ -31,7 +31,6 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -98,8 +97,6 @@ public class CloudComputingService {
 		System.out.println(fillLen("*IAP - Integrated Analysis Platform*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*--  Systems Biology Cloud Computing --*", l));
-		for (IAP_RELEASE ir : IAP_RELEASE.values())
-			System.out.println(fillLen("*-- " + ir.toString() + " --*", l));
 		System.out.println(fillLen("**", l));
 		System.out.println(fillLen("*(c) 2010-2012 IPK, Group Image Analysis*", l));
 		System.out.println(fillLen("**", l));
@@ -316,8 +313,7 @@ public class CloudComputingService {
 					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 					if (!processedSubmissionTimes.contains(submTime))
 						availableTempDatasets.add(new TempDataSetDescription(
-								className, partCnt, submTime, i.getOriginDbId(),
-								IAP_RELEASE.getReleaseFromDescription(i), mergeWithDBid));
+								className, partCnt, submTime, i.getOriginDbId(), mergeWithDBid));
 					processedSubmissionTimes.add(submTime);
 				}
 			}
@@ -464,10 +460,6 @@ public class CloudComputingService {
 							cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
 							cmd.setRemoteCapableAnalysisActionParams("");
 							cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
-							if (tempDataSetDescription.getReleaseIAP() != null)
-								cmd.setCompatibleImageAnalysisPipelineName(tempDataSetDescription.getReleaseIAP());
-							else
-								cmd.setCompatibleImageAnalysisPipelineName(IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_MAIZE);
 							BatchCmd.enqueueBatchCmd(m, cmd);
 							System.out.println("Enqueue: " + jobID);
 						}
@@ -582,7 +574,6 @@ public class CloudComputingService {
 		e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 		e.getHeader().setRemark(
 				e.getHeader().getRemark() +
-						" // IAP image analysis release " + tempDataSetDescription.getReleaseIAP() +
 						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
 						" // processing time: " +
 						SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +

@@ -88,8 +88,7 @@ public class TaskDescription {
 		MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
 				+ " (part index " + batch.getPartIdx() + " of " + batch.getPartCnt() + ")"
-				+ " with " + action.getDefaultTitle() + " / "
-				+ batch.getCompatibleImageAnalysisPipelineName() + "." + timeInfo);
+				+ " with " + action.getDefaultTitle() + "." + timeInfo);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
@@ -141,9 +140,6 @@ public class TaskDescription {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
 						+ SystemAnalysis.getCurrentTime(batch.getSubmissionTime()));
 				experiment.getHeader().setImportusergroup("Temp");
-				experiment.getHeader().setRemark(
-						"IAP image analysis release " + batch.getCompatibleImageAnalysisPipelineName() + " // " +
-								experiment.getHeader().getRemark());
 				// System.out.println("Received result: " + experiment.getName());
 				try {
 					BatchCmd bcmd = m.batch().getCommand(batch);

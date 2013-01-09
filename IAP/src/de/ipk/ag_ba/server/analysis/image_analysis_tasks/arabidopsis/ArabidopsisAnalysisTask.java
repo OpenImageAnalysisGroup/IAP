@@ -1,9 +1,8 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis;
 
-import org.IniIoProvider;
-
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.arabidopsis.ArabidopsisAnalysisPipeline;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.arabidopsis.ArabidopsisAnalysisPipeline;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 /**
@@ -11,28 +10,16 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
  */
 public class ArabidopsisAnalysisTask extends AbstractPhenotypingTask {
 	
-	public ArabidopsisAnalysisTask() {
-		// empty
-	}
+	public static final String DEFAULT_DESC = "Analyse Arabidopsis Phenotype";
+	public static final String DEFAULT_NAME = "Arabidopsis Phenotyping";
 	
-	@Override
-	public String getTaskDescription() {
-		return "Analyse Arabidopsis Phenotype";
-	}
-	
-	@Override
-	public String getName() {
-		return "Arabidopsis Phenotyping";
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
+	public ArabidopsisAnalysisTask(PipelineDesc pd) {
+		super(pd);
 	}
 	
 	@Override
 	public ImageProcessor getImageProcessor() {
-		return new ArabidopsisAnalysisPipeline();
+		return new ArabidopsisAnalysisPipeline(getSystemOptions());
 	}
 	
 	@Override

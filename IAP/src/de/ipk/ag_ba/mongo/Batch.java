@@ -21,7 +21,6 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -320,33 +319,35 @@ public class Batch {
 								}
 						}
 						int claimed = 0;
-						for (IAP_RELEASE ir : IAP_RELEASE.values()) {
-							if (addCnt < maxTasks && claimed < maxTasks) {
-								loop: for (DBObject dbo : collection.find(new BasicDBObject("release", ir.toString()))
-										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))) {
-									BatchCmd batch = (BatchCmd) dbo;
-									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
-										continue;
-									if (!added && batch.getCpuTargetUtilization() <= maxTasks)
-										if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
-											// after 5 minutes tasks are taken away from other systems
-											if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED) {
-												if (batch.getExperimentHeader() == null) {
-													System.out.println(SystemAnalysis.getCurrentTime() + ">Remove batch with NULL experiment ref: " + batch);
-													collection.remove(batch);
-													continue;
-												}
-												if (claim(batch, CloudAnalysisStatus.STARTING, false)) {
-													claimed++;
-													if (claimed >= maxTasks)
-														break loop;
-												}
+						// for (IAP_RELEASE ir : IAP_RELEASE.values()) {
+						if (addCnt < maxTasks && claimed < maxTasks) {
+							loop: for (DBObject dbo : collection.find(
+									// new BasicDBObject("release", ir.toString())
+									)
+									.sort(new BasicDBObject("part_idx", 1))
+									.sort(new BasicDBObject("part_cnt", 1))) {
+								BatchCmd batch = (BatchCmd) dbo;
+								if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
+									continue;
+								if (!added && batch.getCpuTargetUtilization() <= maxTasks)
+									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
+										// after 5 minutes tasks are taken away from other systems
+										if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED) {
+											if (batch.getExperimentHeader() == null) {
+												System.out.println(SystemAnalysis.getCurrentTime() + ">Remove batch with NULL experiment ref: " + batch);
+												collection.remove(batch);
+												continue;
+											}
+											if (claim(batch, CloudAnalysisStatus.STARTING, false)) {
+												claimed++;
+												if (claimed >= maxTasks)
+													break loop;
 											}
 										}
-								}
+									}
 							}
 						}
+						// }
 						// check all tasks (regardless of release)
 						// for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
 						// BatchCmd batch = (BatchCmd) dbo;

@@ -77,6 +77,8 @@ public class ActionMongoFileStorageCommands extends AbstractNavigationAction {
 						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 50), src.getGUIsetting()));
 						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 250), src.getGUIsetting()));
 						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 500), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 750), src.getGUIsetting()));
+						result.add(new NavigationButton(new MoveToVfsAction(m, v2, 1000), src.getGUIsetting()));
 						result.add(new NavigationButton(new MoveToVfsAction(m, v2, -1), src.getGUIsetting()));
 						return result;
 					}
@@ -106,6 +108,8 @@ public class ActionMongoFileStorageCommands extends AbstractNavigationAction {
 						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 50), src.getGUIsetting()));
 						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 250), src.getGUIsetting()));
 						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 500), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 750), src.getGUIsetting()));
+						result.add(new NavigationButton(new CopyToVfsAction(m, v2, 1000), src.getGUIsetting()));
 						result.add(new NavigationButton(new CopyToVfsAction(m, v2, -1), src.getGUIsetting()));
 						return result;
 					}

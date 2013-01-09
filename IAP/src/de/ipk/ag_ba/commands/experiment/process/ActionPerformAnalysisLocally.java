@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
 import org.IniIoProvider;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 
@@ -33,7 +34,8 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Perform " + so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true);
+		return "Perform " + StringManipulationTools
+				.removeHTMLtags(so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true));
 	}
 	
 	@Override
@@ -57,9 +59,6 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 				null, iniIO,
 				so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true),
 				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true));
-		return new UserDefinedImageAnalysisPipelineTask(
-				pd != null ? pd.getName() : null,
-				pd != null ? pd.getIniIO() : null,
-				pd != null ? pd.getTooltip() : null);
+		return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
 }

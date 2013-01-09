@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.AttributeHelper;
 import org.IniIoProvider;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -82,8 +83,8 @@ public class ActionSettings extends AbstractNavigationAction {
 				for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
 					res.add(new NavigationButton(
 							new ActionSettings(pd.getIniFileName(), null,
-									"Change settings of " + pd.getName() + " analysis pipeline",
-									"Settings of " + pd.getName() + " template"),
+									"Change settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " analysis pipeline",
+									"Settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " template"),
 							src.getGUIsetting()));
 	}
 	

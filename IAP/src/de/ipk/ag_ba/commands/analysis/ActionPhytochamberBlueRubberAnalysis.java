@@ -1,13 +1,15 @@
 package de.ipk.ag_ba.commands.analysis;
 
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PhytochamberAnalysisBlueRubberTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisSmallBlueRubberTask;
 
 /**
  * @author klukas
@@ -28,7 +30,11 @@ public class ActionPhytochamberBlueRubberAnalysis extends AbstractPhenotypeAnaly
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new PhytochamberAnalysisBlueRubberTask();
+		PipelineDesc pd = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_NAME) + ".pipeline.ini",
+				experiment.getIniIoProvider(),
+				ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_NAME, ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_DESC);
+		return new ArabidopsisAnalysisSmallBlueRubberTask(pd);
 	}
 	
 	@Override

@@ -1,9 +1,8 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis;
 
-import org.IniIoProvider;
-
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.arabidopsis.ArabidopsisAnalysisPipelineBlueSmallAndMiddle;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.arabidopsis.ArabidopsisAnalysisPipelineBlue;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 /**
@@ -11,28 +10,16 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
  */
 public class ArabidopsisAnalysisSmallBlueRubberTask extends AbstractPhenotypingTask {
 	
-	public ArabidopsisAnalysisSmallBlueRubberTask() {
-		// empty
-	}
+	public final static String DEFAULT_NAME = "Arabidopsis Phenotyping (blue background)";
+	public final static String DEFAULT_DESC = "Analyse Arabidopsis Phenotype";
 	
-	@Override
-	public String getTaskDescription() {
-		return "Analyse Arabidopsis Phenotype (small, blue rubber)";
-	}
-	
-	@Override
-	public String getName() {
-		return "Arabidopsis Phenotyping (small, blue rubber)";
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
+	public ArabidopsisAnalysisSmallBlueRubberTask(PipelineDesc pd) {
+		super(pd);
 	}
 	
 	@Override
 	public ImageProcessor getImageProcessor() {
-		return new ArabidopsisAnalysisPipelineBlueSmallAndMiddle();
+		return new ArabidopsisAnalysisPipelineBlue(getSystemOptions());
 	}
 	
 	@Override

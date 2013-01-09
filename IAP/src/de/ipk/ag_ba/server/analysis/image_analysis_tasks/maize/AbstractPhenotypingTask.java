@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -23,15 +26,12 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -80,10 +80,24 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int unit_test_idx;
 	private int unit_test_steps;
 	private int[] debugValidTrays;
+	private final PipelineDesc pd;
+	
+	public AbstractPhenotypingTask(PipelineDesc pd) {
+		this.pd = pd;
+	}
+	
+	protected SystemOptions getSystemOptions() {
+		return pd.getOptions();
+	}
 	
 	@Override
-	public IAP_RELEASE getVersionTag() throws Exception {
-		return getImageProcessor().getVersionTag();
+	public String getTaskDescription() {
+		return pd.getTooltip();
+	}
+	
+	@Override
+	public String getName() {
+		return pd.getName();
 	}
 	
 	@Override
@@ -1090,4 +1104,5 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	public void debugSetValidTrays(int[] debugValidTrays) {
 		this.debugValidTrays = debugValidTrays;
 	}
+	
 }
