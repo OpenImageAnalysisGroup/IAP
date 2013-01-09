@@ -6,7 +6,7 @@ import iap.blocks.BlColorBalancing;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCrop;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
-import iap.blocks.BlMedianFilter_fluo;
+import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMedianFilter;
 import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
@@ -27,7 +27,7 @@ import iap.blocks.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import iap.blocks.maize.BlIntensityConversion;
 import iap.blocks.maize.BlUseVisMaskToClearFluo_fluo;
 import iap.blocks.maize.BlockColorBalancingVertical;
-import iap.blocks.maize.BlockDrawSkeleton_vis_fluo;
+import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
@@ -72,7 +72,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilter.class.getCanonicalName(),
 				BlIntensityConversion.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
-				BlMedianFilter_fluo.class.getCanonicalName(),
+				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseVisMaskToClearFluo_fluo.class.getCanonicalName(),
 				BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir.class.getCanonicalName(),
@@ -94,7 +94,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				
-				BlockDrawSkeleton_vis_fluo.class.getCanonicalName(),
+				BlockDrawSkeleton.class.getCanonicalName(),
 				
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
