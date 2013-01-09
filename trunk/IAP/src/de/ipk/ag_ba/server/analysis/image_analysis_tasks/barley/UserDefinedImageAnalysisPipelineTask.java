@@ -1,12 +1,12 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley;
 
-import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.IniIoProvider;
+import iap.pipelines.AbstractImageProcessor;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.ImageProcessorOptions;
 
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
-import de.ipk.ag_ba.image.analysis.AbstractImageProcessor;
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
@@ -14,30 +14,8 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
  * @author klukas
  */
 public class UserDefinedImageAnalysisPipelineTask extends AbstractPhenotypingTask {
-	
-	private final String pipelineFileName;
-	private final String desc;
-	private final IniIoProvider iniIO;
-	
-	public UserDefinedImageAnalysisPipelineTask(String name, IniIoProvider iniIO, String desc) {
-		this.pipelineFileName = name;
-		this.iniIO = iniIO;
-		this.desc = desc;
-	}
-	
-	@Override
-	public String getTaskDescription() {
-		return desc;
-	}
-	
-	@Override
-	public String getName() {
-		return pipelineFileName;
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return iniIO;
+	public UserDefinedImageAnalysisPipelineTask(PipelineDesc pd) {
+		super(pd);
 	}
 	
 	@Override
@@ -58,7 +36,6 @@ public class UserDefinedImageAnalysisPipelineTask extends AbstractPhenotypingTas
 			@Override
 			public void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status) {
 				this.status = status;
-				
 			}
 			
 			@Override
@@ -67,15 +44,9 @@ public class UserDefinedImageAnalysisPipelineTask extends AbstractPhenotypingTas
 			}
 			
 			@Override
-			public IAP_RELEASE getVersionTag() {
-				return null;
-			}
-			
-			@Override
 			public BlockPipeline getPipeline(ImageProcessorOptions options) {
-				return getPipelineFromBlockList(null, iniIO, null);
+				return getPipelineFromBlockList(getSystemOptions(), null);
 			}
 		};
 	}
-	
 }

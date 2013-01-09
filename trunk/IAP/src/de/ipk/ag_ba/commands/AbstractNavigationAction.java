@@ -26,11 +26,15 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	private final ArrayList<NavigationButton> additionalEntities = new ArrayList<NavigationButton>();
 	protected BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 	
-	private final String tooltip;
+	private String tooltip;
 	protected NavigationAction srcAction;
 	protected GUIsetting guiSetting;
 	
 	public AbstractNavigationAction(String tooltip) {
+		this.tooltip = tooltip;
+	}
+	
+	protected void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
 	}
 	

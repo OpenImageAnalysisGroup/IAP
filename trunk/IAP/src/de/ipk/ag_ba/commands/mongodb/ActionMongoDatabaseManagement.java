@@ -7,7 +7,6 @@ import org.SystemOptions;
 import com.mongodb.BasicDBObject;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.file_storage.ActionMongoFileStorageCommands;
@@ -63,9 +62,6 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		if (fsl != null && !fsl.isEmpty()) {
 			result.add(new NavigationButton(new ActionMongoFileStorageCommands(m, fsl), src.getGUIsetting()));
 		}
-		
-		if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false))
-			result.add(new NavigationButton(new ActionAnalyzeAllExperiments(m, experimentList), src.getGUIsetting()));
 		
 		boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
 		if (showDeleteCloudJobsIcon) {

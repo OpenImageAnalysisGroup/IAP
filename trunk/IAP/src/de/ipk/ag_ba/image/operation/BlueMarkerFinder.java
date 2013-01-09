@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operation;
 
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.MaximumFinder;
 
@@ -12,7 +13,6 @@ import java.util.TreeSet;
 
 import org.Vector2d;
 
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class BlueMarkerFinder {

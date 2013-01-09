@@ -12,10 +12,8 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.IniIoProvider;
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -49,11 +47,6 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return "Segmentation";
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
 	}
 	
 	@Override
@@ -144,8 +137,4 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
 	}
 	
-	@Override
-	public IAP_RELEASE getVersionTag() {
-		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_3D;
-	}
 }

@@ -10,7 +10,6 @@ import java.util.Date;
 
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 
@@ -34,9 +33,4 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	
 	public int getNumberOfJobs();
 	
-	/**
-	 * @return A version tag, used to ensure that the remote action is executed only with the current version of the code.
-	 * @throws Exception
-	 */
-	public IAP_RELEASE getVersionTag() throws Exception;
 }

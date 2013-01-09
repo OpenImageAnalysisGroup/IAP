@@ -2,7 +2,6 @@ package de.ipk.ag_ba.gui.navigation_actions.maize;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
@@ -15,7 +14,6 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	public ImageAnalysisAction() {
 		super(null);
-		// empty
 	}
 	
 	public ImageAnalysisAction(PipelineDesc pd, MongoDB m, ExperimentReference experiment) {
@@ -30,20 +28,12 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new UserDefinedImageAnalysisPipelineTask(
-				pd != null ? pd.getName() : null,
-				pd != null ? pd.getIniIO() : null,
-				pd != null ? pd.getTooltip() : null);
+		return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
 	
 	@Override
 	public String getDefaultImage() {
 		return "img/000Grad.png";
-	}
-	
-	@Override
-	public String getDefaultTitle() {
-		return pd != null ? pd.getName() : null;
 	}
 	
 	@Override
@@ -57,11 +47,6 @@ public class ImageAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 		
 		return numberOfJobs;
-	}
-	
-	@Override
-	public IAP_RELEASE getVersionTag() throws Exception {
-		return getImageAnalysisTask().getVersionTag();
 	}
 	
 }

@@ -12,7 +12,6 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -196,11 +195,6 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 	@Override
 	public int getNumberOfJobs() {
 		return 1;
-	}
-	
-	@Override
-	public IAP_RELEASE getVersionTag() {
-		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_OTHER;
 	}
 	
 }

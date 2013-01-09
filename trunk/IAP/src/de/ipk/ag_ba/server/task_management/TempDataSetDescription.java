@@ -1,22 +1,18 @@
 package de.ipk.ag_ba.server.task_management;
 
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
-
 public class TempDataSetDescription implements Comparable<TempDataSetDescription> {
 	
 	private final String bcn;
 	private final String bpn;
 	private final String bst;
 	private final String originDBid;
-	private final IAP_RELEASE release_iap;
 	private final String mergeWithDBid;
 	
-	public TempDataSetDescription(String bcn, String bpn, String bst, String originDBid, IAP_RELEASE release_iap, String mergeWithDBid) {
+	public TempDataSetDescription(String bcn, String bpn, String bst, String originDBid, String mergeWithDBid) {
 		this.bcn = bcn;
 		this.bpn = bpn;
 		this.bst = bst;
 		this.originDBid = originDBid;
-		this.release_iap = release_iap;
 		this.mergeWithDBid = mergeWithDBid;
 	}
 	
@@ -57,10 +53,6 @@ public class TempDataSetDescription implements Comparable<TempDataSetDescription
 	
 	public String getOriginDBid() {
 		return originDBid;
-	}
-	
-	public IAP_RELEASE getReleaseIAP() {
-		return release_iap;
 	}
 	
 	public String getMergeWithDBid() {

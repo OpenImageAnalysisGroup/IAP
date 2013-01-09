@@ -21,7 +21,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.database_tools.ActionAnalyzeAllExperiments;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoDbCompact;
@@ -190,18 +189,6 @@ public class MassCopySupport {
 							MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
 									+ SystemAnalysis.getWaitTime(processingTime));
 						}
-						if (SystemOptions.getInstance().getBoolean("IAP", "grid_remote_execution", false)) {
-							ActionAnalyzeAllExperiments all = new ActionAnalyzeAllExperiments(m, m.getExperimentList(null));
-							status.setCurrentStatusText2("Schedule analysis tasks for new data");
-							all.setStatusProvider(getStatusProvider());
-							all.performActionCalculateResults(null);
-							int nn = m.batch().getAll().size();
-							if (nn == 0)
-								status.setCurrentStatusText2("All analyis results are up-to-date");
-							else
-								status.setCurrentStatusText2("Scheduled " + nn +
-										" analysis tasks (" + SystemAnalysis.getCurrentTime() + ")");
-						}
 					}
 				}
 			}
@@ -333,19 +320,6 @@ public class MassCopySupport {
 			done++;
 			status.setCurrentStatusValueFine(100d * done / toSave.size());
 			
-			if (analyzeEachCopiedExperiment) {
-				String id = er.getHeader().getDatabaseId();
-				ArrayList<ExperimentHeaderInterface> experimentList = m.getExperimentList(null);
-				for (ExperimentHeaderInterface ehi : experimentList) {
-					if (ehi.getDatabaseId().equals(id)) {
-						print("TODO Add compute tasks to analyze experiment " + id + ".");
-						if (false) {
-							ActionAnalyzeAllExperiments.processExperimentHeader(m, new StringBuilder(), ehi,
-									ActionAnalyzeAllExperiments.knownAnalysis(ehi, experimentList));
-						}
-					}
-				}
-			}
 			Thread.sleep(1000);
 		}
 		status.setPrefix1(null);

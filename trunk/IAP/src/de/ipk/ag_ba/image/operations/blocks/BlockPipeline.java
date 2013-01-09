@@ -1,5 +1,12 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import iap.blocks.BlCrop;
+import iap.blocks.BlMoveMasksToImageSet;
+import iap.blocks.BlReplaceEmptyOriginalImages;
+import iap.blocks.arabidopsis.BlCutZoomedImages;
+import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -21,13 +28,6 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions;
-import de.ipk.ag_ba.image.analysis.ImageProcessorOptions.CameraPosition;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlCrop_images_vis_fluo_nir_ir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlMoveMasksToImageSet_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.BlReplaceEmptyOriginalImages_vis_fluo_nir;
-import de.ipk.ag_ba.image.operations.blocks.cmds.arabidopsis.BlCutZoomedImages;
-import de.ipk.ag_ba.image.operations.blocks.cmds.data_structures.ImageAnalysisBlockFIS;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -161,9 +161,9 @@ public class BlockPipeline {
 			
 			if (debug)
 				if (block.getClass() != BlCutZoomedImages.class)
-					if (block.getClass() != BlReplaceEmptyOriginalImages_vis_fluo_nir.class)
-						if (block.getClass() != BlCrop_images_vis_fluo_nir_ir.class)
-							if (block.getClass() != BlMoveMasksToImageSet_vis_fluo_nir.class)
+					if (block.getClass() != BlReplaceEmptyOriginalImages.class)
+						if (block.getClass() != BlCrop.class)
+							if (block.getClass() != BlMoveMasksToImageSet.class)
 								if (isd.isDifferentTo(input2)) {
 									System.out.println();
 									System.out.println(SystemAnalysis.getCurrentTime()

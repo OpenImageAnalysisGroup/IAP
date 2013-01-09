@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.experiment.process;
 
 import java.util.ArrayList;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -42,12 +44,17 @@ public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-		for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
-			actions.add(new NavigationButton(
-					new ActionAssignAnalysisTemplate(m, experimentReference, pd.getIniFileName(),
-							"Assign " + pd.getName() + " analysis pipeline to experiment",
-							"<html><center>Use " + pd.getName() + ""),
-					src.getGUIsetting()));
+		try {
+			for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
+				actions.add(new NavigationButton(
+						new ActionAssignAnalysisTemplate(m, experimentReference, pd.getIniFileName(),
+								"Assign " + pd.getName() + " analysis pipeline to experiment",
+								"<html><center>Use " + pd.getName() + ""),
+						src.getGUIsetting()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
 		return actions;
 	}
 }

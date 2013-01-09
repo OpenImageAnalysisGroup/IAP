@@ -1,37 +1,24 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 
-import org.IniIoProvider;
-
-import de.ipk.ag_ba.image.analysis.ImageProcessor;
-import de.ipk.ag_ba.image.analysis.maize.MaizeAnalysisPipelineWith3D;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.maize.MaizeAnalysisPipelineWith3D;
+import de.ipk.ag_ba.gui.PipelineDesc;
 
 /**
  * @author klukas
  */
 public class Maize3DanalysisTask extends AbstractPhenotypingTask {
 	
-	public Maize3DanalysisTask() {
-		// empty
-	}
+	public static final String DEFAULT_DESC = "Analyse Maize 3D-Phenotype";
+	public static final String DEFAULT_NAME = "Maize 3D-Phenotyping";
 	
-	@Override
-	public String getTaskDescription() {
-		return "Analyse Maize 3D-Phenotype";
-	}
-	
-	@Override
-	public String getName() {
-		return "Maize 3D-Phenotyping";
-	}
-	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
+	public Maize3DanalysisTask(PipelineDesc pd) {
+		super(pd);
 	}
 	
 	@Override
 	public ImageProcessor getImageProcessor() {
-		return new MaizeAnalysisPipelineWith3D("Maize 3D-Phenotyping", null);
+		return new MaizeAnalysisPipelineWith3D(getSystemOptions());
 	}
 	
 	@Override

@@ -1,8 +1,10 @@
 package de.ipk.ag_ba.gui.navigation_actions.roots;
 
+import org.StringManipulationTools;
+
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.roots.RootsAnalysisTask;
@@ -26,7 +28,11 @@ public class RootScannAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new RootsAnalysisTask();
+		PipelineDesc pd = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(RootsAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
+				experiment.getIniIoProvider(),
+				RootsAnalysisTask.DEFAULT_NAME, RootsAnalysisTask.DEFAULT_DESC);
+		return new RootsAnalysisTask(pd);
 	}
 	
 	@Override
@@ -52,8 +58,4 @@ public class RootScannAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		return numberOfJobs;
 	}
 	
-	@Override
-	public IAP_RELEASE getVersionTag() throws Exception {
-		return getImageAnalysisTask().getVersionTag();
-	}
 }

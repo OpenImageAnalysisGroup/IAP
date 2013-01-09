@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
+import org.StringManipulationTools;
+
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -11,21 +14,27 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask
 public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	public MaizeAnalysisAction(MongoDB m, ExperimentReference experiment) {
-		super("Analyze Phenotype (Maize)");
+		super(null);
 		this.m = m;
 		this.experiment = experiment;
 		this.experimentResult = null;
 		if (experiment != null && experiment.getHeader() != null)
 			this.mongoDatasetID = experiment.getHeader().getDatabaseId();
+		
+		setTooltip(getImageAnalysisTask().getTaskDescription());
 	}
 	
 	public MaizeAnalysisAction() {
-		super("Analyze Phenotype (Maize)");
+		super(MaizeAnalysisTask.DEFAULT_DESC);
 	}
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
-		return new MaizeAnalysisTask();
+		PipelineDesc pd = new PipelineDesc(
+				StringManipulationTools.getFileSystemName(MaizeAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
+				experiment.getIniIoProvider(),
+				MaizeAnalysisTask.DEFAULT_NAME, MaizeAnalysisTask.DEFAULT_DESC);
+		return new MaizeAnalysisTask(pd);
 	}
 	
 	@Override
@@ -35,7 +44,7 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Maize Analysis";
+		return getImageAnalysisTask().getName();
 	}
 	
 	@Override
@@ -50,5 +59,4 @@ public class MaizeAnalysisAction extends AbstractPhenotypeAnalysisAction {
 		
 		return numberOfJobs;
 	}
-	
 }

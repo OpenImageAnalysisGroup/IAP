@@ -9,14 +9,12 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -375,11 +373,6 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 		return "3D-Reconstruction";
 	}
 	
-	@Override
-	public IniIoProvider getIniIo() {
-		return null;
-	}
-	
 	public void setResolution(int voxelresolution, int widthFactor) {
 		this.voxelresolution = voxelresolution;
 		this.widthFactor = widthFactor;
@@ -391,8 +384,4 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
 	}
 	
-	@Override
-	public IAP_RELEASE getVersionTag() {
-		return IAP_RELEASE.RELEASE_IAP_IMAGE_ANALYSIS_3D;
-	}
 }

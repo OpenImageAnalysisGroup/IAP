@@ -67,7 +67,6 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			cmd.setRemoteCapableAnalysisActionParams(remoteCapableAnalysisActionParams);
 			cmd.setExperimentMongoID(experimentInputMongoID);
 			cmd.setCpuTargetUtilization(remoteAction.getCpuTargetUtilization());
-			cmd.setCompatibleImageAnalysisPipelineName(remoteAction.getVersionTag());
 			cmd.setNewstAvailableData(newestImportDate, databaseIdOfNewestResultData);
 			MongoDB m = remoteAction.getMongoDB();
 			if (m == null)

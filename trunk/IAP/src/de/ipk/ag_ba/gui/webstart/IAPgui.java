@@ -23,7 +23,6 @@ import netscape.javascript.JSObject;
 
 import org.ErrorMsg;
 import org.ReleaseInfo;
-import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.ActionIapHome;
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -134,7 +133,6 @@ public class IAPgui {
 	}
 	
 	public static String getIntroTxt() {
-		String vs = StringManipulationTools.getStringList(IAP_RELEASE.values(), ", ");
 		return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform!</font></h2>"
 				+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
 				+ "developed by the IPK research group Image Analysis.<br>"
@@ -144,7 +142,6 @@ public class IAPgui {
 				+ "<br>"
 				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
 				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
-				"IAP Image Analysis - Pipeline-Versions: <br>" + vs + "<br><br>" +
 				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
 						"<br>" +
 								"<p>Latest changes:<br><br><ul>",

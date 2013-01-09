@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -21,7 +22,6 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -62,9 +62,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		super(tooltip);
 	}
 	
-	@Override
-	public IAP_RELEASE getVersionTag() throws Exception {
-		return getImageAnalysisTask().getVersionTag();
+	protected SystemOptions getSystemOptions() {
+		SystemOptions so = SystemOptions.getInstance(
+				StringManipulationTools.getFileSystemName(getDefaultTitle()) + ".pipeline.ini",
+				experiment.getIniIoProvider());
+		return so;
 	}
 	
 	@Override
@@ -272,7 +274,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					
 					statisticsResult.getHeader().setRemark(
 							statisticsResult.getHeader().getRemark() +
-									" // IAP image analysis release " + getVersionTag() +
 									" // analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime() +
 									" // processing time: " +

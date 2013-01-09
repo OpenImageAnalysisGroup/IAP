@@ -18,7 +18,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAP_RELEASE;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
@@ -132,18 +131,6 @@ public class BatchCmd extends BasicDBObject {
 		return getLong("lastupdate");
 	}
 	
-	public String getCompatibleImageAnalysisPipelineName() {
-		String release = getString("release");
-		if (release == null)
-			return "";
-		else
-			return release;
-	}
-	
-	public void setCompatibleImageAnalysisPipelineName(IAP_RELEASE pipline_id) {
-		put("release", pipline_id + "");
-	}
-	
 	public CloudAnalysisStatus getRunStatus() {
 		for (CloudAnalysisStatus cas : CloudAnalysisStatus.values())
 			if (cas.toNiceString().equals(getString("runstatus")))
@@ -202,8 +189,10 @@ public class BatchCmd extends BasicDBObject {
 	
 	public static ArrayList<DBObject> getRunstatusMatchers(CloudAnalysisStatus starting) {
 		ArrayList<DBObject> res = new ArrayList<DBObject>();
-		for (IAP_RELEASE ir : IAP_RELEASE.values())
-			res.add(new BasicDBObject("runstatus", starting.toString()).append("release", ir.toString()));
+		// for (IAP_RELEASE ir : IAP_RELEASE.values())
+		res.add(new BasicDBObject("runstatus", starting.toString())
+				// .append("release", ir.toString())
+				);
 		return res;
 	}
 	
