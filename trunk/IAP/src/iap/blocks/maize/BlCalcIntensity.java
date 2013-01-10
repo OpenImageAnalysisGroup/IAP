@@ -2,7 +2,6 @@ package iap.blocks.maize;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import java.util.HashSet;
 
@@ -12,8 +11,6 @@ import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.intensity.Histogram;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -40,7 +37,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		return false;
 	}
 	
-	BlockProperty markerDistanceHorizontally = null;
+	Double markerDistanceHorizontally = null;
 	
 	@Override
 	protected void prepare() {
@@ -51,8 +48,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", true);
 		addHistogramValues = getBoolean("Add_Histogram_Values", false);
 		
-		if (getProperties() != null && getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT) != null)
-			markerDistanceHorizontally = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+		markerDistanceHorizontally = options.getCalculatedBlueMarkerDistance();
 	}
 	
 	@Override
@@ -105,8 +101,10 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		double averageVisG = visibleIntensitySumG / visibleFilledPixels;
 		double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 		
-		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(markerDistanceHorizontally,
-				options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Histogram.Mode.MODE_HUE_VIS_ANALYSIS, addHistogramValues);
+		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(
+				markerDistanceHorizontally,
+				options.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
+				addHistogramValues);
 		getProperties().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
@@ -136,7 +134,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.print("AFTER ERODE", debug);
 			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-					options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
+					options.getDoubleSetting(null, "Blue Marker Distance", 1250), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return input().masks().fluo();// io.getImage();
@@ -200,7 +198,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d, null);
 				}
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20)).calculateHistorgram(markerDistanceHorizontally,
-						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						options.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
 				
 				if (options == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
@@ -236,7 +234,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 				getProperties().setNumericProperty(getBlockPosition(),
 						"RESULT_" + options.getCameraPosition() + ".ir.intensity.average", avgIr, null);
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-						options.getIntSetting(Setting.REAL_MARKER_DISTANCE), Mode.MODE_IR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						options.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
 				
 				if (options == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");

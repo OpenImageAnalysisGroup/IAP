@@ -86,7 +86,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.pd = pd;
 	}
 	
-	protected SystemOptions getSystemOptions() {
+	public SystemOptions getSystemOptions() {
 		return pd.getOptions();
 	}
 	
@@ -428,7 +428,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
-				ImageProcessorOptions options = new ImageProcessorOptions();
+				ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
 				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 				postprocessingResults = getImageProcessor()
 						.postProcessPipelineResults(
@@ -949,7 +949,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		boolean side = id.isSide();
 		
-		ImageProcessorOptions options = new ImageProcessorOptions();
+		ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
 		
 		options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 		

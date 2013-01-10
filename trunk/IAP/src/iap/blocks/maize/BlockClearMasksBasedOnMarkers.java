@@ -14,7 +14,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
-	BlockProperty markerPosLeftY, markerPosRightY, markerPosLeftX, markerPosRightX, markerDist;
+	BlockProperty markerPosLeftY, markerPosRightY, markerPosLeftX, markerPosRightX;
+	Double markerDist;
 	boolean debug;
 	boolean hasThreeVerticalMarkerPositionsVisible;
 	
@@ -33,7 +34,7 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 		markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
 		markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 		
-		markerDist = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+		markerDist = options.getCalculatedBlueMarkerDistance();
 	}
 	
 	@Override
@@ -281,9 +282,9 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 		
 		if (options.isMaize()) {
 			if (markerDist != null && markerPosLeftX != null && markerPosRightX != null) {
-				double dist = markerDist.getValue() * 0.15;
-				double posLeft = width / 2 - markerDist.getValue() / 2;
-				double posRight = width / 2 + markerDist.getValue() / 2;
+				double dist = markerDist * 0.15;
+				double posLeft = width / 2 - markerDist / 2;
+				double posRight = width / 2 + markerDist / 2;
 				
 				result = new ImageOperation(result).clearImageRight(
 						(int) (dist + posRight), colorRight)

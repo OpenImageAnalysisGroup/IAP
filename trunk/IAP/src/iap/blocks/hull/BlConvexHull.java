@@ -2,7 +2,6 @@ package iap.blocks.hull;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import java.awt.Color;
 import java.util.Date;
@@ -19,9 +18,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -56,8 +53,8 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 		if (image == null) {
 			return null;
 		}
-		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		Integer realDist = options.getIntSetting(Setting.REAL_MARKER_DISTANCE);
+		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
+		Double realDist = options.getREAL_MARKER_DISTANCE();
 		if (distHorizontal == null)
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);

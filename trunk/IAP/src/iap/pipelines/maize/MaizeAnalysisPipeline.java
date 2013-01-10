@@ -35,7 +35,6 @@ import iap.blocks.maize.BlockRemoveVerticalAndHorizontalStructuresFromVisFluo;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
@@ -83,7 +82,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				// BlockClosingForYellowVisMask.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(), // requires lab filter before
 				BlockRemoveMaizeBambooStick.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
-																								// noise)
+																						// noise)
 				BlockRemoveLevitatingObjectsFromVisFluo.class.getCanonicalName(),
 				// BlTranslateMatch_vis_fluo_nir.class.getCanonicalName(),
 				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
@@ -133,27 +132,14 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		// options.addBooleanSetting(Setting.DEBUG_TAKE_TIMES, true);
-		
-		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
+		String g = "Block Settings";
 		
 		options.setSystemOptionStorage(so, g);
 		
 		options.setIsMaize(true);
+		options.setIsBarley(false);
+		options.setIsArabidopsis(false);
 		
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 20);
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20);
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 20);
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 20);
-		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 90);
-		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 90);
-		options.clearAndAddIntSetting(Setting.B_Diff_NIR, 30); // 20
-		options.clearAndAddIntSetting(Setting.W_Diff_NIR, 33); // 23
-		options.clearAndAddIntSetting(Setting.B_Diff_NIR_TOP, 20); // 30); // 20
-		options.clearAndAddIntSetting(Setting.W_Diff_NIR_TOP, 33);// 33); // 23
-		
-		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1448);
-		// options.setSystemOptionStorage(null, null);
 	}
 	
 	@Override

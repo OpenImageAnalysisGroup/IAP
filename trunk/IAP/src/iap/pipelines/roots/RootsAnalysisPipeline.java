@@ -61,7 +61,7 @@ public class RootsAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
+		String g = "Block Settings";
 		
 		options.setSystemOptionStorage(so, g);
 	}

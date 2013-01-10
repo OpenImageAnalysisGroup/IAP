@@ -114,7 +114,7 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		int maxDist = max(distances);
 		
 		if (maxDist > 0)
-			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT, maxDist);
+			options.setCalculatedBlueMarkerDistance(maxDist);
 		
 		if (debug)
 			System.out.println("maxDist_horizontal: " + maxDist + " " + (maxDist == 0 ? "NO MARKERS FOUND" : ""));

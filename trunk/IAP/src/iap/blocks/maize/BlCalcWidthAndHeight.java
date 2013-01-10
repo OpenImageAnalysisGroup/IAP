@@ -2,7 +2,6 @@ package iap.blocks.maize;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -47,11 +46,9 @@ public class BlCalcWidthAndHeight extends
 	protected FlexibleImage processVISmask() {
 		
 		int background = options.getBackground();
-		double realMarkerDistHorizontal = options
-				.getIntSetting(Setting.REAL_MARKER_DISTANCE);
 		
-		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1,
-				PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
+		Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
+		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
 		
 		boolean useFluo = false;// options.isMaize();
 		
@@ -186,15 +183,13 @@ public class BlCalcWidthAndHeight extends
 									getBlockPosition(),
 									"RESULT_side.width.norm",
 									values.x
-											* (realMarkerDistHorizontal / distHorizontal
-													.getValue()) * resf, "mm");
+											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
 					getProperties()
 							.setNumericProperty(
 									getBlockPosition(),
 									"RESULT_side.height.norm",
 									values.y
-											* (realMarkerDistHorizontal / distHorizontal
-													.getValue()) * resf, "mm");
+											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
 				}
 				getProperties().setNumericProperty(getBlockPosition(),
 						"RESULT_side.width", values.x, "px");
