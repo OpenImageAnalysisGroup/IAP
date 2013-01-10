@@ -1,8 +1,8 @@
 package iap.pipelines.barley;
 
 import iap.blocks.BlBalanceFluo;
-import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlColorBalancing;
+import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.BlCrop;
@@ -35,7 +35,6 @@ import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
@@ -116,23 +115,13 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
+		String g = "Block Settings";
 		options.setSystemOptionStorage(so, g);
 		
-		options.setIsArabidopsis(false);
 		options.setIsBarley(true);
 		options.setIsMaize(false);
+		options.setIsArabidopsis(false);
 		
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 40); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20); // 20
-		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 0);
-		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for
-		// Barley
-		
-		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 10); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 10); // 20
 	}
 	
 	@Override

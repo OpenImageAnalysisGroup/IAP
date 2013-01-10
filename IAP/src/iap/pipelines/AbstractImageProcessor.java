@@ -103,7 +103,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			SystemOptions so,
 			String[] defaultBlockList) {
 		defaultBlockList = so.getStringAll(
-				"IMAGE-ANALYIS-PIPELINE-BLOCKS-" + this.getClass().getCanonicalName(),
+				"Analysis Blocks",
 				"block",
 				defaultBlockList);
 		

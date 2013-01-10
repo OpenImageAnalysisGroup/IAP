@@ -1,13 +1,13 @@
 package iap.pipelines.arabidopsis;
 
 import iap.blocks.BlBalanceFluo;
-import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlColorBalancing;
+import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCrop;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
-import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMedianFilter;
+import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
@@ -31,7 +31,6 @@ import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
@@ -114,23 +113,13 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "IMAGE-ANALYSIS-PIPELINE-SETTINGS-" + getClass().getCanonicalName();
+		String g = "Block Settings";
 		
 		options.setSystemOptionStorage(so, g);
 		
 		options.setIsBarley(false);
 		options.setIsMaize(false);
 		options.setIsArabidopsis(true);
-		
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_SIDE, 7); // 20
-		options.clearAndAddIntSetting(Setting.L_Diff_VIS_TOP, 50); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_VIS_TOP, 20); // 20
-		options.clearAndAddIntSetting(Setting.BOTTOM_CUT_OFFSET_VIS, 0);
-		options.clearAndAddIntSetting(Setting.REAL_MARKER_DISTANCE, 1150); // for
-		
-		options.clearAndAddIntSetting(Setting.L_Diff_FLUO, 120); // 20
-		options.clearAndAddIntSetting(Setting.abDiff_FLUO, 120); // 20
 	}
 	
 	@Override

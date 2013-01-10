@@ -443,4 +443,8 @@ public class BlockPipeline {
 		for (int i : debugValidTrays)
 			this.debugValidTrays.add(i);
 	}
+	
+	public int getSize() {
+		return blocks.size();
+	}
 }

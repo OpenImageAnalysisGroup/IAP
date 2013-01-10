@@ -1,7 +1,6 @@
 package iap.blocks.threeD;
 
 import iap.blocks.data_structures.AbstractBlock;
-import iap.pipelines.ImageProcessorOptions.Setting;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -15,9 +14,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
@@ -45,7 +42,6 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		FlexibleImage fi = input().images() != null ? input().images().vis() : null;
 		if (fi != null) {
 			getProperties().setImage("img.vis.3D", fi.display("CLEARED", false));
-			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_REAL_VALUE, options.getDoubleSetting(Setting.REAL_MARKER_DISTANCE));
 		} else {
 			System.out.println();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
@@ -77,15 +73,12 @@ public class BlockThreeDgeneration extends AbstractBlock {
 				mg.setCubeSideLength(300, 300, 300);
 				
 				ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
-				BlockProperty distHorizontal = null;
-				double realMarkerDistHorizontal = Double.NaN;
+				Double distHorizontal = null;
+				Double realMarkerDistHorizontal = null;
 				for (String angle : allResultsForSnapshot.keySet()) {
-					// System.out.println(SystemAnalysisExt.getCurrentTime() + ">Process image angle " + angle + " (TODO)");
 					BlockResultSet bp = allResultsForSnapshot.get(tray).get(angle);
-					distHorizontal = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-					BlockProperty bpv = bp.getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_REAL_VALUE);
-					if (bpv != null)
-						realMarkerDistHorizontal = bpv.getValue();
+					distHorizontal = options.getCalculatedBlueMarkerDistance();
+					realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
 					FlexibleImage vis = bp.getImage("img.vis.3D");
 					bp.setImage("img.vis.3D", null);
 					if (vis != null) {
@@ -127,7 +120,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 							"RESULT_plant3d.volume", plantVolume, "voxel");
 					
 					if (distHorizontal != null) {
-						double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+						double corr = realMarkerDistHorizontal / distHorizontal;
 						summaryResult.setNumericProperty(0, "RESULT_plant3d.volume.norm",
 								plantVolume * corr * corr * corr, "mm^3");
 					}
@@ -192,8 +185,10 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	/**
 	 * The "fire" burns down each solid voxel with fixed speed.
 	 */
-	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
-			double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
+	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution,
+			ThreeDmodelGenerator mg,
+			Double distHorizontal,
+			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create simple 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -256,7 +251,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		summaryResult.setNumericProperty(0,
 				"RESULT_plant3d.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
-			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericProperty(0,
 					"RESULT_plant3d.skeleton.length.norm",
 					skeletonLength * corr, "mm");
@@ -277,8 +272,10 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	/**
 	 * The "fire" slowly burns down the cube, based on each voxel's probability
 	 */
-	private void createAdvancedProbabilitySkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg, BlockProperty distHorizontal,
-			double realMarkerDistHorizontal,
+	private void createAdvancedProbabilitySkeleton(BlockResultSet summaryResult, int voxelresolution,
+			ThreeDmodelGenerator mg,
+			Double distHorizontal,
+			Double realMarkerDistHorizontal,
 			int[][][] probabilityCube, LoadedVolume volume) {
 		int empty = 0;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
@@ -342,7 +339,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 		summaryResult.setNumericProperty(0,
 				"RESULT_plant3d.probability-skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
-			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
+			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericProperty(0,
 					"RESULT_plant3d.probability-skeleton.length.norm",
 					skeletonLength * corr, "mm");

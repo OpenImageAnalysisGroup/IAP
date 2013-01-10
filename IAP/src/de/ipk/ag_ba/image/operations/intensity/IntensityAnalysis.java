@@ -7,7 +7,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
 
 public class IntensityAnalysis {
@@ -20,7 +19,7 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTableWithUnits calculateHistorgram(BlockProperty optDistHorizontal, Integer optRealMarkerDistance,
+	public ResultsTableWithUnits calculateHistorgram(Double optDistHorizontal, Double optRealMarkerDistance,
 			Histogram.Mode mode, boolean addHistogramValues) {
 		
 		ResultsTableWithUnits result = new ResultsTableWithUnits();
@@ -157,7 +156,7 @@ public class IntensityAnalysis {
 		if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
 			if (addHistogramValues) {
 				if (optDistHorizontal != null && optRealMarkerDistance != null && addNormalizedHistogramValues) {
-					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+					double normalize = optRealMarkerDistance / optDistHorizontal;
 					for (int i = 0; i < this.n; i++) {
 						result.addValue("hsv.normalized.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getFreqAt(i) * normalize);
@@ -297,7 +296,7 @@ public class IntensityAnalysis {
 			
 			if (addHistogramValues)
 				if (addNormalizedHistogramValues && optDistHorizontal != null && optRealMarkerDistance != null) {
-					double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+					double normalize = optRealMarkerDistance / optDistHorizontal;
 					for (int i = 0; i < this.n; i++) {
 						result.addValue(
 								"normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
@@ -313,7 +312,7 @@ public class IntensityAnalysis {
 			if (addHistogramValues)
 				if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
 					if (addNormalizedHistogramValues && optDistHorizontal != null && optRealMarkerDistance != null) {
-						double normalize = optRealMarkerDistance / optDistHorizontal.getValue();
+						double normalize = optRealMarkerDistance / optDistHorizontal;
 						for (int i = 0; i < this.n; i++) {
 							result.addValue(
 									"normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),

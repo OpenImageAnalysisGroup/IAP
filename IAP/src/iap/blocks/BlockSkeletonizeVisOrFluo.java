@@ -3,7 +3,6 @@ package iap.blocks;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.blocks.maize.BlockDrawSkeleton;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
-import iap.pipelines.ImageProcessorOptions.Setting;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -20,9 +19,7 @@ import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -232,7 +229,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 					tempImage[p.x][p.y] = black;
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
-						find(true, false, true, false, black, black, black, null, 0).getImage();
+						find(true, false, true, false, black, black, black, null, 0d).getImage();
 				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().display("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
@@ -274,8 +271,8 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		result2.display("res2", false);
 		
 		// ***Saved***
-		BlockProperty distHorizontal = getProperties().getNumericProperty(0, 1, PropertyNames.MARKER_DISTANCE_LEFT_RIGHT);
-		double normFactor = distHorizontal != null ? options.getIntSetting(Setting.REAL_MARKER_DISTANCE) / distHorizontal.getValue() : 1;
+		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
+		double normFactor = distHorizontal != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
@@ -556,6 +553,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				new String[] { "RESULT_side.leaf.length.sum.max", "RESULT_leaf.length.sum.norm.max", "RESULT_side.leaf.length.sum",
 						"RESULT_leaf.length.sum.norm" });
 	}
+	
 	@Override
 	public HashSet<FlexibleImageType> getInputTypes() {
 		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();

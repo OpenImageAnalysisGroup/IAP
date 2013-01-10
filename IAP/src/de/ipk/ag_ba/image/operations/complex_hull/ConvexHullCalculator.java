@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 /**
@@ -117,8 +116,8 @@ public class ConvexHullCalculator {
 	 */
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
 			boolean drawHull, boolean drawCentroid, int borderColor,
-			int hullLineColor, int centroidColor, BlockProperty distHorizontal,
-			Integer realMarkerDist) {
+			int hullLineColor, int centroidColor, Double distHorizontal,
+			Double realMarkerDist) {
 		
 		calculate(borderColor);
 		
@@ -145,10 +144,9 @@ public class ConvexHullCalculator {
 		if (polygon != null) {
 			rt.incrementCounter();
 			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist)
-					/ (distHorizontal.getValue() * distHorizontal.getValue())
+					/ (distHorizontal * distHorizontal)
 					: 1;
-			double normFactor = distHorizontal != null ? realMarkerDist
-					/ distHorizontal.getValue() : 1;
+			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal : 1;
 			
 			rt.addValue("hull.points", numberOfHullPoints);
 			int filledArea = io.countFilledPixels();
