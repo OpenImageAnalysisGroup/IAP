@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * Holds up to three images (Vis/Fluo/NIR). Makes it more easy to process a
+ * Holds up to four images (Vis/Fluo/NIR/IR). Makes it more easy to process a
  * snapshot and to relate images of different kinds.
  * 
  * @author klukas
@@ -141,10 +141,10 @@ public class FlexibleImageSet {
 		int h = getLargestHeight();
 		// PrintImage.printImage(fluo);
 		return new FlexibleImageSet(
-				vis != null ? vis.resize(w, h) : null,
-				fluo != null ? fluo.resize(w, h) : null,
-				nir != null ? nir.resize(w, h) : null,
-				ir != null ? ir.resize(w, h) : null);
+				vis != null ? vis.resize(w, h, true) : null,
+				fluo != null ? fluo.resize(w, h, true) : null,
+				nir != null ? nir.resize(w, h, true) : null,
+				ir != null ? ir.resize(w, h, true) : null);
 	}
 	
 	public void setVis(FlexibleImage vis) {

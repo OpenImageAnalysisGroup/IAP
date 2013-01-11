@@ -6,12 +6,15 @@ package de.ipk.ag_ba.gui.webstart;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.WeakHashMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
@@ -96,8 +99,9 @@ public class IAPmain extends JApplet {
 		setRunMode(IAPrunMode.SWING_MAIN);
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
-		final JFrame jf = new JFrame(title);
-		jf.add("Center", new IAPmain().getContentPane());
+		JFrame jf = new JFrame(title);
+		IAPmain iap = new IAPmain();
+		jf.add("Center", iap.getContentPane());
 		jf.pack();
 		try {
 			jf.setIconImage(GravistoService.loadImage(IAPmain.class, "img/favicon.ico", 48, 48));
@@ -105,14 +109,50 @@ public class IAPmain extends JApplet {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
+		final WeakReference<JFrame> fr = new WeakReference<JFrame>(jf);
+		jf.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				JFrame j = fr.get();
+				if (j != null) {
+					
+				}
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+			}
+		});
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
 			@Override
 			public void run() {
-				String newTitle = IAPoptions.getInstance().getString("IAP", "window_title", "IAP - The Integrated Analysis Platform");
-				jf.setTitle(newTitle + "");
+				JFrame j = fr.get();
+				if (j != null) {
+					String newTitle = IAPoptions.getInstance().getString("IAP", "window_title", "IAP - The Integrated Analysis Platform");
+					j.setTitle(newTitle + "");
+				}
 			}
 		});
 	}
@@ -432,11 +472,12 @@ public class IAPmain extends JApplet {
 		return null;
 	}
 	
-	private static HashMap<String, NavigationImage> cachedImages = new HashMap<String, NavigationImage>();
+	private static WeakHashMap<String, NavigationImage> cachedImages = new WeakHashMap<String, NavigationImage>();
 	
 	public static synchronized NavigationImage loadIcon(String name) {
-		if (cachedImages.containsKey(name))
-			return cachedImages.get(name);
+		NavigationImage ni = cachedImages.get(name);
+		if (ni != null)
+			return ni;
 		NavigationImage res = new NavigationImage(
 				ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
 		cachedImages.put(name, res);

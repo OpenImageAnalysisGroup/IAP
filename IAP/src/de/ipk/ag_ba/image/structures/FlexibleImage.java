@@ -217,6 +217,30 @@ public class FlexibleImage {
 		}
 	}
 	
+	private FlexibleImage resizeD(double w, double h) {
+		return resize((int) w, (int) h);
+	}
+	
+	public FlexibleImage resize(int w, int h, boolean retainAspecRatio) {
+		if (!retainAspecRatio)
+			return resize(w, h);
+		else {
+			double rW = w / (double) getWidth();
+			double rH = h / (double) getHeight();
+			if (rW - 1 > 0) {
+				if (rW > rH)
+					return resizeD(getWidth() * rH, getHeight() * rH);
+				else
+					return resizeD(getWidth() * rW, getHeight() * rW);
+			} else {
+				if (rW < rH)
+					return resizeD(getWidth() * rH, getHeight() * rH);
+				else
+					return resizeD(getWidth() * rW, getHeight() * rW);
+			}
+		}
+	}
+	
 	public int[][] getAs2A() {
 		int[][] cache2A = null;
 		// boolean useCache = true; // 7777777777777777777777777777 false

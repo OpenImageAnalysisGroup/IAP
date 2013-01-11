@@ -57,7 +57,7 @@ public class SystemOptions {
 						}
 					}
 				});
-				t.setName("Changed Settings Check");
+				t.setName("Settings Change Monitor");
 				t.setPriority(Thread.MIN_PRIORITY);
 				t.setDaemon(false);
 				t.start();
@@ -98,8 +98,6 @@ public class SystemOptions {
 						iniIO.setStoredLastUpdateTime(mt);
 						iniIO.getInstance().ini = readIniFileOrProvider();
 						ini = iniIO.getInstance().ini;
-						System.out.println("DRAW? " + getBoolean("Block Properties - top", "iap.blocks.maize.BlockDrawSkeleton//draw_skeleton", true));
-						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider has been updated externally and has been reloaded.");
 						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
 							for (Runnable r : rr) {
 								try {
@@ -366,9 +364,6 @@ public class SystemOptions {
 			if (iniIO != null) {
 				Long saveTime = iniIO.setString(getIniValue());
 				if (saveTime != null) {
-					System.out.println("DRAW? " + getBoolean("Block Properties - top", "iap.blocks.maize.BlockDrawSkeleton//draw_skeleton", true));
-					
-					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes have been sent to the INI-Provider.");
 					iniIO.setStoredLastUpdateTime(saveTime);
 				} else {
 					System.err.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes could not be saved by the INI-Provider.");

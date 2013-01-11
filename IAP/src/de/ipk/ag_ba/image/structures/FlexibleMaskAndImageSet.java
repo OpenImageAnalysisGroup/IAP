@@ -3,8 +3,10 @@ package de.ipk.ag_ba.image.structures;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import de.ipk.ag_ba.image.operation.ImageOperation;
+import org.SystemOptions;
+
 import de.ipk.ag_ba.image.operation.ImageDisplay;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 public class FlexibleMaskAndImageSet {
 	private FlexibleImageSet images;
@@ -32,7 +34,7 @@ public class FlexibleMaskAndImageSet {
 	}
 	
 	public void print(String title) {
-		print(title, 1680);
+		print(title, SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680));
 	}
 	
 	public void print(String title, int width) {
