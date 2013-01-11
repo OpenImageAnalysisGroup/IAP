@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.WeakHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -951,7 +951,7 @@ public class GravistoService implements HelperClass {
 			return new ImageIcon(url);
 	}
 	
-	private static HashMap<String, BufferedImage> cachedIcons = new HashMap<String, BufferedImage>();
+	private static WeakHashMap<String, BufferedImage> cachedIcons = new WeakHashMap<String, BufferedImage>();
 	
 	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {

@@ -397,7 +397,7 @@ public class NavigationButton implements StyleAware {
 	public static void checkButtonTitle(
 			final WeakReference<NavigationButton> r_n,
 			final WeakReference<JButton> r_n1,
-			final WeakReference<Runnable> r_iconUpdateCheck) {
+			final Runnable iconUpdateCheck) {
 		if (r_n1 == null || r_n.get() == null)
 			return;
 		final ObjectRef rr = new ObjectRef();
@@ -408,7 +408,6 @@ public class NavigationButton implements StyleAware {
 			public void run() {
 				NavigationButton n = r_n.get();
 				JButton n1 = r_n1.get();
-				Runnable iconUpdateCheck = r_iconUpdateCheck != null ? r_iconUpdateCheck.get() : null;
 				if (n == null)
 					return;
 				if (n1 == null)
@@ -418,10 +417,11 @@ public class NavigationButton implements StyleAware {
 					if (lastImage == null)
 						lastImage = ai;
 					if (ai != null && !ai.equals(lastImage)) {
-						System.out.println("CHANGE ICON OF " + n.getTitle() + " (this object: " + this + ")");
 						lastImage = ai;
 						if (iconUpdateCheck != null)
 							iconUpdateCheck.run();
+						else
+							System.out.println("ICONUPDATECHECK IS NULL");
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
@@ -442,9 +442,6 @@ public class NavigationButton implements StyleAware {
 					n1.setText(n.getTitle());
 					n.setRunnableIconCheck(new Object());
 				}
-				n = null;
-				n1 = null;
-				iconUpdateCheck = null;
 			}
 		};
 		rr.setObject(r);
@@ -812,7 +809,7 @@ public class NavigationButton implements StyleAware {
 			NavigationButton.checkButtonTitle(
 					new WeakReference<NavigationButton>(n),
 					new WeakReference<JButton>(n1),
-					new WeakReference<Runnable>(iconUpdateCheck));
+					iconUpdateCheck);
 		} else {
 			WeakReference<JButton> wn1 = new WeakReference<JButton>(n1);
 			WeakReference<NavigationButton> wn = new WeakReference<NavigationButton>(n);

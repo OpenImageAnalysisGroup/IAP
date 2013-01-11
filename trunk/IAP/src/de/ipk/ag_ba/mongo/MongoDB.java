@@ -744,9 +744,6 @@ public class MongoDB {
 					}
 					db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).save(expref);
 					storageTime.setObject(st);
-					System.out.println("SAVING: " + StringManipulationTools.grep(header.getSettings(), "skeleton") + " time=" + st + " // DB OBJECT: "
-							+ expref.get("_id")
-							);
 				} else
 					tso.setBval(0, true);
 			}
@@ -781,8 +778,6 @@ public class MongoDB {
 					header.setAttributesFromMap(expref.toMap());
 					header.setStorageTime(new Date(((ObjectId) expref.get("_id")).getTime()));
 					storageTime.setObject(expref.get("lastHeaderUpdate"));
-					System.out.println("READING: " + StringManipulationTools.grep((String) expref.get("settings"), "skeleton") + " // DB OBJECT: "
-							+ expref.get("_id"));
 				} else
 					tso.setBval(0, true);
 			}

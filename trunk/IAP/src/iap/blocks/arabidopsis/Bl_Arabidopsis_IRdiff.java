@@ -22,8 +22,8 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processIRimage() {
-		FlexibleImage warmBack = input().images().ir();
+	protected FlexibleImage processIRmask() {
+		FlexibleImage warmBack = input().masks().ir();
 		if (warmBack != null) {
 			debug = getBoolean("debug", false);
 			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
