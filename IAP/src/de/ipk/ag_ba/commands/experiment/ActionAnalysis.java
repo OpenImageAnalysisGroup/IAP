@@ -50,7 +50,7 @@ public class ActionAnalysis extends AbstractNavigationAction {
 		if (experimentReference.getHeader().getSettings() != null &&
 				!experimentReference.getHeader().getSettings().isEmpty()) {
 			NavigationAction ac = new ActionSettings(null, ioStringProvider,
-					"Change analysis settings", "<html><center>Modify settings");
+					"Change analysis settings", "Modify settings");
 			SystemOptions so = SystemOptions.getInstance(null, ioStringProvider);
 			String pipeLineName = so.getString("DESCRIPTION", "pipeline_name", null);
 			NavigationAction acExport = new ActionExportAssignedAnalysisTemplate(

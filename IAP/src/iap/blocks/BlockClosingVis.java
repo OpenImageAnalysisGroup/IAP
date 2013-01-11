@@ -41,7 +41,7 @@ public class BlockClosingVis extends AbstractSnapshotAnalysisBlockFIS {
 		if (wImage != w)
 			flImage.resize(w, h);
 		
-		int[] rgbNonModifiedArray = flImage.getAs1A();
+		// int[] rgbNonModifiedArray = flImage.getAs1A();
 		int white = new Color(255, 255, 255).getRGB();
 		int[][] image = new int[w][h];
 		for (int x = 0; x < w; x++) {

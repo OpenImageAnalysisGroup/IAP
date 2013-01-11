@@ -134,7 +134,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.print("AFTER ERODE", debug);
 			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-					options.getDoubleSetting(null, "Blue Marker Distance", 1250), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
+					options.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return input().masks().fluo();// io.getImage();

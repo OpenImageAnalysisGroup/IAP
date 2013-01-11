@@ -51,7 +51,6 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 					new ActionSettingsFieldEditor(this, "Change setting " + section + "/" + setting, setting), src.getGUIsetting()));
 		}
 		for (final String group : group2button.keySet()) {
-			System.out.println("Group: " + group);
 			if (group.length() == 0) {
 				NavigationAction resetSettingsAction = new ActionResetActions(
 						SystemOptions.getInstance(iniFileName, iniIO), section, group);

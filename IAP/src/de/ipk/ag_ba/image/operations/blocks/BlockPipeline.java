@@ -136,6 +136,14 @@ public class BlockPipeline {
 		boolean debug = SystemOptions.getInstance().getBoolean("IAP", "Debug-Pipeline-Execution", false);
 		int tPrintBlockTime = SystemOptions.getInstance().getInteger("IAP", "Info-Print-Block-Execution-Time", 30);
 		
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
+			int n = 0;
+			for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+				System.out.println("Block " + n + "=" + blockClass.getSimpleName());
+				n++;
+			}
+		}
+		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;

@@ -1352,7 +1352,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									.getFileNameMain(),
 									targetTreeNode.getExperiment().getExperiment());
 					System.out.println("BLOCKS: " + iat.getImageProcessor().getPipeline(
-							new ImageProcessorOptions(iat.getSystemOptions())).getSize());
+							new ImageProcessorOptions(iat.getSystemOptions())).getSize() + ", Image Set Hits: " + match.size());
+					for (NumericMeasurementInterface nmi : match)
+						System.out.println("Image Set Match: " + nmi + " // Subtance: " + nmi.getParentSample().getParentCondition().getParentSubstance().getName());
 					BlockPipeline.debugTryAnalysis(
 							targetTreeNode.getExperiment().getExperiment(),
 							match, m,

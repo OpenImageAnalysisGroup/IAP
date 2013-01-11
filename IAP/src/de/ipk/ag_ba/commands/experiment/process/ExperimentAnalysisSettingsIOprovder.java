@@ -19,22 +19,30 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	}
 	
 	private SystemOptions i;
+	private long storedLastUpdateTime;
 	
 	@Override
 	public String getString() {
+		try {
+			m.updateAndGetExperimentHeaderInfoFromDB(experimentReference.getHeader());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String ini = experimentReference.getHeader().getSettings();
 		StringEscapeUtils.unescapeXml(ini);
 		return ini;
 	}
 	
 	@Override
-	public void setString(String value) {
+	public Long setString(String value) {
+		Long res = null;
 		String ini = StringEscapeUtils.escapeXml(value);
 		experimentReference.getHeader().setSettings(ini);
 		
-		if (m != null)
+		if (m != null) {
 			try {
-				m.setExperimentInfo(experimentReference.getHeader());
+				res = m.saveExperimentHeader(experimentReference.getHeader());
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
 						+ experimentReference.getExperimentName()
@@ -44,6 +52,10 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 				e.printStackTrace();
 				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");
 			}
+		} else {
+			System.err.println("WARNING: Could not store changed INI-Provider settings!");
+		}
+		return res;
 	}
 	
 	@Override
@@ -54,5 +66,20 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	@Override
 	public SystemOptions getInstance() {
 		return i;
+	}
+	
+	@Override
+	public Long lastModified() throws Exception {
+		return m.getExperimentHeaderStorageTime(experimentReference.getHeader());
+	}
+	
+	@Override
+	public long storedLastUpdateTime() {
+		return storedLastUpdateTime;
+	}
+	
+	@Override
+	public void setStoredLastUpdateTime(long storedLastUpdateTime) {
+		this.storedLastUpdateTime = storedLastUpdateTime;
 	}
 }

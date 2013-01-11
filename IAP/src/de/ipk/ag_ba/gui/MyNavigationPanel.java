@@ -23,6 +23,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.WeakHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -184,7 +185,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	
 	public ArrayList<NavigationButton> getEntitySet(boolean includeBookmarks) {
 		if (includeBookmarks)
-			return set;
+			return new ArrayList<NavigationButton>(set);
 		else {
 			ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 			for (NavigationButton n : set) {
@@ -197,9 +198,13 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 	}
 	
+	WeakHashMap<NavigationButton, Object> cachedButtons = new WeakHashMap<NavigationButton, Object>();
+	
 	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
+		for (NavigationButton n : set)
+			cachedButtons.put(n, (Object) null);
 		this.set = new ArrayList<NavigationButton>(set);
 		if (target == PanelTarget.ACTION) {
 			if (guiSettting.getClipboardItems().size() > 0) {
@@ -317,6 +322,12 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 		revalidate();
 		repaint();
+		
+		for (NavigationButton n : cachedButtons.keySet())
+			if (n != null)
+				if (n.isRemoved())
+					if (n.getGUIsetting() != null)
+						n.removedCleanup();
 	}
 	
 	private void enableContextMenu() {

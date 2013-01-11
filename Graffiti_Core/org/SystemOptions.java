@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,34 +25,25 @@ public class SystemOptions {
 	
 	private final LinkedHashMap<String, LinkedHashSet<Runnable>> changeListeners = new LinkedHashMap<String, LinkedHashSet<Runnable>>();
 	
-	private long lastModificationTime = 0;
 	private final IniIoProvider iniIO;
 	
+	private final static ArrayList<Runnable> updateCheckTasks = new ArrayList<Runnable>();
+	
+	private final static HashMap<String, ObjectRef> lastModification = new HashMap<String, ObjectRef>();
+	
+	private static Thread updateCheckThread;
+	
 	private SystemOptions(final String iniFileName, final IniIoProvider iniIO) throws Exception {
-		this.iniFileName = iniFileName;
-		this.iniIO = iniIO;
-		if (iniIO != null) {
-			ini = new Ini(new StringReader(iniIO.getString()));
-			return;
-		}
-		instances.put(iniFileName, this);
-		ini = readIni();
-		
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				SystemOptions.this.lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
-				try {
-					do {
-						Thread.sleep(1000);
-						synchronized (SystemOptions.this) {
-							long mt = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
-							if (mt != SystemOptions.this.lastModificationTime) {
-								SystemOptions.this.lastModificationTime = mt;
-								ini = readIni();
-								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName + " has been changed and has been reloaded.");
-								for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
-									for (Runnable r : rr) {
+		synchronized (SystemOptions.class) {
+			if (updateCheckThread == null) {
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							do {
+								Thread.sleep(1000);
+								for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
+									synchronized (SystemOptions.this) {
 										try {
 											r.run();
 										} catch (Exception e) {
@@ -59,20 +51,120 @@ public class SystemOptions {
 										}
 									}
 								}
+							} while (true);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				t.setName("Changed Settings Check");
+				t.setPriority(Thread.MIN_PRIORITY);
+				t.setDaemon(false);
+				t.start();
+				updateCheckThread = t;
+			}
+		}
+		
+		this.iniFileName = iniFileName;
+		this.iniIO = iniIO;
+		if (iniIO != null) {
+			ini = new Ini(new StringReader(iniIO.getString()));
+			WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
+			readIniAndPrepareProviderCheck(wr);
+			return;
+		}
+		readIniAndPrepareFileCheck(iniFileName);
+	}
+	
+	private void readIniAndPrepareProviderCheck(final WeakReference<IniIoProvider> iniIOref) {
+		if (iniIOref == null)
+			return;
+		if (iniIOref.get() == null)
+			return;
+		iniIOref.get().setStoredLastUpdateTime(iniIOref.get().storedLastUpdateTime());
+		
+		Runnable updateChecker = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					IniIoProvider iniIO = iniIOref.get();
+					if (iniIO == null) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider is not available any more. Update-check stops for this object.");
+						updateCheckTasks.remove(this);
+						return;
+					}
+					Long mt = iniIO.lastModified();
+					if (mt != null && mt != iniIO.storedLastUpdateTime()) {
+						iniIO.setStoredLastUpdateTime(mt);
+						iniIO.getInstance().ini = readIniFileOrProvider();
+						ini = iniIO.getInstance().ini;
+						System.out.println("DRAW? " + getBoolean("Block Properties - top", "iap.blocks.maize.BlockDrawSkeleton//draw_skeleton", true));
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider has been updated externally and has been reloaded.");
+						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+							for (Runnable r : rr) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 						}
-					} while (true);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		});
-		t.setName("File Change Monitor " + iniFileName);
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		};
+		updateCheckTasks.add(updateChecker);
 	}
 	
-	protected static HashMap<String, SystemOptions> instances = new HashMap<String, SystemOptions>();
+	private void readIniAndPrepareFileCheck(final String iniFileName) {
+		fileIniInstances.put(iniFileName, this);
+		ini = readIniFileOrProvider();
+		
+		String ffnn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
+		if (!lastModification.containsKey(ffnn)) {
+			lastModification.put(ffnn, new ObjectRef());
+			lastModification.get(ffnn).setObject(new File(ffnn).lastModified());
+		}
+		
+		Runnable updateChecker = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					String ffnn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
+					if (!new File(ffnn).exists()) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
+								+ " is not available any more. Update-check stops for this file.");
+						updateCheckTasks.remove(this);
+						lastModification.remove(ffnn);
+						return;
+					}
+					long mt = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+					if (mt != ((Long) lastModification.get(ffnn).getObject()).longValue()) {
+						lastModification.get(ffnn).setObject(mt);
+						ini = readIniFileOrProvider();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
+								+ " has been changed and has been reloaded.");
+						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+							for (Runnable r : rr) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		updateCheckTasks.add(updateChecker);
+	}
+	
+	protected static HashMap<String, SystemOptions> fileIniInstances = new HashMap<String, SystemOptions>();
 	
 	public synchronized static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
 		if (iniIO != null)
@@ -88,7 +180,7 @@ public class SystemOptions {
 		
 		if (iniFileName == null)
 			iniFileName = "iap.ini";
-		SystemOptions instance = instances.get(iniFileName);
+		SystemOptions instance = fileIniInstances.get(iniFileName);
 		try {
 			if (instance == null)
 				instance = new SystemOptions(iniFileName, iniIO);
@@ -106,10 +198,23 @@ public class SystemOptions {
 		}
 	}
 	
-	private synchronized Ini readIni() {
-		String fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
+	public synchronized void reload() {
+		readIniFileOrProvider();
+	}
+	
+	public synchronized Ini readIniFileOrProvider() {
+		String fn = null;
 		try {
-			return new Ini(new File(fn));
+			if (iniIO != null) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Read Ini Provider Content");
+				String ss = iniIO.getString();
+				ini = new Ini(new StringReader(ss));
+				return ini;
+			} else {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Read Ini File " + iniFileName);
+				fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
+				return new Ini(new File(fn));
+			}
 		} catch (FileNotFoundException fne) {
 			try {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Create settings file: " + fn);
@@ -259,11 +364,22 @@ public class SystemOptions {
 	protected synchronized void store(String srcSection, String srcSetting) {
 		try {
 			if (iniIO != null) {
-				iniIO.setString(getIniValue());
+				Long saveTime = iniIO.setString(getIniValue());
+				if (saveTime != null) {
+					System.out.println("DRAW? " + getBoolean("Block Properties - top", "iap.blocks.maize.BlockDrawSkeleton//draw_skeleton", true));
+					
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes have been sent to the INI-Provider.");
+					iniIO.setStoredLastUpdateTime(saveTime);
+				} else {
+					System.err.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes could not be saved by the INI-Provider.");
+				}
 				return;
 			}
 			ini.store();
-			lastModificationTime = new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
+					+ " have been saved.");
+			lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
+					new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
 			if (rr != null)
 				for (Runnable r : new ArrayList<Runnable>(rr)) {
