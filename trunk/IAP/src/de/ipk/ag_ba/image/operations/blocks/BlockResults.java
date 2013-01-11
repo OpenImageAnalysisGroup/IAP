@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import ij.measure.ResultsTable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -78,7 +77,11 @@ public class BlockResults implements BlockResultSet {
 		
 		storedNumerics.get(position).put(name, value);
 		
-		if (unit!=null) {
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
+			System.out.println(position + ";" + name + ";" + value + ";" + unit);
+		}
+		
+		if (unit != null) {
 			name2unit.put(name, unit);
 			if (name.startsWith("RESULT_")) {
 				name2unit.put(name.substring("RESULT_".length()), unit);

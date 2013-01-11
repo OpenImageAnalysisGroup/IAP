@@ -213,6 +213,11 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		this();
 		if (map == null)
 			return;
+		setAttributesFromMap(map);
+	}
+	
+	@Override
+	public void setAttributesFromMap(Map map) {
 		ArrayList<Object> del = new ArrayList<Object>();
 		for (Object key : map.keySet()) {
 			Object val = map.get(key);

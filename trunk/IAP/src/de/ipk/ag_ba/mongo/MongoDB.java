@@ -717,7 +717,11 @@ public class MongoDB {
 			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
 	}
 	
-	public void setExperimentInfo(final ExperimentHeaderInterface header) throws Exception {
+	/**
+	 * @return Storage time.
+	 */
+	public Long saveExperimentHeader(final ExperimentHeaderInterface header) throws Exception {
+		final ObjectRef storageTime = new ObjectRef();
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		processDB(new RunnableOnDB() {
 			private DB db;
@@ -732,12 +736,17 @@ public class MongoDB {
 				if (expref != null) {
 					HashMap<String, Object> attributes = new HashMap<String, Object>();
 					header.fillAttributeMap(attributes, 0);
+					long st = System.currentTimeMillis();
+					attributes.put("lastHeaderUpdate", st);
 					for (String key : attributes.keySet()) {
 						if (attributes.get(key) != null)
 							expref.put(key, attributes.get(key));
 					}
-					
 					db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString()).save(expref);
+					storageTime.setObject(st);
+					System.out.println("SAVING: " + StringManipulationTools.grep(header.getSettings(), "skeleton") + " time=" + st + " // DB OBJECT: "
+							+ expref.get("_id")
+							);
 				} else
 					tso.setBval(0, true);
 			}
@@ -749,6 +758,43 @@ public class MongoDB {
 		});
 		if (tso.getBval(0, false))
 			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
+		return (Long) storageTime.getObject();
+	}
+	
+	/**
+	 * @return Storage time.
+	 */
+	public Long updateAndGetExperimentHeaderInfoFromDB(final ExperimentHeaderInterface header) throws Exception {
+		final ObjectRef storageTime = new ObjectRef();
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				if (header.getDatabaseId() == null)
+					System.out.println("Cant update experiment, as header DB id is null!");
+				ObjectId id = new ObjectId(header.getDatabaseId());
+				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
+				DBObject expref = dbr.fetch();
+				if (expref != null) {
+					header.setAttributesFromMap(expref.toMap());
+					header.setStorageTime(new Date(((ObjectId) expref.get("_id")).getTime()));
+					storageTime.setObject(expref.get("lastHeaderUpdate"));
+					System.out.println("READING: " + StringManipulationTools.grep((String) expref.get("settings"), "skeleton") + " // DB OBJECT: "
+							+ expref.get("_id"));
+				} else
+					tso.setBval(0, true);
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		if (tso.getBval(0, false))
+			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
+		return (Long) storageTime.getObject();
 	}
 	
 	public void updateExperimentSize(DB db, ExperimentInterface experiment, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider) {
@@ -805,7 +851,7 @@ public class MongoDB {
 					optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
 				}
 				experiment.getHeader().setSizekb(newSize.getLong() / 1024);
-				setExperimentInfo(experiment.getHeader());
+				saveExperimentHeader(experiment.getHeader());
 				if (optStatusProvider != null) {
 					optStatusProvider.setCurrentStatusValue(100);
 					optStatusProvider.setCurrentStatusText1("Finished");
@@ -1552,5 +1598,37 @@ public class MongoDB {
 	
 	public DataBaseFileStorage fileStorage() {
 		return new DataBaseFileStorage(this);
+	}
+	
+	public Long getExperimentHeaderStorageTime(final ExperimentHeaderInterface header) throws Exception {
+		final ObjectRef res = new ObjectRef();
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				if (header.getDatabaseId() == null)
+					System.out.println("Cant update experiment, as header DB id is null!");
+				ObjectId id = new ObjectId(header.getDatabaseId());
+				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
+				DBObject expref = dbr.fetch();
+				if (expref != null) {
+					Long oo = (Long) expref.get("lastHeaderUpdate");
+					res.setObject(oo);
+				} else {
+					System.out.println("CHECK UPDATE TIME: EXP INFO NOT FOUND");
+					tso.setBval(0, true);
+				}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		if (tso.getBval(0, false))
+			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
+		return (Long) res.getObject();
 	}
 }

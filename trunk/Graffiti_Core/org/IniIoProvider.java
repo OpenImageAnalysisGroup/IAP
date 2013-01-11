@@ -4,9 +4,18 @@ public interface IniIoProvider {
 	
 	public String getString();
 	
-	public void setString(String value);
+	/**
+	 * @return Storage time.
+	 */
+	public Long setString(String value);
 	
 	public void setInstance(SystemOptions i);
 	
 	public SystemOptions getInstance();
+	
+	public Long lastModified() throws Exception;
+	
+	public long storedLastUpdateTime();
+	
+	public void setStoredLastUpdateTime(long mt);
 }

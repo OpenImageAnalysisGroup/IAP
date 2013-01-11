@@ -29,13 +29,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlCutZoomedImages extends AbstractBlock {
 	
-	boolean debugValues = true;
+	boolean debugValues;
 	
 	private double[][] zoomLevels;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
+		debugValues = getBoolean("debug", true);
 		String zoomID = "zoom-top:";
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			zoomID = "zoom-side:";
@@ -171,7 +172,8 @@ public class BlCutZoomedImages extends AbstractBlock {
 				zoomY = zoomLevels.length >= 4 && zoomLevels[3].length >= 4 ? zoomLevels[3][3] : zoom;
 				break;
 		}
-		System.out.println("ZOOM: " + zoom + " // X = " + offX + " // Y = " + offY + " // ZOOM Y: " + zoomY);
+		if (debugValues)
+			System.out.println("ZOOM: " + zoom + " // X = " + offX + " // Y = " + offY + " // ZOOM Y: " + zoomY);
 		// add border or cut outside
 		int verticalTooTooMuch = (int) ((1d - zoom) * img.getHeight());
 		int b = -verticalTooTooMuch / 2;

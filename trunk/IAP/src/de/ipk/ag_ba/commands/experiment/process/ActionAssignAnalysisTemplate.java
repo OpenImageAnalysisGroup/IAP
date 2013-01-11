@@ -39,15 +39,15 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
 		ini = StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
-		
 		if (m != null)
 			try {
-				m.setExperimentInfo(exp.getHeader());
+				m.saveExperimentHeader(exp.getHeader());
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
 						+ exp.getExperimentName()
 						+ " in storage location "
 						+ m.getDatabaseName() + ".");
+				exp.getIniIoProvider().getInstance().reload();
 			} catch (Exception e) {
 				e.printStackTrace();
 				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");

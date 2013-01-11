@@ -868,4 +868,16 @@ public class StringManipulationTools implements HelperClass {
 		if (list != null && content != null && !content.isEmpty())
 			list.add(content);
 	}
+	
+	/**
+	 * @return Filtered result.
+	 */
+	public static String grep(String content, String find) {
+		ArrayList<String> res = new ArrayList<String>();
+		for (String l : content.split("\r\n")) {
+			if (l.contains(find))
+				res.add(l);
+		}
+		return getStringList(res, "\r\n");
+	}
 }

@@ -58,28 +58,31 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * @author klukas
  */
 public class NavigationButton implements StyleAware {
-	
 	private String title;
 	private String navigationImage, actionImage;
 	private NavigationAction action;
 	private String tooltipHint;
 	private JComponent gui;
-	private boolean processing;
-	
-	private long processingStart = 0;
 	private JComponent sideGui;
 	private double sideGuiSpace;
 	private double sideGuiWidth;
+	
+	private boolean processing;
+	private long processingStart = 0;
+	
 	private ImageIcon icon;
+	
+	private GUIsetting guiSetting;
 	
 	protected Runnable optFinishAction = null;
 	private Runnable execution;
 	private boolean rightAligned;
 	private ProgressStatusService statusServer;
-	private final GUIsetting guiSetting;
 	private String optStaticIconId;
 	private String overrideTitle;
 	private boolean iconUpdated;
+	private boolean updateCheckRunning;
+	private Object validIconCheckObject;
 	
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
@@ -391,9 +394,11 @@ public class NavigationButton implements StyleAware {
 		// empty, override if needed
 	}
 	
-	public static void checkButtonTitle(final NavigationButton n, final JButton n1,
-			final Runnable iconUpdateCheck) {
-		if (n1 == null)
+	public static void checkButtonTitle(
+			final WeakReference<NavigationButton> r_n,
+			final WeakReference<JButton> r_n1,
+			final WeakReference<Runnable> r_iconUpdateCheck) {
+		if (r_n1 == null || r_n.get() == null)
 			return;
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
@@ -401,30 +406,57 @@ public class NavigationButton implements StyleAware {
 			
 			@Override
 			public void run() {
-				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
+				NavigationButton n = r_n.get();
+				JButton n1 = r_n1.get();
+				Runnable iconUpdateCheck = r_iconUpdateCheck != null ? r_iconUpdateCheck.get() : null;
+				if (n == null)
+					return;
+				if (n1 == null)
+					return;
+				if ((n.isProcessing() || n.requestsTitleUpdates()) && !n.isRemoved()) {
 					String ai = n.getNavigationImage();
 					if (lastImage == null)
 						lastImage = ai;
 					if (ai != null && !ai.equals(lastImage)) {
+						System.out.println("CHANGE ICON OF " + n.getTitle() + " (this object: " + this + ")");
 						lastImage = ai;
 						if (iconUpdateCheck != null)
 							iconUpdateCheck.run();
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
-					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0)
-						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
-					else
-						if (!n1.getText().contains("[REMOVE FROM UPDATE]"))
-							BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0) {
+						if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
+							n.setRunnableIconCheck(rr.getObject());
+							BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
+						}
+					} else
+						if (!n1.getText().contains("[REMOVE FROM UPDATE]")) {
+							if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
+								n.setRunnableIconCheck(rr.getObject());
+								BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+							}
+						} else
+							n.setRunnableIconCheck(new Object());
 				} else {
-					if (n1.isVisible())
-						n1.setText(n.getTitle());
+					n1.setText(n.getTitle());
+					n.setRunnableIconCheck(new Object());
 				}
+				n = null;
+				n1 = null;
+				iconUpdateCheck = null;
 			}
 		};
 		rr.setObject(r);
 		r.run();
+	}
+	
+	protected Object getRunnableIconCheck() {
+		return validIconCheckObject;
+	}
+	
+	protected void setRunnableIconCheck(Object validObject) {
+		this.validIconCheckObject = validObject;
 	}
 	
 	public static void checkButtonTitle(
@@ -484,7 +516,9 @@ public class NavigationButton implements StyleAware {
 			
 			srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(-1);
 			srcNavGraphicslEntity.setProcessing(true);
-			NavigationButton.checkButtonTitle(srcNavGraphicslEntity, n1, null);
+			NavigationButton.checkButtonTitle(
+					new WeakReference<NavigationButton>(srcNavGraphicslEntity),
+					new WeakReference<JButton>(n1), null);
 			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
 			
@@ -775,7 +809,10 @@ public class NavigationButton implements StyleAware {
 		};
 		
 		if (n.isProcessing() || n.requestsTitleUpdates()) {
-			NavigationButton.checkButtonTitle(n, n1, iconUpdateCheck);
+			NavigationButton.checkButtonTitle(
+					new WeakReference<NavigationButton>(n),
+					new WeakReference<JButton>(n1),
+					new WeakReference<Runnable>(iconUpdateCheck));
 		} else {
 			WeakReference<JButton> wn1 = new WeakReference<JButton>(n1);
 			WeakReference<NavigationButton> wn = new WeakReference<NavigationButton>(n);
@@ -841,5 +878,32 @@ public class NavigationButton implements StyleAware {
 	
 	public String getIconStaticId() {
 		return optStaticIconId;
+	}
+	
+	public void removedCleanup() {
+		System.out.println("REMOVED: " + StringManipulationTools.removeHTMLtags(getTitle()).trim());
+		title = "[REMOVE FROM UPDATE]" + title;
+		navigationImage = null;
+		actionImage = null;
+		action = null;
+		tooltipHint = null;
+		gui = null;
+		processing = false;
+		sideGui = null;
+		icon = null;
+		optFinishAction = null;
+		execution = null;
+		statusServer = null;
+		guiSetting = null;
+		optStaticIconId = null;
+		overrideTitle = null;
+		iconUpdated = false;
+	}
+	
+	public boolean isRemoved() {
+		boolean res = guiSetting == null || (
+				!guiSetting.getNavigationPanel().getEntitySet(true).contains(this)
+				&& !guiSetting.getActionPanel().getEntitySet(true).contains(this));
+		return res;
 	}
 }

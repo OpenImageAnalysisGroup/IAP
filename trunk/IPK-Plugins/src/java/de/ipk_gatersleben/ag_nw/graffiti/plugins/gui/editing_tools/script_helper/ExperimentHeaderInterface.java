@@ -142,4 +142,6 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public String getGlobalOutlierInfo();
 	
 	public String getExperimentname();
+	
+	void setAttributesFromMap(Map map);
 }

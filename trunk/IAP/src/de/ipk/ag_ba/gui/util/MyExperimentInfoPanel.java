@@ -388,7 +388,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					} else {
 						if (editPossibleBBB) {
 							if (m != null)
-								m.setExperimentInfo(experimentHeader);
+								m.saveExperimentHeader(experimentHeader);
 							if (m != null)
 								saveB.setText("Updated in database");
 							else
