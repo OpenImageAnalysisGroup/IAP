@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -48,6 +49,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -774,18 +776,22 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 				hsmManager
 						.prepareAndGetTargetFileForContentIndex("in_progress_"
 								+ UUID.randomUUID().toString()));
+		
+		writeExperimentHeaderToIndexFile(ei.getHeader(), new FileOutputStream(indexFile), ei.getNumberOfMeasurementValues());
+		tempFile2fileName.put(indexFile, hsmManager
+				.prepareAndGetTargetFileForContentIndex(indexFileName));
+	}
+	
+	public static void writeExperimentHeaderToIndexFile(ExperimentHeaderInterface ei, OutputStream indexFileOutputStream, int measurements) throws IOException {
 		TextFile indexFileContent = new TextFile();
 		LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
-		ei.getHeader().fillAttributeMap(header,
-				ei.getNumberOfMeasurementValues());
-		String experimentName = ei.getName();
+		ei.fillAttributeMap(header, measurements);
+		String experimentName = ei.getExperimentname();
 		for (String key : header.keySet()) {
 			indexFileContent.add(experimentName + "," + key + ","
 					+ header.get(key));
 		}
-		indexFileContent.write(indexFile);
-		tempFile2fileName.put(indexFile, hsmManager
-				.prepareAndGetTargetFileForContentIndex(indexFileName));
+		indexFileContent.write(indexFileOutputStream);
 	}
 	
 	private void storeXMLdataset(final ExperimentInterface experiment,

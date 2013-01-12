@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.ExperimentHeaderHelper;
 import org.IniIoProvider;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
@@ -37,7 +36,6 @@ public class ExperimentReference {
 	private ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
 	public MongoDB m;
-	private ExperimentHeaderHelper experimentHeaderHelper;
 	
 	private static ArrayList<ExperimentLoader> knownExperimentLoaders = new ArrayList<ExperimentLoader>();
 	
@@ -247,13 +245,5 @@ public class ExperimentReference {
 	
 	public void setIniIoProvider(IniIoProvider iniProvider) {
 		storedIniProvider = iniProvider;
-	}
-	
-	public void getExperimentHeaderHelper(ExperimentHeaderHelper experimentHeaderHelper) {
-		this.experimentHeaderHelper = experimentHeaderHelper;
-	}
-	
-	public ExperimentHeaderHelper getExperimentHeaderHelper() {
-		return experimentHeaderHelper;
 	}
 }
