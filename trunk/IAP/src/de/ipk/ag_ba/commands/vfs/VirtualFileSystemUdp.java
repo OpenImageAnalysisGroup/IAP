@@ -8,6 +8,8 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.vanted.plugin.VfsFileObject;
+
 public class VirtualFileSystemUdp extends VirtualFileSystem {
 	
 	private final String name;
@@ -89,6 +91,11 @@ public class VirtualFileSystemUdp extends VirtualFileSystem {
 	
 	@Override
 	public long getFileLength(IOurl url) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
+	@Override
+	public VfsFileObject getFileObjectFor(String fileName) throws Exception {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 }

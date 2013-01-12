@@ -8,6 +8,10 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.vanted.plugin.VfsFileObject;
+import de.ipk.vanted.plugin.VfsFileProtocol;
+import de.ipk.vanted.util.VfsFileObjectUtil;
+
 public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	
 	private final String name;
@@ -85,5 +89,14 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	@Override
 	public long getFileLength(IOurl url) {
 		throw new UnsupportedOperationException("Not needed, the returned IOurl is from FileSystemHandler");
+	}
+	
+	@Override
+	public VfsFileObject getFileObjectFor(String fileName) throws Exception {
+		String path = fileName.substring(0, fileName.lastIndexOf("/"));
+		String fn = fileName.substring(fileName.lastIndexOf("/") + "/".length());
+		return VfsFileObjectUtil.createVfsFileObject(
+				VfsFileProtocol.LOCAL,
+				path, fn, null, null);
 	}
 }

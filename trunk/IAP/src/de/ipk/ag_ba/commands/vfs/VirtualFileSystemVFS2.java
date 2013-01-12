@@ -97,28 +97,21 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	@Override
 	public IOurl getIOurlFor(String fileNameInclSubFolderPathName) {
 		try {
-			return new IOurl(prefix, folder, fileNameInclSubFolderPathName);
-			
-			// VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
-			// host, folder + "/" + fileName, user, pass);
-			// File tempFile = File.createTempFile("iap_vfs", ".tmp");
-			// String tmpFolder = tempFile.getParent();
-			// String tempFileName = tempFile.getName();
-			// VfsFileObject to = VfsFileObjectUtil.createVfsFileObject(
-			// VfsFileProtocol.LOCAL, tmpFolder,
-			// tempFileName);
-			// file.download(to);
-			// FileSystemHandler.getURL(tempFile);
-			
+			return new IOurl(prefix, "", fileNameInclSubFolderPathName);
 		} catch (Exception e) {
 			throw new UnsupportedOperationException(e);
 		}
 	}
 	
 	public VfsFileObject newVfsFile(String fileNameInclSubFolderPathName) throws Exception {
+		return newVfsFile(fileNameInclSubFolderPathName, false);
+	}
+	
+	public VfsFileObject newVfsFile(String fileNameInclSubFolderPathName, boolean absoluteDirName) throws Exception {
 		return VfsFileObjectUtil.createVfsFileObject(
 				vfs_type, host,
-				folder + "/" + fileNameInclSubFolderPathName, user, pass);
+				(absoluteDirName ? "" : folder + "/") +
+						fileNameInclSubFolderPathName, user, pass);
 	}
 	
 	public VfsFileProtocol getProtocolType() {
@@ -179,5 +172,11 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	
 	public int countFiles(String optSubDirectory) throws Exception {
 		return listFiles(optSubDirectory).size();
+	}
+	
+	@Override
+	public VfsFileObject getFileObjectFor(String fileName) throws Exception {
+		VfsFileObject file = newVfsFile(fileName);
+		return file;
 	}
 }

@@ -1562,9 +1562,16 @@ public class MongoDB {
 		if (vfs_file_storage != null) {
 			synchronized (vfs_file_storage) {
 				try {
-					return lastHit.get(bucket).getIOurlFor(bucket + "/" + detail).getInputStream();
+					if (lastHit != null) {
+						VirtualFileSystem i = lastHit.get(bucket);
+						if (i != null) {
+							IOurl h = i.getIOurlFor(bucket + "/" + detail);
+							return h.getInputStream();
+						}
+					}
 				} catch (Exception e) {
 					// ignore
+					e.printStackTrace();
 				}
 				for (VirtualFileSystem vfs : vfs_file_storage) {
 					if (vfs == lastHit.get(bucket))

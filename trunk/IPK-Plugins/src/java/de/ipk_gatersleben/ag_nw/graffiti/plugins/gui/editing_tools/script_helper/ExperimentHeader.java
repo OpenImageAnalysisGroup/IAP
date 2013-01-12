@@ -13,6 +13,7 @@ import java.util.TreeMap;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.ExperimentHeaderHelper;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -458,6 +459,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	TreeMap<Long, ExperimentHeaderInterface> history = new TreeMap<Long, ExperimentHeaderInterface>();
+	private ExperimentHeaderHelper ehh;
 	
 	@Override
 	public TreeMap<Long, ExperimentHeaderInterface> getHistory() {
@@ -512,5 +514,9 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Deprecated
 	public String getExperimentname() {
 		return getExperimentName();
+	}
+	
+	public void setExperimentHeaderHelper(ExperimentHeaderHelper ehh) {
+		this.ehh = ehh;
 	}
 }

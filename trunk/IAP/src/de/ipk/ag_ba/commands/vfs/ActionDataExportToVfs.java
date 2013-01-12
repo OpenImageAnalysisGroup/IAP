@@ -247,7 +247,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
 						final VfsFileObject targetFile = vfs.newVfsFile(
 								hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t, zefn.contains("#") ? zefn.split("#")[0] : zefn));
+										experiment.getHeader(), t, zefn.contains("#") ? zefn.split("#")[0] : zefn), true);
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
@@ -296,7 +296,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
 						final VfsFileObject targetFile = vfs.newVfsFile(
 								hsmManager.prepareAndGetPreviewFileNameAndPath(
-										experiment.getHeader(), t, zefn));
+										experiment.getHeader(), t, zefn), true);
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
@@ -402,7 +402,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					
 					final VfsFileObject targetFile = vfs.newVfsFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn));
+									experiment.getHeader(), t, zefn), true);
 					
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
@@ -461,7 +461,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					
 					final VfsFileObject targetFile = vfs.newVfsFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn));
+									experiment.getHeader(), t, zefn), true);
 					Runnable postProcess = new Runnable() {
 						@Override
 						public void run() {
@@ -591,7 +591,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 													experiment.getHeader(), t,
 													"in_progress_"
 															+ UUID.randomUUID()
-																	.toString()));
+																	.toString()), true);
 									BufferedOutputStream bos = new BufferedOutputStream(
 											f.getOutputStream());
 									try {
@@ -605,8 +605,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									in.close();
 									if (t != null)
 										f.setLastModified(t);
-									f.setWritable(false);
-									f.setExecutable(false);
+									// f.setWritable(false);
+									// f.setExecutable(false);
 									f.renameTo(targetFile, true);
 								}
 							}
@@ -698,7 +698,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName) throws Exception {
 		// rename all temp files
 		for (VfsFileObject f : tempFile2fileName.keySet()) {
-			VfsFileObject te = vfs.newVfsFile(tempFile2fileName.get(f));
+			VfsFileObject te = vfs.newVfsFile(tempFile2fileName.get(f), true);
 			try {
 				if (f != null && f.exists()) {
 					f.renameTo(te, true);
@@ -727,7 +727,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		VfsFileObject conditionFile = vfs.newVfsFile(
 				hsmManager
 						.prepareAndGetTargetFileForConditionIndex("in_progress_"
-								+ UUID.randomUUID().toString()));
+								+ UUID.randomUUID().toString()), true);
 		TextFile conditionIndexFileContent = new TextFile();
 		
 		TreeMap<String, ArrayList<String>> conditionString2substance = new TreeMap<String, ArrayList<String>>();
@@ -797,7 +797,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		VfsFileObject indexFile = vfs.newVfsFile(
 				hsmManager
 						.prepareAndGetTargetFileForContentIndex("in_progress_"
-								+ UUID.randomUUID().toString()));
+								+ UUID.randomUUID().toString()), true);
 		TextFile indexFileContent = new TextFile();
 		LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
 		ei.getHeader().fillAttributeMap(header,
@@ -822,10 +822,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		tf.add(Experiment.getString(ei, optStatus));
 		VfsFileObject f = vfs.newVfsFile(hsmManager.prepareAndGetDataFileNameAndPath(
 				experiment.getHeader(), null, "in_progress_"
-						+ UUID.randomUUID().toString()));
+						+ UUID.randomUUID().toString()), true);
 		tf.write(f.getOutputStream()); // to temp file
-		f.setExecutable(false);
-		f.setWritable(false);
+		// f.setExecutable(false);
+		// f.setWritable(false);
 		if (ei.getStartDate() != null)
 			f.setLastModified(ei.getStartDate().getTime());
 		String xmlFileName = tsave + "_" + eidx + "_"
