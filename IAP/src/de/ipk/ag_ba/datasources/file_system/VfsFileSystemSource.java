@@ -16,9 +16,12 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ExperimentHeaderHelper;
+import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -97,19 +100,37 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public void readSourceForUpdate() throws Exception {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Get current header from file (" + fileName + ")");
 				HashMap<String, String> properties = new HashMap<String, String>();
 				InputStream is = indexFile.getInputStream();
 				TextFile tf = new TextFile(is, -1);
 				properties.put("_id", vfs.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+				String lastItemId = null;
 				for (String p : tf) {
-					String[] entry = p.split(",", 3);
-					properties.put(entry[1], entry[2]);
+					if (StringManipulationTools.count(p, ",") >= 2) {
+						String[] entry = p.split(",", 3);
+						properties.put(entry[1], entry[2]);
+						lastItemId = entry[1];
+					} else
+						if (lastItemId != null) {
+							properties.put(lastItemId,
+									properties.get(lastItemId)
+											+ System.getProperty("line.separator")
+											+ p);
+						}
 				}
 				eh.setAttributesFromMap(properties);
 			}
 			
 			@Override
 			public Long getLastModified() throws Exception {
+				return indexFile.getLastModified();
+			}
+			
+			@Override
+			public Long saveUpdatedProperties() throws Exception {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
+				ActionDataExportToHsmFolder.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
 				return indexFile.getLastModified();
 			}
 		};

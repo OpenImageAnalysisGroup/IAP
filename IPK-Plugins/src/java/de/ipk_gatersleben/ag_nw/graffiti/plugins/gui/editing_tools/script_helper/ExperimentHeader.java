@@ -516,7 +516,13 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		return getExperimentName();
 	}
 	
+	@Override
 	public void setExperimentHeaderHelper(ExperimentHeaderHelper ehh) {
 		this.ehh = ehh;
+	}
+	
+	@Override
+	public ExperimentHeaderHelper getExperimentHeaderHelper() {
+		return ehh;
 	}
 }

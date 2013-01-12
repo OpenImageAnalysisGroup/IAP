@@ -18,7 +18,7 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	public ExperimentAnalysisSettingsIOprovder(ExperimentReference experimentReference, MongoDB m) {
 		this.experimentReference = experimentReference;
 		this.m = m;
-		this.headerHelper = experimentReference.getExperimentHeaderHelper();
+		this.headerHelper = experimentReference.getHeader().getExperimentHeaderHelper();
 	}
 	
 	private SystemOptions i;
@@ -48,20 +48,22 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 		String ini = StringEscapeUtils.escapeXml(value);
 		experimentReference.getHeader().setSettings(ini);
 		
-		if (m != null) {
-			try {
+		try {
+			if (m != null) {
 				res = m.saveExperimentHeader(experimentReference.getHeader());
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
 						+ experimentReference.getExperimentName()
 						+ " in storage location "
 						+ m.getDatabaseName() + ".");
-			} catch (Exception e) {
-				e.printStackTrace();
-				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");
+			} else {
+				if (experimentReference.getHeader().getExperimentHeaderHelper() != null) {
+					res = experimentReference.getHeader().getExperimentHeaderHelper().saveUpdatedProperties();
+				}
 			}
-		} else {
-			System.err.println("WARNING: Could not store changed INI-Provider settings!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");
 		}
 		return res;
 	}

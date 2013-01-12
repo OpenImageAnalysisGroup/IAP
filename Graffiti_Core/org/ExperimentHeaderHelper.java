@@ -6,4 +6,6 @@ public interface ExperimentHeaderHelper {
 	
 	public Long getLastModified() throws Exception;
 	
+	public Long saveUpdatedProperties() throws Exception;
+	
 }

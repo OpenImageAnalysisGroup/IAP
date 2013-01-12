@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.ExperimentHeaderHelper;
+
 import unit_test_support.TestValueRequired;
 
 @TestValueRequired("experimentname")
@@ -144,4 +146,8 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public String getExperimentname();
 	
 	void setAttributesFromMap(Map map);
+	
+	public ExperimentHeaderHelper getExperimentHeaderHelper();
+	
+	public void setExperimentHeaderHelper(ExperimentHeaderHelper ehh);
 }
