@@ -15,6 +15,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 /**
@@ -148,4 +149,6 @@ public abstract class VirtualFileSystem {
 	public abstract InputStream getPreviewInputStream(IOurl url) throws Exception;
 	
 	public abstract long getFileLength(IOurl url) throws Exception;
+	
+	public abstract VfsFileObject getFileObjectFor(String fileName) throws Exception;
 }

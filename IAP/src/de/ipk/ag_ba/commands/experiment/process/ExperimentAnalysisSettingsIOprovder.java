@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
+import org.ExperimentHeaderHelper;
 import org.IniIoProvider;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -12,10 +13,12 @@ import de.ipk.ag_ba.mongo.MongoDB;
 public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	private final ExperimentReference experimentReference;
 	private final MongoDB m;
+	private final ExperimentHeaderHelper headerHelper;
 	
 	public ExperimentAnalysisSettingsIOprovder(ExperimentReference experimentReference, MongoDB m) {
 		this.experimentReference = experimentReference;
 		this.m = m;
+		this.headerHelper = experimentReference.getExperimentHeaderHelper();
 	}
 	
 	private SystemOptions i;
@@ -24,11 +27,16 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	@Override
 	public String getString() {
 		try {
-			m.updateAndGetExperimentHeaderInfoFromDB(experimentReference.getHeader());
-			
+			if (m != null) {
+				m.updateAndGetExperimentHeaderInfoFromDB(experimentReference.getHeader());
+			} else {
+				if (headerHelper != null)
+					headerHelper.readSourceForUpdate();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		String ini = experimentReference.getHeader().getSettings();
 		StringEscapeUtils.unescapeXml(ini);
 		return ini;
@@ -70,7 +78,14 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	
 	@Override
 	public Long lastModified() throws Exception {
-		return m.getExperimentHeaderStorageTime(experimentReference.getHeader());
+		if (m != null)
+			return m.getExperimentHeaderStorageTime(experimentReference.getHeader());
+		else {
+			if (headerHelper != null) {
+				return headerHelper.getLastModified();
+			} else
+				return null;
+		}
 	}
 	
 	@Override

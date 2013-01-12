@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ExperimentHeaderHelper;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Library;
@@ -23,6 +24,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
+import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -69,7 +71,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			for (String fileName : entries) {
 				long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
 				
-				ExperimentHeader eh = getHSMexperimentHeaderFromFileName(url, fileName);
+				ExperimentHeader eh = getExperimentHeaderFromFileName(url, fileName);
 				
 				if (accessOK(eh)) {
 					String experimentName = eh.getExperimentName();
@@ -84,18 +86,38 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
 	}
 	
-	protected ExperimentHeader getHSMexperimentHeaderFromFileName(VirtualFileSystem url, String fileName) throws Exception {
-		HashMap<String, String> properties = new HashMap<String, String>();
-		IOurl ioUrl = url.getIOurlFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
-		InputStream is = ioUrl.getInputStream();
-		TextFile tf = new TextFile(is, -1);
-		properties.put("_id", url.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
-		for (String p : tf) {
-			String[] entry = p.split(",", 3);
-			properties.put(entry[1], entry[2]);
-		}
-		ExperimentHeader eh = new ExperimentHeader(properties);
-		eh.setDatabaseId(url.getPrefix() + ":index" + File.separator + fileName);
+	public ExperimentHeader getExperimentHeaderFromFileName(final VirtualFileSystem vfs, final String fileName) throws Exception {
+		final ExperimentHeader eh = new ExperimentHeader();
+		
+		final VfsFileObject indexFile = vfs.getFileObjectFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+		
+		eh.setDatabaseId(vfs.getPrefix() + ":index" + File.separator + fileName);
+		
+		ExperimentHeaderHelper ehh = new ExperimentHeaderHelper() {
+			
+			@Override
+			public void readSourceForUpdate() throws Exception {
+				HashMap<String, String> properties = new HashMap<String, String>();
+				InputStream is = indexFile.getInputStream();
+				TextFile tf = new TextFile(is, -1);
+				properties.put("_id", vfs.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+				for (String p : tf) {
+					String[] entry = p.split(",", 3);
+					properties.put(entry[1], entry[2]);
+				}
+				eh.setAttributesFromMap(properties);
+			}
+			
+			@Override
+			public Long getLastModified() throws Exception {
+				return indexFile.getLastModified();
+			}
+		};
+		
+		ehh.readSourceForUpdate();
+		
+		eh.setExperimentHeaderHelper(ehh);
+		
 		return eh;
 	}
 	

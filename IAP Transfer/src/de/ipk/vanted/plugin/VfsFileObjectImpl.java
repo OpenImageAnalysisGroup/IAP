@@ -158,7 +158,7 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public void setLastModified(long time) throws Exception {
-		Method m = file.getClass().getDeclaredMethod("doSetLastModifiedTime", Long.class);
+		Method m = file.getClass().getDeclaredMethod("doSetLastModifiedTime", long.class);
 		m.setAccessible(true);
 		m.invoke(file, time);
 	}
