@@ -48,6 +48,10 @@ public class CopyToVfsAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
+		// if ((int) (System.currentTimeMillis() / 1000) % 2 == 0)
+		// return "img/ext/transfer2.png";
+		// else
+		// return "img/ext/transfer22.png";
 		return "img/ext/network.png";
 	}
 }

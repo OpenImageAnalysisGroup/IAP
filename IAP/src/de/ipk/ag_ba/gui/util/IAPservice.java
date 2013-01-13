@@ -452,14 +452,12 @@ public class IAPservice {
 		
 		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		
-		String search = url.toString();
 		String searchKey = null;
 		Collection<NumericMeasurementInterface> ml = Substance3D.getAllMeasurements(experiment);
 		for (NumericMeasurementInterface md : ml) {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
-				String u = id.getURL().getDetail() + "";
-				if (search.contains(u)) {
+				if (url.equals(id.getURL())) {
 					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))

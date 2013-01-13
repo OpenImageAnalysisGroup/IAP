@@ -421,7 +421,7 @@ public class NavigationButton implements StyleAware {
 						if (iconUpdateCheck != null)
 							iconUpdateCheck.run();
 						else
-							System.out.println("ICONUPDATECHECK IS NULL");
+							System.out.println("ICONUPDATECHECK IS NULL FOR " + n.getTitle());
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());
