@@ -124,6 +124,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
+		// if ((int) (System.currentTimeMillis() / 1000) % 2 == 0)
+		// return "img/ext/transfer2.png";
+		// else
+		// return "img/ext/transfer22.png";
 		return IAPimages.copyToServer();
 	}
 	
@@ -255,7 +259,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
 									bm.getURL(), null, t, targetFile, exists,
-									null);
+									null, false);
 						} catch (Exception e) {
 							System.out
 									.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
@@ -268,7 +272,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
 									bm.getURL(), null, t, targetFile, exists,
-									null);
+									null, false);
 						}
 						if (exists) {
 							files--;
@@ -335,7 +339,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									copyBinaryFileContentToTarget(experiment,
 											written, hsmManager, es, null,
 											previewStream, t, targetFile,
-											exists, null);
+											exists, null, true);
 								else
 									System.out
 											.println("ERROR: Preview could not be created or saved.");
@@ -406,7 +410,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
-							targetFile, targetFile.exists(), null);
+							targetFile, targetFile.exists(), null, false);
 					
 				} catch (Exception e) {
 					System.out.println("ERROR: DATA DATA TRANSFER AND STORAGE: "
@@ -472,7 +476,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					};
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, oldRefUrl, null, t, targetFile,
-							targetFile.exists(), postProcess);
+							targetFile.exists(), postProcess, false);
 				} catch (Exception e) {
 					System.out
 							.println("ERROR: DATA DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
@@ -567,7 +571,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final ExecutorService es, final IOurl url,
 			final MyByteArrayInputStream optUrlContent, final Long t,
 			final VfsFileObject targetFile, final boolean targetExists,
-			final Runnable optPostProcess) throws InterruptedException {
+			final Runnable optPostProcess,
+			final boolean isIconStorage) throws InterruptedException {
 		while (written.getInt() > 0)
 			Thread.sleep(5);
 		written.addInt(1);
@@ -586,12 +591,15 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								System.out.println("No input for " + url);
 							else {
 								synchronized (es) {
-									VfsFileObject f = vfs.newVfsFile(hsmManager
-											.prepareAndGetDataFileNameAndPath(
-													experiment.getHeader(), t,
-													"in_progress_"
-															+ UUID.randomUUID()
-																	.toString()), true);
+									String fn;
+									if (isIconStorage)
+										fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
+												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+									else
+										fn = hsmManager.prepareAndGetDataFileNameAndPath(
+												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+									
+									VfsFileObject f = vfs.newVfsFile(fn, true);
 									BufferedOutputStream bos = new BufferedOutputStream(
 											f.getOutputStream());
 									try {

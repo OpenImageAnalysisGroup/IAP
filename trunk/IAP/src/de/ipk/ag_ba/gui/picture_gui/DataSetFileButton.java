@@ -182,22 +182,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										IOurl s = imageResult
 												.getBinaryFileInfo()
 												.getFileNameMain();
-										Collection<NumericMeasurementInterface> match = IAPservice
-												.getMatchFor(s, targetTreeNode
-														.getExperiment().getExperiment());
-										
-										for (NumericMeasurementInterface nmi : match) {
-											ImageData id = (ImageData) nmi;
-											if (id.getURL().getDetail()
-													.equals(s.getDetail())) {
-												String oldRef = id.getURL()
-														.toString();
-												IOurl u = new IOurl(oldRef);
-												FlexibleImage fi = new FlexibleImage(
-														u);
-												fi.print("Main Image");
-											}
-										}
+										FlexibleImage fi = new FlexibleImage(s);
+										fi.print("Main Image");
 									} catch (Exception err) {
 										JOptionPane
 												.showMessageDialog(
