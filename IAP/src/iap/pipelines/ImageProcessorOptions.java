@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 
 /**
- * @author klukas, entzian
+ * @author klukas
  */
 public class ImageProcessorOptions {
 	

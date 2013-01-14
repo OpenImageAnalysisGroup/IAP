@@ -18,6 +18,7 @@ import org.IniIoProvider;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
+import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
@@ -76,8 +77,10 @@ public class ExperimentReference {
 			} else {
 				for (MongoDB m : MongoDB.getMongos()) {
 					header = m.getExperimentHeader(new ObjectId(databaseID));
-					if (header != null)
+					if (header != null) {
+						setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
 						break;
+					}
 				}
 			}
 		}
@@ -93,6 +96,7 @@ public class ExperimentReference {
 	public ExperimentReference(ExperimentHeaderInterface ehi, MongoDB m) {
 		this(ehi);
 		this.m = m;
+		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
 	}
 	
 	public ExperimentInterface getData(MongoDB m) throws Exception {
@@ -240,6 +244,11 @@ public class ExperimentReference {
 	}
 	
 	public IniIoProvider getIniIoProvider() {
+		if (storedIniProvider == null) {
+			System.out.println(SystemAnalysis.getCurrentTime()
+					+ ">INFO: Add generic INI-Provider info to experiment reference");
+			storedIniProvider = new ExperimentAnalysisSettingsIOprovder(this, null);
+		}
 		return storedIniProvider;
 	}
 	
