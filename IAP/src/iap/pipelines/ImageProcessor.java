@@ -9,13 +9,12 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageProcessor {
 	
-	public abstract HashMap<Integer, FlexibleMaskAndImageSet> pipeline(
+	public abstract HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(
 			ImageProcessorOptions options,
 			FlexibleImageSet input, FlexibleImageSet optInputMasks, int maxThreadsPerImage,
 			HashMap<Integer, FlexibleImageStack> debugStack)

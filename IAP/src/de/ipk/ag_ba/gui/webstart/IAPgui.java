@@ -29,6 +29,7 @@ import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
@@ -39,8 +40,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class IAPgui {
 	
-	public static JComponent getMainGUIcontent(final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
-			boolean secondWindow) {
+	public static JComponent getMainGUIcontent(
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
+			boolean secondWindow,
+			NavigationAction optCustomHomeAction) {
 		
 		final JPanel graphPanel = new JPanel();
 		
@@ -63,7 +66,7 @@ public class IAPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 		
-		final ActionIapHome home = new ActionIapHome(myStatus);
+		final NavigationAction home = optCustomHomeAction != null ? optCustomHomeAction : new ActionIapHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
 		
 		navigationPanel.setGuiSetting(guiSetting);
@@ -75,9 +78,13 @@ public class IAPgui {
 		// overView.setProcessing(true);
 		
 		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
-		home.performActionCalculateResults(overView);
+		try {
+			home.performActionCalculateResults(overView);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
-		actionPanel.setEntitySet(home.getActionEntitySet());
+		actionPanel.setEntitySet(home.getResultNewActionSet());
 		
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {

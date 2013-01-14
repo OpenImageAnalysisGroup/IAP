@@ -125,6 +125,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
 	
 	private ActionListener getNewWindowListener() {
+		return getNewWindowListener(null);
+	}
+	
+	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction) {
 		ActionListener res = new ActionListener() {
 			
 			@Override
@@ -132,10 +136,12 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 						"IAP Cloud Storage, Analysis and Visualization System");
 				final JFrame jff = new JFrame(tt);
+				if (optCustomStartAction != null)
+					jff.setTitle(optCustomStartAction.getDefaultTooltip());
 				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 						"", "");
-				jff.add(IAPgui.getMainGUIcontent(myStatus, true), "0,0");
+				jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction), "0,0");
 				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				jff.setLocationByPlatform(true);
 				jff.setSize(800, 600);
@@ -167,7 +173,10 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						else {
 							String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 									"IAP Cloud Storage, Analysis and Visualization System");
-							jff.setTitle(tt);
+							if (optCustomStartAction != null)
+								jff.setTitle(optCustomStartAction.getDefaultTitle());
+							else
+								jff.setTitle(tt);
 						}
 					}
 				};

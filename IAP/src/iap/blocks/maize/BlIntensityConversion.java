@@ -27,7 +27,7 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 				options.getBackground());
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 		if (debug)
-			fis.addImage("FLUO", io.copy().getImage());
+			fis.addImage("FLUO", io.copy().getImage(), null);
 		double min = 200;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
 			min = 220;
@@ -70,10 +70,10 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
 		
 		if (debug) {
-			fis.addImage("ClChPh", r);
-			fis.addImage("CLASSIC", resClassic);
-			fis.addImage("CHLORO", resChlorophyll);
-			fis.addImage("PHENO", resPhenol);
+			fis.addImage("ClChPh", r, null);
+			fis.addImage("CLASSIC", resClassic, null);
+			fis.addImage("CHLORO", resChlorophyll, null);
+			fis.addImage("PHENO", resPhenol, null);
 			/**
 			 * @see IntensityAnalysis: r_intensityClassic, g_.., b_...
 			 */

@@ -155,7 +155,15 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem {
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		VfsFileObject file = newVfsFile(url.getFileName());
+		if (url.getDetail() != null && url.getDetail().startsWith("data")) {
+			VfsFileObject file = newVfsFile("icons" + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
+			if (file != null && file.exists()) {
+				InputStream is = file.getInputStream();
+				if (is != null)
+					return is;
+			}
+		}
+		VfsFileObject file = newVfsFile(url.getDetail() + "/" + url.getFileName());
 		if (file == null)
 			return null;
 		if (!file.exists())

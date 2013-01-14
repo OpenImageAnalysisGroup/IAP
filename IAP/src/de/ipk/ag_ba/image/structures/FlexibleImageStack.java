@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.structures;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.ImageWindow;
+import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,10 +11,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 
 import org.ErrorMsg;
+import org.FolderPanel;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -29,7 +33,13 @@ public class FlexibleImageStack {
 	
 	private int h;
 	
+	private final ArrayList<String> settingsPaths = new ArrayList<String>();
+	
 	public void addImage(String label, FlexibleImage image) {
+		addImage(label, image, null);
+	}
+	
+	public void addImage(String label, FlexibleImage image, String optSettingsPath) {
 		image = image.copy();
 		if (!sizeKnown) {
 			sizeKnown = true;
@@ -45,7 +55,8 @@ public class FlexibleImageStack {
 				ErrorMsg.addErrorMessage("mismatching image size: " + h + " <!> " + image.getHeight());
 		}
 		try {
-			stack.addSlice(label, image.getAsImagePlus().getProcessor());
+			stack.addSlice(label + "//Settings: " + optSettingsPath + "//", image.getAsImagePlus().getProcessor());
+			settingsPaths.add(optSettingsPath);
 		} catch (Exception e) {
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT ADD IMAGE TO IMAGE-STACK: " +
 					e.getMessage());
@@ -72,7 +83,7 @@ public class FlexibleImageStack {
 		IAPservice.showImageJ();
 	}
 	
-	public void print(String title, final Runnable actionCmd, String buttonTitle) {
+	public void print(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {
 		if (SystemAnalysis.isHeadless())
 			return;
 		ImagePlus image = new ImagePlus();
@@ -87,10 +98,11 @@ public class FlexibleImageStack {
 					actionCmd.run();
 				}
 			});
-			win.add(jb);
+			JComponent ccc = FolderPanel.getBorderedComponent(
+					TableLayout.get3Split(jb, null, optSideComponent, TableLayout.PREFERRED, 5, TableLayout.PREFERRED), 5, 5, 5, 5);
+			win.add(ccc);
 			win.pack();
 			IAPservice.showImageJ();
 		}
 	}
-	
 }

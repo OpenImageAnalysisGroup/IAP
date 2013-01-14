@@ -3,6 +3,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize;
 import iap.pipelines.ImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
@@ -972,12 +972,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
-			HashMap<Integer, FlexibleMaskAndImageSet> ret = imageProcessor.pipeline(options,
+			HashMap<Integer, StringAndFlexibleMaskAndImageSet> ret = imageProcessor.pipeline(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);
 			
 			for (Integer key : ret.keySet()) {
-				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).images() : null;
+				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).getMaskAndImageSet().images() : null;
 				if (pipelineResult != null) {
 					FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
 					resVis = pipelineResult.vis();

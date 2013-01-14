@@ -9,10 +9,12 @@ import javax.imageio.ImageIO;
 
 public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
+	@Override
 	public IOurl saveAs(IOurl source, String targetFilename) throws Exception {
 		throw new UnsupportedOperationException("Save not implemented for IO handler " + this.getClass().getCanonicalName());
 	}
 	
+	@Override
 	public IOurl save(IOurl source) throws Exception {
 		return saveAs(source, source.getFileName());
 	}
@@ -31,10 +33,7 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 			return null;
 		}
 		BufferedImage i = null;
-		InputStream is = url.getInputStream();
-		if (is == null)
-			return null;
-		is = ResourceIOManager.getInputStreamMemoryCached(is);
+		InputStream is = new MyByteArrayInputStream(ResourceIOManager.getPreviewImageContent(url));
 		i = ImageIO.read(is);
 		if (i == null) {
 			return null;
