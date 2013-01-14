@@ -103,7 +103,7 @@ public class AnnotationInfoPanel extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String a = id.getAnnotationField(key);
-					System.out.println("GET " + key + ": " + a);
+					// System.out.println("GET " + key + ": " + a);
 					if (cb.isSelected()) {
 						if (a == null)
 							id.addAnnotationField(key, "1");
@@ -115,7 +115,7 @@ public class AnnotationInfoPanel extends JPanel {
 						else
 							id.replaceAnnotationField(key, "0");
 					}
-					System.out.println("ANNO: " + id.getAnnotation());
+					// System.out.println("ANNO: " + id.getAnnotation());
 				}
 			});
 	}

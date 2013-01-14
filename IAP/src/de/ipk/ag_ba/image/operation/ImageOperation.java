@@ -247,6 +247,8 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation scale(double xScale, double yScale, boolean replaceColors) {
+		if (Math.abs(xScale - 1d) < 0.0001 && Math.abs(yScale - 1d) < 0.0001)
+			return this;
 		image.getProcessor().scale(xScale, yScale);
 		ImageOperation res = new ImageOperation(getImage());
 		if (replaceColors)
@@ -2940,6 +2942,8 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation addBorder(int bordersize, int translatex, int translatey, int borderColor) {
+		if (bordersize == 0 && translatex == 0 && translatey == 0)
+			return this;
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -2972,9 +2976,8 @@ public class ImageOperation {
 	 * @return
 	 */
 	public ImageOperation addBorder(int bordersizeSides, int borderSizeTopBottom, int translatex, int translatey, int borderColor) {
-		if (bordersizeSides == 0 && borderSizeTopBottom == 0)
+		if (bordersizeSides == 0 && borderSizeTopBottom == 0 && translatex == 0 && translatey == 0)
 			return this;
-		System.out.println(this);
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -2993,7 +2996,6 @@ public class ImageOperation {
 			}
 		}
 		ImageOperation res = new ImageOperation(result);
-		System.out.println(res);
 		return res;
 	}
 	
@@ -4277,7 +4279,7 @@ public class ImageOperation {
 		return new FlexibleImage(aa).io();
 	}
 	
-	public ImageOperation crossfade(FlexibleImage b, double progress) {
+	public ImageOperation crossfade(FlexibleImage b, int f1, int f2, int f3) {
 		if (b == null)
 			return this;
 		int[][] aa = getImageAs2dArray();
@@ -4294,7 +4296,7 @@ public class ImageOperation {
 				if (x < bW && y < bH)
 					bpixel = ba[x][y];
 				// Cr = Cd*(1-t)+Cs*t;
-				if ((((x / 5))) % 2 < 1)
+				if ((((x / f1))) % f2 < f3)
 					aa[x][y] = apixel; // ColorUtil.getAvgColor(apixel, bpixel);
 				else
 					aa[x][y] = bpixel;
@@ -4302,14 +4304,15 @@ public class ImageOperation {
 		return new FlexibleImage(aa).io();
 	}
 	
+	public ImageOperation crossfade(FlexibleImage b) {
+		return crossfade(b, 5, 2, 1);
+	}
+	
 	public ImageOperation crossfade(FlexibleImage b, FlexibleImage c) {
 		if (c == null)
-			return crossfade(b, 0.5d);
+			return crossfade(b);
 		if (b == null || c == null)
 			return this;
-		System.out.println(this);
-		System.out.println(b);
-		System.out.println(c);
 		int[][] aa = getImageAs2dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();

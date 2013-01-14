@@ -48,7 +48,9 @@ public class ActionResetActions extends AbstractNavigationAction {
 		return new MainPanelComponent(
 				"Settings for this group have been deleted and will be automatically <br>" +
 						"re-created with its default-value as soon as the value is used for <br>" +
-						"the connected program function.");
+						"the connected program function.<br><br>" +
+						"It is recommended to navigate now fully back within the<br>" +
+						"command history (click the first button in the command history bar).");
 	}
 	
 	@Override

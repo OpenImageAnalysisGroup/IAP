@@ -878,7 +878,7 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public void removedCleanup() {
-		System.out.println("REMOVED: " + StringManipulationTools.removeHTMLtags(getTitle()).trim());
+		// System.out.println("REMOVED: " + StringManipulationTools.removeHTMLtags(getTitle()).trim());
 		title = "[REMOVE FROM UPDATE]" + title;
 		navigationImage = null;
 		actionImage = null;

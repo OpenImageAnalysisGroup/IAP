@@ -170,10 +170,10 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
-		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
-		result.display("res", false);
-		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
-		result2.display("res2", false);
+		// FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
+		// result.display("res", false);
+		// FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
+		// result2.display("res2", false);
 		
 		// ***Saved***
 		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
@@ -280,6 +280,8 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		int h = skeleton.getHeight();
 		int[] img = skeleton.getAs1A().clone();
 		int[] oi = original.getAs1A().clone();
+		if (img.length != oi.length)
+			throw new RuntimeException("Skeleton image has different size than the image, it should be mapped onto!");
 		int last = img.length - w;
 		for (int i = 0; i < img.length; i++) {
 			if (i > w && i < last && img[i] != back) {
