@@ -507,7 +507,6 @@ public class IAPservice {
 	}
 	
 	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
-	private static Boolean mainMongoDBreachable = null;
 	private static HashMap<String, String> niceNames = initNiceNames();
 	
 	public static float[] getCubeRoots(float lo, float up, int n) {
