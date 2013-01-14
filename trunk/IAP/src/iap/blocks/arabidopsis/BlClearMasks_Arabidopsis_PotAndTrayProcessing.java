@@ -18,69 +18,60 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean multiTray = false;
-	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
-		debug = getBoolean("debug", false);
 		
 		super.prepare();
-		if (options.getTrayCnt() > 1) {
-			multiTray = true;
-		}
-		double vertFillGrade = 0.95d;
-		if (options.getTrayCnt() == 6) {
+		
+		int gridHn;
+		int gridVn;
+		multiTray = false;
+		if (options.getTrayCnt() == 1) {
+			gridHn = getInt("Well Grid Horizontal", 1);
+			gridVn = getInt("Well Grid Vertical", 1);
+		} else
+			if (options.getTrayCnt() == 6) {
+				gridHn = getInt("Well Grid Horizontal", 3);
+				gridVn = getInt("Well Grid Vertical", 2);
+				multiTray = true;
+			} else
+				if (options.getTrayCnt() == 12) {
+					gridHn = getInt("Well Grid Horizontal", 4);
+					gridVn = getInt("Well Grid Vertical", 3);
+					multiTray = true;
+				} else {
+					gridHn = getInt("Well Grid Horizontal", 1);
+					gridVn = getInt("Well Grid Vertical", 1);
+				}
+		
+		if (gridHn != 1 || gridVn != 1) {
+			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100;
 			// 3x2
 			FlexibleImage vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, FlexibleImageType.VIS, -30, vertFillGrade, 3, 2);
+				processCuttingOfImage(vis, FlexibleImageType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
 			FlexibleImage fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, FlexibleImageType.FLUO, -30, vertFillGrade, 3, 2);
+				processCuttingOfImage(fluo, FlexibleImageType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
 			FlexibleImage nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade, 3, 2);
+				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade * nir.getHeight() / 2d, gridHn, gridVn);
 			
 			FlexibleImage ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().rotate(180).getImage();
-				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade, 3, 2);
-			}
-		}
-		if (options.getTrayCnt() == 12) {
-			// 4x3
-			FlexibleImage vis = input().images().vis();
-			if (vis != null)
-				processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
-			
-			FlexibleImage fluo = input().images().fluo();
-			if (fluo != null)
-				processCuttingOfImage(fluo, FlexibleImageType.FLUO, 0, vertFillGrade, 4, 3);
-			
-			FlexibleImage nir = input().images().nir();
-			if (nir != null)
-				processCuttingOfImage(nir, FlexibleImageType.NIR, 5, vertFillGrade, 4, 3);
-			
-			FlexibleImage ir = input().images().ir();
-			if (ir != null) {
-				ir = ir.io().rotate(180).getImage();
-				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade, 4, 3);
+				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade * ir.getHeight() / 2d, gridHn, gridVn);
 			}
 		}
 	}
 	
-	private void processCuttingOfImage(FlexibleImage img, FlexibleImageType type, int offY, double vertFillGrade, int cols, int rows) {
+	private void processCuttingOfImage(FlexibleImage img, FlexibleImageType type, double offY, double vertFillGrade, int cols, int rows) {
 		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade), img.getWidth() / 2,
 				img.getHeight() / 2);
 		r.y = r.y + offY;
-		
-		// double b = 30;
-		// r.x += b;
-		// r.y += b;
-		// r.width -= 2 * b;
-		// r.height -= 2 * b;
 		
 		int le = (int) r.getMinX();
 		int to = (int) r.getMinY();
@@ -118,15 +109,11 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
 						clearOutsideCircle(
-								img.getWidth() / 2,
-								img.getHeight() / 2 - 30,
-								(int) (img.getHeight() / 2.45d)).getImage();
+								img.getWidth() / 2 - getInt("VIS Circle Center Shift X", 0),
+								img.getHeight() / 2 - getInt("VIS Circle Center Shift Y", 0),
+								(int) (img.getHeight() * getDouble("VIS Circle Radius Percent of Height", 40.8) / 100d)).getImage();
 			else
 				return img;
-			/*
-			 * .copy().io().
-			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
-			 */
 		} else
 			return img;
 	}
@@ -138,15 +125,11 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
 						clearOutsideCircle(
-								img.getWidth() / 2,
-								img.getHeight() / 2,
-								(int) (img.getHeight() / 2.45d)).getImage();
+								img.getWidth() / 2 - getInt("FLUO Circle Center Shift X", 0),
+								img.getHeight() / 2 - getInt("FLUO Circle Center Shift Y", 0),
+								(int) (img.getHeight() * getDouble("FLUO Circle Radius Percent of Height", 40.8) / 100d)).getImage();
 			else
 				return img;
-			/*
-			 * .copy().io().
-			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
-			 */
 		} else
 			return img;
 	}
@@ -156,17 +139,13 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 		FlexibleImage img = input().images().nir();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io().translate(-3, 0).
+				return img.copy().io().
 						clearOutsideCircle(
-								img.getWidth() / 2,
-								img.getHeight() / 2,
-								(int) (img.getHeight() / 2.45d)).getImage();
+								img.getWidth() / 2 - getInt("NIR Circle Center Shift X", 0),
+								img.getHeight() / 2 - getInt("NIR Circle Center Shift Y", 0),
+								(int) (img.getHeight() * getDouble("NIR Circle Radius Percent of Height", 40.8) / 100d)).getImage();
 			else
 				return img;
-			/*
-			 * .copy().io().
-			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
-			 */
 		} else
 			return img;
 	}
@@ -178,54 +157,13 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io()
 						.clearOutsideCircle(
-								img.getWidth() / 2,
-								img.getHeight() / 2,
-								(int) (img.getHeight() / 2.45d)).print("result", debug)
-						.getImage();
+								img.getWidth() / 2 - getInt("IR Circle Center Shift X", 0),
+								img.getHeight() / 2 - getInt("IR Circle Center Shift Y", 0),
+								(int) (img.getHeight() * getDouble("IR Circle Radius Percent of Height", 40.8) / 100d)).getImage();
 			else
 				return img;
-			/*
-			 * .copy().io().
-			 * clearOutsideRectangle(0, 0, img.getWidth() - 1, (int) (img.getHeight() * 0.65)).getImage();
-			 */
 		} else
 			return img;
-	}
-	
-	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage img = input().images().vis();
-		if (img != null) {
-			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
-		} else
-			return null;
-	}
-	
-	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage img = input().images().fluo();
-		if (img != null) {
-			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
-		} else
-			return null;
-	}
-	
-	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage img = input().images().nir();
-		if (img != null) {
-			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
-		} else
-			return null;
-	}
-	
-	@Override
-	protected FlexibleImage processIRmask() {
-		FlexibleImage img = input().images().ir();
-		if (img != null) {
-			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
-		} else
-			return null;
 	}
 	
 	@Override
@@ -234,6 +172,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 		res.add(FlexibleImageType.VIS);
 		res.add(FlexibleImageType.FLUO);
 		res.add(FlexibleImageType.NIR);
+		res.add(FlexibleImageType.IR);
 		return res;
 	}
 	

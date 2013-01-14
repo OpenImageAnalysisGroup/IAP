@@ -53,15 +53,20 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		double x = (getWidth() - scale * image.getWidth()) / 2;
-		double y = (getHeight() - scale * image.getHeight()) / 2;
-		AffineTransform at = AffineTransform.getTranslateInstance(x, y);
-		at.scale(scale, scale);
-		g2.drawRenderedImage(image, at);
+		if (image != null) {
+			double x = (getWidth() - scale * image.getWidth()) / 2;
+			double y = (getHeight() - scale * image.getHeight()) / 2;
+			AffineTransform at = AffineTransform.getTranslateInstance(x, y);
+			at.scale(scale, scale);
+			g2.drawRenderedImage(image, at);
+		} else
+			g2.drawString("Click 'Update View' to (re)calculate image", 10, 20);
 	}
 	
 	@Override
 	public Dimension getPreferredSize() {
+		if (image == null)
+			return new Dimension(200, 320);
 		int w = (int) (scale * image.getWidth());
 		int h = (int) (scale * image.getHeight());
 		return new Dimension(w, h);
