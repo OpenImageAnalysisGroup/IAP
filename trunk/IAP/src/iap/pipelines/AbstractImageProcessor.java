@@ -41,7 +41,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
 	 */
 	@Override
-	public HashMap<Integer, FlexibleMaskAndImageSet> pipeline(
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(
 			ImageProcessorOptions options,
 			FlexibleImageSet input,
 			FlexibleImageSet optInputMasks,
@@ -52,12 +52,13 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		pipeline.setValidTrays(debugValidTrays);
 		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
-		HashMap<Integer, FlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
+		HashMap<Integer, StringAndFlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
 		
 		if (debugStack != null)
 			for (Integer key : debugStack.keySet()) {
-				debugStack.get(key).addImage("RESULT", result.get(key).getOverviewImage(
-						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)));
+				StringAndFlexibleMaskAndImageSet sai = result.get(key);
+				debugStack.get(key).addImage("RESULT", sai.getMaskAndImageSet().getOverviewImage(
+						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)), sai.getSettings());
 			}
 		
 		return result;

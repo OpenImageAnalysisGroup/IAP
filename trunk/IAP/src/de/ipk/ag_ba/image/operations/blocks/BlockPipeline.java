@@ -1,14 +1,13 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import iap.blocks.BlCrop;
-import iap.blocks.BlMoveMasksToImageSet;
-import iap.blocks.BlReplaceEmptyOriginalImages;
-import iap.blocks.arabidopsis.BlCutZoomedImages;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -19,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.JButton;
+
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ObjectRef;
 import org.StringManipulationTools;
@@ -27,6 +28,11 @@ import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.ActionSettings;
+import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.PanelTarget;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
@@ -78,7 +84,7 @@ public class BlockPipeline {
 	
 	private static long lastOutput = 0;
 	
-	public HashMap<Integer, FlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
 			FlexibleMaskAndImageSet input, HashMap<Integer, FlexibleImageStack> debugStack,
 			HashMap<Integer, BlockResultSet> blockResults,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -102,14 +108,14 @@ public class BlockPipeline {
 			executionTrayCount = IAPservice.getTrayCountFromCondition(abc.getParentSample().getParentCondition());
 		}
 		
-		HashMap<Integer, FlexibleMaskAndImageSet> res = new HashMap<Integer, FlexibleMaskAndImageSet>();
+		HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = new HashMap<Integer, StringAndFlexibleMaskAndImageSet>();
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
 			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
 			BlockResultSet results = new BlockResults();
 			options.setTrayCnt(idx, executionTrayCount);
-			res.put(idx, executeInnerCall(options, input, ds, results, status));
+			res.put(idx, executeInnerCall(options, new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status));
 			if (debugStack != null)
 				debugStack.put(idx, ds);
 			blockResults.put(idx, results);
@@ -117,8 +123,8 @@ public class BlockPipeline {
 		return res;
 	}
 	
-	private FlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
-			FlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
+	private StringAndFlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
+			StringAndFlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
 			BlockResultSet results,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
@@ -158,30 +164,16 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(input, options, results, index++,
+			block.setInputAndOptions(input.getMaskAndImageSet(), options, results, index++,
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
 			
-			ImageSetDescription isd = debug ? null : input.getImageSetDescription();
+			ImageSetDescription isd = debug ? null : input.getMaskAndImageSet().getImageSetDescription();
 			
-			FlexibleMaskAndImageSet input2 = block.process();
+			input.setMaskAndImageSet(block.process());
+			input.setOptions(block.getClass().getCanonicalName());
 			
-			if (debug)
-				if (block.getClass() != BlCutZoomedImages.class)
-					if (block.getClass() != BlReplaceEmptyOriginalImages.class)
-						if (block.getClass() != BlCrop.class)
-							if (block.getClass() != BlMoveMasksToImageSet.class)
-								if (isd.isDifferentTo(input2)) {
-									System.out.println();
-									System.out.println(SystemAnalysis.getCurrentTime()
-											+ ">WARNING: BLOCK " + block.getClass().getSimpleName()
-											+ " HAS MODIFIED THE IMAGE SET:\n"
-											+ isd.getDifferenceDescription(input2));
-									System.out.println("IN: " + input);
-									System.out.println("OUT: " + input2);
-								}
-			input = input2;
 			long tb = System.currentTimeMillis();
 			
 			int seconds = (int) ((tb - ta) / 1000);
@@ -204,16 +196,16 @@ public class BlockPipeline {
 				// options.getTrayIdx()));
 				try {
 					TreeSet<Integer> times = new TreeSet<Integer>();
-					input.images().getVisInfo().getParentSample().getParentCondition().getTimes(times);
+					input.getMaskAndImageSet().images().getVisInfo().getParentSample().getParentCondition().getTimes(times);
 					String timeInfo = "|" + StringManipulationTools.getStringList(times, "|") + "|.";
 					timeInfo = StringManipulationTools.stringReplace(timeInfo,
-							"|" + input.images().getVisInfo().getParentSample().getTime() + "|",
-							"|&gt;<b>" + input.images().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
+							"|" + input.getMaskAndImageSet().images().getVisInfo().getParentSample().getTime() + "|",
+							"|&gt;<b>" + input.getMaskAndImageSet().images().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
 					timeInfo = "</b>" + timeInfo.substring(1, timeInfo.length() - 2) + "<b>";
 					timeInfo = StringManipulationTools.stringReplace(timeInfo, "|", " ");
 					timeInfo = timeInfo.trim();
 					String p = timeInfo + " </b>(" +
-							input.images().getVisInfo().getQualityAnnotation() +
+							input.getMaskAndImageSet().images().getVisInfo().getQualityAnnotation() +
 							(options.getTrayCnt() > 1 ?
 									", tray " + (options.getTrayIdx() + 1) + "/" + options.getTrayCnt() + ")<b>"
 									: ")<b>");
@@ -328,9 +320,10 @@ public class BlockPipeline {
 	 *           Image set to be analyzed.
 	 */
 	public static void debugTryAnalysis(
-			final ExperimentInterface e,
+			final ExperimentReference er,
 			final Collection<NumericMeasurementInterface> input,
 			final MongoDB m, AbstractPhenotypingTask analysisTask) {
+		final ExperimentInterface e = er.getExperiment();
 		final AbstractPhenotypingTask analysisTaskFinal = analysisTask;
 		final LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
 		HashMap<Sample3D, Sample3D> old2newSample = new HashMap<Sample3D, Sample3D>();
@@ -378,6 +371,7 @@ public class BlockPipeline {
 				}
 			}
 		};
+		
 		final ObjectRef finishSwingTaskRef = new ObjectRef();
 		Runnable finishSwingTask = new Runnable() {
 			@Override
@@ -388,6 +382,19 @@ public class BlockPipeline {
 							"No pipeline results available! (" + input.size()
 									+ " images input)", "Error");
 				} else {
+					JButton openSettingsButton = null;
+					if (er.getIniIoProvider() != null) {
+						openSettingsButton = new JButton("Change analysis settings");
+						openSettingsButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								MyNavigationPanel mnp = new MyNavigationPanel(PanelTarget.NAVIGATION, null, null);
+								NavigationAction ac = new ActionSettings(null, er.getIniIoProvider(), "Change analysis settings (experiment " + er.getExperimentName()
+										+ ")", "Modify settings");
+								mnp.getNewWindowListener(ac).actionPerformed(arg0);
+							}
+						});
+					}
 					int idx = 1;
 					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
 					for (FlexibleImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
@@ -408,7 +415,7 @@ public class BlockPipeline {
 										(Runnable) finishSwingTaskRef.getObject(), status, false,
 										true);
 							}
-						}, "Re-run Analysis (debug)");
+						}, "Re-run Analysis (debug)", openSettingsButton);
 						idx++;
 					}
 					idx++;

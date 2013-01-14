@@ -4,6 +4,7 @@ import iap.blocks.BlCrop;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.threeD.BlockThreeDgeneration;
 import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,6 @@ import org.SystemOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -47,7 +47,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	}
 	
 	@Override
-	public HashMap<Integer, FlexibleMaskAndImageSet> pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks,
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks,
 			int maxThreadsPerImage,
 			HashMap<Integer, FlexibleImageStack> debugStack) throws Exception {
 		HashSet<Integer> rotationAngles = new HashSet<Integer>();
@@ -63,7 +63,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 			if (rotationAngles.size() > 3) {
 				// System.out.print(SystemAnalysisExt.getCurrentTime() + ">INFO: START 3D-PROCESSING OF A SAMPLE WITH " + rotationAngles.size()
 				// + " RELATED SIDE ANGLE IMAGES...");
-				HashMap<Integer, FlexibleMaskAndImageSet> res = super.pipeline(options, input, optInputMasks, maxThreadsPerImage, debugStack);
+				HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = super.pipeline(options, input, optInputMasks, maxThreadsPerImage, debugStack);
 				// System.out.println("OK");
 				return res;
 			}

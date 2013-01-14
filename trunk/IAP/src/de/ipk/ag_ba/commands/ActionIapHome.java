@@ -223,8 +223,4 @@ public final class ActionIapHome extends AbstractNavigationAction {
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return myStatus;
 	}
-	
-	public ArrayList<NavigationButton> getActionEntitySet() {
-		return homePrimaryActions;
-	}
 }

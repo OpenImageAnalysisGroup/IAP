@@ -80,7 +80,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		if (debugStack != null && isChangingImages())
 			debugStack.addImage("Input for " + task, input().getOverviewImage(
 					SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
-					));
+					), task);
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", true)) {
 			if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
 				if (input().masks() != null)

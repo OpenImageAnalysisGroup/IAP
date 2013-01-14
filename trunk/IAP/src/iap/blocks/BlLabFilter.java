@@ -39,7 +39,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			ImageOperation visMask = input().masks().vis().io().copy();
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 			if (fis != null)
-				fis.addImage("start", visMask.getImage());
+				fis.addImage("start", visMask.getImage(), null);
 			
 			visMask = visMask
 					.blur(getDouble("LAB-austr-blur", 1))
@@ -54,7 +54,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					options.getBackground());
 			
 			if (fis != null)
-				fis.addImage("blue filtered by HSV", visMask.getImage());
+				fis.addImage("blue filtered by HSV", visMask.getImage(), null);
 			
 			initLABfilterValues();
 			
@@ -68,7 +68,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					options.getBackground(), false);
 			
 			if (fis != null)
-				fis.addImage("main lab filter", visMask.getImage());
+				fis.addImage("main lab filter", visMask.getImage(), null);
 			
 			return visMask.getImage().display("VISS", debug);
 		}

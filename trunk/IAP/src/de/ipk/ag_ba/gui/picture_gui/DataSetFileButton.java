@@ -1342,7 +1342,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					for (NumericMeasurementInterface nmi : match)
 						System.out.println("Image Set Match: " + nmi + " // Subtance: " + nmi.getParentSample().getParentCondition().getParentSubstance().getName());
 					BlockPipeline.debugTryAnalysis(
-							targetTreeNode.getExperiment().getExperiment(),
+							targetTreeNode.getExperiment(),
 							match, m,
 							iat);
 				} catch (Exception err) {
@@ -1374,7 +1374,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									m);
 					
 					BlockPipeline.debugTryAnalysis(
-							targetTreeNode.getExperiment().getExperiment(),
+							targetTreeNode.getExperiment(),
 							match, m,
 							iat);
 				} catch (Exception err) {
