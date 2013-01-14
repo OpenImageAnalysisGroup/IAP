@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 
@@ -72,7 +73,7 @@ public class BlCutZoomedImages extends AbstractBlock {
 					ab = inst.process();
 					FlexibleImageSet in = ab.images();
 					
-					FlexibleImage vis = inputSet.images().getImage(inpImageType).copy();
+					FlexibleImage vis = in.getImage(inpImageType).copy();
 					
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();
@@ -125,8 +126,9 @@ public class BlCutZoomedImages extends AbstractBlock {
 	}
 	
 	private FlexibleImage cut(ImageOperation img) {
-		double zoom = Double.NaN;
+		double zoomX = Double.NaN;
 		double zoomY = Double.NaN;
+		double scaleY = Double.NaN;
 		double offX = Double.NaN;
 		double offY = Double.NaN;
 		String prefix = "UNKNOWN";
@@ -144,18 +146,27 @@ public class BlCutZoomedImages extends AbstractBlock {
 				prefix = "IR";
 				break;
 		}
-		zoom = 100d / getDouble(prefix + " Zoom", 100);
-		zoomY = 100d / getDouble(prefix + " Scale Vertical", 100);
+		zoomX = 100d / getDouble(prefix + " Zoom X", 100);
+		zoomY = 100d / getDouble(prefix + " Zoom Y", 100);
+		scaleY = getDouble(prefix + " Scale Vertical", 100) / 100d;
 		offX = getDouble(prefix + " Shift X", 0);
 		offY = getDouble(prefix + " Shift Y", 0);
 		
 		// add border or cut outside
-		int horTooTooMuch = (int) ((1d - zoom) * img.getWidth());
+		int horTooTooMuch = (int) ((1d - zoomX) * img.getWidth());
 		int horTm = -horTooTooMuch / 2;
-		int verTooTooMuch = (int) ((1d - zoom) * img.getHeight());
+		int verTooTooMuch = (int) ((1d - zoomY) * img.getHeight());
 		int verTm = -verTooTooMuch / 2;
+		if (debugValues || preventDebugValues) {
+			System.out.println("IMAGE TYPE " + img.getType() + ":");
+			System.out.println("ZOOM  X =" + StringManipulationTools.formatNumber(1d / zoomX, "#.##"));
+			System.out.println("ZOOM  Y =" + StringManipulationTools.formatNumber(1d / zoomY, "#.##"));
+			System.out.println("SCALE Y =" + StringManipulationTools.formatNumber(scaleY, "#.##"));
+			System.out.println("OFF X   =" + StringManipulationTools.formatNumber(offX, "#"));
+			System.out.println("OFF Y   =" + StringManipulationTools.formatNumber(offY, "#"));
+		}
 		return img
-				.scale(1, zoomY, false)
+				.scale(1, scaleY, false)
 				.addBorder(horTm, verTm, (int) offX, (int) offY, ImageOperation.BACKGROUND_COLORint)
 				.getImage();
 	}
