@@ -70,7 +70,7 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	@Override
 	public InputStream getPreviewInputStream(final IOurl url) throws Exception {
 		if (folder == null)
-			return super.getPreviewInputStream(url);
+			return null;//
 		else {
 			String fn = url.getFileName();
 			String path = url.getDetail().substring(url.getDetail().indexOf(File.separator) + File.separator.length());
@@ -99,8 +99,8 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	public static File getFile(IOurl url) {
 		return new File(
 				URLDecoder.decode(
-						
-						url.getDetail()
+
+				url.getDetail()
 						) + IOurl.SEPERATOR + url.getFileName());
 	}
 	

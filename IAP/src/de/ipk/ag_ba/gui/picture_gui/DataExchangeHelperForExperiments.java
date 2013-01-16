@@ -392,9 +392,9 @@ public class DataExchangeHelperForExperiments {
 						byte[] pi = ResourceIOManager
 								.getPreviewImageContent(binaryFileInfo
 										.getFileNameMain());
-						if (pi != null)
+						if (pi != null) {
 							previewImage = new ImageIcon(pi);
-						else
+						} else
 							previewLoadAndConstructNeeded = true;
 					} catch (Exception e) {
 						previewLoadAndConstructNeeded = true;
