@@ -2,13 +2,11 @@ package de.ipk.ag_ba.commands;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.ErrorMsg;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -61,13 +59,9 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
 		long overallStorageSizeInBytes = 0;
 		Timestamp storageTimeOfFirstInfoFile = null;
-		String metadataFileExtension = SystemOptions.getInstance().getString("File Import", "Meta-Data-Table-File-Extension", ".csv");
-		String zoomSettingsFileName = SystemOptions.getInstance().getString("File Import", "Zoom-Settings-Value-File-Name", "zoom.txt");
 		boolean foundMetadata = false;
 		HashMap<String, ArrayList<TableDataStringRow>> metadata = new HashMap<String, ArrayList<TableDataStringRow>>();
 		HashMap<String, TableDataHeadingRow> metadataHeading = new HashMap<String, TableDataHeadingRow>();
-		
-		String preferedZoomSetting = null;
 		
 		getStatusProvider().setCurrentStatusText1("Get file list (" + inp.getPath() + ")");
 		String[] list = inp.list();
@@ -88,7 +82,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 					post = ", " + overallStorageSizeInBytes / 1024 / 1024 / 1024 + " GB";
 			}
 			getStatusProvider().setCurrentStatusText2("Found " + snapshots.size() + " data points" + post);
-			if (snapshotDirName.endsWith(metadataFileExtension)) {
+			if (snapshotDirName.endsWith(".cvs") || snapshotDirName.endsWith(".xlsx") || snapshotDirName.endsWith(".xls")) {
 				foundMetadata = true;
 				String fn = inp + File.separator + snapshotDirName;
 				TableData td = TableData.getTableData(new File(fn));
@@ -111,14 +105,6 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 					}
 				}
 				metadata.get(fn).addAll(lines);
-			}
-			if (snapshotDirName.equals(zoomSettingsFileName)) {
-				try {
-					TextFile t = new TextFile(new File(inp + File.separator + zoomSettingsFileName));
-					preferedZoomSetting = t.get(0).trim();
-				} catch (IOException e1) {
-					ErrorMsg.addErrorMessage(e1);
-				}
 			}
 			File f = new File(inp.getPath() + File.separator + snapshotDirName);
 			snapshotDirName = f.getAbsolutePath();
@@ -217,11 +203,9 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		getStatusProvider().setCurrentStatusText2("(images, weight or watering info)");
 		HashMap<String, Condition> optIdTag2condition = null;
 		if (!foundMetadata || metadata == null) {
-			messages.add("<b>Found no meta-data files (files ending with file extension name " + metadataFileExtension + ") in the selected folder!</b>");
-			messages
-					.add("Check the 'File Import'-Settings for the meta-data assignment of column-values!");
-			messages
-					.add("Modify the settings and repeat the loading, in case data is not assigned to the pre-defined fields as desired.");
+			messages.add("<b>Found no meta-data files (files ending with file extension name cvs, xlsx or xlx) in the selected folder!</b>");
+			messages.add("Check the 'File Import'-Settings for the meta-data assignment of column-values!");
+			messages.add("Modify the settings and repeat the loading, in case data is not assigned to the pre-defined fields as desired.");
 		} else {
 			// process metadata
 			optIdTag2condition = new HashMap<String, Condition>();
@@ -272,7 +256,6 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (storageCheck)
 					eh.setSizekb(overallStorageSizeInBytes / 1024);
 				eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
-				eh.setGlobalOutlierInfo(preferedZoomSetting);
 				e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
 				getStatusProvider().setCurrentStatusText1("Created " + eh.getExperimentName() + ".");
 				getStatusProvider().setCurrentStatusText2("Create Experiment Structures...");
