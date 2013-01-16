@@ -82,7 +82,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 					post = ", " + overallStorageSizeInBytes / 1024 / 1024 / 1024 + " GB";
 			}
 			getStatusProvider().setCurrentStatusText2("Found " + snapshots.size() + " data points" + post);
-			if (snapshotDirName.endsWith(".cvs") || snapshotDirName.endsWith(".xlsx") || snapshotDirName.endsWith(".xls")) {
+			if (snapshotDirName.endsWith(".csv") || snapshotDirName.endsWith(".xlsx") || snapshotDirName.endsWith(".xls")) {
 				foundMetadata = true;
 				String fn = inp + File.separator + snapshotDirName;
 				TableData td = TableData.getTableData(new File(fn));
@@ -203,7 +203,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		getStatusProvider().setCurrentStatusText2("(images, weight or watering info)");
 		HashMap<String, Condition> optIdTag2condition = null;
 		if (!foundMetadata || metadata == null) {
-			messages.add("<b>Found no meta-data files (files ending with file extension name cvs, xlsx or xlx) in the selected folder!</b>");
+			messages.add("<b>Found no meta-data files (files ending with file extension name .csv, .xlsx or .xls) in the selected folder!</b>");
 			messages.add("Check the 'File Import'-Settings for the meta-data assignment of column-values!");
 			messages.add("Modify the settings and repeat the loading, in case data is not assigned to the pre-defined fields as desired.");
 		} else {
