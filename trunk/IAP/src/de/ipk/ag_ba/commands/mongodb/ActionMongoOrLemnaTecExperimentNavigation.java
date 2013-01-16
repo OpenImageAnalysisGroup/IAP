@@ -241,7 +241,8 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	@Override
 	public String getDefaultTitle() {
 		ExperimentHeaderInterface header = experimentReference.getHeader();
-		long t = header.getStorageTime() != null ? header.getStorageTime().getTime() :
+		long t = header.getStorageTime() != null && header.getStorageTime().getTime() > 0 ?
+				header.getStorageTime().getTime() :
 				(header.getImportdate() != null ? header.getImportdate().getTime() :
 						0);
 		long startTime = t;
