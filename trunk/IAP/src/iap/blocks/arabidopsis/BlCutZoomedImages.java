@@ -6,16 +6,20 @@ import iap.pipelines.ImageProcessorOptions;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.HashSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
 
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 
@@ -38,18 +42,18 @@ public class BlCutZoomedImages extends AbstractBlock {
 		debugValues = !preventDebugValues && getBoolean("debug", false);
 		if (debugValues) {
 			if (input().images().vis() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition());
+				debugIt(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition(), this);
 			if (input().images().nir() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.NIR, input(), getProperties(), options, getBlockPosition());
+				debugIt(this.getClass(), FlexibleImageType.NIR, input(), getProperties(), options, getBlockPosition(), this);
 			if (input().images().ir() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.IR, input(), getProperties(), options, getBlockPosition());
+				debugIt(this.getClass(), FlexibleImageType.IR, input(), getProperties(), options, getBlockPosition(), this);
 		}
 	}
 	
 	private static void debugIt(final Class blockType, final FlexibleImageType inpImageType,
 			final FlexibleMaskAndImageSet inputSet,
 			final BlockResultSet brs, final ImageProcessorOptions options,
-			final int blockPos) {
+			final int blockPos, final BlCutZoomedImages inst) {
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
@@ -110,7 +114,60 @@ public class BlCutZoomedImages extends AbstractBlock {
 		JComponent v = TableLayout.get3SplitVertical(
 				jsp, null, editAndUpdate, TableLayout.FILL, 5, TableLayout.PREFERRED);
 		v.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		MainFrame.showMessageWindow(inpImageType.name() + " & FLUO", v);
+		
+		final Timer timer = new Timer(500, new ActionListener() {
+			double lastSum = 0;
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				double zoomX = Double.NaN;
+				double zoomY = Double.NaN;
+				double scaleY = Double.NaN;
+				double offX = Double.NaN;
+				double offY = Double.NaN;
+				String prefix = "UNKNOWN";
+				switch (inpImageType) {
+					case VIS:
+						prefix = "VIS";
+						break;
+					case FLUO:
+						prefix = "FLUO";
+						break;
+					case NIR:
+						prefix = "NIR";
+						break;
+					case IR:
+						prefix = "IR";
+						break;
+				}
+				zoomX = 100d / inst.getDouble(prefix + " Zoom X", 100);
+				zoomY = 100d / inst.getDouble(prefix + " Zoom Y", 100);
+				scaleY = inst.getDouble(prefix + " Scale Vertical", 100) / 100d;
+				offX = inst.getDouble(prefix + " Shift X", 0);
+				offY = inst.getDouble(prefix + " Shift Y", 0);
+				int f1 = options.getIntSetting(inst, "Debug-Crossfade-F1_5", 5);
+				int f2 = options.getIntSetting(inst, "Debug-Crossfade-F2_2", 2);
+				int f3 = options.getIntSetting(inst, "Debug-Crossfade-F3_1", 1);
+				double currentSum = zoomX + zoomY + scaleY + offX + offY + f1 + f2 + f3;
+				if (Math.abs(lastSum - currentSum) > 0.0001) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Detected cut settings change, updating view...");
+					okButton.doClick();
+					lastSum = currentSum;
+				}
+			}
+		});
+		
+		final JFrame jf = MainFrame.showMessageWindow(inpImageType.name() + " & FLUO", v);
+		jf.addHierarchyListener(new HierarchyListener() {
+			
+			@Override
+			public void hierarchyChanged(HierarchyEvent arg0) {
+				if (!jf.isVisible())
+					timer.stop();
+			}
+		});
+		timer.setRepeats(true);
+		timer.start();
 	}
 	
 	@Override
@@ -157,14 +214,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 		int horTm = -horTooTooMuch / 2;
 		int verTooTooMuch = (int) ((1d - zoomY) * img.getHeight());
 		int verTm = -verTooTooMuch / 2;
-		if (debugValues || preventDebugValues) {
-			System.out.println("IMAGE TYPE " + img.getType() + ":");
-			System.out.println("ZOOM  X =" + StringManipulationTools.formatNumber(1d / zoomX, "#.##"));
-			System.out.println("ZOOM  Y =" + StringManipulationTools.formatNumber(1d / zoomY, "#.##"));
-			System.out.println("SCALE Y =" + StringManipulationTools.formatNumber(scaleY, "#.##"));
-			System.out.println("OFF X   =" + StringManipulationTools.formatNumber(offX, "#"));
-			System.out.println("OFF Y   =" + StringManipulationTools.formatNumber(offY, "#"));
-		}
 		return img
 				.scale(1, scaleY, false)
 				.addBorder(horTm, verTm, (int) offX, (int) offY, ImageOperation.BACKGROUND_COLORint)
