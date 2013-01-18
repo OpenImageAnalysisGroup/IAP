@@ -84,11 +84,15 @@ public class ExperimentReference {
 						try {
 							databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
 							for (ExperimentReference ehi : dataSource.getAllExperiments()) {
-								if (ehi != null && ehi.getHeader().getDatabaseId().equals(databaseID)) {
+								if (ehi != null) {
+									String dbi =ehi.getHeader().getDatabaseId();
+									dbi = StringManipulationTools.stringReplace(dbi, "\\", "/");
+									if (dbi.equals(databaseID)) {
 									header = ehi.getHeader();
 									vfsFound = true;
 									break;
-								}
+									}
+									}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
