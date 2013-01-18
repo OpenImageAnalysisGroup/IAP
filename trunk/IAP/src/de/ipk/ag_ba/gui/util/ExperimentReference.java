@@ -15,6 +15,7 @@ import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.IniIoProvider;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
@@ -81,6 +82,7 @@ public class ExperimentReference {
 						VfsFileSystemSource dataSource = new VfsFileSystemSource(lib, vfs.getTargetName(), vfs, new String[] {}, IAPmain.loadIcon(ico),
 								IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3));
 						try {
+							databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
 							for (ExperimentReference ehi : dataSource.getAllExperiments()) {
 								if (ehi != null && ehi.getHeader().getDatabaseId().equals(databaseID)) {
 									header = ehi.getHeader();
