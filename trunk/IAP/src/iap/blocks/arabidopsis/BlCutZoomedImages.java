@@ -122,7 +122,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 			public void actionPerformed(ActionEvent arg0) {
 				double zoomX = Double.NaN;
 				double zoomY = Double.NaN;
-				double scaleY = Double.NaN;
 				double offX = Double.NaN;
 				double offY = Double.NaN;
 				String prefix = "UNKNOWN";
@@ -142,13 +141,12 @@ public class BlCutZoomedImages extends AbstractBlock {
 				}
 				zoomX = 100d / inst.getDouble(prefix + " Zoom X", 100);
 				zoomY = 100d / inst.getDouble(prefix + " Zoom Y", 100);
-				scaleY = inst.getDouble(prefix + " Scale Vertical", 100) / 100d;
 				offX = inst.getDouble(prefix + " Shift X", 0);
 				offY = inst.getDouble(prefix + " Shift Y", 0);
 				int f1 = options.getIntSetting(inst, "Debug-Crossfade-F1_5", 5);
 				int f2 = options.getIntSetting(inst, "Debug-Crossfade-F2_2", 2);
 				int f3 = options.getIntSetting(inst, "Debug-Crossfade-F3_1", 1);
-				double currentSum = zoomX + zoomY + scaleY + offX + offY + f1 + f2 + f3;
+				double currentSum = zoomX + zoomY + offX + offY + f1 + f2 + f3;
 				if (Math.abs(lastSum - currentSum) > 0.0001) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Detected cut settings change, updating view...");
 					okButton.doClick();
@@ -185,7 +183,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 	private FlexibleImage cut(ImageOperation img) {
 		double zoomX = Double.NaN;
 		double zoomY = Double.NaN;
-		double scaleY = Double.NaN;
 		double offX = Double.NaN;
 		double offY = Double.NaN;
 		String prefix = "UNKNOWN";
@@ -205,7 +202,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 		}
 		zoomX = 100d / getDouble(prefix + " Zoom X", 100);
 		zoomY = 100d / getDouble(prefix + " Zoom Y", 100);
-		scaleY = getDouble(prefix + " Scale Vertical", 100) / 100d;
 		offX = getDouble(prefix + " Shift X", 0);
 		offY = getDouble(prefix + " Shift Y", 0);
 		
@@ -215,7 +211,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 		int verTooTooMuch = (int) ((1d - zoomY) * img.getHeight());
 		int verTm = -verTooTooMuch / 2;
 		return img
-				.scale(1, scaleY, false)
 				.addBorder(horTm, verTm, (int) offX, (int) offY, ImageOperation.BACKGROUND_COLORint)
 				.getImage();
 	}
