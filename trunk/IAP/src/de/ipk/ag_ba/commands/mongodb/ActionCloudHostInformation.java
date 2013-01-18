@@ -92,7 +92,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						ActionCloudHostInformation.this.ip = ch;
 						lastStatus = ch.getTaskProgress();
 						hostInfo = ch.getHostInfo();
-						status3 = ch.getStatus3();
+						status3 = "<br>" + ch.getStatus3();
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";

@@ -94,7 +94,7 @@ public class BatchCmd extends BasicDBObject {
 			put("progress", statusProvider.getCurrentStatusValueFine());
 			put("line1", statusProvider.getCurrentStatusMessage1());
 			put("line2", statusProvider.getCurrentStatusMessage2());
-			put("line3", statusProvider.getCurrentStatusMessage3());
+			put("line3", "<br>" + statusProvider.getCurrentStatusMessage3());
 			put("waitsForUser", statusProvider.pluginWaitsForUser());
 			
 			if (statusProvider.getCurrentStatusValue() < 100) {
