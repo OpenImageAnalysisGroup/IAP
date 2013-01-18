@@ -18,11 +18,16 @@ import org.IniIoProvider;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 
+import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
+import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -64,25 +69,51 @@ public class ExperimentReference {
 				throw new UnsupportedOperationException(e);
 			}
 		} else {
-			if (databaseID.startsWith("hsm:")) {
-				String fileName = databaseID.substring("hsm:".length());
-				try {
-					if (new File(fileName).exists())
-						header = HsmFileSystemSource.getHSMexperimentHeaderFromFullyQualifiedFileName(fileName);
-					else
-						header = null;
-				} catch (IOException e) {
-					throw new UnsupportedOperationException(e);
-				}
-			} else {
-				for (MongoDB m : MongoDB.getMongos()) {
-					header = m.getExperimentHeader(new ObjectId(databaseID));
-					if (header != null) {
-						setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
-						break;
+			boolean vfsFound = false;
+			if (databaseID.indexOf(":") > 0) {
+				String pre = databaseID.substring(0, databaseID.indexOf(":"));
+				for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(true)) {
+					if (pre.equals(vfs.getPrefix())) {
+						Library lib = new Library();
+						String ico = IAPimages.getFolderRemoteClosed();
+						String ico2 = IAPimages.getFolderRemoteOpen();
+						String ico3 = IAPimages.getFolderRemoteClosed();
+						VfsFileSystemSource dataSource = new VfsFileSystemSource(lib, vfs.getTargetName(), vfs, new String[] {}, IAPmain.loadIcon(ico),
+								IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3));
+						try {
+							for (ExperimentReference ehi : dataSource.getAllExperiments()) {
+								if (ehi != null && ehi.getHeader().getDatabaseId().equals(databaseID)) {
+									header = ehi.getHeader();
+									vfsFound = true;
+									break;
+								}
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
+			if (!vfsFound)
+				if (databaseID.startsWith("hsm:")) {
+					String fileName = databaseID.substring("hsm:".length());
+					try {
+						if (new File(fileName).exists())
+							header = HsmFileSystemSource.getHSMexperimentHeaderFromFullyQualifiedFileName(fileName);
+						else
+							header = null;
+					} catch (IOException e) {
+						throw new UnsupportedOperationException(e);
+					}
+				} else {
+					for (MongoDB m : MongoDB.getMongos()) {
+						header = m.getExperimentHeader(new ObjectId(databaseID));
+						if (header != null) {
+							setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
+							break;
+						}
+					}
+				}
 		}
 		this.experimentName = header != null ? header.getExperimentName() : null;
 	}

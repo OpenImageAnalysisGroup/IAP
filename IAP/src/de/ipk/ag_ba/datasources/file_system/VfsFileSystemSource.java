@@ -11,7 +11,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -24,7 +28,9 @@ import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
+import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.vanted.plugin.VfsFileObject;
@@ -92,10 +98,11 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	public ExperimentHeader getExperimentHeaderFromFileName(final VirtualFileSystem vfs, final String fileName) throws Exception {
 		final ExperimentHeader eh = new ExperimentHeader();
 		
-		final VfsFileObject indexFile = vfs.getFileObjectFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
-		
 		eh.setDatabaseId(vfs.getPrefix() + ":index" + File.separator + fileName);
 		
+		final String prefix = vfs.getPrefix();
+		
+		final VfsFileObject indexFile = vfs.getFileObjectFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
 		ExperimentHeaderHelper ehh = new ExperimentHeaderHelper() {
 			
 			@Override
@@ -104,7 +111,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 				HashMap<String, String> properties = new HashMap<String, String>();
 				InputStream is = indexFile.getInputStream();
 				TextFile tf = new TextFile(is, -1);
-				properties.put("_id", vfs.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+				properties.put("_id", prefix + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
 				String lastItemId = null;
 				for (String p : tf) {
 					if (StringManipulationTools.count(p, ",") >= 2) {
@@ -167,5 +174,36 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	@Override
 	public boolean canHandle(String databaseId) {
 		return databaseId.startsWith(url.getPrefix() + ":");
+	}
+	
+	public ArrayList<ExperimentReference> getAllExperiments() throws Exception {
+		if (!read)
+			readDataSource();
+		HashSet<ExperimentReference> checkedRefs = new HashSet<ExperimentReference>();
+		HashSet<DataSourceLevel> checkedLevels = new HashSet<DataSourceLevel>();
+		
+		ArrayList<ExperimentReference> res = new ArrayList<ExperimentReference>();
+		Queue<DataSourceLevel> check = new LinkedList<DataSourceLevel>();
+		check.add(thisLevel);
+		while (!check.isEmpty()) {
+			DataSourceLevel cl = check.poll();
+			if (cl == null)
+				continue;
+			if (checkedLevels.contains(cl))
+				continue;
+			Collection<ExperimentReference> el = cl.getExperiments();
+			if (el != null)
+				for (ExperimentReference er : el) {
+					if (checkedRefs.contains(er))
+						continue;
+					res.add(er);
+					checkedRefs.add(er);
+				}
+			Collection<DataSourceLevel> sl = cl.getSubLevels();
+			if (sl != null)
+				check.addAll(sl);
+			checkedLevels.add(cl);
+		}
+		return res;
 	}
 }

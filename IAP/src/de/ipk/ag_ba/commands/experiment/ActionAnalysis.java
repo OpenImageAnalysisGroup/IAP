@@ -11,12 +11,16 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionSettings;
 import de.ipk.ag_ba.commands.experiment.process.ActionExportAssignedAnalysisTemplate;
 import de.ipk.ag_ba.commands.experiment.process.ActionPerformAnalysisLocally;
+import de.ipk.ag_ba.commands.experiment.process.ActionPerformGridAnalysis;
 import de.ipk.ag_ba.commands.experiment.process.ActionSelectAnalysisTemplate;
 import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
+import de.ipk.ag_ba.gui.IAPfeature;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class ActionAnalysis extends AbstractNavigationAction {
@@ -65,6 +69,16 @@ public class ActionAnalysis extends AbstractNavigationAction {
 			actions.add(new NavigationButton(
 					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference),
 					src.getGUIsetting()));
+			
+			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
+			if (enableRemoteTaskExecution)
+				for (MongoDB m : MongoDB.getMongos()) {
+					actions.add(new NavigationButton(
+							new ActionPerformGridAnalysis(
+									new PipelineDesc(null, ioStringProvider, null, null),
+									m, experimentReference),
+							src.getGUIsetting()));
+				}
 		}
 		
 		// actions.add(new NavigationButton(

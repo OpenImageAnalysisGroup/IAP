@@ -42,7 +42,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
+public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigationAction
+		implements RemoteCapableAnalysisAction {
 	protected MongoDB m;
 	protected ExperimentReference experiment;
 	NavigationButton src = null;
