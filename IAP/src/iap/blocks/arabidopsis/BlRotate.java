@@ -25,7 +25,7 @@ public class BlRotate extends AbstractBlock {
 	
 	@Override
 	protected FlexibleImage processImage(FlexibleImage image) {
-		double r = getDouble("Rotate Main Image " + image.getType(), image.getType() == FlexibleImageType.IR ? -90d : 0d);
+		double r = image != null ? getDouble("Rotate Main Image " + image.getType(), image.getType() == FlexibleImageType.IR ? -90d : 0d) : 0d;
 		if (image != null && Math.abs(r) > 0.001) {
 			if (image != null && Math.abs(r - 90) < 0.001)
 				image = image.io().rotate90().getImage();
