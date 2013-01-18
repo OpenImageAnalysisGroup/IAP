@@ -27,6 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class BatchCmd extends BasicDBObject {
 	private static final long serialVersionUID = 1L;
 	private BackgroundTaskStatusProviderSupportingExternalCall statusProvider;
+	private ExperimentHeaderInterface header;
 	
 	public HashSet<String> getTargetIPs() {
 		HashSet<String> res = new HashSet<String>();
@@ -114,7 +115,9 @@ public class BatchCmd extends BasicDBObject {
 	public ExperimentHeaderInterface getExperimentHeader() {
 		String expId = getString("experiment");
 		if (expId != null) {
-			return new ExperimentReference(expId).getHeader();
+			if (header == null)
+				header = new ExperimentReference(expId).getHeader();
+			return header;
 		} else
 			return null;
 	}
