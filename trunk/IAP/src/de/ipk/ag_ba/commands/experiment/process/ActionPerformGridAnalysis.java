@@ -46,7 +46,8 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "<html><center>Submit " + numberOfJobs + "<br>analysis jobs to " + m.getDatabaseName();
+		return "<html><center>Submit " + numberOfJobs + "<br>analysis jobs to " +
+				m != null ? m.getDatabaseName() : "(database instance is null)";
 	}
 	
 	@Override

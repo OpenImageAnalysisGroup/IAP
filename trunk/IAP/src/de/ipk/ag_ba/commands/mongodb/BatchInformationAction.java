@@ -37,7 +37,7 @@ public class BatchInformationAction extends AbstractNavigationAction {
 		actionProxy = (RemoteCapableAnalysisAction) Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
 		jobStatus = new MongoJobStatusProvider(cmd, this.m);
 		ExperimentHeaderInterface ehi = cmd.getExperimentHeader();
-		experimentName = ehi!=null ? ehi.getExperimentName(): "null";
+		experimentName = ehi != null ? ehi.getExperimentName() : "null";
 	}
 	
 	@Override
@@ -47,7 +47,14 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return actionProxy.getDefaultTitle();
+		try {
+			if (actionProxy != null)
+				return actionProxy.getDefaultTitle();
+			else
+				return "ActionProxy is NULL";
+		} catch (Exception e) {
+			return e.getMessage();
+		}
 	}
 	
 	@Override
