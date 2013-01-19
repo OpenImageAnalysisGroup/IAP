@@ -168,43 +168,44 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		if (err.getObject() != null)
 			throw (Exception) err.getObject();
 		InputStream res = (InputStream) or.getObject();
-		if (res != null) {
-			return res;
-		} else {
-			MyByteArrayInputStream is = ((MyByteArrayInputStream) super.getPreviewInputStream(url));
-			if (is != null) {
-				final byte[] rrr = is.getBuffTrimmed();
-				
-				m.processDB(new RunnableOnDB() {
-					
-					private DB db;
-					
-					@Override
-					public void run() {
-						try {
-							m.saveStream(
-									url.getDetail(),
-									new MyByteArrayInputStream(rrr, rrr.length),
-									new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)),
-									rrr.length);
-						} catch (Exception e) {
-							err.setObject(e);
-						}
-					}
-					
-					@Override
-					public void setDB(DB db) {
-						this.db = db;
-					}
-				});
-				
-				if (err.getObject() != null)
-					throw (Exception) err.getObject();
-				
-				return new MyByteArrayInputStream(rrr, rrr.length);
-			}
-		}
-		return null;
+		return res;
+		// if (res != null) {
+		// return res;
+		// } else {
+		// MyByteArrayInputStream is = ((MyByteArrayInputStream) super.getPreviewInputStream(url));
+		// if (is != null) {
+		// final byte[] rrr = is.getBuffTrimmed();
+		//
+		// m.processDB(new RunnableOnDB() {
+		//
+		// private DB db;
+		//
+		// @Override
+		// public void run() {
+		// try {
+		// m.saveStream(
+		// url.getDetail(),
+		// new MyByteArrayInputStream(rrr, rrr.length),
+		// new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)),
+		// rrr.length);
+		// } catch (Exception e) {
+		// err.setObject(e);
+		// }
+		// }
+		//
+		// @Override
+		// public void setDB(DB db) {
+		// this.db = db;
+		// }
+		// });
+		//
+		// if (err.getObject() != null)
+		// throw (Exception) err.getObject();
+		//
+		// return new MyByteArrayInputStream(rrr, rrr.length);
+		// }
+		// }
+		// return null;
 	}
 	
 	@Override

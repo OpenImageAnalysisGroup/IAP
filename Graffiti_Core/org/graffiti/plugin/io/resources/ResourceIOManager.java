@@ -34,7 +34,7 @@ public class ResourceIOManager {
 	public static void registerIOHandler(ResourceIOHandler handler) {
 		ResourceIOHandler mh = getHandlerFromPrefix(handler.getPrefix());
 		if (mh != null) {
-			System.err.println("IO Handler with Prefix " + handler.getPrefix() + " can't be registered more than once!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IO Handler with Prefix " + handler.getPrefix() + " is already registered.");
 		} else
 			getInstance().handlers.add(handler);
 	}
@@ -116,6 +116,8 @@ public class ResourceIOManager {
 	}
 	
 	public static MyByteArrayInputStream getInputStreamMemoryCached(InputStream is) throws IOException, Exception {
+		if (is != null && is instanceof MyByteArrayInputStream)
+			return (MyByteArrayInputStream) is;
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ResourceIOManager.copyContent(is, bos);
 		return new MyByteArrayInputStream(bos.toByteArray(), bos.size());

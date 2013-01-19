@@ -1,5 +1,7 @@
 package de.ipk.vanted.util;
 
+import org.SystemAnalysis;
+import org.SystemOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -28,7 +30,7 @@ public class VfsFileObjectUtil {
 				username, password, null);
 	}
 	
-	public synchronized static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
+	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath, String username, String password,
 			Integer port) throws Exception {
 		if (StringUtils.isBlank(host) && protocol != VfsFileProtocol.LOCAL) {
@@ -75,7 +77,7 @@ public class VfsFileObjectUtil {
 		}
 		FileSystemOptions opts = new FileSystemOptions();
 		// Timeout is count by Milliseconds
-		SftpFileSystemConfigBuilder.getInstance().setTimeout(opts, 10000);
+		SftpFileSystemConfigBuilder.getInstance().setTimeout(opts, SystemOptions.getInstance().getInteger("VFS", "timeout_s", 60) * 1000);
 		if (StringUtils.isNotBlank(username)) {
 			StaticUserAuthenticator auth = new StaticUserAuthenticator(
 					username, password, null);
@@ -84,6 +86,8 @@ public class VfsFileObjectUtil {
 		}
 		FileSystemManager fsm = VFS.getManager();
 		FileObject fo = fsm.resolveFile(con, opts);
+		if (fo == null)
+			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT RESOLVE FILE: " + filePath);
 		VfsFileObject vfsFileObj = new VfsFileObjectImpl(fo);
 		return vfsFileObj;
 	}

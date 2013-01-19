@@ -61,4 +61,9 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true));
 		return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
+	
+	@Override
+	public boolean remotingEnabledForThisAction() {
+		return false;
+	}
 }

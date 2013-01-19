@@ -151,7 +151,7 @@ public class IAPgui {
 				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
 				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
 						"<br>" +
-								"<p>Latest changes:<br><br><ul>",
+								"<p>Latest system messages:<br><br><ul>",
 						"<li>", "", "<br><br>") + "</font>";
 	}
 	

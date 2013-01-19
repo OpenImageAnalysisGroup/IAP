@@ -23,10 +23,10 @@ import de.ipk.vanted.plugin.VfsFileProtocol;
  */
 public abstract class VirtualFileSystem {
 	
-	private static LinkedHashSet<VirtualFileSystem> knownFileSystems = new LinkedHashSet<VirtualFileSystem>();
+	private static LinkedHashSet<VirtualFileSystemVFS2> knownFileSystems = new LinkedHashSet<VirtualFileSystemVFS2>();
 	
-	public static ArrayList<VirtualFileSystem> getKnown(boolean excludeNonUserItems) {
-		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>(knownFileSystems);
+	public static ArrayList<VirtualFileSystemVFS2> getKnown(boolean excludeNonUserItems) {
+		ArrayList<VirtualFileSystemVFS2> res = new ArrayList<VirtualFileSystemVFS2>(knownFileSystems);
 		
 		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", false);
 		int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);

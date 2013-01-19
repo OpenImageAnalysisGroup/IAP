@@ -76,12 +76,14 @@ public class ExperimentSaver implements RunnableOnDB {
 	private final MongoDBhandler mh;
 	private final ArrayList<ExperimentHeaderInterface> experimentList;
 	private final MongoDB m;
+	private final boolean skipStorage;
 	
 	public ExperimentSaver(
 			MongoDB m,
 			MongoDBhandler mh, HashType hashType,
 			ExperimentInterface experiment, boolean keepDataLinksToDataSource_safe_space,
-			BackgroundTaskStatusProviderSupportingExternalCall status, ThreadSafeOptions err, ArrayList<ExperimentHeaderInterface> experimentList) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, ThreadSafeOptions err, ArrayList<ExperimentHeaderInterface> experimentList,
+			boolean filesAreAlreadySavedSkipStorage) {
 		this.m = m;
 		this.experimentList = experimentList;
 		this.mh = mh;
@@ -90,6 +92,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		this.keepDataLinksToDataSource_safe_space = keepDataLinksToDataSource_safe_space;
 		this.status = status;
 		this.err = err;
+		skipStorage = filesAreAlreadySavedSkipStorage;
 	}
 	
 	@Override
@@ -310,7 +313,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		if (errorCount.getLong() > 0) {
 			MainFrame.showMessageDialog(
-					"<html>" + "The following files cound not be properly processed:<ul>" + errors.toString() + "</ul> "
+					"<html>" + "The following files cound not properly be processed:<ul>" + errors.toString() + "</ul> "
 							+ "", "Errors");
 		}
 	}
@@ -562,8 +565,11 @@ public class ExperimentSaver implements RunnableOnDB {
 					try {
 						if (m instanceof ImageData) {
 							ImageData id = (ImageData) m;
-							res = saveImageFileDirect(cols, db, id, overallFileSize,
-									keepDataLinksToDataSource_safe_space, mh, hashType, mo);
+							if (skipStorage)
+								res = DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+							else
+								res = saveImageFileDirect(cols, db, id, overallFileSize,
+										keepDataLinksToDataSource_safe_space, mh, hashType, mo);
 							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 								errorCount.addLong(1);
 								errors.append("<li>" + id.getURL().getFileName());

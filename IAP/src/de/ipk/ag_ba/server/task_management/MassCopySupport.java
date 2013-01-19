@@ -336,7 +336,7 @@ public class MassCopySupport {
 			return;
 		boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
 		if (en)
-			print("Automaic Copy FROM LT TO MongoDB has ben scheduled according to execution time plan");
+			print("Automatic Copy FROM LT TO MongoDB has ben scheduled according to execution time plan");
 		else
 			print("Copy function is disabled");
 		
