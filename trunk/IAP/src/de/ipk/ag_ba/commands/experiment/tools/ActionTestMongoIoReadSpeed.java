@@ -197,4 +197,9 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 		return 1;
 	}
 	
+	@Override
+	public boolean remotingEnabledForThisAction() {
+		return true;
+	}
+	
 }

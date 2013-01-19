@@ -585,7 +585,7 @@ public class CloudComputingService {
 		System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
 		
 		System.out.println("> SAVE COMBINED EXPERIMENT...");
-		m.saveExperiment(e, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true);
+		m.saveExperiment(e, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
 		System.out.println("> COMBINED EXPERIMENT HAS BEEN SAVED");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved combined experiment " + e.getName());

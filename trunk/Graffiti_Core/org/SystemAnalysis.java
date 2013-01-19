@@ -274,20 +274,23 @@ public class SystemAnalysis {
 	 */
 	public static String getDataTransferSpeedString(long transfered, long start, long end) {
 		if (transfered <= 0)
-			return "- MB/sec";
+			return "- MB/s";
+		double kiloBytesPerSecond = transfered / 1024d / ((end - start) / 1000d);
 		double megaBytesPerSecond = transfered / 1024d / 1024d / ((end - start) / 1000d);
 		double megaBytesPerMinute = megaBytesPerSecond * 60d;
 		double megaBytesPerHour = megaBytesPerMinute * 60d;
 		double megaBytesPerDay = megaBytesPerHour * 24d;
+		if (kiloBytesPerSecond < 1024)
+			return StringManipulationTools.formatNumber(kiloBytesPerSecond, "#.#") + " KB/s";
 		if (megaBytesPerSecond > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerSecond, "#.#") + " MB/sec";
+			return StringManipulationTools.formatNumber(megaBytesPerSecond, "#.#") + " MB/s";
 		else
 			if (megaBytesPerMinute > 1)
-				return StringManipulationTools.formatNumber(megaBytesPerMinute, "#.#") + " MB/min";
+				return StringManipulationTools.formatNumber(megaBytesPerMinute, "#.#") + " MB/m";
 		if (megaBytesPerHour > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerHour, "#.#") + " MB/hour";
+			return StringManipulationTools.formatNumber(megaBytesPerHour, "#.#") + " MB/h";
 		else
-			return StringManipulationTools.formatNumber(megaBytesPerDay, "#.#") + " MB/day";
+			return StringManipulationTools.formatNumber(megaBytesPerDay, "#.#") + " MB/d";
 	}
 	
 	public static boolean isMacRunning() {
@@ -412,5 +415,21 @@ public class SystemAnalysis {
 	
 	public static Screenshot getScreenshot() throws IOException, AWTException {
 		return new Screenshot();
+	}
+	
+	public static String getDataAmountString(long d) {
+		if (d < 0)
+			return "";
+		if (d == 0)
+			return "0 byte";
+		if (d < 1024l)
+			return d + " byte";
+		if (d < 1024l * 1024l)
+			return d / 1024l + " KB";
+		if (d < 1024l * 1024l * 1024l)
+			return StringManipulationTools.formatNumber(d / 1024d / 1024d, "#.#") + " MB";
+		if (d < 1024l * 1024l * 1024l * 1024l)
+			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d, "#.#") + " GB";
+		return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d, "#.#") + " TB";
 	}
 }

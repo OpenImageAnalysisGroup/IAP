@@ -62,7 +62,7 @@ public class TaskDescription {
 	
 	@Override
 	public String toString() {
-		return "" + analysisActionClassName.substring(analysisActionClassName.lastIndexOf(".") + 1) + ": " + experimentInput.getExperimentName() + "";
+		return "" + analysisActionClassName.substring(analysisActionClassName.lastIndexOf(".") + 1) + " of " + experimentInput.getExperimentName() + "";
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ public class TaskDescription {
 					if (bcmd != null)
 						if (SystemAnalysisExt.getHostName().equals(bcmd.getOwner())) {
 							StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">SAVE EXPERIMENT " + experiment.getName(), false);
-							m.saveExperiment(experiment, statusProvider, true);
+							m.saveExperiment(experiment, statusProvider, true, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()

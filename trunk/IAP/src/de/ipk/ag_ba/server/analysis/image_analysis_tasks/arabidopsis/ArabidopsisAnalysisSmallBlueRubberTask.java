@@ -10,7 +10,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypi
  */
 public class ArabidopsisAnalysisSmallBlueRubberTask extends AbstractPhenotypingTask {
 	
-	public final static String DEFAULT_NAME = "Arabidopsis Phenotyping (blue background)";
+	public final static String DEFAULT_NAME = "Arabidopsis Analysis";
 	public final static String DEFAULT_DESC = "Analyse Arabidopsis Phenotype";
 	
 	public ArabidopsisAnalysisSmallBlueRubberTask(PipelineDesc pd) {

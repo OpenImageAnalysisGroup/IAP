@@ -197,12 +197,13 @@ public class MongoDB {
 	
 	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		saveExperiment(experiment, status, false);
+		saveExperiment(experiment, status, false, false);
 	}
 	
 	public void saveExperiment(final ExperimentInterface experiment,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
-			final boolean keepDataLinksToDataSource_safe_space)
+			final boolean keepDataLinksToDataSource_safe_space,
+			final boolean filesAreAlreadySavedSkipStorage)
 			throws Exception {
 		final ThreadSafeOptions err = new ThreadSafeOptions();
 		RunnableOnDB r = new ExperimentSaver(
@@ -210,7 +211,8 @@ public class MongoDB {
 				mh,
 				getHashType(),
 				experiment, keepDataLinksToDataSource_safe_space, status, err,
-				getExperimentList(null));
+				getExperimentList(null),
+				filesAreAlreadySavedSkipStorage);
 		processDB(r);
 		if (err.getParam(0, null) != null)
 			throw (Exception) err.getParam(0, null);

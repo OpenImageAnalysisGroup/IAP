@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.JButton;
 
@@ -29,6 +28,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.ActionSettings;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -37,7 +37,6 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
-import de.ipk.ag_ba.image.structures.ImageSetDescription;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -169,8 +168,6 @@ public class BlockPipeline {
 			
 			long ta = System.currentTimeMillis();
 			
-			ImageSetDescription isd = debug ? null : input.getMaskAndImageSet().getImageSetDescription();
-			
 			input.setMaskAndImageSet(block.process());
 			input.setOptions(block.getClass().getCanonicalName());
 			
@@ -190,36 +187,6 @@ public class BlockPipeline {
 							+ block.getClass().getSimpleName() + ")");
 			
 			updateBlockStatistics(1);
-			
-			if (status != null) {
-				// status.setCurrentStatusValueFine(100d * (index / (double) blocks.size() / options.getTrayCnt() + 100d / options.getTrayCnt() *
-				// options.getTrayIdx()));
-				try {
-					TreeSet<Integer> times = new TreeSet<Integer>();
-					input.getMaskAndImageSet().images().getVisInfo().getParentSample().getParentCondition().getTimes(times);
-					String timeInfo = "|" + StringManipulationTools.getStringList(times, "|") + "|.";
-					timeInfo = StringManipulationTools.stringReplace(timeInfo,
-							"|" + input.getMaskAndImageSet().images().getVisInfo().getParentSample().getTime() + "|",
-							"|&gt;<b>" + input.getMaskAndImageSet().images().getVisInfo().getParentSample().getTime() + "</b>&lt;|");
-					timeInfo = "</b>" + timeInfo.substring(1, timeInfo.length() - 2) + "<b>";
-					timeInfo = StringManipulationTools.stringReplace(timeInfo, "|", " ");
-					timeInfo = timeInfo.trim();
-					String p = timeInfo + " </b>(" +
-							input.getMaskAndImageSet().images().getVisInfo().getQualityAnnotation() +
-							(options.getTrayCnt() > 1 ?
-									", tray " + (options.getTrayIdx() + 1) + "/" + options.getTrayCnt() + ")<b>"
-									: ")<b>");
-					status.setCurrentStatusText2(p);
-				} catch (Exception e) {
-					MongoDB.saveSystemErrorMessage("Finished " + index + "/"
-							+ blocks.size() + " (Error:" + e.getMessage() + ")", e);
-					status.setCurrentStatusText2("Finished " + index + "/"
-							+ blocks.size() + " (Error:" + e.getMessage() + ")");// + "<br>" +"" +
-				} // filter(blockClass.getSimpleName()));
-					// status.setCurrentStatusText1(block.getClass().getSimpleName());
-				if (status.wantsToStop())
-					break;
-			};
 		}
 		
 		results.clearStore();
@@ -232,13 +199,17 @@ public class BlockPipeline {
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));
 			// status.setCurrentStatusText1("Pipeline finished");
-			String s1 = status.getCurrentStatusMessage1();
+			String s1 = status.getCurrentStatusMessage2();
+			String div = "<br>";
+			if (s1.contains(div))
+				s1 = s1.substring(0, s1.indexOf(div));
 			if (s1 != null && !s1.isEmpty())
 				s1 = s1 + ", ";
-			int n = StringManipulationTools.count(s1, "T=");
-			if (n >= 2)
-				s1 = s1.substring(0, s1.indexOf("T="));
-			status.setCurrentStatusText1(s1 + "T=" + ((b - a) / 1000) + "s");
+			int n = StringManipulationTools.count(s1, ", ");
+			if (n >= 5)
+				s1 = s1.substring(s1.indexOf(", ") + ", ".length());
+			String vfsSpeed = VirtualFileSystemVFS2.getVFSspeedInfo(div, "");
+			status.setCurrentStatusText2(s1 + ((b - a) / 1000) + "s" + vfsSpeed);
 		}
 		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		if (pipelineExecutionsWithinCurrentHour % 5 == 0) {
@@ -389,8 +360,9 @@ public class BlockPipeline {
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
 								MyNavigationPanel mnp = new MyNavigationPanel(PanelTarget.NAVIGATION, null, null);
-								NavigationAction ac = new ActionSettings(null, er.getIniIoProvider(), "Change analysis settings (experiment " + er.getExperimentName()
-										+ ")", "Modify settings");
+								NavigationAction ac = new ActionSettings(null, er.getIniIoProvider(),
+										"Change analysis settings (experiment " + er.getExperimentName()
+												+ ")", "Modify settings");
 								mnp.getNewWindowListener(ac).actionPerformed(arg0);
 							}
 						});

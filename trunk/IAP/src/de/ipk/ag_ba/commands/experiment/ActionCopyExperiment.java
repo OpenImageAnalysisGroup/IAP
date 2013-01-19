@@ -29,7 +29,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	private NavigationButton src;
 	private ArrayList<MongoDB> ml;
 	private boolean addHSMcopy;
-	private ArrayList<VirtualFileSystem> vl;
+	private ArrayList<VirtualFileSystemVFS2> vl;
 	private boolean addUDPcopy;
 	
 	public ActionCopyExperiment(String tooltip) {

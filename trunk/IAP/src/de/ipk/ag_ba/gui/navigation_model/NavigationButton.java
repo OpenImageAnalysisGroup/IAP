@@ -81,7 +81,6 @@ public class NavigationButton implements StyleAware {
 	private String optStaticIconId;
 	private String overrideTitle;
 	private boolean iconUpdated;
-	private boolean updateCheckRunning;
 	private Object validIconCheckObject;
 	
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
@@ -92,7 +91,8 @@ public class NavigationButton implements StyleAware {
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
 		if (navigationAction != null) {
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
-			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction) {
+			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction
+					&& ((RemoteCapableAnalysisAction) navigationAction).remotingEnabledForThisAction()) {
 				RemoteCapableAnalysisAction rca = (RemoteCapableAnalysisAction) navigationAction;
 				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), false);
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
@@ -243,9 +243,9 @@ public class NavigationButton implements StyleAware {
 			if (sm1 != null && sm1.length() > 0)
 				line2 = sm1;
 			if (sm2 != null && sm2.length() > 0)
-				line2 += (sm1 != null && sm1.length() > 0 ? "<p>" : "") + sm2;
+				line2 += (sm1 != null && sm1.length() > 0 ? "<br>" : "") + sm2;
 			if (sm3 != null && sm3.length() > 0)
-				line2 += (line2 != null && sm2 != null && line2.length() + sm2.length() > 0 ? "<p>" : "") + sm3;
+				line2 += (line2 != null && sm2 != null && line2.length() + sm2.length() > 0 ? "<br>" : "<br>") + sm3;
 			
 			if (statusServer != null) {
 				String eta = statusServer.getRemainTime((int) dp == -1, dp);
@@ -879,7 +879,7 @@ public class NavigationButton implements StyleAware {
 	
 	public void removedCleanup() {
 		// System.out.println("REMOVED: " + StringManipulationTools.removeHTMLtags(getTitle()).trim());
-		title = "[REMOVE FROM UPDATE]" + title;
+		title = "<html>[REMOVE FROM UPDATE]<br>[this command needs refresh]<br>[go one step back in command history]<br>" + title;
 		navigationImage = null;
 		actionImage = null;
 		action = null;

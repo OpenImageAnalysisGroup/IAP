@@ -45,7 +45,6 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
-import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -111,31 +110,44 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.workOnSubset = workOnSubset;
 		this.numberOfSubsets = numberOfSubsets;
 		this.m = m;
-		databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
-		if (databaseTarget == null) {
-			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown(true);
-			ArrayList<VirtualFileSystem> remove = new ArrayList<VirtualFileSystem>();
-			for (VirtualFileSystem v : vl) {
-				boolean ok = false;
-				if (v instanceof VirtualFileSystemVFS2) {
-					VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) v;
-					if (v2.getProtocolType() == VfsFileProtocol.LOCAL)
-						ok = true;
-				}
-				if (!ok)
-					remove.add(v);
+		// m should be used if the experiment is also stored there, otherwise the binary files should be stored in the VFS
+		databaseTarget = determineDatabaseTarget(input, m);
+	}
+	
+	public static DatabaseTarget determineDatabaseTarget(Collection<Sample3D> input, MongoDB m) {
+		DatabaseTarget databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
+		String prefix = null;
+		if (input != null && !input.isEmpty()) {
+			prefix = input.iterator().next().getParentCondition().getExperimentDatabaseId().split(":")[0];
+			if (!prefix.startsWith("mongo_")) {
+				databaseTarget = null;
 			}
-			vl.removeAll(remove);
+		}
+		if (databaseTarget == null) {
+			ArrayList<VirtualFileSystemVFS2> vl = VirtualFileSystemFolderStorage.getKnown(true);
 			if (IAPmain.getRunMode() != IAPrunMode.WEB) {
 				if (vl != null && vl.size() > 1) {
-					Object[] sel = MyInputHelper.getInput("Please select the target for the storage of the result images. <br>" +
-							"If no target is selected (or cancel is pressed), the numeric result will be<br>" +
-							"helt in memory, and result image data will be discarded.",
-							"Select target storage", "Target", vl);
-					if (sel != null) {
-						VirtualFileSystem sss = (VirtualFileSystem) sel[0];
-						if (sss != null)
-							databaseTarget = new HSMfolderTargetDataManager(sss.getPrefix(), sss.getTargetPathName());
+					if (prefix != null) {
+						for (VirtualFileSystem vfs : vl) {
+							if (vfs.getPrefix().equals(prefix) && vfs instanceof DatabaseTarget) {
+								databaseTarget = (DatabaseTarget) vfs;
+								break;
+							} else
+								if (vfs.getPrefix().equals(prefix)) {
+									databaseTarget = new HSMfolderTargetDataManager(vfs.getPrefix(), vfs.getTargetPathName());
+									break;
+								}
+						}
+					} else {
+						Object[] sel = MyInputHelper.getInput("Please select the target for the storage of the result images. <br>" +
+								"If no target is selected (or cancel is pressed), the numeric result will be<br>" +
+								"kept in memory, and result image data will be discarded.",
+								"Select target storage", "Target", vl);
+						if (sel != null) {
+							VirtualFileSystem sss = (VirtualFileSystem) sel[0];
+							if (sss != null)
+								databaseTarget = new HSMfolderTargetDataManager(sss.getPrefix(), sss.getTargetPathName());
+						}
 					}
 				} else
 					if (vl != null && vl.size() > 0) {
@@ -144,6 +156,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 			}
 		}
+		return databaseTarget;
 	}
 	
 	public void debugOverrideAndEnableDebugStackStorage(boolean enable) {
@@ -163,12 +176,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		status.setCurrentStatusValue(-1);
 		status.setCurrentStatusText1("Wait for execution time slot");
+		status.setCurrentStatusText2("(another analysis is currently running)");
 		final Semaphore maxInst = BackgroundTaskHelper.lockGetSemaphore(
 				AbstractPhenotypingTask.class, SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1));
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
-			status.setCurrentStatusText1("Execute " + getName());
+			status.setCurrentStatusText1("Initiate " + getName());
+			status.setCurrentStatusText2("");
 			output = new ArrayList<NumericMeasurementInterface>();
 			
 			/**
@@ -182,9 +197,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			addTopOrSideImagesToWorkset(workload_imageSetsWithSpecificAngles, 0, analyzeTopImages(),
 					analyzeSideImages());
-			
-			// workload = filterWorkload(workload, null);// "Athletico");//
-			// "Rainbow Amerindian"); // Athletico
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			final int workloadSnapshots = workload_imageSetsWithSpecificAngles.size();
@@ -221,6 +233,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 			int progress = 0;
 			
+			status.setCurrentStatusText2("");
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
@@ -229,7 +242,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				maxCon.acquire(1);
 				try {
 					progress++;
-					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID;
+					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID + ")";
+					status.setCurrentStatusText1(preThreadName);
 					Thread t = new Thread(new Runnable() {
 						@Override
 						public void run() {
@@ -248,7 +262,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								freed.setBval(0, true);
 							}
 						}
-					}, preThreadName + ")");
+					}, preThreadName);
 					startThread(t);
 				} catch (Exception eeee) {
 					if (!freed.getBval(0, false))
@@ -843,7 +857,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 	}
 	
-	private void processAndOrSaveTiffImagesOrResultImages(
+	private void processAndOrSaveResultImages(
 			int tray, int tray_cnt,
 			ImageSet id,
 			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
@@ -986,7 +1000,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					resIr = pipelineResult.ir();
 					analysisResults = imageProcessor.getSettings();
 					
-					processAndOrSaveTiffImagesOrResultImages(
+					processAndOrSaveResultImages(
 							key, options.getTrayCnt(),
 							id, inVis, inFluo, inNir, inIr,
 							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority);

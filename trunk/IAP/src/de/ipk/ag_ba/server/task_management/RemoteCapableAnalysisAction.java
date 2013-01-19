@@ -33,4 +33,6 @@ public interface RemoteCapableAnalysisAction extends NavigationAction {
 	
 	public int getNumberOfJobs();
 	
+	boolean remotingEnabledForThisAction();
+	
 }

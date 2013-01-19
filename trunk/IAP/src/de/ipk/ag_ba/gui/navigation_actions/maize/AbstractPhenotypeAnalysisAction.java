@@ -17,6 +17,8 @@ import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -98,14 +100,14 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			sw.printTime();
 			if (status != null)
 				status.setCurrentStatusText2("Load time: " + sw.getTimeString());
-			if (m == null) {
+			if (m == null || !dbID.startsWith("mongo_")) {
 				if (status != null)
 					status.setCurrentStatusText2("Clone data set and set title...");
 				sw.setDescription("Experiment cloning");
 				sw.reset();
 				experimentToBeAnalysed = experimentToBeAnalysed.clone();
 				experimentToBeAnalysed.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-				experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+				experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
 						experiment.getExperimentName());
 				experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
 				sw.printTime();
@@ -125,54 +127,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			String plantFilter = SystemOptions.getInstance().getString("Pipeline-Debugging", "DEBUG-SINGLE-PLANT-ID", "001447-D1"); // "1107BA1350"; //
 																																											// "1121KN063";
 			
-			for (SubstanceInterface m : experimentToBeAnalysed) {
-				Substance3D m3 = (Substance3D) m;
-				if (filterTop) {
-					if (!m3.getName().contains(".top"))
-						continue;
-				}
-				// System.out.println("Substance-Name: " + m3.getName());
-				for (ConditionInterface s : m3) {
-					Condition3D s3 = (Condition3D) s;
-					for (SampleInterface sd : s3) {
-						Sample3D sd3 = (Sample3D) sd;
-						boolean containsAnOutlier = false;
-						
-						outlierSearch: for (NumericMeasurementInterface nmi : sd3) {
-							if (nmi instanceof ImageData) {
-								ImageData id = (ImageData) nmi;
-								String o = id.getAnnotationField("outlier");
-								if (o != null && o.equals("1")) {
-									containsAnOutlier = true;
-									break outlierSearch;
-								}
-								if (sf.filterOut(id.getQualityAnnotation(), sd3.getTime())) {
-									containsAnOutlier = true;
-									break outlierSearch;
-								}
-							}
-						}
-						if (optProcessOnlySampleDataNewerThanThisDate != null && sd3.getSampleFineTimeOrRowId() != null)
-							if (sd3.getSampleFineTimeOrRowId() <= optProcessOnlySampleDataNewerThanThisDate.getTime())
-								continue;
-						if (filterTime) {
-							if (sd3.getTime() != DEBUG_SINGLE_DAY)
-								continue;
-						}
-						if (filterPlant) {
-							String qa = sd3.iterator().next().getQualityAnnotation();
-							if (!qa.contains(plantFilter))
-								continue;
-						}
-						if (!containsAnOutlier)
-							if (filter == null || filter.isValidSample(sd3)) {
-								// System.out.println("Add sample to workload (to be analyzed): " + sd3 + " ("
-								// + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
-								workload.add(sd3);
-							}
-					}
-				}
-			}
+			filterOutliers(experimentToBeAnalysed, workload, sf, filterTop, filterTime, DEBUG_SINGLE_DAY, filterPlant, plantFilter);
 			
 			if (status != null) {
 				status.setCurrentStatusText1("Experiment: " + workload.size() + " images (vis+fluo+nir)");
@@ -220,10 +175,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			}
 			
 			if (statRes != null) {
-				// for (MappingData3DPath mp : newStatisticsData) {
-				// mp.getSampleData().setRowId(-1);
-				// }
-				//
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
 				final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
@@ -270,7 +221,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					
 					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 					if (m != null)
-						statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + ": " +
+						statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
 								experiment.getExperimentName());
 					
 					statisticsResult.getHeader().setRemark(
@@ -281,10 +232,14 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime());
 					
-					if (m != null)
-						m.saveExperiment(statisticsResult, getStatusProvider());
-					// else
-					// TODO Save data in VFS target, if defined
+					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(statisticsResult.getHeader().getDatabaseId());
+					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
+						ActionDataExportToVfs ac = new ActionDataExportToVfs(m, new ExperimentReference(statisticsResult), vfs);
+						ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
+						ac.performActionCalculateResults(src);
+					} else
+						if (m != null)
+							m.saveExperiment(statisticsResult, getStatusProvider());
 					
 					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
@@ -312,6 +267,58 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;
+		}
+	}
+	
+	private void filterOutliers(ExperimentInterface experimentToBeAnalysed, ArrayList<Sample3D> workload, MySnapshotFilter sf, boolean filterTop,
+			boolean filterTime, int DEBUG_SINGLE_DAY, boolean filterPlant, String plantFilter) {
+		for (SubstanceInterface m : experimentToBeAnalysed) {
+			Substance3D m3 = (Substance3D) m;
+			if (filterTop) {
+				if (!m3.getName().contains(".top"))
+					continue;
+			}
+			// System.out.println("Substance-Name: " + m3.getName());
+			for (ConditionInterface s : m3) {
+				Condition3D s3 = (Condition3D) s;
+				for (SampleInterface sd : s3) {
+					Sample3D sd3 = (Sample3D) sd;
+					boolean containsAnOutlier = false;
+					
+					outlierSearch: for (NumericMeasurementInterface nmi : sd3) {
+						if (nmi instanceof ImageData) {
+							ImageData id = (ImageData) nmi;
+							String o = id.getAnnotationField("outlier");
+							if (o != null && o.equals("1")) {
+								containsAnOutlier = true;
+								break outlierSearch;
+							}
+							if (sf.filterOut(id.getQualityAnnotation(), sd3.getTime())) {
+								containsAnOutlier = true;
+								break outlierSearch;
+							}
+						}
+					}
+					if (optProcessOnlySampleDataNewerThanThisDate != null && sd3.getSampleFineTimeOrRowId() != null)
+						if (sd3.getSampleFineTimeOrRowId() <= optProcessOnlySampleDataNewerThanThisDate.getTime())
+							continue;
+					if (filterTime) {
+						if (sd3.getTime() != DEBUG_SINGLE_DAY)
+							continue;
+					}
+					if (filterPlant) {
+						String qa = sd3.iterator().next().getQualityAnnotation();
+						if (!qa.contains(plantFilter))
+							continue;
+					}
+					if (!containsAnOutlier)
+						if (filter == null || filter.isValidSample(sd3)) {
+							// System.out.println("Add sample to workload (to be analyzed): " + sd3 + " ("
+							// + SystemAnalysis.getCurrentTimeInclSec(sd3.getSampleFineTimeOrRowId()) + ")");
+							workload.add(sd3);
+						}
+				}
+			}
 		}
 	}
 	
@@ -384,5 +391,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public void setUnitTestValueRangeInfo(int idx, int steps) {
 		this.unit_test_idx = idx;
 		this.unit_test_steps = steps;
+	}
+	
+	@Override
+	public boolean remotingEnabledForThisAction() {
+		return true;
 	}
 }
