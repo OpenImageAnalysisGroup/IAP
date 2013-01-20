@@ -85,7 +85,25 @@ public class VfsFileObjectUtil {
 					opts, auth);
 		}
 		FileSystemManager fsm = VFS.getManager();
-		FileObject fo = fsm.resolveFile(con, opts);
+		FileObject fo = null;
+		for (int i = 0; i < 10; i++) {
+			try {
+				fo = fsm.resolveFile(con, opts);
+				if (fo == null)
+					System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT RESOLVE FILE: " + filePath);
+				VfsFileObject vfsFileObj = new VfsFileObjectImpl(fo);
+				return vfsFileObj;
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COULD NOT RESOLVE FILE (" + e.getMessage() + "). TRYING AGAIN...");
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		fo = fsm.resolveFile(con, opts);
 		if (fo == null)
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT RESOLVE FILE: " + filePath);
 		VfsFileObject vfsFileObj = new VfsFileObjectImpl(fo);
