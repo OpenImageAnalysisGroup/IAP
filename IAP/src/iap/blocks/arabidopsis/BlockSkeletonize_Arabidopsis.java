@@ -207,14 +207,17 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			Double leafWidthInPixels2 = 0d;
 			int skeletonLength;
 			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageOperation ioo = inputImage.io();
 			do {
-				skeletonLength = inputImage.io().skeletonize(false).print("SKELETON2", false).countFilledPixels();
+				ioo = ioo.skeletonize(false).print("SKELETON2", false);
+				skeletonLength = ioo.countFilledPixels();
 				if (skeletonLength > 0)
 					leafWidthInPixels2++;
 				if (fis != null)
 					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
-				inputImage = inputImage.io().erode().getImage();
+				ioo = ioo.erode();
 			} while (skeletonLength > 0);
+			ioo = null;
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);
 				fis.print("SKEL2");
