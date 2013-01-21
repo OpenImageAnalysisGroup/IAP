@@ -126,6 +126,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	public VfsFileObject newVfsFile(String fileNameInclSubFolderPathName, boolean absoluteDirName) throws Exception {
+		if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("/"))
+			fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("/".length());
+		if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("\\"))
+			fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("\\".length());
 		return VfsFileObjectUtil.createVfsFileObject(
 				vfs_type, host,
 				(absoluteDirName ? "" : folder + "/") +
@@ -163,6 +167,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			OutputStream os = file.getOutputStream();
 			if (os == null)
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: Output stream for VFS file could not be created (NULL result)!");
+			is = ResourceIOManager.getInputStreamMemoryCached(is);
 			long copied = ResourceIOManager.copyContent(is, os);
 			writeCounter.addLong(copied);
 			return copied;
@@ -184,7 +189,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			if (!file.exists())
 				return null;
 			readCounter.addLong(file.length());
-			InputStream is = file.getInputStream();
+			InputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
 			return is;
 		}
 	}
@@ -307,8 +312,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
 		String res = "icons" + File.separator + subPath;
-		if (!new File(res).exists())
-			new File(res).mkdirs();
+		// if (!new File(res).exists())
+		// new File(res).mkdirs();
 		return res + File.separator + filterBadChars(zefn);
 	}
 	
@@ -318,8 +323,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
 		String res = DATA_FOLDER_NAME + File.separator + subPath;
-		if (!new File(res).exists())
-			new File(res).mkdirs();
+		// if (!new File(res).exists())
+		// new File(res).mkdirs();
 		if (zefn.contains("#"))
 			return res + File.separator + filterBadChars(zefn.split("#", 2)[0]) + "#" + zefn.split("#", 2)[1];
 		else

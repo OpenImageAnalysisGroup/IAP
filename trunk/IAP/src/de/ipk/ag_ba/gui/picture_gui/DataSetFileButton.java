@@ -464,13 +464,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					jp.add(sn);
 					
 					if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
-						PipelineDesc pd = new PipelineDesc(null, targetTreeNode.getExperiment().getIniIoProvider(), null, null);
-						UserDefinedImageAnalysisPipelineTask iat =
-								new UserDefinedImageAnalysisPipelineTask(pd);
-						JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(m, targetTreeNode, iat);
-						JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(m, targetTreeNode, iat);
-						jp.add(debugPipelineTest0a);
-						jp.add(debugPipelineTest00a);
+						try {
+							PipelineDesc pd = new PipelineDesc(null, targetTreeNode.getExperiment().getIniIoProvider(), null, null);
+							UserDefinedImageAnalysisPipelineTask iat =
+									new UserDefinedImageAnalysisPipelineTask(pd);
+							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(m, targetTreeNode, iat);
+							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(m, targetTreeNode, iat);
+							jp.add(debugPipelineTest0a);
+							jp.add(debugPipelineTest00a);
+						} catch (Exception err) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: Could not analyze assigned pipeline info. Debug menu item is not added to menu list. Error: " + err.getMessage());
+						}
 					}
 					
 					JMenu ta = new JMenu("Analysis Templates");

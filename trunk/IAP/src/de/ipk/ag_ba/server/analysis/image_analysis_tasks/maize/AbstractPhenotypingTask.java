@@ -126,7 +126,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (databaseTarget == null) {
 			ArrayList<VirtualFileSystemVFS2> vl = VirtualFileSystemFolderStorage.getKnown(true);
 			if (IAPmain.getRunMode() != IAPrunMode.WEB) {
-				if (vl != null && vl.size() > 1) {
+				if (vl != null && vl.size() >= 1) {
 					if (prefix != null) {
 						for (VirtualFileSystem vfs : vl) {
 							if (vfs.getPrefix().equals(prefix) && vfs instanceof DatabaseTarget) {

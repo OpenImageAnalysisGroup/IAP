@@ -38,8 +38,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 /**
  * @author klukas
@@ -166,7 +169,17 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
 		
 		IOurl u = url.getIOurlFor(experimentDirectory + File.separator + fileNameOfExperimentFile);
+		String prefix = u.getPrefix();
 		ExperimentInterface md = Experiment.loadFromIOurl(u);
+		for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(md)) {
+			if (nmi != null && nmi instanceof BinaryMeasurement) {
+				BinaryMeasurement bm = (BinaryMeasurement) nmi;
+				if (bm.getURL() != null)
+					bm.getURL().setPrefix(prefix);
+				if (bm.getLabelURL() != null)
+					bm.getLabelURL().setPrefix(prefix);
+			}
+		}
 		md.setHeader(header);
 		return md;
 	}

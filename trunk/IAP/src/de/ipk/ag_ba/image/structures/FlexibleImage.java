@@ -65,11 +65,13 @@ public class FlexibleImage {
 		// synchronized (url2image) {
 		img = url2image.get(url + "");
 		if (img != null)
-			System.out.print("~o" + url);
+			System.out.print("~o~" + url);
 		// else
 		// System.out.println("- ~ "+url);
 		if (img == null) {
 			InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
+			if (is == null)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			img = ImageIO.read(is);
 			url2image.put(url + "", img);
 		}
