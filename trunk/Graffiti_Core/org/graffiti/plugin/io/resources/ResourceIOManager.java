@@ -129,32 +129,36 @@ public class ResourceIOManager {
 	
 	public static long copyContent(InputStream in, OutputStream out, long maxIO) throws IOException {
 		long written = 0;
-		if (maxIO <= 0) {
-			byte[] buffer = new byte[0xFFFF];
-			for (int len; (len = in.read(buffer)) != -1;) {
-				out.write(buffer, 0, len);
-				written += len;
-			}
-		} else {
-			long read = 0;
-			byte[] buffer = new byte[0xFFFF];
-			for (int len; (len = in.read(buffer)) != -1;) {
-				read += len;
-				if (read < maxIO) {
+		try {
+			if (maxIO <= 0) {
+				byte[] buffer = new byte[0xFFFF];
+				for (int len; (len = in.read(buffer)) != -1;) {
 					out.write(buffer, 0, len);
 					written += len;
-				} else {
-					read -= len;
-					out.write(buffer, 0, (int) (maxIO - read));
-					written += maxIO - read;
-					break;
+				}
+			} else {
+				long read = 0;
+				byte[] buffer = new byte[0xFFFF];
+				for (int len; (len = in.read(buffer)) != -1;) {
+					read += len;
+					if (read < maxIO) {
+						out.write(buffer, 0, len);
+						written += len;
+					} else {
+						read -= len;
+						out.write(buffer, 0, (int) (maxIO - read));
+						written += maxIO - read;
+						break;
+					}
 				}
 			}
+		} finally {
+			try {
+				in.close();
+			} finally {
+				out.close();
+			}
 		}
-		
-		in.close();
-		out.close();
-		
 		return written;
 	}
 	

@@ -233,7 +233,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 			int progress = 0;
 			
-			status.setCurrentStatusText2("");
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
