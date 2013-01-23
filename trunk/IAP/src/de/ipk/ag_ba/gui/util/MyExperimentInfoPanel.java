@@ -35,10 +35,12 @@ import org.GuiRow;
 import org.JMButton;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.toedter.calendar.JDateChooser;
 
+import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -317,8 +319,19 @@ public class MyExperimentInfoPanel extends JPanel {
 			fp.addGuiComponentRow(new JLabel("Storage Time"), disable(new JTextField(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime()))),
 					false);
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
-		fp.addGuiComponentRow(new JLabel("Analysis Settings"),
-				disable(new JTextField(experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(undefined)" : "(available)")), false);
+		try {
+			fp.addGuiComponentRow(
+					new JLabel("Analysis Settings"),
+					disable(new JTextField(experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
+							""
+									+ SystemOptions.getInstance(null, new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
+											"pipeline_name", "(unnamed)", false) + " ("
+									+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
+									+ " lines)")), false);
+		} catch (Exception err) {
+			fp.addGuiComponentRow(new JLabel("Analysis Settings"),
+					disable(new JTextField("(improperly defined: error " + err.getMessage() + ")")), false);
+		}
 		boolean showXMLbutton = false;
 		if (optExperiment != null && showXMLbutton)
 			fp.addGuiComponentRow(new JLabel("Show XML"), getShowDataButton(optExperiment), false);
@@ -604,30 +617,39 @@ public class MyExperimentInfoPanel extends JPanel {
 		}
 	}
 	
-	private String niceValue(long d, String unit) {
+	private String niceValue(long s, String unit) {
 		try {
-			if (unit != null && d > 10000) {
-				d = d / 1024;
+			double d = s;
+			if (unit != null && d > 10000000) {
+				d = d / 1024 / 1024;
 				Locale locale = Locale.US;
 				NumberFormat f = NumberFormat.getNumberInstance(locale);
 				f.setMaximumFractionDigits(0);
 				String string = f.format(d);
-				return string + " MB";
-			} else {
-				Locale locale = Locale.US;
-				NumberFormat f = NumberFormat.getNumberInstance(locale);
-				f.setMaximumFractionDigits(0);
-				String string = f.format(d);
-				if (unit != null)
-					return string + " " + unit;
-				else
-					return string;
-			}
+				return string + " GB";
+			} else
+				if (unit != null && d > 10000) {
+					d = d / 1024;
+					Locale locale = Locale.US;
+					NumberFormat f = NumberFormat.getNumberInstance(locale);
+					f.setMaximumFractionDigits(0);
+					String string = f.format(d);
+					return string + " MB";
+				} else {
+					Locale locale = Locale.US;
+					NumberFormat f = NumberFormat.getNumberInstance(locale);
+					f.setMaximumFractionDigits(0);
+					String string = f.format(d);
+					if (unit != null)
+						return string + " " + unit;
+					else
+						return string;
+				}
 		} catch (Exception e) {
 			if (unit != null)
-				return d + " " + unit;
+				return s + " " + unit;
 			else
-				return d + "";
+				return s + "";
 		}
 	}
 	

@@ -364,6 +364,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
 		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
 		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
+		final ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
 		if (imageSetWithSpecificAngle != null) {
 			int threadsToStart = 0;
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
@@ -395,11 +396,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						public void run() {
 							try {
 								try {
-									HashMap<Integer, BlockResultSet> results = processAngleWithinSnapshot(
+									ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
 											imageSetWithSpecificAngle.get(time).get(configAndAngle),
 											maximumThreadCountOnImageLevel, status,
 											workloadEqualAngleSnapshotSets,
 											getParentPriority());
+									synchronized (waitThreads) {
+										waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
+									}
+									HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
 									processVolumeOutput(inSamples.get(time), results);
 									if (results != null) {
 										synchronized (analysisInput) {
@@ -437,6 +442,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			innerLoopSemaphore.acquire(threadsToStart);
 			innerLoopSemaphore.release(threadsToStart);
 		}
+		Thread.currentThread().setName("Analyse " + plantID + " (process saving)");
+		// System.out.println();
+		// System.out.print("[WAIT");
+		BackgroundThreadDispatcher.waitFor(waitThreads);
+		// System.out.println("]");
 		Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
@@ -683,6 +693,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					System.err.println("INTERNAL ERROR: OUTPUT IS NULL!!! 3");
 					return;
 				}
+				try {
+					Thread.sleep((long) (Math.random() * 1400 + 2000));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				if (optLabelImageContent == null) {
 					if (image.getHeight() > 1) {
 						if (id != null && id.getParentSample() != null) {
@@ -856,7 +871,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 	}
 	
-	private void processAndOrSaveResultImages(
+	private ArrayList<MyThread> processAndOrSaveResultImages(
 			int tray, int tray_cnt,
 			ImageSet id,
 			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
@@ -865,6 +880,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
+		ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
 		if (forceDebugStack) {
 			while (forcedDebugStacks.size() < tray_cnt)
 				forcedDebugStacks.add(null);
@@ -927,9 +943,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
 			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
 			d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
-			BackgroundThreadDispatcher.waitFor(new MyThread[] { a, b, c, d });
+			waitThreads.add(a);
+			waitThreads.add(b);
+			waitThreads.add(c);
+			waitThreads.add(d);
 		}
-		// s.printTime();
+		return waitThreads;
 	}
 	
 	@Override
@@ -938,11 +957,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.unit_test_steps = unit_test_steps;
 	}
 	
-	private HashMap<Integer, BlockResultSet> processAngleWithinSnapshot(ImageSet id,
+	private ResultsAndWaitThreads processAngleWithinSnapshot(ImageSet id,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority)
 			throws Exception {
+		ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
 		ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
 		ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
 		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
@@ -998,11 +1018,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					resNir = pipelineResult.nir();
 					resIr = pipelineResult.ir();
 					analysisResults = imageProcessor.getSettings();
-					
-					processAndOrSaveResultImages(
+					waitThreads.addAll(processAndOrSaveResultImages(
 							key, options.getTrayCnt(),
 							id, inVis, inFluo, inNir, inIr,
-							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority);
+							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority));
 				}
 			}
 		}
@@ -1011,7 +1030,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			processStatisticalOutputImages(inVis, analysisResults);
 			
 		}
-		return analysisResults;
+		return new ResultsAndWaitThreads(analysisResults, waitThreads);
 		// } else {
 		// System.err.println("ERROR: Not all three snapshots images could be loaded!");
 		// return null;

@@ -54,7 +54,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 					if (vis != null && fluo != null) {
 						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
-							boolean drawSkeleton = getBoolean("draw_skeleton", true);
+							boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							if (res != null)
 								getProperties().setImage("skeleton_fluo", sk);
@@ -69,7 +69,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				if (vis != null && fluo != null) {
 					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
-						boolean drawSkeleton = getBoolean("draw_skeleton", true);
+						boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
 							getProperties().setImage("skeleton_fluo", sk);

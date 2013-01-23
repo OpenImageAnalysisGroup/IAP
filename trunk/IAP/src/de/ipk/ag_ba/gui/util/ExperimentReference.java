@@ -85,14 +85,14 @@ public class ExperimentReference {
 							databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
 							for (ExperimentReference ehi : dataSource.getAllExperiments()) {
 								if (ehi != null) {
-									String dbi =ehi.getHeader().getDatabaseId();
+									String dbi = ehi.getHeader().getDatabaseId();
 									dbi = StringManipulationTools.stringReplace(dbi, "\\", "/");
 									if (dbi.equals(databaseID)) {
-									header = ehi.getHeader();
-									vfsFound = true;
-									break;
+										header = ehi.getHeader();
+										vfsFound = true;
+										break;
 									}
-									}
+								}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -115,7 +115,7 @@ public class ExperimentReference {
 					for (MongoDB m : MongoDB.getMongos()) {
 						header = m.getExperimentHeader(new ObjectId(databaseID));
 						if (header != null) {
-							setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
+							setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
 							break;
 						}
 					}
@@ -133,7 +133,7 @@ public class ExperimentReference {
 	public ExperimentReference(ExperimentHeaderInterface ehi, MongoDB m) {
 		this(ehi);
 		this.m = m;
-		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this, m));
+		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
 	}
 	
 	public ExperimentInterface getData(MongoDB m) throws Exception {
@@ -284,7 +284,7 @@ public class ExperimentReference {
 		if (storedIniProvider == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">INFO: Add generic INI-Provider info to experiment reference");
-			storedIniProvider = new ExperimentAnalysisSettingsIOprovder(this, null);
+			storedIniProvider = new ExperimentAnalysisSettingsIOprovder(this.getHeader(), null);
 		}
 		return storedIniProvider;
 	}

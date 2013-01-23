@@ -13,9 +13,7 @@ import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
-import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
@@ -178,6 +176,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
 				final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
+				statisticsResult.setHeader(experiment.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 				for (SubstanceInterface s : statisticsResult) {
@@ -188,7 +187,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				
 				System.out.println("Statistics results: " + newStatisticsData.size());
 				// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
-				statisticsResult.setHeader(experiment.getHeader().clone());
 				statisticsResult.getHeader().setDatabaseId("");
 				if (statisticsResult.size() > 0) {
 					SubstanceInterface subst = statisticsResult.iterator().next();
@@ -210,36 +208,42 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					}
 				}
 				
-				statisticsResult.getHeader().setOriginDbId(dbID);
-				statisticsResult.getHeader().setStartdate(new Date(startTime));
+				// statisticsResult.getHeader().setStartdate(new Date(startTime));
 				statisticsResult.getHeader().setStorageTime(new Date());
 				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 				
 				if (getResultReceiver() == null) {
-					if (status != null)
-						status.setCurrentStatusText1("Ready");
-					
+					if (status != null) {
+						status.setCurrentStatusValue(-1);
+						status.setCurrentStatusText1("Calculations finished");
+						status.setCurrentStatusText2("Save result data structure...");
+					}
 					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-					if (m != null)
-						statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
-								experiment.getExperimentName());
+					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
+							experiment.getExperimentName());
 					
 					statisticsResult.getHeader().setRemark(
-							statisticsResult.getHeader().getRemark() +
-									" // analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
-									" // finished: " + SystemAnalysis.getCurrentTime() +
+							(statisticsResult.getHeader().getRemark() != null && !statisticsResult.getHeader().getRemark().isEmpty() ? statisticsResult.getHeader()
+									.getRemark() + " // " : "")
+									+
+									"analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
 									" // processing time: " +
 									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime());
 					
-					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(statisticsResult.getHeader().getDatabaseId());
+					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experimentToBeAnalysed.getHeader().getDatabaseId());
 					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
+						statisticsResult.getHeader().setDatabaseId(dbID);
 						ActionDataExportToVfs ac = new ActionDataExportToVfs(m, new ExperimentReference(statisticsResult), vfs);
+						ac.setSkipClone(true);
 						ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
 						ac.performActionCalculateResults(src);
-					} else
-						if (m != null)
+					} else {
+						statisticsResult.getHeader().setOriginDbId(dbID);
+						if (m != null) {
 							m.saveExperiment(statisticsResult, getStatusProvider());
+						}
+					}
 					
 					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
@@ -263,7 +267,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					getResultReceiver().run();
 				}
 			}
-			
+			if (status != null) {
+				status.setCurrentStatusValue(-1);
+				status.setCurrentStatusText1("Processing completed");
+				status.setCurrentStatusText2("Results have been saved");
+			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;
@@ -326,13 +334,14 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		res.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(experimentResult),
-				src != null ? src.getGUIsetting() : null));
+		// res.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(experimentResult),
+		// src != null ? src.getGUIsetting() : null));
 		
-		if (m != null)
-			res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-					"Save Result (db '" + m.getDatabaseName() + "')", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); // PoweredMongoDBgreen.png"));
-			
+		// if (m != null)
+		// res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
+		// "Save Result (db '" + m.getDatabaseName() + "')", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); //
+		// PoweredMongoDBgreen.png"));
+		
 		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
 				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);

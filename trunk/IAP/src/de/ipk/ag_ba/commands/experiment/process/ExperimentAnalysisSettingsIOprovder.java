@@ -7,18 +7,18 @@ import org.SystemOptions;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.graffiti.editor.MainFrame;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
-	private final ExperimentReference experimentReference;
+	private final ExperimentHeaderInterface header;
 	private final MongoDB m;
 	private final ExperimentHeaderHelper headerHelper;
 	
-	public ExperimentAnalysisSettingsIOprovder(ExperimentReference experimentReference, MongoDB m) {
-		this.experimentReference = experimentReference;
+	public ExperimentAnalysisSettingsIOprovder(ExperimentHeaderInterface header, MongoDB m) {
+		this.header = header;
 		this.m = m;
-		this.headerHelper = experimentReference.getHeader().getExperimentHeaderHelper();
+		this.headerHelper = header.getExperimentHeaderHelper();
 	}
 	
 	private SystemOptions i;
@@ -28,7 +28,7 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	public String getString() {
 		try {
 			if (m != null) {
-				m.updateAndGetExperimentHeaderInfoFromDB(experimentReference.getHeader());
+				m.updateAndGetExperimentHeaderInfoFromDB(header);
 			} else {
 				if (headerHelper != null)
 					headerHelper.readSourceForUpdate();
@@ -37,7 +37,7 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 			e.printStackTrace();
 		}
 		
-		String ini = experimentReference.getHeader().getSettings();
+		String ini = header.getSettings();
 		StringEscapeUtils.unescapeXml(ini);
 		return ini;
 	}
@@ -46,19 +46,19 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	public Long setString(String value) {
 		Long res = null;
 		String ini = StringEscapeUtils.escapeXml(value);
-		experimentReference.getHeader().setSettings(ini);
+		header.setSettings(ini);
 		
 		try {
 			if (m != null) {
-				res = m.saveExperimentHeader(experimentReference.getHeader());
+				res = m.saveExperimentHeader(header);
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
-						+ experimentReference.getExperimentName()
+						+ header.getExperimentname()
 						+ " in storage location "
 						+ m.getDatabaseName() + ".");
 			} else {
-				if (experimentReference.getHeader().getExperimentHeaderHelper() != null) {
-					res = experimentReference.getHeader().getExperimentHeaderHelper().saveUpdatedProperties();
+				if (header.getExperimentHeaderHelper() != null) {
+					res = header.getExperimentHeaderHelper().saveUpdatedProperties();
 				}
 			}
 		} catch (Exception e) {
@@ -81,7 +81,7 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	@Override
 	public Long lastModified() throws Exception {
 		if (m != null)
-			return m.getExperimentHeaderStorageTime(experimentReference.getHeader());
+			return m.getExperimentHeaderStorageTime(header);
 		else {
 			if (headerHelper != null) {
 				return headerHelper.getLastModified();
