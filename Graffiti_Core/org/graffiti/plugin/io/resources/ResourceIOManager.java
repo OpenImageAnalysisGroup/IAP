@@ -97,6 +97,7 @@ public class ResourceIOManager {
 	}
 	
 	public static MyByteArrayInputStream getInputStreamMemoryCached(IOurl url) throws IOException, Exception {
+		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		InputStream is = null;
 		try {

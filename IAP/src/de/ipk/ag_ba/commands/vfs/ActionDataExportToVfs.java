@@ -72,6 +72,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private boolean includeReferenceImages = true;
 	private boolean includeAnnotationImages = true;
 	private final VirtualFileSystemVFS2 vfs;
+	private boolean skipClone;
 	
 	public ActionDataExportToVfs(MongoDB m,
 			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs) {
@@ -138,12 +139,16 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		this.errorMessage = null;
 		try {
 			status.setCurrentStatusText1("Clone Experiment");
-			final ExperimentInterface experiment = experimentReference.getData(
-					m).clone();
+			ExperimentInterface experiment = experimentReference.getData(
+					m);
+			
+			if (!skipClone)
+				experiment = experiment.clone();
 			
 			status.setCurrentStatusText1("Store Files...");
 			
-			experiment.setHeader(experimentReference.getHeader().clone());
+			if (!skipClone)
+				experiment.setHeader(experimentReference.getHeader().clone());
 			
 			experiment.getHeader().setOriginDbId(
 					experimentReference.getHeader().getDatabaseId());
@@ -203,11 +208,13 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						+ SystemAnalysis.getCurrentTime());
 			}
 			experiment.getHeader().setRemark(
-					experiment.getHeader().getRemark()
-							+ " // data transfer errors: " + errorCount);
+					(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
+							experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
 			experiment.getHeader().setStorageTime(new Date());
+			experiment.getHeader().setSizekb(written.getLong() / 1024);
 			
-			createIndexFiles(experiment, hsmManager, status);
+			String indexFileName = createIndexFiles(experiment, hsmManager, status);
+			experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
 			status.setCurrentStatusValueFine(100d);
 			
 			this.mb = (written.getLong() / 1024 / 1024) + "";
@@ -513,14 +520,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return fileName;
 	}
 	
-	private void createIndexFiles(final ExperimentInterface experiment,
+	private String createIndexFiles(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		try {
 			long tsave = System.currentTimeMillis();
 			int eidx = 0;
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName = new LinkedHashMap<VfsFileObject, String>();
-			// for (ExperimentInterface ei : experiment.split()) {
+			
 			ExperimentInterface ei = experiment;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create XML File");
@@ -532,17 +539,17 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					tempFile2fileName, ei);
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create Index File");
-			storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
+			String resName = storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
 			
 			eidx++;
-			// }
-			renameTempInProgressFilesToFinalFileNames(tempFile2fileName);
+			return resName;
 		} catch (Exception err) {
 			System.out.println("ERROR: Save XML of experiment "
 					+ experimentReference.getExperimentName() + " failed: "
 					+ err.getMessage() + " // "
 					+ SystemAnalysis.getCurrentTime());
 			ErrorMsg.addErrorMessage(err);
+			return null;
 		}
 	}
 	
@@ -702,8 +709,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return zefn;
 	}
 	
-	private void renameTempInProgressFilesToFinalFileNames(
+	private boolean renameTempInProgressFilesToFinalFileNames(
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName) throws Exception {
+		
+		boolean allOK = true;
 		// rename all temp files
 		for (VfsFileObject f : tempFile2fileName.keySet()) {
 			VfsFileObject te = vfs.newVfsFile(tempFile2fileName.get(f), true);
@@ -716,11 +725,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							+ SystemAnalysis.getCurrentTime());
 				}
 			} catch (Exception e) {
+				allOK = false;
 				System.err.println("ERROR: Could not rename " + f.getName()
 						+ " to " + te.getName());
 			}
-			
 		}
+		return allOK;
 	}
 	
 	private void storeConditionIndexFile(
@@ -793,7 +803,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								.prepareAndGetTargetFileForConditionIndex(conditionIndexFileName));
 	}
 	
-	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
+	private String storeIndexFile(final HSMfolderTargetDataManager hsmManager,
 			long tsave, int eidx, HashMap<VfsFileObject, String> tempFile2fileName,
 			ExperimentInterface ei) throws Exception {
 		String indexFileName = tsave + "_" + eidx + "_"
@@ -816,8 +826,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ header.get(key));
 		}
 		indexFileContent.write(indexFile.getOutputStream());
-		tempFile2fileName.put(indexFile, hsmManager
-				.prepareAndGetTargetFileForContentIndex(indexFileName));
+		String resName = hsmManager.prepareAndGetTargetFileForContentIndex(indexFileName);
+		tempFile2fileName.put(indexFile, resName);
+		if (resName.startsWith(vfs.getTargetPathName()))
+			resName = resName.substring(vfs.getTargetPathName().length() + "/".length());
+		return resName;
 	}
 	
 	private void storeXMLdataset(final ExperimentInterface experiment,
@@ -870,5 +883,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public MongoDB getMongoInstance() {
 		return m;
+	}
+	
+	public void setSkipClone(boolean skipClone) {
+		this.skipClone = skipClone;
 	}
 }

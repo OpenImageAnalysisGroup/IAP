@@ -19,14 +19,14 @@ public class VfsFileObjectUtil {
 	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath) throws Exception {
-		return VfsFileObjectUtil.createVfsFileObject(protocol, host, filePath,
+		return createVfsFileObject(protocol, host, filePath,
 				null, null, null);
 	}
 	
 	public static VfsFileObject createVfsFileObject(VfsFileProtocol protocol,
 			String host, String filePath, String username, String password)
 			throws Exception {
-		return VfsFileObjectUtil.createVfsFileObject(protocol, host, filePath,
+		return createVfsFileObject(protocol, host, filePath,
 				username, password, null);
 	}
 	

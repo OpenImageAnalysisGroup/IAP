@@ -10,8 +10,8 @@ import java.util.GregorianCalendar;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -22,6 +22,8 @@ import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk.vanted.util.VfsFileObjectUtil;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.PriorityLock;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.PriorityLock.Priority;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
@@ -67,10 +69,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		this.useForMongoFileStorage = useForMongoFileStorage;
 		this.useOnlyForMongoFileStorage = useOnlyForMongoFileStorage;
 		this.useForMongoFileStorageCloudName = useForMongoFileStorageCloudName;
-		if (this.vfs_type == VfsFileProtocol.LOCAL) {
-			ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
-		} else
-			ResourceIOManager.registerIOHandler(new VirtualFileSystemHandler(this));
+		// if (this.vfs_type == VfsFileProtocol.LOCAL) {
+		// ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
+		// } else
+		ResourceIOManager.registerIOHandler(new VirtualFileSystemHandler(this));
 	}
 	
 	@Override
@@ -102,7 +104,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
 				host, path, user, pass);
 		if (!file.exists()) {
-			System.out.println(">>>>>> create directory " + path);
+			if (doPrintStatus())
+				System.out.println(">>>>>> create directory " + path);
 			file.mkdir();
 		}
 		ArrayList<String> res = new ArrayList<String>();
@@ -110,6 +113,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			res.add(s);
 		}
 		return res;
+	}
+	
+	private boolean doPrintStatus() {
+		return SystemOptions.getInstance().getBoolean("VFS", "print activity info to console", false);
 	}
 	
 	@Override
@@ -152,10 +159,12 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		return useForMongoFileStorageCloudName;
 	}
 	
-	Object out = new Object();
-	
-	public long saveStream(String fileNameInclSubFolderPathName, InputStream is, boolean skipKnown, long expectedLengthIfKnown) throws Exception {
-		synchronized (out) {
+	public synchronized long saveStream(String fileNameInclSubFolderPathName, InputStream is, boolean skipKnown, long expectedLengthIfKnown) throws Exception {
+		try {
+			if (doLocking())
+				lock.lock(Priority.LOW);
+			if (doPrintStatus())
+				System.out.print("[s");
 			VfsFileObject file = newVfsFile(fileNameInclSubFolderPathName);
 			if (skipKnown && file.exists()) {
 				long l = file.length();
@@ -170,8 +179,17 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			is = ResourceIOManager.getInputStreamMemoryCached(is);
 			long copied = ResourceIOManager.copyContent(is, os);
 			writeCounter.addLong(copied);
+			if (doPrintStatus())
+				System.out.print("]");
 			return copied;
+		} finally {
+			if (doLocking())
+				lock.unlock();
 		}
+	}
+	
+	private boolean doLocking() {
+		return SystemOptions.getInstance().getBoolean("VFS", vfs_type.name() + " - limit concurrent use", false);
 	}
 	
 	Object in = new Object();
@@ -179,40 +197,49 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	public static ThreadSafeOptions readCounter = new ThreadSafeOptions();
 	public static ThreadSafeOptions writeCounter = new ThreadSafeOptions();
 	
+	private static PriorityLock lock = new PriorityLock();
+	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
-		synchronized (in) {
+		try {
+			if (doLocking())
+				lock.lock(Priority.HIGH);
+			if (doPrintStatus())
+				System.out.print("[l");
 			String fn = url.getDetail() + "/" + url.getFileName().split("#", 2)[0];
 			VfsFileObject file = newVfsFile(fn);
 			if (file == null)
 				return null;
 			if (!file.exists())
 				return null;
-			readCounter.addLong(file.length());
-			InputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
+			MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
+			readCounter.addLong(is.getCount());
+			if (doPrintStatus())
+				System.out.print("]");
 			return is;
+		} finally {
+			if (doLocking())
+				lock.unlock();
 		}
 	}
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		synchronized (in) {
-			if (url.getDetail() != null && url.getDetail().startsWith("data")) {
-				VfsFileObject file = newVfsFile("icons" + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
-				if (file != null && file.exists()) {
-					InputStream is = file.getInputStream();
-					if (is != null)
-						return is;
-				}
+		if (url.getDetail() != null && url.getDetail().startsWith("data")) {
+			VfsFileObject file = newVfsFile("icons" + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
+			if (file != null && file.exists()) {
+				InputStream is = file.getInputStream();
+				if (is != null)
+					return is;
 			}
-			VfsFileObject file = newVfsFile(url.getDetail() + "/" + url.getFileName());
-			if (file == null)
-				return null;
-			if (!file.exists())
-				return null;
-			InputStream is = file.getInputStream();
-			return is;
 		}
+		VfsFileObject file = newVfsFile(url.getDetail() + "/" + url.getFileName());
+		if (file == null)
+			return null;
+		if (!file.exists())
+			return null;
+		InputStream is = file.getInputStream();
+		return is;
 	}
 	
 	@Override
@@ -255,7 +282,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			IOurl url = limg.getURL();
 			
 			String fullPath = new File(targetFileNameFullRes).getParent();
-			String subPath = fullPath.substring(getTargetPathName().length());
+			String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
 			if (url != null) {
 				url.setPrefix(getPrefix());
 				url.setDetail(subPath);
@@ -283,7 +310,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			IOurl url = limg.getLabelURL();
 			
 			String fullPath = new File(targetFileNameFullRes).getParent();
-			String subPath = fullPath.substring(getTargetPathName().length());
+			String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
 			if (url != null) {
 				url.setPrefix(getPrefix());
 				url.setDetail(subPath);

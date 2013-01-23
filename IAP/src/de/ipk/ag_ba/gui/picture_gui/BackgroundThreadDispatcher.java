@@ -135,9 +135,10 @@ public class BackgroundThreadDispatcher {
 	private static long lastGC = 0;
 	
 	ExecutorService es = new ThreadPoolExecutor(
-			SystemAnalysis.getNumberOfCPUs(),
-			SystemAnalysis.getNumberOfCPUs(),
-			SystemAnalysis.getNumberOfCPUs(), TimeUnit.SECONDS,
+			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
+			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
+			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
+			TimeUnit.SECONDS,
 			new ArrayBlockingQueue<Runnable>(SystemAnalysis.getNumberOfCPUs(), true),
 			new ThreadFactory() {
 				int idx = 1;

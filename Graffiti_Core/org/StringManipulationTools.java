@@ -7,11 +7,13 @@
 
 package org;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -833,6 +835,20 @@ public class StringManipulationTools implements HelperClass {
 	 */
 	public static String formatNumber(double d, String pattern) {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
+	}
+	
+	public static String formatNumber(long l) {
+		Locale locale = Locale.getDefault();
+		NumberFormat f = NumberFormat.getNumberInstance(locale);
+		f.setMaximumFractionDigits(0);
+		return f.format(l);
+	}
+	
+	public static String formatNumber(double l, int fracDigits) {
+		Locale locale = Locale.getDefault();
+		NumberFormat f = NumberFormat.getNumberInstance(locale);
+		f.setMaximumFractionDigits(fracDigits);
+		return f.format(l);
 	}
 	
 	public static int count(String s, String find) {

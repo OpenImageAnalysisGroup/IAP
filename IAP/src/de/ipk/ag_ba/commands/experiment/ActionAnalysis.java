@@ -48,7 +48,7 @@ public class ActionAnalysis extends AbstractNavigationAction {
 		
 		if (experimentReference.getIniIoProvider() == null)
 			experimentReference.setIniIoProvider(
-					new ExperimentAnalysisSettingsIOprovder(experimentReference, m));
+					new ExperimentAnalysisSettingsIOprovder(experimentReference.getHeader(), m));
 		
 		IniIoProvider ioStringProvider = experimentReference.getIniIoProvider();
 		
