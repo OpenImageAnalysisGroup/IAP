@@ -541,6 +541,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				optStatus.setCurrentStatusText1("Create Index File");
 			String resName = storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
 			
+			renameTempInProgressFilesToFinalFileNames(tempFile2fileName);
+			
 			eidx++;
 			return resName;
 		} catch (Exception err) {
