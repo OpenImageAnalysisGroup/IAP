@@ -272,7 +272,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		// ***Saved***
 		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-		double normFactor = distHorizontal != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
+		double normFactor = distHorizontal != null && options.getREAL_MARKER_DISTANCE() != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {

@@ -143,10 +143,10 @@ public class ConvexHullCalculator {
 		
 		if (polygon != null) {
 			rt.incrementCounter();
-			double normFactorArea = distHorizontal != null ? (realMarkerDist * realMarkerDist)
+			double normFactorArea = distHorizontal != null && realMarkerDist != null ? (realMarkerDist * realMarkerDist)
 					/ (distHorizontal * distHorizontal)
 					: 1;
-			double normFactor = distHorizontal != null ? realMarkerDist / distHorizontal : 1;
+			double normFactor = distHorizontal != null && realMarkerDist != null ? realMarkerDist / distHorizontal : 1;
 			
 			rt.addValue("hull.points", numberOfHullPoints);
 			int filledArea = io.countFilledPixels();

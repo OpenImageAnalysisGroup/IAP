@@ -47,7 +47,10 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 						+ exp.getExperimentName()
 						+ " in storage location "
 						+ m.getDatabaseName() + ".");
-				exp.getIniIoProvider().getInstance().reload();
+				if (exp.getIniIoProvider() != null)
+					exp.getIniIoProvider().getInstance().reload();
+				else
+					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), m));
 			} catch (Exception e) {
 				e.printStackTrace();
 				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");

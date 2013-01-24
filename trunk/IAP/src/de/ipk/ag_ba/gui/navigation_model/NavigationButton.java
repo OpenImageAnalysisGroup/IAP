@@ -32,6 +32,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
@@ -400,6 +401,9 @@ public class NavigationButton implements StyleAware {
 			final Runnable iconUpdateCheck) {
 		if (r_n1 == null || r_n.get() == null)
 			return;
+		if (iconUpdateCheck == null && r_n != null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: ICONUPDATECHECK IS NULL FOR " + r_n.get().getTitle());
+		
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
 			String lastImage = null;
@@ -420,8 +424,6 @@ public class NavigationButton implements StyleAware {
 						lastImage = ai;
 						if (iconUpdateCheck != null)
 							iconUpdateCheck.run();
-						else
-							System.out.println("ICONUPDATECHECK IS NULL FOR " + n.getTitle());
 					}
 					n1.setText(n.getTitle());
 					// System.out.println(n.getTitle());

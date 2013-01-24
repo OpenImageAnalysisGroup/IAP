@@ -25,6 +25,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+
 public class MongoDBhandler extends AbstractResourceIOHandler {
 	private final String prefix;
 	private final MongoDB m;
@@ -67,6 +69,10 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 				for (String fs : MongoGridFS.getFileCollectionsInclPreview()) {
 					InputStream vfs_is = m.getVFSinputStream(fs, url.getDetail());
 					if (vfs_is != null) {
+						if (vfs_is instanceof MyByteArrayInputStream) {
+							VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) vfs_is).getCount());
+						}
+						
 						or.setObject(vfs_is);
 						return;
 					}
@@ -85,6 +91,13 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 					if (fff != null) {
 						try {
 							InputStream is = fff.getInputStream();
+							if (is != null && is instanceof MyByteArrayInputStream) {
+								VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());
+							} else
+								if (is != null) {
+									is = ResourceIOManager.getInputStreamMemoryCached(is);
+									VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());
+								}
 							// is = decompressStream(is);
 							or.setObject(is);
 							return;

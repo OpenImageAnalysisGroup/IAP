@@ -116,6 +116,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public static DatabaseTarget determineDatabaseTarget(Collection<Sample3D> input, MongoDB m) {
 		DatabaseTarget databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
+		if (databaseTarget != null)
+			return databaseTarget;
 		String prefix = null;
 		if (input != null && !input.isEmpty()) {
 			prefix = input.iterator().next().getParentCondition().getExperimentDatabaseId().split(":")[0];
