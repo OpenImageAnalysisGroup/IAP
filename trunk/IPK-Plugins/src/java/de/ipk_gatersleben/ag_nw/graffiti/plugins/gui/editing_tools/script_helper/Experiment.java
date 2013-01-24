@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -292,17 +293,39 @@ public class Experiment implements ExperimentInterface {
 			ExperimentInterface mappingDataList,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean mergeExperimentsReturnOnlyOne) {
+		final ArrayList<StringBuilder> resSB = new ArrayList<StringBuilder>();
+		AppenderFactory af = new AppenderFactory() {
+			@Override
+			public Appender getNewAppender() {
+				StringBuilder sb = new StringBuilder();
+				resSB.add(sb);
+				Appender ap = new Appender(sb);
+				return ap;
+			}
+		};
+		try {
+			getStrings(af, mappingDataList, status, mergeExperimentsReturnOnlyOne);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		ArrayList<String> res = new ArrayList<String>();
+		while (!resSB.isEmpty()) {
+			StringBuilder sb = resSB.get(0);
+			resSB.remove(0);
+			res.add(sb.toString());
+		}
+		return res;
+	}
+	
+	public static void getStrings(
+			AppenderFactory appenderFactory,
+			ExperimentInterface mappingDataList,
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			boolean mergeExperimentsReturnOnlyOne) throws Exception {
 		
 		HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>> experimentName2substanceName2Conditions = new HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>>();
 		
 		String experimentNameForAll = null;
-		
-		// HashMap<String, Integer> conditionOffsetsForExperiments = new
-		// HashMap<String, Integer>();
-		// int experimentINDEX = 0;
-		// int experimentINDEXoffset = 50000; // maximale anzahl von
-		// experimenten
-		// und/oder conditions !!!
 		
 		if (status != null)
 			status.setCurrentStatusText2("Extracting metadata from elements");
@@ -318,14 +341,6 @@ public class Experiment implements ExperimentInterface {
 						experimentNameForAll = expName;
 					if (mergeExperimentsReturnOnlyOne)
 						expName = experimentNameForAll;
-					
-					// if
-					// (!conditionOffsetsForExperiments.containsKey(condition.getExperimentName()))
-					// {
-					// conditionOffsetsForExperiments.put(condition.getExperimentName(),
-					// (experimentINDEX++)
-					// * experimentINDEXoffset);
-					// }
 					
 					if (!experimentName2substanceName2Conditions
 							.containsKey(expName))
@@ -363,40 +378,55 @@ public class Experiment implements ExperimentInterface {
 				}
 			}
 		
-		ArrayList<String> docList = new ArrayList<String>();
 		if (status != null)
 			status.setCurrentStatusText2("Creating experiment header");
 		if (experimentName2substanceName2Conditions.isEmpty()) {
-			
-			StringBuilder r = new StringBuilder();
-			int measurementcount = 0;
-			
-			r.append("</measurements>");
-			r.append("</experimentdata>");
-			
-			StringBuilder r2 = new StringBuilder();
-			r2.append("<experimentdata>");
-			
 			ExperimentHeaderInterface eh = findHeader(
 					mappingDataList != null ? mappingDataList.getHeader()
 							: null, mappingDataList);
-			eh.toString(r2, measurementcount);
-			r2.append("<measurements>");
 			
-			r2.append(r);
+			StringBuilder r = new StringBuilder();
+			int measurementcount = 0;
+			r.append("<experimentdata>");
+			eh.toString(r, measurementcount);
+			r.append("<measurements>");
+			r.append("</measurements>");
+			r.append("</experimentdata>");
 			
-			docList.add(r2.toString());
+			appenderFactory.getNewAppender().append(r.toString());
+			
+			if (status != null)
+				status.setCurrentStatusText2("Finished processing empty dataset");
 		} else {
 			for (String expName : experimentName2substanceName2Conditions
 					.keySet()) {
 				
-				LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>> substances2conditions = experimentName2substanceName2Conditions
-						.get(expName);
+				Appender r = appenderFactory.getNewAppender();
+				
+				r.append("<experimentdata>");
+				
+				int measurementcount = 0;
+				LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>> substances2conditions =
+						experimentName2substanceName2Conditions.get(expName);
 				ConditionInterface c1 = substances2conditions.values()
 						.iterator().next().values().iterator().next();
 				
-				StringBuilder r = new StringBuilder();
-				int measurementcount = 0;
+				for (String substance : substances2conditions.keySet()) {
+					for (ConditionInterface sd : substances2conditions.get(substance).values()) {
+						for (SampleInterface sample : sd)
+							measurementcount += sample.size();
+					}
+				}
+				
+				ExperimentHeaderInterface eh = findHeader(
+						c1.getExperimentHeader(), mappingDataList);
+				{
+					StringBuilder rr = new StringBuilder();
+					eh.toString(rr, measurementcount);
+					r.append(rr.toString());
+				}
+				r.append("<measurements>");
+				
 				for (String substance : substances2conditions.keySet()) {
 					if (status != null)
 						status.setCurrentStatusText2("Process " + substance);
@@ -406,40 +436,23 @@ public class Experiment implements ExperimentInterface {
 					for (SubstanceInterface sub : mappingDataList)
 						if (sub.getName().equals(substance))
 							s = sub;
-					
-					s.getSubstanceString(r);
-					for (ConditionInterface sd : substances2conditions.get(
-							substance).values()) {
-						// int oldid = sd.getRowId();
-						// sd.setRowId(oldid +
-						// conditionOffsetsForExperiments.get(sd.getExperimentName()));
-						sd.getStringForDocument(r);
-						// sd.setRowId(oldid);
-						for (SampleInterface sample : sd)
-							measurementcount += sample.size();
+					{
+						StringBuilder rr = new StringBuilder();
+						s.getSubstanceString(rr);
+						for (ConditionInterface sd : substances2conditions.get(substance).values()) {
+							sd.getStringForDocument(rr);
+						}
+						rr.append("</substance>");
+						r.append(rr.toString());
 					}
-					r.append("</substance>");
 				}
 				
 				r.append("</measurements>");
 				r.append("</experimentdata>");
-				
-				StringBuilder r2 = new StringBuilder();
-				r2.append("<experimentdata>");
-				
-				ExperimentHeaderInterface eh = findHeader(
-						c1.getExperimentHeader(), mappingDataList);
-				
-				eh.toString(r2, measurementcount);
-				r2.append("<measurements>");
-				
-				r2.append(r);
-				
-				docList.add(r2.toString());
 			}
+			if (status != null)
+				status.setCurrentStatusText2("Created String repreentation");
 		}
-		
-		return docList;
 	}
 	
 	private static ExperimentHeaderInterface findHeader(
@@ -538,7 +551,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-	
+
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
@@ -1212,5 +1225,18 @@ public class Experiment implements ExperimentInterface {
 		String s2 = sample2.getMeasurementtool() + ";" + sample2.getTime() + ";" + sample2.getTimeUnit() + ";" + sample2.getTtestInfo().name();
 		return s1.equals(s2);
 		
+	}
+	
+	public static void write(ExperimentInterface ei, BackgroundTaskStatusProviderSupportingExternalCall optStatus, final OutputStream outputStream)
+			throws Exception {
+		AppenderFactory af = new AppenderFactory() {
+			@Override
+			public Appender getNewAppender() {
+				Appender ap = new Appender(outputStream);
+				return ap;
+			}
+		};
+		getStrings(af, ei, optStatus, true);
+		outputStream.close();
 	}
 }
