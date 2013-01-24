@@ -55,7 +55,7 @@ public class Substance implements SubstanceInterface {
 		res.append("<tr><td>new_blast_e_val</td><td>" + new_blast_e_val + "</td></tr>");
 		res.append("<tr><td>new_blast_score</td><td>" + new_blast_score + "</td></tr>");
 		res.append("<tr><td>affy_hit</td><td>" + new_blast_score + "</td></tr>");
-		res.append("<tr><td>scroe</td><td>" + score + "</td></tr>");
+		res.append("<tr><td>score</td><td>" + score + "</td></tr>");
 		res.append("<tr><td>secure</td><td>" + secure + "</td></tr>");
 		res.append("<tr><td>row ID</td><td>" + rowId + "</td></tr>");
 		res.append("</table></html>");
