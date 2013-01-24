@@ -839,12 +839,17 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			ExperimentInterface ei,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
-		TextFile tf = new TextFile();
-		tf.add(Experiment.getString(ei, optStatus));
 		VfsFileObject f = vfs.newVfsFile(hsmManager.prepareAndGetDataFileNameAndPath(
 				experiment.getHeader(), null, "in_progress_"
 						+ UUID.randomUUID().toString()), true);
-		tf.write(f.getOutputStream()); // to temp file
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Dumping data structure into XML file. Prepare: perform GC. Memory Status: "
+				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
+		System.gc();
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Begin dumping data structure into XML file... (Memory Status: "
+				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
+		Experiment.write(ei, optStatus, f.getOutputStream()); // to temp file
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Finished dumping data structure into XML file. (Memory Status: "
+				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
 		// f.setExecutable(false);
 		// f.setWritable(false);
 		if (ei.getStartDate() != null)
