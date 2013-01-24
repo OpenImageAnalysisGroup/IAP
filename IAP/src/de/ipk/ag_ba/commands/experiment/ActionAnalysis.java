@@ -67,7 +67,7 @@ public class ActionAnalysis extends AbstractNavigationAction {
 			actions.add(new NavigationButton(ac, src.getGUIsetting()));
 			
 			actions.add(new NavigationButton(
-					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference),
+					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference, m),
 					src.getGUIsetting()));
 			
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);

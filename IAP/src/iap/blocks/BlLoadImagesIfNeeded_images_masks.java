@@ -33,7 +33,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 						.setMasks(new FlexibleImageSet(input().masks()));
 			
 			if (input().images().vis() == null
-					&& input().images().getVisInfo() != null) {
+					&& input().images().getVisInfo() != null && getBoolean("Load VIS", true)) {
 				IOurl url = input().images().getVisInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
@@ -65,7 +65,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 			
 			if (input().images().fluo() == null
-					&& input().images().getFluoInfo() != null) {
+					&& input().images().getFluoInfo() != null && getBoolean("Load FLUO", true)) {
 				IOurl url = input().images().getFluoInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
@@ -97,7 +97,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 			
 			if (input().images().nir() == null
-					&& input().images().getNirInfo() != null) {
+					&& input().images().getNirInfo() != null && getBoolean("Load NIR", true)) {
 				IOurl url = input().images().getNirInfo().getURL();
 				try {
 					FlexibleImage fi = new FlexibleImage(url);
@@ -130,7 +130,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		}
 		
 		if (input().images().ir() == null
-				&& input().images().getIrInfo() != null) {
+				&& input().images().getIrInfo() != null && getBoolean("Load IR", true)) {
 			IOurl url = input().images().getIrInfo().getURL();
 			try {
 				FlexibleImage fi = new FlexibleImage(url);

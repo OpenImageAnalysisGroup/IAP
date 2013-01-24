@@ -177,7 +177,7 @@ public class BlCalcWidthAndHeight extends
 								});
 					}
 				
-				if (distHorizontal != null) {
+				if (distHorizontal != null && realMarkerDistHorizontal != null) {
 					getProperties()
 							.setNumericProperty(
 									getBlockPosition(),

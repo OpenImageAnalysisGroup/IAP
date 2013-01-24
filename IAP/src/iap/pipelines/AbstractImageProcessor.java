@@ -120,7 +120,8 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 							System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
 									+ "! (block is not added to pipeline!)");
 					} catch (ClassNotFoundException cnfe) {
-						System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block)");
+						System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block). Pipeline: "
+								+ so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", false));
 					}
 				}
 			}
