@@ -15,10 +15,11 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private final MongoTreeNode projectNode;
 	private boolean sizeDirty = true;
 	
-	private String size = "????????? kb";
+	private String size = "";
 	private final ExperimentReference experiment;
 	private final ActionListener sizeChangedListener;
 	private String tooltip;
+	private boolean isGroupNode = false;
 	
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener,
 			ExperimentReference expRef,
@@ -51,17 +52,17 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	
 	@Override
 	public String toString() {
-		if (projectNode == null && !(getExperimentName() == null)) {
-			if (readOnly)
-				return title + " [" + size + "]";
-			else
-				return title + " [" + size + "]";
-		} else {
-			if (readOnly)
-				return title;
-			else
-				return title;
-		}
+		// if (projectNode == null && !(getExperimentName() == null)) {
+		// if (readOnly)
+		// return title + (size.isEmpty() ? "" : " [" + size + "]");
+		// else
+		// return title + (size.isEmpty() ? "" : " [" + size + "]");
+		// } else {
+		// if (readOnly)
+		// return title;
+		// else
+		return title;
+		// }
 	}
 	
 	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) throws InterruptedException {
@@ -146,6 +147,14 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	
 	public String getTooltipInfo() {
 		return tooltip;
+	}
+	
+	public void setIsGroup(boolean isGroupNode) {
+		this.isGroupNode = isGroupNode;
+	}
+	
+	public boolean isGroupNode() {
+		return isGroupNode;
 	}
 	
 }

@@ -1,9 +1,11 @@
 package de.ipk.ag_ba.gui.images;
 
+import java.awt.Color;
 import java.awt.Image;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class IAPimages {
 	
@@ -11,6 +13,12 @@ public class IAPimages {
 	
 	public static Image getImage(String image) {
 		return IAPservice.getImage(IAPmain.class, image);
+	}
+	
+	public static Image getImage(String image, int maxSize) {
+		Image img = IAPservice.getImage(IAPmain.class, image);
+		FlexibleImage f = new FlexibleImage(img);
+		return f.resize(maxSize, maxSize, true).io().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).getAsBufferedImage();
 	}
 	
 	public static String saveAsArchive() {
@@ -181,4 +189,13 @@ public class IAPimages {
 	public static String getComputerOffline() {
 		return "img/ext/gpl2/Gnome-Network-Offline-64.png";
 	}
+	
+	public static String getCamera() {
+		return "img/ext/camera.png";
+	}
+	
+	public static String getSystemWheel() {
+		return "img/ext/applications2.png";
+	}
+	
 }
