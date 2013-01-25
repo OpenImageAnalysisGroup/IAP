@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import org.StringManipulationTools;
-
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -49,7 +47,6 @@ public class GetSubstances implements Runnable {
 						if (!substancePrefixNames.containsKey(pre))
 							substancePrefixNames.put(pre, new HashSet<SubstanceInterface>());
 						substancePrefixNames.get(pre).add(substance);
-						System.out.println("Sub-Category: " + (validPrefix != null ? validPrefix + "." : "") + sn.split("\\.")[0]);
 						substancesPutIntoSubGroup.add(substance);
 					}
 				}
@@ -103,8 +100,6 @@ public class GetSubstances implements Runnable {
 				children.add(substNode);
 			}
 		}
-		System.out.println("Valid Prefix: " + validPrefix + ", Children: " + children.size() + ", Values: "
-				+ StringManipulationTools.getStringList(children, ", "));
 		projectNode.setChildren(children.toArray(new DBEtreeNodeModelHelper[0]));
 	}
 }
