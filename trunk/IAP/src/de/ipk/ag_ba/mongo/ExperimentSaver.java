@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -335,6 +336,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		// dbSubstances.add(substance);
 		
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
+		final HashSet<String> savedUrls = new HashSet<String>();
 		
 		int nLock = multiThreadedStorage ? 5 : 1;
 		final Semaphore lock = new Semaphore(nLock, true);
@@ -349,7 +351,7 @@ public class ExperimentSaver implements RunnableOnDB {
 								overallFileSize, startTime, conditions,
 								errorCount,
 								lastTransferSum, lastTime, count, errors,
-								numberOfBinaryData, conditionIDs, c, mh, m);
+								numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
 					} catch (Exception e) {
 						e.printStackTrace();
 						errorCount.addLong(1);
@@ -496,7 +498,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			final StringBuilder errors, final int numberOfBinaryData,
 			ArrayList<String> conditionIDs,
 			ConditionInterface c,
-			MongoDBhandler mh, MongoDB mo) throws InterruptedException, ExecutionException {
+			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
 		// if (status != null && status.wantsToStop())
 		// break;
 		
@@ -569,7 +571,7 @@ public class ExperimentSaver implements RunnableOnDB {
 								res = DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 							else
 								res = saveImageFileDirect(cols, db, id, overallFileSize,
-										keepDataLinksToDataSource_safe_space, mh, hashType, mo);
+										keepDataLinksToDataSource_safe_space, mh, hashType, mo, savedUrls);
 							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 								errorCount.addLong(1);
 								errors.append("<li>" + id.getURL().getFileName());
@@ -896,7 +898,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	@SuppressWarnings("resource")
 	public static DatabaseStorageResult saveImageFileDirect(CollectionStorage cols, final DB db, final ImageData image, final ObjectRef fileSize,
 			final boolean keepRemoteURLs_safe_space, MongoDBhandler mh, HashType hashType,
-			MongoDB m)
+			MongoDB m, HashSet<String> savedUrls)
 			throws Exception, IOException {
 		// if the image data source is equal to the target (determined by the prefix),
 		// the image content does not need to be copied (assumption valid while using MongoDB data storage)
@@ -922,15 +924,16 @@ public class ExperimentSaver implements RunnableOnDB {
 					
 					String hashMain = (String) knownURL.get("hash");
 					GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
-					
-					String hashLabel = (String) knownLabelURL.get("hash");
-					GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
-					if (fffMain != null && fffLabel != null && hashMain != null && hashLabel != null) {
-						image.getURL().setPrefix(mh.getPrefix());
-						image.getURL().setDetail(hashMain);
-						image.getLabelURL().setPrefix(mh.getPrefix());
-						image.getLabelURL().setDetail(hashLabel);
-						return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+					if (fffMain != null) {
+						String hashLabel = (String) knownLabelURL.get("hash");
+						GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
+						if (fffMain != null && fffLabel != null && hashMain != null && hashLabel != null) {
+							image.getURL().setPrefix(mh.getPrefix());
+							image.getURL().setDetail(hashMain);
+							image.getLabelURL().setPrefix(mh.getPrefix());
+							image.getLabelURL().setDetail(hashLabel);
+							return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+						}
 					}
 				}
 			}
@@ -939,15 +942,30 @@ public class ExperimentSaver implements RunnableOnDB {
 		// BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 2);
 		byte[] isMain = null;
 		byte[] isLabel = null;
+		boolean skipMainSaving = false;
+		boolean skipLabelSaving = false;
+		String skipMainUrl = image.getURL() + "";
+		String skipLabelUrl = image.getLabelURL() + "";
 		try {
 			try {
-				isMain = image.getURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed() : null;
+				synchronized (savedUrls) {
+					if (savedUrls.contains(skipMainUrl))
+						skipMainSaving = true;
+				}
+				isMain = image.getURL() != null && !skipMainSaving
+						? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed()
+						: null;
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Error: No Inputstream for " + image.getURL() + ". " + e.getMessage() + " // " + SystemAnalysis.getCurrentTime(), e);
 			}
 			try {
-				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()))
-					isLabel = image.getLabelURL() != null ? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed() : null;
+				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL())) {
+					if (savedUrls.contains(skipLabelUrl))
+						skipLabelSaving = true;
+					isLabel = image.getLabelURL() != null && !skipLabelSaving
+							? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed()
+							: null;
+				}
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Error: No Inputstream for " + image.getLabelURL() + ". " + e.getMessage() + " // "
 						+ SystemAnalysis.getCurrentTime(), e);
@@ -955,22 +973,13 @@ public class ExperimentSaver implements RunnableOnDB {
 		} finally {
 			// BackgroundTaskHelper.lockRelease(image.getURL() != null ? image.getURL().getPrefix() : "in");
 		}
-		if (isMain == null) {
-			MongoDB.saveSystemMessage("No input stream for source-URL:  " + image.getURL());
-			return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
-		}
-		if (image.getLabelURL() != null && isLabel == null) {
-			// System.out.println("No input stream for source-URL (label):  " + image.getURL());
-			// return DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
-		}
 		
 		String[] hashes;
 		
 		hashes = GravistoServiceExt.getHashFromInputStream(new InputStream[] {
 				isMain != null && isMain.length > 0 ? new MyByteArrayInputStream(isMain) : null,
 				isLabel != null && isLabel.length > 0 ? new MyByteArrayInputStream(isLabel) : null
-		},
-				new ObjectRef[] { fileSize, fileSize }, hashType, false);
+		}, new ObjectRef[] { fileSize, fileSize }, hashType, false);
 		
 		String hashMain = hashes[0];
 		String hashLabel = hashes[1];
@@ -1001,16 +1010,15 @@ public class ExperimentSaver implements RunnableOnDB {
 			}
 		}
 		
-		GridFSDBFile fffMain = cols.gridfs_images.findOne(hashMain);
-		image.getURL().setPrefix(mh.getPrefix());
-		image.getURL().setDetail(hashMain);
-		
+		GridFSDBFile fffMain = hashMain != null ? cols.gridfs_images.findOne(hashMain) : null;
+		if (hashMain != null) {
+			image.getURL().setPrefix(mh.getPrefix());
+			image.getURL().setDetail(hashMain);
+		}
 		GridFSDBFile fffLabel = null;
 		if (hashLabel != null && image.getLabelURL() != null) {
 			fffLabel = cols.gridfs_label_files.findOne(hashLabel);
 		}
-		
-		// GridFSDBFile fffPreview = null;// gridfs_preview_files.findOne(hashMain);
 		
 		if (fffMain != null && fffMain.getLength() <= 0) {
 			cols.gridfs_images.remove(fffMain);
@@ -1020,10 +1028,6 @@ public class ExperimentSaver implements RunnableOnDB {
 			cols.gridfs_images.remove(fffLabel);
 			fffLabel = null;
 		}
-		// if (fffPreview != null && fffPreview.getLength() <= 0) {
-		// gridfs_images.remove(fffPreview);
-		// fffPreview = null;
-		// }
 		
 		if (hashLabel != null && image.getLabelURL() != null) {
 			if (fffLabel != null) {
@@ -1049,7 +1053,8 @@ public class ExperimentSaver implements RunnableOnDB {
 					a != null ? a.getCount() : 0,
 					b != null ? b.getCount() : 0,
 					c != null ? c.getCount() : 0,
-					fffMain == null, fffLabel == null, m);
+					fffMain == null, fffLabel == null, m,
+					skipMainUrl, skipLabelUrl, savedUrls);
 			
 			if (saved) {
 				return DatabaseStorageResult.STORED_IN_DB;
@@ -1096,7 +1101,8 @@ public class ExperimentSaver implements RunnableOnDB {
 	public static boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
 			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel,
 			long expectedLengthMain, long expectedLengthLabel, long expectedLengthPreview,
-			boolean storeMain, boolean storeLabel, MongoDB m) throws IOException {
+			boolean storeMain, boolean storeLabel, MongoDB m,
+			String skipMainUrl, String skipLabelUrl, HashSet<String> savedUrls) throws IOException {
 		boolean allOK = true;
 		
 		try {
@@ -1134,6 +1140,14 @@ public class ExperimentSaver implements RunnableOnDB {
 				if (fs != null && hash != null && is != null)
 					if (m.saveStream(hash, is, fs, expLen) < 0)
 						allOK = false;
+					else {
+						synchronized (savedUrls) {
+							if (idx == 1)
+								savedUrls.add(skipMainUrl);
+							if (idx == 2)
+								savedUrls.add(skipLabelUrl);
+						}
+					}
 			}
 		} catch (Exception e) {
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: SAVING IMAGE FILE TO MONGDB FAILED WITH EXCEPTION: " + e.getMessage());

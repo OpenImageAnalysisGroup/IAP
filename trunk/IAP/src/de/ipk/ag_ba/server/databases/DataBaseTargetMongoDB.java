@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.server.databases;
 
 import java.io.InputStream;
+import java.util.HashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -55,7 +56,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 					DatabaseStorageResult dsr =
 							ExperimentSaver.saveImageFileDirect(
 									cols, db, limg, null,
-									keepRemoteURLs_safe_space, m.getMongoHandler(), m.getHashType(), m);
+									keepRemoteURLs_safe_space, m.getMongoHandler(), m.getHashType(), m,
+									new HashSet<String>());
 					tso.setParam(0, dsr);
 				} catch (Exception e) {
 					tso.setParam(1, e);
