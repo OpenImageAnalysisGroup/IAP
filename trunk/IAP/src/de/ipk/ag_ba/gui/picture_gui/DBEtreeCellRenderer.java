@@ -14,6 +14,8 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -26,17 +28,6 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
-						int row, boolean hasFocus) {
-		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		if (leaf && !isValidDBEtreeNode(value)) {
-			setToolTipText(null); // no tool tip
-			setIcon(null);
-		}
-		return this;
-	}
-	
 	protected boolean isValidDBEtreeNode(Object value) {
 		if (value instanceof MongoTreeNode) {
 			MongoTreeNode dtn = (MongoTreeNode) value;
@@ -46,5 +37,48 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 				return true;
 		}
 		return false;
+	}
+	
+	ImageIcon cameraRendererIcon, groupRendererIcon;
+	
+	public void setGroupRendererIcon(ImageIcon groupRendererIcon) {
+		this.groupRendererIcon = groupRendererIcon;
+	}
+	
+	public void setCameraRendererIcon(ImageIcon cameraRendererIcon) {
+		this.cameraRendererIcon = cameraRendererIcon;
+	};
+	
+	public Component getTreeCellRendererComponent(JTree tree,
+			Object value, boolean selected, boolean expanded,
+			boolean leaf, int row, boolean hasFocus) {
+		
+		Component ret = super.getTreeCellRendererComponent(tree, value,
+				selected, expanded, leaf, row, hasFocus);
+		
+		JLabel label = (JLabel) ret;
+		
+		if (value instanceof MongoTreeNode) {
+			MongoTreeNode mtn = (MongoTreeNode) value;
+			if (groupRendererIcon != null && mtn.isGroupNode())
+				label.setIcon(groupRendererIcon);
+			else
+				if (cameraRendererIcon != null) {
+					String n = mtn.toString();
+					if ((n.endsWith(".top") || n.endsWith(".side")) &&
+							(n.startsWith("vis.") || n.startsWith("fluo.") || n.startsWith("nir.") || n.startsWith("ir.")))
+						label.setIcon(cameraRendererIcon);
+				}
+		}
+		
+		if (leaf && !isValidDBEtreeNode(value)) {
+			setToolTipText(null); // no tool tip
+			setIcon(null);
+		}
+		
+		String tt = ((MongoTreeNode) value).getTooltipInfo();
+		label.setToolTipText(tt);
+		
+		return ret;
 	}
 }
