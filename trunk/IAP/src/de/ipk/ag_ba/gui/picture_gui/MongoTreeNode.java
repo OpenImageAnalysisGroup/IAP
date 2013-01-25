@@ -20,6 +20,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private final ActionListener sizeChangedListener;
 	private String tooltip;
 	private boolean isGroupNode = false;
+	private boolean isSampleNode;
 	
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener,
 			ExperimentReference expRef,
@@ -155,6 +156,14 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	
 	public boolean isGroupNode() {
 		return isGroupNode;
+	}
+	
+	public void setIsSample(boolean isSampleNode) {
+		this.isSampleNode = isSampleNode;
+	}
+	
+	public boolean isSampleNode() {
+		return isSampleNode;
 	}
 	
 }

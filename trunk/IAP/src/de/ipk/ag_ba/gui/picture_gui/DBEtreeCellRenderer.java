@@ -20,6 +20,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
@@ -39,7 +41,7 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 		return false;
 	}
 	
-	ImageIcon cameraRendererIcon, groupRendererIcon;
+	ImageIcon cameraRendererIcon, groupRendererIcon, timeRendererIcon;
 	
 	public void setGroupRendererIcon(ImageIcon groupRendererIcon) {
 		this.groupRendererIcon = groupRendererIcon;
@@ -47,6 +49,10 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 	
 	public void setCameraRendererIcon(ImageIcon cameraRendererIcon) {
 		this.cameraRendererIcon = cameraRendererIcon;
+	}
+	
+	public void setTimeRendererIcon(ImageIcon timeRendererIcon) {
+		this.timeRendererIcon = timeRendererIcon;
 	};
 	
 	public Component getTreeCellRendererComponent(JTree tree,
@@ -60,15 +66,20 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 		
 		if (value instanceof MongoTreeNode) {
 			MongoTreeNode mtn = (MongoTreeNode) value;
-			if (groupRendererIcon != null && mtn.isGroupNode())
-				label.setIcon(groupRendererIcon);
+			if (timeRendererIcon != null && mtn.isSampleNode())
+				label.setIcon(timeRendererIcon);
 			else
-				if (cameraRendererIcon != null) {
-					String n = mtn.toString();
-					if ((n.endsWith(".top") || n.endsWith(".side")) &&
-							(n.startsWith("vis.") || n.startsWith("fluo.") || n.startsWith("nir.") || n.startsWith("ir.")))
-						label.setIcon(cameraRendererIcon);
-				}
+				if (groupRendererIcon != null && mtn.isGroupNode())
+					label.setIcon(groupRendererIcon);
+				else
+					if (cameraRendererIcon != null) {
+						if (mtn.getTargetEntity() != null && (mtn.getTargetEntity() instanceof SubstanceInterface)) {
+							String n = ((SubstanceInterface) mtn.getTargetEntity()).getName();
+							if ((n.endsWith(".top") || n.endsWith(".side")) &&
+									(n.startsWith("vis.") || n.startsWith("fluo.") || n.startsWith("nir.") || n.startsWith("ir.")))
+								label.setIcon(cameraRendererIcon);
+						}
+					}
 		}
 		
 		if (leaf && !isValidDBEtreeNode(value)) {
