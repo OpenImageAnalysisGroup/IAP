@@ -198,4 +198,8 @@ public class IAPimages {
 		return "img/ext/applications2.png";
 	}
 	
+	public static String getClock() {
+		return "img/ext/gpl2/time.png";
+	}
+	
 }

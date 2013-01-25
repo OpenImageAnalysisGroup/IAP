@@ -135,7 +135,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 			url = new IOurl(url.toString().split(",")[0]);
 		}
 		
-		return super.getPreviewInputStream(url);
+		return null;
 	}
 	
 	public static IOurl getLemnaTecFTPurl(String filename, String displayFileName) {

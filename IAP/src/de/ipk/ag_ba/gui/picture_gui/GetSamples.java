@@ -46,6 +46,7 @@ final class GetSamples implements Runnable {
 			
 			long firstTime = 0;
 			long lastTime = 0;
+			sampNode.setIsSample(true);
 			sampNode.setIsLeaf(false);
 			sampNode.setIndex(p++);
 			String key = sample.getTime() + " / " + sample.getTimeUnit();

@@ -136,6 +136,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		DBEtreeCellRenderer cir = new DBEtreeCellRenderer();
 		cir.setCameraRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getCamera(), 16)));
 		cir.setGroupRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getSystemWheel(), 16)));
+		cir.setTimeRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getClock(), 16)));
 		
 		ToolTipManager.sharedInstance().registerComponent(expTree);
 		
