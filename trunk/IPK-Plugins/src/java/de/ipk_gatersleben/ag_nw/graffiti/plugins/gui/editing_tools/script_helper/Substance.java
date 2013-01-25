@@ -99,8 +99,9 @@ public class Substance implements SubstanceInterface {
 					} else
 						if (childElement.getName().equals("measurements")) {
 							
-							List<?> measurementChildrenList = childElement.getChildren();
-							for (Object o2 : measurementChildrenList) {
+							List cl = childElement.getChildren();
+							while (!cl.isEmpty()) {
+								Object o2 = cl.remove(0);
 								if (o2 instanceof Element) {
 									Element substanceElement = (Element) o2;
 									SubstanceInterface m = Experiment.getTypeManager().getNewSubstance();

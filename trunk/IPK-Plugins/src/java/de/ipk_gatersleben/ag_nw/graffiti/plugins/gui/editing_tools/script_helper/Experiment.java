@@ -36,6 +36,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -1096,12 +1097,16 @@ public class Experiment implements ExperimentInterface {
 		return md;
 	}
 	
-	public static Experiment loadFromXmlBinInputStream(InputStream is) throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document w3Doc = builder.parse(is);
-		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
-		return md;
+	public static Experiment loadFromXmlBinInputStream(InputStream is) throws Exception {
+		// DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		// DocumentBuilder builder = factory.newDocumentBuilder();
+		// Document w3Doc = builder.parse(is);
+		// Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		// return md;
+		
+		SAXBuilder sb = new SAXBuilder();
+		org.jdom.Document doc = sb.build(is);
+		return Experiment.getExperimentFromJDOM(doc);
 	}
 	
 	@Override
