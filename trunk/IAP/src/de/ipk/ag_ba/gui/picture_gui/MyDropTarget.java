@@ -193,7 +193,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	public void addImageOrFileToDatabase(final File file, final boolean deleteUponCompletion) throws InterruptedException {
 		final DataSetFileButton imageButton = new DataSetFileButton(m, targetTreeNode,
 				"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
-						"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null); //$NON-NLS-1$//$NON-NLS-2$
+						"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null, false); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
 		imageButton.showProgressbar();
 		imageButton.setIsAttachment();
@@ -223,7 +223,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					@Override
 					public void run() {
 						// imageButton.setIcon(icon);
-						imageButton.updateLayout(imageButton.mmlbl.getText(), icon, icon);
+						imageButton.updateLayout(imageButton.mmlbl.getText(), icon, icon, false);
 					}
 				});
 				if (DataSetFileButton.getMaxString(file.getName()).endsWith("..."))

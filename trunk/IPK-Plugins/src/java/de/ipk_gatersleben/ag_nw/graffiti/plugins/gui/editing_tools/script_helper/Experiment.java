@@ -1,8 +1,10 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1110,8 +1112,20 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	@Override
-	public void saveToFile(String fileName) throws IOException {
-		TextFile.write(fileName, toString());
+	public void saveToFile(String fileName) throws Exception {
+		
+		final OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fileName));
+		
+		AppenderFactory af = new AppenderFactory() {
+			@Override
+			public Appender getNewAppender() {
+				return new Appender(outputStream);
+			}
+		};
+		getStrings(af, this, null, true);
+		outputStream.close();
+		// old: TextFile.write(fileName, toString());
+		// very old:
 		// stream = new FileOutputStream(xmlFile);
 		// org.jdom.Document dd = JDOM2DOM.getJDOMfromDOM(getDocument());
 		// out.output(dd, stream);

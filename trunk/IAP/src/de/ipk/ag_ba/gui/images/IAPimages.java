@@ -202,4 +202,7 @@ public class IAPimages {
 		return "img/ext/gpl2/time.png";
 	}
 	
+	public static String getHistogramIcon() {
+		return "img/ext/applications-office.png";
+	}
 }

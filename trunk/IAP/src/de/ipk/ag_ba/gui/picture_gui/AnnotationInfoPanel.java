@@ -57,21 +57,21 @@ public class AnnotationInfoPanel extends JPanel {
 	}
 	
 	private ArrayList<JComponent> getAnnotationElements(boolean onlyChecked) {
-		if (cbO == null) {
+		if (cbO == null && imageButton.imageResult != null) {
 			cbO = new JCheckBox("Outlier");
 			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
 			if (mde != null && mde instanceof ImageData) {
 				modifyFlagGui((ImageData) mde, "outlier", cbO);
 			}
 		}
-		if (cbF == null) {
+		if (cbF == null && imageButton.imageResult != null) {
 			cbF = new JCheckBox("Flagged");
 			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
 			if (mde != null && mde instanceof ImageData) {
 				modifyFlagGui((ImageData) mde, "flagged", cbF);
 			}
 		}
-		if (annotationLabel == null) {
+		if (annotationLabel == null && imageButton.imageResult != null) {
 			annotationLabel = new JLabel("");
 			MappingDataEntity mde = imageButton.imageResult.getBinaryFileInfo().entity;
 			if (mde != null && mde instanceof ImageData) {

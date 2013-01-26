@@ -60,8 +60,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_class
 
 /**
  * @author klukas
- *         To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Generation - Code and Comments
  */
 public class XmlDataChartComponent extends JComponent {
 	private static final long serialVersionUID = 1L;
@@ -75,6 +73,20 @@ public class XmlDataChartComponent extends JComponent {
 		if (experiment == null)
 			return;
 		
+		initGUI(preferredChartType, graph, ge, experiment);
+	}
+	
+	public XmlDataChartComponent(ExperimentInterface experiment, String preferredChartType, Graph graph, org.graffiti.graph.GraphElement ge) {
+		
+		if (ge == null || ge.getGraph() == null)
+			return;
+		if (experiment == null)
+			return;
+		
+		initGUI(preferredChartType, graph, ge, experiment);
+	}
+	
+	private void initGUI(String preferredChartType, Graph graph, org.graffiti.graph.GraphElement ge, ExperimentInterface experiment) {
 		Integer mappedDataListSize = experiment.size();
 		
 		int currentXposition = 0;
