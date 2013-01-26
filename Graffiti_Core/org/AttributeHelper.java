@@ -76,7 +76,7 @@ import org.graffiti.plugin.io.resources.IOurl;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -473,6 +473,7 @@ public class AttributeHelper implements HelperClass {
 		idToNiceId.put("grouppart", "KEGG: Part of Group");
 		idToNiceId.put("node_showGridCategory", chartAll + ": Show Category Grid");
 		idToNiceId.put("node_showGridRange", chartAll + ": Show Range Grid");
+		idToNiceId.put("node_removeEmptyConditions", chartAll + ": Remove Empty Conditions");
 		
 		idToNiceId.put("node_categoryBackgroundColorA", chartDiagram + ":<html>&nbsp;Background Color left of A");
 		idToNiceId.put("node_categoryBackgroundColorB", chartDiagram

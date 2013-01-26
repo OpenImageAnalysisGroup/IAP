@@ -86,7 +86,7 @@ public class XmlDataChartComponent extends JComponent {
 		initGUI(preferredChartType, graph, ge, experiment);
 	}
 	
-	private void initGUI(String preferredChartType, Graph graph, org.graffiti.graph.GraphElement ge, ExperimentInterface experiment) {
+	public void initGUI(String preferredChartType, Graph graph, org.graffiti.graph.GraphElement ge, ExperimentInterface experiment) {
 		Integer mappedDataListSize = experiment.size();
 		
 		int currentXposition = 0;
@@ -131,7 +131,7 @@ public class XmlDataChartComponent extends JComponent {
 			BioStatisticalCategoryDataset dataset = null;
 			
 			try {
-				dataset = getDataset(xmldata, graph, SalsoUsedForPlottingStdDev, SshowOnlyHalfErrorBar, SfillTimeGaps, false);
+				dataset = getDataset(xmldata, graph, SalsoUsedForPlottingStdDev, SshowOnlyHalfErrorBar, SfillTimeGaps, removeEmptyConditions);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 				continue;

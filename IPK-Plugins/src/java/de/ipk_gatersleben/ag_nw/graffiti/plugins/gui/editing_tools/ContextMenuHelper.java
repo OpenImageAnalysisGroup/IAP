@@ -67,7 +67,6 @@ public class ContextMenuHelper implements HelperClass {
 												.getMainFrame()
 												.getActiveEditorSession();
 		if (session == null) {
-			MainFrame.showMessageDialog("No graph loaded or active!", "Error");
 			return null;
 		} else {
 			Selection selection = session.getSelectionModel().getActiveSelection();

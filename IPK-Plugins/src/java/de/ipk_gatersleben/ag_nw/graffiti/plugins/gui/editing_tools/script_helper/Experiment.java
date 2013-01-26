@@ -1258,4 +1258,34 @@ public class Experiment implements ExperimentInterface {
 		getStrings(af, ei, optStatus, true);
 		outputStream.close();
 	}
+	
+	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(Collection<SubstanceInterface> toBeExtracted) {
+		Experiment experiment = new Experiment();
+		if (toBeExtracted.isEmpty())
+			return experiment;
+		experiment.setHeader(toBeExtracted.iterator().next().iterator().next().getExperimentHeader().clone());
+		for (SubstanceInterface sub : toBeExtracted) {
+			SubstanceInterface su = sub.clone();
+			for (ConditionInterface c : sub) {
+				ConditionInterface cu = c.clone(su);
+				for (SampleInterface si : c) {
+					SampleInterface sic = si.clone(cu);
+					for (NumericMeasurementInterface nmi : si) {
+						NumericMeasurementInterface nmic = nmi.clone(sic);
+						sic.add(nmic);
+					}
+					cu.add(sic);
+				}
+				su.add(cu);
+			}
+			experiment.add(su);
+		}
+		return experiment;
+	}
+	
+	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(SubstanceInterface toBeExtracted) {
+		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>();
+		sl.add(toBeExtracted);
+		return copyAndExtractSubtanceInclusiveData(sl);
+	}
 }

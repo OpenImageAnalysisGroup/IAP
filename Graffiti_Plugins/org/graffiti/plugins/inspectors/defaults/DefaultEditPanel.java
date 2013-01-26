@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultEditPanel.java,v 1.1 2011-01-31 09:03:29 klukas Exp $
+// $Id: DefaultEditPanel.java,v 1.2 2013-01-26 18:02:16 klukas Exp $
 
 package org.graffiti.plugins.inspectors.defaults;
 
@@ -86,7 +86,7 @@ import org.graffiti.util.PluginHelper;
 /**
  * Represents the edit panel in the inspector.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 @SuppressWarnings("unchecked")
 public class DefaultEditPanel extends EditPanel {
@@ -102,7 +102,7 @@ public class DefaultEditPanel extends EditPanel {
 	// ~ Instance fields ========================================================
 	
 	/** Action for the apply button. */
-	private final Action applyAction;
+	private Action applyAction;
 	
 	/** The attribute that was last specified by buildTable. */
 	Attribute displayedAttr;
@@ -130,6 +130,8 @@ public class DefaultEditPanel extends EditPanel {
 	private final String emptyMessage;
 	
 	private static HashSet<String> discardedRowIDs = new HashSet<String>();
+	
+	private boolean showCompleteRedrawCommand = true;
 	
 	// ~ Constructors ===========================================================
 	
@@ -196,6 +198,10 @@ public class DefaultEditPanel extends EditPanel {
 		// this.attributeTypeMap = new HashMap();
 		this.editComponentsMap = new HashMap();
 		
+		initGUI();
+	}
+	
+	public void initGUI() {
 		/** Button used to apply all changes. */
 		JButton applyButton;
 		JButton applyRedrawButton;
@@ -249,8 +255,11 @@ public class DefaultEditPanel extends EditPanel {
 		// Do not show add attribute and remove attribute buttons
 		// add(attributeButtonPanel, BorderLayout.NORTH);
 		
-		add(TableLayout.getSplit(applyButton, applyRedrawButton, TableLayout.FILL, TableLayout.PREFERRED), "0,0");
-		// add(applyButton, "0,0");
+		if (showCompleteRedrawCommand)
+			add(TableLayout.getSplit(applyButton, applyRedrawButton, TableLayout.FILL, TableLayout.PREFERRED), "0,0");
+		else
+			add(applyButton, "0,0");
+		
 		add(attributeScrollPanel, "0,1");
 		validate();
 		
@@ -960,10 +969,12 @@ public class DefaultEditPanel extends EditPanel {
 			
 			assert (geMap != null);
 			
-			ChangeAttributesEdit aEdit = new ChangeAttributesEdit(
+			if (MainFrame.getInstance().getActiveEditorSession() != null) {
+				ChangeAttributesEdit aEdit = new ChangeAttributesEdit(
 								MainFrame.getInstance().getActiveEditorSession().getGraph(),
 								attributeToOldValueMap, geMap);
-			MainFrame.getInstance().getUndoSupport().postEdit(aEdit);
+				MainFrame.getInstance().getUndoSupport().postEdit(aEdit);
+			}
 		} finally {
 			listenerManager.transactionFinished(this);
 		}
@@ -1086,7 +1097,7 @@ public class DefaultEditPanel extends EditPanel {
 		 * DOCUMENT ME!
 		 * 
 		 * @author $Author: klukas $
-		 * @version $Revision: 1.1 $ $Date: 2011-01-31 09:03:29 $
+		 * @version $Revision: 1.2 $ $Date: 2013-01-26 18:02:16 $
 		 */
 		private class AttributeSelector extends JDialog {
 			private static final long serialVersionUID = 1L;
@@ -1245,7 +1256,7 @@ public class DefaultEditPanel extends EditPanel {
 	 * DOCUMENT ME!
 	 * 
 	 * @author $Author: klukas $
-	 * @version $Revision: 1.1 $ $Date: 2011-01-31 09:03:29 $
+	 * @version $Revision: 1.2 $ $Date: 2013-01-26 18:02:16 $
 	 */
 	@SuppressWarnings("unused")
 	private class RemoveListener implements ActionListener {
@@ -1314,6 +1325,10 @@ public class DefaultEditPanel extends EditPanel {
 		displayedValueEditComponents = new LinkedList<ValueEditComponent>();
 		
 		attributeScrollPanel.setViewportView(new JPanel());
+	}
+	
+	public void setShowCompleteRedrawCommand(boolean showCompleteRedrawCommand) {
+		this.showCompleteRedrawCommand = showCompleteRedrawCommand;
 	}
 }
 

@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 
 import org.AttributeHelper;
 import org.BioStatisticalCategoryDataset;
+import org.graffiti.attributes.AttributeNotFoundException;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.graphics.GraphElementGraphicAttribute;
@@ -293,10 +294,13 @@ public class ChartOptions {
 		double borderVer = ((Double) AttributeHelper.getAttributeValue(ge, "charting", "empty_border_width_vert",
 							borderHor, borderHor)).doubleValue();
 		
-		GraphElementGraphicAttribute geGraphicsAttr = (GraphElementGraphicAttribute) ge
+		try {
+			GraphElementGraphicAttribute geGraphicsAttr = (GraphElementGraphicAttribute) ge
 							.getAttribute(GraphicAttributeConstants.GRAPHICS);
-		borderHor += geGraphicsAttr.getFrameThickness();
-		
+			borderHor += geGraphicsAttr.getFrameThickness();
+		} catch (AttributeNotFoundException anfe) {
+			// empty
+		}
 		int maxXcnt = 2 + 1;
 		if (mappedDataListSize != null && mappedDataListSize > 1)
 			maxXcnt = 2 + mappedDataListSize;
