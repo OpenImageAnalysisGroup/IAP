@@ -2,6 +2,8 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
+
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,12 +13,16 @@ import javax.swing.JTabbedPane;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
+import org.color.ColorUtil;
+import org.graffiti.attributes.Attribute;
+import org.graffiti.attributes.StringAttribute;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.event.AbstractAttributeListener;
 import org.graffiti.event.TransactionEvent;
 import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
+import org.graffiti.graphics.GraphicAttributeConstants;
 import org.graffiti.plugins.inspectors.defaults.DefaultEditPanel;
 import org.graffiti.plugins.inspectors.defaults.GraphTab;
 import org.graffiti.plugins.inspectors.defaults.NodeTab;
@@ -44,8 +50,8 @@ public class DataChartComponentWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Data Chart - " + experiment.iterator().next().getName());
 		setIconImage(IAPimages.getImage(IAPimages.getHistogramIcon()));
-		setSize(SystemOptions.getInstance().getInteger("Data Chart", "Window Width", 800),
-				SystemOptions.getInstance().getInteger("Data Chart", "Window Height", 600));
+		setSize(SystemOptions.getInstance("charts.ini", null).getInteger("Window", "Width", 800),
+				SystemOptions.getInstance("charts.ini", null).getInteger("Window", "Height", 600));
 		setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		final Graph graph = new AdjListGraph();
 		final Node ge = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForKeggNode(100, 100));
@@ -54,6 +60,9 @@ public class DataChartComponentWindow extends JFrame {
 		nh.addDataMapping(experiment.iterator().next());
 		nh.removeAttribute("graphics");
 		graph.removeAttribute("directed");
+		
+		setDefaultChartDisplay(graph, ge, experiment.iterator().next().getName());
+		
 		final XmlDataChartComponent chart = new XmlDataChartComponent(experiment, GraffitiCharts.AUTOMATIC.getName(), graph, ge);
 		chart.setBorder(BorderFactory.createRaisedBevelBorder());
 		EditorSession s = new EditorSession(graph);
@@ -101,5 +110,39 @@ public class DataChartComponentWindow extends JFrame {
 		splitPane.setOneTouchExpandable(true);
 		add(TableLayout.getSplitVertical(new JLabel("ToDo - some settings and filter options"),
 				splitPane, TableLayout.PREFERRED, TableLayout.FILL), "0,0");
+	}
+	
+	private void setDefaultChartDisplay(Graph graph, Node ge, String title) {
+		int idx = 0;
+		Boolean mFalse = new Boolean(false);
+		Boolean mTrue = new Boolean(true);
+		String chartTitle = (String) AttributeHelper.getAttributeValue(ge, "charting", "chartTitle" + idx, title, title);
+		boolean showCategoryAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showCategoryAxis",
+				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-X", true), mFalse)).booleanValue();
+		boolean showRangeAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showRangeAxis",
+				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Y", true),
+					mFalse)).booleanValue();
+		Boolean showRangeAxis2 = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "showRangeAxis", null,
+				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Y2", true), false));
+		int axisFontSize = ((Integer) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisFontSize", new Integer(
+				SystemOptions.getInstance("charts.ini", null).getInteger("Axis", "Font Size", 10)), new Integer(30))).intValue();
+		boolean showGridCategory = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showGridCategory",
+				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Grid-X", false), mTrue)).booleanValue();
+		Double temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_outlineBorderWidth",
+				SystemOptions.getInstance("charts.ini", null).getDouble("Plot", "Outline Line Width", 1),
+					new Double(4d));
+		temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_chartStdDevLineWidth",
+				SystemOptions.getInstance("charts.ini", null).getDouble("Plot", "Std-Dev Line Width", 1),
+					new Double(4d));
+		boolean showLegend = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "show_legend",
+				SystemOptions.getInstance("charts.ini", null).getBoolean("Legend", "Show", true),
+					new Boolean(false))).booleanValue();
+		String rangeAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "rangeAxis", "[unit]", "[unit]");
+		String domainAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "domainAxis",
+					new String("[unit]"), new String("[unit]"));
+		String add = "";
+		Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CHARTBACKGROUNDCOLOR
+				+ add, ColorUtil.getHexFromColor(Color.WHITE));
+		ge.addAttribute(newAtt, "charting");
 	}
 }
