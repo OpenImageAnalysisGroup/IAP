@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -435,7 +436,7 @@ public class DataExchangeHelperForExperiments {
 			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop) {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
-		boolean addDataChart = false;
+		boolean addDataChart = true;
 		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
@@ -445,7 +446,23 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					MainFrame.getInstance().showMessageDialog("ToDo Create Chart...");
+					ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+					HashSet<String> speciesNames = new HashSet<String>();
+					for (SubstanceInterface si : exp)
+						for (ConditionInterface ci : si) {
+							speciesNames.add(ci.getSpecies());
+						}
+					int idx = 1;
+					for (SubstanceInterface si : exp)
+						for (ConditionInterface ci : si)
+							ci.setRowId(idx++);
+					if (speciesNames.size() == 1)
+						for (SubstanceInterface si : exp)
+							for (ConditionInterface ci : si)
+								ci.setSpecies(null);
+					
+					DataChartComponentWindow dccw = new DataChartComponentWindow(exp);
+					dccw.setVisible(true);
 				}
 			});
 			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -463,36 +480,23 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					Experiment experiment = new Experiment();
-					experiment.setHeader(sub.iterator().next().getExperimentHeader().clone());
-					String defaultFileName = StringManipulationTools.getFileSystemName(experiment.getHeader().getExperimentName() + "_" + sub.getName() + ".xlsx");
+					String defaultFileName = StringManipulationTools.getFileSystemName(
+							sub.iterator().next().getExperimentHeader().getExperimentName()
+									+ "_" + sub.getName() + ".xlsx");
 					String fn = FileHelper.getFileName(".xlsx", "Create File", defaultFileName);
 					if (fn != null) {
-						SubstanceInterface su = sub.clone();
-						for (ConditionInterface c : sub) {
-							ConditionInterface cu = c.clone(su);
-							for (SampleInterface si : c) {
-								SampleInterface sic = si.clone(cu);
-								for (NumericMeasurementInterface nmi : si) {
-									NumericMeasurementInterface nmic = nmi.clone(sic);
-									sic.add(nmic);
-								}
-								cu.add(sic);
-							}
-							su.add(cu);
-						}
-						experiment.add(su);
 						boolean xlsx = true;
 						ActionNumericDataReportCompleteFinishedStep3 action = new ActionNumericDataReportCompleteFinishedStep3(null,
 								null, null, false, xlsx, null, null,
 								null, null, null);
-						ExperimentReference er = new ExperimentReference(experiment);
-						action.setExperimentReference(er);
+						action.setExperimentReference(
+								new ExperimentReference(
+										Experiment.copyAndExtractSubtanceInclusiveData(sub)));
 						action.setUseIndividualReportNames(true);
 						action.setStatusProvider(null);
 						action.setSource(null, null);
+						action.setCustomTargetFileName(fn);
 						try {
-							action.setCustomTargetFileName(fn);
 							action.performActionCalculateResults(null);
 						} catch (Exception e) {
 							e.printStackTrace();

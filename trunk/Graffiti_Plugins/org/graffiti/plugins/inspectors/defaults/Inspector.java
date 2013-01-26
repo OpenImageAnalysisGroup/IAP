@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: Inspector.java,v 1.1 2011-01-31 09:03:30 klukas Exp $
+// $Id: Inspector.java,v 1.2 2013-01-26 18:02:16 klukas Exp $
 
 package org.graffiti.plugins.inspectors.defaults;
 
@@ -34,7 +34,7 @@ import org.graffiti.session.SessionListener;
 /**
  * Represents the main class of the inspector plugin.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Inspector extends EditorPluginAdapter implements InspectorPlugin,
 					SessionListener, SelectionListener, NeedEditComponents, ViewListener {
@@ -156,7 +156,8 @@ public class Inspector extends EditorPluginAdapter implements InspectorPlugin,
 			throw new RuntimeException("WARNING: should rarely happen " + cce);
 		}
 		
-		tab.setEditPanelInformation(valueEditComponents, editorSession != null ? editorSession.getGraphElementsMap() : null);
+		tab.setEditPanelInformation(valueEditComponents, editorSession != null ?
+				editorSession.getGraphElementsMap() : null);
 		
 		if (!container.getTabs().contains(tab)) {
 			container.addTab(tab, tab.getIcon());

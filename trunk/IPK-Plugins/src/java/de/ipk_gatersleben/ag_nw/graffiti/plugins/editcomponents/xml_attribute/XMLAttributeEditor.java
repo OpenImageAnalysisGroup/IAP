@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JButton;
@@ -48,7 +49,13 @@ public class XMLAttributeEditor
 		mappingButton.setOpaque(false);
 		mappingButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				XMLAttributeEditor.showMappedDataForSelection(ContextMenuHelper.getActiveSelection(), disp.getName());
+				Collection<GraphElement> sel;
+				sel = ContextMenuHelper.getActiveSelection();
+				if (sel == null) {
+					sel = new ArrayList<GraphElement>();
+					sel.add((GraphElement) ((Attribute) disp).getAttributable());
+				}
+				XMLAttributeEditor.showMappedDataForSelection(sel, disp.getName());
 			}
 		});
 	}

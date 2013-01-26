@@ -178,8 +178,11 @@ public class Condition implements ConditionInterface {
 			
 			serie = species;
 			if (genotype != null && genotype.length() > 0
-					&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+					&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)) {
 				serie += "/" + genotype;
+				if (serie.startsWith(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/"))
+					serie = serie.substring((ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/").length());
+			}
 			if (treatment != null && treatment.length() > 0 && !treatment.equals("null")
 					&& !treatment.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 				serie += " (" + treatment + ")";
@@ -767,7 +770,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-	
+
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
