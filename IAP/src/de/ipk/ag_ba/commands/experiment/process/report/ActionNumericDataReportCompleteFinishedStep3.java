@@ -420,22 +420,31 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusText2("Save XLSX file");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
-				p.prepareTempDirectory();
-				if (targetDirectoryOrTargetFile == null)
-					wb.write(new FileOutputStream(p.getTargetFile(xlsx, experimentReference.getHeader()), xlsx));
-				else
-					wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
+				if (customTargetFileName != null)
+					wb.write(new FileOutputStream(customTargetFileName, xlsx));
+				else {
+					p.prepareTempDirectory();
+					if (targetDirectoryOrTargetFile == null)
+						wb.write(new FileOutputStream(p.getTargetFile(xlsx, experimentReference.getHeader()), xlsx));
+					else
+						wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
+				}
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
 				
-				if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
-					File f = targetDirectoryOrTargetFile;
-					if (f == null)
-						f = p.getTargetFile(xlsx, experimentReference.getHeader());
+				if (customTargetFileName != null && IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
+					File f = new File(customTargetFileName);
 					String tempDirectory = f.getParent();
 					AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
-				}
+				} else
+					if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
+						File f = targetDirectoryOrTargetFile;
+						if (f == null)
+							f = p.getTargetFile(xlsx, experimentReference.getHeader());
+						String tempDirectory = f.getParent();
+						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
+					}
 			} else {
 				{
 					byte[] csvFileContent = csv.toString().getBytes();
@@ -801,6 +810,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	long startTime;
 	File ff;
+	private String customTargetFileName;
 	
 	@Override
 	public boolean prepareCommandLineExecution() throws Exception {
@@ -924,6 +934,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	public void setUseIndividualReportNames(boolean useIndividualReportNames) {
 		this.useIndividualReportNames = useIndividualReportNames;
+	}
+	
+	public void setCustomTargetFileName(String customTargetFileName) {
+		this.customTargetFileName = customTargetFileName;
 	}
 	
 }

@@ -137,7 +137,7 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	
 	public void numberConditions();
 	
-	public void saveToFile(String string) throws IOException;
+	public void saveToFile(String string) throws Exception;
 	
 	public TreeSet<String> getTreatmentList();
 	

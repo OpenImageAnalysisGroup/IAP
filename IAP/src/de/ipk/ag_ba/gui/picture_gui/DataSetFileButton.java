@@ -120,20 +120,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		return myImage.imageAvailable;
 	}
 	
-	// public JMyPC2DBEbutton(String user, String pass, DBEtreeNode projectNode,
-	// ImageResult imageResult, ActionListener sizeChangedListener) {
-	// this(user, pas, projectNode, imageResult.getFileName(),
-	// imageResult.getPreviewIcon(), null);
-	// this.imageResult=imageResult;
-	// this.targetTreeNode=projectNode;
-	// this.sizeChangedListener = sizeChangedListener;
-	// this.user = user;
-	// this.pass = pass;
-	// }
-	
 	public DataSetFileButton(final MongoDB m,
 			final MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
-			ImageIcon previewImage) {
+			ImageIcon previewImage, boolean isNoImageButton) {
 		super();
 		
 		progress = new JProgressBar(0, 100);
@@ -141,7 +130,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		
 		progress.setVisible(false);
 		
-		updateLayout(label, icon, previewImage);
+		updateLayout(label, icon, previewImage, isNoImageButton);
 		
 		addActionListener(this);
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -517,9 +506,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private boolean primary;
 	private String additionalFileNameInfo;
 	private boolean attachment;
+	private ActionListener additionalActionListener;
 	
 	public void updateLayout(String label, MyImageIcon icon,
-			ImageIcon previewImage) {
+			ImageIcon previewImage, boolean isNoImageButton) {
 		double border = 2;
 		removeAll();
 		JLabel ilbl;
@@ -533,6 +523,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				{ border, DataSetFileButton.ICON_HEIGHT, border,
 						TableLayout.PREFERRED, border, TableLayout.PREFERRED,
 						border } }; // Rows
+		
+		if (isNoImageButton)
+			size = new double[][] {
+					{ border, 128, border }, // Columns
+					{ 0, 48, 0,
+							0, 0, TableLayout.PREFERRED,
+							border } };
 		
 		setLayout(new TableLayout(size));
 		
@@ -552,30 +549,34 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode,
-			ImageResult imageResult, ImageIcon previewImage, boolean readOnly) {
+			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle) {
 		this(
 				m,
 				projectNode,
-				"<html><body><b>"
-						+ getMaxString(strip(
-								imageResult.getFileNameMain(),
-								((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
-										"(Attachment)" :
-										((NumericMeasurement3D) imageResult
-												.getBinaryFileInfo().entity)
-												.getQualityAnnotation()
-												+ "<br>("
-												+ (((NumericMeasurement3D) imageResult
+				"<html><body><b>" +
+						(imageResult == null ? "<center>" + customNonImageTitle :
+								getMaxString(strip(
+										imageResult.getFileNameMain(),
+										((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
+												"(Attachment)" :
+												((NumericMeasurement3D) imageResult
 														.getBinaryFileInfo().entity)
-														.getPosition() != null ? ((NumericMeasurement3D) imageResult
-														.getBinaryFileInfo().entity)
-														.getPosition().intValue()
-														+ ")" : "0)"))))
-						+ "</b></body></html>", null, previewImage);
+														.getQualityAnnotation()
+														+ "<br>("
+														+ (((NumericMeasurement3D) imageResult
+																.getBinaryFileInfo().entity)
+																.getPosition() != null ? ((NumericMeasurement3D) imageResult
+																.getBinaryFileInfo().entity)
+																.getPosition().intValue()
+																+ ")" : "0)")))))
+						+ "</b></body></html>", null, previewImage, isNoImageButton);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
-		if (getMaxString(imageResult.getFileNameMain()).endsWith("..."))
+		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
 			setToolTipText(imageResult.getFileNameMain());
+		else
+			if (imageResult == null)
+				setToolTipText(((Substance3D) projectNode.getTargetEntity()).getName());
 	}
 	
 	private static String strip(String fileName, String opt) {
@@ -610,7 +611,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(final ActionEvent evt) {
-		
+		if (imageResult == null && getAdditionalActionListener() != null) {
+			getAdditionalActionListener().actionPerformed(evt);
+			return;
+		}
 		if (!downloadNeeded && evt.getSource() instanceof JButton) {
 			
 			// SwingUtilities.invokeLater(new Runnable() {
@@ -1175,21 +1179,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		return tf;
 	}
 	
-	// /**
-	// * @param imageID
-	// */
-	// public void setImageResultInfo(String imageMD5,
-	// String targetTable,
-	// String targetTablePrimaryKeyName,
-	// Object targetTablePrimaryKeyValue) {
-	// imageResult=DataExchangeHelperForXMLandSOAP.getImageInfo(
-	// imageMD5,
-	// targetTable,
-	// targetTablePrimaryKeyName,
-	// targetTablePrimaryKeyValue);
-	// downloadNeeded=true;
-	// }
-	
 	class IconAdapter extends JComponent {
 		private static final long serialVersionUID = 1L;
 		
@@ -1394,5 +1383,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			}
 		});
 		return debugPipelineTest00a;
+	}
+	
+	public void setAdditionalActionListener(ActionListener additionalActionListener) {
+		this.additionalActionListener = additionalActionListener;
+	}
+	
+	public ActionListener getAdditionalActionListener() {
+		return additionalActionListener;
 	}
 }

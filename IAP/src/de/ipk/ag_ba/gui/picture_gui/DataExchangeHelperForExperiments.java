@@ -7,6 +7,8 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -41,17 +43,23 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCompleteFinishedStep3;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
+import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.ExperimentSaver;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.MongoDBhandler;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
+import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -211,7 +219,8 @@ public class DataExchangeHelperForExperiments {
 		final StopObject stop = new StopObject(false);
 		
 		boolean cleared = false;
-		
+		final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
+		Substance3D sub = null;
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
 			BinaryFileInfo primary = null;
@@ -228,7 +237,7 @@ public class DataExchangeHelperForExperiments {
 								true, id);
 					} else {
 						if (mde instanceof Substance3D) {
-							Substance3D sub = (Substance3D) mde;
+							sub = (Substance3D) mde;
 							primary = null;
 							for (ConditionInterface c : sub)
 								for (SampleInterface si : c) {
@@ -357,7 +366,14 @@ public class DataExchangeHelperForExperiments {
 				}
 			}
 			
-			final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
+			if (sub != null) {
+				if (!cleared) {
+					cleared = true;
+					clearPanel(filePanel, mt, expTree);
+				}
+				processChartGenerator(executeLater, sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop);
+			}
+			
 			BinaryFileInfo lastBBB = null;
 			if (bbb.size() > 0)
 				lastBBB = bbb.get(bbb.size() - 1);
@@ -368,26 +384,7 @@ public class DataExchangeHelperForExperiments {
 				boolean previewLoadAndConstructNeeded = false;
 				
 				ImageIcon previewImage = null;
-				// if
-				// (FileSystemHandler.isFileUrl(binaryFileInfo.getFileNameMain()))
-				// {
-				// MyImageIcon myImage = new
-				// MyImageIcon(MainFrame.getInstance(),
-				// DataSetFileButton.ICON_WIDTH,
-				// DataSetFileButton.ICON_HEIGHT,
-				// binaryFileInfo.getFileNameMain(),
-				// binaryFileInfo.getFileNameLabel(), binaryFileInfo);
-				// myImage.imageAvailable = 1;
-				// previewImage = myImage;
-				// } else
-				// // if
-				// (LemnaTecFTPhandler.isLemnaTecFtpUrl(binaryFileInfo.getFileNameMain()))
-				// {
-				// previewImage = null;
-				// previewLoadAndConstructNeeded = true;
-				// } else {
-				if (DataSetFileButton.ICON_WIDTH == 128) { // binaryFileInfo.getFileNameMain().getPrefix().startsWith("mongo_")
-					// &&
+				if (DataSetFileButton.ICON_WIDTH == 128) {
 					try {
 						byte[] pi = ResourceIOManager
 								.getPreviewImageContent(binaryFileInfo
@@ -403,9 +400,8 @@ public class DataExchangeHelperForExperiments {
 					previewImage = null;
 					previewLoadAndConstructNeeded = true;
 				}
-				// }
 				final DataSetFileButton imageButton = new DataSetFileButton(m,
-						mt, imageResult, previewImage, mt.isReadOnly());
+						mt, imageResult, previewImage, mt.isReadOnly(), false, null);
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
 				if (binaryFileInfo.isAttachment())
@@ -435,6 +431,85 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
+	private static void processChartGenerator(ArrayList<MyThread> executeLater, MappingDataEntity mde, final Substance3D sub,
+			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop) {
+		if (mt != expTree.getSelectionPath().getLastPathComponent())
+			return;
+		boolean addDataChart = false;
+		if (addDataChart) {
+			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
+			
+			MongoDB m = null;
+			final DataSetFileButton chartingButton = new DataSetFileButton(m,
+					mt, null, previewImage, mt.isReadOnly(), true, "Create Data Chart");
+			chartingButton.setAdditionalActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					MainFrame.getInstance().showMessageDialog("ToDo Create Chart...");
+				}
+			});
+			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+			
+			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
+					stop, executeLater, null, chartingButton, false, false));
+		}
+		{
+			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
+			
+			MongoDB m = null;
+			final DataSetFileButton chartingButton = new DataSetFileButton(m,
+					mt, null, previewImage, mt.isReadOnly(), true, "Export Data (XLSX)");
+			chartingButton.setAdditionalActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					Experiment experiment = new Experiment();
+					experiment.setHeader(sub.iterator().next().getExperimentHeader().clone());
+					String defaultFileName = StringManipulationTools.getFileSystemName(experiment.getHeader().getExperimentName() + "_" + sub.getName() + ".xlsx");
+					String fn = FileHelper.getFileName(".xlsx", "Create File", defaultFileName);
+					if (fn != null) {
+						SubstanceInterface su = sub.clone();
+						for (ConditionInterface c : sub) {
+							ConditionInterface cu = c.clone(su);
+							for (SampleInterface si : c) {
+								SampleInterface sic = si.clone(cu);
+								for (NumericMeasurementInterface nmi : si) {
+									NumericMeasurementInterface nmic = nmi.clone(sic);
+									sic.add(nmic);
+								}
+								cu.add(sic);
+							}
+							su.add(cu);
+						}
+						experiment.add(su);
+						boolean xlsx = true;
+						ActionNumericDataReportCompleteFinishedStep3 action = new ActionNumericDataReportCompleteFinishedStep3(null,
+								null, null, false, xlsx, null, null,
+								null, null, null);
+						ExperimentReference er = new ExperimentReference(experiment);
+						action.setExperimentReference(er);
+						action.setUseIndividualReportNames(true);
+						action.setStatusProvider(null);
+						action.setSource(null, null);
+						try {
+							action.setCustomTargetFileName(fn);
+							action.performActionCalculateResults(null);
+						} catch (Exception e) {
+							e.printStackTrace();
+							MainFrame.getInstance().showMessageDialog("Could not perform operation: " + e.getMessage());
+						}
+					}
+				}
+				
+			});
+			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+			
+			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
+					stop, executeLater, null, chartingButton, false, isLast));
+		}
+	}
+	
 	private static Runnable processIcon(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree, final StopObject stop,
 			final ArrayList<MyThread> executeLater,
@@ -452,7 +527,7 @@ public class DataExchangeHelperForExperiments {
 					MeasurementFilter mf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), mt.getExperiment().getHeader().getGlobalOutlierInfo());
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(
 							imageButton, mt, mf);
-					JComponent buttonAndInfo = !binaryFileInfo.isPrimary() ? imageButton
+					JComponent buttonAndInfo = binaryFileInfo == null || !binaryFileInfo.isPrimary() ? imageButton
 							: TableLayout.getSplitVertical(imageButton, aip,
 									TableLayout.PREFERRED,
 									TableLayout.PREFERRED);
@@ -494,7 +569,7 @@ public class DataExchangeHelperForExperiments {
 																				.updateLayout(
 																						null,
 																						myImage,
-																						myImage);
+																						myImage, false);
 																	}
 																});
 											} catch (Exception e) {
@@ -595,71 +670,4 @@ public class DataExchangeHelperForExperiments {
 			targetEntity.setFiles(StringManipulationTools.getStringList(values, ";"));
 		}
 	}
-	
-	// private static File getPreviewFileFromDatabase(BlobPropertyExtended
-	// blobInfo) {
-	//
-	// try {
-	// InputStream bis = new
-	// BufferedInputStream(blobInfo.previewImage.getBinaryStream());
-	// File previewFile = File.createTempFile("dbe_preview_", ".png");
-	// SupplementaryFilePanel.addTempFileToBeDeletedLater(previewFile);
-	// FileOutputStream fos = new FileOutputStream(previewFile);
-	// int readBytes = 0;
-	// int pos = 0;
-	// byte[] readBuff = new byte[1024];
-	// while (0 < (readBytes = bis.read(readBuff))) {
-	// fos.write(readBuff, 0, readBytes);
-	// pos += readBytes;
-	// }
-	// bis.close();
-	// fos.close();
-	// return previewFile;
-	// } catch (Exception e1) {
-	// SupplementaryFilePanel.showError("IOException", e1);
-	// return null;
-	// }
-	// }
-	//
-	// public static ImageResult getImageInfo(String imageMD5, String
-	// targetTable, String targetTablePrimaryKeyName,
-	// Object targetTablePrimaryKeyValue) {
-	// BlobPropertyExtended[] bpea = null;
-	// try {
-	// bpea = CallDBE2WebService.getAllSupplFileInfos("", "",
-	// DBTable.valueOf(targetTable),
-	// targetTablePrimaryKeyValue.toString());
-	// } catch (Exception e) {
-	// ErrorMsg.addErrorMessage(e);
-	// }
-	//
-	// return null;
-	// }
-	//
-	// public static void removeAllImagesForOneTargetNodeFromDataBase(String
-	// user, String pass, ImageResult imageResult) {
-	// try {
-	// for (BlobPropertyExtended bpe :
-	// CallDBE2WebService.getAllSupplFileInfos(user, pass, imageResult
-	// .getTargetTable(), "" + imageResult.getTargetTablePrimaryKeyValue())) {
-	// String id = imageResult.getTargetTablePrimaryKeyValue() + "";
-	// CallDBE2WebService.setDeleteBlobSupplementaryFile(user, pass, bpe.md5,
-	// imageResult.getTargetTable(), id);
-	// }
-	// } catch (Exception e) {
-	// SupplementaryFilePanel.showError("Error while deleting files!", e);
-	// }
-	// }
-	//
-	// public static void removeSingleImageFromDataBase(String user, String
-	// pass,
-	// ImageResult imageResult) {
-	// try {
-	// CallDBE2WebService.setDeleteBlobSupplementaryFile(user, pass,
-	// imageResult.getMd5(), imageResult
-	// .getTargetTable(), imageResult.getTargetTablePrimaryKeyValue() + "");
-	// } catch (Exception e) {
-	// SupplementaryFilePanel.showError("Can't delete file from database!", e);
-	// }
-	// }
 }
