@@ -116,6 +116,9 @@ public class DataChartComponentWindow extends JFrame {
 		int idx = 0;
 		Boolean mFalse = new Boolean(false);
 		Boolean mTrue = new Boolean(true);
+		
+		graph.setName("chartUI");
+		
 		String chartTitle = (String) AttributeHelper.getAttributeValue(ge, "charting", "chartTitle" + idx, title, title);
 		boolean showCategoryAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showCategoryAxis",
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-X", true), mFalse)).booleanValue();

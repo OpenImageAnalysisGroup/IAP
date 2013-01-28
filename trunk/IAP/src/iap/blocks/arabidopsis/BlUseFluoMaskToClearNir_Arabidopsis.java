@@ -17,6 +17,7 @@ public class BlUseFluoMaskToClearNir_Arabidopsis extends AbstractSnapshotAnalysi
 	@Override
 	protected void prepare() {
 		super.prepare();
+		debug = getBoolean("debug", false);
 	}
 	
 	@Override
@@ -38,7 +39,8 @@ public class BlUseFluoMaskToClearNir_Arabidopsis extends AbstractSnapshotAnalysi
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
 					processedMasks.setNir(
-							processedMasks.nir().io().applyMask(processedMasks.fluo(),
+							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(processedMasks.fluo().io()
+									.blur(getDouble("blur fluo mask", 0d)).getImage(),
 									back).print("FILTERED NIR IMAGE", debug).getImage());
 				}
 			}

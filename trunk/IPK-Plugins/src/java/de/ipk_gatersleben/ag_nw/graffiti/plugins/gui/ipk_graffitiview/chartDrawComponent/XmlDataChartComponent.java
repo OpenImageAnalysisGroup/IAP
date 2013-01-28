@@ -12,6 +12,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -149,20 +151,6 @@ public class XmlDataChartComponent extends JComponent {
 			
 			co.setFurtherOptions(graph, dataset, chartTitle);
 			
-			// ChartOptions co = new ChartOptions(ge, graph, dataset, chartTitle, orientation,
-			// showLegend,
-			// domainAxis,
-			// rangeAxis,
-			// showRangeAxis,
-			// showCategoryAxis,
-			// outlineBorderWidth, // seriesColors, seriesOutlineColors,
-			// axisRotation, lowerBound, upperBound, showGridRange, showGridCategory, gridWidth, axisWidth, gridColor,
-			// axisColor, axisFontSize, showStdDev, errorBarLen, showStdDevRangeLine, shapeSize, stdDevLineWidth,
-			// showOnlyHalfErrorBar, showShapes, showLines, usePieScaling, connectPriorItems, plotAxisSteps,
-			// useLogYscale, categoryPaintBackgroundColorIdxA, categoryPaintBackgroundColorIdxC,
-			// categoryPaintBackgroundColorA, categoryPaintBackgroundColorB, categoryPaintBackgroundColorC,
-			// useCustomStepsize, customStepSize);
-			
 			Object chart = createChart(chartType, co, hmo);
 			
 			if (chart == null) {
@@ -170,7 +158,45 @@ public class XmlDataChartComponent extends JComponent {
 			} else {
 				if (!(chart instanceof JComponent)) {
 					JFreeChart jfChart = (JFreeChart) chart;
-					add(prettifyChart(ge, co, chartType, jfChart), currentXposition + "," + currentYposition);
+					if (co.enableUI) {
+						final ChartPanel cp = (ChartPanel) prettifyChart(ge, co, chartType, jfChart);
+						for (MouseListener ml : cp.getMouseListeners())
+							cp.removeMouseListener(ml);
+						cp.addMouseListener(new MouseListener() {
+							
+							@Override
+							public void mouseReleased(MouseEvent e) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public void mousePressed(MouseEvent e) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public void mouseExited(MouseEvent e) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public void mouseEntered(MouseEvent e) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								cp.getPopupMenu().show(cp, e.getX(), e.getY());
+								
+							}
+						});
+						add(cp, currentXposition + "," + currentYposition);
+					} else
+						add(prettifyChart(ge, co, chartType, jfChart), currentXposition + "," + currentYposition);
 				} else {
 					if (chart instanceof MyColorGrid) {
 						Color cbc = NodeTools.getChartBackgroundColor(ge, idx);
@@ -217,8 +243,10 @@ public class XmlDataChartComponent extends JComponent {
 			sl.setBackgroundPaint(AttributeHelper.getFillColor(ge));
 			sl.setOutlinePaint(sl.getBackgroundPaint());
 			chartPanel = new MyLegendComponent(sl, scale.doubleValue());
-		} else
-			chartPanel = new ChartPanel(jfChart, false, false, false, false, false);
+		} else {
+			boolean f = co.enableUI;
+			chartPanel = new ChartPanel(jfChart, f, f, f, false, false);
+		}
 		
 		// chartPanel.set
 		Color cbc = NodeTools.getChartBackgroundColor(ge);
@@ -326,7 +354,7 @@ public class XmlDataChartComponent extends JComponent {
 				co.dataset, // data
 				co.orientation, // orientation
 				co.showLegend, // include legend
-				false, // tooltips
+				co.enableUI, // tooltips
 				false // urls
 				);
 		
@@ -365,7 +393,7 @@ public class XmlDataChartComponent extends JComponent {
 		final JFreeChart chart = ChartFactory.createMultiplePieChart(co.chartTitle, // chart
 				co.dataset, // data
 				TableOrder.BY_COLUMN, co.showLegend, // include legend
-				false, // tooltips
+				co.enableUI, // tooltips
 				false // urls
 				);
 		prettifyPiePlot(co, chart, false);
@@ -440,7 +468,7 @@ public class XmlDataChartComponent extends JComponent {
 		final JFreeChart chart = ChartFactory.createMultiplePieChart3D(co.chartTitle, // chart
 				co.dataset, // data
 				TableOrder.BY_COLUMN, co.showLegend, // include legend
-				false, // tooltips
+				co.enableUI, // tooltips
 				false // urls
 				);
 		prettifyPiePlot(co, chart, true);
@@ -455,7 +483,7 @@ public class XmlDataChartComponent extends JComponent {
 				co.dataset, // data
 				co.orientation, // orientation
 				co.showLegend, // include legend
-				false, // tooltips
+				co.enableUI, // tooltips
 				false // urls
 				);
 		
@@ -487,6 +515,9 @@ public class XmlDataChartComponent extends JComponent {
 		pretifyCategoryPlot(renderer, co);
 		
 		chart.setBackgroundPaint(null);
+		
+		// chart.setAntiAlias(co.enableUI);
+		
 		return chart;
 	}
 	
@@ -538,7 +569,7 @@ public class XmlDataChartComponent extends JComponent {
 				co.dataset, // data
 				co.orientation, // orientation
 				true, // include legend
-				false, // tooltips
+				co.enableUI, // tooltips
 				false // urls
 				);
 		
@@ -590,40 +621,6 @@ public class XmlDataChartComponent extends JComponent {
 		return transformer.createTransformedShape(shape);
 	}
 	
-	// /**
-	// * @param renderer
-	// */
-	// public static void setSeriesColorsAndStroke(XYItemRenderer renderer,
-	// float outlineBorderWidth, ArrayList<Paint> seriesColors,
-	// ArrayList<Paint> seriesOutlineColors) {
-	// /*Stroke myStroke = strokeCache.get(new Float(outlineBorderWidth));
-	// if (myStroke==null) {
-	// myStroke = new BasicStroke(outlineBorderWidth);
-	// strokeCache.put(new Float(outlineBorderWidth), myStroke);
-	// }*/
-	// // Shape s = renderer.getSeriesShape(1);
-	// // double ts = 1/s.getBounds().getWidth()*outlineBorderWidth;
-	// // s = createTransformedShape(s, ts, ts);
-	// renderer.setShape(new Rectangle2D.Float(-outlineBorderWidth/2f,
-	// -outlineBorderWidth/2f,
-	// outlineBorderWidth, outlineBorderWidth));
-	//
-	// //renderer.setStroke(myStroke);
-	// if (seriesColors != null)
-	// for (int i = 0; i < seriesColors.size(); i++) {
-	// //renderer.setSeriesStroke(i, myStroke);
-	// if (seriesColors.get(i) != null)
-	// renderer.setSeriesPaint(i, seriesColors.get(i));
-	// }
-	// if (seriesOutlineColors != null)
-	// for (int i = 0; i < seriesOutlineColors.size(); i++) {
-	// // renderer.setSeriesStroke(i, myStroke);
-	// if (seriesOutlineColors.get(i) != null) {
-	// renderer.setSeriesOutlinePaint(i, seriesOutlineColors.get(i));
-	// }
-	// }
-	// }
-	
 	/**
 	 * @param axis
 	 */
@@ -651,7 +648,7 @@ public class XmlDataChartComponent extends JComponent {
 	private JFreeChart createLineChart(ChartOptions co) {
 		JFreeChart chart = ChartFactory.createLineChart(co.chartTitle, co.domainAxis, // "DOMAIN AXIS",
 				co.rangeAxis, // "RANGE AXIS",
-				co.dataset, co.orientation, co.showLegend, false, false);
+				co.dataset, co.orientation, co.showLegend, co.enableUI, co.enableUI);
 		
 		CategoryPlot plot = chart.getCategoryPlot();
 		
