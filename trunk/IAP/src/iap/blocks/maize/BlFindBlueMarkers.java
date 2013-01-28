@@ -138,7 +138,7 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		if (debug)
-			new ImageOperation(processedImages.vis()).drawMarkers(numericResult).print("Marker Positions", debug);
+			new ImageOperation(processedImages.vis()).drawMarkers(numericResult).show("Marker Positions", debug);
 		if (markerMask != null && processedImages.vis() != null)
 			processedImages.setVis(processedImages.vis().io().and(markerMask).getImage());
 		if (markerMask != null && processedMasks.vis() != null)

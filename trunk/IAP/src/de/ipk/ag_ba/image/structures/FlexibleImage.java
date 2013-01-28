@@ -172,14 +172,14 @@ public class FlexibleImage {
 		return h;
 	}
 	
-	public FlexibleImage display(String title, boolean doIt) {
+	public FlexibleImage show(String title, boolean doIt) {
 		if (doIt)
-			return print(title);
+			return show(title);
 		else
 			return this;
 	}
 	
-	public FlexibleImage print(String title) {
+	public FlexibleImage show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			ImageDisplay.show(
 					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage(),
@@ -357,7 +357,7 @@ public class FlexibleImage {
 			}
 		}
 		if (res.length > 0)
-			return new FlexibleImage(res).display("DABA", false);
+			return new FlexibleImage(res).show("DABA", false);
 		else
 			return null;
 	}

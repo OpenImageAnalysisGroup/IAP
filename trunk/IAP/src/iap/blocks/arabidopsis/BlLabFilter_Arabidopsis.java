@@ -80,7 +80,7 @@ public class BlLabFilter_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
 			int h = toBeFiltered.getHeight();
 			
 			result = result.copy().io().applyMask_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).
-					print("unknown 1", false).getImage();
+					show("unknown 1", false).getImage();
 			
 			// .removeSmallElements(30, 30).getImage().print("ORRR GREEN (NACH REMOVAL)", debug)
 			
@@ -137,7 +137,7 @@ public class BlLabFilter_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
 								blueCurbWidthBarley0_1,
 								blueCurbHeightEndBarly0_8).
 						border_left_right((int) (options.isBarleyInBarleySystem() ? 0 : w * 0.05), Color.red.getRGB()).
-						print("removed noise", debug).getImage();
+						show("removed noise", debug).getImage();
 			else
 				toBeFiltered = result
 						.io()
@@ -202,7 +202,7 @@ public class BlLabFilter_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
 						// (int) (w * 0.01) :
 						// 0,
 						// Color.red.getRGB()).
-						print("removed noise", false).getImage();
+						show("removed noise", false).getImage();
 			if (!options.isBarleyInBarleySystem())
 				toBeFiltered = toBeFiltered.io().medianFilter32Bit().medianFilter32Bit().getImage();
 			if (fis != null)
@@ -212,7 +212,7 @@ public class BlLabFilter_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
 			if (fis != null)
 				fis.addImage("step 8", result);
 			if (debug)
-				result.copy().io().replaceColor(options.getBackground(), Color.black.getRGB()).print("Left-Over", false);
+				result.copy().io().replaceColor(options.getBackground(), Color.black.getRGB()).show("Left-Over", false);
 			if (fis != null)
 				fis.addImage("step 9", result);
 			

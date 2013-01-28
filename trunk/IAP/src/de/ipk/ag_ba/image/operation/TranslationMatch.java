@@ -37,7 +37,7 @@ public class TranslationMatch {
 		ImageOperation io = img.io();
 		
 		if (debug)
-			io.copy().canvas().drawSideHistogram().io().print("USED FOR MATCHING (VERT)");
+			io.copy().canvas().drawSideHistogram().io().show("USED FOR MATCHING (VERT)");
 		
 		corrsVert = new ArrayList<Double>();
 		offsetVertY = -match(mainImagePatternForImageLines, io.calculateVerticalPattern(), corrsVert);

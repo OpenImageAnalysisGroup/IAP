@@ -55,21 +55,21 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	protected FlexibleImage processVISmask() {
 		if (input().masks().vis() != null) {
 			
-			ImageOperation io = new ImageOperation(input().masks().vis().copy()).print("BEFORE TRIMM", debug).erode(getInt("Erode-Cnt-Vis", 2));
+			ImageOperation io = new ImageOperation(input().masks().vis().copy()).show("BEFORE TRIMM", debug).erode(getInt("Erode-Cnt-Vis", 2));
 			io = input().masks().vis().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
-					.print("AFTER ERODE", debug);
+					.show("AFTER ERODE", debug);
 			
 			String pre = "RESULT_" + options.getCameraPosition();
 			int regions = 5;
 			if (calculateValuesAlsoForDifferentRegions) {
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
 					for (int r = 0; r < regions; r++)
-						processVisibleImage(io.getBottom(r, regions).print("Side Part " + r + "/" + regions, debugRegionParts),
+						processVisibleImage(io.getBottom(r, regions).show("Side Part " + r + "/" + regions, debugRegionParts),
 								pre + ".section_" + (r + 1) + "_" + regions + ".");
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
-						processVisibleImage(io.getInnerCircle(r, regions).print("Top Part " + r + "/" + regions, debugRegionParts),
+						processVisibleImage(io.getInnerCircle(r, regions).show("Top Part " + r + "/" + regions, debugRegionParts),
 								pre + ".section_" + (r + 1) + "_" + regions + ".");
 				}
 			}
@@ -129,10 +129,10 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (input().masks().fluo() != null) {
-			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).print("BEFORE TRIMM", debug).
+			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).
 					erode(getInt("Erode-Cnt-Fluo", 2));
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
-					.print("AFTER ERODE", debug);
+					.show("AFTER ERODE", debug);
 			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
 					options.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)

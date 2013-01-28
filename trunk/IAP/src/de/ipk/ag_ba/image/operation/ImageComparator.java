@@ -30,8 +30,8 @@ public class ImageComparator {
 		if (inputImage != null && referenceImage != null) {
 			if (inputImage.getWidth() != referenceImage.getWidth()
 					|| inputImage.getHeight() != referenceImage.getHeight()) {
-				inputImage.print("A");
-				referenceImage.print("A (ref)");
+				inputImage.show("A");
+				referenceImage.show("A (ref)");
 			}
 		}
 		
@@ -46,8 +46,8 @@ public class ImageComparator {
 		if (ignoreRed) {
 			double[] factors = new double[] { 0.05, 0.7, 0.7 };
 			boolean show = true;
-			labImage = new ImageOperation(inputImage).multiplicateImageChannelsWithFactors(factors).print("input", show).getImage().getLab(false);
-			labImageRef = new ImageOperation(referenceImage).multiplicateImageChannelsWithFactors(factors).print("reference", show).getImage().getLab(false);
+			labImage = new ImageOperation(inputImage).multiplicateImageChannelsWithFactors(factors).show("input", show).getImage().getLab(false);
+			labImageRef = new ImageOperation(referenceImage).multiplicateImageChannelsWithFactors(factors).show("reference", show).getImage().getLab(false);
 		} else {
 			labImage = inputImage.getLab(false);
 			labImageRef = referenceImage.getLab(false);
@@ -102,7 +102,7 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 		}
 		if (showDiff)
-			new FlexibleImage(width, height, diff).print("difference: " + desc);
+			new FlexibleImage(width, height, diff).show("difference: " + desc);
 		return new ImageOperation(new FlexibleImage(width, height, result));
 	}
 	

@@ -20,11 +20,19 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	public static boolean ngUse = true;
 	
+	private boolean debug = false;
+	
+	@Override
+	protected void prepare() {
+		super.prepare();
+		debug = getBoolean("debug", false);
+	}
+	
 	@Override
 	protected FlexibleImage processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		FlexibleImage res, mask = input().masks().vis();
+		FlexibleImage res, mask = input().masks().vis().show("vis input", debug);
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (options.isMaize()) {
 				// not for barley
@@ -44,6 +52,8 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 							getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 300) * 2),
 							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
+			if (res != null)
+				res.show("vis result", debug);
 			return res;
 		} else {
 			if (options.isMaize()) {
@@ -58,6 +68,8 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) / 2),
 						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
 			}
+			if (res != null)
+				res.show("vis result", debug);
 			return res;
 		}
 	}

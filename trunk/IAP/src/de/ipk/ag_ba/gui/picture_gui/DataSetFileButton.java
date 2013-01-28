@@ -172,7 +172,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getBinaryFileInfo()
 												.getFileNameMain();
 										FlexibleImage fi = new FlexibleImage(s);
-										fi.print("Main Image");
+										fi.show("Main Image");
 									} catch (Exception err) {
 										JOptionPane
 												.showMessageDialog(
@@ -199,7 +199,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getBinaryFileInfo()
 												.getFileNameLabel();
 										FlexibleImage fi = new FlexibleImage(s);
-										fi.print("Reference Image");
+										fi.show("Reference Image");
 									} catch (Exception err) {
 										MainFrame.getInstance().showMessageDialog("Reference image could not be loaded: " + err.getMessage());
 										return;
@@ -232,7 +232,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													IOurl u = new IOurl(oldRef);
 													FlexibleImage fi = new FlexibleImage(
 															u);
-													fi.print("Annotation Image");
+													fi.show("Annotation Image");
 												} else
 													MainFrame.getInstance().showMessageDialog("Annotation image is undefined");
 											}
@@ -892,7 +892,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							JOptionPane.INFORMATION_MESSAGE);
 				else {
 					FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
-					fi.print("Image View - " + myImage.fileURLmain.getFileNameDecoded());
+					fi.show("Image View - " + myImage.fileURLmain.getFileNameDecoded());
 				}
 			} catch (Exception e) {
 				JOptionPane
@@ -933,7 +933,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					}
 				} else
 					if (fi != null)
-						fi.print("Image Label View - "
+						fi.show("Image Label View - "
 								+ myImage.fileURLlabel.getFileNameDecoded());
 			} catch (Exception e) {
 				JOptionPane
@@ -1262,7 +1262,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									if (id.getURL() != null) {
 										FlexibleImage fi = new FlexibleImage(
 												id.getURL());
-										fi.print(id.getSubstanceName() + " // "
+										fi.show(id.getSubstanceName() + " // "
 												+ pre);
 									}
 								}
@@ -1274,7 +1274,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									if (id.getLabelURL() != null) {
 										FlexibleImage fi = new FlexibleImage(
 												id.getLabelURL());
-										fi.print("Reference "
+										fi.show("Reference "
 												+ id.getSubstanceName()
 												+ " // " + pre);
 									}
@@ -1288,7 +1288,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										FlexibleImage fi = new FlexibleImage(
 												new IOurl(
 														id.getAnnotationField("oldreference")));
-										fi.print("Annotation "
+										fi.show("Annotation "
 												+ id.getSubstanceName()
 												+ " // " + pre);
 									}

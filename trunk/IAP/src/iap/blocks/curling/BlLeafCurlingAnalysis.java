@@ -33,12 +33,12 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		
 		ImageOperation dist = img1.io().skel()
 				.calculateDistanceToBorder(true, ImageOperation.BACKGROUND_COLORint)
-				.print("Distance", debug);
+				.show("Distance", debug);
 		
 		ImageOperation skel = img1.io().copy().skeletonize(true)
-				.print("Skeleton", debug);
+				.show("Skeleton", debug);
 		
-		ImageOperation result = dist.applyMask(skel.getImage(), ImageOperation.BACKGROUND_COLORint).print("Result", debug);
+		ImageOperation result = dist.applyMask(skel.getImage(), ImageOperation.BACKGROUND_COLORint).show("Result", debug);
 		SkeletonProcessor2d skel2d = result.skel2d();
 		skel2d.background = ImageOperation.BACKGROUND_COLORint;
 		skel2d.findEndpointsAndBranches();

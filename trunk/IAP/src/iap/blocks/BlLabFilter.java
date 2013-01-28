@@ -70,7 +70,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			if (fis != null)
 				fis.addImage("main lab filter", visMask.getImage(), null);
 			
-			return visMask.getImage().display("VISS", debug);
+			return visMask.getImage().show("VISS", debug);
 		}
 	}
 	

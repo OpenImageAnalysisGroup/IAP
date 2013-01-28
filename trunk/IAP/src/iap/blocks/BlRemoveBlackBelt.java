@@ -33,16 +33,16 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 			
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				// detect black belt
-				vis = vis.print("Start image", debug).blur(getDouble("blur", 3)).print("blurred", debug)
+				vis = vis.show("Start image", debug).blur(getDouble("blur", 3)).show("blurred", debug)
 						.filterRemoveLAB(
 								getInt("belt-lab-l-min", 0), getInt("belt-lab-l-max", 130),
 								getInt("belt-lab-a-min", 110), getInt("belt-lab-a-max", 130),
 								getInt("belt-lab-b-min", 110), getInt("belt-lab-b-max", 140),
 								options.getBackground(),
-								false).print("LAB filtered", debug)
-						.erode(getInt("erode-cnt", 10)).print("eroded", debug)
-						.dilate(getInt("dilate-cnt", 23)).print("dilated", debug)
-						.grayscale().print("Gray scale for threshold 100", debug)
+								false).show("LAB filtered", debug)
+						.erode(getInt("erode-cnt", 10)).show("eroded", debug)
+						.dilate(getInt("dilate-cnt", 23)).show("dilated", debug)
+						.grayscale().show("Gray scale for threshold 100", debug)
 						.threshold(100, options.getBackground(), new Color(100, 100, 100).getRGB()); // filter out black belt
 				
 				vis = vis.canvas()
@@ -58,7 +58,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 								getInt("small-circle-y", 703),
 								getInt("small-circle-d", 30),
 								options.getBackground(), 0d).io()
-						.print("black belt region", debug);
+						.show("black belt region", debug);
 				
 				blackBeltMask = vis;
 			}
@@ -71,7 +71,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 		if (blackBeltMask == null || vis == null)
 			return vis;
 		vis = input().masks().vis().io().applyMask(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().display("Black belt removed from vis", debug);
+				options.getBackground()).getImage().show("Black belt removed from vis", debug);
 		return vis;
 	}
 	
@@ -81,7 +81,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 		if (blackBeltMask == null || fluo == null)
 			return fluo;
 		fluo = input().masks().fluo().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().display("Black belt removed from fluo", debug);
+				options.getBackground()).getImage().show("Black belt removed from fluo", debug);
 		return fluo;
 	}
 	
@@ -91,7 +91,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 		if (blackBeltMask == null || nir == null)
 			return nir;
 		nir = input().masks().nir().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().display("Black belt removed from nir", debug);
+				options.getBackground()).getImage().show("Black belt removed from nir", debug);
 		return nir;
 	}
 	@Override

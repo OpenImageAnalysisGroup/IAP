@@ -72,11 +72,11 @@ public class SkeletonGraph {
 			}
 		}
 		if (DEBUG) {
-			FlexibleImage fi = new FlexibleImage(skelImg).print("TO BE ANALYZED...");
+			FlexibleImage fi = new FlexibleImage(skelImg).show("TO BE ANALYZED...");
 			debugImg = fi.copy();
 		}
 		if (DEBUG)
-			debugImg.print("MARKED POINTS");
+			debugImg.show("MARKED POINTS");
 		int nGraphEdgePoints = 0;
 		// new FlexibleImage(skelImg).copy().print("BEFORE AAAAAAAA");
 		for (int x = 1; x < w - 1; x++) {
