@@ -77,6 +77,7 @@ public class ChartOptions {
 	public GraphElement ge;
 	public boolean fillTimeGaps;
 	public double borderHor;
+	public boolean enableUI;
 	
 	public ChartOptions(
 						GraphElement ge, Graph graph,
@@ -169,6 +170,8 @@ public class ChartOptions {
 	public void readAttributes(GraphElement ge) {
 		this.ge = ge;
 		this.graph = ge.getGraph();
+		
+		enableUI = graph.getName() != null && graph.getName().equals("chartUI");
 		
 		axisRotation = ((Double) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisRotation", mNull, mNull)).intValue();
 		
