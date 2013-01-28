@@ -31,6 +31,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private boolean calculateValuesAlsoForDifferentRegions = false;
 	private boolean addHistogramValues = false;
+	private boolean addHistogramValuesForSections = false;
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -47,6 +48,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		debugRegionParts = getBoolean("Debug-Show-Region-Images", false);
 		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", true);
 		addHistogramValues = getBoolean("Add_Histogram_Values", false);
+		addHistogramValuesForSections = getBoolean("Histogram for Regions", false);
 		
 		markerDistanceHorizontally = options.getCalculatedBlueMarkerDistance();
 	}
@@ -65,12 +67,12 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getBottom(r, regions).show("Side Part " + r + "/" + regions, debugRegionParts),
-								pre + ".section_" + (r + 1) + "_" + regions + ".");
+								pre + ".section_" + (r + 1) + "_" + regions + ".", true);
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getInnerCircle(r, regions).show("Top Part " + r + "/" + regions, debugRegionParts),
-								pre + ".section_" + (r + 1) + "_" + regions + ".");
+								pre + ".section_" + (r + 1) + "_" + regions + ".", true);
 				}
 			}
 			
@@ -84,14 +86,14 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 			
-			processVisibleImage(io, pre + ".");
+			processVisibleImage(io, pre + ".", false);
 			
 			return input().masks().vis();
 		} else
 			return null;
 	}
 	
-	protected void processVisibleImage(ImageOperation io, String resultPrefix) {
+	protected void processVisibleImage(ImageOperation io, String resultPrefix, boolean isSection) {
 		int visibleFilledPixels = io.countFilledPixels();
 		
 		double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
@@ -104,7 +106,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(
 				markerDistanceHorizontally,
 				options.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
-				addHistogramValues);
+				isSection ? addHistogramValuesForSections : addHistogramValues);
 		getProperties().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
@@ -134,7 +136,8 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.show("AFTER ERODE", debug);
 			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-					options.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, addHistogramValues); // markerDistanceHorizontally
+					options.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
+					addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)
 				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return input().masks().fluo();// io.getImage();
