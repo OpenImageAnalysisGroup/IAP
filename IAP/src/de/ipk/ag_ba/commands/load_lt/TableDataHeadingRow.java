@@ -13,25 +13,25 @@ public class TableDataHeadingRow {
 	private Integer[] plantIDcol, speciesCol, genotypeCol,
 			treatmentCol, sequenceCol, varietyCol, growthconditionsCol;
 	
-	private String separator;
+	private final String separator;
 	
 	public TableDataHeadingRow(HashMap<Integer, String> col2heading) {
-		separator = SystemOptions.getInstance().getString("File Import",
+		separator = SystemOptions.getInstance().getString("Metadata Import",
 				"Multiple-Value-Meta-Data-Connector", " // ");
 		if (col2heading == null) {
-			plantIDcol = SystemOptions.getInstance().getIntArray("File Import",
+			plantIDcol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Plant-ID", new Integer[] { 1 });
-			speciesCol = SystemOptions.getInstance().getIntArray("File Import",
+			speciesCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Species", new Integer[] { 2 });
-			genotypeCol = SystemOptions.getInstance().getIntArray("File Import",
+			genotypeCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Genotype", new Integer[] { 3 });
-			treatmentCol = SystemOptions.getInstance().getIntArray("File Import",
+			treatmentCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Treatment", new Integer[] { 4 });
-			sequenceCol = SystemOptions.getInstance().getIntArray("File Import",
+			sequenceCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Sequence", new Integer[] { 5 });
-			varietyCol = SystemOptions.getInstance().getIntArray("File Import",
+			varietyCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Variety", new Integer[] { -1 });
-			growthconditionsCol = SystemOptions.getInstance().getIntArray("File Import",
+			growthconditionsCol = SystemOptions.getInstance().getIntArray("Metadata Import",
 					"No Heading Row//Columns_Growthconditions", new Integer[] { 7 });
 		} else {
 			ArrayList<Integer> plantIDcolARR = new ArrayList<Integer>();
@@ -61,8 +61,8 @@ public class TableDataHeadingRow {
 			for (Integer col : col2heading.keySet()) {
 				String heading = col2heading.get(col);
 				String sel = SystemOptions.getInstance().getStringRadioSelection(
-						"File Import",
-						"Named Columns//" + heading,
+						"Metadata Import",
+						"Columns//" + heading,
 						possibleValues, getDefaultSelection(col, heading, possibleValues), true);
 				if (sel != null && sel.equals("Plant ID")) {
 					plantIDcolARR.add(col);

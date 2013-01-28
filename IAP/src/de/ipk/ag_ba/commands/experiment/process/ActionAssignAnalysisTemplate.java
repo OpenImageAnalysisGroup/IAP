@@ -47,7 +47,7 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 						+ exp.getExperimentName()
 						+ " in storage location "
 						+ m.getDatabaseName() + ".");
-				if (exp.getIniIoProvider() != null)
+				if (exp.getIniIoProvider() != null && exp.getIniIoProvider().getInstance() != null)
 					exp.getIniIoProvider().getInstance().reload();
 				else
 					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), m));
