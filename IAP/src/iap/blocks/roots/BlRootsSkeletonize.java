@@ -43,7 +43,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			{
 				// analyze separate sections of the roots
 				// img = processRootsInVisibleImage("root_"+i+"_"+n, background, img, rt);
-				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).print("Dilated image for section detection", false);
+				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).show("Dilated image for section detection", false);
 				
 				boolean graphAnalysis = false;
 				if (graphAnalysis) {
@@ -103,7 +103,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					
 					io = new ImageOperation(clusterIDsPixels, io.getWidth(), io.getHeight());
 				}
-				io.print("CLUSTERS", false);
+				io.show("CLUSTERS", false);
 			}
 			
 			getProperties().storeResults("RESULT_", rt, getBlockPosition());
@@ -114,7 +114,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	private FlexibleImage processRootsInVisibleImage(
 			String pre,
 			int background, FlexibleImage img, ResultsTableWithUnits rt) {
-		ImageOperation inp = img.io().print("INPUT FOR SKEL", debug);
+		ImageOperation inp = img.io().show("INPUT FOR SKEL", debug);
 		
 		rt.addValue(pre + "roots.filled.pixels", inp.countFilledPixels());
 		ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
@@ -123,14 +123,14 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			widthHistogram(rt, image);
 		}
 		
-		inp = binary.skeletonize(false).print("INPUT FOR BRANCH DETECTION", debug);
+		inp = binary.skeletonize(false).show("INPUT FOR BRANCH DETECTION", debug);
 		
 		rt.addValue(pre + "roots.skeleton.length", inp.countFilledPixels());
 		
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
 		skel.findEndpointsAndBranches();
 		
-		img = skel.getAsFlexibleImage().display("THE SKELETON", debug);
+		img = skel.getAsFlexibleImage().show("THE SKELETON", debug);
 		
 		ArrayList<Point> branchPoints = skel.getBranches();
 		

@@ -39,12 +39,12 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 					wb.copy().canvas()
 							.drawLine(bx, by, bx + bw, by + bh, Color.BLACK.getRGB(), 0, 2)
 							.drawLine(bx + bw, by, bx, by + bh, Color.BLACK.getRGB(), 0, 2)
-							.io().print("REFRENCE AREA");
+							.io().show("REFRENCE AREA");
 				}
 				wb = wb.clearArea(bx, by, bw, bh, options.getBackground(), true);
 			}
 			
-			wb.print("Reference Image for Warm Background Detection", debug)
+			wb.show("Reference Image for Warm Background Detection", debug)
 					.intensitySumOfChannel(false, false, false, false, warmBackgroundValues);
 			Collections.sort(warmBackgroundValues);
 			double sum = 0;
@@ -62,13 +62,13 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 						options.getBackground());
 			FlexibleImage gray = new FlexibleImage(warmBack.getWidth(), warmBack.getHeight(), res);
 			if (options.isBarley())
-				gray = gray.io().print("ADAPT IN", debug).
+				gray = gray.io().show("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(
 								getInt("Adaptive_Threshold_Region_Size", 50),
 								getInt("Adaptive_Threshold_Assumed_Background_Value", 00),
 								options.getBackground(),
 								getDouble("Adaptive_Threshold_K", 0.001)
-						).getImage().display("ADAPT OUT", debug);
+						).getImage().show("ADAPT OUT", debug);
 			return gray;
 		} else
 			return null;

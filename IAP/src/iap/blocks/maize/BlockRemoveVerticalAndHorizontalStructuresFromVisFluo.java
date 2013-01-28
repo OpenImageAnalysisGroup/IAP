@@ -87,7 +87,7 @@ public class BlockRemoveVerticalAndHorizontalStructuresFromVisFluo extends Abstr
 			}
 		}
 		
-		return new FlexibleImage(w, h, img).display("TEST " + System.currentTimeMillis(), false);
+		return new FlexibleImage(w, h, img).show("TEST " + System.currentTimeMillis(), false);
 	}
 	
 	private double getAvg(int[] filledPixelsPerLine, int startIndex, int n) {

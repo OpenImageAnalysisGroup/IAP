@@ -32,7 +32,7 @@ public class BlTranslateMatch extends AbstractSnapshotAnalysisBlockFIS {
 				ImageOperation vis = input().masks().vis().copy().io().grayscaleByLab();
 				
 				if (debug)
-					vis.copy().canvas().drawSideHistogram().io().print("VIS");
+					vis.copy().canvas().drawSideHistogram().io().show("VIS");
 				
 				TranslationMatch tm = vis.prepareTranslationMatch(debug);
 				
@@ -79,9 +79,9 @@ public class BlTranslateMatch extends AbstractSnapshotAnalysisBlockFIS {
 				
 				if (input().images().nir() != null && options.isBarleyInBarleySystem()) {
 					FlexibleImage nir = input().images().nir().copy().io().adaptiveThresholdForGrayscaleImage(50, 180, options.getBackground(), 0.1).
-							applyMask_ResizeMaskIfNeeded(vis.blur(40).getImage().display("VIS IMAGE AS MASK", debug), Color.black.getRGB()).
+							applyMask_ResizeMaskIfNeeded(vis.blur(40).getImage().show("VIS IMAGE AS MASK", debug), Color.black.getRGB()).
 							replaceColor(Color.black.getRGB(), options.getBackground()).
-							getImage().display("NIR IMAGE FOR CALCULATION", debug);
+							getImage().show("NIR IMAGE FOR CALCULATION", debug);
 					
 					tm.calcOffsetVerticalY(nir);
 					if (options.isBarleyInBarleySystem())

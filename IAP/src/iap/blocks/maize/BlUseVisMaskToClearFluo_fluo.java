@@ -33,18 +33,18 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 			return input().masks().fluo();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			// apply enlarged VIS mask to fluo
-			ImageOperation fluo = input().masks().fluo().copy().io().print("FLUOOO", debug);
+			ImageOperation fluo = input().masks().fluo().copy().io().show("FLUOOO", debug);
 			int b = (int) (input().masks().vis().getWidth() * 0.3);
 			FlexibleImage mask = input().masks().vis().copy().io().
 					addBorder(b, b / 2, (b / 2), options.getBackground()).
 					crop(0.23, 0.03, 0.285, 0.09).
 					blur(options.isMaize() ? 25 : 5).
-					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
+					binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred vis mask", debug).getImage();
 			if (debug)
-				fluo.copy().or(mask.copy()).print("ORR");
+				fluo.copy().or(mask.copy()).show("ORR");
 			return fluo.applyMask_ResizeMaskIfNeeded(
 					mask,
-					options.getBackground()).print("FILTERED VIS", debug).getImage();
+					options.getBackground()).show("FILTERED VIS", debug).getImage();
 		} else
 			return input().masks().fluo();
 	}
@@ -165,22 +165,22 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 				
 				processedMasks.fluo().copy().resize(w, h).io().or(
 						input().masks().vis()
-						).print("OR operation", true);
+						).show("OR operation", true);
 			}
 			// apply enlarged VIS mask to nir
-			ImageOperation nir = processedMasks.nir().copy().io().print("NIRRRR", debug);
+			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
 			FlexibleImage mask = processedMasks.vis().copy().io().or(
 					input().masks().fluo()
-					).print("OR operation", debug).blur(20).
-					binary(Color.BLACK.getRGB(), options.getBackground()).print("blurred vis mask", debug).getImage();
+					).show("OR operation", debug).blur(20).
+					binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred vis mask", debug).getImage();
 			int gray = new Color(180, 180, 180).getRGB();
 			int back = options.getBackground();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,
-					back).print("FILTERED NIR MASK", debug).getImage());
+					back).show("FILTERED NIR MASK", debug).getImage());
 			processedImages.setNir(processedImages.nir().io().applyMask_ResizeMaskIfNeeded(
 					mask,
-					options.getBackground()).print("FILTERED NIR IMAGE", debug).
+					options.getBackground()).show("FILTERED NIR IMAGE", debug).
 					replaceColor(back, gray).getImage());
 			return;
 		}

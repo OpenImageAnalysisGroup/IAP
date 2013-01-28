@@ -55,13 +55,13 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		FlexibleImage res = vis;
 		if (options.isMaize()) {
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().io().print("orig", debug)// .medianFilter32Bit()
+				FlexibleImage viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
 						// .closing(3, 3)
 						// .erode()
 						.border(5)
 						.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
 						.blur(getDouble("Blur-Vis", 1))
-						.getImage().display("vis", debug);
+						.getImage().show("vis", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -79,7 +79,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
 							.dilate(3)
 							.blur(1)
-							.getImage().display("vis", debug);
+							.getImage().show("vis", debug);
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
@@ -96,7 +96,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
 							.dilate(2)
 							.blur(1)
-							.getImage().display("vis", debug);
+							.getImage().show("vis", debug);
 					
 					if (viswork != null)
 						if (vis != null && fluo != null) {
@@ -130,7 +130,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 						.erode(getInt("Erode-Cnt-Fluo", 1))
 						.dilate(getInt("Dilate-Cnt-Fluo", 1))
 						.blur(getDouble("Blur-Fluo", 4))
-						.getImage().display("fluo", debug);
+						.getImage().show("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -148,7 +148,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 						// .erode(1)
 						.dilate(getInt("Dilate-Cnt-Fluo", 4))
 						// .blur(1)
-						.getImage().display("fluo", debug);
+						.getImage().show("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
@@ -190,10 +190,10 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		int bloomLimbCount = 0;
 		if (options.isMaize()) {
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().display("blurf", false), 0.075f, h, 20).io().// blur(3).
+			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().show("blurf", false), 0.075f, h, 20).io().// blur(3).
 					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
 			
-			probablyBloomFluo = probablyBloomFluo.io().print("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
+			probablyBloomFluo = probablyBloomFluo.io().show("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
 					erode().erode().erode().erode().invert().
 					getImage();
 			
@@ -209,7 +209,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
 			skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
 			
-			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().print("BLOOM AREA", debug2).countFilledPixels());
+			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().show("BLOOM AREA", debug2).countFilledPixels());
 		}
 		if (options.isBarley())
 			skel2d.deleteShortEndLimbs(20, true, new HashSet<Point>());
@@ -230,7 +230,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0d).getImage();
-				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().display("INNER HULL", debug);
+				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
@@ -243,7 +243,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 						ttt[p.x][p.y] = clear;
-				temp = new FlexibleImage(ttt).io().print("FINAL", debug).getImage();
+				temp = new FlexibleImage(ttt).io().show("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int filled;
 				ImageOperation tio = temp.io();
@@ -266,9 +266,9 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
-		result.display("res", false);
+		result.show("res", false);
 		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
-		result2.display("res2", false);
+		result2.show("res2", false);
 		
 		// ***Saved***
 		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
@@ -276,7 +276,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			FlexibleImage inputImage = inpFLUOunchanged.copy().display(" inp img 2", false);
+			FlexibleImage inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -296,7 +296,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				lw = 1;
 			for (Point p : branchPoints)
 				canvas.fillRect(p.x - lw / 2, p.y - lw / 2, lw, lw, clear);
-			inputImage = canvas.getImage().display("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
+			inputImage = canvas.getImage().show("CLEARED (" + branchPoints.size() + ") lw=" + leafWidthInPixels, debug);
 			
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;

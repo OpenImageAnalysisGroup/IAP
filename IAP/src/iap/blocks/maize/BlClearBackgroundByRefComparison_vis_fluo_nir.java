@@ -37,7 +37,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		if (input().images().vis() != null && input().masks().vis() == null) {
 			FlexibleImage in = input().images().vis();
 			FlexibleImage simulatedGreen = in.io().copy().filterByHSV(getDouble("Clear-background-vis-color-distance", 0.1), Color.GREEN.getRGB()).
-					print("simulated background green", debug).getImage();
+					show("simulated background green", debug).getImage();
 			FlexibleImage simulatedGreen2 = in
 					.io()
 					.copy()
@@ -47,30 +47,30 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 									getInt("Clear-background-vis-color-green-R", 94),
 									getInt("Clear-background-vis-color-green-G", 118),
 									getInt("Clear-background-vis-color-green-B", 50)).getRGB())
-					.print("simulated background green 2", debug).getImage();
+					.show("simulated background green 2", debug).getImage();
 			FlexibleImage simulatedBlue = in
 					.io()
 					.copy()
-					.print("mist", debug)
+					.show("mist", debug)
 					.filterByHSV(
 							getDouble("Clear-background-vis-color-distance", 0.1),
 							new Color(
 									getInt("Clear-background-vis-color-blue-R", 20),
 									getInt("Clear-background-vis-color-blue-G", 36),
 									getInt("Clear-background-vis-color-blue-B", 76)).getRGB())
-					.print("simulated background blue", debug).getImage();
-			FlexibleImage simBlueGreen = simulatedBlue.io().or(simulatedGreen).or(simulatedGreen2).print("simulated green and blue", debug).getImage();
-			input().masks().setVis(in.io().xor(simBlueGreen).print("sim xor", debug).getImage());
+					.show("simulated background blue", debug).getImage();
+			FlexibleImage simBlueGreen = simulatedBlue.io().or(simulatedGreen).or(simulatedGreen2).show("simulated green and blue", debug).getImage();
+			input().masks().setVis(in.io().xor(simBlueGreen).show("sim xor", debug).getImage());
 		}
 		
 		if (input().images().vis() != null && input().masks().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				FlexibleImage visImg = input().images().vis().display("In VIS", debug);
-				FlexibleImage visMsk = input().masks().vis().display("In Mask", debug);
+				FlexibleImage visImg = input().images().vis().show("In VIS", debug);
+				FlexibleImage visMsk = input().masks().vis().show("In Mask", debug);
 				FlexibleImage cleared = visImg
 						.io()
 						.compare()
-						.compareImages("vis", visMsk.io().blur(getDouble("Clear-background-vis-blur", 2.0)).print("Blurred Mask", debug).getImage(),
+						.compareImages("vis", visMsk.io().blur(getDouble("Clear-background-vis-blur", 2.0)).show("Blurred Mask", debug).getImage(),
 								getInt("Clear-background-vis-l-diff-side", 20),
 								getInt("Clear-background-vis-l-diff-side", 20),
 								getInt("Clear-background-vis-ab-diff-side", 20),
@@ -81,25 +81,25 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 						.border(getInt("Clear-background-vis-border-width-side", 2))
 						.getImage();
 				return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
-						.print("CLEAR RESULT", debug).getImage();
+						.show("CLEAR RESULT", debug).getImage();
 			}
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				FlexibleImage visX = input().images().vis().copy();
 				FlexibleImage cleared = new ImageOperation(visX).blur(getDouble("Clear-background-vis-blur", 2.0))
 						.compare()
-						.compareImages("vis", input().masks().vis().io().blur(getDouble("Clear-background-vis-blur", 2.0)).print("medianb", debug).getImage(),
+						.compareImages("vis", input().masks().vis().io().blur(getDouble("Clear-background-vis-blur", 2.0)).show("medianb", debug).getImage(),
 								getInt("Clear-background-vis-l-diff-top", 40),
 								getInt("Clear-background-vis-l-diff-top", 40),
 								getInt("Clear-background-vis-ab-diff-top", 40),
 								back, debug)
-						.print("comparison result", debug)
+						.show("comparison result", debug)
 						.or(visX.copy().io()
 								.filterRemainHSV(getDouble("Clear-background-vis-remain-distance", 0.02), getDouble("Clear-background-vis-remain-hue", 0.62))
 								.getImage())
 						.border(getInt("Clear-background-vis-border-width-top", 1))
 						.getImage();
 				return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
-						.print("CLEAR RESULT", debug).getImage();
+						.show("CLEAR RESULT", debug).getImage();
 			}
 			throw new UnsupportedOperationException("Unknown camera setting.");
 		} else {
@@ -125,7 +125,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					
 					double fac = getDouble("Clear-background-fluo-lab-factor-side", 0.1);
 					FlexibleImage result = new ImageOperation(fluo.io().copy()
-							.blur(getDouble("Clear-background-fluo-blur", 1.0)).print("Blurred fluo image", false)
+							.blur(getDouble("Clear-background-fluo-blur", 1.0)).show("Blurred fluo image", false)
 							.medianFilter32Bit()
 							.getImage()).compare()
 							.compareImages("fluo", input().masks().fluo().io()
@@ -154,12 +154,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 							new Integer[] {}, new Integer[] {},
 							blueCurbWidthBarley0_1,
 							blueCurbHeightEndBarly0_8).
-							print("removed noise", debug).getImage();
+							show("removed noise", debug).getImage();
 					
 					result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 					
 					if (debug)
-						result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).print("Left-Over");
+						result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).show("Left-Over");
 					
 					return result;
 				}
@@ -215,9 +215,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				if (options.isMaize()) {
 					int blackDiff = getInt("Clear-background-nir-black-diff-top", 14) / 3;
 					int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20) / 3;
-					FlexibleImage msk = new ImageOperation(nir.display("NIR MSK", debug)).compare()
+					FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
 							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
-							.print("result nir", debug).getImage();
+							.show("result nir", debug).getImage();
 					msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
 					
 					return msk;
@@ -232,7 +232,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					int whiteDiff = getInt("Clear-background-nir-white-diff-maize", 20);
 					return new ImageOperation(nir).compare()
 							.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-							.print("result nir", debug)
+							.show("result nir", debug)
 							.thresholdClearBlueBetween(getInt("Clear-background-nir-min-threshold-blue", 150), getInt("Clear-background-nir-max-threshold-blue", 169))
 							.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
 							.border(getInt("Clear-background-nir-border-width-top", 2))
@@ -243,14 +243,14 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 					if (options.isHigherResVisCamera())
 						return new ImageOperation(nir).compare()
 								.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-								.print("result nir", debug)
+								.show("result nir", debug)
 								.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
 								.border(getInt("Clear-background-nir-border-width-top", 2))
 								.getImage();
 					else
 						return new ImageOperation(nir).compare()
 								.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-								.print("result nir", debug)
+								.show("result nir", debug)
 								.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
 								.border(getInt("Clear-background-nir-border-width-top", 2))
 								.getImage();
@@ -287,7 +287,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				}
 			}
 		}
-		FlexibleImage res = new FlexibleImage(in).display("DEBUG", debug);
+		FlexibleImage res = new FlexibleImage(in).show("DEBUG", debug);
 		return res;
 	}
 	

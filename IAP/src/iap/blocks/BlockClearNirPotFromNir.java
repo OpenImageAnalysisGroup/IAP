@@ -25,7 +25,7 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10 || options.isBarleyInBarleySystem())
 			return nir;
 		
-		nir.display("NIR pot analysis IN", debug);
+		nir.show("NIR pot analysis IN", debug);
 		
 		int[][] nirArray = nir.getAs2A();
 		
@@ -72,7 +72,7 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		
-		return new FlexibleImage(nirArray).display("NIR pot removed", debug);
+		return new FlexibleImage(nirArray).show("NIR pot removed", debug);
 	}
 	
 	@Override

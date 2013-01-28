@@ -41,7 +41,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	protected FlexibleImage processVISimage() {
 		FlexibleImage fi = input().images() != null ? input().images().vis() : null;
 		if (fi != null) {
-			getProperties().setImage("img.vis.3D", fi.display("CLEARED", false));
+			getProperties().setImage("img.vis.3D", fi.show("CLEARED", false));
 		} else {
 			System.out.println();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");

@@ -492,7 +492,7 @@ public class ImageOperation {
 			}
 		}
 		
-		return new ImageOperation(originalImage).print("HHHH (deleted " + del + ")", false).setType(getType());
+		return new ImageOperation(originalImage).show("HHHH (deleted " + del + ")", false).setType(getType());
 	}
 	
 	/**
@@ -1311,20 +1311,14 @@ public class ImageOperation {
 		return image;
 	}
 	
-	// ############# print #####################
-	
-	public void printImage() {
-		new FlexibleImage(image).print(SystemAnalysis.getCurrentTime());
-	}
-	
-	public ImageOperation print(String title, boolean doIt) {
+	public ImageOperation show(String title, boolean doIt) {
 		if (doIt)
-			new FlexibleImage(image).print(title);
+			new FlexibleImage(image).show(title);
 		return this;
 	}
 	
-	public ImageOperation print(String title) {
-		return print(title, true);
+	public ImageOperation show(String title) {
+		return show(title, true);
 	}
 	
 	// ############# save ######################
@@ -3477,7 +3471,7 @@ public class ImageOperation {
 			}
 		}
 		if (debug)
-			canvas.getImage().display("region scan for white balance", debug);
+			canvas.getImage().show("region scan for white balance", debug);
 		
 		if (count < w * h * 0.1 && recursion < 30) {
 			if (searchWhiteTrue)
@@ -3573,7 +3567,7 @@ public class ImageOperation {
 				pixL[x][y] = pixR[x][y];
 			}
 		}
-		return new ImageOperation(pixL).flipHor().print("merged balanced", false);
+		return new ImageOperation(pixL).flipHor().show("merged balanced", false);
 	}
 	
 	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps) {
@@ -3795,8 +3789,8 @@ public class ImageOperation {
 	public ImageOperation unsharpedMask(FlexibleImage inp, double weight, double sigma) {
 		double[] fac = { weight, weight, weight };
 		FlexibleImage blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
-		blured.print("blured");
-		return new ImageOperation(inp).print("orig").subtractImages(blured, "").print("sub");
+		blured.show("blured");
+		return new ImageOperation(inp).show("orig").subtractImages(blured, "").show("sub");
 	}
 	
 	public ImageOperation unsharpenMask() {

@@ -34,13 +34,13 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 				int background = options.getBackground();
 				boolean show = false;
 				// visible search most high Y
-				TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.vis().display("Mask Search For Maxima", show)).getExtremePoints(background);
+				TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.vis().show("Mask Search For Maxima", show)).getExtremePoints(background);
 				// cut fluo from top
 				if (extremePoints != null) {
 					int h = processedMasks.fluo().getHeight();
 					int temp = (int) ((extremePoints.getTopY() / (double) processedMasks.vis().getHeight()) * processedMasks.fluo().getHeight());
 					FlexibleImage fi = new ImageOperation(processedMasks.fluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
-					processedMasks.setFluo(fi.display("Fluo Result", show));
+					processedMasks.setFluo(fi.show("Fluo Result", show));
 				}
 			}
 	}

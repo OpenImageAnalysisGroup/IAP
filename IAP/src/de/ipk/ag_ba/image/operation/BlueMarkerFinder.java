@@ -44,19 +44,19 @@ public class BlueMarkerFinder {
 				.io();
 		
 		markerPositionsImage = io1
-				.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).print("nach lab", debug)
+				.thresholdLAB(0, 255, 0, 255, 10, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).show("nach lab", debug)
 				.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
 				.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
-				.print("nach opening", debug)
-				.grayscale().print("nach gray", debug)
-				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).print("nach thresh", debug);
+				.show("nach opening", debug)
+				.grayscale().show("nach gray", debug)
+				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", debug);
 		
-		io1.print("Input für Marker Search", debug);
+		io1.show("Input für Marker Search", debug);
 		
-		io1.print("Input für Marker Search", debug);
+		io1.show("Input für Marker Search", debug);
 		
 		resultTable = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).print("MARKIERT GROESSER (a)", debug).opening(10, 0).print("MARKIERT GROESSER", debug)
+				.findMax(10.0, MaximumFinder.LIST).show("MARKIERT GROESSER (a)", debug).opening(10, 0).show("MARKIERT GROESSER", debug)
 				.getResultsTable();
 		
 	}

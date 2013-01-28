@@ -84,9 +84,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", true)) {
 			if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
 				if (input().masks() != null)
-					input().masks().fluo().print("Mask-Input for step: " + task);
+					input().masks().fluo().show("Mask-Input for step: " + task);
 				else
-					input().images().fluo().print("Image-Input for step: " + task);
+					input().images().fluo().show("Image-Input for step: " + task);
 			return new StopWatch("phytochamberTopImageProcessor: " + task);
 		} else
 			return null;

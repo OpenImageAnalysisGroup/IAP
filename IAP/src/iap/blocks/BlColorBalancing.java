@@ -50,11 +50,11 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 			if (remark != null && remark.length() > 0 && !remark.contains("n")) {
 				if (remark.contains("auto")) {
 					double[] pixLeft, pixRight;
-					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().display("left part", debug), false,
+					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().show("left part", debug), false,
 							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
-					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().display("right part", debug), false,
+					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().show("right part", debug), false,
 							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
-					return io.imageBalancing(255, pixLeft, pixRight).getImage().display("after", false);
+					return io.imageBalancing(255, pixLeft, pixRight).getImage().show("after", false);
 				} else {
 					try {
 						final Float brightup = Float.parseFloat(remark.trim());
@@ -84,7 +84,7 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 			}
 			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
 		}
-		return io.imageBalancing(255, pix).getImage().display("after", false);
+		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
 	
 	@Override
@@ -101,7 +101,7 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
 		else
 			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
-		return io.imageBalancing(255, pix).getImage().display("after", false);
+		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
 	
 	/**

@@ -133,7 +133,7 @@ public class BlCalcWidthAndHeight extends
 													.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF, values.x / 2 + temp.getLeftX() + 50,
 															vertYsoilLevelF, Color.MAGENTA.getRGB(), 0.5, 5)
 													.getImage()
-													.display("DEBUG", debug);
+													.show("DEBUG", debug);
 										else {
 											visRes = visRes
 													.io()
@@ -149,7 +149,7 @@ public class BlCalcWidthAndHeight extends
 															10,
 															Color.BLUE.getRGB(), 255)
 													.getImage()
-													.display("DEBUG", debug);
+													.show("DEBUG", debug);
 											visRes = visRes
 													.io()
 													.canvas()
@@ -165,7 +165,7 @@ public class BlCalcWidthAndHeight extends
 																	- temp.getTopY(),
 															Color.RED.getRGB(), 255)
 													.getImage()
-													.display("DEBUG", debug);
+													.show("DEBUG", debug);
 										}
 										return visRes;
 									}
