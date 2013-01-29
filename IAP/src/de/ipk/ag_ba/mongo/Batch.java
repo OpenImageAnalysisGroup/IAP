@@ -292,7 +292,7 @@ public class Batch {
 					try {
 						hostName = SystemAnalysisExt.getHostName();
 						DBCollection collection = db.getCollection("schedule");
-						if (MongoDB.ensureIndex)
+						if (MongoDB.getEnsureIndex())
 							collection.ensureIndex("release");
 						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;

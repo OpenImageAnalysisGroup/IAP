@@ -72,10 +72,10 @@ public class ExperimentLoader implements RunnableOnDB {
 		// synchronized (db) {
 		
 		final DBCollection collCond = db.getCollection("conditions");
-		if (MongoDB.ensureIndex)
+		if (MongoDB.getEnsureIndex())
 			collCond.ensureIndex("_id");
 		final DBCollection collSubst = db.getCollection("substances");
-		if (MongoDB.ensureIndex)
+		if (MongoDB.getEnsureIndex())
 			collSubst.ensureIndex("_id");
 		
 		DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
@@ -126,7 +126,7 @@ public class ExperimentLoader implements RunnableOnDB {
 						processSubstance(db, experiment, substance, collCond, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS, n);
 					}
 				}
-				if (MongoDB.ensureIndex)
+				if (MongoDB.getEnsureIndex())
 					db.getCollection("substances").ensureIndex("_id");
 				BasicDBList l = (BasicDBList) expref.get("substance_ids");
 				if (l != null) {

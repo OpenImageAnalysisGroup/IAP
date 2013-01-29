@@ -118,7 +118,7 @@ public class CleanupHelper implements RunnableOnDB {
 		status.setCurrentStatusText2("Read list of condition IDs");
 		{
 			DBCollection conditions = db.getCollection("conditions");
-			if (MongoDB.ensureIndex)
+			if (MongoDB.getEnsureIndex())
 				conditions.ensureIndex(new BasicDBObject("_id", 1));
 			long nn = 0, max = conditions.count();
 			status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");

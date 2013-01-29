@@ -25,6 +25,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
@@ -72,7 +73,10 @@ public class ExperimentSaver implements RunnableOnDB {
 	private final ThreadSafeOptions err;
 	private DB db;
 	
-	private final boolean multiThreadedStorage = true;
+	private final boolean multiThreadedStorage =
+			SystemOptions.getInstance().getBoolean("GRID-STORAGE",
+					"Multi-Threaded Safe Operation", false);
+	
 	private final HashType hashType;
 	private final MongoDBhandler mh;
 	private final ArrayList<ExperimentHeaderInterface> experimentList;
@@ -208,14 +212,16 @@ public class ExperimentSaver implements RunnableOnDB {
 		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
 		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		
-		final CollectionStorage cols = new CollectionStorage(db, MongoDB.ensureIndex);
+		final CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 		
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
 		Runtime r = Runtime.getRuntime();
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
 		errorCount.setLong(0);
-		int nLock = multiThreadedStorage ? 4 : 1;
+		int nLock = multiThreadedStorage ?
+				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads substance saving", 1)
+				: 1;
 		final Semaphore lock = new Semaphore(nLock, true);
 		final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 		while (!sl.isEmpty()) {
@@ -338,7 +344,9 @@ public class ExperimentSaver implements RunnableOnDB {
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
 		final HashSet<String> savedUrls = new HashSet<String>();
 		
-		int nLock = multiThreadedStorage ? 5 : 1;
+		int nLock = multiThreadedStorage ?
+				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads condition saving", 1)
+				: 1;
 		final Semaphore lock = new Semaphore(nLock, true);
 		
 		for (final ConditionInterface c : s) {
@@ -396,7 +404,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
 			DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 			
-			if (MongoDB.ensureIndex)
+			if (MongoDB.getEnsureIndex())
 				collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
@@ -411,7 +419,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			} else {
 				GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
 				DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
-				if (MongoDB.ensureIndex)
+				if (MongoDB.getEnsureIndex())
 					collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 				
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
@@ -439,11 +447,11 @@ public class ExperimentSaver implements RunnableOnDB {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
-		if (MongoDB.ensureIndex)
+		if (MongoDB.getEnsureIndex())
 			collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
 		DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
-		if (MongoDB.ensureIndex)
+		if (MongoDB.getEnsureIndex())
 			collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
 		String hash;
@@ -509,7 +517,9 @@ public class ExperimentSaver implements RunnableOnDB {
 			condition = new BasicDBObject(filter(attributes));
 		}
 		
-		int nLock = multiThreadedStorage ? 2 : 1;
+		int nLock = multiThreadedStorage ?
+				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads image saving", 2)
+				: 1;
 		boolean fair = true;
 		final Semaphore lock = new Semaphore(nLock, fair);
 		
@@ -987,7 +997,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		if (image.getURL() != null &&
 				(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
 				image.getURL().getPrefix().startsWith("hsm_")) {
-			if (MongoDB.ensureIndex)
+			if (MongoDB.getEnsureIndex())
 				db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 			
 			if (hashMain != null) {

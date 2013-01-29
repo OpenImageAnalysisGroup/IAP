@@ -52,7 +52,7 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			@Override
 			public void run() {
 				try {
-					CollectionStorage cols = new CollectionStorage(db, MongoDB.ensureIndex);
+					CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 					DatabaseStorageResult dsr =
 							ExperimentSaver.saveImageFileDirect(
 									cols, db, limg, null,
