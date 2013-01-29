@@ -380,23 +380,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 	}
 	
-	private HashMap<String, String> id2coo = null;
-	
 	private String getCoordinatorFromNameID(String kuerzel) {
-		if (id2coo == null) {
-			id2coo = new HashMap<String, String>();
-			String[] coordinatorShortName =
-					SystemOptions.getInstance().getStringAll("Import", "User Mapping//Experiment User ID to Coordinator",
-							new String[] { "BA/Klukas, Dr. Christian (BA)" });
-			if (coordinatorShortName != null)
-				for (String c : coordinatorShortName)
-					if (!c.contains("/"))
-						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: "
-								+ "Invalid name ID to name mapping, should be for example 'BA/Klukas, Dr. Christian (BA)'!");
-					else
-						id2coo.put(c.split("/")[0], c.split("/", 2)[1]);
-		}
-		return id2coo.get(kuerzel);
+		return SystemOptions.getInstance().getString("Import", "User Mapping//Coordinator for Experiment ID", kuerzel);
 	}
 	
 	public static HashSet<String> getAdministrators() {
@@ -1028,8 +1013,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 							if (fn.contains("/"))
 								fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 							IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
-										+ sn.getPath_image_config_blob(), sn.getId_tag()
-										+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+									+ sn.getPath_image_config_blob(), sn.getId_tag()
+									+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 							if (optStatus != null)
 								optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
 							position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
