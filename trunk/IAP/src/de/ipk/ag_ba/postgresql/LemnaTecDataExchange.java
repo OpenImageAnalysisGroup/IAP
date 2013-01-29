@@ -75,7 +75,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
 		HashSet<String> invalidDBs = new HashSet<String>();
 		
-		String[] def = new String[] {
+		String[] defaultIgnored = new String[] {
 				"postgres",
 				"bacula",
 				"LTSystem",
@@ -87,9 +87,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				"CornTest3"
 		};
 		
-		for (String invalid : IAPoptions.getInstance().getStringAll("LT-DB", "DBs//ignore_db", def)) {
-			invalidDBs.add(invalid);
-		}
+		String[] ig = IAPoptions.getInstance().getStringAll("LT-DB", "DBs//ignore_db", defaultIgnored);
+		if (ig != null)
+			for (String invalid : ig) {
+				invalidDBs.add(invalid);
+			}
 		
 		String sqlText = "SELECT datname FROM pg_database";
 		
@@ -349,39 +351,9 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return result;
 	}
 	
-	private HashMap<String, String> login2niceName = null;
-	
 	private String getNiceNameFromLoginName(String name) {
-		// System.out.println("Request nice name for " + name);
-		if (login2niceName == null) {
-			login2niceName = new HashMap<String, String>();
-			login2niceName.put("Fernando", "Arana, Dr. Fernando (HET)");
-			login2niceName.put("Gramel-Eikenroth", "Gramel-Eikenroth (LemnaTec)");
-			login2niceName.put("LTAdmin", "LTAdmin (LemnaTec)");
-			login2niceName.put("LemnaTec Support", "LemnaTec Support (LemnaTec)");
-			login2niceName.put("entzian", "Entzian, Dr. Alexander (BA)");
-			login2niceName.put("Neumannk", "Neumann, Dr. Kerstin (GED)");
-			login2niceName.put("neumannk", "Neumann, Dr. Kerstin (GED)");
-			login2niceName.put("hartmann", "Hartmann, Anja (PBI)");
-			login2niceName.put("mary", "Ziems, Mary (GED");
-			login2niceName.put("Ziems", "Ziems, Mary (GED");
-			login2niceName.put("stein", "Stein, Dr. Nils (GED");
-			login2niceName.put("altmann", "Altmann, Prof. Dr. Thomas (MOG)");
-			login2niceName.put("meyer", "Meyer, Dr. Rhonda (HET)");
-			login2niceName.put("muraya", "Muraya, Dr. Moses Mahugu (HET)");
-			login2niceName.put("Muraya", "Muraya, Dr. Moses Mahugu (HET)");
-			login2niceName.put("weigelt", "Weigelt-Fischer, Dr. Kathleen (HET)");
-			login2niceName.put("Muecke", "Muecke, Ingo (BA)");
-			login2niceName.put("muecke", "Muecke, Ingo (BA)");
-			login2niceName.put("seyfarth", "Seyfarth, Monique (HET)");
-			login2niceName.put("klukas", "Klukas, Dr. Christian (BA)");
-		}
-		String res = login2niceName.get(name);
-		// System.out.println("Result: " + res);
-		if (res != null)
-			return res;
-		else
-			return name;
+		String niceName = SystemOptions.getInstance().getString("Import", "Long User Names//Full name of " + name, name);
+		return niceName;
 	}
 	
 	private String getCoordinatorFromExperimentName(String experimentname) {
@@ -389,11 +361,17 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			if (experimentname == null || experimentname.isEmpty())
 				return null;
 			else {
-				if (experimentname.length() >= 6) {
-					// int id = Integer.parseInt(experimentname.substring(0, 4));
-					String kuerzel = experimentname.substring(4, 6);
-					String coor = getCoordinatorFromNameID(kuerzel);
-					return coor;
+				try {
+					int p0 = SystemOptions.getInstance().getInteger("Import", "User Mapping//Experiment User ID Start", 4);
+					int p2 = SystemOptions.getInstance().getInteger("Import", "User Mapping//Experiment user ID Length", 2);
+					if (experimentname.length() >= p0 + p2) {
+						String kuerzel = experimentname.substring(p0, p0 + p2);
+						String coor = getCoordinatorFromNameID(kuerzel);
+						return coor;
+					}
+				} catch (Exception err) {
+					System.out
+							.println(SystemAnalysis.getCurrentTime() + "ERROR: Could not process experiment name and coordinator name. Error: " + err.getMessage());
 				}
 				return null;
 			}
@@ -407,33 +385,27 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private String getCoordinatorFromNameID(String kuerzel) {
 		if (id2coo == null) {
 			id2coo = new HashMap<String, String>();
-			id2coo.put("IL", "Lermontova, Dr. Inna (KTE)");
-			id2coo.put("AC", "Arana, Dr. Fernando (HET)");
-			id2coo.put("FA", "Arana, Dr. Fernando (HET)");
-			id2coo.put("RM", "Meyer, Dr. Rhonda (HET)");
-			id2coo.put("MM", "Muraya, Dr. Moses Mahugu (HET)");
-			id2coo.put("KN", "Neumann, Kerstin (GED)");
-			id2coo.put("KW", "Weigelt-Fischer, Dr. Kathleen (HET)");
-			id2coo.put("KWF", "Weigelt-Fischer, Dr. Kathleen (HET)");
-			id2coo.put("BA", "Klukas, Dr. Christian (BA)");
+			String[] coordinatorShortName =
+					SystemOptions.getInstance().getStringAll("Import", "User Mapping//Experiment User ID to Coordinator",
+							new String[] { "BA/Klukas, Dr. Christian (BA)" });
+			if (coordinatorShortName != null)
+				for (String c : coordinatorShortName)
+					if (!c.contains("/"))
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: "
+								+ "Invalid name ID to name mapping, should be for example 'BA/Klukas, Dr. Christian (BA)'!");
+					else
+						id2coo.put(c.split("/")[0], c.split("/", 2)[1]);
 		}
 		return id2coo.get(kuerzel);
 	}
 	
 	public static HashSet<String> getAdministrators() {
 		HashSet<String> res = new HashSet<String>();
-		res.add("klukas");
-		res.add("entzian");
-		res.add("muecke");
-		res.add("Muecke");
-		return res;
-	}
-	
-	public static HashSet<String> getGroupLock() {
-		HashSet<String> res = new HashSet<String>();
-		res.add("PBI");
-		res.add("SYS");
-		res.add("BIT");
+		String[] admins = SystemOptions.getInstance().getStringAll("LT-DB", "Administrator Users",
+				new String[] { "klukas", "muecke", "Muecke" });
+		if (admins != null)
+			for (String a : admins)
+				res.add(a);
 		return res;
 	}
 	
@@ -1169,20 +1141,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
-		// Collections.sort(experiment, new Comparator<SubstanceInterface>() {
-		// @Override
-		// public int compare(SubstanceInterface arg0, SubstanceInterface arg1) {
-		// return arg0.getName().compareTo(arg1.getName());
-		// }
-		// });
-		// for (SubstanceInterface si : experiment) {
-		// Collections.sort(si, new Comparator<ConditionInterface>() {
-		// @Override
-		// public int compare(ConditionInterface o1, ConditionInterface o2) {
-		// return o1.toString().compareTo(o2.toString());
-		// }
-		// });
-		// }
 		
 		return experiment;
 	}
@@ -1232,7 +1190,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				}
 			}
 			TextFile tf = new TextFile(new MyByteArrayInputStream(buf, buf.length), 0);
-			// System.out.println(url.toString());
 			byte[] b = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 			double angle = 0;
 			for (String ss : tf) {
