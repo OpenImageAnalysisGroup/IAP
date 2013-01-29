@@ -261,6 +261,16 @@ nBoxPlotList <- list(
 				subsection = 10,
 				subsubsection = 1),
 		
+		"top.vis.border.length.norm" = list(
+				plotName = "top border length (zoom corrected) (mm)", 
+				section = 5,
+				subsection = 11,
+				subsubsection = 1),
+		"top.vis.border.length" = list(
+				plotName = "top border length (px)", 
+				section = 5,
+				subsection = 12,
+				subsubsection = 1),
 		
 		 
 		 "side.area.relative" = list(
