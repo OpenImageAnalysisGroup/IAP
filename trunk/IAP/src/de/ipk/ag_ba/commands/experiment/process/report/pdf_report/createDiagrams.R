@@ -241,13 +241,13 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 		}
 		if (allCharacterSeparated["."] > allCharacterSeparated[", "]) {
 			
-			ownCat("Read input (English number format)...")
+			TRUE %print% "Read input (English number format)..."
 			data <- read.csv(fileName, header = TRUE, sep = separation, fileEncoding = "UTF-8")
 			colnames(data)[14:length(colnames(data))] <- replaceBrakesWithNothing(colnames(data)[14:length(colnames(data))], "..")
 			return(data)
 		} else {
 			
-			ownCat("Read input (German number format)...")
+			TRUE %print% "Read input (German number format)..."
 			data <- read.csv2(fileName, header = TRUE, sep = separation, fileEncoding = "UTF-8")
 			colnames(data) <- replaceBrakesWithNothing(colnames(data), "..")
 			return(data)
@@ -602,10 +602,10 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	overallList$debug %debug% "overallCheckIfDescriptorIsNaOrAllZero()"	
 	
 	if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
-		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "nBoxplots..."));}
+		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "nBoxplots..."));}	## <--- debug %print% Text anpassen!!!
 		for (n in seq(along = overallList$nBoxDes)) {
 			if (!is.na(overallList$nBoxDes[[n]][1])) {
-				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 			}
 		}
 		names(overallList$nBoxDes) <- c(1:length(overallList$nBoxDes))
@@ -619,7 +619,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$nBoxMultiDes), "nBoxMultiPlots..."));}
 		for (n in seq(along = overallList$nBoxMultiDes)) {
 			if (!is.na(overallList$nBoxMultiDes[[n]][1])) {
-				overallList$nBoxMultiDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxMultiDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$nBoxMultiDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxMultiDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 			}
 		}
 		names(overallList$nBoxMultiDes) <- c(1:length(overallList$nBoxMultiDes))
@@ -632,7 +632,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxDes), "Boxplots..."))}
 		for (n in seq(along = overallList$boxDes)) {
 			if (!is.na(overallList$boxDes[[n]][1])) {
-				overallList$boxDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$boxDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 			}
 		}
 		names(overallList$boxDes) <- c(1:length(overallList$boxDes))
@@ -645,7 +645,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxStackDes), "stacked boxplots..."))}
 		for (n in seq(along = overallList$boxStackDes)) {
 			if (!is.na(overallList$boxStackDes[[n]][1])) {
-				overallList$boxStackDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$boxStackDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxStackDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 			}
 		}
 		names(overallList$boxStackDes) <- c(1:length(overallList$boxStackDes))
@@ -659,7 +659,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		for (n in seq(along = overallList$boxSpiderDes)) {
 			if (!is.na(overallList$boxSpiderDes[[n]][1])) {
 				initDescriptor <- overallList$boxSpiderDes[[n]]
-				overallList$boxSpiderDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$boxSpiderDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$boxSpiderDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 				booleanVector <- unlist(initDescriptor) %in% unlist(overallList$boxSpiderDes[[n]])
 				overallList$boxSpiderDesName[[n]] <- as.data.frame(overallList$boxSpiderDesName[[n]][booleanVector])
 				
@@ -677,7 +677,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		for (n in seq(along = overallList$linerangeDes)) {
 			if (!is.na(overallList$linerangeDes[[n]][1])) {
 				initDescriptor <- overallList$linerangeDes[[n]]
-				overallList$linerangeDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$linerangeDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$linerangeDes[[n]] <- checkIfDescriptorIsNaOrAllZero(overallList$linerangeDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 				booleanVector <- unlist(initDescriptor) %in% unlist(overallList$linerangeDes[[n]])
 				overallList$linerangeDesName[[n]] <- as.data.frame(overallList$linerangeDesName[[n]][booleanVector])
 				
@@ -694,7 +694,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		if (overallList$debug) {ownCat(paste(length(overallList$violinBoxDes), "violinplot..."))}
 		for (n in seq(along = overallList$violinBoxDes)) {
 			if (!is.na(overallList$violinBoxDes[[n]][1])) {
-				overallList$violinBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$violinBoxDes[[n]], overallList$iniDataSet, overallList$debug)
+				overallList$violinBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$violinBoxDes[[n]], overallList$iniDataSet, debug = overallList$debug)
 			}
 		}
 		names(overallList$violinBoxDes) <- c(1:length(overallList$violinBoxDes))
@@ -931,7 +931,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	
 	#columnsAfterCheckOfNormalized <- checkForNormalizedColumns(descriptorSet_nBoxplot)
 	if (!is.null(overallList$nBoxDes)) {
-		if (overallList$debug) {ownCat(NBOX.PLOT)}
+		if (overallList$debug) {ownCat(NBOX.PLOT)} ## <---- das noch anpassen "overallList$debug %print% NBOX.PLOT"
 		for (n in seq(along = overallList$nBoxDes)) {
 			overallList$nBoxDes[n] = preprocessingOfDescriptor(overallList$nBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 		}
@@ -1319,7 +1319,7 @@ preprocessingOfDescriptor <- function(descriptorVector, iniDataSet, debug = FALS
 
 preprocessingOfxAxisValue <- function(overallList) {
 	overallList$debug %debug% "preprocessingOfxAxisValue()"
-	overallList$xAxis = unlist(preprocessingOfValues(overallList$xAxis, TRUE))
+	overallList$xAxis = unlist(preprocessingOfValues(overallList$xAxis, TRUE, debug = overallList$debug))
 	
 	if (overallList$filterXaxis != NONE) {
 #		print(overallList$filterXaxis)
@@ -6272,10 +6272,10 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 		}
 	}
 	
-	if (!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
-		overallList <- reduceOverallListForMemorySave(overallList, typOfPlot)
-		gc()
-	}
+#	if (!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
+#		overallList <- reduceOverallListForMemorySave(overallList, typOfPlot)
+#		gc()
+#	}
 }
 
 
@@ -6368,7 +6368,7 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 	}
 	
 	if (isTRUE(all.equal(class(error), "try-error"))) {
-		if (!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {
+		if (!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {		
 			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 			filename <- checkFileName(preFilename, typOfPlot)
 			filenamePlot <- getPlotFileName(filename)
@@ -7066,8 +7066,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 		#filterTreatment <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#treatment <- "none"
-		treatment <- "Treatment"
-		#treatment <- "Genotype"
+#		treatment <- "Treatment"
+		treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
 		filterTreatment <- "none"
 		#filterTreatment <- "control"
@@ -7105,7 +7105,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 		
 		# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
 		
-		if (FALSE) {
+		if (TRUE) {
 			stressStart <- -1
 			stressEnd <- -1
 			stressTyp <- "001"
@@ -7120,7 +7120,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 		
 		splitTreatmentFirst <- FALSE
 		splitTreatmentSecond <- FALSE
-		isRatio <- TRUE
+		isRatio <- FALSE
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet <- workingDataSet
