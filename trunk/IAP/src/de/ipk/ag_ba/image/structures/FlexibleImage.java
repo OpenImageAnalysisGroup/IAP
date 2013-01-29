@@ -141,6 +141,10 @@ public class FlexibleImage {
 		this(IAPservice.getImage(ref, name));
 	}
 	
+	public FlexibleImage(InputStream is) throws IOException {
+		this(ImageIO.read(is));
+	}
+	
 	private static int[] getImgFromRGB(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
 		int[] r = grayR.getAs1A();
 		int[] g = grayG.getAs1A();

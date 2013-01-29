@@ -1072,6 +1072,14 @@ public class IAPservice {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">READ CONFIG FILE " + experimentListFileName + "...");
 		HashSet<String> outOfDateExperiments = new HashSet<String>();
 		
+		{
+			// init some settings, will be retrieved later once an mail is sent
+			@SuppressWarnings("unused")
+			boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in e-Mail", true);
+			@SuppressWarnings("unused")
+			int prefixLength = SystemOptions.getInstance().getInteger("Watch-Service", "DB2WebCam//LT-DB Prefix Length", 3);
+		}
+		
 		long startTime = System.currentTimeMillis();
 		
 		boolean containsAutoTimingSetting = false;
@@ -1178,20 +1186,67 @@ public class IAPservice {
 								boolean m1 = (dddt.getTime() > startTime1 && dddt.getTime() <= endTime1);
 								boolean m2 = (dddt.getTime() > startTime2 && dddt.getTime() <= endTime2);
 								boolean m3 = (new Date().getTime() - ddd.getTime()) > wc.getLastMinutes() * 60 * 1000;
-								String imageSrc = null;
-								String fileName = null;
-								if (ehi.getDatabase().startsWith("CGH")) {
-									fileName = "maize " + SystemAnalysis.getCurrentTimeInclSec() + ".jpg";
-									imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";
-								} else
-									if (ehi.getDatabase().startsWith("BGH")) {
-										fileName = "barley " + SystemAnalysis.getCurrentTimeInclSec() + ".jpg";
-										imageSrc = "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" +
-												System.currentTimeMillis();
+								String imageSrc1 = null;
+								String fileName1 = null;
+								String contentType1 = "image/jpeg";
+								String imageSrc2 = null;
+								String fileName2 = null;
+								String contentType2 = "image/jpeg";
+								int prefixLength = SystemOptions.getInstance().getInteger("Watch-Service",
+										"DB2WebCam//LT-DB Prefix Length", 3);
+								if (ehi.getDatabase() != null && ehi.getDatabase().length() >= prefixLength) {
+									String prefix = ehi.getDatabase().substring(0, prefixLength);
+									ArrayList<String> possibleCameraSources = new ArrayList<String>();
+									possibleCameraSources.add("[No Source]");
+									for (WebCamInfo webcam : IAPservice.getActiveWebCamURLs()) {
+										possibleCameraSources.add(webcam.getName());
 									}
-								if (fileName != null)
-									Thread.sleep(1000); // to ensure that each email has a different file name
-									
+									if (possibleCameraSources.size() > 1) {
+										String cameraSource = SystemOptions.getInstance().getStringRadioSelection("Watch-Service",
+												"DB2WebCam//DB " + prefix + " Camera 1",
+												possibleCameraSources, possibleCameraSources.get(0), true);
+										if (cameraSource != null) {
+											for (WebCamInfo webcam : IAPservice.getActiveWebCamURLs()) {
+												if (webcam.getName() != null && webcam.getName().equals(cameraSource)) {
+													// match
+													contentType1 = webcam.getContentType("image/jpeg");
+													fileName1 = webcam.getName()
+															+ SystemOptions.getInstance().getString("Watch-Service",
+																	"DB2WebCam//DB " + prefix + " Camera 1 Attachment Name Postfix",
+																	"_[time].jpg");
+													if (fileName1 != null && fileName1.indexOf("[time]") >= 0)
+														fileName1 = StringManipulationTools.stringReplace(fileName1, "[time]", SystemAnalysis.getCurrentTimeInclSec());
+													imageSrc1 = webcam.getUrl();
+													break;
+												}
+											}
+										}
+									}
+									if (possibleCameraSources.size() > 2) {
+										String cameraSource = SystemOptions.getInstance().getStringRadioSelection("Watch-Service",
+												"DB2WebCam//DB " + prefix + " Camera 2",
+												possibleCameraSources, possibleCameraSources.get(0), true);
+										if (cameraSource != null) {
+											for (WebCamInfo webcam : IAPservice.getActiveWebCamURLs()) {
+												if (webcam.getName() != null && webcam.getName().equals(cameraSource)) {
+													// match
+													contentType2 = webcam.getContentType("image/jpeg");
+													fileName2 = webcam.getName()
+															+ SystemOptions.getInstance().getString("Watch-Service",
+																	"DB2WebCam//DB " + prefix + " Camera 2 Attachment Name Postfix",
+																	"_[time].jpg");
+													if (fileName2 != null && fileName2.indexOf("[time]") >= 0) {
+														Thread.sleep(1000);
+														fileName2 = StringManipulationTools.stringReplace(fileName2, "[time]", SystemAnalysis.getCurrentTimeInclSec());
+													}
+													imageSrc2 = webcam.getUrl();
+													break;
+												}
+											}
+										}
+									}
+								}
+								
 								if ((m1 || m2) && m3) {
 									// WARN
 									foundSomeError = true;
@@ -1201,8 +1256,9 @@ public class IAPservice {
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND WARNING MAIL FOR EXPERIMENT "
 												+ ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										if (System.currentTimeMillis() - startTime < 15 * 60 * 1000)
-											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 15 MINUTES OF START NO MAIL WILL BE SEND");
+										int minMin = SystemOptions.getInstance().getInteger("Watch-Service", "Startup-Email-Delay-min", 15);
+										if (System.currentTimeMillis() - startTime < minMin * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST " + minMin + " MINUTES OF START NO MAIL WILL BE SEND");
 										else
 											m.sendEmail(
 													wc.getMails(),
@@ -1215,16 +1271,17 @@ public class IAPservice {
 															"No new data found for experiment " + ehi.getExperimentName()
 															+ ".\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-													imageSrc, fileName);
+													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2);
 									}
 									outOfDateExperiments.add(ehi.getExperimentName());
 								} else {
 									// all OK
 									if (outOfDateExperiments.contains(ehi.getExperimentName())) {
+										int minMin = SystemOptions.getInstance().getInteger("Watch-Service", "Startup-Email-Delay-min", 15);
 										System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SEND INFO MAIL FOR EXPERIMENT " + ehi.getExperimentName()
 												+ " TO " + wc.getMails());
-										if (System.currentTimeMillis() - startTime < 15 * 60 * 1000)
-											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST 15 MINUTES OF START NO MAIL WILL BE SEND");
+										if (System.currentTimeMillis() - startTime < minMin * 60 * 1000)
+											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST " + minMin + " MINUTES OF START NO MAIL WILL BE SEND");
 										else
 											m.sendEmail(
 													wc.getMails(),
@@ -1236,7 +1293,7 @@ public class IAPservice {
 															"New data has been found for experiment " + ehi.getExperimentName()
 															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-													imageSrc, fileName);
+													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2);
 										
 									}
 									outOfDateExperiments.remove(ehi.getExperimentName());
@@ -1319,10 +1376,12 @@ public class IAPservice {
 					"IP cameras//Title-" + (idx + 1), templateWebCamTitles[idx]);
 			String u = SystemOptions.getInstance().getString("Watch-Service",
 					"IP cameras//URL-" + (idx + 1), templateWebCamtURLs[idx]);
+			String ct = SystemOptions.getInstance().getString("Watch-Service",
+					"IP cameras//Content Type-" + (idx + 1), "image/jpg");
 			boolean e = SystemOptions.getInstance().getBoolean("Watch-Service",
 					"IP cameras//Webcam " + (idx + 1) + " enabled", true);
 			if (e && n != null && !n.isEmpty() && u != null && !u.isEmpty())
-				urls.add(new WebCamInfo(u, n));
+				urls.add(new WebCamInfo(u, n, ct));
 		}
 		return urls;
 	}
