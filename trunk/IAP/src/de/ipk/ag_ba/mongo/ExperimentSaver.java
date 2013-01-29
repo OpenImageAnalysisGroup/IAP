@@ -72,7 +72,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	private final ThreadSafeOptions err;
 	private DB db;
 	
-	private final boolean multiThreadedStorage = false;
+	private final boolean multiThreadedStorage = true;
 	private final HashType hashType;
 	private final MongoDBhandler mh;
 	private final ArrayList<ExperimentHeaderInterface> experimentList;
