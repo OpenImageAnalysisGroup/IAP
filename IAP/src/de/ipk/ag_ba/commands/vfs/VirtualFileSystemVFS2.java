@@ -264,6 +264,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
 		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
 		String pre = "";
+		String firstPre = "";
 		String finalMainName = null;
 		{ // save main
 			String desiredFileName = limg.getURL().getFileName();
@@ -272,8 +273,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			String substanceName = limg.getSubstanceName();
 			desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
 			finalMainName = desiredFileName;
-			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0)
+			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
 				pre = optFileNameMainAndLabelPrefix[0];
+				firstPre = pre;
+			}
 			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			MyByteArrayInputStream mainStream = ResourceIOManager.getInputStreamMemoryCached(limg.getInputStream());
 			if (mainStream != null && mainStream.getCount() > 0)
@@ -322,7 +325,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		}
 		{
 			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi,
-					snapshotTime, pre + finalMainName.split("#")[0]);
+					snapshotTime, firstPre + finalMainName.split("#")[0]);
 			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
 			if (previewStream != null && previewStream.getCount() > 0)
 				saveStream(targetFileNamePreview, previewStream, false, previewStream.getCount());
