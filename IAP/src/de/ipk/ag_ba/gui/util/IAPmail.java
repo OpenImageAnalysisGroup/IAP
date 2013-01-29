@@ -24,6 +24,7 @@ import org.AttributeHelper;
 import org.HttpBasicAuth;
 import org.ReleaseInfo;
 import org.Screenshot;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -37,7 +38,8 @@ public class IAPmail {
 	// http://www.javapractices.com/topic/TopicAction.do?Id=144
 	public void sendEmail(
 			String aToEmailAddr, String aSubject,
-			String aBody, final String optImageSource, final String fileName
+			String aBody, final String optImageSource1, final String fileName1, final String contentType1,
+			final String optImageSource2, final String fileName2, final String contentType2
 			) {
 		// Here, no Authenticator argument is used (it is null).
 		// Authenticators are used to prompt the user for user
@@ -55,51 +57,12 @@ public class IAPmail {
 			message.setSubject(aSubject);
 			
 			Multipart mp = new MimeMultipart();
-			if (optImageSource != null && !optImageSource.isEmpty()) {
-				// load remote image and add it to the mail
-				try {
-					MimeBodyPart img = new MimeBodyPart();
-					img.setDataHandler(new DataHandler(new DataSource() {
-						
-						@Override
-						public OutputStream getOutputStream() throws IOException {
-							return null;
-						}
-						
-						@Override
-						public String getName() {
-							return fileName;
-						}
-						
-						@Override
-						public InputStream getInputStream() throws IOException {
-							try {
-								InputStream is;
-								if (optImageSource.contains("@")) {
-									String userPass = optImageSource.split("@")[0];
-									String urlStr = optImageSource.split("@")[1];
-									String user = userPass.split(":")[0];
-									String pass = userPass.split(":")[1];
-									is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
-								} else
-									is = new IOurl(optImageSource).getInputStream();
-								return is;
-							} catch (Exception e) {
-								throw new IOException(e.getMessage());
-							}
-						}
-						
-						@Override
-						public String getContentType() {
-							return "image/jpeg";
-						}
-					}));
-					img.setFileName(fileName);
-					mp.addBodyPart(img);
-				} catch (Exception e) {
-					message.setText(aBody + "\n\nWebcam-Image could not be loaded. Eventually the Webcam is turned off.\nError: " + e.getMessage());
-				}
-			}
+			if (optImageSource1 != null && fileName1 != null && contentType1 != null && !optImageSource1.isEmpty() && !fileName1.isEmpty()
+					&& !contentType1.isEmpty())
+				addWebCamScreenshotToMail(aBody, optImageSource1, fileName1, message, mp, contentType1);
+			if (optImageSource2 != null && fileName2 != null && contentType2 != null && !optImageSource2.isEmpty() && !fileName2.isEmpty()
+					&& !contentType2.isEmpty())
+				addWebCamScreenshotToMail(aBody, optImageSource2, fileName2, message, mp, contentType2);
 			try {
 				boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in e-Mail", true);
 				if (takeScreenShot) {
@@ -123,6 +86,61 @@ public class IAPmail {
 			Transport.send(message);
 		} catch (MessagingException ex) {
 			System.err.println("Cannot send email. " + ex);
+		}
+	}
+	
+	private void addWebCamScreenshotToMail(
+			String aBody,
+			final String optImageSource,
+			final String fileName,
+			MimeMessage message, Multipart mp,
+			final String contentType)
+			throws MessagingException {
+		if (optImageSource != null && !optImageSource.isEmpty()) {
+			// load remote image and add it to the mail
+			try {
+				MimeBodyPart img = new MimeBodyPart();
+				img.setDataHandler(new DataHandler(new DataSource() {
+					
+					@Override
+					public OutputStream getOutputStream() throws IOException {
+						return null;
+					}
+					
+					@Override
+					public String getName() {
+						String n = StringManipulationTools.getFileSystemName(fileName);
+						return n;
+					}
+					
+					@Override
+					public InputStream getInputStream() throws IOException {
+						try {
+							InputStream is;
+							if (optImageSource.contains("@")) {
+								String userPass = optImageSource.split("@")[0];
+								String urlStr = optImageSource.split("@")[1];
+								String user = userPass.split(":")[0];
+								String pass = userPass.split(":")[1];
+								is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
+							} else
+								is = new IOurl(optImageSource).getInputStream();
+							return is;
+						} catch (Exception e) {
+							throw new IOException(e.getMessage());
+						}
+					}
+					
+					@Override
+					public String getContentType() {
+						return contentType;
+					}
+				}));
+				img.setFileName(StringManipulationTools.getFileSystemName(fileName));
+				mp.addBodyPart(img);
+			} catch (Exception e) {
+				message.setText(aBody + "\n\nWebcam-Image could not be loaded. Eventually the Webcam is turned off.\nError: " + e.getMessage());
+			}
 		}
 	}
 	

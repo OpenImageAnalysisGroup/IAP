@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +12,14 @@ import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+
 public class Screenshot {
 	
 	private static final long startTime = System.currentTimeMillis();
 	private final String screenshotFileName;
 	private final String screenshotStaticFileName;
-	private final InputStream screenshotImage;
+	private final MyByteArrayInputStream screenshotImage;
 	private final long time;
 	
 	public Screenshot() throws IOException, AWTException {
@@ -28,12 +29,12 @@ public class Screenshot {
 		this.screenshotStaticFileName = getStaticFileName();
 	}
 	
-	private static InputStream getImage() throws IOException, AWTException {
+	private static MyByteArrayInputStream getImage() throws IOException, AWTException {
 		Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 		final BufferedImage capture = new Robot().createScreenCapture(screenRect);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(capture, "png", baos);
-		InputStream is = new ByteArrayInputStream(baos.toByteArray());
+		MyByteArrayInputStream is = new MyByteArrayInputStream(baos.toByteArray());
 		return is;
 	}
 	
@@ -45,6 +46,8 @@ public class Screenshot {
 			e1.printStackTrace();
 			fileN = "unknown host (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
 		}
+		if (fileN != null)
+			fileN = StringManipulationTools.getFileSystemName(fileN);
 		return fileN;
 	}
 	
@@ -56,6 +59,8 @@ public class Screenshot {
 			e1.printStackTrace();
 			fileN = "unknown host (up " + SystemAnalysis.getCurrentTime(startTime) + ").png";
 		}
+		if (fileN != null)
+			fileN = StringManipulationTools.getFileSystemName(fileN);
 		return fileN;
 	}
 	
@@ -64,13 +69,13 @@ public class Screenshot {
 	}
 	
 	public InputStream getScreenshotImage() {
-		return screenshotImage;
+		return new MyByteArrayInputStream(screenshotImage.getBuffTrimmed());
 	}
 	
 	public long getTime() {
 		return time;
 	}
-
+	
 	public String getScreenshotStaticFileName() {
 		return screenshotStaticFileName;
 	}
