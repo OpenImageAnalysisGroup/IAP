@@ -1,10 +1,10 @@
 # Author: Entzian, Klukas
 ###############################################################################
-cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep=""))
+cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep = ""))
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
+debug <- TRUE
 CATCH.ERROR <- TRUE
 
 calculateNothing <- FALSE
@@ -113,18 +113,18 @@ DIRECTORY.SEPARATOR <- "/"
 
 ## fileName Pattern
 PRE.AND.POST.VALUE <- "_"
-SECTION.TEX <- paste(PRE.AND.POST.VALUE, "sec", PRE.AND.POST.VALUE, sep="")
-NEW.SECTION.TEX <- paste(PRE.AND.POST.VALUE, NEW.SECTION, PRE.AND.POST.VALUE, sep="")
+SECTION.TEX <- paste(PRE.AND.POST.VALUE, "sec", PRE.AND.POST.VALUE, sep = "")
+NEW.SECTION.TEX <- paste(PRE.AND.POST.VALUE, NEW.SECTION, PRE.AND.POST.VALUE, sep = "")
 OVERALL.FILENAME.TEX <- "overallFileNameTex"
-OVERALL.FIRST.SECTION.TEX <- paste(PRE.AND.POST.VALUE, FIRST.SECTION, PRE.AND.POST.VALUE, sep="")
-OVERALL.SECOND.SECTION.TEX <- paste(PRE.AND.POST.VALUE, SECOND.SECTION, PRE.AND.POST.VALUE, sep="")
-OVERALL.THIRD.SECTION.TEX <- paste(PRE.AND.POST.VALUE, THIRD.SECTION, PRE.AND.POST.VALUE, sep="")
-OVERALL.FOURTH.SECTION.TEX <- paste(PRE.AND.POST.VALUE, FOURTH.SECTION, PRE.AND.POST.VALUE, sep="")
-OVERALL.APPENDIX.SECTION.TEX <- paste(PRE.AND.POST.VALUE, APPENDIX.SECTION, PRE.AND.POST.VALUE, sep="")
+OVERALL.FIRST.SECTION.TEX <- paste(PRE.AND.POST.VALUE, FIRST.SECTION, PRE.AND.POST.VALUE, sep = "")
+OVERALL.SECOND.SECTION.TEX <- paste(PRE.AND.POST.VALUE, SECOND.SECTION, PRE.AND.POST.VALUE, sep = "")
+OVERALL.THIRD.SECTION.TEX <- paste(PRE.AND.POST.VALUE, THIRD.SECTION, PRE.AND.POST.VALUE, sep = "")
+OVERALL.FOURTH.SECTION.TEX <- paste(PRE.AND.POST.VALUE, FOURTH.SECTION, PRE.AND.POST.VALUE, sep = "")
+OVERALL.APPENDIX.SECTION.TEX <- paste(PRE.AND.POST.VALUE, APPENDIX.SECTION, PRE.AND.POST.VALUE, sep = "")
 POINT.PATTERN <- "\\."
 DIGITS.PATTERN <- "[[:digit:]]+"
-TEX.PATTERN <- paste(POINT.PATTERN, "[Tt][Ee][Xx]$", sep="")
-SECTION.PATTERN <- paste(SECTION.TEX, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, TEX.PATTERN, sep="")
+TEX.PATTERN <- paste(POINT.PATTERN, "[Tt][Ee][Xx]$", sep = "")
+SECTION.PATTERN <- paste(SECTION.TEX, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, POINT.PATTERN, DIGITS.PATTERN, TEX.PATTERN, sep = "")
 
 OVERALL.FILENAME.PATTERN <- "overallFileNamePattern"
 
@@ -141,7 +141,7 @@ BUILD.SECTION.SECOND.INDEX <- 5
 NEWLINE.TEX.INCLUDE <- " \\newline "
 NEWLINE.TEX <- " \n"
 NEWLINE.PARA.TEX <- "~"
-TABULATOR.TEX <- "    "
+TABULATOR.TEX <- " "
 
 ## default values
 VALUE.AVERAGE <- "average"
@@ -151,17 +151,17 @@ START.TYP.STRESS <- "stress"
 
 ## file names
 REPORT <- "report"
-REPORT.FILE <- paste(REPORT, TEX, sep =".")
-ERROR.FILE <- paste(ERROR, TEX, sep =".")
-LIB.ERROR.FILE <- paste(LIB, ERROR, TEX, sep =".")
-ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep ="")
+REPORT.FILE <- paste(REPORT, TEX, sep = ".")
+ERROR.FILE <- paste(ERROR, TEX, sep = ".")
+LIB.ERROR.FILE <- paste(LIB, ERROR, TEX, sep = ".")
+ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep = "")
 
-LIB.UPDATE <- paste(LIB, UPDATE, sep ="")
+LIB.UPDATE <- paste(LIB, UPDATE, sep = "")
 
 getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	requestList = list(
-			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")),
-									spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
+			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")), 
+							spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
 			)
 	)
 	return(requestList)
@@ -173,24 +173,33 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	if (typOfBreak == 0) {
 		stop("The code stopps manual by the \"break\" function", call. = FALSE)
 	} else {
-		ownCat(paste("Script will stopped for ",breakValue, " sec!", sep=""))
+		ownCat(paste("Script will stopped for ", breakValue, " sec!", sep = ""))
 		
 		Sys.sleep(breakValue)
 		ownCat("Break ends!")
 	}
 }
 
-"%debug%" <- function(debug, debugNumber) {
+##
+#	print the value with the "DebugBreakPoint" flag if debug is TRUE
+##
+"%debug%" <- function(debug, value) {
+	debug %print% paste("DebugBreakPoint: ", value)
+}
+
+##
+#	print value if debug is TRUE
+##
+"%print%" <- function(debug, value) {
 	if (debug) {
-		ownCat(paste("DebugBreakPoint: ", debugNumber))
-		
+		ownCat(as.character(value), endline = TRUE)
 	}
 }
+
 
 "%checkEqual%" <- function(treat, seconTreat) {
 	if (treat == seconTreat) {
 		ownCat("Second filter has the same value as first filter so it set to \"none\"")
-		
 		return(NONE)
 	} else {
 		return(seconTreat)
@@ -201,10 +210,10 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 	#overallList$debug %debug% "%errorReport%"
 	if (length(errorDescriptor) > 0) {
 		if (typOfError == NOT.EXISTS) {
-			ownCat(paste("Descriptor '", errorDescriptor, "' is missing!", sep=""))
+			ownCat(paste("Descriptor '", errorDescriptor, "' is missing!", sep = ""))
 			
 		} else if (typOfError == NOT.NUMERIC.OR.ALL.ZERO) {
-#			ownCat(paste("the values of the descriptor(s) '", errorDescriptor, "', are all zero or not numeric!", sep=""))
+#			ownCat(paste("the values of the descriptor(s) '", errorDescriptor, "', are all zero or not numeric!", sep = ""))
 		}
 	}
 }
@@ -218,33 +227,30 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 "%readInputDataFile%" <- function(separation, fileName) {
-	#loadAndInstallPackages(TRUE, FALSE)
-	
-	#separation = ";"
 	ownCat(paste("Read input file", fileName))
 	if (file.exists(fileName)) {
 		allCharacterSeparated <- vector()
 		
-		if(CHECK.INPUT.FILE.IF.ENG.OR.GER) {
-			preScanForPointOrComma <- scan(file=fileName, what=character(0), nlines=2, sep="\n")
-			preScanForPointOrComma <- paste(preScanForPointOrComma[2],",.", sep="")
+		if (CHECK.INPUT.FILE.IF.ENG.OR.GER) {
+			preScanForPointOrComma <- scan(file = fileName, what = character(0), nlines = 2, sep = "\n")
+			preScanForPointOrComma <- paste(preScanForPointOrComma[2], ", .", sep = "")
 			allCharacterSeparated <- table(strsplit(toupper(preScanForPointOrComma), '')[[1]])
 		} else {
 			allCharacterSeparated["."] <- 1
-			allCharacterSeparated[","] <- 0
+			allCharacterSeparated[", "] <- 0
 		}
-		if (allCharacterSeparated["."] > allCharacterSeparated[","]) {
+		if (allCharacterSeparated["."] > allCharacterSeparated[", "]) {
 			
 			ownCat("Read input (English number format)...")
-			data <- read.csv(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")
+			data <- read.csv(fileName, header = TRUE, sep = separation, fileEncoding = "UTF-8")
 			colnames(data)[14:length(colnames(data))] <- replaceBrakesWithNothing(colnames(data)[14:length(colnames(data))], "..")
-			return(data) #encoding="UTF-8"
+			return(data)
 		} else {
 			
 			ownCat("Read input (German number format)...")
-			data <- read.csv2(fileName, header=TRUE, sep=separation, fileEncoding="UTF-8")
+			data <- read.csv2(fileName, header = TRUE, sep = separation, fileEncoding = "UTF-8")
 			colnames(data) <- replaceBrakesWithNothing(colnames(data), "..")
-			return(data) #, encoding="UTF-8"
+			return(data)
 		}
 	} else {
 		return(NULL)
@@ -273,7 +279,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 		if (k == NONE) {
 			vectorTemp = c(vectorTemp, vector1)
 		} else {
-			vectorTemp = c(vectorTemp, paste(vector1, k, sep = "/")) #    #/#
+			vectorTemp = c(vectorTemp, paste(vector1, k, sep = "/")) # #/#
 		}
 	}
 	return(vectorTemp)
@@ -288,7 +294,7 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 "%checkRowLengthOfDataFrame%" <- function(dataFrame, len) {
-	if(nrow(dataFrame) > len) {
+	if (nrow(dataFrame) > len) {
 		return(TRUE)
 	} else {
 		return(FALSE)
@@ -297,17 +303,15 @@ getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
 }
 
 
-ownCat <- function(text, endline=TRUE){
-	#print(text)
-	
-#	while (class(text) == "list") {
-#		text <- unlist(text)
-#	}
-	if(DO.PARALLELISATION) {
+##
+#	print text with/without wordwrap also in the parallel modus
+##
+ownCat <- function(text, endline = TRUE) {
+	if (DO.PARALLELISATION) {
 		if (sfParallel()) {
-			sfCat(text, master=TRUE)
+			sfCat(text, master = TRUE)
 			if (endline)
-				sfCat("\n", master=TRUE)
+				sfCat("\n", master = TRUE)
 		} else {
 			cat(unlist(text))
 			if (endline)
@@ -318,214 +322,177 @@ ownCat <- function(text, endline=TRUE){
 		if (endline)
 			cat("\n")
 	}
-	
-#tryCatch({	
-#	if (sfParallel()) {
-#		sfCat(text, master=TRUE)
-#		if (endline)
-#			sfCat("\n", master=TRUE)
-#	} else {
-#		cat(unlist(text))
-#		if (endline)
-#			cat("\n")
-#	}
-#	},
-#	error = function(e) {
-#		print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-#		print(text)
-#		print("hhhhhhhhhhhhhhhhhhhhhhhhhhhh")})
 }
 
-getFileNames <- function(path, pattern = TEX.PATTERN, debug) {
+getFileNames <- function(path, pattern = TEX.PATTERN, debug = debug) {
 	debug %debug% "getFileNames()"
 	
 	fileNames <- list.files(path, pattern = pattern)
-	#workingFileNames <- grep(SECTION, fileNames, ignore.case=TRUE)
+	#workingFileNames <- grep(SECTION, fileNames, ignore.case = TRUE)
 	
-#	if(length(workingFileNames) > 0){
+#	if (length(workingFileNames) > 0) {
 #		return(fileNames[workingFileNames])
 #	}
 	
-	if(length(fileNames) > 0) {
+	if (length(fileNames) > 0) {
 		return(fileNames)
 	} else {
 		return(NULL)
 	}
 }
 
-loadFiles <- function(path, pattern = "\\.[Rr]$", trace = TRUE) {
+loadFiles <- function(path, pattern = "\\.[Rr]$", trace = TRUE, debug = FALSE) {
+	debug %debug% "loadFiles()"
+	
 	for (nm in list.files(path, pattern = pattern)) {
-		if(trace) ownCat(paste("load: ", nm, sep=""))
+		if (trace) ownCat(paste("load: ", nm, sep = ""))
 		source(file.path(path, nm))
 	}
 }
 
-overallOutlierDetection <- function(overallList) {
-	overallList$debug %debug% "overallOutlierDetection()"	
+##
+#	install, update and load the submitted libs
+#	@install: install missing libs if TRUE
+#	@update: update existing libs if TRUE
+##
+loadInstallAndUpdatePackages <- function(libraries, install = FALSE, update = FALSE, debug = FALSE) {	
+	debug %debug% "loadInstallAndUpdatePackages()"
 	
-	
-	workingDataSet <- overallList$iniDataSet[,!colnames(overallList$iniDataSet) %in% c(overallList$treatment, overallList$secondTreatment, overallList$xAxis)]
-	workingDataSet[is.na(workingDataSet)] <- 0
-
-	
-	test <- cbind(overallList$iniDataSet[overallList$xAxis], workingDataSet[,1])
-	test2 <- cbind(workingDataSet[,c(1,21,22)])
-	aq.plot(test2, alpha=0.1)
-	color.plot(test, quan=0.75)
-	
-	
-#	sehr gut
-	# create data:
-	set.seed(134)
-	x <- cbind(rnorm(80), rnorm(80), rnorm(80))
-	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1), rnorm(10, 5, 1))
-	z <- rbind(x,y)
-# execute:
-	aq.plot(z, alpha=0.05)
-	
-	
-	###################
-
-	data(humus)
-	res <-chisq.plot(log(humus[,c("Co","Cu","Ni")]))
-	res <-chisq.plot(z)
-	res$outliers # these are the potential outliers
-	
-	################
-	
-#	geht nur mit zwei dimensionen
-	# create data:
-	x <- cbind(rnorm(100), rnorm(100))
-	y <- cbind(rnorm(10, 5, 1), rnorm(10, 5, 1))
-	z <- rbind(x,y)
-# execute:
-	color.plot(z, quan=0.75)
-	
-	################
-	
-	# create data:
-	x <- cbind(rnorm(100), rnorm(100))
-	y <- cbind(rnorm(10, 3, 1), rnorm(10, 3, 1))
-	z <- rbind(x,y)
-# execute:
-	dd.plot(z)
-
-	##################
-
-# Geostatistical data:
-	data(humus) # Load humus data
-	uni.plot(log(humus[, c("As", "Cd", "Co", "Cu", "Mg", "Pb", "Zn")]),symb=TRUE)
-}
-
-loadInstallAndUpdatePackages <- function(libraries, install=FALSE, update = FALSE, useDev=FALSE, debug=FALSE) {	
-#	libraries  <- c("Cairo", "RColorBrewer", "data.table", "ggplot2", "psych", "fmsb", "plotrix")	
-	repos <- c("http://cran.r-project.org","http://www.rforge.net/")
-	#libPath <- ".libPaths()[1]"
+	repos <- c("http://cran.r-project.org", "http://www.rforge.net/")
 	libPath <- Sys.getenv("R_LIBS_USER")
 	
-#	if(libPath == "") {
-#		createLibPath(, debug)
-#	}
+	installLibs(install, libraries, repos, libPath, debug = debug)
+	updateLibs(update, libraries, repos, libPath, debug = debug)
+	checkLibsForErrorsAndLoad(libraries, debug = debug)
+
+}
+
+##
+#	install missing Libs if "install" is TRUE
+##
+installLibs <- function(install, libraries, repos, libPath, debug = FALSE) {
+	debug %debug% "installLibs()"
 	
 	if (install & length(libraries) > 0) {
-		ownCat("Check for new packages...")
+		TRUE %print% "Check for new packages..."
 		
-		for(n in repos) {
-			
+		for(n in repos) {		
 			installedPackages <- names(installed.packages()[, 'Package'])
-			availablePackagesOnTheRepos <- available.packages(contriburl= contrib.url(n))[,1]
+			availablePackagesOnTheRepos <- available.packages(contriburl = contrib.url(n))[, 1]
 			ins <- libraries[!libraries %in% installedPackages & libraries %in% availablePackagesOnTheRepos]
-		
+			
 			if (length(ins) > 0) {
-				ownCat(paste("The following packages will be installed: ", ins, sep=""))
-				
-				install.packages(ins, lib=libPath, repos=n, dependencies = TRUE)
-			}
-		
-		}
-		
-		if (useDev) {
-			#install.packages(c("devtools"), lib=libPath, repos=repos, dependencies = TRUE)
-			#dev_mode()
-			#install_github("ggplot2")
-		}
+				TRUE %print% paste("The following packages will be installed: ", ins, sep = "")	
+				install.packages(ins, lib = libPath, repos = n, dependencies = TRUE)
+			}	
+		}	
 	}
+}
+
+##
+#	update out of date libs if "update" is TRUE
+##
+updateLibs <- function(update, libraries, repos, libPath, debug = FALSE) {
+	debug %debug% "updateLibs()"
 	
 	if (update) {
-		#installedOldPackages <- names(old.packages()[, 'Package'])
-		ownCat("Check for package updates...")
+		TRUE %print% "Check for package updates..."
 		
 		for(n in repos) {
-			update.packages(lib.loc = libPath, checkBuilt=TRUE, ask=FALSE,	repos=n)
+			update.packages(lib.loc = libPath, checkBuilt = TRUE, ask = FALSE, 	repos = n)
 		}
 	}
+}
+
+##
+#	checks that all the conditions (instaled, actual) are present to load the Libs 
+#	if not, then load the lib
+##
+checkLibsForErrorsAndLoad <- function(libraries, debug = FALSE) {
+	debug %debug% "checkLibsForErrorsAndLoad()"
 	
 	if (length(libraries) > 0) {
-		ownCat("Load libraries:")
+		TRUE %print% "Load libraries:"
+
 		libError <- FALSE
 		libErrorText <- NULL
 		outOfDateLib <- NULL
 		for(nn in libraries) {
-			ownCat(nn)
-			if(CATCH.ERROR) {
+			TRUE %print% nn
+			if (CATCH.ERROR) {
 				error <- try(iniLibrary(nn), silent = debug)
-				if(checkOfTryError(error, typ=LIB)) {
+				if (checkOfTryError(error, typ = LIB)) {
 					libError <- TRUE
 					libErrorText <- c(libErrorText, nn)
 				} else {
-					outOfDateLib <- checkVersionsOfUsedPackages(nn, outOfDateLib)
+					outOfDateLib <- checkVersionsOfUsedPackages(nn, outOfDateLib, debug = debug)
 				}
 			} else {
-				iniLibrary(nn)
+				iniLibrary(nn, debug = debug)
 			}
-		}
-		
-		if(libError) {
-			ckeckIfReportTexIsThere(libErrorText, typ = LIB)
-			stop("Not all necessary libs are installed!", call. = FALSE)
-		} else if(length(outOfDateLib) > 0) {
-			ckeckIfReportTexIsThere(outOfDateLib, typ = LIB.UPDATE)
-			stop("Libs not up to date!", call. = FALSE)
-		}
-		
-		if (useDev) {
-			library("devtools")
 		}	
+		checkIfThereSomeErrorsWhileLoadingLibs(libError, libErrorText, outOfDateLib, debug = debug)		
 	}	
 }
 
+##
+#	check whether there are errors while loading the libraries
+#	not all installed or not up to date
+#	Stop the script should occur at least one of both
+#	print a error file
+##
+checkIfThereSomeErrorsWhileLoadingLibs <- function(libError, libErrorText, outOfDateLib, debug = FALSE) {
+	debug %debug% "checkIfThereSomeErrorsWhileLoadingLibs()"
+	
+	if (libError) {
+		ckeckIfReportTexIsThere(libErrorText, typ = LIB, debug = debug)
+		stop("Not all necessary libs are installed!", call. = FALSE)
+	} else if (length(outOfDateLib) > 0) {
+		ckeckIfReportTexIsThere(outOfDateLib, typ = LIB.UPDATE, debug = debug)
+		stop("Libs not up to date!", call. = FALSE)
+	}
+}
 
-checkVersionsOfUsedPackages <- function(lib, outOfDateLib) {
-	if(!is.null(sessionInfo()$otherPkgs[[lib]]) && !is.null(sessionInfo()$otherPkgs[[lib]]$Version)) {
+##
+#	check if the necessary libs have at least the required basic version
+##
+checkVersionsOfUsedPackages <- function(lib, outOfDateLib, debug = FALSE) {
+	debug %debug% "checkVersionsOfUsedPackages()"
+	
+	if (!is.null(sessionInfo()$otherPkgs[[lib]]) && !is.null(sessionInfo()$otherPkgs[[lib]]$Version)) {
 		localVersion <- sessionInfo()$otherPkgs[[lib]]$Version
 		
-		minVersion <- switch(lib,
-				Cairo = "1.5-3",
-				RColorBrewer = "1.0-5",
-				data.table = "1.8.6",
-				ggplot2 = "0.9.2.1",
-				fmsb = "0.3.4",
-				snow = "0.3-10",
-				snowfall = "1.84",
+		minVersion <- switch(lib, 
+				Cairo = "1.5-3", 
+				RColorBrewer = "1.0-5", 
+				data.table = "1.8.6", 
+				ggplot2 = "0.9.2.1", 
+				fmsb = "0.3.4", 
+				snow = "0.3-10", 
+				snowfall = "1.84", 
 				stringr = "0.6.1")
 		
-		if(localVersion >= minVersion) {
+		if (localVersion >= minVersion) {
 			return(outOfDateLib)
 		} else {
-			return(c(outOfDateLib, nn))
+			return(c(outOfDateLib, lib))
 		}
 	}
 	return(outOfDateLib)
 }
 
-
-
-iniLibrary <- function(lib) {
-	if(DO.PARALLELISATION) {
-		if (sfParallel())
+##
+#	load libs
+##
+iniLibrary <- function(lib, debug = FALSE) {
+	debug %debug% "iniLibrary()"
+	
+	if (DO.PARALLELISATION) {
+		if (sfParallel()) {
 			sfLibrary(lib, character.only = TRUE)
-		else
+		} else {
 			library(lib, character.only = TRUE)
+		}
 	} else {
 		library(lib, character.only = TRUE)
 	}
@@ -533,11 +500,11 @@ iniLibrary <- function(lib) {
 
 buildDataSet <- function(workingDataSet, overallResult, colname, index, diagramTyp = "") {
 	if (length(colname) > 0) {
-		for (jj in seq(along=colname)) {
+		for (jj in seq(along = colname)) {
 			if (diagramTyp == SPIDER.PLOT) {
-				searchVector <- gsub("\\.[0-9]*","",colnames(overallResult)) %in% paste(colname[jj], index, sep="")	
+				searchVector <- gsub("\\.[0-9]*", "", colnames(overallResult)) %in% paste(colname[jj], index, sep = "")	
 			} else {
-				searchVector <- paste(colname[jj], index, sep="")
+				searchVector <- paste(colname[jj], index, sep = "")
 			}		
 			workingDataSet = cbind(workingDataSet, overallResult[searchVector])
 		}	
@@ -547,17 +514,17 @@ buildDataSet <- function(workingDataSet, overallResult, colname, index, diagramT
 
 reNameSpin <- function(colNameWichMustBind, colNames) {
 	
-	descriptorListIndex <- strsplit(substr(colNameWichMustBind,nchar(colNames$colOfMean)+1, nchar(colNameWichMustBind)),"\\.")
+	descriptorListIndex <- strsplit(substr(colNameWichMustBind, nchar(colNames$colOfMean)+1, nchar(colNameWichMustBind)), "\\.")
 	
 	if (descriptorListIndex[[1]][1] != "" & descriptorListIndex[[1]][2] != "") {
-		return(colNames$desNames[[descriptorListIndex[[1]][1]]][descriptorListIndex[[1]][2],])
+		return(colNames$desNames[[descriptorListIndex[[1]][1]]][descriptorListIndex[[1]][2], ])
 	} else {
 		return(colNameWichMustBind)
 	}
 }
 
 
-reNameHist <-  function(colNameWichMustBind) {
+reNameHist <- function(colNameWichMustBind) {
 	colNameWichMustBind = as.character(colNameWichMustBind)
 	positions = which(strsplit(colNameWichMustBind, '')[[1]] == '.')
 	colNameWichMustBind = substr(colNameWichMustBind, positions[length(positions)]+1, nchar(colNameWichMustBind))
@@ -568,7 +535,7 @@ reNameHist <-  function(colNameWichMustBind) {
 	return(colNameWichMustBind)	
 }
 
-reNameColumn <-  function(plotThisValues, columnNameReplace = NAME, columnNameWhichUsedToReplace = PRIMAER.TREATMENT) {
+reNameColumn <- function(plotThisValues, columnNameReplace = NAME, columnNameWhichUsedToReplace = PRIMAER.TREATMENT) {
 	if (!is.null(plotThisValues[columnNameWhichUsedToReplace])) {
 		plotThisValues[columnNameReplace] = plotThisValues[columnNameWhichUsedToReplace]
 	}
@@ -592,30 +559,26 @@ changeWhenTreatmentNoneAndSecondTreatmentNotNone <- function(listOfTreat, listOf
 	}
 }
 
-checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug) {
-	debug %debug% "Start of checkOfTreatments()"
-#	ownCat(args[5])
-#	ownCat(args[6])
-
+checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug = FALSE) {
+	debug %debug% "checkOfTreatments()"
+	
 	treatment <- treatment %exists% args[3]
 	secondTreatment <- secondTreatment %exists% args[4]
 	secondTreatment <- treatment %checkEqual% secondTreatment
 	
-	listOfTreat <- list(treatment=treatment, secondTreatment=secondTreatment)
-	listOfFilterTreat <- list(filterTreatment = filterTreatment, filterSecondTreatment = filterSecondTreatment)	## wird erstmal noch nichts weiter mit gemacht! nur geswapt falls notwendig
-
+	listOfTreat <- list(treatment = treatment, secondTreatment = secondTreatment)
+	listOfFilterTreat <- list(filterTreatment = filterTreatment, filterSecondTreatment = filterSecondTreatment)
+	
 	if (treatment == NONE && secondTreatment == NONE) {
 		listOfTreat$treatment <- NONE.TREATMENT
 		listOfTreatAndFilterTreat <- list(listOfTreat, listOfFilterTreat)
 	} else {	
 		for (k in names(listOfTreat)) {
 			if (listOfTreat[[k]] != NONE) {
-				#overallTreat = list(iniDataSet=workingDataSet, descriptor=listOfTreat[[k]], debug=debug, stoppTheCalculation = FALSE, errorDescriptor=character())
-				#overallTreat = list(iniDataSet=workingDataSet, descriptor=listOfTreat[[k]], debug=debug, stoppTheCalculation = FALSE)
-				descriptorVector <- getVector(preprocessingOfDescriptor(listOfTreat[[k]], workingDataSet, debug))
+				descriptorVector <- getVector(preprocessingOfDescriptor(listOfTreat[[k]], workingDataSet, debug = debug), debug = debug)
 				
 				if (!is.null(descriptorVector)) {
-					descriptorVector <- getVector(checkIfDescriptorIsNaOrAllZero(descriptorVector, workingDataSet, FALSE))
+					descriptorVector <- getVector(checkIfDescriptorIsNaOrAllZero(descriptorVector, workingDataSet, FALSE), debug = debug)
 					
 					if (all(!is.na(descriptorVector))) { #!is.null(descriptorVector)
 						listOfTreat[[k]] <- descriptorVector
@@ -623,17 +586,15 @@ checkOfTreatments <- function(args, treatment, filterTreatment, secondTreatment,
 				} 
 				
 				if (all(is.na(descriptorVector))) { # is.null(descriptorVector)
-					ownCat(paste(k, " set to '",NONE,"'", sep=""))
+					ownCat(paste(k, " set to '", NONE, "'", sep = ""))
 					
 					listOfTreat[[k]] <- NONE
 				}
 			}
 		}
-	
+		
 		listOfTreatAndFilterTreat <- changeWhenTreatmentNoneAndSecondTreatmentNotNone(listOfTreat, listOfFilterTreat)
-	}
-	debug %debug% "End of checkOfTreatments()"
-
+	}	
 	return(listOfTreatAndFilterTreat)
 }
 
@@ -679,7 +640,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		ownCat("All values for Boxplot are 'NA'")
 		
 	}
-
+	
 	if (!is.null(overallList$boxStackDes) && sum(!is.na(overallList$boxStackDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxStackDes), "stacked boxplots..."))}
 		for (n in seq(along = overallList$boxStackDes)) {
@@ -692,7 +653,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		ownCat("All values for stackedBoxplot are 'NA'")
 		
 	}
-
+	
 	if (!is.null(overallList$boxSpiderDes) && sum(!is.na(overallList$boxSpiderDes)) > 0) {
 		if (overallList$debug) {ownCat(paste(length(overallList$boxSpiderDes), "spiderplots..."))}
 		for (n in seq(along = overallList$boxSpiderDes)) {
@@ -744,11 +705,11 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	
 	
 	if ((!sum(!is.na(overallList$nBoxDes)) > 0 && 
-		 !sum(!is.na(overallList$nBoxMultiDes)) > 0 && 
-		 !sum(!is.na(overallList$boxStackDes)) > 0 && 
-		 !sum(!is.na(overallList$boxDes)) > 0 && 
-		 !sum(!is.na(overallList$boxSpiderDes)) > 0 && 
-		 !sum(!is.na(overallList$violinBoxDes))) > 0) {
+				!sum(!is.na(overallList$nBoxMultiDes)) > 0 && 
+				!sum(!is.na(overallList$boxStackDes)) > 0 && 
+				!sum(!is.na(overallList$boxDes)) > 0 && 
+				!sum(!is.na(overallList$boxSpiderDes)) > 0 && 
+				!sum(!is.na(overallList$violinBoxDes))) > 0) {
 		ownCat("No descriptor set (all descriptors are zero or NA) - the program needs to stop!")
 		overallList$stoppTheCalculation <- TRUE 
 	}
@@ -758,24 +719,24 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 
 
 checkIfDescriptorIsNaOrAllZero <- function(descriptorVector, iniDataSet, isDescriptor = TRUE, debug = FALSE) {
-#############
+	#############
 #descriptorVector <- overallList$nBoxDes[[n]]
 #iniDataSet <- overallList$iniDataSet
 #isDescriptor <- TRUE
-#############
+	#############
 	
 	#overallList$debug %debug% "checkIfDescriptorIsNaOrAllZero()"
 	descriptorVector <- as.vector(descriptorVector)
 	#descriptorVector = getVector(descriptorVector)
 	tempDescriptor <- descriptorVector 
-		
+	
 	if (isDescriptor) {
 		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0 & colSums(iniDataSet[descriptorVector] *1, na.rm = TRUE) != 0]
 	} else {
 		descriptorVector <- descriptorVector[colSums(!is.na(iniDataSet[descriptorVector])) != 0]
 	}
 	errorDescriptor <- tempDescriptor %GetDescriptorAfterCheckIfDescriptorNotExists% descriptorVector
-
+	
 	if (length(errorDescriptor) > 0 && debug) {
 		errorDescriptor %errorReport% NOT.NUMERIC.OR.ALL.ZERO	
 	}
@@ -835,7 +796,7 @@ overallChangeName <- function(overallList) {
 		#overallList$boxSpiderDesName = as.list(overallList$boxSpiderDesName)
 		#names(overallList$boxSpiderDesName) = c(1:length(overallList$boxSpiderDesName))
 	}
-
+	
 	if (!is.null(overallList$imageFileNames_LinerangePlots)) {
 		if (overallList$debug) {ownCat("linerangeplots...");}
 		overallList$imageFileNames_LinerangePlots <- changefileName(overallList$imageFileNames_LinerangePlots, LINERANGE.PLOT)
@@ -850,7 +811,7 @@ overallChangeName <- function(overallList) {
 		overallList$violinBoxDesName <- as.list(overallList$violinBoxDesName)
 		names(overallList$violinBoxDesName) <- c(1:length(overallList$violinBoxDesName))
 	}
-
+	
 	return(overallList)
 }
 
@@ -870,7 +831,7 @@ setOptions <- function(overallList, typOfPlot, typOfOptions, listOfExtraOptions)
 
 setSomePrintingOptions <- function(overallList) {
 	overallList$debug %debug% "setSomePrintingOptions()"
-
+	
 	requestList = 	getSpecialRequestDependentOfUserAndTypOfExperiment()
 	if (!(overallList$user == NONE & overallList$typOfExperiment == NONE)) {
 		listOfExtraOptions = requestList[[overallList$user]][[overallList$typOfExperiment]]	
@@ -898,7 +859,7 @@ setSomePrintingOptions <- function(overallList) {
 
 checkUserOfExperiment <- function(overallList) {
 	overallList$debug %debug% "checkUserOfExperiment()"
-
+	
 	user = NONE
 	if ("Plant.ID" %in% colnames(overallList$iniDataSet)) {
 		user = substr(overallList$iniDataSet$'Plant.ID'[1], 5, 6)		
@@ -910,14 +871,14 @@ checkUserOfExperiment <- function(overallList) {
 
 checkTypOfExperiment <- function(overallList) {
 	overallList$debug %debug% "checkTypOfExperiment()"
-
+	
 	typ = NONE
 	if ("Species" %in% colnames(overallList$iniDataSet)) {
-		if (length(grep("barley", overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+		if (length(grep("barley", overallList$iniDataSet$Species[1], ignore.case = TRUE)) > 0) {
 			typ = "barley"
-		} else if (length(grep("maize", overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+		} else if (length(grep("maize", overallList$iniDataSet$Species[1], ignore.case = TRUE)) > 0) {
 			typ = "maize"
-		} else if (length(grep("arabidopsis", overallList$iniDataSet$Species[1], ignore.case=TRUE)) > 0) {
+		} else if (length(grep("arabidopsis", overallList$iniDataSet$Species[1], ignore.case = TRUE)) > 0) {
 			typ = "arabidopsis"
 		}	
 	}
@@ -932,30 +893,31 @@ changefileName <- function(fileNameVector, typOfPlot) {
 	
 	fileNameVector = gsub("\\$", ";", substr(fileNameVector, 1, 70))
 	fileNameVector = gsub("\\^", "", fileNameVector)
-
-	if(typOfPlot == STACKBOX.PLOT) {
+	
+	if (typOfPlot == STACKBOX.PLOT) {
 		for(i in 1:length(fileNameVector)) {
-			if (length(grep("\\.bin\\.",fileNameVector[i], ignore.case=TRUE)) > 0){
-				stringSplit <- paste(strsplit(fileNameVector[i], '\\.bin\\.')[[1]][1], ".bin.", sep="")
+			if (length(grep("\\.bin\\.", fileNameVector[i], ignore.case = TRUE)) > 0) {
+				stringSplit <- paste(strsplit(fileNameVector[i], '\\.bin\\.')[[1]][1], ".bin.", sep = "")
 				fileNameVector[i] <- stringSplit
 			} 
 		}
 	}
-
+	
 	return(as.list(fileNameVector))
 }
-
-preprocessingOfValues <- function(value, isColValue=FALSE, replaceString=".", isColName=FALSE) {
+############ hier geht es weiter #########################
+preprocessingOfValues <- function(value, isColValue = FALSE, replaceString = ".", isColName = FALSE, debug = FALSE) {
+	debug %debug% "preprocessingOfValues()"	
+	
 	if (!is.null(value)) {
 		regExpressionCol = "[^[:alnum:]|^_]|[[:space:]|\\^]"
-		#regExpressionCol = "[^[:alnum:]]|[[:space:]|\\^]"
 		if (isColValue || isColName) {
-			value = strsplit(as.character(value), "$", fixed=TRUE)
+			value <- strsplit(as.character(value), "$", fixed = TRUE)
 		}
 		
-		if (!isColName){
+		if (!isColName) {
 			for (n in seq(along = value)) {
-				value[[n]] = gsub(regExpressionCol, replaceString, value[[n]])
+				value[[n]] <- gsub(regExpressionCol, replaceString, value[[n]])
 			}
 		}
 	} else {
@@ -975,7 +937,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		}
 		overallList$nBoxDes <- checkOfNormalizedAndUnnormalized(overallList$nBoxDes)
 	} else {
-		ownCat(paste(NBOX.PLOT," is NULL", sep=""))
+		ownCat(paste(NBOX.PLOT, " is NULL", sep = ""))
 		
 	} 
 	
@@ -986,7 +948,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		}
 		overallList$nBoxMultiDes <- checkOfNormalizedAndUnnormalized(overallList$nBoxMultiDes)
 	} else {
-		ownCat(paste(NBOX.MULTI.PLOT," is NULL", sep=""))
+		ownCat(paste(NBOX.MULTI.PLOT, " is NULL", sep = ""))
 		
 	} 
 	
@@ -997,7 +959,7 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		}
 		overallList$boxDes <- checkOfNormalizedAndUnnormalized(overallList$boxDes)
 	} else {
-		ownCat(paste(BOX.PLOT, " is NULL", sep=""))
+		ownCat(paste(BOX.PLOT, " is NULL", sep = ""))
 		
 	} 
 	
@@ -1009,12 +971,12 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 #		print("test_stacked")
 #		print(overallList$boxStackDes)
 		overallList$boxStackDes <- checkOfNormalizedAndUnnormalized(overallList$boxStackDes)			
-
+		
 	} else {
-		ownCat(paste(STACKBOX.PLOT, " is NULL", sep=""))
+		ownCat(paste(STACKBOX.PLOT, " is NULL", sep = ""))
 		
 	} 
-
+	
 	if (!is.null(overallList$boxSpiderDes)) {
 		if (overallList$debug) {ownCat(SPIDER.PLOT)}
 		for (n in seq(along = overallList$boxSpiderDes)) {
@@ -1022,9 +984,9 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 			overallList$boxSpiderDes[n] = preprocessingOfDescriptor(overallList$boxSpiderDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$boxSpiderDes[n][[1]]
 			#print(booleanVector)
-			#print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector]))
-			if(sum(booleanVector) > 0) {
-				overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			#print(as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName = TRUE)[[1]][booleanVector]))
+			if (sum(booleanVector) > 0) {
+				overallList$boxSpiderDesName[n] = as.data.frame(preprocessingOfValues(overallList$boxSpiderDesName[[n]], isColName = TRUE)[[1]][booleanVector])
 			} else {
 				overallList$boxSpiderDesName[n] <- NA
 			}
@@ -1033,18 +995,18 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		overallList$boxSpiderDesName <- checkOfNormalizedAndUnnormalized(overallList$boxSpiderDesName)
 		
 	} else {
-		ownCat(paste(SPIDER.PLOT, " is NULL", sep=""))
+		ownCat(paste(SPIDER.PLOT, " is NULL", sep = ""))
 		
 	} 
-
+	
 	if (!is.null(overallList$linerangeDes)) {
 		if (overallList$debug) {ownCat(LINERANGE.PLOT)}
 		for (n in seq(along = overallList$linerangeDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$linerangeDes[n], isColValue = TRUE)
 			overallList$linerangeDes[n] = preprocessingOfDescriptor(overallList$linerangeDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$linerangeDes[n][[1]]
-			if(sum(booleanVector) > 0) {
-				overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			if (sum(booleanVector) > 0) {
+				overallList$linerangeDesName[n] = as.data.frame(preprocessingOfValues(overallList$linerangeDesName[[n]], isColName = TRUE)[[1]][booleanVector])
 			} else {
 				overallList$linerangeDesName[n] <- NA
 			}
@@ -1052,18 +1014,18 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 		overallList$linerangeDes <- checkOfNormalizedAndUnnormalized(overallList$linerangeDes)
 		
 	} else {
-		ownCat(paste(LINERANGE.PLOT, " is NULL", sep=""))
+		ownCat(paste(LINERANGE.PLOT, " is NULL", sep = ""))
 		
 	} 
-
+	
 	if (!is.null(overallList$violinBoxDes) & overallList$isRatio) {
 		if (overallList$debug) {ownCat(VIOLIN.PLOT)}
 		for (n in seq(along = overallList$violinBoxDes)) {
 			initDescriptor <- preprocessingOfValues(overallList$violinBoxDes[n], isColValue = TRUE)
 			overallList$violinBoxDes[n] = preprocessingOfDescriptor(overallList$violinBoxDes[[n]], overallList$iniDataSet, overallList$debug)
 			booleanVector <- initDescriptor[[1]] %in% overallList$violinBoxDes[n][[1]]
-			if(sum(booleanVector) > 0) {
-				overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName=TRUE)[[1]][booleanVector])
+			if (sum(booleanVector) > 0) {
+				overallList$violinBoxDesName[n] = as.data.frame(preprocessingOfValues(overallList$violinBoxDesName[[n]], isColName = TRUE)[[1]][booleanVector])
 			} else {
 				overallList$violinBoxDesName[n] <- NA
 			}
@@ -1076,11 +1038,11 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 	} 
 	
 	if ((!sum(!is.na(overallList$nBoxDes)) > 0 &&
-		 !sum(!is.na(overallList$nBoxMultiDes)) > 0 &&
-		 !sum(!is.na(overallList$boxStackDes)) > 0 && 
-		 !sum(!is.na(overallList$boxDes)) > 0 &&  
-		 !sum(!is.na(overallList$boxSpiderDes)) > 0 && 
-		 !sum(!is.na(overallList$violinBoxDes))) > 0) {
+				!sum(!is.na(overallList$nBoxMultiDes)) > 0 &&
+				!sum(!is.na(overallList$boxStackDes)) > 0 && 
+				!sum(!is.na(overallList$boxDes)) > 0 && 
+				!sum(!is.na(overallList$boxSpiderDes)) > 0 && 
+				!sum(!is.na(overallList$violinBoxDes))) > 0) {
 		ownCat("No descriptor set - this run needs to stop!")
 		overallList$stoppTheCalculation = TRUE
 	}
@@ -1088,27 +1050,27 @@ overallPreprocessingOfDescriptor <- function(overallList) {
 }
 
 parseToR <- function(text) {
-	text <- gsub("(", ".", text, fixed=TRUE)
-	text <- gsub(")", ".", text, fixed=TRUE)
-	text <- gsub(" ", ".", text, fixed=TRUE)
-	text <- gsub("^", ".", text, fixed=TRUE)
-	text <- gsub("/", ".", text, fixed=TRUE)
-	text <- gsub("%", ".", text, fixed=TRUE)
+	text <- gsub("(", ".", text, fixed = TRUE)
+	text <- gsub(")", ".", text, fixed = TRUE)
+	text <- gsub(" ", ".", text, fixed = TRUE)
+	text <- gsub("^", ".", text, fixed = TRUE)
+	text <- gsub("/", ".", text, fixed = TRUE)
+	text <- gsub("%", ".", text, fixed = TRUE)
 	
 	return(text)
 }
 
 searchUnit <- function(desString, unitList) {
-######
+	######
 #desString <- nn
-######
+	######
 	unit <- "no unit"
 	desString <- parseToR(desString)
 	unitPosition <- str_locate(desString, fixed(getVector(unitList$unitR)))
 	unitPosition <- as.data.frame(na.omit(unitPosition))
-	if(nrow(unitPosition) != 0) {
+	if (nrow(unitPosition) != 0) {
 		unit <- as.character(unitList[unitList$unitR == str_sub(desString, unitPosition$start[1], nchar(desString)), "unitTex"])
-		if(length(unit) == 0 || unit == "0") {
+		if (length(unit) == 0 || unit == "0") {
 			unit <- "no unit"
 		}
 	}	
@@ -1118,17 +1080,17 @@ searchUnit <- function(desString, unitList) {
 buildLongUnitTable <- function(descAndUnitDataFrame) {
 	ownCat("... create unit table")
 	columnName <- c("Descriptor", "Unit")
-	writeLatexTable(LONG.UNIT.TABLE, columnName, columnWidth=c("13cm","3cm"))
-
-	for(kk in seq(along=descAndUnitDataFrame$des)) {
-		writeLatexTable(LONG.UNIT.TABLE, value = c(descAndUnitDataFrame$desName[[kk]],descAndUnitDataFrame$des[[kk]]))
+	writeLatexTable(LONG.UNIT.TABLE, columnName, columnWidth = c("13cm", "3cm"))
+	
+	for(kk in seq(along = descAndUnitDataFrame$des)) {
+		writeLatexTable(LONG.UNIT.TABLE, value = c(descAndUnitDataFrame$desName[[kk]], descAndUnitDataFrame$des[[kk]]))
 	}
 	
-#	apply(descAndUnitDataFrame, 1, function(x,y) {
+#	apply(descAndUnitDataFrame, 1, function(x, y) {
 #					print(y)
 #					print(x)
 #					print("####")
-#					#writeLatexTable(y,getVector(x))
+#					#writeLatexTable(y, getVector(x))
 #				}, LONG.UNIT.TABLE)
 	writeLatexTable(LONG.UNIT.TABLE)
 }
@@ -1146,10 +1108,10 @@ buildDataFrame <- function(allDesNN, allDesNameNN, allValues) {
 builAllUnitVector <- function(allDes, allDesName, allTypOfPlot) {
 	
 	allValues <- data.frame()
-	for(nn in seq(along=allTypOfPlot)) {
-		if(allTypOfPlot[[nn]] == STACKBOX.PLOT) {
-			for(kk in seq(along=allDes[[nn]])) {
-				if(!(all(is.na(allDes[[nn]][[kk]])) || all(is.na(allDesName[[nn]][[kk]])))) {
+	for(nn in seq(along = allTypOfPlot)) {
+		if (allTypOfPlot[[nn]] == STACKBOX.PLOT) {
+			for(kk in seq(along = allDes[[nn]])) {
+				if (!(all(is.na(allDes[[nn]][[kk]])) || all(is.na(allDesName[[nn]][[kk]])))) {
 					allValues <- buildDataFrame(allDes[[nn]][[kk]], rep.int(allDesName[[nn]][[kk]], nrow(allDes[[nn]][[kk]])), allValues)
 				}
 			}		
@@ -1170,8 +1132,8 @@ getUnits <- function(overallList) {
 	allTypOfPlot <- list(BOX.PLOT, VIOLIN.PLOT, LINERANGE.PLOT, SPIDER.PLOT, STACKBOX.PLOT, NBOX.PLOT, NBOX.MULTI.PLOT)
 	
 	allDes <- builAllUnitVector(allDes, allDesName, allTypOfPlot)	
-	allDes <- allDes[-which(duplicated(allDes$des)),]
-
+	allDes <- allDes[-which(duplicated(allDes$des)), ]
+	
 	unitList <- getUnitList()
 	
 #	test <- apply(allDes, 1, function(x, unitList) {
@@ -1181,7 +1143,7 @@ getUnits <- function(overallList) {
 #	}, unitList)
 	
 	
-	for(kk in seq(along=allDes$des)) {
+	for(kk in seq(along = allDes$des)) {
 		allDes$des[[kk]] <- searchUnit(allDes$des[[kk]], unitList)
 		allDes$desName[[kk]] <- cleanSubtitle(allDes$desName[[kk]])
 	}
@@ -1190,100 +1152,102 @@ getUnits <- function(overallList) {
 	buildLongUnitTable(allDes)
 	return(overallList)
 }
-	
+
 
 
 getUnitList <- function(column = NULL) {
 	unitList <- data.frame(
-		unitR =
-			c(".percent.",
-			 ".mm.2.",
-			 ".mm.",
-			 ".g.",
-			 ".relative...pix.",
-			 ".relative.",
-			 "sqrt.px.3.",
-			 ".px.3.",
-			 ".px.",
-			 ".tassel.",
-			 ".sum.of.day.",
-			 ".leafs.",
-			 "...day.",
-			 "...",  #entspricht (%)
-			 ".c.p."
-			 ),
-		unitTex =
-			c("%",
-			  "mm^2",
-			 "mm",
-			 "g",
-			 "relative/px",
-			 "relative",
-			 "sqrt(px^3)",
-			 "px^3",
-			 "px",
-			 "tassel",
-			 "g",
-			 "leafs",
-			 "%/day",
-			 "%",  #entspricht (%)
-			 "c/p"
-			),
-		unitExcel =
-				c("(percent.",
-					"(mm^2)",
-					"(mm)",
-					"(g)",
-					"(relative / pix)",
-					"(relative)",
-					"sqrt(px^3)",
-					"(px^3)",
-					"(px)",
-					".tassel)",
-					"(sum of day)",
-					"(leafs)",
-					"(%/day)",
-					"(%)",  #entspricht (%)
-					"(c/p)"
-				)
+			unitR = 
+					c(".percent.", 
+							".mm.2.", 
+							".mm.", 
+							".g.", 
+							".relative...pix.", 
+							".relative.", 
+							"sqrt.px.3.", 
+							".px.3.", 
+							".px.", 
+							".tassel.", 
+							".sum.of.day.", 
+							".leafs.", 
+							"...day.", 
+							"...", #entspricht (%)
+							".c.p."
+					), 
+			unitTex = 
+					c("%", 
+							"mm^2", 
+							"mm", 
+							"g", 
+							"relative/px", 
+							"relative", 
+							"sqrt(px^3)", 
+							"px^3", 
+							"px", 
+							"tassel", 
+							"g", 
+							"leafs", 
+							"%/day", 
+							"%", #entspricht (%)
+							"c/p"
+					), 
+			unitExcel = 
+					c("(percent.", 
+							"(mm^2)", 
+							"(mm)", 
+							"(g)", 
+							"(relative / pix)", 
+							"(relative)", 
+							"sqrt(px^3)", 
+							"(px^3)", 
+							"(px)", 
+							".tassel)", 
+							"(sum of day)", 
+							"(leafs)", 
+							"(%/day)", 
+							"(%)", #entspricht (%)
+							"(c/p)"
+					)
 	)
-	if(is.null(column)) {
+	if (is.null(column)) {
 		return(unitList)
 	} else {
-		return(getVector(unitList[,column]))
+		return(getVector(unitList[, column]))
 	}
 }
 
-replaceBrakesWithNothing <- function(label, unit="(") {
-	endValue <- str_locate(label, fixed(unit))[,"start"]-1
+replaceBrakesWithNothing <- function(label, unit = "(", debug = FALSE) {
+	debug %debug% "replaceBrakesWithNothing()"
+
+	endValue <- str_locate(label, fixed(unit))[, "start"]-1
 	endValue[is.na(endValue)] <- -1L
-	label <- str_sub(label, 1L,endValue)
+	label <- str_sub(label, 1L, endValue)
 	label <- str_trim(label)
 	return(label)
 }
 
 
-replaceUnits <- function(label, typ="unitR") {
+replaceUnits <- function(label, typ = "unitR") {
 	
 	unitList <- getUnitList(typ)
 	
 	for(nn in unitList) {
-		label <- str_replace_all(label, fixed(nn),"")
+		label <- str_replace_all(label, fixed(nn), "")
 	}
 	
-#	label <- str_replace_all(label, fixed(".percent."),"")
-#	label <- str_replace_all(label, fixed(".mm.2."),"")
-#	label <- str_replace_all(label, fixed(".mm."),"")
-#	label <- str_replace_all(label, fixed(".g."),"")
-#	label <- str_replace_all(label, fixed(".relative...pix."),"")
-#	label <- str_replace_all(label, fixed(".relative."),"")
-#	label <- str_replace_all(label, fixed(".px.3."),"")
-#	label <- str_replace_all(label, fixed(".px."),"")
-#	label <- str_replace_all(label, fixed(".tassel."),"")
-#	label <- str_replace_all(label, fixed(".sum.of.day."),"")
-#	label <- str_replace_all(label, fixed(".leafs."),"")
-#	label <- str_replace_all(label, fixed("...day."),"")
-#	label <- str_replace_all(label, fixed("..."),"") #entspricht (%)
+#	label <- str_replace_all(label, fixed(".percent."), "")
+#	label <- str_replace_all(label, fixed(".mm.2."), "")
+#	label <- str_replace_all(label, fixed(".mm."), "")
+#	label <- str_replace_all(label, fixed(".g."), "")
+#	label <- str_replace_all(label, fixed(".relative...pix."), "")
+#	label <- str_replace_all(label, fixed(".relative."), "")
+#	label <- str_replace_all(label, fixed(".px.3."), "")
+#	label <- str_replace_all(label, fixed(".px."), "")
+#	label <- str_replace_all(label, fixed(".tassel."), "")
+#	label <- str_replace_all(label, fixed(".sum.of.day."), "")
+#	label <- str_replace_all(label, fixed(".leafs."), "")
+#	label <- str_replace_all(label, fixed("...day."), "")
+#	label <- str_replace_all(label, fixed("..."), "") #entspricht (%)
 	label <- str_trim(label)
 	
 	return(label)
@@ -1302,30 +1266,30 @@ reduceAllUnits <- function(allDes) {
 }
 
 checkOfNormalizedAndUnnormalized <- function(allDes) {
-#########
+	#########
 #allDes <- overallList$boxStackDes
 #allDes <- overallList$nBoxDes
 #allDes <- overallList$linerangeDes
-#########
-
+	#########
+	
 	tempAllDes <- allDes
 	allDes <- reduceAllUnits(allDes)
 	for(kk in seq(along = allDes)) {
 		## das unlist bei nbox überprüfen
 		vector <- unlist(allDes[kk])
-		if((length(grep("normalized.",vector , ignore.case=TRUE)) > 0) ||
-		   (length(grep("norm.",vector , ignore.case=TRUE)) > 0) ||
-		   (length(grep(".normalized",vector , ignore.case=TRUE)) > 0) ||
-		   (length(grep(".norm",vector , ignore.case=TRUE)) > 0)){
-			nnUn <- gsub("normalized.","",vector)
-			nnUn <- gsub("norm.", "",nnUn)
-			nnUn <- gsub(".normalized","",nnUn)
-			nnUn <- gsub(".norm", "",nnUn)
+		if ((length(grep("normalized.", vector , ignore.case = TRUE)) > 0) ||
+				(length(grep("norm.", vector , ignore.case = TRUE)) > 0) ||
+				(length(grep(".normalized", vector , ignore.case = TRUE)) > 0) ||
+				(length(grep(".norm", vector , ignore.case = TRUE)) > 0)) {
+			nnUn <- gsub("normalized.", "", vector)
+			nnUn <- gsub("norm.", "", nnUn)
+			nnUn <- gsub(".normalized", "", nnUn)
+			nnUn <- gsub(".norm", "", nnUn)
 			
 			for(nn in seq(along = allDes)) {
-				#if(sum(nnUn %in% unlist(allDes[nn])) == length(unlist(allDes[nn]))) {
-				if(identical(as.character(nnUn), as.character(allDes[[nn]]))) {
-				#	print("raus damit")
+				#if (sum(nnUn %in% unlist(allDes[nn])) == length(unlist(allDes[nn]))) {
+				if (identical(as.character(nnUn), as.character(allDes[[nn]]))) {
+					#	print("raus damit")
 					tempAllDes[[nn]] <- NA
 				} 
 			}
@@ -1335,24 +1299,17 @@ checkOfNormalizedAndUnnormalized <- function(allDes) {
 }
 
 
-preprocessingOfDescriptor <- function(descriptorVector, iniDataSet, debug=FALSE) {
-##############	
-#descriptorVector <- overallList$nBoxDes[[n]] 
-#descriptorVector <- overallList$boxStackDes[[n]]
-#descriptorVector <- overallList$linerangeDes[[n]]
-#iniDataSet <- overallList$iniDataSet	
-##############	
+preprocessingOfDescriptor <- function(descriptorVector, iniDataSet, debug = FALSE) {
+	debug %debug% "preprocessingOfDescriptor()"	
 	
-	#overallList$debug %debug% "preprocessingOfDescriptor()"
-	descriptorVector = unlist(preprocessingOfValues(descriptorVector, isColValue = TRUE))	#descriptor is value for yAxis
-	
+	descriptorVector = unlist(preprocessingOfValues(descriptorVector, isColValue = TRUE))
 	errorDescriptor = descriptorVector %GetDescriptorAfterCheckIfDescriptorNotExists% iniDataSet 
 	descriptorVector = descriptorVector %GetDescriptorsAfterCheckIfDescriptorExists% iniDataSet
-		
+	
 	if (length(errorDescriptor)>0 && debug) {
 		errorDescriptor %errorReport% NOT.EXISTS
 	} 
-
+	
 	if (length(descriptorVector) > 0) {
 		return(as.data.frame(descriptorVector))
 	} else {
@@ -1366,10 +1323,10 @@ preprocessingOfxAxisValue <- function(overallList) {
 	
 	if (overallList$filterXaxis != NONE) {
 #		print(overallList$filterXaxis)
-#		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE))
-#		print(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
-#		print(as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]]))
-		overallList$filterXaxis = as.numeric(strsplit(overallList$filterXaxis, "$", fixed=TRUE)[[1]])
+#		print(strsplit(overallList$filterXaxis, "$", fixed = TRUE))
+#		print(strsplit(overallList$filterXaxis, "$", fixed = TRUE)[[1]])
+#		print(as.numeric(strsplit(overallList$filterXaxis, "$", fixed = TRUE)[[1]]))
+		overallList$filterXaxis = as.numeric(strsplit(overallList$filterXaxis, "$", fixed = TRUE)[[1]])
 	} else {
 		overallList$filterXaxis = as.numeric(unique(overallList$iniDataSet[overallList$xAxis])[[1]])	#xAxis muss einen Wert enthalten ansonsten Bricht das Program weiter oben ab
 	}
@@ -1378,9 +1335,9 @@ preprocessingOfxAxisValue <- function(overallList) {
 
 getSingelFilter <- function(filter, treatment, dataSet) {
 	if (filter != NONE) {
-		return(strsplit(filter, "$", fixed=TRUE)[[1]])
+		return(strsplit(filter, "$", fixed = TRUE)[[1]])
 	} else {
-		if(all(is.na(as.character(unique(dataSet[treatment])[[1]])))){
+		if (all(is.na(as.character(unique(dataSet[treatment])[[1]])))) {
 			return("")
 		} else {
 			return(as.character(unique(dataSet[treatment])[[1]]))
@@ -1396,26 +1353,26 @@ preprocessingOfTreatment <- function(overallList) {
 		
 		if (overallList$treatment != NONE & (overallList$treatment %checkIfDescriptorExists% overallList$iniDataSet)) {	
 			overallList$filterTreatment = getSingelFilter(overallList$filterTreatment, overallList$treatment, overallList$iniDataSet)
-			if(any(overallList$filterTreatment == "")) {
-				if(all(overallList$filterTreatment == "")) {
+			if (any(overallList$filterTreatment == "")) {
+				if (all(overallList$filterTreatment == "")) {
 					overallList <- setTreatmentToNull(overallList)
 				} else {
 					overallList$filterTreatment <- overallList$filterTreatment[!overallList$filterTreatment == ""]
-					ownCat(paste("reduce \"''\" in 'filterTreatment'!", sep=""))
+					ownCat(paste("reduce \"''\" in 'filterTreatment'!", sep = ""))
 				}
 			}
 		} else {
 			overallList <- setTreatmentToNull(overallList)
 #			overallList$treatment = NONE
 #			overallList$filterTreatment = NONE
-#			ownCat(paste("Set 'filterTreatment' and 'treatment' to '",NONE,"'!", sep=""))
-					
+#			ownCat(paste("Set 'filterTreatment' and 'treatment' to '", NONE, "'!", sep = ""))
+			
 		}			
 	} else {
 		overallList <- setTreatmentToNull(overallList)
 #		overallList$treatment = NONE
 #		overallList$filterTreatment = NONE
-#		ownCat(paste("Set 'filterTreatment' and 'treatment' to '",NONE,"'!", sep=""))
+#		ownCat(paste("Set 'filterTreatment' and 'treatment' to '", NONE, "'!", sep = ""))
 		
 	}
 	return(overallList)
@@ -1424,7 +1381,7 @@ preprocessingOfTreatment <- function(overallList) {
 setTreatmentToNull <- function(overallList) {
 	overallList$treatment = NONE
 	overallList$filterTreatment = NONE
-	ownCat(paste("Set 'filterTreatment' and 'treatment' to '",NONE,"'!", sep=""))
+	ownCat(paste("Set 'filterTreatment' and 'treatment' to '", NONE, "'!", sep = ""))
 	return(overallList)
 }
 
@@ -1432,7 +1389,7 @@ setSecondTreatmentToNull <- function(overallList) {
 	overallList$secondTreatment <- NONE
 	overallList$filterSecondTreatment <- NONE
 	overallList$splitTreatmentSecond <- FALSE
-	ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
+	ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '", NONE, "' and 'splitTreatmentSecond' to 'FALSE'!", sep = ""))
 	return(overallList)
 }
 
@@ -1441,16 +1398,16 @@ preprocessingOfSecondTreatment <- function(overallList) {
 	
 	if (!is.null(overallList$secondTreatment)) {
 		overallList$secondTreatment <- preprocessingOfValues(overallList$secondTreatment)
-
+		
 		if (overallList$secondTreatment != NONE & (overallList$secondTreatment %checkIfDescriptorExists% overallList$iniDataSet)) {
 			overallList$filterSecondTreatment <- getSingelFilter(overallList$filterSecondTreatment, overallList$secondTreatment, overallList$iniDataSet)
 			
-			if(any(overallList$filterSecondTreatment == "")) {
-				if(all(overallList$filterSecondTreatment == "")) {
+			if (any(overallList$filterSecondTreatment == "")) {
+				if (all(overallList$filterSecondTreatment == "")) {
 					overallList <- setSecondTreatmentToNull(overallList)
 				} else {
 					overallList$filterSecondTreatment <- overallList$filterSecondTreatment[!overallList$filterSecondTreatment == ""]
-					ownCat(paste("reduce \"''\" in 'filterSecondTreatment'!", sep=""))
+					ownCat(paste("reduce \"''\" in 'filterSecondTreatment'!", sep = ""))
 				}
 			}
 			
@@ -1459,7 +1416,7 @@ preprocessingOfSecondTreatment <- function(overallList) {
 #				overallList$secondTreatment <- NONE
 #				overallList$filterSecondTreatment <- NONE
 #				overallList$splitTreatmentSecond <- FALSE
-#				ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
+#				ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '", NONE, "' and 'splitTreatmentSecond' to 'FALSE'!", sep = ""))
 			}
 			
 		} else {
@@ -1467,7 +1424,7 @@ preprocessingOfSecondTreatment <- function(overallList) {
 #			overallList$secondTreatment <- NONE
 #			overallList$filterSecondTreatment <- NONE
 #			overallList$splitTreatmentSecond <- FALSE
-#			ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
+#			ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '", NONE, "' and 'splitTreatmentSecond' to 'FALSE'!", sep = ""))
 			
 		}	
 	} else {
@@ -1475,13 +1432,13 @@ preprocessingOfSecondTreatment <- function(overallList) {
 #		overallList$secondTreatment <- NONE
 #		overallList$filterSecondTreatment <- NONE
 #		overallList$splitTreatmentSecond <- FALSE
-#		ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '",NONE,"' and 'splitTreatmentSecond' to 'FALSE'!", sep=""))
+#		ownCat(paste("Set 'filterSecondTreatment', 'secondTreatment' to '", NONE, "' and 'splitTreatmentSecond' to 'FALSE'!", sep = ""))
 		
 	}
 	return(overallList)
 }
 
-check <- function(value, checkValue=c(NONE, NA)) {
+check <- function(value, checkValue = c(NONE, NA)) {
 	if (!is.null(value)) {
 		return(value %GetDescriptorAfterCheckIfDescriptorNotExists% checkValue)
 		#return(unique(value %GetDescriptorAfterCheckIfDescriptorNotExists% checkValue))
@@ -1490,30 +1447,24 @@ check <- function(value, checkValue=c(NONE, NA)) {
 	}
 }
 
-getVector <- function(descriptorSet, specialList = NULL) {
-##############
-#specialList <- FOURTH.SECTION
-##############
-
+getVector <- function(descriptorSet, specialList = NULL, debug = FALSE) {
+	debug %debug% "getVector()"
+	
 	if (!is.null(descriptorSet)) {
-		vector <-  vector()
-		if(class(descriptorSet) == "data.frame") {
-			lengthVec <- length(descriptorSet[,1])
-#		} else if (class(descriptorSet) == "list") {
-#			lengthVec <- length(descriptorSet)
+		vector <- vector()
+		if (class(descriptorSet) == "data.frame") {
+			lengthVec <- length(descriptorSet[, 1])
 		} else {
 			lengthVec <- length(descriptorSet)
 		}
 		
 		for (n in 1:lengthVec) {
-			if(class(descriptorSet) == "data.frame") {
-				vector = c(vector, as.vector(descriptorSet[n,]))
-#			} else if(class(descriptorSet) == "list") {
-#				vector = c(vector, as.vector(unlist(descriptorSet[[n]])))
+			if (class(descriptorSet) == "data.frame") {
+				vector = c(vector, as.vector(descriptorSet[n, ]))
 			} else {
-				if(!is.null(specialList)){
+				if (!is.null(specialList)) {
 					addVector <- as.vector(unlist(descriptorSet[[n]][specialList]))
-					if(is.null(addVector)) {
+					if (is.null(addVector)) {
 						addVector <- 0
 					}		
 					
@@ -1529,19 +1480,17 @@ getVector <- function(descriptorSet, specialList = NULL) {
 }
 
 
-getRealNameAndPrintSection <- function(descriptorSet) {
-########	
-#descriptorSet <- nBoxPlotList
-########
-
-	columName <- names(descriptorSet)
-	columName <- replaceBrakesWithNothing(columName)
-	plotName <- getVector(descriptorSet, "plotName")
+getRealNameAndPrintSection <- function(descriptorSet, debug = FALSE) {
+	debug %debug% "getRealNameAndPrintSection()"
 	
-	section <- getVector(descriptorSet, FIRST.SECTION)		
-	subsection <- getVector(descriptorSet, SECOND.SECTION)
-	subsubsection <- getVector(descriptorSet, THIRD.SECTION)
-	paragraph <- getVector(descriptorSet, FOURTH.SECTION)
+	columName <- names(descriptorSet)
+	columName <- replaceBrakesWithNothing(columName, debug = debug)
+	plotName <- getVector(descriptorSet, "plotName", debug = debug)
+
+	section <- getVector(descriptorSet, FIRST.SECTION, debug = debug)		
+	subsection <- getVector(descriptorSet, SECOND.SECTION, debug = debug)
+	subsubsection <- getVector(descriptorSet, THIRD.SECTION, debug = debug)
+	paragraph <- getVector(descriptorSet, FOURTH.SECTION, debug = debug)
 	sectionList <- list(section = section, subsection = subsection, subsubsection = subsubsection, paragraph = paragraph)
 	
 	return(list(columName = columName, plotName = plotName, section = sectionList))
@@ -1549,6 +1498,7 @@ getRealNameAndPrintSection <- function(descriptorSet) {
 
 reduceWorkingDataSize <- function(overallList) {
 	overallList$debug %debug% "reduceWorkingDataSize()"
+
 	if (overallList$isRatio) {
 		overallList$iniDataSet <- overallList$iniDataSet[unique(c(check(getVector(overallList$nBoxDes)), check(getVector(overallList$nBoxMultiDes)), check(getVector(overallList$boxDes)), check(getVector(overallList$boxStackDes)), check(getVector(overallList$boxSpiderDes)), check(getVector(overallList$linerangeDes)), check(getVector(overallList$violinBoxDes)), check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment)))]
 	} else {
@@ -1558,22 +1508,22 @@ reduceWorkingDataSize <- function(overallList) {
 }
 
 groupByFunction <- function(groupByList) {
-######
+	######
 #groupByList <- list(overallList$treatment, overallList$secondTreatment)
-######
+	######
 	groupByList = unlist(groupByList)
 	return(unlist(groupByList[ifelse(groupByList != NONE, TRUE, FALSE)]))
 }
 
-getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues, plot=FALSE) {
-###############
+getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues, plot = FALSE) {
+	###############
 #groupedDataFrame <- groupedDataFrameMean
 #listOfValues <- booleanVectorList
-#plot=FALSE
-###############
+#plot = FALSE
+	###############
 	
 	iniType = !plot
-	tempVector = rep.int(iniType, times=length(groupedDataFrame[, 1]))
+	tempVector = rep.int(iniType, times = length(groupedDataFrame[, 1]))
 	
 	for (h in names(listOfValues)) {
 		if (h != NONE & !is.null(groupedDataFrame[[h]])) {
@@ -1588,7 +1538,7 @@ getBooleanVectorForFilterValues <- function(groupedDataFrame, listOfValues, plot
 }
 
 buildRowForOverallList <- function(i, des, listOfValues, dataSet, day) {
-	rowString = list(row=des, day=numeric())
+	rowString = list(row = des, day = numeric())
 	for (k in listOfValues) {
 		if (k != NONE) {
 			rowString$row = paste(rowString$row, dataSet[i, k])
@@ -1628,33 +1578,33 @@ buildList <- function(overallList, colOfXaxis) {
 }
 
 buildRowName <- function(mergeDataSet, groupBy, contactTheValues, yName = VALUES) {	
-#####
+	#####
 #mergeDataSet <- iniDataSet
-#####
+	#####
 	
 	if (length(groupBy) == 0) {
-		return(data.frame(name=rep.int(yName, length(mergeDataSet[, 1])), mergeDataSet))
+		return(data.frame(name = rep.int(yName, length(mergeDataSet[, 1])), mergeDataSet))
 	} else if (length(groupBy) == 1) {
-		return(data.frame(name=mergeDataSet[, groupBy], mergeDataSet[, !(colnames(mergeDataSet) %in% groupBy)]))
+		return(data.frame(name = mergeDataSet[, groupBy], mergeDataSet[, !(colnames(mergeDataSet) %in% groupBy)]))
 	} else {		
 		#temp = mergeDataSet[, groupBy[2]]
 		temp <- vector()	
 		first <- FALSE
 		for (hh in seq(along = groupBy)) {
-			if(!contactTheValues && !first) {
-			 first <- TRUE
+			if (!contactTheValues && !first) {
+				first <- TRUE
 			} else {
-				if(length(unique(mergeDataSet[, groupBy[hh]])) > 1) {
-					if(length(temp) > 0) {
-						temp <- paste(temp, mergeDataSet[, groupBy[hh]], sep = "/") #  #/#
+				if (length(unique(mergeDataSet[, groupBy[hh]])) > 1) {
+					if (length(temp) > 0) {
+						temp <- paste(temp, mergeDataSet[, groupBy[hh]], sep = "/") # #/#
 					} else {
 						temp <- mergeDataSet[, groupBy[hh]]
 					}
 				}
 			}				
 		}
-	
-		return(data.frame(name=temp, primaerTreatment= mergeDataSet[, groupBy[1]], mergeDataSet[, mergeDataSet %allColnamesWithoutThisOnes% groupBy]))
+		
+		return(data.frame(name = temp, primaerTreatment = mergeDataSet[, groupBy[1]], mergeDataSet[, mergeDataSet %allColnamesWithoutThisOnes% groupBy]))
 	}	
 }
 
@@ -1663,33 +1613,33 @@ checkTheNumberOfEntriesOfTheDay <- function(iniPosition, values, uniqueDays) {
 }
 
 
-getToPlottedDays <- function(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays, changes=NULL) {
-##########
+getToPlottedDays <- function(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays, changes = NULL) {
+	##########
 #
-##########
+	##########
 #tempValues <- values
 	uniqueDays = unique(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]))
 	
-	if(minimumNumberOfValuesOfEachDays > 1) {
+	if (minimumNumberOfValuesOfEachDays > 1) {
 		newValues <- data.frame()
 		for(dd in uniqueDays) {
-			if(sum(values$xAxis==dd) >= minimumNumberOfValuesOfEachDays) {
-				newValues <- rbind(newValues, values[values$xAxis== dd,])
+			if (sum(values$xAxis == dd) >= minimumNumberOfValuesOfEachDays) {
+				newValues <- rbind(newValues, values[values$xAxis == dd, ])
 			}
 		}
 		values <- newValues
 	}
 	
-	if(length(values)>0) {
+	if (length(values)>0) {
 		uniqueDays = unique(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]))
 		medianPosition = floor(median(1:length(uniqueDays)))
 		
-		days = uniqueDays[floor(median(1:length(uniqueDays[uniqueDays<=uniqueDays[medianPosition]])))]
+		days = uniqueDays[floor(median(1:length(uniqueDays[uniqueDays <= uniqueDays[medianPosition]])))]
 		
 		days = c(days, uniqueDays[medianPosition])
-		days = c(days, uniqueDays[floor(median(length(uniqueDays[uniqueDays>=uniqueDays[medianPosition]]):length(uniqueDays)))])
+		days = c(days, uniqueDays[floor(median(length(uniqueDays[uniqueDays >= uniqueDays[medianPosition]]):length(uniqueDays)))])
 		days = c(days, uniqueDays[length(uniqueDays)])
-		 
+		
 		if (!is.null(changes)) {
 			days = c(as.numeric(changes), days[(length(changes)+1):4])
 		}
@@ -1702,138 +1652,138 @@ getToPlottedDays <- function(values, nameOfValueColumn, minimumNumberOfValuesOfE
 }
 
 setxAxisfactor <- function(xAxisName, values, nameOfValueColumn, options = NULL, typOfPlot = "") {
-##############
+	##############
 #xAxisName <- overallList$xAxisName
 #xAxisValue <- overallResult$xAxis
 #nameOfValueColumn <- "value"
-#values <- overallResult[c("xAxis","value")]
-##############
-
-
+#values <- overallResult[c("xAxis", "value")]
+	##############
+	
+	
 	minimumNumberOfValuesOfEachDays <- 1
-	if(typOfPlot == BOX.PLOT) {
+	if (typOfPlot == BOX.PLOT) {
 		minimumNumberOfValuesOfEachDays <- 2
 	}
-
+	
 	
 	if (!is.null(options$daysOfBoxplotNeedsReplace)) {
 		whichDayShouldBePlot = getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays, options$daysOfBoxplotNeedsReplace)
 	} else {
 		whichDayShouldBePlot = getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays)
 	}
-	if(!is.null(whichDayShouldBePlot)) {
-		xAxisfactor = factor(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]), levels=unique(whichDayShouldBePlot))
-	
+	if (!is.null(whichDayShouldBePlot)) {
+		xAxisfactor = factor(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]), levels = unique(whichDayShouldBePlot))
+		
 		xAxisfactor = paste(xAxisName, xAxisfactor)
 		naString = paste(xAxisName, "NA")
 		xAxisfactor[xAxisfactor == naString] = NA
 		
-	#	xAxisfactor = paste("DAS", xAxisfactor)
-	#	xAxisfactor[xAxisfactor == "DAS NA"] = NA
+		#	xAxisfactor = paste("DAS", xAxisfactor)
+		#	xAxisfactor[xAxisfactor == "DAS NA"] = NA
 	} else {
 		xAxisfactor <- NULL
 	}
-		
+	
 	return(xAxisfactor)
 }
 
 
 overallGetResultDataFrame <- function(overallList) {
 	overallList$debug %debug% "overallGetResultDataFrame()"	
-
+	
 	if (!calculateNothing) {	
-			groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
-			colNames <- list(colOfXaxis="xAxis", colOfMean="mean", colOfSD="se", colName="name", xAxis=overallList$xAxis)
-			booleanVectorList <- buildList(overallList, colNames$colOfXaxis)
-			columnsStandard <- c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
-			contactTheValues <- FALSE
-			
-			if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) && overallList$secondTreatment != NONE) {
-				contactTheValues <- TRUE
-				ownCat("... there should be no split, so the data have to be conected now!")
-			}
-			
-			if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
-				if (overallList$debug) {ownCat(NBOX.PLOT)}
-				columns <- c(columnsStandard, check(getVector(overallList$nBoxDes)))
-				overallList$overallResult_nBoxDes <- getResultDataFrame(NBOX.PLOT, overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",NBOX.PLOT," are 'NA'", sep=""))
-			}
-			
-			if (!is.null(overallList$nBoxMultiDes) && sum(!is.na(overallList$nBoxMultiDes)) > 0) {
-				if (overallList$debug) {ownCat(NBOX.MULTI.PLOT)}
-				columns <- c(columnsStandard, check(getVector(overallList$nBoxMultiDes)))
-				overallList$overallResult_nBoxMultiDes <- getResultDataFrame(NBOX.MULTI.PLOT, overallList$nBoxMultiDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",NBOX.MULTI.PLOT," are 'NA'", sep=""))
-			}
-			
-			if (!is.null(overallList$boxDes) && sum(!is.na(overallList$boxDes)) > 0) {
-				if (overallList$debug) {ownCat(BOX.PLOT)}
-				colNames$colOfMean = VALUES
-				columns = c(columnsStandard, check(getVector(overallList$boxDes)))
-				overallList$overallResult_boxDes <- getResultDataFrame(BOX.PLOT, overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",BOX.PLOT," are 'NA'", sep=""))
-			}
-			
-			if (!is.null(overallList$boxStackDes) && sum(!is.na(overallList$boxStackDes)) > 0) {
-				if (overallList$debug) {ownCat(STACKBOX.PLOT)}
-				colNames$colOfMean = check(getVector(overallList$boxStackDes))
-				colNames$colOfXaxis = overallList$xAxis
-				columns = c(columnsStandard, check(getVector(overallList$boxStackDes)))
-				overallList$overallResult_boxStackDes = getResultDataFrame(STACKBOX.PLOT, overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",STACKBOX.PLOT," are 'NA'", sep=""))
-			}
+		groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
+		colNames <- list(colOfXaxis = "xAxis", colOfMean = "mean", colOfSD = "se", colName = "name", xAxis = overallList$xAxis)
+		booleanVectorList <- buildList(overallList, colNames$colOfXaxis)
+		columnsStandard <- c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
+		contactTheValues <- FALSE
 		
-			if (!is.null(overallList$boxSpiderDes) && sum(!is.na(overallList$boxSpiderDes)) > 0) {
-				if (overallList$debug) {ownCat(SPIDER.PLOT)}
-				#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
-				colNames$colOfMean = VALUES
-				colNames$colOfXaxis = overallList$xAxis
-				colNames$desNames = overallList$boxSpiderDesName
-				columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
-				overallList$overallResult_boxSpiderDes = getResultDataFrame(SPIDER.PLOT, overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",SPIDER.PLOT," are 'NA'", sep=""))
-			}
-
-			if (!is.null(overallList$linerangeDes) && sum(!is.na(overallList$linerangeDes)) > 0) {
-				if (overallList$debug) {ownCat(LINERANGE.PLOT)}
-				#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
-				colNames$colOfMean = VALUES
-				colNames$colOfXaxis = overallList$xAxis
-				colNames$desNames = overallList$linerangeDesName
-				columns = c(columnsStandard, check(getVector(overallList$linerangeDes)))
-				overallList$overallResult_linerangeDes = getResultDataFrame(LINERANGE.PLOT, overallList$linerangeDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			} else {
-				ownCat(paste("All values for ",LINERANGE.PLOT ," are 'NA'", sep=""))
-			}
-			
-			if (!is.null(overallList$violinBoxDes) && sum(!is.na(overallList$violinBoxDes)) > 0 && overallList$isRatio) {
-				if (overallList$debug) {ownCat(VIOLIN.PLOT)}
-				colNames$colOfMean = "mean"
-				colNames$colOfXaxis = "xAxis"
-				columns = c(columnsStandard, check(getVector(overallList$violinBoxDes)))
-				overallList$overallResult_violinBoxDes = getResultDataFrame(VIOLIN.PLOT, overallList$violinBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
-			}
-			
-			
-			if(overallList$deleteNboxplot) {
-				overallList$iniDataSet <- NULL
-			}
-			
-			if (is.null(overallList$boxStackDes) && 
+		if ((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) && overallList$secondTreatment != NONE) {
+			contactTheValues <- TRUE
+			ownCat("... there should be no split, so the data have to be conected now!")
+		}
+		
+		if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
+			if (overallList$debug) {ownCat(NBOX.PLOT)}
+			columns <- c(columnsStandard, check(getVector(overallList$nBoxDes)))
+			overallList$overallResult_nBoxDes <- getResultDataFrame(NBOX.PLOT, overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", NBOX.PLOT, " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$nBoxMultiDes) && sum(!is.na(overallList$nBoxMultiDes)) > 0) {
+			if (overallList$debug) {ownCat(NBOX.MULTI.PLOT)}
+			columns <- c(columnsStandard, check(getVector(overallList$nBoxMultiDes)))
+			overallList$overallResult_nBoxMultiDes <- getResultDataFrame(NBOX.MULTI.PLOT, overallList$nBoxMultiDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", NBOX.MULTI.PLOT, " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$boxDes) && sum(!is.na(overallList$boxDes)) > 0) {
+			if (overallList$debug) {ownCat(BOX.PLOT)}
+			colNames$colOfMean = VALUES
+			columns = c(columnsStandard, check(getVector(overallList$boxDes)))
+			overallList$overallResult_boxDes <- getResultDataFrame(BOX.PLOT, overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", BOX.PLOT, " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$boxStackDes) && sum(!is.na(overallList$boxStackDes)) > 0) {
+			if (overallList$debug) {ownCat(STACKBOX.PLOT)}
+			colNames$colOfMean = check(getVector(overallList$boxStackDes))
+			colNames$colOfXaxis = overallList$xAxis
+			columns = c(columnsStandard, check(getVector(overallList$boxStackDes)))
+			overallList$overallResult_boxStackDes = getResultDataFrame(STACKBOX.PLOT, overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", STACKBOX.PLOT, " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$boxSpiderDes) && sum(!is.na(overallList$boxSpiderDes)) > 0) {
+			if (overallList$debug) {ownCat(SPIDER.PLOT)}
+			#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
+			colNames$colOfMean = VALUES
+			colNames$colOfXaxis = overallList$xAxis
+			colNames$desNames = overallList$boxSpiderDesName
+			columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
+			overallList$overallResult_boxSpiderDes = getResultDataFrame(SPIDER.PLOT, overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", SPIDER.PLOT, " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$linerangeDes) && sum(!is.na(overallList$linerangeDes)) > 0) {
+			if (overallList$debug) {ownCat(LINERANGE.PLOT)}
+			#colNames$colOfMean = check(getVector(overallList$boxSpiderDes))
+			colNames$colOfMean = VALUES
+			colNames$colOfXaxis = overallList$xAxis
+			colNames$desNames = overallList$linerangeDesName
+			columns = c(columnsStandard, check(getVector(overallList$linerangeDes)))
+			overallList$overallResult_linerangeDes = getResultDataFrame(LINERANGE.PLOT, overallList$linerangeDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		} else {
+			ownCat(paste("All values for ", LINERANGE.PLOT , " are 'NA'", sep = ""))
+		}
+		
+		if (!is.null(overallList$violinBoxDes) && sum(!is.na(overallList$violinBoxDes)) > 0 && overallList$isRatio) {
+			if (overallList$debug) {ownCat(VIOLIN.PLOT)}
+			colNames$colOfMean = "mean"
+			colNames$colOfXaxis = "xAxis"
+			columns = c(columnsStandard, check(getVector(overallList$violinBoxDes)))
+			overallList$overallResult_violinBoxDes = getResultDataFrame(VIOLIN.PLOT, overallList$violinBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+		}
+		
+		
+		if (overallList$deleteNboxplot) {
+			overallList$iniDataSet <- NULL
+		}
+		
+		if (is.null(overallList$boxStackDes) && 
 				is.null(overallList$nBoxMultiDes) &&
 				is.null(overallList$boxDes) &&
 				is.null(overallList$nBoxDes) && 
 				is.null(overallList$boxSpiderDes) && 
 				is.null(overallList$violinBoxDes)) {
-				ownCat("No descriptor set - this run needs to stop!")
-				overallList$stoppTheCalculation = TRUE
-			}
+			ownCat("No descriptor set - this run needs to stop!")
+			overallList$stoppTheCalculation = TRUE
+		}
 	}
 	return(overallList)
 }
@@ -1841,7 +1791,7 @@ overallGetResultDataFrame <- function(overallList) {
 getPlotNumber <- function(colNameWichMustBind, descriptorList, diagramTyp) {
 	
 	if (diagramTyp == STACKBOX.PLOT) {
-	
+		
 		for (n in names(descriptorList)) {
 			if (colNameWichMustBind %in% as.vector(unlist(descriptorList[[n]]))) {
 				return(n)
@@ -1849,57 +1799,57 @@ getPlotNumber <- function(colNameWichMustBind, descriptorList, diagramTyp) {
 		}
 		return(-1)
 	} else if (diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
-		return(strsplit(substring(colNameWichMustBind,nchar(VALUES)+1),"\\.")[[1]][1])
+		return(strsplit(substring(colNameWichMustBind, nchar(VALUES)+1), "\\.")[[1]][1])
 	}
 }
 
 
 getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, colNames, booleanVectorList, debug, contactTheValues) {	
-#############################
+	#############################
 #	diagramTyp = "spiderplot"
 #	descriptorList = overallList$boxSpiderDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug
-#########################	
+	#########################	
 #	diagramTyp = "boxplotStacked"
 #	descriptorList = overallList$boxStackDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug	
-#########################
+	#########################
 #	diagramTyp = "nboxplot"
 #	descriptorList = overallList$nBoxDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug
-#########################
+	#########################
 #	diagramTyp = NBOX.MULTI.PLOT
 #	descriptorList = overallList$nBoxMultiDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug
-#########################
+	#########################
 #	diagramTyp = "violinplot"
 #	descriptorList = overallList$violinBoxDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug
-#########################	
+	#########################	
 #	diagramTyp = "boxplot"
 #	descriptorList = overallList$boxDes
 #	iniDataSet = overallList$iniDataSet[columns]
 #	debug = overallList$debug	
-#########################
+	#########################
 #splitTreatmentFirst <- overallList$splitTreatmentFirst
 #splitTreatmentSecond <- overallList$splitTreatmentSecond
-#########################
-
+	#########################
+	
 	debug %debug% "getResultDataFrame()"
 	
 	#contactTheValues <- FALSE
 	descriptor = getVector(descriptorList)
-
+	
 	if (diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
 		descriptorName <- character()
-		for(n in 1:length(descriptorList)){
-			lengthVector <- length(descriptorList[[n]][,1])
-			descriptorName <- c(descriptorName, paste(rep.int(n, lengthVector),c(1:lengthVector), sep="."))		
+		for(n in 1:length(descriptorList)) {
+			lengthVector <- length(descriptorList[[n]][, 1])
+			descriptorName <- c(descriptorName, paste(rep.int(n, lengthVector), c(1:lengthVector), sep = "."))		
 		}
 	} else {	
 		descriptorName <- seq(1:length(descriptor))
@@ -1907,19 +1857,19 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 	
 	descriptorName <- descriptorName[!is.na(descriptor)]
 	descriptor <- descriptor[!is.na(descriptor)]
-
+	
 	
 	if (diagramTyp != BOX.PLOT) {
 		groupedDataFrame = data.table(iniDataSet)
 		#key(groupedDataFrame) = c(groupBy, colNames$xAxis)
-		setkeyv(groupedDataFrame,c(groupBy, colNames$xAxis))
+		setkeyv(groupedDataFrame, c(groupBy, colNames$xAxis))
 	}
 	
 	if (diagramTyp == BOX.PLOT) {
-		if(length(groupBy)>0) {
+		if (length(groupBy)>0) {
 			groupedDataFrameMean <- iniDataSet[groupBy[1]]
-			groupByReduce <- groupBy[groupBy!=groupBy[1]]
-		
+			groupByReduce <- groupBy[groupBy != groupBy[1]]
+			
 			for (n in c(groupByReduce, colNames$xAxis, descriptor)) {
 				groupedDataFrameMean <- cbind(groupedDataFrameMean, iniDataSet[n])
 			}		
@@ -1927,69 +1877,69 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 			groupedDataFrameMean <- iniDataSet
 		}
 	} else {
-		groupedDataFrameMean = as.data.frame(groupedDataFrame[, lapply(.SD, mean, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
-		#groupedDataFrameMean = as.data.frame(groupedDataFrame[, lapply(colnames(groupedDataFrame), mean, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
+		groupedDataFrameMean = as.data.frame(groupedDataFrame[, lapply(.SD, mean, na.rm = TRUE), by = c(groupBy, colNames$xAxis)])
+		#groupedDataFrameMean = as.data.frame(groupedDataFrame[, lapply(colnames(groupedDataFrame), mean, na.rm = TRUE), by = c(groupBy, colNames$xAxis)])
 	}
 	
 	if (diagramTyp == NBOX.PLOT || diagramTyp == BOX.PLOT || diagramTyp == SPIDER.PLOT || diagramTyp == VIOLIN.PLOT || diagramTyp == LINERANGE.PLOT) {
-		#colNamesOfTheRest = paste(colNames$colOfMean, seq(1:length(descriptor)), sep="")	
-		colNamesOfTheRest <- paste(colNames$colOfMean, descriptorName, sep="")	
+		#colNamesOfTheRest = paste(colNames$colOfMean, seq(1:length(descriptor)), sep = "")	
+		colNamesOfTheRest <- paste(colNames$colOfMean, descriptorName, sep = "")	
 	} else {
 		colNamesOfTheRest <- groupedDataFrameMean %allColnamesWithoutThisOnes% c(groupBy, colNames$xAxis)
 	}
-
+	
 	colnames(groupedDataFrameMean) <- c(groupBy, colNames$colOfXaxis, colNamesOfTheRest)
 	
 	if (diagramTyp == NBOX.PLOT || diagramTyp == NBOX.MULTI.PLOT) {
-		groupedDataFrameSD = as.data.frame(groupedDataFrame[, lapply(.SD, sd, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
-		#groupedDataFrameSD = as.data.frame(groupedDataFrame[, lapply(colnames(groupedDataFrame), sd, na.rm=TRUE), by=c(groupBy, colNames$xAxis)])
-		if(diagramTyp == NBOX.PLOT) {
-			colnames(groupedDataFrameSD) <- c(groupBy, colNames$colOfXaxis, paste(colNames$colOfSD, descriptorName, sep=""))
+		groupedDataFrameSD = as.data.frame(groupedDataFrame[, lapply(.SD, sd, na.rm = TRUE), by = c(groupBy, colNames$xAxis)])
+		#groupedDataFrameSD = as.data.frame(groupedDataFrame[, lapply(colnames(groupedDataFrame), sd, na.rm = TRUE), by = c(groupBy, colNames$xAxis)])
+		if (diagramTyp == NBOX.PLOT) {
+			colnames(groupedDataFrameSD) <- c(groupBy, colNames$colOfXaxis, paste(colNames$colOfSD, descriptorName, sep = ""))
 		} else {
-			colnames(groupedDataFrameSD) <- c(groupBy, colNames$colOfXaxis, paste(colNames$colOfSD, colNamesOfTheRest, sep=""))
+			colnames(groupedDataFrameSD) <- c(groupBy, colNames$colOfXaxis, paste(colNames$colOfSD, colNamesOfTheRest, sep = ""))
 		}
 	}
 	
 	booleanVector = getBooleanVectorForFilterValues(groupedDataFrameMean, booleanVectorList)
 	
 	if (diagramTyp == NBOX.PLOT || diagramTyp == NBOX.MULTI.PLOT) {
-		iniDataSet <- merge(sort=FALSE, groupedDataFrameMean[booleanVector, ], groupedDataFrameSD[booleanVector, ], by = c(groupBy, colNames$colOfXaxis))
+		iniDataSet <- merge(sort = FALSE, groupedDataFrameMean[booleanVector, ], groupedDataFrameSD[booleanVector, ], by = c(groupBy, colNames$colOfXaxis))
 		overallResult <- buildRowName(iniDataSet, groupBy, contactTheValues)
-	
-		if(diagramTyp == NBOX.MULTI.PLOT) {
+		
+		if (diagramTyp == NBOX.MULTI.PLOT) {
 			addValue <- 0
 			newDataSet <- data.frame()
 			firstnewDataSet <- TRUE
 			firstAddColumn <- TRUE
-			for(nn in seq(along=descriptorList)) {
-				if(!is.na(descriptorList[[nn]][1])) {
+			for(nn in seq(along = descriptorList)) {
+				if (!is.na(descriptorList[[nn]][1])) {
 					tempDesMorThanOne <- character()
-					actualDataSet <- overallResult[,c(getPrimAndOrName(colnames(overallResult)),colNames$colOfXaxis,getVector(descriptorList[nn]), paste(colNames$colOfSD, getVector(descriptorList[nn]), sep=""))]
+					actualDataSet <- overallResult[, c(getPrimAndOrName(colnames(overallResult)), colNames$colOfXaxis, getVector(descriptorList[nn]), paste(colNames$colOfSD, getVector(descriptorList[nn]), sep = ""))]
 					newDataSetKK <- data.frame()
 					firstNewDataSetTemp <- TRUE
-					for(kk in seq(along=descriptorList[[nn]])) {							
-						if(!is.na(descriptorList[[nn]][kk][1])){
-							usedColumn <- c(as.character(descriptorList[[nn]][kk]), paste(colNames$colOfSD, as.character(descriptorList[[nn]][kk]), sep=""))
-							if(firstAddColumn) {
+					for(kk in seq(along = descriptorList[[nn]])) {							
+						if (!is.na(descriptorList[[nn]][kk][1])) {
+							usedColumn <- c(as.character(descriptorList[[nn]][kk]), paste(colNames$colOfSD, as.character(descriptorList[[nn]][kk]), sep = ""))
+							if (firstAddColumn) {
 								additionalColumns <- c(getPrimAndOrName(colnames(overallResult)), colNames$colOfXaxis)
 							} else {
 								additionalColumns <- NULL
 							}
 							usedColumn <- c(additionalColumns, usedColumn)
 							
-							newDataSetTemp <- actualDataSet[,usedColumn]
+							newDataSetTemp <- actualDataSet[, usedColumn]
 							
-							if(str_detect(descriptorList[[nn]][kk], fixed("section_"))) {
+							if (str_detect(descriptorList[[nn]][kk], fixed("section_"))) {
 								newName <- str_split(descriptorList[[nn]][kk], fixed("section_"))[[1]][2]
 								newName <- str_split(newName, fixed("_"))[[1]][1]
-								newName <- paste("Section", newName, sep=" ")
+								newName <- paste("Section", newName, sep = " ")
 							} else {
 								newName <- descriptorList[[nn]][kk]
 							}
 							newDataSetTemp <- cbind(newDataSetTemp, column = rep.int(newName, nrow(actualDataSet))) # as.character(descriptorList[[nn]][kk])
-							colnames(newDataSetTemp) <- c(additionalColumns, paste(MEAN,nn, sep=""), paste(SE, nn, sep=""), paste(COLUMN, nn, sep=""))
-						
-							if(firstNewDataSetTemp) { #kk == 1
+							colnames(newDataSetTemp) <- c(additionalColumns, paste(MEAN, nn, sep = ""), paste(SE, nn, sep = ""), paste(COLUMN, nn, sep = ""))
+							
+							if (firstNewDataSetTemp) { #kk == 1
 								newDataSetKK <- newDataSetTemp
 								firstNewDataSetTemp <- FALSE
 							} else {	
@@ -1998,11 +1948,11 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 						}
 					}
 					
-					if(length(newDataSetKK) != 0 ) {
+					if (length(newDataSetKK) != 0 ) {
 						firstAddColumn <- FALSE
 					}				
 					
-					if(firstnewDataSet) { # nn == 1
+					if (firstnewDataSet) { # nn == 1
 						newDataSet <- newDataSetKK
 						firstnewDataSet <- FALSE
 					} else {
@@ -2020,17 +1970,17 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		iniDataSet <- groupedDataFrameMean[booleanVector, ]
 		buildRowNameDataSet = buildRowName(iniDataSet, groupBy, contactTheValues)
 		temp = data.frame()
-
+		
 		
 		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, PRIMAER.TREATMENT)) {
 			plot = getPlotNumber(colNameWichMustBind, descriptorList, diagramTyp)
 			
 			colNameWichMustBindReNamed <- reNameSpin(colNameWichMustBind, colNames)
-		
+			
 			if (is.null(buildRowNameDataSet$primaerTreatment)) {	
-				temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot=plot))			
+				temp = rbind(temp, data.frame(hist = rep.int(x = colNameWichMustBindReNamed, times = length(buildRowNameDataSet[, colNameWichMustBind])), values = buildRowNameDataSet[, colNameWichMustBind], xAxis = buildRowNameDataSet[, colNames$colOfXaxis], name = buildRowNameDataSet[, colNames$colName], plot = plot))			
 			} else {
-				temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), primaerTreatment=buildRowNameDataSet[, PRIMAER.TREATMENT], values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot = plot))			
+				temp = rbind(temp, data.frame(hist = rep.int(x = colNameWichMustBindReNamed, times = length(buildRowNameDataSet[, colNameWichMustBind])), primaerTreatment = buildRowNameDataSet[, PRIMAER.TREATMENT], values = buildRowNameDataSet[, colNameWichMustBind], xAxis = buildRowNameDataSet[, colNames$colOfXaxis], name = buildRowNameDataSet[, colNames$colName], plot = plot))			
 			}
 		}
 		overallResult = temp
@@ -2042,14 +1992,14 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		
 		for (colNameWichMustBind in buildRowNameDataSet %allColnamesWithoutThisOnes% c(colNames$xAxis, colNames$colName, PRIMAER.TREATMENT)) {
 			plot = getPlotNumber(colNameWichMustBind, descriptorList, diagramTyp)
-		
-			if (plot!=-1) {
+			
+			if (plot != -1) {
 				colNameWichMustBindReNamed = reNameHist(colNameWichMustBind)
-		
+				
 				if (is.null(buildRowNameDataSet$primaerTreatment)) {	
-					temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot=plot))			
+					temp = rbind(temp, data.frame(hist = rep.int(x = colNameWichMustBindReNamed, times = length(buildRowNameDataSet[, colNameWichMustBind])), values = buildRowNameDataSet[, colNameWichMustBind], xAxis = buildRowNameDataSet[, colNames$colOfXaxis], name = buildRowNameDataSet[, colNames$colName], plot = plot))			
 				} else {
-					temp = rbind(temp, data.frame(hist=rep.int(x=colNameWichMustBindReNamed, times=length(buildRowNameDataSet[, colNameWichMustBind])), primaerTreatment=buildRowNameDataSet[, PRIMAER.TREATMENT], values=buildRowNameDataSet[, colNameWichMustBind], xAxis=buildRowNameDataSet[, colNames$colOfXaxis], name=buildRowNameDataSet[, colNames$colName], plot = plot))			
+					temp = rbind(temp, data.frame(hist = rep.int(x = colNameWichMustBindReNamed, times = length(buildRowNameDataSet[, colNameWichMustBind])), primaerTreatment = buildRowNameDataSet[, PRIMAER.TREATMENT], values = buildRowNameDataSet[, colNameWichMustBind], xAxis = buildRowNameDataSet[, colNames$colOfXaxis], name = buildRowNameDataSet[, colNames$colName], plot = plot))			
 				}
 			}
 		}
@@ -2074,36 +2024,36 @@ setDefaultAxisNames <- function(overallList) {
 }
 
 setColorListHist <- function(descriptorList, colorVector) {
-	interval = seq(0.05, 0.95, by=0.1)
+	interval = seq(0.05, 0.95, by = 0.1)
 	intervalSat = rep.int(c(0.8, 1.0), 5)
-	intervalFluo = seq(0, 0.166666666666, by=0.0185185185)
-
-	interval20 = seq(0.025, 0.975, by=0.05)
+	intervalFluo = seq(0, 0.166666666666, by = 0.0185185185)
+	
+	interval20 = seq(0.025, 0.975, by = 0.05)
 	intervalSat20 = 1 #rep.int(c(0.8, 1.0), 10)
-	intervalFluo20 = seq(0, 0.166666666666, by=0.008771929789)
-
-	if (length(grep("fluo", getVector(descriptorList), ignore.case=TRUE)) > 0) { #rot			
-#		colorList = as.list(hsv(h=c(rev(intervalFluo), rev(intervalFluo20)), s=c(intervalSat, intervalSat20), v=1))
-		colorList = as.list(hsv(h=c(intervalFluo, intervalFluo20), s=c(intervalSat, intervalSat20), v=1))
-	} else if (length(grep("phenol", getVector(descriptorList), ignore.case=TRUE)) > 0) { #gelb
-		colorList = as.list(hsv(h=c(intervalFluo, intervalFluo20), s=c(intervalSat, intervalSat20), v=1))
-	} else if (length(grep("vis.hsv.h", getVector(descriptorList), ignore.case=TRUE)) > 0) {
-		colorList = as.list(hsv(h=c(interval, interval20), s=1, v=c(intervalSat, intervalSat20)))
-	} else if (length(grep("vis.hsv.s", getVector(descriptorList), ignore.case=TRUE)) > 0) {
+	intervalFluo20 = seq(0, 0.166666666666, by = 0.008771929789)
+	
+	if (length(grep("fluo", getVector(descriptorList), ignore.case = TRUE)) > 0) { #rot			
+#		colorList = as.list(hsv(h = c(rev(intervalFluo), rev(intervalFluo20)), s = c(intervalSat, intervalSat20), v = 1))
+		colorList = as.list(hsv(h = c(intervalFluo, intervalFluo20), s = c(intervalSat, intervalSat20), v = 1))
+	} else if (length(grep("phenol", getVector(descriptorList), ignore.case = TRUE)) > 0) { #gelb
+		colorList = as.list(hsv(h = c(intervalFluo, intervalFluo20), s = c(intervalSat, intervalSat20), v = 1))
+	} else if (length(grep("vis.hsv.h", getVector(descriptorList), ignore.case = TRUE)) > 0) {
+		colorList = as.list(hsv(h = c(interval, interval20), s = 1, v = c(intervalSat, intervalSat20)))
+	} else if (length(grep("vis.hsv.s", getVector(descriptorList), ignore.case = TRUE)) > 0) {
 		colorList = colorRampPalette(colorVector)(30)
-	} else if ((length(grep("nir", getVector(descriptorList), ignore.case=TRUE)) > 0) ||
-			   (length(grep("vis.hsv.v", getVector(descriptorList), ignore.case=TRUE)) > 0)) {
-		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval),rev(interval20)), max = 1))
+	} else if ((length(grep("nir", getVector(descriptorList), ignore.case = TRUE)) > 0) ||
+			(length(grep("vis.hsv.v", getVector(descriptorList), ignore.case = TRUE)) > 0)) {
+		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), max = 1))
 	} else {
 		return(list(0))
 	}
 	names(colorList) = c(
-		"0..25", "25..51", "51..76", "76..102", "102..127", 
-		"127..153", "153..178", "178..204", "204..229", "229..255", 
-		"0..12", "12..25", "25..38", "38..51", "51..63", "63..76", "76..89", 
-		"89..102", "102..114", "114..127", "127..140", "140..153", "153..165", 
-		"165..178", "178..191", "191..204", "204..216", "216..229", "229..242", 
-		"242..255")
+			"0..25", "25..51", "51..76", "76..102", "102..127", 
+			"127..153", "153..178", "178..204", "204..229", "229..255", 
+			"0..12", "12..25", "25..38", "38..51", "51..63", "63..76", "76..89", 
+			"89..102", "102..114", "114..127", "127..140", "140..153", "153..165", 
+			"165..178", "178..191", "191..204", "204..216", "216..229", "229..242", 
+			"242..255")
 	return(colorList)
 }
 
@@ -2117,10 +2067,10 @@ getColorVector <- function(isGray) {
 	}
 }
 
-getColorRampPalette <- function(colorVector, overallResult = NULL, whichColumShouldUse = NULL, typOfPlot=NULL) {
-	if(!is.null(typOfPlot) && !is.null(whichColumShouldUse)) {
+getColorRampPalette <- function(colorVector, overallResult = NULL, whichColumShouldUse = NULL, typOfPlot = NULL) {
+	if (!is.null(typOfPlot) && !is.null(whichColumShouldUse)) {
 		return(colorRampPalette(colorVector)(length(unique(overallResult[[whichColumShouldUse]]))))
-	} else if(is.null(whichColumShouldUse)) {
+	} else if (is.null(whichColumShouldUse)) {
 		return(colorRampPalette(colorVector)(length(overallResult)))
 	} else {
 		return(colorRampPalette(colorVector)(whichColumShouldUse))
@@ -2129,17 +2079,17 @@ getColorRampPalette <- function(colorVector, overallResult = NULL, whichColumSho
 
 
 setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, first, second) {
-######################
+	######################
 #diagramTyp <- "spiderplot"
 #descriptorList <- overallList$boxSpiderDes
 #overallResult <- overallList$overallResult_boxSpiderDes
 #isGray <- overallList$isGray
 #first <- overallList$splitTreatmentFirst
 #second <- overallList$splitTreatmentSecond
-######################
+	######################
 	
-
-#	if(!first && second) {
+	
+#	if (!first && second) {
 #		prePlot <- TRUE
 #	} else {
 #		prePlot <- FALSE
@@ -2151,29 +2101,29 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, firs
 	
 	colorList = list()
 	if (diagramTyp == NBOX.PLOT || diagramTyp == BOX.PLOT || diagramTyp == VIOLIN.PLOT || diagramTyp == SPIDER.PLOT || diagramTyp == LINERANGE.PLOT) {
-		if(!is.null(descriptorList)) {
+		if (!is.null(descriptorList)) {
 			for (n in names(descriptorList)) {
 				#if (!is.na(descriptorList[[n]])) {
 				if (sum(!is.na(descriptorList[[n]])) > 0) {
 					
 					colorList[[n]] = getColorRampPalette(colorVector, overallResult, whichColumShouldUse, diagramTyp)
 					#print(colorList[[n]])
-	#				if (isOtherTyp) {
-	#					colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
-	#				} else {
-	#					if("primaerTreatment" %in% colnames(overallResult)) {
-	#						colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$primaerTreatment)))
-	#					} else {
-	#						colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
-	#					}
-	#				}
+					#				if (isOtherTyp) {
+					#					colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+					#				} else {
+					#					if ("primaerTreatment" %in% colnames(overallResult)) {
+					#						colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$primaerTreatment)))
+					#					} else {
+					#						colorList[[n]] = colorRampPalette(colorVector)(length(unique(overallResult$name)))
+					#					}
+					#				}
 				} else {
 					#ownCat("All values are 'NA'")
 				}
 			}
 		}
 	} else {
-		if(!is.null(descriptorList)) {
+		if (!is.null(descriptorList)) {
 			for (n in names(descriptorList)) {
 				if (sum(!is.na(descriptorList[[n]])) > 0) {
 					colorList[[n]] = setColorListHist(descriptorList[n], colorVector)
@@ -2187,36 +2137,36 @@ setColorList <- function(diagramTyp, descriptorList, overallResult, isGray, firs
 }
 
 setColorForAll <- function(overallList, first, second) {
-#########
+	#########
 #first <- overallList$splitTreatmentFirst 
 #second <- overallList$splitTreatmentSecond
-########
-
+	########
+	
 	overallList$debug %debug% "setColorForAll()" 
 	
 	des <- ""
-	if((first && second)){
+	if ((first && second)) {
 		des <- overallList$secondFilterTreatmentRename
 	} else if ((!first && second)) {
 		des <- overallList$filterTreatmentRename
-	} else if((first && !second)) {
-		if(overallList$secondTreatment == NONE) {
+	} else if ((first && !second)) {
+		if (overallList$secondTreatment == NONE) {
 			des <- overallList$filterTreatmentRename
 		} else {
 			des <- overallList$secondFilterTreatmentRename
 		}
 	} else {
-		if(length(overallList$filterTreatmentRename) == 0 && length(overallList$secondFilterTreatmentRename) == 0){
+		if (length(overallList$filterTreatmentRename) == 0 && length(overallList$secondFilterTreatmentRename) == 0) {
 			des <- VALUES
-		} else if(length(overallList$secondFilterTreatmentRename) == 0 || length(overallList$filterSecondTreatment) < 2) {
+		} else if (length(overallList$secondFilterTreatmentRename) == 0 || length(overallList$filterSecondTreatment) < 2) {
 			des <- overallList$filterTreatmentRename
-		} else if(length(overallList$filterTreatmentRename) == 0 || length(overallList$filterTreatment) < 2) {
+		} else if (length(overallList$filterTreatmentRename) == 0 || length(overallList$filterTreatment) < 2) {
 			des <- overallList$secondFilterTreatmentRename
 		} else {
 			des <- overallList$filterTreatmentRename %contactAllWithAll% overallList$secondFilterTreatmentRename
 		}
 	}
-		
+	
 	colorVector <- getColorVector(overallList$isGray)
 	color <- getColorRampPalette(colorVector, des)
 	color <- as.list(color)
@@ -2230,7 +2180,7 @@ setColor <- function(overallList) {
 	overallList$debug %debug% "setColor()" 
 	
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
-					
+	
 #	overallList$color_nBox = setColorList(NBOX.PLOT, overallList$nBoxDes, overallList$overallResult_nBoxDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 #	overallList$color_box = setColorList(BOX.PLOT, overallList$boxDes, overallList$overallResult_boxDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 #	overallList$color_spider = setColorList(SPIDER.PLOT, overallList$boxSpiderDes, overallList$overallResult_boxSpiderDes, overallList$isGray, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
@@ -2243,26 +2193,26 @@ setColor <- function(overallList) {
 	return(overallList)
 }
 
-normalizeToHundredPercent =  function(whichRows, overallResult) {
-	return(t(apply(overallResult[whichRows, ], 1, function(x, y) {(100*x)/y}, y=colSums(overallResult[whichRows, ]))))
+normalizeToHundredPercent = function(whichRows, overallResult) {
+	return(t(apply(overallResult[whichRows, ], 1, function(x, y) {(100*x)/y}, y = colSums(overallResult[whichRows, ]))))
 }
 
 renameYForSubsection <- function(label) {
 	
-	label <- gsub("\\\\% ","percent", label)
-	label <- gsub("\\^2","$^2$", label)
-	label <- paste(toupper(substr(label,0,1)),substr(label, 2, nchar(label)), sep="")
-			
+	label <- gsub("\\\\% ", "percent", label)
+	label <- gsub("\\^2", "$^2$", label)
+	label <- paste(toupper(substr(label, 0, 1)), substr(label, 2, nchar(label)), sep = "")
+	
 	return(label)
 }
 
-trimSectionSeparator <-  function(string, sepE=SECTION.SEPARATOR) {
-	if(nchar(string) != 0) {
-		if(substr(string, 1, 1) == sepE) {
+trimSectionSeparator <- function(string, sepE = SECTION.SEPARATOR) {
+	if (nchar(string) != 0) {
+		if (substr(string, 1, 1) == sepE) {
 			string <- substring(string, 2)
 		}
 		
-		if(substring(string, nchar(string)) == sepE) {
+		if (substring(string, nchar(string)) == sepE) {
 			string <- substr(string, 1, nchar(string)-1)
 		}
 		
@@ -2271,9 +2221,9 @@ trimSectionSeparator <-  function(string, sepE=SECTION.SEPARATOR) {
 	return("")
 }
 
-buildSectionString <-  function(sectionList, imagesIndex, appendix) {
+buildSectionString <- function(sectionList, imagesIndex, appendix) {
 	#sectionList <- overallList$nBoxSection
-	if(appendix) {
+	if (appendix) {
 		return(APPENDIX.SECTION)
 	} else {
 		sectionVector <- vector()
@@ -2287,15 +2237,15 @@ buildSectionString <-  function(sectionList, imagesIndex, appendix) {
 }
 
 firstLetterBig <- function(string) {
-	return(paste(toupper(substring(string, 1,1)), substring(string, 2),sep=""))
+	return(paste(toupper(substring(string, 1, 1)), substring(string, 2), sep = ""))
 }
 
 
-writeLatexFile <- function(preFileNameLatexFile, fileNameImageFile="", ylabel="", subsectionDepth=1, saveFormatImage = "pdf", section = 99) { #insertSubsections=FALSE,
-	#o=""
+writeLatexFile <- function(preFileNameLatexFile, fileNameImageFile = "", ylabel = "", subsectionDepth = 1, saveFormatImage = "pdf", section = 99) { #insertSubsections = FALSE, 
+	#o = ""
 	#fileNameImageFile = preprocessingOfValues(fileNameImageFile, FALSE, "_")
-
-	fileNameLatexFile = paste(preprocessingOfValues(preFileNameLatexFile, FALSE, "_"), SECTION.TEX, section, sep="")
+	
+	fileNameLatexFile = paste(preprocessingOfValues(preFileNameLatexFile, FALSE, "_"), SECTION.TEX, section, sep = "")
 	
 	#o = gsub('[[:punct:]]', "_", o)
 	#print(fileNameImageFile)
@@ -2303,242 +2253,242 @@ writeLatexFile <- function(preFileNameLatexFile, fileNameImageFile="", ylabel=""
 	if (nchar(ylabel) > 0) {
 		ylabel <- renameYForSubsection(ylabel)
 		if (subsectionDepth == 1) {
-			latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+			latexText = paste(latexText, "\\subsection{", ylabel, "}\n", sep = "" )
 		} else if (subsectionDepth == 2) {
-			latexText = paste(latexText, "\\subsubsection{",ylabel,"}\n", sep="" )
+			latexText = paste(latexText, "\\subsubsection{", ylabel, "}\n", sep = "" )
 		} else if (subsectionDepth == 3) {
-			latexText = paste(latexText, "\\paragraph{",ylabel,"}~", sep="" )
+			latexText = paste(latexText, "\\paragraph{", ylabel, "}~", sep = "" )
 		} else if (subsectionDepth == 4) {
-			latexText = paste(latexText, "\\subparagraph{",ylabel,"}~", sep="" )
+			latexText = paste(latexText, "\\subparagraph{", ylabel, "}~", sep = "" )
 		}
 	}
-
+	
 #	if (insertSubsections & nchar(ylabel) > 0) {
 #		ylabel <- renameYForAppendix(ylabel)
-#		latexText = paste(latexText, "\\subsection{",ylabel,"}\n", sep="" )
+#		latexText = paste(latexText, "\\subsection{", ylabel, "}\n", sep = "" )
 #	}
 	
-	if(fileNameImageFile == "") {
-		latexText <- paste(latexText, "\\loadTex{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, preFileNameLatexFile, sep="")
-		latexText = paste(latexText, ".", TEX, "}", sep="")
+	if (fileNameImageFile == "") {
+		latexText <- paste(latexText, "\\loadTex{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, preFileNameLatexFile, sep = "")
+		latexText = paste(latexText, ".", TEX, "}", sep = "")
 	} else {
-		latexText <- paste(latexText, "\\loadImage{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, fileNameImageFile, sep="")
-		latexText = paste(latexText, ".", saveFormatImage, "}", sep="")
+		latexText <- paste(latexText, "\\loadImage{", DIRECTORY.PLOTS, DIRECTORY.SEPARATOR, fileNameImageFile, sep = "")
+		latexText = paste(latexText, ".", saveFormatImage, "}", sep = "")
 	}
 	
 	
-
-	fileNameLatexFile <- paste(DIRECTORY.PLOTSTEX, fileNameLatexFile, sep=DIRECTORY.SEPARATOR)
-	if(!(section == ERROR && file.exists(paste(fileNameLatexFile, TEX, sep=".")))) {
-		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
+	
+	fileNameLatexFile <- paste(DIRECTORY.PLOTSTEX, fileNameLatexFile, sep = DIRECTORY.SEPARATOR)
+	if (!(section == ERROR && file.exists(paste(fileNameLatexFile, TEX, sep = ".")))) {
+		write(x = latexText, append = TRUE, file = paste(fileNameLatexFile, TEX, sep = "."))
 	}
 }
 
-writeLatexTable <- function(fileNameLatexFile, columnName=NULL, value=NULL, columnWidth=NULL) {
+writeLatexTable <- function(fileNameLatexFile, columnName = NULL, value = NULL, columnWidth = NULL) {
 	latexText <- ""
-
+	
 	if (length(columnName) > 0) {
 		#latexText <- "\\begin{tabular}{|"
 		latexText <- "\\begin{longtable}{|"
 		
 		for(n in 1:length(columnName)) {
-			latexText <- paste(latexText, "p{",columnWidth[n],"}|", sep="")
+			latexText <- paste(latexText, "p{", columnWidth[n], "}|", sep = "")
 		}
-		latexText <- paste(latexText, "}", sep="")
+		latexText <- paste(latexText, "}", sep = "")
 		
 		#This is the header for the first page of the table... --> endfirsthead
 		#This is the header for the remaining page(s) of the table... --> endhead
 		for(n in 1:2) {
 			
-			latexText <- paste(latexText, " \\hline ", sep="")
+			latexText <- paste(latexText, " \\hline ", sep = "")
 			for(n in 1:length(columnName)) {
-				latexText <- paste(latexText, "{\\textbf{",
-						parseString2Latex(renameFilterOutput(as.character(columnName[n]))),
-					"}}", sep="")
+				latexText <- paste(latexText, "{\\textbf{", 
+						parseString2Latex(renameFilterOutput(as.character(columnName[n]))), 
+						"}}", sep = "")
 				if (n != length(columnName)) {
-					latexText <- paste(latexText, "& ", sep=" ")
+					latexText <- paste(latexText, "& ", sep = " ")
 				}
 			}
-			latexText <- paste(latexText,
-								"\\tabularnewline",
-								"\\hline",
-								"\\hline", sep=" ")
+			latexText <- paste(latexText, 
+					"\\tabularnewline", 
+					"\\hline", 
+					"\\hline", sep = " ")
 			if (n == 1) {
-				latexText <- paste(latexText, "\\endfirsthead", sep=" ")
+				latexText <- paste(latexText, "\\endfirsthead", sep = " ")
 			} else {
-				latexText <- paste(latexText, "\\endhead", sep=" ")
+				latexText <- paste(latexText, "\\endhead", sep = " ")
 			}
 		}
 		
 		#This is the footer for all pages except the last page of the table...		
-		latexText <- paste(latexText, "\\multicolumn{", length(columnName), "}{l}{{Continued on Next Page\\ldots}} ",
-							"\\tabularnewline ",
-							"\\endfoot ", sep="")
+		latexText <- paste(latexText, "\\multicolumn{", length(columnName), "}{l}{{Continued on Next Page\\ldots}} ", 
+				"\\tabularnewline ", 
+				"\\endfoot ", sep = "")
 		
 		#This is the footer for the last page of the table...
-		latexText <- paste(latexText,"\\hline \\hline \\endlastfoot", sep=" ")
+		latexText <- paste(latexText, "\\hline \\hline \\endlastfoot", sep = " ")
 		
-	} else if (length(value) > 0){
+	} else if (length(value) > 0) {
 		if (!is.null(value)) {
 			for(n in 1:length(value)) {
 				latexText <- paste(latexText, parseString2Latex(renameFilterOutput(as.character(value[n]))))
 				if (n != length(value)) {
-					latexText <- paste(latexText, " &", sep="")
+					latexText <- paste(latexText, " &", sep = "")
 				}
 			}
 			latexText <- paste(latexText, "\\tabularnewline \\hline")
 		}
 	} else {
 		latexText <- paste(latexText, 
-#						"\\hline",
-#						"\\hline",
-#						"\\end{tabular}", sep=" ")
-						"\\end{longtable}", sep=" ")
+#						"\\hline", 
+#						"\\hline", 
+#						"\\end{tabular}", sep = " ")
+				"\\end{longtable}", sep = " ")
 	}
-
+	
 	if (latexText != "") {
-		write(x=latexText, append=TRUE, file=paste(fileNameLatexFile, TEX, sep="."))
+		write(x = latexText, append = TRUE, file = paste(fileNameLatexFile, TEX, sep = "."))
 	}	
 }
 
 
 getSectionAsMatrix <- function(sectionOverall) {
-	return(str_split_fixed(sectionOverall,fixed(SECTION.SEPARATOR), str_count(sectionOverall[1], fixed(SECTION.SEPARATOR))+2))
+	return(str_split_fixed(sectionOverall, fixed(SECTION.SEPARATOR), str_count(sectionOverall[1], fixed(SECTION.SEPARATOR))+2))
 }
 
 
-getSectionMatrix <- function(sectionOverall, fileNames, debug) {
+getSectionMatrix <- function(sectionOverall, fileNames, debug = debug) {
 	debug %debug% "getSectionMatrix()"
 	sectionMatrix <- getSectionAsMatrix(sectionOverall)
-	sectionMatrix[,str_count(sectionOverall[1], fixed(SECTION.SEPARATOR))+2] <- fileNames
-
+	sectionMatrix[, str_count(sectionOverall[1], fixed(SECTION.SEPARATOR))+2] <- fileNames
+	
 	return(sectionMatrix)
 }
 
 getConstance <- function(sectionTyp, typ) {
 	
-	if(sectionTyp == FIRST.SECTION || sectionTyp == 1) {
-		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
+	if (sectionTyp == FIRST.SECTION || sectionTyp == 1) {
+		if (typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.FIRST.SECTION.TEX)
-		} else if(typ == REDUCE.SECTION) {
+		} else if (typ == REDUCE.SECTION) {
 			return(NONE)
-		} else if(typ == GET.INT.AS.SECTION) {
+		} else if (typ == GET.INT.AS.SECTION) {
 			return(FIRST.SECTION)
-		} else if(typ == GET.NUMBER.OF.SECTION) {
+		} else if (typ == GET.NUMBER.OF.SECTION) {
 			return(1)
-		} else if(typ == FILL.WITH.NULL.SECTION) {
+		} else if (typ == FILL.WITH.NULL.SECTION) {
 			return(3)
 		}
-	} else if(sectionTyp == SECOND.SECTION || sectionTyp == 2) {
-		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
+	} else if (sectionTyp == SECOND.SECTION || sectionTyp == 2) {
+		if (typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.SECOND.SECTION.TEX)
-		} else if(typ == REDUCE.SECTION) {
+		} else if (typ == REDUCE.SECTION) {
 			return(FIRST.SECTION)
-		} else if(typ == GET.INT.AS.SECTION) {
+		} else if (typ == GET.INT.AS.SECTION) {
 			return(SECOND.SECTION)
-		} else if(typ == GET.NUMBER.OF.SECTION) {
+		} else if (typ == GET.NUMBER.OF.SECTION) {
 			return(2)
-		} else if(typ == FILL.WITH.NULL.SECTION) {
+		} else if (typ == FILL.WITH.NULL.SECTION) {
 			return(2)
 		}
-	} else if(sectionTyp == THIRD.SECTION || sectionTyp == 3) {
-		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
+	} else if (sectionTyp == THIRD.SECTION || sectionTyp == 3) {
+		if (typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.THIRD.SECTION.TEX)
-		} else if(typ == REDUCE.SECTION) {
+		} else if (typ == REDUCE.SECTION) {
 			return(SECOND.SECTION)
-		} else if(typ == GET.INT.AS.SECTION) {
+		} else if (typ == GET.INT.AS.SECTION) {
 			return(THIRD.SECTION)
-		} else if(typ == GET.NUMBER.OF.SECTION) {
+		} else if (typ == GET.NUMBER.OF.SECTION) {
 			return(3)
-		} else if(typ == FILL.WITH.NULL.SECTION) {
+		} else if (typ == FILL.WITH.NULL.SECTION) {
 			return(1)
 		}
-	} else if(sectionTyp == FOURTH.SECTION || sectionTyp == 4) {
-		if(typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
+	} else if (sectionTyp == FOURTH.SECTION || sectionTyp == 4) {
+		if (typ == OVERALL.FILENAME.TEX || typ == OVERALL.FILENAME.PATTERN) {
 			return(OVERALL.FOURTH.SECTION.TEX)
-		} else if(typ == REDUCE.SECTION) {
+		} else if (typ == REDUCE.SECTION) {
 			return(THIRD.SECTION)
-		} else if(typ == GET.INT.AS.SECTION) {
+		} else if (typ == GET.INT.AS.SECTION) {
 			return(FOURTH.SECTION)
-		} else if(typ == GET.NUMBER.OF.SECTION) {
+		} else if (typ == GET.NUMBER.OF.SECTION) {
 			return(4)
-		} else if(typ == FILL.WITH.NULL.SECTION) {
+		} else if (typ == FILL.WITH.NULL.SECTION) {
 			return(0)
 		}
 	}
 	return(NONE)
 }
 
-writeOnlyALatexFile <- function(latexText, fileName, append=FALSE) {
-	#fileName <- paste("tex",fileName, sep="/")
-	write(x=latexText, append=append, file=paste(fileName, TEX, sep="."))
+writeOnlyALatexFile <- function(latexText, fileName, append = FALSE) {
+	#fileName <- paste("tex", fileName, sep = "/")
+	write(x = latexText, append = append, file = paste(fileName, TEX, sep = "."))
 }
 
 
 writeLatexSectionFile <- function(latexText, sectionTyp, sectionID, debug = FALSE) {
 	debug %debug% "writeLatexSectionFile()"
-
+	
 	const <- getConstance(sectionTyp, OVERALL.FILENAME.TEX)
 	newSection <- checkValue(sectionMappingList, sectionTyp, sectionID, NEW.SECTION, NONE, TRUE)
-	newSection <- paste(NEW.SECTION.TEX, newSection, sep="")
+	newSection <- paste(NEW.SECTION.TEX, newSection, sep = "")
 	
-	fileName <- paste(const, sectionID, newSection, sep="")
-	fileName <- paste(DIRECTORY.SECTION, fileName, sep=DIRECTORY.SEPARATOR)
-	write(x=latexText, append=TRUE, file=paste(fileName, TEX, sep="."))
+	fileName <- paste(const, sectionID, newSection, sep = "")
+	fileName <- paste(DIRECTORY.SECTION, fileName, sep = DIRECTORY.SEPARATOR)
+	write(x = latexText, append = TRUE, file = paste(fileName, TEX, sep = "."))
 }
 
 
-setReset <- function(latexText, tabText="") {
+setReset <- function(latexText, tabText = "") {
 	return(paste(latexText, tabText, "\\resetBoolean", NEWLINE.TEX, sep = ""))
 }
 
 
-getBooleanVectorForWholeSection <- function(sectionMatrix, sectionID, identicalMatrix, debug) {
-#########
+getBooleanVectorForWholeSection <- function(sectionMatrix, sectionID, identicalMatrix, debug = debug) {
+	#########
 #sectionID <- subsubsectionID
 #identicalMatrix <- identicalMatrixSubSubSection
-#########
+	#########
 	debug %debug% "getBooleanVectorForWholeSection()"
-
-	#splitId <- unlist(str_split(sectionIDVector[[1]],POINT.PATTERN))
-	#booleanVectorForWholeSectionIni <- rep.int(FALSE, length(sectionMatrix[,1]))
-	addValues <- c(sectionID, rownames(identicalMatrix)[as.vector(identicalMatrix[,sectionID])])	
+	
+	#splitId <- unlist(str_split(sectionIDVector[[1]], POINT.PATTERN))
+	#booleanVectorForWholeSectionIni <- rep.int(FALSE, length(sectionMatrix[, 1]))
+	addValues <- c(sectionID, rownames(identicalMatrix)[as.vector(identicalMatrix[, sectionID])])	
 	addValues <- str_split(addValues, POINT.PATTERN)
 	
-	booleanVec <- data.frame(rep.int(FALSE, length(sectionMatrix[,1])))
+	booleanVec <- data.frame(rep.int(FALSE, length(sectionMatrix[, 1])))
 	
 	for(kk in seq(along = addValues)) {
-		booleanVectorForWholeSection <- rep.int(FALSE, length(sectionMatrix[,1]))
+		booleanVectorForWholeSection <- rep.int(FALSE, length(sectionMatrix[, 1]))
 		for(hh in seq(along = addValues[[kk]])) {
-			if(hh == 1) {
-				booleanVectorForWholeSection <- booleanVectorForWholeSection | (sectionMatrix[,hh] %in% addValues[[kk]][hh])
+			if (hh == 1) {
+				booleanVectorForWholeSection <- booleanVectorForWholeSection | (sectionMatrix[, hh] %in% addValues[[kk]][hh])
 			} else {
-				booleanVectorForWholeSection <- booleanVectorForWholeSection & (sectionMatrix[,hh] %in% addValues[[kk]][hh])
+				booleanVectorForWholeSection <- booleanVectorForWholeSection & (sectionMatrix[, hh] %in% addValues[[kk]][hh])
 			}	
 		}
-#		if(kk == 1) {	
+#		if (kk == 1) {	
 #			booleanVec <- booleanVectorForWholeSection
 #		} else {
-			booleanVec <- cbind(booleanVec, booleanVectorForWholeSection)
+		booleanVec <- cbind(booleanVec, booleanVectorForWholeSection)
 #		}
 	}
 	
 	return(rowSums(booleanVec) > 0)
-	#return(rowSums(booleanVec) == length(booleanVec[1,]))
+	#return(rowSums(booleanVec) == length(booleanVec[1, ]))
 }
 
 
-setCheckFiles <- function(latexText, fileVector, tabText="") {
+setCheckFiles <- function(latexText, fileVector, tabText = "") {
 	
 	for(file in fileVector) {
-		file <- paste(DIRECTORY.PLOTSTEX, file, sep=DIRECTORY.SEPARATOR)
-		latexText <- paste(latexText, tabText, "\\checkFileNoReset{", file ,"}", NEWLINE.TEX, sep="")
+		file <- paste(DIRECTORY.PLOTSTEX, file, sep = DIRECTORY.SEPARATOR)
+		latexText <- paste(latexText, tabText, "\\checkFileNoReset{", file , "}", NEWLINE.TEX, sep = "")
 	}
 	return(latexText)
 }
 
-setIfThenElse <- function(latexText, tabText="") {
-	return(paste(latexText, tabText, "\\ifthenelse{\\boolean{isFile1}}{", NEWLINE.TEX, sep=""))
+setIfThenElse <- function(latexText, tabText = "") {
+	return(paste(latexText, tabText, "\\ifthenelse{\\boolean{isFile1}}{", NEWLINE.TEX, sep = ""))
 }
 
 
@@ -2549,16 +2499,16 @@ conectEachRowNotForSection <- function(matrixVector) {
 
 
 conectEachRow <- function(matrixVector, sepE = SECTION.SEPARATOR) {
-#########
-#matrixVector <- unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3,4)])
-#########
-	if(class(matrixVector) == "character") {
+	#########
+#matrixVector <- unique(sectionMatrix[booleanVectorForWholeSection, c(1, 2, 3, 4)])
+	#########
+	if (class(matrixVector) == "character") {
 		return(conectSectionIDVector(matrixVector, sepE))
-	} else if(class(matrixVector) == "matrix") {
+	} else if (class(matrixVector) == "matrix") {
 		conectVector <- vector()
 		
-		for(nn in seq(along = matrixVector[,1])) {
-			conectVector <- c(conectVector, conectSectionIDVector(matrixVector[nn,], sepE))
+		for(nn in seq(along = matrixVector[, 1])) {
+			conectVector <- c(conectVector, conectSectionIDVector(matrixVector[nn, ], sepE))
 		}
 		
 		return(conectVector)
@@ -2569,8 +2519,8 @@ conectEachRow <- function(matrixVector, sepE = SECTION.SEPARATOR) {
 
 
 conectSectionIDVectorList <- function(sectionIDVector, conectionList) {
-	if(nchar(sectionIDVector) > 0) {
-		return(paste(conectSectionIDVector(sectionIDVector), conectionList, sep=SECTION.SEPARATOR))
+	if (nchar(sectionIDVector) > 0) {
+		return(paste(conectSectionIDVector(sectionIDVector), conectionList, sep = SECTION.SEPARATOR))
 	} else {
 		return(conectionList)
 	}
@@ -2578,10 +2528,10 @@ conectSectionIDVectorList <- function(sectionIDVector, conectionList) {
 
 
 conectSectionIDVector <- function(sectionIDVector, sepE = SECTION.SEPARATOR) {
-	if(length(sectionIDVector) > 1) {
+	if (length(sectionIDVector) > 1) {
 		con <- ""
 		for(nn in sectionIDVector) {
-			con <- paste(con, nn, sep= sepE)
+			con <- paste(con, nn, sep = sepE)
 		}		
 		return(trimSectionSeparator(con, sepE))
 	} else {
@@ -2590,30 +2540,30 @@ conectSectionIDVector <- function(sectionIDVector, sepE = SECTION.SEPARATOR) {
 }
 
 setTextOrTypOfClearOrReset <- function(latexText, text, tabText) {
-	return(paste(latexText, tabText, text, NEWLINE.TEX, sep=""))
+	return(paste(latexText, tabText, text, NEWLINE.TEX, sep = ""))
 }
 
 setTitle <- function(latexText, sectionTyp, title, tabText) {
-	return(paste(latexText, tabText, "\\", sectionTyp,"{", title, "}", #\\noindent
+	return(paste(latexText, tabText, "\\", sectionTyp, "{", title, "}", #\\noindent
 					ifelse(sectionTyp != FOURTH.SECTION, NEWLINE.TEX, NEWLINE.PARA.TEX), 
-					sep=""))
+					sep = ""))
 }
 
 isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, whichValueShouldBeChecked, defaultValue, getNewSection) {
-#######
+	#######
 #newPosition <- position
-#######	
+	#######	
 	
 	#print(oldPosition)
 	#print(newPosition)
-
+	
 	toCheckMother <- unlist(str_split(oldPosition, POINT.PATTERN))
 	toCheckSon <- unlist(str_split(newPosition, POINT.PATTERN))
 	#print("check if there a pre relation")
-	if(length(toCheckMother) == length(toCheckSon)) {
+	if (length(toCheckMother) == length(toCheckSon)) {
 		for(nn in 1:(length(toCheckMother)-1)) {
-			if(toCheckMother[nn] != toCheckSon[nn]) {
-				if(nn == 1) {
+			if (toCheckMother[nn] != toCheckSon[nn]) {
+				if (nn == 1) {
 					tempMother <- toCheckMother[1]
 					tempSon <- toCheckSon[1]
 				} else {
@@ -2623,7 +2573,7 @@ isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, wh
 				#print("########")
 				#print(tempMother)
 				#print(checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection))
-				if(tempSon %in% checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection)) {
+				if (tempSon %in% checkValue(sectionMappingList, getConstance(nn, GET.INT.AS.SECTION), tempMother, whichValueShouldBeChecked, defaultValue, getNewSection)) {
 					#print("interner Check")
 					return(TRUE)
 				}
@@ -2640,22 +2590,22 @@ isThereAPreRelation <- function(sectionMappingList, oldPosition, newPosition, wh
 	return(FALSE)
 }
 
-checkValue <- function(sectionMappingList, sectionTyp, position, whichValueShouldBeChecked, defaultValue = "", getNewSection=FALSE) {
-############
+checkValue <- function(sectionMappingList, sectionTyp, position, whichValueShouldBeChecked, defaultValue = "", getNewSection = FALSE) {
+	############
 #sectionMappingListSectionTyp <- sectionMappingList[[sectionTyp]]
 #position <- "13.2.7"
 #whichValueShouldBeChecked <- "newSection"
 #defaultValue <- CLEAR.PAGE.NO
 #getNewSection <- FALSE
-############
+	############
 	sectionMappingListSectionTyp <- sectionMappingList[[sectionTyp]]
 	
 	positionVector <- vector()
 	repeat {
-		if(!is.null(sectionMappingListSectionTyp[[position]][[whichValueShouldBeChecked]])) {				   
+		if (!is.null(sectionMappingListSectionTyp[[position]][[whichValueShouldBeChecked]])) {				 
 			#section[[sectionVector[sectionNameIndex]]][concatSection[[sectionVector[sectionNameIndex]]] == nn] <- sectionMappingList[[sectionVector[sectionNameIndex]]][[values[nn]]]$newSection
-			if(whichValueShouldBeChecked == NEW.SECTION && !getNewSection) {
-				if(length(positionVector) > 0) {
+			if (whichValueShouldBeChecked == NEW.SECTION && !getNewSection) {
+				if (length(positionVector) > 0) {
 					return(positionVector)
 				} else {
 					return(defaultValue)
@@ -2663,15 +2613,15 @@ checkValue <- function(sectionMappingList, sectionTyp, position, whichValueShoul
 			}
 			return(sectionMappingListSectionTyp[[position]][[whichValueShouldBeChecked]])
 			break;
-		} else if(!is.null(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom)) {
-			if(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom == position) {
+		} else if (!is.null(sectionMappingListSectionTyp[[position]]$takeRestValuesFrom)) {
+			if (sectionMappingListSectionTyp[[position]]$takeRestValuesFrom == position) {
 				break;
 			}
 			oldPosition <- position
 			position <- sectionMappingListSectionTyp[[position]]$takeRestValuesFrom
-			if(whichValueShouldBeChecked == NEW.SECTION && !getNewSection) {
-				if(getConstance(sectionTyp, REDUCE.SECTION) != NONE) {
-					if(isThereAPreRelation(sectionMappingList, oldPosition, position, whichValueShouldBeChecked, defaultValue, getNewSection)) {
+			if (whichValueShouldBeChecked == NEW.SECTION && !getNewSection) {
+				if (getConstance(sectionTyp, REDUCE.SECTION) != NONE) {
+					if (isThereAPreRelation(sectionMappingList, oldPosition, position, whichValueShouldBeChecked, defaultValue, getNewSection)) {
 						positionVector <- c(positionVector, position)
 					}
 				} else {
@@ -2687,31 +2637,31 @@ checkValue <- function(sectionMappingList, sectionTyp, position, whichValueShoul
 
 
 setAdditionInfos <- function(latexText, sectionTyp, sectionID, tabText = "") {
-###########
+	###########
 #sectionTyp <- THIRD.SECTION
-###########
+	###########
 	
 	#sectionIDVector <- conectSectionIDVector(sectionIDVector)
 	
-#	if(!sectionIDVector %in% names(sectionMappingList[[sectionTyp]])) {
+#	if (!sectionIDVector %in% names(sectionMappingList[[sectionTyp]])) {
 #		latexText <- setTextOrTypOfClearOrReset(latexText, CLEAR.PAGE.NO, tabText)
 #		latexText <- setTextOrTypOfClearOrReset(latexText, RESET.PAGE.NO, tabText) 
-#		latexText <- setTitle(latexText, sectionTyp, paste(sectionTyp, sectionIDVector, sep=" "), tabText)
+#		latexText <- setTitle(latexText, sectionTyp, paste(sectionTyp, sectionIDVector, sep = " "), tabText)
 #		latexText <- setTextOrTypOfClearOrReset(latexText, "", tabText)
 #		
 #	} else {
-		
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfClear", CLEAR.PAGE.NO), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfReset", RESET.PAGE.NO), tabText) 
-		latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList, sectionTyp, sectionID, "title", paste(sectionTyp, sectionID, sep=" ")), tabText)
-		latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "text", ""), tabText)
+	
+	latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfClear", CLEAR.PAGE.NO), tabText)
+	latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "typOfReset", RESET.PAGE.NO), tabText) 
+	latexText <- setTitle(latexText, sectionTyp, checkValue(sectionMappingList, sectionTyp, sectionID, "title", paste(sectionTyp, sectionID, sep = " ")), tabText)
+	latexText <- setTextOrTypOfClearOrReset(latexText, checkValue(sectionMappingList, sectionTyp, sectionID, "text", ""), tabText)
 	
 #	}
 	return(latexText)
 }
 
 setClosedBraces <- function(latexText, tabText) {
-	return(paste(latexText, tabText, "}{}", NEWLINE.TEX, NEWLINE.TEX, sep=""))
+	return(paste(latexText, tabText, "}{}", NEWLINE.TEX, NEWLINE.TEX, sep = ""))
 }
 
 
@@ -2727,24 +2677,24 @@ setLoadFile <- function(latexText, file, isTex = TRUE, tabText = "") {
 	
 	
 	
-	if(isTex) {
-		file <- paste(DIRECTORY.PLOTSTEX, file, sep=DIRECTORY.SEPARATOR)
-		latexText <- paste(latexText, tabText, "\\loadTex{", str_sub(file, 1, str_locate(file, TEX.PATTERN)[,"start"]-1), "}", NEWLINE.TEX, sep="")
+	if (isTex) {
+		file <- paste(DIRECTORY.PLOTSTEX, file, sep = DIRECTORY.SEPARATOR)
+		latexText <- paste(latexText, tabText, "\\loadTex{", str_sub(file, 1, str_locate(file, TEX.PATTERN)[, "start"]-1), "}", NEWLINE.TEX, sep = "")
 	} else {
-		file <- paste(DIRECTORY.PLOTS, file, sep=DIRECTORY.SEPARATOR)
-		latexText <- paste(latexText, tabText, "\\loadImage{", file, "}", NEWLINE.TEX, sep="")
+		file <- paste(DIRECTORY.PLOTS, file, sep = DIRECTORY.SEPARATOR)
+		latexText <- paste(latexText, tabText, "\\loadImage{", file, "}", NEWLINE.TEX, sep = "")
 	}
 	
 	return(latexText)
 }
 
 
-setLoadImageAndLoadTex <- function(latexText, fileVector, tabText="") {
-##########
-#fileVector <- sectionMatrix[booleanVectorForWholeSection,"file"]
-##########
+setLoadImageAndLoadTex <- function(latexText, fileVector, tabText = "") {
+	##########
+#fileVector <- sectionMatrix[booleanVectorForWholeSection, "file"]
+	##########
 	
-	texFiles <- as.logical(lapply(fileVector,str_count, TEX.PATTERN))
+	texFiles <- as.logical(lapply(fileVector, str_count, TEX.PATTERN))
 	for(signleFileIndex in seq(along = fileVector)) {
 		latexText <- setResetCheckAndIFPart(latexText, fileVector[signleFileIndex], tabText)
 		tabText <- increaseTabText(tabText)
@@ -2752,18 +2702,18 @@ setLoadImageAndLoadTex <- function(latexText, fileVector, tabText="") {
 		tabText <- reduceTabText(tabText)
 		latexText <- setClosedBraces(latexText, tabText)
 	}
-			
+	
 	return(latexText)
 }
 
 increaseTabText <- function(tabText) {
-	return(paste(tabText, TABULATOR.TEX, sep=""))
+	return(paste(tabText, TABULATOR.TEX, sep = ""))
 }
 
 
 reduceTabText <- function(tabText) {
 	
-	if(nchar(tabText) >= nchar(TABULATOR.TEX)) {
+	if (nchar(tabText) >= nchar(TABULATOR.TEX)) {
 		return(str_sub(tabText, 1, -(nchar(TABULATOR.TEX)+1)))
 	} else {
 		return("")
@@ -2772,7 +2722,7 @@ reduceTabText <- function(tabText) {
 
 
 makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
-##########
+	##########
 #sectionTyp <- FIRST.SECTION
 #uniqueVector <- uniqueSectionVector
 #sectionTyp <- SECOND.SECTION
@@ -2781,42 +2731,42 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 #uniqueVector <- uniqueSubSubSectionVector
 #sectionTyp <- FOURTH.SECTION
 #uniqueVector <- uniqueParagraphVector
-##########	
-
-	identicalMatrix <- matrix(FALSE,nrow=length(uniqueVector),ncol=length(uniqueVector), dimnames = list(uniqueVector, uniqueVector))
+	##########	
+	
+	identicalMatrix <- matrix(FALSE, nrow = length(uniqueVector), ncol = length(uniqueVector), dimnames = list(uniqueVector, uniqueVector))
 	for(kk in uniqueVector) {
 #		sectionIDVector <- conectSectionIDVector(c(preSectionIDVector, kk))
 		identicalVector <- checkValue(sectionMappingList, sectionTyp, kk, NEW.SECTION, NONE)
-
-		if(identicalVector != NONE) {	
+		
+		if (identicalVector != NONE) {	
 			newIdenticalVector <- identicalVector[!(identicalVector %in% colnames(identicalMatrix))]
-			newMatrix <- matrix(FALSE,nrow=length(identicalMatrix[1,]),ncol=length(newIdenticalVector), dimnames = list(rownames(identicalMatrix), newIdenticalVector))
+			newMatrix <- matrix(FALSE, nrow = length(identicalMatrix[1, ]), ncol = length(newIdenticalVector), dimnames = list(rownames(identicalMatrix), newIdenticalVector))
 			identicalMatrix <- cbind(identicalMatrix, newMatrix)
-			newMatrix <- matrix(FALSE,ncol=length(identicalMatrix[1,]),nrow=length(newIdenticalVector), dimnames = list(newIdenticalVector, colnames(identicalMatrix)))
+			newMatrix <- matrix(FALSE, ncol = length(identicalMatrix[1, ]), nrow = length(newIdenticalVector), dimnames = list(newIdenticalVector, colnames(identicalMatrix)))
 			identicalMatrix <- rbind(identicalMatrix, newMatrix)
 			
-#			if(!(length(identicalVector) > 0)) {
+#			if (!(length(identicalVector) > 0)) {
 #				identicalVector <- NONE
 #			}
-				
+			
 			identicalMatrix[kk, identicalVector] <- TRUE
 			identicalMatrix[identicalVector, kk] <- TRUE
 		}
 	}
-
+	
 	checkVector <- vector()
 	goThroughVector <- vector()
 	allColumns <- colnames(identicalMatrix)
-		
+	
 	repeat {
-		if(length(allColumns) > 0 ) {	
-			checkVector <- rownames(identicalMatrix)[identicalMatrix[,allColumns[1]]]
+		if (length(allColumns) > 0 ) {	
+			checkVector <- rownames(identicalMatrix)[identicalMatrix[, allColumns[1]]]
 			goThroughVector <- allColumns[1]
 			repeat {
-				if(length(checkVector) > 0) {
-					newValues <- rownames(identicalMatrix)[identicalMatrix[,checkVector[1]]]
+				if (length(checkVector) > 0) {
+					newValues <- rownames(identicalMatrix)[identicalMatrix[, checkVector[1]]]
 					goThroughVector <- c(goThroughVector, checkVector[1])
-					checkVector <- checkVector[checkVector!=checkVector[1]]
+					checkVector <- checkVector[checkVector != checkVector[1]]
 					checkVector <- c(checkVector, newValues[!(newValues %in% goThroughVector) & !(newValues %in% checkVector)])
 				} else {
 					break
@@ -2824,7 +2774,7 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 			}
 			
 			for(kk in goThroughVector) {
-				identicalMatrix[goThroughVector[goThroughVector!=kk],kk] <- TRUE
+				identicalMatrix[goThroughVector[goThroughVector != kk], kk] <- TRUE
 			}
 			allColumns <- allColumns[!(allColumns %in% goThroughVector)]
 		} else {
@@ -2838,23 +2788,23 @@ makeIdenticalMatrix <- function(sectionTyp, uniqueVector) {
 checkIfNull <- function(value) {
 	splitStr <- unlist(str_split(value, POINT.PATTERN))
 	return(splitStr[length(splitStr)] == "0")
-
+	
 }
 
 getUniqueSectionsValues <- function(booleanVectorForWholeSection = NULL, sectionMatrix, sectionTyp) {
-########
+	########
 #sectionTyp <- FOURTH.SECTION
-########
-	if(!is.null(booleanVectorForWholeSection)) {
+	########
+	if (!is.null(booleanVectorForWholeSection)) {
 		tempVector <- sectionMatrix[booleanVectorForWholeSection, c(1:getConstance(sectionTyp, GET.NUMBER.OF.SECTION))]
 		
-		if(class(tempVector) == "matrix") {
+		if (class(tempVector) == "matrix") {
 			return(conectEachRow(unique(tempVector)))
 		} else {
 			return(conectEachRow(tempVector))
 		}
 	} else {
-		if(class(sectionMatrix) == "matrix") {
+		if (class(sectionMatrix) == "matrix") {
 			return(unique(sectionMatrix[, 1]))
 		} else {
 			return(sectionMatrix[, 1])
@@ -2862,14 +2812,14 @@ getUniqueSectionsValues <- function(booleanVectorForWholeSection = NULL, section
 	}
 }
 
-buildSectionTexFile <- function(sectionMatrix, debug) {
-#########
+buildSectionTexFile <- function(sectionMatrix, debug = debug) {
+	#########
 #sectionID <- unique(sectionMatrix[, 1])[1]
-#subsectionID <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2)]))[1]
-#########
+#subsectionID <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1, 2)]))[1]
+	#########
 	debug %debug% "buildSectionTexFile()"
 	#uniqueSectionVector <- unique(sectionMatrix[, 1])
-	alreadyWrittenSection <- matrix(rep.int(FALSE, length(sectionMatrix[,1])), dimnames = c(list(cbind(conectEachRow(sectionMatrix[,1:4]))), "alreadyWritten"))
+	alreadyWrittenSection <- matrix(rep.int(FALSE, length(sectionMatrix[, 1])), dimnames = c(list(cbind(conectEachRow(sectionMatrix[, 1:4]))), "alreadyWritten"))
 	uniqueSectionVector <- getUniqueSectionsValues(sectionMatrix = sectionMatrix, sectionTyp = FIRST.SECTION)
 	identicalMatrixSection <- makeIdenticalMatrix(FIRST.SECTION, uniqueSectionVector)
 	alreadyBeenProcessedSection <- vector()
@@ -2879,142 +2829,142 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 	alreadyWrittenFilesP <- vector()
 	for(sectionID in uniqueSectionVector) {
 		debug %debug% paste("... sectionID", sectionID)
-		if(!checkIfNull(sectionID) && !((sectionID %in% alreadyBeenProcessedSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,sectionID, FIRST.SECTION))) {
-			additionalSection <- colnames(identicalMatrixSection)[getVector(identicalMatrixSection[,sectionID])]
+		if (!checkIfNull(sectionID) && !((sectionID %in% alreadyBeenProcessedSection) || checkAlreadyWrittenSection(alreadyWrittenSection , sectionID, FIRST.SECTION))) {
+			additionalSection <- colnames(identicalMatrixSection)[getVector(identicalMatrixSection[, sectionID])]
 			alreadyBeenProcessedSection <- c(alreadyBeenProcessedSection, additionalSection)
-
-			#print(paste("sectionID: ", sectionID, sep=""))
+			
+			#print(paste("sectionID: ", sectionID, sep = ""))
 			latexTextS <- ""
 			tabTextS <- ""
 			#sectionIDVector <- c(sectionID, list(additionalSection))
-			booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionID, identicalMatrixSection, debug)
-			latexTextS <- setResetCheckAndIFPart(latexTextS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextS)
+			booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, sectionID, identicalMatrixSection, debug = debug)
+			latexTextS <- setResetCheckAndIFPart(latexTextS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextS)
 			tabTextS <- increaseTabText(tabTextS)
 			latexTextS <- setAdditionInfos(latexTextS, FIRST.SECTION, sectionID, tabTextS)
-					
-			if(sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 2]))) == 0) {
-				latexTextS <- setLoadImageAndLoadTex(latexTextS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextS)
+			
+			if (sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 2]))) == 0) {
+				latexTextS <- setLoadImageAndLoadTex(latexTextS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextS)
 			} else {
-					
-			#	uniqueSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2)]))
+				
+				#	uniqueSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1, 2)]))
 				uniqueSubSectionVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, SECOND.SECTION)
 				identicalMatrixSubSection <- makeIdenticalMatrix(SECOND.SECTION, uniqueSubSectionVector)
 				alreadyBeenProcessedSubSection <- vector()
 				
 				for(subsectionID in uniqueSubSectionVector) {
 					debug %debug% paste("... subsectionID", subsectionID)
-					if(!checkIfNull(subsectionID) && !((subsectionID %in% alreadyBeenProcessedSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,subsectionID, SECOND.SECTION))) {
+					if (!checkIfNull(subsectionID) && !((subsectionID %in% alreadyBeenProcessedSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection , subsectionID, SECOND.SECTION))) {
 						
-						additionalSubSection <- colnames(identicalMatrixSubSection)[getVector(identicalMatrixSubSection[,subsectionID])]
+						additionalSubSection <- colnames(identicalMatrixSubSection)[getVector(identicalMatrixSubSection[, subsectionID])]
 						alreadyBeenProcessedSubSection <- c(alreadyBeenProcessedSubSection, additionalSubSection)
 						
 						latexTextSS <- ""
 						tabTextSS <- ""
 						
-						#print(paste("subsectionID: ", subsectionID, sep=""))
-						#subsectionIDShort <- str_sub(subsectionID, 1, str_locate(subsectionID,"\\.")[,"start"]-1)
+						#print(paste("subsectionID: ", subsectionID, sep = ""))
+						#subsectionIDShort <- str_sub(subsectionID, 1, str_locate(subsectionID, "\\.")[, "start"]-1)
 						#sectionIDVector <- c(subsectionID, list(additionalSection, additionalSubSection))
 						#() hier was ändern
-						booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsectionID, identicalMatrixSubSection, debug)
+						booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsectionID, identicalMatrixSubSection, debug = debug)
 						
-						latexTextSS <- setResetCheckAndIFPart(latexTextSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSS)
+						latexTextSS <- setResetCheckAndIFPart(latexTextSS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextSS)
 						tabTextSS <- increaseTabText(tabTextSS)
 						latexTextSS <- setAdditionInfos(latexTextSS, SECOND.SECTION, subsectionID, tabTextSS)
 						
-						if(sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 3]))) == 0) {
-							latexTextSS <- setLoadImageAndLoadTex(latexTextSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSS)
+						if (sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 3]))) == 0) {
+							latexTextSS <- setLoadImageAndLoadTex(latexTextSS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextSS)
 						} else {
-						
-							#uniqueSubSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3)]))
+							
+							#uniqueSubSubSectionVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1, 2, 3)]))
 							uniqueSubSubSectionVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, THIRD.SECTION)
 							identicalMatrixSubSubSection <- makeIdenticalMatrix(THIRD.SECTION, uniqueSubSubSectionVector)
 							alreadyBeenProcessedSubSubSection <- vector()
 							
 							for(subsubsectionID in uniqueSubSubSectionVector) {
 								debug %debug% paste("... subsubsectionID", subsubsectionID)
-								if(!checkIfNull(subsubsectionID) && !((subsubsectionID %in% alreadyBeenProcessedSubSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection ,subsubsectionID, THIRD.SECTION))) {
+								if (!checkIfNull(subsubsectionID) && !((subsubsectionID %in% alreadyBeenProcessedSubSubSection) || checkAlreadyWrittenSection(alreadyWrittenSection , subsubsectionID, THIRD.SECTION))) {
 									
-									additionalSubSubSection <- colnames(identicalMatrixSubSubSection)[getVector(identicalMatrixSubSubSection[,subsubsectionID])]
+									additionalSubSubSection <- colnames(identicalMatrixSubSubSection)[getVector(identicalMatrixSubSubSection[, subsubsectionID])]
 									alreadyBeenProcessedSubSubSection <- c(alreadyBeenProcessedSubSubSection, additionalSubSubSection)
 									latexTextSSS <- ""
 									tabTextSSS <- ""
 									#sectionIDVector <- c(sectionID, subsectionIDShort, subsubsectionID)
 									
 									#sectionIDVector <- c(subsubsectionID, list(additionalSection, additionalSubSection, additionalSubSubSection))
-									booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsubsectionID, identicalMatrixSubSubSection, debug)
-									latexTextSSS <- setResetCheckAndIFPart(latexTextSSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSSS)
+									booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, subsubsectionID, identicalMatrixSubSubSection, debug = debug)
+									latexTextSSS <- setResetCheckAndIFPart(latexTextSSS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextSSS)
 									tabTextSSS <- increaseTabText(tabTextSSS)
 									latexTextSSS <- setAdditionInfos(latexTextSSS, THIRD.SECTION, subsubsectionID, tabTextSSS)
 									
-									if(sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 4]))) == 0) {
-										latexTextSSS <- setLoadImageAndLoadTex(latexTextSSS, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextSSS)
+									if (sum(!("0" %in% unique(sectionMatrix[booleanVectorForWholeSection, 4]))) == 0) {
+										latexTextSSS <- setLoadImageAndLoadTex(latexTextSSS, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextSSS)
 									} else {
-				
-										#uniqueParagraphVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1,2,3,4)]))
+										
+										#uniqueParagraphVector <- conectEachRow(unique(sectionMatrix[booleanVectorForWholeSection, c(1, 2, 3, 4)]))
 										uniqueParagraphVector <- getUniqueSectionsValues(booleanVectorForWholeSection, sectionMatrix, FOURTH.SECTION)
 										identicalMatrixParagraph <- makeIdenticalMatrix(FOURTH.SECTION, uniqueParagraphVector)
 										alreadyBeenProcessedParagraph <- vector()
 										
 										for(paragraphID in uniqueParagraphVector) {
 											debug %debug% paste("... paragraphID", paragraphID)
-											if(!checkIfNull(paragraphID) && !((paragraphID %in% alreadyBeenProcessedParagraph) || checkAlreadyWrittenSection(alreadyWrittenSection ,paragraphID, FOURTH.SECTION))) {
+											if (!checkIfNull(paragraphID) && !((paragraphID %in% alreadyBeenProcessedParagraph) || checkAlreadyWrittenSection(alreadyWrittenSection , paragraphID, FOURTH.SECTION))) {
 												
-												additionalParagraph <- colnames(identicalMatrixParagraph)[getVector(identicalMatrixParagraph[,paragraphID])]
+												additionalParagraph <- colnames(identicalMatrixParagraph)[getVector(identicalMatrixParagraph[, paragraphID])]
 												alreadyBeenProcessedParagraph <- c(alreadyBeenProcessedParagraph, additionalParagraph)
 												latexTextP <- ""
 												tabTextP <- ""
 												
 												#sectionIDVector <- c(sectionID, subsectionIDShort, subsubsectionID, paragraphID)
 												#sectionIDVector <- c(paragraphID, list(additionalSection, additionalSubSection, additionalSubSubSection, additionalParagraph))
-												booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, paragraphID, identicalMatrixParagraph, debug)
-												latexTextP <- setResetCheckAndIFPart(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
+												booleanVectorForWholeSection <- getBooleanVectorForWholeSection(sectionMatrix, paragraphID, identicalMatrixParagraph, debug = debug)
+												latexTextP <- setResetCheckAndIFPart(latexTextP, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextP)
 												tabTextP <- increaseTabText(tabTextP)
 												latexTextP <- setAdditionInfos(latexTextP, FOURTH.SECTION, paragraphID, tabTextP)
-												latexTextP <- setLoadImageAndLoadTex(latexTextP, sectionMatrix[booleanVectorForWholeSection,"file"], tabTextP)
+												latexTextP <- setLoadImageAndLoadTex(latexTextP, sectionMatrix[booleanVectorForWholeSection, "file"], tabTextP)
 												tabTextP <- reduceTabText(tabTextP)
 												latexTextP <- setClosedBraces(latexTextP, tabTextP)
-												#if(paragraphID == "7.1.1.1") {
-													#print("##################################### here we are ###############################")
-													#print(alreadyWrittenSection[paragraphID,1])
+												#if (paragraphID == "7.1.1.1") {
+												#print("##################################### here we are ###############################")
+												#print(alreadyWrittenSection[paragraphID, 1])
 												#}
-												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug)
+												writeLatexSectionFile(latexTextP, FOURTH.SECTION, paragraphID, debug = debug)
 												alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, paragraphID, FOURTH.SECTION)
 											}
 										}
 									}
-									tempList <- writeInclude(latexTextSSS, tabTextSSS, FOURTH.SECTION, alreadyWrittenFilesP, debug)
+									tempList <- writeInclude(latexTextSSS, tabTextSSS, FOURTH.SECTION, alreadyWrittenFilesP, debug = debug)
 									latexTextSSS <- tempList$latexText
 									alreadyWrittenFilesP <- tempList$alreadyWrittenFiles
 									
 									tabTextSSS <- reduceTabText(tabTextSSS)
 									latexTextSSS <- setClosedBraces(latexTextSSS, tabTextSSS)
 									
-									writeLatexSectionFile(latexTextSSS, THIRD.SECTION, subsubsectionID, debug)
+									writeLatexSectionFile(latexTextSSS, THIRD.SECTION, subsubsectionID, debug = debug)
 									alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, subsubsectionID, THIRD.SECTION)
 								}
 							}
 						}
-						tempList <- writeInclude(latexTextSS, tabTextSS, THIRD.SECTION, alreadyWrittenFilesSSS, debug)
+						tempList <- writeInclude(latexTextSS, tabTextSS, THIRD.SECTION, alreadyWrittenFilesSSS, debug = debug)
 						latexTextSS <- tempList$latexText
 						alreadyWrittenFilesSSS <- tempList$alreadyWrittenFiles
 						
 						tabTextSS <- reduceTabText(tabTextSS)
-						latexTextSS <- setClosedBraces(latexTextSS,tabTextSS)
-				
-						writeLatexSectionFile(latexTextSS, SECOND.SECTION, subsectionID, debug)
+						latexTextSS <- setClosedBraces(latexTextSS, tabTextSS)
+						
+						writeLatexSectionFile(latexTextSS, SECOND.SECTION, subsectionID, debug = debug)
 						alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, subsectionID, SECOND.SECTION)
 						
 					}
 				}
 			}
-			tempList <- writeInclude(latexTextS, tabTextS, SECOND.SECTION, alreadyWrittenFilesSS, debug)
+			tempList <- writeInclude(latexTextS, tabTextS, SECOND.SECTION, alreadyWrittenFilesSS, debug = debug)
 			latexTextS <- tempList$latexText
 			alreadyWrittenFilesSS <- tempList$alreadyWrittenFiles
 			
 			tabTextS <- reduceTabText(tabTextS)
 			latexTextS <- setClosedBraces(latexTextS, tabTextS)
 			
-			writeLatexSectionFile(latexTextS, FIRST.SECTION, sectionID, debug)
+			writeLatexSectionFile(latexTextS, FIRST.SECTION, sectionID, debug = debug)
 			alreadyWrittenSection <- setAlreadyWrittenSectionMatrix(alreadyWrittenSection, sectionID, FIRST.SECTION)
 		}
 	}
@@ -3023,10 +2973,10 @@ buildSectionTexFile <- function(sectionMatrix, debug) {
 checkAlreadyWrittenSection <- function(alreadyWrittenSection , sectionID, sectionTyp) {
 	
 	repInt <- getConstance(sectionTyp, FILL.WITH.NULL.SECTION)
-	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0,repInt)))
+	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0, repInt)))
 	
-	if(sectionID %in% rownames(alreadyWrittenSection)) {
-		return(alreadyWrittenSection[sectionID,])
+	if (sectionID %in% rownames(alreadyWrittenSection)) {
+		return(alreadyWrittenSection[sectionID, ])
 	} else {
 		return(FALSE)
 	}
@@ -3034,16 +2984,16 @@ checkAlreadyWrittenSection <- function(alreadyWrittenSection , sectionID, sectio
 
 
 setAlreadyWrittenSectionMatrix <- function(alreadyWrittenSection, sectionID, sectionTyp) {
-##########
+	##########
 #sectionID <- subsectionID
 #sectionTyp <- SECOND.SECTION
-##########
+	##########
 	
 	repInt <- getConstance(sectionTyp, FILL.WITH.NULL.SECTION)
-	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0,repInt)))
+	sectionID <- conectSectionIDVector(c(sectionID, rep.int(0, repInt)))
 	
-	if(sectionID %in% rownames(alreadyWrittenSection)) {
-		alreadyWrittenSection[sectionID,1] <- TRUE
+	if (sectionID %in% rownames(alreadyWrittenSection)) {
+		alreadyWrittenSection[sectionID, 1] <- TRUE
 	} else {
 		
 		alreadyWrittenSection <- rbind(alreadyWrittenSection, TRUE)
@@ -3054,51 +3004,51 @@ setAlreadyWrittenSectionMatrix <- function(alreadyWrittenSection, sectionID, sec
 
 
 writeInclude <- function(latexText, tabText, sectionTyp, alreadyWrittenFiles, debug = FALSE) {
-########
+	########
 #sectionTyp <- THIRD.SECTION
-########
+	########
 	
 	
 	debug %debug% "writeInclude()"	
-		
-	fileNames <- getFileNames(path = paste(DIRECTORY.SECTION, "", sep=DIRECTORY.SEPARATOR), pattern = getConstance(sectionTyp, OVERALL.FILENAME.PATTERN), debug)
+	
+	fileNames <- getFileNames(path = paste(DIRECTORY.SECTION, "", sep = DIRECTORY.SEPARATOR), pattern = getConstance(sectionTyp, OVERALL.FILENAME.PATTERN), debug = debug)
 	fileNames <- fileNames[!(fileNames %in% alreadyWrittenFiles)]
 	alreadyWrittenFiles <- c(alreadyWrittenFiles, fileNames)
-
-	if(!is.null(fileNames)) {
-		sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(NEW.SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2))
+	
+	if (!is.null(fileNames)) {
+		sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(NEW.SECTION.TEX))[, "end"]+1, -(nchar(TEX)+2))
 		fileNames <- fileNames[order(as.numeric(sectionIDVector))]
-		if(sectionTyp == FIRST.SECTION) {
-			fileNames <- str_sub(fileNames, 1, str_locate(fileNames, TEX.PATTERN)[,"start"]-1)
+		if (sectionTyp == FIRST.SECTION) {
+			fileNames <- str_sub(fileNames, 1, str_locate(fileNames, TEX.PATTERN)[, "start"]-1)
 		}
 		for(nn in fileNames) {
 			
 			
-			nn <- paste(DIRECTORY.SECTION,nn, sep=DIRECTORY.SEPARATOR)
-			#if(sectionTyp == FIRST.SECTION) {
+			nn <- paste(DIRECTORY.SECTION, nn, sep = DIRECTORY.SEPARATOR)
+			#if (sectionTyp == FIRST.SECTION) {
 			#	latexText <- includeFile(latexText, tabText, nn)
 			#} else {
-				latexText <- inputFile(latexText, tabText, nn)
+			latexText <- inputFile(latexText, tabText, nn)
 			#}
 		}
 	}
-	return(list(latexText= latexText, alreadyWrittenFiles = alreadyWrittenFiles))
+	return(list(latexText = latexText, alreadyWrittenFiles = alreadyWrittenFiles))
 }
 
 
 includeFile <- function(latexText, tabText, file) {
-	return(paste(latexText, tabText, "\\include{", file, "}", NEWLINE.TEX, sep=""))
+	return(paste(latexText, tabText, "\\include{", file, "}", NEWLINE.TEX, sep = ""))
 }
 
 inputFile <- function(latexText, tabText, file) {
-	return(paste(latexText, tabText, "\\input{", file, "}", NEWLINE.TEX, sep=""))
+	return(paste(latexText, tabText, "\\input{", file, "}", NEWLINE.TEX, sep = ""))
 }
 
-includeAppendixAndError <- function(buildAppendixTexPart, tabText, pattern, debug) {
+includeAppendixAndError <- function(buildAppendixTexPart, tabText, pattern, debug = debug) {
 	debug %debug% "includeAppendixAndError()"
 	
-	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, pattern,sep=""), debug)
-	if(length(fileName) > 0) {
+	fileName <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep = DIRECTORY.SEPARATOR), pattern = paste(SECTION.TEX, pattern, sep = ""), debug = debug)
+	if (length(fileName) > 0) {
 		buildAppendixTexPart <- setResetCheckAndIFPart(buildAppendixTexPart, fileName, tabText)
 		tabText <- increaseTabText(tabText)
 		buildAppendixTexPart <- setAdditionInfos(buildAppendixTexPart, FIRST.SECTION, pattern, tabText)
@@ -3117,16 +3067,16 @@ writeReportFile <- function(tabText = "", debug = FALSE) {
 	buildReportFileText <- inputFile("", tabText, "reportDefHead") 
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportDefGeneralSection")
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportCluster")
-	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug)$latexText
-	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, APPENDIX.SECTION, debug)
-	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, ERROR.SECTION, debug)
+	buildReportFileText <- writeInclude(buildReportFileText, tabText, FIRST.SECTION, "", debug = debug)$latexText
+	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, APPENDIX.SECTION, debug = debug)
+	buildReportFileText <- includeAppendixAndError(buildReportFileText, tabText, ERROR.SECTION, debug = debug)
 	buildReportFileText <- inputFile(buildReportFileText, tabText, "reportFooter")
 	writeOnlyALatexFile(buildReportFileText, REPORT)
 }
 
 buildReportTex <- function(debug) {
 	debug %debug% "buildReportTex()"
-##################
+	##################
 #linePlot		01		
 #barPlot		50
 #boxPlot		20
@@ -3134,46 +3084,46 @@ buildReportTex <- function(debug) {
 #violinPlot		40
 #stackedPlot	60
 #linerangePlot	70
-#lineMultiPlot  80
-##################	
-
-	fileNames <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep=DIRECTORY.SEPARATOR), pattern = SECTION.PATTERN, debug)
+#lineMultiPlot 80
+	##################	
+	
+	fileNames <- getFileNames(path = paste(DIRECTORY.PLOTSTEX, "", sep = DIRECTORY.SEPARATOR), pattern = SECTION.PATTERN, debug = debug)
 	#print(fileNames)
-	if(!is.null(fileNames)) {
-		sectionMatrix <- getSectionMatrix(str_sub(fileNames, str_locate(fileNames, fixed(SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2)), fileNames, debug)
+	if (!is.null(fileNames)) {
+		sectionMatrix <- getSectionMatrix(str_sub(fileNames, str_locate(fileNames, fixed(SECTION.TEX))[, "end"]+1, -(nchar(TEX)+2)), fileNames, debug = debug)
 		colnames(sectionMatrix) <- c(names(sectionMappingList), "file")
-		buildSectionTexFile(sectionMatrix, debug)	
+		buildSectionTexFile(sectionMatrix, debug = debug)	
 	}
-
-	#fileNames <- getFileNames(path = ".", pattern = OVERALL.SECTION.PATTERN, debug)
-	#if(!is.null(fileNames)) {
-	#	sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(OVERALL.SECTION.TEX))[,"end"]+1, -(nchar(TEX)+2))
-		writeReportFile(debug = debug)
+	
+	#fileNames <- getFileNames(path = ".", pattern = OVERALL.SECTION.PATTERN, debug = debug)
+	#if (!is.null(fileNames)) {
+	#	sectionIDVector <- str_sub(fileNames, str_locate(fileNames, fixed(OVERALL.SECTION.TEX))[, "end"]+1, -(nchar(TEX)+2))
+	writeReportFile(debug = debug)
 	#}
 }
 
 saveImageFile <- function(overallList, plot, fileName, newHeight = "") {
-
-	#filename = preprocessingOfValues(paste(filename, extraString, sep=""), FALSE, replaceString = "_")	
-	if(newHeight == "") {
+	
+	#filename = preprocessingOfValues(paste(filename, extraString, sep = ""), FALSE, replaceString = "_")	
+	if (newHeight == "") {
 		height <- 5
 	} else {
 		height <- newHeight
 	}
-
+	
 	#print(filename)
-	#ggsave (filename=paste(paste(filename, runif(1, 0.0, 1.0)), overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=5)
+	#ggsave (filename = paste(paste(filename, runif (1, 0.0, 1.0)), overallList$saveFormat, sep = "."), plot = plot, dpi = as.numeric(overallList$dpi), width = 8, height = 5)
 	fileName <- getPlotFileName(fileName)
-#	print(paste("before Max Memory: ",memory.size(TRUE), sep=""))
-#	print(paste("before actually used Memory: ",memory.size(FALSE), sep=""))
-
+#	print(paste("before Max Memory: ", memory.size(TRUE), sep = ""))
+#	print(paste("before actually used Memory: ", memory.size(FALSE), sep = ""))
+	
 #print(filename)
-	ggsave (filename=paste(fileName, overallList$saveFormat, sep="."), plot = plot, dpi=as.numeric(overallList$dpi), width=8, height=height)
-
+	ggsave (filename = paste(fileName, overallList$saveFormat, sep = "."), plot = plot, dpi = as.numeric(overallList$dpi), width = 8, height = height)
+	
 }
 
-getPlotFileName <-  function(filename) {
-	return(paste(DIRECTORY.PLOTS, filename, sep=DIRECTORY.SEPARATOR))
+getPlotFileName <- function(filename) {
+	return(paste(DIRECTORY.PLOTS, filename, sep = DIRECTORY.SEPARATOR))
 }
 
 #makeDepthBoxplotDiagram <- function(h, overallList) {
@@ -3183,8 +3133,8 @@ getPlotFileName <-  function(filename) {
 #	if (h == 1) {
 #		openImageFile(overallList)
 #	}
-#	par(mar=c(4.1, 4.1, 2.1, 2.1))
-#	plot.depth(as.matrix(overallList$overallResult), plot.type=h, xlabel=overallList$xAxisName, l.width=12, lp.color=overallList$color)
+#	par(mar = c(4.1, 4.1, 2.1, 2.1))
+#	plot.depth(as.matrix(overallList$overallResult), plot.type = h, xlabel = overallList$xAxisName, l.width = 12, lp.color = overallList$color)
 #	
 #	grid()
 #	if (h == 1) {
@@ -3198,15 +3148,15 @@ getPlotFileName <-  function(filename) {
 #}
 
 conact <- function(data, whichColumShouldUse) {
-	if(length(whichColumShouldUse) == 1) {
+	if (length(whichColumShouldUse) == 1) {
 		data <- t(t(data))
 	}
 	conactVector <- data.frame()
-	for(nn in seq(along=whichColumShouldUse)) {
-		if(nn > 1) {
-			conactVector <- paste(conactVector, as.character(data[,nn]))
+	for(nn in seq(along = whichColumShouldUse)) {
+		if (nn > 1) {
+			conactVector <- paste(conactVector, as.character(data[, nn]))
 		} else {
-			conactVector <- as.character(data[,nn])
+			conactVector <- as.character(data[, nn])
 		}
 	}
 	return(conactVector)
@@ -3214,7 +3164,7 @@ conact <- function(data, whichColumShouldUse) {
 
 getPrimAndOrName <- function(colNames) {
 	if (PRIMAER.TREATMENT %in% colNames) {
-		if(NAME %in% colNames) {
+		if (NAME %in% colNames) {
 			return(c(PRIMAER.TREATMENT, NAME))
 		} else {
 			return(PRIMAER.TREATMENT)
@@ -3225,14 +3175,14 @@ getPrimAndOrName <- function(colNames) {
 }
 
 
-checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlot = NBOX.PLOT, first = FALSE, second = FALSE) {	
-#########
+checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor = "", typOfPlot = NBOX.PLOT, first = FALSE, second = FALSE) {	
+	#########
 #first <- overallList$splitTreatmentFirst
 #second <- overallList$splitTreatmentSecond
-#index <- levels(overallResult[,whichColumShouldUse])[1]
-#########
-	if((first && second) || (first && !second) || (!first && second)) {
-		if(typOfPlot == NBOX.PLOT) {
+#index <- levels(overallResult[, whichColumShouldUse])[1]
+	#########
+	if ((first && second) || (first && !second) || (!first && second)) {
+		if (typOfPlot == NBOX.PLOT) {
 			whichColumShouldUse <- getPrimAndOrName(colnames(overallResult))
 		} else {
 			whichColumShouldUse <- checkWhichColumShouldUseForPlot(first, second, colnames(overallResult), typOfPlot, FALSE) # TRUE ## bei true true -> FALSE ansosnten TRUE?
@@ -3240,19 +3190,19 @@ checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlo
 	} else {
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(first, second, colnames(overallResult), typOfPlot, TRUE) # TRUE ## bei true true -> FALSE ansosnten TRUE?		
 	}
-
-	if(typOfPlot == NBOX.MULTI.PLOT) {
+	
+	if (typOfPlot == NBOX.MULTI.PLOT) {
 		whichColumShouldUse <- c(whichColumShouldUse, COLUMN)
 	}
 	overallResultTemp <- overallResult
-	overallResultTemp$check <- conact(overallResult[,whichColumShouldUse], whichColumShouldUse)
+	overallResultTemp$check <- conact(overallResult[, whichColumShouldUse], whichColumShouldUse)
 	
 	max <- -1	
 	for (index in unique(overallResultTemp$check)) {
 		if (typOfPlot == NBOX.PLOT || typOfPlot == BOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {	
-			temp <- sum(!is.na(overallResult$mean[overallResultTemp[,"check"] == index]))
+			temp <- sum(!is.na(overallResult$mean[overallResultTemp[, "check"] == index]))
 		} else {
-			boolVec <- overallResultTemp[,"check"] == index
+			boolVec <- overallResultTemp[, "check"] == index
 			temp <- sum(!is.na(overallResultTemp[boolVec, descriptor]))
 		}
 		max <- ifelse(temp > max, temp, max)
@@ -3267,7 +3217,7 @@ checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlo
 #	se = as.data.frame(as.vector(se))
 #	colnames(se) = "se"
 #
-#	return(data.frame(value=values, means=means, se=se))
+#	return(data.frame(value = values, means = means, se = se))
 #}
 #
 #buildMyStats2 <- function(values, means, se, rowName) {
@@ -3280,12 +3230,12 @@ checkIfOneColumnHasOnlyValues <- function(overallResult, descriptor="", typOfPlo
 #	se = as.data.frame(as.vector(se))
 #	colnames(se) = "se"
 #	
-#	return(data.frame(value=values, means=means, se=se, rowName=rowName))
+#	return(data.frame(value = values, means = means, se = se, rowName = rowName))
 #}
 
 reduceOverallResult <- function(tempOverallList, imagesIndex) {
 	tempOverallList$debug %debug% "reduceOverallResult()"
-
+	
 	workingDataSet = buildDataSet(tempOverallList$overallResult[, 1:2], tempOverallList, c("mean", "se"), imagesIndex)
 	colnames(workingDataSet) = c(colnames(workingDataSet)[1:2], "mean", "se")
 	return(workingDataSet)	
@@ -3293,26 +3243,26 @@ reduceOverallResult <- function(tempOverallList, imagesIndex) {
 
 
 reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, debug, diagramTyp = NBOX.PLOT) {
-####################
+	####################
 #debug <- overallList$debug
 #diagramTyp <- "nboxplot"
-#####################
+	#####################
 	
 	
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
-	if(diagramTyp == STRESS.PLOT) {
+	if (diagramTyp == STRESS.PLOT) {
 		workingDataSet <- tempOverallResult[tempOverallResult$descriptor == imagesIndex, ]
-		stressColumns <- grep("stress",colnames(workingDataSet), ignore.case=TRUE)
+		stressColumns <- grep("stress", colnames(workingDataSet), ignore.case = TRUE)
 		standardValues <- seq(min(stressColumns)-1)
 		
-		#newWorkingDataSet <- matrix(ncol=length(c(standardValues, "values", "stress")), dimnames=list("",c(colnames(workingDataSet)[standardValues], "values", "stress")))
+		#newWorkingDataSet <- matrix(ncol = length(c(standardValues, "values", "stress")), dimnames = list("", c(colnames(workingDataSet)[standardValues], "values", "stress")))
 		
 		for(nn in seq(along = stressColumns)) {
-			if(nn == 1) {
-				newWorkingDataSet <- cbind(workingDataSet[,c(standardValues)], values = as.numeric(as.character(workingDataSet[,stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]])
+			if (nn == 1) {
+				newWorkingDataSet <- cbind(workingDataSet[, c(standardValues)], values = as.numeric(as.character(workingDataSet[, stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]])
 			} else {
-				newWorkingDataSet <- rbind(newWorkingDataSet, cbind(workingDataSet[,c(standardValues)], values = as.numeric(as.character(workingDataSet[,stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]]))
+				newWorkingDataSet <- rbind(newWorkingDataSet, cbind(workingDataSet[, c(standardValues)], values = as.numeric(as.character(workingDataSet[, stressColumns[nn]])), stress = colnames(workingDataSet)[stressColumns[nn]]))
 			}
 		}
 		
@@ -3341,24 +3291,24 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 #		} else {
 #			standardColumnName = c("name", "xAxis")
 #		}
-
+		
 		if (sum(!(colNames %in% colnames(tempOverallResult)))>0) {
-
+			
 			workingDataSet = buildDataSet(tempOverallResult[, standardColumnName], tempOverallResult, colNames, imagesIndex, diagramTyp)
-			lengthOfNewColumns <- length(colnames(workingDataSet[,-c(1:length(standardColumnName))]))
+			lengthOfNewColumns <- length(colnames(workingDataSet[, -c(1:length(standardColumnName))]))
 			
 #			if (diagramTyp == "spiderplot") {
 #				if (lengthOfNewColumns > 1) {
-#					colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames,lengthOfNewColumns),1:lengthOfNewColumns, sep=""))
-#				}else {
+#					colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames, lengthOfNewColumns), 1:lengthOfNewColumns, sep = ""))
+#				} else {
 #					colnames(workingDataSet) = c(standardColumnName, colNames)
 #				}
 #			} else {
-				colnames(workingDataSet) = c(standardColumnName, colNames)
+			colnames(workingDataSet) = c(standardColumnName, colNames)
 #			}
-		
+			
 #			if (lengthOfNewColumns > 1) {
-#				colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames,lengthOfNewColumns),1:lengthOfNewColumns, sep=""))
+#				colnames(workingDataSet) = c(standardColumnName, paste(rep.int(colNames, lengthOfNewColumns), 1:lengthOfNewColumns, sep = ""))
 #			} else {
 #				colnames(workingDataSet) = c(standardColumnName, colNames)
 #			}
@@ -3372,13 +3322,13 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 
 #newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, tooLong, maxValues) {
 #	#numberCharAfterSeparate <- 8
-#	if(tooLong) {
-##		if(maxValues > 10)
+#	if (tooLong) {
+##		if (maxValues > 10)
 #		
 #		if (nchar(n) > (numberCharAfterSeparate + 4)) {
-#			newTreatmentName <- paste(seq, ". ", substr(n,1,numberCharAfterSeparate), " ...", sep="")
+#			newTreatmentName <- paste(seq, ". ", substr(n, 1, numberCharAfterSeparate), " ...", sep = "")
 #		} else {
-#			newTreatmentName <- paste(seq, ". ", n, sep="")
+#			newTreatmentName <- paste(seq, ". ", n, sep = "")
 #		}
 #	} else {
 #		newTreatmentName <- n
@@ -3387,11 +3337,11 @@ reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, d
 #}
 
 newTreatmentNameFunction <- function(seq, n, numberCharAfterSeparate, lengthForPoints) {
-		
+	
 	if (nchar(n) > (numberCharAfterSeparate + lengthForPoints)) {
-		return(paste(seq, ". ", substr(n,1,numberCharAfterSeparate), "...", sep=""))
+		return(paste(seq, ". ", substr(n, 1, numberCharAfterSeparate), "...", sep = ""))
 	} else {
-		return(paste(seq, ". ", n, sep=""))
+		return(paste(seq, ". ", n, sep = ""))
 	}	
 	#return(newTreatmentName)
 }
@@ -3403,7 +3353,7 @@ renameOfTheTreatments <- function(overallList) {
 		if (overallList$filterTreatment[1] != NONE) {
 			overallList$filterTreatmentRename <- setFilterTreatmentRename(overallList$filterTreatment, overallList$filterTreatmentRename, "conditionsFirstFilter")
 		}
-	
+		
 		if (overallList$filterSecondTreatment[1] != NONE) {
 			overallList$secondFilterTreatmentRename <- setFilterTreatmentRename(overallList$filterSecondTreatment, overallList$secondFilterTreatmentRename, "conditionsSecondFilter")
 		}
@@ -3416,30 +3366,30 @@ setFilterTreatmentRename <- function(oldNames, newNames, fileName) {
 	numberCharAfterSeparate <- 8
 	lengthForPoints <- 4
 	
-	if(length(oldNames) > 10) {
+	if (length(oldNames) > 10) {
 		numberCharAfterSeparate <- 6
 	}
 	
 	tooLong <- checkIfTooLong(oldNames, (numberCharAfterSeparate + lengthForPoints))
-		
-	if(tooLong) {
-		writeLatexTable(fileName, columnName, columnWidth=c("3cm","13cm"))
+	
+	if (tooLong) {
+		writeLatexTable(fileName, columnName, columnWidth = c("3cm", "13cm"))
 	}
 	
 	seq <- 0;
 	for(n in oldNames) {	
-		if(tooLong) {
+		if (tooLong) {
 			seq <- seq+1
-#			if(n == "") {
+#			if (n == "") {
 #				n <- " "
 #			}
 			newNames[[n]] <- newTreatmentNameFunction(seq, n, numberCharAfterSeparate, lengthForPoints)
-			writeLatexTable(fileName, value=c(newNames[[n]],n))
+			writeLatexTable(fileName, value = c(newNames[[n]], n))
 		} else {
 			newNames[[n]] <- n
 		}
 	}
-	if(tooLong) {
+	if (tooLong) {
 		writeLatexTable(fileName)
 	}
 	return(newNames)
@@ -3456,19 +3406,19 @@ checkIfTooLong <- function(nameVector, cutline) {
 	return(FALSE)
 }
 
-replaceTreatmentNamesOverallOneValue <- function(overallList, title, typOfPlot="") {
-######
-##listForGetTitle <- optionListForGetBoolean
+replaceTreatmentNamesOverallOneValue <- function(overallList, title, typOfPlot = "") {
+	######
+	##listForGetTitle <- optionListForGetBoolean
 #title <- nn
-######
+	######
 	overallList$debug %debug% "replaceTreatmentNamesOverallOneValue()"
-	#if(!overallList$appendix) {
-		if((typOfPlot == SPIDER.PLOT || typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) && 
+	#if (!overallList$appendix) {
+	if ((typOfPlot == SPIDER.PLOT || typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) && 
 			!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {		
-			title <- replaceTreatmentNames(overallList, title, onlySecondTreatment = TRUE, oneValue = TRUE)
-		} else {
-			title <- replaceTreatmentNames(overallList, title, onlyFirstTreatment = TRUE, oneValue = TRUE)
-		}
+		title <- replaceTreatmentNames(overallList, title, onlySecondTreatment = TRUE, oneValue = TRUE)
+	} else {
+		title <- replaceTreatmentNames(overallList, title, onlyFirstTreatment = TRUE, oneValue = TRUE)
+	}
 	#}
 	
 	return(title)
@@ -3486,62 +3436,62 @@ replaceTreatmentNamesOverallOneValue <- function(overallList, title, typOfPlot="
 
 replaceTreatmentNamesOverall <- function(overallList, overallResult) {	
 	overallList$debug %debug% "replaceTreatmentNamesOverall()"
-	#if(!overallList$appendix) {
-
-		if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
-			if(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-				
-#				if(length(overallList$filterTreatmentRename) == 0 && length(overallList$secondFilterTreatmentRename) == 0){
-					overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]])
+	#if (!overallList$appendix) {
+	
+	if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+		if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+			
+#				if (length(overallList$filterTreatmentRename) == 0 && length(overallList$secondFilterTreatmentRename) == 0) {
+			overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]])
 #				} else {
-#					overallResult[[NAME]] <- replaceTreatmentNames(overallList, conectEachRow(as.matrix(overallResult[,c(PRIMAER.TREATMENT, NAME)]), "/"))
+#					overallResult[[NAME]] <- replaceTreatmentNames(overallList, conectEachRow(as.matrix(overallResult[, c(PRIMAER.TREATMENT, NAME)]), "/"))
 #				}
-			} else {
-				overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]], onlySecondTreatment = TRUE)
-				overallResult[[PRIMAER.TREATMENT]] <- replaceTreatmentNames(overallList, overallResult[[PRIMAER.TREATMENT]], onlyFirstTreatment = TRUE)
-			}
 		} else {
-			overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]], onlyFirstTreatment = TRUE)
+			overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]], onlySecondTreatment = TRUE)
+			overallResult[[PRIMAER.TREATMENT]] <- replaceTreatmentNames(overallList, overallResult[[PRIMAER.TREATMENT]], onlyFirstTreatment = TRUE)
 		}
+	} else {
+		overallResult[[NAME]] <- replaceTreatmentNames(overallList, overallResult[[NAME]], onlyFirstTreatment = TRUE)
+	}
 	#}
 	return(overallResult)
 }
 
 replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment = FALSE, onlySecondTreatment = FALSE, oneValue = FALSE) {
-##########
-##columnWhichShouldReplace <- overallResult$name
-##onlyFirstTreatment <- TRUE
-##onlySecondTreatment <- TRUE
-##n <- overallList$filterTreatment[1]
-##k <- overallList$filterSecondTreatment[1]
+	##########
+	##columnWhichShouldReplace <- overallResult$name
+	##onlyFirstTreatment <- TRUE
+	##onlySecondTreatment <- TRUE
+	##n <- overallList$filterTreatment[1]
+	##k <- overallList$filterSecondTreatment[1]
 #columnWhichShouldReplace <- title
-##########
-
+	##########
+	
 #print(columnWhichShouldReplace)
 #print(onlyFirstTreatment)
 #print(onlySecondTreatment)
-
+	
 	overallList$debug %debug% "replaceTreatmentNames()"
 	
 	columnWhichShouldReplace <- as.character(columnWhichShouldReplace)
 	
 	if (overallList$filterSecondTreatment[1] != NONE && !onlyFirstTreatment && !onlySecondTreatment) {
-		if(oneValue) {
-			columnWhichShouldReplace <- paste(overallList$filterTreatmentRename[[columnWhichShouldReplace]],"/", overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]], sep="")
+		if (oneValue) {
+			columnWhichShouldReplace <- paste(overallList$filterTreatmentRename[[columnWhichShouldReplace]], "/", overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]], sep = "")
 		} else {
 			
-			if(length(overallList$filterTreatment) < 2) {
+			if (length(overallList$filterTreatment) < 2) {
 				#columnWhichShouldReplace <- overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]]
 #				for(k in overallList$filterSecondTreatment) {
-#					replace(columnWhichShouldReplace, columnWhichShouldReplace==k, as.character(overallList$secondFilterTreatmentRename[[k]]))
+#					replace(columnWhichShouldReplace, columnWhichShouldReplace == k, as.character(overallList$secondFilterTreatmentRename[[k]]))
 #				}
 				columnWhichShouldReplace <- replaceOnlySecond(overallList, columnWhichShouldReplace, TRUE, oneValue)
-			} else if(length(overallList$filterSecondTreatment) < 2) {
+			} else if (length(overallList$filterSecondTreatment) < 2) {
 				columnWhichShouldReplace <- replaceOnlyFirst(overallList, columnWhichShouldReplace, TRUE, oneValue)
 			} else {
 				for(n in overallList$filterTreatment) {
 					for(k in overallList$filterSecondTreatment) {
-						columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==paste(n,"/",k, sep=""), paste(overallList$filterTreatmentRename[[n]],"/", overallList$secondFilterTreatmentRename[[k]], sep=""))
+						columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace == paste(n, "/", k, sep = ""), paste(overallList$filterTreatmentRename[[n]], "/", overallList$secondFilterTreatmentRename[[k]], sep = ""))
 					}
 				}
 			}
@@ -3549,25 +3499,25 @@ replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFir
 	} 
 	
 #	if (overallList$filterTreatment[1] != NONE && onlyFirstTreatment) {
-#		if(oneValue) {
+#		if (oneValue) {
 #			columnWhichShouldReplace <- overallList$filterTreatmentRename[[columnWhichShouldReplace]]
 #		} else {
 #			for(n in overallList$filterTreatment) {
-#				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$filterTreatmentRename[[n]])
+#				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace == n, overallList$filterTreatmentRename[[n]])
 #			}
 #		}
-		columnWhichShouldReplace <- replaceOnlyFirst(overallList, columnWhichShouldReplace, onlyFirstTreatment, oneValue)
+	columnWhichShouldReplace <- replaceOnlyFirst(overallList, columnWhichShouldReplace, onlyFirstTreatment, oneValue)
 #	}
 	
 #	if (overallList$filterSecondTreatment[1] != NONE && onlySecondTreatment) {
-#		if(oneValue) {
+#		if (oneValue) {
 #			columnWhichShouldReplace <- overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]]
 #		} else {
 #			for(n in overallList$filterSecondTreatment) {
-#				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace==n, overallList$secondFilterTreatmentRename[[n]])
+#				columnWhichShouldReplace <- replace(columnWhichShouldReplace, columnWhichShouldReplace == n, overallList$secondFilterTreatmentRename[[n]])
 #			}
 #		}
-		columnWhichShouldReplace <- replaceOnlySecond(overallList, columnWhichShouldReplace, onlySecondTreatment, oneValue)
+	columnWhichShouldReplace <- replaceOnlySecond(overallList, columnWhichShouldReplace, onlySecondTreatment, oneValue)
 #	}
 	#ownCat(unique(columnWhichShouldReplace))
 	return(as.factor(columnWhichShouldReplace))
@@ -3576,11 +3526,11 @@ replaceTreatmentNames <- function(overallList, columnWhichShouldReplace, onlyFir
 
 replaceOnlyFirst <- function(overallList, columnWhichShouldReplace, onlyFirstTreatment, oneValue) {
 	if (overallList$filterTreatment[1] != NONE && onlyFirstTreatment) {
-		if(oneValue) {
+		if (oneValue) {
 			columnWhichShouldReplace <- overallList$filterTreatmentRename[[columnWhichShouldReplace]]
 		} else {
 			for(n in overallList$filterTreatment) {
-				columnWhichShouldReplace <- replace(as.character(columnWhichShouldReplace), columnWhichShouldReplace==n, as.character(overallList$filterTreatmentRename[[n]]))
+				columnWhichShouldReplace <- replace(as.character(columnWhichShouldReplace), columnWhichShouldReplace == n, as.character(overallList$filterTreatmentRename[[n]]))
 			}
 		}
 	}
@@ -3590,11 +3540,11 @@ replaceOnlyFirst <- function(overallList, columnWhichShouldReplace, onlyFirstTre
 
 replaceOnlySecond <- function(overallList, columnWhichShouldReplace, onlySecondTreatment, oneValue) {
 	if (overallList$filterSecondTreatment[1] != NONE && onlySecondTreatment) {
-		if(oneValue) {
+		if (oneValue) {
 			columnWhichShouldReplace <- overallList$secondFilterTreatmentRename[[columnWhichShouldReplace]]
 		} else {
 			for(n in overallList$filterSecondTreatment) {
-				columnWhichShouldReplace <- replace(as.character(columnWhichShouldReplace), columnWhichShouldReplace==n, as.character(overallList$secondFilterTreatmentRename[[n]]))
+				columnWhichShouldReplace <- replace(as.character(columnWhichShouldReplace), columnWhichShouldReplace == n, as.character(overallList$secondFilterTreatmentRename[[n]]))
 			}
 		}
 	}
@@ -3602,13 +3552,13 @@ replaceOnlySecond <- function(overallList, columnWhichShouldReplace, onlySecondT
 }
 
 
-getString <- function(value, sep=", ") {
+getString <- function(value, sep = ", ") {
 	str <- character(0)
-	#if(class(value) == data.frame) {
-		value <- getVector(value)
+	#if (class(value) == data.frame) {
+	value <- getVector(value)
 	#}
 	
-	for(nn in value){
+	for(nn in value) {
 		str <- paste(str, nn, sep = sep)
 	}
 	return(str)
@@ -3616,101 +3566,101 @@ getString <- function(value, sep=", ") {
 
 createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 	typString <- ""
-
-	if(typ == NBOX.PLOT) {
+	
+	if (typ == NBOX.PLOT) {
 		typString <- "line plot"
 	} else if (typ == STACKBOX.PLOT) {
 		typString <- "stacked barplot"
-	} else if(typ == BOX.PLOT) {
+	} else if (typ == BOX.PLOT) {
 		typString <- "box plot"
-	} else if(typ == SPIDER.PLOT) {
+	} else if (typ == SPIDER.PLOT) {
 		imageName <- getString(imageName)
 		typString <- "spider plot"
-	} else if(typ == LINERANGE.PLOT) {
+	} else if (typ == LINERANGE.PLOT) {
 		imageName <- getString(imageName)	
 		typString <- "linerange plot"
-	} else if(typ == VIOLIN.PLOT) {
+	} else if (typ == VIOLIN.PLOT) {
 		typString <- "violin plot"
-	} else if(typ == STRESS.PLOT) {
+	} else if (typ == STRESS.PLOT) {
 		typString <- "stress plot"
 	}
-
-	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '",imageName, "'", sep=""))
+	
+	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '", imageName, "'", sep = ""))
 	
 }
 
 parseString2Latex <- function(text) {
-
+	
 	##text <- gsub("\\", "\\textbackslash ", text)
-	text <- gsub("{", "\\{ ", text, fixed=TRUE)
-	text <- gsub("}", "\\} ", text, fixed=TRUE)
-	text <- gsub("ä", "{\\\"a}", text, fixed=TRUE)
-	text <- gsub("ö", "{\\\"o}", text, fixed=TRUE)
-	text <- gsub("ü", "{\\\"u}", text, fixed=TRUE)
-	text <- gsub("ß", "{\\ss}", text, fixed=TRUE)
-	text <- gsub("_", "{\\_}", text, fixed=TRUE)
-	text <- gsub("<", "\\textless " , text, fixed=TRUE)
-	text <- gsub(">", "\\textgreater ", text, fixed=TRUE)
-	text <- gsub("§", "\\S ", text, fixed=TRUE)
-	text <- gsub("$", "\\$ ", text, fixed=TRUE)
-	text <- gsub("&", "\\& ", text, fixed=TRUE)
-	text <- gsub("#", "\\# ", text, fixed=TRUE)
-	text <- gsub("%", "\\% ", text, fixed=TRUE)
-	text <- gsub("~", "\\textasciitilde ", text, fixed=TRUE)
-	text <- gsub("€", "\\texteuro ", text, fixed=TRUE)
-
+	text <- gsub("{", "\\{ ", text, fixed = TRUE)
+	text <- gsub("}", "\\} ", text, fixed = TRUE)
+	text <- gsub("ä", "{\\\"a}", text, fixed = TRUE)
+	text <- gsub("ö", "{\\\"o}", text, fixed = TRUE)
+	text <- gsub("ü", "{\\\"u}", text, fixed = TRUE)
+	text <- gsub("ß", "{\\ss}", text, fixed = TRUE)
+	text <- gsub("_", "{\\_}", text, fixed = TRUE)
+	text <- gsub("<", "\\textless " , text, fixed = TRUE)
+	text <- gsub(">", "\\textgreater ", text, fixed = TRUE)
+	text <- gsub("§", "\\S ", text, fixed = TRUE)
+	text <- gsub("$", "\\$ ", text, fixed = TRUE)
+	text <- gsub("&", "\\& ", text, fixed = TRUE)
+	text <- gsub("#", "\\# ", text, fixed = TRUE)
+	text <- gsub("%", "\\% ", text, fixed = TRUE)
+	text <- gsub("~", "\\textasciitilde ", text, fixed = TRUE)
+	text <- gsub("€", "\\texteuro ", text, fixed = TRUE)
+	
 	return(text)
 }
 
 renameFilterOutput <- function(text) {
 	
-	text <- gsub("=",": ",text, fixed = TRUE)
+	text <- gsub(" = ", ": ", text, fixed = TRUE)
 	text <- gsub("/", ", ", text, fixed = TRUE)
 	text <- gsub("(", " (", text, fixed = TRUE)
-	text <- gsub("  ", " ", text, fixed = TRUE)
+	text <- gsub(" ", " ", text, fixed = TRUE)
 	
 	return(text)
 }
 
 renameY <- function(label) {
 	
-	if (length(grep("\\.\\.",label, ignore.case=TRUE)) > 0){
-		label <- sub("\\.\\.", " (",label)
-		label <- paste(substring(label,1,nchar(label)-1),")",sep="")
+	if (length(grep("\\.\\.", label, ignore.case = TRUE)) > 0) {
+		label <- sub("\\.\\.", " (", label)
+		label <- paste(substring(label, 1, nchar(label)-1), ")", sep = "")
 	}
 	
-	label <- sub("mm\\.2","mm^2",label)	
+	label <- sub("mm\\.2", "mm^2", label)	
 	label <- sub("percent", "(%)", label)
 	label <- sub("pixels", "(px)", label)
 	label <- sub("(c p)", "(c/p)", label)
 	label <- gsub("_", "-", label)
 	label <- sub("(relative pix)", "(relative/px)", label)
-	label <- gsub("\\."," ",label)
-	label <- gsub("\\(\\(","(", label)
-	label <- gsub("\\)\\)",")", label)
+	label <- gsub("\\.", " ", label)
+	label <- gsub("\\(\\(", "(", label)
+	label <- gsub("\\)\\)", ")", label)
 	label <- str_trim(label)
-
-	if(nchar(label) > 4) {
-		if(substring(tolower(label), 1,4) == "top ") {
-			label <- paste(substring(label, 4), "top", sep=" - ")
+	
+	if (nchar(label) > 4) {
+		if (substring(tolower(label), 1, 4) == "top ") {
+			label <- paste(substring(label, 4), "top", sep = " - ")
 		}
 	}
 	
-	if(nchar(label) > 5) {
-		if(substring(tolower(label), 1,5) == "side ") {
-			label <- paste(substring(label, 5), "side", sep=" - ")
+	if (nchar(label) > 5) {
+		if (substring(tolower(label), 1, 5) == "side ") {
+			label <- paste(substring(label, 5), "side", sep = " - ")
 		}
 	}
-
+	
 	return(label)		
 }
 
 cleanSubtitle <- function(label) {
 	
 	#print(label)
-	label <- sub("\\(g\\)","",label)
-	label <- sub("\\(mm\\)","",label)
-	label <- sub("\\(mm\\^2\\)","",label)	
+	label <- sub("\\(g\\)", "", label)
+	label <- sub("\\(mm\\)", "", label)
+	label <- sub("\\(mm\\^2\\)", "", label)	
 	label <- sub("\\(%\\)", "", label)
 	label <- sub("\\(px\\)", "", label)
 	label <- sub("\\(px\\^3\\)", "", label)
@@ -3725,83 +3675,88 @@ cleanSubtitle <- function(label) {
 }
 
 checkFileName <- function(filename, extraString) {
-	filename <- preprocessingOfValues(paste(filename, extraString, sep=""), FALSE, replaceString = "_")
-	if(nchar(filename) > 90) {
+	filename <- preprocessingOfValues(paste(filename, extraString, sep = ""), FALSE, replaceString = "_")
+	if (nchar(filename) > 90) {
 		filename <- substr(filename, 1, 90)
 	}
 	return(filename)
 }
 
-writeTheData  <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue="", subSectionTitel="", makeOverallImage=FALSE, isAppendix=FALSE, subsectionDepth=1, typOfPlot = "", section) {
-########
+writeTheData <- function(overallList, plot, fileName, extraString, writeLatexFileFirstValue = "", subSectionTitel = "", makeOverallImage = FALSE, isAppendix = FALSE, subsectionDepth = 1, typOfPlot = "", section) {
+	########
 #fileName <- overallFileName
-#extraString <- paste(title, typOfPlot, sep="")
-#writeLatexFileFirstValue <- paste(overallFileName, typOfPlot, "OI", sep="")
+#extraString <- paste(title, typOfPlot, sep = "")
+#writeLatexFileFirstValue <- paste(overallFileName, typOfPlot, "OI", sep = "")
 #subSectionTitel <- subtitle
 #makeOverallImage <- overallImage
 #isAppendix <- overallList$appendix
-########	
-	#writeLatexFileSecondValue="",
+	########	
+	#writeLatexFileSecondValue = "", 
 	overallList$debug %debug% "writeTheData()"		
-
+	
 	fileName <- checkFileName(fileName, extraString)
 	#print(fileName)
 	if (subSectionTitel != "") {
 		subSectionTitel <- parseString2Latex(subSectionTitel)
 	}
 #print("fileName gecheckt")
-#	if(typOfPlot == LINERANGE.PLOT || (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond && typOfPlot == SPIDER.PLOT)) {
-	if(typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
+#	if (typOfPlot == LINERANGE.PLOT || (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond && typOfPlot == SPIDER.PLOT)) {
+	if (typOfPlot == LINERANGE.PLOT || typOfPlot == SPIDER.PLOT) {
 		saveImageFile(overallList, plot, fileName, 12)
 	} else {
 		saveImageFile(overallList, plot, fileName)
 	}
 #print("bild gespeichert")
-	if(typOfPlot != STRESS.PLOT) {
+	if (typOfPlot != STRESS.PLOT) {
 		if (makeOverallImage) {
 			if (subSectionTitel != "") {
-				writeLatexFile(writeLatexFileFirstValue, fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, saveFormatImage = overallList$saveFormat, section = section)	
+				writeLatexFile(writeLatexFileFirstValue, fileName, ylabel = subSectionTitel, subsectionDepth = subsectionDepth, saveFormatImage = overallList$saveFormat, section = section)	
 			} else {
 				writeLatexFile(writeLatexFileFirstValue, fileName, saveFormatImage = overallList$saveFormat, section = section)
 			}
 		}
 	}
 #print("latexFile geschrieben")
-
+	
 #	else {
 #		writeLatexFile(fileName, writeLatexFileSecondValue)	
 #	}
 #print(isAppendix)
 	if (isAppendix) {
 		if (subSectionTitel != "") {
-			writeLatexFile("appendixImage", fileName, ylabel=subSectionTitel, subsectionDepth=subsectionDepth, section = section)
+			writeLatexFile("appendixImage", fileName, ylabel = subSectionTitel, subsectionDepth = subsectionDepth, section = section)
 		} else {
 			writeLatexFile("appendixImage", fileName, section = section)
 		}
 	}
 }
 
+##
+#	determine which libraries should be loaded/install
+##
 loadLibs <- function(debug = FALSE) {
-	libraries  <- c(
-		  "Cairo", "RColorBrewer", "data.table", "ggplot2",
-		 "fmsb", "methods", "grid", "snow", "snowfall", "stringr") #, "mvoutlier")
-	loadInstallAndUpdatePackages(libraries, INSTALL.PACKAGE, CHECK.FOR.UPDATE, FALSE, debug)
+	debug %debug% "loadLibs()"
+	
+	libraries <- c(
+			"Cairo", "RColorBrewer", "data.table", "ggplot2", 
+			"fmsb", "methods", "grid", "snow", "snowfall", "stringr")
+	loadInstallAndUpdatePackages(libraries, INSTALL.PACKAGE, CHECK.FOR.UPDATE, debug = debug)
 }
 
-myBreaks <- function(value){
+myBreaks <- function(value) {
 	minV <- min(value)
 	maxV <- max(value)
 	
-	if((maxV - minV) <= 10) {
+	if ((maxV - minV) <= 10) {
 		steps <- 1
-	} else if((maxV - minV) > 10 && (maxV - minV) < 30) {
+	} else if ((maxV - minV) > 10 && (maxV - minV) < 30) {
 		steps <- 5
 	} else {
 		steps <- 10
 	}
 	
 	breaks <- seq(minV, maxV, steps)
-	names(breaks) <- attr(breaks,"labels")
+	names(breaks) <- attr(breaks, "labels")
 	return(breaks)
 }
 
@@ -3812,11 +3767,11 @@ shapeTransparence <- function(column) {
 	
 	numberOfDescriptors <- length(unique(column))
 	
-	if(numberOfDescriptors > 5) {
+	if (numberOfDescriptors > 5) {
 		alpha <- 0.1 - (numberOfDescriptors - 5) * 0.0036
 	}
 	
-	if(alpha < 0) {
+	if (alpha < 0) {
 		alpha = 0
 	}
 	
@@ -3828,62 +3783,62 @@ testfunction <- function(parameter) {
 }
 
 checkSumOfXAxis <- function(typOfPlot, sumOfXAxis, number) {
-	if(typOfPlot == SPIDER.PLOT) {
+	if (typOfPlot == SPIDER.PLOT) {
 		return(any(sumOfXAxis < number & sumOfXAxis != 0)) # es ist egal wenn etwas 0 ist ; | sumOfXAxis == 0
-	} else if(typOfPlot == LINERANGE.PLOT) {
+	} else if (typOfPlot == LINERANGE.PLOT) {
 		return(all(sumOfXAxis < number & sumOfXAxis != 0))
 	}
 }
 
 checkIfOnePlotTypeHasLessThanNumberValues <- function(overallResult, whichColumShouldUse, number, typOfPlot, remove = FALSE) {
-######
+	######
 #number <- 2
 #whichColumShouldUse <- c("name", "hist")
 #remove <- TRUE
-######
+	######
 	bool <- FALSE
 	removeVector <- rep.int(TRUE, nrow(overallResult))
 	
-	if(typOfPlot == SPIDER.PLOT) {
-		sumOfXAxis <- table(overallResult[,c(whichColumShouldUse, X.AXIS)])
-	#	if(all(sumOfXAxis < number) && !all(sumOfXAxis > 0)) {# <- das gilt bei linerange
-		if(checkSumOfXAxis(typOfPlot, sumOfXAxis, number)) {
-			if(remove) {
-				if(length(dim(sumOfXAxis)) == 1) {
+	if (typOfPlot == SPIDER.PLOT) {
+		sumOfXAxis <- table(overallResult[, c(whichColumShouldUse, X.AXIS)])
+		#	if (all(sumOfXAxis < number) && !all(sumOfXAxis > 0)) {# <- das gilt bei linerange
+		if (checkSumOfXAxis(typOfPlot, sumOfXAxis, number)) {
+			if (remove) {
+				if (length(dim(sumOfXAxis)) == 1) {
 					sumOfXAxis <- t(sumOfXAxis)
 				}
 				removeVector <- apply(overallResult, 1, function(x, y, z) {
-								
-								for(nn in seq(along=z)) {
-									if(length(z) > nn) {
-										y <- y[as.character(x[z[nn]]),]
-									} else {
-										return(y[as.character(x[z[nn]])])
-									}	
-								}
-													
-							}, !(sumOfXAxis < number & sumOfXAxis != 0), c(whichColumShouldUse, X.AXIS))
-					
-				#overallResult <- overallResult[!(overallResult[,X.AXIS] == colnames(sumOfXAxis)[apply(sumOfXAxis < number & sumOfXAxis > 0, 2, "any")]),]
+							
+							for(nn in seq(along = z)) {
+								if (length(z) > nn) {
+									y <- y[as.character(x[z[nn]]), ]
+								} else {
+									return(y[as.character(x[z[nn]])])
+								}	
+							}
+							
+						}, !(sumOfXAxis < number & sumOfXAxis != 0), c(whichColumShouldUse, X.AXIS))
+				
+				#overallResult <- overallResult[!(overallResult[, X.AXIS] == colnames(sumOfXAxis)[apply(sumOfXAxis < number & sumOfXAxis > 0, 2, "any")]), ]
 			}
-				bool <- TRUE
+			bool <- TRUE
 		}
 	} else if (typOfPlot == NBOX.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
-	
+		
 		dataTableOverallResult <- data.table(overallResult)
 		
-		if(typOfPlot == LINERANGE.PLOT) {
-			sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), length), by= c(whichColumShouldUse, X.AXIS)])
+		if (typOfPlot == LINERANGE.PLOT) {
+			sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), length), by = c(whichColumShouldUse, X.AXIS)])
 			
-			if(checkSumOfXAxis(typOfPlot, sumOfXAxis$V1, number)) {
-#				if(remove) {
+			if (checkSumOfXAxis(typOfPlot, sumOfXAxis$V1, number)) {
+#				if (remove) {
 #					
 #					removeVector <- apply(overallResult, 1, function(x, y, z) {
 #								boolV <- rep.int(TRUE, nrow(y))
-#								for(nn in seq(along=z)) {
+#								for(nn in seq(along = z)) {
 #									boolV <- boolV & y[z[nn]] == as.character(x[z[nn]])
 #								}
-#								if(any(boolV)) {
+#								if (any(boolV)) {
 #									return(FALSE)
 #								} else {
 #									return(TRUE)
@@ -3893,23 +3848,23 @@ checkIfOnePlotTypeHasLessThanNumberValues <- function(overallResult, whichColumS
 				bool <- TRUE
 			}
 			
-		} else if (typOfPlot == NBOX.PLOT){
-	#		removeVector <- rep.int(TRUE, nrow(overallResult))
-	#		dataTableOverallResult <- data.table(overallResult)
-			sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), sum, na.rm=TRUE), by= c(whichColumShouldUse, X.AXIS)])
-			for(n in unique(sumOfXAxis[,whichColumShouldUse])) {
-				if(sum(as.character(sumOfXAxis[,whichColumShouldUse]) == as.character(n)) < number) {			
-#					if(remove) {
-#						removeVector <- removeVector & !(as.character(sumOfXAxis[,whichColumShouldUse]) == as.character(n))
+		} else if (typOfPlot == NBOX.PLOT) {
+			#		removeVector <- rep.int(TRUE, nrow(overallResult))
+			#		dataTableOverallResult <- data.table(overallResult)
+			sumOfXAxis <- as.data.frame(dataTableOverallResult[, lapply(list(xAxis), sum, na.rm = TRUE), by = c(whichColumShouldUse, X.AXIS)])
+			for(n in unique(sumOfXAxis[, whichColumShouldUse])) {
+				if (sum(as.character(sumOfXAxis[, whichColumShouldUse]) == as.character(n)) < number) {			
+#					if (remove) {
+#						removeVector <- removeVector & !(as.character(sumOfXAxis[, whichColumShouldUse]) == as.character(n))
 #					} 			
 					bool <- TRUE
 				}
 			}	
 		}
-	#	
+		#	
 	}
 	
-	overallResult <- overallResult[removeVector,]	
+	overallResult <- overallResult[removeVector, ]	
 	overallResult <- reduceLevels(overallResult)
 	return(list(overallResult = overallResult, bool = bool))
 }
@@ -3925,21 +3880,21 @@ makeStressDiagram <- function(overallResult, overallDesName, overallList, images
 }
 
 makeLinearDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
-#############
+	#############
 #title <- nn
 #title <- ""	
-############	
+	############	
 	
-#  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stressStart <- c(10,20,30,37)
+# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
+#	overallList$stressStart <- c(10, 20, 30, 37)
 #	overallList$stressEnd <- c(13, 23, 33, 40)
-#	overallList$stressTyp <- c("001","001","004", "003")
+#	overallList$stressTyp <- c("001", "001", "004", "003")
 #	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stressStart <- c(10,20,30)
-#	overallList$stressEnd <- c(13, 23,33)
-#	overallList$stressTyp <- c("002","001","002")
-#	overallList$stressLabel <- c(-1, -1,-1)
+#	overallList$stressStart <- c(10, 20, 30)
+#	overallList$stressEnd <- c(13, 23, 33)
+#	overallList$stressTyp <- c("002", "001", "002")
+#	overallList$stressLabel <- c(-1, -1, -1)
 	
 	overallList$debug %debug% "makeLinearDiagram()"	
 	ylabelForAppendix <- ""
@@ -3948,16 +3903,16 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	
 	
 	#overallColor <- overallList$color_nBox
-#	if(typOfPlot == NBOX.MULTI.PLOT) {
+#	if (typOfPlot == NBOX.MULTI.PLOT) {
 #		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)[[imagesIndex]]
 #	} else {
 	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	#}
 	#color <- overallColor[[imagesIndex]]
 	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
-
-#	if(length(grep("2147483647",overallResult$xAxis, ignore.case=TRUE))){
-#		if(length(unique(overallResult$xAxis)) >1 ) {
+	
+#	if (length(grep("2147483647", overallResult$xAxis, ignore.case = TRUE))) {
+#		if (length(unique(overallResult$xAxis)) >1 ) {
 #			overallResult$xAxis[overallResult$xAxis == 2147483647] <- sort(unique(overallResult$xAxis), decreasing = TRUE)[2]+1
 #		} else {
 #			overallResult$xAxis[overallResult$xAxis == 2147483647] <- 1
@@ -3967,20 +3922,20 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
 		if (!checkIfOneColumnHasOnlyValues(overallResult, typOfPlot = typOfPlot, first = overallList$splitTreatmentFirst, second = overallList$splitTreatmentSecond)) {
-			overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
+			overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 			
-			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 				whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)
 			} else {
 				whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 			}
-
-#			if(typOfPlot == NBOX.MULTI.PLOT) {
+			
+#			if (typOfPlot == NBOX.MULTI.PLOT) {
 #				whichColumShouldUse <- c(whichColumShouldUse, COLUMN)
 #			}
 			
-		#print(whichColumShouldUse)
-			overallResult <- cbind(overallResult, ymin=overallResult$mean-overallResult$se, ymax=overallResult$mean+overallResult$se)
+			#print(whichColumShouldUse)
+			overallResult <- cbind(overallResult, ymin = overallResult$mean-overallResult$se, ymax = overallResult$mean+overallResult$se)
 			
 			hasLessThanThreeValues <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, whichColumShouldUse, 3, typOfPlot)$bool
 			#hasLessThanTwoValues <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, whichColumShouldUse, 2, typOfPlot)$bool
@@ -3988,19 +3943,19 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 			overallResult <- reorderList$overallResult
 			
-#			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+#			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #				colorReorder <- color[overallList$secondFilterTreatmentRename %in% title]
 #				shapeReorder <- c(1:length(color))[overallList$secondFilterTreatmentRename %in% title]
 #			} else {
-				#colorReorder <- color[reorderList$sortList]
-				#shapeReorder <- c(1:length(color))[reorderList$sortList]
-				colorReorder <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
-				overallColor <- colorReorder
-				shapeReorder <- c(1:length(colorReorder))[reorderList$sortList]
-				
+			#colorReorder <- color[reorderList$sortList]
+			#shapeReorder <- c(1:length(color))[reorderList$sortList]
+			colorReorder <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
+			overallColor <- colorReorder
+			shapeReorder <- c(1:length(colorReorder))[reorderList$sortList]
+			
 			#}
 			
-			if(overallList$stressStart != -1) {
+			if (overallList$stressStart != -1) {
 				stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$mean, typOfPlot, overallResult$se)
 				colorReorder <- addColorForStressPhaseAndOther(stressArea, colorReorder, typOfPlot)
 			}
@@ -4009,92 +3964,92 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			
 #			print(whichColumShouldUse)
 #			print(head(overallResult))
-			plot <-	ggplot() 
-					
-			if(length(stressArea) > 0) {
+			plot <- 	ggplot() 
+			
+			if (length(stressArea) > 0) {
 				plot <- plot + 
-						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ)) +
-						#geom_text(data=stressArea, aes(x=xmin, y=(ymax-ymax*0.15), label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
-						geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
+						geom_rect(data = stressArea, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = typ)) +
+						#geom_text(data = stressArea, aes(x = xmin, y = (ymax-ymax*0.15), label = label), size = 2, hjust = 0, vjust = 1, angle = 90, colour = "grey")
+						geom_text(data = stressArea, aes(x = xmin, y = ymin, label = label), size = 2, hjust = 0, vjust = 1, angle = 90, colour = "grey")
 				
 			}	
 			
-			if (((length(grep("%/day",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || 
-						overallList$isRatio || 
-						length(grep("relative",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0 || 
-						length(grep("average",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) &&
-						(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0)) &&
-						!hasLessThanThreeValues) {
-							plot <- plot + 
-									geom_smooth(data=overallResult, aes_string(x="xAxis", y="mean", shape=whichColumShouldUse, ymin="ymin", ymax="ymax", colour=whichColumShouldUse, fill=whichColumShouldUse), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))
-									
+			if (((length(grep("%/day", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0 || 
+							overallList$isRatio || 
+							length(grep("relative", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0 || 
+							length(grep("average", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) &&
+						(length(grep("blue marker", overallDesName[[imagesIndex]], ignore.case = TRUE)) <= 0)) &&
+					!hasLessThanThreeValues) {
+				plot <- plot + 
+						geom_smooth(data = overallResult, aes_string(x = "xAxis", y = "mean", shape = whichColumShouldUse, ymin = "ymin", ymax = "ymax", colour = whichColumShouldUse, fill = whichColumShouldUse), method = "loess", stat = "smooth", alpha = shapeTransparence(overallResult[[whichColumShouldUse]]))
+				
 				#print(plot)
-#				if(isOtherTyp) {
+#				if (isOtherTyp) {
 #					plot <- plot +
-#							geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=primaerTreatment, ymin=mean-se, ymax=mean+se, colour=primaerTreatment, fill=primaerTreatment), method="loess", stat="smooth", alpha=0.1)
+#							geom_smooth(data = overallResult, aes(x = xAxis, y = mean, shape = primaerTreatment, ymin = mean-se, ymax = mean+se, colour = primaerTreatment, fill = primaerTreatment), method = "loess", stat = "smooth", alpha = 0.1)
 #				} else {
 #					plot <- plot +
-#							geom_smooth(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, colour=name, fill=name), method="loess", stat="smooth", alpha=0.1) 
+#							geom_smooth(data = overallResult, aes(x = xAxis, y = mean, shape = name, ymin = mean-se, ymax = mean+se, colour = name, fill = name), method = "loess", stat = "smooth", alpha = 0.1) 
 #				}
-						
-						#plot <- plot + geom_ribbon(aes(ymin=mean-se, ymax=mean+se, fill=name), alpha=0.1)
-			} else if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
+				
+				#plot <- plot + geom_ribbon(aes(ymin = mean-se, ymax = mean+se, fill = name), alpha = 0.1)
+			} else if (length(grep("blue marker", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) {
 				plot <- plot + 
-						geom_smooth(data=overallResult, aes(x=xAxis, y=mean, ymin=ymin, ymax=ymax), method="loess", stat="smooth", alpha=shapeTransparence(overallResult[[whichColumShouldUse]]))	
+						geom_smooth(data = overallResult, aes(x = xAxis, y = mean, ymin = ymin, ymax = ymax), method = "loess", stat = "smooth", alpha = shapeTransparence(overallResult[[whichColumShouldUse]]))	
 			} else {
 				plot <- plot + 
-						#plot <-	ggplot()+
-						geom_ribbon(data=overallResult, aes_string(x="xAxis", y="mean", ymin="ymin", ymax="ymax", fill=whichColumShouldUse), stat="identity", alpha=shapeTransparence(overallResult[[whichColumShouldUse]])) +
-						geom_line(data=overallResult, aes_string(x="xAxis", y="mean", colour=whichColumShouldUse), alpha=0.95)
-						#geom_point(data=overallResult, aes_string(x="xAxis", y="mean", color=whichColumShouldUse), size=3)
+						#plot <- 	ggplot()+
+						geom_ribbon(data = overallResult, aes_string(x = "xAxis", y = "mean", ymin = "ymin", ymax = "ymax", fill = whichColumShouldUse), stat = "identity", alpha = shapeTransparence(overallResult[[whichColumShouldUse]])) +
+						geom_line(data = overallResult, aes_string(x = "xAxis", y = "mean", colour = whichColumShouldUse), alpha = 0.95)
+				#geom_point(data = overallResult, aes_string(x = "xAxis", y = "mean", color = whichColumShouldUse), size = 3)
 				#print(plot)
-#				if(isOtherTyp) {
+#				if (isOtherTyp) {
 #					plot <- plot + 
-#	#						geom_ribbon(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
-#	#						geom_line(data=overallResult, aes(x=xAxis, y=mean, color=name), alpha=0.2)
-#						geom_ribbon(data=overallResult, aes(x=xAxis, y=mean, shape=primaerTreatment, ymin=mean-se, ymax=mean+se, fill=primaerTreatment), stat="identity", alpha=0.1) +
-#						geom_line(data=overallResult, aes(x=xAxis, y=mean, color=primaerTreatment), alpha=0.2)
+#	#						geom_ribbon(data = overallResult, aes(x = xAxis, y = mean, shape = name, ymin = mean-se, ymax = mean+se, fill = name), stat = "identity", alpha = 0.1) +
+#	#						geom_line(data = overallResult, aes(x = xAxis, y = mean, color = name), alpha = 0.2)
+#						geom_ribbon(data = overallResult, aes(x = xAxis, y = mean, shape = primaerTreatment, ymin = mean-se, ymax = mean+se, fill = primaerTreatment), stat = "identity", alpha = 0.1) +
+#						geom_line(data = overallResult, aes(x = xAxis, y = mean, color = primaerTreatment), alpha = 0.2)
 #				} else {
 #					plot <- plot + 
-#							#						geom_ribbon(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
-#							#						geom_line(data=overallResult, aes(x=xAxis, y=mean, color=name), alpha=0.2)
-#							geom_ribbon(data=overallResult, aes(x=xAxis, y=mean, shape=name, ymin=mean-se, ymax=mean+se, fill=name), stat="identity", alpha=0.1) +
-#							geom_line(data=overallResult, aes(x=xAxis, y=mean, color=name), alpha=0.2)
+#							#						geom_ribbon(data = overallResult, aes(x = xAxis, y = mean, shape = name, ymin = mean-se, ymax = mean+se, fill = name), stat = "identity", alpha = 0.1) +
+#							#						geom_line(data = overallResult, aes(x = xAxis, y = mean, color = name), alpha = 0.2)
+#							geom_ribbon(data = overallResult, aes(x = xAxis, y = mean, shape = name, ymin = mean-se, ymax = mean+se, fill = name), stat = "identity", alpha = 0.1) +
+#							geom_line(data = overallResult, aes(x = xAxis, y = mean, color = name), alpha = 0.2)
 #				}
 			}
 			#print(plot)
 			
-			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0) {
-					plot <- plot +	
-							geom_point(data=overallResult, aes_string(x="xAxis", y="mean", colour=whichColumShouldUse, shape=whichColumShouldUse), size=3)
-#				if(isOtherTyp) {
+			if (length(grep("blue marker", overallDesName[[imagesIndex]], ignore.case = TRUE)) <= 0) {
+				plot <- plot +	
+						geom_point(data = overallResult, aes_string(x = "xAxis", y = "mean", colour = whichColumShouldUse, shape = whichColumShouldUse), size = 3)
+#				if (isOtherTyp) {
 #					plot <- plot +	
-#							geom_point(data=overallResult, aes(x=xAxis, y=mean, color=primaerTreatment), size=3)
+#							geom_point(data = overallResult, aes(x = xAxis, y = mean, color = primaerTreatment), size = 3)
 #				} else {
 #					plot <- plot +	
-#							geom_point(data=overallResult, aes(x=xAxis, y=mean, color=name), size=3)
+#							geom_point(data = overallResult, aes(x = xAxis, y = mean, color = name), size = 3)
 #				}
 			} else {
 				plot <- plot +	
-						geom_point(data=overallResult, aes(x=xAxis, y=mean), size=3)
+						geom_point(data = overallResult, aes(x = xAxis, y = mean), size = 3)
 			}
-							#ownCat("drinne")
+			#ownCat("drinne")
 #							ownCat(overallResult$xAxis)
 #							ownCat(min(as.numeric(as.character(overallResult$xAxis))))
 #							ownCat(max(as.numeric(as.character(overallResult$xAxis))))
-			plot <-  plot + 
-					#scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))), limits=min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
-					scale_x_continuous(name=overallList$xAxisName, breaks=myBreaks(as.numeric(as.character(overallResult$xAxis))))		
-					if (overallList$appendix) {
-						ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
-						plot <- plot + 
-								ylab(ylabelForAppendix)
-					} else {
-						plot <- plot + 
-								ylab(overallDesName[[imagesIndex]])
-					}
-								
-			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) {
+			plot <- plot + 
+					#scale_x_continuous(name = overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))), limits = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis))))					
+					scale_x_continuous(name = overallList$xAxisName, breaks = myBreaks(as.numeric(as.character(overallResult$xAxis))))		
+			if (overallList$appendix) {
+				ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
+				plot <- plot + 
+						ylab(ylabelForAppendix)
+			} else {
+				plot <- plot + 
+						ylab(overallDesName[[imagesIndex]])
+			}
+			
+			if (length(grep("blue marker", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) {
 				if ((length(colorReorder) - length(stressArea)) == 1) {
 					colorReorder <- c(colorReorder, colorReorder)
 				}
@@ -4103,20 +4058,20 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 			}
 			
 			plot <- plot +
-					scale_fill_manual(values = colorReorder, guide="none") +
-					scale_colour_manual(values= colorReorder) +
+					scale_fill_manual(values = colorReorder, guide = "none") +
+					scale_colour_manual(values = colorReorder) +
 					scale_shape_manual(values = shapeReorder) +
 					theme_bw()
 			#print(plot)		
-			if((overallList$secondTreatment == NONE && overallList$splitTreatmentFirst) || 
-				(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
-				((!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) && 
-				 length(unique(overallResult[,whichColumShouldUse])) == 1)) {
+			if ((overallList$secondTreatment == NONE && overallList$splitTreatmentFirst) || 
+					(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
+					((!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) && 
+						length(unique(overallResult[, whichColumShouldUse])) == 1)) {
 				plot <- plot +
-						theme(legend.position = "none",
-  							  legend.direction="horizontal")
+						theme(legend.position = "none", 
+								legend.direction = "horizontal")
 			} else {
-				if(typOfPlot == NBOX.MULTI.PLOT) {
+				if (typOfPlot == NBOX.MULTI.PLOT) {
 					plot <- plot +
 							theme(legend.position = "bottom")
 				} else {
@@ -4125,58 +4080,58 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 				}
 			}	
 			plot <- plot +	
-					theme(axis.title.x = element_text(face="bold", size=11), 
-							axis.title.y = element_text(face="bold", size=11, angle=90), 
+					theme(axis.title.x = element_text(face = "bold", size = 11), 
+							axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
 							#panel.grid.major = element_blank(), # switch off major gridlines
 							#panel.grid.minor = element_blank(), # switch off minor gridlines
 							#legend.position = "right", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
 							legend.title = element_blank(), # switch off the legend title						
 							#legend.key.size = unit(1.5, "lines"), 
 							legend.key = element_blank(), # switch off the rectangle around symbols in the legend
-							panel.border = element_rect(colour="Grey", size=0.1)
+							panel.border = element_rect(colour = "Grey", size = 0.1)
 					) 
-					#+ guides(colour = guide_legend("none"))
+			#+ guides(colour = guide_legend("none"))
 			plot <- setFontSize(plot, overallColor, typOfPlot)
 			
-			plot <-  plot + guides(
-					shape=guide_legend(ncol=calculateLegendRowAndColNumber(unique(as.character(overallResult[[whichColumShouldUse]])), typOfPlot),
-							byrow=FALSE),
-					colour=guide_legend(ncol=calculateLegendRowAndColNumber(unique(as.character(overallResult[[whichColumShouldUse]])), typOfPlot),
-							byrow=FALSE)
+			plot <- plot + guides(
+					shape = guide_legend(ncol = calculateLegendRowAndColNumber(unique(as.character(overallResult[[whichColumShouldUse]])), typOfPlot), 
+							byrow = FALSE), 
+					colour = guide_legend(ncol = calculateLegendRowAndColNumber(unique(as.character(overallResult[[whichColumShouldUse]])), typOfPlot), 
+							byrow = FALSE)
 			)
 			#print(plot)
 #			if (length(overallColor[[imagesIndex]]) > 18 & length(overallColor[[imagesIndex]]) < 31) {
 #				plot = plot + 
-#					   theme(legend.text = element_text(size=6),
-#							legend.key.size = unit(0.7, "lines"),
-#							strip.text.x = element_text(size=6)
+#					 theme(legend.text = element_text(size = 6), 
+#							legend.key.size = unit(0.7, "lines"), 
+#							strip.text.x = element_text(size = 6)
 #						)
 #			} else if (length(overallColor[[imagesIndex]]) >= 31) {
 #				plot = plot + 
-#					   theme(legend.text = element_text(size=4),
-#							legend.key.size = unit(0.4, "lines"),
-#							strip.text.x = element_text(size=4)
+#					 theme(legend.text = element_text(size = 4), 
+#							legend.key.size = unit(0.4, "lines"), 
+#							strip.text.x = element_text(size = 4)
 #						)
 #			} else {
 #				plot <- plot + 
-#					   theme(legend.text = element_text(size=11),
-#							strip.text.x = element_text(size=11)
+#					 theme(legend.text = element_text(size = 11), 
+#							strip.text.x = element_text(size = 11)
 #						)
 #			}
 			
-		if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
-			(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
-			(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
+			if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
+					(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
+					(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
 				if (title != "") {
 					titleText <- title
-					if(length(unique(overallResult[,whichColumShouldUse])) == 1 && !(overallList$secondTreatment == NONE && !(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond))) {
-						titleText <- paste(titleText, " - ", unique(overallResult[,whichColumShouldUse]), sep="")
+					if (length(unique(overallResult[, whichColumShouldUse])) == 1 && !(overallList$secondTreatment == NONE && !(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond))) {
+						titleText <- paste(titleText, " - ", unique(overallResult[, whichColumShouldUse]), sep = "")
 					}
 					plot = plot + ggtitle(titleText)
 				}
-		}
+			}
 			
-			if(length(grep("blue marker",overallDesName[[imagesIndex]], ignore.case=TRUE)) <= 0) {
+			if (length(grep("blue marker", overallDesName[[imagesIndex]], ignore.case = TRUE)) <= 0) {
 				
 				plot <- facetWrap(plot, overallResult, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 				
@@ -4186,32 +4141,32 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 #				} else 
 #				if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #					
-#					if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
-#						if(length(unique(overallResult$primaerTreatment)) > 1) {
+#					if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+#						if (length(unique(overallResult$primaerTreatment)) > 1) {
 #							plot <- plot + 
 #									facet_wrap(~ primaerTreatment)
 #						}
 #					} else {
-#						if(length(unique(overallResult$name)) > 1) {
+#						if (length(unique(overallResult$name)) > 1) {
 #							plot <- plot + 
 #									facet_wrap(~ name)
 #						}
 #					}
-#				} else if (!(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)){
-#					if(length(unique(overallResult$name)) > 1) {
+#				} else if (!(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
+#					if (length(unique(overallResult$name)) > 1) {
 #						plot <- plot + 
 #								facet_wrap(~ name)
 #					}
 #				}
 			}
-								
+			
 			#print(plot)
-
+			
 			subtitle <- ""
 			overallImage <- TRUE
 			subsectionDepth <- 1
 			
-			if(title != "") {
+			if (title != "") {
 				sep <- " - "
 			} else {
 				sep <- ""
@@ -4224,53 +4179,53 @@ makeLinearDiagram <- function(overallResult, overallDesName, overallList, images
 #					(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
 				
 #				if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) && 
-#					((length(grep("convex",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) ||
-#					 (length(grep("maximum extension",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) ||
-#					 (length(grep("_vis_hsv_",overallFileName, ignore.case=TRUE)) > 0))) {
+#					((length(grep("convex", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) ||
+#					 (length(grep("maximum extension", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) ||
+#					 (length(grep("_vis_hsv_", overallFileName, ignore.case = TRUE)) > 0))) {
 #			 
-#					subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
+#					subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep = sep)
 #					
-#					if((length(grep("convex",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0) ||
-#					   (length(grep("maximum extension",overallDesName[[imagesIndex]], ignore.case=TRUE)) > 0)){
+#					if ((length(grep("convex", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0) ||
+#					 (length(grep("maximum extension", overallDesName[[imagesIndex]], ignore.case = TRUE)) > 0)) {
 #						subsectionDepth <- 3
-#					} else if((length(grep("_vis_hsv_",overallFileName, ignore.case=TRUE)) > 0)) {
+#					} else if ((length(grep("_vis_hsv_", overallFileName, ignore.case = TRUE)) > 0)) {
 #						subsectionDepth <- 4
 #					} else {
 #						subsectionDepth <- 2
 #					}
 #				}
 			} else {
-				subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep=sep)
-					
+				subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep = sep)
+				
 				subsectionDepth <- 1
 				overallImage <- FALSE
 			}
 			#print(subtitle)
-##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
-##!#				newCoords = seq(min(overallList$filterXaxis, na.rm=TRUE), max(overallList$filterXaxis, na.rm=TRUE), 1)
-##!#				newValue = approx(overallList$filterXaxis, overallList$overallResult[y, ], xout=newCoords, method="linear")
-##!#				
-##!#				naVector = is.na(overallList$overallResult[y, ])
-##!#				overallResultWithNaValues = overallList$overallResult[y, ]
-##!#				overallList$overallResult[y, naVector] = newValue$y[overallList$filterXaxis[naVector]]
+			##!# nicht löschen, ist die interpolation (alles in dieser if Abfrage mit #!# makiert)
+			##!#				newCoords = seq(min(overallList$filterXaxis, na.rm = TRUE), max(overallList$filterXaxis, na.rm = TRUE), 1)
+			##!#				newValue = approx(overallList$filterXaxis, overallList$overallResult[y, ], xout = newCoords, method = "linear")
+			##!#				
+			##!#				naVector = is.na(overallList$overallResult[y, ])
+			##!#				overallResultWithNaValues = overallList$overallResult[y, ]
+			##!#				overallList$overallResult[y, naVector] = newValue$y[overallList$filterXaxis[naVector]]
 #				
 #				if (firstPlot) {
 #					firstPlot = FALSE
-##!#				plot(overallList$filterXaxis, overallList$overallResult[y, ], main="", type="c", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult, na.rm=TRUE), max(overallList$overallResult, na.rm=TRUE)))
-#					plot(overallList$filterXaxis, overallList$overallResult[y, ], main="", type="b", xlab=overallList$xAxisName, col=overallList$color[y], ylab=overallList$yAxisName, pch=y, lty=1, lwd=3, ylim=c(min(overallList$overallResult, na.rm=TRUE), max(overallList$overallResult, na.rm=TRUE)))
+			##!#				plot(overallList$filterXaxis, overallList$overallResult[y, ], main = "", type = "c", xlab = overallList$xAxisName, col = overallList$color[y], ylab = overallList$yAxisName, pch = y, lty = 1, lwd = 3, ylim = c(min(overallList$overallResult, na.rm = TRUE), max(overallList$overallResult, na.rm = TRUE)))
+#					plot(overallList$filterXaxis, overallList$overallResult[y, ], main = "", type = "b", xlab = overallList$xAxisName, col = overallList$color[y], ylab = overallList$yAxisName, pch = y, lty = 1, lwd = 3, ylim = c(min(overallList$overallResult, na.rm = TRUE), max(overallList$overallResult, na.rm = TRUE)))
 #				} else {
-##!#				points(overallList$filterXaxis, overallList$overallResult[y, ], type="c", col=overallList$color[y], pch=y, lty=1, lwd=3 )	
-#					points(overallList$filterXaxis, overallList$overallResult[y, ], type="b", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+			##!#				points(overallList$filterXaxis, overallList$overallResult[y, ], type = "c", col = overallList$color[y], pch = y, lty = 1, lwd = 3 )	
+#					points(overallList$filterXaxis, overallList$overallResult[y, ], type = "b", col = overallList$color[y], pch = y, lty = 1, lwd = 3 )
 #				}
-##!#				points(overallList$filterXaxis, overallResultWithNaValues, type="p", col=overallList$color[y], pch=y, lty=1, lwd=3 )
+			##!#				points(overallList$filterXaxis, overallResultWithNaValues, type = "p", col = overallList$color[y], pch = y, lty = 1, lwd = 3 )
 #			} 
 			
-				#print(overallResult)
-			writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, typOfPlot, "OI", sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth, section = section)
-					
+			#print(overallResult)
+			writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep = ""), paste(overallFileName, typOfPlot, "OI", sep = ""), subtitle, overallImage, isAppendix = overallList$appendix, subsectionDepth = subsectionDepth, section = section)
+			
 		} else {
 			ownCat("Only one column has values, create barplot!")
-	
+			
 			day = overallResult$xAxis[!is.na(overallResult$mean)][1]
 			tempXaxisName = overallList$xAxisName
 			overallList$xAxisName = paste(overallList$xAxisName, day)
@@ -4294,7 +4249,7 @@ getColor <- function(overallColorIndex, overallResult) {
 }
 
 getTheColumWhichShouldUse <- function(colNames) {
-
+	
 	if (PRIMAER.TREATMENT %in% colNames) {
 		return(PRIMAER.TREATMENT)
 	} else {
@@ -4305,13 +4260,13 @@ getTheColumWhichShouldUse <- function(colNames) {
 setFontSize <- function(plot, value, typOfPlot, first = FALSE, second = FALSE) {
 	
 	
-	if(typOfPlot == STACKBOX.PLOT) {
-		if(PRIMAER.TREATMENT %in% colnames(value)) {
+	if (typOfPlot == STACKBOX.PLOT) {
+		if (PRIMAER.TREATMENT %in% colnames(value)) {
 			numerOfDescriptors <- length(unique(value[[PRIMAER.TREATMENT]]))
 		} else {
 			numerOfDescriptors <- length(unique(value[[NAME]]))
 		}
-	} else if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == BOX.PLOT) {
+	} else if (typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT || typOfPlot == BOX.PLOT) {
 		numerOfDescriptors <- length(value)
 	}
 	#print(numerOfDescriptors)
@@ -4320,103 +4275,103 @@ setFontSize <- function(plot, value, typOfPlot, first = FALSE, second = FALSE) {
 	unitSize <- numeric()
 	textSize <- numeric()
 	
-	if(numerOfDescriptors > 40) {
-		if(typOfPlot == STACKBOX.PLOT) {
+	if (numerOfDescriptors > 40) {
+		if (typOfPlot == STACKBOX.PLOT) {
 			textSize <- 5
-		} else if(typOfPlot == NBOX.PLOT) {
+		} else if (typOfPlot == NBOX.PLOT) {
 			legendSize <- 4
 			unitSize <- 0.1
 			textSize <- 4
-		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-			if((first && second)) {
+		} else if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+			if ((first && second)) {
 				textSize <- 5
 			}
-		} else if(typOfPlot == BOX.PLOT) {
+		} else if (typOfPlot == BOX.PLOT) {
 			textSize <- 5
 		}
-	} else if(numerOfDescriptors > 30) {
-		if(typOfPlot == STACKBOX.PLOT) {
+	} else if (numerOfDescriptors > 30) {
+		if (typOfPlot == STACKBOX.PLOT) {
 			textSize <- 6
-		} else if(typOfPlot == NBOX.PLOT) {
+		} else if (typOfPlot == NBOX.PLOT) {
 			legendSize <- 5
 			unitSize <- 0.5
 			textSize <- 6
-		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-			if((first && second)) {
+		} else if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+			if ((first && second)) {
 				textSize <- 6
 			}
-		} else if(typOfPlot == BOX.PLOT) {
+		} else if (typOfPlot == BOX.PLOT) {
 			textSize <- 6
 		}
-	} else if(numerOfDescriptors > 12 && numerOfDescriptors <= 30) {
-		if(typOfPlot == STACKBOX.PLOT) {
+	} else if (numerOfDescriptors > 12 && numerOfDescriptors <= 30) {
+		if (typOfPlot == STACKBOX.PLOT) {
 			textSize <- 8
-		} else if(typOfPlot == NBOX.PLOT) {
+		} else if (typOfPlot == NBOX.PLOT) {
 			legendSize <- 6
 			unitSize <- 0.7
 			textSize <- 8
-		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-			if((first && second)) {
+		} else if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+			if ((first && second)) {
 				textSize <- 8
 			}
-		} else if(typOfPlot == BOX.PLOT) {
+		} else if (typOfPlot == BOX.PLOT) {
 			textSize <- 8
 		}
-	} else if(numerOfDescriptors > 8 && numerOfDescriptors <= 12) {
-		if(typOfPlot == BOX.PLOT) {
+	} else if (numerOfDescriptors > 8 && numerOfDescriptors <= 12) {
+		if (typOfPlot == BOX.PLOT) {
 			textSize <- 8
 		}	
 	}
 	
-	if(length(textSize) != 0) {
-		if(typOfPlot == STACKBOX.PLOT) {
+	if (length(textSize) != 0) {
+		if (typOfPlot == STACKBOX.PLOT) {
 			plot <- plot + 
-					theme(strip.text.x = element_text(size=8))
-		} else if(typOfPlot == NBOX.PLOT) { 
+					theme(strip.text.x = element_text(size = 8))
+		} else if (typOfPlot == NBOX.PLOT) { 
 			plot = plot + 
-					theme(legend.text = element_text(size=legendSize),
-							legend.key.size = unit(unitSize, "lines"),
-							strip.text.x = element_text(size=textSize)
+					theme(legend.text = element_text(size = legendSize), 
+							legend.key.size = unit(unitSize, "lines"), 
+							strip.text.x = element_text(size = textSize)
 					)
-		} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-			if((first && second)) {
+		} else if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+			if ((first && second)) {
 				plot <- plot + 
-						theme(strip.text.x = element_text(size=textSize),
-							  strip.text.y = element_text(size=textSize))
+						theme(strip.text.x = element_text(size = textSize), 
+								strip.text.y = element_text(size = textSize))
 			}
-		} else if(typOfPlot == BOX.PLOT) {	
+		} else if (typOfPlot == BOX.PLOT) {	
 			plot <- plot +
-					theme(axis.text.x = element_text(size=textSize, angle=90))	
+					theme(axis.text.x = element_text(size = textSize, angle = 90))	
 		}
 	}
 	return(plot)
 }
 
-#plotStackedImage <- function(overallResult, overallDesName, overallList, imagesIndex, title = "", legende=TRUE, minor_breaks=FALSE) {
+#plotStackedImage <- function(overallResult, overallDesName, overallList, imagesIndex, title = "", legende = TRUE, minor_breaks = FALSE) {
 makeStackedDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
-#####
+	#####
 #legende <- TRUE
 #positionType <- overallList$stackedBarOptions$typOfGeomBar[1]
 #title <- ""
 #title <- nn
-#####
-
-
+	#####
+	
+	
 #makeStress <- FALSE
-
-
-#  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stressStart <- c(10,20,30,37)
+	
+	
+# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
+#	overallList$stressStart <- c(10, 20, 30, 37)
 #	overallList$stressEnd <- c(13, 23, 33, 40)
-#	overallList$stressTyp <- c("001","001","004", "003")
+#	overallList$stressTyp <- c("001", "001", "004", "003")
 #	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stressStart <- c(10,20,30)
-#	overallList$stressEnd <- c(13, 23,33)
-#	overallList$stressTyp <- c("002","001","002")
-#	overallList$stressLabel <- c(-1, -1,-1)
-
-
+#	overallList$stressStart <- c(10, 20, 30)
+#	overallList$stressEnd <- c(13, 23, 33)
+#	overallList$stressTyp <- c("002", "001", "002")
+#	overallList$stressLabel <- c(-1, -1, -1)
+	
+	
 	overallList$debug %debug% "makeStackedDiagram()"	
 	
 	legende <- TRUE
@@ -4426,7 +4381,7 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 #print(section)
 #print(overallDesName[[imagesIndex]])
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
-	
+		
 		isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 		
 		if (length(overallList$stackedBarOptions$typOfGeomBar) == 0) {
@@ -4438,9 +4393,9 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 		reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 		overallResult <- reorderList$overallResult
 #		if ("primaerTreatment" %in% colnames(overallResult)) {
-#			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
+#			overallResult$primaerTreatment <- replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 #		} else {
-#			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
+#			overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, TRUE)
 #		}
 #		print(overallList$stackedBarOptions$typOfGeomBar)
 		for (positionType in overallList$stackedBarOptions$typOfGeomBar) {	
@@ -4448,39 +4403,39 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 			makeStress <- TRUE
 			stressArea <- data.frame()
 			#print(overallColor[[imagesIndex]])
-		#print(overallResult)
+			#print(overallResult)
 			colorWithoutStress <- getColor(overallColor[[imagesIndex]], overallResult)
 			#print(colorWithoutStress)
-			if(positionType == "stack") {
+			if (positionType == "stack") {
 				makeStress <- FALSE
 			}
 			
-			if(overallList$stressStart != -1 && positionType != "fill" && makeStress) {
-				stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$values, typOfPlot, positionType, overallResult[, c("xAxis", whichColumShouldUse)]) #  getTheColumWhichShouldUse(colnames(overallResult))
+			if (overallList$stressStart != -1 && positionType != "fill" && makeStress) {
+				stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$values, typOfPlot, positionType, overallResult[, c("xAxis", whichColumShouldUse)]) # getTheColumWhichShouldUse(colnames(overallResult))
 				color <- addColorForStressPhaseAndOther(stressArea, colorWithoutStress, positionType)
 			}
 #			print(stressArea)
 #			print(overallList$stressStart)
 			plot <- ggplot()
 			
-			if(length(stressArea) >0) {
+			if (length(stressArea) >0) {
 				plot <- plot + 
-						geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ), guides="none") +
-						geom_text(data=stressArea, aes(x=xmin, y=(ymax-ymax*0.15), label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
+						geom_rect(data = stressArea, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = typ), guides = "none") +
+						geom_text(data = stressArea, aes(x = xmin, y = (ymax-ymax*0.15), label = label), size = 2, hjust = 0, vjust = 1, angle = 90, colour = "grey")
 				
 			}	
 			
 			if (positionType == "dodge") {				
 				plot <- plot +
-						geom_line(data= overallResult, aes(x=xAxis, y=values, colour=hist), position="identity") + 
+						geom_line(data = overallResult, aes(x = xAxis, y = values, colour = hist), position = "identity") + 
 						#scale_fill_manual(values = overallColor[[imagesIndex]]) +
-						#scale_colour_manual(values= getColor(overallColor[[imagesIndex]], overallResult))
-						scale_colour_manual(values= colorWithoutStress)
+						#scale_colour_manual(values = getColor(overallColor[[imagesIndex]], overallResult))
+						scale_colour_manual(values = colorWithoutStress)
 				
 			} else {
 				plot <- plot +
-						geom_bar(data = overallResult, aes(x=xAxis, y=values, fill=hist), stat="identity", position = positionType)
-						
+						geom_bar(data = overallResult, aes(x = xAxis, y = values, fill = hist), stat = "identity", position = positionType)
+				
 			}
 			#print(plot)				
 			if (positionType == "dodge" || positionType == "stack") {
@@ -4488,57 +4443,57 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 			} else {
 				name <- sub("(zoom corrected) ", "", overallDesName[[imagesIndex]])
 			}
-
-				plot <- plot + 
-					   ylab(name) +
-					   xlab(overallList$xAxisName)	
 			
-			if(positionType == "dodge" && length(stressArea) >0) {
-			#	print("No1")
+			plot <- plot + 
+					ylab(name) +
+					xlab(overallList$xAxisName)	
+			
+			if (positionType == "dodge" && length(stressArea) >0) {
+				#	print("No1")
 				plot <- plot +
-						scale_fill_manual(values = color[!(color %in% colorWithoutStress)], name="", labels = c(unique(as.character(stressArea$label))), guide="none")
-			} else if(positionType == "stack" && length(stressArea) >0) {
-			#	print("No2")
-				#if(length(stressArea) >0) {
-					plot <- plot + 
-							scale_fill_manual(values = color, name="", labels = c(unique(as.character(stressArea$label)),unique(as.character(overallResult$hist))))
+						scale_fill_manual(values = color[!(color %in% colorWithoutStress)], name = "", labels = c(unique(as.character(stressArea$label))), guide = "none")
+			} else if (positionType == "stack" && length(stressArea) >0) {
+				#	print("No2")
+				#if (length(stressArea) >0) {
+				plot <- plot + 
+						scale_fill_manual(values = color, name = "", labels = c(unique(as.character(stressArea$label)), unique(as.character(overallResult$hist))))
 #				} else {
 #					plot <- plot +
-#						scale_fill_manual(values = colorWithoutStress, name="")
+#						scale_fill_manual(values = colorWithoutStress, name = "")
 #				}
 			} else {
 				#print("No3")
 				#print(colorWithoutStress)
 				plot <- plot +
-					scale_fill_manual(values = colorWithoutStress, name="")
+						scale_fill_manual(values = colorWithoutStress, name = "")
 			}
 #			print("dadad")
 #			 print(plot)
 #			print("bis hier")
-			 #	scale_fill_manual(values = color, name="") +
-				#	scale_color_manual(value=c("red", "blue")) +
-					#scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name="") +
+			#	scale_fill_manual(values = color, name = "") +
+			#	scale_color_manual(value = c("red", "blue")) +
+			#scale_fill_manual(values = getColor(overallColor[[imagesIndex]], overallResult), name = "") +
 			plot <- plot +
 					theme_bw() +
-					theme(axis.title.x = element_text(face="bold", size=11), 
-							axis.title.y = element_text(face="bold", size=11, angle=90), 
+					theme(axis.title.x = element_text(face = "bold", size = 11), 
+							axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
 							#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
 							#panel.background = element_rect(linetype = "dotted"), 
-							panel.border = element_rect(colour="Grey", size=0.1), 
-							strip.background = element_rect(colour=NA),
-							#plot.title = element_text(size=5) 
-	#						plot.title = element_rect(colour="Pink", size=0.1)
+							panel.border = element_rect(colour = "Grey", size = 0.1), 
+							strip.background = element_rect(colour = NA), 
+							#plot.title = element_text(size = 5) 
+							#						plot.title = element_rect(colour = "Pink", size = 0.1)
 							panel.grid.minor = element_blank()
 					) 
 			plot <- setFontSize(plot, overallResult, typOfPlot)
 			
 			if (!legende) {
-				plot = plot + theme(legend.position="none")
+				plot = plot + theme(legend.position = "none")
 			} else {
-				plot = plot + theme(legend.position="right", 
-									legend.title = element_blank(), 
-									legend.text = element_text(size=11), 
-									legend.key = element_blank())
+				plot = plot + theme(legend.position = "right", 
+						legend.title = element_blank(), 
+						legend.text = element_text(size = 11), 
+						legend.key = element_blank())
 			}
 			if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
 					(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
@@ -4546,26 +4501,26 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 				if (title != "") {
 					titleText <- title
 					whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)
-					if(length(unique(overallResult[,whichColumShouldUse])) == 1) {
-						titleText <- paste(titleText, " - ", unique(overallResult[,whichColumShouldUse]), sep="")
+					if (length(unique(overallResult[, whichColumShouldUse])) == 1) {
+						titleText <- paste(titleText, " - ", unique(overallResult[, whichColumShouldUse]), sep = "")
 					}
 					plot = plot + ggtitle(titleText)
 				}
 			}
-						
+			
 			if (positionType == "fill") {
-				plot = plot + scale_y_continuous(labels=seq(0, 100, 20), breaks=seq(0, 1, 0.2))
+				plot = plot + scale_y_continuous(labels = seq(0, 100, 20), breaks = seq(0, 1, 0.2))
 			}
 			
-		
+			
 #			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
 #				# no facet_wrap!
 #			} else
 #print(head(overallResult))
-
+			
 			plot <- facetWrap(plot, overallResult, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 #			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {		
-#				if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
+#				if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
 #					plot <- plot + 
 #							facet_wrap(~ primaerTreatment)
 #				} else {
@@ -4576,7 +4531,7 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 #				plot <- plot + 
 #						facet_wrap(~ name)
 #			}
-		
+			
 			
 #			if ("primaerTreatment" %in% colnames(overallResult)) {				
 #				plot = plot + facet_wrap(~ primaerTreatment)
@@ -4584,25 +4539,25 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 #				plot = plot + facet_wrap(~ name)
 #			}
 			
-		#	print(plot)
+			#	print(plot)
 			
 			subtitle <- ""
 #			if (positionType == overallList$stackedBarOptions$typOfGeomBar[1] || length(overallList$stackedBarOptions$typOfGeomBar) == 1) {
 #				subtitle <- title
 #			}
-	
 			
-			writeTheData(overallList, plot, overallFileName, paste("overall", title, positionType, sep=""), paste(overallFileName, "stackedOI", sep=""), subtitle, TRUE,subsectionDepth=2, section = section)
 			
-#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep=""))
+			writeTheData(overallList, plot, overallFileName, paste("overall", title, positionType, sep = ""), paste(overallFileName, "stackedOI", sep = ""), subtitle, TRUE, subsectionDepth = 2, section = section)
+			
+#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste("overall", title, positionType, sep = ""))
 #			if (makeOverallImage) {
 #				if (title != "") {
-#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""), TRUE, title)	
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep = ""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep = ""), TRUE, title)	
 #				} else {
-#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep=""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep=""))
+#					writeLatexFile(paste(overallFileName[[imagesIndex]], "stackedOverallImage", sep = ""), paste(overallFileName[[imagesIndex]], "overall", title, positionType, sep = ""))
 #				}
 #			} else {
-#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep="_"))	
+#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], "overall", positionType, title, sep = "_"))	
 #			}			
 		}
 	}
@@ -4611,21 +4566,21 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 removeNAsSpider <- function(overallResult, xAxisPosition) {
 	overallResultStart <- overallResult[1:xAxisPosition]
 	overallResult <- overallResult[(xAxisPosition+1):length(colnames(overallResult))]
-	booleanVector <- !apply(overallResult,1,function(x)all(is.na(x)))
+	booleanVector <- !apply(overallResult, 1, function(x)all(is.na(x)))
 	
-	return(cbind(overallResultStart[booleanVector,], overallResult[booleanVector,]))
+	return(cbind(overallResultStart[booleanVector, ], overallResult[booleanVector, ]))
 }
 
 
 openPlotDevice <- function(overallList, fileName, extraString, h) {
-	if (h==1) {
-		filename = preprocessingOfValues(paste(fileName, extraString, sep=""), FALSE, replaceString = "_")
-		Cairo(width=10, height=7, file=paste(filename, overallList$saveFormat, sep="."), type=overallList$saveFormat, bg="transparent", units="in", dpi=as.numeric(overallList$dpi))
+	if (h == 1) {
+		filename = preprocessingOfValues(paste(fileName, extraString, sep = ""), FALSE, replaceString = "_")
+		Cairo(width = 10, height = 7, file = paste(filename, overallList$saveFormat, sep = "."), type = overallList$saveFormat, bg = "transparent", units = "in", dpi = as.numeric(overallList$dpi))
 	}
 }
 
 closePlotDevice <- function(h) {
-	if (h==1) {
+	if (h == 1) {
 		dev.off()
 	}
 }
@@ -4639,23 +4594,23 @@ transferIntoPercentValues <- function(overallResult, xAxisPosition) {
 
 checkIfShouldSplitAfterPrimaryAndSecondaryTreatment <- function(first, second) {
 	isOtherTyp <- FALSE
-	if(!first && second) {
+	if (!first && second) {
 		isOtherTyp <- TRUE
 	}
 	return(isOtherTyp)
 }
 
 normalizeEachDescriptor <- function(overallResult) {
-
+	
 	for(name in unique(overallResult$hist)) {
-		overallResult[overallResult$hist == name,]$values <- sapply(overallResult[overallResult$hist == name,]$values,  function(x,y) {(x/y)}, y=max(overallResult[overallResult$hist == name,]$values))
+		overallResult[overallResult$hist == name, ]$values <- sapply(overallResult[overallResult$hist == name, ]$values, function(x, y) {(x/y)}, y = max(overallResult[overallResult$hist == name, ]$values))
 	}
 	return(overallResult)
 }
 
 makeSpiderDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
 	overallList$debug %debug% "makeSpiderDiagram()"		
-
+	
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
 		#test <- c("side fluo intensity", "side nir intensity", "side visible hue average value", "top visible hue average value")
 		#if (sum(!getVector(overallDesName[[imagesIndex]]) %in% test) > 1) {
@@ -4683,9 +4638,9 @@ makeSpiderDiagram <- function(overallResult, overallDesName, overallList, images
 #	if (length(groupBy) == 0 || length(groupBy) == 1) {
 #		
 #		if (doSpiderPlot) {
-#			plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, typOfPlot=typOfPlot)	
+#			plotSpiderImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende = TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex = imagesIndex, overallFileName = overallFileName, typOfPlot = typOfPlot)	
 #		}
-#		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex= imagesIndex, overallFileName =overallFileName, typOfPlot="lineRangePlot")	
+#		plotLineRangeImage(overallList = overallList, overallResult = overallResult, makeOverallImage = TRUE, legende = TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex = imagesIndex, overallFileName = overallFileName, typOfPlot = "lineRangePlot")	
 #	} else {
 #		for (value in overallList$filterSecondTreatment) {			
 #			title = overallList$secondFilterTreatmentRename[[value]]
@@ -4693,13 +4648,13 @@ makeSpiderDiagram <- function(overallResult, overallDesName, overallList, images
 #			#booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = plottedName))
 #			booleanVector = getBooleanVectorForFilterValues(overallResult, list(name = value))
 #			plotThisValues = overallResult[booleanVector, ]
-##			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[,1])]
-##			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[,1])+1):length(overallColor[[imagesIndex]])]
+##			usedOverallColor <- overallColor[[imagesIndex]][1:length(unique(plotThisValues["primaerTreatment"])[, 1])]
+##			overallColor[[imagesIndex]] <- overallColor[[imagesIndex]][(length(unique(plotThisValues["primaerTreatment"])[, 1])+1):length(overallColor[[imagesIndex]])]
 #			
 #			if (doSpiderPlot) {
-#				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, typOfPlot=typOfPlot)
+#				plotSpiderImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende = TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex = imagesIndex, overallFileName = overallFileName, typOfPlot = typOfPlot)
 #			}
-#			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende=TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex=imagesIndex, overallFileName=overallFileName, typOfPlot="lineRangePlot")
+#			plotLineRangeImage(overallList, plotThisValues, title = title, makeOverallImage = TRUE, legende = TRUE, usedoverallColor = overallColor[[imagesIndex]], overallDesName = overallDesName, imagesIndex = imagesIndex, overallFileName = overallFileName, typOfPlot = "lineRangePlot")
 #		}	 
 #	}
 #}
@@ -4707,34 +4662,34 @@ makeSpiderDiagram <- function(overallResult, overallDesName, overallList, images
 reduceLevels <- function(overallResult) {
 	
 	for(nn in colnames(overallResult)) {
-		if(class(overallResult[,nn]) == "factor") {
-			overallResult[,nn] <- overallResult[,nn][, drop=TRUE]
+		if (class(overallResult[, nn]) == "factor") {
+			overallResult[, nn] <- overallResult[, nn][, drop = TRUE]
 		}
 	}
 	return(overallResult)
 }
 
 
-plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot,  title, legende=TRUE) {
-################
-##overallColor <- usedOverallColor 
-##	typOfPlot <- "spiderplot"
-##	makeOverallImage = TRUE
-##	usedoverallColor = overallColor[[imagesIndex]]
-##	overallResult <- plotThisValues
-#legende=TRUE
+plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, legende = TRUE) {
+	################
+	##overallColor <- usedOverallColor 
+	##	typOfPlot <- "spiderplot"
+	##	makeOverallImage = TRUE
+	##	usedoverallColor = overallColor[[imagesIndex]]
+	##	overallResult <- plotThisValues
+#legende = TRUE
 #positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #title <- nn
 #title <- ""
 #overallResult <- overallResultSplit
-#################
-
+	#################
+	
 	overallList$debug %debug% "plotSpiderImage()"	
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
-			
+		
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		options <- overallList$spiderOptions
-		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName,  overallResult[c(X.AXIS, VALUES)], VALUES, options) 
+		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult[c(X.AXIS, VALUES)], VALUES, options) 
 		overallResult <- na.omit(overallResult)
 		
 		if (overallResult %checkRowLengthOfDataFrame% 0) {
@@ -4743,18 +4698,18 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 			
 			#overallColor <- overallList$color_spider
 			section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
-	
-			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+			
+			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 				pre <- TRUE
 			} else {
 				pre <- FALSE
 			}
 			
 			whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, pre)		
-			#overallResult <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, getColumnsForCheckIfOnePlotTypeHasLess(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, typOfPlot,whichColumShouldUse), 2, typOfPlot, TRUE)$overallResult
+			#overallResult <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, getColumnsForCheckIfOnePlotTypeHasLess(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, typOfPlot, whichColumShouldUse), 2, typOfPlot, TRUE)$overallResult
 			overallResult <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, whichColumShouldUse, 2, typOfPlot, TRUE)$overallResult
 			
-#			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+#			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #				overallColor <- getVector(overallList$color[levels(overallResult[[checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)]])])
 #			} else {
 #				overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
@@ -4766,90 +4721,90 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 				overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 				
 				histVec <- levels(overallResult$hist)
-				for(kk in seq(along=histVec)) {
-					histVec[kk] <- paste(kk,histVec[kk])
+				for(kk in seq(along = histVec)) {
+					histVec[kk] <- paste(kk, histVec[kk])
 				}
-				overallResult$hist <- factor((overallResult$hist), levels((overallResult$hist)), seq(along=unique(overallResult$hist)))
+				overallResult$hist <- factor((overallResult$hist), levels((overallResult$hist)), seq(along = unique(overallResult$hist)))
 				nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
-			
-		#		print(histVec)
-		#		print(usedoverallColor)
-				for (positionType in options$typOfGeomBar) {			
-		 		
 				
-		#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-		#				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
-		#				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
-		#				#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-		#			} else {
-						#print(head(overallResult))
-						plot <- ggplot(overallResult, aes_string(x=HIST, y=VALUES, group=whichColumShouldUse, shape=whichColumShouldUse, color=whichColumShouldUse, fill=HIST)) +
-								geom_point(size=3) +
-								geom_line()
+				#		print(histVec)
+				#		print(usedoverallColor)
+				for (positionType in options$typOfGeomBar) {			
+					
+					
+					#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+					#				overallResult <- cbind(overallResult, plot = rep.int(1, length(overallResult[, 1])))
+					#				plot <- ggplot(overallResult, aes(plot, value, fill = plot))
+					#				#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+					#			} else {
+					#print(head(overallResult))
+					plot <- ggplot(overallResult, aes_string(x = HIST, y = VALUES, group = whichColumShouldUse, shape = whichColumShouldUse, color = whichColumShouldUse, fill = HIST)) +
+							geom_point(size = 3) +
+							geom_line()
 					#}
-		
-				#	print(plot)
-			
-		#			if ("primaerTreatment" %in% colnames(overallResult)) {
-		#				overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
-		#				nameString <- unique(as.character(overallResult$primaerTreatment))
-		#				
-		##				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=primaerTreatment)) +
-		##						geom_point(aes(color=as.character(primaerTreatment), shape=hist), size=3) +
-		##						geom_line(aes(colour=as.character(primaerTreatment))) 
-		#				
-		#				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=as.character(primaerTreatment), shape=as.character(primaerTreatment), color=as.character(primaerTreatment), fill=hist)) +
-		#						geom_point(size=3) +
-		#						geom_line()  
-		#			} else {
-		#				overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
-		#				nameString <- unique(as.character(overallResult$name))
-		#				
-		#				plot = ggplot(data=overallResult, aes(x=hist, y=values, group=as.character(name), color=as.character(name), shape=as.character(name), fill=hist)) +
-		#						geom_point(size=3) +
-		#						geom_line() 
-		#			}
-			
+					
+					#	print(plot)
+					
+					#			if ("primaerTreatment" %in% colnames(overallResult)) {
+					#				overallResult$primaerTreatment <- replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
+					#				nameString <- unique(as.character(overallResult$primaerTreatment))
+					#				
+					##				plot = ggplot(data = overallResult, aes(x = hist, y = values, group = primaerTreatment)) +
+					##						geom_point(aes(color = as.character(primaerTreatment), shape = hist), size = 3) +
+					##						geom_line(aes(colour = as.character(primaerTreatment))) 
+					#				
+					#				plot = ggplot(data = overallResult, aes(x = hist, y = values, group = as.character(primaerTreatment), shape = as.character(primaerTreatment), color = as.character(primaerTreatment), fill = hist)) +
+					#						geom_point(size = 3) +
+					#						geom_line() 
+					#			} else {
+					#				overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, TRUE)
+					#				nameString <- unique(as.character(overallResult$name))
+					#				
+					#				plot = ggplot(data = overallResult, aes(x = hist, y = values, group = as.character(name), color = as.character(name), shape = as.character(name), fill = hist)) +
+					#						geom_point(size = 3) +
+					#						geom_line() 
+					#			}
+					
 					plot <- plot +
-							#geom_point(aes(color=as.character(name), shape=hist), size=3) +
-		#					scale_shape_manual(values = c(1:length(unique(overallResult$hist))), name="Property") +
-							#scale_shape_manual(values = c(1:length(unique(as.character(overallResult$primaerTreatment)))), name="Property") +
-							scale_shape_manual(values = c(1:length(nameString)), name="Property") +
-							#geom_line(aes(colour=as.character(name))) +
-						#	scale_colour_manual(name="Condition", values=usedoverallColor)
-							scale_colour_manual(values=overallColor, name="Property") + 
-							scale_fill_manual(values=rep.int("black",length(histVec)), name="Condition", breaks=unique(overallResult$hist), labels=histVec)
+							#geom_point(aes(color = as.character(name), shape = hist), size = 3) +
+							#					scale_shape_manual(values = c(1:length(unique(overallResult$hist))), name = "Property") +
+							#scale_shape_manual(values = c(1:length(unique(as.character(overallResult$primaerTreatment)))), name = "Property") +
+							scale_shape_manual(values = c(1:length(nameString)), name = "Property") +
+							#geom_line(aes(colour = as.character(name))) +
+							#	scale_colour_manual(name = "Condition", values = usedoverallColor)
+							scale_colour_manual(values = overallColor, name = "Property") + 
+							scale_fill_manual(values = rep.int("black", length(histVec)), name = "Condition", breaks = unique(overallResult$hist), labels = histVec)
 					#print(plot)
 					if (positionType == "x") {			
-						#plot <- plot + coord_polar(theta="x", expand=TRUE)
-						plot <- plot + coord_polar(theta="x")
+						#plot <- plot + coord_polar(theta = "x", expand = TRUE)
+						plot <- plot + coord_polar(theta = "x")
 					} else {
-						#plot <- plot + coord_polar(theta="y", expand=TRUE)
-						plot <- plot + coord_polar(theta="y")
+						#plot <- plot + coord_polar(theta = "y", expand = TRUE)
+						plot <- plot + coord_polar(theta = "y")
 					}
 					#print(plot)
-						plot <- plot + 
-								scale_y_continuous() +
-								theme_bw() +
-								theme(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
-										axis.title.x = element_blank(), 
-										axis.title.y = element_blank(),
-		#								axis.title.y = element_text(face="bold", size=11, angle=90), 
-										panel.grid.minor = element_blank(), 
-										panel.border = element_rect(colour="Grey", size=0.1)
-										#axis.text.x = element_blank(),
-										#axis.text.y = element_blank()
-								)
-						
+					plot <- plot + 
+							scale_y_continuous() +
+							theme_bw() +
+							theme(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
+									axis.title.x = element_blank(), 
+									axis.title.y = element_blank(), 
+									#								axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
+									panel.grid.minor = element_blank(), 
+									panel.border = element_rect(colour = "Grey", size = 0.1)
+							#axis.text.x = element_blank(), 
+							#axis.text.y = element_blank()
+							)
+					
 					plot <- setFontSize(plot, overallColor, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)	
-						#print(plot)
+					#print(plot)
 					if (positionType == "y") {
 						plot <- plot + 
-								Theme(axis.text.y = element_blank(),
-										axis.ticks	= element_blank()	
+								Theme(axis.text.y = element_blank(), 
+										axis.ticks	 = element_blank()	
 								)
 					}	
-						
+					
 					if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
 							(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
 							(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
@@ -4860,60 +4815,60 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 					
 					
 					if (!legende) {
-						plot = plot + theme(legend.position=NONE)
+						plot = plot + theme(legend.position = NONE)
 					} else {
 						plot = plot + 
-							   theme(#legend.justification  = "center", 
-									   legend.direction="horizontal",
-									   legend.position="bottom",
-									   legend.box = "vertical",
-									   legend.title.align = 0.5,
-									   #legend.position=c(0.5,0),
-									  # legend.title = element_blank(),
-									   legend.key = element_blank()
-					   			)			
-					
-					
-		#				if(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && overallList$secondTreatment == "none") {
-		#					plot <-  plot + guides(fill=guide_legend(title.position= "top", 
-		#									ncol=calculateLegendRowAndColNumber(histVec), 
-		#									byrow=FALSE)
-		#					)
-		#				} else {
-							plot <-  plot + guides(
-									shape=guide_legend(title.position= "top", 
-											ncol=calculateLegendRowAndColNumber(nameString, typOfPlot),
-											byrow=FALSE),
-									fill=guide_legend(title.position= "top", 
-											ncol=calculateLegendRowAndColNumber(histVec, typOfPlot), 
-											byrow=FALSE)
-							)
+								theme(#legend.justification = "center", 
+										legend.direction = "horizontal", 
+										legend.position = "bottom", 
+										legend.box = "vertical", 
+										legend.title.align = 0.5, 
+										#legend.position = c(0.5, 0), 
+										# legend.title = element_blank(), 
+										legend.key = element_blank()
+								)			
+						
+						
+						#				if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && overallList$secondTreatment == "none") {
+						#					plot <- plot + guides(fill = guide_legend(title.position = "top", 
+						#									ncol = calculateLegendRowAndColNumber(histVec), 
+						#									byrow = FALSE)
+						#					)
+						#				} else {
+						plot <- plot + guides(
+								shape = guide_legend(title.position = "top", 
+										ncol = calculateLegendRowAndColNumber(nameString, typOfPlot), 
+										byrow = FALSE), 
+								fill = guide_legend(title.position = "top", 
+										ncol = calculateLegendRowAndColNumber(histVec, typOfPlot), 
+										byrow = FALSE)
+						)
 						#}
 						
 					}		
 					#print(plot)
-		#			if (title != "") {
-		#				plot = plot + theme(title = title)
-		#			}
+					#			if (title != "") {
+					#				plot = plot + theme(title = title)
+					#			}
 					plot <- facetWrap(plot, overallResult, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, whichColumShouldUse)
-		#			if(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
-		#				if(whichColumShouldUse == NAME) {
-		#					plot = plot + facet_grid(name ~ xAxisfactor)
-		#				} else {
-		#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-		#				}
-		#				
-		#			} else {
-		#				plot = plot + facet_grid(~ xAxisfactor)
-		#			}
-		#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-		#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-		#					
-		#				} else {
-		#					plot = plot + facet_grid(name ~ xAxisfactor)
-		#				}
-		
-		#			print("drinne")
+					#			if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+					#				if (whichColumShouldUse == NAME) {
+					#					plot = plot + facet_grid(name ~ xAxisfactor)
+					#				} else {
+					#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+					#				}
+					#				
+					#			} else {
+					#				plot = plot + facet_grid(~ xAxisfactor)
+					#			}
+					#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+					#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+					#					
+					#				} else {
+					#					plot = plot + facet_grid(name ~ xAxisfactor)
+					#				}
+					
+					#			print("drinne")
 					#print(plot)
 					
 					subtitle <- ""
@@ -4921,18 +4876,18 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 #						subtitle <- title
 #					}
 					
-					writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, positionType, sep=""), paste(overallFileName, "spiderOI", sep=""), subtitle, TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
-																															
-		#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, positionType, sep=""))
-		#			if (makeOverallImage) {
-		#				if (title != "") {
-		#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, title, positionType, sep=""), TRUE, title)	
-		#				} else {
-		#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, title, positionType, sep=""))
-		#				}
-		#			} else {
-		#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], typOfPlot, positionType, title, sep=""))	
-		#			}
+					writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, positionType, sep = ""), paste(overallFileName, "spiderOI", sep = ""), subtitle, TRUE, subsectionDepth = 2, typOfPlot = typOfPlot, section = section)
+					
+					#			saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, positionType, sep = ""))
+					#			if (makeOverallImage) {
+					#				if (title != "") {
+					#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep = ""), paste(overallFileName[[imagesIndex]], typOfPlot, title, positionType, sep = ""), TRUE, title)	
+					#				} else {
+					#					writeLatexFile(paste(overallFileName[[imagesIndex]], "spiderOverallImage", sep = ""), paste(overallFileName[[imagesIndex]], typOfPlot, title, positionType, sep = ""))
+					#				}
+					#			} else {
+					#				writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], typOfPlot, positionType, title, sep = ""))	
+					#			}
 				}
 			}
 		}
@@ -4940,24 +4895,24 @@ plotSpiderImage <- function(overallResult, overallDesName, overallList, imagesIn
 }
 
 calculateLegendRowAndColNumber <- function(legendText, typOfPlot) {
-########	
+	########	
 #legendText <- unique(overallResult$name)
 #legendText <- unique(overallResult$hist)
 #legendText <- overallColor[[imagesIndex]]
-#######	
+	#######	
 	legendText <- as.character(getVector(legendText))
 	
-	if(typOfPlot == NBOX.PLOT) {
+	if (typOfPlot == NBOX.PLOT) {
 		ncol <- ceiling(length(legendText) / 40)
 	} else {
 		lengthOfOneRow <- 90
-	
-		averageLengthOfSet <- round(sum(nchar(legendText),na.rm=TRUE) / length(legendText))
-	
+		
+		averageLengthOfSet <- round(sum(nchar(legendText), na.rm = TRUE) / length(legendText))
+		
 		ncol <- floor(lengthOfOneRow / averageLengthOfSet) -1
 		if (ncol == 0) {
 			ncol <- 1
-		} else if(ncol > length(legendText)) {
+		} else if (ncol > length(legendText)) {
 			ncol <- length(legendText)
 		}	
 	}
@@ -4965,8 +4920,8 @@ calculateLegendRowAndColNumber <- function(legendText, typOfPlot) {
 } 
 
 getColumnsForCheckIfOnePlotTypeHasLess <- function(first, second, typOfPlot, whichColumShouldUse) {
-	if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-		if(first && second) {
+	if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+		if (first && second) {
 			return(c(whichColumShouldUse, HIST))	
 		} else {
 			return(HIST)
@@ -4975,22 +4930,22 @@ getColumnsForCheckIfOnePlotTypeHasLess <- function(first, second, typOfPlot, whi
 }
 
 
-makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot,  title, legende=TRUE) {
+makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, legende = TRUE) {
 	################
-##	makeOverallImage = TRUE
-##	legende=TRUE
-##	usedoverallColor <- overallColor[[imagesIndex]]
-##	overallResult <- plotThisValues
-##	positionType <- overallList$spiderOptions$typOfGeomBar[1]
+	##	makeOverallImage = TRUE
+	##	legende = TRUE
+	##	usedoverallColor <- overallColor[[imagesIndex]]
+	##	overallResult <- plotThisValues
+	##	positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #typOfPlot <- "lineRangePlot"
 #legende <- TRUE
-##positionType <- overallList$spiderOptions$typOfGeomBar[1]
+	##positionType <- overallList$spiderOptions$typOfGeomBar[1]
 #title <- nn
 #title <- ""
 #overallResult <- overallResultSplit
 	#################
 	
-	#ownCat(overallResult[1,])
+	#ownCat(overallResult[1, ])
 #tempoverallResult <- overallResult
 #overallResult <- tempoverallResult
 	overallList$debug %debug% "plotLineRangeImage()"
@@ -4998,7 +4953,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		options <- overallList$linerangeOptions
-		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult[c("xAxis","values")], "values", options)
+		overallResult$xAxisfactor = setxAxisfactor(overallList$xAxisName, overallResult[c("xAxis", "values")], "values", options)
 		overallResult <- na.omit(overallResult)
 		if (overallResult %checkRowLengthOfDataFrame% 0) {
 			overallResult <- normalizeEachDescriptor(overallResult)
@@ -5007,7 +4962,7 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 			
 			section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
 			
-			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 				pre <- TRUE
 			} else {
 				pre <- FALSE
@@ -5016,91 +4971,91 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 			whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, pre)
 			overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 			
-#			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+#			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #				overallColor <- getVector(overallList$color[levels(overallResult[[checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)]])])
 #			} else {
 #				overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 #			}			
 			
-			isOnlyOneValue <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, getColumnsForCheckIfOnePlotTypeHasLess(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, typOfPlot,whichColumShouldUse), 2, typOfPlot)$bool
+			isOnlyOneValue <- checkIfOnePlotTypeHasLessThanNumberValues(overallResult, getColumnsForCheckIfOnePlotTypeHasLess(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, typOfPlot, whichColumShouldUse), 2, typOfPlot)$bool
 			nameString <- unique(as.character(overallResult[[whichColumShouldUse]]))
 			
-	#		if ("primaerTreatment" %in% colnames(overallResult)) {
-	#			overallResult$primaerTreatment <-  replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
-	#			nameString <-  unique(as.character(overallResult$primaerTreatment))
-	#		} else {
-	#			overallResult$name <-  replaceTreatmentNames(overallList, overallResult$name, TRUE)
-	#			nameString <-  unique(as.character(overallResult$name))
-	#		}
+			#		if ("primaerTreatment" %in% colnames(overallResult)) {
+			#			overallResult$primaerTreatment <- replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
+			#			nameString <- unique(as.character(overallResult$primaerTreatment))
+			#		} else {
+			#			overallResult$name <- replaceTreatmentNames(overallList, overallResult$name, TRUE)
+			#			nameString <- unique(as.character(overallResult$name))
+			#		}
 			#print(nameString)
 			
-			plot <- ggplot(data=overallResult, aes(x=hist, y=values))
-			if(!isOnlyOneValue) {
+			plot <- ggplot(data = overallResult, aes(x = hist, y = values))
+			if (!isOnlyOneValue) {
 				plot <- plot +
 						geom_line()
 			}
 			plot <- plot +
-					geom_point(aes_string(color=whichColumShouldUse, shape=whichColumShouldUse, fill=whichColumShouldUse), size=3)
+					geom_point(aes_string(color = whichColumShouldUse, shape = whichColumShouldUse, fill = whichColumShouldUse), size = 3)
 			#print(plot)
-	#		if ("primaerTreatment" %in% colnames(overallResult)) {				
-	#			plot <- plot + geom_point(aes(color=as.character(primaerTreatment), shape=as.character(primaerTreatment)), size=3)
-	#			
-	#		} else {
-	#			plot <- plot + geom_point(aes(color=as.character(name), shape=as.character(name)), size=3)
-	#		}
+			#		if ("primaerTreatment" %in% colnames(overallResult)) {				
+			#			plot <- plot + geom_point(aes(color = as.character(primaerTreatment), shape = as.character(primaerTreatment)), size = 3)
+			#			
+			#		} else {
+			#			plot <- plot + geom_point(aes(color = as.character(name), shape = as.character(name)), size = 3)
+			#		}
 			#print(plot)
 			#print(usedoverallColor)
 			plot <- plot +
-					scale_colour_manual(values=overallColor) +
-					#scale_fill_manual(values=overallColor[[imagesIndex]]) +
+					scale_colour_manual(values = overallColor) +
+					#scale_fill_manual(values = overallColor[[imagesIndex]]) +
 					scale_shape_manual(values = c(1:length(nameString))) +
 					scale_y_continuous() +
 					theme_bw() +
 					theme(#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), # Rand geht nicht in ggplot 0.9
 							axis.title.x = element_blank(), 
-							axis.title.y = element_blank(),
-							axis.text.x = element_text(angle=90),
+							axis.title.y = element_blank(), 
+							axis.text.x = element_text(angle = 90), 
 							panel.grid.minor = element_blank(), 
-							panel.border = element_rect(colour="Grey", size=0.1)
-							#axis.text.x = element_blank()
+							panel.border = element_rect(colour = "Grey", size = 0.1)
+					#axis.text.x = element_blank()
 					#axis.text.y = element_blank()
 					) 
 			
 			plot <- setFontSize(plot, overallColor, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
 			
 			if (!legende) {
-				plot = plot + theme(legend.position="none")
+				plot = plot + theme(legend.position = "none")
 			} else {
 				plot = plot + 
 						theme(#legend.justifiownCation = 'bottom', 
-								legend.direction="horizontal",
-								legend.position="bottom",
-								legend.box = "vertical",
-								#legend.position=c(0.5,0),
-								legend.title = element_blank(),
+								legend.direction = "horizontal", 
+								legend.position = "bottom", 
+								legend.box = "vertical", 
+								#legend.position = c(0.5, 0), 
+								legend.title = element_blank(), 
 								legend.key = element_blank()
 						)
 				
-				plot <-  plot + guides(colour=guide_legend(title.position= "top", 
-										ncol=calculateLegendRowAndColNumber(nameString, typOfPlot),
-										byrow=T)			
-								) 
+				plot <- plot + guides(colour = guide_legend(title.position = "top", 
+								ncol = calculateLegendRowAndColNumber(nameString, typOfPlot), 
+								byrow = T)			
+				) 
 				
-	#			if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
-	#				size <- 6
-	#				unit <- 0.7
-	#			} else if (length(overallColor[[imagesIndex]]) >= 6) {
-	#				size <- 5
-	#				unit <- 0.4
-	#			} else {
-	#				size <- 11
-	#				unit <- 1.0
-	#			}
-	#			
-	#			plot = plot + theme(legend.text = element_text(size=size), 
-	#					legend.key.size = unit(unit, "lines"),
-	#					axis.text.x = element_text(face="bold", size=size, angle=90)
-	#			)
+				#			if (length(overallColor[[imagesIndex]]) > 3 & length(overallColor[[imagesIndex]]) < 6) {
+				#				size <- 6
+				#				unit <- 0.7
+				#			} else if (length(overallColor[[imagesIndex]]) >= 6) {
+				#				size <- 5
+				#				unit <- 0.4
+				#			} else {
+				#				size <- 11
+				#				unit <- 1.0
+				#			}
+				#			
+				#			plot = plot + theme(legend.text = element_text(size = size), 
+				#					legend.key.size = unit(unit, "lines"), 
+				#					axis.text.x = element_text(face = "bold", size = size, angle = 90)
+				#			)
 			}		
 			if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
 					(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
@@ -5111,43 +5066,43 @@ makeLinerangeDiagram <- function(overallResult, overallDesName, overallList, ima
 			}
 			
 			plot <- facetWrap(plot, overallResult, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, whichColumShouldUse)
-	#		if(overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
-	#			if(whichColumShouldUse == NAME) {
-	#				plot = plot + facet_grid(name ~ xAxisfactor)
-	#			} else {
-	#				plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-	#			}
-	#			
-	#		} else {
-	#			plot = plot + facet_grid(~ xAxisfactor)
-	#		}
-	#				if ("primaerTreatment" %in% colnames(overallResult)) {				
-	#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
-	#					
-	#				} else {
-	#					plot = plot + facet_grid(name ~ xAxisfactor)
-	#				}
+			#		if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+			#			if (whichColumShouldUse == NAME) {
+			#				plot = plot + facet_grid(name ~ xAxisfactor)
+			#			} else {
+			#				plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+			#			}
+			#			
+			#		} else {
+			#			plot = plot + facet_grid(~ xAxisfactor)
+			#		}
+			#				if ("primaerTreatment" %in% colnames(overallResult)) {				
+			#					plot = plot + facet_grid(primaerTreatment ~ xAxisfactor)
+			#					
+			#				} else {
+			#					plot = plot + facet_grid(name ~ xAxisfactor)
+			#				}
 			
 			
 			#print(plot)
-	
-			writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, sep=""), paste(overallFileName, "lineRangeOI", sep=""), "", TRUE, subsectionDepth=2, typOfPlot=typOfPlot, section = section)
-	
-	#		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, sep=""))
-	#		if (makeOverallImage) {
-	#			writeLatexFile(paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep=""), paste(overallFileName[[imagesIndex]], typOfPlot, title, sep=""))	
-	#		} else {
-	#			writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], typOfPlot, title, sep="_"))	
-	#		}			
+			
+			writeTheData(overallList, plot, overallFileName, paste(typOfPlot, title, sep = ""), paste(overallFileName, "lineRangeOI", sep = ""), "", TRUE, subsectionDepth = 2, typOfPlot = typOfPlot, section = section)
+			
+			#		saveImageFile(overallList, plot, overallFileName[[imagesIndex]], paste(typOfPlot, title, sep = ""))
+			#		if (makeOverallImage) {
+			#			writeLatexFile(paste(overallFileName[[imagesIndex]], "lineRangeOverallImage", sep = ""), paste(overallFileName[[imagesIndex]], typOfPlot, title, sep = ""))	
+			#		} else {
+			#			writeLatexFile(overallFileName[[imagesIndex]], paste(overallFileName[[imagesIndex]], typOfPlot, title, sep = "_"))	
+			#		}			
 		}
 	}		
 }
 
 lim <- function(value, newValue) {
-	if(value != 0) {
+	if (value != 0) {
 		limValue <- (newValue/value) + 0.1
-	
-		if(limValue > 1.15 || limValue < 0.85) {
+		
+		if (limValue > 1.15 || limValue < 0.85) {
 			return(FALSE)
 		} else {
 			return(TRUE)
@@ -5158,7 +5113,7 @@ lim <- function(value, newValue) {
 }
 
 checkIfNaForMinMax <- function(overallResult, column) {
-	if(all(is.na(overallResult[column])) || all(is.null(overallResult[column]))) {
+	if (all(is.na(overallResult[column])) || all(is.null(overallResult[column]))) {
 		minVal <- 0
 		maxVal <- 0
 	} else {
@@ -5171,7 +5126,7 @@ checkIfNaForMinMax <- function(overallResult, column) {
 
 scallyAxis <- function(factor, overallResult) {
 	
-#	if(all(is.na(overallResult$se))) {
+#	if (all(is.na(overallResult$se))) {
 #		minSe <- 0
 #		maxSe <- 0
 #	} else {
@@ -5186,20 +5141,20 @@ scallyAxis <- function(factor, overallResult) {
 	middelBorder <- 0.5 * factor
 	minBorder <- 0.1 * factor
 	
-	if(minValue > -minBorder && maxValue < minBorder) {
+	if (minValue > -minBorder && maxValue < minBorder) {
 		factor <- minBorder
-	} else if(minValue > -middelBorder && maxValue < middelBorder) {
+	} else if (minValue > -middelBorder && maxValue < middelBorder) {
 		factor <- middelBorder
 	}
-
+	
 	yminValue <- floor(minValue / factor) * factor
 	ymaxValue <- ceiling(maxValue / factor) * factor
-
-	if(lim(minValue, yminValue)) {
+	
+	if (lim(minValue, yminValue)) {
 		yminValue <- yminValue - factor
 	}
 	
-	if(lim(maxValue, ymaxValue)) {
+	if (lim(maxValue, ymaxValue)) {
 		ymaxValue <- ymaxValue + factor
 	}
 	
@@ -5209,24 +5164,24 @@ scallyAxis <- function(factor, overallResult) {
 
 makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title, isOnlyOneValue = FALSE) {
 	overallList$debug %debug% "makeBarDiagram()"	
-#######
+	#######
 #isOnlyOneValue <- TRUE
-#######
-	overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
+	#######
+	overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 	prePlot <- FALSE
-	if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
+	if (typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
-	#	overallColor <- overallList$color_nBox
+		#	overallColor <- overallList$color_nBox
 		
 		section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
-		if((!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond)) { #|| (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) # (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
+		if ((!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond)) { #|| (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) # (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
 			prePlot <- TRUE
 		} else {
 			prePlot <- FALSE
 		}
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, prePlot)
 		yValue <- MEAN
-	} else if(typOfPlot == STRESS.PLOT){
+	} else if (typOfPlot == STRESS.PLOT) {
 		overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 		#overallColor <- getColorRampPalette(colorVector = getColorVector(overallList$isGray), whichColumShouldUse = 5)
 		#overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
@@ -5235,11 +5190,11 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		whichColumShouldUse <- NAME
 		yValue <- VALUES
 	}
-		
+	
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
 		if (isOnlyOneValue) {
 			
-#			if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+#			if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #				prePlot <- TRUE
 #			} else {
 #				prePlot <- FALSE
@@ -5249,11 +5204,11 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			overallResult <- reorderList$overallResult
 			overallColor <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 			
-			plot = ggplot(data=overallResult, aes_string(x=whichColumShouldUse, y=yValue))
+			plot = ggplot(data = overallResult, aes_string(x = whichColumShouldUse, y = yValue))
 		} else {
-			plot = ggplot(data=overallResult, aes(x=xAxis, y=mean))
+			plot = ggplot(data = overallResult, aes(x = xAxis, y = mean))
 		}
-	
+		
 		if (overallList$appendix) {
 			ylabelForAppendix <- renameY(overallDesName[[imagesIndex]])
 			plot <- plot + 
@@ -5262,40 +5217,40 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 			plot <- plot + 
 					ylab(overallDesName[[imagesIndex]])
 		}
-
+		
 		plot <- plot + 						
-				geom_bar(stat="identity", aes_string(fill=NAME), size=0.1) ## colour="Grey",
+				geom_bar(stat = "identity", aes_string(fill = NAME), size = 0.1) ## colour = "Grey", 
 		
 		
-	if(typOfPlot != STRESS.PLOT) {
-		plot <- plot + 
-				geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.2, colour="black")
-	}
-				#geom_errorbar(aes(ymax=mean+se, ymin=mean-se), width=0.5, colour="Pink")+
-				#ylab(overallDesName[[imagesIndex]]) +
-	
-		if(length(grep("_start",overallFileName, ignore.case=TRUE)) > 0){
+		if (typOfPlot != STRESS.PLOT) {
+			plot <- plot + 
+					geom_errorbar(aes(ymax = mean+se, ymin = mean-se), width = 0.2, colour = "black")
+		}
+		#geom_errorbar(aes(ymax = mean+se, ymin = mean-se), width = 0.5, colour = "Pink")+
+		#ylab(overallDesName[[imagesIndex]]) +
+		
+		if (length(grep("_start", overallFileName, ignore.case = TRUE)) > 0) {
 			factor <- 10
 			plot <- plot + 
 					scallyAxis(factor, overallResult)
-		} else if(length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0) {
+		} else if (length(grep("lm3s_", overallFileName, ignore.case = TRUE)) > 0) {
 			factor <- 0.2
 			plot <- plot + 
 					scallyAxis(factor, overallResult)
-		} else if(typOfPlot != STRESS.PLOT) {
+		} else if (typOfPlot != STRESS.PLOT) {
 			maxMean <- max(overallResult$mean)
 			maxSe <- max(overallResult$se)
 			
 			plot <- plot +
-					coord_cartesian(ylim=c(0, maxMean + maxSe+ (110*maxMean)/100)) 
+					coord_cartesian(ylim = c(0, maxMean + maxSe+ (110*maxMean)/100)) 
 		}				
-
+		
 		
 		plot <- plot +	
 				scale_fill_manual(values = overallColor)
 		
-#		if(isOnlyOneValue) {
-#			if(typOfPlot == STRESS.PLOT) {
+#		if (isOnlyOneValue) {
+#			if (typOfPlot == STRESS.PLOT) {
 #				plot <- plot +	
 #						scale_fill_manual(values = overallColor[reorderList$sortList])
 #			} else {
@@ -5307,22 +5262,22 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 #					scale_fill_manual(values = overallColor[[imagesIndex]][reorderList$sortList])
 #		}
 		
-			plot <- plot +	
+		plot <- plot +	
 				theme_bw() +
-				theme(legend.position="none", 
+				theme(legend.position = "none", 
 						#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-						#axis.title.x = element_text(face="bold", size=11), 
-						axis.title.y = element_text(face="bold", size=11, angle=90), 
-						axis.text.x = element_text(angle=90),
+						#axis.title.x = element_text(face = "bold", size = 11), 
+						axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
+						axis.text.x = element_text(angle = 90), 
 						panel.grid.minor = element_blank(), 
-						panel.border = element_rect(colour="Grey", size=0.1)
+						panel.border = element_rect(colour = "Grey", size = 0.1)
 				)
 		
-		if((length(grep("-1",overallList$xAxisName, ignore.case=TRUE)) < 1) &&		#length(grep("2147483647",overallList$xAxisName, ignore.case=TRUE)) < 1 ||
-			typOfPlot != STRESS.PLOT){
+		if ((length(grep("-1", overallList$xAxisName, ignore.case = TRUE)) < 1) &&		#length(grep("2147483647", overallList$xAxisName, ignore.case = TRUE)) < 1 ||
+				typOfPlot != STRESS.PLOT) {
 			plot <- plot + 
 					xlab(overallList$xAxisName) +
-					theme(axis.title.x = element_text(face="bold", size=11))
+					theme(axis.title.x = element_text(face = "bold", size = 11))
 		} else {
 			plot <- plot +
 					theme(axis.title.x = element_blank())
@@ -5334,16 +5289,16 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 				(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
 			if (title != "") {
 				titleText <- title
-				if(length(unique(overallResult[,whichColumShouldUse])) == 1 && !(overallList$secondTreatment == NONE && !(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond))) {
-					titleText <- paste(titleText, " - ", unique(overallResult[,whichColumShouldUse]), sep="")
+				if (length(unique(overallResult[, whichColumShouldUse])) == 1 && !(overallList$secondTreatment == NONE && !(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond))) {
+					titleText <- paste(titleText, " - ", unique(overallResult[, whichColumShouldUse]), sep = "")
 				}
 				plot = plot + ggtitle(titleText)
 			}
 		}
 		
-	#	print(plot)
+		#	print(plot)
 		plot <- facetWrap(plot, overallResult, typOfPlot, overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
-#		if(typOfPlot == STRESS.PLOT) {
+#		if (typOfPlot == STRESS.PLOT) {
 #			plot <- plot +
 #					facet_wrap(~ stress)
 #		}	
@@ -5352,7 +5307,7 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 		overallImage <- TRUE
 		subsectionDepth <- 1
 		
-		if(title != "") {
+		if (title != "") {
 			sep <- " - "
 		} else {
 			sep <- ""
@@ -5362,31 +5317,31 @@ makeBarDiagram <- function(overallResult, overallDesName, overallList, imagesInd
 #			if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
 #				(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) ||
 #				(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
-#				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep=sep)
+#				subtitle <- paste(cleanSubtitle(overallDesName[[imagesIndex]]), title, sep = sep)
 #				
-#				if((length(grep("lm3s_",overallFileName, ignore.case=TRUE)) > 0)) {
+#				if ((length(grep("lm3s_", overallFileName, ignore.case = TRUE)) > 0)) {
 #					subsectionDepth <- 5
 #				} else {
 #					subsectionDepth <- 2
 #				}
 #			}
 		} else {
-			subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep=sep)
+			subtitle <- paste(cleanSubtitle(ylabelForAppendix), title, sep = sep)
 			
 			subsectionDepth <- 1
 			overallImage <- FALSE
 		}
-
-		if(typOfPlot == BOX.PLOT) {
+		
+		if (typOfPlot == BOX.PLOT) {
 			overallImageText <- "BarplotOI"										
-		} else if(typOfPlot == STRESS.PLOT) {
+		} else if (typOfPlot == STRESS.PLOT) {
 			overallImageText <- "StressOI"	
 		} else {
 			overallImageText <- "OI"
 		}
 		
 		#print(plot)
-		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, typOfPlot, overallImageText, sep=""), subtitle, overallImage, isAppendix=overallList$appendix, subsectionDepth=subsectionDepth, section = section)
+		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep = ""), paste(overallFileName, typOfPlot, overallImageText, sep = ""), subtitle, overallImage, isAppendix = overallList$appendix, subsectionDepth = subsectionDepth, section = section)
 	}
 }
 
@@ -5402,24 +5357,24 @@ reownCategorized <- function(overallResult) {
 #		ownList <- list(name = character())
 #	}
 	
-	overallResult <- cbind(overallResult, group=rbind(-1))
+	overallResult <- cbind(overallResult, group = rbind(-1))
 	overallResultTemp <- overallResult
 	
 	for(n in as.character(unique(unlist(overallResultTemp$name)))) {
 		
-	#	ownList[1] <- n
-		booleanVector = getBooleanVectorForFilterValues(overallResultTemp, list(name=n))
-		overallResult <- overallResultTemp[booleanVector,]
+		#	ownList[1] <- n
+		booleanVector = getBooleanVectorForFilterValues(overallResultTemp, list(name = n))
+		overallResult <- overallResultTemp[booleanVector, ]
 		
-		lin_interp = function(x, y, length.out=length(overallResult$xAxis)) {
-			approx(x, y, xout=seq(min(x), max(x), length.out=length.out))$y
+		lin_interp = function(x, y, length.out = length(overallResult$xAxis)) {
+			approx(x, y, xout = seq(min(x), max(x), length.out = length.out))$y
 		}
 		
 		overallResult$xAxis <- lin_interp(overallResult$xAxis, overallResult$xAxis)
 		overallResult$mean <- lin_interp(overallResult$xAxis, overallResult$mean)
 		
 		ownCatRle = rle(overallResult$mean < 0)
-		overallResult$group = rep.int(1:length(ownCatRle$lengths), times=ownCatRle$lengths)
+		overallResult$group = rep.int(1:length(ownCatRle$lengths), times = ownCatRle$lengths)
 		overallResultTemp[booleanVector, ] <- overallResult
 	}
 	
@@ -5449,15 +5404,15 @@ setColorDependentOfGroup <- function(overallResult) {
 	} else {
 		color <- c(color, "palegreen2")
 	}
-
-	if(length(as.character(unique(overallResult$group))) > 1) {
+	
+	if (length(as.character(unique(overallResult$group))) > 1) {
 		if (lastColorPositiv) {
 			color <- c(color, "palegreen2")
 		} else {
 			color <- c(color, "light grey")
 		}
 	}
-
+	
 	return(color)
 }
 
@@ -5465,19 +5420,19 @@ OneMinusTheValue <- function(tempOverallResult, overallDescriptor) {
 	
 	notOneMinus <- vector()
 #	for(nn in names(overallDescriptor)) {
-#		if(length(grep("nir",overallDescriptor[[nn]], ignore.case=TRUE)) > 0){
-#			notOneMinus <- c(notOneMinus, paste("mean", nn, sep=""))
+#		if (length(grep("nir", overallDescriptor[[nn]], ignore.case = TRUE)) > 0) {
+#			notOneMinus <- c(notOneMinus, paste("mean", nn, sep = ""))
 #		}
 #	}
 	colMinus <- tempOverallResult %allColnamesWithoutThisOnes% notOneMinus
-		if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
-			#overallResult[,4:length(colnames(overallResult))] <- 1-overallResult[,4:length(colnames(overallResult))]
-			colMinus <- colMinus[-c(1:3)]
-		} else {
-			#overallResult[,3:length(colnames(overallResult))] <- 1-overallResult[,3:length(colnames(overallResult))]
-			colMinus <- colMinus[-c(1:2)]
-		}
-		tempOverallResult[,colMinus] <- 1-tempOverallResult[,colMinus]
+	if (PRIMAER.TREATMENT %in% colnames(tempOverallResult)) {
+		#overallResult[, 4:length(colnames(overallResult))] <- 1-overallResult[, 4:length(colnames(overallResult))]
+		colMinus <- colMinus[-c(1:3)]
+	} else {
+		#overallResult[, 3:length(colnames(overallResult))] <- 1-overallResult[, 3:length(colnames(overallResult))]
+		colMinus <- colMinus[-c(1:2)]
+	}
+	tempOverallResult[, colMinus] <- 1-tempOverallResult[, colMinus]
 	return(tempOverallResult)
 }
 
@@ -5485,36 +5440,36 @@ reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = 
 	groupedOverallResult <- data.table(overallResult)
 	#sortString <- NAME
 	
-#	if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
+#	if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
 #		sortString <- PRIMAER.TREATMENT
 #	}
 #print(head(groupedOverallResult))
 #print(whichColumShouldUse)
-
-	if(typOfPlot == STACKBOX.PLOT || typOfPlot == STRESS.PLOT) {
-		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(values), sum, na.rm=TRUE), by=c(whichColumShouldUse)])
+	
+	if (typOfPlot == STACKBOX.PLOT || typOfPlot == STRESS.PLOT) {
+		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(values), sum, na.rm = TRUE), by = c(whichColumShouldUse)])
 	} else {
-		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm=TRUE), by=c(whichColumShouldUse)])
+		sumVector <- as.data.frame(groupedOverallResult[, lapply(list(mean), mean, na.rm = TRUE), by = c(whichColumShouldUse)])
 	}
 	#sumVector$c <- levels(overallResult[[whichColumShouldUse]])
 	sumVector$c <- as.character(unique(overallResult[[whichColumShouldUse]]))
 	
 	#print(head(sumVector))
 	#print(levels(overallResult[[sortString]]))
-#	print(sumVector[order(sumVector$V1),]$c)
+#	print(sumVector[order(sumVector$V1), ]$c)
 	
-#	if(typOfPlot == VIOLIN.PLOT) {
+#	if (typOfPlot == VIOLIN.PLOT) {
 #		for(n in levels(overallResult[[whichColumShouldUse]])) {
-#			overallResult[[whichColumShouldUse]] <- replace(as.character(overallResult[[whichColumShouldUse]]), overallResult[[whichColumShouldUse]] == n, paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep=""))
-#			sumVector[sumVector$c == n,]$c <- paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep="")
+#			overallResult[[whichColumShouldUse]] <- replace(as.character(overallResult[[whichColumShouldUse]]), overallResult[[whichColumShouldUse]] == n, paste(sumVector[sumVector$c == n, ]$c, " (", round(sumVector[sumVector$c == n, ]$V1, digits = 1), ")", sep = ""))
+#			sumVector[sumVector$c == n, ]$c <- paste(sumVector[sumVector$c == n, ]$c, " (", round(sumVector[sumVector$c == n, ]$V1, digits = 1), ")", sep = "")
 #		}
 #	}
 	
-	if(typOfPlot == VIOLIN.PLOT) {
+	if (typOfPlot == VIOLIN.PLOT) {
 		# n <- unique(overallResult[[whichColumShouldUse]])[1]
 		for(n in unique(overallResult[[whichColumShouldUse]])) {
-			overallResult[[whichColumShouldUse]] <- replace(as.character(overallResult[[whichColumShouldUse]]), overallResult[[whichColumShouldUse]] == n, paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep=""))
-			sumVector[sumVector$c == n,]$c <- paste(sumVector[sumVector$c == n,]$c, " (", round(sumVector[sumVector$c == n,]$V1, digits=1), ")", sep="")
+			overallResult[[whichColumShouldUse]] <- replace(as.character(overallResult[[whichColumShouldUse]]), overallResult[[whichColumShouldUse]] == n, paste(sumVector[sumVector$c == n, ]$c, " (", round(sumVector[sumVector$c == n, ]$V1, digits = 1), ")", sep = ""))
+			sumVector[sumVector$c == n, ]$c <- paste(sumVector[sumVector$c == n, ]$c, " (", round(sumVector[sumVector$c == n, ]$V1, digits = 1), ")", sep = "")
 		}
 	}
 	
@@ -5523,32 +5478,32 @@ reorderThePlotOrder <- function(overallResult, typOfPlot, whichColumShouldUse = 
 	#print(levels(overallResult[[whichColumShouldUse]]))
 	#print(sumVector[sortList, ]$c)
 	#print(head(sortList))
-
+	
 	return(list(overallResult = overallResult, sortList = sortList))
 }
 
 buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yValues, typOfPlot, additionalValues = NONE, additionalDataFrameValues = NONE) {
-#############
+	#############
 #stressStart <- overallList$stressStart
 #stressEnd <- overallList$stressEnd
 #yValues <- overallResult$mean
 #typOfPlot <- typOfPlot
-#############
+	#############
 #yValues <- overallResult$values
-#additionalValues <-  "stack"
+#additionalValues <- "stack"
 #additionalDataFrameValues <- overallResult[, c("xAxis", "plot")]
 #additionalDataFrameValues <- overallResult[, c("xAxis", "primaerTreatment")]
-############
-
-
+	############
+	
+	
 	stress.Area <- data.frame()
 	#possible.Stress.Values <- c("0", "1", "2", "3", "4") # c("n", "d", "w", "c", "s")
 	standard.stressLabels <- list("000" = "normal", "001" = "drought stress", "002" = "moisture stress", "003" = "chemical stress", "004" = "salt stress")
 	
-	ymin <- min(yValues,na.rm = TRUE)
+	ymin <- min(yValues, na.rm = TRUE)
 	ymax <- max(yValues, na.rm = TRUE)
 	
-	if (typOfPlot == VIOLIN.PLOT)  {
+	if (typOfPlot == VIOLIN.PLOT) {
 		if (abs(ymin) >= abs(ymax)) {
 			ymax <- abs(ymin)
 		} else {
@@ -5560,9 +5515,9 @@ buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yVal
 				ymin <- 0
 				ymax <- 1.00
 			} else if (additionalValues == "stack") {
-				if(additionalDataFrameValues != NONE) {
+				if (additionalDataFrameValues != NONE) {
 					newDataFrame <- data.table(yValues, additionalDataFrameValues)
-					newDataFrame <- as.data.frame(newDataFrame[, lapply(.SD, sum, na.rm=TRUE), by=colnames(additionalDataFrameValues)])
+					newDataFrame <- as.data.frame(newDataFrame[, lapply(.SD, sum, na.rm = TRUE), by = colnames(additionalDataFrameValues)])
 					ymin <- 0
 					ymax <- max(newDataFrame$yValues, na.rm = TRUE)
 				}
@@ -5571,11 +5526,11 @@ buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yVal
 	} else if (typOfPlot == NBOX.PLOT) {
 		if (additionalValues != NONE) {
 			
-			ymin <- ymin - max(additionalValues,na.rm = TRUE)
+			ymin <- ymin - max(additionalValues, na.rm = TRUE)
 			ymax <- ymax + max(additionalValues, na.rm = TRUE)	
 		}
 	}
-
+	
 #	ymin <- (ymin - ymin * 0.01)
 #	ymax <- (ymax + ymax * 0.01)
 #	print(stressStart)
@@ -5583,7 +5538,7 @@ buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yVal
 #	print(stressTyp)
 #	print(stressLabel)
 	
-	for (kk in seq(along=stressStart)) {
+	for (kk in seq(along = stressStart)) {
 		if (stressStart[kk] != -1 && stressEnd[kk] != -1) {
 			stressStart <- as.numeric(stressStart)
 			stressEnd <- as.numeric(stressEnd)
@@ -5595,20 +5550,20 @@ buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yVal
 				xmax <- stressEnd[kk]
 			}
 			
-			if(!(stressTyp[kk] %in% names(standard.stressLabels))) {
+			if (!(stressTyp[kk] %in% names(standard.stressLabels))) {
 				ownCat("... unknown stresstyp, change to \"normal\" -> (0)")
 				stressTyp[kk] <- names(standard.stressLabels)[1]
 			}
 			
-			if(stressLabel[kk] == -1) {
+			if (stressLabel[kk] == -1) {
 				ownCat("... no stresslabel are set, change to standard label for the stresstyp")
 				stressLabel[kk] <- standard.stressLabels[[stressTyp[kk]]]
 			}
 			
-			stress.Area <- rbind(stress.Area, data.frame(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, typ=stressTyp[kk], label=stressLabel[kk]))
+			stress.Area <- rbind(stress.Area, data.frame(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, typ = stressTyp[kk], label = stressLabel[kk]))
 		}
 	}
-	#dCNV_Biom[order(attr(dCNV_Bio, "Labels")),order(attr(dCNV_Bio, "Labels"))]
+	#dCNV_Biom[order(attr(dCNV_Bio, "Labels")), order(attr(dCNV_Bio, "Labels"))]
 #	stress.Area <- sort(stress.Area)
 	#print(stress.Area)
 	return(stress.Area)
@@ -5617,7 +5572,7 @@ buildStressArea <- function(stressStart, stressEnd, stressTyp, stressLabel, yVal
 addColorForStressPhaseAndOther <- function(stressArea, color, typOfPlot = "none") {
 	# c("000", "001", "002", "003", "004") entspricht c("n", "d", "w", "c", "s")
 	
-	if(typOfPlot == NBOX.PLOT || typOfPlot == "dodge") { # || typOfPlot == "stack") {
+	if (typOfPlot == NBOX.PLOT || typOfPlot == "dodge") { # || typOfPlot == "stack") {
 		stressAreaTyp <- rev(sort(as.character(unique(stressArea$typ))))
 	} else {
 		stressAreaTyp <- sort(as.character(unique(stressArea$typ)))
@@ -5638,14 +5593,14 @@ addColorForStressPhaseAndOther <- function(stressArea, color, typOfPlot = "none"
 	return(color)
 }
 
-#plotViolinPlotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title="") {
+#plotViolinPlotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "") {
 makeViolinDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
-########
+	########
 #overallResult <- plotThisValues
 #title <- ""
-########
+	########
 	overallList$debug %debug% "makeViolinDiagram()"
-
+	
 	overallResult <- reownCategorized(overallResult)
 	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 	color <- setColorDependentOfGroup(overallResult)
@@ -5656,21 +5611,21 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 	
 	#overallResult <- reorderThePlotOrder(overallResult, typOfPlot)
 	stressArea <- data.frame()
-
+	
 	#print(head(overallResult))
 	
-#  c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
-#	overallList$stressStart <- c(10,20,30,37)
+# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")	
+#	overallList$stressStart <- c(10, 20, 30, 37)
 #	overallList$stressEnd <- c(13, 23, 33, 40)
-#	overallList$stressTyp <- c("d","d","s", "c")
+#	overallList$stressTyp <- c("d", "d", "s", "c")
 #	overallList$stressLabel <- c(-1, -1, -1, -1)
 #	
-#	overallList$stressStart <- c(10,20,30)
-#	overallList$stressEnd <- c(13, 23,33)
-#	overallList$stressTyp <- c("2","1","2")
-#	overallList$stressLabel <- c(-1, -1,-1)
+#	overallList$stressStart <- c(10, 20, 30)
+#	overallList$stressEnd <- c(13, 23, 33)
+#	overallList$stressTyp <- c("2", "1", "2")
+#	overallList$stressLabel <- c(-1, -1, -1)
 	
-	if(overallList$stressStart[1] != -1) {
+	if (overallList$stressStart[1] != -1) {
 		stressArea <- buildStressArea(overallList$stressStart, overallList$stressEnd, overallList$stressTyp, overallList$stressLabel, overallResult$mean, typOfPlot)
 		color <- addColorForStressPhaseAndOther(stressArea, color)
 	}
@@ -5678,37 +5633,37 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 #	print(color)
 #	print(stressArea)
 	if (overallResult %checkRowLengthOfDataFrame% 0) {
-						
-		plot <-	ggplot()				
-				
-		if(length(stressArea) >0) {
+		
+		plot <- 	ggplot()				
+		
+		if (length(stressArea) >0) {
 			plot <- plot + 
-				geom_rect(data=stressArea, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=typ)) +
-				geom_text(data=stressArea, aes(x=xmin, y=ymin, label=label), size=2, hjust=0, vjust=1, angle = 90, colour="grey")
+					geom_rect(data = stressArea, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = typ)) +
+					geom_text(data = stressArea, aes(x = xmin, y = ymin, label = label), size = 2, hjust = 0, vjust = 1, angle = 90, colour = "grey")
 			
 		}	
 		#print(plot)
-			plot <- plot +
-				geom_ribbon(data=overallResult, aes(x=xAxis, fill=mean>=0, group=group, ymin=-mean, ymax=mean)) +						
+		plot <- plot +
+				geom_ribbon(data = overallResult, aes(x = xAxis, fill = mean >= 0, group = group, ymin = -mean, ymax = mean)) +						
 				scale_fill_manual(values = color) +
-				scale_x_continuous(name=overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) + 
-				scale_y_continuous(name=overallDesName[[imagesIndex]],  minor_breaks = min(as.numeric(as.character(overallResult$mean))):max(as.numeric(as.character(overallResult$mean)))) +
+				scale_x_continuous(name = overallList$xAxisName, minor_breaks = min(as.numeric(as.character(overallResult$xAxis))):max(as.numeric(as.character(overallResult$xAxis)))) + 
+				scale_y_continuous(name = overallDesName[[imagesIndex]], minor_breaks = min(as.numeric(as.character(overallResult$mean))):max(as.numeric(as.character(overallResult$mean)))) +
 				#ylab(overallDesName[[imagesIndex]]) +
-				#label=c("0.4", "0.2", "0.0", "0.2", "0.4")
-				#scale_y_discrete(aes(factor(c(0.4, 0.2, 0.0, 0.2, 0.4))), name=overallDesName[[imagesIndex]],limits=c(-10,1)) +
+				#label = c("0.4", "0.2", "0.0", "0.2", "0.4")
+				#scale_y_discrete(aes(factor(c(0.4, 0.2, 0.0, 0.2, 0.4))), name = overallDesName[[imagesIndex]], limits = c(-10, 1)) +
 				#scale_fill_manual(values = overallColor[[imagesIndex]]) +
-				#scale_colour_manual(values= overallColor[[imagesIndex]]) +
+				#scale_colour_manual(values = overallColor[[imagesIndex]]) +
 				coord_flip()+
 				theme_bw() +
-				theme(axis.title.x = element_text(face="bold", size=11), 
-						axis.title.y = element_text(face="bold", size=11, angle=90), 
+				theme(axis.title.x = element_text(face = "bold", size = 11), 
+						axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
 						#panel.grid.major = element_blank(), # switch off major gridlines
 						#panel.grid.minor = element_blank(), # switch off minor gridlines
 						legend.position = "none", # manually position the legend (numbers being from 0, 0 at bottom left of whole plot to 1, 1 at top right)
 						#legend.title = element_blank(), # switch off the legend title						
 						#legend.key.size = unit(1.5, "lines"), 
 						#legend. key = element_blank(), # switch off the rectangle around symbols in the legend
-						panel.border = element_rect(colour="Grey", size=0.1)
+						panel.border = element_rect(colour = "Grey", size = 0.1)
 				)
 		if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
 				(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
@@ -5720,21 +5675,21 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 		
 		if (length(unique(overallResult$name)) > 4) {
 			plot = plot + theme(
-					axis.text.x = element_text(size = 8),
+					axis.text.x = element_text(size = 8), 
 					strip.text.x = element_text(size = 7)
 			)
 		} else {
 			plot = plot + theme(
-					axis.text.x = element_text(size = 9),
+					axis.text.x = element_text(size = 9), 
 					strip.text.x = element_text(size = 10)
 			)
 		}
 		
 		plot <- facetWrap(plot, overallResult, typOfPlot)
-#		plot <- plot + facet_wrap(~ name, ncol=5) 
-	
+#		plot <- plot + facet_wrap(~ name, ncol = 5) 
+		
 		#print(plot)
-				
+		
 #		if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #			subsectionDepth <- 3
 #		} else {
@@ -5742,8 +5697,8 @@ makeViolinDiagram <- function(overallResult, overallDesName, overallList, images
 #		}		
 #		print(title)
 #		print(overallDesName[[imagesIndex]])
-			
-		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, "violinOI", sep=""), overallDesName[[imagesIndex]], TRUE, subsectionDepth=2, section = section)
+		
+		writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep = ""), paste(overallFileName, "violinOI", sep = ""), overallDesName[[imagesIndex]], TRUE, subsectionDepth = 2, section = section)
 	}
 }
 
@@ -5752,7 +5707,7 @@ getExtraPlot <- function(first, second, colNames) {
 	if (first && !second || (first && second)) {
 		columName <- getTheColumWhichShouldUse(colNames)
 	} else if (!first && second) {
-			columName <- NAME
+		columName <- NAME
 	} else {
 		columName <- NAME
 	}			
@@ -5770,17 +5725,17 @@ getColumnForColor <- function(first, second, colNames) {
 }
 
 
-checkWhichColumShouldUseForPlot <- function(first, second, colNames, plotTyp = "", prePlot=FALSE) {
-#######
+checkWhichColumShouldUseForPlot <- function(first, second, colNames, plotTyp = "", prePlot = FALSE) {
+	#######
 #first <- overallList$splitTreatmentFirst
 #second <- overallList$splitTreatmentSecond
 #colNames <- colnames(overallResult)
 #plotTyp <- typOfPlot
 #prePlot <- TRUE
-######
-
+	######
+	
 #	if (first && second) {
-#		if((plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT || plotTyp == BAR.PLOT || plotTyp == NBOX.PLOT)) {
+#		if ((plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT || plotTyp == BAR.PLOT || plotTyp == NBOX.PLOT)) {
 #			columName <- NAME
 #		} else {
 #			columName <- PRIMAER.TREATMENT
@@ -5788,11 +5743,11 @@ checkWhichColumShouldUseForPlot <- function(first, second, colNames, plotTyp = "
 #	} else 
 	
 	if (first && !second || (first && second) || (!first && second)) {
-		if((plotTyp == NBOX.PLOT || plotTyp == NBOX.MULTI.PLOT || plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT) && !prePlot) {
+		if ((plotTyp == NBOX.PLOT || plotTyp == NBOX.MULTI.PLOT || plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT) && !prePlot) {
 			columName <- NAME	
 		} else {
 			columName <- getTheColumWhichShouldUse(colNames)
-#			if("primaerTreatment" %in% colNames) {
+#			if ("primaerTreatment" %in% colNames) {
 #				columName <- "primaerTreatment"
 #			} else {
 #				columName <- "name"
@@ -5800,13 +5755,13 @@ checkWhichColumShouldUseForPlot <- function(first, second, colNames, plotTyp = "
 		}
 	} 
 #	else if (!first && second) {
-#		if((plotTyp == NBOX.PLOT || plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT) && !prePlot) {
+#		if ((plotTyp == NBOX.PLOT || plotTyp == BOX.PLOT || plotTyp == SPIDER.PLOT || plotTyp == LINERANGE.PLOT) && !prePlot) {
 #			columName <- getTheColumWhichShouldUse(colNames)
-##			if("primaerTreatment" %in% colNames) {
-##				columName <- "primaerTreatment"
-##			} else {
-##				columName <- "name"
-##			}
+	##			if ("primaerTreatment" %in% colNames) {
+	##				columName <- "primaerTreatment"
+	##			} else {
+	##				columName <- "name"
+	##			}
 #		} else {
 #			columName <- NAME
 #		}
@@ -5821,25 +5776,25 @@ checkWhichColumShouldUseForPlot <- function(first, second, colNames, plotTyp = "
 makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
 	#############
 #overallResult <- overallResultSplit
-##overallResultTemp <- overallResultSplitSecondTime
-##title <- paste(kk, nn, sep=" / ")
+	##overallResultTemp <- overallResultSplitSecondTime
+	##title <- paste(kk, nn, sep = " / ")
 #title <- nn
-##title <- ""	
+	##title <- ""	
 	############
 	
 	overallList$debug %debug% "makeBoxplotDiagram()"
- 
+	
 	overallFileName <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 #	overallColor <- overallList$color_box[[imagesIndex]]
-#	if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+#	if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 #		overallColor <- overallColor[overallList$secondFilterTreatmentRename %in% title]
 #	}
 	
 	options <- overallList$boxOptions
 	section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
-	overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
+	overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 	#isOtherTyp <- checkIfShouldSplitAfterPrimaryAndSecondaryTreatment(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond)
-	if(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+	if (!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)
 	} else {
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, FALSE)
@@ -5847,110 +5802,110 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 	
 	#print(whichColumShouldUse)
 	#if (!is.na(overallDescriptor[[imagesIndex]])) {
-		#ownCat(paste("Process ", overallDesName[[imagesIndex]]))
-		#createOuputOverview(BOX.PLOT, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
-		
-		if (length(overallResult[, 1]) > 0) {
-			xAxisfactor <- setxAxisfactor(overallList$xAxisName, overallResult[c("xAxis",VALUES)], VALUES, options, typOfPlot)	
-			
-			if(!is.null(xAxisfactor)) {
-				overallResult$xAxisfactor <- xAxisfactor 	
-				overallResult <- na.omit(overallResult)
-				if(overallResult %checkRowLengthOfDataFrame% 0) {
-					overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
-					
-					reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
-					overallResult <- reorderList$overallResult
-				
-					#colorReorder <- overallColor[reorderList$sortList]
-					colorReorder <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
-					
-					
-					#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill=name, colour=name)) + 
-					#myPlot = ggplot(overallResult, aes(factor(name), value, fill=name)) +
-				
-					
-		#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-		#				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
-		#				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
-		#			#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-		#			} else {
-						#print(head(overallResult))
-						plot <- ggplot(overallResult, aes_string(x=whichColumShouldUse, y=VALUES, fill=whichColumShouldUse))
-					#}
-					
-					
-		#			else if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
-		#				plot <- ggplot(overallResult, aes(factor(name), value, fill=name))
-		#			} else if (!isOtherTyp) {
-		#				if("primaerTreatment" %in% colnames(overallResult)) {
-		#					plot <- ggplot(overallResult, aes(factor(primaerTreatment), value, fill=primaerTreatment))
-		#				} else {
-		#					plot <- ggplot(overallResult, aes(factor(name), value, fill=name))
-		#				}
-		#			} else {
-		#				plot <- ggplot(overallResult, aes(factor(name), value, fill=name))
-		#			}
-					
-			
-		#			if(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
-		#				overallResult <- cbind(overallResult,plot=rep.int(1, length(overallResult[,1])))
-		#				plot <- ggplot(overallResult, aes(plot, value, fill=plot))
-		#			} else {
-		#				if(isOtherTyp) {
-		#					plot <- ggplot(overallResult, aes(factor(name), value, fill=name))
-		#				} else {
-		#					plot <- ggplot(overallResult, aes(factor(primaerTreatment), value, fill=primaerTreatment))
-		#				}
-		#			}
-
-					if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
-							(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
-							(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
-						if (title != "") {
-							plot = plot + ggtitle(title)
-						}
-					}
-					plot <- plot +
-							geom_boxplot() +
-							ylab(overallDesName[[imagesIndex]]) +
-							scale_fill_manual(values = colorReorder)
-							#coord_cartesian(ylim=c(0, max(overallList$overallResult$mean + overallList$overallResult$se + 10, na.rm=TRUE))) +
-							#xlab(paste(min(overallResult$xAxis), overallList$xAxisName, "..", max(overallResult$xAxis), overallList$xAxisName)) +
-		#print(plot)		
-		#			if(!(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {	
-		#				plot = plot +
-		#						scale_fill_manual(values = overallColor[[imagesIndex]])
-		#			}
-							#stat_summary(fun.data = f, geom = "crossbar", height = 0.1, 	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
-					plot <- plot +			
-							theme_bw() +
-							theme(legend.position="none", 
-									#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
-									axis.title.x = element_blank(), 
-									axis.title.y = element_text(face="bold", size=11, angle=90), 
-									panel.grid.minor = element_blank(), 
-									panel.border = element_rect(colour="Grey", size=0.1)
-									
-							)
-	#				if(overallList$splitTreatmentFirst && overallList$secondTreatment == "none") {
-	#					plot = plot +
-	#							theme(axis.text.x =element_blank())
-	#				} else {
-						plot <- setFontSize(plot, colorReorder, typOfPlot)
-#						plot = plot + 
-#								theme(axis.text.x = element_text(size=11, angle=90))	#size= 5
-					#}
-	#				if(length(unique(overallResult$xAxisfactor)) > 1) {
-	#					plot = plot +	
-	#							facet_wrap(~ xAxisfactor, drop=TRUE)
-	#				}
-					plot <- facetWrap(plot, overallResult, typOfPlot, first= overallList$splitTreatmentFirst, second = overallList$splitTreatmentSecond, whichColumShouldUse = whichColumShouldUse)	
+	#ownCat(paste("Process ", overallDesName[[imagesIndex]]))
+	#createOuputOverview(BOX.PLOT, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
 	
-					#print(plot)
-					
-					subsectionDepth <- 1
-					subtitle <- ""
+	if (length(overallResult[, 1]) > 0) {
+		xAxisfactor <- setxAxisfactor(overallList$xAxisName, overallResult[c("xAxis", VALUES)], VALUES, options, typOfPlot)	
+		
+		if (!is.null(xAxisfactor)) {
+			overallResult$xAxisfactor <- xAxisfactor 	
+			overallResult <- na.omit(overallResult)
+			if (overallResult %checkRowLengthOfDataFrame% 0) {
+				overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
+				
+				reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
+				overallResult <- reorderList$overallResult
+				
+				#colorReorder <- overallColor[reorderList$sortList]
+				colorReorder <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
+				
+				
+				#myPlot = ggplot(overallList$overallResult, aes(factor(name), value, fill = name, colour = name)) + 
+				#myPlot = ggplot(overallResult, aes(factor(name), value, fill = name)) +
+				
+				
+				#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+				#				overallResult <- cbind(overallResult, plot = rep.int(1, length(overallResult[, 1])))
+				#				plot <- ggplot(overallResult, aes(plot, value, fill = plot))
+				#			#} else if (overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+				#			} else {
+				#print(head(overallResult))
+				plot <- ggplot(overallResult, aes_string(x = whichColumShouldUse, y = VALUES, fill = whichColumShouldUse))
+				#}
+				
+				
+				#			else if (overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) {
+				#				plot <- ggplot(overallResult, aes(factor(name), value, fill = name))
+				#			} else if (!isOtherTyp) {
+				#				if ("primaerTreatment" %in% colnames(overallResult)) {
+				#					plot <- ggplot(overallResult, aes(factor(primaerTreatment), value, fill = primaerTreatment))
+				#				} else {
+				#					plot <- ggplot(overallResult, aes(factor(name), value, fill = name))
+				#				}
+				#			} else {
+				#				plot <- ggplot(overallResult, aes(factor(name), value, fill = name))
+				#			}
+				
+				
+				#			if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
+				#				overallResult <- cbind(overallResult, plot = rep.int(1, length(overallResult[, 1])))
+				#				plot <- ggplot(overallResult, aes(plot, value, fill = plot))
+				#			} else {
+				#				if (isOtherTyp) {
+				#					plot <- ggplot(overallResult, aes(factor(name), value, fill = name))
+				#				} else {
+				#					plot <- ggplot(overallResult, aes(factor(primaerTreatment), value, fill = primaerTreatment))
+				#				}
+				#			}
+				
+				if ((overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
+						(!overallList$splitTreatmentFirst && overallList$splitTreatmentSecond) || 
+						(overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {
+					if (title != "") {
+						plot = plot + ggtitle(title)
+					}
+				}
+				plot <- plot +
+						geom_boxplot() +
+						ylab(overallDesName[[imagesIndex]]) +
+						scale_fill_manual(values = colorReorder)
+				#coord_cartesian(ylim = c(0, max(overallList$overallResult$mean + overallList$overallResult$se + 10, na.rm = TRUE))) +
+				#xlab(paste(min(overallResult$xAxis), overallList$xAxisName, "..", max(overallResult$xAxis), overallList$xAxisName)) +
+				#print(plot)		
+				#			if (!(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) {	
+				#				plot = plot +
+				#						scale_fill_manual(values = overallColor[[imagesIndex]])
+				#			}
+				#stat_summary(fun.data = f, geom = "crossbar", height = 0.1, 	colour = NA, fill = "skyblue", width = 0.8, alpha = 0.5) +
+				plot <- plot +			
+						theme_bw() +
+						theme(legend.position = "none", 
+								#plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"), 
+								axis.title.x = element_blank(), 
+								axis.title.y = element_text(face = "bold", size = 11, angle = 90), 
+								panel.grid.minor = element_blank(), 
+								panel.border = element_rect(colour = "Grey", size = 0.1)
+						
+						)
+				#				if (overallList$splitTreatmentFirst && overallList$secondTreatment == "none") {
+				#					plot = plot +
+				#							theme(axis.text.x = element_blank())
+				#				} else {
+				plot <- setFontSize(plot, colorReorder, typOfPlot)
+#						plot = plot + 
+#								theme(axis.text.x = element_text(size = 11, angle = 90))	#size = 5
+				#}
+				#				if (length(unique(overallResult$xAxisfactor)) > 1) {
+				#					plot = plot +	
+				#							facet_wrap(~ xAxisfactor, drop = TRUE)
+				#				}
+				plot <- facetWrap(plot, overallResult, typOfPlot, first = overallList$splitTreatmentFirst, second = overallList$splitTreatmentSecond, whichColumShouldUse = whichColumShouldUse)	
+				
+				#print(plot)
+				
+				subsectionDepth <- 1
+				subtitle <- ""
 #					subtitle <- title
 #					
 #					if (!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) {
@@ -5958,55 +5913,55 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 #					} else {
 #						subsectionDepth <- 2
 #					}		
-					
-					writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep=""), paste(overallFileName, typOfPlot, "OI", sep=""), subtitle, TRUE, subsectionDepth=subsectionDepth, section = section)
-								
-		#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], typOfPlot)
-		#
-		#				if (overallList$appendix) {
-		#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], typOfPlot)
-		#				}
-				}
+				
+				writeTheData(overallList, plot, overallFileName, paste(title, typOfPlot, sep = ""), paste(overallFileName, typOfPlot, "OI", sep = ""), subtitle, TRUE, subsectionDepth = subsectionDepth, section = section)
+				
+				#				saveImageFile(overallList, plot, overallFileName[[imagesIndex]], typOfPlot)
+				#
+				#				if (overallList$appendix) {
+				#					writeLatexFile("appendixImage", overallFileName[[imagesIndex]], typOfPlot)
+				#				}
 			}
 		}
+	}
 	#}
 }
 
 facetWrap <- function(plot, overallResult, typOfPlot, first = FALSE, second = FALSE, whichColumShouldUse = NULL) {
 	
-	if(typOfPlot == BOX.PLOT) {
-#		if((!first && second)) {
+	if (typOfPlot == BOX.PLOT) {
+#		if ((!first && second)) {
 #			plot <- facetWrapXFactorAndNameOrPri(plot, overallResult, whichColumShouldUse)
 #		} else {		
-			plot <- facetWarapOnlyXFactor(plot, overallResult)
+		plot <- facetWarapOnlyXFactor(plot, overallResult)
 #		}
-	} else if(typOfPlot == NBOX.PLOT){
+	} else if (typOfPlot == NBOX.PLOT) {
 		if ((first && !second) || (!first && second)) {		
 			plot <- facetWrapPriAndName(plot, overallResult)
-		} else if (first && second){
+		} else if (first && second) {
 			plot <- facetWarapOnlyName(plot, overallResult)
 		}	
 		
-	} else if(typOfPlot == NBOX.MULTI.PLOT){
+	} else if (typOfPlot == NBOX.MULTI.PLOT) {
 		if ((first && !second) || (!first && second)) {		
 			plot <- facetWrapPriAndNameAndCol(plot, overallResult)
-		} else if (first && second){
+		} else if (first && second) {
 			plot <- facetWarapOnlyNameAndCol(plot, overallResult)
 		} else {
 			plot <- facetWarapOnlyCol(plot, overallResult)
 		}	
 		
-	} else if(typOfPlot == STACKBOX.PLOT) {
+	} else if (typOfPlot == STACKBOX.PLOT) {
 		if (!first && second) {		
 			plot <- facetWrapPriAndName(plot, overallResult)
 			#plot <- facetWarapOnlyName(plot, overallResult)
 		} else {
 			plot <- facetWarapOnlyName(plot, overallResult)
 		}
-	} else if(typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
-		if((first && second) || (!first && second)) {
+	} else if (typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+		if ((first && second) || (!first && second)) {
 			plot <- facetWrapXFactorAndNameOrPri(plot, overallResult, whichColumShouldUse)
-#			if(whichColumShouldUse == NAME) {
+#			if (whichColumShouldUse == NAME) {
 #				plot <- plot + facet_grid(name ~ xAxisfactor)
 #			} else {
 #				plot <- plot + facet_grid(primaerTreatment ~ xAxisfactor)
@@ -6016,11 +5971,11 @@ facetWrap <- function(plot, overallResult, typOfPlot, first = FALSE, second = FA
 			plot <- facetWarapOnlyXFactor(plot, overallResult)
 			#plot = plot + facet_grid(~ xAxisfactor)
 		}
-	} else if(typOfPlot == VIOLIN.PLOT) {
+	} else if (typOfPlot == VIOLIN.PLOT) {
 		plot <- facetWarapOnlyName(plot, overallResult, 5)
-		#plot <- plot + facet_wrap(~ name, ncol=5) 
-	} else if(typOfPlot == STRESS.PLOT) {
-		if(length(unique(overallResult$stress)) > 1) {
+		#plot <- plot + facet_wrap(~ name, ncol = 5) 
+	} else if (typOfPlot == STRESS.PLOT) {
+		if (length(unique(overallResult$stress)) > 1) {
 			plot <- plot +	
 					facet_wrap(~ stress)
 		}	
@@ -6031,19 +5986,19 @@ facetWrap <- function(plot, overallResult, typOfPlot, first = FALSE, second = FA
 
 facetWrapPriAndNameAndCol <- function(plot, overallResult) {
 	
-	if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
-		if(length(unique(overallResult$primaerTreatment)) == 1) {
+	if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+		if (length(unique(overallResult$primaerTreatment)) == 1) {
 			plot <- facetWarapOnlyCol(plot, overallResult)
 		} else {
 			plot <- plot + 
-					facet_grid(column ~ primaerTreatment, drop=FALSE)
+					facet_grid(column ~ primaerTreatment, drop = FALSE)
 		}
 	} else {
-		if(length(unique(overallResult$name)) == 1) {
+		if (length(unique(overallResult$name)) == 1) {
 			plot <- facetWarapOnlyCol(plot, overallResult)
 		} else {
 			plot <- plot + 
-					facet_grid(column ~ name, drop=FALSE)
+					facet_grid(column ~ name, drop = FALSE)
 		}
 	}
 	
@@ -6053,15 +6008,15 @@ facetWrapPriAndNameAndCol <- function(plot, overallResult) {
 
 facetWrapPriAndName <- function(plot, overallResult) {
 	
-	if(PRIMAER.TREATMENT %in% colnames(overallResult)) {
-		if(length(unique(overallResult$primaerTreatment)) > 1) {
+	if (PRIMAER.TREATMENT %in% colnames(overallResult)) {
+		if (length(unique(overallResult$primaerTreatment)) > 1) {
 			plot <- plot + 
-					facet_wrap(~ primaerTreatment, drop=FALSE)
+					facet_wrap(~ primaerTreatment, drop = FALSE)
 		}
 	} else {
-		if(length(unique(overallResult$name)) > 1) {
+		if (length(unique(overallResult$name)) > 1) {
 			plot <- plot + 
-					facet_wrap(~ name, drop=FALSE)
+					facet_wrap(~ name, drop = FALSE)
 		}
 	}
 	
@@ -6069,45 +6024,45 @@ facetWrapPriAndName <- function(plot, overallResult) {
 }
 
 facetWarapOnlyNameAndCol <- function(plot, overallResult, ncol = NULL) {
-	if(length(unique(overallResult$name)) > 1) {
+	if (length(unique(overallResult$name)) > 1) {
 		plot <- plot + 
-				facet_wrap(column ~ name, ncol = ncol, drop=FALSE)	
+				facet_wrap(column ~ name, ncol = ncol, drop = FALSE)	
 	}
 	return(plot)
 }
 
 facetWarapOnlyCol <- function(plot, overallResult) {
-	if(length(unique(overallResult$column)) > 1) {
+	if (length(unique(overallResult$column)) > 1) {
 		plot <- plot + 
-				facet_wrap(~ column, drop=FALSE)	
+				facet_wrap(~ column, drop = FALSE)	
 	}
 	return(plot)
 }
 
 
 facetWarapOnlyName <- function(plot, overallResult, ncol = NULL) {
-	if(length(unique(overallResult$name)) > 1) {
+	if (length(unique(overallResult$name)) > 1) {
 		plot <- plot + 
-				facet_wrap(~ name, ncol = ncol, drop=FALSE)	
+				facet_wrap(~ name, ncol = ncol, drop = FALSE)	
 	}
 	return(plot)
 }
 
 facetWarapOnlyXFactor <- function(plot, overallResult) {
-	if(length(unique(overallResult$xAxisfactor)) > 1) {
+	if (length(unique(overallResult$xAxisfactor)) > 1) {
 		plot <- plot +	
-				facet_wrap(~ xAxisfactor, drop=FALSE)
+				facet_wrap(~ xAxisfactor, drop = FALSE)
 	}
 	return(plot)
 } 
 
 facetWrapXFactorAndNameOrPri <- function(plot, overallResult, whichColumShouldUse) {	
-	if(whichColumShouldUse == NAME) {
-		if(length(unique(overallResult$name)) > 1 && length(unique(overallResult$xAxisfactor)) > 1) {
+	if (whichColumShouldUse == NAME) {
+		if (length(unique(overallResult$name)) > 1 && length(unique(overallResult$xAxisfactor)) > 1) {
 			plot <- plot + facet_grid(name ~ xAxisfactor)
 		}
 	} else {
-		if(length(unique(overallResult$primaerTreatment)) > 1 && length(unique(overallResult$xAxisfactor)) > 1) {
+		if (length(unique(overallResult$primaerTreatment)) > 1 && length(unique(overallResult$xAxisfactor)) > 1) {
 			plot <- plot + facet_grid(primaerTreatment ~ xAxisfactor)
 		}
 	}
@@ -6116,42 +6071,42 @@ facetWrapXFactorAndNameOrPri <- function(plot, overallResult, whichColumShouldUs
 
 
 plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title) {
-#########
+	#########
 #title <- ""
 #overallResult <- overallResultSplit
-#title	<- nn
-#########
-
+#title	 <- nn
+	#########
+	
 	overallList$debug %debug% "plotDiagram()"	
-
-	if(typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
+	
+	if (typOfPlot == NBOX.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
 		makeLinearDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 	} 
-#	else if(typOfPlot == NBOX.MULTI.PLOT) {
+#	else if (typOfPlot == NBOX.MULTI.PLOT) {
 #		makeLinearDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 #	} 
-	else if(typOfPlot == BOX.PLOT) {
+	else if (typOfPlot == BOX.PLOT) {
 		makeBoxplotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == STACKBOX.PLOT) {
+	} else if (typOfPlot == STACKBOX.PLOT) {
 		makeStackedDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == SPIDER.PLOT) {
+	} else if (typOfPlot == SPIDER.PLOT) {
 		makeSpiderDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == LINERANGE.PLOT) {
+	} else if (typOfPlot == LINERANGE.PLOT) {
 		makeLinerangeDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == VIOLIN.PLOT) {
+	} else if (typOfPlot == VIOLIN.PLOT) {
 		makeViolinDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == BAR.PLOT) {
+	} else if (typOfPlot == BAR.PLOT) {
 		makeBarDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
-	} else if(typOfPlot == STRESS.PLOT) {
+	} else if (typOfPlot == STRESS.PLOT) {
 		makeStressDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)
 	}
 	
-#	switch(typOfPlot,
-#			NBOX.PLOT = makeLinearDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title),
-#			BOX.PLOT = makeBoxplotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title),
-#			STACKBOX.PLOT = makeStackedDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title),
-#			SPIDER.PLOT = makeSpiderDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title),
-#			VIOLIN.PLOT = makeViolinDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title),
+#	switch(typOfPlot, 
+#			NBOX.PLOT = makeLinearDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title), 
+#			BOX.PLOT = makeBoxplotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title), 
+#			STACKBOX.PLOT = makeStackedDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title), 
+#			SPIDER.PLOT = makeSpiderDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title), 
+#			VIOLIN.PLOT = makeViolinDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title), 
 #			BAR.PLOT = makeBarDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title)) 
 	
 	
@@ -6159,24 +6114,24 @@ plotDiagram <- function(overallResult, overallDesName, overallList, imagesIndex,
 
 makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesIndex, typOfPlot) {
 	overallList$debug %debug% "makeSplitDiagram()"
-
-	if((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
-		(overallList$splitTreatmentFirst && overallList$secondTreatment == NONE && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
-		(typOfPlot == VIOLIN.PLOT) ||
-		(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) { #&& (typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) 
-			plotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "")	
+	
+	if ((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
+			(overallList$splitTreatmentFirst && overallList$secondTreatment == NONE && !(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) || 
+			(typOfPlot == VIOLIN.PLOT) ||
+			(!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond)) { #&& (typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT)) 
+		plotDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot, title = "")	
 	} else {
 		#nn <- unique(as.character(overallResult[[extraPlot]]))[1]
 		##extraPlot <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot, TRUE)
 		extraPlot <- getExtraPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult))
 		for(nn in unique(as.character(overallResult[[extraPlot]]))) {
-			overallList$debug %debug% paste("... subplot: ", nn, sep= "") 
+			overallList$debug %debug% paste("... subplot: ", nn, sep = "") 
 			optionListForGetBoolean <- list(value = nn)
 			names(optionListForGetBoolean) <- extraPlot
 			booleanVector <- getBooleanVectorForFilterValues(overallResult, optionListForGetBoolean)
 			overallResultSplit <- overallResult[booleanVector, ]
 			
-			if(length(unique(as.character(overallResult[[extraPlot]]))) > 0) {
+			if (length(unique(as.character(overallResult[[extraPlot]]))) > 0) {
 				nn <- replaceTreatmentNamesOverallOneValue(overallList, nn, typOfPlot)
 			} else {
 				nn <- ""
@@ -6189,8 +6144,8 @@ makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesI
 
 startDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
 	overallList$debug %debug% "startDiagramming()"
-
-	if(DO.PARALLELISATION) {
+	
+	if (DO.PARALLELISATION) {
 		sfClusterEval(paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot), 
 				stopOnError = FALSE)
 	} else {
@@ -6200,105 +6155,105 @@ startDiagramming <- function(overallList, tempOverallResult, overallDescriptor, 
 
 
 paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
-###############
-#tempOverallResult <- overallList$overallResult_nBoxDes  
+	###############
+#tempOverallResult <- overallList$overallResult_nBoxDes 
 #overallDescriptor <- overallList$nBoxDes 
 #overallDesName <- overallList$nBoxDesName
 #typOfPlot <- NBOX.PLOT	
 #imagesIndex <- "1"
-###############
-#tempOverallResult <- overallList$overallResult_nBoxMultiDes  
+	###############
+#tempOverallResult <- overallList$overallResult_nBoxMultiDes 
 #overallDescriptor <- overallList$nBoxMultiDes 
 #overallDesName <- overallList$nBoxMultiDesName
 #typOfPlot <- NBOX.MULTI.PLOT	
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_boxSpiderDes 
-#overallDescriptor <- overallList$boxSpiderDes  
+#overallDescriptor <- overallList$boxSpiderDes 
 #overallDesName <- overallList$boxSpiderDesName 
 #typOfPlot <- SPIDER.PLOT
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_violinBoxDes
 #overallDescriptor <- overallList$violinBoxDes
 #overallDesName <- overallList$violinBoxDesName
 #typOfPlot <- VIOLIN.PLOT
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_boxDes
 #overallDescriptor <- overallList$boxDes
 #overallDesName <- overallList$boxDesName
 #typOfPlot <- BOX.PLOT
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_boxStackDes
 #overallDescriptor <- overallList$boxStackDes
 #overallDesName <- overallList$boxStackDesName
 #typOfPlot <- STACKBOX.PLOT
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_linerangeDes 
-#overallDescriptor <- overallList$linerangeDes  
+#overallDescriptor <- overallList$linerangeDes 
 #overallDesName <- overallList$linerangeDesName 
 #typOfPlot <- LINERANGE.PLOT
 #imagesIndex <- "1"
-###############
+	###############
 #tempOverallResult <- overallList$overallResult_stressDes 
-#overallDescriptor <- overallList$stressDes  
+#overallDescriptor <- overallList$stressDes 
 #overallDesName <- overallList$stressDesName 
 #typOfPlot <- STRESS.PLOT
 #imagesIndex <- "1"
-###############
-
+	###############
+	
 	overallList$debug %debug% "paralleliseDiagramming()"
 	
-#	if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
+#	if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
 #		tempOverallResult <- na.omit(tempOverallResult)
 #	} else 
 	
-	if(typOfPlot == VIOLIN.PLOT){
+	if (typOfPlot == VIOLIN.PLOT) {
 		tempOverallResult <- OneMinusTheValue(tempOverallResult, overallDescriptor)
 	}
 	
 	for (imagesIndex in names(overallDescriptor)) {
 		if (all(!is.na(overallDescriptor[[imagesIndex]]))) {
-		#if (!is.na(overallDescriptor[[imagesIndex]][1])) {
+			#if (!is.na(overallDescriptor[[imagesIndex]][1])) {
 			plot <- TRUE
-			if(DO.MODELLING.OF.STRESS && length(descriptorStressVector) > 0) {
-				if(!(overallDescriptor[[imagesIndex]] %in% descriptorStressVector)) {
+			if (DO.MODELLING.OF.STRESS && length(descriptorStressVector) > 0) {
+				if (!(overallDescriptor[[imagesIndex]] %in% descriptorStressVector)) {
 					plot <- FALSE	
 				}
 			}
-			if(plot) {
-				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)),  overallDesName[[imagesIndex]])
+			if (plot) {
+				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
 				overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, typOfPlot)
-			
-				if(typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
+				
+				if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
 					overallResult <- na.omit(overallResult)
-				} else if(typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
+				} else if (typOfPlot == NBOX.PLOT || typOfPlot == BAR.PLOT || typOfPlot == NBOX.MULTI.PLOT) {
 					overallResult = overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
 					overallResult[is.na(overallResult)] = 0 #second if there are values where the se are NA (because only one Value are there) -> the se are set to 0	
-					#overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)
-				} else if(typOfPlot == VIOLIN.PLOT) {
+					#overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
+				} else if (typOfPlot == VIOLIN.PLOT) {
 					overallResult <- overallResult[!is.na(overallResult$mean), ]	#first all values where "mean" != NA are taken
-				} else if(typOfPlot == STRESS.PLOT) {
-					#overallResult <-  replaceTreatmentNamesOverall(overallList, overallResult)	
+				} else if (typOfPlot == STRESS.PLOT) {
+					#overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)	
 				}
-			
+				
 				if (overallResult %checkRowLengthOfDataFrame% 0) {
-					if("2147483647" %in% overallResult[,X.AXIS]){
-						if(length(unique(overallResult[,X.AXIS])) > 1) {
-							overallResult[overallResult[,X.AXIS] == 2147483647, X.AXIS] <- sort(unique(overallResult[,X.AXIS]), decreasing = TRUE)[2]+1
+					if ("2147483647" %in% overallResult[, X.AXIS]) {
+						if (length(unique(overallResult[, X.AXIS])) > 1) {
+							overallResult[overallResult[, X.AXIS] == 2147483647, X.AXIS] <- sort(unique(overallResult[, X.AXIS]), decreasing = TRUE)[2]+1
 						} else {
-							overallResult[overallResult[,X.AXIS] == 2147483647,X.AXIS] <- -1
+							overallResult[overallResult[, X.AXIS] == 2147483647, X.AXIS] <- -1
 						}
 					}
-						
-					if(CATCH.ERROR) {
+					
+					if (CATCH.ERROR) {
 						if (INNER.THREADED && DO.PARALLELISATION) {
 							
-							error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
-										stopOnError=FALSE), silent = !overallList$debug)
+							error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot, 
+											stopOnError = FALSE), silent = !overallList$debug)
 						} else {
 							error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
 						}
@@ -6306,8 +6261,8 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 					} else {
 						if (INNER.THREADED && DO.PARALLELISATION) {
 							
-							sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot,
-									stopOnError=FALSE)
+							sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot, 
+									stopOnError = FALSE)
 						} else {
 							makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot)
 						}
@@ -6317,7 +6272,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 		}
 	}
 	
-	if(!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
+	if (!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
 		overallList <- reduceOverallListForMemorySave(overallList, typOfPlot)
 		gc()
 	}
@@ -6331,66 +6286,66 @@ reduceOverallListForMemorySave <- function(overallList, typOfPlot) {
 
 
 getOverallValuesPerType <- function(typOfPlot, typOfValues) {
-	if(typOfPlot == NBOX.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+	if (typOfPlot == NBOX.PLOT) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_nBoxplots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("nBoxSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_nBoxDes")
 		}
 	} else if (typOfPlot == NBOX.MULTI.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_nBoxMultiPlots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("nBoxMultiSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_nBoxMultiDes")
 		}
 	} else if (typOfPlot == STRESS.PLOT) {
-		if(typOfValues == GET.SECTION.VALUE) {
+		if (typOfValues == GET.SECTION.VALUE) {
 			return(STRESS)
 		}	
 	} else if (typOfPlot == BAR.PLOT) {	
 		#empty	
 	} else if (typOfPlot == BOX.PLOT) {	
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_Boxplots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("boxSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_boxDes")
 		}
 	} else if (typOfPlot == STACKBOX.PLOT) {	
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_StackedPlots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("boxStackSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_boxStackDes")
 		}
 	} else if (typOfPlot == SPIDER.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_SpiderPlots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("boxSpiderSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_boxSpiderDes")
 		}		
 	} else if (typOfPlot == LINERANGE.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_LinerangePlots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("linerangeSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_linerangeDes")
 		}		
 	} else if (typOfPlot == VIOLIN.PLOT) {
-		if(typOfValues == GET.OVERALL.FILE.NAME) {
+		if (typOfValues == GET.OVERALL.FILE.NAME) {
 			return("imageFileNames_violinPlots")
-		} else if(typOfValues == GET.SECTION.VALUE) {
+		} else if (typOfValues == GET.SECTION.VALUE) {
 			return("violinBoxSection")
-		} else if(typOfValues == GET.OVERALL.RESULT.RESET) {
+		} else if (typOfValues == GET.OVERALL.RESULT.RESET) {
 			return("overallResult_violinBoxDes")
 		}		
 	}
@@ -6399,8 +6354,8 @@ getOverallValuesPerType <- function(typOfPlot, typOfValues) {
 
 getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = -1) {
 	overallList$debug %debug% "getOverallValues()"
-
-	if(imagesIndex == -1 || typOfValues == GET.SECTION.VALUE) {
+	
+	if (imagesIndex == -1 || typOfValues == GET.SECTION.VALUE) {
 		return(overallList[[getOverallValuesPerType(typOfPlot, typOfValues)]])
 	} else {
 		return(overallList[[getOverallValuesPerType(typOfPlot, typOfValues)]][[imagesIndex]])
@@ -6408,46 +6363,46 @@ getOverallValues <- function(overallList, typOfPlot, typOfValues, imagesIndex = 
 }
 
 checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOfPlot = NULL, typ = NULL) {
-	if(!is.null(overallList)) {
+	if (!is.null(overallList)) {
 		overallList$debug %debug% "checkOfTryError()"
 	}
 	
-	if(isTRUE(all.equal(class(error), "try-error"))) {
-		if(!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {
+	if (isTRUE(all.equal(class(error), "try-error"))) {
+		if (!(is.null(overallList) || is.null(imagesIndex) || is.null(typOfPlot))) {
 			preFilename <- getOverallValues(overallList, typOfPlot, GET.OVERALL.FILE.NAME, imagesIndex)
 			filename <- checkFileName(preFilename, typOfPlot)
 			filenamePlot <- getPlotFileName(filename)
 			createErrorPlot(filenamePlot, filename)
 			
 			section <- buildSectionString(getOverallValues(overallList, typOfPlot, GET.SECTION.VALUE), imagesIndex, overallList$appendix)
-			writeLatexFile(paste(preFilename, typOfPlot, "OI", sep=""), filename, saveFormatImage = overallList$saveFormat, section = section)
-					
-			text <- paste("Error in file: ", filenamePlot, NEWLINE.TEX.INCLUDE,
-						  "Error-Message: ", NEWLINE.TEX.INCLUDE,
-						  geterrmessage(), NEWLINE.TEX.INCLUDE,
-						  "ooooooooooooooooooooooooooo", NEWLINE.TEX.INCLUDE, NEWLINE.TEX.INCLUDE, sep="")
-			text<- parseString2Latex(text)	
+			writeLatexFile(paste(preFilename, typOfPlot, "OI", sep = ""), filename, saveFormatImage = overallList$saveFormat, section = section)
+			
+			text <- paste("Error in file: ", filenamePlot, NEWLINE.TEX.INCLUDE, 
+					"Error-Message: ", NEWLINE.TEX.INCLUDE, 
+					geterrmessage(), NEWLINE.TEX.INCLUDE, 
+					"ooooooooooooooooooooooooooo", NEWLINE.TEX.INCLUDE, NEWLINE.TEX.INCLUDE, sep = "")
+			text <- parseString2Latex(text)	
 			writeLatexFile(ERROR, saveFormatImage = overallList$saveFormat, section = ERROR)
-			#errorFile <- paste(ERROR, SECTION.TEX, ERROR, sep="")
-				  
+			#errorFile <- paste(ERROR, SECTION.TEX, ERROR, sep = "")
+			
 			writeOnlyALatexFile(text, getPlotFileName(ERROR), TRUE)
-		} else if(!is.null(typ) && typ == LIB) {
+		} else if (!is.null(typ) && typ == LIB) {
 			return(TRUE)
 		} else {
-#			if(!file.exists(REPORT.FILE)) {
+#			if (!file.exists(REPORT.FILE)) {
 #				text <- "\\documentclass{article} \\newline
 #						\\begin{document} \\newline
 #						There was an error! \\newline
 #						\\end{document}"
 #				
-#				write(x=text, append=FALSE, file=REPORT.FILE)
+#				write(x = text, append = FALSE, file = REPORT.FILE)
 #			}
-			ckeckIfReportTexIsThere(errorText =  geterrmessage())
-			write(x="no Output! The whole script stops!", append=FALSE, file=ERROR.TOTAL.FILE)
+			ckeckIfReportTexIsThere(errorText = geterrmessage())		############# DEBUG
+			write(x = "no Output! The whole script stops!", append = FALSE, file = ERROR.TOTAL.FILE)
 		}
 	}
 	
-	if(!is.null(typ) && typ == LIB) {
+	if (!is.null(typ) && typ == LIB) {
 		return(FALSE)
 	}
 }
@@ -6470,21 +6425,21 @@ getStandardColnames <- function(tempOverallResult) {
 # "se": standard deviation
 ######
 calculateSomeStressForTheGivenTyp <- function(overallResult, descriptorName) {
-	plantName <- overallResult[,NAME]
-	days <- overallResult[,X.AXIS]
-	valuesMean <- overallResult[,"mean"]
-	valuesSd <- overallResult[,"se"]
+	plantName <- overallResult[, NAME]
+	days <- overallResult[, X.AXIS]
+	valuesMean <- overallResult[, "mean"]
+	valuesSd <- overallResult[, "se"]
 	
 	stressName <- vector()
 	for(nn in 1:5) {
-		stressName <- c(stressName, paste("stress", nn, sep=""))
+		stressName <- c(stressName, paste("stress", nn, sep = ""))
 	}	
 	
-	stress1 <- mean(valuesMean, na.rm=TRUE)
-	stress2 <- max(valuesMean, na.rm=TRUE)
-	stress3 <- min(valuesMean, na.rm=TRUE)
-	stress4 <- sd(valuesMean, na.rm=TRUE)
-	stress5 <- sum(valuesMean, na.rm=TRUE)
+	stress1 <- mean(valuesMean, na.rm = TRUE)
+	stress2 <- max(valuesMean, na.rm = TRUE)
+	stress3 <- min(valuesMean, na.rm = TRUE)
+	stress4 <- sd(valuesMean, na.rm = TRUE)
+	stress5 <- sum(valuesMean, na.rm = TRUE)
 	
 	#stressMatrix <- matrix(c(stress1, stress2, stress3, stress4, stress5), dimnames = list(stressName, "value"))
 	stressVector <- c(stress1, stress2, stress3, stress4, stress5)
@@ -6498,15 +6453,15 @@ calculateSomeStressForTheGivenTyp <- function(overallResult, descriptorName) {
 # overallList$stressMatrixList <- this is the whole list of the stress values
 # overallList$stressMatrixList$genevalue1 <- here you get all values for all descriptors for the genotype "genevalue1" the same access is: overallList$stressMatrixList[["genevalue1"]]
 # overallList$stressMatrixList$genevalue1$descriptor1 <- here you get a matrix with all stress values of the genotype "genevalue1" and the descriptor "descriptor1"
-# overallList$stressMatrixList$genevalue1$descriptor1[1,1] <- here you get the first stress value
-# overallList$stressMatrixList$genevalue1$descriptor1[2,1] <- the second ...
+# overallList$stressMatrixList$genevalue1$descriptor1[1, 1] <- here you get the first stress value
+# overallList$stressMatrixList$genevalue1$descriptor1[2, 1] <- the second ...
 ###########
 calculateStressValues <- function(overallList) {
 	overallList$debug %debug% "calculateStressValues()"
-
-	if(DO.MODELLING.OF.STRESS) {
+	
+	if (DO.MODELLING.OF.STRESS) {
 		workingData <- overallList$overallResult_nBoxDes	
-		uniqueValues <- unique(as.character(workingData[,NAME]))
+		uniqueValues <- unique(as.character(workingData[, NAME]))
 		desVec <- na.omit(unlist(overallList$nBoxDes))
 		
 		#stressResultMatrix <- matrix(-1, nrow = length(desVec), ncol = length(uniqueValues), dimnames = list(names(desVec), uniqueValues))
@@ -6514,15 +6469,15 @@ calculateStressValues <- function(overallList) {
 		numberOfStressValues <- 5
 		numberOfColumns <- 2 + numberOfStressValues
 		stressResultMatrix <- matrix(-1, nrow = length(uniqueValues) * length(desVec), ncol = numberOfColumns)
-		colnames(stressResultMatrix) <- c("name", "descriptor", paste("stress", seq(1:5), sep=""))
+		colnames(stressResultMatrix) <- c("name", "descriptor", paste("stress", seq(1:5), sep = ""))
 		
 		index <- 1
 		for(pp in uniqueValues) {
-			newWorkingDataSet <- workingData[workingData[,NAME] == pp,]
+			newWorkingDataSet <- workingData[workingData[, NAME] == pp, ]
 			for (descriptorIndex in names(desVec)) {	
 				overallResult <- reduceWholeOverallResultToOneValue(newWorkingDataSet, descriptorIndex, overallList$debug, NBOX.PLOT)
 				
-				stressResultMatrix[index,] <- c(pp, descriptorIndex, calculateSomeStressForTheGivenTyp(overallResult, as.character(overallList$nBoxDes[[descriptorIndex]])))
+				stressResultMatrix[index, ] <- c(pp, descriptorIndex, calculateSomeStressForTheGivenTyp(overallResult, as.character(overallList$nBoxDes[[descriptorIndex]])))
 				#overallList$nBoxDesName[[descriptorIndex]]
 				
 				
@@ -6537,7 +6492,7 @@ calculateStressValues <- function(overallList) {
 		overallList$stressDesName <- overallList$nBoxDesName
 		overallList$stressOptions <- NULL
 		
-		#tempOverallResult <- overallList$overallResult_nBoxDes  
+		#tempOverallResult <- overallList$overallResult_nBoxDes 
 		#overallDescriptor <- overallList$nBoxDes 
 		#overallDesName <- overallList$nBoxDesName
 		#typOfPlot <- NBOX.PLOT	
@@ -6551,162 +6506,142 @@ makeDiagrams <- function(overallList) {
 	overallList$debug %debug% "makeDiagrams()"
 	
 	if (SHOULD.THREADED && DO.PARALLELISATION) {
-			sfExport("overallList")
+		sfExport("overallList")
 	}
 	if (!calculateNothing) {
-				
-if(!plotOnlyViolin) {	
-if(!plotOnlySpider) {
-if(!plotOnlyLineRange) {
-if(!plotOnlyStacked) {
-if(!plotOnlyBoxplot) {
-if(!plotOnlyNBoxMulti) {
-if(!plotOnlyNBox) {
-
-		if (DO.MODELLING.OF.STRESS && sum(!is.na(overallList$stressDes)) > 0) {
-			if (overallList$debug) {ownCat("stress modelling...")}
-			startDiagramming(overallList, overallList$overallResult_stressDes,  overallList$stressDes, overallList$stressDesName, STRESS.PLOT)				
-		} else {
-			ownCat("All values for stress modelling are 'NA'")
-		}
-}
-if(!plotOnlyStressValues) {
-		if (sum(!is.na(overallList$nBoxDes)) > 0) {
-			if (overallList$debug) {ownCat("nBoxplot...")}
-				startDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT)
-		} else {
-			ownCat("All values for nBoxplot are 'NA'")
-		}
-}}
-if(!plotOnlyNBox) {
-		if (sum(!is.na(overallList$nBoxMultiDes)) > 0) {
-			if (overallList$debug) {ownCat("nBoxMultiPlot...")}
-			startDiagramming(overallList, overallList$overallResult_nBoxMultiDes,  overallList$nBoxMultiDes, overallList$nBoxMultiDesName, NBOX.MULTI.PLOT)
-		} else {
-			ownCat("All values for nBoxMultiPlot are 'NA'")
-		}
-}}
-
-if(!plotOnlyStressValues) {
-if(!plotOnlyNBox) {
-if(!plotOnlyNBoxMulti) {
-		if (sum(!is.na(overallList$boxDes)) > 0) {
-			if (overallList$debug) {ownCat("Boxplot...")}						
-			startDiagramming(overallList, overallList$overallResult_boxDes,  overallList$boxDes, overallList$boxDesName, BOX.PLOT)		
-		} else {
-			ownCat("All values for Boxplot are 'NA'...")
-		}
-}}}}
-
-if(!plotOnlyStressValues) {
-if(!plotOnlyNBox) {
-if(!plotOnlyNBoxMulti) {
-if(!plotOnlyBoxplot) {
-		if (sum(!is.na(overallList$boxStackDes)) > 0) {
-			if (overallList$debug) {ownCat("Stacked Boxplot...")}
-			startDiagramming(overallList, overallList$overallResult_boxStackDes,  overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT)
-		} else {
-			ownCat("All values for stacked Boxplot are 'NA'...")
-			}
-}}}}}}
-
-if(!plotOnlyStressValues) {
-if(!plotOnlyStacked) {
-if(!plotOnlyBoxplot) {
-if(!plotOnlyNBox) {
-if(!plotOnlyNBoxMulti) {
-if(!plotOnlyLineRange) {
-		if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
-			if (overallList$debug) {ownCat("Spider plot...")}
-			startDiagramming(overallList, overallList$overallResult_boxSpiderDes,  overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT)
-		} else {
-			ownCat("All values for spider plot are 'NA'...")
-		}
-}
-		if (sum(!is.na(overallList$linerangeDes)) > 0) {
-			if (overallList$debug) {ownCat("Linerange plot...")}
-			startDiagramming(overallList, overallList$overallResult_linerangeDes,  overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT)
-		} else {
-			ownCat("All values for linerange plot are 'NA'...")
-		}
-}}}}}}
-
-if(!plotOnlyStressValues) {
-if(!plotOnlyStacked) {
-if(!plotOnlyBoxplot) {
-if(!plotOnlyNBox) {
-if(!plotOnlyNBoxMulti) {
-if(!plotOnlySpider) {
-if(!plotOnlyLineRange) {
-		if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
-			if (overallList$debug) {ownCat("Violin plot...")}
-			startDiagramming(overallList, overallList$overallResult_violinBoxDes,  overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT)
-		} else {
-			ownCat("All values for violin Boxplot are 'NA'...")
-		}
-}}}}}}}
+		
+		if (!plotOnlyViolin) {	
+			if (!plotOnlySpider) {
+				if (!plotOnlyLineRange) {
+					if (!plotOnlyStacked) {
+						if (!plotOnlyBoxplot) {
+							if (!plotOnlyNBoxMulti) {
+								if (!plotOnlyNBox) {
+									
+									if (DO.MODELLING.OF.STRESS && sum(!is.na(overallList$stressDes)) > 0) {
+										if (overallList$debug) {ownCat("stress modelling...")}
+										startDiagramming(overallList, overallList$overallResult_stressDes, overallList$stressDes, overallList$stressDesName, STRESS.PLOT)				
+									} else {
+										ownCat("All values for stress modelling are 'NA'")
+									}
+								}
+								if (!plotOnlyStressValues) {
+									if (sum(!is.na(overallList$nBoxDes)) > 0) {
+										if (overallList$debug) {ownCat("nBoxplot...")}
+										startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT)
+									} else {
+										ownCat("All values for nBoxplot are 'NA'")
+									}
+								}}
+							if (!plotOnlyNBox) {
+								if (sum(!is.na(overallList$nBoxMultiDes)) > 0) {
+									if (overallList$debug) {ownCat("nBoxMultiPlot...")}
+									startDiagramming(overallList, overallList$overallResult_nBoxMultiDes, overallList$nBoxMultiDes, overallList$nBoxMultiDesName, NBOX.MULTI.PLOT)
+								} else {
+									ownCat("All values for nBoxMultiPlot are 'NA'")
+								}
+							}}
+						
+						if (!plotOnlyStressValues) {
+							if (!plotOnlyNBox) {
+								if (!plotOnlyNBoxMulti) {
+									if (sum(!is.na(overallList$boxDes)) > 0) {
+										if (overallList$debug) {ownCat("Boxplot...")}						
+										startDiagramming(overallList, overallList$overallResult_boxDes, overallList$boxDes, overallList$boxDesName, BOX.PLOT)		
+									} else {
+										ownCat("All values for Boxplot are 'NA'...")
+									}
+								}}}}
+					
+					if (!plotOnlyStressValues) {
+						if (!plotOnlyNBox) {
+							if (!plotOnlyNBoxMulti) {
+								if (!plotOnlyBoxplot) {
+									if (sum(!is.na(overallList$boxStackDes)) > 0) {
+										if (overallList$debug) {ownCat("Stacked Boxplot...")}
+										startDiagramming(overallList, overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT)
+									} else {
+										ownCat("All values for stacked Boxplot are 'NA'...")
+									}
+								}}}}}}
+			
+			if (!plotOnlyStressValues) {
+				if (!plotOnlyStacked) {
+					if (!plotOnlyBoxplot) {
+						if (!plotOnlyNBox) {
+							if (!plotOnlyNBoxMulti) {
+								if (!plotOnlyLineRange) {
+									if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
+										if (overallList$debug) {ownCat("Spider plot...")}
+										startDiagramming(overallList, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT)
+									} else {
+										ownCat("All values for spider plot are 'NA'...")
+									}
+								}
+								if (sum(!is.na(overallList$linerangeDes)) > 0) {
+									if (overallList$debug) {ownCat("Linerange plot...")}
+									startDiagramming(overallList, overallList$overallResult_linerangeDes, overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT)
+								} else {
+									ownCat("All values for linerange plot are 'NA'...")
+								}
+							}}}}}}
+		
+		if (!plotOnlyStressValues) {
+			if (!plotOnlyStacked) {
+				if (!plotOnlyBoxplot) {
+					if (!plotOnlyNBox) {
+						if (!plotOnlyNBoxMulti) {
+							if (!plotOnlySpider) {
+								if (!plotOnlyLineRange) {
+									if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
+										if (overallList$debug) {ownCat("Violin plot...")}
+										startDiagramming(overallList, overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT)
+									} else {
+										ownCat("All values for violin Boxplot are 'NA'...")
+									}
+								}}}}}}}
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
-			startDiagramming(overallList, overallList$overallResult_nBoxDes,  overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT)
+			startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT)
 		}
 	}
 }
 
-addDesSetLineSec <- function(descriptorSet, descriptorSetName, workingDataSet, descriptorSet_section) {
-#########
-#descriptorSet <- descriptorSet_temp$columName
-#descriptorSetName <- descriptorSet_temp$plotName 
-#descriptorSet_section <- descriptorSet_temp$section
-#########
+addDesSetLineSec <- function(descriptorSet, descriptorSetName, workingDataSet, descriptorSet_section, debug = FALSE) {
+	debug %debug% "addDesSetLineSec()"
 	
-	for(nn in seq(along=descriptorSet)) {
-		if(str_detect(descriptorSet[nn], fixed("#"))) {
+	for(nn in seq(along = descriptorSet)) {
+		if (str_detect(descriptorSet[nn], fixed("#"))) {
 			newDesAll <- character()
 			split <- unlist(str_split(descriptorSet[nn], fixed("#")))
 			for(kk in seq(1:5)) {
-				newDes <- paste(split[1], "_", kk, "_", "5.", split[2], sep="")
-				if(kk == 1) {
+				newDes <- paste(split[1], "_", kk, "_", "5.", split[2], sep = "")
+				if (kk == 1) {
 					sep <- ""
 				} else {
 					sep <- "$"
 				}
-				newDesAll <- paste(newDesAll, newDes, sep=sep)
-			}
-			
-#			if(!is.null(descriptorSet_section)) {
-#				addDesSection <- list(section = c(addDesSection$section, descriptorSet_section$section[nn]),
-#									  subsection = c(addDesSection$subsection, descriptorSet_section$subsection[nn]),
-#									  subsubsection = c(addDesSection$subsubsection, descriptorSet_section$subsubsection[nn]),
-#									  paragraph = c(addDesSection$paragraph, descriptorSet_section$paragraph[nn]))
-#			}
-			
-			
+				newDesAll <- paste(newDesAll, newDes, sep = sep)
+			}			
 			descriptorSet[nn] <- newDesAll
 		}
 	}
-
-	return(list(desSet=descriptorSet, desName = descriptorSetName, desSec = descriptorSet_section))
-
+	
+	return(list(desSet = descriptorSet, desName = descriptorSetName, desSec = descriptorSet_section))
 }
 
 
 
 
-addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet, descriptorSet_section = NULL) {
-############
-#descriptorSet_boxplotStacked <- descriptorSet_temp$columName
-#descriptorSetName_boxplotStacked <- descriptorSet_temp$plotName
-#descriptorSet_section <- descriptorSet_temp$section
-############
-	
-	
+addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotStacked, workingDataSet, descriptorSet_section = NULL, debug = FALSE) {
+	debug %debug% "addDesSet()"
+		
 	addDescSet <- character()
 	addDescSetNames <- character()
 	addDesSection <- list()
 	i <- 0
 	for (ds in descriptorSet_boxplotStacked) {
 		addCol <- ""
-		#addColDesc <- ""
 		for (col in colnames(workingDataSet)) {	
 			if (nchar(ds)>5) {
 				last4chars = substr(col, nchar(ds)-4, nchar(ds))
@@ -6714,22 +6649,20 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 					col_substring = substr(col, 1, nchar(ds))
 					if (col_substring == ds) {
 						if (nchar(addCol)>0) {
-							addCol = paste(addCol, "$", sep="")
+							addCol = paste(addCol, "$", sep = "")
 						}
-						addCol <- paste(addCol, col, sep="")
+						addCol <- paste(addCol, col, sep = "")
 					} 
 				}
 			}
 		}
 		i <- i+1
-	#	addColDesc = descriptorSetName_boxplotStacked[i]
 		if (nchar(addCol)>0) {
-			#ownCat(paste("Adding ", addCol, "with description", addColDesc))
-			if(!is.null(descriptorSet_section)) {
-				addDesSection <- list(section = c(addDesSection$section, descriptorSet_section$section[i]),
-									  subsection = c(addDesSection$subsection, descriptorSet_section$subsection[i]),
-									  subsubsection = c(addDesSection$subsubsection, descriptorSet_section$subsubsection[i]),
-									  paragraph = c(addDesSection$paragraph, descriptorSet_section$paragraph[i]))
+			if (!is.null(descriptorSet_section)) {
+				addDesSection <- list(section = c(addDesSection$section, descriptorSet_section$section[i]), 
+						subsection = c(addDesSection$subsection, descriptorSet_section$subsection[i]), 
+						subsubsection = c(addDesSection$subsubsection, descriptorSet_section$subsubsection[i]), 
+						paragraph = c(addDesSection$paragraph, descriptorSet_section$paragraph[i]))
 			}
 			
 			addDescSet <- c(addDescSet, addCol)
@@ -6738,12 +6671,10 @@ addDesSet <- function(descriptorSet_boxplotStacked, descriptorSetName_boxplotSta
 	}
 	
 	if (length(addDescSet) > 0) {
-		return(list(desSet=addDescSet, desName = addDescSetNames, desSec = addDesSection))
+		return(list(desSet = addDescSet, desName = addDescSetNames, desSec = addDesSection))
 	} else {
-		return(list(desSet=descriptorSet_boxplotStacked, desName = descriptorSetName_boxplotStacked, desSec = addDesSection))
+		return(list(desSet = descriptorSet_boxplotStacked, desName = descriptorSetName_boxplotStacked, desSec = addDesSection))
 	}
-	#descriptorSet_boxplotStacked = c(descriptorSet_boxplotStacked, addDescSetNames) 	
-	#return(descriptorSet_boxplotStacked)
 }
 
 isOwnNull <- function(value) {
@@ -6762,51 +6693,40 @@ replaceNullWithRealNullAndSetName <- function(value, names) {
 }
 
 
-changeSectionToRealSection <- function(section, sectionMappingList, lengthAppendix = 0) {
-##########
-#section <- descriptorSet_temp$section
-#lengthAppendix = 0
-##########
-
-	if(!is.null(section)) {
+changeSectionToRealSection <- function(section, sectionMappingList, lengthAppendix = 0, debug = FALSE) {
+	debug %debug% "changeSectionToRealSection()"
 	
+	if (!is.null(section)) {
 		for(con in seq(along = section)) {
-			if(con != 1) {
-				if(length(section[[1]]) != length(section[[con]])) {
+			if (con != 1) {
+				if (length(section[[1]]) != length(section[[con]])) {
 					section[[con]] <- c(section[[con]], rep.int(0, length(section[[1]]) - length(section[[con]])))
 				}
 			}
 		}
 		
 		concatSection <- section
-		
 		sectionVector <- names(concatSection)
 		for(sectionNameIndex in seq(along = sectionVector)) {
 			values <- vector()
 			for(con2 in seq(along = 1:sectionNameIndex)) {
-				if(con2 == 1) {
+				if (con2 == 1) {
 					values <- concatSection[[sectionVector[con2]]]
 				} else {
-#					if(length(concatSection[[sectionVector[1]]]) != length(concatSection[[sectionVector[con]]])) {
-#						concatSection[[sectionVector[con]]] <- c(concatSection[[sectionVector[con]]], rep.int(0, length(concatSection[[sectionVector[1]]]) - length(concatSection[[sectionVector[con]]])))
-#					}
-					values <- paste(values, concatSection[[sectionVector[con2]]], sep=".")
+					values <- paste(values, concatSection[[sectionVector[con2]]], sep = ".")
 				}
 			}
 			
-			#for(nn in unique(values)) {
 			for(nn in seq(along = concatSection[[sectionVector[sectionNameIndex]]])) {
-				if(values[nn] %in% sectionMappingList[[sectionVector[sectionNameIndex]]]) {
-					if(section[[sectionVector[sectionNameIndex]]][nn] != 0 && 
-					   !is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[values[nn]]])) {
-				   		position <- values[nn]
-				   		
+				if (values[nn] %in% sectionMappingList[[sectionVector[sectionNameIndex]]]) {
+					if (section[[sectionVector[sectionNameIndex]]][nn] != 0 && !is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[values[nn]]])) {
+						position <- values[nn]
+						
 						repeat {
-							if(!is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$newSection)) {				   
-								#section[[sectionVector[sectionNameIndex]]][concatSection[[sectionVector[sectionNameIndex]]] == nn] <- sectionMappingList[[sectionVector[sectionNameIndex]]][[values[nn]]]$newSection
+							if (!is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$newSection)) {				 
 								section[[sectionVector[sectionNameIndex]]][nn] <- sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$newSection
 								break;
-							} else if(!is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$takeRestValuesFrom)) {
+							} else if (!is.null(sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$takeRestValuesFrom)) {
 								position <- sectionMappingList[[sectionVector[sectionNameIndex]]][[position]]$takeRestValuesFrom	
 							} else {
 								break;
@@ -6816,7 +6736,6 @@ changeSectionToRealSection <- function(section, sectionMappingList, lengthAppend
 				}
 			}	
 		}
-	
 		return(section)	
 	} else {
 		return(rep.int(sectionMappingList$section[[APPENDIX.SECTION]]$newSection, lengthAppendix))
@@ -6824,7 +6743,7 @@ changeSectionToRealSection <- function(section, sectionMappingList, lengthAppend
 }
 
 changeXAxisName <- function(overallList) {
-	if (length(overallList$iniDataSet$Day..Int.) > 1 ){
+	if (length(overallList$iniDataSet$Day..Int.) > 1 ) {
 		day_int <- as.character(overallList$iniDataSet$Day..Int.[1])
 		day <- as.character(overallList$iniDataSet$Day[1])
 		overallList$xAxisName <- substr(day, 1, nchar(day)-(nchar(day_int)+1))
@@ -6835,14 +6754,14 @@ changeXAxisName <- function(overallList) {
 createErrorPlot <- function(file, name) {
 	
 	library("Cairo")
-	if(length(file) == 0) {
-		file <- paste(DIRECTORY.PLOTS, paste("errorTempFile", format(Sys.time(), "%d%H%M%S%Y"),sep=""), sep=DIRECTORY.SEPARATOR)
+	if (length(file) == 0) {
+		file <- paste(DIRECTORY.PLOTS, paste("errorTempFile", format(Sys.time(), "%d%H%M%S%Y"), sep = ""), sep = DIRECTORY.SEPARATOR)
 	}
-	ownCat(paste("Create error plot '", file, "'", sep=""))
-	Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
+	ownCat(paste("Create error plot '", file, "'", sep = ""))
+	Cairo(width = 900, height = 70, file = file, type = "pdf", bg = "transparent", units = "px", dpi = 90)
 	par(mar = c(0, 0, 0, 0))
 	plot.new()
-	legend("left", paste("error in ", name, sep=""), col= c("black"), pch=1, bty="n")
+	legend("left", paste("error in ", name, sep = ""), col = c("black"), pch = 1, bty = "n")
 	dev.off()
 }
 
@@ -6851,64 +6770,63 @@ ckeckIfNoValuesImagesIsThere <- function(file = "noValues.pdf") {
 	
 	if (!file.exists(file)) {
 		library("Cairo")
-		ownCat(paste("Create defaultImage '", file, "'", sep=""))
-		Cairo(width=900, height=70, file=file, type="pdf", bg="transparent", units="px", dpi=90)
+		ownCat(paste("Create defaultImage '", file, "'", sep = ""))
+		Cairo(width = 900, height = 70, file = file, type = "pdf", bg = "transparent", units = "px", dpi = 90)
 		par(mar = c(0, 0, 0, 0))
 		plot.new()
-		legend("left", "no values", col= c("black"), pch=1, bty="n")
+		legend("left", "no values", col = c("black"), pch = 1, bty = "n")
 		dev.off()
 	}
 }
 
-ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL) {
-	ownCat("Check if the report.tex file is there")
+ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL, debug = FALSE) {
+	debug %debug% "ckeckIfReportTexIsThere()"
 	
-	if(!file.exists(REPORT.FILE)) {
+	if(is.null(typ)) {
+		debug %debug% "Check if the report.tex file is there"
+	}
+	
+	if (!file.exists(REPORT.FILE)) {
 		text <- "\\documentclass{article} \\newline
 				\\begin{document} \\newline
 				There was an error! \\newline"
-
-		if(!is.null(typ) && typ == LIB) {
-			text <- paste(text, "Please install the following packages (using the \"install.packages\" command): \\newline", sep="")
-			for(nn in seq(along=errorText)) {
-				text <- paste(text, nn, ". install.packages(\"", errorText[nn], "\") \\newline", sep="")
+		
+		if (!is.null(typ) && typ == LIB) {
+			text <- paste(text, "Please install the following packages (using the \"install.packages\" command): \\newline", sep = "")
+			for(nn in seq(along = errorText)) {
+				text <- paste(text, nn, ". install.packages(\"", errorText[nn], "\") \\newline", sep = "")
 			} 
 		} else if (!is.null(typ) && typ == LIB.UPDATE) {
-			text <- paste(text, "Please updtae the following packages (using the \"update.packages\" command): \\newline", sep="")
-			for(nn in seq(along=errorText)) {
-				text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\") \\newline", sep="")
-			}
-			
+			text <- paste(text, "Please updtae the following packages (using the \"update.packages\" command): \\newline", sep = "")
+			for(nn in seq(along = errorText)) {
+				text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\") \\newline", sep = "")
+			}			
 		} else {
-			if(errorText != "") {
-				text <- paste(text, errorText, sep="")
+			if (errorText != "") {
+				text <- paste(text, errorText, sep = "")
 			} 
 		}
-			text <- paste(text, "\\end{document}", sep="")
-		
-		write(x=text, append=FALSE, file=REPORT.FILE)
+		text <- paste(text, "\\end{document}", sep = "")		
+		write(x = text, append = FALSE, file = REPORT.FILE)
 	}
 }
 
 checkIfAllNecessaryFilesAreThere <- function() {
-		ownCat("... check if all necessary files are there")
-		ckeckIfNoValuesImagesIsThere()
-		ckeckIfReportTexIsThere()
+	ownCat("... check if all necessary files are there")
+	ckeckIfNoValuesImagesIsThere()
+	ckeckIfReportTexIsThere()		###########debug
 }
 
-#loadCheckIfAllNecessaryFilesAreThere <- function() {
-#	source("createMissingFiles.R")
-#}
+buildBlacklist <- function(workingDataSet, descriptorSet, debug = FALSE) {
+	debug %debug% "initRfunction()"
 
-buildBlacklist <- function(workingDataSet, descriptorSet) {
-	
-	additionalDescriptors <- c(descriptorSet, "Day (Int)", "Day (Float)", "Day", "Time", "Plant ID", "vis.side", "fluo.side", "nir.side", "vis.top", "fluo.top", "nir.top") #,"lm3s_nostress_ratio.side.nir.intensity.average (%)"
-	
+	additionalDescriptors <- c(descriptorSet, "Day (Int)", "Day (Float)", "Day", "Time", "Plant ID", "vis.side", "fluo.side", "nir.side", "vis.top", "fluo.top", "nir.top")	
 	searchString <- c(".histogram.")
+	
 	for(nn in seq(1:5)) {
-		searchString <- c(searchString, paste("section_",nn,"_5", sep = ""))
+		searchString <- c(searchString, paste("section_", nn, "_5", sep = ""))
 	}
-	additionalDescriptors <- preprocessingOfValues(additionalDescriptors, TRUE)
+	additionalDescriptors <- preprocessingOfValues(additionalDescriptors, TRUE, debug = debug)
 	for(kk in searchString) {
 		additionalDescriptors <- c(additionalDescriptors, colnames(workingDataSet)[grep(kk, colnames(workingDataSet), ignore.case = TRUE)])
 	}
@@ -6917,92 +6835,57 @@ buildBlacklist <- function(workingDataSet, descriptorSet) {
 }
 
 
-loadStressPeriod <- function(stressValue, arg) {
+loadStressPeriod <- function(stressValue, arg, debug = FALSE) {
+	debug %debug% "initRfunction()"
+	
 	stressValue <- stressValue %exists% arg
-	stressValue <- unlist(preprocessingOfValues(stressValue, isColName = TRUE))
-
+	stressValue <- unlist(preprocessingOfValues(stressValue, isColName = TRUE, debug = debug))
 	return(stressValue)
 }
 
-checkStressTypValues <- function(stressTyp) {
+checkStressTypValues <- function(stressTyp, debug = FALSE) {
+	debug %debug% "checkStressTypValues()"
 	
-	newValues <- list("n" = "000", "d" = "001", "w" = "002", "c" = "003", "s" = "004",
-					   "0" = "000", "1" = "001", "2" = "002", "3" = "003", "4" = "004")
+	newValues <- list("n" = "000", "d" = "001", "w" = "002", "c" = "003", "s" = "004", 
+			"0" = "000", "1" = "001", "2" = "002", "3" = "003", "4" = "004")
 	
-	for (kk in seq(along=stressTyp)) {
+	for (kk in seq(along = stressTyp)) {
 		if (stressTyp[kk] %in% names(newValues)) {
 			stressTyp[kk] <- newValues[[stressTyp[kk]]]
-			ownCat("... change old stresstyp value to new!")
+			debug %debug% "... change old stresstyp value to new!"
 		}
 	}
 	return(stressTyp)
 }
-#()
-#addVisibleSections <- function(descriptorSet_temp, plotTyp) {
-#	
-#	buildBackbone <- vector()
-# 	preValues <- c(BUILD.TOP, BUILD.SIDE)
-#	
-#	index <- 1
-#	for(nn in preValues) {
-#		buildBackboneBase <- paste(nn, BUILD.SEPARATOR.ONE, BUILD.SECTION, BUILD.SEPARATOR.TWO, sep = "")
-#		for(kk in seq(BUILD.SECTION.FIRST.INDEX)) {
-#			for(hh in seq(BUILD.SECTION.SECOND.INDEX)) {
-#				buildBackbone[index] <- paste(buildBackboneBase
-#			}
-#		}
-#	}
-#	
-#	buildBackbone <- paste()	
-#}
-#
-#addAdditionalColums <-  function(descriptorSet_temp, plotTyp) {
-#	
-#	descriptorSet_temp <- addVisibleSections(descriptorSet_temp, plotTyp)
-#	
-#	return(descriptorSet_temp)
-#}
 
-
+##
+#	set the system ini values for error-reporting,
+#	close all open devs and
+#	load the necessary libraries
+##
 initRfunction <- function(debug) {
-	#"LC_COLLATE=German_Germany.1252;LC_CTYPE=German_Germany.1252;LC_MONETARY=German_Germany.1252;LC_NUMERIC=C;LC_TIME=German_Germany.1252"
-	#Sys.setlocale(locale="de_DE.ISO8859-15")
-	#Sys.setlocale("LC_ALL", "en_US.UTF-8")
-	#gcinfo(TRUE)
-	#gc()
-	
 	debug %debug% "initRfunction()"
+	
 	if (debug) {
 		options(error = quote({
-			#sink(file="error.txt", split = TRUE);
-			dump.frames();
-			ownCat(attr(last.dump, "error.message"));
-			#x = attr(last.dump, "error.message")
-			traceback();
-			#sink(file=NULL);		
-			#q()
-		}))
+							dump.frames();
+							ownCat(attr(last.dump, "error.message"));
+							traceback();
+						}))
 		options(show.error.messages = TRUE)
-		#options(showWarnCalls = TRUE)
-		#options(showErrorCalls = TRUE)
 		options(warn = 0)
-		#options(warn = 2)
 	} else {	
 		options(error = NULL)
-		#options(showWarnCalls = FALSE)
-		#options(showErrorCalls = FALSE)
 		options(warn = -1)
 		options(show.error.messages = FALSE)
 	}
-#	if (memory.limit() < 15000) {
-#		memory.limit(size=15000)
-#	}
 	
 	while(!is.null(dev.list())) {
 		dev.off()
 	}
-	if(debug) {
-		loadLibs(debug) #debug
+	
+	if (debug) {
+		loadLibs(debug)
 	} else {
 		suppressMessages(loadLibs(debug))
 	}
@@ -7011,46 +6894,41 @@ initRfunction <- function(debug) {
 createLibPath <- function(debug) {
 	debug %debug% "createLibPath()"
 	
-	dir.create(paste(".",DIRECTORY.SECTION, sep=DIRECTORY.SEPARATOR))
+	dir.create(paste(".", DIRECTORY.SECTION, sep = DIRECTORY.SEPARATOR))
 	
 }
-
+###################################################################################################################################################################
 createInitDirectories <- function(debug) {
 	debug %debug% "createInitDirectories()"
 	
-	dir.create(paste(".",DIRECTORY.SECTION, sep=DIRECTORY.SEPARATOR))
-	dir.create(paste(".",DIRECTORY.PLOTS, sep=DIRECTORY.SEPARATOR))
-	dir.create(paste(".",DIRECTORY.PLOTSTEX, sep=DIRECTORY.SEPARATOR))
-
+	dir.create(paste(".", DIRECTORY.SECTION, sep = DIRECTORY.SEPARATOR))
+	dir.create(paste(".", DIRECTORY.PLOTS, sep = DIRECTORY.SEPARATOR))
+	dir.create(paste(".", DIRECTORY.PLOTSTEX, sep = DIRECTORY.SEPARATOR))
 }
 
-
-startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
+##
+#	Set the initial values and start the report function
+##
+startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 	initRfunction(debug)
-	#typOfStartOptions = START.TYP.TEST; debug=TRUE;
+	#typOfStartOptions <- START.TYP.TEST; debug = TRUE;
 	createInitDirectories(debug)
-	typOfStartOptions = tolower(typOfStartOptions)
+	typOfStartOptions <- tolower(typOfStartOptions)
 	
-	args = commandArgs(TRUE)
-#	for(nn in seq(along=args)) {
-#		ownCat(paste(nn, ".: ", args[nn], sep=""))
-#	}
-	
+	args <- commandArgs(TRUE)	
 	saveFormat = "pdf"
-	dpi = "90" ##90 ## CK: seems to change nothing for ggplot2 instead the output size should be modified, if needed // 17.2.2012	
+	dpi = "90"
 	
 	isGray = FALSE
-	#showResultInR = FALSE
 	
 	# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
-	stressStart <- -1 #"10" # -1
-	stressEnd <- -1 #"15" # -1
-	stressTyp <- -1 #"1" # -1 ## 1 -> dry; 2 -> wet; 0 -> normal; 4 -> salt; 3 -> chemical
-	stressLabel <- -1 #"drought stress" # -1
+	# stressTyp: 1 -> dry; 2 -> wet; 0 -> normal; 4 -> salt; 3 -> chemical; -1 <- none
+	stressStart <- -1
+	stressEnd <- -1
+	stressTyp <- -1 
+	stressLabel <- -1	
 	
-	
-	
-	if(DO.MODELLING.OF.STRESS) {
+	if (DO.MODELLING.OF.STRESS) {
 		treatment <- STRESS.MODELL.TREATMENT
 	} else {
 		treatment = "Treatment"
@@ -7061,7 +6939,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	
 	secondTreatment = NONE
 	filterSecondTreatment = NONE
-	splitTreatmentSecond= FALSE
+	splitTreatmentSecond = FALSE
 	
 	xAxis = "Day..Int." 
 	xAxisName = "DAS"
@@ -7072,31 +6950,29 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 	should.Clustered <- FALSE
 	bootstrap.N <- -1
 	
-#	diagramTypVector = vector()
 	descriptorSet = vector()
 	descriptorSetName = vector()
 	
-	if(DO.MODELLING.OF.STRESS) {
+	if (DO.MODELLING.OF.STRESS) {
 		fileName <- STRESS.MODELL.INPUT
 	} else {
 		fileName = NONE
 	}
 	
 	appendix = FALSE
-	#appendix = TRUE
 	
 	separation = ";"
-
+	
 	if (typOfStartOptions == START.TYP.REPORT) {
 		fileName <- fileName %exists% args[1]
 		
 		should.Clustered <- should.Clustered %exists% args[7]
 		bootstrap.N <- bootstrap.N %exists% args[8] 
-		stressStart <- loadStressPeriod(stressStart, args[9])
-		stressEnd <- loadStressPeriod(stressEnd, args[10])
-		stressTyp <- loadStressPeriod(stressTyp, args[11])
-		stressTyp <- checkStressTypValues(stressTyp)	
-		stressLabel <- loadStressPeriod(stressLabel, args[12])
+		stressStart <- loadStressPeriod(stressStart, args[9], debug = debug)
+		stressEnd <- loadStressPeriod(stressEnd, args[10], debug = debug)
+		stressTyp <- loadStressPeriod(stressTyp, args[11], debug = debug)
+		stressTyp <- checkStressTypValues(stressTyp, debug = debug)	
+		stressLabel <- loadStressPeriod(stressLabel, args[12], debug = debug)
 		splitTreatmentFirst <- as.logical(splitTreatmentFirst %exists% args[13])
 		splitTreatmentSecond <- as.logical(splitTreatmentSecond %exists% args[14])
 		
@@ -7106,93 +6982,88 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 			descriptorSet_boxplot <- vector()
 			descriptorSet_boxplotStacked <- vector()
 			
-			if (length(workingDataSet[,1]) > 0) {
+			if (length(workingDataSet[, 1]) > 0) {
 				
-				loadFiles(path = ".", pattern = "PlotList\\.[Rr]$") ## load nBoxPlotList, boxPlotList, ...
-				loadFiles(path = ".", pattern = "sectionMapping\\.[Rr]$")	## load sectionMappingList
+				loadFiles(path = ".", pattern = "PlotList\\.[Rr]$", debug = debug) ## load nBoxPlotList, boxPlotList, ...
+				loadFiles(path = ".", pattern = "sectionMapping\\.[Rr]$", debug = debug)	## load sectionMappingList
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(nBoxPlotList)
-				#descriptorSet_temp <- addAdditionalColums(descriptorSet_temp, NBOX.PLOT)
+				descriptorSet_temp <- getRealNameAndPrintSection(nBoxPlotList, debug = debug)
 				descriptorSet_nBoxplot <- descriptorSet_temp$columName
 				descriptorSetName_nBoxplot <- descriptorSet_temp$plotName	
-				descriptorSection_nBoxplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
-
-				descriptorSet_temp <- getRealNameAndPrintSection(nBoxMultiPlotList)
-				descriptorList <- addDesSetLineSec(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section)
+				descriptorSection_nBoxplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList, debug = debug)
+				
+				descriptorSet_temp <- getRealNameAndPrintSection(nBoxMultiPlotList, debug = debug)
+				descriptorList <- addDesSetLineSec(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section, debug = debug)
 				descriptorSet_nBoxMultiplot <- descriptorList$desSet
 				descriptorSetName_nBoxMultiplot <- descriptorList$desName
-				descriptorSection_nBoxMultiplot <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList)
+				descriptorSection_nBoxMultiplot <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList, debug = debug)
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(boxPlotList)
+				descriptorSet_temp <- getRealNameAndPrintSection(boxPlotList, debug = debug)
 				descriptorSet_boxplot <- descriptorSet_temp$columName
 				descriptorSetName_boxplot <- descriptorSet_temp$plotName	
-				descriptorSection_boxplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+				descriptorSection_boxplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList, debug = debug)
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(spiderPlotList)
+				descriptorSet_temp <- getRealNameAndPrintSection(spiderPlotList, debug = debug)
 				descriptorSet_spiderplot <- descriptorSet_temp$columName
 				descriptorSetName_spiderplot <- descriptorSet_temp$plotName	
-				descriptorSection_spiderplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+				descriptorSection_spiderplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList, debug = debug)
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(linerangePlotList)
+				descriptorSet_temp <- getRealNameAndPrintSection(linerangePlotList, debug = debug)
 				descriptorSet_linerangeplot <- descriptorSet_temp$columName
 				descriptorSetName_linerangeplot <- descriptorSet_temp$plotName	
-				descriptorSection_linerangeplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+				descriptorSection_linerangeplot <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList, debug = debug)
 				
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(violinPlotList)
+				descriptorSet_temp <- getRealNameAndPrintSection(violinPlotList, debug = debug)
 				descriptorSet_violinBox <- descriptorSet_temp$columName
 				descriptorSetName_violinBox <- descriptorSet_temp$plotName	
-				descriptorSection_violinBox <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
+				descriptorSection_violinBox <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList, debug = debug)
 				
-				descriptorSet_temp <- getRealNameAndPrintSection(stackedPlotList)
-				descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section)
+				descriptorSet_temp <- getRealNameAndPrintSection(stackedPlotList, debug = debug)
+				descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section, debug = debug)
 				descriptorSet_boxplotStacked <- descriptorList$desSet
 				descriptorSetName_boxplotStacked <- descriptorList$desName
-				descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList)
-
+				descriptorSection_boxplotStacked <- changeSectionToRealSection(descriptorList$desSec, sectionMappingList, debug = debug)
 				
 				appendix = as.logical(appendix %exists% args[5])
-			
+				
 				if (appendix) {
-					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot)
+					blacklist = buildBlacklist(workingDataSet, descriptorSet_nBoxplot, debug = debug)
 					descriptorSetAppendix = colnames(workingDataSet[!as.data.frame(sapply(colnames(workingDataSet), '%in%', blacklist))[, 1]])
 					descriptorSetNameAppendix = descriptorSetAppendix
-				#print(length(descriptorSetAppendix))
-					descriptorSectionAppendix <- changeSectionToRealSection(NULL, sectionMappingList, length(descriptorSetAppendix))
-					#rep.int(99, length(descriptorSetAppendix))
-					#diagramTypVectorAppendix = rep.int("nboxplot", times=length(descriptorSetNameAppendix))
+					descriptorSectionAppendix <- changeSectionToRealSection(NULL, sectionMappingList, length(descriptorSetAppendix), debug = debug)
 				}
-			
+				
 				saveFormat = saveFormat %exists% args[2]
-			
-				listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug)
+				
+				listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug = debug)
 				treatment = listOfTreatAndFilterTreat[[1]][[1]]
 				secondTreatment = listOfTreatAndFilterTreat[[1]][[2]]
 				filterTreatment = listOfTreatAndFilterTreat[[2]][[1]]
 				filterSecondTreatment = listOfTreatAndFilterTreat[[2]][[2]]
-
+				
 				if (treatment == NONE.TREATMENT) {
-					workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int(VALUE.AVERAGE, times = length(workingDataSet[,1])))	
+					workingDataSet <- cbind(workingDataSet, noneTreatment = rep.int(VALUE.AVERAGE, times = length(workingDataSet[, 1])))	
 				}
-
-				isRatio	= as.logical(isRatio %exists% args[6])
+				
+				isRatio	 = as.logical(isRatio %exists% args[6])
 			} else {
 				fileName = NONE
 			}
 		}
 		
-	}  else if (typOfStartOptions == START.TYP.TEST){
+	} else if (typOfStartOptions == START.TYP.TEST) {
 		
-		if(DO.PARALLELISATION) {
+		if (DO.PARALLELISATION) {
 			library("snowfall")
 		}
 		debug <- TRUE
 		initRfunction(debug)
-		if(DO.PARALLELISATION) {
+		if (DO.PARALLELISATION) {
 			sfStop()
 		}
 		#treatment <- "Species"
-		#filterTreatment  <- "Athletico$Fernandez$Weisse Zarin"
+		#filterTreatment <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#treatment <- "none"
 		treatment <- "Treatment"
@@ -7203,16 +7074,16 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
 		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
-
+		
 		#secondTreatment <- "none"
-		#filterSecondTreatment  <- "none"
+		#filterSecondTreatment <- "none"
 		
 		secondTreatment <- "none"
 		#secondTreatment <- "Genotype"
 		#secondTreatment <- "Treatment"
-		filterSecondTreatment  <- "none"
-		#filterSecondTreatment  <- "S 250$S 280"
-		#filterSecondTreatment  <- "Wiebke$MorexPE$Streif"
+		filterSecondTreatment <- "none"
+		#filterSecondTreatment <- "S 250$S 280"
+		#filterSecondTreatment <- "Wiebke$MorexPE$Streif"
 		
 		#secondTreatment <- "Treatment"
 		#filterSecondTreatment <- "dry / normal"
@@ -7220,9 +7091,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		#filterSecondTreatment <- "Athletico$Weisse Zarin"
 		#filterSecondTreatment <- "BCC_1367_Apex$BCC_1391_Isaria$BCC_1403_Perun$BCC_1433_HeilsFranken$BCC_1441_PflugsIntensiv$Wiebke$BCC_1413_Sissy$BCC_1417_Trumpf"
 		filterXaxis <- "none"
-
+		
 		bgColor <- "transparent"
-		isGray="FALSE"
+		isGray = "FALSE"
 		#showResultInR <- FALSE
 		
 		fileName <- "report.csv"
@@ -7234,7 +7105,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		
 		# c("0", "1", "2", "3", "4") entspricht c("n", "d", "w", "c", "s")
 		
-		if(FALSE) {
+		if (FALSE) {
 			stressStart <- -1
 			stressEnd <- -1
 			stressTyp <- "001"
@@ -7294,7 +7165,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		descriptorSet_violinBox <- descriptorSet_temp$columName
 		descriptorSetName_violinBox <- descriptorSet_temp$plotName	
 		descriptorSection_violinBox <- changeSectionToRealSection(descriptorSet_temp$section, sectionMappingList)
-				
+		
 		descriptorSet_temp <- getRealNameAndPrintSection(stackedPlotList)
 		descriptorList <- addDesSet(descriptorSet_temp$columName, descriptorSet_temp$plotName, workingDataSet, descriptorSet_temp$section)
 		descriptorSet_boxplotStacked <- descriptorList$desSet
@@ -7309,9 +7180,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 		boxStackDes = descriptorSet_boxplotStacked 
 		boxDesName = descriptorSetName_boxplot
 		boxStackDesName = descriptorSetName_boxplotStacked 
-		nBoxOptions= nBoxOptions
+		nBoxOptions = nBoxOptions
 		nBoxMultiOptions <- nBoxMultiOptions
-		boxOptions= boxOptions
+		boxOptions = boxOptions
 		stackedBarOptions = stackedBarOptions
 		linerangeOptions = linerangeOptions
 		nBoxDes <- descriptorSet_nBoxplot
@@ -7341,7 +7212,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 			descriptorSetNameAppendix <- descriptorSetAppendix
 			descriptorSectionAppendix <- changeSectionToRealSection(NULL, sectionMappingList, length(descriptorSetAppendix))
 			#descriptorSectionAppendix <- rep.int(99, length(descriptorSetAppendix))
-			#diagramTypVectorAppendix = rep.int("nboxplot", times=length(descriptorSetNameAppendix))		
+			#diagramTypVectorAppendix = rep.int("nboxplot", times = length(descriptorSetNameAppendix))		
 			nBoxDes <- descriptorSetAppendix
 			nBoxDesName <- descriptorSetNameAppendix
 			nBoxSection <- descriptorSectionAppendix
@@ -7369,75 +7240,75 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 			violinBoxSection <- NULL
 			linerangeSection <- NULL
 		}
-
-		listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug)
+		
+		listOfTreatAndFilterTreat = checkOfTreatments(args, treatment, filterTreatment, secondTreatment, filterSecondTreatment, workingDataSet, debug = debug)
 		treatment = listOfTreatAndFilterTreat[[1]][[1]]
 		secondTreatment = listOfTreatAndFilterTreat[[1]][[2]]
 		filterTreatment = listOfTreatAndFilterTreat[[2]][[1]]
 		filterSecondTreatment = listOfTreatAndFilterTreat[[2]][[2]]
 		
 		if (treatment == NONE.TREATMENT) {
-			workingDataSet <- cbind(workingDataSet, noneTreatment=rep.int(VALUE.AVERAGE, times = length(workingDataSet[,1])))	
+			workingDataSet <- cbind(workingDataSet, noneTreatment = rep.int(VALUE.AVERAGE, times = length(workingDataSet[, 1])))	
 		}
 		
 	}
 	
-	if (typOfStartOptions != START.TYP.TEST){
+	if (typOfStartOptions != START.TYP.TEST) {
 		secondRun = appendix
-		appendix =  FALSE
+		appendix = FALSE
 		renameList <- list(filterTreatmentRename = list(), secondFilterTreatmentRename = list())
 		
 		if (fileName != NONE) {## & (length(descriptorSet_nBoxplot) > 0 || length(descriptorSet_boxplot) > 0 || length(descriptorSet_boxplotStacked) > 0)
 			time = system.time({
-				repeat {					
-					if (appendix) 
-						ownCat("Generate diagrams for annotation descriptors...")
-					else
-						ownCat("Generate diagrams for main descriptors...")
-						renameList <- createDiagrams(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray,
-												nBoxDes = descriptorSet_nBoxplot, nBoxMultiDes = descriptorSet_nBoxMultiplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, boxSpiderDes = descriptorSet_spiderplot, violinBoxDes = descriptorSet_violinBox, 	linerangeDes = descriptorSet_linerangeplot,
-												nBoxDesName = descriptorSetName_nBoxplot, nBoxMultiDesName = descriptorSetName_nBoxMultiplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, boxSpiderDesName = descriptorSetName_spiderplot, violinBoxDesName = descriptorSetName_violinBox, linerangeDesName = descriptorSetName_linerangeplot,
-												nBoxSection = descriptorSection_nBoxplot, nBoxMultiSection = descriptorSection_nBoxMultiplot, boxSection = descriptorSection_boxplot, boxStackSection = descriptorSection_boxplotStacked, boxSpiderSection = descriptorSection_spiderplot, violinBoxSection = descriptorSection_violinBox, linerangeSection = descriptorSection_linerangeplot,
-												nBoxOptions= nBoxOptions, nBoxMultiOptions= nBoxMultiOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions, violinOptions = violinOptions, linerangeOptions = linerangeOptions,
-												treatment = treatment, filterTreatment = filterTreatment, 
-												secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
-												xAxisName = xAxisName, debug = debug, appendix=appendix, isRatio=isRatio,
-												filterTreatmentRename = renameList$filterTreatmentRename, secondFilterTreatmentRename = renameList$secondFilterTreatmentRename,
-												stressStart=stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
-												splitTreatmentFirst=splitTreatmentFirst, splitTreatmentSecond=splitTreatmentSecond, 
-												deleteNboxplot = !secondRun)
-					if (secondRun) {
-						appendix <- TRUE
-						secondRun <- FALSE
-						descriptorSet_nBoxplot <- descriptorSetAppendix
-						descriptorSetName_nBoxplot <- descriptorSetNameAppendix
-						descriptorSection_nBoxplot <- descriptorSectionAppendix
-						#diagramTypVector = diagramTypVectorAppendix
-						descriptorSet_nBoxMultiplot <- NULL
-						descriptorSetName_nBoxMultiplot <- NULL
-						descriptorSection_nBoxMultiplot <- NULL
-						descriptorSet_boxplot <- NULL
-						descriptorSetName_boxplot <- NULL
-						descriptorSection_boxplot <- NULL
-						descriptorSet_boxplotStacked <- NULL
-						descriptorSetName_boxplotStacked <- NULL
-						descriptorSection_boxplotStacked <- NULL
-						descriptorSet_spiderplot <- NULL
-						descriptorSetName_spiderplot <- NULL
-						descriptorSection_spiderplot <- NULL
-						descriptorSet_violinBox <- NULL
-						descriptorSetName_violinBox <- NULL
-						descriptorSection_violinBox <- NULL
-						descriptorSet_linerangeplot <- NULL
-						descriptorSetName_linerangeplot <- NULL
-						descriptorSection_linerangeplot <- NULL
-						
-					} else {
-						break
-					}
-				}
-				checkIfAllNecessaryFilesAreThere()
-			}, TRUE)
+						repeat {					
+							if (appendix) 
+								ownCat("Generate diagrams for annotation descriptors...")
+							else
+								ownCat("Generate diagrams for main descriptors...")
+							renameList <- createDiagrams(iniDataSet = workingDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
+									nBoxDes = descriptorSet_nBoxplot, nBoxMultiDes = descriptorSet_nBoxMultiplot, boxDes = descriptorSet_boxplot, boxStackDes = descriptorSet_boxplotStacked, boxSpiderDes = descriptorSet_spiderplot, violinBoxDes = descriptorSet_violinBox, 	linerangeDes = descriptorSet_linerangeplot, 
+									nBoxDesName = descriptorSetName_nBoxplot, nBoxMultiDesName = descriptorSetName_nBoxMultiplot, boxDesName = descriptorSetName_boxplot, boxStackDesName = descriptorSetName_boxplotStacked, boxSpiderDesName = descriptorSetName_spiderplot, violinBoxDesName = descriptorSetName_violinBox, linerangeDesName = descriptorSetName_linerangeplot, 
+									nBoxSection = descriptorSection_nBoxplot, nBoxMultiSection = descriptorSection_nBoxMultiplot, boxSection = descriptorSection_boxplot, boxStackSection = descriptorSection_boxplotStacked, boxSpiderSection = descriptorSection_spiderplot, violinBoxSection = descriptorSection_violinBox, linerangeSection = descriptorSection_linerangeplot, 
+									nBoxOptions = nBoxOptions, nBoxMultiOptions = nBoxMultiOptions, boxOptions = boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions, violinOptions = violinOptions, linerangeOptions = linerangeOptions, 
+									treatment = treatment, filterTreatment = filterTreatment, 
+									secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
+									xAxisName = xAxisName, debug = debug, appendix = appendix, isRatio = isRatio, 
+									filterTreatmentRename = renameList$filterTreatmentRename, secondFilterTreatmentRename = renameList$secondFilterTreatmentRename, 
+									stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel, 
+									splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond, 
+									deleteNboxplot = !secondRun)
+							if (secondRun) {
+								appendix <- TRUE
+								secondRun <- FALSE
+								descriptorSet_nBoxplot <- descriptorSetAppendix
+								descriptorSetName_nBoxplot <- descriptorSetNameAppendix
+								descriptorSection_nBoxplot <- descriptorSectionAppendix
+								#diagramTypVector = diagramTypVectorAppendix
+								descriptorSet_nBoxMultiplot <- NULL
+								descriptorSetName_nBoxMultiplot <- NULL
+								descriptorSection_nBoxMultiplot <- NULL
+								descriptorSet_boxplot <- NULL
+								descriptorSetName_boxplot <- NULL
+								descriptorSection_boxplot <- NULL
+								descriptorSet_boxplotStacked <- NULL
+								descriptorSetName_boxplotStacked <- NULL
+								descriptorSection_boxplotStacked <- NULL
+								descriptorSet_spiderplot <- NULL
+								descriptorSetName_spiderplot <- NULL
+								descriptorSection_spiderplot <- NULL
+								descriptorSet_violinBox <- NULL
+								descriptorSetName_violinBox <- NULL
+								descriptorSection_violinBox <- NULL
+								descriptorSet_linerangeplot <- NULL
+								descriptorSetName_linerangeplot <- NULL
+								descriptorSection_linerangeplot <- NULL
+								
+							} else {
+								break
+							}
+						}
+						checkIfAllNecessaryFilesAreThere()
+					}, TRUE)
 			
 			ownCat("Processing finished")		
 			ownCat(time)
@@ -7454,51 +7325,51 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug=FALSE) {
 			
 		}
 	} 
-#### Bis hier einlesen beim manuellen testen ##############	
+	#### Bis hier einlesen beim manuellen testen ##############	
 	return(NULL)
 }
 
-createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false", 
-		nBoxDes = NULL, nBoxMultiDes = NULL, boxDes = NULL, boxStackDes = NULL, boxSpiderDes = NULL, violinBoxDes = NULL, linerangeDes = NULL,
-		nBoxDesName = NULL, nBoxMultiDesName = NULL, boxDesName = NULL, boxStackDesName = NULL, boxSpiderDesName = NULL, violinBoxDesName = NULL, linerangeDesName = NULL,
-		nBoxSection = NULL, nBoxMultiSection= NULL, boxSection = NULL, boxStackSection = NULL, boxSpiderSection = NULL, violinBoxSection = NULL, linerangeSection = NULL,
-		nBoxOptions= NULL, nBoxMultiOptions= NULL, boxOptions= NULL, stackedBarOptions = NULL, spiderOptions = NULL, violinOptions = NULL, linerangeOptions = NULL,
+createDiagrams <- function(iniDataSet, saveFormat = "pdf", dpi = "90", isGray = "false", 
+		nBoxDes = NULL, nBoxMultiDes = NULL, boxDes = NULL, boxStackDes = NULL, boxSpiderDes = NULL, violinBoxDes = NULL, linerangeDes = NULL, 
+		nBoxDesName = NULL, nBoxMultiDesName = NULL, boxDesName = NULL, boxStackDesName = NULL, boxSpiderDesName = NULL, violinBoxDesName = NULL, linerangeDesName = NULL, 
+		nBoxSection = NULL, nBoxMultiSection = NULL, boxSection = NULL, boxStackSection = NULL, boxSpiderSection = NULL, violinBoxSection = NULL, linerangeSection = NULL, 
+		nBoxOptions = NULL, nBoxMultiOptions = NULL, boxOptions = NULL, stackedBarOptions = NULL, spiderOptions = NULL, violinOptions = NULL, linerangeOptions = NULL, 
 		treatment = "Treatment", filterTreatment = NONE, 
 		secondTreatment = NONE, filterSecondTreatment = NONE, filterXaxis = NONE, xAxis = xAxis, 
-		xAxisName = NONE, debug = FALSE, appendix = FALSE, stoppTheCalculation = FALSE, isRatio = FALSE,
-		filterTreatmentRename = list(), secondFilterTreatmentRename = list(),
-		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1,
-		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE,
+		xAxisName = NONE, debug = FALSE, appendix = FALSE, stoppTheCalculation = FALSE, isRatio = FALSE, 
+		filterTreatmentRename = list(), secondFilterTreatmentRename = list(), 
+		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1, 
+		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE, 
 		deleteNboxplot = TRUE) {		
-
-	overallList <- list(iniDataSet=iniDataSet, saveFormat=saveFormat, dpi=dpi, isGray=isGray, 
-						nBoxDes = nBoxDes, nBoxMultiDes = nBoxMultiDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes, linerangeDes = linerangeDes,
-						imageFileNames_nBoxplots = nBoxDes, imageFileNames_nBoxMultiPlots = nBoxMultiDes, imageFileNames_Boxplots = boxDes, imageFileNames_StackedPlots = boxStackDes, imageFileNames_SpiderPlots = boxSpiderDes, imageFileNames_violinPlots = violinBoxDes, imageFileNames_LinerangePlots = linerangeDes,
-						nBoxDesName = nBoxDesName, nBoxMultiDesName = nBoxMultiDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName, boxSpiderDesName = boxSpiderDesName, violinBoxDesName=violinBoxDesName, linerangeDesName = linerangeDesName, 
-						nBoxSection = nBoxSection, nBoxMultiSection = nBoxMultiSection, boxSection = boxSection, boxStackSection = boxStackSection, boxSpiderSection = boxSpiderSection, violinBoxSection = violinBoxSection, linerangeSection = linerangeSection,
-						nBoxOptions= nBoxOptions, nBoxMultiOptions= nBoxMultiOptions, boxOptions= boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions, violinOptions=violinOptions, linerangeOptions = linerangeOptions,
-						treatment=treatment, filterTreatment=filterTreatment, 
-						secondTreatment=secondTreatment, filterSecondTreatment=filterSecondTreatment, filterXaxis=filterXaxis, xAxis=xAxis, 
-						xAxisName=xAxisName, debug=debug, 
-						appendix=appendix, stoppTheCalculation=stoppTheCalculation, isRatio = isRatio,
-						overallResult_nBoxDes=data.frame(), overallResult_boxDes=data.frame(), overallResult_boxStackDes=data.frame(), overallResult_boxSpiderDes=data.frame(), overallResult_violinBoxDes = data.frame(), overallResult_linerangeDes = data.frame(),
-						color_nBox = list(), color_box=list(), color_boxStack=list(), color_spider = list(), color_violin= list(), color_linerange= list(),
-						user=NONE, typ=NONE,
-						filterTreatmentRename = filterTreatmentRename, secondFilterTreatmentRename = secondFilterTreatmentRename,
-						stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel,
-						splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond,
-						deleteNboxplot = deleteNboxplot
-						)	
+	
+	overallList <- list(iniDataSet = iniDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
+			nBoxDes = nBoxDes, nBoxMultiDes = nBoxMultiDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes, linerangeDes = linerangeDes, 
+			imageFileNames_nBoxplots = nBoxDes, imageFileNames_nBoxMultiPlots = nBoxMultiDes, imageFileNames_Boxplots = boxDes, imageFileNames_StackedPlots = boxStackDes, imageFileNames_SpiderPlots = boxSpiderDes, imageFileNames_violinPlots = violinBoxDes, imageFileNames_LinerangePlots = linerangeDes, 
+			nBoxDesName = nBoxDesName, nBoxMultiDesName = nBoxMultiDesName, boxDesName = boxDesName, boxStackDesName = boxStackDesName, boxSpiderDesName = boxSpiderDesName, violinBoxDesName = violinBoxDesName, linerangeDesName = linerangeDesName, 
+			nBoxSection = nBoxSection, nBoxMultiSection = nBoxMultiSection, boxSection = boxSection, boxStackSection = boxStackSection, boxSpiderSection = boxSpiderSection, violinBoxSection = violinBoxSection, linerangeSection = linerangeSection, 
+			nBoxOptions = nBoxOptions, nBoxMultiOptions = nBoxMultiOptions, boxOptions = boxOptions, stackedBarOptions = stackedBarOptions, spiderOptions = spiderOptions, violinOptions = violinOptions, linerangeOptions = linerangeOptions, 
+			treatment = treatment, filterTreatment = filterTreatment, 
+			secondTreatment = secondTreatment, filterSecondTreatment = filterSecondTreatment, filterXaxis = filterXaxis, xAxis = xAxis, 
+			xAxisName = xAxisName, debug = debug, 
+			appendix = appendix, stoppTheCalculation = stoppTheCalculation, isRatio = isRatio, 
+			overallResult_nBoxDes = data.frame(), overallResult_boxDes = data.frame(), overallResult_boxStackDes = data.frame(), overallResult_boxSpiderDes = data.frame(), overallResult_violinBoxDes = data.frame(), overallResult_linerangeDes = data.frame(), 
+			color_nBox = list(), color_box = list(), color_boxStack = list(), color_spider = list(), color_violin = list(), color_linerange = list(), 
+			user = NONE, typ = NONE, 
+			filterTreatmentRename = filterTreatmentRename, secondFilterTreatmentRename = secondFilterTreatmentRename, 
+			stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel, 
+			splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond, 
+			deleteNboxplot = deleteNboxplot
+	)	
 	
 	overallList$debug %debug% "Start"
-
+	
 	overallList = checkTypOfExperiment(overallList)
 	overallList = checkUserOfExperiment(overallList)
 	overallList = setSomePrintingOptions(overallList)
 	overallList = overallChangeName(overallList)
 	overallList = changeXAxisName(overallList)
 	overallList = overallPreprocessingOfDescriptor(overallList)
-
+	
 #	####
 #	overallList = preprocessingOfxAxisValue(overallList)
 #	overallList = preprocessingOfTreatment(overallList)
@@ -7512,7 +7383,7 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 #	#overallList = overallOutlierDetection(overallList)
 #	overallList = overallGetResultDataFrame(overallList)
 #	overallList = setColor(overallList) 
-##	makeDiagrams(overallList)
+	##	makeDiagrams(overallList)
 	#######
 	
 	if (!overallList$stoppTheCalculation) {
@@ -7526,12 +7397,12 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 			overallList <- reduceWorkingDataSize(overallList)
 			overallList <- setDefaultAxisNames(overallList)
 			#ownCat(overallList)
-		#	overallList = overallOutlierDetection(overallList)
+			#	overallList = overallOutlierDetection(overallList)
 			overallList <- overallGetResultDataFrame(overallList)			
 			if (!overallList$stoppTheCalculation) {
 				overallList <- setColor(overallList) 
 				overallList <- calculateStressValues(overallList)
-				if(!plotNothing) {
+				if (!plotNothing) {
 					makeDiagrams(overallList)
 				}
 			}
@@ -7541,14 +7412,13 @@ createDiagrams <- function(iniDataSet, saveFormat="pdf", dpi="90", isGray="false
 }
 
 initSnow <- function() {
-	# loadLibs(TRUE)
 	library("snowfall")
 	
-	if(CPU.ATUO.DETECTED) {
+	if (CPU.ATUO.DETECTED) {
 		CPU.CNT <- parallel::detectCores()
 	}
 	
-	sfInit(parallel=threaded, cpus=CPU.CNT)
+	sfInit(parallel = threaded, cpus = CPU.CNT)
 	
 	if (sfParallel()) {
 		ownCat(c("Running in parallel mode on", sfCpus(), "nodes."))
@@ -7565,38 +7435,23 @@ stopSnow <- function() {
 	sfStop()
 }
 
-#sapply(list.files(pattern="[.]R$", path=getwd(), full.names=TRUE), source);
-######### START #########
-#rm(list=ls(all=TRUE))
-#startOptions("test", TRUE)
-#startOptions("allmanual", TRUE)
-
-#initSnow()
-#if(plotNothing) {
-#	startOptions(START.TYP.STRESS, debug)
-#	ownCat("Completing stress calculation ...")
-#} else {
-#	startOptions(START.TYP.REPORT, debug)
-#	ownCat("Completing diagram creation ...")
-#}
-#stopSnow()
-if(DO.PARALLELISATION) {
+if (DO.PARALLELISATION) {
 	initSnow()
 }
-#startOptions(START.TYP.TEST, debug)
-if(CATCH.ERROR) {
-	error <- try(startOptions(START.TYP.REPORT, debug))
+
+if (CATCH.ERROR) {
+	error <- try(startOptions(START.TYP.REPORT, debug = debug))
 	checkOfTryError(error)
 } else {
-	startOptions(START.TYP.REPORT, debug)
+	startOptions(START.TYP.REPORT, debug = debug)
 }
 ownCat("Completing diagram creation ...")
-if(DO.PARALLELISATION) {
+if (DO.PARALLELISATION) {
 	stopSnow()
 }
-if(debug) {
+if (debug) {
 	ownCat("Print all warnings:")
 	warnings()
 }
-#gcinfo(FALSE)
-rm(list=ls(all=TRUE))
+
+rm(list = ls(all = TRUE))
