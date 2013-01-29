@@ -363,7 +363,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			else {
 				try {
 					int p0 = SystemOptions.getInstance().getInteger("Import", "User Mapping//Experiment User ID Start", 4);
-					int p2 = SystemOptions.getInstance().getInteger("Import", "User Mapping//Experiment user ID Length", 2);
+					int p2 = SystemOptions.getInstance().getInteger("Import", "User Mapping//Experiment User ID Length", 2);
 					if (experimentname.length() >= p0 + p2) {
 						String kuerzel = experimentname.substring(p0, p0 + p2);
 						String coor = getCoordinatorFromNameID(kuerzel);
