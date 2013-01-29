@@ -1228,6 +1228,15 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "5.1.1"
 				),
 				
+				"5.11.1" = list(
+						takeRestValuesFrom = "5.1.1"
+				),
+				
+				"5.12.1" = list(
+						takeRestValuesFrom = "5.1.1"
+				),
+				
+				
 				"7.1.1" = list(
 						newSection = 1,
 						title = "Color shade (hue)",
