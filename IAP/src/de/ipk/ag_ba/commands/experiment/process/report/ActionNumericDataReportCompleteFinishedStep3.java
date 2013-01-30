@@ -433,7 +433,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
 				
-				if (customTargetFileName != null && IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
+				if (customTargetFileName != null && (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET)) {
 					File f = new File(customTargetFileName);
 					String tempDirectory = f.getParent();
 					AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
