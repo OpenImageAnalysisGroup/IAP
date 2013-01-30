@@ -880,6 +880,8 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public void removedCleanup() {
+		if (action.requestTitleUpdates())
+			return;
 		// System.out.println("REMOVED: " + StringManipulationTools.removeHTMLtags(getTitle()).trim());
 		title = "<html>[REMOVE FROM UPDATE]<br>[this command needs refresh]<br>[go one step back in command history]<br>" + title;
 		navigationImage = null;

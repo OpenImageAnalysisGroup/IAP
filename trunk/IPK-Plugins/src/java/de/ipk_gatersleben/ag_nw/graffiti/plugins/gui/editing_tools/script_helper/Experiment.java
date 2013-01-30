@@ -81,7 +81,7 @@ public class Experiment implements ExperimentInterface {
 	
 	public Experiment(Document doc) {
 		this();
-		addAll(getExperimentFromDOM(doc));
+		addAll(getExperimentFromDOM(doc, null));
 	}
 	
 	@Override
@@ -506,8 +506,8 @@ public class Experiment implements ExperimentInterface {
 		return Experiment.typemanager;
 	}
 	
-	public static Experiment getExperimentFromDOM(org.w3c.dom.Document doc) {
-		return getExperimentFromJDOM(JDOM2DOM.getJDOMfromDOM(doc));
+	public static Experiment getExperimentFromDOM(org.w3c.dom.Document doc, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		return getExperimentFromJDOM(JDOM2DOM.getJDOMfromDOM(doc), optStatus);
 	}
 	
 	// public static List<Substance> getExperimentFromDocuments(List<Document>
@@ -524,7 +524,7 @@ public class Experiment implements ExperimentInterface {
 			List<org.jdom.Document> documents) {
 		List<Experiment> results = new ArrayList<Experiment>();
 		for (org.jdom.Document doc : documents)
-			results.add(Substance.getData(doc.getRootElement()));
+			results.add(Substance.getData(doc.getRootElement(), null));
 		
 		if (results.size() == 0)
 			return new Experiment();
@@ -540,8 +540,8 @@ public class Experiment implements ExperimentInterface {
 		}
 	}
 	
-	public static Experiment getExperimentFromJDOM(org.jdom.Document doc) {
-		Experiment e = Substance.getData(doc.getRootElement());
+	public static Experiment getExperimentFromJDOM(org.jdom.Document doc, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		Experiment e = Substance.getData(doc.getRootElement(), optStatus);
 		if (e.isEmpty()) {
 			Element temp = doc.getRootElement().getChild("experiment")
 					.getChild("experimentname");
@@ -554,7 +554,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-
+	
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
@@ -1086,29 +1086,37 @@ public class Experiment implements ExperimentInterface {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document w3Doc = builder.parse(in);
 		in.close();
-		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		Experiment md = Experiment.getExperimentFromDOM(w3Doc, null);
 		return md;
 	}
 	
-	public static ExperimentInterface loadFromIOurl(IOurl url)
+	public static ExperimentInterface loadFromIOurl(IOurl url, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Open Inputstream");
+		
 		InputStream is = url.getInputStream();
 		if (is == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No input stream for URL " + url);
-		Experiment md = loadFromXmlBinInputStream(is);
+		Experiment md = loadFromXmlBinInputStream(is, optStatus);
 		return md;
 	}
 	
-	public static Experiment loadFromXmlBinInputStream(InputStream is) throws Exception {
+	public static Experiment loadFromXmlBinInputStream(InputStream is, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		// DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// DocumentBuilder builder = factory.newDocumentBuilder();
 		// Document w3Doc = builder.parse(is);
 		// Experiment md = Experiment.getExperimentFromDOM(w3Doc);
 		// return md;
 		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Process XML structure");
+		
 		SAXBuilder sb = new SAXBuilder();
 		org.jdom.Document doc = sb.build(is);
-		return Experiment.getExperimentFromJDOM(doc);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Generate Experiment structure");
+		return Experiment.getExperimentFromJDOM(doc, optStatus);
 	}
 	
 	@Override

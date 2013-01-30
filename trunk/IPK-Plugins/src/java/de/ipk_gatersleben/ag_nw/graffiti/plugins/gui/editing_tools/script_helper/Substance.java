@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.AttributeHelper;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.plugin.XMLHelper;
@@ -78,8 +79,10 @@ public class Substance implements SubstanceInterface {
 	 * unit="µmol / g FW">0.1216941964366841</average> <data replicates="3"
 	 * unit="µmol / g FW">0.1720235400633771</data> <data replicates="3"
 	 * unit="µmol / g FW">0.07136485280999108</data> </sample> ...
+	 * 
+	 * @param optStatus
 	 */
-	static Experiment getData(Element e) {
+	static Experiment getData(Element e, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		ArrayList<SubstanceInterface> result = new ArrayList<SubstanceInterface>();
 		boolean debug = false;
 		try {
@@ -98,8 +101,12 @@ public class Substance implements SubstanceInterface {
 						experimentChildElement = childElement;
 					} else
 						if (childElement.getName().equals("measurements")) {
+							if (optStatus != null)
+								optStatus.setCurrentStatusText1("Generate Experiment Structure");
 							
 							List cl = childElement.getChildren();
+							int idx = 0;
+							int max = cl.size();
 							while (!cl.isEmpty()) {
 								Object o2 = cl.remove(0);
 								if (o2 instanceof Element) {
@@ -108,7 +115,12 @@ public class Substance implements SubstanceInterface {
 									
 									if (m.setMappedData(substanceElement, experimentChildElement))
 										result.add(m);
+									if (optStatus != null)
+										optStatus.setCurrentStatusText1("Processed " + m.getName());
 								}
+								idx++;
+								if (optStatus != null)
+									optStatus.setCurrentStatusValueFine(100d * idx / max);
 							}
 						}
 				}

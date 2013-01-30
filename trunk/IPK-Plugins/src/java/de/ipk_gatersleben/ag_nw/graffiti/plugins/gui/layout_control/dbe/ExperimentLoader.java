@@ -292,7 +292,7 @@ public class ExperimentLoader {
 						DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 						DocumentBuilder builder = factory.newDocumentBuilder();
 						Document w3Doc = builder.parse(in);
-						Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+						Experiment md = Experiment.getExperimentFromDOM(w3Doc, null);
 						receiver.processReceivedData(null, excelOrBinaryFile.getName(), md, null);
 						// } catch (JDOMException e) {
 						// ErrorMsg.addErrorMessage(e);

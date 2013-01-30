@@ -38,7 +38,9 @@ public class ActionViewExportData extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 		try {
+			status.setCurrentStatusText1("Load Data");
 			experiment.getData(m);
+			status.setCurrentStatusText1("");
 			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment,
 					experiment.getExperimentName());
 			mpc = new MainPanelComponent(sfp);
