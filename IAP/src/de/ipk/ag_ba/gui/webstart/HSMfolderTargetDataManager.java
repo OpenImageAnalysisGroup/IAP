@@ -56,7 +56,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	private static final String CONDITION_FOLDER_NAME = "conditions";
 	
 	private final String path;
-	private String prefix;
+	private final String prefix;
 	
 	public HSMfolderTargetDataManager(String prefix, String path) {
 		this.prefix = prefix;
@@ -182,7 +182,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		Document w3Doc = builder.parse(new File(loadFile));
 		if (status != null)
 			status.setCurrentStatusText1("Convert DOM to Experiment....");
-		Experiment md = Experiment.getExperimentFromDOM(w3Doc);
+		Experiment md = Experiment.getExperimentFromDOM(w3Doc, status);
 		if (status != null)
 			status.setCurrentStatusText1("Update URLs...");
 		updateFileUrls(md);

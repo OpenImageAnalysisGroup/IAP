@@ -188,7 +188,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		File mageFile = OpenMageFileDialogService.getXMLfile();
 		if (mageFile != null) {
 			Document doc = MAGEprocessor.getDataset(mageFile);
-			Experiment md = Experiment.getExperimentFromDOM(doc);
+			Experiment md = Experiment.getExperimentFromDOM(doc, null);
 			processReceivedData(null, mageFile.getName(), md, null);
 		}
 	}

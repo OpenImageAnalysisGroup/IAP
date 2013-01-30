@@ -19,7 +19,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ProjectEntity {
 	
-	private String experimentName;
+	private final String experimentName;
 	// private Document document;
 	
 	// private Element measurementCountElement;
@@ -93,7 +93,7 @@ public class ProjectEntity {
 	}
 	
 	private void setDocument(Document document) {
-		Experiment md = Experiment.getExperimentFromDOM(document);
+		Experiment md = Experiment.getExperimentFromDOM(document, null);
 		this.md = md;
 		// this.document = document;
 	}

@@ -167,10 +167,13 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 				HSMfolderTargetDataManager.DATA_FOLDER_NAME + File.separator +
 						hsm.getTargetDirectory(header, null);
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
-		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Load Experiment");
 		IOurl u = url.getIOurlFor(experimentDirectory + File.separator + fileNameOfExperimentFile);
 		String prefix = u.getPrefix();
-		ExperimentInterface md = Experiment.loadFromIOurl(u);
+		ExperimentInterface md = Experiment.loadFromIOurl(u, optStatus);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Post processing");
 		for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(md)) {
 			if (nmi != null && nmi instanceof BinaryMeasurement) {
 				BinaryMeasurement bm = (BinaryMeasurement) nmi;
@@ -181,6 +184,8 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			}
 		}
 		md.setHeader(header);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Processing finished");
 		return md;
 	}
 	
