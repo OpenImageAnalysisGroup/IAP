@@ -1629,7 +1629,6 @@ public class MongoDB {
 					}
 				} catch (Exception e) {
 					// ignore
-					e.printStackTrace();
 				}
 				for (VirtualFileSystem vfs : vfs_file_storage) {
 					if (vfs == lastHit.get(bucket))
