@@ -41,35 +41,38 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			if (fis != null)
 				fis.addImage("start", visMask.getImage(), null);
 			
-			visMask = visMask
-					.blur(getDouble("LAB-austr-blur", 1))
-					.filterRemoveHSV(
-							getDouble("LAB-austr-max-disctance", (1 / 2d - 1 / 3d)),
-							getDouble("LAB-austr-color-hue", (2 / 3d)),
-							getDouble("LAB-austr-max-lightness", (200d / 255d))); // filter out blue
-			visMask = input().images().vis().io().copy().applyMask(
-					visMask.closing(
-							getInt("LAB-austr-closing-number-dilate", 2),
-							getInt("LAB-austr-closing-number-erode", 4)).getImage(),
-					options.getBackground());
+			if (getBoolean("Filter by HSV Color Space", false)) {
+				visMask = visMask
+						.blur(getDouble("Blur", 1))
+						.filterRemoveHSV(
+								getDouble("HSV-max-disctance", (1 / 2d - 1 / 3d)),
+								getDouble("HSV-hue", (2 / 3d)),
+								getDouble("HSV-max-lightness", (200d / 255d))); // filter out blue
+				visMask = input().images().vis().io().copy().applyMask(
+						visMask.closing(
+								getInt("Closing-count-dilate", 2),
+								getInt("Closing-count-erode", 4)).getImage(),
+						options.getBackground());
+				
+				if (fis != null)
+					fis.addImage("blue filtered by HSV", visMask.getImage(), null);
+			}
 			
-			if (fis != null)
-				fis.addImage("blue filtered by HSV", visMask.getImage(), null);
-			
-			initLABfilterValues();
-			
-			visMask = visMask.filterRemoveLAB(
-					LAB_MIN_L_VALUE_VIS,
-					LAB_MAX_L_VALUE_VIS,
-					LAB_MIN_A_VALUE_VIS,
-					LAB_MAX_A_VALUE_VIS,
-					LAB_MIN_B_VALUE_VIS,
-					LAB_MAX_B_VALUE_VIS,
-					options.getBackground(), false);
-			
-			if (fis != null)
-				fis.addImage("main lab filter", visMask.getImage(), null);
-			
+			if (getBoolean("Filter by LAB Color Space", true)) {
+				initLABfilterValues();
+				
+				visMask = visMask.filterRemoveLAB(
+						LAB_MIN_L_VALUE_VIS,
+						LAB_MAX_L_VALUE_VIS,
+						LAB_MIN_A_VALUE_VIS,
+						LAB_MAX_A_VALUE_VIS,
+						LAB_MIN_B_VALUE_VIS,
+						LAB_MAX_B_VALUE_VIS,
+						options.getBackground(), false);
+				
+				if (fis != null)
+					fis.addImage("main lab filter", visMask.getImage(), null);
+			}
 			return visMask.getImage().show("VISS", debug);
 		}
 	}

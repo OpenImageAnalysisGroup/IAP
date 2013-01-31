@@ -3156,7 +3156,9 @@ public class ImageOperation {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int threshold = (int) cutoff;
-		
+		if (threshold == 0) {
+			return this;
+		}
 		for (int y = 0; y < image.getHeight(); y++) {
 			int yw = y * w;
 			if (threshold > img2d.length)
@@ -3183,22 +3185,75 @@ public class ImageOperation {
 		return new ImageOperation(img2d, w, h);
 	}
 	
-	public ImageOperation clearImageAbove(double threshold, int background) {
+	/**
+	 * @author Dijun Chen， Christian Klukas
+	 */
+	public ImageOperation clearImage(ImageSide side, double percent, int background) {
+		if (Math.abs(percent) < 0.0001)
+			return this;
+		
 		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
-		int end = w * (int) threshold;
+		int h = image.getHeight();
+		
+		switch (side) {
+			case Bottom:
+				int start = (int) (h * (1 - percent));
+				for (int y = start; y < h; y++) {
+					int yw = y * w;
+					for (int x = 0; x < w; x++) {
+						img2d[x + yw] = background;
+					}
+				}
+				break;
+			case Left:
+				int end = (int) (w * percent);
+				for (int y = 0; y < h; y++) {
+					int yw = y * w;
+					for (int x = 0; x < end; x++) {
+						img2d[x + yw] = background;
+					}
+				}
+				break;
+			case Right:
+				start = (int) (w * (1 - percent));
+				for (int y = 0; y < h; y++) {
+					int yw = y * w;
+					for (int x = start; x < w; x++) {
+						img2d[x + yw] = background;
+					}
+				}
+				break;
+			case Top:
+				end = (int) (h * percent);
+				for (int y = 0; y < end; y++) {
+					int yw = y * w;
+					for (int x = 0; x < w; x++) {
+						img2d[x + yw] = background;
+					}
+				}
+				break;
+		}
+		
+		return new ImageOperation(img2d, w, image.getHeight());
+	}
+	
+	public ImageOperation clearImageAbove(double thresholdY, int background) {
+		int[] img2d = getImageAs1dArray();
+		int w = image.getWidth();
+		int endY = w * (int) thresholdY;
 		int idx = 0;
-		while (idx < end) {
+		while (idx < endY) {
 			img2d[idx++] = background;
 		}
 		return new ImageOperation(img2d, w, image.getHeight());
 	}
 	
-	public ImageOperation clearImageBottom(int threshold, int background) {
+	public ImageOperation clearImageBottom(double threshold, int background) {
 		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		for (int y = threshold; y < h; y++) {
+		for (int y = (int) threshold; y < h; y++) {
 			int yw = y * w;
 			for (int x = 0; x < w; x++) {
 				img2d[x + yw] = background;

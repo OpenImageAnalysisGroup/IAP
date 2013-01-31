@@ -14,6 +14,7 @@ import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.BlockClosingVis;
+import iap.blocks.BlockCutFromSide;
 import iap.blocks.BlockRemoveMaizeBambooStick;
 import iap.blocks.BlockSkeletonizeVisOrFluo;
 import iap.blocks.curling.BlLeafCurlingAnalysis;
@@ -74,36 +75,19 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlockClearMasksBasedOnMarkers.class.getCanonicalName(),
 				BlLabFilter.class.getCanonicalName(),
 				BlockClosingVis.class.getCanonicalName(),
-				// "beforeBloomEnhancement" image is saved in the following block
-				// BlockClosingForMaizeBloom_vis_stores_image.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockRemoveSmallStructuresUsingOpeningFromTopVis.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
-				// BlockClosingForYellowVisMask.class.getCanonicalName(),
-				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(), // requires lab filter before
-				BlockRemoveMaizeBambooStick.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
-																						// noise)
+				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
+				BlockRemoveMaizeBambooStick.class.getCanonicalName(),
 				BlockRemoveLevitatingObjectsFromVisFluo.class.getCanonicalName(),
-				// BlTranslateMatch_vis_fluo_nir.class.getCanonicalName(),
 				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
-				
+				BlockCutFromSide.class.getCanonicalName(),
 				BlockRemoveVerticalAndHorizontalStructuresFromVisFluo.class.getCanonicalName(),
-				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(), // 2nd run
-				
+				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
-				
-				// BlockRemoveSmallClusters_vis.class.getCanonicalName(),
-				// BlockRemoveMaizeBambooStick_vis.class.getCanonicalName(), // requires remove small clusters before (the processing would vertically stop at any
-				// noise)
-				// BlockRemoveLevitatingObjects_vis.class.getCanonicalName(),
-				// BlockRemoveVerticalAndHorizontalStructures_vis.class.getCanonicalName(),
-				// BlockRemoveSmallClusters_vis.class.getCanonicalName(), // 2nd run
-				// BlUseFluoMaskToClear_vis_nir.class.getCanonicalName(),
-				
 				BlNirFilterSide_nir.class.getCanonicalName(),
-				
-				// BlockLabFilterVis.class.getCanonicalName(),
-				BlCopyImagesApplyMask.class.getCanonicalName(), // without nir
+				BlCopyImagesApplyMask.class.getCanonicalName(),
 				
 				// calculation of numeric values
 				BlCalcWidthAndHeight.class.getCanonicalName(),
