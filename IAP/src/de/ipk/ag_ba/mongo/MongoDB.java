@@ -418,7 +418,7 @@ public class MongoDB {
 					lastVFS = (VirtualFileSystemVFS2) v;
 			}
 			if (lastVFS != null) {
-				result = lastVFS.saveStream(fs.getBucketName() + "/" + hash, is, false, expectedFileSize);
+				result = lastVFS.saveStream(fs.getBucketName() + "/" + hash, is, true, expectedFileSize);
 				stored_in_VFS = true;
 			}
 		}
