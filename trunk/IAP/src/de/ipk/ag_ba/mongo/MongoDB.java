@@ -546,7 +546,7 @@ public class MongoDB {
 					String[] mn = SystemOptions.getInstance().getStringAll("GRID-STORAGE",
 							"User Name Mapping", new String[] {
 							"klukas/Christian Klukas"
-					});
+							});
 					if (mn != null)
 						for (String s : mn)
 							if (!s.contains("/"))
@@ -1614,6 +1614,36 @@ public class MongoDB {
 			}
 		}
 		return null;
+	}
+	
+	public boolean hasVFSinputStream(String bucket, String detail) {
+		if (vfs_file_storage != null) {
+			synchronized (vfs_file_storage) {
+				try {
+					if (lastHit != null) {
+						VirtualFileSystem i = lastHit.get(bucket);
+						if (i != null) {
+							IOurl h = i.getIOurlFor(bucket + "/" + detail);
+							return i.getFileLength(h) > 0;
+						}
+					}
+				} catch (Exception e) {
+					// ignore
+					e.printStackTrace();
+				}
+				for (VirtualFileSystem vfs : vfs_file_storage) {
+					if (vfs == lastHit.get(bucket))
+						continue;
+					IOurl url = vfs.getIOurlFor(bucket + "/" + detail);
+					try {
+						return vfs.getFileLength(url) > 0;
+					} catch (Exception e) {
+						return false;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	public MongoDBhandler getMongoHandler() {
