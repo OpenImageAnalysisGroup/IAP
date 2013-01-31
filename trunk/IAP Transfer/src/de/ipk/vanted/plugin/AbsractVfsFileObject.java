@@ -56,7 +56,7 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	}
 	
 	@Override
-	public long length() {
+	public long length() throws FileSystemException {
 		throw new UnsupportedOperationException("Not implemented!");
 	}
 	

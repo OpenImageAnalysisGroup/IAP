@@ -36,7 +36,7 @@ public interface VfsFileObject {
 	
 	public URL getURL() throws IOException;
 	
-	public long length();
+	public long length() throws IOException;
 	
 	public OutputStream getOutputStream() throws IOException;
 	
