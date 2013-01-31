@@ -920,7 +920,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		// is not modified
 		if (image.getURL() != null &&
 				(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
-				image.getURL().getPrefix().startsWith("hsm_"))) {
+						image.getURL().getPrefix().startsWith("hsm_"))) {
 			if (keepRemoteURLs_safe_space)
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 			
@@ -929,6 +929,32 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()) && image.getLabelURL() != null) {
 				DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 				if (knownURL != null && knownLabelURL != null) {
+					GridFS gridfs_images = cols.gridfs_images;
+					GridFS gridfs_label_files = cols.gridfs_label_files;
+					
+					String hashMain = (String) knownURL.get("hash");
+					GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
+					if (fffMain != null) {
+						String hashLabel = (String) knownLabelURL.get("hash");
+						GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
+						if (fffMain != null && fffLabel != null && hashMain != null && hashLabel != null) {
+							image.getURL().setPrefix(mh.getPrefix());
+							image.getURL().setDetail(hashMain);
+							image.getLabelURL().setPrefix(mh.getPrefix());
+							image.getLabelURL().setDetail(hashLabel);
+							return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+						}
+					}
+				}
+			}
+		}
+		if (image.getURL() != null && image.getURL().getPrefix().startsWith("mongo_")) {
+			if (keepRemoteURLs_safe_space)
+				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+			String hash = image.getURL().getDetail();
+			if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()) && image.getLabelURL() != null) {
+				String hashLabel = image.getLabelURL().getDetail();
+				if (hash != null && knownLabelURL != null) {
 					GridFS gridfs_images = cols.gridfs_images;
 					GridFS gridfs_label_files = cols.gridfs_label_files;
 					
