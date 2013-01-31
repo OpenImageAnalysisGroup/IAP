@@ -182,43 +182,6 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			throw (Exception) err.getObject();
 		InputStream res = (InputStream) or.getObject();
 		return res;
-		// if (res != null) {
-		// return res;
-		// } else {
-		// MyByteArrayInputStream is = ((MyByteArrayInputStream) super.getPreviewInputStream(url));
-		// if (is != null) {
-		// final byte[] rrr = is.getBuffTrimmed();
-		//
-		// m.processDB(new RunnableOnDB() {
-		//
-		// private DB db;
-		//
-		// @Override
-		// public void run() {
-		// try {
-		// m.saveStream(
-		// url.getDetail(),
-		// new MyByteArrayInputStream(rrr, rrr.length),
-		// new GridFS(db, MongoGridFS.getPreviewFileCollections().get(0)),
-		// rrr.length);
-		// } catch (Exception e) {
-		// err.setObject(e);
-		// }
-		// }
-		//
-		// @Override
-		// public void setDB(DB db) {
-		// this.db = db;
-		// }
-		// });
-		//
-		// if (err.getObject() != null)
-		// throw (Exception) err.getObject();
-		//
-		// return new MyByteArrayInputStream(rrr, rrr.length);
-		// }
-		// }
-		// return null;
 	}
 	
 	@Override
@@ -259,5 +222,50 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		if (err.getObject() != null)
 			throw (Exception) err.getObject();
 		return (Long) orSize.getObject();
+	}
+	
+	public boolean hasInputStreamForHash(final String hash) {
+		final ObjectRef found = new ObjectRef();
+		found.setObject(Boolean.FALSE);
+		
+		try {
+			m.processDB(new RunnableOnDB() {
+				private DB db;
+				
+				@Override
+				public void run() {
+					for (String fs : MongoGridFS.getFileCollectionsInclPreview()) {
+						if (m.hasVFSinputStream(fs, hash)) {
+							found.setObject(Boolean.TRUE);
+							return;
+						}
+					}
+					// check all gridFS file collections and look for matching hash value...
+					boolean ensureIndex = false;
+					if (ensureIndex)
+						for (String fs : MongoGridFS.getFileCollections()) {
+							DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+							collectionChunks.ensureIndex("files_id");
+						}
+					for (String fs : MongoGridFS.getFileCollections()) {
+						GridFS gridfs = new GridFS(db, fs);
+						
+						GridFSDBFile fff = gridfs.findOne(hash);
+						if (fff != null) {
+							found.setObject(Boolean.TRUE);
+						}
+					}
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					this.db = db;
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return (Boolean) found.getObject();
 	}
 }
