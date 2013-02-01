@@ -447,7 +447,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		Thread.currentThread().setName("Analyse " + plantID + " (process saving)");
 		// System.out.println();
 		// System.out.print("[WAIT");
-		BackgroundThreadDispatcher.waitFor(waitThreads);
+		if (waitThreads != null && waitThreads.size() > 0)
+			BackgroundThreadDispatcher.waitFor(waitThreads);
 		// System.out.println("]");
 		Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
 		if (!analysisResults.isEmpty()) {
@@ -695,11 +696,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					System.err.println("INTERNAL ERROR: OUTPUT IS NULL!!! 3");
 					return;
 				}
-				try {
-					Thread.sleep((long) (Math.random() * 1400 + 2000));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 				if (optLabelImageContent == null) {
 					if (image.getHeight() > 1) {
 						if (id != null && id.getParentSample() != null) {
@@ -941,14 +937,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						tray, tray_cnt,
 						inIr, resIr, buf, ".png");
 			
-			a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
-			b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
-			c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
-			d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
-			waitThreads.add(a);
-			waitThreads.add(b);
-			waitThreads.add(c);
-			waitThreads.add(d);
+			if (ra != null) {
+				a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
+				waitThreads.add(a);
+			}
+			if (rb != null) {
+				b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
+				waitThreads.add(b);
+			}
+			if (rc != null) {
+				c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
+				waitThreads.add(c);
+			}
+			if (rd != null) {
+				d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
+				waitThreads.add(d);
+			}
 		}
 		return waitThreads;
 	}

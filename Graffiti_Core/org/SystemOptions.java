@@ -110,6 +110,7 @@ public class SystemOptions {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+					updateCheckTasks.remove(this);
 				}
 			}
 		};
