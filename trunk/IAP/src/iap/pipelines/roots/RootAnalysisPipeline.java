@@ -16,16 +16,16 @@ import org.SystemOptions;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 
 /**
- * Roots / Waterscan Pipeline
+ * Root analysis (scanned washed roots)
  * 
- * @author klukas, entzian
+ * @author klukas
  */
-public class RootsAnalysisPipeline extends AbstractImageProcessor {
+public class RootAnalysisPipeline extends AbstractImageProcessor {
 	
 	private BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final SystemOptions so;
 	
-	public RootsAnalysisPipeline(SystemOptions so) {
+	public RootAnalysisPipeline(SystemOptions so) {
 		this.so = so;
 	}
 	
