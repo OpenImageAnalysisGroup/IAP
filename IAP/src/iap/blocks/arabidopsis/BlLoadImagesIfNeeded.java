@@ -26,7 +26,6 @@ public class BlLoadImagesIfNeeded extends
 	@Override
 	protected void prepare() {
 		if (input() != null) {
-			// synchronized (options) {
 			if (input().images() != null)
 				input().setImages(
 						new FlexibleImageSet(input().images()));

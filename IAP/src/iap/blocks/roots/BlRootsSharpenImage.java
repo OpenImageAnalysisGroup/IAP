@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 /**
- * @author klukas, entzian
+ * @author klukas
  */
 public class BlRootsSharpenImage extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
