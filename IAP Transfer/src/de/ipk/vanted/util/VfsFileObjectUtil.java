@@ -36,6 +36,7 @@ public class VfsFileObjectUtil {
 		if (StringUtils.isBlank(host) && protocol != VfsFileProtocol.LOCAL) {
 			throw new Exception("Host name can not be empty!");
 		}
+		boolean authOK = true;
 		String con = "file://";
 		switch (protocol) {
 			case FTP:
@@ -58,9 +59,10 @@ public class VfsFileObjectUtil {
 				break;
 			default:
 				con = "file://";
+				authOK = false;
 				break;
 		}
-		if (StringUtils.isNotBlank(username)) {
+		if (authOK && StringUtils.isNotBlank(username)) {
 			con += username;
 			if (StringUtils.isNotBlank(password)) {
 				con += ":" + password;
