@@ -404,7 +404,7 @@ public class DataMapping extends AbstractExperimentDataProcessor {
 								Node n = (Node) ge;
 								Collection<GraphElement> shortestPathNodesAndEdges = WeightedShortestPathSelectionAlgorithm
 										.getShortestPathElements(rg.getGraphElements(), n, mappedNodes, false, false, false,
-												Double.MAX_VALUE, null, false, false, false);
+												Double.MAX_VALUE, null, false, false, false, true);
 								elements.addAll(shortestPathNodesAndEdges);
 							}
 						}
