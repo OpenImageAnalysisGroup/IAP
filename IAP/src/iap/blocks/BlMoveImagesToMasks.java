@@ -11,7 +11,7 @@ public class BlMoveImagesToMasks extends AbstractImageAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() {
-		return new FlexibleMaskAndImageSet(input().images(), input().images());
+		return new FlexibleMaskAndImageSet(input().images(), input().images().copy());
 	}
 	
 	@Override

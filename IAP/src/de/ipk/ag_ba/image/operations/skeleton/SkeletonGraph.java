@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operations.skeleton;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.AttributeHelper;
 import org.SystemAnalysis;
@@ -40,10 +41,15 @@ public class SkeletonGraph {
 	public void createGraph() {
 		this.graph = new AdjListGraph();
 		int nPoints = 0;
+		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
+				if (!knownColors.contains(p)) {
+					System.out.println("Pixel Color: " + p);
+					knownColors.add(p);
+				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
 						|| p == SkeletonProcessor2d.colorBloom) {
 					nPoints++;
@@ -137,10 +143,10 @@ public class SkeletonGraph {
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
 					+ nGraphEdgePoints);
-		tryRemove4crossings(graph);
-		if (DEBUG)
-			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
-					+ nGraphEdgePoints);
+		// tryRemove4crossings(graph);
+		// if (DEBUG)
+		// System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
+		// + nGraphEdgePoints);
 	}
 	
 	private void tryRemove4crossings(AdjListGraph graph) {
@@ -263,7 +269,7 @@ public class SkeletonGraph {
 					}
 				}
 			if (!stop) {
-				// printMatrix(skelImg, x, y);
+				printMatrix(skelImg, x, y);
 				if (skelImg[x][y] != SkeletonProcessor2d.colorBranches && skelImg[x][y] != SkeletonProcessor2d.colorEndpoints)
 					skelImg[x][y] = background;
 				search: for (int xd = -1; xd <= 1; xd++)

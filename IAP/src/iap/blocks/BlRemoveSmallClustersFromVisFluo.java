@@ -102,10 +102,10 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 									options.getNeighbourhood(), options.getCameraPosition(), null, true).getImage();
 			}
 		} else {
-			return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
+			return new ImageOperation(input().masks().fluo().show("input fluo", debug)).removeSmallClusters(ngUse,
 					getDouble("Noise-Size-Fluo-Area", 3),
 					getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 100) * 0.5)),
-					options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+					options.getNeighbourhood(), options.getCameraPosition(), null).show("result fluo", debug).getImage();
 		}
 	}
 	

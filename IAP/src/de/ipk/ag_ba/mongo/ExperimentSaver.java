@@ -916,6 +916,13 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (image.getURL().getPrefix().equals(mh.getPrefix()) && image.getLabelURL().getPrefix().equals(mh.getPrefix()))
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		}
+		if (image.getURL() != null && image.getURL().getPrefix().startsWith("mongo_") && image.getURL().getDetail().startsWith("lemna-db.")) {
+			image.getURL().setPrefix(LemnaTecFTPhandler.PREFIX);
+		}
+		if (image.getLabelURL() != null && image.getLabelURL().getPrefix().startsWith("mongo_") && image.getLabelURL().getDetail().startsWith("lemna-db.")) {
+			image.getLabelURL().setPrefix(LemnaTecFTPhandler.PREFIX);
+		}
+		
 		// check if the source URL has been imported before, it is assumed that the source URL content
 		// is not modified
 		if (image.getURL() != null &&

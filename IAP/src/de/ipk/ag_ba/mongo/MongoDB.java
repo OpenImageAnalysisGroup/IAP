@@ -832,32 +832,42 @@ public class MongoDB {
 					optStatusProvider.setCurrentStatusValueFine(0);
 					optStatusProvider.setCurrentStatusText1("Update Experiment Size Info");
 				}
-				List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
-				double max = 0;
+				
+				boolean ng = true;
 				int n = 0;
-				HashMap<Class, ArrayList<GridFS>> cachedFS = new HashMap<Class, ArrayList<GridFS>>();
-				for (NumericMeasurementInterface nmd : abc) {
-					if (nmd instanceof BinaryMeasurement) {
-						max++;
-					}
-				}
-				for (NumericMeasurementInterface nmd : abc) {
-					if (nmd instanceof BinaryMeasurement) {
-						n++;
-						if (optStatusProvider != null && n % 100 == 0) {
-							optStatusProvider.setCurrentStatusValueFine(100d * n / max);
-							optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
+				double max = 0;
+				if (ng) {
+					List<NumericMeasurementInterface> fl = Substance3D.getAllFiles(experiment, MeasurementNodeType.IMAGE);
+					n = fl.size();
+					max = n;
+					Long size = Substance3D.getFileSize(fl);
+					newSize.addLong(size);
+				} else {
+					List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
+					HashMap<Class, ArrayList<GridFS>> cachedFS = new HashMap<Class, ArrayList<GridFS>>();
+					for (NumericMeasurementInterface nmd : abc) {
+						if (nmd instanceof BinaryMeasurement) {
+							max++;
 						}
-						IOurl url = ((BinaryMeasurement) nmd).getURL();
-						if (url != null) {
-							String hash = url.getDetail();
-							if (!cachedFS.containsKey(nmd.getClass()))
-								cachedFS.put(nmd.getClass(), MongoGridFS.getGridFsFileCollectionsFor(db, nmd));
-							ArrayList<GridFS> col = cachedFS.get(nmd.getClass());
-							for (GridFS gridfs : col) {
-								GridFSDBFile file = gridfs.findOne(hash);
-								if (file != null) {
-									newSize.addLong(file.getLength());
+					}
+					for (NumericMeasurementInterface nmd : abc) {
+						if (nmd instanceof BinaryMeasurement) {
+							n++;
+							if (optStatusProvider != null && n % 100 == 0) {
+								optStatusProvider.setCurrentStatusValueFine(100d * n / max);
+								optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
+							}
+							IOurl url = ((BinaryMeasurement) nmd).getURL();
+							if (url != null) {
+								String hash = url.getDetail();
+								if (!cachedFS.containsKey(nmd.getClass()))
+									cachedFS.put(nmd.getClass(), MongoGridFS.getGridFsFileCollectionsFor(db, nmd));
+								ArrayList<GridFS> col = cachedFS.get(nmd.getClass());
+								for (GridFS gridfs : col) {
+									GridFSDBFile file = gridfs.findOne(hash);
+									if (file != null) {
+										newSize.addLong(file.getLength());
+									}
 								}
 							}
 						}

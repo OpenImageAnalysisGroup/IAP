@@ -9,12 +9,14 @@ import com.mongodb.BasicDBObject;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
 import de.ipk.ag_ba.commands.mongodb.file_storage.ActionMongoFileStorageCommands;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 
 public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 	
@@ -73,9 +75,10 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		result.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDbCompact(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionDeleteHistoryOfAllExperiments(m), src.getGUIsetting()));
+		result.add(new NavigationButton(new ActionCopyExperiment(m, ExperimentHeaderService.filterNewest(experimentList), src.getGUIsetting()),
+				src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionDataExportCSVfileList(m, experimentList), src.getGUIsetting()));
 		
 		return result;
 	}
-	
 }

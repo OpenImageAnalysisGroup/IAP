@@ -8,7 +8,7 @@ import org.SettingsHelperDefaultIsTrue;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionDataUdpBroadcast;
-import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
+import de.ipk.ag_ba.commands.mongodb.ActionCopyListOfExperimentsToMongo;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
@@ -20,12 +20,13 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 
 public class ActionCopyExperiment extends AbstractNavigationAction implements NavigationAction {
 	
 	private MongoDB m;
-	private ExperimentReference experimentReference;
+	private ArrayList<ExperimentReference> experimentReferences;
 	private NavigationButton src;
 	private ArrayList<MongoDB> ml;
 	private boolean addHSMcopy;
@@ -39,7 +40,19 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	public ActionCopyExperiment(MongoDB m, ExperimentReference experimentReference, GUIsetting guiSetting) {
 		this("Copy dataset");
 		this.m = m;
-		this.experimentReference = experimentReference;
+		this.experimentReferences = new ArrayList<ExperimentReference>();
+		this.experimentReferences.add(experimentReference);
+		this.guiSetting = guiSetting;
+	}
+	
+	public ActionCopyExperiment(MongoDB m, ArrayList<ExperimentHeaderInterface> experimentHeaderList, GUIsetting guiSetting) {
+		this("Copy dataset");
+		this.m = m;
+		this.experimentReferences = new ArrayList<ExperimentReference>();
+		for (ExperimentHeaderInterface eh : experimentHeaderList) {
+			ExperimentReference er = new ExperimentReference(eh, m);
+			this.experimentReferences.add(er);
+		}
 		this.guiSetting = guiSetting;
 	}
 	
@@ -63,23 +76,25 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		for (MongoDB m : ml)
-			res.add(new NavigationButton(new ActionCopyToMongo(m, experimentReference), guiSetting));
+			res.add(new NavigationButton(new ActionCopyListOfExperimentsToMongo(m, experimentReferences), guiSetting));
 		for (VirtualFileSystem vx : vl) {
 			if (vx instanceof VirtualFileSystemVFS2) {
 				VirtualFileSystemVFS2 v = (VirtualFileSystemVFS2) vx;
-				res.add(new NavigationButton(new ActionDataExportToVfs(m, experimentReference, v), guiSetting));
+				res.add(new NavigationButton(new ActionDataExportToVfs(m, experimentReferences, v), guiSetting));
 			}
 		}
 		
-		if (addUDPcopy) {
-			res.add(new NavigationButton(new ActionDataUdpBroadcast(m, experimentReference), guiSetting));
-		}
+		if (experimentReferences.size() == 1)
+			if (addUDPcopy) {
+				res.add(new NavigationButton(new ActionDataUdpBroadcast(m, experimentReferences.iterator().next()), guiSetting));
+			}
 		
-		if (addHSMcopy) {
-			String hsmf = IAPmain.getHSMfolder();
-			if (hsmf != null)
-				res.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReference, hsmf), guiSetting));
-		}
+		if (experimentReferences.size() == 1)
+			if (addHSMcopy) {
+				String hsmf = IAPmain.getHSMfolder();
+				if (hsmf != null)
+					res.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReferences.iterator().next(), hsmf), guiSetting));
+			}
 		
 		return res;
 	}
@@ -96,6 +111,9 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy";
+		if (experimentReferences.size() == 1)
+			return "Copy";
+		else
+			return "Copy Set of Experiments (" + experimentReferences.size() + ")";
 	}
 }

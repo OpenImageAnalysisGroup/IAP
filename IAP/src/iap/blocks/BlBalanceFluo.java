@@ -45,21 +45,6 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 		
 	}
 	
-	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage inputMain = input().images().fluo();
-		if (inputMain == null)
-			return null;
-		FlexibleImage input = input().masks().fluo();
-		FlexibleImage res;
-		boolean invert = true;
-		if (input != null)
-			res = balance(input, 255, invert);
-		else
-			res = input;
-		return res;
-	}
-	
 	/**
 	 * Calculates the average of the brightness of an area around an image.
 	 * 
