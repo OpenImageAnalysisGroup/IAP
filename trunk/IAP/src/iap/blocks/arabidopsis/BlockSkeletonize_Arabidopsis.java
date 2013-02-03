@@ -101,34 +101,9 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		
-		boolean bloomDetection = false;
-		int bloomLimbCount = 0;
-		if (bloomDetection) {
-			skel2d.deleteShortEndLimbs(10, true, new HashSet<Point>());
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().show("blurf", false), 0.075f, h, 20).io().// blur(3).
-					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
-			
-			probablyBloomFluo = probablyBloomFluo.io().show("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
-					erode().erode().erode().erode().invert().
-					getImage();
-			
-			if (debug2) {
-				FlexibleImageStack fis = new FlexibleImageStack();
-				fis.addImage("PROB", probablyBloomFluo);
-				fis.addImage("FLUO", fluo);
-				fis.print("CHECK THIS");
-			}
-			
-			HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-			bloomLimbCount = knownBloompoints.size();
-			skel2d.deleteShortEndLimbs(10, false, knownBloompoints);
-			skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
-			
-			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().show("BLOOM AREA", debug2).countFilledPixels());
-		} else {
-			skel2d.deleteShortEndLimbs(getInt("minimum limbs length (absolute)", 15), false, new HashSet<Point>());
-			skel2d.deleteShortEndLimbs(-getInt("relative limbs threshold (percent)", 50), false, new HashSet<Point>());
-		}
+		skel2d.deleteShortEndLimbs(getInt("minimum limbs length (absolute)", 15), false, new HashSet<Point>());
+		skel2d.deleteShortEndLimbs(-getInt("relative limbs threshold (percent)", 50), false, new HashSet<Point>());
+		
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {
@@ -174,10 +149,9 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		int leafcount = skel2d.endlimbs.size();
 		FlexibleImage skelres = skel2d.getAsFlexibleImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
-		leafcount -= bloomLimbCount;
 		
-		// ***Out***
-		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
+		if (debug)
+			System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		// FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
 		// result.display("res", false);
 		// FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
@@ -239,8 +213,6 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
-		if (bloomDetection)
-			rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {
 			if (distHorizontal != null)
@@ -253,12 +225,6 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				rt.addValue("leaf.width.outer.max.norm", leafWidthInPixels * normFactor);
 			rt.addValue("leaf.width.outer.max", leafWidthInPixels);
 		}
-		
-		if (bloomDetection)
-			if (bloomLimbCount > 0)
-				rt.addValue("bloom", 1);
-			else
-				rt.addValue("bloom", 0);
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)

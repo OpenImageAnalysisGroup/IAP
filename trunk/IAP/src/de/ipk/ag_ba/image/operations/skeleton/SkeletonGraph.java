@@ -92,6 +92,8 @@ public class SkeletonGraph {
 					Vector2i startPoint = new Vector2i(x, y);
 					System.out.println("Start: " + startPoint);
 					boolean foundLine;
+					Node lastStartNode = null;
+					Node lastEndNode = null;
 					do {
 						ArrayList<Vector2i> edgePoints = traverseAndClearLineStartingFromStartPoint(new Vector2i(x, y));
 						foundLine = edgePoints.size() > 1;
@@ -115,7 +117,11 @@ public class SkeletonGraph {
 							nGraphEdgePoints += edgePoints.size();
 							nGraphEdgePoints--;// either source or target pixel is not really part of the edge
 							edge.setDouble("len", edgePoints.size());
-							
+							if (lastStartNode == startNode && lastEndNode == endNode) {
+								break;
+							}
+							lastStartNode = startNode;
+							lastEndNode = endNode;
 						}
 					} while (foundLine);
 				}
@@ -269,7 +275,7 @@ public class SkeletonGraph {
 					}
 				}
 			if (!stop) {
-				printMatrix(skelImg, x, y);
+				// printMatrix(skelImg, x, y);
 				if (skelImg[x][y] != SkeletonProcessor2d.colorBranches && skelImg[x][y] != SkeletonProcessor2d.colorEndpoints)
 					skelImg[x][y] = background;
 				search: for (int xd = -1; xd <= 1; xd++)
