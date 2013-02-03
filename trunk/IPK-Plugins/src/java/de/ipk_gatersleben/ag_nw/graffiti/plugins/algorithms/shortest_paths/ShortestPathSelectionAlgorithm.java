@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: ShortestPathSelectionAlgorithm.java,v 1.2 2012-11-07 14:47:54 klukas Exp $
+ * $Id: ShortestPathSelectionAlgorithm.java,v 1.3 2013-02-03 19:28:03 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
  * @author klukas
  */
 public class ShortestPathSelectionAlgorithm
-					extends AbstractAlgorithm {
+		extends AbstractAlgorithm {
 	
 	private boolean settingIncludeInnerEdges = false;
 	private boolean settingDirected = true;
@@ -56,10 +56,10 @@ public class ShortestPathSelectionAlgorithm
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new BooleanParameter(settingDirected, "Consider Edge Direction", ""),
-							new BooleanParameter(settingIncludeEdges, "Select Edges", "If enabled, edges along the shortest path(s) are selected"),
-							new BooleanParameter(settingIncludeInnerEdges, "Select Inner-Edges",
-												"If selected, all edges connecting nodes of the shortest path(s) are selected") };
+				new BooleanParameter(settingDirected, "Consider Edge Direction", ""),
+				new BooleanParameter(settingIncludeEdges, "Select Edges", "If enabled, edges along the shortest path(s) are selected"),
+				new BooleanParameter(settingIncludeInnerEdges, "Select Inner-Edges",
+						"If selected, all edges connecting nodes of the shortest path(s) are selected") };
 	}
 	
 	/**
@@ -76,6 +76,7 @@ public class ShortestPathSelectionAlgorithm
 	/**
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void execute() {
 		ArrayList<GraphElement> currentSelElements = new ArrayList<GraphElement>();
@@ -94,10 +95,11 @@ public class ShortestPathSelectionAlgorithm
 			if (ge instanceof Node) {
 				Node n = (Node) ge;
 				Collection<GraphElement> shortestPathNodesAndEdges =
-									WeightedShortestPathSelectionAlgorithm.getShortestPathElements(
-														graph.getGraphElements(),
-														n,
-														targetNodesToBeProcessed, settingDirected, false, false, Double.MAX_VALUE, null, false, false, false);
+						WeightedShortestPathSelectionAlgorithm.getShortestPathElements(
+								graph.getGraphElements(),
+								n,
+								targetNodesToBeProcessed, settingDirected, false,
+								false, Double.MAX_VALUE, null, false, false, false, true);
 				new ArrayList<GraphElement>(shortestPathNodesAndEdges);
 				for (GraphElement gg : shortestPathNodesAndEdges) {
 					if (settingIncludeEdges && (gg instanceof Edge))
@@ -123,6 +125,7 @@ public class ShortestPathSelectionAlgorithm
 	/**
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Find Shortest Path...";
 	}

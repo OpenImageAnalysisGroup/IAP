@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.3 2013-02-03 15:28:34 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.4 2013-02-03 19:28:03 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -25,6 +25,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.parameter.BooleanParameter;
 import org.graffiti.plugin.parameter.ObjectListParameter;
 import org.graffiti.plugin.parameter.Parameter;
@@ -46,6 +47,7 @@ public class WeightedShortestPathSelectionAlgorithm
 	private boolean setAttribute = false;
 	private boolean setLabel = false;
 	private boolean putWeightOnEdges = false;
+	private boolean allowMultiplePathsWithSameDistance = true;
 	private AttributePathNameSearchType weightattribute = null;
 	
 	/**
@@ -57,8 +59,6 @@ public class WeightedShortestPathSelectionAlgorithm
 	@Override
 	public void check() throws PreconditionException {
 		super.check();
-		if (selection == null || selection.getNumberOfNodes() < 2)
-			throw new PreconditionException("at least one start and one end node has to be selected");
 	}
 	
 	/**
@@ -81,7 +81,9 @@ public class WeightedShortestPathSelectionAlgorithm
 				new BooleanParameter(setAttribute, "Add Distance Attribute",
 						"If enabled, a attribute will be added, which contains calculated distance information."),
 				new BooleanParameter(setLabel, "Replace Label with Distance",
-						"If enabled, edge and node labels will show calculated distance information."), };
+						"If enabled, edge and node labels will show calculated distance information."),
+				new BooleanParameter(allowMultiplePathsWithSameDistance, "Allow Multiple Paths",
+						"If enabled, multiple paths with the same minimum distance are found.") };
 	}
 	
 	/**
@@ -97,6 +99,7 @@ public class WeightedShortestPathSelectionAlgorithm
 		putWeightOnEdges = ((BooleanParameter) params[i++]).getBoolean();
 		setAttribute = ((BooleanParameter) params[i++]).getBoolean();
 		setLabel = ((BooleanParameter) params[i++]).getBoolean();
+		allowMultiplePathsWithSameDistance = ((BooleanParameter) params[i++]).getBoolean();
 	}
 	
 	/**
@@ -111,6 +114,62 @@ public class WeightedShortestPathSelectionAlgorithm
 		graph.numberGraphElements();
 		if (selection != null)
 			currentSelElements.addAll(selection.getElements());
+		if (currentSelElements.size() < 2) {
+			ArrayList<GraphElement> possibleSourceElements = new ArrayList<GraphElement>();
+			if (currentSelElements.size() == 1)
+				possibleSourceElements.add(currentSelElements.iterator().next());
+			else
+				possibleSourceElements.addAll(graph.getNodes());
+			ArrayList<GraphElement> longestDistanceElements = new ArrayList<GraphElement>();
+			double shortestLen = -1;
+			for (GraphElement sourceElement : possibleSourceElements) {
+				for (GraphElement target : graph.getNodes()) {
+					ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
+					targetGraphElementsToBeProcessed.add(target);
+					
+					ThreadSafeOptions retDist = new ThreadSafeOptions();
+					retDist.setDouble(0);
+					getShortestPathElements(
+							graph.getGraphElements(),
+							sourceElement,
+							targetGraphElementsToBeProcessed,
+							settingDirected,
+							considerNodeWeight,
+							considerEdgeWeight,
+							Double.MAX_VALUE,
+							weightattribute,
+							putWeightOnEdges,
+							false,
+							false,
+							false,
+							retDist);
+					// process shortestPathNodesAndEdges
+					double pathLen = retDist.getDouble();
+					if (pathLen > 0) {
+						if (Math.abs(pathLen - shortestLen) < 0.000001 && allowMultiplePathsWithSameDistance) {
+							shortestLen = pathLen;
+							longestDistanceElements.add(sourceElement);
+							longestDistanceElements.add(target);
+							// System.out.println("DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> " + new GraphElementHelper(target).getLabel()
+							// + " : "
+							// + pathLen);
+						} else
+							if (pathLen > shortestLen) {
+								shortestLen = pathLen;
+								longestDistanceElements.clear();
+								longestDistanceElements.add(sourceElement);
+								longestDistanceElements.add(target);
+								// System.out.println("DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> "
+								// + new GraphElementHelper(target).getLabel() + " : "
+								// + pathLen);
+							}
+					}
+				}
+			}
+			if (longestDistanceElements.size() > 0)
+				currentSelElements.addAll(longestDistanceElements);
+		}
+		
 		ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
 		for (GraphElement ge : currentSelElements) {
 			targetGraphElementsToBeProcessed.add(ge);
@@ -127,13 +186,33 @@ public class WeightedShortestPathSelectionAlgorithm
 					weightattribute,
 					putWeightOnEdges,
 					setAttribute,
-					setLabel);
+					setLabel,
+					allowMultiplePathsWithSameDistance);
 			sel.addAll(shortestPathNodesAndEdges);
 			if (!settingDirected)
 				targetGraphElementsToBeProcessed.remove(ge);
 		}
+		
 		sel.addAll(currentSelElements);
 		MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(sel);
+	}
+	
+	public static Collection<GraphElement> getShortestPathElements(
+			Collection<GraphElement> validGraphElements,
+			GraphElement startGraphElement,
+			ListOrderedSet targetGraphElements,
+			boolean directed,
+			boolean considerNodeWeight,
+			boolean considerEdgeWeight,
+			double maxDistance,
+			AttributePathNameSearchType weightattribute,
+			boolean putWeightOnEdges,
+			boolean setAttribute,
+			boolean setLabel,
+			boolean allowMultiplePathsWithSameDistance) {
+		return getShortestPathElements(validGraphElements, startGraphElement, targetGraphElements, directed,
+				considerNodeWeight, considerEdgeWeight, maxDistance, weightattribute, putWeightOnEdges, setAttribute, setLabel,
+				allowMultiplePathsWithSameDistance, null);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -148,7 +227,9 @@ public class WeightedShortestPathSelectionAlgorithm
 			AttributePathNameSearchType weightattribute,
 			boolean putWeightOnEdges,
 			boolean setAttribute,
-			boolean setLabel) {
+			boolean setLabel,
+			boolean allowMultiplePathsWithSameDistance,
+			ThreadSafeOptions optShortestDistanceReturn) {
 		
 		Queue<GraphElement> findTheseGraphElements = new LinkedList<GraphElement>();
 		findTheseGraphElements.addAll(targetGraphElements);
@@ -157,13 +238,13 @@ public class WeightedShortestPathSelectionAlgorithm
 		
 		Queue<WeightedDistanceInfo> toDo = new LinkedList<WeightedDistanceInfo>();
 		
-		HashMap<GraphElement, WeightedDistanceInfo> node2distanceinfo = new HashMap<GraphElement, WeightedDistanceInfo>();
+		HashMap<GraphElement, WeightedDistanceInfo> graphelement2distanceinfo = new HashMap<GraphElement, WeightedDistanceInfo>();
 		
 		WeightedDistanceInfo di = new WeightedDistanceInfo(
 				0, startGraphElement, startGraphElement, considerNodeWeight, considerEdgeWeight,
 				weightattribute, putWeightOnEdges, setAttribute);
 		toDo.add(di);
-		node2distanceinfo.put(startGraphElement, di);
+		graphelement2distanceinfo.put(startGraphElement, di);
 		
 		do {
 			WeightedDistanceInfo currentProcessingUnit = toDo.remove();
@@ -174,9 +255,10 @@ public class WeightedShortestPathSelectionAlgorithm
 			for (GraphElement neighbour : connectedGraphElements) {
 				if (!validGraphElements.contains(neighbour))
 					continue;
-				if (node2distanceinfo.containsKey(neighbour)) {
-					WeightedDistanceInfo neighbourProcessingUnit = node2distanceinfo.get(neighbour);
-					neighbourProcessingUnit.checkDistanceAndMemorizePossibleSourceElement(currentGraphElement, currentProcessingUnit.getMinDistance());
+				if (graphelement2distanceinfo.containsKey(neighbour)) {
+					WeightedDistanceInfo neighbourProcessingUnit = graphelement2distanceinfo.get(neighbour);
+					neighbourProcessingUnit.checkDistanceAndMemorizePossibleSourceElement(currentGraphElement, currentProcessingUnit.getMinDistance(),
+							allowMultiplePathsWithSameDistance);
 				} else {
 					WeightedDistanceInfo newInfo = new WeightedDistanceInfo(
 							currentProcessingUnit.getMinDistance(),
@@ -189,10 +271,10 @@ public class WeightedShortestPathSelectionAlgorithm
 							setAttribute);
 					if (newInfo.getMinDistance() <= maxDistance)
 						toDo.add(newInfo);
-					node2distanceinfo.put(neighbour, newInfo);
+					graphelement2distanceinfo.put(neighbour, newInfo);
 				}
 				if (targetGraphElements.contains(neighbour)) {
-					WeightedDistanceInfo thisEntity = node2distanceinfo.get(neighbour);
+					WeightedDistanceInfo thisEntity = graphelement2distanceinfo.get(neighbour);
 					if (thisEntity.allPossibleSourcePathsTraversed(directed))
 						findTheseGraphElements.remove(neighbour);
 				}
@@ -200,29 +282,31 @@ public class WeightedShortestPathSelectionAlgorithm
 		} while ((!toDo.isEmpty() && !findTheseGraphElements.isEmpty()));
 		
 		if (setLabel)
-			for (GraphElement ge : node2distanceinfo.keySet()) {
-				WeightedDistanceInfo pdi = node2distanceinfo.get(ge);
+			for (GraphElement ge : graphelement2distanceinfo.keySet()) {
+				WeightedDistanceInfo pdi = graphelement2distanceinfo.get(ge);
 				AttributeHelper.setLabel(ge, (int) pdi.getMinDistance() + "");
 			}
 		if (setAttribute)
-			for (GraphElement ge : node2distanceinfo.keySet()) {
-				WeightedDistanceInfo pdi = node2distanceinfo.get(ge);
+			for (GraphElement ge : graphelement2distanceinfo.keySet()) {
+				WeightedDistanceInfo pdi = graphelement2distanceinfo.get(ge);
 				AttributeHelper.setAttribute(ge, "properties", "shortestdistance", pdi.getMinDistance());
 			}
 		
 		for (Object o : targetGraphElements) {
 			GraphElement targetNode = (GraphElement) o;
 			elementsOfShortestPaths.add(targetNode);
-			if (node2distanceinfo.containsKey(targetNode)) {
-				WeightedDistanceInfo distInfo = node2distanceinfo.get(targetNode);
+			if (graphelement2distanceinfo.containsKey(targetNode)) {
+				WeightedDistanceInfo distInfo = graphelement2distanceinfo.get(targetNode);
 				processDistanceInfoFromTargetToSource(
-						node2distanceinfo,
+						graphelement2distanceinfo,
 						elementsOfShortestPaths,
 						distInfo,
 						directed,
-						weightattribute);
+						weightattribute,
+						optShortestDistanceReturn);
 			}
 		}
+		
 		return elementsOfShortestPaths;
 	}
 	
@@ -231,7 +315,7 @@ public class WeightedShortestPathSelectionAlgorithm
 			HashSet<GraphElement> elementsOfShortestPath,
 			WeightedDistanceInfo distInfo,
 			boolean directed,
-			AttributePathNameSearchType weightAttribute) {
+			AttributePathNameSearchType weightAttribute, ThreadSafeOptions optShortestDistanceReturn) {
 		elementsOfShortestPath.add(distInfo.getGraphElement());
 		Collection<GraphElement> graphElementsWithMinimalDistance = distInfo.getSourceGraphElementsWithMinimalDistance();
 		for (GraphElement sourceElement : graphElementsWithMinimalDistance) {
@@ -241,13 +325,15 @@ public class WeightedShortestPathSelectionAlgorithm
 			if (sourceElement != distInfo.getGraphElement())
 				if (node2distanceinfo.containsKey(sourceElement)) {
 					WeightedDistanceInfo distanceInfoForSourceElement = node2distanceinfo.get(sourceElement); // process distance
+					if (optShortestDistanceReturn != null)
+						optShortestDistanceReturn.addDouble(distanceInfoForSourceElement.getMyDistancePenality());
 					// recursively visit source elements from target to source
 					processDistanceInfoFromTargetToSource(
 							node2distanceinfo,
 							elementsOfShortestPath,
 							distanceInfoForSourceElement,
 							directed,
-							weightAttribute);
+							weightAttribute, optShortestDistanceReturn);
 				}
 		}
 	}
@@ -274,7 +360,9 @@ public class WeightedShortestPathSelectionAlgorithm
 				" of 1. Use the &quot;Add Attribute&quot; or &quot;Set Label&quot; settings, to enable a<br>" +
 				"review of the calculated distances.<br><br>" +
 				"Hint: Use the simpler shortest path selection command to select nodes or edges,<br>" +
-				"for situations where graph element attribute values should not be considered.";
+				"for situations where graph element attribute values should not be considered.<br><br>" +
+				"Hint: Special functions: If only one node is selected, the most far ones are located.<br>" +
+				"If no node is selected, the longest shortest path is determined.";
 	}
 	
 	/**

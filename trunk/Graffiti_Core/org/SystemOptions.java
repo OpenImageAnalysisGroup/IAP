@@ -500,6 +500,7 @@ public class SystemOptions {
 		if (newValues.size() == 1) {
 			sec.add(setting, "");
 		}
+		store(section, setting);
 	}
 	
 	public synchronized void addChangeListener(String section, String setting, Runnable runnable) {

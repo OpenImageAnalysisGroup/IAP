@@ -18,17 +18,17 @@ import org.graffiti.graph.Node;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 
 public class WeightedDistanceInfo {
-	private HashSet<GraphElement> sourceGraphElementsWithShortestDistance = new HashSet<GraphElement>();
-	private HashSet<GraphElement> rejectedGraphElementsBecauseOfNonOptimalDistance = new HashSet<GraphElement>();
+	private final HashSet<GraphElement> sourceGraphElementsWithShortestDistance = new HashSet<GraphElement>();
+	private final HashSet<GraphElement> rejectedGraphElementsBecauseOfNonOptimalDistance = new HashSet<GraphElement>();
 	private double currentlyKnownMinimumDistance;
 	private double myDistancePenality;
-	private GraphElement thisGraphElement;
+	private final GraphElement thisGraphElement;
 	private static double epsilon = 0.000000000001;
 	
 	public WeightedDistanceInfo(double initDistance, GraphElement sourceNode, GraphElement thisNode,
-						boolean considerNodeWeight, boolean considerEdgeWeight,
-						AttributePathNameSearchType weightattribute, boolean putWeightOnEdges,
-						boolean addAttribute) {
+			boolean considerNodeWeight, boolean considerEdgeWeight,
+			AttributePathNameSearchType weightattribute, boolean putWeightOnEdges,
+			boolean addAttribute) {
 		sourceGraphElementsWithShortestDistance.add(sourceNode);
 		this.thisGraphElement = thisNode;
 		if (thisGraphElement instanceof Node) {
@@ -61,8 +61,8 @@ public class WeightedDistanceInfo {
 		return currentlyKnownMinimumDistance;
 	}
 	
-	public void checkDistanceAndMemorizePossibleSourceElement(GraphElement workGraphElement, double distanceUntilNeighbourElement) {
-		if (Math.abs(distanceUntilNeighbourElement + myDistancePenality - currentlyKnownMinimumDistance) < epsilon) {
+	public void checkDistanceAndMemorizePossibleSourceElement(GraphElement workGraphElement, double distanceUntilNeighbourElement, boolean allowMultiplePath) {
+		if (Math.abs(distanceUntilNeighbourElement + myDistancePenality - currentlyKnownMinimumDistance) < epsilon && allowMultiplePath) {
 			sourceGraphElementsWithShortestDistance.add(workGraphElement);
 		} else
 			if (distanceUntilNeighbourElement + myDistancePenality < currentlyKnownMinimumDistance) {
@@ -99,7 +99,7 @@ public class WeightedDistanceInfo {
 		boolean foundNotProcessed = false;
 		for (GraphElement ge : getConnectedGraphElements(directed)) {
 			if (!sourceGraphElementsWithShortestDistance.contains(ge) &&
-								!rejectedGraphElementsBecauseOfNonOptimalDistance.contains(ge)) {
+					!rejectedGraphElementsBecauseOfNonOptimalDistance.contains(ge)) {
 				foundNotProcessed = true;
 				break;
 			}
@@ -109,5 +109,9 @@ public class WeightedDistanceInfo {
 	
 	public Collection<GraphElement> getSourceGraphElementsWithMinimalDistance() {
 		return sourceGraphElementsWithShortestDistance;
+	}
+	
+	public double getMyDistancePenality() {
+		return myDistancePenality;
 	}
 }
