@@ -4,14 +4,16 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.Colors;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
-import org.graffiti.editor.MainFrame;
+import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -31,6 +33,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected FlexibleImage processVISmask() {
+		debug = getBoolean("debug", false);
 		int background = options.getBackground();
 		FlexibleImage img = input().masks().vis();
 		if (img != null) {
@@ -42,20 +45,35 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			img = processRootsInVisibleImage("", background, img, rt);
 			
 			{
-				// analyze separate sections of the roots
-				// img = processRootsInVisibleImage("root_"+i+"_"+n, background, img, rt);
-				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).show("Dilated image for section detection", false);
+				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).show("Dilated image for section detection", debug);
 				
-				boolean graphAnalysis = true;
+				boolean graphAnalysis = getBoolean("graqh-based analysis", true);
 				if (graphAnalysis) {
-					SkeletonProcessor2d skel = new SkeletonProcessor2d(in.skeletonize(true).show("skeleton IN for graph", true).copy().getImage());
-					// int[] saf = in.getImageAs1dArray();
+					SkeletonProcessor2d skel = new SkeletonProcessor2d(inImage.copy().io().binary(0, Color.WHITE.getRGB()).skeletonize(true)
+							.show("skeleton IN for graph", debug).copy().getImage());
 					skel.background = -1;
-					skel.findEndpointsAndBranches();
-					new FlexibleImage(skel.skelImg).copy().show("calculated skeleton for Graph analysis", true);
+					boolean v1 = true, v2 = false;
+					if (v1)
+						skel.findEndpointsAndBranches();
+					if (v2)
+					{
+						skel.findEndpointsAndBranches2();
+						skel.deleteShortEndLimbs(10, false, new HashSet<Point>());
+						skel.calculateEndlimbsRecursive();
+					}
+					new FlexibleImage(skel.skelImg).copy().show("calculated skeleton for Graph analysis", debug);
 					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 					sg.createGraph();
-					MainFrame.getInstance().showGraph(sg.getGraph(), null);
+					GMLWriter gw = new GMLWriter();
+					try {
+						gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "\\skel_root.gml"), sg.getGraph());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					// skel2d.connectSkeleton();
+					// skel2d.findTrailWithMaxBranches();
+					
 				}
 				
 				ClusterDetection cd = new ClusterDetection(in.getImage(), ImageOperation.BACKGROUND_COLORint);

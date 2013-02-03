@@ -80,6 +80,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						try {
 							processedMasks.setVis(processVISmask());
 						} catch (Exception e) {
+							e.printStackTrace();
 							reportError(e, "could not process VIS mask");
 						}
 					}
