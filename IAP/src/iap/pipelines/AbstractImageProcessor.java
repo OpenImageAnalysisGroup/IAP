@@ -111,7 +111,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		BlockPipeline p = new BlockPipeline();
 		if (defaultBlockList != null)
 			for (String b : defaultBlockList) {
-				if (b != null && !b.startsWith("#")) {
+				if (b != null && !b.startsWith("#") && !b.trim().isEmpty()) {
 					try {
 						Class<?> c = Class.forName(b);
 						if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
