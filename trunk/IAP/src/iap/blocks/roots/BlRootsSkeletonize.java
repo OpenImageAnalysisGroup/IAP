@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import org.Colors;
 import org.StringManipulationTools;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -45,15 +46,16 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 				// img = processRootsInVisibleImage("root_"+i+"_"+n, background, img, rt);
 				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).show("Dilated image for section detection", false);
 				
-				boolean graphAnalysis = false;
+				boolean graphAnalysis = true;
 				if (graphAnalysis) {
-					SkeletonProcessor2d skel = new SkeletonProcessor2d(in.copy().getImage());
-					int[] saf = in.getImageAs1dArray();
+					SkeletonProcessor2d skel = new SkeletonProcessor2d(in.skeletonize(true).show("skeleton IN for graph", true).copy().getImage());
+					// int[] saf = in.getImageAs1dArray();
 					skel.background = -1;
 					skel.findEndpointsAndBranches();
+					new FlexibleImage(skel.skelImg).copy().show("calculated skeleton for Graph analysis", true);
 					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 					sg.createGraph();
-					// MainFrame.getInstance().showGraph(sg.getGraph(), null);
+					MainFrame.getInstance().showGraph(sg.getGraph(), null);
 				}
 				
 				ClusterDetection cd = new ClusterDetection(in.getImage(), ImageOperation.BACKGROUND_COLORint);

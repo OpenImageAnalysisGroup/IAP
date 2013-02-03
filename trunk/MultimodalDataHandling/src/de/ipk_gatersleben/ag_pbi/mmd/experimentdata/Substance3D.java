@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -233,9 +234,18 @@ public class Substance3D extends Substance {
 	}
 	
 	public static Long getFileSize(List<NumericMeasurementInterface> files) {
+		return getFileSize(files, null);
+	}
+	
+	public static Long getFileSize(List<NumericMeasurementInterface> files, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		long size = 0;
 		HashMap<String, ResourceIOHandler> map = new HashMap<String, ResourceIOHandler>();
+		int idx = 0;
+		int max = files.size();
 		mainLoop: for (NumericMeasurementInterface nmi : files) {
+			idx++;
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine(100d * idx / max);
 			if (nmi instanceof BinaryMeasurement) {
 				BinaryMeasurement binaryMeasurement = (BinaryMeasurement) nmi;
 				IOurl u = binaryMeasurement.getURL();
