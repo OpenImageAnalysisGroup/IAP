@@ -267,7 +267,7 @@ public class GraphHelper implements HelperClass {
 		
 		ArrayList<Graph> graphList = new ArrayList<Graph>();
 		
-		List<Node> nodesToProcess = graph.getNodes();
+		List<Node> nodesToProcess = new ArrayList<Node>(graph.getNodes());
 		HashMap<Node, Node> sourceGraphNode2connectedGraphNode = new LinkedHashMap<Node, Node>();
 		while (!nodesToProcess.isEmpty()) {
 			Node startNode = nodesToProcess.get(0);
@@ -695,6 +695,7 @@ public class GraphHelper implements HelperClass {
 			activeView.setGraph(g);
 		} else {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					if (activeView == null || g == null)
 						return;
@@ -931,6 +932,7 @@ public class GraphHelper implements HelperClass {
 		if (sortCommand == NodeSortCommand.dontSort)
 			return;
 		SortedSet<NodeHelper> sortedNodes = new TreeSet<NodeHelper>(new Comparator<NodeHelper>() {
+			@Override
 			public int compare(NodeHelper o1, NodeHelper o2) {
 				if (sortConsiderCluster) {
 					String c1 = o1.getClusterID("");
@@ -994,6 +996,7 @@ public class GraphHelper implements HelperClass {
 			return result;
 		}
 		SortedSet<NodeHelper> sortedNodes = new TreeSet<NodeHelper>(new Comparator<NodeHelper>() {
+			@Override
 			public int compare(NodeHelper o1, NodeHelper o2) {
 				if (sortConsiderCluster) {
 					String c1 = o1.getClusterID("");
@@ -1034,6 +1037,7 @@ public class GraphHelper implements HelperClass {
 			return result;
 		}
 		SortedSet<NodeHelper> sortedNodes = new TreeSet<NodeHelper>(new Comparator<NodeHelper>() {
+			@Override
 			public int compare(NodeHelper o1, NodeHelper o2) {
 				if (sortConsiderCluster) {
 					String c1 = o1.getClusterID("");

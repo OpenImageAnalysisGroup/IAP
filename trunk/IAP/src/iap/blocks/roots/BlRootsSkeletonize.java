@@ -146,7 +146,6 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			System.out.println("LIMBS: " + nEndLimbs);
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 			sg.createGraph();
-			sg.deleteSelfLoops();
 			sg.getGraph().numberGraphElements();
 			System.out.println("Analyze Shortest Path For Skeleton Graph with " + sg.getGraph().getNumberOfNodes()
 					+ " nodes and " + sg.getGraph().getNumberOfEdges() + " edges...");
