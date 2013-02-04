@@ -44,17 +44,21 @@ public class BlockCutFromSide extends AbstractBlock {
 		if (!doCut)
 			return mask;
 		
-		double cutoffLeft = getDouble("Cut-off from left (percent)", 0) / 100d;
-		double cutoffRight = getDouble("Cut-off from right (percent)", 0) / 100d;
-		double cutoffTop = getDouble("Cut-off from top (percent)", 0) / 100d;
-		double cutoffBottom = getDouble("Cut-off from bottom (percent)", 0) / 100d;
+		double cutoffLeft = getDouble("Cut-off " + mask.getType() + " from left (percent)", 0) / 100d;
+		double cutoffRight = getDouble("Cut-off " + mask.getType() + " from right (percent)", 0) / 100d;
+		double cutoffTop = getDouble("Cut-off " + mask.getType() + " from top (percent)", 0) / 100d;
+		double cutoffBottom = getDouble("Cut-off " + mask.getType() + " from bottom (percent)", 0) / 100d;
 		
 		int background = options.getBackground();
+		
 		if (mask.getType() == FlexibleImageType.NIR) {
 			int gray = new Color(180, 180, 180).getRGB();
 			background = gray;
 		}
 		
+		if (getBoolean("debug", false)) {
+			background = Color.BLUE.getRGB();
+		}
 		FlexibleImage result = mask.io()
 				.clearImage(ImageSide.Left, cutoffLeft, background)
 				.clearImage(ImageSide.Right, cutoffRight, background)
