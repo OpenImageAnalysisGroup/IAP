@@ -17,7 +17,7 @@ import org.graffiti.graph.Node;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 
 public class SkeletonGraph {
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	private final int w;
 	private final int h;
 	private final int[][] skelImg;
@@ -63,7 +63,8 @@ public class SkeletonGraph {
 					// position2node.put(key, n);
 					// }
 					position2node.put(x + ";" + y, n);
-					System.out.println("MEM: " + x + " // " + y);
+					if (DEBUG)
+						System.out.println("MEM: " + x + " // " + y);
 				}
 			}
 		}
@@ -90,7 +91,8 @@ public class SkeletonGraph {
 				int p = skelImg[x][y];
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches) {
 					Vector2i startPoint = new Vector2i(x, y);
-					System.out.println("Start: " + startPoint);
+					if (DEBUG)
+						System.out.println("Start: " + startPoint);
 					boolean foundLine;
 					Node lastStartNode = null;
 					Node lastEndNode = null;
@@ -104,7 +106,8 @@ public class SkeletonGraph {
 						Node startNode = position2node.get(s.x + ";" + s.y);
 						Node endNode = position2node.get(e.x + ";" + e.y);
 						if (endNode == null) {
-							System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
+							if (DEBUG)
+								System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
 						}
 						if (DEBUG)
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
@@ -303,5 +306,11 @@ public class SkeletonGraph {
 	
 	public Graph getGraph() {
 		return graph;
+	}
+	
+	public void deleteSelfLoops() {
+		for (Edge e : new ArrayList<Edge>(graph.getEdges()))
+			if (e.getSource() == e.getTarget())
+				graph.deleteEdge(e);
 	}
 }
