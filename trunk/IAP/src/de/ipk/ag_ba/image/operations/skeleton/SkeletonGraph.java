@@ -47,7 +47,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (!knownColors.contains(p)) {
-					System.out.println("Pixel Color: " + p);
+					System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p));
 					knownColors.add(p);
 				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
