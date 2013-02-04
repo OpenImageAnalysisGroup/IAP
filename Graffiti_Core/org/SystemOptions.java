@@ -110,7 +110,6 @@ public class SystemOptions {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					updateCheckTasks.remove(this);
 				}
 			}
 		};
@@ -260,6 +259,9 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
+			boolean current = getBoolean(group, setting, value);
+			if (current == value)
+				return;
 			if (setting.contains("|")) {
 				group = setting.split("\\|", 2)[0];
 				setting = setting.split("\\|", 2)[1];

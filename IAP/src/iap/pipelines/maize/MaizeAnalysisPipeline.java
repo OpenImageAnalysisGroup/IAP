@@ -17,6 +17,8 @@ import iap.blocks.BlockClosingVis;
 import iap.blocks.BlockCutFromSide;
 import iap.blocks.BlockRemoveMaizeBambooStick;
 import iap.blocks.BlockSkeletonizeVisOrFluo;
+import iap.blocks.arabidopsis.BlCutZoomedImages;
+import iap.blocks.arabidopsis.BlRotate;
 import iap.blocks.curling.BlLeafCurlingAnalysis;
 import iap.blocks.hull.BlConvexHull;
 import iap.blocks.maize.BlCalcIntensity;
@@ -62,6 +64,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		String[] defaultBlockList = new String[] {
 				BlLoadImagesIfNeeded_images_masks.class.getCanonicalName(),
+				BlRotate.class.getCanonicalName(),
+				BlCutZoomedImages.class.getCanonicalName(),
 				BlCreateDummyReferenceIfNeeded.class.getCanonicalName(),
 				BlColorBalancing.class.getCanonicalName(),
 				BlFindBlueMarkers.class.getCanonicalName(),
