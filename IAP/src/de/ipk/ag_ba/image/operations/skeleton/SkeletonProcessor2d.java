@@ -22,11 +22,29 @@ public class SkeletonProcessor2d {
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
 	public static final int foreground = Color.orange.getRGB();
-	public int background = getDefaultBackground(); // TODO Color.BLACK.getRGB() or -16777216 must be replaced by the real backgroundcolor
+	public int background = getDefaultBackground();
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
 	public boolean debug = false;
 	public static int colorBloomEndpoint = Color.CYAN.getRGB();
+	
+	public static String getColorDesc(int color) {
+		if (color == colorEndpoints)
+			return "endpoint";
+		if (color == colorBranches)
+			return "branch";
+		if (color == colorMarkedEndLimbs)
+			return "endLimb";
+		if (color == foreground)
+			return "foreground";
+		if (color == colorDebug)
+			return "debug";
+		if (color == colorBloomEndpoint)
+			return "bloomEndPoint";
+		if (color == getDefaultBackground())
+			return "background";
+		return "invalid color";
+	}
 	
 	public SkeletonProcessor2d(FlexibleImage inp) {
 		this.skelImg = inp.getAs2A().clone();
@@ -446,6 +464,7 @@ public class SkeletonProcessor2d {
 	 */
 	public void deleteShortEndLimbs(int threshold, boolean simulate, HashSet<Point> knownBlooms) {
 		int n = 0;
+		boolean repeat = threshold > 0;
 		do {
 			// do {
 			removeShortEndLimbsUpdateCrossingsAndEndpoints();
@@ -474,13 +493,15 @@ public class SkeletonProcessor2d {
 			calculateEndlimbsRecursive();
 			// System.out.println("numofendlimbs2: " + endlimbs.size());
 			n++;
-		} while (connectSkeleton() && n < 100);
+		} while (connectSkeleton() && n < 100 && repeat);
 	}
 	
 	/**
 	 * @return Average of the smallest n percent
 	 */
 	private int getAutoThresh(double n) {
+		if (n < 0)
+			return (int) -n;
 		double res = 0;
 		int size = endlimbs.size();
 		int[] lengths = new int[size];

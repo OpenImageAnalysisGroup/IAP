@@ -55,44 +55,6 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			{
 				ImageOperation in = inImage.copy().io().binary(0, Color.WHITE.getRGB()).dilate(10).show("Dilated image for section detection", debug);
 				
-				boolean graphAnalysis = getBoolean("graqh-based analysis", true);
-				if (graphAnalysis) {
-					SkeletonProcessor2d skel = new SkeletonProcessor2d(inImage.copy().io().binary(0, Color.WHITE.getRGB()).skeletonize(true)
-							.show("skeleton IN for graph", debug).copy().getImage());
-					skel.background = -1;
-					skel.findEndpointsAndBranches();
-					new FlexibleImage(skel.skelImg).copy().show("calculated skeleton for Graph analysis", debug);
-					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-					sg.createGraph();
-					sg.deleteSelfLoops();
-					sg.getGraph().numberGraphElements();
-					ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
-					List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
-							sg.getGraph().getGraphElements(),
-							new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
-							optLengthReturn);
-					rt.addValue("roots.skeleton.maximum.minimum.length", optLengthReturn.getDouble());
-					
-					boolean createDebugGML = false;
-					if (createDebugGML) {
-						for (GraphElement ge : elem) {
-							if (ge instanceof Node) {
-								new NodeHelper((Node) ge).setFillColor(Color.YELLOW)
-										.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
-							}
-						}
-						GMLWriter gw = new GMLWriter();
-						try {
-							gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "/skel_root.gml"), sg.getGraph());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					// skel2d.connectSkeleton();
-					// skel2d.findTrailWithMaxBranches();
-					
-				}
-				
 				ClusterDetection cd = new ClusterDetection(in.getImage(), ImageOperation.BACKGROUND_COLORint);
 				cd.detectClusters();
 				int clusters = cd.getClusterCount();
@@ -138,6 +100,30 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 						idx++;
 					}
 					
+					if (sizes.size() > 1) {
+						// at least one cluster (besides the background has been found)
+						while (sizes.size() > 2)
+							sizes.remove(sizes.iterator().next());
+						int largestClusterSize = sizes.iterator().next();
+						int cidx = 0;
+						for (int iii = 0; iii < clusterSize.length; iii++)
+							if (clusterSize[iii] == largestClusterSize)
+								cidx = iii;
+						int targetClusterColor = -1;
+						for (int color : color2clusterId.keySet())
+							if (color2clusterId.get(color) != null && color2clusterId.get(color) == cidx)
+								targetClusterColor = color;
+						int[] pixels = io.copy().getImageAs1dArray();
+						for (int pidx = 0; pidx < pixels.length; pidx++) {
+							int c = pixels[pidx];
+							if (c != targetClusterColor && c != background)
+								pixels[pidx] = background;
+						}
+						int w = io.getWidth();
+						int h = io.getHeight();
+						graphAnalysis(new FlexibleImage(w, h, pixels).show("largest root component for graph analysis").io(), rt);
+					}
+					
 					io = new ImageOperation(clusterIDsPixels, io.getWidth(), io.getHeight());
 				}
 				io.show("CLUSTERS", false);
@@ -146,6 +132,58 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		}
 		return img;
+	}
+	
+	private void graphAnalysis(ImageOperation in, ResultsTableWithUnits rt) {
+		boolean graphAnalysis = getBoolean("graqh-based analysis", true);
+		if (graphAnalysis) {
+			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
+			System.out.println("Real background: " + in.replaceColor(-1, SkeletonProcessor2d.getDefaultBackground()).getImageAs1dArray()[0]);
+			skel.background = SkeletonProcessor2d.getDefaultBackground();
+			skel.findEndpointsAndBranches();
+			skel.calculateEndlimbsRecursive();
+			int nEndLimbs = skel.endlimbs.size();
+			System.out.println("LIMBS: " + nEndLimbs);
+			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
+			sg.createGraph();
+			sg.deleteSelfLoops();
+			sg.getGraph().numberGraphElements();
+			System.out.println("Analyze Shortest Path For Skeleton Graph with " + sg.getGraph().getNumberOfNodes()
+					+ " nodes and " + sg.getGraph().getNumberOfEdges() + " edges...");
+			boolean createDebugGML = true;
+			if (createDebugGML) {
+				GMLWriter gw = new GMLWriter();
+				try {
+					gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "/skel_root_input.gml"), sg.getGraph());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
+			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+					sg.getGraph().getGraphElements(),
+					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
+					optLengthReturn);
+			rt.addValue("roots.skeleton.maximum.minimum.length", optLengthReturn.getDouble());
+			
+			if (createDebugGML) {
+				for (GraphElement ge : elem) {
+					if (ge instanceof Node) {
+						new NodeHelper((Node) ge).setFillColor(Color.YELLOW)
+								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
+					}
+				}
+				GMLWriter gw = new GMLWriter();
+				try {
+					gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "/skel_root.gml"), sg.getGraph());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			// skel2d.connectSkeleton();
+			// skel2d.findTrailWithMaxBranches();
+			
+		}
 	}
 	
 	private FlexibleImage processRootsInVisibleImage(
