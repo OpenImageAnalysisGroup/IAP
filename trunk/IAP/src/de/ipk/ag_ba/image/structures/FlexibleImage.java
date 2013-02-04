@@ -20,6 +20,7 @@ import java.util.WeakHashMap;
 import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -186,7 +187,12 @@ public class FlexibleImage {
 	public FlexibleImage show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			ImageDisplay.show(
-					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(255, 155, 255).getRGB()).getImage(),
+					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint,
+							new Color(
+									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Red)", 115))),
+									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Green)", 115))),
+									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Blue)", 145))))
+									.getRGB()).getImage(),
 					title);
 			IAPservice.showImageJ();
 		}
