@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.8 2013-02-04 23:38:29 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.9 2013-02-04 23:57:07 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -119,10 +119,11 @@ public class WeightedShortestPathSelectionAlgorithm
 		if (currentSelElements.size() < 2) {
 			ArrayList<GraphElement> possibleSourceElements = new ArrayList<GraphElement>();
 			possibleSourceElements.addAll(graph.getNodes());
-			if (currentSelElements.size() == 1)
+			possibleSourceElements.addAll(graph.getEdges());
+			if (currentSelElements.size() == 1) {
 				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(currentSelElements.iterator().next(),
 						possibleSourceElements, weightattribute, null));
-			else
+			} else
 				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(possibleSourceElements,
 						weightattribute, null));
 		}
@@ -167,7 +168,7 @@ public class WeightedShortestPathSelectionAlgorithm
 			ThreadSafeOptions optLengthReturn) {
 		WeightedShortestPathSelectionAlgorithm wsp = new WeightedShortestPathSelectionAlgorithm();
 		Selection sel = new Selection();
-		wsp.considerEdgeWeight = true;
+		wsp.considerEdgeWeight = wa != null;
 		wsp.considerNodeWeight = false;
 		wsp.putWeightOnEdges = true;
 		wsp.settingDirected = false;
@@ -223,7 +224,10 @@ public class WeightedShortestPathSelectionAlgorithm
 		ArrayList<GraphElement> longestDistanceElements = new ArrayList<GraphElement>();
 		double maximumShortestLen = -1;
 		HashSet<GraphElement> startElements = new HashSet<GraphElement>();
-		for (GraphElement sourceElement : possibleSourceElements) {
+		Collection<GraphElement> srcElems = possibleSourceElements;
+		if (currentSelElements != null && currentSelElements.size() > 0)
+			srcElems = currentSelElements;
+		for (GraphElement sourceElement : srcElems) {
 			startElements.add(sourceElement);
 			for (GraphElement target : possibleSourceElements) {
 				if (sourceElement == target)
@@ -451,8 +455,8 @@ public class WeightedShortestPathSelectionAlgorithm
 				"review of the calculated distances.<br><br>" +
 				"Hint: Use the simpler shortest path selection command to select nodes or edges,<br>" +
 				"for situations where graph element attribute values should not be considered.<br><br>" +
-				"Hint: Special functions: If only one node is selected, the most far ones are located.<br>" +
-				"If no node is selected, the longest shortest path is determined.";
+				"Hints: Special functions: If only one node is selected, the path to the  most<br>" +
+				"far ones are located. If no node is selected, the graph diameter elements are determined.";
 	}
 	
 	/**
@@ -461,7 +465,7 @@ public class WeightedShortestPathSelectionAlgorithm
 	@Override
 	public String getName() {
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR)
-			return "Find Weighted Shortest Path...";
+			return "Find Weighted Shortest Path/Diameter...";
 		else
 			return null;
 	}
