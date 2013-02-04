@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.7 2013-02-04 12:36:43 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.8 2013-02-04 23:38:29 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -222,9 +222,13 @@ public class WeightedShortestPathSelectionAlgorithm
 			ThreadSafeOptions optLengthReturn) {
 		ArrayList<GraphElement> longestDistanceElements = new ArrayList<GraphElement>();
 		double maximumShortestLen = -1;
+		HashSet<GraphElement> startElements = new HashSet<GraphElement>();
 		for (GraphElement sourceElement : possibleSourceElements) {
+			startElements.add(sourceElement);
 			for (GraphElement target : possibleSourceElements) {
 				if (sourceElement == target)
+					continue;
+				if (startElements.contains(target))
 					continue;
 				ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
 				targetGraphElementsToBeProcessed.add(target);
