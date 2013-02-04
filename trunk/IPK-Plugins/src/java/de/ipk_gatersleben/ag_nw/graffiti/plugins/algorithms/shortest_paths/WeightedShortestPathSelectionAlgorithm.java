@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.5 2013-02-04 11:27:35 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.6 2013-02-04 12:03:12 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -120,9 +120,11 @@ public class WeightedShortestPathSelectionAlgorithm
 			ArrayList<GraphElement> possibleSourceElements = new ArrayList<GraphElement>();
 			possibleSourceElements.addAll(graph.getNodes());
 			if (currentSelElements.size() == 1)
-				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(currentSelElements.iterator().next(), possibleSourceElements, weightattribute));
+				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(currentSelElements.iterator().next(),
+						possibleSourceElements, weightattribute, null));
 			else
-				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(possibleSourceElements, weightattribute));
+				currentSelElements.addAll(findLongestShortestPathStartAndEndPoints(possibleSourceElements,
+						weightattribute, null));
 		}
 		
 		ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
@@ -152,12 +154,17 @@ public class WeightedShortestPathSelectionAlgorithm
 		MainFrame.getInstance().getActiveEditorSession().getSelectionModel().setActiveSelection(sel);
 	}
 	
-	public static List<GraphElement> findLongestShortestPathStartAndEndPoints(Collection<GraphElement> possibleSourceElements, AttributePathNameSearchType wa) {
-		return findLongestShortestPathStartAndEndPoints(null, possibleSourceElements, wa);
+	public static List<GraphElement> findLongestShortestPathStartAndEndPoints(
+			Collection<GraphElement> possibleSourceElements, AttributePathNameSearchType wa,
+			ThreadSafeOptions optLengthReturn) {
+		return findLongestShortestPathStartAndEndPoints(null, possibleSourceElements, wa,
+				optLengthReturn);
 	}
 	
-	public static List<GraphElement> findLongestShortestPathStartAndEndPoints(GraphElement optStart, Collection<GraphElement> possibleSourceElements,
-			AttributePathNameSearchType wa) {
+	public static List<GraphElement> findLongestShortestPathStartAndEndPoints(
+			GraphElement optStart, Collection<GraphElement> possibleSourceElements,
+			AttributePathNameSearchType wa,
+			ThreadSafeOptions optLengthReturn) {
 		WeightedShortestPathSelectionAlgorithm wsp = new WeightedShortestPathSelectionAlgorithm();
 		Selection sel = new Selection();
 		wsp.considerEdgeWeight = true;
@@ -170,11 +177,13 @@ public class WeightedShortestPathSelectionAlgorithm
 		ArrayList<GraphElement> currentSelElements = new ArrayList<GraphElement>();
 		if (optStart != null)
 			currentSelElements.add(optStart);
-		wsp.findLongestShortestPathElements(currentSelElements, possibleSourceElements);
+		wsp.findLongestShortestPathElements(currentSelElements, possibleSourceElements, optLengthReturn);
 		return currentSelElements;
 	}
 	
-	public static List<GraphElement> findLongestShortestPathElements(Collection<GraphElement> possibleSourceElements, AttributePathNameSearchType wa) {
+	public static List<GraphElement> findLongestShortestPathElements(
+			Collection<GraphElement> possibleSourceElements, AttributePathNameSearchType wa,
+			ThreadSafeOptions optLengthReturn) {
 		WeightedShortestPathSelectionAlgorithm wsp = new WeightedShortestPathSelectionAlgorithm();
 		Selection sel = new Selection();
 		wsp.setSelection(sel);
@@ -183,7 +192,7 @@ public class WeightedShortestPathSelectionAlgorithm
 		wsp.putWeightOnEdges = true;
 		wsp.settingDirected = false;
 		wsp.weightattribute = wa;
-		sel.addAll(findLongestShortestPathStartAndEndPoints(possibleSourceElements, wa));
+		sel.addAll(findLongestShortestPathStartAndEndPoints(possibleSourceElements, wa, optLengthReturn));
 		wsp.setSelection(sel);
 		ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
 		for (GraphElement ge : sel.getElements()) {
@@ -208,9 +217,11 @@ public class WeightedShortestPathSelectionAlgorithm
 		return sel.getElements();
 	}
 	
-	private void findLongestShortestPathElements(Collection<GraphElement> currentSelElements, Collection<GraphElement> possibleSourceElements) {
+	private void findLongestShortestPathElements(
+			Collection<GraphElement> currentSelElements, Collection<GraphElement> possibleSourceElements,
+			ThreadSafeOptions optLengthReturn) {
 		ArrayList<GraphElement> longestDistanceElements = new ArrayList<GraphElement>();
-		double shortestLen = -1;
+		double maximumShortestLen = -1;
 		for (GraphElement sourceElement : possibleSourceElements) {
 			for (GraphElement target : possibleSourceElements) {
 				if (sourceElement == target)
@@ -240,16 +251,16 @@ public class WeightedShortestPathSelectionAlgorithm
 						+ " : "
 						+ pathLen);
 				if (pathLen > 0 && pathLen < Double.MAX_VALUE) {
-					if (Math.abs(pathLen - shortestLen) < 0.000001 && allowMultiplePathsWithSameDistance) {
-						shortestLen = pathLen;
+					if (Math.abs(pathLen - maximumShortestLen) < 0.000001 && allowMultiplePathsWithSameDistance) {
+						maximumShortestLen = pathLen;
 						longestDistanceElements.add(sourceElement);
 						longestDistanceElements.add(target);
 						System.out.println("RES DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> " + new GraphElementHelper(target).getLabel()
 								+ " : "
 								+ pathLen);
 					} else
-						if (pathLen > shortestLen) {
-							shortestLen = pathLen;
+						if (pathLen > maximumShortestLen) {
+							maximumShortestLen = pathLen;
 							longestDistanceElements.clear();
 							longestDistanceElements.add(sourceElement);
 							longestDistanceElements.add(target);
@@ -260,6 +271,8 @@ public class WeightedShortestPathSelectionAlgorithm
 				}
 			}
 		}
+		if (optLengthReturn != null)
+			optLengthReturn.setDouble(maximumShortestLen);
 		if (longestDistanceElements.size() > 0)
 			currentSelElements.addAll(longestDistanceElements);
 	}

@@ -125,6 +125,8 @@ public class SkeletonGraph {
 							}
 							lastStartNode = startNode;
 							lastEndNode = endNode;
+							if (edgePoints.size() == 0)
+								graph.deleteEdge(edge);
 						}
 					} while (foundLine);
 				}
