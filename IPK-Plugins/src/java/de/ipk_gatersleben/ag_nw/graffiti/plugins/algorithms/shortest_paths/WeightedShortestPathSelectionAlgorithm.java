@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.6 2013-02-04 12:03:12 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.7 2013-02-04 12:36:43 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -247,26 +247,32 @@ public class WeightedShortestPathSelectionAlgorithm
 						retDist);
 				// process shortestPathNodesAndEdges
 				double pathLen = retDist.getDouble();
-				System.out.println("DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> " + new GraphElementHelper(target).getLabel()
-						+ " : "
-						+ pathLen);
+				boolean printDistance = false;
+				if (printDistance)
+					System.out.println("DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + "/" +
+							sourceElement + " <==> " + new GraphElementHelper(target).getLabel() + "/" + target
+							+ " : "
+							+ pathLen);
 				if (pathLen > 0 && pathLen < Double.MAX_VALUE) {
 					if (Math.abs(pathLen - maximumShortestLen) < 0.000001 && allowMultiplePathsWithSameDistance) {
 						maximumShortestLen = pathLen;
 						longestDistanceElements.add(sourceElement);
 						longestDistanceElements.add(target);
-						System.out.println("RES DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> " + new GraphElementHelper(target).getLabel()
-								+ " : "
-								+ pathLen);
+						if (printDistance)
+							System.out.println("RES DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> "
+									+ new GraphElementHelper(target).getLabel()
+									+ " : "
+									+ pathLen);
 					} else
 						if (pathLen > maximumShortestLen) {
 							maximumShortestLen = pathLen;
 							longestDistanceElements.clear();
 							longestDistanceElements.add(sourceElement);
 							longestDistanceElements.add(target);
-							System.out.println("RES DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> "
-									+ new GraphElementHelper(target).getLabel() + " : "
-									+ pathLen);
+							if (printDistance)
+								System.out.println("RES DISTANCE " + new GraphElementHelper(sourceElement).getLabel() + " <==> "
+										+ new GraphElementHelper(target).getLabel() + " : "
+										+ pathLen);
 						}
 				}
 			}

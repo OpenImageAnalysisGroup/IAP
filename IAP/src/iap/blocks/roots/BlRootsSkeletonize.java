@@ -65,6 +65,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 					sg.createGraph();
 					sg.deleteSelfLoops();
+					sg.getGraph().numberGraphElements();
 					ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
 					List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
 							sg.getGraph().getGraphElements(),
