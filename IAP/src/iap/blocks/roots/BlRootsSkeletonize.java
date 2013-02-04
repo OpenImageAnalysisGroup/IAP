@@ -8,11 +8,15 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.Colors;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.graffiti.graph.GraphElement;
+import org.graffiti.graph.Node;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -22,6 +26,10 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonGraph;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
 
 /**
  * Skeletonize the roots and store root lengths, and other parameters.
@@ -52,25 +60,33 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					SkeletonProcessor2d skel = new SkeletonProcessor2d(inImage.copy().io().binary(0, Color.WHITE.getRGB()).skeletonize(true)
 							.show("skeleton IN for graph", debug).copy().getImage());
 					skel.background = -1;
-					boolean v1 = true, v2 = false;
-					if (v1)
-						skel.findEndpointsAndBranches();
-					if (v2)
-					{
-						skel.findEndpointsAndBranches2();
-						skel.deleteShortEndLimbs(10, false, new HashSet<Point>());
-						skel.calculateEndlimbsRecursive();
-					}
+					skel.findEndpointsAndBranches();
 					new FlexibleImage(skel.skelImg).copy().show("calculated skeleton for Graph analysis", debug);
 					SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 					sg.createGraph();
-					GMLWriter gw = new GMLWriter();
-					try {
-						gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "\\skel_root.gml"), sg.getGraph());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					sg.deleteSelfLoops();
+					ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
+					List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+							sg.getGraph().getGraphElements(),
+							new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
+							optLengthReturn);
+					rt.addValue("roots.skeleton.maximum.minimum.length", optLengthReturn.getDouble());
 					
+					boolean createDebugGML = false;
+					if (createDebugGML) {
+						for (GraphElement ge : elem) {
+							if (ge instanceof Node) {
+								new NodeHelper((Node) ge).setFillColor(Color.YELLOW)
+										.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
+							}
+						}
+						GMLWriter gw = new GMLWriter();
+						try {
+							gw.write(new FileOutputStream(ReleaseInfo.getDesktopFolder() + "/skel_root.gml"), sg.getGraph());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 					// skel2d.connectSkeleton();
 					// skel2d.findTrailWithMaxBranches();
 					

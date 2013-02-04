@@ -261,8 +261,9 @@ public class NodeHelper implements Node, HelperClass {
 		return n;
 	}
 	
-	public void setFillColor(Color c) {
+	public NodeHelper setFillColor(Color c) {
 		AttributeHelper.setFillColor(n, c);
+		return this;
 	}
 	
 	public Color getFillColor() {
