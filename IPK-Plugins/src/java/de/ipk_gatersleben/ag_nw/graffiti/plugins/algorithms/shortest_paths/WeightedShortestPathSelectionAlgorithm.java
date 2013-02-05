@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.9 2013-02-04 23:57:07 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.10 2013-02-05 14:09:03 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -23,7 +23,9 @@ import org.Release;
 import org.ReleaseInfo;
 import org.apache.commons.collections.set.ListOrderedSet;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.graph.Edge;
 import org.graffiti.graph.GraphElement;
+import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -228,12 +230,40 @@ public class WeightedShortestPathSelectionAlgorithm
 		if (currentSelElements != null && currentSelElements.size() > 0)
 			srcElems = currentSelElements;
 		for (GraphElement sourceElement : srcElems) {
+			if (!settingDirected) {
+				// only leaf nodes or edges connected to leaf nodes are allowed
+				if (sourceElement instanceof Edge) {
+					int neiS = ((((Edge) sourceElement).getSource())).getNeighbors().size();
+					int neiT = ((((Edge) sourceElement).getTarget())).getNeighbors().size();
+					if (neiS != 1 && neiT != 1)
+						continue;
+				} else {
+					int nei = ((Node) sourceElement).getNeighbors().size();
+					if (nei != 1)
+						continue;
+				}
+			}
 			startElements.add(sourceElement);
 			for (GraphElement target : possibleSourceElements) {
 				if (sourceElement == target)
 					continue;
 				if (startElements.contains(target))
 					continue;
+				
+				if (!settingDirected) {
+					// only leaf nodes or edges connected to leaf nodes are allowed
+					if (target instanceof Edge) {
+						int neiS = ((((Edge) target).getSource())).getNeighbors().size();
+						int neiT = ((((Edge) target).getTarget())).getNeighbors().size();
+						if (neiS != 1 && neiT != 1)
+							continue;
+					} else {
+						int nei = ((Node) target).getNeighbors().size();
+						if (nei != 1)
+							continue;
+					}
+				}
+				
 				ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
 				targetGraphElementsToBeProcessed.add(target);
 				

@@ -50,6 +50,7 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Select Edges...";
 	}
@@ -58,41 +59,41 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 	public String getDescription() {
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR)
 			return "<html><small>Select one of the checkboxes in order to limit the edge<br>" +
-								"selection to edges which meet all of the checked criteria.<br>" +
-								"<br>" +
-								"<b>Leave all checkboxes unchecked to select ALL edges.</b><br><br>";
+					"selection to edges which meet all of the checked criteria.<br>" +
+					"<br>" +
+					"<b>Leave all checkboxes unchecked to select ALL edges.</b><br><br>";
 		else
 			return "<html><small>" +
-								"Select one of the checkboxes in order to limit the edge selection to edges<br>" +
-								"inside the pathway-subgraphs or to edges connecting different pathway-subgraphs<br>" +
-								"- otherwise all edges will be selected.<br>" +
-								"You may also limit the selection to self-edges, where source and target<br>" +
-								"of the edge are the same node.";
+					"Select one of the checkboxes in order to limit the edge selection to edges<br>" +
+					"inside the pathway-subgraphs or to edges connecting different pathway-subgraphs<br>" +
+					"- otherwise all edges will be selected.<br>" +
+					"You may also limit the selection to self-edges, where source and target<br>" +
+					"of the edge are the same node.";
 	}
 	
 	@Override
 	public Parameter[] getParameters() {
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
 			return new Parameter[] {
-								selection.isEmpty() ? null : new BooleanParameter(extendSelection, "Extend selection", "<html>" +
-													"If selected, the selection will be extended,<br>" +
-													"leaving currently selected elements unaffected."),
-								new BooleanParameter(selInnerClusterEdges, "Limit to edges inside the same cluster", ""),
-								new BooleanParameter(selInterClusterEdges, "Limit to edges connecting different clusters", ""),
-								new BooleanParameter(onlyWithMapping, "Limit to edges with mapping-data", ""),
-								new BooleanParameter(onlyWithoutMapping, "Limit to edges without mapping-data", ""),
-								new BooleanParameter(onlyConnectingSelectedNodes, "Limit to edges connecting already selected nodes", ""),
-								new BooleanParameter(selfLoops, "Limit to self-loops", ""),
-								new BooleanParameter(onlyParallelEdges, "Limit to parallel edges", ""),
-								new BooleanParameter(onlyAntiParallelEdges, "Limit to anti-parallel edges", ""),
-								new BooleanParameter(onlyVisibleEdges, "Limit to visible edges", ""),
-								new BooleanParameter(onlyNonVisibleEdges, "Limit to hidden edges", ""), };
+					selection.isEmpty() ? null : new BooleanParameter(extendSelection, "Extend selection", "<html>" +
+							"If selected, the selection will be extended,<br>" +
+							"leaving currently selected elements unaffected."),
+					new BooleanParameter(selInnerClusterEdges, "Limit to edges inside the same cluster", ""),
+					new BooleanParameter(selInterClusterEdges, "Limit to edges connecting different clusters", ""),
+					new BooleanParameter(onlyWithMapping, "Limit to edges with mapping-data", ""),
+					new BooleanParameter(onlyWithoutMapping, "Limit to edges without mapping-data", ""),
+					new BooleanParameter(onlyConnectingSelectedNodes, "Limit to edges connecting already selected nodes", ""),
+					new BooleanParameter(selfLoops, "Limit to self-loops", ""),
+					new BooleanParameter(onlyParallelEdges, "Limit to parallel edges", ""),
+					new BooleanParameter(onlyAntiParallelEdges, "Limit to anti-parallel edges", ""),
+					new BooleanParameter(onlyVisibleEdges, "Limit to visible edges", ""),
+					new BooleanParameter(onlyNonVisibleEdges, "Limit to hidden edges", ""), };
 		} else {
 			return new Parameter[] {
-								new BooleanParameter(selInnerClusterEdges, "Select edges inside Pathway-Subgraphs", ""),
-								new BooleanParameter(selInterClusterEdges, "Select edges connecting different Pathway-Subgraphs", ""),
-								new BooleanParameter(selfLoops, "Limit to self-edges", ""),
-								new BooleanParameter(onlyConnectingSelectedNodes, "Limit to edges connecting already selected nodes", ""), };
+					new BooleanParameter(selInnerClusterEdges, "Select edges inside Pathway-Subgraphs", ""),
+					new BooleanParameter(selInterClusterEdges, "Select edges connecting different Pathway-Subgraphs", ""),
+					new BooleanParameter(selfLoops, "Limit to self-edges", ""),
+					new BooleanParameter(onlyConnectingSelectedNodes, "Limit to edges connecting already selected nodes", ""), };
 		}
 	}
 	
@@ -140,6 +141,7 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		try {
 			graph.getListenerManager().transactionStarted(this);
@@ -198,7 +200,7 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 		return result;
 	}
 	
-	private boolean parallelEdgeExists(Edge e) {
+	public static boolean parallelEdgeExists(Edge e) {
 		if (e.isDirected()) {
 			for (Edge e2 : e.getSource().getDirectedOutEdges()) {
 				if (e == e2)
@@ -220,7 +222,7 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 		}
 	}
 	
-	private boolean antiParallelEdgeExists(Edge e) {
+	public static boolean antiParallelEdgeExists(Edge e) {
 		if (e.isDirected()) {
 			for (Edge e2 : e.getTarget().getDirectedOutEdges()) {
 				if (e == e2)
@@ -234,7 +236,7 @@ public class SelectEdgesAlgorithm extends AbstractAlgorithm {
 		}
 	}
 	
-	private boolean isParallelRegardlessOfDirection(Edge e1, Edge e2) {
+	public static boolean isParallelRegardlessOfDirection(Edge e1, Edge e2) {
 		if (e1.getSource() == e2.getSource() && e1.getTarget() == e2.getTarget())
 			return true;
 		if (e1.getTarget() == e2.getSource() && e1.getSource() == e2.getTarget())

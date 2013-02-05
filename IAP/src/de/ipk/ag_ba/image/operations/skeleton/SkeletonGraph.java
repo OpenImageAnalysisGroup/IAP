@@ -23,6 +23,7 @@ import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectEdgesAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
@@ -104,10 +105,15 @@ public class SkeletonGraph {
 							if (DEBUG)
 								System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
 						}
+						if (startNode == endNode)
+							break;
 						if (DEBUG)
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
 									+ (startNode == null || endNode == null ? "NULL" : ""));
 						if (startNode != null && endNode != null) {
+							boolean del = false;
+							if (startNode.getNeighbors().contains(endNode))
+								del = true;
 							Edge edge = graph.addEdge(startNode, endNode, true);
 							ObjectAttribute oa = new ObjectAttribute("info");
 							oa.setValue(new LimbInfo(edgePoints));
@@ -118,7 +124,7 @@ public class SkeletonGraph {
 							}
 							lastStartNode = startNode;
 							lastEndNode = endNode;
-							if (edgePoints.size() == 0)
+							if (del)
 								graph.deleteEdge(edge);
 						}
 					} while (foundLine);
@@ -353,5 +359,11 @@ public class SkeletonGraph {
 			}
 		}
 		return id2size;
+	}
+	
+	public void removeParallelEdges() {
+		for (Edge e : new ArrayList<Edge>(graph.getEdges()))
+			if (SelectEdgesAlgorithm.parallelEdgeExists(e) || SelectEdgesAlgorithm.antiParallelEdgeExists(e))
+				graph.deleteEdge(e);
 	}
 }
