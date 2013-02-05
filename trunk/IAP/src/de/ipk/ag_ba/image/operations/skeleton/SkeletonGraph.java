@@ -1,9 +1,12 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
 import java.awt.Color;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.AttributeHelper;
 import org.SystemAnalysis;
@@ -12,9 +15,17 @@ import org.graffiti.attributes.ObjectAttribute;
 import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.Graph;
+import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
 
 public class SkeletonGraph {
 	private final boolean DEBUG = false;
@@ -38,30 +49,24 @@ public class SkeletonGraph {
 		this.skelImg = new FlexibleImage(w, h, skelImg1a).getAs2A();
 	}
 	
-	public void createGraph() {
+	public void createGraph(int[] clusterIDsPixels) {
 		this.graph = new AdjListGraph();
-		int nPoints = 0;
 		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (!knownColors.contains(p)) {
-					System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p));
+					// System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p));
 					knownColors.add(p);
 				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
 						|| p == SkeletonProcessor2d.colorBloom) {
-					nPoints++;
 					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
 					n.setInteger("x", x);
 					n.setInteger("y", y);
-					// for (int xd = -1; xd <= 2; xd++)
-					// for (int yd = -2; yd <= 2; yd++) {
-					// String key = (x + xd) + ";" + (y + yd);
-					// if (!position2node.containsKey(key))
-					// position2node.put(key, n);
-					// }
+					if (clusterIDsPixels != null)
+						new NodeHelper(n).setClusterID(clusterIDsPixels[y * w + x] + "");
 					position2node.put(x + ";" + y, n);
 					if (DEBUG)
 						System.out.println("MEM: " + x + " // " + y);
@@ -69,22 +74,12 @@ public class SkeletonGraph {
 			}
 		}
 		
-		int nEdgePoints = 0;
-		for (int x = 1; x < w - 1; x++) {
-			for (int y = 1; y < h - 1; y++) {
-				int p = skelImg[x][y];
-				if (p != SkeletonProcessor2d.getDefaultBackground()) {
-					nEdgePoints++;
-				}
-			}
-		}
 		if (DEBUG) {
 			FlexibleImage fi = new FlexibleImage(skelImg).show("TO BE ANALYZED...");
 			debugImg = fi.copy();
 		}
 		if (DEBUG)
 			debugImg.show("MARKED POINTS");
-		int nGraphEdgePoints = 0;
 		// new FlexibleImage(skelImg).copy().print("BEFORE AAAAAAAA");
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
@@ -117,8 +112,6 @@ public class SkeletonGraph {
 							ObjectAttribute oa = new ObjectAttribute("info");
 							oa.setValue(new LimbInfo(edgePoints));
 							edge.addAttribute(oa, "");
-							nGraphEdgePoints += edgePoints.size();
-							nGraphEdgePoints--;// either source or target pixel is not really part of the edge
 							edge.setDouble("len", edgePoints.size());
 							if (lastStartNode == startNode && lastEndNode == endNode) {
 								break;
@@ -150,10 +143,7 @@ public class SkeletonGraph {
 			}
 		// new FlexibleImage(skelImg).copy().print("AFTER AAAAAAAA");
 		if (DEBUG)
-			System.out.println("Skeletonimage: Marked Pixels: " + nPoints + " Edge Pixels: " + nEdgePoints);
-		if (DEBUG)
-			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
-					+ nGraphEdgePoints);
+			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges());
 		// tryRemove4crossings(graph);
 		// if (DEBUG)
 		// System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
@@ -314,5 +304,54 @@ public class SkeletonGraph {
 		for (Edge e : new ArrayList<Edge>(graph.getEdges()))
 			if (e.getSource() == e.getTarget())
 				graph.deleteEdge(e);
+	}
+	
+	/**
+	 * @return map from cluster ID 2 size, -1 to largest size
+	 */
+	public HashMap<Integer, Double> calculateDiameter(String optGMLoutputFileName) throws Exception {
+		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
+		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
+		// System.out.println("Skeleton graph created. Number of components: " + gl.size());
+		Graph lcgg = null;
+		double largestDiameter = 0;
+		for (Graph gg : gl) {
+			if (gg.getNumberOfNodes() == 0)
+				continue;
+			Integer id = Integer.parseInt(new NodeHelper(gg.getNodes().iterator().next()).getClusterID(null));
+			if (optGMLoutputFileName != null)
+				System.out.print("Determine graph diameter: ");
+			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
+			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+					gg.getGraphElements(),
+					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
+					optLengthReturn);
+			if (optGMLoutputFileName != null)
+				for (GraphElement ge : elem) {
+					if (ge instanceof Node) {
+						new NodeHelper((Node) ge).setFillColor(Color.YELLOW)
+								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
+					}
+				}
+			Double dia = optLengthReturn.getDouble();
+			id2size.put(id, dia);
+			if (optGMLoutputFileName != null)
+				System.out.println(dia.intValue());
+			if (dia > largestDiameter) {
+				lcgg = gg;
+				largestDiameter = dia;
+				id2size.put(-1, dia);
+			}
+		}
+		if (lcgg != null) {
+			lcgg.numberGraphElements();
+			if (optGMLoutputFileName != null) {
+				GMLWriter gw = new GMLWriter();
+				// ReleaseInfo.getDesktopFolder() + "/skel.gml")
+				gw.write(new FileOutputStream(optGMLoutputFileName), lcgg);
+				System.out.println("Largest Component Diameter: " + (int) largestDiameter + ", saved graph in " + optGMLoutputFileName);
+			}
+		}
+		return id2size;
 	}
 }

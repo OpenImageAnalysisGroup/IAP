@@ -891,4 +891,8 @@ public class SkeletonProcessor2d {
 	public static int getDefaultBackground() {
 		return Color.BLACK.getRGB();
 	}
+	
+	public ImageOperation getImageOperation() {
+		return new ImageOperation(skelImg);
+	}
 }

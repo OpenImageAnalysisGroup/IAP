@@ -23,8 +23,8 @@ public class BlRootsAddBorderAroundImage extends AbstractSnapshotAnalysisBlockFI
 					.io()
 					.addBorder(
 							getInt("BORDER_SIZE_VIS", 100),
-							getInt("ROOT_TRANSLATE_X", 50),
-							getInt("ROOT_TRANSLATE_Y", 50),
+							getInt("ROOT_TRANSLATE_X", 0),
+							getInt("ROOT_TRANSLATE_Y", 0),
 							white
 					).getImage();
 		return img;
