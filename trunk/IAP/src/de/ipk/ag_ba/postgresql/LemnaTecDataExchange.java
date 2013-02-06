@@ -29,6 +29,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.apache.commons.lang3.StringUtils;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -381,7 +382,11 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	}
 	
 	private String getCoordinatorFromNameID(String kuerzel) {
-		return SystemOptions.getInstance().getString("Import", "User Mapping//Coordinator for Experiment ID", kuerzel);
+		if (kuerzel == null || !kuerzel.toUpperCase().equals(kuerzel) ||
+				!StringUtils.isAlpha(kuerzel))
+			return "(coordinator can not be determined, non-standard measurement label)";
+		else
+			return SystemOptions.getInstance().getString("Import", "User Mapping//Coordinator " + kuerzel, kuerzel);
 	}
 	
 	public static HashSet<String> getAdministrators() {
