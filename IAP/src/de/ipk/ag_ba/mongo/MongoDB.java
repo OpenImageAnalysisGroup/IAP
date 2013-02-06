@@ -1695,7 +1695,7 @@ public class MongoDB {
 			}
 		});
 		if (tso.getBval(0, false))
-			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found!");
+			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found! (name: " + header.getExperimentname() + ")");
 		return (Long) res.getObject();
 	}
 }

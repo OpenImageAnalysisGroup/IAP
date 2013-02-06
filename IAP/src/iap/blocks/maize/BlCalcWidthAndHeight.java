@@ -53,6 +53,8 @@ public class BlCalcWidthAndHeight extends
 		boolean useFluo = false;// options.isMaize();
 		
 		FlexibleImage visRes = input().masks().vis();
+		if (visRes == null)
+			return null;
 		
 		int vertYsoilLevel = -1;
 		

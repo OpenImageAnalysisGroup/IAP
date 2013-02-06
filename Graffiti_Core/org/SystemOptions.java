@@ -93,7 +93,16 @@ public class SystemOptions {
 						updateCheckTasks.remove(this);
 						return;
 					}
-					Long mt = iniIO.lastModified();
+					Long mt;
+					try {
+						mt = iniIO.lastModified();
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
+								+ e.getMessage());
+						updateCheckTasks.remove(this);
+						return;
+					}
 					if (mt != null && mt != iniIO.storedLastUpdateTime()) {
 						iniIO.setStoredLastUpdateTime(mt);
 						iniIO.getInstance().ini = readIniFileOrProvider();

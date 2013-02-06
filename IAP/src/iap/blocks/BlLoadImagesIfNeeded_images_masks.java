@@ -39,6 +39,9 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					FlexibleImage fi = new FlexibleImage(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setVis(fi);
+					if (fi.getWidth() < 200)
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + fi + " / " + url.getInputStream());
+					
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: VIS-MAIN: " + e.getMessage() + " // " + url);
@@ -167,6 +170,8 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 	private void checkForStrangeTVtestImageAndReplaceWithNull() {
 		if (input().images().vis() != null) {
 			FlexibleImage i = input().images().vis();
+			if (i.getWidth() < 200)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -175,6 +180,8 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		}
 		if (input().images().fluo() != null) {
 			FlexibleImage i = input().images().fluo();
+			if (i.getWidth() < 200)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW FLUO RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -183,6 +190,8 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		}
 		if (input().images().nir() != null) {
 			FlexibleImage i = input().images().nir();
+			if (i.getWidth() < 200)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -191,6 +200,8 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		}
 		if (input().masks().vis() != null) {
 			FlexibleImage i = input().masks().vis();
+			if (i.getWidth() < 200)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS MASK RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -207,6 +218,8 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		}
 		if (input().masks().nir() != null) {
 			FlexibleImage i = input().masks().nir();
+			if (i.getWidth() < 200)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR MASK RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");

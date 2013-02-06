@@ -169,7 +169,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			if (skipKnown && file.exists()) {
 				long l = file.length();
 				if (l > 0 && l == expectedLengthIfKnown) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Skipping known file in VFS: " + fileNameInclSubFolderPathName);
+					if (doPrintStatus())
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Skipping known file in VFS: " + fileNameInclSubFolderPathName);
 					return expectedLengthIfKnown;
 				}
 			}
