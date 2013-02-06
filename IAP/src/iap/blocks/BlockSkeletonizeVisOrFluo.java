@@ -226,7 +226,8 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				FlexibleImage clearImage = new FlexibleImage(tempImage).copy();
 				int black = Color.BLACK.getRGB();
 				for (Point p : branchPoints)
-					tempImage[p.x][p.y] = black;
+					if (p.x >= 0 && p.y >= 0 && p.x < w && p.y < h)
+						tempImage[p.x][p.y] = black;
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0d).getImage();
