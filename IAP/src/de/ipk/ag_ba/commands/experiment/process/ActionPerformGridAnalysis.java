@@ -34,7 +34,8 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
 		if (pd == null)
-			return new UserDefinedImageAnalysisPipelineTask(new PipelineDesc(null, experiment.getIniIoProvider(), null, null));
+			return new UserDefinedImageAnalysisPipelineTask(
+					new PipelineDesc(null, experiment.getIniIoProvider(), null, null));
 		else
 			return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
