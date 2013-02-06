@@ -2,7 +2,7 @@
  * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
  *******************************************************************************/
 /*
- * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.10 2013-02-05 14:09:03 klukas Exp $
+ * $Id: WeightedShortestPathSelectionAlgorithm.java,v 1.11 2013-02-06 09:02:44 klukas Exp $
  */
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths;
@@ -369,7 +369,7 @@ public class WeightedShortestPathSelectionAlgorithm
 				weightattribute, putWeightOnEdges, setAttribute);
 		toDo.add(di);
 		graphelement2distanceinfo.put(startGraphElement, di);
-		
+
 		do {
 			WeightedDistanceInfo currentProcessingUnit = toDo.remove();
 			GraphElement currentGraphElement = currentProcessingUnit.getGraphElement();
