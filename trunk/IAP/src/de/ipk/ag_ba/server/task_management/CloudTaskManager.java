@@ -141,7 +141,7 @@ public class CloudTaskManager {
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
 							if (header != null) {
-								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header), hostName);
+								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header, m), hostName);
 								int tu = batch.getCpuTargetUtilization();
 								boolean stop = false;
 								if (cpuDesire < Integer.MAX_VALUE) {
