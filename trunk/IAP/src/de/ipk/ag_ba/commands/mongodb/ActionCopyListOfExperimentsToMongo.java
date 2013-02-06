@@ -63,7 +63,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		this.m = (MongoDB) sel[0];
 		
 		ArrayList<ExperimentReference> expList = new ArrayList<ExperimentReference>();
-		boolean filter = true;
+		boolean filter = experimentlist.size() > 1;
 		if (!filter) {
 			expList.addAll(experimentlist);
 		} else {
