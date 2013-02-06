@@ -157,35 +157,39 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		boolean graphAnalysis = getBoolean("graqh-based analysis", true);
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
-			// System.out.println("Real background: " + in.replaceColor(-1, SkeletonProcessor2d.getDefaultBackground()).getImageAs1dArray()[0]);
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
 			skel.findEndpointsAndBranches();
 			skel.calculateEndlimbsRecursive();
 			int nEndLimbs = skel.endlimbs.size();
-			// System.out.println("LIMBS: " + nEndLimbs);
+			rt.addValue("roots.skeleton.endlimbs", nEndLimbs);
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 			sg.createGraph(clusterIDsPixels);
 			sg.deleteSelfLoops();
 			sg.removeParallelEdges();
 			sg.getGraph().numberGraphElements();
-			// System.out.println("Analyze Diameter(s) For Skeleton Graph with " + sg.getGraph().getNumberOfNodes()
-			// + " nodes and " + sg.getGraph().getNumberOfEdges() + " edges...");
+			rt.addValue("roots.graph.nodes", sg.getGraph().getNumberOfNodes());
+			rt.addValue("roots.graph.edges", sg.getGraph().getNumberOfEdges());
 			
-			HashMap<Integer, Double> id2size = sg.calculateDiameter(null);
-			HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
-			int idx = 1;
-			for (Integer id : id2size.keySet()) {
-				if (id2size.get(id) <= 0)
-					continue;
-				if (id != -1 && !co2i.containsKey(id))
-					co2i.put(id, idx++);
-				int niceID = id;
-				if (id != -1)
-					niceID = co2i.get(id);
-				if (niceID >= 0)
-					rt.addValue("roots.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length", id2size.get(id));
-				else
-					rt.addValue("roots.skeleton.diameter.max", id2size.get(id));
+			if (nEndLimbs > getInt("Maximum End-Limb-Count for Graph-Analysis", 500)) {
+				rt.addValue("roots.graph.analysis_performed", 0);
+			} else {
+				rt.addValue("roots.graph.analysis_performed", 1);
+				HashMap<Integer, Double> id2size = sg.calculateDiameter(null);
+				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
+				int idx = 1;
+				for (Integer id : id2size.keySet()) {
+					if (id2size.get(id) <= 0)
+						continue;
+					if (id != -1 && !co2i.containsKey(id))
+						co2i.put(id, idx++);
+					int niceID = id;
+					if (id != -1)
+						niceID = co2i.get(id);
+					if (niceID >= 0)
+						rt.addValue("roots.graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length", id2size.get(id));
+					else
+						rt.addValue("roots.graph.diameter.max", id2size.get(id));
+				}
 			}
 		}
 	}
