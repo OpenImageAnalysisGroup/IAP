@@ -204,18 +204,18 @@ public class SystemOptions {
 		String fn = null;
 		try {
 			if (iniIO != null) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Read Ini Provider Content");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Read INI Provider Content");
 				String ss = iniIO.getString();
 				ini = new Ini(new StringReader(ss));
 				return ini;
 			} else {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Read Ini File " + iniFileName);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Read INI File " + ReleaseInfo.getAppFolderWithFinalSep() + iniFileName);
 				fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
 				return new Ini(new File(fn));
 			}
 		} catch (FileNotFoundException fne) {
 			try {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Create settings file: " + fn);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Create INI settings file: " + fn);
 				Ini ini = new Ini();
 				File f = new File(fn);
 				f.createNewFile();

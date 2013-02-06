@@ -35,6 +35,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -1093,11 +1094,25 @@ public class Experiment implements ExperimentInterface {
 	public static ExperimentInterface loadFromIOurl(IOurl url, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
 		if (optStatus != null)
-			optStatus.setCurrentStatusText2("Open Inputstream");
+			optStatus.setCurrentStatusText1("Transfer Binary Data...");
+		
+		long start = System.currentTimeMillis();
 		
 		InputStream is = url.getInputStream();
 		if (is == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No input stream for URL " + url);
+		if (optStatus != null)
+			if (is == null)
+				optStatus.setCurrentStatusText2("Error: No Data");
+			else {
+				if (is instanceof MyByteArrayInputStream) {
+					long end = System.currentTimeMillis();
+					long transfered = ((MyByteArrayInputStream) is).available();
+					optStatus.setCurrentStatusText1("Binary Data Transferred (" + transfered / 1024 / 1024 + " MB , "
+							+ SystemAnalysis.getDataTransferSpeedString(transfered, start, end) + ")");
+				} else
+					optStatus.setCurrentStatusText1("Binary Data Transferred");
+			}
 		Experiment md = loadFromXmlBinInputStream(is, optStatus);
 		return md;
 	}
@@ -1110,12 +1125,14 @@ public class Experiment implements ExperimentInterface {
 		// return md;
 		
 		if (optStatus != null)
-			optStatus.setCurrentStatusText2("Process XML structure");
+			optStatus.setCurrentStatusText2("Process XML structure...");
 		
 		SAXBuilder sb = new SAXBuilder();
 		org.jdom.Document doc = sb.build(is);
-		if (optStatus != null)
-			optStatus.setCurrentStatusText2("Generate Experiment structure");
+		if (optStatus != null) {
+			optStatus.setCurrentStatusText1("Generate experiment structure...");
+			optStatus.setCurrentStatusText2("");
+		}
 		return Experiment.getExperimentFromJDOM(doc, optStatus);
 	}
 	

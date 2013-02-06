@@ -41,7 +41,6 @@ import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
-import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -97,6 +96,7 @@ public class IAPmain extends JApplet {
 	
 	public static void main(String[] args) {
 		setRunMode(IAPrunMode.SWING_MAIN);
+		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
 		JFrame jf = new JFrame(title);
@@ -160,7 +160,6 @@ public class IAPmain extends JApplet {
 	public IAPmain() {
 		if (getRunMode() == IAPrunMode.UNKNOWN)
 			setRunMode(IAPrunMode.SWING_APPLET);
-		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		if (getRunMode() == IAPrunMode.SWING_APPLET)
 			ReleaseInfo.setRunningAsApplet(this);
 		
@@ -202,7 +201,7 @@ public class IAPmain extends JApplet {
 					ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
 				}
 				IAPmain.myClassKnown = true;
-				System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
+				// System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
 				myAppletLoad(mainFrame1, myStatus);
 				// myAppletLoad(mainFrame2, myStatus);
 			}
@@ -283,7 +282,8 @@ public class IAPmain extends JApplet {
 			@Override
 			public void setText(String text) {
 				MainFrame.showMessage(text, MessageType.PERMANENT_INFO);
-				System.out.println(text);
+				if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Plugin-Loading-Infos", false))
+					System.out.println(text);
 			}
 			
 			@Override

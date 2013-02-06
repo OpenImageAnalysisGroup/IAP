@@ -175,7 +175,7 @@ public class IAPgui {
 				navigateTo(target, navigationPanel, actionPanel, graphPanel);
 			}
 		};
-		button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+		button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr, null);
 	}
 	
 	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
@@ -224,7 +224,7 @@ public class IAPgui {
 						}
 					}
 				};
-				button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr);
+				button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr, null);
 			} else {
 				System.out.println("WARNING: Could not find target action: " + thisTarget);
 				// navigationPanel.getEntitySet(false).iterator().next().executeNavigation(
