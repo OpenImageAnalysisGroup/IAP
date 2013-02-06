@@ -236,11 +236,10 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
 				int hf = inpFLUOunchanged.getHeight();
-				for (int x = 0; x < wf; x++)
-					for (int y = 0; y < hf; y++) {
-						if (x < wf && y < hf && x > 0 && y > 0)
-							if (tempImage[x][y] != black)
-								ttt[x][y] = clear;
+				for (int x = 0; x < tempImage.length; x++)
+					for (int y = 0; y < tempImage[x].length; y++) {
+						if (tempImage[x][y] != black)
+							ttt[x][y] = clear;
 					}
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
