@@ -185,6 +185,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 					int niceID = id;
 					if (id != -1)
 						niceID = co2i.get(id);
+					rt.addValue("roots.graph.parts", id2size.size());
 					if (niceID >= 0)
 						rt.addValue("roots.graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length", id2size.get(id));
 					else
