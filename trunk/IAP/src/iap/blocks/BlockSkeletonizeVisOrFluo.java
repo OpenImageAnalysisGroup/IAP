@@ -376,7 +376,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		int[] img = skeleton.getAs1A().clone();
 		int[] oi = original.getAs1A().clone();
 		int last = img.length - w;
-		for (int i = 0; i < img.length; i++) {
+		for (int i = 0; i < img.length && i < oi.length; i++) {
 			if (i > w && i < last && img[i] != back) {
 				int center = oi[i];
 				int above = oi[i - w];

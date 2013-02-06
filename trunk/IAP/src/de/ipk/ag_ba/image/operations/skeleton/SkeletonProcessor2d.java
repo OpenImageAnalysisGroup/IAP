@@ -635,8 +635,8 @@ public class SkeletonProcessor2d {
 	
 	public FlexibleImage copyONOriginalImage(FlexibleImage vis) {
 		int[][] plantImg = vis.getAs2A();
-		int w = skelImg.length;
-		int h = skelImg[0].length;
+		int w = Math.min(skelImg.length, plantImg.length);
+		int h = Math.min(skelImg[0].length, plantImg[0].length);
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				int v = skelImg[x][y];
