@@ -23,7 +23,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.WeakHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -207,13 +206,9 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		}
 	}
 	
-	WeakHashMap<NavigationButton, Object> cachedButtons = new WeakHashMap<NavigationButton, Object>();
-	
 	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
-		for (NavigationButton n : set)
-			cachedButtons.put(n, (Object) null);
 		this.set = new ArrayList<NavigationButton>(set);
 		if (target == PanelTarget.ACTION) {
 			if (guiSettting.getClipboardItems().size() > 0) {
@@ -282,9 +277,9 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
 							firstStar = false;
 							lbl.setToolTipText("Remove " + ne.getTitle() + " bookmark");
-							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction()));
+							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction(), buttonStyle));
 						} else {
-							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne));
+							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne, buttonStyle));
 							lbl.setToolTipText("Add bookmark");
 						}
 						// lbl.setForeground(Color.GRAY);
@@ -332,11 +327,11 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		revalidate();
 		repaint();
 		
-		for (NavigationButton n : cachedButtons.keySet())
-			if (n != null)
-				if (n.isRemoved())
-					if (n.getGUIsetting() != null)
-						n.removedCleanup();
+		// for (NavigationButton n : cachedButtons.keySet())
+		// if (n != null)
+		// if (n.isRemoved())
+		// if (n.getGUIsetting() != null)
+		// n.removedCleanup();
 	}
 	
 	private void enableContextMenu() {
@@ -353,7 +348,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		menuItemButtons.setEnabled(false);
 	}
 	
-	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right, final NavigationButton ne) {
+	private MouseListener getAddBookmarkActionListener(final JLabel lbl, final ObjectRef right, final NavigationButton ne, final ButtonDrawStyle style) {
 		MouseListener res = new MouseListener() {
 			
 			@Override
@@ -373,7 +368,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
 									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-											theOther, graphPanel, null, null);
+											theOther, graphPanel, null, null, style);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
 						} else
@@ -443,7 +438,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	private MouseListener getDeleteBookmarkActionListener(final JLabel lbl, final ObjectRef right,
-			final NavigationAction action) {
+			final NavigationAction action, final ButtonDrawStyle style) {
 		MouseListener res = new MouseListener() {
 			
 			@Override
@@ -456,7 +451,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						} else {
 							if (!set.isEmpty())
 								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
-										theOther, graphPanel, null, null);
+										theOther, graphPanel, null, null, style);
 						}
 					}
 				}

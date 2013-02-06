@@ -45,7 +45,7 @@ public class MyUtility {
 				target = target.substring("Overview".length());
 			if (target.startsWith("."))
 				target = target.substring(".".length());
-			System.out.println(SystemAnalysis.getCurrentTime() + ">" + target);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: NAVIGATE TO: " + target);
 			JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
 			win.eval("window.location.hash='" + target + "';");
 			win.eval("document.title='IAP: " + ft + "';");

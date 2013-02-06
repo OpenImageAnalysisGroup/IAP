@@ -101,10 +101,9 @@ public class Substance implements SubstanceInterface {
 						experimentChildElement = childElement;
 					} else
 						if (childElement.getName().equals("measurements")) {
-							if (optStatus != null)
-								optStatus.setCurrentStatusText1("Generate Experiment Structure");
-							
 							List cl = childElement.getChildren();
+							if (optStatus != null)
+								optStatus.setCurrentStatusText1("Process " + cl.size() + " substance entries");
 							int idx = 0;
 							int max = cl.size();
 							while (!cl.isEmpty()) {

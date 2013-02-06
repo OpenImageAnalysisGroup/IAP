@@ -223,7 +223,7 @@ public class ExperimentLoader implements RunnableOnDB {
 		}
 		
 		if (optStatusProvider != null)
-			optStatusProvider.setCurrentStatusText1("" + idxS + "/" + n + ": " + s3d.getName());
+			optStatusProvider.setCurrentStatusText1("Load subset " + idxS + "/" + n + "<br><font color='gray'><small>(" + s3d.getName() + ")</small></font>");
 		synchronized (experiment) {
 			experiment.add(s3d);
 		}

@@ -32,7 +32,6 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
-import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
@@ -181,6 +180,8 @@ public class NavigationButton implements StyleAware {
 		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
 			return title;
 		else {
+			// if (requestsTitleUpdates() && !isProcessing())
+			// return title;
 			String dots = "";
 			String dots2 = "";
 			int speed = 500;
@@ -395,14 +396,12 @@ public class NavigationButton implements StyleAware {
 		// empty, override if needed
 	}
 	
-	public static void checkButtonTitle(
+	public static void updateButtonTitle(
 			final WeakReference<NavigationButton> r_n,
 			final WeakReference<JButton> r_n1,
 			final Runnable iconUpdateCheck) {
 		if (r_n1 == null || r_n.get() == null)
 			return;
-		if (iconUpdateCheck == null && r_n != null)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: ICONUPDATECHECK IS NULL FOR " + r_n.get().getTitle());
 		
 		final ObjectRef rr = new ObjectRef();
 		Runnable r = new Runnable() {
@@ -425,23 +424,26 @@ public class NavigationButton implements StyleAware {
 						if (iconUpdateCheck != null)
 							iconUpdateCheck.run();
 					}
-					n1.setText(n.getTitle());
-					// System.out.println(n.getTitle());
+					n1.setText(n.getTitle());// + "!!!!!" + System.currentTimeMillis());
 					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0) {
-						if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
-							n.setRunnableIconCheck(rr.getObject());
-							BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
-						}
+						if (!n1.isVisible())
+							System.out.println("UPDATING INVISIBLE BUTTON " + n1.getText());
+						// if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
+						n.setRunnableIconCheck(rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
+						// }
 					} else
 						if (!n1.getText().contains("[REMOVE FROM UPDATE]")) {
-							if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
-								n.setRunnableIconCheck(rr.getObject());
-								BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
-							}
+							if (!n1.isVisible())
+								System.out.println("UPDATING INVISIBLE BUTTON " + n1.getText());
+							// if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
+							n.setRunnableIconCheck(rr.getObject());
+							BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+							// }
 						} else
 							n.setRunnableIconCheck(new Object());
 				} else {
-					n1.setText(n.getTitle());
+					n1.setText(n.getTitle());// + "?????" + System.currentTimeMillis());
 					n.setRunnableIconCheck(new Object());
 				}
 			}
@@ -454,7 +456,7 @@ public class NavigationButton implements StyleAware {
 		return validIconCheckObject;
 	}
 	
-	protected void setRunnableIconCheck(Object validObject) {
+	public void setRunnableIconCheck(Object validObject) {
 		this.validIconCheckObject = validObject;
 	}
 	
@@ -490,13 +492,14 @@ public class NavigationButton implements StyleAware {
 	
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
 			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
-			final Runnable optFinishAction) {
-		executeNavigation(target, navPanel, actionPanel, graphPanel, n1, optFinishAction, false);
+			final Runnable optFinishAction, final ButtonDrawStyle style) {
+		executeNavigation(target, navPanel, actionPanel, graphPanel, n1, optFinishAction, false, style);
 	}
 	
 	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
 			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
-			final Runnable optFinishAction, final boolean recursive) {
+			final Runnable optFinishAction, final boolean recursive,
+			final ButtonDrawStyle style) {
 		final NavigationButton srcNavGraphicslEntity = this;
 		if (n1 != null && srcNavGraphicslEntity.isProcessing()) {
 			if (n1.getText().equalsIgnoreCase("Please wait"))
@@ -515,9 +518,14 @@ public class NavigationButton implements StyleAware {
 			
 			srcNavGraphicslEntity.getAction().getStatusProvider().setCurrentStatusValue(-1);
 			srcNavGraphicslEntity.setProcessing(true);
-			NavigationButton.checkButtonTitle(
+			
+			Runnable iconUpdateCheck = style != null ? getIconUpdateCheckRunnable(
+					new WeakReference<NavigationButton>(srcNavGraphicslEntity), target,
+					new WeakReference<JButton>(n1),
+					getImageSize(style, target)) : null;
+			NavigationButton.updateButtonTitle(
 					new WeakReference<NavigationButton>(srcNavGraphicslEntity),
-					new WeakReference<JButton>(n1), null);
+					new WeakReference<JButton>(n1), iconUpdateCheck);
 			MyUtility.navigate(navPanel.getEntitySet(false), srcNavGraphicslEntity.getTitle());
 			final NavigationAction na = srcNavGraphicslEntity.getAction();
 			
@@ -635,7 +643,7 @@ public class NavigationButton implements StyleAware {
 												SwingUtilities.invokeLater(new Runnable() {
 													@Override
 													public void run() {
-														src.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null, true);
+														src.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null, true, style);
 													}
 												});
 												break;
@@ -669,20 +677,14 @@ public class NavigationButton implements StyleAware {
 		}
 	}
 	
-	public static JComponent getNavigationButton(ButtonDrawStyle style, final NavigationButton n,
+	public static JComponent getNavigationButton(final ButtonDrawStyle style, final NavigationButton n,
 			final PanelTarget target, final MyNavigationPanel navPanel, final MyNavigationPanel actionPanel,
 			final JComponent graphPanel) {
 		
 		if (n.getGUI() != null)
 			return n.getGUI();
 		
-		int imgS = 48;
-		
-		if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
-			if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
-				imgS = 25;// 32;
-			else
-				imgS = 48;
+		int imgS = getImageSize(style, target);
 		
 		ImageIcon icon = null;
 		if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
@@ -785,34 +787,18 @@ public class NavigationButton implements StyleAware {
 		
 		final int imgSf = imgS;
 		
-		Runnable iconUpdateCheck = new Runnable() {
-			@Override
-			public void run() {
-				ImageIcon icon;
-				if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
-					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgSf, imgSf));
-				} else
-					if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
-						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgSf, imgSf));
-					}
-					else {
-						if (target == PanelTarget.NAVIGATION)
-							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
-						else
-							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
-					}
-				if (icon != null)
-					icon.setDescription(imgSf + "");
-				n1.setIcon(icon);
-			}
-		};
+		final Runnable iconUpdateCheck;
 		
 		if (n.isProcessing() || n.requestsTitleUpdates()) {
-			NavigationButton.checkButtonTitle(
+			iconUpdateCheck = getIconUpdateCheckRunnable(
+					new WeakReference<NavigationButton>(n), target,
+					new WeakReference<JButton>(n1), imgSf);
+			NavigationButton.updateButtonTitle(
 					new WeakReference<NavigationButton>(n),
 					new WeakReference<JButton>(n1),
 					iconUpdateCheck);
 		} else {
+			iconUpdateCheck = null;
 			WeakReference<JButton> wn1 = new WeakReference<JButton>(n1);
 			WeakReference<NavigationButton> wn = new WeakReference<NavigationButton>(n);
 			NavigationButton.checkButtonTitle(wn, wn1);
@@ -834,7 +820,7 @@ public class NavigationButton implements StyleAware {
 		n.setExecution(new Runnable() {
 			@Override
 			public void run() {
-				n.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, null);
+				n.executeNavigation(target, navPanel, actionPanel, graphPanel, n1, iconUpdateCheck, style);
 			}
 		});
 		n1.addActionListener(new ActionListener() {
@@ -864,6 +850,51 @@ public class NavigationButton implements StyleAware {
 		// return mc;
 		// } else
 		return rr;
+	}
+	
+	private static int getImageSize(ButtonDrawStyle style, final PanelTarget target) {
+		int imgS = 48;
+		
+		if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
+			if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
+				imgS = 25;// 32;
+			else
+				imgS = 48;
+		return imgS;
+	}
+	
+	private static Runnable getIconUpdateCheckRunnable(
+			final WeakReference<NavigationButton> wr_n,
+			final PanelTarget target,
+			final WeakReference<JButton> wr_n1, final int imgSf) {
+		Runnable iconUpdateCheck = new Runnable() {
+			@Override
+			public void run() {
+				NavigationButton n = wr_n.get();
+				if (n == null)
+					return;
+				JButton n1 = wr_n1.get();
+				if (n1 == null)
+					return;
+				ImageIcon icon;
+				if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
+					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgSf, imgSf));
+				} else
+					if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
+						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgSf, imgSf));
+					}
+					else {
+						if (target == PanelTarget.NAVIGATION)
+							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
+						else
+							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
+					}
+				if (icon != null)
+					icon.setDescription(imgSf + "");
+				n1.setIcon(icon);
+			}
+		};
+		return iconUpdateCheck;
 	}
 	
 	@Override

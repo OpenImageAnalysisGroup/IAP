@@ -548,11 +548,15 @@ public class MongoDB {
 							"klukas/Christian Klukas"
 							});
 					if (mn != null)
-						for (String s : mn)
+						for (String s : mn) {
+							if (s == null || s.trim().isEmpty())
+								continue;
 							if (!s.contains("/"))
-								System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid user name mapping, should be 'username/nicename'!");
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">WARNING: Invalid user name mapping, should be 'username/nicename'! (" + s + ")");
 							else
 								mapableNames.put(s.split("/")[0], s.split("/", 2)[1]);
+						}
 					for (DBObject header : col.find()) {
 						if (opt_last_ping != null)
 							opt_last_ping.setLong(System.currentTimeMillis());
