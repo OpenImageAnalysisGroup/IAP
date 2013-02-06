@@ -66,7 +66,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			
 			@Override
 			public void run() {
-				for (String fs : MongoGridFS.getFileCollectionsInclPreview()) {
+				for (String fs : MongoGridFS.getFileCollections()) {
 					InputStream vfs_is = m.getVFSinputStream(fs, url.getDetail());
 					if (vfs_is != null) {
 						if (vfs_is instanceof MyByteArrayInputStream) {
