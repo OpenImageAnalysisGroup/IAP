@@ -252,7 +252,13 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								Date t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
+								Date t;
+								if (nm.getParentSample().getSampleFineTimeOrRowId() != null)
+									t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
+								else
+									t = nm.getParentSample().getParentCondition().getExperimentStorageDate();
+								if (t == null)
+									t = new Date();
 								gc.setTime(t);
 								
 								final String zefn;
@@ -293,16 +299,24 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
 															entry.setSize(in.getCount());
 															entry.setCrc(in.getCRC32());
-															entry.setTime(id.getParentSample().getSampleFineTimeOrRowId());
+															Date t;
+															if (id.getParentSample().getSampleFineTimeOrRowId() != null)
+																t = new Date(id.getParentSample().getSampleFineTimeOrRowId());
+															else
+																t = id.getParentSample().getParentCondition().getExperimentStorageDate();
+															if (t == null)
+																t = new Date();
+															entry.setTime(t.getTime());
 															out.putNextEntry(entry);
 															out.write(in.getBuff(), 0, in.getCount());
 															out.closeEntry();
+															written.addLong(in.getCount());
 														}
 													} catch (IOException e) {
 														System.out.println("ERROR: " + e.getMessage());
+													} finally {
+														written.addInt(-1);
 													}
-													written.addLong(in.getCount());
-													written.addInt(-1);
 												}
 											}
 										});
