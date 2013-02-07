@@ -27,21 +27,16 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * calculate the skeleton to detect the leafs and the tassel.
- * REQUIRES FLUO image for bloom detection.
- * 
  * @author pape, klukas
  */
 public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private boolean debug = false;
-	private boolean debug2 = false;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		debug2 = getBoolean("debug (2)", false);
 	}
 	
 	@Override
