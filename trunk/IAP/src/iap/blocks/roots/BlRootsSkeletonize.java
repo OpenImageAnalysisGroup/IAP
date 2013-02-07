@@ -9,8 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.AttributeHelper;
 import org.Colors;
 import org.StringManipulationTools;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.graffiti.graph.Edge;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -169,7 +172,21 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			sg.getGraph().numberGraphElements();
 			rt.addValue("roots.graph.nodes", sg.getGraph().getNumberOfNodes());
 			rt.addValue("roots.graph.edges", sg.getGraph().getNumberOfEdges());
-			
+			{
+				DescriptiveStatistics limbs = new DescriptiveStatistics();
+				for (Edge e : sg.getGraph().getEdges()) {
+					Integer val = (Integer) AttributeHelper.getAttributeValue(e, "", "len", null, 1);
+					if (val != null) {
+						limbs.addValue(val);
+					}
+				}
+				if (limbs.getN() > 0) {
+					rt.addValue("roots.graph.limb.length.average", limbs.getMean());
+					rt.addValue("roots.graph.limb.length.stddev", limbs.getStandardDeviation());
+					rt.addValue("roots.graph.limb.length.skewness", limbs.getSkewness());
+					rt.addValue("roots.graph.limb.length.kurtosis", limbs.getKurtosis());
+				}
+			}
 			if (nEndLimbs > getInt("Maximum End-Limb-Count for Graph-Analysis", 500)) {
 				rt.addValue("roots.graph.analysis_performed", 0);
 			} else {
