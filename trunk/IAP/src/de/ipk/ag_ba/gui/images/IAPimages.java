@@ -205,4 +205,8 @@ public class IAPimages {
 	public static String getHistogramIcon() {
 		return "img/ext/applications-office.png";
 	}
+	
+	public static String getThreeDocuments() {
+		return "img/ext/gpl2/Gnome-Emblem-Documents-64.png";
+	}
 }
