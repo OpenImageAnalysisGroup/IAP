@@ -9,6 +9,7 @@ import com.mongodb.BasicDBObject;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.database_tools.ActionMergeAnalysisResults;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
 import de.ipk.ag_ba.commands.mongodb.file_storage.ActionMongoFileStorageCommands;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
@@ -71,6 +72,8 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 					new ActionDeleteAnalysisJobs(m), guiSetting);
 			result.add(deleteCloudJobs);
 		}
+		
+		result.add(new NavigationButton(new ActionMergeAnalysisResults(m), guiSetting));
 		
 		result.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDbCompact(m), src.getGUIsetting()));
