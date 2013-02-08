@@ -6788,16 +6788,19 @@ ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL, debug = FALSE) {
 	
 	if (!file.exists(REPORT.FILE)) {
 		text <- "\\documentclass{article} \\newline
-				\\begin{document} \\newline
-				There was an error! \\newline"
+				\\begin{document} \\newline"
+
+		if (!(!is.null(typ) && (typ == LIB.UPDATE || typ == LIB))) {
+			text <- paste(text, "There was an error! \\newline", sep="")
+		}
 		
 		if (!is.null(typ) && typ == LIB) {
-			text <- paste(text, "Please install the following packages (using the \"install.packages\" command): \\newline", sep = "")
+			text <- paste(text, "Report function requires special packages. Please install the following packages (using the \"install.packages\" command): \\newline", sep = "")
 			for(nn in seq(along = errorText)) {
 				text <- paste(text, nn, ". install.packages(\"", errorText[nn], "\") \\newline", sep = "")
 			} 
 		} else if (!is.null(typ) && typ == LIB.UPDATE) {
-			text <- paste(text, "Please updtae the following packages (using the \"update.packages\" command): \\newline", sep = "")
+			text <- paste(text, "Report function requires updated packages. Please update the following packages (using the \"update.packages\" command): \\newline", sep = "")
 			for(nn in seq(along = errorText)) {
 				text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\") \\newline", sep = "")
 			}			
