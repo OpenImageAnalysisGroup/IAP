@@ -21,7 +21,8 @@ public enum ImageConfiguration {
 		if (name == null || name.length() == 0)
 			return Unknown;
 		name = name.toUpperCase();
-		
+		if (name.equals("DUMMY SUBSTANCE"))
+			return ImageConfiguration.RgbTop;
 		if (name.contains("FLU") && name.contains("TOP"))
 			return ImageConfiguration.FluoTop;
 		if (name.contains("FLU"))

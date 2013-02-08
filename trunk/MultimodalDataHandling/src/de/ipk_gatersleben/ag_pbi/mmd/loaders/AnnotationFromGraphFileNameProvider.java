@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.ErrorMsg;
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.view.View;
 
@@ -232,115 +231,17 @@ public class AnnotationFromGraphFileNameProvider extends AbstractExperimentDataP
 		return false;
 	}
 	
-	public static FileNameScanner[] getFileNameInfos(ArrayList<File> fileList, String optProvidedFileNameFormat,
-			HashMap<Integer, Condition> optReplicate2conditionInfo) {
-		try {
-			ArrayList<FileNameScanner> result = new ArrayList<FileNameScanner>();
-			for (File f : fileList) {
-				String fn = f.getName();
-				String[] elements = fn.split("_");
-				/*
-				 * H13, H31, WT sind die 3 Genotypen
-				 * 01...10 sind die fortlaufenden Nummern, von jedem Genotyp 10
-				 * Pflanzen
-				 * 1016, 1020,...1385 sind die Carriernummern Zusammen ist das alles
-				 * die Pflanzen ID (Bsp.: "H31_10_1384")
-				 * RgbTopHL2, Nir_Top... sind die Snapshotnamen *
-				 * Der Rest Timestamp, Datum, Uhrzeit
-				 */
-				// [001, 2010-03-04 16, 24, 03, LT, FLUO, Side, 90Grad.png]
-				// 001_2010-03-04 16_24_03_LT_FLUO_Side_90Grad.png
-				FileNameScanner s = null;
-				if (optProvidedFileNameFormat != null) {
-					s = new FileNameScanner(optProvidedFileNameFormat, fn);
-				} else
-					if (elements != null && elements.length == 1 && fn.endsWith(".jpg")) {
-						// process root scan images from GED
-						if (StringManipulationTools.count(fn, "-") == 2) {
-							// type 2: C1-17-P1256.jpg
-							s = new FileNameScanner("V-G-R", fn);
-						} else
-							if (StringManipulationTools.count(fn, "-") == 3) {
-								// type 1: Ep2-C1-3-P2428.jpg
-								s = new FileNameScanner("X-V-G-R", fn);
-							}
-						s.setSpecies("Barley");
-					} else
-						if (elements != null && elements.length == 1) {
-							if (fn.endsWith("Grad.png")) {
-								s = new FileNameScanner("A'Grad'", fn);
-								s.setCondition("Unspecified");
-								s.setSubstance("RgbSide");
-							}
-						} else
-							if (elements != null && elements.length == 8) {
-								if (fn.endsWith("0_0.png")) {
-									// 0024 calibration wheat_000668-LETL_2010-09-18_01-20-19_27426_FLUO TV_0_0.png
-									// 0024 calibration wheat_001428-WW_2010-09-30_12-00-09_32390_FLUO SV2_0_0.png
-									/*
-									 * G = genotype, R = replicate ID, X = ignore, A = rotation (degree), D =
-									 * date (yyyy-mm-dd), 'some string' = some string (ignored, but may be used
-									 * to divide strings), S = substance, V = variety, P = species
-									 * Examples: "R_D X_X_X_X_S_S_A'Grad'", "G_X_R_S_A_X_X_D_X", "G_X_R_S_S_D_X"
-									 */
-									s = new FileNameScanner("X_X-", fn);
-								} else {
-									// 001
-									try {
-										s = new FileNameScanner("R_D X_X_X_X_S_S_A'Grad'", fn);
-									} catch (Exception er) {
-										s = new FileNameScanner("G_X_R_S_D_X", fn);
-									}
-								}
-							} else {
-								boolean transferGerste = false;
-								if (transferGerste) {
-									fn = StringManipulationTools.stringReplace(fn, "_Side", "Side");
-									fn = StringManipulationTools.stringReplace(fn, "_Top", "Top");
-									fn = StringManipulationTools.stringReplace(fn, "RGB", "Rgb");
-									fn = StringManipulationTools.stringReplace(fn, "FLUO", "Fluo");
-									fn = StringManipulationTools.stringReplace(fn, "NIR", "Nir");
-									fn = StringManipulationTools.stringReplace(fn, ".png", "");
-									s = new FileNameScanner("R_D X_X_X_X_X_S_A'Grad'", fn);
-									/*
-									 * G = genotype, R = replicate ID, X = ignore, A =
-									 * rotation
-									 * (degree), D = date (yyyy-mm-dd), 'some string' = some
-									 * string (ignored, but may be used to divide strings)
-									 */
-								} else {
-									// WT_10_1394_RgbTopHL2_2010-06-28_07_43_31.png
-									//
-									// H13_01_1016_Fluo_Top_2010-06-18_07_40_05.png
-									// WT_04_1388_Nir_Top_2010-06-18_07_37_41.png
-									// H13_01_1016_FluoSide_90_Grad_HL2_2010-06-25_07_40_02.png
-									// H13_02_1020_RgbSide_0_Grad_HL2_2010-06-28_07_44_49.png
-									// WT_05_1389_NirSide_0_Grad_HL2_2010-06-28_07_40_16.png
-									if (fn.contains("Side_")) {
-										// side view
-										s = new FileNameScanner("G_X_R_S_A_X_D_X", fn);
-									} else
-										if (fn.contains("Top_")) {
-											// top view
-											s = new FileNameScanner("G_X_R_S_S_D_X", fn);
-										}
-								}
-							}
-				if (s != null) {
-					if (optReplicate2conditionInfo != null && optReplicate2conditionInfo.containsKey(s.getReplicateID())) {
-						Condition c = optReplicate2conditionInfo.get(s.getReplicateID());
-						s.setConditionTemplate(c);
-					}
-					
-					result.add(s);
-				} else {
-					System.out.println("No scanner for: " + fn);
-				}
+	public static FileNameScanner[] getFileNameInfos(ArrayList<File> fileList, String fileNameFormat,
+			HashMap<Integer, Condition> optReplicate2conditionInfo) throws Exception {
+		ArrayList<FileNameScanner> result = new ArrayList<FileNameScanner>();
+		for (File f : fileList) {
+			FileNameScanner s = new FileNameScanner(fileNameFormat, f.getName());
+			if (optReplicate2conditionInfo != null && optReplicate2conditionInfo.containsKey(s.getReplicateID())) {
+				Condition c = optReplicate2conditionInfo.get(s.getReplicateID());
+				s.setConditionTemplate(c);
 			}
-			return result.toArray(new FileNameScanner[] {});
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new FileNameScanner[] {};
+			result.add(s);
 		}
+		return result.toArray(new FileNameScanner[] {});
 	}
 }

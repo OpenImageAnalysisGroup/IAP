@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import org.AttributeHelper;
 import org.Colors;
 import org.StringManipulationTools;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -175,7 +174,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 			{
 				DescriptiveStatistics limbs = new DescriptiveStatistics();
 				for (Edge e : sg.getGraph().getEdges()) {
-					Integer val = (Integer) AttributeHelper.getAttributeValue(e, "", "len", null, 1);
+					Double val = e.getDouble("len");
 					if (val != null) {
 						limbs.addValue(val);
 					}
