@@ -419,7 +419,7 @@ checkLibsForErrorsAndLoad <- function(libraries, debug = FALSE) {
 		outOfDateLib <- NULL
 		for(nn in libraries) {
 			TRUE %print% nn
-			if (CATCH.ERROR) {
+			if (FALSE) {# CATCH.ERROR) {
 				error <- try(iniLibrary(nn), silent = debug)
 				if (checkOfTryError(error, typ = LIB)) {
 					libError <- TRUE
