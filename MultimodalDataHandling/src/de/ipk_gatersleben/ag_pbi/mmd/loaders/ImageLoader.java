@@ -37,7 +37,8 @@ public class ImageLoader extends TemplateLoaderMMD {
 	public List<ExperimentInterface> process(List<File> files, ExperimentDataProcessor annotationProvider) {
 		DataImportDialog did = new DataImportDialog();
 		List<ExperimentDataProcessor> myAnnotationFromFileProviders = new ArrayList<ExperimentDataProcessor>();
-		myAnnotationFromFileProviders.add(annotationProvider);
+		if (annotationProvider != null)
+			myAnnotationFromFileProviders.add(annotationProvider);
 		Collection<ExperimentInterface> c = did.getExperimentMetadataFromUserByDialog(files, this, myAnnotationFromFileProviders);
 		if (c == null)
 			return new ArrayList<ExperimentInterface>();

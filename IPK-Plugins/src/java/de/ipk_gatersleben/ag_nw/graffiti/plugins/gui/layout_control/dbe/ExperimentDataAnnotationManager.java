@@ -20,7 +20,7 @@ public class ExperimentDataAnnotationManager {
 	}
 	
 	public HashMap<File, ExperimentDataAnnotation> getExperimentAnnotation(
-						List<ExperimentDataProcessor> optUseTheseProcessors, Collection<File> files) {
+			List<ExperimentDataProcessor> optUseTheseProcessors, Collection<File> files) {
 		HashMap<File, ExperimentDataAnnotation> res = new HashMap<File, ExperimentDataAnnotation>();
 		Collection<ExperimentDataProcessor> processors = optUseTheseProcessors;
 		if (processors == null)
@@ -38,9 +38,12 @@ public class ExperimentDataAnnotationManager {
 			for (ExperimentDataProcessor ep : processors) {
 				HashMap<File, ExperimentDataAnnotation> file2annotation = annos.get(ep);
 				if (file2annotation != null)
-					if (ea == null)
+					if (ea == null) {
 						ea = file2annotation.get(f);
-					else
+						if (ea == null) {
+							ea = ExperimentDataAnnotation.getEmptyAnnotation();
+						}
+					} else
 						ea.mergeAnnotations(file2annotation.get(f));
 			}
 			if (ea != null)

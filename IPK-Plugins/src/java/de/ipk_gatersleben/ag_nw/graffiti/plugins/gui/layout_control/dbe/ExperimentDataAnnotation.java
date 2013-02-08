@@ -1,6 +1,9 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
+
+import org.SystemAnalysis;
 
 public class ExperimentDataAnnotation {
 	
@@ -12,7 +15,7 @@ public class ExperimentDataAnnotation {
 	private LinkedHashSet<String> condspecies;
 	private LinkedHashSet<String> condgenotype;
 	private LinkedHashSet<String> condtreatment;
-	private final LinkedHashSet<String> condvariety;
+	private LinkedHashSet<String> condvariety;
 	private LinkedHashSet<String> samptimepoint;
 	private LinkedHashSet<String> samptimeunit;
 	private LinkedHashSet<String> sampcomp;
@@ -209,5 +212,33 @@ public class ExperimentDataAnnotation {
 	
 	public boolean isSetAsDefault() {
 		return setAsDefault;
+	}
+	
+	public static ExperimentDataAnnotation getEmptyAnnotation() {
+		ExperimentDataAnnotation ea = new ExperimentDataAnnotation();
+		ea.expname = getSet("Imported Dataset " + SystemAnalysis.getCurrentTime());
+		ea.expsrc = null;
+		ea.expcoord = getSet(SystemAnalysis.getUserName());
+		ea.expstartdate = getSet(new Date() + "");
+		ea.expimportdate = getSet(new Date() + "");
+		ea.condspecies = getSet("Unspecified Species");
+		ea.condgenotype = getSet("Unspecified Genotype");
+		ea.condtreatment = getSet("Unspecified Treatment");
+		ea.condvariety = getSet("Unspecified Variety");
+		ea.samptimepoint = getSet("-1");
+		ea.samptimeunit = getSet("-1");
+		ea.sampcomp = null;
+		ea.sampmeas = null;
+		ea.replIDs = null;
+		ea.substances = null;
+		ea.positions = null;
+		ea.positionUnits = null;
+		return ea;
+	}
+	
+	private static LinkedHashSet<String> getSet(String string) {
+		LinkedHashSet<String> res = new LinkedHashSet<String>();
+		res.add(string);
+		return res;
 	}
 }
