@@ -50,7 +50,7 @@ public class SkeletonGraph {
 		this.skelImg = new FlexibleImage(w, h, skelImg1a).getAs2A();
 	}
 	
-	public void createGraph(int[] clusterIDsPixels) {
+	public void createGraph(int[] optClusterIDsPixels) {
 		this.graph = new AdjListGraph();
 		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
@@ -66,8 +66,8 @@ public class SkeletonGraph {
 					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
 					n.setInteger("x", x);
 					n.setInteger("y", y);
-					if (clusterIDsPixels != null)
-						new NodeHelper(n).setClusterID(clusterIDsPixels[y * w + x] + "");
+					if (optClusterIDsPixels != null)
+						new NodeHelper(n).setClusterID(optClusterIDsPixels[y * w + x] + "");
 					position2node.put(x + ";" + y, n);
 					if (DEBUG)
 						System.out.println("MEM: " + x + " // " + y);
@@ -147,13 +147,8 @@ public class SkeletonGraph {
 						System.out.println("NNN: " + x1 + "/" + y1 + " near to " + x2 + "/" + y2);
 				}
 			}
-		// new FlexibleImage(skelImg).copy().print("AFTER AAAAAAAA");
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges());
-		// tryRemove4crossings(graph);
-		// if (DEBUG)
-		// System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges() + " Edge Pixels: "
-		// + nGraphEdgePoints);
 	}
 	
 	private void tryRemove4crossings(AdjListGraph graph) {
@@ -313,6 +308,7 @@ public class SkeletonGraph {
 	}
 	
 	/**
+	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
 	public HashMap<Integer, Double> calculateDiameter(String optGMLoutputFileName) throws Exception {
