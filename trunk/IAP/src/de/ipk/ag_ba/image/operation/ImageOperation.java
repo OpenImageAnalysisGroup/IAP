@@ -240,12 +240,15 @@ public class ImageOperation {
 	/**
 	 * Scales the image content. New clear regions are recolored to the
 	 * background color.
+	 * Image size does not change!
 	 */
-	
 	public ImageOperation scale(double xScale, double yScale) {
 		return scale(xScale, yScale, true);
 	}
 	
+	/**
+	 * Scales the image content. Image size does not change!
+	 */
 	public ImageOperation scale(double xScale, double yScale, boolean replaceColors) {
 		if (Math.abs(xScale - 1d) < 0.0001 && Math.abs(yScale - 1d) < 0.0001)
 			return this;
