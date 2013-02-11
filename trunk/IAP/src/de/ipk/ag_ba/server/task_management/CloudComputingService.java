@@ -91,23 +91,8 @@ public class CloudComputingService {
 	}
 	
 	public static void main(String[] args) {
-		int l = "***************************************************".length();
-		System.out.println("***************************************************");
-		System.out.println(fillLen("**", l));
-		System.out.println(fillLen("*IAP - Integrated Analysis Platform*", l));
-		System.out.println(fillLen("**", l));
-		System.out.println(fillLen("*--  Systems Biology Cloud Computing --*", l));
-		System.out.println(fillLen("**", l));
-		System.out.println(fillLen("*(c) 2010-2012 IPK, Group Image Analysis*", l));
-		System.out.println(fillLen("**", l));
-		System.out.println("***************************************************");
-		System.out.println(fillLen("**", l));
-		System.out.println(fillLenLA("*  PI: Christian Klukas  *", ".", l, 2));
-		System.out.println(fillLenLA("*  Dijun Chen  *", ".", l, 2));
-		System.out.println(fillLenLA("*  Alexander Entzian  *", ".", l, 2));
-		System.out.println(fillLenLA("*  Jean-Michel Pape  *", ".", l, 2));
-		System.out.println(fillLen("**", l));
-		System.out.println("***************************************************");
+		for (String info : IAPmain.getMainInfoLines())
+			System.out.println(info);
 		SystemAnalysis.simulateHeadless = true;
 		IAPmain.setRunMode(IAPrunMode.CLOUD_HOST);
 		{
@@ -236,12 +221,12 @@ public class CloudComputingService {
 								}
 							}
 		SystemInfoExt si = new SystemInfoExt();
-		System.out.println("CPUs (sockets,physical,logical): " +
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SYSTEM CPUs (sockets,physical,logical): " +
 				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
 				si.getCpuLogicalCores() + ", using " + SystemAnalysis.getNumberOfCPUs());
-		System.out.println("MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using " + SystemAnalysis.getMemoryMB() / 1024 + " GB");
-		System.out.println(SystemAnalysis.getCurrentTime() + ">");
-		System.out.println(SystemAnalysis.getCurrentTime() + "> INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SYSTEM MEMORY: " + SystemAnalysisExt.getPhysicalMemoryInGB() + " GB, using "
+				+ SystemAnalysis.getMemoryMB() / 1024 + " GB");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INITIALIZE CLOUD TASK MANAGER (T=" + IAPservice.getCurrentTimeAsNiceString() + ")");
 		
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LabCube construction", false);
 		ImageOperation io = new ImageOperation(new int[][] { { 0, 0 } });
@@ -271,22 +256,6 @@ public class CloudComputingService {
 			cc.switchStatus(m);
 			System.out.println(SystemAnalysis.getCurrentTime() + ">START CLOUD SERVICE FOR " + m.getPrimaryHandler().getPrefix());
 		}
-	}
-	
-	private static String fillLen(String string, int len) {
-		while (string.length() < len) {
-			string = string.substring(0, 1) + " " + string.substring(1);
-			if (string.length() < len)
-				string = string.substring(0, string.length() - 1) + " " + string.substring(string.length() - 1, string.length());
-		}
-		return string;
-	}
-	
-	private static String fillLenLA(String string, String fill, int len, int retainLeft) {
-		while (string.length() < len) {
-			string = string.substring(0, string.length() - retainLeft) + fill + string.substring(string.length() - retainLeft, string.length());
-		}
-		return string;
 	}
 	
 	public void setEnableCalculations(boolean enableCloudComputing) {

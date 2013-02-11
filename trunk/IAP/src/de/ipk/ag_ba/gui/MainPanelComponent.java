@@ -8,6 +8,7 @@ package de.ipk.ag_ba.gui;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
@@ -45,6 +46,10 @@ public class MainPanelComponent {
 	}
 	
 	public MainPanelComponent(Collection<String> htmlTextPanels) {
+		this(htmlTextPanels, null);
+	}
+	
+	public MainPanelComponent(Collection<String> htmlTextPanels, Color optCustomBackgroundColor) {
 		this.htmlTextPanels = htmlTextPanels;
 		
 		ArrayList<JComponent> infos = new ArrayList<JComponent>();
@@ -56,9 +61,15 @@ public class MainPanelComponent {
 			jep.setText(txt);
 			jep.setEditable(false);
 			jep.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-			jep.setOpaque(true);
-			jep.setBackground(Colors.brighten(MyNavigationPanel.getTabColor(), 0.8, 1.2));
-			
+			if (!(optCustomBackgroundColor != null && optCustomBackgroundColor.getRed() == 1
+					&& optCustomBackgroundColor.getGreen() == 1 && optCustomBackgroundColor.getBlue() == 1)) {
+				jep.setOpaque(true);
+				if (optCustomBackgroundColor != null)
+					jep.setBackground(optCustomBackgroundColor);
+				else
+					jep.setBackground(Colors.brighten(MyNavigationPanel.getTabColor(), 0.8, 1.2));
+			} else
+				jep.setOpaque(false);
 			jep.addHyperlinkListener(new HyperlinkListener() {
 				@Override
 				public void hyperlinkUpdate(HyperlinkEvent e) {
