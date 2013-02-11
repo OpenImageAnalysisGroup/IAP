@@ -419,7 +419,7 @@ checkLibsForErrorsAndLoad <- function(libraries, debug = FALSE) {
 		outOfDateLib <- NULL
 		for(nn in libraries) {
 			TRUE %print% nn
-			if (FALSE) {# CATCH.ERROR) {
+			if (CATCH.ERROR) {
 				error <- try(iniLibrary(nn), silent = debug)
 				if (checkOfTryError(error, typ = LIB)) {
 					libError <- TRUE
@@ -463,7 +463,7 @@ checkVersionsOfUsedPackages <- function(lib, outOfDateLib, debug = FALSE) {
 		localVersion <- sessionInfo()$otherPkgs[[lib]]$Version
 		
 		minVersion <- switch(lib, 
-				Cairo = "1.5-3", 
+				Cairo = "1.5-2", 
 				RColorBrewer = "1.0-5", 
 				data.table = "1.8.6", 
 				ggplot2 = "0.9.2.1", 
@@ -6802,7 +6802,10 @@ ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL, debug = FALSE) {
 		} else if (!is.null(typ) && typ == LIB.UPDATE) {
 			text <- paste(text, "Report function requires updated packages. Please update the following packages (using the \"update.packages\" command): \\newline", sep = "")
 			for(nn in seq(along = errorText)) {
-				text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\") \\newline", sep = "")
+				repos <- c("http://cran.r-project.org", "http://www.rforge.net/")
+				for(rep in repos) {
+					text <- paste(text, nn, ". update.packages(\"", errorText[nn], "\", repos = \"", rep, "\") \\newline", sep = "")
+				}
 			}			
 		} else {
 			if (errorText != "") {

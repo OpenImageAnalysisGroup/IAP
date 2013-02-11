@@ -16,6 +16,7 @@ import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.BlockClosingVis;
+import iap.blocks.BlockCutFromSide;
 import iap.blocks.BlockSkeletonizeVisOrFluo;
 import iap.blocks.arabidopsis.BlCutZoomedImages;
 import iap.blocks.arabidopsis.Bl_Arabidopsis_IRdiff;
@@ -87,11 +88,12 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
+				BlockCutFromSide.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-
+				
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
-
+				
 				// calculation of numeric values
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
@@ -99,9 +101,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-
+				
 				BlockDrawSkeleton.class.getCanonicalName(),
-
+				
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()

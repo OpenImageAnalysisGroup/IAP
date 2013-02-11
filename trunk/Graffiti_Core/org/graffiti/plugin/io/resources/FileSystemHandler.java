@@ -12,8 +12,8 @@ import org.StringManipulationTools;
 public class FileSystemHandler extends AbstractResourceIOHandler {
 	
 	public static final String DEFAULT_PREFIX = "file";
-	private String prefix;
-	private String folder;
+	private final String prefix;
+	private final String folder;
 	
 	public FileSystemHandler() {
 		this(DEFAULT_PREFIX, null);
@@ -24,6 +24,7 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 		this.folder = folder;
 	}
 	
+	@Override
 	public String getPrefix() {
 		return prefix;
 	}

@@ -3249,6 +3249,7 @@ public class ImageOperation {
 		while (idx < endY) {
 			img2d[idx++] = background;
 		}
+		
 		return new ImageOperation(img2d, w, image.getHeight());
 	}
 	
