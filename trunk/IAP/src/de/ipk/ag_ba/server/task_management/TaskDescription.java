@@ -132,6 +132,7 @@ public class TaskDescription {
 					batch.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
 				if (cmd != null && cmd.getStatusProvider() != null)
 					cmd.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
+				experiment.getHeader().setOriginDbId(batch.getExperimentDatabaseId());
 				experiment.getHeader().setExperimentname(
 						cmd.getRemoteCapableAnalysisActionClassName() + "§"
 								+ batch.getPartIdx() + "§" + batch.getPartCnt() + "§"
