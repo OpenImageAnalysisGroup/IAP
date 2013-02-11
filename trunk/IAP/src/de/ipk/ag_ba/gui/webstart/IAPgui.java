@@ -141,15 +141,12 @@ public class IAPgui {
 	
 	public static String getIntroTxt() {
 		return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform!</font></h2>"
-				+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system, "
-				+ "developed by the IPK research group Image Analysis.<br>"
+				+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system. "
+				+ "It is focused on high-throughput plant phenotyping and developed by the IPK research group 'image analysis'.<br>"
 				+ "<br>"
-				+ "This information system is in beta-stage. "
-				+ "Some features may not work reliable.<br>"
-				+ "<br>"
-				+ "If you have any questions, don't hesitate to contact the group Image Analysis:<br>"
-				+ "Dr. Christian Klukas, Tel. 763, <a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
-				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 10),
+				+ "You find information on how to use this software and additional reference information by clicking the command button 'About'.<br>"
+				+ "Use the first row of buttons to go back to any previously selected command or to return to this 'Start'-screen." +
+				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0),
 						"<br>" +
 								"<p>Latest system messages:<br><br><ul>",
 						"<li>", "", "<br><br>") + "</font>";
