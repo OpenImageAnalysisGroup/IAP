@@ -51,27 +51,28 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 			FlexibleImage vis = input().images().vis();
 			if (vis != null)
 				processCuttingOfImage(vis, FlexibleImageType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
-			
+			// processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
 			FlexibleImage fluo = input().images().fluo();
 			if (fluo != null)
 				processCuttingOfImage(fluo, FlexibleImageType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
 			FlexibleImage nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, FlexibleImageType.NIR, 0, vertFillGrade * nir.getHeight() / 2d, gridHn, gridVn);
+				processCuttingOfImage(nir, FlexibleImageType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
 			FlexibleImage ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().rotate(180).getImage();
-				processCuttingOfImage(ir, FlexibleImageType.IR, 0, vertFillGrade * ir.getHeight() / 2d, gridHn, gridVn);
+				processCuttingOfImage(ir, FlexibleImageType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			}
 		}
 	}
 	
 	private void processCuttingOfImage(FlexibleImage img, FlexibleImageType type, double offY, double vertFillGrade, int cols, int rows) {
-		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade), img.getWidth() / 2,
+		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
+				img.getWidth() / 2,
 				img.getHeight() / 2);
-		r.y = r.y + offY;
+		// r.y = r.y + offY;
 		
 		int le = (int) r.getMinX();
 		int to = (int) r.getMinY();
