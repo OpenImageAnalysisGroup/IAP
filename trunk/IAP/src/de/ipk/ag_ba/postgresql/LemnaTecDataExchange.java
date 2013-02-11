@@ -139,13 +139,25 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	public synchronized ArrayList<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws SQLException, ClassNotFoundException {
-		ArrayList<ExperimentHeaderInterface> res = null;// memRes1.get(user + ";" + database);
-		// if (res == null || System.currentTimeMillis() - updateTime > 2 * 60 * 1000) {
-		res = getExperimentsInDatabaseIC(user, database, optStatus);
-		// updateTime = System.currentTimeMillis();
-		// memRes1.put(user + ";" + database, res);
-		// }
-		return res;
+		if (database == null || database.equals("null")) {
+			ArrayList<ExperimentHeaderInterface> resForAll = new ArrayList<ExperimentHeaderInterface>();
+			for (String db : getDatabases()) {
+				try {
+					ArrayList<ExperimentHeaderInterface> res = null;
+					res = getExperimentsInDatabaseIC(user, db, optStatus);
+					if (res != null && res.size() > 0)
+						resForAll.addAll(res);
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not get list of experiments for LT database " + db + ". Error: "
+							+ e.getMessage());
+				}
+			}
+			return resForAll;
+		} else {
+			ArrayList<ExperimentHeaderInterface> res = null;
+			res = getExperimentsInDatabaseIC(user, database, optStatus);
+			return res;
+		}
 	}
 	
 	private ArrayList<ExperimentHeaderInterface> getExperimentsInDatabaseIC(String user, String database,

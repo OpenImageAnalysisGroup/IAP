@@ -59,7 +59,7 @@ public class ExperimentReference {
 			String db = databaseID.split(":")[1];
 			try {
 				Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(
-						SystemAnalysis.getUserName(), db);
+						null/* SystemAnalysis.getUserName() */, db);
 				for (ExperimentHeaderInterface ehi : res) {
 					if (ehi.getDatabaseId().equals(databaseID)) {
 						header = ehi;

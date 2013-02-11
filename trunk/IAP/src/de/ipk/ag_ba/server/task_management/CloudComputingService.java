@@ -311,9 +311,11 @@ public class CloudComputingService {
 					String partCnt = cc[2];
 					String submTime = cc[3];
 					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
-					if (!processedSubmissionTimes.contains(submTime))
+					if (!processedSubmissionTimes.contains(submTime)) {
 						availableTempDatasets.add(new TempDataSetDescription(
 								className, partCnt, submTime, i.getOriginDbId(), mergeWithDBid));
+						System.out.println(SystemAnalysis.getCurrentTime() + "INFO: Found temp dataset: " + i.getExperimentName());
+					}
 					processedSubmissionTimes.add(submTime);
 				}
 			}
@@ -350,7 +352,9 @@ public class CloudComputingService {
 						+ knownResults.size());
 				{
 					// check if source data is still available
-					ExperimentReference eRef = new ExperimentReference(knownResults.iterator().next().getOriginDbId());
+					ExperimentHeaderInterface firstExp = knownResults.iterator().next();
+					String oid = firstExp.getOriginDbId();
+					ExperimentReference eRef = new ExperimentReference(oid);
 					ExperimentHeaderInterface eRefHeader = eRef.getHeader();
 					if (eRefHeader == null) {
 						// source data set has been deleted meanwhile
@@ -359,8 +363,9 @@ public class CloudComputingService {
 								tempDataSetDescription.getPartCntI() + " parts)";
 						System.out.println(msg);
 						MongoDB.saveSystemMessage(msg);
-						for (ExperimentHeaderInterface r : knownResults) {
+						for (ExperimentHeaderInterface r : new ArrayList<ExperimentHeaderInterface>(knownResults)) {
 							m.deleteExperiment(r.getDatabaseId());
+							knownResults.remove(r);
 						}
 						continue;
 					}
@@ -474,6 +479,7 @@ public class CloudComputingService {
 					}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
@@ -511,8 +517,9 @@ public class CloudComputingService {
 				optStatus.setCurrentStatusText2("Process " + ii.getExperimentName() + " (" + nnii + "/" + tempDataSetDescription.getPartCntI() + ")");
 			nnii++;
 			if (originName == null) {
-				String ori = ii.getOriginDbId();
-				ExperimentHeaderInterface oriH = m.getExperimentHeader(new ObjectId(ori));
+				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
+				ExperimentHeaderInterface oriH = eRef.getHeader();
+				
 				String[] cc = ii.getExperimentName().split("§");
 				String ana = cc[0];
 				ana = ana.substring(ana.lastIndexOf(".") + ".".length());
@@ -521,13 +528,16 @@ public class CloudComputingService {
 					optStatus.setCurrentStatusText1("Merge " + knownResults.size() + " parts (" + originName + ")");
 				MongoDB.saveSystemMessage("Start combining analysis results for " + originName + " (" + knownResults.size() + " parts)");
 			}
-			System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
-					/ 1024
-					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+			if (r.freeMemory() * 0.8 > r.maxMemory()) {
+				System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
+						/ 1024
+						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
+			}
 			StopWatch s1 = new StopWatch(">m.getExperiment");
-			BackgroundTaskConsoleLogger status = new BackgroundTaskConsoleLogger("", "", true);
+			BackgroundTaskConsoleLogger status = new BackgroundTaskConsoleLogger("", "", false);
 			ExperimentInterface ei = m.getExperiment(ii, false, status);
-			s1.printTime();
+			if (s1.getTime() > 30000)
+				s1.printTime();
 			TreeSet<String> condS = new TreeSet<String>();
 			for (SubstanceInterface s : ei) {
 				for (ConditionInterface ci : s) {
@@ -544,7 +554,8 @@ public class CloudComputingService {
 			
 			StopWatch s = new StopWatch(">e.addMerge");
 			e.addAndMerge(ei);
-			s.printTime();
+			if (s.getTime() > 30000)
+				s.printTime();
 		}
 		String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 		if (sn.indexOf(".") > 0)
