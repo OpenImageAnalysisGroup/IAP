@@ -557,6 +557,44 @@ public class IAPmain extends JApplet {
 	public static void setRunMode(IAPrunMode currentGuiMode) {
 		IAPmain.currentGuiMode = currentGuiMode;
 	}
+	
+	public static ArrayList<String> getMainInfoLines() {
+		ArrayList<String> res = new ArrayList<String>();
+		int l = "***************************************************".length();
+		res.add("***************************************************");
+		res.add(fillLen("**", l));
+		res.add(fillLen("*IAP - Integrated Analysis Platform*", l));
+		res.add(fillLen("**", l));
+		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
+		res.add(fillLen("**", l));
+		res.add(fillLen("*(c) 2010-2013 IPK, Group Image Analysis*", l));
+		res.add(fillLen("**", l));
+		res.add("***************************************************");
+		res.add(fillLen("**", l));
+		res.add(fillLenLA("*  PI: Christian Klukas  *", ".", l, 2));
+		res.add(fillLenLA("*  Alexander Entzian  *", ".", l, 2));
+		res.add(fillLenLA("*  Jean-Michel Pape  *", ".", l, 2));
+		res.add(fillLenLA("*  Dijun Chen  *", ".", l, 2));
+		res.add(fillLen("**", l));
+		res.add("***************************************************");
+		return res;
+	}
+	
+	private static String fillLen(String string, int len) {
+		while (string.length() < len) {
+			string = string.substring(0, 1) + " " + string.substring(1);
+			if (string.length() < len)
+				string = string.substring(0, string.length() - 1) + " " + string.substring(string.length() - 1, string.length());
+		}
+		return string;
+	}
+	
+	private static String fillLenLA(String string, String fill, int len, int retainLeft) {
+		while (string.length() < len) {
+			string = string.substring(0, string.length() - retainLeft) + fill + string.substring(string.length() - retainLeft, string.length());
+		}
+		return string;
+	}
 }
 
 // ------------------------------------------------------------------------------

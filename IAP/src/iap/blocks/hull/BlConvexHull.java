@@ -245,8 +245,8 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 								summaryResult.setNumericProperty(getBlockPosition(),
 										"RESULT_side.vis.area.avg.wue", wue, "px^2/ml/day");
-								System.out.println("[Absolute] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
-										+ new Date(time).toString() + ", used for side area growth of " + wue + " pixels per ml per day");
+								// System.out.println("[Absolute] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
+								// + new Date(time).toString() + ", used for side area growth of " + wue + " pixels per ml per day");
 								
 							}
 						}
@@ -255,8 +255,8 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 								summaryResult.setNumericProperty(getBlockPosition(),
 										"RESULT_side.vis.area.avg.wue.relative", wue, "percent/ml/day");
-								System.out.println("[Relative] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
-										+ new Date(time).toString() + ", used for side area growth of " + wue + " percent per ml per day");
+								// System.out.println("[Relative] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
+								// + new Date(time).toString() + ", used for side area growth of " + wue + " percent per ml per day");
 								
 							}
 						}

@@ -162,6 +162,8 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		if (showSetting) {
 			homePrimaryActions.add(new NavigationButton(new ActionSettings(null, null, "Configure the system", "Settings"), guiSetting));
 		}
+		
+		homePrimaryActions.add(new NavigationButton(new ActionAbout("Version and Copyright information"), guiSetting));
 	}
 	
 	ArrayList<NavigationButton> bookmarks;
