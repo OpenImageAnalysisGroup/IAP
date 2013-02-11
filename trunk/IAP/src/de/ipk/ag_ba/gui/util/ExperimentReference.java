@@ -73,32 +73,37 @@ public class ExperimentReference {
 			boolean vfsFound = false;
 			if (databaseID.indexOf(":") > 0) {
 				String pre = databaseID.substring(0, databaseID.indexOf(":"));
-				for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(true)) {
-					if (pre.equals(vfs.getPrefix())) {
-						Library lib = new Library();
-						String ico = IAPimages.getFolderRemoteClosed();
-						String ico2 = IAPimages.getFolderRemoteOpen();
-						String ico3 = IAPimages.getFolderRemoteClosed();
-						VfsFileSystemSource dataSource = new VfsFileSystemSource(lib, vfs.getTargetName(), vfs, new String[] {}, IAPmain.loadIcon(ico),
-								IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3));
-						try {
-							databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
-							for (ExperimentReference ehi : dataSource.getAllExperiments()) {
-								if (ehi != null) {
-									String dbi = ehi.getHeader().getDatabaseId();
-									dbi = StringManipulationTools.stringReplace(dbi, "\\", "/");
-									if (dbi.equals(databaseID)) {
-										header = ehi.getHeader();
-										vfsFound = true;
-										break;
+				for (Boolean ignorePrefix : new Boolean[] { Boolean.FALSE, Boolean.TRUE })
+					for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(true)) {
+						if (pre.equals(vfs.getPrefix()) | ignorePrefix) {
+							if (ignorePrefix)
+								databaseID = databaseID.substring(databaseID.indexOf(":") + ":".length());
+							Library lib = new Library();
+							String ico = IAPimages.getFolderRemoteClosed();
+							String ico2 = IAPimages.getFolderRemoteOpen();
+							String ico3 = IAPimages.getFolderRemoteClosed();
+							VfsFileSystemSource dataSource = new VfsFileSystemSource(lib, vfs.getTargetName(), vfs, new String[] {}, IAPmain.loadIcon(ico),
+									IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3));
+							try {
+								databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
+								for (ExperimentReference ehi : dataSource.getAllExperiments()) {
+									if (ehi != null) {
+										String dbi = ehi.getHeader().getDatabaseId();
+										if (ignorePrefix && dbi.indexOf(":") > 0)
+											dbi = dbi.substring(dbi.indexOf(":") + ":".length());
+										dbi = StringManipulationTools.stringReplace(dbi, "\\", "/");
+										if (dbi.equals(databaseID)) {
+											header = ehi.getHeader();
+											vfsFound = true;
+											break;
+										}
 									}
 								}
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
 					}
-				}
 			}
 			if (!vfsFound)
 				if (databaseID.startsWith("hsm:")) {
