@@ -50,7 +50,6 @@ import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
-import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -388,9 +387,7 @@ public class MongoDB {
 								}
 							}
 						}
-						WriteResult wr = collExps.remove(expRef);
-						System.out.println("Remove write result: " + wr);
-						
+						collExps.remove(expRef);
 					}
 				}
 			}

@@ -59,7 +59,7 @@ public class SystemOptions {
 				});
 				t.setName("Settings Change Monitor");
 				t.setPriority(Thread.MIN_PRIORITY);
-				t.setDaemon(false);
+				t.setDaemon(true);
 				t.start();
 				updateCheckThread = t;
 			}

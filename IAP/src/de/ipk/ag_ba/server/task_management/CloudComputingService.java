@@ -364,6 +364,7 @@ public class CloudComputingService {
 						System.out.println(msg);
 						MongoDB.saveSystemMessage(msg);
 						for (ExperimentHeaderInterface r : new ArrayList<ExperimentHeaderInterface>(knownResults)) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete " + r.getExperimentName());
 							m.deleteExperiment(r.getDatabaseId());
 							knownResults.remove(r);
 						}
