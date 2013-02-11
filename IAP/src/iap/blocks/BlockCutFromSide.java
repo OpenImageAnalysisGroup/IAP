@@ -45,7 +45,7 @@ public class BlockCutFromSide extends AbstractBlock {
 			return mask;
 		
 		double cutoffLeft = getDouble("Cut-off " + mask.getType() + " from left (percent)", 0) / 100d;
-		double cutoffRight = getDouble("Cut-off " + mask.getType() + " from right (percent)", 0) / 100d;
+		double cutoffRight = getDouble("Cut-off " + mask.getType() + "from right (percent)", 0) / 100d;
 		double cutoffTop = getDouble("Cut-off " + mask.getType() + " from top (percent)", 0) / 100d;
 		double cutoffBottom = getDouble("Cut-off " + mask.getType() + " from bottom (percent)", 0) / 100d;
 		
