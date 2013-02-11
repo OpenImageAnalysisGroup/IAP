@@ -231,18 +231,17 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime());
 					
+					statisticsResult.getHeader().setOriginDbId(dbID);
+					
 					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experimentToBeAnalysed.getHeader().getDatabaseId());
 					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
-						statisticsResult.getHeader().setDatabaseId(dbID);
 						ActionDataExportToVfs ac = new ActionDataExportToVfs(m, new ExperimentReference(statisticsResult), vfs);
 						ac.setSkipClone(true);
 						ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
 						if (status != null)
-							;
-						ac.setStatusProvider(status);
+							ac.setStatusProvider(status);
 						ac.performActionCalculateResults(src);
 					} else {
-						statisticsResult.getHeader().setOriginDbId(dbID);
 						if (m != null) {
 							m.saveExperiment(statisticsResult, getStatusProvider());
 						}
