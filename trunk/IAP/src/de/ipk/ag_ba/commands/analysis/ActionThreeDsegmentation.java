@@ -79,7 +79,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			// }
 			// }
 			
-			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m);
+			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m, m.getColls());
 			VolumeSegmentation segmentationTask = new VolumeSegmentation(saveVolumesToDB);
 			segmentationTask.setInput(
 					AbstractPhenotypingTask.getWateringInfo(res),

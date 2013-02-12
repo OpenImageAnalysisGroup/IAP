@@ -1590,6 +1590,7 @@ public class MongoDB {
 	}
 	
 	HashMap<String, VirtualFileSystem> lastHit = new HashMap<String, VirtualFileSystem>();
+	private CollectionStorage colls;
 	
 	public InputStream getVFSinputStream(String bucket, String detail) {
 		if (vfs_file_storage != null) {
@@ -1694,5 +1695,25 @@ public class MongoDB {
 		if (tso.getBval(0, false))
 			throw new Exception("Experiment with ID " + header.getDatabaseId() + " not found! (name: " + header.getExperimentname() + ")");
 		return (Long) res.getObject();
+	}
+	
+	public CollectionStorage getColls() throws Exception {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		if (colls == null) {
+			RunnableOnDB runnableOnDB = new RunnableOnDB() {
+				@Override
+				public void run() {
+					// empty
+				}
+				
+				@Override
+				public void setDB(DB db) {
+					tso.setParam(0, db);
+				}
+			};
+			processDB(runnableOnDB);
+			colls = new CollectionStorage((DB) tso.getParam(0, null), getEnsureIndex());
+		}
+		return colls;
 	}
 }

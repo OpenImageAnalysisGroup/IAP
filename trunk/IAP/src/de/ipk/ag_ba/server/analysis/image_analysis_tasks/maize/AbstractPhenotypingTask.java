@@ -111,11 +111,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.numberOfSubsets = numberOfSubsets;
 		this.m = m;
 		// m should be used if the experiment is also stored there, otherwise the binary files should be stored in the VFS
-		databaseTarget = determineDatabaseTarget(input, m);
+		try {
+			databaseTarget = determineDatabaseTarget(input, m);
+		} catch (Exception e) {
+			e.printStackTrace();
+			MongoDB.saveSystemErrorMessage("Could not initialize storage target: " + e.getMessage(), e);
+		}
 	}
 	
-	public static DatabaseTarget determineDatabaseTarget(Collection<Sample3D> input, MongoDB m) {
-		DatabaseTarget databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m) : null;
+	public static DatabaseTarget determineDatabaseTarget(Collection<Sample3D> input, MongoDB m) throws Exception {
+		DatabaseTarget databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m, m.getColls()) : null;
 		if (databaseTarget != null)
 			return databaseTarget;
 		String prefix = null;

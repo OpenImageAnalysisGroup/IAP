@@ -31,10 +31,12 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	
 	private final boolean store;
 	private final MongoDB m;
+	private final CollectionStorage cols;
 	
-	public DataBaseTargetMongoDB(boolean store, MongoDB m) {
+	public DataBaseTargetMongoDB(boolean store, MongoDB m, CollectionStorage cols) {
 		this.store = store;
 		this.m = m;
+		this.cols = cols;
 	}
 	
 	@Override
@@ -52,7 +54,6 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 			@Override
 			public void run() {
 				try {
-					CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 					DatabaseStorageResult dsr =
 							ExperimentSaver.saveImageFileDirect(
 									cols, db, limg, null,
