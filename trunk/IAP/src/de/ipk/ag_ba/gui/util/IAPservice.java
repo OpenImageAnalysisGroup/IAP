@@ -1552,17 +1552,6 @@ public class IAPservice {
 		return cubeRoots[(int) (1000 * v)];
 	}
 	
-	public static int getMaxTrayCount(ExperimentInterface experiment) throws Exception {
-		int max = 1;
-		for (SubstanceInterface si : experiment)
-			for (ConditionInterface ci : si) {
-				int tc = getTrayCountFromCondition(ci);
-				if (tc > max)
-					max = tc;
-			}
-		return max;
-	}
-	
 	public static boolean isAnalyzedWithCurrentRelease(ExperimentHeaderInterface exp) {
 		// for (IAP_RELEASE ir : IAP_RELEASE.values())
 		// if (exp.getRemark().contains(ir.toString()))
@@ -1579,18 +1568,6 @@ public class IAPservice {
 	}
 	
 	private static ImageJ ij = null;
-	
-	public static int getTrayCountFromCondition(ConditionInterface con) {
-		String t = con.getTreatment() + "/" + con.getSequence() + "/" + con.getGrowthconditions();
-		int executionTrayCount = 1;
-		if (t != null && (t.contains("OAC_2x3") || t.contains("6-tray"))) {
-			executionTrayCount = 6; // 2x3
-		} else
-			if (t != null && (t.contains("OAC_4x3") || t.contains("12-tray"))) {
-				executionTrayCount = 12; // 3x4
-			}
-		return executionTrayCount;
-	}
 	
 	public static void autoCloseAt(final int hour) {
 		Thread autoClose = new Thread(new Runnable() {
