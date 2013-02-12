@@ -268,7 +268,24 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/applications-system.png";
+		// return "img/ext/applications-system.png";
+		long time = System.currentTimeMillis();
+		int sec = (int) (time / 1000);
+		switch (sec % 6) {
+			case 0:
+				return "img/ext/applications-system-07.5.png";
+			case 1:
+				return "img/ext/applications-system-15.png";
+			case 2:
+				return "img/ext/applications-system-22.5.png";
+			case 3:
+				return "img/ext/applications-system-30.png";
+			case 4:
+				return "img/ext/applications-system-37.5.png";
+			case 5:
+				return "img/ext/applications-system-45.png";
+		}
+		return null;
 	}
 	
 	@Override
