@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.AttributeHelper;
 import org.IniIoProvider;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 
@@ -21,22 +22,30 @@ public class ActionExportAssignedAnalysisTemplate extends AbstractNavigationActi
 	private String title;
 	private IniIoProvider ini;
 	private String exportFileName;
+	private String timestamp;
 	
 	public ActionExportAssignedAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
 	public ActionExportAssignedAnalysisTemplate(IniIoProvider ini, String exportFileName,
-			String tooltip, String title) {
+			String tooltip, String title, String timestamp) {
 		this(tooltip);
 		this.ini = ini;
 		this.exportFileName = exportFileName;
 		this.title = title;
+		this.timestamp = timestamp;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		String iniContent = SystemOptions.getInstance(null, ini).getIniValue();
+		SystemOptions so = SystemOptions.getInstance(null, ini);
+		String iniContent = so.getIniValue();
+		
+		String pn = so.getString("DESCRIPTION", "pipeline_name", null, false);
+		if (pn != null && !pn.isEmpty())
+			iniContent = StringManipulationTools.stringReplace(iniContent, "pipeline_name = " + pn, "pipeline_name = " + pn + " [" + timestamp + "]");
+		
 		TextFile.write(ReleaseInfo.getAppFolderWithFinalSep() + exportFileName, iniContent);
 		if (IAPmain.getRunMode() == IAPrunMode.SWING_APPLET || IAPmain.getRunMode() == IAPrunMode.SWING_MAIN)
 			AttributeHelper.showInFileBrowser(ReleaseInfo.getAppFolder(), exportFileName);

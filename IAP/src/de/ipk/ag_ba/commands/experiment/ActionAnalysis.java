@@ -58,11 +58,13 @@ public class ActionAnalysis extends AbstractNavigationAction {
 					"Change analysis settings", "Modify settings");
 			SystemOptions so = SystemOptions.getInstance(null, ioStringProvider);
 			String pipeLineName = so.getString("DESCRIPTION", "pipeline_name", null);
+			String ttt = SystemAnalysis.getCurrentTime();
 			NavigationAction acExport = new ActionExportAssignedAnalysisTemplate(
 					ioStringProvider,
 					StringManipulationTools.getFileSystemName(pipeLineName + "." + SystemAnalysis.getCurrentTime()) + ".pipeline.ini",
-					"Export the analysis pipline settings as a template file",
-					"Export");
+					"Export the analysis pipline settings in the new template file " + StringManipulationTools.getFileSystemName(pipeLineName + "." + ttt)
+							+ ".pipeline.ini",
+					"Export", ttt);
 			ac.addAdditionalEntity(new NavigationButton(acExport, src.getGUIsetting()));
 			actions.add(new NavigationButton(ac, src.getGUIsetting()));
 			
