@@ -8,6 +8,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -123,15 +124,15 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						double progress = (finishedJobs - firstStatusProgress) / part_cnt;
 						if (progress > 0) {
 							long fullTime = (long) (processingTimePPP / progress);
-							remain =
-									// "eta: " + SystemAnalysis.getCurrentTime(ct + (long) (fullTime * (1d - value / 100d)))
-									// + ", overall: "
-									// + SystemAnalysis.getWaitTimeShort(fullTime)
-									// + ", remain: "
-									// + SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)));
-									SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)))
-											+ " / "
-											+ SystemAnalysis.getWaitTimeShort(fullTime);
+							remain = "";
+							// // "eta: " + SystemAnalysis.getCurrentTime(ct + (long) (fullTime * (1d - value / 100d)))
+							// // + ", overall: "
+							// // + SystemAnalysis.getWaitTimeShort(fullTime)
+							// // + ", remain: "
+							// // + SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)));
+							// SystemAnalysis.getWaitTimeShort((long) (fullTime * (1d - value / 100d)))
+							// + " / "
+							// + SystemAnalysis.getWaitTimeShort(fullTime);
 							
 							ArrayList<String> s = new ArrayList<String>();
 							for (String ss : submission2partCnt.keySet()) {
@@ -139,11 +140,13 @@ public class ActionJobStatus extends AbstractNavigationAction {
 										+ "$".length()));
 								s.add(SystemAnalysis.getCurrentTime(l));
 							}
-							remain += "<br>starts: " + StringManipulationTools.getStringListMerge(s, ", ");
-							long partTime = fullTime / part_cnt;
+							remain += "starts: " + StringManipulationTools.getStringListMerge(s, ", ");
+							long partTime = fullTime / part_cnt; // current speed
+							if (SystemOptions.getInstance().getBoolean("IAP", "Show Overall Task Speed", true))
+								partTime = (long) (processingTime / finishedJobs); // historic overall speed
 							remain += "<br>processed: " + StringManipulationTools.formatNumber(finishedJobs, "#.000") + " in "
 									+ SystemAnalysis.getWaitTimeShort(processingTime)
-									+ ", 1 task takes " + SystemAnalysis.getWaitTimeShort(partTime);
+									+ ", " + SystemAnalysis.getWaitTime(partTime, 1) + "/task";
 						}
 					} else
 						remain = "";
@@ -266,11 +269,11 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		return "Tasks";
 	}
 	
+	int sec = 0;
+	
 	@Override
 	public String getDefaultImage() {
-		// return "img/ext/applications-system.png";
-		long time = System.currentTimeMillis();
-		int sec = (int) (time / 1000);
+		this.sec++;
 		switch (sec % 6) {
 			case 0:
 				return "img/ext/applications-system-07.5.png";
