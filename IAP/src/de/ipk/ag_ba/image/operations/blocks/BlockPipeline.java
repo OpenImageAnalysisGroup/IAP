@@ -1,8 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import iap.blocks.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
@@ -33,7 +33,6 @@ import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
@@ -94,17 +93,15 @@ public class BlockPipeline {
 		// the load-image-block then needs to cut out image 1/6, 2/6, ...
 		// and place the section in the middle of the image for further processing
 		int executionTrayCount = 1;
-		
-		ImageData abc = input.images().getVisInfo();
-		if (abc == null)
-			abc = input.images().getFluoInfo();
-		if (abc == null)
-			abc = input.images().getNirInfo();
-		if (abc == null)
-			abc = input.images().getIrInfo();
-		if (abc != null && options.getCameraPosition() == CameraPosition.TOP) {
-			// check plant annotation and determine if this is a arabidopsis 6 or 12 tray
-			executionTrayCount = IAPservice.getTrayCountFromCondition(abc.getParentSample().getParentCondition());
+		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+			if (blockClass != null && (blockClass == BlClearMasks_Arabidopsis_PotAndTrayProcessing.class)) {
+				ImageAnalysisBlockFIS inst = blockClass.newInstance();
+				int hg = options.getIntSetting(inst, "Well Grid Horizontal", 1);
+				int wg = options.getIntSetting(inst, "Well Grid Vertical", 1);
+				int n = hg * wg;
+				if (n > 0)
+					executionTrayCount = n;
+			}
 		}
 		
 		HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = new HashMap<Integer, StringAndFlexibleMaskAndImageSet>();
