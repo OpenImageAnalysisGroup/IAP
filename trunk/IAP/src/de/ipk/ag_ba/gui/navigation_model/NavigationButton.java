@@ -411,6 +411,7 @@ public class NavigationButton implements StyleAware {
 			public void run() {
 				NavigationButton n = r_n.get();
 				JButton n1 = r_n1.get();
+				boolean imageUpdated = false;
 				if (n == null)
 					return;
 				if (n1 == null)
@@ -421,8 +422,10 @@ public class NavigationButton implements StyleAware {
 						lastImage = ai;
 					if (ai != null && !ai.equals(lastImage)) {
 						lastImage = ai;
-						if (iconUpdateCheck != null)
+						if (iconUpdateCheck != null) {
 							iconUpdateCheck.run();
+							imageUpdated = true;
+						}
 					}
 					n1.setText(n.getTitle());// + "!!!!!" + System.currentTimeMillis());
 					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0) {
@@ -438,7 +441,9 @@ public class NavigationButton implements StyleAware {
 								System.out.println("UPDATING INVISIBLE BUTTON " + n1.getText());
 							// if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
 							n.setRunnableIconCheck(rr.getObject());
-							BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+							BackgroundTaskHelper.executeLaterOnSwingTask(
+									imageUpdated ? 500 : 500,
+									(Runnable) rr.getObject());
 							// }
 						} else
 							n.setRunnableIconCheck(new Object());
