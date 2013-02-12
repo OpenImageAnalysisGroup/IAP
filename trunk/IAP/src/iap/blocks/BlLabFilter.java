@@ -16,14 +16,14 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 /**
  * Uses a lab-based pixel filter for the vis images.
  * 
- * @author Klukas
+ * @author Klukas, entzian
  */
 public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
-	int LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS;
-	int LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS;
-	int LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS;
+	Integer[] LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS;
+	Integer[] LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS;
+	Integer[] LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS;
 	
 	@Override
 	protected void prepare() {
@@ -61,14 +61,32 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 			if (getBoolean("Filter by LAB Color Space", true)) {
 				initLABfilterValues();
 				
-				visMask = visMask.filterRemoveLAB(
-						LAB_MIN_L_VALUE_VIS,
-						LAB_MAX_L_VALUE_VIS,
-						LAB_MIN_A_VALUE_VIS,
-						LAB_MAX_A_VALUE_VIS,
-						LAB_MIN_B_VALUE_VIS,
-						LAB_MAX_B_VALUE_VIS,
-						options.getBackground(), false);
+				double blueCurbWidthBarley0_1 = 0;
+				double blueCurbHeightEndBarly0_8 = 1;
+				FlexibleImage toBeFiltered = visMask.hq_thresholdLAB_multi_color_or_and_not(
+						LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS,
+						LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS,
+						LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS,
+						options.getBackground(),
+						Integer.MAX_VALUE,
+						true,
+						new Integer[] {}, new Integer[] {},
+						new Integer[] {}, new Integer[] {},
+						new Integer[] {}, new Integer[] {},
+						blueCurbWidthBarley0_1,
+						blueCurbHeightEndBarly0_8).
+						show("removed lab", debug).getImage();
+				
+				// visMask = visMask.filterRemoveLAB(
+				// LAB_MIN_L_VALUE_VIS,
+				// LAB_MAX_L_VALUE_VIS,
+				// LAB_MIN_A_VALUE_VIS,
+				// LAB_MAX_A_VALUE_VIS,
+				// LAB_MIN_B_VALUE_VIS,
+				// LAB_MAX_B_VALUE_VIS,
+				// options.getBackground(), false);
+				
+				visMask = visMask.applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground());
 				
 				if (fis != null)
 					fis.addImage("main lab filter", visMask.getImage(), null);
@@ -80,61 +98,116 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	private void initLABfilterValues() {
 		if (options.isBarley()) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
-				LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-				LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-				LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-				LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-				LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+				
+				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 100, -1, -1, -1 });
+				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 135, -1, -1, -1 });
+				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
+				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				
+				// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
+				// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+				// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+				// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
+				// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
+				// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 			} else {
-				LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-				LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-				LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-				LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-				LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-				LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
+				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
+				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				
+				// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
+				// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+				// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+				// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
+				// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
+				// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 			}
 		} else
 			if (options.isArabidopsis()) {
 				if (options.getCameraPosition() == CameraPosition.TOP) {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 125);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 120);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+					
+					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 125, -1, -1, -1 });
+					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 135, -1, -1, -1 });
+					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 120, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					
+					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 125);
+					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+					// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+					// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
+					// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 120);
+					// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 				} else {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+					
+					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
+					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					
+					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
+					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+					// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+					// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
+					// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
+					// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 				}
 			} else
 				if (options.isMaize()) {
 					if (options.getCameraPosition() == CameraPosition.TOP) {
-						LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 50 * 255 / 100);
-						LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-						LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-						LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 120);
-						LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 125);
-						LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+						
+						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 50 * 255 / 100, -1, -1, -1 });
+						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 120, -1, -1, -1 });
+						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 125, -1, -1, -1 });
+						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						
+						// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 50 * 255 / 100);
+						// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+						// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+						// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 120);
+						// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 125);
+						// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 					} else {
-						LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-						LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-						LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-						LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-						LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
-						LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+						
+						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
+						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
+						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						
+						// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
+						// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+						// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+						// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
+						// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
+						// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 					}
 				} else {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+					
+					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
+					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					
+					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
+					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+					// LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+					// LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
+					// LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
+					// LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
 				}
 	}
 	
