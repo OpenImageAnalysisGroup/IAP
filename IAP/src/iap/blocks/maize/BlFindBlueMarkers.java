@@ -130,7 +130,8 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private FlexibleImage getMarkers(FlexibleImage image, ArrayList<MarkerPair> result) {
 		double s = getDouble("Scale-factor-decrease-img-and-mask", 1); // options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
-		ImageOperation io = image.io().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), options.isMaize(), true);
+		ImageOperation io = image.io().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), true,
+				getBoolean("delted located blue markers", true), debug);
 		return io != null ? io.getImage() : null;
 	}
 	

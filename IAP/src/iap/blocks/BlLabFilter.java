@@ -69,7 +69,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 						LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS,
 						options.getBackground(),
 						Integer.MAX_VALUE,
-						true,
+						getBoolean("Return filtered image", true),
 						new Integer[] {}, new Integer[] {},
 						new Integer[] {}, new Integer[] {},
 						new Integer[] {}, new Integer[] {},
