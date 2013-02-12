@@ -2170,7 +2170,8 @@ public class ImageOperation {
 			Integer[] lowerValueOfL, Integer[] upperValueOfL,
 			Integer[] lowerValueOfA, Integer[] upperValueOfA,
 			Integer[] lowerValueOfB, Integer[] upperValueOfB,
-			int background, int potRemovalColorStartIndex,
+			int background,
+			int potRemovalColorStartIndex,
 			boolean getRemovedPixel,
 			Integer[] plant_lowerValueOfL, Integer[] plant_upperValueOfL,
 			Integer[] plant_lowerValueOfA, Integer[] plant_upperValueOfA,
@@ -2788,8 +2789,8 @@ public class ImageOperation {
 	public ImageOperation searchBlueMarkers(
 			ArrayList<MarkerPair> result,
 			double options, CameraPosition typ, boolean maize,
-			boolean clearBlueMarkers) {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize);
+			boolean clearBlueMarkers, boolean debug) {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize, debug);
 		
 		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint);
 		
