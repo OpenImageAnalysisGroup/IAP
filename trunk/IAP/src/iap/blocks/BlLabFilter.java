@@ -102,9 +102,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 100, -1, -1, -1 });
 				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 135, -1, -1, -1 });
+				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 135, -1, -1, -1 });
 				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 				
 				// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
 				// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -116,9 +116,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
 				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
 				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 				
 				// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
 				// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -134,9 +134,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 125, -1, -1, -1 });
 					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 135, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 135, -1, -1, -1 });
 					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 120, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 					
 					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 125);
 					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -149,9 +149,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
 					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
 					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 					
 					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
 					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -167,9 +167,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 50 * 255 / 100, -1, -1, -1 });
 						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 120, -1, -1, -1 });
+						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 120, -1, -1, -1 });
 						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 125, -1, -1, -1 });
-						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 						
 						// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 50 * 255 / 100);
 						// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -182,9 +182,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
 						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
 						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
-						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 						
 						// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
 						// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
@@ -198,9 +198,9 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
 					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
 					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
 					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
 					
 					// LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
 					// LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
