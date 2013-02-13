@@ -101,11 +101,11 @@ public class PdfCreator {
 		
 		para = extendParameter(para,
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "check R package versions", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "install new R packages", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "automatic update R packages", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "install missing required R packages", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "automatic update of R packages", false),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "script debug function", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "Enforce minimum R package versions", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "Remove intermediate files (just keep PDF)", false));
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "enforce minimum R package versions", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "remove intermediate files (just keep PDF)", false));
 		
 		this.lastOutput = lastOutput;
 		readAndModifyLaTexFile("reportDefGeneralSection.tex", exp);
