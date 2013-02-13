@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	
 	private final MongoDB m;
-	private ArrayList<NavigationButton> mergedDocuments;
+	private final ArrayList<NavigationButton> mergedDocuments = new ArrayList<NavigationButton>();
 	private String splitCount;
 	private NavigationButton src;
 	private int nSplit = -1;
@@ -90,5 +90,6 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		mergedDocuments.clear();
+		m.processSplitResults().merge(true, getStatusProvider());
 	}
 }

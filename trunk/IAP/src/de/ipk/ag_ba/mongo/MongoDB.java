@@ -1354,7 +1354,15 @@ public class MongoDB {
 	
 	public static void saveSystemMessage(String msg) {
 		try {
-			MongoDB.getDefaultCloud().addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
+			saveSystemMessage(MongoDB.getDefaultCloud(), msg);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	public static void saveSystemMessage(MongoDB m, String msg) {
+		try {
+			m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
 					"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 		} catch (Exception e1) {
 			e1.printStackTrace();

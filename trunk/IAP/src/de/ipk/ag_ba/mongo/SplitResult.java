@@ -125,7 +125,7 @@ public class SplitResult {
 				originName = ana + ": " + oriH.getExperimentName();
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Merge " + knownResults.size() + " parts (" + originName + ")");
-				MongoDB.saveSystemMessage("Start combining analysis results for " + originName + " (" + knownResults.size() + " parts)");
+				MongoDB.saveSystemMessage(m, "Start combining analysis results for " + originName + " (" + knownResults.size() + " parts)");
 			}
 			if (r.freeMemory() * 0.8 > r.maxMemory()) {
 				System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024
@@ -240,8 +240,7 @@ public class SplitResult {
 	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 		
-		ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
-		HashSet<TempDataSetDescription> availableTempDatasets = m.processSplitResults().getSplitResultExperimentSets();
+		HashSet<TempDataSetDescription> availableTempDatasets = getSplitResultExperimentSets();
 		for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
 			ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 			HashSet<String> added = new HashSet<String>();
@@ -359,7 +358,7 @@ public class SplitResult {
 			}
 			if (res == null) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
-				System.exit(1);
+				return;
 			} else {
 				if (res[0] instanceof String)
 					addNewTasksIfMissing = !((String) res[0]).contains("n");
@@ -390,7 +389,7 @@ public class SplitResult {
 						cmd.setRemoteCapableAnalysisActionParams("");
 						cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
 						BatchCmd.enqueueBatchCmd(m, cmd);
-						System.out.println("Enqueue: " + jobID);
+						System.out.println("Enqueued new analysis task with ID " + jobID);
 					}
 				}
 			} else
