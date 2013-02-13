@@ -186,8 +186,8 @@ public class SplitResult {
 				e.getHeader().getRemark() +
 						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
 						" // processing time: " +
-						SystemAnalysis.getWaitTime(tProcessing) + " // finished: " +
-						SystemAnalysis.getCurrentTime() + " // manual merge");
+						SystemAnalysis.getWaitTime(tProcessing) + " // split results merged: " +
+						SystemAnalysis.getCurrentTime());
 		System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 		System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
 		System.out.println("*****************************");
