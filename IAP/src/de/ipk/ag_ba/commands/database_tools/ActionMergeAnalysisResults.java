@@ -9,6 +9,8 @@ package de.ipk.ag_ba.commands.database_tools;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -59,7 +61,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 		return "<html><center>" +
 				"Merge Split Analysis Results" +
 				(nSplit >= 0 ? "<br><font color='gray'><small>(" + nTemps + " results for " + nSplit + " experiments)</small></font>" : "") +
-				"</center></html>";
+				"</center>";
 	}
 	
 	@Override
@@ -73,6 +75,11 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 				mergedDocuments.size() + " result datasets have been saved.");
 	}
 	
+	@Override
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
+		return status;
+	}
+
 	@Override
 	public boolean isProvidingActions() {
 		return true;
@@ -90,6 +97,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		mergedDocuments.clear();
-		m.processSplitResults().merge(true, getStatusProvider());
+		status.setCurrentStatusText1("Initialize Command Operation");
+		m.processSplitResults().merge(true, status);
 	}
 }

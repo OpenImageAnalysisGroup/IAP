@@ -60,7 +60,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		return "<html><center>Delete " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks and<br>" +
-				(nTemps >= 0 ? nTemps + "" : "") + " temporary result datasets</center></html>";
+				(nTemps >= 0 ? nTemps + "" : "") + " temporary result datasets</center>";
 	}
 	
 	@Override

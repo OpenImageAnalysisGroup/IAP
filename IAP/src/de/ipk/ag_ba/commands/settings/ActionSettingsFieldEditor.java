@@ -235,7 +235,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					this.actionSettingsEditor.section, s2, null, null, false);
 			s = s.substring(0, s.length() - "-radio-selection".length());
 			return "<html><center><b>" + s + "</b><br>" +
-					"&nbsp;" + sel + "&nbsp;" + "</center></html>";
+					"&nbsp;" + sel + "&nbsp;" + "</center>";
 		}
 		if (isBoolean)
 			return s;
@@ -249,7 +249,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				while (sb.length() < sv.length())
 					sb.append("*");
 				return "<html><center><b>" + s + "</b><br>" +
-						"&nbsp;" + sb + "&nbsp;" + "</center></html>";
+						"&nbsp;" + sb + "&nbsp;" + "</center>";
 			} else {
 				SystemOptions o = SystemOptions.getInstance(
 						this.actionSettingsEditor.iniFileName,
@@ -257,7 +257,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				if (o != null && this.actionSettingsEditor != null && this.actionSettingsEditor.section != null)
 					return "<html><center><b>" + s + "</b><br>" +
 							"&nbsp;" + o.getObject(this.actionSettingsEditor.section, setting, 2)
-							+ "&nbsp;" + "</center></html>";
+							+ "&nbsp;" + "</center>";
 				else {
 					return "(not available)";
 				}

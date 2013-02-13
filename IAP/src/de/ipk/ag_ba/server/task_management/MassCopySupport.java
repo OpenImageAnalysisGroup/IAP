@@ -193,10 +193,10 @@ public class MassCopySupport {
 				}
 			}
 			if (!onlyMerge) {
-				status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")</html>");
+				status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")");
 				status.setCurrentStatusText2("Next sync at 1 AM");
 			} else {
-				status.setCurrentStatusText2("<html>Result-check completed<br>(" + new Date() + ")</html>");
+				status.setCurrentStatusText2("<html>Result-check completed<br>(" + new Date() + ")");
 				status.setCurrentStatusText2("Next sync at 1 AM");
 			}
 		} catch (Exception e1) {

@@ -322,6 +322,8 @@ public class SplitResult {
 			boolean addNewTasksIfMissing = false;
 			Object[] res;
 			if (interactive) {
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("User input required");
 				if (SystemAnalysis.isHeadless()) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
 							+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
@@ -348,8 +350,9 @@ public class SplitResult {
 									"<br>Analyzed experiment: "
 											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
 									: "")
-							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
-							+ knownResults.size(), "Add compute tasks?", new Object[] {
+							+ "<br>Required result sets: " + tempDataSetDescription.getPartCntI() + ", completed calculations: "
+							+ knownResults.size()+(knownResults.size()==tempDataSetDescription.getPartCntI()? " (all tasks completed)": " (results missing)")
+							+"<br><br>Click cancel to stop processing this and further datasets.", "Add compute tasks?", new Object[] {
 							"Add compute tasks for missing data?", addNewTasksIfMissing
 					});
 			} else {
@@ -357,6 +360,8 @@ public class SplitResult {
 				res = new Object[] { false };
 			}
 			if (res == null) {
+				if (optStatus!=null)
+					optStatus.setCurrentStatusText1("Processing cancelled");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 				return;
 			} else {
@@ -367,6 +372,8 @@ public class SplitResult {
 			}
 			if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
 				if (addNewTasksIfMissing) {
+					if (optStatus!=null)
+						optStatus.setCurrentStatusText1("Schedule missing compute tasks");
 					// not everything has been computed (internal error)
 					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
 					{
@@ -395,6 +402,8 @@ public class SplitResult {
 			} else
 				if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 					try {
+						if (optStatus!=null)
+							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
 					} catch (Exception e) {
 						MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
