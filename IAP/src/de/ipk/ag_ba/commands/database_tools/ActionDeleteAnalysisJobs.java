@@ -7,13 +7,19 @@
 package de.ipk.ag_ba.commands.database_tools;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.mongo.SplitResult;
+import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.TempDataSetDescription;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
@@ -23,10 +29,27 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	private final MongoDB m;
 	private long deleted;
 	private int deletedTempDatasets;
+	protected int nJobs = -1;
+	protected int nSplit = -1;
+	protected int nTemps = -1;
 	
-	public ActionDeleteAnalysisJobs(MongoDB m) {
+	public ActionDeleteAnalysisJobs(final MongoDB m) {
 		super("Deletes running and scheduled compute tasks");
 		this.m = m;
+		BackgroundTaskHelper.issueSimpleTask("Count split results",
+				"Determine number of split result datasets",
+				new Runnable() {
+					@Override
+					public void run() {
+						SplitResult sr = m.processSplitResults();
+						Collection<BatchCmd> availableJobs = m.batch().getAll();
+						ActionDeleteAnalysisJobs.this.nJobs = availableJobs.size();
+						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets();
+						ActionDeleteAnalysisJobs.this.nSplit = availableTempResultSets.size();
+						ArrayList<ExperimentHeaderInterface> availTempDatasets = sr.getAvailableTempDatasets();
+						ActionDeleteAnalysisJobs.this.nTemps = availTempDatasets.size();
+					}
+				}, null);
 	}
 	
 	@Override
@@ -36,7 +59,8 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Delete Analysis Tasks";
+		return "<html><center>Delete " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks and<br>" +
+				(nTemps >= 0 ? nTemps + "" : "") + " temporary result datasets</center></html>";
 	}
 	
 	@Override

@@ -1716,4 +1716,8 @@ public class MongoDB {
 		}
 		return colls;
 	}
+	
+	public SplitResult processSplitResults() {
+		return new SplitResult(this);
+	}
 }

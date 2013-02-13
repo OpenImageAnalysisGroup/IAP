@@ -255,7 +255,7 @@ public class NavigationButton implements StyleAware {
 					if (line2.length() > 0 && sm3 != null)
 						line2 += sm3.length() == 0 ? ", " : "";
 					if (sm3 == null || sm3.length() == 0)
-						line2 += "" + eta;
+						line2 += " ~ " + eta;
 				}
 			}
 			line2 = "<br>" + line2;
