@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.ErrorMsg;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -238,175 +237,170 @@ public class SplitResult {
 		System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 	}
 	
-	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
-		try {
-			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
-			
-			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
-			HashSet<TempDataSetDescription> availableTempDatasets = m.processSplitResults().getSplitResultExperimentSets();
-			for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
-				ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
-				HashSet<String> added = new HashSet<String>();
-				for (ExperimentHeaderInterface i : el) {
-					if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
-						String[] cc = i.getExperimentName().split("§");
-						if (i.getImportusergroup().equals("Temp") &&
-								(cc.length == 4 || cc.length == 5)) {
-							String className = cc[0];
-							String partIdx = cc[1];
-							String partCnt = cc[2];
-							String submTime = cc[3];
-							String mergeWithDBid = cc.length == 5 ? cc[4] : "";
-							String bcn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
-							String bpn = tempDataSetDescription.getPartCnt();
-							String bst = tempDataSetDescription.getSubmissionTime();
-							String bmw = tempDataSetDescription.getMergeWithDBid();
-							if (className.equals(bcn)
-									&& partCnt.equals(bpn)
-									&& submTime.equals(bst)
-									&& !added.contains(partIdx)
-									&& mergeWithDBid.equals(bmw)) {
-								knownResults.add(i);
-								added.add(partIdx);
-							}
+	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		DataMappingTypeManager3D.replaceVantedMappingTypeManager();
+		
+		ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
+		HashSet<TempDataSetDescription> availableTempDatasets = m.processSplitResults().getSplitResultExperimentSets();
+		for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
+			ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
+			HashSet<String> added = new HashSet<String>();
+			for (ExperimentHeaderInterface i : el) {
+				if (i.getExperimentName() != null && i.getExperimentName().contains("§")) {
+					String[] cc = i.getExperimentName().split("§");
+					if (i.getImportusergroup().equals("Temp") &&
+							(cc.length == 4 || cc.length == 5)) {
+						String className = cc[0];
+						String partIdx = cc[1];
+						String partCnt = cc[2];
+						String submTime = cc[3];
+						String mergeWithDBid = cc.length == 5 ? cc[4] : "";
+						String bcn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
+						String bpn = tempDataSetDescription.getPartCnt();
+						String bst = tempDataSetDescription.getSubmissionTime();
+						String bmw = tempDataSetDescription.getMergeWithDBid();
+						if (className.equals(bcn)
+								&& partCnt.equals(bpn)
+								&& submTime.equals(bst)
+								&& !added.contains(partIdx)
+								&& mergeWithDBid.equals(bmw)) {
+							knownResults.add(i);
+							added.add(partIdx);
 						}
 					}
 				}
-				System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-				System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
-						+ knownResults.size());
-				{
-					// check if source data is still available
-					ExperimentHeaderInterface firstExp = knownResults.iterator().next();
-					String oid = firstExp.getOriginDbId();
-					ExperimentReference eRef = new ExperimentReference(oid);
+			}
+			System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
+			System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
+					+ knownResults.size());
+			{
+				// check if source data is still available
+				ExperimentHeaderInterface firstExp = knownResults.iterator().next();
+				String oid = firstExp.getOriginDbId();
+				ExperimentReference eRef = new ExperimentReference(oid);
+				ExperimentHeaderInterface eRefHeader = eRef.getHeader();
+				if (eRefHeader == null) {
+					// source data set has been deleted meanwhile
+					// therefore the analysis results will be deleted, too
+					String msg = "Source data set for analysis results has been deleted, about to delete non-relevant result data (" + knownResults.size() + "/" +
+							tempDataSetDescription.getPartCntI() + " parts)";
+					System.out.println(msg);
+					MongoDB.saveSystemMessage(msg);
+					for (ExperimentHeaderInterface r : new ArrayList<ExperimentHeaderInterface>(knownResults)) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete " + r.getExperimentName());
+						m.deleteExperiment(r.getDatabaseId());
+						knownResults.remove(r);
+					}
+					continue;
+				}
+			}
+			ExperimentReference optPreviousResultsToBeMerged = null;
+			{
+				// check if result data needs to be merged with previous calculation results
+				String[] cc = knownResults.iterator().next().getExperimentName().split("§");
+				String mergeWithDBid = cc.length == 5 ? cc[4] : "";
+				if (!mergeWithDBid.isEmpty() && !mergeWithDBid.equals("null")) {
+					ExperimentReference eRef = new ExperimentReference(mergeWithDBid);
 					ExperimentHeaderInterface eRefHeader = eRef.getHeader();
 					if (eRefHeader == null) {
 						// source data set has been deleted meanwhile
 						// therefore the analysis results will be deleted, too
-						String msg = "Source data set for analysis results has been deleted, about to delete non-relevant result data (" + knownResults.size() + "/" +
+						String msg = "Result data set to be merged with analysis results has been deleted, about to delete non-relevant result data ("
+								+ knownResults.size() + "/" +
 								tempDataSetDescription.getPartCntI() + " parts)";
 						System.out.println(msg);
 						MongoDB.saveSystemMessage(msg);
-						for (ExperimentHeaderInterface r : new ArrayList<ExperimentHeaderInterface>(knownResults)) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete " + r.getExperimentName());
+						for (ExperimentHeaderInterface r : knownResults) {
 							m.deleteExperiment(r.getDatabaseId());
-							knownResults.remove(r);
 						}
 						continue;
+					} else {
+						optPreviousResultsToBeMerged = eRef;
 					}
 				}
-				ExperimentReference optPreviousResultsToBeMerged = null;
-				{
-					// check if result data needs to be merged with previous calculation results
-					String[] cc = knownResults.iterator().next().getExperimentName().split("§");
-					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
-					if (!mergeWithDBid.isEmpty() && !mergeWithDBid.equals("null")) {
-						ExperimentReference eRef = new ExperimentReference(mergeWithDBid);
-						ExperimentHeaderInterface eRefHeader = eRef.getHeader();
-						if (eRefHeader == null) {
-							// source data set has been deleted meanwhile
-							// therefore the analysis results will be deleted, too
-							String msg = "Result data set to be merged with analysis results has been deleted, about to delete non-relevant result data ("
-									+ knownResults.size() + "/" +
-									tempDataSetDescription.getPartCntI() + " parts)";
-							System.out.println(msg);
-							MongoDB.saveSystemMessage(msg);
-							for (ExperimentHeaderInterface r : knownResults) {
-								m.deleteExperiment(r.getDatabaseId());
-							}
-							continue;
-						} else {
-							optPreviousResultsToBeMerged = eRef;
-						}
-					}
-				}
-				
-				boolean addNewTasksIfMissing = false;
-				Object[] res;
-				if (interactive) {
-					if (SystemAnalysis.isHeadless()) {
-						System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
-								+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
-						if (tempDataSetDescription.getPartCntI() == knownResults.size()) {
-							res = new Object[] { false };
-						} else {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
-									+ ", FINISHED: "
-									+ knownResults.size());
-							System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
-							String in = SystemAnalysis.getCommandLineInput();
-							if (in == null)
-								res = null;
+			}
+			
+			boolean addNewTasksIfMissing = false;
+			Object[] res;
+			if (interactive) {
+				if (SystemAnalysis.isHeadless()) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
+							+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName());
+					if (tempDataSetDescription.getPartCntI() == knownResults.size()) {
+						res = new Object[] { false };
+					} else {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">Process incomplete data sets? TODO: " + tempDataSetDescription.getPartCntI()
+								+ ", FINISHED: "
+								+ knownResults.size());
+						System.out.println("Add compute tasks for missing data? (ENTER yes/no)");
+						String in = SystemAnalysis.getCommandLineInput();
+						if (in == null)
+							res = null;
+						else
+							if (in.toUpperCase().contains("Y"))
+								res = new Object[] { true };
 							else
-								if (in.toUpperCase().contains("Y"))
-									res = new Object[] { true };
-								else
-									res = new Object[] { false };
-						}
-					} else
-						res = MyInputHelper.getInput("<html>Process incomplete data sets? "
-								+
-								(knownResults.size() > 0 ?
-										"<br>Analyzed experiment: "
-												+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
-										: "")
-								+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
-								+ knownResults.size(), "Add compute tasks?", new Object[] {
-								"Add compute tasks for missing data?", addNewTasksIfMissing
-						});
-				} else {
-					// non-interactive
-					res = new Object[] { false };
-				}
-				if (res == null) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
-					System.exit(1);
-				} else {
-					if (res[0] instanceof String)
-						addNewTasksIfMissing = !((String) res[0]).contains("n");
-					else
-						addNewTasksIfMissing = (Boolean) res[0];
-				}
-				if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
-					if (addNewTasksIfMissing) {
-						// not everything has been computed (internal error)
-						TreeSet<Integer> jobIDs = new TreeSet<Integer>();
-						{
-							int idx = 0;
-							while (idx < tempDataSetDescription.getPartCntI()) {
-								if (!added.contains(idx + "")) {
-									System.out.println("Missing: " + idx);
-									jobIDs.add(idx++);
-								} else
-									idx++;
-							}
-						}
-						for (int jobID : jobIDs) {
-							BatchCmd cmd = new BatchCmd();
-							cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
-							cmd.setSubmissionTime(tempDataSetDescription.getSubmissionTimeL());
-							cmd.setTargetIPs(new HashSet<String>());
-							cmd.setSubTaskInfo(jobID, tempDataSetDescription.getPartCntI());
-							cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
-							cmd.setRemoteCapableAnalysisActionParams("");
-							cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
-							BatchCmd.enqueueBatchCmd(m, cmd);
-							System.out.println("Enqueue: " + jobID);
-						}
+								res = new Object[] { false };
 					}
 				} else
-					if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
-						try {
-							doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
-						} catch (Exception e) {
-							MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
+					res = MyInputHelper.getInput("<html>Process incomplete data sets? "
+							+
+							(knownResults.size() > 0 ?
+									"<br>Analyzed experiment: "
+											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
+									: "")
+							+ "<br>TODO: " + (tempDataSetDescription.getPartCntI() - 1) + ", FINISHED: "
+							+ knownResults.size(), "Add compute tasks?", new Object[] {
+							"Add compute tasks for missing data?", addNewTasksIfMissing
+					});
+			} else {
+				// non-interactive
+				res = new Object[] { false };
+			}
+			if (res == null) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
+				System.exit(1);
+			} else {
+				if (res[0] instanceof String)
+					addNewTasksIfMissing = !((String) res[0]).contains("n");
+				else
+					addNewTasksIfMissing = (Boolean) res[0];
+			}
+			if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
+				if (addNewTasksIfMissing) {
+					// not everything has been computed (internal error)
+					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
+					{
+						int idx = 0;
+						while (idx < tempDataSetDescription.getPartCntI()) {
+							if (!added.contains(idx + "")) {
+								System.out.println("Missing: " + idx);
+								jobIDs.add(idx++);
+							} else
+								idx++;
 						}
 					}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
+					for (int jobID : jobIDs) {
+						BatchCmd cmd = new BatchCmd();
+						cmd.setRunStatus(CloudAnalysisStatus.SCHEDULED);
+						cmd.setSubmissionTime(tempDataSetDescription.getSubmissionTimeL());
+						cmd.setTargetIPs(new HashSet<String>());
+						cmd.setSubTaskInfo(jobID, tempDataSetDescription.getPartCntI());
+						cmd.setRemoteCapableAnalysisActionClassName(tempDataSetDescription.getRemoteCapableAnalysisActionClassName());
+						cmd.setRemoteCapableAnalysisActionParams("");
+						cmd.setExperimentMongoID(tempDataSetDescription.getOriginDBid());
+						BatchCmd.enqueueBatchCmd(m, cmd);
+						System.out.println("Enqueue: " + jobID);
+					}
+				}
+			} else
+				if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
+					try {
+						doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+					} catch (Exception e) {
+						MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
+					}
+				}
 		}
 	}
 	
