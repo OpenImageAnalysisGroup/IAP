@@ -322,7 +322,7 @@ public class SplitResult {
 			boolean addNewTasksIfMissing = false;
 			Object[] res;
 			if (interactive) {
-				if (optStatus!=null)
+				if (optStatus != null)
 					optStatus.setCurrentStatusText1("User input required");
 				if (SystemAnalysis.isHeadless()) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Analyzed experiment: "
@@ -344,15 +344,15 @@ public class SplitResult {
 								res = new Object[] { false };
 					}
 				} else
-					res = MyInputHelper.getInput("<html>Process incomplete data sets? "
+					res = MyInputHelper.getInput("<html>Process this data set? "
 							+
 							(knownResults.size() > 0 ?
 									"<br>Analyzed experiment: "
 											+ new ExperimentReference(knownResults.iterator().next().getOriginDbId()).getHeader().getExperimentName()
 									: "")
 							+ "<br>Required result sets: " + tempDataSetDescription.getPartCntI() + ", completed calculations: "
-							+ knownResults.size()+(knownResults.size()==tempDataSetDescription.getPartCntI()? " (all tasks completed)": " (results missing)")
-							+"<br><br>Click cancel to stop processing this and further datasets.", "Add compute tasks?", new Object[] {
+							+ knownResults.size() + (knownResults.size() == tempDataSetDescription.getPartCntI() ? " (all tasks completed)" : " (results missing)")
+							+ "<br><br>Click cancel to stop processing this and further datasets.", "Add compute tasks?", new Object[] {
 							"Add compute tasks for missing data?", addNewTasksIfMissing
 					});
 			} else {
@@ -360,7 +360,7 @@ public class SplitResult {
 				res = new Object[] { false };
 			}
 			if (res == null) {
-				if (optStatus!=null)
+				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Processing cancelled");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
 				return;
@@ -372,7 +372,7 @@ public class SplitResult {
 			}
 			if (knownResults.size() < tempDataSetDescription.getPartCntI()) {
 				if (addNewTasksIfMissing) {
-					if (optStatus!=null)
+					if (optStatus != null)
 						optStatus.setCurrentStatusText1("Schedule missing compute tasks");
 					// not everything has been computed (internal error)
 					TreeSet<Integer> jobIDs = new TreeSet<Integer>();
@@ -402,7 +402,7 @@ public class SplitResult {
 			} else
 				if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
 					try {
-						if (optStatus!=null)
+						if (optStatus != null)
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
 					} catch (Exception e) {
