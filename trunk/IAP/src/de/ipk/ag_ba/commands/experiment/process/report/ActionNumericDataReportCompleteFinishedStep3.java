@@ -121,8 +121,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true), ", ") + ")");
 	}
 	
-	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition, Boolean splitFirst,
+	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition,
+			Boolean splitFirst,
 			Boolean splitSecond) {
+		
 		ArrayList<String> res = new ArrayList<String>();
 		boolean appendix = false;
 		boolean ratio = false;
@@ -200,6 +202,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			else
 				res.add("FALSE");
 		}
+		
 		return res.toArray(new String[] {});
 	}
 	
@@ -535,9 +538,14 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						timeoutMinutes = 60 * 12; // 12 h
 					if (tsoBootstrapN.getInt() > 100)
 						timeoutMinutes = 60 * 24 * 7; // 7*24h
-					p.executeRstat(getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(),
-							experimentReference.getHeader().getSequence(),
-							tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
+					p.executeRstat(
+							getArrayFrom(
+									divideDatasetBy,
+									tsoBootstrapN.getInt(),
+									experimentReference.getHeader().getSequence(),
+									tsoSplitFirst.getBval(0, false),
+									tsoSplitSecond.getBval(0, false)
+							),
 							experiment, status,
 							lastOutput, timeoutMinutes);
 					p.getOutput();

@@ -17,6 +17,7 @@ import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -95,8 +96,17 @@ public class PdfCreator {
 		return report;
 	}
 	
-	public void executeRstat(final String[] parameter, ExperimentInterface exp,
+	public void executeRstat(String[] para, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
+		
+		para = extendParameter(para,
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "check R package versions", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "install new R packages", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "automatic update R packages", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "script debug function", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "Enforce minimum R package versions", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "Remove intermediate files (just keep PDF)", false));
+		
 		this.lastOutput = lastOutput;
 		readAndModifyLaTexFile("reportDefGeneralSection.tex", exp);
 		
@@ -107,11 +117,11 @@ public class PdfCreator {
 			new File(name).setExecutable(true);
 		}
 		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name +
-				", WITH PARAMETERS: " + StringManipulationTools.getStringList(parameter, " / "));
+				", WITH PARAMETERS: " + StringManipulationTools.getStringList(para, " / "));
 		
 		final String nameF = name;
-		
 		final ObjectRef myRef = new ObjectRef();
+		final String[] parameter = para;
 		
 		Runnable r = new Runnable() {
 			@Override
@@ -234,6 +244,15 @@ public class PdfCreator {
 			tso.setBval(1, true);
 			throw new UnsupportedOperationException(e);
 		}
+	}
+	
+	private String[] extendParameter(String[] parameter, boolean... b) {
+		String[] res = new String[parameter.length + b.length];
+		for (int i = 0; i < parameter.length; i++)
+			res[i] = parameter[i];
+		for (int i = parameter.length; i < parameter.length + b.length; i++)
+			res[i] = ("" + b[i - parameter.length]).toUpperCase();
+		return res;
 	}
 	
 	/**
