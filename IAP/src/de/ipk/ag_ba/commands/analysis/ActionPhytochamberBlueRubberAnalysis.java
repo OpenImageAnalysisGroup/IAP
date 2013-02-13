@@ -43,7 +43,7 @@ public class ActionPhytochamberBlueRubberAnalysis extends AbstractPhenotypeAnaly
 	@Override
 	public int getNumberOfJobs() {
 		int snapshotsPerJob = 50;
-		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		int numberOfJobs = experiment.getHeader().getNumberOfFiles() / 4 / snapshotsPerJob;
 		
 		return numberOfJobs;
 	}

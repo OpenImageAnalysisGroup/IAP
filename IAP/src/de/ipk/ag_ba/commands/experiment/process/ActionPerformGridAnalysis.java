@@ -27,7 +27,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 		this.experimentResult = null;
 		if (experimentReference != null && experimentReference.getHeader() != null)
 			this.mongoDatasetID = experimentReference.getHeader().getDatabaseId();
-		int snapshotsPerJob = 200;
+		int snapshotsPerJob = 100;
 		this.numberOfJobs = experimentReference.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 	}
 	
