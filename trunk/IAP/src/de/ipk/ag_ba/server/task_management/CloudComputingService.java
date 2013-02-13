@@ -267,27 +267,7 @@ public class CloudComputingService {
 			DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 			
 			ArrayList<ExperimentHeaderInterface> el = m.getExperimentList(null);
-			HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
-			HashSet<String> processedSubmissionTimes = new HashSet<String>();
-			for (ExperimentHeaderInterface i : el) {
-				if ((i.getExperimentType() + "").contains("Trash"))
-					continue;
-				String[] cc = i.getExperimentName().split("§");
-				if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") &&
-						(cc.length == 4 || cc.length == 5)) {
-					String className = cc[0];
-					String idxCnt = cc[1];
-					String partCnt = cc[2];
-					String submTime = cc[3];
-					String mergeWithDBid = cc.length == 5 ? cc[4] : "";
-					if (!processedSubmissionTimes.contains(submTime)) {
-						availableTempDatasets.add(new TempDataSetDescription(
-								className, partCnt, submTime, i.getOriginDbId(), mergeWithDBid));
-						System.out.println(SystemAnalysis.getCurrentTime() + "INFO: Found temp dataset: " + i.getExperimentName());
-					}
-					processedSubmissionTimes.add(submTime);
-				}
-			}
+			HashSet<TempDataSetDescription> availableTempDatasets = m.processSplitResults().getSplitResultExperimentSets();
 			for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
 				ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 				HashSet<String> added = new HashSet<String>();

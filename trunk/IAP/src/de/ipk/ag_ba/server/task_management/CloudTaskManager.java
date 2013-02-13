@@ -114,11 +114,11 @@ public class CloudTaskManager {
 							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 							progressSum,
-							"Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
+							(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
 									"" + StringManipulationTools.getStringList(progress, ", ") +
 									(progress.size() > 1 ?
 											"<br>" +
-													status3provider.getCurrentStatusMessage3() : ""));
+													status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
 					
 					int maxTasks = 1;
 					if (maxTasks < 1)
