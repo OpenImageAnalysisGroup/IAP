@@ -222,8 +222,10 @@ public class ImageOperation {
 	public ImageOperation rotate(double degree, boolean replaceColor) {
 		image.getProcessor().rotate(degree);
 		ImageOperation res = new ImageOperation(getImage());
-		res = res.replaceColor(Color.BLACK.getRGB(),
-				ImageOperation.BACKGROUND_COLORint);
+		if (replaceColor) {
+			res = res.replaceColor(Color.BLACK.getRGB(),
+					ImageOperation.BACKGROUND_COLORint);
+		}
 		return res;
 	}
 	
