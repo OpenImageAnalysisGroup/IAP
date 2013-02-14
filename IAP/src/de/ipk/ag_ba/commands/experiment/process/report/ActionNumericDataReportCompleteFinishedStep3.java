@@ -201,6 +201,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				res.add("TRUE");
 			else
 				res.add("FALSE");
+		} else {
+			res.add("N/A");
+			res.add("N/A");
 		}
 		
 		return res.toArray(new String[] {});
