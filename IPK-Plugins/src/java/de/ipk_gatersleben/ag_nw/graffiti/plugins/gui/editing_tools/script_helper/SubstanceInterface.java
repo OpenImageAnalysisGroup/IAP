@@ -27,8 +27,6 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	 */
 	public abstract boolean setMappedData(Element e, Element experimentChildElement);
 	
-	public abstract ConditionInterface addAndMergeData(SubstanceInterface targetSubstance, ConditionInterface seriesnew, boolean ignoreSnapshotFineTime);
-	
 	public abstract String getXMLstring();
 	
 	@Override

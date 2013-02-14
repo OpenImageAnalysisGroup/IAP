@@ -14,7 +14,8 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 /**
  * @author klukas
@@ -42,17 +43,28 @@ public class ActionRemerge extends AbstractNavigationAction {
 		try {
 			ExperimentInterface e = experiment.getData(m);
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus = status;
+			// if (optStatus != null)
+			// optStatus.setCurrentStatusText1("Get mapping path objects");
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
+			// ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
+			// experiment.setExperimentData(null);
+			// e.clear();
+			// e = null;
+			// if (optStatus != null)
+			// optStatus.setCurrentStatusText1("Transform path objects to experiment");
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
 			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Get mapping path objects");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
-			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
-			experiment.setExperimentData(null);
-			e.clear();
-			e = null;
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Transform path objects to experiment");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-			e = MappingData3DPath.merge(mdpl, false, status);
+				optStatus.setCurrentStatusText1("Create unified experiment");
+			int idx = 0;
+			int max = e.size();
+			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
+				idx++;
+				if (optStatus != null)
+					optStatus.setCurrentStatusText2("Process substance " + +idx + "/" + max);
+				if (optStatus != null)
+					optStatus.setCurrentStatusValueFine(100d / max * idx);
+				Substance3D.addAndMerge(e, s, false);
+			}
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Created unified experiment");
 			if (optStatus != null)

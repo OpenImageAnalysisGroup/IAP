@@ -941,7 +941,7 @@ public class Experiment implements ExperimentInterface {
 	@Override
 	public int getNumberOfMeasurementValues() {
 		int res = 0;
-		for (SubstanceInterface m : this) {
+		for (SubstanceInterface m : new ArrayList<SubstanceInterface>(this)) {
 			res += m.getDataPointCount(false);
 		}
 		return res;

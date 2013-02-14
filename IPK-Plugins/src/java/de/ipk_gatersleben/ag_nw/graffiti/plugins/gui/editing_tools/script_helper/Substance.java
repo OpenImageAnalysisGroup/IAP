@@ -177,43 +177,67 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged, boolean ignoreSnapshotFineTime) {
+	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substance, boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
 		for (SubstanceInterface m : result)
-			if (tobeMerged.compareTo(m) == 0) {
+			if (substance.compareTo(m) == 0) {
 				targetSubstance = m;
 				break;
 			}
 		
 		if (targetSubstance == null) {
-			targetSubstance = tobeMerged.clone();
-			result.add(targetSubstance);
+			targetSubstance = substance;
+			if (!result.contains(targetSubstance))
+				result.add(targetSubstance);
 		}
-		for (ConditionInterface cond : tobeMerged) {
+		for (ConditionInterface cond : substance) {
 			cond.setParent(targetSubstance);
-			targetSubstance.addAndMergeData(targetSubstance, cond, ignoreSnapshotFineTime);
+			addAndMergeConditionData(result, targetSubstance, cond, ignoreSnapshotFineTime);
 		}
-		tobeMerged.clear();
+		result.add(targetSubstance);
 	}
 	
-	@Override
-	public ConditionInterface addAndMergeData(SubstanceInterface targetSubstance, ConditionInterface newCondition, boolean ignoreSnapshotFineTime) {
+	private static void addAndMergeConditionData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface condition,
+			boolean ignoreSnapshotFineTime) {
 		ConditionInterface targetCondition = null;
-		for (ConditionInterface cond : this)
-			if (cond.compareTo(newCondition) == 0) {
+		for (ConditionInterface cond : targetSubstance)
+			if (cond.compareTo(condition) == 0) {
 				targetCondition = cond;
 				break;
 			}
 		
 		if (targetCondition == null) {
-			targetCondition = newCondition.clone(targetSubstance);
-			targetSubstance.add(newCondition);
+			targetCondition = condition;
+			if (!targetSubstance.contains(condition)) {
+				targetSubstance.add(condition);
+				targetCondition.setExperimentHeader(targetExperiment.getHeader());
+			}
 		}
-		for (SampleInterface s : newCondition) {
-			s.setParent(targetCondition);
-			targetCondition.addAndMerge(targetCondition, s, ignoreSnapshotFineTime);
+		for (SampleInterface sample : condition) {
+			sample.setParent(targetCondition);
+			addAndMergeSampleData(targetExperiment, targetSubstance, targetCondition, sample, ignoreSnapshotFineTime);
 		}
-		return targetCondition;
+	}
+	
+	private static void addAndMergeSampleData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface targetCondition,
+			SampleInterface sample, boolean ignoreSnapshotFineTime) {
+		SampleInterface targetSample = null;
+		for (SampleInterface s : targetCondition)
+			if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
+				targetSample = s;
+				break;
+			}
+		
+		if (targetSample == null) {
+			targetSample = sample;
+			if (targetSample.contains(sample))
+				targetCondition.add(targetSample);
+		}
+		for (NumericMeasurementInterface m : sample.toArray(new NumericMeasurementInterface[] {})) {
+			m.setParentSample(targetSample);
+			if (targetSample.contains(m))
+				targetSample.add(m);
+		}
 	}
 	
 	@Override
