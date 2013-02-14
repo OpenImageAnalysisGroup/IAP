@@ -166,13 +166,19 @@ public class SplitResult {
 				ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 			}
 		}
-		boolean superMerge = false;
+		boolean superMerge = true;
 		if (superMerge) {
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Get mapping path objects");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
 			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
 			e.clear();
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Mapping path obhjects to experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
 			e = MappingData3DPath.merge(mdpl, false);
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Created unified experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
 		}
 		long tStart = tempDataSetDescription.getSubmissionTimeL();
