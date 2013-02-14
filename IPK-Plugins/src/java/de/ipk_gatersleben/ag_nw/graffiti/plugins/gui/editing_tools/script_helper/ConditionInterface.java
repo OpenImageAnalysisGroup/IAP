@@ -144,7 +144,7 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public String getExperimentRemark();
 	
-	public SampleInterface addAndMerge(SampleInterface samplenew, boolean ignoreSnapshotFineTime);
+	public SampleInterface addAndMerge(ConditionInterface targetCondition, SampleInterface samplenew, boolean ignoreSnapshotFineTime);
 	
 	public void setParent(SubstanceInterface md);
 	

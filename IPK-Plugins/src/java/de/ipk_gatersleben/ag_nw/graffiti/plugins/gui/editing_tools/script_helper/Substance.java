@@ -179,32 +179,25 @@ public class Substance implements SubstanceInterface {
 	
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface tobeMerged, boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
-		synchronized (result) {
-			for (SubstanceInterface m : result)
-				if (tobeMerged.compareTo(m) == 0) {
-					targetSubstance = m;
-					break;
-				}
-		}
+		for (SubstanceInterface m : result)
+			if (tobeMerged.compareTo(m) == 0) {
+				targetSubstance = m;
+				break;
+			}
 		
 		if (targetSubstance == null) {
-			synchronized (result) {
-				result.add(tobeMerged);
-			}
-		} else {
-			synchronized (targetSubstance) {
-				for (ConditionInterface cond : tobeMerged) {
-					cond.setParent(targetSubstance);
-					targetSubstance.addAndMergeData(cond, ignoreSnapshotFineTime);
-				}
-				// tobeMerged.clear();
-				// tobeMerged.setName("INVALID_MERGED_SKIP");
-			}
+			targetSubstance = tobeMerged.clone();
+			result.add(targetSubstance);
 		}
+		for (ConditionInterface cond : tobeMerged) {
+			cond.setParent(targetSubstance);
+			targetSubstance.addAndMergeData(targetSubstance, cond, ignoreSnapshotFineTime);
+		}
+		tobeMerged.clear();
 	}
 	
 	@Override
-	public ConditionInterface addAndMergeData(ConditionInterface newCondition, boolean ignoreSnapshotFineTime) {
+	public ConditionInterface addAndMergeData(SubstanceInterface targetSubstance, ConditionInterface newCondition, boolean ignoreSnapshotFineTime) {
 		ConditionInterface targetCondition = null;
 		for (ConditionInterface cond : this)
 			if (cond.compareTo(newCondition) == 0) {
@@ -213,18 +206,14 @@ public class Substance implements SubstanceInterface {
 			}
 		
 		if (targetCondition == null) {
-			add(newCondition);
-			return newCondition;
-		} else {
-			for (SampleInterface s : newCondition) {
-				s.setParent(targetCondition);
-				targetCondition.addAndMerge(s, ignoreSnapshotFineTime);
-			}
-			// newCondition.clear();
-			// newCondition.setGenotype("INVALID_MERGED_SKIP");
-			
-			return targetCondition;
+			targetCondition = newCondition.clone(targetSubstance);
+			targetSubstance.add(newCondition);
 		}
+		for (SampleInterface s : newCondition) {
+			s.setParent(targetCondition);
+			targetCondition.addAndMerge(targetCondition, s, ignoreSnapshotFineTime);
+		}
+		return targetCondition;
 	}
 	
 	@Override

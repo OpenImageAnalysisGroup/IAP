@@ -727,7 +727,7 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
-	public SampleInterface addAndMerge(SampleInterface samplenew, boolean ignoreSnapshotFineTime) {
+	public SampleInterface addAndMerge(ConditionInterface targetCondition, SampleInterface samplenew, boolean ignoreSnapshotFineTime) {
 		SampleInterface save = null;
 		for (SampleInterface s : this)
 			if (s.compareTo(samplenew, ignoreSnapshotFineTime) == 0) {
@@ -736,15 +736,15 @@ public class Condition implements ConditionInterface {
 			}
 		
 		if (save == null) {
-			add(samplenew);
-			return samplenew;
-		} else {
-			for (NumericMeasurementInterface m : samplenew.toArray(new NumericMeasurementInterface[] {})) {
-				m.setParentSample(save);
-				save.add(m);
-			}
-			return save;
+			save = samplenew.clone(targetCondition);
+			targetCondition.add(save);
 		}
+		for (NumericMeasurementInterface m : samplenew.toArray(new NumericMeasurementInterface[] {})) {
+			m.setParentSample(save);
+			save.add(m);
+		}
+		samplenew.clear();
+		return save;
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -89,12 +90,12 @@ public class MappingData3DPath {
 		// try {
 		final ThreadSafeOptions idx = new ThreadSafeOptions();
 		final int max = mappingpaths.size();
-		final TreeMap<String, ArrayList<MappingData3DPath>> data = new TreeMap<String, ArrayList<MappingData3DPath>>();
+		final TreeMap<String, LinkedList<MappingData3DPath>> data = new TreeMap<String, LinkedList<MappingData3DPath>>();
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Process " + mappingpaths.size() + " mapping path objects");
 		for (MappingData3DPath p : mappingpaths) {
 			if (!data.containsKey(p.getSubstance().getName()))
-				data.put(p.getSubstance().getName(), new ArrayList<MappingData3DPath>());
+				data.put(p.getSubstance().getName(), new LinkedList<MappingData3DPath>());
 			data.get(p.getSubstance().getName()).add(p);
 		}
 		
@@ -104,11 +105,12 @@ public class MappingData3DPath {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Process " + substance);
 			try {
-				for (MappingData3DPath p : data.get(substance)) {
+				while (!data.get(substance).isEmpty()) {
+					MappingData3DPath p = data.get(substance).poll();
 					Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
 					idx.addInt(1);
 					if (optStatus != null)
-						optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
+						optStatus.setCurrentStatusValueFine(100d / (double) max * idx.getInt());
 					if (optStatus != null)
 						optStatus.setCurrentStatusText2("Path Object " + idx.getInt() + "/" + max);
 				}
