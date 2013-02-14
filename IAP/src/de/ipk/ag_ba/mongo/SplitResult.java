@@ -352,8 +352,12 @@ public class SplitResult {
 									: "")
 							+ "<br>Required result sets: " + tempDataSetDescription.getPartCntI() + ", completed calculations: "
 							+ knownResults.size() + (knownResults.size() == tempDataSetDescription.getPartCntI() ? " (all tasks completed)" : " (results missing)")
-							+ "<br><br>Click cancel to stop processing this and further datasets.", "Add compute tasks?", new Object[] {
-							"Add compute tasks for missing data?", addNewTasksIfMissing
+							+ "<br>"
+							+ "<br>Click cancel to stop processing this and further datasets.", "Add compute tasks?", new Object[] {
+							"<html>" +
+									"Add compute tasks for missing data?<br>" +
+									"If this is not selected and not all results are computed,<br>" +
+									"this dataset will be ignored.", addNewTasksIfMissing
 					});
 			} else {
 				// non-interactive
