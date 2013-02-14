@@ -22,7 +22,7 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		boolean useNirSkeleton = getBoolean("Calculate_Skeleton", true);
 		// if (options.getCameraPosition() == CameraPosition.SIDE) {
 		FlexibleImage nirMask = input().masks().nir();
-		if (getBoolean("Replace Background with Gray", true)) {
+		if (getBoolean("Replace Background with Gray", false)) {
 			int gl = getInt("Replace color value", 180);
 			nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(gl, gl, gl).getRGB()).getImage().show("Background replace with gray", debug);
 		}
