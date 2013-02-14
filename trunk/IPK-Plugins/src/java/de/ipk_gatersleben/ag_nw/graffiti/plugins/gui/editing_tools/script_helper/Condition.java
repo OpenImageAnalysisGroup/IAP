@@ -727,27 +727,6 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
-	public SampleInterface addAndMerge(ConditionInterface targetCondition, SampleInterface samplenew, boolean ignoreSnapshotFineTime) {
-		SampleInterface save = null;
-		for (SampleInterface s : this)
-			if (s.compareTo(samplenew, ignoreSnapshotFineTime) == 0) {
-				save = s;
-				break;
-			}
-		
-		if (save == null) {
-			save = samplenew.clone(targetCondition);
-			targetCondition.add(save);
-		}
-		for (NumericMeasurementInterface m : samplenew.toArray(new NumericMeasurementInterface[] {})) {
-			m.setParentSample(save);
-			save.add(m);
-		}
-		samplenew.clear();
-		return save;
-	}
-	
-	@Override
 	public void setParent(SubstanceInterface md) {
 		parent = md;
 	}
@@ -770,7 +749,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
