@@ -40,26 +40,25 @@ public class ActionRemerge extends AbstractNavigationAction {
 		this.src = src;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface e = experiment.getData(m);
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus = status;
-			Experiment e = (Experiment) res;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Get mapping path objects");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
 			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
 			e.clear();
 			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Trpath objects to experiment");
+				optStatus.setCurrentStatusText1("Transform path objects to experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-			e = (Experiment) MappingData3DPath.merge(mdpl, false);
+			e = MappingData3DPath.merge(mdpl, false, status);
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Created unified experiment");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Sort substances and conditions");
-			((Experiment) res).sortSubstances();
-			((Experiment) res).sortConditions();
+			((Experiment) e).sortSubstances();
+			((Experiment) e).sortConditions();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
-			experiment = (ExperimentReference) res;
+			experiment.setExperimentData(e);
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}

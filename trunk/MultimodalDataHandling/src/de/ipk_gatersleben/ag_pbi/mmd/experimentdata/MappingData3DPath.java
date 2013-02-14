@@ -90,6 +90,8 @@ public class MappingData3DPath {
 		final ThreadSafeOptions idx = new ThreadSafeOptions();
 		final int max = mappingpaths.size();
 		final TreeMap<String, ArrayList<MappingData3DPath>> data = new TreeMap<String, ArrayList<MappingData3DPath>>();
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Process " + mappingpaths.size() + " mapping path objects");
 		for (MappingData3DPath p : mappingpaths) {
 			if (!data.containsKey(p.getSubstance().getName()))
 				data.put(p.getSubstance().getName(), new ArrayList<MappingData3DPath>());
@@ -98,35 +100,24 @@ public class MappingData3DPath {
 		
 		// final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, SystemAnalysis.getNumberOfCPUs());
 		for (String substance : data.keySet()) {
-			final String substanceF = substance;
 			// System.out.println("MERGE SUBSET SUBSTANCE " + substance + " (" + data.get(substance).size() + " values)...");
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						for (MappingData3DPath p : data.get(substanceF)) {
-							Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
-							idx.addInt(1);
-							if (optStatus != null)
-								optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
-						}
-					} finally {
-						// lock.release();
-					}
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Process " + substance);
+			try {
+				for (MappingData3DPath p : data.get(substance)) {
+					Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
+					idx.addInt(1);
+					if (optStatus != null)
+						optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2("Path Object " + idx.getInt() + "/" + max);
 				}
-			};
-			// lock.acquire();
-			// Thread t = new Thread(r);
-			// t.setName("Process subtance " + substance);
-			// t.start();
-			r.run();
+			} finally {
+				// lock.release();
+			}
 		}
-		
-		// lock.acquire(SystemAnalysis.getNumberOfCPUs());
-		// lock.release(SystemAnalysis.getNumberOfCPUs());
-		// } catch (InterruptedException e) {
-		// throw new RuntimeException(e);
-		// }
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Merged Mapping Paths");
 		return experiment;
 	}
 	
