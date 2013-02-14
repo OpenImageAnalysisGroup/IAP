@@ -46,7 +46,9 @@ public class ActionRemerge extends AbstractNavigationAction {
 				optStatus.setCurrentStatusText1("Get mapping path objects");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
 			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
+			experiment.setExperimentData(null);
 			e.clear();
+			e = null;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Transform path objects to experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
