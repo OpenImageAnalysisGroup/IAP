@@ -78,7 +78,6 @@ public class BlCutZoomedImages extends AbstractBlock {
 					FlexibleImageSet in = ab.images();
 					
 					FlexibleImage vis = in.getImage(inpImageType).copy();
-					
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();
 					FlexibleImage selImage = ab.images().getImage(inpImageType);

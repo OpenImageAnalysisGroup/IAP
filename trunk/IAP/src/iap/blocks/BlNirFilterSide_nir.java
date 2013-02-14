@@ -3,6 +3,7 @@ package iap.blocks;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
+import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.structures.FlexibleImage;
@@ -21,6 +22,10 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		boolean useNirSkeleton = getBoolean("Calculate_Skeleton", true);
 		// if (options.getCameraPosition() == CameraPosition.SIDE) {
 		FlexibleImage nirMask = input().masks().nir();
+		if (getBoolean("Replace Background with Gray", true)) {
+			int gl = getInt("Replace color value", 180);
+			nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(gl, gl, gl).getRGB()).getImage().show("Background replace with gray", debug);
+		}
 		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = 180;
 		if (nirMask != null) {
