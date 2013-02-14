@@ -3723,7 +3723,7 @@ public class ImageOperation {
 				s += 40;
 			int tx = (int) (i / (double) len * w / 2d);
 			int ty = h - (int) (i / (double) len * h / 2d);
-			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -70, 500, true, false);
+			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -20, 500, true, false);
 			calibrationCurveFromTopLeftToCenter[i] = valuesCenter[0] * 255;
 			indexArray[i] = i + 1;
 		}
