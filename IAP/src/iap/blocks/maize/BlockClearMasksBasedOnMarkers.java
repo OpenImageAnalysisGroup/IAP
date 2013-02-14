@@ -43,6 +43,10 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			return null;
 		
 		FlexibleImage input = input().masks().vis();
+		if (!getBoolean("process vis", true)) {
+			return input;
+		}
+		
 		FlexibleImage result = input;
 		int color = options.getBackground();
 		boolean visCutPosSet = false;
@@ -106,6 +110,11 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			return input().masks().fluo();
 		
 		FlexibleImage input = input().masks().fluo();
+		
+		if (!getBoolean("process fluo", true)) {
+			return input;
+		}
+		
 		FlexibleImage result = input;
 		boolean fluoCutPosSet = false;
 		if (!options.isBarleyInBarleySystem())
@@ -163,7 +172,13 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 	protected FlexibleImage processNIRimage() {
 		if (input().images().nir() == null)
 			return null;
+		
 		FlexibleImage input = input().images().nir();
+		
+		if (!getBoolean("process nir", true)) {
+			return input;
+		}
+		
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (options.isBarleyInBarleySystem())
@@ -182,6 +197,11 @@ public class BlockClearMasksBasedOnMarkers extends AbstractSnapshotAnalysisBlock
 			return null;
 		
 		FlexibleImage input = input().masks().nir();
+		
+		if (!getBoolean("process nir", true)) {
+			return input;
+		}
+		
 		FlexibleImage result = input;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (options.isBarleyInBarleySystem())
