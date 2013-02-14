@@ -90,19 +90,24 @@ public class BlTranslateMatch extends AbstractSnapshotAnalysisBlockFIS {
 						tm.calcOffsetHorizontalX(null);
 					
 					boolean dontMoveUp = getBoolean("Dont_Move_NIR_Pot_Up", false);
-					if (!dontMoveUp) {
+					if (dontMoveUp) {
 						// don't move NIR pot up, only down
 						if (tm.getOffsetVerticalY() < 0)
 							tm.setOffsetVerticalY(0);
 					}
 					
 					boolean dontMoveDown = getBoolean("Dont_Move_NIR_Pot_Down", false);
-					if (!dontMoveDown) {
-						input().images().setNir(tm.translate(input().images().nir().copy()));
-						
-						if (input().masks().nir() != null)
-							input().masks().setNir(tm.translate(input().masks().nir()));
+					if (dontMoveDown) {
+						// don't move NIR pot down, only up
+						if (tm.getOffsetVerticalY() > 0)
+							tm.setOffsetVerticalY(0);
 					}
+					
+					input().images().setNir(tm.translate(input().images().nir().copy()));
+					
+					if (input().masks().nir() != null)
+						input().masks().setNir(tm.translate(input().masks().nir()));
+					
 				}
 			}
 		} // if side
