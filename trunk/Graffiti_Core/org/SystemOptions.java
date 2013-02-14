@@ -285,7 +285,14 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			Integer r = ini.get(group, setting, Integer.class);
+			Integer r;
+			try {
+				r = ini.get(group, setting, Integer.class);
+			} catch (Exception err) {
+				r = ini.get(group, setting, Double.class).intValue();
+				ini.put(group, setting, r);
+				store(group, setting);
+			}
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
 				store(group, setting);
