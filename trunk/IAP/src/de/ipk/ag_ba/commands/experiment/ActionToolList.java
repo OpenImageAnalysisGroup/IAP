@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.tools.ActionPerformanceTest;
+import de.ipk.ag_ba.commands.experiment.tools.ActionRemerge;
 import de.ipk.ag_ba.commands.experiment.tools.ActionResetConditionFromImageName;
 import de.ipk.ag_ba.commands.experiment.tools.ActionSaveWebCamImagesSelectSource;
 import de.ipk.ag_ba.commands.experiment.tools.ActionShowXML;
@@ -33,6 +34,7 @@ public class ActionToolList extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.add(new NavigationButton(new ActionPerformanceTest(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionSortSubstances(m, experimentReference), guiSetting));
+		res.add(new NavigationButton(new ActionRemerge(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionResetConditionFromImageName(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionShowXML(m, experimentReference), guiSetting));
 		res.add(new NavigationButton(new ActionSaveWebCamImagesSelectSource(m, experimentReference), guiSetting));
