@@ -1291,6 +1291,17 @@ public class ImageOperation {
 		return new ImageOperation(workImage);
 	}
 	
+	public ImageOperation removeSmallClusters(boolean nextGeneration, int cutOffAreaSizeOfImage, int cutOffVertHorOfImage,
+			NeighbourhoodSetting nb, CameraPosition typ,
+			ObjectRef optClusterSizeReturn, boolean considerArea) {
+		FlexibleImage workImage = new FlexibleImage(image);
+		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
+				ImageOperation.BACKGROUND_COLORint,
+				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
+				optClusterSizeReturn, considerArea);
+		return new ImageOperation(workImage);
+	}
+	
 	public ImageOperation findEdge() {
 		image.getProcessor().findEdges();
 		return new ImageOperation(image); // .getProcessor().getBufferedImage()
@@ -1628,17 +1639,9 @@ public class ImageOperation {
 		if (clusterDimensionMinWH != null && clusterDimensionMinWH.length > 0)
 			for (int idx = 0; idx < rgbArray.length; idx++) {
 				int clusterID = mask[idx];
-				if (clusterID >= 0
-						&&
-						(
-						(
-						clusterDimensionMinWH[clusterID] < cutOffMinimumDimension
-						|| clusterSizes[clusterID] <= cutOffMinimumArea
-						)
-						|| (clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension &&
-						// toBeDeletedClusterIDs.contains(clusterID)
-						toBeDeletedClusterIDs[clusterID]
-						)))
+				if (clusterID >= 0 &&
+						((clusterDimensionMinWH[clusterID] < cutOffMinimumDimension || clusterSizes[clusterID] <= cutOffMinimumArea) ||
+						(clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs[clusterID])))
 					rgbArray[idx] = iBackgroundFill;
 			}
 		

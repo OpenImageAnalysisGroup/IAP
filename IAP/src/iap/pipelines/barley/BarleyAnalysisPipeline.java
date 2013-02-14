@@ -6,7 +6,7 @@ import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.BlCrop;
-import iap.blocks.BlLabFilter;
+import iap.blocks.BlLabFilterExt;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
 import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMoveMasksToImageSet;
@@ -76,7 +76,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveBlackBelt.class.getCanonicalName(),
-				BlLabFilter.class.getCanonicalName(),
+				BlLabFilterExt.class.getCanonicalName(),
 				BlockClosingVis.class.getCanonicalName(),
 				BlockClearMasksBasedOnMarkers.class.getCanonicalName(),
 				// BlMedianFilter_vis.class.getCanonicalName(),

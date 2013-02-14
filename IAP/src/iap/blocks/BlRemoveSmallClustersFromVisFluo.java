@@ -37,20 +37,25 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 			if (options.isMaize()) {
 				// not for barley
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						getDouble("Noise-Size-Vis-Area", (0.001d) / 4d / 2d),
+						// getDouble("Noise-Size-Vis-Area-Percent", (0.001d) / 4d / 2d),
+						getInt("Noise-Size-Vis-Area", 2),
 						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) * 2),
-						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+						options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
 			} else {
 				if (options.isArabidopsis()) {
-					Double cs = getDouble("REMOVE_SMALL_CLUSTER_SIZE_VIS", options.getCameraPosition() == CameraPosition.SIDE ? 30 : 25);
-					res = new ImageOperation(mask).removeSmallClusters(ngUse, cs, cs.intValue(),
-							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-				} else
-					// barley
+					// Double cs = getDouble("REMOVE_SMALL_CLUSTER_SIZE_VIS", options.getCameraPosition() == CameraPosition.SIDE ? 30 : 25);
 					res = new ImageOperation(mask).removeSmallClusters(ngUse,
-							getDouble("Noise-Size-Vis-Area", (0.001d) / 2000d),
+							getInt("Noise-Size-Vis-Area", 25),
+							getInt("Noise-Size-Vis-Dimension-Absolute", 25),
+							// cs,
+							// cs.intValue(),
+							options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
+				} else
+					res = new ImageOperation(mask).removeSmallClusters(ngUse,
+							// getDouble("Noise-Size-Vis-Area-Percent", (0.001d) / 2000d),
+							getInt("Noise-Size-Vis-Area", 2),
 							getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 300) * 2),
-							options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+							options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
 			}
 			if (res != null)
 				res.show("vis result", debug);
@@ -58,16 +63,26 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 		} else {
 			if (options.isMaize()) {
 				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						getDouble("Noise-Size-Vis-Area", (0.001d) / 4d),
+						// getDouble("Noise-Size-Vis-Area-Percent", (0.001d) / 4d),
+						getInt("Noise-Size-Vis-Area", 2),
 						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) * 1),
-						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+						options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
 				
-			} else {
-				res = new ImageOperation(mask).removeSmallClusters(ngUse,
-						getDouble("Noise-Size-Vis-Area", 2),
-						getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) / 2),
-						options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
-			}
+			} else
+				if (options.isArabidopsis()) {
+					res = new ImageOperation(mask).removeSmallClusters(ngUse,
+							getInt("Noise-Size-Vis-Area", 30),
+							getInt("Noise-Size-Vis-Dimension-Absolute", 30),
+							// cs,
+							// cs.intValue(),
+							options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
+				} else {
+					res = new ImageOperation(mask).removeSmallClusters(ngUse,
+							// getDouble("Noise-Size-Vis-Area-Percent", (0.001d) / 4d),
+							getInt("Noise-Size-Vis-Area", 2),
+							getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) / 2),
+							options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
+				}
 			if (res != null)
 				res.show("vis result", debug);
 			return res;
@@ -84,28 +99,33 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 				return new ImageOperation(input().masks().fluo()).
 						dilate().
 						removeSmallClusters(ngUse,
-								getDouble("Noise-Size-Fluo-Area", (0.001d) / 20 / 2d),
+								// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
+								getInt("Noise-Size-Fluo-Area", 20),
 								getInt("Noise-Size-Fluo-Dimension-Absolute", (input().masks().fluo().getWidth() / 100) * 1),
-								options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+								options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).getImage();
 			} else {
 				if (options.isArabidopsis()) {
 					return new ImageOperation(input().masks().fluo()).
 							removeSmallClusters(ngUse,
-									getDouble("Noise-Size-Fluo-Area", 20),
+									// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
+									getInt("Noise-Size-Fluo-Area", 20),
 									getInt("Noise-Size-Fluo-Dimension-Absolute", 20),
-									options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+									options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).getImage();
 				} else
 					return new ImageOperation(input().masks().fluo()).copy().dilate().dilate().dilate().
 							removeSmallClusters(ngUse,
-									getDouble("Noise-Size-Fluo-Area", (0.001d) / 20 / 2d),
+									// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
+									getInt("Noise-Size-Fluo-Area", 20),
 									getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 300) * 3d)),
-									options.getNeighbourhood(), options.getCameraPosition(), null, true).getImage();
+									options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).getImage();
 			}
 		} else {
 			return new ImageOperation(input().masks().fluo().show("input fluo", debug)).removeSmallClusters(ngUse,
-					getDouble("Noise-Size-Fluo-Area", 3),
+					// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
+					getInt("Noise-Size-Fluo-Area", 3),
 					getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 100) * 0.5)),
-					options.getNeighbourhood(), options.getCameraPosition(), null).show("result fluo", debug).getImage();
+					options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
+					.getImage();
 		}
 	}
 	
