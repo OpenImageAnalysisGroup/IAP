@@ -182,19 +182,22 @@ public class Substance implements SubstanceInterface {
 		for (SubstanceInterface m : result)
 			if (substance.compareTo(m) == 0) {
 				targetSubstance = m;
+				if (result.contains(substance) && targetSubstance != substance)
+					result.remove(substance);
 				break;
 			}
 		
 		if (targetSubstance == null) {
 			targetSubstance = substance;
-			if (!result.contains(targetSubstance))
+			if (!result.contains(targetSubstance)) {
 				result.add(targetSubstance);
+				System.out.println("Adding a substance?!");
+			}
 		}
-		for (ConditionInterface cond : substance) {
+		for (ConditionInterface cond : new ArrayList<ConditionInterface>(substance)) {
 			cond.setParent(targetSubstance);
 			addAndMergeConditionData(result, targetSubstance, cond, ignoreSnapshotFineTime);
 		}
-		result.add(targetSubstance);
 	}
 	
 	private static void addAndMergeConditionData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface condition,
@@ -203,6 +206,8 @@ public class Substance implements SubstanceInterface {
 		for (ConditionInterface cond : targetSubstance)
 			if (cond.compareTo(condition) == 0) {
 				targetCondition = cond;
+				if (targetSubstance.contains(condition) && targetCondition != condition)
+					targetSubstance.remove(condition);
 				break;
 			}
 		
@@ -213,7 +218,7 @@ public class Substance implements SubstanceInterface {
 				targetCondition.setExperimentHeader(targetExperiment.getHeader());
 			}
 		}
-		for (SampleInterface sample : condition) {
+		for (SampleInterface sample : new ArrayList<SampleInterface>(condition)) {
 			sample.setParent(targetCondition);
 			addAndMergeSampleData(targetExperiment, targetSubstance, targetCondition, sample, ignoreSnapshotFineTime);
 		}
@@ -225,18 +230,20 @@ public class Substance implements SubstanceInterface {
 		for (SampleInterface s : targetCondition)
 			if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
 				targetSample = s;
+				if (targetCondition.contains(sample) && targetSample != sample)
+					targetCondition.remove(sample);
 				break;
 			}
 		
 		if (targetSample == null) {
 			targetSample = sample;
-			if (targetSample.contains(sample))
+			if (!targetSample.contains(sample))
 				targetCondition.add(targetSample);
 		}
 		for (NumericMeasurementInterface m : sample.toArray(new NumericMeasurementInterface[] {})) {
 			m.setParentSample(targetSample);
-			if (targetSample.contains(m))
-				targetSample.add(m);
+			// if (!targetSample.contains(m))
+			targetSample.add(m);
 		}
 	}
 	
