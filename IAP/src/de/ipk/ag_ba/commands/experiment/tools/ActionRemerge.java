@@ -16,6 +16,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 /**
@@ -62,6 +63,8 @@ public class ActionRemerge extends AbstractNavigationAction {
 			int subC = e.size();
 			int conC = 0;
 			int samC = 0;
+			int imgC = Substance3D.countMeasurementValues(e, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
+			int numC = e.getNumberOfMeasurementValues();
 			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
 				conC += s.size();
 				for (ConditionInterface ci : s) {
@@ -85,6 +88,8 @@ public class ActionRemerge extends AbstractNavigationAction {
 			int NMsubC = e.size();
 			int NMconC = 0;
 			int NMsamC = 0;
+			int NMimgC = Substance3D.countMeasurementValues(e, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
+			int NMnumC = e.getNumberOfMeasurementValues();
 			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
 				NMconC += s.size();
 				for (ConditionInterface ci : s) {
@@ -92,7 +97,8 @@ public class ActionRemerge extends AbstractNavigationAction {
 				}
 			}
 			operationResult = "Results of merge operation:<br>" +
-					"Substances: " + subC + " ==> " + NMsubC + ", Conditions " + conC + " ==> " + NMconC + ", Samples " + samC + " ==> " + NMsamC;
+					"Substances: " + subC + " ==> " + NMsubC + ", Conditions " + conC + " ==> " + NMconC + ", Samples " + samC + " ==> " + NMsamC + ", Images "
+					+ imgC + " ==> " + NMimgC + ", Measurement Values " + numC + " ==> " + NMnumC;
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
 			experiment.setExperimentData(e);
 		} catch (Exception e) {
