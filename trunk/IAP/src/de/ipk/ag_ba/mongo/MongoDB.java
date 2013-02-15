@@ -127,7 +127,10 @@ public class MongoDB {
 	}
 	
 	public static MongoDB getDefaultCloud() {
-		return getCloud(0);
+		for (MongoDB db : getMongos())
+			if (db.enabled)
+				return db;
+		return null;
 	}
 	
 	public static MongoDB getCloud(int idx) {
