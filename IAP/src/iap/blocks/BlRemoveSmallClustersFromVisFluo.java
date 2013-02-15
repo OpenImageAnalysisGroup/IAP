@@ -95,9 +95,10 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 			return null;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
+			
 			if (options.isMaize()) {
 				return new ImageOperation(input().masks().fluo()).
-						dilate().
+						dilate(getInt("dilation fluo", 1)).
 						removeSmallClusters(ngUse,
 								// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
 								getInt("Noise-Size-Fluo-Area", 20),
@@ -106,13 +107,16 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 			} else {
 				if (options.isArabidopsis()) {
 					return new ImageOperation(input().masks().fluo()).
+							dilate(getInt("dilation fluo", 0)).
 							removeSmallClusters(ngUse,
 									// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
 									getInt("Noise-Size-Fluo-Area", 20),
 									getInt("Noise-Size-Fluo-Dimension-Absolute", 20),
 									options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).getImage();
 				} else
-					return new ImageOperation(input().masks().fluo()).copy().dilate().dilate().dilate().
+					
+					return new ImageOperation(input().masks().fluo()).copy().
+							dilate(getInt("dilation fluo", 3)).
 							removeSmallClusters(ngUse,
 									// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
 									getInt("Noise-Size-Fluo-Area", 20),
@@ -120,11 +124,13 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 									options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).getImage();
 			}
 		} else {
-			return new ImageOperation(input().masks().fluo().show("input fluo", debug)).removeSmallClusters(ngUse,
-					// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
-					getInt("Noise-Size-Fluo-Area", 3),
-					getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 100) * 0.5)),
-					options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
+			return new ImageOperation(input().masks().fluo().show("input fluo", debug)).
+					dilate(getInt("dilation fluo", 0)).
+					removeSmallClusters(ngUse,
+							// getDouble("Noise-Size-Fluo-Area-Percent", (0.001d) / 20 / 2d),
+							getInt("Noise-Size-Fluo-Area", 3),
+							getInt("Noise-Size-Fluo-Dimension-Absolute", (int) ((input().masks().fluo().getWidth() / 100) * 0.5)),
+							options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
 					.getImage();
 		}
 	}
