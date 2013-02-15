@@ -12,6 +12,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -25,6 +26,7 @@ public class ActionRemerge extends AbstractNavigationAction {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
+	private String operationResult = "";
 	
 	public ActionRemerge(MongoDB m, ExperimentReference experiment) {
 		super("Re-merge based on data annotation");
@@ -39,7 +41,7 @@ public class ActionRemerge extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
-		
+		operationResult = "";
 		try {
 			ExperimentInterface e = experiment.getData(m);
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus = status;
@@ -57,6 +59,15 @@ public class ActionRemerge extends AbstractNavigationAction {
 				optStatus.setCurrentStatusText1("Create unified experiment");
 			int idx = 0;
 			int max = e.size();
+			int subC = e.size();
+			int conC = 0;
+			int samC = 0;
+			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
+				conC += s.size();
+				for (ConditionInterface ci : s) {
+					samC += ci.size();
+				}
+			}
 			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
 				idx++;
 				if (optStatus != null)
@@ -71,6 +82,17 @@ public class ActionRemerge extends AbstractNavigationAction {
 				optStatus.setCurrentStatusText1("Sort substances and conditions");
 			((Experiment) e).sortSubstances();
 			((Experiment) e).sortConditions();
+			int NMsubC = e.size();
+			int NMconC = 0;
+			int NMsamC = 0;
+			for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
+				NMconC += s.size();
+				for (ConditionInterface ci : s) {
+					NMsamC += ci.size();
+				}
+			}
+			operationResult = "Results of merge operation:<br>" +
+					"Substances: " + subC + " ==> " + NMsubC + ", Conditions " + conC + " ==> " + NMconC + ", Samples " + samC + " ==> " + NMsamC;
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
 			experiment.setExperimentData(e);
 		} catch (Exception e) {
@@ -94,8 +116,13 @@ public class ActionRemerge extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("Data has been re-assembled based on annotation!<br>" +
-				"(click 'Save Changes' to make the new order permanent)");
+		try {
+			return new MainPanelComponent("Data has been re-assembled based on annotation: " + operationResult + "<br>" +
+					"(click 'Save Changes' to make the new structure permanent)<br><br><br>" + ((Experiment) experiment.getData(status)).toHTMLstring());
+		} catch (Exception e) {
+			return new MainPanelComponent("Data has been re-assembled based on annotation!" + operationResult + "<br>" +
+					"(click 'Save Changes' to make the new structure permanent)<br><br><br>Experiment info could not be displayed! Error: " + e.getMessage());
+		}
 	}
 	
 	@Override
