@@ -1557,12 +1557,12 @@ public class ImageOperation {
 			boolean considerArea, RunnableWithVetoRight veto) {
 		
 		if (cutOffMinimumArea < 1) {
-			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
+			// System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
 			cutOffMinimumArea = 1;
 		}
 		
 		if (cutOffMinimumDimension < 1) {
-			System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumDimension + ". Set to 1.");
+			// System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumDimension + ". Set to 1.");
 			cutOffMinimumDimension = 1;
 		}
 		
