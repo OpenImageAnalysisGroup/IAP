@@ -178,6 +178,10 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substance, boolean ignoreSnapshotFineTime) {
+		if (true) {
+			result.add(substance);
+			return;
+		}
 		SubstanceInterface targetSubstance = null;
 		for (SubstanceInterface m : result)
 			if (substance.compareTo(m) == 0) {
