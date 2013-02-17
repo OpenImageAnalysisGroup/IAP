@@ -48,6 +48,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.gridfs.GridFS;
@@ -236,42 +238,32 @@ public class MongoDB {
 					DB db;
 					String key = optHosts + ";" + database;
 					if (m.get(key) == null) {
+						Builder mob = new MongoClientOptions.Builder();
+						mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1));
+						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000));
+						mob.threadsAllowedToBlockForConnectionMultiplier(SystemOptions.getInstance().getInteger("GRID-STORAGE",
+								"threads allowed to wait for connection",
+								1000000));
+						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000));
+						mob.writeConcern(WriteConcern.NONE);
+						
+						MongoClientOptions mco = mob.build();
+						
+						StopWatch s = new StopWatch("INFO: new MongoClient(...)", false);
 						if (optHosts == null || optHosts.length() == 0) {
-							StopWatch s = new StopWatch("INFO: new MongoClient()", false);
-							MongoClient mc = new MongoClient();
-							mc.setWriteConcern(WriteConcern.NONE);
+							MongoClient mc = new MongoClient("localhost", mco);
 							m.put(key, mc);
-							m.get(key).getMongoOptions().connectionsPerHost =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1);
-							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads allowed to wait for connection",
-											1000000);
-							m.get(key).getMongoOptions().connectTimeout =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000);
-							m.get(key).getMongoOptions().socketTimeout =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000);
-							s.printTime();
 						} else {
-							StopWatch s = new StopWatch("INFO: new MongoClient(seeds)", false);
 							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 							for (String h : optHosts.split(","))
 								seeds.add(new ServerAddress(h));
-							m.put(key, new MongoClient(seeds));
-							m.get(key).getMongoOptions().connectionsPerHost =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1);
-							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads allowed to wait for connection",
-											1000000);
-							m.get(key).getMongoOptions().connectTimeout =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000);
-							m.get(key).getMongoOptions().socketTimeout =
-									SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000);
-							s.printTime(1000);
+							m.put(key, new MongoClient(seeds, mco));
 						}
+						s.printTime(1000);
 						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
 							DB dbAdmin = m.get(key).getDB("admin");
 							try {
-								StopWatch s = new StopWatch("INFO: dbAdmin.authenticate()");
+								s = new StopWatch("INFO: dbAdmin.authenticate()");
 								dbAdmin.authenticate(optLogin, optPass.toCharArray());
 								s.printTime(1000);
 								if (authenticatedDBs.get(m.get(key)) == null)
