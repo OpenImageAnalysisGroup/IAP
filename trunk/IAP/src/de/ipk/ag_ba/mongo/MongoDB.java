@@ -246,6 +246,8 @@ public class MongoDB {
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier =
 									SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads allowed to wait for connection",
 											1000000);
+							m.get(key).getMongoOptions().connectTimeout =
+									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000);
 							m.get(key).getMongoOptions().socketTimeout =
 									SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000);
 							s.printTime();
@@ -260,6 +262,8 @@ public class MongoDB {
 							m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier =
 									SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads allowed to wait for connection",
 											1000000);
+							m.get(key).getMongoOptions().connectTimeout =
+									SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000);
 							m.get(key).getMongoOptions().socketTimeout =
 									SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000);
 							s.printTime(1000);

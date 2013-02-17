@@ -8,6 +8,9 @@ package de.ipk.ag_ba.commands.database_tools;
 
 import java.util.ArrayList;
 
+import org.StringManipulationTools;
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
@@ -84,14 +87,23 @@ public class ActionDeleteSelectedAnalysisSplitResults extends AbstractNavigation
 				ExperimentReference er = new ExperimentReference(ei, m);
 				Experiment ee = (Experiment) er.getData(m);
 				ehl.add(ei);
-				String expN = ee.getName();
+				String expN = ei.getExperimentName();
 				int ml = ee.getNumberOfMeasurementValues();
 				int ic = Substance3D.countMeasurementValues2(ee, MeasurementNodeType.IMAGE);
-				descL.add(
-						"<html>Analysis of " + pe + ":<br>"
-								+ expN + "<br>"
-								+ "Measurement values: " + ml + "<br>" +
-								"Images: " + ic);
+				String s =
+						"<html>" +
+								(ic < 100 ? "<font color='red'>" : "")
+								+ "Analysis result for " + pe + ": <br>"
+								+ "Measurement values: " + ml + ". <br>" +
+								"Images: " + ic + ".<br>"
+								+ "Experiment Name: " + expN + "<hr>";
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " + StringManipulationTools.removeHTMLtags(s));
+				if (ic < 20) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: ABOUT TO DELETE " + expN);
+					Thread.sleep(10000);
+					m.deleteExperiment(ei.getDatabaseId());
+				}
+				descL.add(s);
 			} else
 				status.setCurrentStatusText2("Skip Dataset");
 		}
