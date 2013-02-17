@@ -55,9 +55,9 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	@Override
 	public String getCurrentStatusMessage1() {
 		try {
-			return "<html>Owner: " + (cmd.getOwner() != null ? cmd.getOwner() : "(unclaimed)") + "<br>" +
-					"Status: " + cmd.getRunStatus().toString() + "" +
-					"<br>" + cmd.getCurrentStatusMessage1();
+			return "<html>" + (cmd.getOwner() != null ? "Owner: " + cmd.getNiceOwner() + "<br>" : "") +
+					"Status: " + cmd.getRunStatus().toString()
+					+ (cmd.getCurrentStatusMessage1() != null ? "<br>" + cmd.getCurrentStatusMessage1() : "");
 		} catch (NullPointerException npe) {
 			return "";
 		}

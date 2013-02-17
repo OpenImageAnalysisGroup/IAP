@@ -49,7 +49,8 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		try {
 			if (actionProxy != null)
-				return actionProxy.getDefaultTitle();
+				return actionProxy.getDefaultTitle() + " " + (cmd.getPartIdx() + 1) + "/"
+						+ cmd.getPartCnt() + "<br><small>(for " + experimentName + ")</small>";
 			else
 				return "ActionProxy is NULL";
 		} catch (Exception e) {

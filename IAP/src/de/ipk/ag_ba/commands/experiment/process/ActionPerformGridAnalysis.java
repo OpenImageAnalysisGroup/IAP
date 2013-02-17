@@ -42,12 +42,18 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/network-workgroup-power.png";
+		if (m == null)
+			return "img/ext/gpl2/Gnome-Text-X-Script-64.png";
+		else
+			return "img/ext/network-workgroup-power.png";
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "<html><center>Submit " + numberOfJobs + " analysis jobs to " + (m != null ? m.getDatabaseName() : "(database instance is null)") + "";
+		if (m == null)
+			return "Analysis Job";
+		else
+			return "<html><center>Submit " + numberOfJobs + " analysis jobs to " + (m != null ? m.getDatabaseName() : "(database instance is null)") + "";
 	}
 	
 	@Override
