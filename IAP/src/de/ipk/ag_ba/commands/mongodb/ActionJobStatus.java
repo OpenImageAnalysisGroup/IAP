@@ -251,6 +251,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		try {
 			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
 			final HashMap<String, ArrayList<NavigationButton>> set = new HashMap<String, ArrayList<NavigationButton>>();
+			final HashMap<String, Integer> setMaxSize = new HashMap<String, Integer>();
 			for (BatchCmd b : m.batch().getAll()) {
 				if (!dbId2header.containsKey(b.getExperimentDatabaseId()))
 					dbId2header.put(b.getExperimentDatabaseId(), b.getExperimentHeader());
@@ -265,6 +266,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				if (!set.containsKey(desc))
 					set.put(desc, new ArrayList<NavigationButton>());
 				set.get(desc).add(n);
+				setMaxSize.put(desc, b.getPartCnt());
 			}
 			for (String desc : set.keySet()) {
 				final String fd = desc;
@@ -275,7 +277,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					
 					@Override
 					public String getDefaultTitle() {
-						return "<html><center>" + fd + " (" + set.get(fd).size() + ")";
+						return "<html><center>" + fd + " (" + set.get(fd).size()
+								+ "/" + setMaxSize.get(fd) + ")";
 					}
 					
 					@Override
