@@ -240,4 +240,15 @@ public class BatchCmd extends BasicDBObject {
 		return getDesiredOperatingSystem() == null
 				|| getDesiredOperatingSystem().equals(SystemAnalysis.getOperatingSystem());
 	}
+	
+	public String getNiceOwner() {
+		String hostInfo = getOwner();
+		try {
+			String[] hhh = hostInfo.split("_", 2);
+			String host = hhh[0];
+			return "" + host + " (up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
+		} catch (Exception e) {
+			return hostInfo;
+		}
+	}
 }
