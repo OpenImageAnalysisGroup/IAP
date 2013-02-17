@@ -245,7 +245,7 @@ public class MongoDB {
 								"threads allowed to wait for connection",
 								1000000));
 						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000));
-						mob.writeConcern(WriteConcern.NONE);
+						mob.writeConcern(WriteConcern.ACKNOWLEDGED);
 						
 						MongoClientOptions mco = mob.build();
 						
