@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
@@ -11,10 +12,12 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 public class ActionJobStatus extends AbstractNavigationAction {
@@ -246,12 +249,46 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		try {
+			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
+			final HashMap<String, ArrayList<NavigationButton>> set = new HashMap<String, ArrayList<NavigationButton>>();
 			for (BatchCmd b : m.batch().getAll()) {
-				NavigationButton n;
-				n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
+				if (!dbId2header.containsKey(b.getExperimentDatabaseId()))
+					dbId2header.put(b.getExperimentDatabaseId(), b.getExperimentHeader());
+				ExperimentHeaderInterface ehi = dbId2header.get(b.getExperimentDatabaseId());
+				NavigationButton n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
 				n.setProcessing(true);
-				// n.setRightAligned(true);
-				res.add(n);
+				
+				String desc = ehi.getExperimentName() + "<br>"
+						+ " Job submission " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
+						+ "(" + b.getRunStatus() + ")";
+				
+				if (!set.containsKey(desc))
+					set.put(desc, new ArrayList<NavigationButton>());
+				set.get(desc).add(n);
+			}
+			for (String desc : set.keySet()) {
+				final String fd = desc;
+				NavigationAction setCmd = new AbstractNavigationAction(desc) {
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "<html><center>" + fd + " (" + set.get(fd).size() + ")";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/Gtk-Dnd-Multiple-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return set.get(fd);
+					}
+				};
+				res.add(new NavigationButton(setCmd, guiSetting));
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
