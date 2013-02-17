@@ -213,6 +213,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
 						src.getGUIsetting(), m));
+				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.UNTRASH_ALL,
+						src.getGUIsetting(), m));
 				for (ExperimentHeaderInterface ehi : trashed) {
 					ExperimentReference exp = new ExperimentReference(ehi, m);
 					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));

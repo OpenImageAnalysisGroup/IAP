@@ -15,7 +15,8 @@ public enum DeletionCommand {
 	UNTRASH("Put Back", "img/ext/trash-undelete.png"),
 	DELETE("Delete", "img/ext/edit-delete.png"),
 	EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST("Empty Trash", "img/ext/trash-delete-all2.png"),
-	TRASH_GROUP_OF_EXPERIMENTS("Move ALL to Trash", "img/ext/trash-delete.png");
+	TRASH_GROUP_OF_EXPERIMENTS("Move ALL to Trash", "img/ext/trash-delete.png"),
+	UNTRASH_ALL("Put Back All", "img/ext/trash-undelete.png");
 	
 	String title, img;
 	

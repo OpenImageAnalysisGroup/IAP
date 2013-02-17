@@ -141,7 +141,7 @@ public class ActionTrash extends AbstractNavigationAction {
 				message += "Error: " + e.getMessage();
 			}
 		}
-		if (cmd == DeletionCommand.UNTRASH) {
+		if (cmd == DeletionCommand.UNTRASH || cmd == DeletionCommand.UNTRASH_ALL) {
 			try {
 				String type = hhh.getExperimentType();
 				if (type.contains("Trash;"))
