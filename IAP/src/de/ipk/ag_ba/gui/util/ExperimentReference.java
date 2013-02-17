@@ -202,9 +202,9 @@ public class ExperimentReference {
 				this.experiment = res;
 				if (res == null)
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded.");
-				else
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " +
-							experiment.size() + " substances (DB ID " + res.getHeader().getDatabaseId() + ").");
+				// else
+				// System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " +
+				// experiment.size() + " substances (DB ID " + res.getHeader().getDatabaseId() + ").");
 				return res;
 			}
 		}
