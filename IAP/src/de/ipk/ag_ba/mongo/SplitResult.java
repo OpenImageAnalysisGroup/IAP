@@ -113,7 +113,7 @@ public class SplitResult {
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
 			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Process " + ii.getExperimentName() + " (" + nnii + "/" + tempDataSetDescription.getPartCntI() + ")");
+				optStatus.setCurrentStatusText2("Process " + nnii + "/" + tempDataSetDescription.getPartCntI() + "");
 			nnii++;
 			if (originName == null) {
 				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
@@ -166,7 +166,7 @@ public class SplitResult {
 				ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 			}
 		}
-		boolean superMerge = true;
+		boolean superMerge = false;
 		if (superMerge) {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Get mapping path objects");
