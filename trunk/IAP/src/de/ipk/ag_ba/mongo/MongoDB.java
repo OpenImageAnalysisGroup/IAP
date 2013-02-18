@@ -245,6 +245,8 @@ public class MongoDB {
 								"threads allowed to wait for connection",
 								1000000));
 						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 24 * 60 * 60 * 1000));
+						mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "wax wait time", 24 * 60 * 60 * 1000));
+						mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
 						mob.writeConcern(WriteConcern.ACKNOWLEDGED);
 						
 						MongoClientOptions mco = mob.build();
@@ -261,6 +263,8 @@ public class MongoDB {
 						}
 						m.get(key).getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1);
 						m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 24 * 60 * 60 * 1000);
+						m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 24 * 60 * 60 * 1000);
+						m.get(key).getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
 						m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
 								"threads allowed to wait for connection",
 								1000000);
