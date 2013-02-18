@@ -29,6 +29,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -225,7 +226,14 @@ public class ExperimentLoader implements RunnableOnDB {
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusText1("Load subset " + idxS + "/" + n + "<br><font color='gray'><small>(" + s3d.getName() + ")</small></font>");
 		synchronized (experiment) {
-			experiment.add(s3d);
+			boolean add = true;
+			for (SubstanceInterface so : experiment)
+				if (so.compareTo(s3d) == 0) {
+					s3d = (Substance3D) so;
+					add = false;
+				}
+			if (add)
+				experiment.add(s3d);
 		}
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		if (condList != null) {

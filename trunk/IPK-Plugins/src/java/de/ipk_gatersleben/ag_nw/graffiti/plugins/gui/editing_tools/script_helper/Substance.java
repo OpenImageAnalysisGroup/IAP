@@ -178,10 +178,6 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substance, boolean ignoreSnapshotFineTime) {
-		if (true) {
-			result.add(substance);
-			return;
-		}
 		SubstanceInterface targetSubstance = null;
 		for (SubstanceInterface m : result)
 			if (substance.compareTo(m) == 0) {
@@ -195,8 +191,10 @@ public class Substance implements SubstanceInterface {
 			targetSubstance = substance;
 			if (!result.contains(targetSubstance)) {
 				result.add(targetSubstance);
+				return;
 			}
 		}
+		
 		for (ConditionInterface cond : new ArrayList<ConditionInterface>(substance)) {
 			cond.setParent(targetSubstance);
 			addAndMergeConditionData(result, targetSubstance, cond, ignoreSnapshotFineTime);
@@ -205,19 +203,12 @@ public class Substance implements SubstanceInterface {
 	
 	private static void addAndMergeConditionData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface condition,
 			boolean ignoreSnapshotFineTime) {
-		int n = targetExperiment.getNumberOfMeasurementValues();
 		ConditionInterface targetCondition = null;
 		for (ConditionInterface cond : targetSubstance)
 			if (cond.compareTo(condition) == 0) {
 				targetCondition = cond;
 				// if (targetSubstance.contains(condition) && targetCondition != condition)
 				// targetSubstance.remove(condition);
-				int n2 = targetExperiment.getNumberOfMeasurementValues();
-				if (n2 != n) {
-					System.out.println("ERRR_____");
-					n = n2;
-				}
-				
 				break;
 			}
 		
@@ -226,69 +217,37 @@ public class Substance implements SubstanceInterface {
 			if (!targetSubstance.contains(condition)) {
 				targetSubstance.add(condition);
 				targetCondition.setExperimentHeader(targetExperiment.getHeader());
+				return;
 			}
 		}
 		for (SampleInterface sample : new ArrayList<SampleInterface>(condition)) {
-			int n2 = targetExperiment.getNumberOfMeasurementValues();
-			System.out.println(n + " ==> " + n2);
-			if (n2 != n) {
-				System.out.println("ERRR");
-				n = n2;
-			}
 			sample.setParent(targetCondition);
-			n2 = targetExperiment.getNumberOfMeasurementValues();
-			if (n2 != n) {
-				System.out.println("ERRR:::");
-				n = n2;
-			}
 			addAndMergeSampleData(targetExperiment, targetSubstance, targetCondition, sample, ignoreSnapshotFineTime);
-			n2 = targetExperiment.getNumberOfMeasurementValues();
-			if (n2 != n) {
-				System.out.println("ERRR!!!!");
-				n = n2;
-			}
 		}
 	}
 	
 	private static void addAndMergeSampleData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface targetCondition,
 			SampleInterface sample, boolean ignoreSnapshotFineTime) {
 		SampleInterface targetSample = null;
-		int n0 = targetExperiment.getNumberOfMeasurementValues();
 		for (SampleInterface s : targetCondition)
 			if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
 				targetSample = s;
 				// if (targetCondition.contains(sample) && targetSample != sample)
 				// targetCondition.remove(sample);
-				int n01 = targetExperiment.getNumberOfMeasurementValues();
-				if (n01 != n0) {
-					System.out.println("ERR20");
-				}
-				
 				break;
 			}
 		
 		if (targetSample == null) {
 			targetSample = sample;
-			if (!targetSample.contains(sample))
+			if (!targetSample.contains(sample)) {
 				targetCondition.add(targetSample);
-			int n2 = targetExperiment.getNumberOfMeasurementValues();
-			if (n2 != n0) {
-				System.out.println("ERR2101010110101");
+				return;
 			}
 		}
-		int n = targetExperiment.getNumberOfMeasurementValues();
 		for (NumericMeasurementInterface m : sample.toArray(new NumericMeasurementInterface[] {})) {
 			m.setParentSample(targetSample);
 			if (!targetSample.contains(m))
 				targetSample.add(m);
-			int n2 = targetExperiment.getNumberOfMeasurementValues();
-			if (n2 != n) {
-				System.out.println("ERR2");
-			}
-		}
-		int n2 = targetExperiment.getNumberOfMeasurementValues();
-		if (n2 != n) {
-			System.out.println("ERR22222");
 		}
 	}
 	
