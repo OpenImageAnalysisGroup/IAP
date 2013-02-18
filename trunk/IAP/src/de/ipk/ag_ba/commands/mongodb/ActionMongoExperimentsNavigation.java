@@ -558,10 +558,11 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		do {
 			Thread.sleep(100);
 			long current = System.currentTimeMillis();
-			if (current - tso_LastDbResult.getLong() > 60000) {
+			int to = SystemOptions.getInstance().getInteger("GRID-STORAGE", "Data Source Read-Timeout (s)", 240);
+			if (current - tso_LastDbResult.getLong() > to * 1000) {
 				t.interrupt();
 				error = true;
-				errorMsg = "time out - 60s";
+				errorMsg = "time out - " + to + "s";
 				break;
 			}
 		} while (t.isAlive());
