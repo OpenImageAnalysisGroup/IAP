@@ -547,7 +547,7 @@ public class MongoDB {
 						optStatus.setCurrentStatusText1("Get Experiment List");
 					DBCollection col = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 					if (optStatus != null)
-						optStatus.setCurrentStatusText1("Iterate Experimentlist");
+						optStatus.setCurrentStatusText1("Enumerate Experiments");
 					HashMap<String, String> mapableNames = new HashMap<String, String>();
 					String[] mn = SystemOptions.getInstance().getStringAll("GRID-STORAGE",
 							"User Name Mapping", new String[] {

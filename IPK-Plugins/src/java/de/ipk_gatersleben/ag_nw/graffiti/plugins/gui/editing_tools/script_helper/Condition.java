@@ -161,7 +161,8 @@ public class Condition implements ConditionInterface {
 				return conditionCache;
 			// String res = /* getExperimentName() + ": " + */getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
 			// + getGrowthconditions() + " / " + getVariety() + "/" + getSequence();
-			String res = getExperimentName() + ", " + getRowId() + ": " + getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
+			// getExperimentName() + ": " +
+			String res = getSpecies() + " / " + getGenotype() + " / " + getTreatment() + " / "
 					+ getGrowthconditions() + " / " + getVariety();
 			
 			if (cached)
@@ -174,12 +175,19 @@ public class Condition implements ConditionInterface {
 			
 			String species = getSpecies();
 			String genotype = getGenotype();
+			String variety = getVariety();
 			String treatment = getTreatment();
 			
 			serie = species;
 			if (genotype != null && genotype.length() > 0
 					&& !genotype.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)) {
 				serie += "/" + genotype;
+				if (serie.startsWith(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/"))
+					serie = serie.substring((ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/").length());
+			}
+			if (variety != null && variety.length() > 0
+					&& !variety.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING)) {
+				serie += "/" + variety;
 				if (serie.startsWith(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/"))
 					serie = serie.substring((ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING + "/").length());
 			}
@@ -693,7 +701,11 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public int compareTo(ConditionInterface otherSeries) {
-		return getConditionName(false, true).compareTo(((Condition) otherSeries).getConditionName(false, true));
+		String a = getConditionName(false, true);
+		String b = ((Condition) otherSeries).getConditionName(false, true);
+		int res = a.compareTo(b);
+		// System.out.println("Compare: " + res + " / " + a + " / " + b);
+		return res;
 	}
 	
 	@Override
@@ -749,7 +761,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-	
+
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
