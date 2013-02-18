@@ -182,17 +182,17 @@ public class Substance implements SubstanceInterface {
 		for (SubstanceInterface m : result)
 			if (substance.compareTo(m) == 0) {
 				targetSubstance = m;
-				if (result.contains(substance) && targetSubstance != substance)
-					result.remove(substance);
+				// if (result.contains(substance) && targetSubstance != substance)
+				// result.remove(substance);
 				break;
 			}
 		
 		if (targetSubstance == null) {
 			targetSubstance = substance;
-			if (!result.contains(targetSubstance)) {
-				result.add(targetSubstance);
-				return;
-			}
+			// if (!result.contains(targetSubstance)) {
+			result.add(targetSubstance);
+			return;
+			// }
 		}
 		
 		for (ConditionInterface cond : new ArrayList<ConditionInterface>(substance)) {
@@ -214,11 +214,11 @@ public class Substance implements SubstanceInterface {
 		
 		if (targetCondition == null) {
 			targetCondition = condition;
-			if (!targetSubstance.contains(condition)) {
-				targetSubstance.add(condition);
-				targetCondition.setExperimentHeader(targetExperiment.getHeader());
-				return;
-			}
+			// if (!targetSubstance.contains(condition)) {
+			targetSubstance.add(condition);
+			targetCondition.setExperimentHeader(targetExperiment.getHeader());
+			return;
+			// }
 		}
 		for (SampleInterface sample : new ArrayList<SampleInterface>(condition)) {
 			sample.setParent(targetCondition);
@@ -239,10 +239,10 @@ public class Substance implements SubstanceInterface {
 		
 		if (targetSample == null) {
 			targetSample = sample;
-			if (!targetSample.contains(sample)) {
-				targetCondition.add(targetSample);
-				return;
-			}
+			// if (!targetSample.contains(sample)) {
+			targetCondition.add(targetSample);
+			return;
+			// }
 		}
 		for (NumericMeasurementInterface m : sample.toArray(new NumericMeasurementInterface[] {})) {
 			m.setParentSample(targetSample);
