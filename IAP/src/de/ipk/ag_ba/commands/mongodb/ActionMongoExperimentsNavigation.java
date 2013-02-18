@@ -585,7 +585,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			if (nn[3] != null && nn[3].contains(","))
 				nn[3] = nn[3].split(",")[0];
 			String start = SystemAnalysis.getCurrentTime(Long.parseLong(nn[3]));
-			n = nn[0] + " (" + nn[1] + "/" + nn[2] + ") started " + start;
+			n = "" + nn[1] + "/" + nn[2] + " <small>" + start + "</small>";
 		} catch (Exception err) {
 			System.err.println("ERROR: Problematic experiment name: " + exp.getExperimentName());
 		}
