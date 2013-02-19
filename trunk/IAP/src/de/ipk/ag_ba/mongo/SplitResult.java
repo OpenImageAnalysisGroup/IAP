@@ -137,12 +137,6 @@ public class SplitResult {
 			ExperimentInterface ei = m.getExperiment(ii, false, status);
 			if (s1.getTime() > 30000)
 				s1.printTime();
-			TreeSet<String> condS = new TreeSet<String>();
-			for (SubstanceInterface s : ei) {
-				for (ConditionInterface ci : s) {
-					condS.add(ci.getConditionName());
-				}
-			}
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
 			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
