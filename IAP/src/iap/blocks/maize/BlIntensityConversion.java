@@ -69,6 +69,10 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
 		
+		if (!getBoolean("show conversion", true)) {
+			r = io.copy().applyMask(r, options.getBackground()).getImage();
+		}
+		
 		if (debug) {
 			fis.addImage("ClChPh", r, null);
 			fis.addImage("CLASSIC", resClassic, null);

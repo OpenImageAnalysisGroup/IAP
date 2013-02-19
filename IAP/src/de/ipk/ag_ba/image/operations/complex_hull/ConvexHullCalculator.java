@@ -114,8 +114,18 @@ public class ConvexHullCalculator {
 	 * @param distHorizontal
 	 * @param realDist
 	 */
+	
 	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
 			boolean drawHull, boolean drawCentroid, int borderColor,
+			int hullLineColor, int centroidColor, Double distHorizontal,
+			Double realMarkerDist) {
+		
+		return find(drawInputimage, drawBorder, drawHull, drawInputimage, drawCentroid, borderColor,
+				hullLineColor, centroidColor, distHorizontal, realMarkerDist);
+	}
+	
+	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
+			boolean drawHull, boolean drawPCLine, boolean drawCentroid, int borderColor,
 			int hullLineColor, int centroidColor, Double distHorizontal,
 			Double realMarkerDist) {
 		
@@ -199,7 +209,7 @@ public class ConvexHullCalculator {
 					// rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
 				}
 				
-				if (drawInputimage) {
+				if (drawPCLine) {
 					FlexibleImage inDrawing = res.getImage();
 					ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
 					if (span2.getP1() != null && span2.getP1l() != null) {
