@@ -546,8 +546,6 @@ public class MongoDB {
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1("Get Experiment List");
 					DBCollection col = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
-					if (optStatus != null)
-						optStatus.setCurrentStatusText1("Enumerate Experiments");
 					HashMap<String, String> mapableNames = new HashMap<String, String>();
 					String[] mn = SystemOptions.getInstance().getStringAll("GRID-STORAGE",
 							"User Name Mapping", new String[] {
@@ -563,29 +561,18 @@ public class MongoDB {
 							else
 								mapableNames.put(s.split("/")[0], s.split("/", 2)[1]);
 						}
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1("Count");
+					
+					long max = col.count();
+					if (optStatus != null)
+						optStatus.setCurrentStatusText1("Found " + max);
+					long idx = 0;
 					for (DBObject header : col.find()) {
 						if (opt_last_ping != null)
 							opt_last_ping.setLong(System.currentTimeMillis());
 						ExperimentHeader h = new ExperimentHeader(header.toMap());
 						h.setStorageTime(new Date(((ObjectId) header.get("_id")).getTime()));
-						if (h.getImportusername() == null || h.getImportusername().isEmpty()) {
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">ERROR: FIXING INTERNAL PROBLEM: IMPORT USER NAME IS EMPTY, UPDATING INFO WITH LOCAL USER INFO");
-							h.setImportusername(SystemAnalysis.getUserName());
-							header.put("importusername", h.getImportusername());
-							if (h.getImportusername() != null && !h.getImportusername().isEmpty())
-								col.save(header, WriteConcern.SAFE);
-							else
-								System.out.println(SystemAnalysis.getCurrentTime()
-										+ ">ERROR: USER INFO COULD NOT BE UPDATED (LOCAL INFO IS NULL OR EMPTY)");
-						}
-						if (h.getExperimentName() != null && h.getExperimentName().contains("(manual merge")) {
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">INFO: REMOVE _manual merge_ note from experiment name");
-							h.setExperimentname(h.getExperimentName().substring(0, h.getExperimentName().indexOf(" (manual merge")));
-							header.put("experimentname", h.getExperimentName());
-							col.save(header, WriteConcern.SAFE);
-						}
 						if (mapableNames.containsKey(h.getImportusername())) {
 							String newName = mapableNames.get(h.getImportusername());
 							System.out.println(SystemAnalysis.getCurrentTime()
@@ -599,6 +586,15 @@ public class MongoDB {
 								LemnaTecDataExchange.getAdministrators().contains(user) ||
 								h.getCoordinator().toUpperCase().contains(user.toUpperCase()))
 							res.add(h);
+						idx++;
+						if (optStatus != null) {
+							optStatus.setCurrentStatusText1("Process Experiment " + idx + "/" + max + "");
+							optStatus.setCurrentStatusValueFine(100d / max * idx);
+						}
+					}
+					if (optStatus != null) {
+						optStatus.setCurrentStatusValueFine(100d);
+						optStatus.setCurrentStatusText1("");
 					}
 				}
 				
