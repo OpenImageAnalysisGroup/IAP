@@ -595,6 +595,6 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	
 	@Override
 	public boolean requestTitleUpdates() {
-		return true;
+		return false;
 	}
 }
