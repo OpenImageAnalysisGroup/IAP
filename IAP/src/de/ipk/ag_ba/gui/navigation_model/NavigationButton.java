@@ -427,8 +427,7 @@ public class NavigationButton implements StyleAware {
 							imageUpdated = true;
 						}
 					}
-					String t = n.getTitle();
-					n1.setText(t);// + "!!!!!" + System.currentTimeMillis());
+					n1.setText(n.getTitle());// + "!!!!!" + System.currentTimeMillis());
 					if (n1.getText() != null && n1.getText().indexOf("Please wait") >= 0) {
 						if (!n1.isVisible())
 							System.out.println("UPDATING INVISIBLE BUTTON " + n1.getText());

@@ -295,11 +295,12 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 							summaryResult.setNumericProperty(getBlockPosition(),
 									"RESULT_volume.vis.iap.wue", wue, "px^3/ml/day");
 							
-							System.out.println("Plant " + plantID + " has been watered with about "
-									+ waterUsePerDay.intValue() + " ml per day, at "
-									+ new Date(time).toString() + ", used for side volume growth of "
-									+ wue + " pixels per ml per day, relative volume growth: "
-									+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
+							if (false)
+								System.out.println("Plant " + plantID + " has been watered with about "
+										+ waterUsePerDay.intValue() + " ml per day, at "
+										+ new Date(time).toString() + ", used for side volume growth of "
+										+ wue + " pixels per ml per day, relative volume growth: "
+										+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
 							
 						}
 					}
