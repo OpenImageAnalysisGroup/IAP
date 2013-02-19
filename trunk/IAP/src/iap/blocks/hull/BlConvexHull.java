@@ -58,7 +58,8 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 		if (distHorizontal == null)
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);
-		res = new ImageOperation(image).hull().find(true, false, drawHull, drawHull, Color.RED.getRGB(),
+		boolean drawPCLine = getBoolean("draw_PC_line", true);
+		res = new ImageOperation(image).hull().find(true, false, drawHull, drawPCLine, drawHull, Color.RED.getRGB(),
 				Color.CYAN.getRGB(),
 				Color.RED.getRGB(), distHorizontal, realDist);
 		
