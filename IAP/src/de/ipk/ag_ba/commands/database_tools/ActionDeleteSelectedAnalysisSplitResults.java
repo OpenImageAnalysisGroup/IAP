@@ -98,11 +98,11 @@ public class ActionDeleteSelectedAnalysisSplitResults extends AbstractNavigation
 								"Images: " + ic + ".<br>"
 								+ "Experiment Name: " + expN + "<hr>";
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " + StringManipulationTools.removeHTMLtags(s));
-				if (ic < 20) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: ABOUT TO DELETE " + expN);
-					Thread.sleep(10000);
-					m.deleteExperiment(ei.getDatabaseId());
-				}
+				// if (ic < 20) {
+				// System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: ABOUT TO DELETE " + expN);
+				// Thread.sleep(10000);
+				// m.deleteExperiment(ei.getDatabaseId());
+				// }
 				descL.add(s);
 			} else
 				status.setCurrentStatusText2("Skip Dataset");
