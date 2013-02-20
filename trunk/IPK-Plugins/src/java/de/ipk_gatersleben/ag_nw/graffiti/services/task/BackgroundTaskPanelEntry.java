@@ -266,6 +266,7 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 		this.statusProvider = statusProvider;
 		if (taskStatusLabel.isVisible()) {
 			if (taskMessage != null) {
+				taskMessage = StringManipulationTools.stringReplace(taskMessage, "<br>", " ").trim();
 				if (taskMessage.startsWith("<html>"))
 					taskStatusLabel.setText(MyGraphicsTools.stringReplace(taskMessage, "<html>", "<html>&nbsp;"));
 				else
