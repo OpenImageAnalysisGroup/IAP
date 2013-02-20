@@ -471,7 +471,7 @@ public class SnapshotDataIAP {
 				StringBuilder columnData = new StringBuilder();
 				for (int i = 0; i < nmax; i++) {
 					columnData.append(separator);
-					Double v = storeAngleToValues.get(angle).get(i);
+					Double v = i < storeAngleToValues.get(angle).size() ? storeAngleToValues.get(angle).get(i) : null;
 					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
 						if (!numberFormat_deTrue_enFalse)
 							columnData.append(v);
