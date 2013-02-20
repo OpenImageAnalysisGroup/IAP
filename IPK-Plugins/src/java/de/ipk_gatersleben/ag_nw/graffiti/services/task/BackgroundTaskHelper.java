@@ -17,6 +17,7 @@ import javax.swing.Timer;
 import org.BackgroundTaskStatusProvider;
 import org.HelperClass;
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -206,48 +207,48 @@ public class BackgroundTaskHelper implements HelperClass {
 	
 	public static void issueSimpleTask(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask, BackgroundTaskStatusProvider sp) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, true, false);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, StringManipulationTools.removeHTMLtags(taskName), true, false);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask, BackgroundTaskStatusProvider sp,
 			int delayForPanel) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, true, false, delayForPanel);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, StringManipulationTools.removeHTMLtags(taskName), true, false, delayForPanel);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTaskInWindow(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask,
 			BackgroundTaskStatusProvider sp) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, true, true);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, StringManipulationTools.removeHTMLtags(taskName), true, true);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTaskInWindow(String taskName, String progressText, Runnable backgroundTask, Runnable finishSwingTask,
 			BackgroundTaskStatusProvider sp, boolean modal, boolean autoclose) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, taskName, autoclose, true);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sp, taskName, StringManipulationTools.removeHTMLtags(taskName), autoclose, true);
 		bth.setModalWindow(modal);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText, Runnable backgroundTask1, Runnable finishSwingTask) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText, "", backgroundTask1, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, taskName, true, false);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, StringManipulationTools.removeHTMLtags(taskName), true, false);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText1, String progressText2, Runnable backgroundTask1, Runnable finishSwingTask) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText1, progressText2, backgroundTask1, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, taskName, true, false);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, StringManipulationTools.removeHTMLtags(taskName), true, false);
 		bth.startWork(taskName);
 	}
 	
 	public static void issueSimpleTask(String taskName, String progressText1, String progressText2, Runnable backgroundTask1, Runnable finishSwingTask,
 			boolean autoclose) {
 		SimpleBackgroundTask sbt = new SimpleBackgroundTask(progressText1, progressText2, backgroundTask1, finishSwingTask);
-		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, taskName, autoclose, false);
+		BackgroundTaskHelper bth = new BackgroundTaskHelper(sbt, sbt, taskName, StringManipulationTools.removeHTMLtags(taskName), autoclose, false);
 		bth.startWork(taskName);
 	}
 	
