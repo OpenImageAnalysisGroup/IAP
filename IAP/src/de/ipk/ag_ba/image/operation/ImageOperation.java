@@ -3635,10 +3635,18 @@ public class ImageOperation {
 		return new ImageOperation(pixL).flipHor().show("merged balanced", false);
 	}
 	
-	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps) {
-		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
-		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
-		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps).getImage();
+	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps, boolean debug) {
+		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		return new FlexibleImage(r, g, b).io();
+	}
+	
+	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps, boolean debug,
+			double s0, double ss) {
+		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
+		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
+		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
 		return new FlexibleImage(r, g, b).io();
 	}
 	
@@ -3702,7 +3710,16 @@ public class ImageOperation {
 		return new FlexibleImage(getWidth(), getHeight(), img).io();
 	}
 	
-	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps) {
+	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug) {
+		double s0 = whiteLevel_180d < 200 ? 5d : 5d;
+		double ss = whiteLevel_180d < 200 ? 15d : 15d;
+		if (whiteLevel_180d > 200)
+			s0 += 40;
+		return rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss);
+	}
+	
+	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug,
+			double s0, double ss) {
 		int[][] img = getImageAs2dArray();
 		int w = img.length;
 		int h = img[0].length;
@@ -3714,16 +3731,12 @@ public class ImageOperation {
 		
 		double[] calibrationCurveFromTopLeftToCenter = new double[steps];
 		double[] indexArray = new double[steps];
-		double s0 = whiteLevel_180d < 200 ? 5d : 5d;
-		double ss = whiteLevel_180d < 200 ? 15d : 15d;
 		int len = indexArray.length;
 		for (int i = 0; i < len; i++) {
 			int s = (int) (s0 + i * ss / len);
-			if (whiteLevel_180d > 200)
-				s += 40;
 			int tx = (int) (i / (double) len * w / 2d);
 			int ty = h - (int) (i / (double) len * h / 2d);
-			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -20, 500, true, false);
+			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -20, 500, true, debug);
 			calibrationCurveFromTopLeftToCenter[i] = valuesCenter[0] * 255;
 			indexArray[i] = i + 1;
 		}
