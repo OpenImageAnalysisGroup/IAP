@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-debug <- FALSE
+DEBUG <- FALSE
 CATCH.ERROR <- FALSE
 
 calculateNothing <- FALSE
@@ -88,6 +88,7 @@ PLOTTING.LISTS <- "plottingLists"
 ## fileName
 SECTION.SEPARATOR <- "."
 TEX <- "tex"
+PDF <- "pdf"
 
 ## sectionList Mapping Values
 NEW.SECTION <- "newSection"
@@ -152,6 +153,7 @@ START.TYP.STRESS <- "stress"
 ## file names
 REPORT <- "report"
 REPORT.FILE <- paste(REPORT, TEX, sep = ".")
+REPORT.PDF <- paste(REPORT, PDF, sep = ".")
 ERROR.FILE <- paste(ERROR, TEX, sep = ".")
 LIB.ERROR.FILE <- paste(LIB, ERROR, TEX, sep = ".")
 ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep = "")
@@ -355,22 +357,24 @@ loadFiles <- function(path, pattern = "\\.[Rr]$", trace = TRUE, debug = FALSE) {
 #	@install: install missing libs if TRUE
 #	@update: update existing libs if TRUE
 ##
-loadInstallAndUpdatePackages <- function(libraries, install = FALSE, update = FALSE, debug = FALSE) {	
+loadInstallAndUpdatePackages <- function(libraries, install = FALSE, update = FALSE, check = FALSE, catch = FALSE, debug = FALSE) {	
 	debug %debug% "loadInstallAndUpdatePackages()"
 	
 	repos <- c("http://cran.r-project.org", "http://www.rforge.net/")
 	libPath <- Sys.getenv("R_LIBS_USER")
 	
-	installLibs(install, libraries, repos, libPath, debug = debug)
-	updateLibs(update, libraries, repos, libPath, debug = debug)
-	checkLibsForErrorsAndLoad(libraries, debug = debug)
-
+	
+	installLibs(install = install, libraries = libraries, repos = repos, libPath = libPath, debug = debug)
+	updateLibs(update = update, libraries = libraries, repos = repos, libPath = libPath, debug = debug)
+	checkLibs(check = check, libraries = libraries, debug = debug)
+	loadLibs(libraries = libraries, catch = catch, debug = debug)
 }
+
 
 ##
 #	install missing Libs if "install" is TRUE
 ##
-installLibs <- function(install, libraries, repos, libPath, debug = FALSE) {
+installLibs <- function(install = FALSE, libraries, repos, libPath, debug = FALSE) {
 	debug %debug% "installLibs()"
 	
 	if (install & length(libraries) > 0) {
@@ -392,11 +396,11 @@ installLibs <- function(install, libraries, repos, libPath, debug = FALSE) {
 ##
 #	update out of date libs if "update" is TRUE
 ##
-updateLibs <- function(update, libraries, repos, libPath, debug = FALSE) {
+updateLibs <- function(update = FALSE, libraries, repos, libPath, debug = FALSE) {
 	debug %debug% "updateLibs()"
 	
 	if (update) {
-		TRUE %print% "Check for package updates..."
+		TRUE %print% "Check for package updates ..."
 		
 		for(n in repos) {
 			update.packages(lib.loc = libPath, checkBuilt = TRUE, ask = FALSE, 	repos = n)
@@ -405,52 +409,59 @@ updateLibs <- function(update, libraries, repos, libPath, debug = FALSE) {
 }
 
 ##
-#	checks that all the conditions (instaled, actual) are present to load the Libs 
-#	if not, then load the lib
+#	check the version of the installed libs and compare this with the necessary libs for the report function
+#	if "check" is true the the comparison is performed
+#	the program stops when older version are found
 ##
-checkLibsForErrorsAndLoad <- function(libraries, debug = FALSE) {
+checkLibs <- function(check = FALSE, libraries, debug = FALSE) {
+	debug %debug% "checkLibs()"
+	
+	if(check) {
+		TRUE %print% "Check for package versions ..."		
+		
+		outOfDateLib <- NULL
+		for(nn in libraries) {
+			outOfDateLib <- checkVersionsOfUsedPackages(nn, outOfDateLib, debug = debug)
+		}		
+		
+		if (length(outOfDateLib) > 0) {
+			ckeckIfReportTexIsThere(outOfDateLib, typ = LIB.UPDATE, debug = debug)
+			stop("Libs not up to date!", call. = FALSE)
+		}	
+	}
+}
+
+
+##
+#	load the libs
+#	if errors then stopp the program
+##
+loadLibs <- function(libraries, catch = FALSE, debug = FALSE) {
 	debug %debug% "checkLibsForErrorsAndLoad()"
 	
 	if (length(libraries) > 0) {
 		TRUE %print% "Load libraries:"
 
-		libError <- FALSE
 		libErrorText <- NULL
-		outOfDateLib <- NULL
+		
 		for(nn in libraries) {
 			TRUE %print% nn
-			if (CATCH.ERROR) {
+			if (catch) { #CATCH.ERROR (((())))))
 				error <- try(iniLibrary(nn), silent = debug)
 				if (checkOfTryError(error, typ = LIB)) {
-					libError <- TRUE
 					libErrorText <- c(libErrorText, nn)
-				} else {
-					outOfDateLib <- checkVersionsOfUsedPackages(nn, outOfDateLib, debug = debug)
-				}
+				} 
 			} else {
 				iniLibrary(nn, debug = debug)
 			}
 		}	
-		checkIfThereSomeErrorsWhileLoadingLibs(libError, libErrorText, outOfDateLib, debug = debug)		
+		
+		if (length(libErrorText) > 0) {
+			ckeckIfReportTexIsThere(libErrorText, typ = LIB, debug = debug)
+#			stop("Not all necessary libs are installed!", call. = FALSE)
+			stop("There were problems loading the Libs!", call. = FALSE)
+		}
 	}	
-}
-
-##
-#	check whether there are errors while loading the libraries
-#	not all installed or not up to date
-#	Stop the script should occur at least one of both
-#	print a error file
-##
-checkIfThereSomeErrorsWhileLoadingLibs <- function(libError, libErrorText, outOfDateLib, debug = FALSE) {
-	debug %debug% "checkIfThereSomeErrorsWhileLoadingLibs()"
-	
-	if (libError) {
-		ckeckIfReportTexIsThere(libErrorText, typ = LIB, debug = debug)
-		stop("Not all necessary libs are installed!", call. = FALSE)
-	} else if (length(outOfDateLib) > 0) {
-		ckeckIfReportTexIsThere(outOfDateLib, typ = LIB.UPDATE, debug = debug)
-		stop("Libs not up to date!", call. = FALSE)
-	}
 }
 
 ##
@@ -3734,13 +3745,14 @@ writeTheData <- function(overallList, plot, fileName, extraString, writeLatexFil
 ##
 #	determine which libraries should be loaded/install
 ##
-loadLibs <- function(debug = FALSE) {
+processLibs <- function(install = FALSE, update = FALSE, check = FALSE, catch = FALSE, debug = FALSE) {
 	debug %debug% "loadLibs()"
 	
 	libraries <- c(
 			"Cairo", "RColorBrewer", "data.table", "ggplot2", 
 			"fmsb", "methods", "grid", "snow", "snowfall", "stringr")
-	loadInstallAndUpdatePackages(libraries, INSTALL.PACKAGE, CHECK.FOR.UPDATE, debug = debug)
+#	loadInstallAndUpdatePackages(libraries, INSTALL.PACKAGE, CHECK.FOR.UPDATE, debug = debug)
+	loadInstallAndUpdatePackages(libraries, install = install, update = update,  check = check, catch = catch, debug = debug)
 }
 
 myBreaks <- function(value) {
@@ -6142,19 +6154,19 @@ makeSplitDiagram <- function(overallResult, overallDesName, overallList, imagesI
 	}
 }
 
-startDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
-	overallList$debug %debug% "startDiagramming()"
+startDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot, catch = FALSE, debug = FALSE) {
+	debug %debug% "startDiagramming()"
 	
 	if (DO.PARALLELISATION) {
-		sfClusterEval(paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot), 
+		sfClusterEval(paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot, catch = catch, debug = debug), 
 				stopOnError = FALSE)
 	} else {
-		paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot)
+		paralleliseDiagramming(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot, catch = catch, debug = debug)
 	}	
 }
 
 
-paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot) {
+paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescriptor, overallDesName, typOfPlot, catch = FALSE, debug = FALSE) {
 	###############
 #tempOverallResult <- overallList$overallResult_nBoxDes 
 #overallDescriptor <- overallList$nBoxDes 
@@ -6205,7 +6217,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 #imagesIndex <- "1"
 	###############
 	
-	overallList$debug %debug% "paralleliseDiagramming()"
+	debug %debug% "paralleliseDiagramming()"
 	
 #	if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
 #		tempOverallResult <- na.omit(tempOverallResult)
@@ -6226,7 +6238,7 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 			}
 			if (plot) {
 				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
-				overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, overallList$debug, typOfPlot)
+				overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, debug, typOfPlot)
 				
 				if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
 					overallResult <- na.omit(overallResult)
@@ -6249,13 +6261,13 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 						}
 					}
 					
-					if (CATCH.ERROR) {
+					if (catch) {
 						if (INNER.THREADED && DO.PARALLELISATION) {
 							
 							error <- try(sfClusterCall(makeSplitDiagram, overallResult, overallDesName, overallList, imagesIndex, typOfPlot, 
-											stopOnError = FALSE), silent = !overallList$debug)
+											stopOnError = FALSE), silent = !debug)
 						} else {
-							error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !overallList$debug)
+							error <- try(makeSplitDiagram(overallResult, overallDesName, overallList, imagesIndex, typOfPlot), silent = !debug)
 						}
 						checkOfTryError(error, overallList, imagesIndex, typOfPlot)
 					} else {
@@ -6520,7 +6532,7 @@ makeDiagrams <- function(overallList) {
 									
 									if (DO.MODELLING.OF.STRESS && sum(!is.na(overallList$stressDes)) > 0) {
 										if (overallList$debug) {ownCat("stress modelling...")}
-										startDiagramming(overallList, overallList$overallResult_stressDes, overallList$stressDes, overallList$stressDesName, STRESS.PLOT)				
+										startDiagramming(overallList, overallList$overallResult_stressDes, overallList$stressDes, overallList$stressDesName, STRESS.PLOT, catch = overallList$catch, debug = overallList$debug)				
 									} else {
 										ownCat("All values for stress modelling are 'NA'")
 									}
@@ -6528,7 +6540,7 @@ makeDiagrams <- function(overallList) {
 								if (!plotOnlyStressValues) {
 									if (sum(!is.na(overallList$nBoxDes)) > 0) {
 										if (overallList$debug) {ownCat("nBoxplot...")}
-										startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT)
+										startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT, catch = overallList$catch, debug = overallList$debug)
 									} else {
 										ownCat("All values for nBoxplot are 'NA'")
 									}
@@ -6536,7 +6548,7 @@ makeDiagrams <- function(overallList) {
 							if (!plotOnlyNBox) {
 								if (sum(!is.na(overallList$nBoxMultiDes)) > 0) {
 									if (overallList$debug) {ownCat("nBoxMultiPlot...")}
-									startDiagramming(overallList, overallList$overallResult_nBoxMultiDes, overallList$nBoxMultiDes, overallList$nBoxMultiDesName, NBOX.MULTI.PLOT)
+									startDiagramming(overallList, overallList$overallResult_nBoxMultiDes, overallList$nBoxMultiDes, overallList$nBoxMultiDesName, NBOX.MULTI.PLOT, catch = overallList$catch, debug = overallList$debug)
 								} else {
 									ownCat("All values for nBoxMultiPlot are 'NA'")
 								}
@@ -6547,7 +6559,7 @@ makeDiagrams <- function(overallList) {
 								if (!plotOnlyNBoxMulti) {
 									if (sum(!is.na(overallList$boxDes)) > 0) {
 										if (overallList$debug) {ownCat("Boxplot...")}						
-										startDiagramming(overallList, overallList$overallResult_boxDes, overallList$boxDes, overallList$boxDesName, BOX.PLOT)		
+										startDiagramming(overallList, overallList$overallResult_boxDes, overallList$boxDes, overallList$boxDesName, BOX.PLOT, catch = overallList$catch, debug = overallList$debug)		
 									} else {
 										ownCat("All values for Boxplot are 'NA'...")
 									}
@@ -6559,7 +6571,7 @@ makeDiagrams <- function(overallList) {
 								if (!plotOnlyBoxplot) {
 									if (sum(!is.na(overallList$boxStackDes)) > 0) {
 										if (overallList$debug) {ownCat("Stacked Boxplot...")}
-										startDiagramming(overallList, overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT)
+										startDiagramming(overallList, overallList$overallResult_boxStackDes, overallList$boxStackDes, overallList$boxStackDesName, STACKBOX.PLOT, catch = overallList$catch, debug = overallList$debug)
 									} else {
 										ownCat("All values for stacked Boxplot are 'NA'...")
 									}
@@ -6573,14 +6585,14 @@ makeDiagrams <- function(overallList) {
 								if (!plotOnlyLineRange) {
 									if (sum(!is.na(overallList$boxSpiderDes)) > 0) {
 										if (overallList$debug) {ownCat("Spider plot...")}
-										startDiagramming(overallList, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT)
+										startDiagramming(overallList, overallList$overallResult_boxSpiderDes, overallList$boxSpiderDes, overallList$boxSpiderDesName, SPIDER.PLOT, catch = overallList$catch, debug = overallList$debug)
 									} else {
 										ownCat("All values for spider plot are 'NA'...")
 									}
 								}
 								if (sum(!is.na(overallList$linerangeDes)) > 0) {
 									if (overallList$debug) {ownCat("Linerange plot...")}
-									startDiagramming(overallList, overallList$overallResult_linerangeDes, overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT)
+									startDiagramming(overallList, overallList$overallResult_linerangeDes, overallList$linerangeDes, overallList$linerangeDesName, LINERANGE.PLOT, catch = overallList$catch, debug = overallList$debug)
 								} else {
 									ownCat("All values for linerange plot are 'NA'...")
 								}
@@ -6595,14 +6607,14 @@ makeDiagrams <- function(overallList) {
 								if (!plotOnlyLineRange) {
 									if (sum(!is.na(overallList$violinBoxDes)) > 0 & overallList$isRatio) {
 										if (overallList$debug) {ownCat("Violin plot...")}
-										startDiagramming(overallList, overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT)
+										startDiagramming(overallList, overallList$overallResult_violinBoxDes, overallList$violinBoxDes, overallList$violinBoxDesName, VIOLIN.PLOT, catch = overallList$catch, debug = overallList$debug)
 									} else {
 										ownCat("All values for violin Boxplot are 'NA'...")
 									}
 								}}}}}}}
 		if (FALSE) {	# falls auch mal barplots erstellt werden sollen (ausser wenn nur ein Tag vorhanden ist!)
 			if (overallList$debug) {ownCat("Barplot...")}
-			startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT)
+			startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, BAR.PLOT, catch = overallList$catch, debug = overallList$debug)
 		}
 	}
 }
@@ -6869,7 +6881,7 @@ checkStressTypValues <- function(stressTyp, debug = FALSE) {
 #	close all open devs and
 #	load the necessary libraries
 ##
-initRfunction <- function(debug) {
+initRfunction <- function(install = FALSE, update = FALSE, check = FALSE, catch = FALSE, debug = FALSE) {
 	debug %debug% "initRfunction()"
 	
 	if (debug) {
@@ -6891,9 +6903,9 @@ initRfunction <- function(debug) {
 	}
 	
 	if (debug) {
-		loadLibs(debug)
+		processLibs(install = install, update = update, check = check, catch = catch, debug = debug)
 	} else {
-		suppressMessages(loadLibs(debug))
+		suppressMessages(processLibs(install = install, update = update, check = check, catch = catch, debug = debug))
 	}
 }
 
@@ -6915,13 +6927,21 @@ createInitDirectories <- function(debug) {
 ##
 #	Set the initial values and start the report function
 ##
-startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
-	initRfunction(debug)
+startOptions <- function(args, typOfStartOptions = START.TYP.TEST, catch = FALSE, debug = FALSE) {
+	debug %debug% "startOptions()"
+	
+	checkRPackagesVersions <- as.logical(FALSE %exists% args[15])
+	installMissingRPackages <- as.logical(FALSE %exists% args[16])
+	updateOldRPackages <- as.logical(FALSE %exists% args[17])
+
+	initRfunction(install = installMissingRPackages, update = updateOldRPackages, check = checkRPackagesVersions, catch = catch, debug = debug)
+	
 	#typOfStartOptions <- START.TYP.TEST; debug = TRUE;
 	createInitDirectories(debug)
 	typOfStartOptions <- tolower(typOfStartOptions)
 	
-	args <- commandArgs(TRUE)	
+#	args <- commandArgs(TRUE)
+
 	saveFormat = "pdf"
 	dpi = "90"
 	
@@ -6968,7 +6988,7 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 	appendix = FALSE
 	
 	separation = ";"
-	
+		
 	if (typOfStartOptions == START.TYP.REPORT) {
 		fileName <- fileName %exists% args[1]
 		
@@ -7064,7 +7084,12 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 			library("snowfall")
 		}
 		debug <- TRUE
-		initRfunction(debug)
+		checkRPackagesVersions <- FALSE
+		installMissingRPackages <- FALSE
+		updateOldRPackages <- FALSE
+		catchErrorAndReport <- TRUE
+		
+		initRfunction(install = installMissingRPackages, update = updateOldRPackages, check = checkRPackagesVersions, catch = catchErrorAndReport, debug = debug)
 		if (DO.PARALLELISATION) {
 			sfStop()
 		}
@@ -7072,12 +7097,12 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 		#filterTreatment <- "Athletico$Fernandez$Weisse Zarin"
 		
 		#treatment <- "none"
-#		treatment <- "Treatment"
-		treatment <- "Genotype"
+		treatment <- "Treatment"
+		#treatment <- "Genotype"
 		#filterTreatment <- "stress / control"
-		filterTreatment <- "none"
+		#filterTreatment <- "none"
 		#filterTreatment <- "control"
-		#filterTreatment <- "dry$normal"
+		filterTreatment <- "dry$normal"
 		#filterTreatment <- "Trockentress$normal bewaessert"
 		#filterTreatment <- "N661230.3 x IL$N323525.9 x IL$N590895.3 x IL"
 		
@@ -7130,6 +7155,9 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 		calculateNothing <- FALSE
 		stoppTheCalculation <- FALSE
 		iniDataSet <- workingDataSet
+		
+		
+		removeAllFilesWithoutTheReport <- FALSE
 		
 		
 		loadFiles(path = ".", pattern = "PlotList\\.[Rr]$")
@@ -7282,7 +7310,8 @@ startOptions <- function(typOfStartOptions = START.TYP.TEST, debug = FALSE) {
 									filterTreatmentRename = renameList$filterTreatmentRename, secondFilterTreatmentRename = renameList$secondFilterTreatmentRename, 
 									stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel, 
 									splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond, 
-									deleteNboxplot = !secondRun)
+									deleteNboxplot = !secondRun,
+									catch = catch)
 							if (secondRun) {
 								appendix <- TRUE
 								secondRun <- FALSE
@@ -7346,7 +7375,8 @@ createDiagrams <- function(iniDataSet, saveFormat = "pdf", dpi = "90", isGray = 
 		filterTreatmentRename = list(), secondFilterTreatmentRename = list(), 
 		stressStart = -1, stressEnd = -1, stressTyp = -1, stressLabel = -1, 
 		splitTreatmentFirst = TRUE, splitTreatmentSecond = FALSE, 
-		deleteNboxplot = TRUE) {		
+		deleteNboxplot = TRUE,
+		catch = FALSE) {		
 	
 	overallList <- list(iniDataSet = iniDataSet, saveFormat = saveFormat, dpi = dpi, isGray = isGray, 
 			nBoxDes = nBoxDes, nBoxMultiDes = nBoxMultiDes, boxDes = boxDes, boxStackDes = boxStackDes, boxSpiderDes = boxSpiderDes, violinBoxDes = violinBoxDes, linerangeDes = linerangeDes, 
@@ -7364,7 +7394,8 @@ createDiagrams <- function(iniDataSet, saveFormat = "pdf", dpi = "90", isGray = 
 			filterTreatmentRename = filterTreatmentRename, secondFilterTreatmentRename = secondFilterTreatmentRename, 
 			stressStart = stressStart, stressEnd = stressEnd, stressTyp = stressTyp, stressLabel = stressLabel, 
 			splitTreatmentFirst = splitTreatmentFirst, splitTreatmentSecond = splitTreatmentSecond, 
-			deleteNboxplot = deleteNboxplot
+			deleteNboxplot = deleteNboxplot,
+			catch = catch
 	)	
 	
 	overallList$debug %debug% "Start"
@@ -7416,8 +7447,32 @@ createDiagrams <- function(iniDataSet, saveFormat = "pdf", dpi = "90", isGray = 
 	}
 	return(list(filterTreatmentRename = overallList$filterTreatmentRename, secondFilterTreatmentRename = overallList$secondFilterTreatmentRename))
 }
+#
+#deletAllFilesWithoutReport <- function(filename, debug = FALSE) {
+#	debug %debug% "deletAllFilesWithoutReport()"
+#	
+#	files <- list.files()
+#	if(filename %in% files) {		
+##		file.remove(files[!(files %in% filename)])
+#		
+#		paste("löschen der Dateien:", files[!(files %in% filename)])
+#		
+#		dirs <- list.dirs()
+#		for(nn in dirs) {
+#			paste("löschen:", nn)
+##			unlink(nn, recursive = TRUE)
+#		}		
+#	} else {
+#		print("alles löschen")
+##		unlink(".", recursive = TRUE)
+#	}
+#}
 
-initSnow <- function() {
+
+
+initSnow <- function(debug = FALSE) {
+	debug %debug% "initSnow()"
+	
 	library("snowfall")
 	
 	if (CPU.ATUO.DETECTED) {
@@ -7427,37 +7482,57 @@ initSnow <- function() {
 	sfInit(parallel = threaded, cpus = CPU.CNT)
 	
 	if (sfParallel()) {
-		ownCat(c("Running in parallel mode on", sfCpus(), "nodes."))
+		TRUE %print% paste("Running in parallel mode on", sfCpus(), "nodes.", sep="")
 		threaded <- TRUE
 	} else {
-		ownCat("Running in sequential mode.")
+		TRUE %print% "Running in sequential mode."
 		threaded <- FALSE
 	}
 	if (threaded)
 		sfExportAll()
 }
 
-stopSnow <- function() {
+stopSnow <- function(debug = FALSE) {
+	debug %debug% "stopSnow()"
+	
 	sfStop()
 }
 
-if (DO.PARALLELISATION) {
-	initSnow()
+
+processing <- function() {
+	
+	args <- commandArgs(TRUE)
+	catchErrorAndReport <- as.logical(CATCH.ERROR %exists% args[19])
+	debug <- as.logical(DEBUG %exists% args[18])
+	
+	debug %debug% "processing()"
+	
+	if (DO.PARALLELISATION) {
+		initSnow(debug = debug)
+	}
+	
+	if (catchErrorAndReport) {
+		error <- try(startOptions(args, START.TYP.REPORT, catch = catchErrorAndReport, debug = debug))
+		checkOfTryError(error)
+	} else {
+		startOptions(args, START.TYP.REPORT, catch = catchErrorAndReport, debug = debug)
+	}
+		
+	TRUE %print% "Completing diagram and creation with R ..."	
+	if (DO.PARALLELISATION) {
+		stopSnow(debug = debug)
+	}
+	
+#	if(as.logical(FALSE %exists% args[20])) {
+#		deletAllFilesWithoutReport(filename = REPORT.PDF, debug = debug)
+#	}
+	
+	
+	if (debug) {
+		TRUE %print% "Print all warnings:"
+		warnings()
+	}
 }
 
-if (CATCH.ERROR) {
-	error <- try(startOptions(START.TYP.REPORT, debug = debug))
-	checkOfTryError(error)
-} else {
-	startOptions(START.TYP.REPORT, debug = debug)
-}
-ownCat("Completing diagram creation ...")
-if (DO.PARALLELISATION) {
-	stopSnow()
-}
-if (debug) {
-	ownCat("Print all warnings:")
-	warnings()
-}
-
+processing()
 rm(list = ls(all = TRUE))
