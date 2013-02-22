@@ -564,7 +564,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					// p.deleteDirectory();
 					
 					if (SystemOptions.getInstance().getBoolean("PDF Report Generation", "remove intermediate files (just keep PDF)", false)) {
-						p.deleteAllWithout(new String[] { "report.pdf" });
+						p.deleteAllWithout(new String[] { "report.pdf" }, new String[] { "plots", "plotTex", "section" });
 					}
 					
 				} else {
