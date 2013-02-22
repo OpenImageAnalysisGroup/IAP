@@ -326,8 +326,10 @@ public class PdfCreator {
 			for (ConditionInterface ci : si) {
 				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
 				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
-				treatments.add(t);
-				growthConds.add(gc);
+				if (t != null && !t.trim().isEmpty())
+					treatments.add(t);
+				if (gc != null && !gc.trim().isEmpty())
+					growthConds.add(gc);
 			}
 		
 		for (SubstanceInterface si : e)
@@ -339,18 +341,18 @@ public class PdfCreator {
 				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
 				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
 				if (sp != null && sp.length() > 40)
-					sp = sp.substring(0, 40) + " ...";
+					sp = sp.substring(0, 36) + " ...";
 				if (gt != null && gt.length() > 40)
-					gt = gt.substring(0, 40) + " ...";
+					gt = gt.substring(0, 36) + " ...";
 				if (v != null && v.length() > 40)
 					v = v.substring(0, 40) + " ...";
 				if (t != null && t.length() > 40)
-					t = t.substring(0, 40) + " ...";
+					t = t.substring(0, 36) + " ...";
 				if (gc != null && gc.length() > 40)
-					gc = gc.substring(0, 40) + " ...";
-				if (treatments.size() == 1)
+					gc = gc.substring(0, 36) + " ...";
+				if (treatments.size() == 1 && !t.trim().isEmpty())
 					t = "(all equal)";
-				if (growthConds.size() == 1)
+				if (growthConds.size() == 1 && !gc.trim().isEmpty())
 					gc = "(all equal)";
 				boolean first = true;
 				String row = "";
