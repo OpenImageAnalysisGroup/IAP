@@ -99,6 +99,8 @@ public class PdfCreator {
 	public void executeRstat(String[] para, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
 		
+		exp.numberConditions();
+		
 		para = extendParameter(para,
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "enforce minimum R package versions", true),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "install missing required R packages", false),
@@ -327,6 +329,16 @@ public class PdfCreator {
 				String v = StringManipulationTools.string2Latex(ci.getVariety() != null ? ci.getVariety() : "");
 				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
 				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
+				if (sp != null && sp.length() > 40)
+					sp = sp.substring(0, 40) + " ...";
+				if (gt != null && gt.length() > 40)
+					gt = gt.substring(0, 40) + " ...";
+				if (v != null && v.length() > 40)
+					v = v.substring(0, 40) + " ...";
+				if (t != null && t.length() > 40)
+					t = t.substring(0, 40) + " ...";
+				if (gc != null && gc.length() > 40)
+					gc = gc.substring(0, 40) + " ...";
 				boolean first = true;
 				String row = "";
 				// t.split(";")
@@ -338,6 +350,7 @@ public class PdfCreator {
 						row += safe(" &  &  &  & " + inRow + " & &  \\tabularnewline");
 					}
 				}
+				
 				row += " \\hline";
 				row = StringManipulationTools.stringReplace(row, "=", ": ");
 				row = StringManipulationTools.stringReplace(row, "(", " (");

@@ -473,9 +473,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						if (tso.getBval(0, true)) {
 							String colHeader = (String) tso.getParam(0, "");
 							String colNiceName = (String) tso.getParam(1, "");
-							if (colHeader.equals("water_weight"))
+							if (colHeader.equals("water_weight (g)"))
 								colHeader = "Water (weight-diff)";
-							if (colHeader.equals("weight_before"))
+							if (colHeader.equals("weight_before (g)"))
 								colHeader = "Weight A (g)";
 							clusteringProperties.add(colHeader);
 						}
