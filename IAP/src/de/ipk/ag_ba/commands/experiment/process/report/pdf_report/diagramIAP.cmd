@@ -15,7 +15,11 @@ echo "Stress typ?   : $9"
 echo "Stress label? : ${10}"
 echo "Split Cond1?  : ${11}"
 echo "Split Cond2?  : ${12}"
-
+echo "Check package version?  : ${13}"
+echo "Install new package?  : ${14}"
+echo "Update package? : ${15}"
+echo "Debug? : ${16}"
+echo "Catch error? : ${17}"
 
 if[-f report.aux]; then
 	del /s report.aux

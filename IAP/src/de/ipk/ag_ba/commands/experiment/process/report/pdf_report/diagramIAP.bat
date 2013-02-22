@@ -29,8 +29,6 @@ shift /8
 echo Debug?: %9
 shift /8
 echo Catch error?: %9
-shift /8
-echo Delete all files?: %9
 
 
 rem The delete option is important at the development phase

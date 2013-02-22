@@ -7447,28 +7447,6 @@ createDiagrams <- function(iniDataSet, saveFormat = "pdf", dpi = "90", isGray = 
 	}
 	return(list(filterTreatmentRename = overallList$filterTreatmentRename, secondFilterTreatmentRename = overallList$secondFilterTreatmentRename))
 }
-#
-#deletAllFilesWithoutReport <- function(filename, debug = FALSE) {
-#	debug %debug% "deletAllFilesWithoutReport()"
-#	
-#	files <- list.files()
-#	if(filename %in% files) {		
-##		file.remove(files[!(files %in% filename)])
-#		
-#		paste("löschen der Dateien:", files[!(files %in% filename)])
-#		
-#		dirs <- list.dirs()
-#		for(nn in dirs) {
-#			paste("löschen:", nn)
-##			unlink(nn, recursive = TRUE)
-#		}		
-#	} else {
-#		print("alles löschen")
-##		unlink(".", recursive = TRUE)
-#	}
-#}
-
-
 
 initSnow <- function(debug = FALSE) {
 	debug %debug% "initSnow()"
@@ -7522,11 +7500,6 @@ processing <- function() {
 	if (DO.PARALLELISATION) {
 		stopSnow(debug = debug)
 	}
-	
-#	if(as.logical(FALSE %exists% args[20])) {
-#		deletAllFilesWithoutReport(filename = REPORT.PDF, debug = debug)
-#	}
-	
 	
 	if (debug) {
 		TRUE %print% "Print all warnings:"
