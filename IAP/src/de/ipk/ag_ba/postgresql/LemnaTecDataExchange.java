@@ -35,10 +35,12 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
+import de.ipk.ag_ba.commands.load_lt.TableDataHeadingRow;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -49,6 +51,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDataStringRow;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -56,7 +59,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * @author entzian, klukas
+ * @author klukas, entzian
  */
 public class LemnaTecDataExchange implements ExperimentLoader {
 	private final String user;
@@ -125,8 +128,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		}
 		return result;
 	}
-	
-	// private static HashMap<String, Collection<ExperimentHeaderInterface>> memRes1 = new HashMap<String, Collection<ExperimentHeaderInterface>>();
 	
 	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database) throws ClassNotFoundException, SQLException {
 		return getExperimentsInDatabase(user, database, null);
@@ -1147,6 +1148,16 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		return experiment;
 	}
 	
+	private HashSet<String> getMetaNamesSeedDates() {
+		HashSet<String> res = new HashSet<String>();
+		String[] seedDataIDs = SystemOptions.getInstance().getStringAll("Metadata",
+				"Seed Date IDs", new String[] { "SEEDDATE", "seed date", "Aussaat", "Sowing", "Seeddate" });
+		if (seedDataIDs != null)
+			for (String s : seedDataIDs)
+				res.add(s);
+		return res;
+	}
+	
 	private void updateSnapshotTimes(ExperimentInterface experiment, int add, String newTimeUnit) {
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
@@ -1227,9 +1238,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	private HashMap<String, Condition> getPlantIdAnnotation(ExperimentHeaderInterface header) throws SQLException,
 			ClassNotFoundException {
 		HashMap<String, Condition> res = new HashMap<String, Condition>();
-		
-		HashSet<String> globalEnvironmentMetaNames = getEnvironmentMetaNames();
-		
 		Connection connection = openConnectionToDatabase(header.getDatabase());
 		try {
 			String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
@@ -1245,20 +1253,20 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			try {
 				ResultSet rs = ps.executeQuery();
 				
-				HashSet<String> seedDateNames = getMetaNamesSeedDates();
+				ArrayList<String> possibleValues = new ArrayList<String>();
+				possibleValues.add("Ignored Column");
+				possibleValues.add("Plant ID");
+				for (ConditionInfo ci : ConditionInfo.values())
+					if (ci != ConditionInfo.IGNORED_FIELD)
+						if (ci != ConditionInfo.FILES)
+							possibleValues.add(ci + "");
 				
 				while (rs.next()) {
-					
 					String plantID = rs.getString(1);
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					// String info = "metaName: " + metaName + " metaValue: " + metaValue;
-					// if (!printedMetaData.contains(info)) {
-					// System.out.println(info);
-					// printedMetaData.add(info);
-					// }
 					
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
@@ -1266,97 +1274,27 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						res.get(plantID).setSpecies(species);
 					}
 					
-					if (seedDateNames.contains(metaName)) {
-						addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
-					} else
-						if (metaName.equalsIgnoreCase("Sequence") || metaName.equalsIgnoreCase("Transplantingdate")) {
-							addSequenceInfoToCondition(res.get(plantID), metaName, metaValue);
-						} else
-							if (metaName.equalsIgnoreCase("Species") || metaName.equalsIgnoreCase("Pflanzenart") ||
-									metaName.equalsIgnoreCase("Plant"))
-								// res.get(plantID).setSpecies(filterName(metaValue));
-								res.get(plantID).setSpecies(metaValue);
+					String sel = SystemOptions.getInstance().getStringRadioSelection(
+							"Metadata",
+							"Columns//" + metaName,
+							possibleValues, getDefaultSelection(null, metaName, possibleValues), true);
+					boolean includeMetaDataType = SystemOptions.getInstance().getBoolean(
+							"Metadata", "Columns//" + metaName + " - use as prefix", sel != null && sel.equals("Ignored Column"));
+					if (sel != null && !sel.equals("Ignored Column") && !sel.equals("Plant ID")) {
+						ConditionInfo ciSel = ConditionInfo.valueOfString(sel);
+						if (ciSel != null) {
+							if (includeMetaDataType)
+								metaValue = metaName + ": " + metaValue;
+							String currentVal = res.get(plantID).getField(ciSel);
+							if (currentVal != null && currentVal.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
+								currentVal = null;
+							if (currentVal == null || currentVal.trim().isEmpty())
+								res.get(plantID).setField(ciSel, metaValue);
 							else
-								if (metaName.equalsIgnoreCase("Genotype") || metaName.equalsIgnoreCase("Pflanzenname")
-										|| metaName.equalsIgnoreCase("Name")
-										|| metaName.equalsIgnoreCase("GENOTYP")
-								// || metaName.equalsIgnoreCase("TYP")
-								)
-									res.get(plantID).setGenotype(metaValue);
-								else
-									if (metaName.equalsIgnoreCase("Variety") || metaName.equalsIgnoreCase("variety-tax")
-											|| metaName.equalsIgnoreCase("ID genotype") || metaName.equalsIgnoreCase("ID Genotyp"))
-										res.get(plantID).setVariety(metaValue);
-									else
-										if (metaName.equalsIgnoreCase("Growthconditions") || metaName.equalsIgnoreCase("Pot") ||
-												metaName.equalsIgnoreCase("Topf") ||
-												metaName.equalsIgnoreCase("Covering") ||
-												metaName.equalsIgnoreCase("Potting")) {
-											addGrowthCondition(res.get(plantID), metaName, metaValue);
-										} else
-											if (globalEnvironmentMetaNames.contains(metaName)) {
-												addSequenceInfoToExperiment(header, metaName + ": " + metaValue);
-											} else {
-												if (metaValue != null && metaValue.trim().length() > 0) {
-													String oldTreatment = res.get(plantID).getTreatment();
-													if (oldTreatment == null)
-														oldTreatment = "";
-													if (oldTreatment.length() > 0 && !oldTreatment.endsWith(";"))
-														oldTreatment = oldTreatment + ";";
-													
-													String oldVariety = res.get(plantID).getVariety();
-													if (oldVariety == null)
-														oldVariety = "";
-													if (oldVariety.length() > 0)
-														oldVariety = oldVariety + ";";
-													
-													// if (metaName.startsWith("ID Genotyp")) {
-													// ignore this annotation, it was used by KFW, AG HET to identify the replicate
-													// the plant ID is used for identification of the replicate, already. So this
-													// information is not needed and disturbs the definition of the treatment information
-													// } else
-													if (metaName.startsWith("old ID")) {
-														if (!oldTreatment.contains("old IDs defined"))
-															res.get(plantID).setTreatment(oldTreatment + "old IDs defined");
-													} else
-														if (metaName.startsWith("Sorte")) {
-															if (!oldTreatment.contains(metaValue.trim()))
-																res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
-														} else {
-															if (metaName.equalsIgnoreCase("Typ")) {
-																// addSequenceInfoToCondition(res.get(plantID), metaName + ": " + metaValue.trim());
-																res.get(plantID).setTreatment(oldTreatment + metaValue.trim());
-															} else {
-																if (metaName.startsWith("conditions "))
-																	metaName = metaName.substring("conditions ".length()).trim();
-																
-																if (!oldTreatment.contains(metaName + ": " + metaValue.trim()))
-																	res.get(plantID).setTreatment(oldTreatment + metaName + ": " + metaValue.trim());
-																else {
-																	if (metaValue != null && metaValue.trim().length() > 0) {
-																		String ss = metaName + ": " + metaValue;
-																		if (oldTreatment != null && oldTreatment.length() > 0) {
-																			if (!oldTreatment.contains(ss))
-																				res.get(plantID).setTreatment(oldTreatment + ss);
-																		} else
-																			res.get(plantID).setTreatment(ss);
-																	}
-																}
-															}
-														}
-													String currentTreatment = res.get(plantID).getTreatment();
-													if (currentTreatment != null) {
-														TreeSet<String> content = new TreeSet<String>();
-														for (String s : currentTreatment.split(";")) {
-															s = s.trim();
-															if (!s.isEmpty())
-																content.add(s);
-														}
-														res.get(plantID).setTreatment(StringManipulationTools.getStringList(content, ";"));
-													}
-												}
-											}
-					
+								if (!currentVal.contains(metaValue))
+									res.get(plantID).setField(ciSel, currentVal.trim() + " // " + metaValue);
+						}
+					}
 				}
 				rs.close();
 				ps.close();
@@ -1368,91 +1306,6 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			closeDatabaseConnection(connection);
 		}
 		return res;
-	}
-	
-	private void addGrowthCondition(Condition condition, String metaName, String metaValue) {
-		String con = condition.getGrowthconditions();
-		if (con == null || con.trim().isEmpty()) {
-			if (metaName.equalsIgnoreCase("Growthconditions"))
-				condition.setGrowthconditions(metaValue);
-			else
-				condition.setGrowthconditions(metaName + ":" + metaValue);
-		} else {
-			condition.setGrowthconditions(con + " // " + metaName + ":" + metaValue);
-		}
-	}
-	
-	private HashSet<String> getMetaNamesSeedDates() {
-		HashSet<String> res = new HashSet<String>();
-		res.add("SEEDDATE");
-		res.add("seed date");
-		res.add("Aussaat");
-		res.add("Sowing");
-		res.add("Seeddate");
-		return res;
-	}
-	
-	private HashSet<String> getEnvironmentMetaNames() {
-		HashSet<String> res = new HashSet<String>();
-		res.add("SEEDDATE");
-		res.add("seed date");
-		res.add("Aussaat");
-		res.add("Kühlung");
-		res.add("Keimung");
-		res.add("Start Experiment");
-		res.add("Ende Experiment");
-		res.add("Bewässerung");
-		res.add("Aufnahme");
-		res.add("Lichtintensität");
-		res.add("Lichtzeitraum");
-		res.add("Tageslänge");
-		res.add("Temperatur (Tag)");
-		res.add("Temperatur (Nacht)");
-		res.add("rel.Luftfeuchte (Tag)");
-		res.add("rel.Luftfeuchte (Nacht)");
-		res.add("Day Length");
-		res.add("Finish Experiment");
-		res.add("Germination"); // ?? eventually plant specific
-		res.add("Imaging");
-		res.add("Light Intensity");
-		res.add("Light Period");
-		res.add("Sowing");
-		res.add("Stratification");
-		res.add("Temperature (Day)");
-		res.add("Temperature (Night)");
-		// res.add("Watering"); // used as treatment by 1207RM
-		res.add("rel.Humidity (Day)");
-		res.add("rel.Humidity (Night)");
-		return res;
-	}
-	
-	private void addSequenceInfoToExperiment(ExperimentHeaderInterface header, String value) {
-		String current = (header.getSequence() != null) ? header.getSequence() : "";
-		if (current.length() > 0)
-			current += " // ";
-		if (!current.contains(value + " // ")) {
-			current += value;
-			header.setSequence(current);
-		}
-	}
-	
-	private void addSequenceInfoToCondition(Condition condition, String metaName, String value) {
-		String current = (condition.getSequence() != null) ? condition.getSequence() : "";
-		if (current.length() > 0)
-			current += " // ";
-		if (!metaName.equals("Sequence"))
-			value = metaName + ":" + value;
-		if (!current.contains(value + " // ")) {
-			current += value;
-			condition.setSequence(current);
-		}
-	}
-	
-	private String filterName(String metaValue) {
-		String result = metaValue;
-		if (result.indexOf("_") > 0)
-			result = result.substring(0, result.indexOf("_"));
-		return result;
 	}
 	
 	private int countMeasurementValues(ExperimentInterface experiment, MeasurementNodeType[] measurementNodeTypes) {
@@ -1597,8 +1450,33 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		
 	}
 	
+	public static void extendId2ConditionList(HashMap<String, Condition> optIdTag2condition, TableDataHeadingRow heading, ArrayList<TableDataStringRow> md) {
+		for (TableDataStringRow tdsr : md) {
+			String id = heading.getPlantID(tdsr);
+			if (id != null) {
+				Condition c = new Condition(null);
+				c.setSpecies(heading.getSpecies(tdsr));
+				c.setGenotype(heading.getGenotype(tdsr));
+				c.setVariety(heading.getVariety(tdsr));
+				c.setSequence(heading.getSequence(tdsr));
+				c.setTreatment(heading.getTreatment(tdsr));
+				c.setGrowthconditions(heading.getGrowthconditions(tdsr));
+				optIdTag2condition.put(id, c);
+			}
+		}
+	}
+	
 	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh,
 			ArrayList<Snapshot> snapshots, HashMap<String, Condition> optIdTag2condition) throws ClassNotFoundException, SQLException {
 		return new LemnaTecDataExchange().getExperiment(eh, false, null, snapshots, optIdTag2condition);
+	}
+	
+	public static String getDefaultSelection(Integer optCol, String heading, ArrayList<String> possibleValues) {
+		if (optCol != null && optCol == 1)
+			return possibleValues.get(1);
+		for (String p : possibleValues)
+			if (p.equalsIgnoreCase(heading))
+				return p;
+		return "Ignored Column";
 	}
 }

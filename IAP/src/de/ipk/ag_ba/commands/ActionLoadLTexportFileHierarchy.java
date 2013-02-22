@@ -213,19 +213,8 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				TableDataHeadingRow heading = metadataHeading.get(fn);
 				if (heading == null)
 					heading = new TableDataHeadingRow(null); // default heading info
-				for (TableDataStringRow tdsr : metadata.get(fn)) {
-					String id = heading.getPlantID(tdsr);
-					if (id != null) {
-						Condition c = new Condition(null);
-						c.setSpecies(heading.getSpecies(tdsr));
-						c.setGenotype(heading.getGenotype(tdsr));
-						c.setVariety(heading.getVariety(tdsr));
-						c.setSequence(heading.getSequence(tdsr));
-						c.setTreatment(heading.getTreatment(tdsr));
-						c.setGrowthconditions(heading.getGrowthconditions(tdsr));
-						optIdTag2condition.put(id, c);
-					}
-				}
+				ArrayList<TableDataStringRow> md = metadata.get(fn);
+				LemnaTecDataExchange.extendId2ConditionList(optIdTag2condition, heading, md);
 			}
 		}
 		// get experiment from snapshot info...

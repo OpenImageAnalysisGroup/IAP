@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.SystemOptions;
 
+import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDataStringRow;
 
@@ -16,22 +17,22 @@ public class TableDataHeadingRow {
 	private final String separator;
 	
 	public TableDataHeadingRow(HashMap<Integer, String> col2heading) {
-		separator = SystemOptions.getInstance().getString("Metadata Import",
+		separator = SystemOptions.getInstance().getString("Metadata",
 				"Multiple-Value-Meta-Data-Connector", " // ");
 		if (col2heading == null) {
-			plantIDcol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			plantIDcol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Plant-ID", new Integer[] { 1 });
-			speciesCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			speciesCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Species", new Integer[] { 2 });
-			genotypeCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			genotypeCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Genotype", new Integer[] { 3 });
-			treatmentCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			treatmentCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Treatment", new Integer[] { 4 });
-			sequenceCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			sequenceCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Sequence", new Integer[] { 5 });
-			varietyCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			varietyCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Variety", new Integer[] { -1 });
-			growthconditionsCol = SystemOptions.getInstance().getIntArray("Metadata Import",
+			growthconditionsCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Growthconditions", new Integer[] { 7 });
 		} else {
 			ArrayList<Integer> plantIDcolARR = new ArrayList<Integer>();
@@ -61,9 +62,9 @@ public class TableDataHeadingRow {
 			for (Integer col : col2heading.keySet()) {
 				String heading = col2heading.get(col);
 				String sel = SystemOptions.getInstance().getStringRadioSelection(
-						"Metadata Import",
+						"Metadata",
 						"Columns//" + heading,
-						possibleValues, getDefaultSelection(col, heading, possibleValues), true);
+						possibleValues, LemnaTecDataExchange.getDefaultSelection(col, heading, possibleValues), true);
 				if (sel != null && sel.equals("Plant ID")) {
 					plantIDcolARR.add(col);
 				} else
@@ -83,15 +84,6 @@ public class TableDataHeadingRow {
 			varietyCol = varietyColARR.toArray(new Integer[] {});
 			growthconditionsCol = growthconditionsColARR.toArray(new Integer[] {});
 		}
-	}
-	
-	private String getDefaultSelection(Integer col, String heading, ArrayList<String> possibleValues) {
-		if (col == 1)
-			return possibleValues.get(1);
-		for (String p : possibleValues)
-			if (p.equalsIgnoreCase(heading))
-				return p;
-		return "Ignored Column";
 	}
 	
 	public String getPlantID(TableDataStringRow tdsr) {

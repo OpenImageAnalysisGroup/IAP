@@ -936,15 +936,12 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL()) && image.getLabelURL() != null) {
 				DBObject knownLabelURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", image.getLabelURL().toString()));
 				if (knownURL != null && knownLabelURL != null) {
-					GridFS gridfs_images = cols.gridfs_images;
-					GridFS gridfs_label_files = cols.gridfs_label_files;
-					
 					String hashMain = (String) knownURL.get("hash");
-					GridFSDBFile fffMain = gridfs_images.findOne(hashMain);
-					if (fffMain != null) {
+					boolean fffMain = mh.hasInputStreamForHash(hashMain);
+					if (fffMain) {
 						String hashLabel = (String) knownLabelURL.get("hash");
-						GridFSDBFile fffLabel = gridfs_label_files.findOne(hashLabel);
-						if (fffMain != null && fffLabel != null && hashMain != null && hashLabel != null) {
+						boolean fffLabel = mh.hasInputStreamForHash(hashLabel);
+						if (fffMain && fffLabel && hashMain != null && hashLabel != null) {
 							image.getURL().setPrefix(mh.getPrefix());
 							image.getURL().setDetail(hashMain);
 							image.getLabelURL().setPrefix(mh.getPrefix());
