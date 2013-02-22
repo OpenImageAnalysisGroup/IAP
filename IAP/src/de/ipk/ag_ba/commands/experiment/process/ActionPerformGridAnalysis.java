@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.ErrorMsg;
 
@@ -41,15 +41,16 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 		try {
 			ExperimentInterface e = experimentReference.getData(m);
 			List<NumericMeasurementInterface> images = Substance3D.getAllFiles(e, MeasurementNodeType.IMAGE);
-			HashSet<String> ids = new HashSet<String>();
+			TreeSet<String> ids = new TreeSet<String>();
 			if (images != null) {
-				for (NumericMeasurementInterface nmi : images)
+				for (NumericMeasurementInterface nmi : images) {
 					if (nmi.getQualityAnnotation() != null && !nmi.getQualityAnnotation().isEmpty())
 						ids.add(nmi.getQualityAnnotation());
+				}
 			}
+		
 			if (ids.size() > 1)
-				numberOfJobs = ids.size();
-			this.numberOfJobs = experimentReference.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+				this.numberOfJobs = ids.size();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
