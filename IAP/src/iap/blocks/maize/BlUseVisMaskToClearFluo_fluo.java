@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 /**
- * Clears the fluo top image (not side), based on the vis mask.
+ * Clears the fluo image, based on the vis mask.
  * 
  * @author Christian Klukas
  */
@@ -33,7 +33,7 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 			return input().masks().fluo();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			// apply enlarged VIS mask to fluo
-			ImageOperation fluo = input().masks().fluo().copy().io().show("FLUOOO", debug);
+			ImageOperation fluo = input().masks().fluo().copy().io().show("FLUO", debug);
 			int b = (int) (input().masks().vis().getWidth() * 0.3);
 			FlexibleImage mask = input().masks().vis().copy().io().
 					addBorder(b, b / 2, (b / 2), options.getBackground()).

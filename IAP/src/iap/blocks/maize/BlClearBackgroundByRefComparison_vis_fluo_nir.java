@@ -208,17 +208,17 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		if (input().images().nir() != null && input().masks().nir() != null) {
 			if (options.getCameraPosition() == CameraPosition.SIDE) {
 				FlexibleImage nir = input().masks().nir();
-				if (options.isBarleyInBarleySystem()) {
+				if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
 					// remove horizontal bar
-					nir = filterHorBar(nir);
+					nir = filterHorBar(nir).show("removed constant bar", debug);
 				}
-				if (options.isMaize()) {
-					int blackDiff = getInt("Clear-background-nir-black-diff-top", 14) / 3;
-					int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20) / 3;
+				if (getBoolean("Process NIR Mask", options.isMaize())) {
+					int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
+					int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
 					FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
 							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
 							.show("result nir", debug).getImage();
-					msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
+					// msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage().show("result NIR mask", debug);
 					
 					return msk;
 				}
