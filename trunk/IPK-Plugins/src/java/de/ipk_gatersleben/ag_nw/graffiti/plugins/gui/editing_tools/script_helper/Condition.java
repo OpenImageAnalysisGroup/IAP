@@ -847,14 +847,40 @@ public class Condition implements ConditionInterface {
 				break;
 			case TREATMENT:
 				setTreatment(value);
+				break;
 			case SEQUENCE:
 				setSequence(value);
+				break;
 			case FILES:
 				setFiles(value);
+				break;
 			case IGNORED_FIELD:
 				// intentionally empty
 				break;
 		}
+	}
+	
+	public String getField(ConditionInfo field) {
+		switch (field) {
+			case SPECIES:
+				return getSpecies();
+			case GENOTYPE:
+				return getGenotype();
+			case VARIETY:
+				return getVariety();
+			case GROWTHCONDITIONS:
+				return getGrowthconditions();
+			case TREATMENT:
+				return getTreatment();
+			case SEQUENCE:
+				return getSequence();
+			case FILES:
+				return getFiles();
+			case IGNORED_FIELD:
+				// intentionally empty
+				return null;
+		}
+		return null;
 	}
 	
 	@Override
