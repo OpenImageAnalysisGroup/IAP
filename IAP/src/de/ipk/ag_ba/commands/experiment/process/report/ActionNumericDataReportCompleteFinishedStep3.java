@@ -21,6 +21,7 @@ import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -561,6 +562,11 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 						status.setCurrentStatusText2("Processing finished");
 					
 					// p.deleteDirectory();
+					
+					if (SystemOptions.getInstance().getBoolean("PDF Report Generation", "remove intermediate files (just keep PDF)", false)) {
+						p.deleteAllWithout(new String[] { "report.pdf" });
+					}
+					
 				} else {
 					p.openTargetDirectory();
 				}

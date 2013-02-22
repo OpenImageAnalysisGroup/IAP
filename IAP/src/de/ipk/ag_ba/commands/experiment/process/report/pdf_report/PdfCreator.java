@@ -100,12 +100,11 @@ public class PdfCreator {
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
 		
 		para = extendParameter(para,
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "check R package versions", false),
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "enforce minimum R package versions", true),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "install missing required R packages", false),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "automatic update of R packages", false),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "script debug function", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "enforce minimum R package versions", false),
-				SystemOptions.getInstance().getBoolean("PDF Report Generation", "remove intermediate files (just keep PDF)", false));
+				SystemOptions.getInstance().getBoolean("PDF Report Generation", "catch errors", true));
 		
 		this.lastOutput = lastOutput;
 		readAndModifyLaTexFile("reportDefGeneralSection.tex", exp);
@@ -394,6 +393,48 @@ public class PdfCreator {
 		}
 		out.close();
 		return bos.getBuffTrimmed();
+	}
+	
+	public void deleteAllWithout(String[] files) {
+		deletAllInThisDir(tempDirectory, files);
+	}
+	
+	private void deletAllInThisDir(File dir, String[] filesNotDelete) {
+		// System.out.println("... delete all old files in the directory: " + dir.getName());
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory()) {
+				deletAllInThisDir(file, filesNotDelete);
+				file.delete();
+			} else {
+				if (!arrayContains(filesNotDelete, file.getName(), true)) {
+					if (!file.delete()) {
+						System.err.println(file + " could not be deleted!");
+					}
+				}
+			}
+			
+		}
+		// System.out.println("... all files from directory " + dir.getName() + " are now deleted!");
+	}
+	
+	public boolean arrayContains(Object[] array, Object value, boolean ignoreCase) {
+		for (int i = 0; i < array.length; i++) {
+			if (((array[i] == null) && (value == null))) {
+				return true;
+			} else {
+				if (ignoreCase) {
+					if (((String) array[i]).equalsIgnoreCase((String) value)) {
+						return true;
+					}
+				} else {
+					if (array[i].equals(value)) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	public void deleteDirectory() {

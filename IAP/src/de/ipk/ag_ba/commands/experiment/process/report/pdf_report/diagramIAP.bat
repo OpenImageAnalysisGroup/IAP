@@ -19,6 +19,18 @@ shift /8
 echo Split Cond1?  : %9
 shift /8
 echo Split Cond2?  : %9
+shift /8
+echo Check package version?  : %9
+shift /8
+echo Install new package?  : %9
+shift /8
+echo Update package?: %9
+shift /8
+echo Debug?: %9
+shift /8
+echo Catch error?: %9
+shift /8
+echo Delete all files?: %9
 
 
 rem The delete option is important at the development phase
