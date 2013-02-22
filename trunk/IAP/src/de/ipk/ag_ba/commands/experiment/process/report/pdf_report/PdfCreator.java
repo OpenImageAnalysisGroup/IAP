@@ -395,16 +395,29 @@ public class PdfCreator {
 		return bos.getBuffTrimmed();
 	}
 	
-	public void deleteAllWithout(String[] files) {
-		deletAllInThisDir(tempDirectory, files);
+	public void deleteAllWithout(String[] files, String[] validSubDirs) {
+		deletAllInThisDir(tempDirectory, files, validSubDirs);
 	}
 	
-	private void deletAllInThisDir(File dir, String[] filesNotDelete) {
+	private void deletAllInThisDir(File dir, String[] filesNotDelete, String[] validSubDirs) {
 		// System.out.println("... delete all old files in the directory: " + dir.getName());
+		boolean found = false;
+		for (File file : dir.listFiles()) {
+			if (!file.isDirectory()) {
+				if (arrayContains(filesNotDelete, file.getName(), true)) {
+					found = true;
+					break;
+				}
+			}
+		}
+		if (!found)
+			throw new UnsupportedOperationException("Target dir " + dir + " is not removed, did not find result files!");
 		for (File file : dir.listFiles()) {
 			if (file.isDirectory()) {
-				deletAllInThisDir(file, filesNotDelete);
-				file.delete();
+				if (arrayContains(validSubDirs, file.getName(), true)) {
+					deletAllInThisDir(file, filesNotDelete, validSubDirs);
+					file.delete();
+				}
 			} else {
 				if (!arrayContains(filesNotDelete, file.getName(), true)) {
 					if (!file.delete()) {
