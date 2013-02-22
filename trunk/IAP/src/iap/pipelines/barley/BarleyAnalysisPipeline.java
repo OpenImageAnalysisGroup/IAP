@@ -11,7 +11,6 @@ import iap.blocks.BlLoadImagesIfNeeded_images_masks;
 import iap.blocks.BlMedianFilterFluo;
 import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
-import iap.blocks.BlRemoveBlackBelt;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.BlockClearNirPotFromNir;
@@ -75,13 +74,12 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
-				BlRemoveBlackBelt.class.getCanonicalName(),
+				// BlRemoveBlackBelt.class.getCanonicalName(),
 				BlLabFilterExt.class.getCanonicalName(),
 				BlockClosingVis.class.getCanonicalName(),
 				BlockClearMasksBasedOnMarkers.class.getCanonicalName(),
 				// BlMedianFilter_vis.class.getCanonicalName(),
 				Bl_Arabidopsis_IRdiff.class.getCanonicalName(),
-				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlIntensityConversion.class.getCanonicalName(),
 				// BlTranslateMatch.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
@@ -91,19 +89,20 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlockCutFromSide.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-				
+
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
-				
+
 				// calculation of numeric values
+				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
 				BlCalcIntensity.class.getCanonicalName(),
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-				
+
 				BlockDrawSkeleton.class.getCanonicalName(),
-				
+
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()

@@ -23,11 +23,14 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	@Override
 	protected FlexibleImage processNIRimage() {
 		FlexibleImage nir = input().images().nir();
+		if (!getBoolean("process NIR image", true))
+			return nir;
 		if (nir == null)
 			return null;
-		if (options.isBarleyInBarleySystem()) {
-			double[] pix = getProbablyWhitePixels(nir);
-			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
+		if (getBoolean("black NIR background", false)) {
+			ImageOperation inv = nir.io().copy().invert();
+			double[] pix = getProbablyWhitePixels(inv.getImage());
+			return inv.imageBalancing(getInt("balance-vertical-brigthness", 180), pix).invert().getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
 			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
@@ -37,11 +40,14 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	@Override
 	protected FlexibleImage processNIRmask() {
 		FlexibleImage nir = input().masks().nir();
+		if (!getBoolean("process NIR mask", true))
+			return nir;
 		if (nir == null)
 			return null;
-		if (options.isBarleyInBarleySystem()) {
-			double[] pix = getProbablyWhitePixels(nir);
-			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();
+		if (getBoolean("black NIR background", false)) {
+			ImageOperation inv = nir.io().copy().invert();
+			double[] pix = getProbablyWhitePixels(inv.getImage());
+			return inv.imageBalancing(getInt("balance-vertical-brigthness", 180), pix).invert().getImage();
 		} else {
 			double[] pix = getProbablyWhitePixels(nir);
 			return nir.io().imageBalancing(getInt("balance-vertical-brigthness", 180), pix).getImage();

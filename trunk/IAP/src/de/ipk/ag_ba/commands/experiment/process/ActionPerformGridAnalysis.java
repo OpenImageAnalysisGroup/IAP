@@ -1,11 +1,20 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 /**
  * @author klukas
@@ -29,6 +38,22 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 			this.mongoDatasetID = experimentReference.getHeader().getDatabaseId();
 		int snapshotsPerJob = 100;
 		this.numberOfJobs = experimentReference.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		try {
+			ExperimentInterface e = experimentReference.getData(m);
+			List<NumericMeasurementInterface> images = Substance3D.getAllFiles(e, MeasurementNodeType.IMAGE);
+			HashSet<String> ids = new HashSet<String>();
+			if (images != null) {
+				for (NumericMeasurementInterface nmi : images)
+					if (nmi.getQualityAnnotation() != null && !nmi.getQualityAnnotation().isEmpty())
+						ids.add(nmi.getQualityAnnotation());
+			}
+			if (ids.size() > 1)
+				numberOfJobs = ids.size();
+			this.numberOfJobs = experimentReference.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		
 	}
 	
 	@Override

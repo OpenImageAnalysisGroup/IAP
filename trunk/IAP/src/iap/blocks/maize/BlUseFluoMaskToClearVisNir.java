@@ -35,7 +35,8 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (input().masks().vis() == null || input().masks().fluo() == null)
+		if (input().masks().vis() == null || input().masks().fluo() == null ||
+				!getBoolean("Provess VIS", true))
 			return input().masks().vis();
 		if (options.getCameraPosition() == CameraPosition.TOP || (options.isBarley() && !options.isBarleyInBarleySystem())
 				|| options.isMaize()) {
@@ -73,7 +74,8 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (input().images().nir() == null || input().masks().fluo() == null)
+		if (input().images().nir() == null || input().masks().fluo() == null ||
+				!getBoolean("Provess NIR", true))
 			return input().masks().nir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().masks().nir();
@@ -90,7 +92,8 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (input().images().nir() == null || input().masks().fluo() == null || options.isBarleyInBarleySystem())
+		if (input().images().nir() == null || input().masks().fluo() == null ||
+				!getBoolean("Provess NIR", true))
 			return input().images().nir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().images().nir();
@@ -108,7 +111,8 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 	@Override
 	protected FlexibleImage processIRmask() {
 		if (input().masks().ir() == null || input().masks().fluo() == null
-				|| input().masks().vis() == null || options.isBarleyInBarleySystem())
+				|| input().masks().vis() == null ||
+					!getBoolean("Provess IR", true))
 			return input().masks().ir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			FlexibleImage input = input().masks().ir();
@@ -192,6 +196,14 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 				processedMasks.vis() == null) {
 			processedMasks.setNir(input().masks().nir());
 			return;
+		}
+		if (getBoolean("Apply VIS mask to FLUO mask", false)) {
+			ImageOperation f = processedMasks.fluo().copy().io().show("FLUO before VIS mask application", debug);
+			processedMasks.setFluo(
+					f.applyMask_ResizeMaskIfNeeded(
+							processedMasks.vis().copy().io()
+									.blur(getDouble("Blur VIS before application to FLUO", 10)).getImage(),
+							options.getBackground()).getImage());
 		}
 		// if (options.getCameraPosition() == CameraPosition.TOP) {
 		if (processedMasks.fluo() != null) {
