@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -98,8 +99,6 @@ public class PdfCreator {
 	
 	public void executeRstat(String[] para, ExperimentInterface exp,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, final ArrayList<String> lastOutput, int timeoutMinutes) throws IOException {
-		
-		exp.numberConditions();
 		
 		para = extendParameter(para,
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "enforce minimum R package versions", true),
@@ -321,6 +320,16 @@ public class PdfCreator {
 	
 	public TreeSet<String> getConditions(ExperimentInterface e) {
 		TreeSet<String> result = new TreeSet<String>();
+		HashSet<String> treatments = new HashSet<String>();
+		HashSet<String> growthConds = new HashSet<String>();
+		for (SubstanceInterface si : e)
+			for (ConditionInterface ci : si) {
+				String t = StringManipulationTools.string2Latex(ci.getTreatment() != null ? ci.getTreatment() : "");
+				String gc = StringManipulationTools.string2Latex(ci.getGrowthconditions() != null ? ci.getGrowthconditions() : "");
+				treatments.add(t);
+				growthConds.add(gc);
+			}
+		
 		for (SubstanceInterface si : e)
 			for (ConditionInterface ci : si) {
 				String id = StringManipulationTools.string2Latex(ci.getConditionId() + "");
@@ -339,6 +348,10 @@ public class PdfCreator {
 					t = t.substring(0, 40) + " ...";
 				if (gc != null && gc.length() > 40)
 					gc = gc.substring(0, 40) + " ...";
+				if (treatments.size() == 1)
+					t = "(all equal)";
+				if (growthConds.size() == 1)
+					gc = "(all equal)";
 				boolean first = true;
 				String row = "";
 				// t.split(";")
