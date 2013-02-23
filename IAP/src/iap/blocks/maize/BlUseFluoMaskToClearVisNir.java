@@ -46,11 +46,6 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 			FlexibleImage mask = input().masks().fluo().copy().io()
 						.blur(blurValue).
 						binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred fluo mask", debug).getImage();
-			// if (options.isBarley() && !options.isBarleyInBarleySystem()) {
-			// mask = mask.getIO().replaceColors(Color.BLACK.getRGB(), Color.BLUE.getRGB()).translate(0, 20).scale(0.96, 1).getImage();
-			// }
-			// input().masks().vis().copy().io().or(
-			// mask).print("OR operation", debug);
 			return vis.applyMask_ResizeMaskIfNeeded(
 						mask,
 						options.getBackground()).show("FILTERED VIS", debug).getImage();
