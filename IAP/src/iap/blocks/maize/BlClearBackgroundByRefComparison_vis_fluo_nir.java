@@ -51,7 +51,6 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			FlexibleImage simulatedBlue = in
 					.io()
 					.copy()
-					.show("mist", debug)
 					.filterByHSV(
 							getDouble("Clear-background-vis-color-distance", 0.1),
 							new Color(
@@ -64,10 +63,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		}
 		
 		if (input().images().vis() != null && input().masks().vis() != null) {
-			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				FlexibleImage visImg = input().images().vis().show("In VIS", debug);
-				FlexibleImage visMsk = input().masks().vis().show("In Mask", debug);
-				FlexibleImage cleared = visImg
+			FlexibleImage visImg = input().images().vis().show("In VIS", debug);
+			FlexibleImage visMsk = input().masks().vis().show("In Mask", debug);
+			FlexibleImage cleared = visImg
 						.io()
 						.compare()
 						.compareImages("vis", visMsk.io().blur(getDouble("Clear-background-vis-blur", 2.0)).show("Blurred Mask", debug).getImage(),
@@ -78,30 +76,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 						.or(visMsk.copy().io()
 								.filterRemainHSV(getDouble("Clear-background-vis-remain-distance", 0.02), getDouble("Clear-background-vis-remain-hue", 0.62))
 								.getImage())
-						.border(getInt("Clear-background-vis-border-width-side", 2))
 						.getImage();
-				return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
+			return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
 						.show("CLEAR RESULT", debug).getImage();
-			}
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				FlexibleImage visX = input().images().vis().copy();
-				FlexibleImage cleared = new ImageOperation(visX).blur(getDouble("Clear-background-vis-blur", 2.0))
-						.compare()
-						.compareImages("vis", input().masks().vis().io().blur(getDouble("Clear-background-vis-blur", 2.0)).show("medianb", debug).getImage(),
-								getInt("Clear-background-vis-l-diff-top", 40),
-								getInt("Clear-background-vis-l-diff-top", 40),
-								getInt("Clear-background-vis-ab-diff-top", 40),
-								back, debug)
-						.show("comparison result", debug)
-						.or(visX.copy().io()
-								.filterRemainHSV(getDouble("Clear-background-vis-remain-distance", 0.02), getDouble("Clear-background-vis-remain-hue", 0.62))
-								.getImage())
-						.border(getInt("Clear-background-vis-border-width-top", 1))
-						.getImage();
-				return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
-						.show("CLEAR RESULT", debug).getImage();
-			}
-			throw new UnsupportedOperationException("Unknown camera setting.");
 		} else {
 			return null;
 		}
@@ -110,74 +87,45 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	@Override
 	protected FlexibleImage processFLUOmask() {
 		if (input().images().fluo() != null && input().masks().fluo() != null) {
-			if ((options.isBarley() && options.isHigherResVisCamera()))
-				return input().images().fluo();
-			else
-				if (options.getCameraPosition() == CameraPosition.SIDE) {
-					double scaleFactor = getDouble("Scale-factor-decrease-mask", 1.0);
-					FlexibleImage fluo = input().images().fluo();
-					fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-					
-					double leftRightBorder = getDouble("Clear-background-fluo-left-right-border-side", 0.1);
-					
-					if (options.isArabidopsis())
-						leftRightBorder = 0;
-					
-					double fac = getDouble("Clear-background-fluo-lab-factor-side", 0.1);
-					FlexibleImage result = new ImageOperation(fluo.io().copy()
+			FlexibleImage fluo = input().images().fluo();
+			
+			FlexibleImage result = new ImageOperation(fluo.io().copy()
 							.blur(getDouble("Clear-background-fluo-blur", 1.0)).show("Blurred fluo image", false)
 							.medianFilter32Bit()
 							.getImage()).compare()
 							.compareImages("fluo", input().masks().fluo().io()
 									.medianFilter32Bit()
 									.getImage(),
-									getInt("Clear-background-fluo-l-diff", 75) * fac,
-									getInt("Clear-background-fluo-l-diff", 75) * fac,
-									getInt("Clear-background-fluo-ab-diff", 40) * fac,
+									getInt("Clear-background-fluo-l-diff", 7),
+									getInt("Clear-background-fluo-l-diff", 7),
+									getInt("Clear-background-fluo-ab-diff", 4),
 									back)
-							.border(getInt("Clear-background-fluo-border-width-side", 2))
-							.border_left_right((int) (fluo.getWidth() * leftRightBorder), options.getBackground())
 							.getImage();
-					double blueCurbWidthBarley0_1 = 0;
-					double blueCurbHeightEndBarly0_8 = 1;
-					FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
-							// black background and green pot (fluo of white pot)
-							getIntArray("Clear-background-fluo-min-l-array", new Integer[] { -1, 200 - 40, 50 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-l-array", new Integer[] { 115, 200 + 20, 50 + 4, 50 }),
-							getIntArray("Clear-background-fluo-min-a-array", new Integer[] { 80 - 5, 104 - 15, 169 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-a-array", new Integer[] { 140 + 5, 104 + 15, 169 + 4, 250 }),
-							getIntArray("Clear-background-fluo-min-b-array", new Integer[] { 116 - 5, 206 - 20, 160 - 4, 0 }),
-							getIntArray("Clear-background-fluo-max-b-array", new Integer[] { 175 + 5, 206 + 20, 160 + 4, 250 }),
-							options.getBackground(), Integer.MAX_VALUE, false,
-							new Integer[] {}, new Integer[] {},
-							new Integer[] {}, new Integer[] {},
-							new Integer[] {}, new Integer[] {},
-							blueCurbWidthBarley0_1,
-							blueCurbHeightEndBarly0_8).
-							show("removed noise", debug).getImage();
-					
-					result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
-					
-					if (debug)
-						result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).show("Left-Over");
-					
-					return result;
-				}
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				double scaleFactor = getDouble("Scale-factor-decrease-mask", 1.0);
-				FlexibleImage fluo = input().images().fluo();
-				fluo = fluo.resize((int) (scaleFactor * fluo.getWidth()), (int) (scaleFactor * fluo.getHeight()));
-				double fac = getDouble("Clear-background-fluo-lab-factor-top", 0.2);
-				return new ImageOperation(fluo).compare()
-						.compareImages("fluo", input().masks().fluo(),
-								getInt("Clear-background-fluo-l-diff", 75) * fac,
-								getInt("Clear-background-fluo-l-diff", 75) * fac,
-								getInt("Clear-background-fluo-ab-diff", 40) * fac,
-								back)
-						.border(getInt("Clear-background-fluo-border-width-top", 2))
-						.getImage();
+			double blueCurbWidthBarley0_1 = 0;
+			double blueCurbHeightEndBarly0_8 = 1;
+			if (getBoolean("Filter FLUO with LAB", false)) {
+				FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
+								// black background and green pot (fluo of white pot)
+						getIntArray("Clear-background-fluo-min-l-array", new Integer[] { -1, 200 - 40, 50 - 4, 0 }),
+								getIntArray("Clear-background-fluo-max-l-array", new Integer[] { 115, 200 + 20, 50 + 4, 50 }),
+								getIntArray("Clear-background-fluo-min-a-array", new Integer[] { 80 - 5, 104 - 15, 169 - 4, 0 }),
+								getIntArray("Clear-background-fluo-max-a-array", new Integer[] { 140 + 5, 104 + 15, 169 + 4, 250 }),
+								getIntArray("Clear-background-fluo-min-b-array", new Integer[] { 116 - 5, 206 - 20, 160 - 4, 0 }),
+								getIntArray("Clear-background-fluo-max-b-array", new Integer[] { 175 + 5, 206 + 20, 160 + 4, 250 }),
+								options.getBackground(), Integer.MAX_VALUE, false,
+								new Integer[] {}, new Integer[] {},
+								new Integer[] {}, new Integer[] {},
+								new Integer[] {}, new Integer[] {},
+								blueCurbWidthBarley0_1,
+								blueCurbHeightEndBarly0_8).
+								show("removed noise", debug).getImage();
+				
+				result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
 			}
-			throw new UnsupportedOperationException("Unknown camera setting.");
+			if (debug)
+				result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).show("Left-Over");
+			
+			return result;
 		} else {
 			return null;
 		}
@@ -186,12 +134,10 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	@Override
 	protected FlexibleImage processNIRimage() {
 		FlexibleImage nir = input().images().nir();
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			if (options.isBarleyInBarleySystem()) {
-				// remove horizontal bar
-				if (nir != null) {
-					nir = filterHorBar(nir);
-				}
+		if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
+			// remove horizontal bar
+			if (nir != null) {
+				nir = filterHorBar(nir);
 			}
 		}
 		return nir;
@@ -206,57 +152,20 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			input().masks().setNir(ImageOperation.createColoredImage(w, h, new Color(180, 180, 180)));
 		}
 		if (input().images().nir() != null && input().masks().nir() != null) {
-			if (options.getCameraPosition() == CameraPosition.SIDE) {
-				FlexibleImage nir = input().masks().nir();
-				if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
-					// remove horizontal bar
-					nir = filterHorBar(nir).show("removed constant bar", debug);
-				}
-				if (getBoolean("Process NIR Mask", options.isMaize())) {
-					int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
-					int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
-					FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
+			FlexibleImage nir = input().masks().nir();
+			if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
+				// remove horizontal bar
+				nir = filterHorBar(nir).show("removed constant bar", debug);
+			}
+			if (getBoolean("Process NIR Mask", options.isMaize())) {
+				int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
+				int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
+				FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
 							.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
 							.show("result nir", debug).getImage();
-					// msk = msk.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage().show("result NIR mask", debug);
-					
-					return msk;
-				}
-				return nir;
+				return input().images().nir().io().applyMask(msk, options.getBackground()).getImage();
 			}
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				FlexibleImage nir = input().images().nir();
-				
-				if (options.isMaize()) {
-					int blackDiff = getInt("Clear-background-nir-black-diff-top-maize", 14);
-					int whiteDiff = getInt("Clear-background-nir-white-diff-maize", 20);
-					return new ImageOperation(nir).compare()
-							.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-							.show("result nir", debug)
-							.thresholdClearBlueBetween(getInt("Clear-background-nir-min-threshold-blue", 150), getInt("Clear-background-nir-max-threshold-blue", 169))
-							.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
-							.border(getInt("Clear-background-nir-border-width-top", 2))
-							.getImage();
-				} else {
-					int blackDiff = getInt("Clear-background-nir-black-diff-top", 10);
-					int whiteDiff = getInt("Clear-background-nir-white-diff", 23);
-					if (options.isHigherResVisCamera())
-						return new ImageOperation(nir).compare()
-								.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-								.show("result nir", debug)
-								.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
-								.border(getInt("Clear-background-nir-border-width-top", 2))
-								.getImage();
-					else
-						return new ImageOperation(nir).compare()
-								.compareGrayImages(input().masks().nir(), blackDiff, whiteDiff, options.getBackground())
-								.show("result nir", debug)
-								.thresholdBlueHigherThan(getInt("Clear-background-nir-higher-threshold-blue", 240))
-								.border(getInt("Clear-background-nir-border-width-top", 2))
-								.getImage();
-				}
-			}
-			throw new UnsupportedOperationException("Unknown camera setting.");
+			return nir;
 		} else {
 			return null;
 		}
