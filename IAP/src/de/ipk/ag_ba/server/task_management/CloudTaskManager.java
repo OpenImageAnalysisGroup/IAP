@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -120,7 +121,7 @@ public class CloudTaskManager {
 											"<br>" +
 													status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
 					
-					int maxTasks = 1;
+					int maxTasks = SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1);
 					if (maxTasks < 1)
 						maxTasks = 1;
 					int cpuDesire = 0;
