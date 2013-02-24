@@ -39,7 +39,6 @@ import org.graffiti.editor.MessageType;
 import org.graffiti.editor.SplashScreenInterface;
 import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -227,8 +226,7 @@ public class IAPmain extends JApplet {
 		// ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos())
-			for (ResourceIOHandler handler : m.getHandlers())
-				ResourceIOManager.registerIOHandler(handler);
+			ResourceIOManager.registerIOHandler(m.getHandler());
 	}
 	
 	public void myAppletLoad(final MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {

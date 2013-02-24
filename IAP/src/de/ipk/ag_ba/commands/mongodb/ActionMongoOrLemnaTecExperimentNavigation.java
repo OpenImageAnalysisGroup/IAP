@@ -251,7 +251,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 				(header.getExperimentType() != null &&
 				header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString()))) {
 			add = "input age " + SystemAnalysis.getWaitTime(
-					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>analysis";
+					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>saved";
 			t = header.getStorageTime().getTime();
 		}
 		String time = SystemAnalysis.getWaitTime(System.currentTimeMillis() - t, 1);

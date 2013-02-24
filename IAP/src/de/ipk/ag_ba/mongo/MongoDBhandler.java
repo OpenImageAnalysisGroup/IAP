@@ -45,9 +45,9 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		
 		MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(srcIS);
 		ObjectRef resultFileSize = new ObjectRef();
+		int size = is.available();
 		String hash = GravistoService.getHashFromInputStream(is, resultFileSize, m.getHashType());
-		is = new MyByteArrayInputStream(is.getBuff(), is.available());
-		
+		is = new MyByteArrayInputStream(is.getBuff(), size);
 		GridFS fs = m.getGridFS(c);
 		long res = m.saveStream(hash, is, fs, resultFileSize.getLong());
 		if (res >= 0)
@@ -234,7 +234,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 				
 				@Override
 				public void run() {
-					for (String fs : MongoGridFS.getFileCollectionsInclPreview()) {
+					for (String fs : MongoGridFS.getFileCollections()) {
 						if (m.hasVFSinputStream(fs, hash)) {
 							found.setObject(Boolean.TRUE);
 							return;
