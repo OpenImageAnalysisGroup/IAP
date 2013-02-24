@@ -14,7 +14,6 @@ import java.util.TimerTask;
 import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.datasource.Library;
@@ -51,8 +50,7 @@ public class BackupSupport {
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos()) {
-			for (ResourceIOHandler handler : m.getHandlers())
-				ResourceIOManager.registerIOHandler(handler);
+			ResourceIOManager.registerIOHandler(m.getHandler());
 		}
 		final String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap_backup_history.txt";
 		try {

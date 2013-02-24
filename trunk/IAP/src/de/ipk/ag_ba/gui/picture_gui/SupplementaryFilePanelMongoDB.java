@@ -57,17 +57,17 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		// in case it is no DBE-TreeNode or if it is one and it is Read-Only
 		// then reject drop
 		if (targetDropTarget.isTargetReadOnly()) {
-			JOptionPane.showMessageDialog(this, "Image can not be added to current database node.\n"
-					+ "This experiment is loaded in Read-Only Mode for your Accout!", "No write-access to experiment",
+			JOptionPane.showMessageDialog(this, "Image can not be added to current database node.",
+					"No write-access to this entity of the experiment",
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		
 		JFileChooser fc = new JFileChooser();
-		fc.setDialogTitle("Add File(s) to Database");
+		fc.setDialogTitle("Add file(s) or directory content");
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		fc.setMultiSelectionEnabled(true);
-		if (fc.showDialog(this, "Add File(s) to Database") == JFileChooser.APPROVE_OPTION) {
+		if (fc.showDialog(this, "Add file(s) or directory content") == JFileChooser.APPROVE_OPTION) {
 			final File files[] = fc.getSelectedFiles();
 			
 			try {
@@ -92,8 +92,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						}
 						
 					}
-				}, "database write thread");
-				// writeThread.setPriority(Thread.MIN_PRIORITY);
+				}, "file strage thread");
 				BackgroundThreadDispatcher.addTask(writeThread, -1, 0, true);
 			} catch (Exception err) {
 				JOptionPane.showMessageDialog(null, "Error: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -280,7 +279,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	public static void showError(String string, Exception e) {
 		String s = e != null ? e.getMessage() : "";
-		MainFrame.showMessageDialogWithScrollBars2(s, "Error: " + string);
+		MainFrame.showMessageDialogWithScrollBars2("Message: " + string + "\n\nError: " + s, "Error");
 	}
 	
 	@Override

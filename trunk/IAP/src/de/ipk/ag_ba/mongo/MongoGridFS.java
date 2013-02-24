@@ -18,7 +18,8 @@ public enum MongoGridFS {
 	FS_VOLUMES("fs_volumes"), FS_VOLUMES_FILES("fs_volumes.files"),
 	FS_VOLUME_LABELS("fs_volume_labels"), FS_VOLUME_LABELS_FILES("fs_volume_labels.files"),
 	FS_NETWORKS("fs_networks"), FS_NETWORKS_FILES("fs_networks.files"),
-	FS_NETWORK_LABELS("fs_network_labels"), fs_networks_labels_files("fs_network_labels.files");
+	FS_NETWORK_LABELS("fs_network_labels"), fs_networks_labels_files("fs_network_labels.files"),
+	FS_ANNOTATION_FILES("fs_annotation_files");
 	
 	private String collection_or_field;
 	
@@ -54,19 +55,22 @@ public enum MongoGridFS {
 	
 	public static ArrayList<String> getFileCollectionsFor(NumericMeasurementInterface nmd) {
 		ArrayList<String> res = new ArrayList<String>();
-		if (nmd instanceof ImageData) {
-			res.add(FS_IMAGES.toString());
-			res.add(FS_IMAGE_LABELS.toString());
+		if (nmd == null) {
+			res.add(FS_ANNOTATION_FILES.toString());
 		} else
-			if (nmd instanceof VolumeData) {
-				res.add(FS_VOLUMES.toString());
-				res.add(FS_VOLUME_LABELS.toString());
+			if (nmd instanceof ImageData) {
+				res.add(FS_IMAGES.toString());
+				res.add(FS_IMAGE_LABELS.toString());
 			} else
-				if (nmd instanceof NetworkData) {
-					res.add(FS_NETWORKS.toString());
-					res.add(FS_NETWORK_LABELS.toString());
+				if (nmd instanceof VolumeData) {
+					res.add(FS_VOLUMES.toString());
+					res.add(FS_VOLUME_LABELS.toString());
 				} else
-					res.addAll(getFileCollections());
+					if (nmd instanceof NetworkData) {
+						res.add(FS_NETWORKS.toString());
+						res.add(FS_NETWORK_LABELS.toString());
+					} else
+						res.addAll(getFileCollections());
 		return res;
 	}
 	

@@ -25,13 +25,4 @@ public enum DatabaseStorageResult {
 		return desc;
 	}
 	
-	private String md5;
-	
-	public void setMD5(String md5) {
-		this.md5 = md5;
-	}
-	
-	public String getMD5() {
-		return md5;
-	}
 }

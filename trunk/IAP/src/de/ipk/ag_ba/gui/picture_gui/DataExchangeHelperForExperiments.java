@@ -12,8 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -33,7 +33,6 @@ import javax.swing.SwingUtilities;
 import org.ErrorMsg;
 import org.MeasurementFilter;
 import org.StringManipulationTools;
-import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -48,10 +47,11 @@ import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCo
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.mongo.DataStorageType;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
-import de.ipk.ag_ba.mongo.ExperimentSaver;
+import de.ipk.ag_ba.mongo.DatabaseStorageResultWithURL;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.mongo.MongoDBhandler;
+import de.ipk.ag_ba.mongo.MongoResourceIOConfigObject;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -141,64 +141,29 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
-	public static DatabaseStorageResult insertHashedFile(final MongoDB m,
+	public static DatabaseStorageResultWithURL insertHashedFile(final MongoDB m,
 			final File file, File createTempPreviewImage, int isJavaImage,
 			DataSetFileButton imageButton, MappingDataEntity tableName) {
 		
-		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		DatabaseStorageResult res = null;
+		IOurl resultURL = null;
 		try {
-			m.processDB(new RunnableOnDB() {
-				private DB db;
-				
-				@Override
-				public void run() {
-					String hash;
-					try {
-						hash = GravistoService.getHashFromFile(file,
-								m.getHashType());
-						GridFS gridfs_annotation = new GridFS(db, "annotations");
-						ExperimentSaver.saveAnnotationFile(gridfs_annotation, hash, file);
-						// GridFS gridfs_images = new GridFS(db, "images");
-						GridFSDBFile fff = gridfs_annotation.findOne(hash);
-						if (fff != null) {
-							tso.setParam(
-									0,
-									DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED);
-							tso.setParam(1, hash);
-							return;
-						} else {
-							try {
-								ExperimentSaver.saveAnnotationFile(gridfs_annotation, hash,
-										file);
-								tso.setParam(0,
-										DatabaseStorageResult.STORED_IN_DB);
-								tso.setParam(1, hash);
-								return;
-							} catch (IOException e) {
-								ErrorMsg.addErrorMessage(e);
-								tso.setParam(
-										0,
-										DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG);
-								return;
-							}
-						}
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
-				
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-			return null;
+			MongoResourceIOConfigObject config = new MongoResourceIOConfigObject(null, DataStorageType.ANNOTATION_FILE);
+			String targetFilename = file.getName();
+			resultURL = m.getHandler().copyDataAndReplaceURLPrefix(new FileInputStream(file), targetFilename, config);
+			
+			if (createTempPreviewImage != null) {
+				config = new MongoResourceIOConfigObject(null, DataStorageType.PREVIEW_ICON);
+				m.getHandler().copyDataAndReplaceURLPrefix(new FileInputStream(createTempPreviewImage), targetFilename, config);
+			}
+			
+			res = DatabaseStorageResult.STORED_IN_DB;
+		} catch (Exception e1) {
+			ErrorMsg.addErrorMessage(e1);
+			res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 		}
-		((DatabaseStorageResult) tso.getParam(0, null)).setMD5((String) tso
-				.getParam(1, ""));
-		return (DatabaseStorageResult) tso.getParam(0, null);
+		
+		return new DatabaseStorageResultWithURL(res, resultURL);
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
@@ -227,6 +192,17 @@ public class DataExchangeHelperForExperiments {
 			BinaryFileInfo primary = null;
 			try {
 				MappingDataEntity mde = mt.getTargetEntity();
+				
+				String files = mde.getFiles();
+				if (m != null && files != null && !files.isEmpty()) {
+					for (String url_string : files.split(";")) {
+						IOurl url = new IOurl(url_string);
+						BinaryFileInfo bfi = new BinaryFileInfo(url, null, false, mde);
+						bfi.setIsAttachment(true);
+						bbb.add(bfi);
+					}
+				}
+				
 				if (mde instanceof ImageData) {
 					ImageData id = (ImageData) mde;
 					primary = new BinaryFileInfo(id.getURL(), id.getLabelURL(),
@@ -322,19 +298,7 @@ public class DataExchangeHelperForExperiments {
 							}
 					}
 				}
-				String files = mde.getFiles();
-				if (m != null && files != null && !files.isEmpty()) {
-					for (String f : files.split(";")) {
-						String md5 = f.split(":", 2)[0];
-						String fileName = f.split(":", 2)[1];
-						MongoDBhandler h = (MongoDBhandler) m.getHandlers()[0];
-						String prefix = h.getPrefix();
-						IOurl url = new IOurl(prefix, md5, fileName);
-						BinaryFileInfo bfi = new BinaryFileInfo(url, null, false, mde);
-						bfi.setIsAttachment(true);
-						bbb.add(bfi);
-					}
-				}
+				
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -660,17 +624,17 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
-	public static void attachFileToEntity(MappingDataEntity targetEntity, DatabaseStorageResult md5, String name) {
+	public static void attachFileToEntity(MappingDataEntity targetEntity, DatabaseStorageResultWithURL res, String name) {
 		if (name.contains(":"))
 			name = StringManipulationTools.stringReplace(name, ";", "_");
 		String currentValue = targetEntity.getFiles();
 		if (currentValue == null || currentValue.isEmpty())
-			targetEntity.setFiles(md5.getMD5() + ":" + name);
+			targetEntity.setFiles(res.getResultURL() + "");
 		else {
 			LinkedHashSet<String> values = new LinkedHashSet<String>();
 			for (String s : currentValue.split(";"))
 				values.add(s);
-			values.add(md5.getMD5() + ":" + name);
+			values.add(res.getResultURL() + "");
 			targetEntity.setFiles(StringManipulationTools.getStringList(values, ";"));
 		}
 	}

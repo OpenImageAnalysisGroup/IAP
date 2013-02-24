@@ -3,7 +3,6 @@ package de.ipk.ag_ba.mongo;
 import info.StopWatch;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -916,6 +915,10 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (image.getURL().getPrefix().equals(mh.getPrefix()) && image.getLabelURL().getPrefix().equals(mh.getPrefix()))
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		}
+		if (image.getURL() != null && image.getLabelURL() == null) {
+			if (image.getURL().getPrefix().equals(mh.getPrefix()))
+				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
+		}
 		if (image.getURL() != null && image.getURL().getPrefix().startsWith("mongo_") && image.getURL().getDetail().startsWith("lemna-db.")) {
 			image.getURL().setPrefix(LemnaTecFTPhandler.PREFIX);
 		}
@@ -1045,23 +1048,14 @@ public class ExperimentSaver implements RunnableOnDB {
 			}
 		}
 		
-		GridFSDBFile fffMain = hashMain != null ? cols.gridfs_images.findOne(hashMain) : null;
+		Boolean fffMain = hashMain != null ? m.getHandler().hasInputStreamForHash(hashMain) : null;
 		if (hashMain != null) {
 			image.getURL().setPrefix(mh.getPrefix());
 			image.getURL().setDetail(hashMain);
 		}
-		GridFSDBFile fffLabel = null;
+		Boolean fffLabel = null;
 		if (hashLabel != null && image.getLabelURL() != null) {
-			fffLabel = cols.gridfs_label_files.findOne(hashLabel);
-		}
-		
-		if (fffMain != null && fffMain.getLength() <= 0) {
-			cols.gridfs_images.remove(fffMain);
-			fffMain = null;
-		}
-		if (fffLabel != null && fffLabel.getLength() <= 0) {
-			cols.gridfs_images.remove(fffLabel);
-			fffLabel = null;
+			fffLabel = m.getHandler().hasInputStreamForHash(hashLabel);
 		}
 		
 		if (hashLabel != null && image.getLabelURL() != null) {
@@ -1125,13 +1119,13 @@ public class ExperimentSaver implements RunnableOnDB {
 		substances.insert(dbSubstance);
 	}
 	
-	public static long saveAnnotationFile(GridFS gridfs_annotation, String hash, File file) throws IOException {
-		GridFSInputFile inputFile = gridfs_annotation.createFile(file);
-		inputFile.setFilename(hash);
-		// inputFile.getMetaData().put("name", file.getName());
-		inputFile.save();
-		return file.length();
-	}
+	// public static long saveAnnotationFile(GridFS gridfs_annotation, String hash, File file) throws IOException {
+	// GridFSInputFile inputFile = gridfs_annotation.createFile(file);
+	// inputFile.setFilename(hash);
+	// // inputFile.getMetaData().put("name", file.getName());
+	// inputFile.save();
+	// return file.length();
+	// }
 	
 	public static boolean saveImageFile(InputStream[] isImages, GridFS gridfs_images, GridFS gridfs_label_images,
 			GridFS gridfs_preview_files, ImageData image, String hashMain, String hashLabel,

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.datasource.Library;
@@ -236,8 +235,7 @@ public class CloudComputingService {
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos()) {
-			for (ResourceIOHandler handler : m.getHandlers())
-				ResourceIOManager.registerIOHandler(handler);
+			ResourceIOManager.registerIOHandler(m.getHandler());
 			
 			CloudComputingService cc = CloudComputingService.getInstance(m);
 			cc.switchStatus(m);

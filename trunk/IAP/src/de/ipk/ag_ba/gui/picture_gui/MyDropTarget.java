@@ -20,10 +20,13 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
+import de.ipk.ag_ba.mongo.DatabaseStorageResultWithURL;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+
+;
 
 /**
  * @author Christian Klukas
@@ -240,16 +243,17 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 						imageButton.hideProgressbar();
 					} else {
 						imageButton.setProgressValue(-1);
-						DatabaseStorageResult md5 = DataExchangeHelperForExperiments.insertHashedFile(m, file,
+						DatabaseStorageResultWithURL res = DataExchangeHelperForExperiments.insertHashedFile(m, file,
 								imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(),
 								imageButton, targetTreeNode.getTargetEntity());
 						// ((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
-						if (md5 == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
+						if (res.getResult() == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 							SupplementaryFilePanelMongoDB.showError("The file " + file.getName()
-									+ " could not be stored to the Database (Target-Table " + targetTreeNode.getTargetEntity(),
+									+ " could not be stored!",
 									null);
 						} else {
-							DataExchangeHelperForExperiments.attachFileToEntity(targetTreeNode.getTargetEntity(), md5, file.getName());
+							DataExchangeHelperForExperiments.attachFileToEntity(targetTreeNode.getTargetEntity(),
+									res, file.getName());
 						}
 						imageButton.setDownloadNeeded(true);
 						imageButton.downloadInProgress = false;

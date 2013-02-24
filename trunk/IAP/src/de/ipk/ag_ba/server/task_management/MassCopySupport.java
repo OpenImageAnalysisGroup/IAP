@@ -18,7 +18,6 @@ import org.SettingsHelperDefaultIsFalse;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
@@ -58,8 +57,7 @@ public class MassCopySupport {
 		
 		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		for (MongoDB m : MongoDB.getMongos()) {
-			for (ResourceIOHandler handler : m.getHandlers())
-				ResourceIOManager.registerIOHandler(handler);
+			ResourceIOManager.registerIOHandler(m.getHandler());
 		}
 		final String fn = ReleaseInfo.getAppFolderWithFinalSep() + "iap_mass_copy_history.txt";
 		try {
