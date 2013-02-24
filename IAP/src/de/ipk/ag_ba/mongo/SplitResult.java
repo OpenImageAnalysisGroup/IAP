@@ -94,7 +94,7 @@ public class SplitResult {
 		ExperimentInterface e = new Experiment();
 		
 		if (optPreviousResultsToBeMerged != null) {
-			String msg = "Previous analysis results, to be merged with current result, will no be loaded (" + optPreviousResultsToBeMerged.getExperimentName()
+			String msg = "Previous analysis results, to be merged with current result, will now be loaded (" + optPreviousResultsToBeMerged.getExperimentName()
 					+ ","
 					+ optPreviousResultsToBeMerged.getHeader().getImportdate() + ")";
 			System.out.println(msg);
@@ -112,8 +112,6 @@ public class SplitResult {
 		int nnii = 1;
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
-			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Process " + nnii + "/" + tempDataSetDescription.getPartCntI() + "");
 			nnii++;
 			if (originName == null) {
 				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
@@ -139,7 +137,8 @@ public class SplitResult {
 				s1.printTime();
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
-			System.out.println(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]);
+			String msg = "loading: " + s1.getTime() + " ms";
+			System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + " // loaded in " + s1.getTime() + " ms");
 			if (optStatus != null)
 				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 			// for (String c : condS)
@@ -147,9 +146,16 @@ public class SplitResult {
 			
 			StopWatch s = new StopWatch(">e.addMerge");
 			e.addAndMerge(ei);
+			System.out.println(" // merged in " + s.getTime() + " ms");
+			if (optStatus != null)
+				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + "<br>" +
+							"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
+			
 			if (s.getTime() > 30000)
 				s.printTime();
 		}
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Merged data, prepare saving...");
 		String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 		if (sn.indexOf(".") > 0)
 			sn = sn.substring(sn.lastIndexOf(".") + 1);

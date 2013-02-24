@@ -223,6 +223,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				: 1;
 		final Semaphore lock = new Semaphore(nLock, true);
 		final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
+		final int substanceCount = sl.size();
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.get(0);
 			sl.remove(0);
@@ -236,7 +237,7 @@ public class ExperimentSaver implements RunnableOnDB {
 						processSubstanceSaving(cols, db, status, keepDataLinksToDataSource_safe_space, attributes,
 								overallFileSize, startTime, substances, conditions,
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs,
-								errorCount, s);
+								errorCount, s, tsoIdxS.getInt(), substanceCount);
 					} catch (InterruptedException e) {
 						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ",experiment " + experiment.getName(), e);
 						e.printStackTrace();
@@ -328,10 +329,15 @@ public class ExperimentSaver implements RunnableOnDB {
 			final DB db, final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final boolean keepDataLinksToDataSource_safe_space, final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
 			final ObjectRef startTime, DBCollection substances, final DBCollection conditions, final ObjectRef lastTransferSum, final ObjectRef lastTime,
-			final ObjectRef count, final StringBuilder errors, final int numberOfBinaryData, ArrayList<String> substanceIDs, final ObjectRef errorCount,
-			SubstanceInterface s) throws InterruptedException {
-		if (status != null)
-			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">SAVE SUBSTANCE " + s.getName());
+			final ObjectRef count, final StringBuilder errors,
+			final int numberOfBinaryData, ArrayList<String> substanceIDs, final ObjectRef errorCount,
+			SubstanceInterface s,
+			int substanceIndex, int substanceCount) throws InterruptedException {
+		if (status != null) {
+			status.setCurrentStatusValueFine(100d * substanceIndex / substanceCount);
+			status.setCurrentStatusText1("Save " + substanceIndex + "/" + substanceCount);
+			status.setCurrentStatusText2("<small><font color='gray'>(" + s.getName() + ")</font></small>");
+		}
 		BasicDBObject substance;
 		synchronized (attributes) {
 			attributes.clear();
