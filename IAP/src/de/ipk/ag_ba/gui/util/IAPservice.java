@@ -1521,12 +1521,12 @@ public class IAPservice {
 		}
 	}
 	
-	public static int getIRintensityDifferenceColor(double d, int back) {
+	public static int getIRintensityDifferenceColor(double d, int back, double scale) {
 		if (Double.isNaN(d))
 			return back;
 		else {
 			if (d < 0) {
-				int gray = (int) Math.round(255 - (-d * 255) * 17);
+				int gray = (int) Math.round(255 - (-d * 255) * scale);
 				if (gray < 0) {
 					// System.err.println("Too high temp difference (multiplier for visualization is too high): " + gray);
 					return back;
