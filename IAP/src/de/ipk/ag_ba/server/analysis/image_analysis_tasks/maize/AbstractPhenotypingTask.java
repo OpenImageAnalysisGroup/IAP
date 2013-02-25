@@ -658,8 +658,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						is.firstEntry().getValue().getVIS(),
 						is.firstEntry().getValue().getFLUO(),
 						is.firstEntry().getValue().getNIR(),
-						is.firstEntry().getValue().getIR()
-				}) {
+						is.firstEntry().getValue().getIR() }) {
 					if (id == null)
 						continue;
 					time = id.getParentSample().getSampleFineTimeOrRowId();
@@ -758,7 +757,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		try {
 			LoadedImage lib = result;
 			if (storeResultInDatabase != null) {
-				result = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, result, true);
+				result = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, result, false);
 				// add processed image to result
 				if (result != null)
 					return new ImageData(result.getParentSample(), result);
