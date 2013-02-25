@@ -43,7 +43,8 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 	public LoadedImage saveImage(
 			final String[] optFileNameMainAndLabelPrefix,
 			final LoadedImage limg,
-			final boolean keepRemoteURLs_safe_space) throws Exception {
+			final boolean keepRemoteURLs_safe_space,
+			final boolean skipLabelProcessing) throws Exception {
 		if (!store)
 			return null;
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -57,7 +58,9 @@ public class DataBaseTargetMongoDB implements DatabaseTarget {
 					DatabaseStorageResult dsr =
 							ExperimentSaver.saveImageFileDirect(
 									cols, db, limg, null,
-									keepRemoteURLs_safe_space, m.getMongoHandler(), m.getHashType(), m,
+									keepRemoteURLs_safe_space,
+									skipLabelProcessing,
+									m.getMongoHandler(), m.getHashType(), m,
 									new HashSet<String>());
 					tso.setParam(0, dsr);
 				} catch (Exception e) {

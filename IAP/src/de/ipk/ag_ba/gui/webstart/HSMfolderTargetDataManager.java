@@ -235,7 +235,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	@Override
 	public LoadedImage saveImage(
 			String[] optFileNameMainAndLabelPrefix,
-			LoadedImage limg, boolean keepRemoteURLs_safe_space) throws Exception {
+			LoadedImage limg, boolean keepRemoteURLs_safe_space, boolean ignoreLabelURL) throws Exception {
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
 		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
 		String pre = "";
@@ -266,7 +266,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 					url.setFileName(desiredFileName);
 			}
 		}
-		if (limg.getLabelURL() != null) { // save label
+		if (limg.getLabelURL() != null && !ignoreLabelURL) { // save label
 			String desiredFileName = limg.getLabelURL().getFileName();
 			if (desiredFileName != null && desiredFileName.contains("#"))
 				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);

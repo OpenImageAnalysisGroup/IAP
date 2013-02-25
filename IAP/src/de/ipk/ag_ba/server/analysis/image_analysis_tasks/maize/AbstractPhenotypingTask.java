@@ -673,8 +673,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Processing "
-					+ workload_imageSetsWithSpecificAngles.size() + " of " + sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.size()
-					+ " (subset " + workOnSubset + "/" + numberOfSubsets + ")");
+					+ workload_imageSetsWithSpecificAngles.size() + " plants" +
+					(numberOfSubsets > 0 ?
+							" (subset " + workOnSubset + "/" + numberOfSubsets + ")"
+							: "."));
 		}
 		
 		if (max > 0)
@@ -757,7 +759,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		try {
 			LoadedImage lib = result;
 			if (storeResultInDatabase != null) {
-				result = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, result, false);
+				result = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, result, false, true);
 				// add processed image to result
 				if (result != null)
 					return new ImageData(result.getParentSample(), result);
