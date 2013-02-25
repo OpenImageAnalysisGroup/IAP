@@ -34,7 +34,7 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processVISimage() {
-		if (input().images().vis() == null || !getBoolean("process VIS image", options.getCameraPosition() == CameraPosition.TOP))
+		if (input().images().vis() == null || !getBoolean("process VIS image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().vis();
 		
 		FlexibleImage input = input().images().vis();
@@ -46,7 +46,7 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processVISmask() {
-		if (input().masks().vis() == null || !getBoolean("process VIS mask", options.getCameraPosition() == CameraPosition.TOP))
+		if (input().masks().vis() == null || !getBoolean("process VIS mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().vis();
 		
 		FlexibleImage input = input().masks().vis();
@@ -58,7 +58,7 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processNIRimage() {
-		if (input().images().nir() == null || !getBoolean("process NIR image", options.getCameraPosition() == CameraPosition.TOP))
+		if (input().images().nir() == null || !getBoolean("process NIR image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().nir();
 		
 		FlexibleImage input = input().images().nir();
@@ -70,7 +70,7 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	
 	@Override
 	protected FlexibleImage processNIRmask() {
-		if (input().masks().nir() == null || !getBoolean("process NIR mask", options.getCameraPosition() == CameraPosition.TOP))
+		if (input().masks().nir() == null || !getBoolean("process NIR mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().nir();
 		
 		FlexibleImage input = input().masks().nir();
