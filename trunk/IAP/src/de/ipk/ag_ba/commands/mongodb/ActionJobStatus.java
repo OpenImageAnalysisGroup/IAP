@@ -259,7 +259,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				NavigationButton n = new NavigationButton(new BatchInformationAction(b, m), src.getGUIsetting());
 				n.setProcessing(true);
 				
-				String desc = ehi.getExperimentName() + "<br>"
+				String desc = "<html>" + ehi.getExperimentName() + "<br>"
 						+ " Job submission " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
 						+ "(" + b.getRunStatus() + ")";
 				
