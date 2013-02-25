@@ -1534,9 +1534,10 @@ public class IAPservice {
 				}
 				return new Color(gray, gray, gray).getRGB();
 			} else {
-				int red = (int) Math.round(d * 255);
-				red = 255 - red;
-				return new Color(255, 255, 255).getRGB();
+				return back;
+				// int red = (int) Math.round(d * 255);
+				// red = 255 - red;
+				// return new Color(255, 255, 255).getRGB();
 			}
 		}
 	}
