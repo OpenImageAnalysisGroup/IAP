@@ -30,6 +30,11 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		super.prepare();
 		debug = getBoolean("debug", false);
 		back = ImageOperation.BACKGROUND_COLORint;
+		if (input().masks().nir() != null)
+			input().masks().setNir(
+					input().masks().nir().io().replaceColor(
+							new Color(255, 255, 255).getRGB(),
+							new Color(254, 254, 254).getRGB()).getImage());
 	}
 	
 	@Override
