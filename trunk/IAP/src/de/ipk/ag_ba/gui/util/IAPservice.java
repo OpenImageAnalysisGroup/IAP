@@ -1529,7 +1529,8 @@ public class IAPservice {
 				int gray = (int) Math.round(255 - (-d * 255) * 17);
 				if (gray < 0) {
 					// System.err.println("Too high temp difference (multiplier for visualization is too high): " + gray);
-					gray = 0;
+					return back;
+					// gray = 0;
 				}
 				return new Color(gray, gray, gray).getRGB();
 			} else {
