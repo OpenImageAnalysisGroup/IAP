@@ -586,7 +586,7 @@ public class ExperimentSaver implements RunnableOnDB {
 								res = DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 							else
 								res = saveImageFileDirect(cols, db, id, overallFileSize,
-										keepDataLinksToDataSource_safe_space, mh, hashType, mo, savedUrls);
+										keepDataLinksToDataSource_safe_space, false, mh, hashType, mo, savedUrls);
 							if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 								errorCount.addLong(1);
 								errors.append("<li>" + id.getURL().getFileName());
@@ -912,7 +912,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	
 	@SuppressWarnings("resource")
 	public static DatabaseStorageResult saveImageFileDirect(CollectionStorage cols, final DB db, final ImageData image, final ObjectRef fileSize,
-			final boolean keepRemoteURLs_safe_space, MongoDBhandler mh, HashType hashType,
+			final boolean keepRemoteURLs_safe_space, boolean skipProcessingOfLabel, MongoDBhandler mh, HashType hashType,
 			MongoDB m, HashSet<String> savedUrls)
 			throws Exception, IOException {
 		// if the image data source is equal to the target (determined by the prefix),
@@ -1070,25 +1070,24 @@ public class ExperimentSaver implements RunnableOnDB {
 				image.getLabelURL().setDetail(hashLabel);
 			}
 		}
+		if (hashLabel == null && skipProcessingOfLabel)
+			fffLabel = true;
 		
-		if (fffMain != null && fffLabel != null) {// && fffPreview != null) {
+		if (fffMain && fffLabel) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			boolean saved;
 			MyByteArrayInputStream a = isMain != null && isMain.length > 0 ? new MyByteArrayInputStream(isMain) : null;
-			MyByteArrayInputStream b = isLabel != null && isLabel.length > 0 ? new MyByteArrayInputStream(isLabel) : null;
+			MyByteArrayInputStream b = isLabel != null && isLabel.length > 0 && !skipProcessingOfLabel ? new MyByteArrayInputStream(isLabel) : null;
 			MyByteArrayInputStream c = isMain != null && isMain.length > 0 ? getPreviewImageStream(new MyByteArrayInputStream(isMain)) : null;
-			saved = saveImageFile(new InputStream[] {
-					a,
-					b,
-					c
-			}, cols.gridfs_images, cols.gridfs_label_files,
+			saved = saveImageFile(new InputStream[] { a, b, c },
+					cols.gridfs_images, cols.gridfs_label_files,
 					cols.gridfs_preview_files, image, hashMain,
 					hashLabel,
 					a != null ? a.getCount() : 0,
 					b != null ? b.getCount() : 0,
 					c != null ? c.getCount() : 0,
-					fffMain == null, fffLabel == null, m,
+					fffMain != null && !fffMain, fffLabel != null && !fffLabel, m,
 					skipMainUrl, skipLabelUrl, savedUrls);
 			
 			if (saved) {
