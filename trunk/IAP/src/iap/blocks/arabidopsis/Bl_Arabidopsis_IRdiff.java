@@ -59,7 +59,7 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 			for (int i = 0; i < res.length; i++)
 				res[i] = IAPservice.getIRintensityDifferenceColor(
 						IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
-						options.getBackground());
+						options.getBackground(), getDouble("temperature scaling", 10));
 			FlexibleImage gray = new FlexibleImage(warmBack.getWidth(), warmBack.getHeight(), res);
 			if (options.isBarley())
 				gray = gray.io().show("ADAPT IN", debug).
