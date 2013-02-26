@@ -82,6 +82,7 @@ public class CloudTaskManager {
 	
 	private void run() throws Exception {
 		long startTime = System.currentTimeMillis();
+		boolean disallownewtasks = false; // in batch mode only one task is allowed to be started
 		try {
 			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 			double progressSum = -1;
@@ -136,7 +137,7 @@ public class CloudTaskManager {
 							}
 						}
 					}
-					if (!fixedDisableProcess && cpuDesire < maxTasks) { // if (runningTasks.size() < maxTasks) {
+					if (!fixedDisableProcess && cpuDesire < maxTasks && !disallownewtasks) { // if (runningTasks.size() < maxTasks) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
@@ -190,36 +191,39 @@ public class CloudTaskManager {
 					if (del.size() > 0)
 						runningTasks.removeAll(del);
 					
-					for (TaskDescription td : commands_to_start) {
-						if (!runningTasks.contains(td)) {
-							try {
-								if (td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS)) {
-									runningTasks.add(td);
-									final TaskDescription tdf = td;
-									Runnable r = new Runnable() {
-										@Override
-										public void run() {
-											try {
-												tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
-											} catch (Exception e) {
-												e.printStackTrace();
-												MongoDB.saveSystemErrorMessage("Error executing analysis batch task.", e);
+					if (!disallownewtasks)
+						for (TaskDescription td : commands_to_start) {
+							if (!runningTasks.contains(td)) {
+								try {
+									if (td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS)) {
+										runningTasks.add(td);
+										if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE)
+											disallownewtasks = true;
+										final TaskDescription tdf = td;
+										Runnable r = new Runnable() {
+											@Override
+											public void run() {
+												try {
+													tdf.startWork(tdf.getBatchCmd(), hostName, hostName, m);
+												} catch (Exception e) {
+													e.printStackTrace();
+													MongoDB.saveSystemErrorMessage("Error executing analysis batch task.", e);
+												}
 											}
-										}
-									};
-									Thread t = new Thread(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName());
-									t.setPriority(Thread.MIN_PRIORITY);
-									t.start();
+										};
+										Thread t = new Thread(r, td.getBatchCmd().getRemoteCapableAnalysisActionClassName());
+										t.setPriority(Thread.MIN_PRIORITY);
+										t.start();
+									}
+								} catch (Exception e) {
+									System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
+									MongoDB.saveSystemErrorMessage("Could not start batch-cmd.", e);
 								}
-							} catch (Exception e) {
-								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: BATCH-CMD COULD NOT BE STARTED: " + e.getMessage());
-								MongoDB.saveSystemErrorMessage("Could not start batch-cmd.", e);
+							} else {
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">INFO: INTERNAL INFO: runningTasks already contains a cmd which was sheduled for start");
 							}
-						} else {
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">INFO: INTERNAL INFO: runningTasks already contains a cmd which was sheduled for start");
 						}
-					}
 					if (nn == 0)
 						progressSum = -1;
 					else
