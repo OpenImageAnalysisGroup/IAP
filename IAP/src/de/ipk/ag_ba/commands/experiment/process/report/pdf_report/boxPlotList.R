@@ -80,6 +80,18 @@ boxPlotList <- list(
 				plotName = "side border length (px)", 
 				section = 21,
 				subsection = 10,
+				subsubsection = 1),
+
+		"top.vis.border.length.norm (mm)" = list(
+				plotName = "top border length (zoom corrected) (mm)", 
+				section = 21,
+				subsection = 11,
+				subsubsection = 1),
+		
+		"top.vis.border.length (px)" = list(
+				plotName = "top border length (px)", 
+				section = 21,
+				subsection = 12,
 				subsubsection = 1)	
 		
 #		"volume.fluo.iap" = list(plotName = "digital biomass (fluorescence images, IAP formula) (px^3)", section = 6)

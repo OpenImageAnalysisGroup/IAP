@@ -2052,8 +2052,9 @@ setColorListHist <- function(descriptorList, colorVector) {
 		colorList = as.list(hsv(h = c(interval, interval20), s = 1, v = c(intervalSat, intervalSat20)))
 	} else if (length(grep("vis.hsv.s", getVector(descriptorList), ignore.case = TRUE)) > 0) {
 		colorList = colorRampPalette(colorVector)(30)
-	} else if ((length(grep("nir", getVector(descriptorList), ignore.case = TRUE)) > 0) ||
-			(length(grep("vis.hsv.v", getVector(descriptorList), ignore.case = TRUE)) > 0)) {
+	} else if ((length(grep("vis.hsv.v", getVector(descriptorList), ignore.case = TRUE)) > 0)) {
+		colorList = as.list(rgb(c(interval, interval20), c(interval, interval20), c(interval, interval20), max = 1))
+	} else if ((length(grep("nir", getVector(descriptorList), ignore.case = TRUE)) > 0)) {
 		colorList = as.list(rgb(c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), c(rev(interval), rev(interval20)), max = 1))
 	} else {
 		return(list(0))
@@ -4404,6 +4405,7 @@ makeStackedDiagram <- function(overallResult, overallDesName, overallList, image
 		whichColumShouldUse <- checkWhichColumShouldUseForPlot(overallList$splitTreatmentFirst, overallList$splitTreatmentSecond, colnames(overallResult), typOfPlot)
 		reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
 		overallResult <- reorderList$overallResult
+				
 #		if ("primaerTreatment" %in% colnames(overallResult)) {
 #			overallResult$primaerTreatment <- replaceTreatmentNames(overallList, overallResult$primaerTreatment, TRUE)
 #		} else {

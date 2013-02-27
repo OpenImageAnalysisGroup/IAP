@@ -1566,8 +1566,10 @@ public class ImageOperation {
 			cutOffMinimumDimension = 1;
 		}
 		
-		if (!considerArea)
+		if (!considerArea) {
 			cutOffMinimumArea = 0;
+			cutOffMinimumDimension = 0;
+		}
 		
 		Segmentation ps;
 		

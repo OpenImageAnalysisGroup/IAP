@@ -460,8 +460,9 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return res;
 		} else {
-			for (String s : ini.get(section).keySet())
-				res.add(s);
+			if (ini.get(section) != null)
+				for (String s : new ArrayList<String>(ini.get(section).keySet()))
+					res.add(s);
 		}
 		return res;
 	}

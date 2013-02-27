@@ -558,7 +558,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Weights", #(before and after watering)
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -575,7 +575,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Difference between special descriptors (zoom corrected)",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -588,7 +588,7 @@ sectionMappingList <- list(
 						newSection = 2,
 						title = "Difference within special descriptors (zoom corrected)",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -600,24 +600,24 @@ sectionMappingList <- list(
 				"2.1" = list(
 						newSection = 3,
 						title = "Zoom changes",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
 				"40.1" = list(
 						newSection = 4,
 						title = "Stress ratio",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
 				"3.1" = list(
 						newSection = 1,
 						title = "First growth period",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -636,8 +636,8 @@ sectionMappingList <- list(
 				"20.1" = list(
 						newSection = 1,
 						title = "IAP formula",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						#typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
@@ -660,16 +660,16 @@ sectionMappingList <- list(
 				"4.3" = list(
 						newSection = 3,
 						title = "Water use efficiency",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
 				"21.1" = list(
 						newSection = 1,
 						title = "Height (zoom corrected)",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -773,11 +773,32 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "21.10"
 				),
 				
+				"21.11" = list(
+						newSection = 6,
+						title = "Top border length (zoom corrected)",
+						text = "",
+						takeRestValuesFrom = "21.1"
+				),
+				
+				"5.11" = list(
+						takeRestValuesFrom = "21.11"
+				),
+				
+				"21.12" = list(
+						title = "Top border length",
+						text = "",
+						takeRestValuesFrom = "21.11"
+				),
+				
+				"5.12" = list(
+						takeRestValuesFrom = "21.12"
+				),
+				
 				
 				"6.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Projected side area",
 						text = ""
 				),
@@ -812,8 +833,8 @@ sectionMappingList <- list(
 
 				"8.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -891,8 +912,8 @@ sectionMappingList <- list(
 				
 				"80.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -906,8 +927,8 @@ sectionMappingList <- list(
 				
 				"14.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -933,7 +954,7 @@ sectionMappingList <- list(
 				"11.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -947,7 +968,7 @@ sectionMappingList <- list(
 				"12.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Average wetness of side image",
 						text = ""
 				),
@@ -973,8 +994,8 @@ sectionMappingList <- list(
 				
 				"13.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Side",
 						text = ""
 				),
@@ -993,7 +1014,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Before watering",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1007,7 +1028,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Top marker",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1021,8 +1042,8 @@ sectionMappingList <- list(
 				"3.1.1" = list(
 						newSection = 1,
 						title = "Quality of the initial data",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 			
@@ -1030,7 +1051,7 @@ sectionMappingList <- list(
 #						newSection = 2,
 #						title = "",
 #						typOfReset = RESET.PAGE.NO,
-#						typOfClear = CLEAR.PAGE.OWN.SUB,
+#						typOfClear = CLEAR.PAGE.NO,
 #						text = paste(NEW.PAR.INDENT,
 #								"SRV represent the slope of the stress function. The greater this value the faster is the stress reaction.", NEWLINE.TEX,
 #								sep = SEPARATOR.ITEM)
@@ -1081,8 +1102,8 @@ sectionMappingList <- list(
 				"20.1.1" = list(
 						newSection = 1,
 						title = "RGB",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1105,7 +1126,7 @@ sectionMappingList <- list(
 #						newSection = 1,
 #						title = "Fluctuation at special days",
 #						typOfReset = RESET.PAGE.NO,
-#						typOfClear = CLEAR.PAGE.OWN.SUB,
+#						typOfClear = CLEAR.PAGE.NO,
 #						text = ""
 #				),
 #				
@@ -1120,7 +1141,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Fluctuation at special days",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1136,7 +1157,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Based on digital biomass",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text =""
 				),
 				
@@ -1184,6 +1205,14 @@ sectionMappingList <- list(
 				),
 				
 				"21.10.1" = list(
+						takeRestValuesFrom = "21.1.1"
+				),
+				
+				"21.11.1" = list(
+						takeRestValuesFrom = "21.1.1"
+				),
+				
+				"21.12.1" = list(
 						takeRestValuesFrom = "21.1.1"
 				),
 				
@@ -1236,12 +1265,11 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "5.1.1"
 				),
 				
-				
 				"7.1.1" = list(
 						newSection = 1,
 						title = "Color shade (hue)",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1343,8 +1371,8 @@ sectionMappingList <- list(
 				
 				"8.1.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Average intensity",
 						text = ""
 				),
@@ -1541,8 +1569,8 @@ sectionMappingList <- list(
 				"80.1.1" = list(
 						newSection = 1,
 						title = "NDVI",
-						typOfReset = RESET.PAGE.OWN,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfReset = RESET.PAGE.NO,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1653,7 +1681,7 @@ sectionMappingList <- list(
 #				"11.1" = list(
 #						newSection = 1,
 #						typOfReset = RESET.PAGE.NO,
-#						typOfClear = CLEAR.PAGE.OWN,
+#						typOfClear = CLEAR.PAGE.NO,
 #						title = "Number of leafs",
 #						text = paste(NEW.PAR.INDENT,BEGIN.ITEM,
 #								LINE.ITEM, "Number of leafs-tips", NEWLINE.TEX,
@@ -1686,7 +1714,7 @@ sectionMappingList <- list(
 				"11.1.1" = list(
 						newSection = 1,
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN,
+						typOfClear = CLEAR.PAGE.NO,
 						title = "Leafs",
 						text = ""
 				),
@@ -1716,7 +1744,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Brown divided by green",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1751,7 +1779,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Number of leaf segments ",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -1814,7 +1842,7 @@ sectionMappingList <- list(
 				),
 				
 				"13.1.3" = list(
-						newSection = 3,
+						newSection = 4,
 						title = "PC1 - maximum distance (zoom corrected)",
 						text = "",
 						takeRestValuesFrom = "13.1.1"
@@ -1826,7 +1854,7 @@ sectionMappingList <- list(
 				),
 				
 				"13.1.5" = list(
-						newSection = 4,
+						newSection = 5,
 						title = "PC2 - Opposite direction maxmium distance (zoom corrected)",
 						text = "",
 						takeRestValuesFrom = "13.1.1"
@@ -1838,21 +1866,21 @@ sectionMappingList <- list(
 				),
 				
 				"13.1.7" = list(
-						newSection = 5,
+						newSection = 6,
 						title = "Fillgrade",
 						text = "",
 						takeRestValuesFrom = "13.1.1"
 				),
 				
 				"13.1.8" = list(
-						newSection = 6,
+						newSection = 7,
 						title = "Compactness",
 						text = "",
 						takeRestValuesFrom = "13.1.1"
 				),
 				
 				"13.1.9" = list(
-						newSection = 7,
+						newSection = 8,
 						title = "Circularity",
 						text = "",
 						takeRestValuesFrom = "13.1.1"
@@ -1865,6 +1893,13 @@ sectionMappingList <- list(
 						takeRestValuesFrom = "13.1.1"
 				),
 				
+				"13.1.11" = list(
+						newSection = 3,
+						title = "Average distance to center",
+						text = "",
+						takeRestValuesFrom = "13.1.1"
+				),
+
 				"13.2.1" = list(
 						takeRestValuesFrom = "13.1.1"
 				),
@@ -1903,8 +1938,10 @@ sectionMappingList <- list(
 				
 				"13.2.10" = list(
 						takeRestValuesFrom = "13.1.10"
+				),
+				"13.2.11" = list(
+						takeRestValuesFrom = "13.1.11"
 				)
-				
 				
 		),
 		paragraph = list(
@@ -1913,7 +1950,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Side area (zoom corrected)",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -2005,7 +2042,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Fluctuation at special days",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -2030,7 +2067,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Based on RGB",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -2316,7 +2353,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Average hue",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -3081,7 +3118,7 @@ sectionMappingList <- list(
 						newSection = 1,
 						title = "Average intensity",
 						typOfReset = RESET.PAGE.NO,
-						typOfClear = CLEAR.PAGE.OWN.SUB,
+						typOfClear = CLEAR.PAGE.NO,
 						text = ""
 				),
 				
@@ -3192,7 +3229,7 @@ sectionMappingList <- list(
 				
 				"11.1.1.1" = list(
 						newSection = 1,
-						typOfReset = RESET.PAGE.OWN,
+						typOfReset = RESET.PAGE.NO,
 						typOfClear = CLEAR.PAGE.NO,
 						title = "Number of leafs",
 						text = ""
