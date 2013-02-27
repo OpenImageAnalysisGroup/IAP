@@ -18,12 +18,12 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public class ActionMongoDbCompact extends AbstractNavigationAction implements NavigationAction {
+public class ActionMongoDbRepair extends AbstractNavigationAction implements NavigationAction {
 	
 	private final MongoDB m;
 	
-	public ActionMongoDbCompact(MongoDB m) {
-		super("Compact database (may take several hours, database is offline during this time)");
+	public ActionMongoDbRepair(MongoDB m) {
+		super("Repair database (may take several hours, database is offline during this time, releases space on file system)");
 		this.m = m;
 	}
 	
@@ -32,7 +32,7 @@ public class ActionMongoDbCompact extends AbstractNavigationAction implements Na
 	String result = "Internal Error";
 	private static boolean started = false;
 	
-	public static boolean compactOperationRunning;
+	public static boolean repairOperationRunning;
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
@@ -51,11 +51,11 @@ public class ActionMongoDbCompact extends AbstractNavigationAction implements Na
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		started = true;
-		ActionMongoDbCompact.compactOperationRunning = true;
+		ActionMongoDbRepair.repairOperationRunning = true;
 		try {
 			result = m.compact(status);
 		} finally {
-			ActionMongoDbCompact.compactOperationRunning = false;
+			ActionMongoDbRepair.repairOperationRunning = false;
 		}
 	}
 	
@@ -66,20 +66,22 @@ public class ActionMongoDbCompact extends AbstractNavigationAction implements Na
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getFileRoller();
+		return IAPimages.getFileRoller3();
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return IAPimages.getFileRoller();
+		return IAPimages.getFileRoller3();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
 		if (!started)
-			return "<html><center>Compact Database<br><small>Database goes offline, may take hours</small></center>";
+			return "<html><center>Repair Database (free disk space)<br><small>" +
+					"Database goes offline, may take hours,<br>" +
+					"requires as much free space as currently used</small></center>";
 		else
-			return "<html><center>Compacting Database<br><small>Don't interrupt this long lasting operation</small></center>";
+			return "<html><center>Repairing Database (free disk space)<br><small>Don't interrupt this long lasting operation</small></center>";
 	}
 	
 	@Override
