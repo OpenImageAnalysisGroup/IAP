@@ -80,6 +80,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		
 		result.add(new NavigationButton(new ActionMongoDbReorganize(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionMongoDbCompact(m), src.getGUIsetting()));
+		result.add(new NavigationButton(new ActionMongoDbRepair(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionDeleteHistoryOfAllExperiments(m), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionCopyExperiment(m, ExperimentHeaderService.filterNewest(experimentList), src.getGUIsetting()),
 				src.getGUIsetting()));

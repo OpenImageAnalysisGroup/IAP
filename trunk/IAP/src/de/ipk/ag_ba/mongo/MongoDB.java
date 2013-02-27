@@ -1370,6 +1370,14 @@ public class MongoDB {
 		return res.toString();
 	}
 	
+	public String repair(
+			final BackgroundTaskStatusProviderSupportingExternalCall status)
+			throws Exception {
+		final StringBuilder res = new StringBuilder();
+		processDB(new CleanupCompactHelper(status, res, true));
+		return res.toString();
+	}
+	
 	public static void saveSystemMessage(String msg) {
 		try {
 			saveSystemMessage(MongoDB.getDefaultCloud(), msg);

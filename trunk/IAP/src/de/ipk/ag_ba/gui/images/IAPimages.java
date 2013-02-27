@@ -126,6 +126,10 @@ public class IAPimages {
 		return "img/ext/gpl2/File-Roller-64.png";
 	}
 	
+	public static String getFileRoller3() {
+		return "img/ext/gpl2/File-Roller-64-warning.png";
+	}
+	
 	public static String getToolbox() {
 		return "img/ext/gpl2/Gnome-Applications-System-64.png";
 	}

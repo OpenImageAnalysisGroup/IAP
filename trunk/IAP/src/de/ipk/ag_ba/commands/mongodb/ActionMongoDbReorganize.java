@@ -12,7 +12,6 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 
@@ -32,7 +31,7 @@ public class ActionMongoDbReorganize extends AbstractNavigationAction implements
 	
 	String result = "Internal Error";
 	
-	private boolean compactDatabase = false;
+	private final boolean compactDatabase = false;
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
@@ -45,29 +44,6 @@ public class ActionMongoDbReorganize extends AbstractNavigationAction implements
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>(currentSet);
 		result.add(src);
 		return result;
-	}
-	
-	@Override
-	public ParameterOptions getParameters() {
-		return new ParameterOptions(
-				"<html>" +
-						"This command removes not linked database entries and files.<br><br>" +
-						"If enabled, not only internal database space is made available,<br>" +
-						"but also space in the file system.<br>" +
-						"This operation and especially this option may need a long time<br>" +
-						"to proceed (up to several hours).",
-				new Object[] {
-						"Compact database@@Warning: May take a very long time (up to several hours)", compactDatabase
-				});
-	}
-	
-	@Override
-	public void setParameters(Object[] parameters) {
-		super.setParameters(parameters);
-		if (parameters != null && parameters.length == 1) {
-			int idx = 0;
-			compactDatabase = (Boolean) parameters[idx++];
-		}
 	}
 	
 	@Override
@@ -93,7 +69,9 @@ public class ActionMongoDbReorganize extends AbstractNavigationAction implements
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Reorganize";
+		return "<html><center>Reorganize<br>" +
+				"<small>Remove stale DB entries</small>" +
+				"</center>";
 	}
 	
 }
