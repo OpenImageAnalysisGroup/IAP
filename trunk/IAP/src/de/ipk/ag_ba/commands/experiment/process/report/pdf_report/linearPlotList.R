@@ -266,12 +266,12 @@ nBoxPlotList <- list(
 				section = 5,
 				subsection = 11,
 				subsubsection = 1),
+		
 		"top.vis.border.length" = list(
 				plotName = "top border length (px)", 
 				section = 5,
 				subsection = 12,
 				subsubsection = 1),
-		
 		 
 		 "side.area.relative" = list(
 				 plotName = "side area growth rate (%/day)", 
@@ -579,10 +579,10 @@ nBoxPlotList <- list(
 		"side.vis.hull.pc2.norm" = list(plotName = "opposite direction of the side maximum extension (zoom corrected) (mm)", section = 13, subsection = 1, subsubsection = 5),
 		"side.vis.hull.pc2" = list(plotName = "opposite direction of the side maximum extension (px)", section = 13, subsection = 1, subsubsection = 6),
 		"side.vis.hull.fillgrade (percent)" = list(plotName = "fillgrade of side convex hull (%)", section = 13, subsection = 1, subsubsection = 7),		
-
 		"side.vis.compactness.16 (relative)" = list(plotName = "side compactness (16-inf)", section = 13, subsection = 1, subsubsection = 8),
 		"side.vis.compactness.01 (relative)" = list(plotName = "side compactness (0-1)", section = 13, subsection = 1, subsubsection = 8),
 		"side.vis.hull.circularity (relative)" = list(plotName = "side circularity", section = 13, subsection = 1, subsubsection = 9),
+		"side.avg_distance_to_center (px)" = list(plotName = "side average distance to center (px)", section = 13, subsection = 1, subsubsection = 11),
 		
 		"top.vis.hull.area.norm (mm^2)" = list(plotName = "top area of convex hull (zoom corrected) (mm^2)", section = 13, subsection = 2, subsubsection = 1),
 		"top.vis.hull.area (px)" = list(plotName = "top area of convex hull (px)", section = 13, subsection = 2, subsubsection = 2),	
@@ -592,10 +592,11 @@ nBoxPlotList <- list(
 		"top.vis.hull.pc2.norm" = list(plotName = "opposite direction of the top maximum extension (zoom corrected) (mm)", section = 13, subsection = 2, subsubsection = 5),
 		"top.vis.hull.pc2" = list(plotName = "opposite direction of the top maximum extension (px)", section = 13, subsection = 2, subsubsection = 6),
 		"top.vis.hull.fillgrade (percent)" = list(plotName = "fillgrade of top convex hull (%)", section = 13, subsection = 2, subsubsection = 7),
-		
 		"top.vis.compactness.16 (relative)" = list(plotName = "top compactness (16-inf)", section = 13, subsection = 2, subsubsection = 8),
 		"top.vis.compactness.01 (relative)" = list(plotName = "top compactness (0-1)", section = 13, subsection = 2, subsubsection = 8),
 		"top.vis.hull.circularity (relative)" = list(plotName = "top circularity", section = 13, subsection = 2, subsubsection = 9),
+		"top.avg_distance_to_center (px)" = list(plotName = "top average distance to center (px)", section = 13, subsection = 2, subsubsection = 11),
+		
 
 ####### end convex hull #################
 		
