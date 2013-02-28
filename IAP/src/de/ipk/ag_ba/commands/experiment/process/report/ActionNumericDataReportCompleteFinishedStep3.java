@@ -376,6 +376,9 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
+			if (status != null)
+				status.setCurrentStatusValueFine(-1);
+			
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			Workbook wb = xlsx ? new XSSFWorkbook() : null;
@@ -425,6 +428,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			if (xlsx) {
 				csv = null;
 				if (status != null)
+					status.setCurrentStatusValue(-1);
+				if (status != null)
 					status.setCurrentStatusText2("Save XLSX file");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
 				if (customTargetFileName != null)
@@ -436,6 +441,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					else
 						wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
 				}
+				if (status != null)
+					status.setCurrentStatusValueFine(100d);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
 				if (status != null)
 					status.setCurrentStatusText2("File saved");
@@ -665,15 +672,18 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		// System.out.println("format: " + s);
 		
 		boolean adjusted = false;
-		
+		int scnt = snapshotsToBeProcessed.size();
+		int sidx = 0;
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
-			if (status != null)
+			sidx++;
+			if (status != null) {
+				status.setCurrentStatusValueFine(100d * sidx / scnt);
 				status.setCurrentStatusText1("Rows remaining: " + snapshotsToBeProcessed.size());
-			if (status != null)
 				status.setCurrentStatusText2("Memory status: "
 						+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + snapshotsToBeProcessed.size() + " "
 					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
