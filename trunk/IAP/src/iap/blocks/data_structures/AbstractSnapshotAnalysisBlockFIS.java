@@ -1,7 +1,6 @@
 package iap.blocks.data_structures;
 
 import org.ErrorMsg;
-import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
@@ -19,6 +18,8 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	
 	@Override
 	protected FlexibleMaskAndImageSet run() throws InterruptedException {
+		if (!getBoolean("enabled", true))
+			return input();
 		int parentPriority = getParentPriority();
 		final FlexibleImageSet processedImages = new FlexibleImageSet(input().images());
 		final FlexibleImageSet processedMasks = new FlexibleImageSet(input().images());
@@ -136,10 +137,6 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		this.prio = prio;
 	}
 	
-	protected void prepare() {
-		// empty
-	}
-	
 	protected FlexibleImage processVISimage() {
 		return input().images().vis();
 	}
@@ -167,41 +164,18 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	protected FlexibleImage processFLUOmask() {
-		if (input() == null)
-			System.out.println("ERROR 1");
-		if (input().masks() == null)
-			System.out.println("ERROR 2");
 		return input().masks().fluo();
 	}
 	
 	protected FlexibleImage processNIRmask() {
-		if (input() == null)
-			System.out.println("ERROR 3");
-		if (input().masks() == null)
-			System.out.println("ERROR 4");
 		return input().masks().nir();
 	}
 	
 	protected FlexibleImage processIRmask() {
-		if (input() == null)
-			System.out.println("ERROR 5");
-		if (input().masks() == null)
-			System.out.println("ERROR 6");
 		return input().masks().ir();
 	}
 	
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
-		// empty
-	}
-	
-	@Override
-	public Parameter[] getParameters() {
-		// empty
-		return null;
-	}
-	
-	@Override
-	public void setParameters(Parameter[] params) {
 		// empty
 	}
 }

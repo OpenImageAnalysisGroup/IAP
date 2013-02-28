@@ -33,23 +33,6 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
 public class BlCutZoomedImages extends AbstractBlock {
 	
-	boolean debugValues;
-	boolean preventDebugValues;
-	
-	@Override
-	protected void prepare() {
-		super.prepare();
-		debugValues = !preventDebugValues && getBoolean("debug", false);
-		if (debugValues) {
-			if (input().images().vis() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition(), this);
-			if (input().images().nir() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.NIR, input(), getProperties(), options, getBlockPosition(), this);
-			if (input().images().ir() != null && input().images().fluo() != null)
-				debugIt(this.getClass(), FlexibleImageType.IR, input(), getProperties(), options, getBlockPosition(), this);
-		}
-	}
-	
 	private static void debugIt(final Class blockType, final FlexibleImageType inpImageType,
 			final FlexibleMaskAndImageSet inputSet,
 			final BlockResultSet brs, final ImageProcessorOptions options,
