@@ -356,7 +356,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
-						exportIndividualAngles, xlsx, snFilter);
+						exportIndividualAngles, xlsx, snFilter, status);
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
@@ -370,7 +370,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter);
+						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status);
 				csvHeader = getCSVheader();
 				csv.append(csvHeader);
 				if (row2col2value != null)

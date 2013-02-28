@@ -550,7 +550,8 @@ public class IAPservice {
 			boolean prepareTransportToBrowser,
 			boolean storeAllAngleValues,
 			boolean storeAllReplicates,
-			SnapshotFilter optSnapshotFilter) {
+			SnapshotFilter optSnapshotFilter,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
@@ -558,7 +559,8 @@ public class IAPservice {
 		System.out.println("Store all replicates? " + prepareTransportToBrowser);
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
-		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Rename substances");
 		HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();
 		
 		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
@@ -585,6 +587,9 @@ public class IAPservice {
 		
 		boolean hasTemperatureData = false;
 		TreeMap<Long, Double> timeDay2averageTemp = new TreeMap<Long, Double>();
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Process Climate Data");
 		
 		if (experiment != null) {
 			String type = experiment.getHeader().getExperimentType();
@@ -649,6 +654,10 @@ public class IAPservice {
 				}
 			}
 		}
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Create Snapshots");
+		
 		if (experiment != null)
 			for (SubstanceInterface substance : experiment) {
 				for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
@@ -879,6 +888,9 @@ public class IAPservice {
 										System.out.println("About to filter out a snapshot: " + sn);
 										System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
 									}
+								if (optStatus != null)
+									optStatus.setCurrentStatusText1("Create Snapshots (" + result.size() + ")");
+								
 							}
 						}
 					}
@@ -886,6 +898,9 @@ public class IAPservice {
 			}
 		
 		sw.printTime(100);
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Sorting Snapshots (" + result.size() + ")");
 		
 		sw = new StopWatch("Sort Snapshots");
 		Collections.sort(result, new Comparator<SnapshotDataIAP>() {
@@ -910,11 +925,17 @@ public class IAPservice {
 		});
 		sw.printTime(50);
 		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Process Fields");
+		
 		for (SnapshotDataIAP sd : result)
 			if (prepareTransportToBrowser)
 				sd.prepareFieldsForDataTransport();
 			else
 				sd.prepareStore();
+		
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("Snapshot Set Created");
 		
 		return result;
 	}
