@@ -26,6 +26,7 @@ public class ErrorMsg implements HelperClass {
 	private static String statusMsg = null;
 	
 	private static boolean rethrowErrorMessages = true;
+	private static ErrorMessageProcessor customErrorHandler;
 	
 	public static void setRethrowErrorMessages(boolean rethrowErrorMessages) {
 		ErrorMsg.rethrowErrorMessages = rethrowErrorMessages;
@@ -46,6 +47,8 @@ public class ErrorMsg implements HelperClass {
 	 * @param errorMsg
 	 */
 	public synchronized static void addErrorMessage(String errorMsg) {
+		if (customErrorHandler != null)
+			customErrorHandler.reportError(errorMsg);
 		if (rethrowErrorMessages)
 			throw new Error(errorMsg);
 		else
@@ -310,6 +313,8 @@ public class ErrorMsg implements HelperClass {
 	}
 	
 	public static void addErrorMessage(Exception e) {
+		if (customErrorHandler != null)
+			customErrorHandler.reportError(e);
 		e.printStackTrace();
 		if (SystemAnalysis.isHeadless() && e != null) {
 			System.out.println("ERROR-MSG: " + e.getMessage());
@@ -325,6 +330,10 @@ public class ErrorMsg implements HelperClass {
 			runnable.run();
 		else
 			finishedAddonLoadingListeners.add(runnable);
+	}
+	
+	public static void setCustomErrorHandler(ErrorMessageProcessor errorMessageProcessor) {
+		customErrorHandler = errorMessageProcessor;
 	}
 	
 }

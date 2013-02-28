@@ -2,19 +2,39 @@ package iap.blocks.data_structures;
 
 import iap.pipelines.ImageProcessorOptions;
 import info.StopWatch;
+import info.clearthought.layout.TableLayout;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.Timer;
+
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.parameter.Parameter;
 
+import de.ipk.ag_ba.gui.ZoomedImage;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -64,6 +84,23 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		this.properties = properties;
 		this.blockPositionInPipeline = blockPositionInPipeline;
 		this.debugStack = debugStack;
+	}
+	
+	protected boolean debugValues;
+	protected boolean preventDebugValues;
+	
+	protected void prepare() {
+		debugValues = !preventDebugValues && getBoolean("debug", false);
+		if (debugValues) {
+			if (input().images().vis() != null && input().masks().vis() != null)
+				debugPipelineBlock(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition(), this);
+			if (input().images().fluo() != null && input().masks().fluo() != null)
+				debugPipelineBlock(this.getClass(), FlexibleImageType.FLUO, input(), getProperties(), options, getBlockPosition(), this);
+			if (input().images().nir() != null && input().masks().nir() != null)
+				debugPipelineBlock(this.getClass(), FlexibleImageType.NIR, input(), getProperties(), options, getBlockPosition(), this);
+			if (input().images().ir() != null && input().masks().ir() != null)
+				debugPipelineBlock(this.getClass(), FlexibleImageType.IR, input(), getProperties(), options, getBlockPosition(), this);
+		}
 	}
 	
 	@Override
@@ -129,12 +166,17 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: ERROR IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug: System.Exit in case of pipeline error",
+				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE))
+			System.exit(SystemOptions.getInstance().getInteger(
+					"IAP", "Debug: System.Exit return value in case of pipeline error", 1));
 	}
 	
 	protected void reportError(Exception error, String errorMessage) {
 		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
+		IAPmain.errorCheck();
 	}
 	
 	@Override
@@ -219,4 +261,82 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			}
 		}
 	}
+	
+	private static void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
+			final FlexibleMaskAndImageSet inputSet,
+			final BlockResultSet brs, final ImageProcessorOptions options,
+			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
+		
+		final ZoomedImage ic = new ZoomedImage(null);
+		final JScrollPane jsp = new JScrollPane(ic);
+		jsp.setBorder(BorderFactory.createLoweredBevelBorder());
+		
+		final JButton okButton = new JButton();
+		
+		okButton.setAction(new AbstractAction("Update View") {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					AbstractSnapshotAnalysisBlockFIS inst = (AbstractSnapshotAnalysisBlockFIS) blockType.newInstance();
+					FlexibleImageSet a = inputSet.images().copy();
+					FlexibleImageSet b = inputSet.masks().copy();
+					FlexibleMaskAndImageSet ab = new FlexibleMaskAndImageSet(a, b);
+					inst.preventDebugValues = true;
+					inst.setInputAndOptions(ab, options, brs, blockPos, null);
+					ab = inst.process();
+					int vs = jsp.getVerticalScrollBar().getValue();
+					int hs = jsp.getHorizontalScrollBar().getValue();
+					FlexibleImage processingResultImage = ab.masks().getImage(inpImageType);
+					if (processingResultImage == null)
+						throw new Exception("Processed image not available");
+					
+					ic.setImage(processingResultImage.getAsBufferedImage());
+					jsp.setViewportView(ic);
+					jsp.revalidate();
+					jsp.getVerticalScrollBar().setValue(vs);
+					jsp.getHorizontalScrollBar().setValue(hs);
+					okButton.setText("<html><center>Update View<br>Updated " + SystemAnalysis.getCurrentTimeInclSec());
+				} catch (Exception e) {
+					e.printStackTrace();
+					MainFrame.showMessageDialog("Error: " + e.getMessage(), "Error");
+					okButton.setText("<html><center>Update View<br>Error " + e.getMessage());
+				}
+			}
+		});
+		
+		JComponent editAndUpdate = TableLayout.get3Split(
+				null,
+				null,
+				TableLayout.get3Split(
+						ic.getZoomSlider(), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+				TableLayout.FILL, 5, TableLayout.PREFERRED);
+		JComponent v = TableLayout.get3SplitVertical(
+				jsp, null, editAndUpdate, TableLayout.FILL, 5, TableLayout.PREFERRED);
+		v.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		
+		final Timer timer = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				boolean changesDetected = false;
+				if (changesDetected) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Detected settings change, updating view...");
+					okButton.doClick();
+				}
+			}
+		});
+		
+		final JFrame jf = MainFrame.showMessageWindow(inpImageType.name(), v);
+		jf.addHierarchyListener(new HierarchyListener() {
+			@Override
+			public void hierarchyChanged(HierarchyEvent arg0) {
+				if (!jf.isVisible())
+					timer.stop();
+			}
+		});
+		timer.setRepeats(true);
+		timer.start();
+	}
+	
 }

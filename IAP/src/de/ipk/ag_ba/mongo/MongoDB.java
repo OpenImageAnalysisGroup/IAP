@@ -61,6 +61,7 @@ import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
@@ -1398,6 +1399,7 @@ public class MongoDB {
 	public static void saveSystemErrorMessage(String error, Exception e) {
 		if (e == null) {
 			saveSystemMessage(error);
+			IAPmain.errorCheck();
 			return;
 		}
 		System.err.println(SystemAnalysis.getCurrentTime() + ">" + error);
@@ -1406,6 +1408,7 @@ public class MongoDB {
 				".<br>Stack-trace:<br>" +
 				e.getStackTrace() != null ?
 				StringManipulationTools.getStringList(e.getStackTrace(), "<br>") : "(no stacktrace)");
+		IAPmain.errorCheck();
 	}
 	
 	public boolean isDbHostReachable() {
