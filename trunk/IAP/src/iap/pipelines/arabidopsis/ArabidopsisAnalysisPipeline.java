@@ -75,16 +75,16 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseVisMaskToClearFluo_fluo.class.getCanonicalName(),
 				BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir.class.getCanonicalName(),
-				
+
 				BlSmoothShape.class.getCanonicalName(),
-				
+
 				BlMedianFilter.class.getCanonicalName(),
 				BlMedianFilter.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-				
+
 				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
-				
+
 				// calculation of numeric values
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
@@ -92,9 +92,9 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-				
+
 				BlockDrawSkeleton.class.getCanonicalName(),
-				
+
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()
@@ -113,9 +113,7 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "Block Settings";
-		
-		options.setSystemOptionStorage(so, g);
+		options.setSystemOptionStorage(so);
 		
 		options.setIsBarley(false);
 		options.setIsMaize(false);

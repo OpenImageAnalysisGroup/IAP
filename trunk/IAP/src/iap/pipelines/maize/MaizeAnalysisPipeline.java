@@ -92,14 +92,14 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-				
+
 				// calculation of numeric values
 				BlCalcWidthAndHeight.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcIntensity.class.getCanonicalName(),
 				BlConvexHull.class.getCanonicalName(),
-				
+
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				BlockDrawSkeleton.class.getCanonicalName(),
@@ -120,9 +120,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "Block Settings";
-		
-		options.setSystemOptionStorage(so, g);
+		options.setSystemOptionStorage(so);
 		
 		options.setIsMaize(true);
 		options.setIsBarley(false);

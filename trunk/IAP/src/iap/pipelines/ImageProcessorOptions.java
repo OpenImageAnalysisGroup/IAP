@@ -31,7 +31,6 @@ public class ImageProcessorOptions {
 	private int unit_test_idx;
 	private int unit_test_steps;
 	private SystemOptions optSystemOptionStorage;
-	private String optSystemOptionStorageGroup;
 	
 	public ImageProcessorOptions(SystemOptions options) {
 		this.optSystemOptionStorage = options;
@@ -55,6 +54,10 @@ public class ImageProcessorOptions {
 	public void setCameraPosition(CameraPosition cameraTyp) {
 		this.cameraTyp = cameraTyp;
 		
+	}
+	
+	public SystemOptions getOptSystemOptions() {
+		return optSystemOptionStorage;
 	}
 	
 	public CameraPosition getCameraPosition() {
@@ -139,17 +142,12 @@ public class ImageProcessorOptions {
 		return unit_test_steps;
 	}
 	
-	public void setSystemOptionStorage(SystemOptions systemOptionStorage, String systemOptionStorageGroup) {
+	public void setSystemOptionStorage(SystemOptions systemOptionStorage) {
 		this.setOptSystemOptionStorage(systemOptionStorage);
-		this.setOptSystemOptionStorageGroup(systemOptionStorageGroup);
 	}
 	
-	private String getOptSystemOptionStorageGroup() {
+	public String getSystemOptionStorageGroup() {
 		return "Block Properties - " + getCameraPosition();
-	}
-	
-	private void setOptSystemOptionStorageGroup(String optSystemOptionStorageGroup) {
-		this.optSystemOptionStorageGroup = optSystemOptionStorageGroup;
 	}
 	
 	private void setOptSystemOptionStorage(SystemOptions optSystemOptionStorage) {
@@ -161,11 +159,13 @@ public class ImageProcessorOptions {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getBoolean(
-					getOptSystemOptionStorageGroup(),
-					block != null ?
-							block.getClass().getCanonicalName() + "//" + title :
-							title,
-					defaultValue);
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
+	}
+	
+	private String getSettingName(ImageAnalysisBlockFIS block, String title) {
+		return block != null ?
+				block.getClass().getCanonicalName() + "//" + title :
+				title;
 	}
 	
 	public double getDoubleSetting(ImageAnalysisBlockFIS block, String title, double defaultValue) {
@@ -173,11 +173,7 @@ public class ImageProcessorOptions {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getDouble(
-					getOptSystemOptionStorageGroup(),
-					block != null ?
-							block.getClass().getCanonicalName() + "//" + title :
-							title,
-					defaultValue);
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
 	public int getIntSetting(ImageAnalysisBlockFIS block, String title, int defaultValue) {
@@ -185,11 +181,7 @@ public class ImageProcessorOptions {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getInteger(
-					getOptSystemOptionStorageGroup(),
-					block != null ?
-							block.getClass().getCanonicalName() + "//" + title :
-							title,
-					defaultValue);
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
 	public String getStringSetting(ImageAnalysisBlockFIS block, String title, String defaultValue) {
@@ -197,11 +189,7 @@ public class ImageProcessorOptions {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getString(
-					getOptSystemOptionStorageGroup(),
-					block != null ?
-							block.getClass().getCanonicalName() + "//" + title :
-							title,
-					defaultValue);
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
 	public Integer[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, Integer[] defaultValue) {
@@ -209,11 +197,7 @@ public class ImageProcessorOptions {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getIntArray(
-					getOptSystemOptionStorageGroup(),
-					block != null ?
-							block.getClass().getCanonicalName() + "//" + title :
-							title,
-					defaultValue);
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
 	Double calculatedBlueMarkerDistance = null;

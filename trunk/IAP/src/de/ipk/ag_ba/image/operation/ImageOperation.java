@@ -1568,7 +1568,6 @@ public class ImageOperation {
 		
 		if (!considerArea) {
 			cutOffMinimumArea = 0;
-			cutOffMinimumDimension = 0;
 		}
 		
 		Segmentation ps;
@@ -1859,8 +1858,13 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation filterRemoveHSV(double maxDist, double clearColorHUE, double maxLightness) {
+		return filterRemoveHSV(clearColorHUE - maxDist, clearColorHUE + maxDist, 0, 1, 0d, maxLightness);
+	}
+	
+	public ImageOperation filterRemoveHSV(double minHue, double maxHue,
+			double minSat, double maxSat,
+			double minLightness, double maxLightness) {
 		
-		double t = clearColorHUE;
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
@@ -1874,7 +1878,9 @@ public class ImageOperation {
 			
 			Color.RGBtoHSB(r, g, b, hsb);
 			
-			if (Math.abs(hsb[0] - t) <= maxDist && hsb[2] < maxLightness)
+			if (hsb[0] >= minHue && hsb[0] <= maxHue
+					&& hsb[1] >= minSat && hsb[1] <= maxSat
+					&& hsb[2] >= minLightness && hsb[2] <= maxLightness)
 				pixels[index] = BACKGROUND_COLORint;
 			else
 				pixels[index] = rgb;

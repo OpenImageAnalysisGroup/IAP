@@ -18,6 +18,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
  * 
  * @author Klukas
  */
+@Deprecated
 public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;

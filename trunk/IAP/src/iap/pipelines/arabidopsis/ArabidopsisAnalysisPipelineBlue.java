@@ -93,9 +93,7 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 		if (options == null)
 			return;
 		
-		String g = "Block Settings";
-		
-		options.setSystemOptionStorage(so, g);
+		options.setSystemOptionStorage(so);
 		
 		options.setIsBarley(false);
 		options.setIsMaize(false);
