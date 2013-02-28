@@ -1249,7 +1249,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			String species = IAPexperimentTypes.getSpeciesFromExperimentType(expType);
 			
 			ps.setString(1, header.getExperimentName());
-			// HashSet<String> printedMetaData = new HashSet<String>();
+			HashSet<String> printedMetaData = new HashSet<String>();
 			try {
 				ResultSet rs = ps.executeQuery();
 				
@@ -1267,7 +1267,10 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					String metaValue = rs.getString(3);
 					if (metaValue != null)
 						metaValue = metaValue.trim();
-					
+					String o = plantID + " / " + metaName + " / " + metaValue;
+					if (!printedMetaData.contains(o))
+						System.out.println(o);
+					printedMetaData.add(o);
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
 						res.put(plantID, new Condition(null));
