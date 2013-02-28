@@ -76,7 +76,7 @@ import org.graffiti.plugin.io.resources.IOurl;
  * attributes.
  * 
  * @author Christian Klukas
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class AttributeHelper implements HelperClass {
 	
@@ -140,29 +140,35 @@ public class AttributeHelper implements HelperClass {
 			r.exec(cmd + " " + par);
 		} catch (IOException e) {
 			try {
-				String cmd = "gnome-open"; // xdg-open
+				String cmd = "xdg-open";
 				String par = url;
 				r.exec(new String[] { cmd, par });
-			} catch (Exception e2) {
+			} catch (Exception e20) {
 				try {
-					String osName = System.getProperty("os.name");
-					if (osName.startsWith("Mac OS") || osName.startsWith("Darwin")) {
-						String cmd = "open";
-						String par = url;
-						r.exec(new String[] { cmd, par });
-					}
-				} catch (Exception e3) {
+					String cmd = "gnome-open"; // xdg-open
+					String par = url;
+					r.exec(new String[] { cmd, par });
+				} catch (Exception e2) {
 					try {
-						String cmd = "kfmclient exec";
-						String par = url;
-						r.exec(new String[] { cmd, par });
-					} catch (Exception e4) {
-						JOptionPane.showMessageDialog(
-								null,
-								"<html>Error executing command. Error Messages:<p>" + e.getLocalizedMessage()
-										+ " (Windows File Open)<p>" + e2.getLocalizedMessage() + " (gnome File Open)<p>"
-										+ e3.getLocalizedMessage() + " (Mac OS X File Open)<p>" + e4.getLocalizedMessage()
-										+ " (KDE File Open)</html>", "Error opening file", JOptionPane.WARNING_MESSAGE);
+						String osName = System.getProperty("os.name");
+						if (osName.startsWith("Mac OS") || osName.startsWith("Darwin")) {
+							String cmd = "open";
+							String par = url;
+							r.exec(new String[] { cmd, par });
+						}
+					} catch (Exception e3) {
+						try {
+							String cmd = "kfmclient exec";
+							String par = url;
+							r.exec(new String[] { cmd, par });
+						} catch (Exception e4) {
+							JOptionPane.showMessageDialog(
+									null,
+									"<html>Error executing command. Error Messages:<p>" + e.getLocalizedMessage()
+											+ " (Windows File Open)<p>" + e2.getLocalizedMessage() + " (gnome File Open)<p>"
+											+ e3.getLocalizedMessage() + " (Mac OS X File Open)<p>" + e4.getLocalizedMessage()
+											+ " (KDE File Open)</html>", "Error opening file", JOptionPane.WARNING_MESSAGE);
+						}
 					}
 				}
 			}
@@ -3627,7 +3633,8 @@ public class AttributeHelper implements HelperClass {
 				String p = folder + fn;
 				r.exec(new String[] { "open", "-R", p }, null, null);
 			} else {
-				showInBrowser(folder + fn);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Open folder, containing file " + fn);
+				showInBrowser(folder);// + fn);
 			}
 		}
 	}

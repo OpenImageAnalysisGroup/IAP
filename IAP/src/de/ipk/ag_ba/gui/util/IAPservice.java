@@ -83,6 +83,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.SnapshotFilter;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -551,7 +552,7 @@ public class IAPservice {
 			boolean storeAllAngleValues,
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef) {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
@@ -566,7 +567,9 @@ public class IAPservice {
 		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
 		
 		if (experiment != null) {
-			for (SubstanceInterface substance : experiment)
+			for (SubstanceInterface substance : experiment) {
+				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
+					continue;
 				if (substance.getName() != null && substance.getName().contains(".bin.")) {
 					String oldName = substance.getName();
 					oldName = StringManipulationTools.stringReplace(oldName, ".0.", ".00.");
@@ -581,6 +584,7 @@ public class IAPservice {
 					oldName = StringManipulationTools.stringReplace(oldName, ".9.", ".09.");
 					substance.setName(oldName);
 				}
+			}
 			Experiment e = (Experiment) experiment;
 			e.sortSubstances();
 		}
@@ -613,6 +617,8 @@ public class IAPservice {
 				}
 			GregorianCalendar gc = new GregorianCalendar();
 			for (SubstanceInterface substance : experiment) {
+				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
+					continue;
 				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {
 					for (ConditionInterface ci : substance) {
 						for (SampleInterface sa : ci) {
@@ -630,6 +636,8 @@ public class IAPservice {
 			if (hasTemperatureData) {
 				experiment = experiment.clone();
 				for (SubstanceInterface substance : experiment) {
+					if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
+						continue;
 					for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 						for (SampleInterface s : c) {
 							Long time = s.getSampleFineTimeOrRowId();
@@ -664,6 +672,8 @@ public class IAPservice {
 				sidx++;
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Process subset " + sidx + "/" + scnt);
+				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
+					continue;
 				processConditions(urlManager, optSubstanceIds, storeAllAngleValues, storeAllReplicates, optSnapshotFilter, optStatus, timestampAndQuality2snapshot,
 						result, substance);
 				if (optStatus != null)

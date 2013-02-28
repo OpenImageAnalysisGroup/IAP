@@ -74,7 +74,34 @@ public class ActionViewExportData extends AbstractNavigationAction {
 						toggles,
 						false,
 						true,
-						null, null, null, null, null),
+						null, null, null, null, null, "complete, high mem requ.", ExportSetting.ALL),
+				guiSetting));
+		res.add(new NavigationButton(
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m,
+						experiment,
+						toggles,
+						false,
+						true,
+						null, null, null, null, null, "no histogram, no sections", ExportSetting.NO_HIST_NO_SECTIONS),
+				guiSetting));
+		res.add(new NavigationButton(
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m,
+						experiment,
+						toggles,
+						false,
+						true,
+						null, null, null, null, null, "histograms", ExportSetting.ONLY_MAIN_HISTO),
+				guiSetting));
+		res.add(new NavigationButton(
+				new ActionNumericDataReportCompleteFinishedStep3(
+						m,
+						experiment,
+						toggles,
+						false,
+						true,
+						null, null, null, null, null, "sections", ExportSetting.ONLY_SECTIONS),
 				guiSetting));
 		res.add(new NavigationButton(
 				new ActionNumericDataReportCompleteFinishedStep3(

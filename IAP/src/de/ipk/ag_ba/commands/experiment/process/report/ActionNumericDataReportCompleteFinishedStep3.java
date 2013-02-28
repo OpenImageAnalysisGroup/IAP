@@ -8,6 +8,9 @@ package de.ipk.ag_ba.commands.experiment.process.report;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +35,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.PdfCreator;
 import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -54,7 +58,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
-	private NavigationButton src;
 	
 	ArrayList<String> lastOutput = new ArrayList<String>();
 	
@@ -69,6 +72,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	private ArrayList<ThreadSafeOptions> togglesInterestingProperties;
 	private ThreadSafeOptions tsoBootstrapN, tsoSplitFirst, tsoSplitSecond;
 	private boolean useIndividualReportNames;
+	private String optCustomSubset;
+	private ExportSetting optCustomSubsetDef;
 	
 	public ActionNumericDataReportCompleteFinishedStep3(String tooltip,
 			boolean exportIndividualAngles,
@@ -88,6 +93,23 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
 			ThreadSafeOptions tsoBootstrapN,
 			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
+		this(m, experimentReference, divideDatasetBy, exportIndividualAngles, xlsx,
+				togglesFiltering, togglesInterestingProperties,
+				tsoBootstrapN,
+				tsoSplitFirst, tsoSplitSecond, null, null);
+	}
+	
+	public ActionNumericDataReportCompleteFinishedStep3(
+			MongoDB m, ExperimentReference experimentReference,
+			ArrayList<ThreadSafeOptions> divideDatasetBy,
+			boolean exportIndividualAngles,
+			boolean xlsx,
+			ArrayList<ThreadSafeOptions> togglesFiltering,
+			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
+			ThreadSafeOptions tsoBootstrapN,
+			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond,
+			String optCustomSubset,
+			ExportSetting optCustomSubsetDef) {
 		this(getToolTipInfo(experimentReference, divideDatasetBy,
 				exportIndividualAngles, xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
 				exportIndividualAngles,
@@ -97,6 +119,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		this.togglesFiltering = togglesFiltering;
 		this.togglesInterestingProperties = togglesInterestingProperties;
 		this.tsoBootstrapN = tsoBootstrapN;
+		this.optCustomSubset = optCustomSubset;
+		this.optCustomSubsetDef = optCustomSubsetDef;
 		if (divideDatasetBy != null)
 			for (ThreadSafeOptions tso : divideDatasetBy) {
 				String s = (String) tso.getParam(0, "");
@@ -258,6 +282,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					add = "<br>[NO PROPERTY OVERVIEW]";
 			}
 		}
+		if (optCustomSubset != null)
+			add += "<br><small>(" + optCustomSubset + ")</small>";
 		if (exportIndividualAngles || xlsx) {
 			if (!xlsx)
 				return "Create CSV File" + add;
@@ -304,7 +330,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		this.src = src;
 		ExperimentInterface experiment = experimentReference.getData(m, false, getStatusProvider());
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
@@ -356,7 +381,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
-						exportIndividualAngles, xlsx, snFilter, status);
+						exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
@@ -370,7 +395,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status);
+						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
 				csvHeader = getCSVheader();
 				csv.append(csvHeader);
 				if (row2col2value != null)
@@ -430,22 +455,40 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				if (status != null)
 					status.setCurrentStatusValue(-1);
 				if (status != null)
-					status.setCurrentStatusText2("Save XLSX file");
+					status.setCurrentStatusText2("Prepare saving of file...");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
+				final ThreadSafeOptions written = new ThreadSafeOptions();
+				OutputStream out;
 				if (customTargetFileName != null)
-					wb.write(new FileOutputStream(customTargetFileName, xlsx));
+					out = new FileOutputStream(customTargetFileName, xlsx);
 				else {
 					p.prepareTempDirectory();
 					if (targetDirectoryOrTargetFile == null)
-						wb.write(new FileOutputStream(p.getTargetFile(xlsx, experimentReference.getHeader()), xlsx));
+						out = new FileOutputStream(p.getTargetFile(xlsx, experimentReference.getHeader()), xlsx);
 					else
-						wb.write(new FileOutputStream(targetDirectoryOrTargetFile, xlsx));
+						out = new FileOutputStream(targetDirectoryOrTargetFile, xlsx);
 				}
 				if (status != null)
-					status.setCurrentStatusValueFine(100d);
-				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved");
+					status.setCurrentStatusText1("Generate XSLX");
+				FilterOutputStream fos = new FilterOutputStream(out) {
+					@Override
+					public void write(int b) throws IOException {
+						super.write(b);
+						written.addLong(1);
+						if (written.getLong() % 1024 == 0)
+							if (status != null)
+								status.setCurrentStatusText2("Stored on disk: " + written.getLong() / 1024 + " KB");
+					}
+					
+				};
+				wb.write(fos);
 				if (status != null)
-					status.setCurrentStatusText2("File saved");
+					status.setCurrentStatusValueFine(100d);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved (" + written.getLong() / 1024 / 1024 + " MB)");
+				if (status != null)
+					status.setCurrentStatusText1("Output complete");
+				if (status != null)
+					status.setCurrentStatusText2("File saved (" + written.getLong() / 1024 / 1024 + " MB)");
 				
 				if (customTargetFileName != null && (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET)) {
 					File f = new File(customTargetFileName);
@@ -579,6 +622,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 					p.openTargetDirectory();
 				}
 		}
+		if (status != null)
+			status.setCurrentStatusValueFine(-1d);
 	}
 	
 	private HashSet<Integer> findGroupingColumns(String csvHeader) {
@@ -679,10 +724,10 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			sidx++;
 			if (status != null) {
 				status.setCurrentStatusValueFine(100d * sidx / scnt);
-				status.setCurrentStatusText1("Rows remaining: " + snapshotsToBeProcessed.size());
-				status.setCurrentStatusText2("Memory status: "
+				status.setCurrentStatusText1("Filling worksheet, remaining rows: " + snapshotsToBeProcessed.size());
+				status.setCurrentStatusText2("<small><font color='gray'>Memory status: "
 						+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB</font></small>");
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + snapshotsToBeProcessed.size() + " "
 					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
