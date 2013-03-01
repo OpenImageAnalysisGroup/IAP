@@ -51,27 +51,27 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// empty
 	}
 	
-	protected boolean getBoolean(String setting, boolean defaultValue) {
+	public boolean getBoolean(String setting, boolean defaultValue) {
 		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
-	protected boolean getBoolean(ImageAnalysisBlockFIS block, String setting, boolean defaultValue) {
+	public boolean getBoolean(ImageAnalysisBlockFIS block, String setting, boolean defaultValue) {
 		return options.getBooleanSetting(block, setting, defaultValue);
 	}
 	
-	protected int getInt(String setting, int defaultValue) {
+	public int getInt(String setting, int defaultValue) {
 		return options.getIntSetting(this, setting, defaultValue);
 	}
 	
-	protected double getDouble(String setting, double defaultValue) {
+	public double getDouble(String setting, double defaultValue) {
 		return options.getDoubleSetting(this, setting, defaultValue);
 	}
 	
-	protected String getString(String setting, String defaultValue) {
+	public String getString(String setting, String defaultValue) {
 		return options.getStringSetting(this, setting, defaultValue);
 	}
 	
-	protected Integer[] getIntArray(String setting, Integer[] defaultValue) {
+	public Integer[] getIntArray(String setting, Integer[] defaultValue) {
 		return options.getIntArraySetting(this, setting, defaultValue);
 	}
 	
@@ -262,7 +262,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
-	private static void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
+	protected void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
 			final FlexibleMaskAndImageSet inputSet,
 			final BlockResultSet brs, final ImageProcessorOptions options,
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
