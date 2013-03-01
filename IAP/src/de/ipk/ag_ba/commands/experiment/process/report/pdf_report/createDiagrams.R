@@ -16,7 +16,7 @@ plotOnlyViolin <- FALSE
 plotOnlyStacked <- FALSE
 plotOnlySpider <- FALSE
 plotOnlyLineRange <- FALSE
-plotOnlyBoxplot <- FALSE
+plotOnlyBoxplot <- TRUE
 plotOnlyStressValues <- FALSE
 
 
@@ -445,7 +445,7 @@ loadLibs <- function(libraries, catch = FALSE, debug = FALSE) {
 		libErrorText <- NULL
 		
 		for(nn in libraries) {
-			TRUE %print% nn
+			TRUE %print% paste("load library: ", nn, sep = "")
 			if (catch) { #CATCH.ERROR (((())))))
 				error <- try(iniLibrary(nn), silent = debug)
 				if (checkOfTryError(error, typ = LIB)) {
@@ -1662,6 +1662,21 @@ getToPlottedDays <- function(values, nameOfValueColumn, minimumNumberOfValuesOfE
 	
 }
 
+fillWhichDayShouldBePlottedWithNull <- function(whichDayShouldBePlot) {
+	
+	longestValue <- max(str_length(unique(whichDayShouldBePlot)[!is.na(unique(whichDayShouldBePlot))]))
+
+	for(nn in unique(whichDayShouldBePlot)) {
+		if(!is.na(nn)) {	
+			if(str_length(nn) < longestValue) {
+				whichDayShouldBePlot[whichDayShouldBePlot == nn] <- paste(rep.int("0", longestValue-str_length(nn)), as.character(nn), sep="")
+			}
+		}
+	}
+	return(whichDayShouldBePlot)
+}
+
+
 setxAxisfactor <- function(xAxisName, values, nameOfValueColumn, options = NULL, typOfPlot = "") {
 	##############
 #xAxisName <- overallList$xAxisName
@@ -1678,23 +1693,29 @@ setxAxisfactor <- function(xAxisName, values, nameOfValueColumn, options = NULL,
 	
 	
 	if (!is.null(options$daysOfBoxplotNeedsReplace)) {
-		whichDayShouldBePlot = getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays, options$daysOfBoxplotNeedsReplace)
+		whichDayShouldBePlot <- getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays, options$daysOfBoxplotNeedsReplace)
 	} else {
-		whichDayShouldBePlot = getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays)
+		whichDayShouldBePlot <- getToPlottedDays(values, nameOfValueColumn, minimumNumberOfValuesOfEachDays)
 	}
 	if (!is.null(whichDayShouldBePlot)) {
-		xAxisfactor = factor(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]), levels = unique(whichDayShouldBePlot))
 		
-		xAxisfactor = paste(xAxisName, xAxisfactor)
-		naString = paste(xAxisName, "NA")
+		
+		xAxisfactor <- factor(getVector(values[values %allColnamesWithoutThisOnes% nameOfValueColumn]), levels = unique(whichDayShouldBePlot))
+#		levels(xAxisfactor) <- unique(whichDayShouldBePlot)
+		
+		xAxisfactor <- fillWhichDayShouldBePlottedWithNull(as.character(xAxisfactor))
+		xAxisfactor <- paste(xAxisName, xAxisfactor)
+		
+		naString <- paste(xAxisName, "NA")
 		xAxisfactor[xAxisfactor == naString] = NA
-		
+
 		#	xAxisfactor = paste("DAS", xAxisfactor)
 		#	xAxisfactor[xAxisfactor == "DAS NA"] = NA
+		
 	} else {
 		xAxisfactor <- NULL
 	}
-	
+
 	return(xAxisfactor)
 }
 
@@ -3595,6 +3616,8 @@ createOuputOverview <- function(typ, actualImage, maxImage, imageName) {
 		typString <- "violin plot"
 	} else if (typ == STRESS.PLOT) {
 		typString <- "stress plot"
+	} else if(typ == NBOX.MULTI.PLOT) {
+		typString <- "section plot"
 	}
 	
 	ownCat(paste("Create ", typString, " ", actualImage, "/", maxImage, ": '", imageName, "'", sep = ""))
@@ -5829,8 +5852,7 @@ makeBoxplotDiagram <- function(overallResult, overallDesName, overallList, image
 				overallResult <- replaceTreatmentNamesOverall(overallList, overallResult)
 				
 				reorderList <- reorderThePlotOrder(overallResult, typOfPlot, whichColumShouldUse)
-				overallResult <- reorderList$overallResult
-				
+				overallResult <- reorderList$overallResult			
 				#colorReorder <- overallColor[reorderList$sortList]
 				colorReorder <- getVector(overallList$color[levels(overallResult[[whichColumShouldUse]])])
 				
@@ -6220,7 +6242,8 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 	###############
 	
 	debug %debug% "paralleliseDiagramming()"
-	
+	index <- 0;
+	maxIndex <- sum(!is.na(overallDescriptor))
 #	if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT) {
 #		tempOverallResult <- na.omit(tempOverallResult)
 #	} else 
@@ -6239,7 +6262,9 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 				}
 			}
 			if (plot) {
-				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
+				index <- index + 1
+#				createOuputOverview(typOfPlot, imagesIndex, length(names(overallDescriptor)), overallDesName[[imagesIndex]])
+				createOuputOverview(typOfPlot, index, maxIndex, overallDesName[[imagesIndex]])
 				overallResult = reduceWholeOverallResultToOneValue(tempOverallResult, imagesIndex, debug, typOfPlot)
 				
 				if (typOfPlot == BOX.PLOT || typOfPlot == STACKBOX.PLOT || typOfPlot == SPIDER.PLOT || typOfPlot == LINERANGE.PLOT) {
