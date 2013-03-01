@@ -1,6 +1,7 @@
 package iap.blocks.arabidopsis;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions;
 import info.clearthought.layout.TableLayout;
@@ -33,10 +34,10 @@ import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
 
 public class BlCutZoomedImages extends AbstractBlock {
 	
-	private static void debugIt(final Class blockType, final FlexibleImageType inpImageType,
-			final FlexibleMaskAndImageSet inputSet,
-			final BlockResultSet brs, final ImageProcessorOptions options,
-			final int blockPos, final BlCutZoomedImages inst) {
+	protected void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
+				final FlexibleMaskAndImageSet inputSet,
+				final BlockResultSet brs, final ImageProcessorOptions options,
+				final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
