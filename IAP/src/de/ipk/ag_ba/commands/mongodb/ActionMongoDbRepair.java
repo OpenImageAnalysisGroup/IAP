@@ -53,7 +53,7 @@ public class ActionMongoDbRepair extends AbstractNavigationAction implements Nav
 		started = true;
 		ActionMongoDbRepair.repairOperationRunning = true;
 		try {
-			result = m.compact(status);
+			result = m.repair(status);
 		} finally {
 			ActionMongoDbRepair.repairOperationRunning = false;
 		}
