@@ -214,23 +214,20 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 			if (processedMasks.nir() != null && getBoolean("Process NIR", true)) {
 				int gray = new Color(180, 180, 180).getRGB();
 				ImageOperation nirMask = processedMasks.nir().copy().io().show("NIR unchanged", debug);
-				processedMasks.setNir(
-						nirMask.applyMask_ResizeMaskIfNeeded(
-								mask,
-								back).replaceColor(back, gray).show("FILTERED NIR MASK", debug).getImage());
+				if (getBoolean("NIR replace clear area with gray", false))
+					processedMasks.setNir(
+							nirMask.applyMask_ResizeMaskIfNeeded(
+									mask,
+									back).replaceColor(back, gray).show("FILTERED NIR MASK", debug).getImage());
+				else
+					processedMasks.setNir(
+							nirMask.applyMask_ResizeMaskIfNeeded(
+									mask,
+									back).show("FILTERED NIR MASK", debug).getImage());
 				processedImages.setNir(processedImages.nir().io().applyMask_ResizeMaskIfNeeded(
 						mask,
 						options.getBackground()).show("FILTERED NIR IMAGE", debug).
 						replaceColor(back, gray).getImage());
-				
-				if (options.getCameraPosition() == CameraPosition.SIDE)
-					processedMasks.setNir(processedImages.nir().copy());
-				
-				if (options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE)
-					if (processedImages.nir() != null) {
-						processedMasks.setNir(processedImages.nir().copy());
-						return;
-					}
 			}
 			
 			if (processedMasks.ir() != null && getBoolean("Process IR", true)) {
@@ -258,6 +255,7 @@ public class BlUseFluoMaskToClearVisNir extends AbstractSnapshotAnalysisBlockFIS
 		res.add(FlexibleImageType.VIS);
 		res.add(FlexibleImageType.FLUO);
 		res.add(FlexibleImageType.NIR);
+		res.add(FlexibleImageType.IR);
 		return res;
 	}
 }
