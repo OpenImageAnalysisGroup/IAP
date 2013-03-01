@@ -90,7 +90,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected boolean preventDebugValues;
 	
 	protected void prepare() {
-		debugValues = !preventDebugValues && getBoolean("debug", false);
+		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
 			if (input().images().vis() != null && input().masks().vis() != null)
 				debugPipelineBlock(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition(), this);
