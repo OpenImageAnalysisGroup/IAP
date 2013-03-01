@@ -40,6 +40,7 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 			boolean debug = false;
 			ImageOperation processedMask = mask.io().show("in mask", debug).copy();
 			int HSVfilters = getInt("Number of HSV " + optics + " filters", 1);
+			FlexibleImage imageUnChanged = image.copy();
 			for (int filter = 1; filter <= HSVfilters; filter++) {
 				String pf = optics + " filter " + filter + ": ";
 				processedMask = processedMask
@@ -51,13 +52,14 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 								getDouble(pf + "max S", 1),
 								getDouble(pf + "min V", 0),
 								getDouble(pf + "max V", (200d / 255d))).show(pf + " res", debug);
-				processedMask = image.io().applyMask(
+				processedMask = processedMask.and(mask);
+				image = image.io().applyMask(
 						processedMask.closing(getInt(pf + "dilate", 2), getInt(pf + "erode", 4)).getImage(),
-						options.getBackground());
+						options.getBackground()).getImage();
 			}
 			// blur introduces new pixel areas, so the original mask is applied here, to shrink it down
 			// so that the result does not introduce new pixel areas, only less (filter operation)
-			processedMask = processedMask.and(mask);
+			processedMask = imageUnChanged.io().applyMask(processedMask.getImage(), options.getBackground());
 			return processedMask.getImage();
 		}
 	}
