@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -91,16 +93,21 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	@Override
 	public String getDefaultTitle() {
 		String ns = " (" + experiments.size() + ")";
+		String yy = "20";
+		if (db.substring("APH_".length()).length() >= 2) {
+			String possibleYear = db.substring("APH_".length()).substring(0, 2);
+			if (!StringManipulationTools.removeNumbersFromString(possibleYear).isEmpty())
+				yy = "";
+		}
 		if (db.startsWith("APH_"))
-			return "Phytoch. 20" + db.substring("APH_".length()) + ns;
+			return "Phytoch. " + yy + db.substring("APH_".length()) + ns;
 		else
 			if (db.startsWith("CGH_"))
-				return "Maize Greenh. 20" + db.substring("CGH_".length()) + ns;
+				return "Maize Greenh. " + yy + db.substring("CGH_".length()) + ns;
 			else
 				if (db.startsWith("BGH_"))
-					return "Barley Greenh. 20" + db.substring("BGH_".length()) + ns;
+					return "Barley Greenh. " + yy + db.substring("BGH_".length()) + ns;
 				else
 					return db + ns;
 	}
-	
 }
