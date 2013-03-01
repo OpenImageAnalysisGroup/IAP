@@ -42,7 +42,7 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 			int HSVfilters = getInt("Number of HSV " + optics + " filters", 1);
 			FlexibleImage imageUnChanged = image.copy();
 			for (int filter = 1; filter <= HSVfilters; filter++) {
-				String pf = optics + " filter " + filter + ": ";
+				String pf = optics + " filter " + filter + "__";
 				processedMask = processedMask
 						.blur(getDouble(pf + " blur", 1)).show("in mask blurred", debug)
 						.filterRemoveHSV(
