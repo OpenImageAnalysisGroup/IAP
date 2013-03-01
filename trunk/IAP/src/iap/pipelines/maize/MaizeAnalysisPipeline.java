@@ -1,6 +1,7 @@
 package iap.pipelines.maize;
 
 import iap.blocks.BlBalanceFluo;
+import iap.blocks.BlCalcNirSkeleton;
 import iap.blocks.BlColorBalancing;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCreateDummyReferenceIfNeeded;
@@ -85,21 +86,22 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockRemoveMaizeBambooStick.class.getCanonicalName(),
 				BlockRemoveLevitatingObjectsFromVisFluo.class.getCanonicalName(),
-				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
 				BlockRemoveVerticalAndHorizontalStructuresFromVisFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
+				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
+				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-
+				
 				// calculation of numeric values
 				BlCalcWidthAndHeight.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcIntensity.class.getCanonicalName(),
 				BlConvexHull.class.getCanonicalName(),
-
+				
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				BlockDrawSkeleton.class.getCanonicalName(),
