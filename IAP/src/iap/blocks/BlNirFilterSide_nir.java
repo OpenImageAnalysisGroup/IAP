@@ -21,20 +21,20 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 		boolean debug = getBoolean("debug", false);
 		FlexibleImage nirMask = input().masks().nir();
 		
-		if (!getBoolean("enable", true)) {
+		if (!getBoolean("enabled", true)) {
 			return nirMask;
 		}
 		
-		if (getBoolean("Replace Background with Gray", false)) {
-			int gl = getInt("Replace color value", 180);
-			nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(gl, gl, gl).getRGB()).getImage().show("Background replace with gray", debug);
-		}
 		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = 180;
 		if (nirMask != null) {
 			double f;
 			int regionSize;
 			f = getDouble("Adaptive_Threshold_F", 0.08);
+			if (getBoolean("Replace Background with Gray", true)) {
+				int gl = getInt("Replace color value", 180);
+				nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(gl, gl, gl).getRGB()).getImage().show("Background replace with gray", debug);
+			}
 			regionSize = getInt("Adaptive_Threshold_Region_Size", 50);
 			nirMask = nirMask.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(regionSize, average,
