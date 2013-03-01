@@ -1,6 +1,7 @@
 package iap.pipelines.barley;
 
 import iap.blocks.BlBalanceFluo;
+import iap.blocks.BlCalcNirSkeleton;
 import iap.blocks.BlColorBalancing;
 import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
@@ -88,10 +89,11 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
+				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-
+				
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
-
+				
 				// calculation of numeric values
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
@@ -100,9 +102,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-
+				
 				BlockDrawSkeleton.class.getCanonicalName(),
-
+				
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()
