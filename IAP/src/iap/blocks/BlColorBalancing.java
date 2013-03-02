@@ -38,7 +38,7 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage vis = input().images().vis();
 		if (vis == null)
 			return null;
-		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE || !options.isArabidopsis()))
+		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
 			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
@@ -92,7 +92,7 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImage vis = input().masks().vis();
 		if (vis == null)
 			return null;
-		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE || !options.isArabidopsis()))
+		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
 			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;

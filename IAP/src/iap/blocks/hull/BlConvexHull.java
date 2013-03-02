@@ -48,6 +48,8 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private ImageOperation processImage(String prefix, FlexibleImage image) {
+		boolean debug = getBoolean("debug", false);
+		
 		ResultsTableWithUnits numericResults;
 		ImageOperation res;
 		if (image == null) {
@@ -59,7 +61,7 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);
 		boolean drawPCLine = getBoolean("draw_PC_line", true);
-		res = new ImageOperation(image).hull().find(true, false, drawHull, drawPCLine, drawHull, Color.RED.getRGB(),
+		res = new ImageOperation(image).show(prefix + " input image", debug).hull().find(true, false, drawHull, drawPCLine, drawHull, Color.RED.getRGB(),
 				Color.CYAN.getRGB(),
 				Color.RED.getRGB(), distHorizontal, realDist);
 		

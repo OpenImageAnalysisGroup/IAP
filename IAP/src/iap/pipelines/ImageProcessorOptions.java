@@ -76,44 +76,8 @@ public class ImageProcessorOptions {
 		return neighbourhood;
 	}
 	
-	public void setIsMaize(boolean isMaize) {
-		optSystemOptionStorage.setBoolean("Pipeline", "is Maize", isMaize);
-	}
-	
-	public boolean isMaize() {
-		return optSystemOptionStorage.getBoolean("Pipeline", "is Maize", false);
-	}
-	
 	public int getNirBackground() {
 		return nirBackground;
-	}
-	
-	public boolean isBarleyInBarleySystem() {
-		return !isMaize() && !isHigherResVisCamera();
-	}
-	
-	public void setHigherResVisCamera(boolean highResMaize) {
-		optSystemOptionStorage.setBoolean("Pipeline", "is Vis Cam Higher Res Than Fluo", highResMaize);
-	}
-	
-	public boolean isHigherResVisCamera() {
-		return optSystemOptionStorage.getBoolean("Pipeline", "is Vis Cam Higher Res Than Fluo", false);
-	}
-	
-	public void setIsBarley(boolean isBarley) {
-		optSystemOptionStorage.setBoolean("Pipeline", "is Barley", isBarley);
-	}
-	
-	public boolean isBarley() {
-		return optSystemOptionStorage.getBoolean("Pipeline", "is Barley", false);
-	}
-	
-	public void setIsArabidopsis(boolean isArabidopsis) {
-		optSystemOptionStorage.setBoolean("Pipeline", "is Arabidopsis", isArabidopsis);
-	}
-	
-	public boolean isArabidopsis() {
-		return optSystemOptionStorage.getBoolean("Pipeline", "is Arabidopsis", false);
 	}
 	
 	public void setTrayCnt(int tray_idx, int tray_cnt) {

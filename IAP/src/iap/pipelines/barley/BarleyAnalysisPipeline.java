@@ -14,12 +14,13 @@ import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
+import iap.blocks.BlUseFluoMaskToClearOtherImages;
 import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.BlockClosingVis;
 import iap.blocks.BlockCutFromSide;
 import iap.blocks.BlockSkeletonizeVisOrFluo;
 import iap.blocks.arabidopsis.BlCutZoomedImages;
-import iap.blocks.arabidopsis.Bl_Arabidopsis_IRdiff;
+import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.curling.BlLeafCurlingAnalysis;
 import iap.blocks.hull.BlConvexHull;
 import iap.blocks.maize.BlCalcIntensity;
@@ -28,8 +29,6 @@ import iap.blocks.maize.BlCalcWidthAndHeight;
 import iap.blocks.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
 import iap.blocks.maize.BlFindBlueMarkers;
 import iap.blocks.maize.BlIntensityConversion;
-import iap.blocks.maize.BlUseFluoMaskToClearVisNir;
-import iap.blocks.maize.BlockClearMasksBasedOnMarkers;
 import iap.blocks.maize.BlockColorBalancingVertical;
 import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
@@ -75,25 +74,21 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
-				// BlRemoveBlackBelt.class.getCanonicalName(),
 				BlLabFilterExt.class.getCanonicalName(),
 				BlockClosingVis.class.getCanonicalName(),
-				BlockClearMasksBasedOnMarkers.class.getCanonicalName(),
-				// BlMedianFilter_vis.class.getCanonicalName(),
-				Bl_Arabidopsis_IRdiff.class.getCanonicalName(),
+				BlIRdiff.class.getCanonicalName(),
 				BlIntensityConversion.class.getCanonicalName(),
-				// BlTranslateMatch.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
-				BlUseFluoMaskToClearVisNir.class.getCanonicalName(),
+				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-				
+
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
-				
+
 				// calculation of numeric values
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
@@ -102,9 +97,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-				
+
 				BlockDrawSkeleton.class.getCanonicalName(),
-				
+
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()
@@ -118,11 +113,6 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 			return;
 		
 		options.setSystemOptionStorage(so);
-		
-		options.setIsBarley(true);
-		options.setIsMaize(false);
-		options.setIsArabidopsis(false);
-		
 	}
 	
 	@Override

@@ -79,64 +79,21 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private void initLABfilterValues() {
-		if (options.isBarley()) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
-				LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-				LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-				LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-				LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-				LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-			} else {
-				LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-				LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-				LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-				LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-				LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-				LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-			}
-		} else
-			if (options.isArabidopsis()) {
-				if (options.getCameraPosition() == CameraPosition.TOP) {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 125);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 120);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-				} else {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-				}
-			} else
-				if (options.isMaize()) {
-					if (options.getCameraPosition() == CameraPosition.TOP) {
-						LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 50 * 255 / 100);
-						LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-						LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-						LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 120);
-						LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 125);
-						LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-					} else {
-						LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-						LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-						LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-						LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-						LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
-						LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-					}
-				} else {
-					LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-					LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-					LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-					LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-					LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 122);
-					LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-				}
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
+			LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+			LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+			LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
+			LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
+			LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+		} else {
+			LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
+			LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
+			LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
+			LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
+			LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
+			LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+		}
 	}
 	
 	@Override

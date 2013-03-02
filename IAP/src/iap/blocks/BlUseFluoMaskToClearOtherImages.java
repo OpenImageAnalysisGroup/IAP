@@ -1,4 +1,4 @@
-package iap.blocks.arabidopsis;
+package iap.blocks;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageSet;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
-public class BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
@@ -49,7 +49,7 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir extends AbstractSnapsho
 				// apply enlarged fluo mask to vis
 				FlexibleImage mask = input().masks().fluo().copy().io().
 						crop(0.06, 0.08, 0.04, 0.02).show("Cropped Fluo Mask", false).
-						blur(options.isMaize() ? 25 : 5).
+						blur(getDouble("blur VIS mask", 20)).
 						binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred fluo mask", debug).getImage();
 				if (debug)
 					visMask.copy().io().or(mask.copy()).show("ORR");
@@ -129,19 +129,15 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir extends AbstractSnapsho
 		positions.setBottom((int) (positions.getBottomY() * s));
 		positions.setLeft((int) (positions.getLeftX() * s - pl * inputToCut.getWidth()));
 		positions.setRight((int) (positions.getRightX() * s + pr * inputToCut.getWidth()));
-		
-		if (options.isArabidopsis())
-			return ioInputForCut.clearImageLeft(positions.getLeftX() * 0.95, bl).
-					clearImageRight(positions.getRightX() * 1.05, br)
-					.clearImageAbove(positions.getTopY() * 0.95, ba)
-					.clearImageBottom((int) (positions.getBottomY() * 1.15d), ba)
+		double offsetFactorL = getDouble("Offset Factor Left", 0.05);
+		double offsetFactorR = getDouble("Offset Factor Right", 0.05);
+		double offsetFactorT = getDouble("Offset Factor Top", 0.05);
+		double offsetFactorB = getDouble("Offset Factor Bottom", 0.15);
+		return ioInputForCut.clearImageLeft(positions.getLeftX() * (1 - offsetFactorL), bl).
+					clearImageRight(positions.getRightX() * (1 + offsetFactorR), br)
+					.clearImageAbove(positions.getTopY() * (1 - offsetFactorT), ba)
+					.clearImageBottom((int) (positions.getBottomY() * (1 + offsetFactorB)), ba)
 					.getImage();
-		else
-			return ioInputForCut.clearImageLeft(options.isBarleyInBarleySystem() ? positions.getLeftX() * 0.7 : positions.getLeftX(), bl).
-					clearImageRight(options.isBarleyInBarleySystem() ? positions.getRightX() * 1.3 : positions.getRightX(), br)
-					.clearImageAbove(positions.getTopY() * 0.95, ba)
-					.getImage();
-		// return ioInputForCut.clearImageAbove(positions.getTopY(), ba).getImage();
 	}
 	
 	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {

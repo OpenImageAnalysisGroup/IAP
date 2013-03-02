@@ -231,13 +231,6 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 	@Override
 	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
-		if (options != null)
-			if (processedImages != null
-					&& processedImages.vis() != null
-					&& processedImages.fluo() != null
-					&& processedImages.vis().getHeight() > processedImages.fluo().getHeight())
-				options.setHigherResVisCamera(true);
-		
 		if (processedImages.vis() != null
 				&& processedMasks.vis() != null
 				&& processedImages.vis().getWidth() != processedMasks.vis().getWidth()) {
