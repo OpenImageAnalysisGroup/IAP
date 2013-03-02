@@ -166,151 +166,42 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private void initLABfilterValuesVis() {
-		if (options.isBarley()) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				
-				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 100, -1, -1, -1 });
-				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 135, -1, -1, -1 });
-				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-				
-			} else {
-				LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-				
-			}
-		} else
-			if (options.isArabidopsis()) {
-				if (options.getCameraPosition() == CameraPosition.TOP) {
-					
-					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 125, -1, -1, -1 });
-					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 135, -1, -1, -1 });
-					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 120, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				} else {
-					
-					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				}
-			} else
-				if (options.isMaize()) {
-					if (options.getCameraPosition() == CameraPosition.TOP) {
-						
-						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 50 * 255 / 100, -1, -1, -1 });
-						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 120, -1, -1, -1 });
-						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 125, -1, -1, -1 });
-						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-						
-					} else {
-						
-						LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
-						LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-						
-					}
-				} else {
-					
-					LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 122, -1, -1, -1 });
-					LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				}
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			
+			LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 100, -1, -1, -1 });
+			LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 135, -1, -1, -1 });
+			LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
+			LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
+			
+		} else {
+			LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_A_VALUE_VIS = getIntArray("Lab-filter-vis-min-a-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_A_VALUE_VIS = getIntArray("Lab-filter-vis-max-a-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_B_VALUE_VIS = getIntArray("Lab-filter-vis-min-b-array", new Integer[] { 123, -1, -1, -1 });
+			LAB_MAX_B_VALUE_VIS = getIntArray("Lab-filter-vis-max-b-array", new Integer[] { 255, -1, -1, -1 });
+		}
 	}
 	
 	private void initLABfilterValuesFluo() {
-		if (options.isBarley()) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
-				
-				LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 100, -1, -1, -1 });
-				LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 135, -1, -1, -1 });
-				LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-				
-			} else {
-				LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-				LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 255, -1, -1, -1 });
-				LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 123, -1, -1, -1 });
-				LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-				
-			}
-		} else
-			if (options.isArabidopsis()) {
-				if (options.getCameraPosition() == CameraPosition.TOP) {
-					
-					LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 125, -1, -1, -1 });
-					LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 135, -1, -1, -1 });
-					LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 120, -1, -1, -1 });
-					LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				} else {
-					
-					LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 123, -1, -1, -1 });
-					LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				}
-			} else
-				if (options.isMaize()) {
-					if (options.getCameraPosition() == CameraPosition.TOP) {
-						
-						LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 50 * 255 / 100, -1, -1, -1 });
-						LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 120, -1, -1, -1 });
-						LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 125, -1, -1, -1 });
-						LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-						
-					} else {
-						
-						LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-						LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 255, -1, -1, -1 });
-						LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 122, -1, -1, -1 });
-						LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-						
-					}
-				} else {
-					
-					LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
-					LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 255, -1, -1, -1 });
-					LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 122, -1, -1, -1 });
-					LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
-					
-				}
+		if (options.getCameraPosition() == CameraPosition.TOP) {
+			LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 100, -1, -1, -1 });
+			LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 135, -1, -1, -1 });
+			LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 123, -1, -1, -1 });
+			LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
+			
+		} else {
+			LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });
+			LAB_MAX_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-a-array", new Integer[] { 255, -1, -1, -1 });
+			LAB_MIN_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-b-array", new Integer[] { 123, -1, -1, -1 });
+			LAB_MAX_B_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-b-array", new Integer[] { 255, -1, -1, -1 });
+		}
 	}
 	
 	@Override

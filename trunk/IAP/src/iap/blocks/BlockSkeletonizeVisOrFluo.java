@@ -42,73 +42,50 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		debug2 = getBoolean("debug2", false);
+		debug2 = getBoolean("debug bloom detection", false);
 	}
 	
 	@Override
 	protected synchronized FlexibleImage processVISmask() {
 		FlexibleImage vis = input().masks().vis();
-		if (!getBoolean("skeletonize", true))
+		if (!getBoolean("skeletonize VIS", true))
 			return vis;
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMaskBeforSkeleton.png");
 		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		FlexibleImage res = vis;
-		if (options.isMaize()) {
-			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
-						// .closing(3, 3)
-						// .erode()
-						.border(5)
+		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+			FlexibleImage viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
+					// .closing(3, 3)
+					// .erode()
+					.border(5)
 						.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
-						.blur(getDouble("Blur-Vis", 1))
+					.blur(getDouble("Blur-Vis", 1))
 						.getImage().show("vis", debug);
-				
-				if (viswork != null)
-					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-						if (sk != null)
-							getProperties().setImage("skeleton", sk);
-						FlexibleImage rrr = getProperties().getImage("beforeBloomEnhancement");
-						if (rrr != null)
-							res = rrr;
-					}
-			}
-		} else {
-			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				if (false) {
-					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
-							.dilate(3)
-							.blur(1)
-							.getImage().show("vis", debug);
-					
-					if (viswork != null)
-						if (vis != null && fluo != null) {
-							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-							if (sk != null) {
-								boolean drawSkeleton = getBoolean("draw_skeleton", true);
-								res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
-							}
-						}
-				}
-			}
-			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-				if (false) {
-					FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
-							.dilate(2)
-							.blur(1)
-							.getImage().show("vis", debug);
-					
-					if (viswork != null)
-						if (vis != null && fluo != null) {
-							FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-							if (sk != null) {
-								boolean drawSkeleton = getBoolean("draw_skeleton", true);
-								res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
-							}
-						}
-				}
-			}
 			
+			if (viswork != null)
+				if (vis != null && fluo != null) {
+					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					if (sk != null)
+						getProperties().setImage("skeleton", sk);
+					FlexibleImage rrr = getProperties().getImage("beforeBloomEnhancement");
+					if (rrr != null)
+						res = rrr;
+				}
+		}
+		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+			FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
+					.dilate(getInt("Dilate", 2))
+							.blur(getInt("Blur", 1))
+							.getImage().show("vis", debug);
+			
+			if (viswork != null)
+				if (vis != null && fluo != null) {
+					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					if (sk != null) {
+						boolean drawSkeleton = getBoolean("draw_skeleton", true);
+						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
+					}
+				}
 		}
 		return res;
 	}
@@ -116,52 +93,47 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	@Override
 	protected synchronized FlexibleImage processFLUOmask() {
 		FlexibleImage vis = input().masks().vis();
-		if (!getBoolean("skeletonize", true))
+		if (!getBoolean("skeletonize FLUO", false))
 			return input().masks().fluo();
 		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
 		FlexibleImage res = fluo.copy();
-		if (options.isMaize()) {
-			// empty
-		} else {
-			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = fluo.copy().io()// .medianFilter32Bit()
-						.erode(getInt("Erode-Cnt-Fluo", 1))
+		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+			FlexibleImage viswork = fluo.copy().io()// .medianFilter32Bit()
+					.erode(getInt("Erode-Cnt-Fluo", 1))
 						.dilate(getInt("Dilate-Cnt-Fluo", 1))
 						.blur(getDouble("Blur-Fluo", 4))
 						.getImage().show("fluo", debug);
-				
-				if (viswork != null)
-					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-						if (sk != null) {
-							boolean drawSkeleton = getBoolean(new BlockDrawSkeleton(), "draw_skeleton", true);
-							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
-							if (res != null)
-								getProperties().setImage("skeleton_fluo", sk);
-						}
-					}
-			}
-			if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
-						// .erode(1)
-						.dilate(getInt("Dilate-Cnt-Fluo", 4))
-						// .blur(1)
-						.getImage().show("fluo", debug);
-				
-				if (viswork != null)
-					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
-						if (sk != null) {
-							boolean drawSkeleton = getBoolean("draw_skeleton", true);
-							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
-							if (res != null)
-								getProperties().setImage("skeleton_fluo", sk);
-						}
-					}
-			}
 			
+			if (viswork != null)
+				if (vis != null && fluo != null) {
+					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					if (sk != null) {
+						boolean drawSkeleton = getBoolean(new BlockDrawSkeleton(), "draw_skeleton", true);
+						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
+						if (res != null)
+							getProperties().setImage("skeleton_fluo", sk);
+					}
+				}
+		}
+		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+			FlexibleImage viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
+					// .erode(1)
+					.dilate(getInt("Dilate-Cnt-Fluo", 4))
+						// .blur(1)
+					.getImage().show("fluo", debug);
+			
+			if (viswork != null)
+				if (vis != null && fluo != null) {
+					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					if (sk != null) {
+						boolean drawSkeleton = getBoolean("draw_skeleton", true);
+						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
+						if (res != null)
+							getProperties().setImage("skeleton_fluo", sk);
+					}
+				}
 		}
 		return input().masks().fluo();
 	}
@@ -189,12 +161,13 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		rt.incrementCounter();
 		
 		int bloomLimbCount = 0;
-		if (options.isMaize()) {
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(10).getImage().show("blurf", false), 0.075f, h, 20).io().// blur(3).
-					thresholdGrayClearLowerThan(10, Color.BLACK.getRGB()).getImage();
+		if (getBoolean("Detect Bloom", false)) {
+			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(getInt("bloom-blur", 10)).getImage()
+					.show("blur fluo for bloom detection", debug), 0.075f, h, 20).io().// blur(3).
+					thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 10), Color.BLACK.getRGB()).getImage();
 			
 			probablyBloomFluo = probablyBloomFluo.io().show("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
-					erode().erode().erode().erode().invert().
+					erode(getInt("bloom-erode-cnt", 4)).invert().
 					getImage();
 			
 			if (debug2) {
@@ -211,8 +184,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			
 			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().show("BLOOM AREA", debug2).countFilledPixels());
 		}
-		if (options.isBarley())
-			skel2d.deleteShortEndLimbs(20, true, new HashSet<Point>());
+		skel2d.deleteShortEndLimbs(getInt("delete limbs threshold", 20), true, new HashSet<Point>());
 		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {

@@ -6,6 +6,7 @@ import iap.blocks.BlColorBalancing;
 import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCrop;
+import iap.blocks.BlFilterByLAB;
 import iap.blocks.BlLoadImagesIfNeeded_images_masks;
 import iap.blocks.BlMedianFilter;
 import iap.blocks.BlMedianFilterFluo;
@@ -14,11 +15,10 @@ import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.BlSmoothShape;
+import iap.blocks.BlUseFluoMaskToClearOtherImages;
 import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.arabidopsis.BlClearMasks_Arabidops;
-import iap.blocks.arabidopsis.BlLabFilter_Arabidopsis;
 import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
-import iap.blocks.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir;
 import iap.blocks.arabidopsis.BlockSkeletonize_Arabidopsis;
 import iap.blocks.hull.BlConvexHull;
 import iap.blocks.maize.BlCalcIntensity;
@@ -68,25 +68,25 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlockColorBalancingVertical.class.getCanonicalName(),
 				BlBalanceFluo.class.getCanonicalName(),
 				BlClearBackgroundByRefComparison_vis_fluo_nir.class.getCanonicalName(),
-				BlLabFilter_Arabidopsis.class.getCanonicalName(),
+				BlFilterByLAB.class.getCanonicalName(),
 				BlMedianFilter.class.getCanonicalName(),
 				BlIntensityConversion.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseVisMaskToClearFluo_fluo.class.getCanonicalName(),
-				BlUseFluoMaskToClear_Arabidopsis_vis_nir_ir.class.getCanonicalName(),
-				
+				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
+
 				BlSmoothShape.class.getCanonicalName(),
-				
+
 				BlMedianFilter.class.getCanonicalName(),
 				BlMedianFilter.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-				
+
 				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
-				
+
 				// calculation of numeric values
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
@@ -94,9 +94,9 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-				
+
 				BlockDrawSkeleton.class.getCanonicalName(),
-				
+
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()
@@ -116,10 +116,6 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 			return;
 		
 		options.setSystemOptionStorage(so);
-		
-		options.setIsBarley(false);
-		options.setIsMaize(false);
-		options.setIsArabidopsis(true);
 	}
 	
 	@Override

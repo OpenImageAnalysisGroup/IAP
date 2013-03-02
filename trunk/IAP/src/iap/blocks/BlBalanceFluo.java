@@ -12,14 +12,13 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 /**
- * Recolor pictures according to white point (or black point for fluo).
+ * Recolor pictures according to black point for fluo.
  * 
  * @author pape, klukas
  */
 public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
-	boolean barleyInBarley;
 	
 	BlockProperty bpleft, bpright;
 	
@@ -27,7 +26,6 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		barleyInBarley = getBoolean("barleyInBarley", false);
 		bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X);
 		bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X);
 	}
@@ -42,7 +40,18 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 		else
 			res = input;
 		return res;
-		
+	}
+	
+	@Override
+	protected FlexibleImage processFLUOmask() {
+		FlexibleImage input = input().masks().fluo();
+		FlexibleImage res;
+		boolean invert = true;
+		if (input != null)
+			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
+		else
+			res = input;
+		return res;
 	}
 	
 	/**
@@ -68,7 +77,7 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 			int a = (right - left) / 4;
 			int b = right - left;
 			
-			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, !barleyInBarley, debug);
+			values = io.getRGBAverage(left, height / 2 - a / 2, b, a, lThres, abThres, true, debug);
 		} else {
 			float[] valuesTop, valuesBottom;
 			int left = (int) (0.3 * width);
@@ -77,8 +86,8 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 			int scanWidth = right - left;
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
 			
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, !barleyInBarley, debug);
-			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, !barleyInBarley, debug);
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, false, debug);
+			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, debug);
 			
 			values = new float[6];
 			int i = 0;

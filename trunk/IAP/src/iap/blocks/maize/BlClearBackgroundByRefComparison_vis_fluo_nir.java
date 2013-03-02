@@ -183,7 +183,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				// remove horizontal bar
 				nir = filterHorBar(nir).show("removed constant bar", debug);
 			}
-			if (getBoolean("Process NIR Mask", options.isMaize())) {
+			if (getBoolean("Process NIR Mask", true)) {
 				int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
 				int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
 				FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()

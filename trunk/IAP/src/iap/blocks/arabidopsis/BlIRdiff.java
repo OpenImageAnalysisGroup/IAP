@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 /**
  * @author klukas
  */
-public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
+public class BlIRdiff extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug = false;
 	
@@ -29,7 +29,7 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
 			ImageOperation wb = warmBack.copy().io();
 			
-			if (getBoolean("Use Center Bottom Position as Temperature Reference", options.isBarley())) {
+			if (getBoolean("Use Center Bottom Position as Temperature Reference", false)) {
 				int bx = (int) (wb.getWidth() / 100d * getDouble("Pot Position X (percent)", 47.5));
 				int by = (int) (wb.getHeight() / 100d * getDouble("Pot Position Y (percent)",
 						options.getCameraPosition() == CameraPosition.SIDE ? 95 : 47.5));
@@ -61,7 +61,7 @@ public class Bl_Arabidopsis_IRdiff extends AbstractSnapshotAnalysisBlockFIS {
 						IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
 						options.getBackground(), getDouble("temperature scaling", 10));
 			FlexibleImage gray = new FlexibleImage(warmBack.getWidth(), warmBack.getHeight(), res);
-			if (options.isBarley())
+			if (getBoolean("Adaptive Thresholding", false))
 				gray = gray.io().show("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(
 								getInt("Adaptive_Threshold_Region_Size", 50),

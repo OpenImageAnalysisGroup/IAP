@@ -19,11 +19,7 @@ public class BlockClosingVis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
-		int n;
-		if (options.isHigherResVisCamera())
-			n = getInt("Closing-Cnt", 5);
-		else
-			n = getInt("Closing-Cnt", 3);
+		int n = getInt("Closing-Cnt", 3);
 		FlexibleImage workImage = closing(mask, image, options.getBackground(), n);
 		return workImage;
 	}

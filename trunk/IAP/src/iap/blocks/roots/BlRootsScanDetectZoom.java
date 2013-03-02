@@ -23,7 +23,6 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected FlexibleImage processVISmask() {
 		FlexibleImage img = input().masks().vis();
-		options.setHigherResVisCamera(false);
 		if (img != null) {
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
@@ -32,7 +31,6 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 			int allPixels = img.getWidth() * img.getHeight();
 			
 			if (whitePixels / (double) allPixels < 0.15d) {
-				options.setHigherResVisCamera(true);
 				rt.addValue("zoom", 1);
 			} else
 				rt.addValue("zoom", 0);

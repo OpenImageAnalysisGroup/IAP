@@ -10,13 +10,9 @@ import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.Vector2d;
 
-import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
@@ -58,31 +54,27 @@ public class BlCalcWidthAndHeight extends
 		
 		int vertYsoilLevel = -1;
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE && options.isHigherResVisCamera() && options.isBarley()
-				&& getInt("fixed_pot_cut_off_vis", 150) > 0) {
-			vertYsoilLevel = visRes.getHeight() - getInt("fixed_pot_cut_off_vis", 150);
-		} else
-			if (!options.isBarleyInBarleySystem() && options.getCameraPosition() == CameraPosition.SIDE) {
-				if (useFluo) {
-					if (getProperties().getNumericProperty(0, 1,
+		if (options.getCameraPosition() == CameraPosition.SIDE) {
+			if (useFluo) {
+				if (getProperties().getNumericProperty(0, 1,
 							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
-						vertYsoilLevel = (int) getProperties()
+					vertYsoilLevel = (int) getProperties()
 								.getNumericProperty(
 										0,
 										1,
 										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
 								.getValue();
-				} else {
-					if (getProperties().getNumericProperty(0, 1,
+			} else {
+				if (getProperties().getNumericProperty(0, 1,
 							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
-						vertYsoilLevel = (int) getProperties()
+					vertYsoilLevel = (int) getProperties()
 								.getNumericProperty(
 										0,
 										1,
 										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
 								.getValue();
-				}
 			}
+		}
 		final int vertYsoilLevelF = vertYsoilLevel;
 		
 		FlexibleImage img = useFluo ? input().masks().fluo()
@@ -100,16 +92,12 @@ public class BlCalcWidthAndHeight extends
 							.images().vis().getHeight())
 					: 1.0;
 			
-			// double resfww = useFluo ? (double) getInput().getMasks().getVis()
-			// .getWidth()
-			// / (double) img.getWidth() : 1.0;
-			
 			final Point values = temp != null ? new Point(Math.abs(temp
 					.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY()
 					- temp.getTopY())) : null;
 			
 			if (values != null) {
-				boolean drawVerticalHeightBar = !IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
+				boolean drawVerticalHeightBar = getBoolean("Draw Height Line", true);
 				if (drawVerticalHeightBar)
 					if (!useFluo) {
 						getProperties().addImagePostProcessor(
@@ -200,32 +188,6 @@ public class BlCalcWidthAndHeight extends
 				
 			}
 		}
-		
-		// if (options.getCameraTyp() == CameraTyp.TOP) {
-		// Point values = getWidthandHeightTop(getInput().getMasks().getFluo(),
-		// background);
-		//
-		// if (values != null) {
-		//
-		// if (distLeft != null) {
-		// getProperties().setNumericProperty(getBlockPosition(),
-		// "RESULT_top.width", values.x * (realMarkerDist /
-		// distLeft.getValue()));
-		// getProperties().setNumericProperty(getBlockPosition(),
-		// "RESULT_top.height", values.y * (realMarkerDist /
-		// distLeft.getValue()));
-		// }
-		//
-		// if (distLeft == null && distRight != null) {
-		// getProperties().setNumericProperty(getBlockPosition(),
-		// "RESULT_top.width", values.x * (realMarkerDist /
-		// distRight.getValue()));
-		// getProperties().setNumericProperty(getBlockPosition(),
-		// "RESULT_top.height", values.y * (realMarkerDist /
-		// distRight.getValue()));
-		// }
-		// }
-		// }
 		return visRes;
 	}
 	
@@ -237,69 +199,6 @@ public class BlCalcWidthAndHeight extends
 			if (vertYsoilLevel > 0)
 				temp.setBottom(vertYsoilLevel);
 			return temp;
-			// Point values = new Point(Math.abs(temp.getRightX() -
-			// temp.getLeftX()), Math.abs(temp.getBottomY() - temp.getTopY()));
-			// return values;
-		} else
-			return null;
-	}
-	
-	private Point getWidthandHeightTop(FlexibleImage image, int background) {
-		if (image == null) {
-			System.err
-					.println("ERROR: BlockCalculateWidthAndHeight: Flu Mask is NULL!");
-			return null;
-		}
-		
-		int imagecentx = image.getWidth() / 2;
-		int imagecenty = image.getHeight() / 2;
-		int diagonal = (int) Math.sqrt((image.getWidth() * image.getWidth())
-				+ (image.getHeight() * image.getHeight()));
-		
-		ImageOperation io = new ImageOperation(image);
-		BlockProperty pa = getProperties().getNumericProperty(0, 1,
-				PropertyNames.CENTROID_X);
-		BlockProperty pb = getProperties().getNumericProperty(0, 1,
-				PropertyNames.CENTROID_Y);
-		FlexibleImage resize = null;
-		
-		if (pa != null && pb != null) {
-			
-			Vector2d cent = io.getCentroid(background);
-			int centroidX = (int) cent.x;
-			int centroidY = (int) cent.y;
-			
-			// size vis and fluo are the same, scalefactor cant be calculated
-			// int paScale = (int) (pa.getValue() *
-			// (getInput().getMasks().getVis().getWidth() / image.getWidth()));
-			// int pbScale = (int) (pa.getValue() *
-			// (getInput().getMasks().getVis().getWidth() / image.getWidth()));
-			
-			if (image.getWidth() > image.getHeight()) {
-				resize = io.addBorder((diagonal - image.getWidth()) / 2,
-						(imagecentx - centroidX), (imagecenty - centroidY),
-						background).getImage();
-			} else {
-				resize = io.addBorder((diagonal - image.getHeight()) / 2,
-						(imagecentx - centroidX), (imagecenty - centroidY),
-						background).getImage();
-			}
-			
-			int angle = (int) getProperties().getNumericProperty(0, 1,
-					PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION).getValue();
-			
-			if (resize != null) {
-				resize = new ImageOperation(resize).rotate(-angle).getImage();
-				// resize.print("resize");
-				TopBottomLeftRight temp = getWidthAndHeightSide(resize,
-						background, -1);
-				Point values = new Point(Math.abs(temp.getRightX()
-						- temp.getLeftX()), Math.abs(temp.getBottomY()
-						- temp.getTopY()));
-				return values;
-			} else {
-				return null;
-			}
 		} else
 			return null;
 	}

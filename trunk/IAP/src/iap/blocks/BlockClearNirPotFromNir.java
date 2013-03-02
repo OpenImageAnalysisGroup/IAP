@@ -22,7 +22,7 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 		
 		FlexibleImage nir = input().images().nir();
 		
-		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10 || options.isBarleyInBarleySystem())
+		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10)
 			return nir;
 		
 		nir.show("NIR pot analysis IN", debug);
@@ -53,9 +53,7 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 				}
 				int g = 180;
 				int gray = (0xFF << 24 | (g & 0xFF) << 16) | ((g & 0xFF) << 8) | ((g & 0xFF) << 0);
-				double co = 0.1;
-				if (!options.isBarleyInBarleySystem())
-					co = 2;
+				double co = getDouble("co", 0.1);
 				if (maxContinousBlack > co * w) {
 					for (int x = 0; x < w; x++) {
 						nirArray[x][y] = gray;

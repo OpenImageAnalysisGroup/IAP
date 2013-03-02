@@ -16,7 +16,7 @@ import iap.blocks.arabidopsis.BlRotate;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClearIr;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClearNir_Arabidopsis;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
-import iap.blocks.arabidopsis.Bl_Arabidopsis_IRdiff;
+import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.arabidopsis.BlockSkeletonize_Arabidopsis;
 import iap.blocks.hull.BlConvexHull;
 import iap.blocks.maize.BlCalcIntensity;
@@ -66,7 +66,7 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClear_Arabidopsis_vis.class.getCanonicalName(),
 				BlUseFluoMaskToClearNir_Arabidopsis.class.getCanonicalName(),
-				Bl_Arabidopsis_IRdiff.class.getCanonicalName(),
+				BlIRdiff.class.getCanonicalName(),
 				BlUseFluoMaskToClearIr.class.getCanonicalName(),
 				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
@@ -94,11 +94,6 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 			return;
 		
 		options.setSystemOptionStorage(so);
-		
-		options.setIsBarley(false);
-		options.setIsMaize(false);
-		options.setIsArabidopsis(true);
-		
 	}
 	
 	@Override

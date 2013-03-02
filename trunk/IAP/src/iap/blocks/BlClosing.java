@@ -21,17 +21,8 @@ public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		FlexibleImage mask = input().masks().vis();
 		
-		int n;
-		if (options.isBarleyInBarleySystem()) {
-			n = getInt("Closing-Cnt vis", 3);
-		} else {
-			if (options.isHigherResVisCamera())
-				n = getInt("Closing-Cnt vis", 5);
-			else
-				n = getInt("Closing-Cnt vis", 3);
-		}
-		
-		if (!getBoolean("enable vis", false)) {
+		int n = getInt("Closing-Cnt vis", 3);
+		if (!getBoolean("process VIS", false)) {
 			return mask;
 		}
 		
@@ -45,25 +36,15 @@ public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 		
 		FlexibleImage mask = input().masks().fluo();
 		
-		if (!getBoolean("enable fluo", false)) {
+		if (!getBoolean("process FLUO", false)) {
 			return mask;
 		}
 		
-		int n;
-		if (options.isBarleyInBarleySystem()) {
-			n = getInt("Closing-Cnt fluo", 3);
-		} else {
-			if (options.isHigherResVisCamera())
-				n = getInt("Closing-Cnt fluo", 5);
-			else
-				n = getInt("Closing-Cnt fluo", 3);
-		}
-		
+		int n = getInt("Closing-Cnt fluo", 3);
 		return closing(mask, n);
 	}
 	
 	private static FlexibleImage closing(FlexibleImage mask, int closingRepeat) {
-		
 		ImageOperation op = new ImageOperation(mask);
 		for (int ii = 0; ii < closingRepeat; ii++) {
 			op.closing();
