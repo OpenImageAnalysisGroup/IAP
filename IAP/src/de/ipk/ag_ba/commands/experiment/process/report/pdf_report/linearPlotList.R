@@ -359,9 +359,9 @@ nBoxPlotList <- list(
 		"side.vis.hsv.v.normalized.histogram.bin.06.63_76" = list(plotName = "brightness side - bin6 (zoom corrected)", section = 7, subsection = 1, subsubsection = 3, paragraph = 20),
 		
 		"side.ndvi (relative)" = list(plotName = "side NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 1),
-		"side.ndvi.vis.blue.intensity.average (relative)" = list(plotName = "side blue intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 3),
-		"side.ndvi.vis.green.intensity.average (relative)" = list(plotName = "side green intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 2),
-		"side.ndvi.vis.red.intensity.average (relative)" = list(plotName = "side red intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 1),
+		"side.ndvi.vis.blue.intensity.average (relative)" = list(plotName = "side blue intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 4),
+		"side.ndvi.vis.green.intensity.average (relative)" = list(plotName = "side green intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 3),
+		"side.ndvi.vis.red.intensity.average (relative)" = list(plotName = "side red intensity NDVI", section = 7, subsection = 1, subsubsection = 4, paragraph = 2),
 		
 #		"side.vis.lab.l.mean" = list(plotName = "(L)AB side - mean", section = 7, subsection = 1, subsubsection = 5, paragraph = 1),
 #		"side.vis.lab.l.stddev" = list(plotName = "(L)AB side - stddev", section = 7, subsection = 1, subsubsection = 5, paragraph = 2),
@@ -462,9 +462,9 @@ nBoxPlotList <- list(
 		"top.vis.hsv.v.normalized.histogram.bin.06.63_76" = list(plotName = "brightness top - bin6 (zoom corrected)", section = 7, subsection = 2, subsubsection = 3, paragraph = 20),	
 		
 		"top.ndvi (relative)" = list(plotName = "top NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 1),
-		"top.ndvi.vis.blue.intensity.average (relative)" = list(plotName = "top blue intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 3),
-		"top.ndvi.vis.green.intensity.average (relative)" = list(plotName = "top green intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 2),
-		"top.ndvi.vis.red.intensity.average (relative)" = list(plotName = "top red intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 1),
+		"top.ndvi.vis.blue.intensity.average (relative)" = list(plotName = "top blue intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 4),
+		"top.ndvi.vis.green.intensity.average (relative)" = list(plotName = "top green intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 3),
+		"top.ndvi.vis.red.intensity.average (relative)" = list(plotName = "top red intensity NDVI", section = 7, subsection = 2, subsubsection = 4, paragraph = 2),
 		
 #		"top.vis.lab.l.mean" = list(plotName = "(L)AB top - mean", section = 7, subsection = 2, subsubsection = 5, paragraph = 1),
 #		"top.vis.lab.l.stddev" = list(plotName = "(L)AB top - stddev", section = 7, subsection = 2, subsubsection = 5, paragraph = 2),
