@@ -140,10 +140,13 @@ public class BlockPipeline {
 		
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
 			int n = 0;
+			
+			System.out.println("\n##Blocks##");
 			for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
 				System.out.println("Block " + n + "=" + blockClass.getSimpleName());
 				n++;
 			}
+			System.out.println("##Output##");
 		}
 		
 		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
