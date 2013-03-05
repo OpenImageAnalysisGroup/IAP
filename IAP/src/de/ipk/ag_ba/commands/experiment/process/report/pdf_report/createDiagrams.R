@@ -16,7 +16,7 @@ plotOnlyViolin <- FALSE
 plotOnlyStacked <- FALSE
 plotOnlySpider <- FALSE
 plotOnlyLineRange <- FALSE
-plotOnlyBoxplot <- TRUE
+plotOnlyBoxplot <- FALSE
 plotOnlyStressValues <- FALSE
 
 
