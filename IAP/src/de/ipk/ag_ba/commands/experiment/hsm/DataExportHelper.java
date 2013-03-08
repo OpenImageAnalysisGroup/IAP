@@ -1,15 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2010-2013 Image Analysis Group, IPK Gatersleben
- *******************************************************************************/
-/*
- * Created on Nov 9, 2010 by Christian Klukas
- */
-package de.ipk.ag_ba.commands.vfs;
+package de.ipk.ag_ba.commands.experiment.hsm;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -34,18 +31,14 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
-import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -55,185 +48,27 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 
-/**
- * @author klukas
- */
-public class ActionDataExportToVfs extends AbstractNavigationAction {
-	private final MongoDB m;
-	private final ArrayList<ExperimentReference> experimentReferences;
-	private NavigationButton src;
-	private String mb;
+public class DataExportHelper {
+	
+	private ExperimentReference experimentReference;
 	private int files, knownFiles, errorCount;
-	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
-	private boolean includeMainImages = true;
-	private boolean includeReferenceImages = true;
-	private boolean includeAnnotationImages = true;
-	private final VirtualFileSystemVFS2 vfs;
-	private boolean skipClone;
+	private final String hsmFolder;
+	private final MongoDB m;
+	private final BackgroundTaskStatusProviderSupportingExternalCall status;
+	private String fn;
+	private final ThreadSafeOptions tso = new ThreadSafeOptions();
+	boolean includeMainImages = true;
+	boolean includeReferenceImages = true;
+	boolean includeAnnotationImages = true;
+	private String mb;
 	
-	public ActionDataExportToVfs(MongoDB m,
-			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs) {
-		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
+	public DataExportHelper(ExperimentReference experimentReference, MongoDB m, String hsmFolder,
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
+		this.experimentReference = experimentReference;
 		this.m = m;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
-		this.experimentReferences.add(experimentReference);
-		this.vfs = vfs;
-	}
-	
-	public ActionDataExportToVfs(MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs) {
-		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
-		this.m = m;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
-		this.experimentReferences.addAll(experimentReference);
-		this.vfs = vfs;
-	}
-	
-	@Override
-	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
-	}
-	
-	@Override
-	public ParameterOptions getParameters() {
-		return new ParameterOptions(
-				"<html>"
-						+ "This commands copies the experiment and its connected binary data to the<br>"
-						+ "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
-						"Copy images", includeMainImages,
-						"Copy reference images", includeReferenceImages,
-						"Copy annotation images", includeAnnotationImages });
-	}
-	
-	@Override
-	public void setParameters(Object[] parameters) {
-		super.setParameters(parameters);
-		if (parameters != null && parameters.length == 3) {
-			int idx = 0;
-			includeMainImages = (Boolean) parameters[idx++];
-			includeReferenceImages = (Boolean) parameters[idx++];
-			includeAnnotationImages = (Boolean) parameters[idx++];
-		}
-	}
-	
-	@Override
-	public ArrayList<NavigationButton> getResultNewNavigationSet(
-			ArrayList<NavigationButton> currentSet) {
-		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(
-				currentSet);
-		// res.add(src);
-		return res;
-	}
-	
-	@Override
-	public String getDefaultTitle() {
-		return "Copy to " + (vfs != null ? vfs.getTargetName() : "(undefined)");
-	}
-	
-	@Override
-	public String getDefaultImage() {
-		return IAPimages.copyToServer();
-	}
-	
-	@Override
-	public void performActionCalculateResults(NavigationButton src)
-			throws Exception {
-		this.src = src;
-		this.errorMessage = null;
-		try {
-			for (ExperimentReference experimentReference : experimentReferences) {
-				status.setCurrentStatusText1("Clone Experiment");
-				ExperimentInterface experiment = experimentReference.getData(
-						m);
-				
-				if (!skipClone)
-					experiment = experiment.clone();
-				
-				status.setCurrentStatusText1("Store Files...");
-				
-				if (!skipClone)
-					experiment.setHeader(experimentReference.getHeader().clone());
-				
-				experiment.getHeader().setOriginDbId(
-						experimentReference.getHeader().getDatabaseId());
-				final ThreadSafeOptions written = new ThreadSafeOptions();
-				
-				this.files = determineNumberOfFilesInDataset(experiment);
-				int idx = 0;
-				
-				knownFiles = 0;
-				
-				errorCount = 0;
-				
-				final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
-						vfs.getPrefix(), vfs.getTargetPathName());
-				
-				long startTime = System.currentTimeMillis();
-				
-				ExecutorService es = Executors.newFixedThreadPool(2);
-				
-				boolean simulate = false;
-				
-				for (SubstanceInterface su : experiment) {
-					final String substanceName = su.getName();
-					for (ConditionInterface co : su)
-						for (SampleInterface sa : co) {
-							for (NumericMeasurementInterface nm : sa) {
-								if (simulate) {
-									; // System.out.println("backup to hsm simu");
-								} else
-									idx = storeData(experiment, written, idx,
-											hsmManager, startTime, es,
-											substanceName, nm);
-							}
-						}
-				}
-				
-				es.shutdown();
-				es.awaitTermination(31, TimeUnit.DAYS);
-				
-				if (errorCount == 0) {
-					status.setCurrentStatusText1("Finalize storage");
-					status.setCurrentStatusText1("Write Index...");
-					// save XML and header
-					System.out.println("OK: VfsFile transfer of experiment "
-							+ experimentReference.getExperimentName()
-							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " complete (saved " + idx
-							+ " files). Saving XML... // "
-							+ SystemAnalysis.getCurrentTime());
-					status.setCurrentStatusText1("Finalize storage");
-					status.setCurrentStatusText2("Index Created");
-				} else {
-					status.setCurrentStatusText1("Data Transfer Incomplete");
-					status.setCurrentStatusText2("Could not save valid dataset");
-					System.out.println("ERROR: VfsFile transfer of experiment "
-							+ experimentReference.getExperimentName()
-							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " incomplete (" + errorCount + " errors). // "
-							+ SystemAnalysis.getCurrentTime());
-				}
-				experiment.getHeader().setRemark(
-						(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
-								experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
-				experiment.getHeader().setStorageTime(new Date());
-				experiment.getHeader().setSizekb(written.getLong() / 1024);
-				
-				String indexFileName = createIndexFiles(experiment, hsmManager, status, experimentReference.getExperimentName());
-				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
-				status.setCurrentStatusValueFine(100d);
-				
-				this.mb = (written.getLong() / 1024 / 1024) + "";
-				tso.setParam(2, true);
-			}
-		} catch (Exception e) {
-			
-			errorCount++;
-			tso.setParam(2, true);
-			
-			// if (fn != null && fn.trim().length() > 0 && new VfsFilesystemFile(fn).exists())
-			// new VfsFilesystemFile(fn).delete();
-			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
-		}
+		this.hsmFolder = hsmFolder;
+		this.status = status;
 	}
 	
 	private int storeData(final ExperimentInterface experiment,
@@ -242,12 +77,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			ExecutorService es, final String substanceName,
 			NumericMeasurementInterface nm) {
 		
-		// copy main binary VfsFile (url)
+		// copy main binary file (url)
 		if (nm instanceof BinaryMeasurement) {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
 			if (bm.getURL() == null)
 				return idx;
-			IOurl unchangedURL = bm.getURL().copy();
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
 			final Long t = nm.getParentSample().getSampleFineTimeOrRowId();
@@ -262,9 +96,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					String zefn = null;
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
-						final VfsFileObject targetFile = vfs.newVfsFile(
+						final File targetFile = new File(
 								hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t, zefn.contains("#") ? zefn.split("#")[0] : zefn), true);
+										experiment.getHeader(), t, zefn));
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
@@ -272,12 +106,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
 									bm.getURL(), null, t, targetFile, exists,
-									null, false);
+									null);
 						} catch (Exception e) {
 							System.out
-									.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
+									.println("ERROR: HSM TRANSFER AND DATA STORAGE: "
 											+ e.getMessage()
-											+ " // WILL RETRY IN 2 MINUTES // "
+											+ " // WILL RETRY IN 10 MINUTES // "
 											+ SystemAnalysis
 													.getCurrentTime());
 							Thread.sleep(10 * 60 * 1000);
@@ -285,7 +119,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
 									bm.getURL(), null, t, targetFile, exists,
-									null, false);
+									null);
 						}
 						if (exists) {
 							files--;
@@ -294,7 +128,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						}
 					} catch (Exception e) {
 						System.out
-								.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
+								.println("ERROR: HSM TRANSFER AND DATA STORAGE: "
 										+ e.getMessage()
 										+ " // "
 										+ zefn
@@ -311,54 +145,43 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					String zefn = null;
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
-						final VfsFileObject targetFile = vfs.newVfsFile(
+						final File targetFile = new File(
 								hsmManager.prepareAndGetPreviewFileNameAndPath(
-										experiment.getHeader(), t, zefn), true);
+										experiment.getHeader(), t, zefn));
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
 						if (!exists) {
 							InputStream is = null;
-							
-							byte[] previewData = ResourceIOManager.getPreviewImageContent(unchangedURL);
-							if (previewData == null || previewData.length == 0)
-								if (fileContent != null) {
-									MyByteArrayInputStream bis = fileContent.get();
-									if (bis != null)
-										is = bis.getNewStream();
-								}
+							if (fileContent != null) {
+								MyByteArrayInputStream bis = fileContent.get();
+								if (bis != null)
+									is = bis.getNewStream();
+							}
 							try {
-								if (is == null && (previewData == null || previewData.length == 0)) {
+								if (is == null) {
 									is = ResourceIOManager
 											.getInputStreamMemoryCached(bm
 													.getURL());
-									if (is == null || is.available() <= 0) {
+									if (is.available() <= 0) {
 										System.out
 												.println("ERROR: Input stream contains no content for image with URL "
 														+ bm.getURL());
 									}
 								}
-								
-								MyByteArrayInputStream previewStream = null;
-								if (previewData == null || previewData.length == 0) {
-									if (is != null) {
-										BufferedImage bimage = ImageIO.read(is);
-										previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
-									}
-								} else {
-									previewStream = new MyByteArrayInputStream(previewData, previewData.length);
-								}
+								BufferedImage bimage = ImageIO.read(is);
+								MyByteArrayInputStream previewStream = MyImageIOhelper
+										.getPreviewImageStream(bimage);
 								if (previewStream != null)
 									copyBinaryFileContentToTarget(experiment,
 											written, hsmManager, es, null,
 											previewStream, t, targetFile,
-											exists, null, true);
+											exists, null);
 								else
 									System.out
 											.println("ERROR: Preview could not be created or saved.");
 							} finally {
-								if (is != null)
-									is.close();
+								is.close();
 							}
 						}
 					} catch (Exception e) {
@@ -381,7 +204,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ " MB, " + (int) speed + " MB/s");
 		}
 		
-		// copy label binary VfsFile (label url)
+		// copy label binary file (label url)
 		if (nm instanceof BinaryMeasurement) {
 			final BinaryMeasurement bm = (BinaryMeasurement) nm;
 			if (bm.getLabelURL() == null)
@@ -411,22 +234,22 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									+ fn.substring(fn.lastIndexOf("/")
 											+ "/".length())
 									+ getFileExtension(bm.getLabelURL()
-											.getFileName());
+											.getFileName());;
 						} else
 							zefn = "label_"
 									+ determineBinaryFileName(t, substanceName, nm,
 											bm);
 					
-					final VfsFileObject targetFile = vfs.newVfsFile(
+					final File targetFile = new File(
 							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn), true);
+									experiment.getHeader(), t, zefn));
 					
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
-							targetFile, targetFile.exists(), null, false);
+							targetFile, targetFile.exists(), null);
 					
 				} catch (Exception e) {
-					System.out.println("ERROR: DATA DATA TRANSFER AND STORAGE: "
+					System.out.println("ERROR: HSM DATA TRANSFER AND STORAGE: "
 							+ e.getMessage() + " // "
 							+ SystemAnalysis.getCurrentTime());
 					e.printStackTrace();
@@ -441,7 +264,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			}
 		}
 		
-		// copy old reference label binary VfsFile (oldreference annotation)
+		// copy old reference label binary file (oldreference annotation)
 		if (nm instanceof ImageData) {
 			final ImageData id = (ImageData) nm;
 			String oldRef = id.getAnnotationField("oldreference");
@@ -476,9 +299,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									+ determineBinaryFileName(t, substanceName, nm,
 											id);
 					
-					final VfsFileObject targetFile = vfs.newVfsFile(
+					final File targetFile = new File(
 							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn), true);
+									experiment.getHeader(), t, zefn));
 					Runnable postProcess = new Runnable() {
 						@Override
 						public void run() {
@@ -489,10 +312,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					};
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, oldRefUrl, null, t, targetFile,
-							targetFile.exists(), postProcess, false);
+							targetFile.exists(), postProcess);
 				} catch (Exception e) {
 					System.out
-							.println("ERROR: DATA DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
+							.println("ERROR: HSM DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
 									+ e.getMessage()
 									+ " // "
 									+ SystemAnalysis.getCurrentTime());
@@ -521,43 +344,38 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private String extractLastFileName(String fileName) {
 		if (fileName.contains(File.separator))
 			fileName = fileName.substring(fileName.lastIndexOf(File.separator));
-		if (fileName.contains("#"))
-			fileName = fileName.substring(fileName.lastIndexOf("#") + 1);
 		return fileName;
 	}
 	
-	private String createIndexFiles(final ExperimentInterface experiment,
+	private void createIndexFiles(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String experimentSourceName) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		try {
 			long tsave = System.currentTimeMillis();
 			int eidx = 0;
-			LinkedHashMap<VfsFileObject, String> tempFile2fileName = new LinkedHashMap<VfsFileObject, String>();
-			
-			ExperimentInterface ei = experiment;
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Create XML File");
-			storeXMLdataset(experiment, hsmManager, tsave, eidx,
-					tempFile2fileName, ei, optStatus);
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Create Condition File");
-			storeConditionIndexFile(hsmManager, tsave, eidx,
-					tempFile2fileName, ei);
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Create Index File");
-			String resName = storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
-			
-			renameTempInProgressFilesToFinalFileNames(tempFile2fileName, experimentSourceName);
-			
-			eidx++;
-			return resName;
+			LinkedHashMap<File, String> tempFile2fileName = new LinkedHashMap<File, String>();
+			for (ExperimentInterface ei : experiment.split()) {
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Create XML File");
+				storeXMLdataset(experiment, hsmManager, tsave, eidx,
+						tempFile2fileName, ei, optStatus);
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Create Condition File");
+				storeConditionIndexFile(hsmManager, tsave, eidx,
+						tempFile2fileName, ei);
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Create Index File");
+				storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
+				
+				eidx++;
+			}
+			renameTempInProgressFilesToFinalFileNames(tempFile2fileName);
 		} catch (Exception err) {
 			System.out.println("ERROR: Save XML of experiment "
-					+ experimentSourceName + " failed: "
+					+ experimentReference.getExperimentName() + " failed: "
 					+ err.getMessage() + " // "
 					+ SystemAnalysis.getCurrentTime());
 			ErrorMsg.addErrorMessage(err);
-			return null;
 		}
 	}
 	
@@ -585,9 +403,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final HSMfolderTargetDataManager hsmManager,
 			final ExecutorService es, final IOurl url,
 			final MyByteArrayInputStream optUrlContent, final Long t,
-			final VfsFileObject targetFile, final boolean targetExists,
-			final Runnable optPostProcess,
-			final boolean isIconStorage) throws InterruptedException {
+			final File targetFile, final boolean targetExists,
+			final Runnable optPostProcess) throws InterruptedException {
 		while (written.getInt() > 0)
 			Thread.sleep(5);
 		written.addInt(1);
@@ -599,66 +416,50 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				try {
 					try {
 						if (!targetExists) {
-							in = url != null || optUrlContent == null ? ResourceIOManager
+							in = url != null ? ResourceIOManager
 									.getInputStreamMemoryCached(url)
 									: optUrlContent;
-							if (in == null)
-								System.out.println("No input for " + url);
-							else {
-								synchronized (es) {
-									String fn;
-									if (isIconStorage)
-										fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
-												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-									else
-										fn = hsmManager.prepareAndGetDataFileNameAndPath(
-												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-									
-									VfsFileObject f = vfs.newVfsFile(fn, true);
-									BufferedOutputStream bos = new BufferedOutputStream(
-											f.getOutputStream());
-									try {
-										if (in.getCount() > 0)
-											bos.write(in.getBuff(), 0,
-													in.getCount());
-									} finally {
-										bos.close();
-									}
-									written.addLong(in.getCount());
-									in.close();
-									if (t != null)
-										f.setLastModified(t);
-									// f.setWritable(false);
-									// f.setExecutable(false);
-									f.renameTo(targetFile, true);
+							synchronized (es) {
+								File f = new File(hsmManager
+										.prepareAndGetDataFileNameAndPath(
+												experiment.getHeader(), t,
+												"in_progress_"
+														+ UUID.randomUUID()
+																.toString()));
+								BufferedOutputStream bos = new BufferedOutputStream(
+										new FileOutputStream(f));
+								try {
+									if (in.getCount() > 0)
+										bos.write(in.getBuff(), 0,
+												in.getCount());
+								} finally {
+									bos.close();
 								}
+								written.addLong(in.getCount());
+								in.close();
+								if (t != null)
+									f.setLastModified(t);
+								f.setWritable(false);
+								f.setExecutable(false);
+								f.renameTo(targetFile);
 							}
 						}
+						String fullPath = targetFile.getAbsolutePath();
+						String subPath = fullPath.substring(hsmFolder.length());
 						if (url != null) {
-							// System.out.println("Current URL: " + url);
-							// System.out.println("Target File Name: " + targetFile.getName());
-							url.setPrefix(vfs.getPrefix());
+							url.setPrefix(HsmResourceIoHandler
+									.getPrefix(hsmFolder));
 							url.setDetail("");
-							String path = hsmManager
-									.prepareAndGetDataFileNameAndPath(
-											experiment.getHeader(), t,
-											targetFile.getName().split("#", 2)[0]);
-							// System.out.println("Path: " + path);
-							path = path.substring(hsmManager.getPath().length() + File.separator.length());
-							url.setDetail(path.substring(0, path.lastIndexOf(File.separator)));
-							path = path.substring(path.lastIndexOf(File.separator) + File.separator.length());
-							url.setFileName(path + "#"
+							url.setFileName(subPath + "#"
 									+ extractLastFileName(url.getFileName()));
 						}
 						if (optPostProcess != null)
 							optPostProcess.run();
 					} catch (Exception e) {
-						e.printStackTrace();
 						System.out.println("ERROR: " + e.getMessage());
 						errorCount++;
 					}
 				} finally {
-					// BackgroundTaskHelper.lockRelease(hsmFolder);
 					written.addInt(-1);
 				}
 				return in != null ? in.getNewStream() : null;
@@ -666,7 +467,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		});
 	}
 	
-	public static String determineBinaryFileName(long t, final String substanceName,
+	private String determineBinaryFileName(long t, final String substanceName,
 			NumericMeasurementInterface nm, final BinaryMeasurement bm) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
@@ -709,7 +510,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ "_"
 					+ HSMfolderTargetDataManager.digit2(gc
 							.get(GregorianCalendar.SECOND))
-					+ id.getURL().getFileNameExtension();
+					+ " "
+					+ id.getURL().getFileName();
 			
 		} else {
 			zefn = bm.getURL().getFileName();
@@ -717,43 +519,40 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return zefn;
 	}
 	
-	private boolean renameTempInProgressFilesToFinalFileNames(
-			LinkedHashMap<VfsFileObject, String> tempFile2fileName, String experimentSourceName) throws Exception {
-		
-		boolean allOK = true;
+	private void renameTempInProgressFilesToFinalFileNames(
+			LinkedHashMap<File, String> tempFile2fileName) throws IOException {
 		// rename all temp files
-		for (VfsFileObject f : tempFile2fileName.keySet()) {
-			VfsFileObject te = vfs.newVfsFile(tempFile2fileName.get(f), true);
+		for (File f : tempFile2fileName.keySet()) {
+			File te = new File(tempFile2fileName.get(f));
 			try {
 				if (f != null && f.exists()) {
-					f.renameTo(te, true);
+					f.renameTo(te);
 					System.out.println("OK: Save XML of experiment "
-							+ experimentSourceName + " as "
-							+ te.getName() + " // "
+							+ experimentReference.getExperimentName() + " as "
+							+ te.getCanonicalPath() + " // "
 							+ SystemAnalysis.getCurrentTime());
 				}
 			} catch (Exception e) {
-				allOK = false;
 				System.err.println("ERROR: Could not rename " + f.getName()
 						+ " to " + te.getName());
 			}
+			
 		}
-		return allOK;
 	}
 	
 	private void storeConditionIndexFile(
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
-			HashMap<VfsFileObject, String> tempFile2fileName, ExperimentInterface ei)
-			throws Exception {
+			HashMap<File, String> tempFile2fileName, ExperimentInterface ei)
+			throws IOException {
 		String conditionIndexFileName = tsave + "_" + eidx + "_"
 				+ ei.getHeader().getImportusername() + "_" + ei.getName()
 				+ ".iap.index.csv";
 		conditionIndexFileName = StringManipulationTools.stringReplace(
 				conditionIndexFileName, ":", "-");
-		VfsFileObject conditionFile = vfs.newVfsFile(
+		File conditionFile = new File(
 				hsmManager
 						.prepareAndGetTargetFileForConditionIndex("in_progress_"
-								+ UUID.randomUUID().toString()), true);
+								+ UUID.randomUUID().toString()));
 		TextFile conditionIndexFileContent = new TextFile();
 		
 		TreeMap<String, ArrayList<String>> conditionString2substance = new TreeMap<String, ArrayList<String>>();
@@ -804,62 +603,58 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							conditionString2substance.get(condString), ";"));
 			conditionNumber++;
 		}
-		conditionIndexFileContent.write(conditionFile.getOutputStream());
+		conditionIndexFileContent.write(conditionFile);
 		tempFile2fileName
 				.put(conditionFile,
 						hsmManager
 								.prepareAndGetTargetFileForConditionIndex(conditionIndexFileName));
 	}
 	
-	private String storeIndexFile(final HSMfolderTargetDataManager hsmManager,
-			long tsave, int eidx, HashMap<VfsFileObject, String> tempFile2fileName,
-			ExperimentInterface ei) throws Exception {
+	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
+			long tsave, int eidx, HashMap<File, String> tempFile2fileName,
+			ExperimentInterface ei) throws IOException {
 		String indexFileName = tsave + "_" + eidx + "_"
 				+ ei.getHeader().getImportusername() + "_" + ei.getName()
 				+ ".iap.index.csv";
 		indexFileName = StringManipulationTools.stringReplace(indexFileName,
 				":", "-");
 		
-		VfsFileObject indexFile = vfs.newVfsFile(
+		File indexFile = new File(
 				hsmManager
 						.prepareAndGetTargetFileForContentIndex("in_progress_"
-								+ UUID.randomUUID().toString()), true);
+								+ UUID.randomUUID().toString()));
+		
+		writeExperimentHeaderToIndexFile(ei.getHeader(), new FileOutputStream(indexFile), ei.getNumberOfMeasurementValues());
+		tempFile2fileName.put(indexFile, hsmManager
+				.prepareAndGetTargetFileForContentIndex(indexFileName));
+	}
+	
+	public static void writeExperimentHeaderToIndexFile(ExperimentHeaderInterface ei, OutputStream indexFileOutputStream, int measurements) throws IOException {
 		TextFile indexFileContent = new TextFile();
 		LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
-		ei.getHeader().fillAttributeMap(header,
-				ei.getNumberOfMeasurementValues());
-		String experimentName = ei.getName();
+		ei.fillAttributeMap(header, measurements);
+		String experimentName = ei.getExperimentname();
 		for (String key : header.keySet()) {
 			indexFileContent.add(experimentName + "," + key + ","
 					+ header.get(key));
 		}
-		indexFileContent.write(indexFile.getOutputStream());
-		String resName = hsmManager.prepareAndGetTargetFileForContentIndex(indexFileName);
-		tempFile2fileName.put(indexFile, resName);
-		if (resName.startsWith(vfs.getTargetPathName()))
-			resName = resName.substring(vfs.getTargetPathName().length() + "/".length());
-		return resName;
+		indexFileContent.write(indexFileOutputStream);
 	}
 	
 	private void storeXMLdataset(final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
-			LinkedHashMap<VfsFileObject, String> tempFile2fileName,
+			LinkedHashMap<File, String> tempFile2fileName,
 			ExperimentInterface ei,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
-			throws Exception {
-		VfsFileObject f = vfs.newVfsFile(hsmManager.prepareAndGetDataFileNameAndPath(
+			throws IOException {
+		TextFile tf = new TextFile();
+		tf.add(Experiment.getString(ei, optStatus));
+		File f = new File(hsmManager.prepareAndGetDataFileNameAndPath(
 				experiment.getHeader(), null, "in_progress_"
-						+ UUID.randomUUID().toString()), true);
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Dumping data structure into XML file. Prepare: perform GC. Memory Status: "
-				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
-		System.gc();
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Begin dumping data structure into XML file... (Memory Status: "
-				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
-		Experiment.write(ei, optStatus, f.getOutputStream()); // to temp file
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Finished dumping data structure into XML file. (Memory Status: "
-				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
-		// f.setExecutable(false);
-		// f.setWritable(false);
+						+ UUID.randomUUID().toString()));
+		tf.write(f); // to temp file
+		f.setExecutable(false);
+		f.setWritable(false);
 		if (ei.getStartDate() != null)
 			f.setLastModified(ei.getStartDate().getTime());
 		String xmlFileName = tsave + "_" + eidx + "_"
@@ -873,28 +668,107 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						experiment.getHeader(), null, xmlFileName));
 	}
 	
-	@Override
-	public MainPanelComponent getResultMainPanel() {
-		if (errorMessage == null)
-			errorMessage = "";
-		else {
-			errorMessage = " " + errorMessage + "";
+	public void performCopy() {
+		this.errorMessage = null;
+		try {
+			status.setCurrentStatusText1("Clone Experiment");
+			final ExperimentInterface experiment = experimentReference.getData(
+					m).clone();
+			
+			status.setCurrentStatusText1("Store Files...");
+			
+			experiment.setHeader(experimentReference.getHeader().clone());
+			
+			experiment.getHeader().setOriginDbId(
+					experimentReference.getHeader().getDatabaseId());
+			final ThreadSafeOptions written = new ThreadSafeOptions();
+			
+			this.files = determineNumberOfFilesInDataset(experiment);
+			int idx = 0;
+			
+			knownFiles = 0;
+			errorCount = 0;
+			
+			final HSMfolderTargetDataManager hsmManager = new HSMfolderTargetDataManager(
+					HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
+			
+			long startTime = System.currentTimeMillis();
+			
+			ExecutorService es = Executors.newFixedThreadPool(2);
+			
+			boolean simulate = false;
+			
+			for (SubstanceInterface su : experiment) {
+				final String substanceName = su.getName();
+				for (ConditionInterface co : su)
+					for (SampleInterface sa : co) {
+						for (NumericMeasurementInterface nm : sa) {
+							if (simulate) {
+								; // System.out.println("backup to hsm simu");
+							} else
+								idx = storeData(experiment, written, idx,
+										hsmManager, startTime, es,
+										substanceName, nm);
+						}
+					}
+			}
+			
+			es.shutdown();
+			es.awaitTermination(31, TimeUnit.DAYS);
+			
+			if (errorCount == 0) {
+				status.setCurrentStatusText1("Finalize storage");
+				status.setCurrentStatusText1("Write Index...");
+				// save XML and header
+				System.out.println("OK: File transfer of experiment "
+						+ experimentReference.getExperimentName()
+						+ " to HSM complete (saved " + idx
+						+ " files). Saving XML... // "
+						+ SystemAnalysis.getCurrentTime());
+				status.setCurrentStatusText1("Finalize storage");
+				status.setCurrentStatusText2("Index Created");
+			} else {
+				status.setCurrentStatusText1("Data Transfer Incomplete");
+				status.setCurrentStatusText2("Could not save valid dataset");
+				System.out.println("ERROR: File transfer of experiment "
+						+ experimentReference.getExperimentName()
+						+ " to HSM incomplete (" + errorCount + " errors). // "
+						+ SystemAnalysis.getCurrentTime());
+			}
+			experiment.getHeader().setRemark(
+					experiment.getHeader().getRemark()
+							+ " // HSM transfer errors: " + errorCount);
+			experiment.getHeader().setStorageTime(new Date());
+			
+			createIndexFiles(experiment, hsmManager, status);
+			status.setCurrentStatusValueFine(100d);
+			
+			this.mb = (written.getLong() / 1024 / 1024) + "";
+			tso.setParam(2, true);
+		} catch (Exception e) {
+			
+			errorCount++;
+			tso.setParam(2, true);
+			
+			if (fn != null && fn.trim().length() > 0 && new File(fn).exists())
+				new File(fn).delete();
+			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
-		
-		if (errorMessage.trim().length() > 0)
-			return new MainPanelComponent("Output incomplete. Error: "
-					+ errorMessage);
-		else
-			return new MainPanelComponent("The data has been exported (copied "
-					+ mb + " MB, " + files + " files added, " + knownFiles
-					+ " existing files have been skipped)." + errorMessage);
 	}
 	
-	public MongoDB getMongoInstance() {
-		return m;
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 	
-	public void setSkipClone(boolean skipClone) {
-		this.skipClone = skipClone;
+	public int getKnownFiles() {
+		return knownFiles;
+	}
+	
+	public int getFiles() {
+		return files;
+	}
+	
+	public String getMB() {
+		return mb;
 	}
 }

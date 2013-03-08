@@ -6,8 +6,7 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCompleteFinishedStep3;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExport;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
@@ -65,55 +64,11 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		
 		res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
 		
-		ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+		res.add(new NavigationButton(new ActionNumericExportCommands(
+				"Export Numeric Data", toggles, m, experiment), src.getGUIsetting()));
 		
-		res.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experiment,
-						toggles,
-						false,
-						true,
-						null, null, null, null, null, "complete, high mem requ.", ExportSetting.ALL),
-				guiSetting));
-		res.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experiment,
-						toggles,
-						false,
-						true,
-						null, null, null, null, null, "no histogram, no sections", ExportSetting.NO_HIST_NO_SECTIONS),
-				guiSetting));
-		res.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experiment,
-						toggles,
-						false,
-						true,
-						null, null, null, null, null, "histograms", ExportSetting.ONLY_MAIN_HISTO),
-				guiSetting));
-		res.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experiment,
-						toggles,
-						false,
-						true,
-						null, null, null, null, null, "sections", ExportSetting.ONLY_SECTIONS),
-				guiSetting));
-		res.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m,
-						experiment,
-						toggles,
-						true,
-						false,
-						null, null, null, null, null),
-				guiSetting));
-		
-		res.add(new NavigationButton(new ActionDataExport(m, experiment), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDataExportZIP(m, experiment), src.getGUIsetting()));
 		res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
 		res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		

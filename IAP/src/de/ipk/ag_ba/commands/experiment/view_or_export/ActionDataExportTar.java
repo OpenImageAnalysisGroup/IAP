@@ -49,17 +49,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class ActionDataExportTar extends AbstractNavigationAction implements SpecialCommandLineSupport {
-	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
-	private NavigationButton src;
 	private String fn;
 	private String mb;
 	private int files;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
-	
-	// private JTable table;
 	
 	public ActionDataExportTar(String tooltip) {
 		super(tooltip);
@@ -79,7 +75,6 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		// res.add(src);
 		return res;
 	}
 	
@@ -142,7 +137,6 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		this.src = src;
 		this.errorMessage = null;
 		try {
 			OutputStream os;
@@ -336,50 +330,6 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
-		
-		// ArrayList<String> cols = new ArrayList<String>();
-		// cols.add("Plant");
-		// cols.add("Carrier");
-		// cols.add("Experiment");
-		// cols.add("Time");
-		// cols.add("Weight (before watering)");
-		// cols.add("Weight (after watering)");
-		// cols.add("Water");
-		// Object[] columns = cols.toArray();
-		//
-		// ExperimentInterface experiment = experimentReference.getData(m);
-		// ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
-		// for (SubstanceInterface su : experiment) {
-		// if (su.getName() == null)
-		// continue;
-		//
-		// if (su.getName().equals("weight_before")) {
-		//
-		// }
-		// if (su.getName().equals("water_weight")) {
-		//
-		// }
-		// if (su.getName().equals("water_amount")) {
-		//
-		// }
-		// for (ConditionInterface c : su) {
-		// for (SampleInterface sa : c) {
-		// for (Measurement m : sa) {
-		// ReportRow r = new ReportRow();
-		// r.setPlant(c.getConditionId() + ": " + c.getConditionName());
-		// r.setCarrier(m.getReplicateID());
-		// r.setExperiment(experiment.getHeader().getExperimentname());
-		// r.setTime(sa.getSampleTime());
-		// }
-		// }
-		// }
-		// }
-		//
-		// ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-		//
-		// Object[][] rowdata = new Object[rows.size()][cols.size()];
-		//
-		// table = new JTable(rowdata, columns);
 	}
 	
 	private String filter(int maxLen, ConditionInterface condition) {
@@ -460,10 +410,6 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 					return false;
 			}
 			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
-			// if (!f.canWrite()) {
-			// System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: Can't write to file (" + f.getAbsolutePath() + ")");
-			// return false;
-			// }
 			tso.setParam(0, new FileOutputStream(f));
 			startTime = System.currentTimeMillis();
 			ff = f;
@@ -480,5 +426,4 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 				"t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000) + ", " +
 				"speed=" + StringManipulationTools.formatNumber(mbps, "#.#") + " MB/s");
 	}
-	
 }
