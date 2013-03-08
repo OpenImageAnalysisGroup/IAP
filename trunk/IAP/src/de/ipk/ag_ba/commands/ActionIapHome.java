@@ -12,7 +12,6 @@ import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
-import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
 import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
@@ -21,7 +20,6 @@ import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.nav.RimasNav;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -95,33 +93,8 @@ public final class ActionIapHome extends AbstractNavigationAction {
 		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", false);
 		if (vfs) {
 			// add VFS entries
-			for (VirtualFileSystem entry : VirtualFileSystem.getKnown(true)) {
-				Library lib = new Library();
-				String ico = IAPimages.getFolderRemoteClosed();
-				String ico2 = IAPimages.getFolderRemoteOpen();
-				String ico3 = IAPimages.getFolderRemoteClosed();
-				if (entry.getTransferProtocolName().contains("UDP")) {
-					ico = "img/ext/network-workgroup.png";
-					ico2 = "img/ext/network-workgroup-power.png";
-					ico3 = IAPimages.getFolderRemoteClosed();
-				}
-				if (entry.getDesiredIcon() != null) {
-					ico = entry.getDesiredIcon();
-					ico2 = entry.getDesiredIcon();
-					ico3 = entry.getDesiredIcon();
-				}
-				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, entry.getTargetName(), entry,
-						new String[] {},
-						IAPmain.loadIcon(ico),
-						IAPmain.loadIcon(ico2),
-						IAPmain.loadIcon(ico3));
-				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
-				for (NavigationAction na : entry.getAdditionalNavigationActions()) {
-					action.addAdditionalEntity(new NavigationButton(na, guiSetting));
-				}
-				NavigationButton hsmSrc = new NavigationButton(entry.getTargetName(), action, guiSetting);
-				hsmSrc.setToolTipText("Target: " + entry.getTargetPathName() + " via " + entry.getTransferProtocolName());
-				homePrimaryActions.add(hsmSrc);
+			for (VirtualFileSystem vfsEntry : VirtualFileSystem.getKnown(true)) {
+				homePrimaryActions.add(vfsEntry.getNavigationButton(guiSetting));
 			}
 		}
 		

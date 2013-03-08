@@ -25,7 +25,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Library;
-import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
+import de.ipk.ag_ba.commands.experiment.hsm.DataExportHelper;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
@@ -140,7 +140,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			@Override
 			public Long saveUpdatedProperties() throws Exception {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
-				ActionDataExportToHsmFolder.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
+				DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
 				return indexFile.getLastModified();
 			}
 		};

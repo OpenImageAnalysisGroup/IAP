@@ -60,6 +60,16 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(ltl);
 		}
 		
+		boolean addLoadExportedVFSicon = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
+		if (addLoadExportedVFSicon &&
+				SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true)) {
+			NavigationAction loadedExportedVfsAction = null;
+			NavigationButton loadExportedVfsButton = new NavigationButton(loadedExportedVfsAction, "Load Dataset from Folder",
+					"img/ext/user-desktop.png",
+					"img/ext/user-desktop.png", src != null ? src.getGUIsetting() : guiSetting);
+			phenoDBcommands.add(loadExportedVfsButton);
+		}
+		
 		boolean lt = IAPoptions.getInstance().getBoolean("LT-DB", "show_icon", true);
 		if (lt) {
 			NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();

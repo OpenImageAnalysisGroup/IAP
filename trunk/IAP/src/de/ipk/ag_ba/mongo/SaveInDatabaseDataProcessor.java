@@ -33,7 +33,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 	protected void processData() {
 		try {
 			MyExperimentInfoPanel panel = new MyExperimentInfoPanel();
-			MongoDB m;
+			MongoDB m = null;
 			
 			mappingData = mappingData.clone();
 			mappingData.getHeader().setDatabaseId("");
@@ -64,7 +64,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 				} else {
 					try {
 						ExperimentReference er = new ExperimentReference(mappingData);
-						vfs.saveExperiment(er, new CommandLineBackgroundTaskStatusProvider(true));
+						vfs.saveExperiment(null, er, new CommandLineBackgroundTaskStatusProvider(true));
 						mappingData = null;
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);

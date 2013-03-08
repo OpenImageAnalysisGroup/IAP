@@ -12,9 +12,17 @@ import org.StringManipulationTools;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
+import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
@@ -111,9 +119,9 @@ public abstract class VirtualFileSystem {
 	
 	public abstract IOurl getIOurlFor(String fileName);
 	
-	public void saveExperiment(ExperimentReference experimentReference,
+	public void saveExperiment(MongoDB m, ExperimentReference experimentReference,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
-		ActionDataExportToVfs a = new ActionDataExportToVfs(null, experimentReference,
+		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
 				(VirtualFileSystemVFS2) this);
 		a.performActionCalculateResults(null);
 	}
@@ -151,4 +159,34 @@ public abstract class VirtualFileSystem {
 	public abstract long getFileLength(IOurl url) throws Exception;
 	
 	public abstract VfsFileObject getFileObjectFor(String fileName) throws Exception;
+	
+	public NavigationButton getNavigationButton(GUIsetting guiSetting) {
+		VirtualFileSystem vfsEntry = this;
+		Library lib = new Library();
+		String ico = IAPimages.getFolderRemoteClosed();
+		String ico2 = IAPimages.getFolderRemoteOpen();
+		String ico3 = IAPimages.getFolderRemoteClosed();
+		if (vfsEntry.getTransferProtocolName().contains("UDP")) {
+			ico = "img/ext/network-workgroup.png";
+			ico2 = "img/ext/network-workgroup-power.png";
+			ico3 = IAPimages.getFolderRemoteClosed();
+		}
+		if (vfsEntry.getDesiredIcon() != null) {
+			ico = vfsEntry.getDesiredIcon();
+			ico2 = vfsEntry.getDesiredIcon();
+			ico3 = vfsEntry.getDesiredIcon();
+		}
+		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
+				new String[] {},
+				IAPmain.loadIcon(ico),
+				IAPmain.loadIcon(ico2),
+				IAPmain.loadIcon(ico3));
+		ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+		for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
+			action.addAdditionalEntity(new NavigationButton(na, guiSetting));
+		}
+		NavigationButton vfsSrc = new NavigationButton(vfsEntry.getTargetName(), action, guiSetting);
+		vfsSrc.setToolTipText("Target: " + vfsEntry.getTargetPathName() + " via " + vfsEntry.getTransferProtocolName());
+		return vfsSrc;
+	}
 }

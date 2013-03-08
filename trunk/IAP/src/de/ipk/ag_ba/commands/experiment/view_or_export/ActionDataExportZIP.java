@@ -52,24 +52,21 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class ActionDataExport extends AbstractNavigationAction implements SpecialCommandLineSupport {
+public class ActionDataExportZIP extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private MongoDB m;
 	private ExperimentReference experimentReference;
-	private NavigationButton src;
 	private String fn;
 	private String mb;
 	private int files;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
 	
-	// private JTable table;
-	
-	public ActionDataExport(String tooltip) {
+	public ActionDataExportZIP(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionDataExport(MongoDB m, ExperimentReference experimentReference) {
+	public ActionDataExportZIP(MongoDB m, ExperimentReference experimentReference) {
 		this("Create ZIP file");
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -97,10 +94,10 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 		return IAPimages.saveAsArchive();
 	}
 	
-	private static WeakHashMap<String, ActionDataExport> validLinks2action = new WeakHashMap<String, ActionDataExport>();
+	private static WeakHashMap<String, ActionDataExportZIP> validLinks2action = new WeakHashMap<String, ActionDataExportZIP>();
 	
 	public static void setOutputStreamForAction(String uiid, OutputStream os) throws Exception {
-		ActionDataExport da = validLinks2action.get(uiid);
+		ActionDataExportZIP da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -110,7 +107,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 	}
 	
 	public static String getFileNameForAction(String uiid) throws Exception {
-		ActionDataExport da = validLinks2action.get(uiid);
+		ActionDataExportZIP da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -119,7 +116,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 	}
 	
 	public static Long getExperimentSizeForAction(String uiid) throws Exception {
-		ActionDataExport da = validLinks2action.get(uiid);
+		ActionDataExportZIP da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -128,7 +125,7 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 	}
 	
 	public static void waitForFinishedDownloadAction(String uiid) throws Exception {
-		ActionDataExport da = validLinks2action.get(uiid);
+		ActionDataExportZIP da = validLinks2action.get(uiid);
 		if (da == null)
 			throw new Exception("" +
 					"Action ID is unknown, please click data export command " +
@@ -146,7 +143,6 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		this.src = src;
 		this.errorMessage = null;
 		try {
 			OutputStream os;
@@ -360,50 +356,6 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
-		
-		// ArrayList<String> cols = new ArrayList<String>();
-		// cols.add("Plant");
-		// cols.add("Carrier");
-		// cols.add("Experiment");
-		// cols.add("Time");
-		// cols.add("Weight (before watering)");
-		// cols.add("Weight (after watering)");
-		// cols.add("Water");
-		// Object[] columns = cols.toArray();
-		//
-		// ExperimentInterface experiment = experimentReference.getData(m);
-		// ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
-		// for (SubstanceInterface su : experiment) {
-		// if (su.getName() == null)
-		// continue;
-		//
-		// if (su.getName().equals("weight_before")) {
-		//
-		// }
-		// if (su.getName().equals("water_weight")) {
-		//
-		// }
-		// if (su.getName().equals("water_amount")) {
-		//
-		// }
-		// for (ConditionInterface c : su) {
-		// for (SampleInterface sa : c) {
-		// for (Measurement m : sa) {
-		// ReportRow r = new ReportRow();
-		// r.setPlant(c.getConditionId() + ": " + c.getConditionName());
-		// r.setCarrier(m.getReplicateID());
-		// r.setExperiment(experiment.getHeader().getExperimentname());
-		// r.setTime(sa.getSampleTime());
-		// }
-		// }
-		// }
-		// }
-		//
-		// ArrayList<NumericMeasurementInterface> workload = new ArrayList<NumericMeasurementInterface>();
-		//
-		// Object[][] rowdata = new Object[rows.size()][cols.size()];
-		//
-		// table = new JTable(rowdata, columns);
 	}
 	
 	private void removeLostEntries() {
@@ -464,10 +416,6 @@ public class ActionDataExport extends AbstractNavigationAction implements Specia
 					return false;
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Output to " + f.getAbsolutePath());
-			// if (!f.canWrite()) {
-			// System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: Can't write to file (" + f.getAbsolutePath() + ")");
-			// return false;
-			// }
 			tso.setParam(0, new FileOutputStream(f));
 			startTime = System.currentTimeMillis();
 			ff = f;

@@ -23,6 +23,9 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 
+/**
+ * @author klukas
+ */
 public class ActionCopyExperiment extends AbstractNavigationAction implements NavigationAction {
 	
 	private MongoDB m;
@@ -96,6 +99,10 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 					res.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReferences.iterator().next(), hsmf), guiSetting));
 			}
 		
+		res.add(new NavigationButton(new ActionDataExportToUserSelectedFileSystemFolder(
+				"Copy dataset to a user-selected target folder",
+				m, experimentReferences), guiSetting));
+		
 		return res;
 	}
 	
@@ -106,7 +113,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/transfer2c.png";// IAPimages.getNetworkedServers();
+		return "img/ext/transfer2c.png";
 	}
 	
 	@Override
