@@ -123,6 +123,8 @@ public abstract class VirtualFileSystem {
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
 				(VirtualFileSystemVFS2) this);
+		if (statusProvider != null)
+			a.setStatusProvider(statusProvider);
 		a.performActionCalculateResults(null);
 	}
 	

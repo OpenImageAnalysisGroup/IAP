@@ -58,6 +58,11 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	}
 	
 	@Override
+	public String getDefaultTitle() {
+		return "Copy to file system...";
+	}
+	
+	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}
