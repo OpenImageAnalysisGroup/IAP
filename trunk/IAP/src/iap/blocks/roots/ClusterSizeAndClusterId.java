@@ -2,7 +2,8 @@ package iap.blocks.roots;
 
 public class ClusterSizeAndClusterId implements Comparable<ClusterSizeAndClusterId> {
 	
-	Integer id, size = 0;
+	public Integer id;
+	public Integer size = 0;
 	
 	@Override
 	public int compareTo(ClusterSizeAndClusterId o) {
