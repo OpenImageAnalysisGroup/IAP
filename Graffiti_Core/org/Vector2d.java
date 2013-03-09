@@ -98,4 +98,8 @@ public class Vector2d {
 		double ry = (this.x * Math.sin(n)) + (this.y * Math.cos(n));
 		return new Vector2d(rx, ry);
 	}
+	
+	public double angle(Vector2d end) {
+		return Math.atan2(end.y - y, end.x - x);
+	}
 }
