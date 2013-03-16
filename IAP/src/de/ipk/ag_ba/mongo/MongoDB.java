@@ -1719,7 +1719,7 @@ public class MongoDB {
 					Long oo = (Long) expref.get("lastHeaderUpdate");
 					res.setObject(oo);
 				} else {
-					System.out.println("CHECK UPDATE TIME: EXP INFO NOT FOUND");
+					// System.out.println("CHECK UPDATE TIME: EXP INFO NOT FOUND");
 					tso.setBval(0, true);
 				}
 			}
