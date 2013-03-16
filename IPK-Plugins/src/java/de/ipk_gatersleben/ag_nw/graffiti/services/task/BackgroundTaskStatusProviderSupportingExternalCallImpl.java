@@ -133,7 +133,7 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 			double progress = currPro
 					- firstProgressFineValue;
 			double speed = progress / timeForProgress;
-			double remainingTime = (100 - progress) / speed;
+			double remainingTime = (100 - currPro) / speed;
 			double fullTime = 100d / speed;
 			long finishTime = (long) (lastProgressUpdateTime + remainingTime);
 			
@@ -142,7 +142,7 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 			// + SystemAnalysis.getWaitTimeShort((long) remainingTime);
 			result = SystemAnalysis.getWaitTimeShort((long) remainingTime)
 					+ " of "
-					+ SystemAnalysis.getWaitTimeShort((long) fullTime) + " remain";
+					+ SystemAnalysis.getWaitTimeShort((long) fullTime) + " remain (" + SystemAnalysis.getCurrentTime(finishTime) + ")";
 		} else
 			if (currPro > 0.1) {
 				firstProgressFineTime = System.currentTimeMillis();

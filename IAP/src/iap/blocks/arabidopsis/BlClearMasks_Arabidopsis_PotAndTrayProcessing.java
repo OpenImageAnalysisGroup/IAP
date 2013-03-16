@@ -62,7 +62,7 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 			
 			FlexibleImage ir = input().images().ir();
 			if (ir != null) {
-				ir = ir.io().rotate(180).getImage();
+				ir = ir.io().getImage();
 				processCuttingOfImage(ir, FlexibleImageType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			}
 		}
