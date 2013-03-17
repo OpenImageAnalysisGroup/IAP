@@ -53,7 +53,6 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 							niceHostName = host + "<br>(up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
 						}
 						niceHostName = host + "<br>(up " + SystemAnalysis.getCurrentTime(Long.parseLong(hhh[1])) + ")";
-						
 					} catch (Exception err) {
 						// ignore unknown formatting
 					}
