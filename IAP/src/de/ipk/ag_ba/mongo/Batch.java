@@ -301,7 +301,8 @@ public class Batch {
 							if (addCnt < maxTasks)
 								for (DBObject dbo : collection.find(rm)
 										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1)).limit(maxTasks)) {
+										.sort(new BasicDBObject("part_cnt", 1))
+										.sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
@@ -325,7 +326,8 @@ public class Batch {
 									// new BasicDBObject("release", ir.toString())
 									)
 									.sort(new BasicDBObject("part_idx", 1))
-									.sort(new BasicDBObject("part_cnt", 1))) {
+									.sort(new BasicDBObject("part_cnt", 1))
+									.sort(new BasicDBObject("submission", 1))) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 									continue;
@@ -347,22 +349,12 @@ public class Batch {
 									}
 							}
 						}
-						// }
-						// check all tasks (regardless of release)
-						// for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
-						// BatchCmd batch = (BatchCmd) dbo;
-						// if (batch.getExperimentHeader() == null) {
-						// System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: found batch CMD with NULL experiment-header!");
-						// continue;
-						// }
-						// System.out.println("" + dbo);
-						// }
-						//
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
 								for (DBObject dbo : collection.find(sm)
 										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))) {
+										.sort(new BasicDBObject("part_cnt", 1))
+										.sort(new BasicDBObject("submission", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -382,7 +374,8 @@ public class Batch {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
 								for (DBObject dbo : collection.find(sm)
 										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))) {
+										.sort(new BasicDBObject("part_cnt", 1))
+										.sort(new BasicDBObject("submission", 1))) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
