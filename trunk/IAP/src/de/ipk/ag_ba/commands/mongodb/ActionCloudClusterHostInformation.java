@@ -58,7 +58,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 					int lastPipelineTimeMin = -1;
 					int lastPipelineTimeMax = -1;
 					int speed = 0;
-					HashMap<String, CloudHost> hl_filtered = new HashMap<String, CloudHost>();
+					HashMap<String, ArrayList<CloudHost>> hl_filtered = new HashMap<String, ArrayList<CloudHost>>();
 					for (CloudHost ch : hl) {
 						if (ch != null && ch.isClusterExecutionMode()) {
 							String ip = ch.getHostName();
@@ -66,33 +66,37 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 								continue;
 							if (ip.contains("_"))
 								ip = ip.substring(0, ip.indexOf("_"));
-							hl_filtered.put(ip, ch);
+							if (!hl_filtered.containsKey(ip))
+								hl_filtered.put(ip, new ArrayList<CloudHost>());
+							hl_filtered.get(ip).add(ch);
 						}
 					}
 					hostInfo = hl_filtered.size() + " nodes";
 					
-					for (CloudHost ch : hl_filtered.values()) {
-						if (ch != null && ch.isClusterExecutionMode()) {
-							lastStatus = ch.getTaskProgress();
-							int be = ch.getBlocksExecutedWithinLastMinute();
-							if (be >= 0)
-								blocksExecutedWithinLastMinute += be;
-							
-							int te = ch.getTasksWithinLastMinute();
-							if (te >= 0)
-								tasksWithinLastMinute += te;
-							int realizedSpeed = ch.getPipelinesPerHour();
-							if (realizedSpeed >= 0)
-								speed += realizedSpeed;
-							int pph = ch.getPipelineExecutedWithinCurrentHour();
-							if (pph >= 0)
-								pipelinesPerHour += pph;
-							int pt = ch.getLastPipelineTime();
-							if (pt >= 0) {
-								if (pt > lastPipelineTimeMax || lastPipelineTimeMax < 0)
-									lastPipelineTimeMax = pt;
-								if (pt < lastPipelineTimeMin || lastPipelineTimeMin < 0)
-									lastPipelineTimeMin = pt;
+					for (ArrayList<CloudHost> al : hl_filtered.values()) {
+						for (CloudHost ch : al) {
+							if (ch != null && ch.isClusterExecutionMode()) {
+								lastStatus = ch.getTaskProgress();
+								int be = ch.getBlocksExecutedWithinLastMinute();
+								if (be >= 0)
+									blocksExecutedWithinLastMinute += be;
+								
+								int te = ch.getTasksWithinLastMinute();
+								if (te >= 0)
+									tasksWithinLastMinute += te;
+								int realizedSpeed = ch.getPipelinesPerHour();
+								if (realizedSpeed >= 0)
+									speed += realizedSpeed;
+								int pph = ch.getPipelineExecutedWithinCurrentHour();
+								if (pph >= 0)
+									pipelinesPerHour += pph;
+								int pt = ch.getLastPipelineTime();
+								if (pt >= 0) {
+									if (pt > lastPipelineTimeMax || lastPipelineTimeMax < 0)
+										lastPipelineTimeMax = pt;
+									if (pt < lastPipelineTimeMin || lastPipelineTimeMin < 0)
+										lastPipelineTimeMin = pt;
+								}
 							}
 						}
 					}
@@ -176,7 +180,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Compute Cluster";
+		return "Compute Grid";
 	}
 	
 	@Override
