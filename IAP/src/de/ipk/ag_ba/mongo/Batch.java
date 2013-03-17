@@ -320,11 +320,8 @@ public class Batch {
 								}
 						}
 						int claimed = 0;
-						// for (IAP_RELEASE ir : IAP_RELEASE.values()) {
 						if (addCnt < maxTasks && claimed < maxTasks) {
-							loop: for (DBObject dbo : collection.find(
-									// new BasicDBObject("release", ir.toString())
-									)
+							loop: for (DBObject dbo : collection.find()
 									.sort(new BasicDBObject("part_idx", 1))
 									.sort(new BasicDBObject("part_cnt", 1))
 									.sort(new BasicDBObject("submission", 1))) {
