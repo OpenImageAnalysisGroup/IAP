@@ -15,7 +15,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -190,12 +189,9 @@ public class BatchCmd extends BasicDBObject {
 		return getString("owner");
 	}
 	
-	public static ArrayList<DBObject> getRunstatusMatchers(CloudAnalysisStatus starting) {
-		ArrayList<DBObject> res = new ArrayList<DBObject>();
-		// for (IAP_RELEASE ir : IAP_RELEASE.values())
-		res.add(new BasicDBObject("runstatus", starting.toString())
-				// .append("release", ir.toString())
-				);
+	public static ArrayList<BasicDBObject> getRunstatusMatchers(CloudAnalysisStatus starting) {
+		ArrayList<BasicDBObject> res = new ArrayList<BasicDBObject>();
+		res.add(new BasicDBObject("runstatus", starting.toString()));
 		return res;
 	}
 	
