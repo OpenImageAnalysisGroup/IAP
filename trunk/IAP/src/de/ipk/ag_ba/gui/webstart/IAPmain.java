@@ -615,7 +615,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void errorCheck() {
-		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error",
+		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error (" + IAPmain.getRunMode() + ")",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
 		int errNum = SystemOptions.getInstance().getInteger(
 				"IAP", "Debug: System.Exit return value in case of error", 1);
