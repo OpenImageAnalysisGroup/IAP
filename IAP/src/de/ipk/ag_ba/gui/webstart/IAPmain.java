@@ -623,6 +623,11 @@ public class IAPmain extends JApplet {
 			Thread.dumpStack();
 			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">INFO: System.exit because of reported error ('Settings > IAP > Debug - System.Exit in case of error' is enabled)");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				//
+			}
 			System.exit(errNum);
 		}
 	}
