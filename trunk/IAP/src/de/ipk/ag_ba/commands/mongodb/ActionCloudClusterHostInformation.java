@@ -51,13 +51,14 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			@Override
 			public String getCurrentStatusMessage1() {
 				try {
-					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(5 * 60 * 1000);
+					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(10 * 1000);// 5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
 					int tasksWithinLastMinute = 0;
 					int pipelinesPerHour = 0;
 					int lastPipelineTimeMin = -1;
 					int lastPipelineTimeMax = -1;
 					int speed = 0;
+					int procCnt = 0;
 					HashMap<String, ArrayList<CloudHost>> hl_filtered = new HashMap<String, ArrayList<CloudHost>>();
 					for (CloudHost ch : hl) {
 						if (ch != null && ch.isClusterExecutionMode()) {
@@ -69,9 +70,10 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 							if (!hl_filtered.containsKey(ip))
 								hl_filtered.put(ip, new ArrayList<CloudHost>());
 							hl_filtered.get(ip).add(ch);
+							procCnt++;
 						}
 					}
-					hostInfo = hl_filtered.size() + " nodes";
+					hostInfo = hl_filtered.size() + " nodes, " + procCnt + " instances";
 					
 					for (ArrayList<CloudHost> al : hl_filtered.values()) {
 						for (CloudHost ch : al) {
