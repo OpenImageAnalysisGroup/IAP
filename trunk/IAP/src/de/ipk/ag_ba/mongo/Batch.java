@@ -291,6 +291,7 @@ public class Batch {
 					String hostName;
 					try {
 						DBCollection collection = db.getCollection("schedule");
+						collection.setObjectClass(BatchCmd.class);
 						for (BasicDBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.IN_PROGRESS)) {
 							rm.append("lastupdate", new BasicDBObject("$lt", System.currentTimeMillis() - 30 * 60000));
 							// after 30 minutes with no update, the status of the batch is changed from in_progress to scheduled
@@ -306,7 +307,6 @@ public class Batch {
 						hostName = SystemAnalysisExt.getHostName();
 						if (MongoDB.getEnsureIndex())
 							collection.ensureIndex("release");
-						collection.setObjectClass(BatchCmd.class);
 						boolean added = false;
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
