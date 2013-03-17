@@ -13,7 +13,7 @@ public class ResourceIOManager {
 	
 	private static ResourceIOManager instance;
 	
-	private static ResourceIOManager getInstance() {
+	public synchronized static ResourceIOManager getInstance() {
 		if (instance == null) {
 			instance = new ResourceIOManager();
 			registerIOHandler(new FileSystemHandler());
@@ -31,7 +31,7 @@ public class ResourceIOManager {
 		handlers = new LinkedHashSet<ResourceIOHandler>();
 	}
 	
-	public static void registerIOHandler(ResourceIOHandler handler) {
+	public synchronized static void registerIOHandler(ResourceIOHandler handler) {
 		ResourceIOHandler mh = getHandlerFromPrefix(handler.getPrefix());
 		if (mh != null) {
 			;// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IO Handler with Prefix " + handler.getPrefix() + " is already registered.");
@@ -39,7 +39,7 @@ public class ResourceIOManager {
 			getInstance().handlers.add(handler);
 	}
 	
-	public static void removeIOHandler(ResourceIOHandler handler) {
+	public synchronized static void removeIOHandler(ResourceIOHandler handler) {
 		getInstance().handlers.remove(handler);
 	}
 	
@@ -162,14 +162,10 @@ public class ResourceIOManager {
 		return written;
 	}
 	
-	public static ResourceIOHandler getHandlerFromPrefix(String prefix) {
+	public synchronized static ResourceIOHandler getHandlerFromPrefix(String prefix) {
 		for (ResourceIOHandler mh : getInstance().handlers)
 			if (mh.getPrefix().startsWith(prefix))
 				return mh;
-		
-		// if (prefix.contains("_"))
-		// return getHandlerFromPrefix(prefix.substring(0, prefix.indexOf("_")));
-		// else
 		return null;
 	}
 	
@@ -205,5 +201,9 @@ public class ResourceIOManager {
 			is.reset();
 			return is;
 		}
+	}
+	
+	public synchronized LinkedHashSet<ResourceIOHandler> getHandlers() {
+		return new LinkedHashSet<ResourceIOHandler>(handlers);
 	}
 }

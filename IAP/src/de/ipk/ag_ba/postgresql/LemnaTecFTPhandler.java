@@ -73,27 +73,6 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
 				VfsFileObject fo = VfsFileObjectUtil.createVfsFileObject(VfsFileProtocol.SFTP, scpHost, dir + "/" + fn, scpUser, scpPassword);
 				return ResourceIOManager.getInputStreamMemoryCached(fo.getInputStream());
-				// InputStream iss = null;
-				// // synchronized (PREFIX) {
-				// ChannelSftp c = getNewChannel(scpUser, scpPassword, scpHost);
-				// c.getSession().setTimeout(60 * 60 * 1000); // set timeout of 60 minutes
-				// String detail = url.getDetail();
-				// detail = scpLocalFolder + detail.split("/", 2)[1];
-				// String dir = detail.substring(0, detail.lastIndexOf("/"));
-				// System.out.println(SystemAnalysis.getCurrentTime() + ">SCP change directory: " + dir);
-				// c.cd(dir);
-				// String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
-				// InputStream is = c.get(fn);
-				// System.out.println(SystemAnalysis.getCurrentTime() + ">SCP request initiated: " + fn);
-				// iss = ResourceIOManager.getInputStreamMemoryCached(is);
-				// System.out.println(SystemAnalysis.getCurrentTime() + ">SCP request finished: " + fn);
-				// // }
-				//
-				// c.getSession().disconnect();
-				//
-				// c.disconnect();
-				//
-				// return iss;
 			} else {
 				boolean advancedFTP = true;
 				
