@@ -1022,10 +1022,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					resFluo = pipelineResult.fluo();
 					resNir = pipelineResult.nir();
 					resIr = pipelineResult.ir();
+					
+					boolean multiTray = options.getTrayCnt() > 1;
+					ImageData inVis2 = inVis == null ? null : (ImageData) inVis.clone(inVis.getParentSample());
+					ImageData inFluo2 = inFluo == null ? null : (ImageData) inFluo.clone(inFluo.getParentSample());
+					ImageData inNir2 = inNir == null ? null : (ImageData) inNir.clone(inNir.getParentSample());
+					ImageData inIr2 = inIr == null ? null : (ImageData) inIr.clone(inIr.getParentSample());
+					if (multiTray) {
+						for (ImageData img : new ImageData[] { inVis2, inFluo2, inNir2, inIr2 })
+							if (img != null)
+								img.setQualityAnnotation(img.getQualityAnnotation() + "_" + key);
+					}
+					
 					analysisResults = imageProcessor.getSettings();
 					waitThreads.addAll(processAndOrSaveResultImages(
 							key, options.getTrayCnt(),
-							id, inVis, inFluo, inNir, inIr,
+							id, inVis2, inFluo2, inNir2, inIr2,
 							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority));
 				}
 			}

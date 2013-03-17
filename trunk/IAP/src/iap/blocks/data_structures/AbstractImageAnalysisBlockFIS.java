@@ -166,7 +166,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: ERROR IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug: System.Exit in case of pipeline error",
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of pipeline error",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE))
 			System.exit(SystemOptions.getInstance().getInteger(
 					"IAP", "Debug: System.Exit return value in case of pipeline error", 1));

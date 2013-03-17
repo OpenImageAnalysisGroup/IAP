@@ -163,7 +163,7 @@ public class IAPmain extends JApplet {
 		if (getRunMode() == IAPrunMode.SWING_APPLET)
 			ReleaseInfo.setRunningAsApplet(this);
 		
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug: System.Exit in case of error",
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE)) {
 			ErrorMsg.setCustomErrorHandler(new ErrorMessageProcessor() {
 				@Override
@@ -615,14 +615,14 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void errorCheck() {
-		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug: System.Exit in case of error",
+		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
 		int errNum = SystemOptions.getInstance().getInteger(
 				"IAP", "Debug: System.Exit return value in case of error", 1);
 		if (errClose) {
 			Thread.dumpStack();
 			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">INFO: System.exit because of reported error ('Settings > IAP > Debug: System.Exit in case of error' is enabled)");
+					+ ">INFO: System.exit because of reported error ('Settings > IAP > Debug - System.Exit in case of error' is enabled)");
 			System.exit(errNum);
 		}
 	}

@@ -108,6 +108,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	
 	private String filterBadChars(String string) {
 		String s = StringManipulationTools.UnicodeToURLsyntax(string);
+		s = StringManipulationTools.stringReplace(s, "%167", "§");
 		s = StringManipulationTools.stringReplace(s, "%32", " ");
 		s = StringManipulationTools.stringReplace(s, "%95", "_");
 		s = StringManipulationTools.stringReplace(s, "%40", "(");

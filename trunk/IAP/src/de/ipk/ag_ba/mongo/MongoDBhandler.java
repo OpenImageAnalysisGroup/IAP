@@ -12,12 +12,15 @@ import java.io.PushbackInputStream;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
+import org.ErrorMsg;
 import org.ObjectRef;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.mongodb.DB;
@@ -26,6 +29,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 
 public class MongoDBhandler extends AbstractResourceIOHandler {
 	private final String prefix;
@@ -66,6 +70,31 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			
 			@Override
 			public void run() {
+				boolean getRemoteLTdataNotSavedInMongo = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Load missing input from LT storage", true);
+				if (getRemoteLTdataNotSavedInMongo) {
+					try {
+						if (url.getDetail().indexOf(".") > 0) {
+							for (ResourceIOHandler rh : ResourceIOManager.getInstance().getHandlers())
+								if (rh instanceof LemnaTecFTPhandler) {
+									InputStream is;
+									IOurl url2 = new IOurl(url);
+									url2.setPrefix(rh.getPrefix());
+									is = rh.getInputStream(url2);
+									if (is != null) {
+										if (is != null) {
+											if (is instanceof MyByteArrayInputStream) {
+												VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());
+											}
+											or.setObject(is);
+											return;
+										}
+									}
+								}
+						}
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
 				for (String fs : MongoGridFS.getFileCollections()) {
 					InputStream vfs_is = m.getVFSinputStream(fs, url.getDetail());
 					if (vfs_is != null) {
