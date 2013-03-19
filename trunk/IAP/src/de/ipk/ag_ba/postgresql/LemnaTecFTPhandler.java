@@ -8,6 +8,7 @@ package de.ipk.ag_ba.postgresql;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -61,10 +62,26 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
 		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "LemnaTec");
 		
+		boolean useLocalCopyIfAvail = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use local file access if available", false);
+		String localCopyPath = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//Local copy or mount point", "Z:\\");
+		
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
 		}
 		
+		try {
+			if (useLocalCopyIfAvail) {
+				String detail = url.getDetail();
+				detail = detail.split("/", 2)[1];
+				String dir = detail.substring(0, detail.lastIndexOf("/"));
+				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
+				File f = new File(localCopyPath + dir + File.separator + fn);
+				if (f.exists())
+					return new FileInputStream(f);
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not access local file copy for LT file transfer. Error: " + e.getMessage());
+		}
 		if (url.isEqualPrefix(getPrefix())) {
 			if (useSCP) {
 				String detail = url.getDetail();
