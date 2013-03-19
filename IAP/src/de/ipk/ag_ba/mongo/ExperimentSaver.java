@@ -986,28 +986,28 @@ public class ExperimentSaver implements RunnableOnDB {
 		// BackgroundTaskHelper.lockGetSemaphore(image.getURL() != null ? image.getURL().getPrefix() : "in", 2);
 		byte[] isMain = null;
 		byte[] isLabel = null;
-		boolean skipMainSaving = false;
-		boolean skipLabelSaving = false;
+		// boolean skipMainSaving = false;
+		// boolean skipLabelSaving = false;
 		String skipMainUrl = image.getURL() + "";
 		String skipLabelUrl = image.getLabelURL() + "";
 		try {
 			try {
-				synchronized (savedUrls) {
-					if (savedUrls.contains(skipMainUrl))
-						skipMainSaving = true;
-				}
-				isMain = image.getURL() != null && !skipMainSaving
-						? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed()
+				// synchronized (savedUrls) {
+				// if (savedUrls.contains(skipMainUrl))
+				// skipMainSaving = true;
+				// }
+				isMain = image.getURL() != null // && !skipMainSaving
+				? ResourceIOManager.getInputStreamMemoryCached(image.getURL()).getBuffTrimmed()
 						: null;
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Error: No Inputstream for " + image.getURL() + ". " + e.getMessage() + " // " + SystemAnalysis.getCurrentTime(), e);
 			}
 			try {
 				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL())) {
-					if (savedUrls.contains(skipLabelUrl))
-						skipLabelSaving = true;
-					isLabel = image.getLabelURL() != null && !skipLabelSaving
-							? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed()
+					// if (savedUrls.contains(skipLabelUrl))
+					// skipLabelSaving = true;
+					isLabel = image.getLabelURL() != null // && !skipLabelSaving
+					? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed()
 							: null;
 				}
 			} catch (Exception e) {
@@ -1059,17 +1059,13 @@ public class ExperimentSaver implements RunnableOnDB {
 			image.getURL().setPrefix(mh.getPrefix());
 			image.getURL().setDetail(hashMain);
 		}
-		Boolean fffLabel = null;
+		Boolean fffLabel = hashLabel != null ? m.getHandler().hasInputStreamForHash(hashLabel) : null;
 		if (hashLabel != null && image.getLabelURL() != null) {
-			fffLabel = m.getHandler().hasInputStreamForHash(hashLabel);
-		}
+			image.getLabelURL().setPrefix(mh.getPrefix());
+			image.getLabelURL().setDetail(hashLabel);
+		} else
+			System.out.println("UxUU");
 		
-		if (hashLabel != null && image.getLabelURL() != null) {
-			if (fffLabel != null) {
-				image.getLabelURL().setPrefix(mh.getPrefix());
-				image.getLabelURL().setDetail(hashLabel);
-			}
-		}
 		if (hashLabel == null && skipProcessingOfLabel)
 			fffLabel = true;
 		else

@@ -1679,16 +1679,20 @@ public class MongoDB {
 				} catch (Exception e) {
 					// ignore
 				}
+				boolean r = false;
 				for (VirtualFileSystem vfs : vfs_file_storage) {
 					if (vfs == lastHit.get(bucket))
 						continue;
 					IOurl url = vfs.getIOurlFor(bucket + "/" + detail);
 					try {
-						return vfs.getFileLength(url) > 0;
+						r = vfs.getFileLength(url) > 0;
+						if (r)
+							return r;
 					} catch (Exception e) {
-						return false;
+						// ignore
 					}
 				}
+				return r;
 			}
 		}
 		return false;
