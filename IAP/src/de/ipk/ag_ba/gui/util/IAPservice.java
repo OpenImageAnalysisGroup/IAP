@@ -69,6 +69,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.AttributeComponent;
 import org.graffiti.plugin.view.GraphElementComponent;
 import org.graffiti.plugin.view.View;
@@ -94,6 +95,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
@@ -1068,6 +1070,7 @@ public class IAPservice {
 	}
 	
 	public static void monitorExperimentDataProgress() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
+		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
 		System.out.println(SystemAnalysis.getCurrentTime() + ">START OBSERVING EXPERIMENT PROGRESS...");
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
@@ -1301,6 +1304,7 @@ public class IAPservice {
 												+ ehi.getExperimentName()
 												+ " TO " + wc.getMails());
 										int minMin = SystemOptions.getInstance().getInteger("Watch-Service", "Startup-Email-Delay-min", 15);
+										minMin = -1;
 										if (System.currentTimeMillis() - startTime < minMin * 60 * 1000)
 											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST " + minMin + " MINUTES OF START NO MAIL WILL BE SEND");
 										else
@@ -1315,7 +1319,7 @@ public class IAPservice {
 															"No new data found for experiment " + ehi.getExperimentName()
 															+ ".\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2);
+													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2, ehi);
 									}
 									outOfDateExperiments.add(ehi.getExperimentName());
 								} else {
@@ -1337,7 +1341,7 @@ public class IAPservice {
 															"New data has been found for experiment " + ehi.getExperimentName()
 															+ ". Status is now OK!\n\n\nExperiment details:\n\n" +
 															StringManipulationTools.stringReplace(ehi.toStringLines(), "<br>", "\n"),
-													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2);
+													imageSrc1, fileName1, contentType1, imageSrc2, fileName2, contentType2, ehi);
 										
 									}
 									outOfDateExperiments.remove(ehi.getExperimentName());
