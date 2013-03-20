@@ -1304,7 +1304,6 @@ public class IAPservice {
 												+ ehi.getExperimentName()
 												+ " TO " + wc.getMails());
 										int minMin = SystemOptions.getInstance().getInteger("Watch-Service", "Startup-Email-Delay-min", 15);
-										minMin = -1;
 										if (System.currentTimeMillis() - startTime < minMin * 60 * 1000)
 											System.out.println(SystemAnalysis.getCurrentTime() + ">WITHIN THE FIRST " + minMin + " MINUTES OF START NO MAIL WILL BE SEND");
 										else
