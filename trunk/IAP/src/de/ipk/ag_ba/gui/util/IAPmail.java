@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -21,15 +22,27 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.AttributeHelper;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.HttpBasicAuth;
 import org.ReleaseInfo;
 import org.Screenshot;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 
 public class IAPmail {
 	
@@ -39,11 +52,9 @@ public class IAPmail {
 	public void sendEmail(
 			String aToEmailAddr, String aSubject,
 			String aBody, final String optImageSource1, final String fileName1, final String contentType1,
-			final String optImageSource2, final String fileName2, final String contentType2
+			final String optImageSource2, final String fileName2, final String contentType2,
+			final ExperimentHeaderInterface optEHI
 			) {
-		// Here, no Authenticator argument is used (it is null).
-		// Authenticators are used to prompt the user for user
-		// name and password.
 		Session session = Session.getDefaultInstance(fMailServerConfig, null);
 		MimeMessage message = new MimeMessage(session);
 		try {
@@ -59,10 +70,10 @@ public class IAPmail {
 			Multipart mp = new MimeMultipart();
 			if (optImageSource1 != null && fileName1 != null && contentType1 != null && !optImageSource1.isEmpty() && !fileName1.isEmpty()
 					&& !contentType1.isEmpty())
-				addWebCamScreenshotToMail(aBody, optImageSource1, fileName1, message, mp, contentType1);
+				addImageOrWebCamScreenshotToMail(aBody, optImageSource1, fileName1, message, mp, contentType1, false);
 			if (optImageSource2 != null && fileName2 != null && contentType2 != null && !optImageSource2.isEmpty() && !fileName2.isEmpty()
 					&& !contentType2.isEmpty())
-				addWebCamScreenshotToMail(aBody, optImageSource2, fileName2, message, mp, contentType2);
+				addImageOrWebCamScreenshotToMail(aBody, optImageSource2, fileName2, message, mp, contentType2, false);
 			try {
 				boolean takeScreenShot = SystemOptions.getInstance().getBoolean("Watch-Service", "Include Screenshot in e-Mail", true);
 				if (takeScreenShot) {
@@ -74,14 +85,76 @@ public class IAPmail {
 				System.err.println("Could not create desktop screenshot!");
 				e.printStackTrace();
 			}
+			String errMsg = "";
+			StringBuilder latestNumericData = new StringBuilder();
+			if (optEHI != null) {
+				try {
+					ExperimentInterface e = new ExperimentReference(optEHI).getData(((BackgroundTaskStatusProviderSupportingExternalCall) null));
+					long newestSnapshotTime = -1;
+					ArrayList<SampleInterface> newestSamples = new ArrayList<SampleInterface>();
+					for (SubstanceInterface s : e) {
+						for (ConditionInterface ci : s) {
+							for (SampleInterface si : ci) {
+								if (si.getSampleFineTimeOrRowId() > newestSnapshotTime) {
+									newestSamples.clear();
+									newestSamples.add(si);
+									newestSnapshotTime = si.getSampleFineTimeOrRowId();
+								} else {
+									if (si.getSampleFineTimeOrRowId() == newestSnapshotTime) {
+										newestSamples.add(si);
+									}
+								}
+							}
+						}
+					}
+					if (newestSamples.size() > 0) {
+						latestNumericData.append("Most recent measurements (" + SystemAnalysis.getCurrentTime(newestSnapshotTime) + "):\n");
+						for (SampleInterface ns : newestSamples) {
+							int imgCnt = 0;
+							for (NumericMeasurementInterface nmi : ns) {
+								if (nmi instanceof BinaryMeasurement) {
+									if (imgCnt == 0) {
+										BinaryMeasurement bm = (BinaryMeasurement) nmi;
+										String attachmentName = StringManipulationTools.getFileSystemName(
+												SystemAnalysis.getCurrentTime(newestSnapshotTime)
+														+ "__"
+														+ nmi.getParentSample().getParentCondition().getParentSubstance().getName()
+														+ "__"
+														+ bm.getURL().getFileName());
+										int size = addImageOrWebCamScreenshotToMail(aBody, bm.getURL().toString(),
+												attachmentName, message, mp, "image/png", true);
+										int sizeKB = size / 1024;
+										latestNumericData
+												.append("Image of "
+														+ nmi.getQualityAnnotation()
+														+ ": "
+														+ nmi.getParentSample().getParentCondition().getParentSubstance().getName()
+														+ ", input size"
+														+ " = "
+														+ sizeKB
+														+ " KB, to save e-mail space the image has been resized (if larger than 640x480) and is included as attachment, filename = "
+														+ attachmentName + "\n");
+									}
+									imgCnt++;
+								} else {
+									latestNumericData.append("Numeric value for "
+											+ nmi.getQualityAnnotation()
+											+ ": "
+											+ nmi.getParentSample().getParentCondition().getParentSubstance().getName()
+											+ " = " + nmi.getValue() + " " + nmi.getUnit() + "\n");
+								}
+							}
+						}
+					}
+				} catch (Exception e) {
+					errMsg = "Could not retrieve or attach experiment images. Error: " + e;
+				}
+			}
+			
 			MimeBodyPart txt = new MimeBodyPart();
-			txt.setText("\n" + aBody);
+			txt.setText("\n" + aBody + "\n" + errMsg + "\n\n" + latestNumericData);
 			mp.addBodyPart(txt);
 			message.setContent(mp);
-			
-			// } else {
-			// message.setText(aBody);
-			// }
 			
 			Transport.send(message);
 		} catch (MessagingException ex) {
@@ -89,16 +162,45 @@ public class IAPmail {
 		}
 	}
 	
-	private void addWebCamScreenshotToMail(
+	private int addImageOrWebCamScreenshotToMail(
 			String aBody,
 			final String optImageSource,
 			final String fileName,
 			MimeMessage message, Multipart mp,
-			final String contentType)
+			final String contentType, boolean resize)
 			throws MessagingException {
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		if (optImageSource != null && !optImageSource.isEmpty()) {
 			// load remote image and add it to the mail
 			try {
+				InputStream is = null;
+				try {
+					if (optImageSource.contains("@")) {
+						String userPass = optImageSource.split("@")[0];
+						String urlStr = optImageSource.split("@")[1];
+						String user = userPass.split(":")[0];
+						String pass = userPass.split(":")[1];
+						is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
+					} else
+						is = new IOurl(optImageSource).getInputStream();
+					is = ResourceIOManager.getInputStreamMemoryCached(is);
+					tso.setInt(((MyByteArrayInputStream) is).getCount());
+					// SystemAnalysis.simulateHeadless = false;
+					if (resize) {
+						FlexibleImage img = new FlexibleImage(is);
+						if (img.getWidth() > 640 || img.getHeight() > 480) {
+							double sc1 = 640d / img.getWidth();
+							double sc2 = 480d / img.getHeight();
+							double sc = Math.min(sc1, sc2);
+							is = img.io().resize(sc, sc).getImage().getAsPNGstream();
+						}
+					}
+				} catch (Exception e) {
+					throw new IOException(e.getMessage());
+				}
+				
+				final InputStream fis = is;
+				
 				MimeBodyPart img = new MimeBodyPart();
 				img.setDataHandler(new DataHandler(new DataSource() {
 					
@@ -115,20 +217,7 @@ public class IAPmail {
 					
 					@Override
 					public InputStream getInputStream() throws IOException {
-						try {
-							InputStream is;
-							if (optImageSource.contains("@")) {
-								String userPass = optImageSource.split("@")[0];
-								String urlStr = optImageSource.split("@")[1];
-								String user = userPass.split(":")[0];
-								String pass = userPass.split(":")[1];
-								is = HttpBasicAuth.downloadFileWithAuth(urlStr, user, pass);
-							} else
-								is = new IOurl(optImageSource).getInputStream();
-							return is;
-						} catch (Exception e) {
-							throw new IOException(e.getMessage());
-						}
+						return ((MyByteArrayInputStream) fis).getNewStream();
 					}
 					
 					@Override
@@ -139,9 +228,12 @@ public class IAPmail {
 				img.setFileName(StringManipulationTools.getFileSystemName(fileName));
 				mp.addBodyPart(img);
 			} catch (Exception e) {
-				message.setText(aBody + "\n\nWebcam-Image could not be loaded. Eventually the Webcam is turned off.\nError: " + e.getMessage());
+				message.setText(aBody + "\n\nImage could not be loaded. " +
+						"Eventually the image source can not be read or the webcam is turned off.\nError: "
+						+ e.getMessage());
 			}
 		}
+		return tso.getInt();
 	}
 	
 	private void createScreenshotAndAttachToMail(Multipart mp) throws AWTException, MessagingException, IOException {
