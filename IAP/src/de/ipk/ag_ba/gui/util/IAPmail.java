@@ -108,7 +108,7 @@ public class IAPmail {
 						}
 					}
 					if (newestSamples.size() > 0) {
-						latestNumericData.append("Most recent measurements (" + SystemAnalysis.getCurrentTime(newestSnapshotTime) + "):\n");
+						latestNumericData.append("Most recent measurements (" + SystemAnalysis.getCurrentTime(newestSnapshotTime) + "):\n\n");
 						for (SampleInterface ns : newestSamples) {
 							int imgCnt = 0;
 							for (NumericMeasurementInterface nmi : ns) {
