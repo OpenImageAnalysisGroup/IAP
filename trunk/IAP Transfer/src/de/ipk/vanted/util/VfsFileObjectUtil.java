@@ -37,6 +37,7 @@ public class VfsFileObjectUtil {
 			throw new Exception("Host name can not be empty!");
 		}
 		boolean authOK = true;
+		boolean local = false;
 		String con = "file://";
 		switch (protocol) {
 			case FTP:
@@ -60,6 +61,7 @@ public class VfsFileObjectUtil {
 			default:
 				con = "file://";
 				authOK = false;
+				local = true;
 				break;
 		}
 		if (authOK && StringUtils.isNotBlank(username)) {
@@ -69,7 +71,8 @@ public class VfsFileObjectUtil {
 			}
 			con += "@";
 		}
-		con += host;
+		if (!local)
+			con += host;
 		
 		if (port != null) {
 			con += ":" + port;
@@ -80,7 +83,7 @@ public class VfsFileObjectUtil {
 		FileSystemOptions opts = new FileSystemOptions();
 		// Timeout is count by Milliseconds
 		SftpFileSystemConfigBuilder.getInstance().setTimeout(opts, SystemOptions.getInstance().getInteger("VFS", "timeout_s", 60) * 1000);
-		if (StringUtils.isNotBlank(username)) {
+		if (authOK && StringUtils.isNotBlank(username)) {
 			StaticUserAuthenticator auth = new StaticUserAuthenticator(
 					username, password, null);
 			DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(
