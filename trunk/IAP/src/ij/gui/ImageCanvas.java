@@ -38,6 +38,8 @@ import java.awt.image.IndexColorModel;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /** This is a Canvas used to display images in a Window. */
@@ -999,9 +1001,10 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		float[] hsv = new float[3];
 		Color.RGBtoHSB(r, g, b, hsv);
 		
-		IJ.showStatus("red=" + c.getRed() + ", green=" + c.getGreen() + ", blue=" + c.getBlue() + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H=" + hsv[0]
-				+ ", S="
-				+ hsv[1] + ", V=" + hsv[2]);
+		IJ.showStatus("r" + c.getRed() + "|g" + c.getGreen() + "|b" + c.getBlue() + "|L" + Li + "|a" + ai + "|b" + bi
+				+ "|H" + StringManipulationTools.formatNumber(hsv[0], 3)
+				+ "|S" + StringManipulationTools.formatNumber(hsv[1], 3)
+				+ "|V" + StringManipulationTools.formatNumber(hsv[2], 3));
 	}
 	
 	private void setForegroundColor(Color c) {
