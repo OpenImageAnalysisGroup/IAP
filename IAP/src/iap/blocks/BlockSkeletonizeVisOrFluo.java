@@ -58,9 +58,9 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 					// .closing(3, 3)
 					// .erode()
 					.border(5)
-						.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
+					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
 					.blur(getDouble("Blur-Vis", 1))
-						.getImage().show("vis", debug);
+					.getImage().show("vis", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
@@ -75,8 +75,8 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
 			FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
 					.dilate(getInt("Dilate", 2))
-							.blur(getInt("Blur", 1))
-							.getImage().show("vis", debug);
+					.blur(getInt("Blur", 1))
+					.getImage().show("vis", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
@@ -102,9 +102,9 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 			FlexibleImage viswork = fluo.copy().io()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 1))
-						.dilate(getInt("Dilate-Cnt-Fluo", 1))
-						.blur(getDouble("Blur-Fluo", 4))
-						.getImage().show("fluo", debug);
+					.dilate(getInt("Dilate-Cnt-Fluo", 1))
+					.blur(getDouble("Blur-Fluo", 4))
+					.getImage().show("fluo", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
@@ -121,7 +121,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			FlexibleImage viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
 					// .erode(1)
 					.dilate(getInt("Dilate-Cnt-Fluo", 4))
-						// .blur(1)
+					// .blur(1)
 					.getImage().show("fluo", debug);
 			
 			if (viswork != null)
@@ -147,7 +147,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();
 		int w = vis.getWidth();
-		int h = vis.getHeight();
+		int height = vis.getHeight();
 		
 		int leafcount = skel2d.endlimbs.size();
 		// System.out.println("A Leaf count: " + leafcount);
@@ -162,19 +162,37 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		int bloomLimbCount = 0;
 		if (getBoolean("Detect Bloom", false)) {
-			FlexibleImage probablyBloomFluo = skel2d.calcProbablyBloomImage(fluo.io().blur(getInt("bloom-blur", 10)).getImage()
-					.show("blur fluo for bloom detection", debug), 0.075f, h, 20).io().// blur(3).
-					thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 10), Color.BLACK.getRGB()).getImage();
-			
-			probablyBloomFluo = probablyBloomFluo.io().show("BEFORE", false).medianFilter32Bit().invert().removeSmallClusters(true, null).
-					erode(getInt("bloom-erode-cnt", 4)).invert().
-					getImage();
-			
+			FlexibleImage proc = fluo;
+			FlexibleImage probablyBloomFluo = null;
+			if (!getBoolean("consider fluo image for bloom detection", true)) {
+				proc = vis.copy();
+				probablyBloomFluo = proc.io().filterRemainHSV(
+						getDouble("bloom hue min", 0), getDouble("bloom hue max", 1),
+						getDouble("bloom sat min", 0), getDouble("bloom sat max", 1),
+						getDouble("bloom val min", 0), getDouble("bloom val max", 1)
+						).show("bloom filtered by HSV", getBoolean("debug bloom detection HSV filter", false))
+						.medianFilter32Bit()
+						.erode(getInt("bloom-erode-cnt", 0))
+						// .invert()
+						// .removeSmallClusters(true, null).invert().invert()
+						// .erode(getInt("bloom-dilate-cnt", 4))
+						.getImage().show("bloom filtered by HSV and then cleaned", getBoolean("debug bloom detection HSV filter", false));
+			} else {
+				probablyBloomFluo = skel2d.calcProbablyBloomImage(
+						proc.io().blur(getInt("bloom-blur", 10)).getImage().show("blur for bloom detection", debug),
+						getDouble("bloom hue", 0.075f)).io().// blur(3).
+						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
+				
+				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).medianFilter32Bit().invert()
+						.removeSmallClusters(true, null).
+						erode(getInt("bloom-erode-cnt", 4)).invert().
+						getImage();
+			}
 			if (debug2) {
 				FlexibleImageStack fis = new FlexibleImageStack();
-				fis.addImage("PROB", probablyBloomFluo);
-				fis.addImage("FLUO", fluo);
-				fis.print("CHECK THIS");
+				fis.addImage("probably bloom area", probablyBloomFluo);
+				fis.addImage("input image", proc);
+				fis.print("bloom area");
 			}
 			
 			HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
@@ -190,15 +208,15 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		if (specialLeafWidthCalculations) {
 			ArrayList<Point> branchPoints = skel2d.getBranches();
 			if (branchPoints.size() > 0) {
-				int[][] tempImage = new int[w][h];
+				int[][] tempImage = new int[w][height];
 				int clear = ImageOperation.BACKGROUND_COLORint;
 				for (int x = 0; x < w; x++)
-					for (int y = 0; y < h; y++)
+					for (int y = 0; y < height; y++)
 						tempImage[x][y] = clear;
 				FlexibleImage clearImage = new FlexibleImage(tempImage).copy();
 				int black = Color.BLACK.getRGB();
 				for (Point p : branchPoints)
-					if (p.x >= 0 && p.y >= 0 && p.x < w && p.y < h)
+					if (p.x >= 0 && p.y >= 0 && p.x < w && p.y < height)
 						tempImage[p.x][p.y] = black;
 				FlexibleImage temp = new FlexibleImage(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).

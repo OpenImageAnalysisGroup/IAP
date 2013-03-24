@@ -803,38 +803,18 @@ public class SkeletonProcessor2d {
 		return maxLimbs;
 	}
 	
-	public FlexibleImage calcProbablyBloomImage(FlexibleImage image, float hueBloom, int hVis, float f) {
+	public FlexibleImage calcProbablyBloomImage(FlexibleImage image, double hueBloom) {
 		int[][] visImg = image.getAs2A();
 		int h = image.getHeight();
 		int w = image.getWidth();
-		if (getMinLimbY() == null)
-			return new FlexibleImage(new int[w][h]);
-		int cutPositionY = (int) ((getMinLimbY().endpoint.y * h / (double) hVis) - h * 0.05);
-		int r, g, b, c, s = 0;
+		int r, g, b, c = 0;
 		float distToYellow = 0f;
 		float[] hsbvals = new float[3];
 		int[][] res = new int[w][h];
-		double hueSum = 0;
-		int nnn = 0;
 		
+		float avgHue = (float) hueBloom;
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				c = visImg[x][y];
-				if (c != background) {
-					r = ((c & 0xff0000) >> 16); // R 0..1
-					g = ((c & 0x00ff00) >> 8); // G 0..1
-					b = (c & 0x0000ff); // B 0..1
-					
-					Color.RGBtoHSB(r, g, b, hsbvals);
-					hueSum += hsbvals[0];
-					nnn++;
-				}
-			}
-		}
-		float avgHue = hueBloom;// (float) (nnn > 0 ? hueSum / nnn : hueBloom);
-		
-		for (int x = 0; x < w; x++) {
-			for (int y = cutPositionY - s; y < cutPositionY + h * 0.1; y++) {
 				if (y < 0 || y >= h)
 					continue;
 				c = visImg[x][y];
@@ -844,7 +824,7 @@ public class SkeletonProcessor2d {
 					b = (c & 0x0000ff); // B 0..1
 					
 					Color.RGBtoHSB(r, g, b, hsbvals);
-					distToYellow = 255 - Math.abs((avgHue - hsbvals[0]) * 255 * f); // 0.167 equivalent to Yellow
+					distToYellow = 255 - Math.abs((avgHue - hsbvals[0]) * 255f * 10f); // 0.167 equivalent to Yellow
 				} else {
 					distToYellow = 0;
 				}

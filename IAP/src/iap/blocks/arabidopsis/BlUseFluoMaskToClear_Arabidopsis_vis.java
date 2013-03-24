@@ -33,7 +33,13 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 				if (options.getCameraPosition() == CameraPosition.SIDE) {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io().addBorder(0, 50, 0, 30, options.getBackground()).blur(2).getImage(),
+									processedMasks.fluo().io().copy().addBorder(
+											getInt("cut left right", 0),
+											getInt("cut top bottom", 50),
+											getInt("shift X", 0),
+											getInt("shift Y", 30),
+											options.getBackground())
+											.blur(getDouble("blur fluo mask on vis", 2)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 				}
 				if (options.getCameraPosition() == CameraPosition.TOP) {
@@ -65,6 +71,7 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 	public HashSet<FlexibleImageType> getOutputTypes() {
 		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
 		res.add(FlexibleImageType.VIS);
+		res.add(FlexibleImageType.FLUO);
 		return res;
 	}
 	
