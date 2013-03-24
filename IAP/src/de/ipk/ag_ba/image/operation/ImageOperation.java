@@ -1807,26 +1807,46 @@ public class ImageOperation {
 				.getHeight());
 	}
 	
-	public ImageOperation filterRemainHSV(double maxDist, double clearColorHUE) {
+	public ImageOperation filterRemainHSV(double maxDistHue, double clearColorHUE) {
 		
-		double t = clearColorHUE;
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
 		int[] pixels = getImageAs1dArray();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
-			// int a = ((rgb >> 24) & 0xff);
 			r = ((rgb >> 16) & 0xff);
 			g = ((rgb >> 8) & 0xff);
 			b = (rgb & 0xff);
 			
 			Color.RGBtoHSB(r, g, b, hsb);
 			
-			if (Math.abs(hsb[0] - t) > maxDist)
+			if (Math.abs(hsb[0] - clearColorHUE) > maxDistHue)
 				pixels[index] = BACKGROUND_COLORint;
 			else
 				pixels[index] = rgb;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
+	public ImageOperation filterRemainHSV(double h1, double h2, double s1, double s2, double v1, double v2) {
+		float[] hsb = new float[3];
+		int r, g, b, rgb;
+		
+		int[] pixels = getImageAs1dArray();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (hsb[0] >= h1 && hsb[0] <= h2 && hsb[1] >= s1 && hsb[1] <= s2 && hsb[2] >= v1 && hsb[2] <= v2)
+				pixels[index] = rgb;
+			else
+				pixels[index] = BACKGROUND_COLORint;
 		}
 		return new ImageOperation(pixels, getImage().getWidth(), getImage()
 				.getHeight());
