@@ -6,9 +6,8 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportAsFilesAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -70,7 +69,7 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		
 		res.add(new NavigationButton(new ActionDataExportZIP(m, experiment), src.getGUIsetting()));
 		res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
-		res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
 		return res;
 	}

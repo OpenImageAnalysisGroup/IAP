@@ -79,7 +79,7 @@ public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
 	@Override
 	public String getDefaultImage() {
 		if (saveAnnotation)
-			return "img/ext/gpl2/Gnome-Document-Save-64.png";
+			return "img/ext/gpl2/Gnome-Emblem-Downloads-64.png";// Gnome-Document-Save-64.png";
 		if (active) {
 			if (System.currentTimeMillis() % 1000 < 500)
 				return "img/ext/transfer2.png";
