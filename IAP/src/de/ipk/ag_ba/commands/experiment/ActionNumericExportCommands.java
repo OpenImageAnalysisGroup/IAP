@@ -28,6 +28,11 @@ final class ActionNumericExportCommands extends AbstractNavigationAction {
 	}
 	
 	@Override
+	public String getDefaultTitle() {
+		return "Export Numeric Data";
+	}
+	
+	@Override
 	public String getDefaultImage() {
 		return "img/colorhistogram.png";
 	}
