@@ -213,4 +213,12 @@ public class IAPimages {
 	public static String getThreeDocuments() {
 		return "img/ext/gpl2/Gnome-Emblem-Documents-64.png";
 	}
+	
+	public static String getLeafDiseaseImage() {
+		return "img/leaf_analysis.png";
+	}
+	
+	public static String getRapeseedImage() {
+		return "img/rapeseed.png";
+	}
 }
