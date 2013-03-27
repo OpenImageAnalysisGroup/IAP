@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.AttributeHelper;
 import org.Colors;
 import org.StringManipulationTools;
 import org.Vector2d;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Edge;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -125,7 +127,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 			sg.deleteSelfLoops();
 			sg.removeParallelEdges();
 			sg.getGraph().numberGraphElements();
-			double minSegmentLen = getDouble("minimum stem segment len", 100);
+			// double minSegmentLen = getDouble("minimum stem segment len", 100);
 			if (sg.getGraph().getNumberOfNodes() > 0) {
 				rt.addValue(prefix + resultPrefix + ".graph.nodes", sg.getGraph().getNumberOfNodes());
 				rt.addValue(prefix + resultPrefix + ".graph.edges", sg.getGraph().getNumberOfEdges());
@@ -135,11 +137,11 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 						Double val = e.getDouble("len");
 						if (val != null) {
 							limbs.addValue(val);
-							if (val >= minSegmentLen) {
+							if (val > 10) {
 								Vector2d sta = new Vector2d(e.getSource().getInteger("x"), e.getSource().getInteger("y"));
 								Vector2d end = new Vector2d(e.getTarget().getInteger("x"), e.getTarget().getInteger("y"));
 								double directLen = sta.distance(end);
-								if (directLen >= minSegmentLen) {
+								if (directLen > 10) {// minSegmentLen) {
 									// Krümmung bestimmen
 									double kruemmung = 1 - directLen / val; // 0 straight, 1 sloped
 									if (sta.y > end.y) {
@@ -149,6 +151,13 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 									}
 									double rotation = sta.angle(end);
 									double distToStraightness = Math.abs(rotation - Math.PI / 2);
+									AttributeHelper.setLabel(e, "<html>Rotation: " + (int) (rotation / Math.PI * 180) + "<br>"
+											+ "Dist. to straight: " + (int) (distToStraightness / Math.PI * 180) + "<br>"
+											+ "Kruemmung (0 straight): " + StringManipulationTools.formatNumber(kruemmung, 2));
+									AttributeHelper.setAttribute(e, "", "length", val);
+									AttributeHelper.setAttribute(e, "", "diststraight", distToStraightness / Math.PI * 180);
+									AttributeHelper.setAttribute(e, "", "kruemmung", kruemmung);
+									AttributeHelper.setAttribute(e, "", "dist", directLen);
 								}
 							}
 						}
@@ -161,6 +170,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 							rt.addValue(prefix + resultPrefix + ".graph.limb.length.kurtosis", limbs.getKurtosis());
 						}
 				}
+				MainFrame.getInstance().showGraph(sg.getGraph(), null);
 			}
 		}
 	}
@@ -206,6 +216,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 		int pixelCnt;
 		image = image.resize(2);
 		String prefix3 = "prefix3";
+		boolean graphAnalysed = false;
 		do {
 			pixelCnt = image.copy().skeletonize(false).countFilledPixels();
 			if (pixelCnt > 0) {
@@ -213,8 +224,9 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
 					String prefix = "";
 					if (width > 1)
 						prefix = ".thinned" + StringManipulationTools.formatNumber(width - 1, "00");
-					if (getBoolean("Calculate Graph Diameters", true)) {
+					if (getBoolean("Calculate Graph Diameters", true) && !graphAnalysed) {
 						try {
+							graphAnalysed = true;
 							ImageOperation si = image.copy().dilate().skeletonize(true);// .resize(0.5d);
 							graphAnalysis(getClusterIDarray(image),
 									new FlexibleImage(si.getWidth(), si.getHeight(),
