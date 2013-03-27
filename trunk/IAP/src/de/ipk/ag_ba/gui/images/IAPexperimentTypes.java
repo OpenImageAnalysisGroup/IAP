@@ -13,6 +13,7 @@ public enum IAPexperimentTypes {
 	RootWaterScan("Roots (Scann)", "Barley Roots"),
 	ImportedAnalysisResults("Imported Analysis Results", "Unknown"),
 	ClimateData("Climate", "Unknown"),
+	LeafImages("Leaf Images", "Unknown"),
 	ImportedDataset("Imported Dataset", "Unknown"),
 	Test("Test (can be deleted)", "Unknown");
 	

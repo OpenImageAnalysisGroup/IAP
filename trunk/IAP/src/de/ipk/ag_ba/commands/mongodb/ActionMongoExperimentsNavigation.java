@@ -271,7 +271,13 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
 								return IAPimages.getRoots();
 							else
-								return "img/ext/network-workgroup.png";
+								if (group.startsWith(IAPexperimentTypes.LeafImages + ""))
+									return IAPimages.getLeafDiseaseImage();
+								else
+									if (group.startsWith(IAPexperimentTypes.Raps + ""))
+										return IAPimages.getRapeseedImage();
+									else
+										return "img/ext/network-workgroup.png";
 			}
 			
 			@Override
@@ -293,7 +299,13 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
 								return IAPimages.getRoots();
 							else
-								return "img/ext/network-workgroup-power.png";
+								if (group.startsWith(IAPexperimentTypes.LeafImages + ""))
+									return IAPimages.getLeafDiseaseImage();
+								else
+									if (group.startsWith(IAPexperimentTypes.Raps + ""))
+										return IAPimages.getRapeseedImage();
+									else
+										return "img/ext/network-workgroup-power.png";
 			}
 			
 			@Override
