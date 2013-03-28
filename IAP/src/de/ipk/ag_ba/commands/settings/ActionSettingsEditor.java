@@ -121,13 +121,55 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 			else
 				if (section.toLowerCase().endsWith(".pipeline-top"))
 					return "Top-Settings";
-				else
-					return WordUtils.capitalizeFully(section, ' ');
+				else {
+					SystemOptions inst = SystemOptions.getInstance(iniFileName, iniIO);
+					String d = "";
+					for (final String setting : inst.getSectionSettings(section)) {
+						if (setting != null && setting.equals("description")) {
+							d = inst.getString(section, setting, "");
+						}
+					}
+					if (d.length() > 80)
+						d = "";
+					if (d != null && !d.isEmpty())
+						return "<html><center>" + WordUtils.capitalizeFully(section, ' ') + "<br>(" + d + ")";
+					else
+						return WordUtils.capitalizeFully(section, ' ');
+				}
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Emblem-Package-64.png";// "Gnome-Accessories-Text-Editor-64.png";
+		boolean disabled = false;
+		boolean enabled = false;
+		SystemOptions inst = SystemOptions.getInstance(iniFileName, iniIO);
+		for (final String setting : inst.getSectionSettings(section)) {
+			if (setting != null && setting.equals("enabled")) {
+				if (!inst.getBoolean(section, setting, false)) {
+					disabled = true;
+					break;
+				} else {
+					enabled = true;
+					break;
+				}
+			}
+			if (setting != null && setting.equals("show_icon")) {
+				if (!inst.getBoolean(section, setting, false)) {
+					disabled = true;
+					break;
+				} else {
+					enabled = true;
+					break;
+				}
+			}
+		}
+		if (disabled)
+			return "img/ext/gpl2/Gnome-Emblem-Package-64_disabled.png";// "Gnome-Accessories-Text-Editor-64.png";
+		else
+			if (enabled)
+				return "img/ext/gpl2/Gnome-Emblem-Package-64_enabled.png";// "Gnome-Accessories-Text-Editor-64.png";
+			else
+				return "img/ext/gpl2/Gnome-Emblem-Package-64.png";// "Gnome-Accessories-Text-Editor-64.png";
 	}
 	
 	@Override
