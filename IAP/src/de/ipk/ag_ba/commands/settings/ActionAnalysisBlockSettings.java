@@ -47,6 +47,8 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 					g = g.substring(g.lastIndexOf(".") + ".".length());
 		if (g != null && g.startsWith("_"))
 			g = g.substring("_".length());
+		if (g != null)
+			g = g.replace('_', ' ');
 		return g;
 	}
 	
