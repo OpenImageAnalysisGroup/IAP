@@ -103,6 +103,10 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 				"Copy dataset to a user-selected target folder",
 				m, experimentReferences), guiSetting));
 		
+		res.add(new NavigationButton(new ActionDataExportToUserSelectedVFStarget(
+				"Copy dataset to a user-selected remote target",
+				m, experimentReferences), guiSetting));
+		
 		return res;
 	}
 	
