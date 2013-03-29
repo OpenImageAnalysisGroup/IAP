@@ -150,8 +150,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 						if (isString) {
 							if (setting.toLowerCase().contains("password")) {
 								Object[] i = MyInputHelper.getInput(
-										"WARNING: The <u>password will be shown now and saved as clear text</u> in the settings-ini-file!" +
-												"<br>Click 'Cancel' to interrupt the process of displaying and " +
+										"WARNING: The <u>password will be saved as clear text</u> in the settings-ini-file!" +
+												"<br>Click 'Cancel' to interrupt the process of " +
 												"editing the password.", "WARNING");
 								if (i == null)
 									return;

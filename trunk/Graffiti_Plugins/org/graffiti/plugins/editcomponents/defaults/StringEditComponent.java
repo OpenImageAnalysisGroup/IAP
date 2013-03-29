@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: StringEditComponent.java,v 1.1 2011-01-31 09:03:25 klukas Exp $
+// $Id: StringEditComponent.java,v 1.2 2013-03-29 13:18:35 klukas Exp $
 
 package org.graffiti.plugins.editcomponents.defaults;
 
@@ -21,6 +21,7 @@ import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
@@ -39,13 +40,13 @@ import org.graffiti.plugin.editcomponent.AbstractValueEditComponent;
  * <code>StringEditComponent</code> provides an edit component for editing
  * strings. The edit field has just one line.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @see org.graffiti.plugin.editcomponent.AbstractValueEditComponent
  * @see javax.swing.text.JTextComponent
  * @see TextAreaEditComponent
  */
 public class StringEditComponent
-					extends AbstractValueEditComponent {
+		extends AbstractValueEditComponent {
 	// ~ Instance fields ========================================================
 	
 	/** The text field containing the value of the displayable. */
@@ -81,6 +82,7 @@ public class StringEditComponent
 	 * 
 	 * @return the <code>JComponent</code> of this edit component.
 	 */
+	@Override
 	public JComponent getComponent() {
 		
 		if (textComp == null) {
@@ -96,6 +98,13 @@ public class StringEditComponent
 				
 			} else {
 				textComp = new JTextField(getDisplayable().getValue().toString());
+				try {
+					if (getDisplayable().getName().equalsIgnoreCase("password")) {
+						textComp = new JPasswordField(getDisplayable().getValue().toString());
+					}
+				} catch (Exception e) {
+					// empty
+				}
 			}
 			
 			textComp.setMinimumSize(new Dimension(0, 30));
@@ -114,6 +123,7 @@ public class StringEditComponent
 		s.setOpaque(false);
 		s.setToolTipText("Click to select all graph elements with the same attribute value");
 		s.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String search = textComp.getText().toUpperCase();
 				search = StringManipulationTools.removeHTMLtags(search);
@@ -150,7 +160,7 @@ public class StringEditComponent
 				MainFrame.getInstance().getActiveEditorSession().getSelectionModel().selectionChanged();
 				
 				MainFrame.showMessage("Added " + select.size() + " elements to selection. Press Shift while clicking the search button to search within text.",
-									MessageType.INFO);
+						MessageType.INFO);
 			}
 		});
 		return s;
@@ -159,6 +169,7 @@ public class StringEditComponent
 	/**
 	 * Sets the current value of the displayable in the corresponding <code>JComponent</code>.
 	 */
+	@Override
 	public void setEditFieldValue() {
 		if (showEmpty) {
 			this.textComp.setText(EMPTY_STRING);
@@ -171,11 +182,12 @@ public class StringEditComponent
 	/**
 	 * Sets the value of the displayable specified in the <code>JComponent</code>. But only if it is different.
 	 */
+	@Override
 	public void setValue() {
 		String text = this.textComp.getText();
 		
 		if (!text.equals(EMPTY_STRING) &&
-							!this.displayable.getValue().toString().equals(text)) {
+				!this.displayable.getValue().toString().equals(text)) {
 			this.displayable.setValue(text);
 		}
 	}

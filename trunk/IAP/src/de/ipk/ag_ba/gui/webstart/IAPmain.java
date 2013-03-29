@@ -599,7 +599,7 @@ public class IAPmain extends JApplet {
 		res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Contributions to library code or external *", " ", l, 2));
-		res.add(fillLenLA("*  scripts: H. Rohn (PBI) and A. Entzian  *", " ", l, 2));
+		res.add(fillLenLA("*     scripts: H. Rohn (PBI) and A. Entzian  *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add("***************************************************");
 		return res;
