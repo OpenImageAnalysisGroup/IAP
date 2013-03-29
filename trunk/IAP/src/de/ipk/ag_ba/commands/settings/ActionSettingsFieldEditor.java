@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.commands.settings;
 
+import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -12,6 +14,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 class ActionSettingsFieldEditor extends AbstractNavigationAction {
@@ -175,7 +178,42 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 								ArrayList<String> entries = new ArrayList<String>();
 								int line = 1;
 								for (String sl : ss) {
-									entries.add("Item " + (line++));
+									if (!setting.equals("block"))
+										entries.add("Item " + (line++));
+									else {
+										String inf = "Step " + (line++);
+										if (line <= 10)
+											inf = "Step 0" + (line - 1);
+										try {
+											ImageAnalysisBlockFIS inst = (ImageAnalysisBlockFIS) Class.forName(sl).newInstance();
+											
+											String gs = "<font color='green'>";
+											String ge = "</font>";
+											String rs = "<font color='red'>";
+											String re = "</font>";
+											String ns = "<font color='darkgray'>";
+											String ne = "</font>";
+											String is = "<font color='blue'>";
+											String ie = "</font>";
+											
+											String vi = gs + (inst.getInputTypes().contains(FlexibleImageType.VIS) ? "V" : "&darr;") + ge;
+											String fi = rs + (inst.getInputTypes().contains(FlexibleImageType.FLUO) ? "F" : "&darr;") + re;
+											String ni = ns + (inst.getInputTypes().contains(FlexibleImageType.NIR) ? "N" : "&darr;") + ne;
+											String ii = is + (inst.getInputTypes().contains(FlexibleImageType.IR) ? "I" : "&darr;") + ie;
+											
+											String vo = gs + (inst.getOutputTypes().contains(FlexibleImageType.VIS) ? "V" : "&darr;") + ge;
+											String fo = rs + (inst.getOutputTypes().contains(FlexibleImageType.FLUO) ? "F" : "&darr;") + re;
+											String no = ns + (inst.getOutputTypes().contains(FlexibleImageType.NIR) ? "N" : "&darr;") + ne;
+											String io = is + (inst.getOutputTypes().contains(FlexibleImageType.IR) ? "I" : "&darr;") + ie;
+											
+											inf = "<html><table border='0'><tr><td>" + inf + "</td><td><font color='gray' size='-2'><code>"
+													+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""
+													+ "<br> OUT&#9656; " + vo + " " + fo + " " + no + " " + io + "</code></font></td></tr></table>";
+										} catch (Exception e) {
+											inf = "<html>" + inf + "<br>[" + e.getMessage() + "]";
+										}
+										entries.add(inf);
+									}
 									entries.add(sl + "");
 								}
 								Object[] inp = MyInputHelper.getInput(

@@ -62,46 +62,11 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				for (NavigationButton r : group2button.get(group))
 					res.add(r);
 			} else {
-				res.add(new NavigationButton(new AbstractNavigationAction("Change settings of block " + group) {
-					
-					@Override
-					public void performActionCalculateResults(NavigationButton src) throws Exception {
-						// empty
-					}
-					
-					@Override
-					public String getDefaultTitle() {
-						String g = group;
-						if (g != null && g.indexOf(".Block") > 0)
-							g = g.substring(g.lastIndexOf(".Block") + ".Block".length());
-						else
-							if (g != null && g.indexOf(".Bl") > 0)
-								g = g.substring(g.lastIndexOf(".Bl") + ".Bl".length());
-							else
-								if (g != null && g.indexOf(".") > 0)
-									g = g.substring(g.lastIndexOf(".") + ".".length());
-						if (g != null && g.startsWith("_"))
-							g = g.substring("_".length());
-						return g;
-					}
-					
-					@Override
-					public String getDefaultImage() {
-						return "img/ext/gpl2/Glade-3-64.png";
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewActionSet() {
-						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(group2button.get(group));
-						NavigationAction resetSettingsAction = new ActionResetActions(
-								SystemOptions.getInstance(iniFileName, iniIO), section, group);
-						NavigationButton restSettingsButton = new NavigationButton(
-								resetSettingsAction, src.getGUIsetting());
-						restSettingsButton.setRightAligned(true);
-						res.add(0, restSettingsButton);
-						return res;
-					}
-				}, guiSetting));
+				res.add(new NavigationButton(new ActionAnalysisBlockSettings(
+						"Change settings of block " + group,
+						src, group2button, iniFileName, iniIO, section,
+						group),
+						guiSetting));
 			}
 		}
 	}
