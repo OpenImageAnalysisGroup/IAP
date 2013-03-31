@@ -203,7 +203,8 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 		if (m != null) { // dbeType ==
 			// DBEtype.Phenotyping &&
 			NavigationButton scheduleExperiment = new NavigationButton(scheduleExperimentAction,
-					"Schedule Experiment", "img/ext/image-loading.png", guIsetting);
+					m != null ? "Schedule Experiment" : "Create Dataset",
+					m != null ? "img/ext/image-loading.png" : "img/ext/gpl2/Gnome-Text-X-Generic-Template-64.png", guIsetting);
 			res.add(scheduleExperiment);
 		}
 		

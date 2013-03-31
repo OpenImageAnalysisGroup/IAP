@@ -33,11 +33,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 /**
  * @author klukas
  */
-public final class ActionIapHome extends AbstractNavigationAction {
+public final class ActionHome extends AbstractNavigationAction {
 	private ArrayList<NavigationButton> homePrimaryActions = new ArrayList<NavigationButton>();
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 	
-	public ActionIapHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public ActionHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
 		super("IAP Home");
 		this.myStatus = myStatus;
 		

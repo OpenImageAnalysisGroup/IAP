@@ -24,7 +24,7 @@ import netscape.javascript.JSObject;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 
-import de.ipk.ag_ba.commands.ActionIapHome;
+import de.ipk.ag_ba.commands.ActionHome;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.MyNavigationPanel;
@@ -66,7 +66,7 @@ public class IAPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 		
-		final NavigationAction home = optCustomHomeAction != null ? optCustomHomeAction : new ActionIapHome(myStatus);
+		final NavigationAction home = optCustomHomeAction != null ? optCustomHomeAction : new ActionHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
 		
 		navigationPanel.setGuiSetting(guiSetting);
