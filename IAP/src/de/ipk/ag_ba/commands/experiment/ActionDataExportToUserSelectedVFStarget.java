@@ -38,7 +38,7 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy to remote storage...";
+		return "Remote Storage";
 	}
 	
 	@Override
@@ -49,6 +49,11 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 				continue;
 			NavigationAction navigationAction = new ActionDataExportToUserSpecficVFStarget(
 					"Copy to remote site using " + p, m, experimentReference, p);
+			res.add(new NavigationButton(navigationAction, guiSetting));
+		}
+		{
+			NavigationAction navigationAction = new ActionDataExportToUserSpecficVFStarget(
+					"Copy to local file system", m, experimentReference, VfsFileProtocol.LOCAL);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
 		return res;

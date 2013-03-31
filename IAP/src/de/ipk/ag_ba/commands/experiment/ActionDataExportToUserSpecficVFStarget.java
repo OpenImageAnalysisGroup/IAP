@@ -1,14 +1,15 @@
 package de.ipk.ag_ba.commands.experiment;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
-import org.OpenFileDialogService;
+import org.StringManipulationTools;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -21,6 +22,9 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	private final ArrayList<ExperimentReference> experimentReference;
 	private final MongoDB m;
 	private VfsFileProtocol p;
+	
+	private String host, user, pass, directory, vfsName;
+	private boolean saveVFS = false, savePassWithVFS = false;
 	
 	public ActionDataExportToUserSpecficVFStarget(String tooltip) {
 		super(tooltip);
@@ -46,15 +50,16 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 						"Password", "pass",
 						"Sub-directory", "",
 						"", new JLabel("<html>&nbsp;"),
-						"Create Bookmark", false,
+						"<html>Create permanent<br>VFS entry", false,
 						"Save Password", false,
-						"Bookmark Name", "Bookmark",
+						"VFS entry name", "Storage 1",
 						"", new JLabel("<html><small><font color='gray'>"
-								+ "The bookmark is only created if the connection<br>"
+								+ "The VFS entry is only created if the connection<br>"
 								+ "to the target site can be established. The main<br>"
-								+ "Copy command displays defined bookmarks as new<br>"
-								+ "targets. Bookmarks can be deleted from the settings<br>"
-								+ "folder (file name ends with '.copy.bookmark').<br>"),
+								+ "Copy command displays defined VFS entries as new<br>"
+								+ "targets. The Home action command displays them as<br>"
+								+ "additional storage sites. Click Settings do disable<br>" +
+								"specific entries later."),
 						"", new JLabel("<html>&nbsp;")
 				});
 		return po;
@@ -63,28 +68,55 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	@Override
 	public void setParameters(Object[] parameters) {
 		super.setParameters(parameters);
+		int i = 0;
+		host = (String) parameters[i++];
+		user = (String) parameters[i++];
+		pass = (String) parameters[i++];
+		directory = (String) parameters[i++];
+		i++;
+		saveVFS = (Boolean) parameters[i++];
+		savePassWithVFS = (Boolean) parameters[i++];
+		vfsName = (String) parameters[i++];
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		if (experimentReference == null)
 			return;
-		
-		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
-		if (currentDirectory != null) {
-			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
-					"user.dir",
-					VfsFileProtocol.LOCAL,
-					"User Selected Directory",
-					"File I/O", "",
-					null,
-					null,
-					currentDirectory.getCanonicalPath(),
-					false,
-					false,
-					null);
-			for (ExperimentReference er : experimentReference)
-				vfs.saveExperiment(m, er, getStatusProvider());
+		String pref = "remote." + (p + "").toLowerCase();
+		if (saveVFS)
+			pref = "vfs." + StringManipulationTools.getFileSystemName(vfsName).toLowerCase();
+		VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
+				pref,
+				p,
+				"Custom Remote Target",
+				"temporary defined " + p + " I/O",
+				host,
+				user,
+				pass,
+				directory,
+				false,
+				false,
+				null);
+		for (ExperimentReference er : experimentReference)
+			vfs.saveExperiment(m, er, getStatusProvider());
+		if (saveVFS) {
+			IAPoptions.getInstance().setBoolean("VFS", "enabled", true);
+			int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
+			int idx = n + 1;
+			SystemOptions.getInstance().setInteger("VFS", "n", n + 1);
+			SystemOptions.getInstance().setBoolean("VFS-" + idx, "enabled", true);
+			SystemOptions.getInstance().setString("VFS-" + idx, "url_prefix", pref);
+			SystemOptions.getInstance().setString("VFS-" + idx, "description", vfsName);
+			SystemOptions.getInstance().setString("VFS-" + idx, "vfs_type", p + "");
+			SystemOptions.getInstance().setString("VFS-" + idx, "protocol_description", p + " I/O");
+			SystemOptions.getInstance().setString("VFS-" + idx, "host", host);
+			SystemOptions.getInstance().setString("VFS-" + idx, "user", user);
+			SystemOptions.getInstance().setString("VFS-" + idx, "password", savePassWithVFS ? pass : "?");
+			SystemOptions.getInstance().setString("VFS-" + idx, "directory", directory);
+			SystemOptions.getInstance().setBoolean("VFS-" + idx, "Store Mongo-DB files", false);
+			SystemOptions.getInstance().setBoolean("VFS-" + idx, "Use only for Mongo-DB storage", false);
+			SystemOptions.getInstance().setString("VFS-" + idx, "Mongo-DB database name", "");
 		}
 	}
 	
@@ -95,7 +127,7 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy using " + p + "...";
+		return "" + p + "";
 	}
 	
 	@Override

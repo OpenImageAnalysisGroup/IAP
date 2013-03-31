@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.commands.mongodb;
 
+import info.clearthought.layout.TableLayout;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +16,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -27,17 +32,23 @@ import de.ipk.ag_ba.commands.DeletionCommand;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.clima.ActionImportClimateData;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
 
 /**
  * @author klukas
@@ -143,8 +154,63 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 									src.getGUIsetting()));
 				
 				if (!limitToResuls)
-					if (currentUser == null || !currentUser.equals("public"))
+					if (currentUser == null || !currentUser.equals("public")) {
+						NavigationAction scheduleExperimentAction = new AbstractNavigationAction("Schedule a new experiment") {
+							
+							private NavigationButton src;
+							
+							@Override
+							public void performActionCalculateResults(NavigationButton src) {
+								this.src = src;
+							}
+							
+							@Override
+							public ArrayList<NavigationButton> getResultNewNavigationSet(
+									ArrayList<NavigationButton> currentSet) {
+								ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+								res.add(src);
+								return res;
+							}
+							
+							@Override
+							public MainPanelComponent getResultMainPanel() {
+								ExperimentHeaderInterface ei = new ExperimentHeader();
+								ei.setExperimentname("Dataset");
+								ei.setExperimenttype("Imported Dataset");
+								ei.setCoordinator(SystemAnalysis.getUserName());
+								ei.setImportusername(SystemAnalysis.getUserName());
+								ei.setStartdate(new Date());
+								ei.setImportdate(new Date());
+								final MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+								info.setExperimentInfo(m, ei, true, null);
+								
+								Substance md = new Substance();
+								final Condition experimentInfo = new Condition(md);
+								
+								info.setSaveAction(new RunnableWithExperimentInfo() {
+									@Override
+									public void run(ExperimentHeaderInterface newProperties) throws Exception {
+										experimentInfo.setExperimentInfo(newProperties);
+									}
+								});
+								JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);
+								jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+								jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
+								jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
+								return new MainPanelComponent(jp);
+							}
+							
+							@Override
+							public ArrayList<NavigationButton> getResultNewActionSet() {
+								return new ArrayList<NavigationButton>();
+							}
+						};
+						NavigationButton scheduleExperiment = new NavigationButton(scheduleExperimentAction,
+								"Create Dataset",
+								"img/ext/gpl2/Gnome-Text-X-Generic-Template-64.png", guiSetting);
+						res.add(scheduleExperiment);
 						res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
+					}
 				
 				for (String group : experiments.keySet()) {
 					if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
