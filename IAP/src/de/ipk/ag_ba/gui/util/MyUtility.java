@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import netscape.javascript.JSObject;
 
-import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
@@ -46,9 +45,9 @@ public class MyUtility {
 			if (target.startsWith("."))
 				target = target.substring(".".length());
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: NAVIGATE TO: " + target);
-			JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
-			win.eval("window.location.hash='" + target + "';");
-			win.eval("document.title='IAP: " + ft + "';");
+			JSObject win = null;// JDK8, unclear how to do this: JSObject.getWindow(ReleaseInfo.getApplet());
+			// win.eval("window.location.hash='" + target + "';");
+			// win.eval("document.title='IAP: " + ft + "';");
 		} catch (Exception e1) {
 			// empty
 		}
