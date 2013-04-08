@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 
-import org.SystemAnalysis;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -54,20 +53,20 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public InputStream getInputStream() throws IOException {
-		for (int i = 0; i < 10; i++) {
-			try {
-				return file.getContent().getInputStream();
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COULD NOT GET INPUT STREAM ("
-						+ e.getMessage() + "). TRYING AGAIN...");
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
+		// for (int i = 0; i < 10; i++) {
+		// try {
+		// return file.getContent().getInputStream();
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COULD NOT GET INPUT STREAM ("
+		// + e.getMessage() + "). TRYING AGAIN...");
+		// try {
+		// Thread.sleep(10000);
+		// } catch (InterruptedException e1) {
+		// e1.printStackTrace();
+		// }
+		// }
+		// }
 		return file.getContent().getInputStream();
 	}
 	
