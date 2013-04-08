@@ -1185,6 +1185,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		} catch (Exception e) {
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: SAVING IMAGE FILE TO MONGDB FAILED WITH EXCEPTION: " + e.getMessage());
 			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
 		}
 		
 		return allOK;
