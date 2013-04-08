@@ -35,9 +35,9 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy().addBorder(
 											getInt("cut left right", 0),
-											getInt("cut top bottom", 50),
+											getInt("cut top bottom", 0),
 											getInt("shift X", 0),
-											getInt("shift Y", 30),
+											getInt("shift Y", 0),
 											options.getBackground())
 											.blur(getDouble("blur fluo mask on vis", 2)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
@@ -46,12 +46,12 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 					double f = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask(
-									processedMasks.fluo().io().resize(f, f)
+									processedMasks.fluo().io().copy().resize(f, f)
 											.blur(getDouble("blur fluo mask on vis", 1.5d)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 					processedMasks.setFluo(
-							processedMasks.fluo().io().applyMask(
-									processedMasks.vis().io().resize(1d / f, 1d / f)
+							processedMasks.fluo().io().copy().applyMask(
+									processedMasks.vis().io().copy().resize(1d / f, 1d / f)
 											.blur(getDouble("blur vis mask on fluo", 1.5d)).getImage(),
 									back).show("FILTERED FLUO IMAGE", debug).getImage());
 				}
