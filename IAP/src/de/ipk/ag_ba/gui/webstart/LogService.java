@@ -10,7 +10,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {
 	
-	private static boolean ba13reachable = MongoDB.getDefaultCloud().isDbHostReachable();
+	private static boolean ba13reachable = MongoDB.getDefaultCloud() == null ? false : MongoDB.getDefaultCloud().isDbHostReachable();
 	
 	public String getLatestNews(final int n, String pre, final String preLine, String lineBreak, String follow) {
 		if (n < 1)

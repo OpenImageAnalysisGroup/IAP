@@ -140,16 +140,21 @@ public class IAPgui {
 	}
 	
 	public static String getIntroTxt() {
-		return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform!</font></h2>"
-				+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system. "
-				+ "It is focused on high-throughput plant phenotyping and developed by the IPK research group 'image analysis'.<br>"
-				+ "<br>"
-				+ "You find information on how to use this software and additional reference information by clicking the command button 'About'.<br>"
-				+ "Use the first row of buttons to go back to any previously selected command or to return to this 'Start'-screen." +
-				new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0),
-						"<br>" +
-								"<p>Latest system messages:<br><br><ul>",
-						"<li>", "", "<br><br>") + "</font>";
+		try {
+			return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform!</font></h2>"
+					+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system. "
+					+ "It is focused on high-throughput plant phenotyping and developed by the IPK research group 'image analysis'.<br>"
+					+ "<br>"
+					+ "You find information on how to use this software and additional reference information by clicking the command button 'About'.<br>"
+					+ "Use the first row of buttons to go back to any previously selected command or to return to this 'Start'-screen." +
+					new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0),
+							"<br>" +
+									"<p>Latest system messages:<br><br><ul>",
+							"<li>", "", "<br><br>") + "</font>";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "<html><h2>Exception while getting intro-text: " + e.getMessage() + "</h2>";
+		}
 	}
 	
 	public static void navigateTo(final String target, NavigationButton src) {
