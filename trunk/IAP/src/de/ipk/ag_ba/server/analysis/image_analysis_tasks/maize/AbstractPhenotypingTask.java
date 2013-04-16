@@ -509,6 +509,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								+ ">ERROR: Could not save volume data: "
 								+ e.getMessage());
 						e.printStackTrace();
+						ErrorMsg.addErrorMessage(e);
 					}
 				}
 			}
@@ -713,9 +714,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							if (imageRef != null) {
 								if (output != null)
 									output.add(imageRef);
-							} else
+							} else {
 								System.out.println(SystemAnalysis.getCurrentTime()
 										+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
+								ErrorMsg.addErrorMessage("SaveImageAndUpdateURL failed! (NULL Result)");
+							}
 						}
 					}
 				} else {
@@ -731,6 +734,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								loadedImage,
 								databaseTarget, true, tray, tray_cnt);
 						if (imageRef == null) {
+							ErrorMsg.addErrorMessage("SaveImageAndUpdateURL failed! (ERROR #1)");
 							System.out.println("ERROR #1");
 						} else {
 							if (output != null)
@@ -763,10 +767,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				// add processed image to result
 				if (result != null)
 					return new ImageData(result.getParentSample(), result);
-				else
+				else {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">Could not save in DB: "
 							+ lib.getURL().toString());
+					ErrorMsg.addErrorMessage("Could not save in DB: "
+							+ lib.getURL().toString());
+				}
 			} else {
 				boolean clearmemory = true;
 				if (clearmemory) {
@@ -780,7 +787,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
