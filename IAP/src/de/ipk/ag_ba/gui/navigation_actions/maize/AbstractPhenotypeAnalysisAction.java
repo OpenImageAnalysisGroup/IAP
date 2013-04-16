@@ -163,6 +163,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			if (statRes == null) {
 				System.err.println("Error: no statistics result");
+				ErrorMsg.addErrorMessage("no statistics result");
 			} else {
 				for (NumericMeasurementInterface m : statRes) {
 					if (m == null)

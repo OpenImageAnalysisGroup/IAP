@@ -58,12 +58,12 @@ public class ActionAbout extends AbstractNavigationAction {
 		Book book = new Book(null, "<html><center>" +
 				"User Documentation<br>" +
 				"<font color='gray'><small>(online PDF)</small></font></center>",
-				new IOurl("http://ba-13.ipk-gatersleben.de/iap/documentation.pdf"),
+				new IOurl("http://iap.ipk-gatersleben.de/documentation.pdf"),
 				"img/dataset.png");
 		rr.add(book.getNavigationButton(src));
 		
 		Book webUrl = new Book(null, "Source Code",
-				new IOurl("http://www.sourceforge.net"),
+				new IOurl("http://sourceforge.net/projects/iapg2p"),
 				"img/ext/gpl2/Gtk-Dnd-Multiple-64.png");
 		rr.add(webUrl.getNavigationButton(src));
 		
