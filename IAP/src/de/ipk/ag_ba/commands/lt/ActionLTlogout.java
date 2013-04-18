@@ -4,7 +4,7 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 
@@ -17,10 +17,10 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 /**
  * @author klukas
  */
-public class ActionLemnaAssessment extends AbstractNavigationAction implements NavigationAction {
+public class ActionLTlogout extends AbstractNavigationAction implements NavigationAction {
 	
-	public ActionLemnaAssessment() {
-		super("Predict experiment storage and time requirements");
+	public ActionLTlogout() {
+		super("Logout");
 	}
 	
 	private NavigationButton src;
@@ -45,22 +45,22 @@ public class ActionLemnaAssessment extends AbstractNavigationAction implements N
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("This command has no function when using the desktop-mode of IAP.");
+		return new MainPanelComponent("This command has no function when using the applet version of IAP.");
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getCloudResult();
+		return IAPimages.getLogout();
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return IAPimages.getCloudResult();
+		return IAPimages.getLogout();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Exp. Planning";
+		return "Logout";
 	}
 	
 }

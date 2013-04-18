@@ -9,7 +9,7 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -106,7 +106,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,
 					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions,
+			ActionMongoOrLTexperimentNavigation.getDefaultActions(storedActions,
 					new ExperimentReference(res), res.getHeader(), false,
 					src.getGUIsetting(), m);
 			// TODO: create show with VANTED action with these action commands:

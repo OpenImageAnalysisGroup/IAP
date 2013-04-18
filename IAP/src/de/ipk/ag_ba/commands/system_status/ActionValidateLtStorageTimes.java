@@ -9,11 +9,11 @@ import java.util.HashSet;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -62,10 +62,10 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 		filePathCal.set(Calendar.SECOND, 0);
 		
 		int n = 0;
-		for (String database : new LemnaTecDataExchange().getDatabases()) {
+		for (String database : new LTdataExchange().getDatabases()) {
 			ArrayList<ExperimentHeaderInterface> ell = new ArrayList<ExperimentHeaderInterface>();
 			try {
-				ell = new LemnaTecDataExchange().getExperimentsInDatabase(null, database, getStatusProvider());
+				ell = new LTdataExchange().getExperimentsInDatabase(null, database, getStatusProvider());
 			} catch (Exception e) {
 				String s = "Could not analyze DB " + database + ": " + e.getMessage();
 				System.out.println(s);
@@ -74,7 +74,7 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 			for (ExperimentHeaderInterface ehi : ell) {
 				n++;
 				boolean foundError = false;
-				ExperimentInterface exp = new LemnaTecDataExchange().getExperiment(ehi, false, getStatusProvider());
+				ExperimentInterface exp = new LTdataExchange().getExperiment(ehi, false, getStatusProvider());
 				for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(exp, MeasurementNodeType.IMAGE)) {
 					ImageData id = (ImageData) nmi;
 					Date snapshotTime = new Date(id.getParentSample().getSampleFineTimeOrRowId());
@@ -129,7 +129,7 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> ra = new ArrayList<NavigationButton>();
 		for (ExperimentHeaderInterface ee : errorExp) {
-			ra.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(new ExperimentReference(ee)), src.getGUIsetting()));
+			ra.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(new ExperimentReference(ee)), src.getGUIsetting()));
 		}
 		return ra;
 	}

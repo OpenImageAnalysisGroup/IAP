@@ -24,8 +24,8 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
@@ -48,7 +48,7 @@ public class BackupSupport {
 	private BackupSupport() {
 		new MultimodalDataHandlingAddon();
 		
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos()) {
 			ResourceIOManager.registerIOHandler(m.getHandler());
 		}
@@ -123,9 +123,9 @@ public class BackupSupport {
 		try {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">START BACKUP SYNC");
 			
-			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to HSM Backup", false);
+			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: Imaging System to HSM Backup", false);
 			
-			LemnaTecDataExchange lt = new LemnaTecDataExchange();
+			LTdataExchange lt = new LTdataExchange();
 			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
 			ArrayList<IdTime> hsmIdArr = new ArrayList<IdTime>();
 			ArrayList<IdTime> toSave = new ArrayList<IdTime>();

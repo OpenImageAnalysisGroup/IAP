@@ -23,17 +23,6 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 	private final String prefix;
 	private final String folder;
 	
-	// EXPERIMENT-XML-URL:
-	// hsm_media_nfs_hsm://Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\ \(APH\)/klukas/WT_H3/1303994908266_0_klukas_WT_H3.iap.vanted.bin
-	// DATA-URL:
-	// hsm_media_nfs_hsm://Maize\ Greenhouse\ Experiment/LemnaTec\ \(CGH\)/klukas/1107BA_Corn/data/2011-03-07/fluo.side\ DEG_000\ REPL_2\ 1107BA1009\ day_6\
-	// 2011-03-07\ 09_16_59.png#original-Filename.png
-	// ICON-URL:
-	// hsm_media_nfs_hsm://Maize\ Greenhouse\ Experiment/LemnaTec\ \(CGH\)/klukas/1107BA_Corn/icons/2011-03-07/fluo.side\ DEG_000\ REPL_2\ 1107BA1009\ day_6\
-	// 2011-03-07\ 09_16_59.png#original-Filename.png
-	
-	// for file I/O the "#original-Filename.png" needs to be removed
-	
 	public HsmResourceIoHandler(String folder) {
 		if (folder.contains("_"))
 			throw new UnsupportedOperationException("Invalid HSM folder! Folder must not contain the _ character: " + folder);

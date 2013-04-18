@@ -578,8 +578,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	public static NavigationButton getMongoExperimentButton(
 			final String displayName,
 			ExperimentReference ei, GUIsetting guiSetting) {
-		ActionMongoOrLemnaTecExperimentNavigation action =
-				new ActionMongoOrLemnaTecExperimentNavigation(ei);
+		ActionMongoOrLTexperimentNavigation action =
+				new ActionMongoOrLTexperimentNavigation(ei);
 		action.setOverrideTitle(displayName);
 		
 		NavigationButton exp = new NavigationButton(action, guiSetting);

@@ -26,7 +26,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 /**
@@ -196,8 +196,8 @@ public class CloudComputingService {
 															System.out.println("   'close'   - close after task completion (cluster execution mode)");
 															System.out.println("   'info'    - Show CPU info");
 															System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
-															System.out.println("   'back'    - perform LemnaTec to HSM backup now");
-															System.out.println("   'backup'  - perform LemnaTec to HSM backup now, and then every midnight");
+															System.out.println("   'back'    - perform LT Imaging System to HSM backup now");
+															System.out.println("   'backup'  - perform LT Imaging System to HSM backup now, and then every midnight");
 															System.out
 																	.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
 															System.out
@@ -233,7 +233,7 @@ public class CloudComputingService {
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
 		
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos()) {
 			ResourceIOManager.registerIOHandler(m.getHandler());
 			

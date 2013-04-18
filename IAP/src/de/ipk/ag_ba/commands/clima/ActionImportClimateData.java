@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -305,7 +305,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 		
 		MongoDB m = null;
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
 				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);
 		return res;

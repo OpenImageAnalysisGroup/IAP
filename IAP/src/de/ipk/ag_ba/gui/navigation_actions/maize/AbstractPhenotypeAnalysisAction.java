@@ -14,7 +14,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -346,7 +346,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		// "Save Result (db '" + m.getDatabaseName() + "')", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); //
 		// PoweredMongoDBgreen.png"));
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
 				new ExperimentReference(experimentResult), experimentResult.getHeader(),
 				false, src != null ? src.getGUIsetting() : null, m);
 		return res;

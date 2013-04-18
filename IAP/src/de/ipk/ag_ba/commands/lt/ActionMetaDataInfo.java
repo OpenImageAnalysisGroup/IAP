@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.MetaDataType;
 
 public class ActionMetaDataInfo extends AbstractNavigationAction {
@@ -35,7 +35,7 @@ public class ActionMetaDataInfo extends AbstractNavigationAction {
 		res.append("<b>Meta-Data for Experiment " + ml + ", stored in " + db + ":</b><br><br>");
 		res.append("<table border='1'>");
 		res.append("<tr><th>ID</th><th>Type</th><th>Values (Number of Plant-IDs)</th></tr>");
-		LemnaTecDataExchange lt = new LemnaTecDataExchange();
+		LTdataExchange lt = new LTdataExchange();
 		for (MetaDataType metaInfoId : lt.getMetaDataIdsForMeasureLabel(db, ml)) {
 			ArrayList<String> ids = lt.getMetaDataValues(db, ml, metaInfoId.getMeta_data_name(), true);
 			res.append("<tr><th>" + metaInfoId.getMeta_data_name() + " (" + ids.size() + ")</th><td>" + metaInfoId.getMeta_data_type() + "</td><td>"

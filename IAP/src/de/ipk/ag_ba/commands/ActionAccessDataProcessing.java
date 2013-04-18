@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.SystemOptions;
 
-import de.ipk.ag_ba.commands.lemnatec.ActionLemnaTecNavigation;
+import de.ipk.ag_ba.commands.lt.ActionLTnavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -72,7 +72,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 		
 		boolean lt = IAPoptions.getInstance().getBoolean("LT-DB", "show_icon", true);
 		if (lt) {
-			NavigationAction lemnaExperiments = new ActionLemnaTecNavigation();
+			NavigationAction lemnaExperiments = new ActionLTnavigation();
 			NavigationButton lemnaEntity = new NavigationButton(lemnaExperiments, src != null ? src.getGUIsetting()
 					: guiSetting);
 			phenoDBcommands.add(lemnaEntity);

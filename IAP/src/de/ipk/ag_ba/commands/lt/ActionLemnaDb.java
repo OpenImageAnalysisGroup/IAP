@@ -4,7 +4,7 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.Comparator;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -29,7 +29,7 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	private final ArrayList<ExperimentHeaderInterface> experiments;
 	
 	public ActionLemnaDb(String db, ArrayList<ExperimentHeaderInterface> experiments) {
-		super("Open LemnaTec-DB " + db);
+		super("Open LT-DB " + db);
 		this.db = db;
 		this.experiments = experiments;
 	}
@@ -39,7 +39,7 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (ExperimentHeaderInterface ehi : experiments) {
 			ExperimentReference experiment = new ExperimentReference(ehi);
-			result.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(experiment), src.getGUIsetting()));
+			result.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(experiment), src.getGUIsetting()));
 		}
 		return result;
 	}

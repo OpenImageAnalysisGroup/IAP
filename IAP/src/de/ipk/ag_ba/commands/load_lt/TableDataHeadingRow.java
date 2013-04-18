@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.SystemOptions;
 
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDataStringRow;
 
@@ -64,7 +64,7 @@ public class TableDataHeadingRow {
 				String sel = SystemOptions.getInstance().getStringRadioSelection(
 						"Metadata",
 						"Columns//" + heading,
-						possibleValues, LemnaTecDataExchange.getDefaultSelection(col, heading, possibleValues), true);
+						possibleValues, LTdataExchange.getDefaultSelection(col, heading, possibleValues), true);
 				if (sel != null && sel.equals("Plant ID")) {
 					plantIDcolARR.add(col);
 				} else

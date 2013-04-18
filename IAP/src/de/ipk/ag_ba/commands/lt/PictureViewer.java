@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import info.clearthought.layout.TableLayout;
 

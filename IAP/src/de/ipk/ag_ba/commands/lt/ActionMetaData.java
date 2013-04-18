@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -7,7 +7,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 
 public class ActionMetaData extends AbstractNavigationAction {
 	
@@ -20,7 +20,7 @@ public class ActionMetaData extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		res.clear();
-		LemnaTecDataExchange lt = new LemnaTecDataExchange();
+		LTdataExchange lt = new LTdataExchange();
 		status.setCurrentStatusText1("Enumerate MetaData Information...");
 		final TreeMap<String, ArrayList<NavigationButton>> db2el = new TreeMap<String, ArrayList<NavigationButton>>();
 		for (String db : lt.getDatabases()) {

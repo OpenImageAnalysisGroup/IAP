@@ -30,7 +30,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -55,10 +55,10 @@ public class ExperimentReference {
 	}
 	
 	public ExperimentReference(String databaseID) {
-		if (databaseID.startsWith("lemnatec:")) {
+		if (databaseID.startsWith("lt:")) {
 			String db = databaseID.split(":")[1];
 			try {
-				Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(
+				Collection<ExperimentHeaderInterface> res = new LTdataExchange().getExperimentsInDatabase(
 						null/* SystemAnalysis.getUserName() */, db);
 				for (ExperimentHeaderInterface ehi : res) {
 					if (ehi.getDatabaseId().equals(databaseID)) {
@@ -188,8 +188,8 @@ public class ExperimentReference {
 					}
 				}
 				if (databaseId != null)
-					if (databaseId.startsWith("lemnatec:"))
-						res = new LemnaTecDataExchange().getExperiment(header, interactiveGetExperimentSize, status);
+					if (databaseId.startsWith("lt:"))
+						res = new LTdataExchange().getExperiment(header, interactiveGetExperimentSize, status);
 					else
 						if (databaseId.startsWith("hsm:")) {
 							res = HSMfolderTargetDataManager.getExperiment(databaseId);

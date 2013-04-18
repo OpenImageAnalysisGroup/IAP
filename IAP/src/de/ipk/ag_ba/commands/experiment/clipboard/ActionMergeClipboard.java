@@ -7,7 +7,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -131,7 +131,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		// res.add(new NavigationButton(new ActionCopyToMongo(null, new ExperimentReference(experimentResult)),
 		// "Save Result", "img/ext/user-desktop.png", guiSetting));
 		
-		ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(res,
+		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
 				new ExperimentReference(experimentResult),
 				experimentResult.getHeader(),
 				false, guiSetting, null);

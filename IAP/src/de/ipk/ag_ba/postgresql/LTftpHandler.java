@@ -29,21 +29,21 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 /**
  * @author klukas
  */
-public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
+public class LTftpHandler extends AbstractResourceIOHandler {
 	
-	public static final String PREFIX = "lemnatec-ftp";
+	public static final String PREFIX = "lt-ftp";
 	
 	private static boolean useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
 	private static String ftpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP host", "lemna-db.ipk-gatersleben.de");
 	private static String ftpLocalFolder = SystemOptions.getInstance()
 			.getString("LT-DB", "Image File Transfer//FTP directory prefix", "/../../data0/pgftp/");
-	private static String ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "lemnatec");
-	private static String ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "LemnaTec");
+	private static String ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "");
+	private static String ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "");
 	
 	private static String scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemna-db.ipk-gatersleben.de");
 	private static String scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/data0/pgftp/");
 	private static String scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
-	private static String scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "LemnaTec");
+	private static String scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "");
 	
 	@Override
 	public String getPrefix() {
@@ -54,13 +54,13 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	public InputStream getInputStream(IOurl url) throws Exception {
 		useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
 		ftpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP directory prefix", "/../../data0/pgftp/");
-		ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "lemnatec");
-		ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "LemnaTec");
+		ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "");
+		ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "");
 		
 		scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemna-db.ipk-gatersleben.de");
 		scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/data0/pgftp/");
 		scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
-		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "LemnaTec");
+		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "");
 		
 		boolean useLocalCopyIfAvail = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use local file access if available", false);
 		String localCopyPath = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//Local copy or mount point", "Z:\\");
@@ -134,7 +134,7 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 		return null;
 	}
 	
-	public static IOurl getLemnaTecFTPurl(String filename, String displayFileName) {
+	public static IOurl getImagingSystemFTPurl(String filename, String displayFileName) {
 		String host = SystemOptions.getInstance().getString(
 				"LT-DB", "Image File Transfer//FTP host", "lemna-db.ipk-gatersleben.de");
 		if (filename.contains("/")) {
@@ -148,14 +148,14 @@ public class LemnaTecFTPhandler extends AbstractResourceIOHandler {
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
 			throws Exception {
-		throw new Exception("LemnaTec FTP Output is not supported!");
+		throw new Exception("Imaging System server FTP Output is not supported!");
 	}
 	
 	public static IOurl getURL(File file) {
 		return new IOurl(PREFIX, file.getParent() + "/", file.getName());
 	}
 	
-	public static boolean isLemnaTecFtpUrl(IOurl fileName) {
+	public static boolean isImagingSystemFtpUrl(IOurl fileName) {
 		if (fileName != null && fileName.getPrefix() != null)
 			return fileName.getPrefix().equals(PREFIX);
 		else

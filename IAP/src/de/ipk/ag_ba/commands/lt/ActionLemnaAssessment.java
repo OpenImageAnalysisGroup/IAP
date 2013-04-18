@@ -4,30 +4,31 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author klukas
  */
-public class ActionLemnaTecDatabaseCollection extends AbstractNavigationAction implements NavigationAction {
+public class ActionLemnaAssessment extends AbstractNavigationAction implements NavigationAction {
+	
+	public ActionLemnaAssessment() {
+		super("Predict experiment storage and time requirements");
+	}
 	
 	private NavigationButton src;
-	private final ArrayList<NavigationButton> prepared;
-	
-	public ActionLemnaTecDatabaseCollection(ArrayList<NavigationButton> prepared) {
-		super("Show list of unsorted (old) experiments");
-		this.prepared = prepared;
-	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return prepared;
+		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
+		return result;
 	}
 	
 	@Override
@@ -43,18 +44,23 @@ public class ActionLemnaTecDatabaseCollection extends AbstractNavigationAction i
 	}
 	
 	@Override
+	public MainPanelComponent getResultMainPanel() {
+		return new MainPanelComponent("This command has no function when using the desktop-mode of IAP.");
+	}
+	
+	@Override
 	public String getDefaultImage() {
-		return "img/DBE2_logo-gray_s.png";
+		return IAPimages.getCloudResult();
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/DBE2_logo_s.png";
+		return IAPimages.getCloudResult();
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Unsorted Data";
+		return "Exp. Planning";
 	}
 	
 }
