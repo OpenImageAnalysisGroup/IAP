@@ -230,7 +230,7 @@ public class PixelSegmentation implements Segmentation {
 		for (int i = 0; i < currentClusterId; i++)
 			if (clusterBorderSize[i] > 0) {
 				cluster_lambda[i] = (double) imageClusterSize[i] / (double) clusterBorderSize[i]
-									/ clusterBorderSize[i] * 4 * Math.PI;
+						/ clusterBorderSize[i] * 4 * Math.PI;
 			}
 		
 	}
@@ -355,8 +355,8 @@ public class PixelSegmentation implements Segmentation {
 			for (int k = 0; k < perimeterMask[l].length; k++) {
 				if (perimeterMask[l][k] == 1) {
 					if (currentPositionI - 1 + l >= 0 && currentPositionJ - 1 + k >= 0
-										&& currentPositionI - 1 + l <= src_image.length - 1
-										&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
+							&& currentPositionI - 1 + l <= src_image.length - 1
+							&& currentPositionJ - 1 + k <= src_image[currentPositionI].length - 1) {
 						if (image_cluster_ids[currentPositionI - 1 + l][currentPositionJ - 1 + k] != image_cluster_ids[currentPositionI][currentPositionJ]) {
 							clusterBorderSize[image_cluster_ids[currentPositionI][currentPositionJ]]++;
 							
@@ -641,36 +641,12 @@ public class PixelSegmentation implements Segmentation {
 	}
 	
 	public static void main(String[] args) throws IOException, Exception {
-		
-		// int [][] eingabe_image = new int [2000][2000];
-		// for(int i = 0; i<2000; i++)
-		// for(int j = 0; j<2000; j++)
-		// eingabe_image[i][j] = i;
-		
-		// int[][] eingabe_image = { { 0, 1, 1, 0, 1, 0, 1, 0 },
-		// { 1, 1, 0, 0, 1, 1, 1, 0 },
-		// { 0, 1, 1, 1, 1, 0, 1, 0 },
-		// { 0, 0, 0, 0, 0, 1, 1, 0 },
-		// { 0, 1, 1, 1, 0, 0, 0, 1 },
-		// { 1, 1, 1, 1, 1, 0, 0, 0 } };
-		
-		// IOurl testURL = new IOurl("file:///Users/entzian/Desktop/test.png");
-		// BufferedImage testBI = ImageIO.read(testURL.getInputStream());
-		// int[][] testArray = ImageConverter.convertBIto2A(testBI);
-		//
-		// for (int i = 0; i < testArray.length; i++)
-		// for (int j = 0; j < testArray[0].length; j++)
-		// if (testArray[i][j] == Color.WHITE.getRGB())
-		// testArray[i][j] = 0;
-		// else
-		// testArray[i][j] = 1;
-		
 		int[][] eingabe_image = { { 0, 1, 1, 0, 1, 1, 1 },
-											{ 1, 1, 1, 1, 1, 0, 1 },
-											{ 0, 0, 0, 0, 0, 0, 1 },
-											{ 0, 0, 0, 0, 0, 1, 1 },
-											{ 0, 1, 0, 0, 0, 0, 0 },
-											{ 1, 1, 0, 0, 0, 0, 0 } };
+				{ 1, 1, 1, 1, 1, 0, 1 },
+				{ 0, 0, 0, 0, 0, 0, 1 },
+				{ 0, 0, 0, 0, 0, 1, 1 },
+				{ 0, 1, 0, 0, 0, 0, 0 },
+				{ 1, 1, 0, 0, 0, 0, 0 } };
 		//
 		PixelSegmentation test = new PixelSegmentation(new FlexibleImage(eingabe_image), NeighbourhoodSetting.NB4);
 		// PixelSegmentation test = new PixelSegmentation(testArray, NeighbourhoodSetting.NB4);
@@ -681,14 +657,8 @@ public class PixelSegmentation implements Segmentation {
 		test.printImage();
 		test.printClusterArray();
 		System.out.println("Number of Clusters: " +
-							test.getNumberOfCluster());
+				test.getNumberOfCluster());
 		System.out.println("Number of Pixel: " + test.getNumberOfPixel());
-		// System.out.println("Area:");
-		// test.printArray(test.getArea());
-		// System.out.println("Perimeter: ");
-		// test.printArray(test.getPerimeter());
-		// System.out.println("Ratio: ");
-		// test.printArray(test.getCircuitRatio());
 	}
 	
 	private void mergeHashMapDritteVariante() {
@@ -696,13 +666,6 @@ public class PixelSegmentation implements Segmentation {
 		int[] fuellGrad = new int[currentClusterId]; // enspricht x
 		clusterMap = new int[currentClusterId]; // entspricht y
 		tableLinks = new int[currentClusterId][currentClusterId];// entspricht z
-		
-		// for (int key : clusterMapping.keySet()) {
-		// for (int value : clusterMapping.get(key)) {
-		// tableLinks[key][value] = -1;
-		// tableLinks[value][key] = -1;
-		// }
-		// }
 		
 		for (int i = 0; i < currentClusterId; i++) {
 			clusterMap[i] = -1; // überall wo -1 steht wird dann der Index als Cluster gesetzt

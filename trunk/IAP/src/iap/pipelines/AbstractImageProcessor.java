@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * @author pape, klukas, entzian
+ * @author pape, klukas
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	

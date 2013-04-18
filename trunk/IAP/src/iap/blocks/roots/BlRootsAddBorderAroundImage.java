@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 /**
  * Add border of N pixels around the images (visible)
  * 
- * @author klukas, entzian
+ * @author klukas
  */
 public class BlRootsAddBorderAroundImage extends AbstractSnapshotAnalysisBlockFIS {
 	@Override

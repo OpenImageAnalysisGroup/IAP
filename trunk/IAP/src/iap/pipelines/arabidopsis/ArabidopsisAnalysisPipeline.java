@@ -43,7 +43,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
  * images. Depends on reference images for initial comparison and foreground /
  * background separation.
  * 
- * @author klukas, pape, entzian
+ * @author klukas
  */
 public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 	
@@ -76,17 +76,17 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlUseVisMaskToClearFluo_fluo.class.getCanonicalName(),
 				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
-
+				
 				BlSmoothShape.class.getCanonicalName(),
-
+				
 				BlMedianFilter.class.getCanonicalName(),
 				BlMedianFilter.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
 				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-
+				
 				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
-
+				
 				// calculation of numeric values
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
@@ -94,9 +94,9 @@ public class ArabidopsisAnalysisPipeline extends AbstractImageProcessor {
 				BlConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
-
+				
 				BlockDrawSkeleton.class.getCanonicalName(),
-
+				
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlReplaceEmptyOriginalImages.class.getCanonicalName()

@@ -11,12 +11,12 @@ import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
 import iap.blocks.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
 import iap.blocks.arabidopsis.BlCutZoomedImages;
+import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
 import iap.blocks.arabidopsis.BlRotate;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClearIr;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClearNir_Arabidopsis;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
-import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.arabidopsis.BlockSkeletonize_Arabidopsis;
 import iap.blocks.hull.BlConvexHull;
 import iap.blocks.maize.BlCalcIntensity;
@@ -37,7 +37,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
  * images. Depends on reference images for initial comparison and foreground /
  * background separation.
  * 
- * @author klukas, pape, entzian
+ * @author klukas
  */
 public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 	
