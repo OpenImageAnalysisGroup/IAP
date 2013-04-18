@@ -153,23 +153,15 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	
 	public static ExperimentInterface getExperiment(ExperimentHeaderInterface header, BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		// hsm:/Users/klukas/Library/Preferences/VANTED/local-iap-hsm/aaa_directory/1303994908266_0_klukas_WT_H3.iap.index.csv
 		String indexFileName = header.getDatabaseId().substring("hsm:".length());
 		String fileName = indexFileName.substring(indexFileName.lastIndexOf(File.separator) + File.separator.length());
-		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/aaa_directory/1303994908266_0_klukas_WT_H3.iap.index.csv
 		String hsmFolder = indexFileName.substring(0, indexFileName.lastIndexOf(File.separator));
-		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/aaa_directory
-		// cd ..
 		hsmFolder = hsmFolder.substring(0, hsmFolder.lastIndexOf(File.separator));
-		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm
 		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(
 				HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
 		String experimentDirectory = hsm.getTargetDirectory(header, null);
-		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\ \(APH\)/klukas/WT_H3
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
 		String loadFile = hsmFolder + File.separator + DATA_FOLDER_NAME + File.separator + experimentDirectory + File.separator + fileNameOfExperimentFile;
-		// /Users/klukas/Library/Preferences/VANTED/local-iap-hsm/Phenotyping\ Experiment\ \(unknown\ greenhouse\)/LemnaTec\
-		// \(APH\)/klukas/WT_H3/1303994908266_0_klukas_WT_H3.iap.vanted.bin
 		Experiment md = loadExperimentFromFile(header, status, loadFile);
 		return md;
 	}

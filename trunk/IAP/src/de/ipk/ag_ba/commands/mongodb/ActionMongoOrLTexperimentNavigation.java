@@ -34,7 +34,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 /**
  * @author klukas
  */
-public class ActionMongoOrLemnaTecExperimentNavigation extends
+public class ActionMongoOrLTexperimentNavigation extends
 		AbstractNavigationAction implements RunnableWithMappingData {
 	private NavigationButton src;
 	private String domainUser;
@@ -44,11 +44,11 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 	private boolean requestTitleUpdates = true;
 	private boolean oldAnalysis;
 	
-	public ActionMongoOrLemnaTecExperimentNavigation(
+	public ActionMongoOrLTexperimentNavigation(
 			ExperimentReference exp) {
 		super(
 				exp.getHeader().getDatabaseId() != null
-						&& exp.getHeader().getDatabaseId().startsWith("lemnatec:") ? "Access LemnaTec-DB data set"
+						&& exp.getHeader().getDatabaseId().startsWith("lt:") ? "Access imaging system data set"
 						: "Access Systems Biology Cloud Data Set");
 		
 		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>"
@@ -89,11 +89,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			add = true;
 		}
 		if (add) {
-			boolean imageAnalysis = true;/*
-													 * header.getDatabaseId() == null || (experimentReference.m != null
-													 * || header.getDatabaseId().startsWith("hsm:")
-													 * || header.getDatabaseId().startsWith("lemnatec:"));
-													 */
+			boolean imageAnalysis = true;
 			getDefaultActions(
 					actions,
 					experimentReference,
@@ -108,7 +104,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 		}
 		
 		if (header != null && header.getDatabaseId() != null
-				&& !header.getDatabaseId().startsWith("lemnatec:")
+				&& !header.getDatabaseId().startsWith("lt:")
 				&& (header.getImportusername() == null
 						|| header.getImportusername().equals("tomcat") || header
 						.getImportusername().equals(
@@ -173,7 +169,7 @@ public class ActionMongoOrLemnaTecExperimentNavigation extends
 			@Override
 			public void run() {
 				status.setCurrentStatusValue(100);
-				ActionMongoOrLemnaTecExperimentNavigation.this.requestTitleUpdates = false;
+				ActionMongoOrLTexperimentNavigation.this.requestTitleUpdates = false;
 			}
 		});
 	}

@@ -11,7 +11,7 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -133,7 +133,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(
 					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLemnaTecExperimentNavigation.getDefaultActions(storedActions,
+			ActionMongoOrLTexperimentNavigation.getDefaultActions(storedActions,
 					new ExperimentReference(statisticsResult),
 					statisticsResult
 							.getHeader(), false, src.getGUIsetting(), m);

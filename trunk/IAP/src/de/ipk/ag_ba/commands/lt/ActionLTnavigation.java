@@ -4,7 +4,7 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,19 +15,19 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
-import de.ipk.ag_ba.datasources.http_folder.LemnaTecDokuSource;
+import de.ipk.ag_ba.datasources.http_folder.LTdocuSource;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
  */
-public class ActionLemnaTecNavigation extends AbstractNavigationAction implements NavigationAction {
+public class ActionLTnavigation extends AbstractNavigationAction implements NavigationAction {
 	
 	private NavigationButton src;
 	private String login;
@@ -36,8 +36,8 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 	private ArrayList<String> listOfDatabases = null;
 	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 	
-	public ActionLemnaTecNavigation() {
-		super("Access LemnaTec-DB");
+	public ActionLTnavigation() {
+		super("Access LT-DB");
 	}
 	
 	public void setLogin(String user) {
@@ -76,26 +76,26 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 		result.clear();
 		try {
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
-				result.add(new NavigationButton(new ActionLemnaTecLogout(), src.getGUIsetting()));
+				result.add(new NavigationButton(new ActionLTlogout(), src.getGUIsetting()));
 			
-			result.add(new NavigationButton(new ActionLemnaTecUserNavigation(login), src.getGUIsetting()));
+			result.add(new NavigationButton(new ActionLTuserNavigation(login), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
-			listOfDatabases = listOfDatabases != null ? listOfDatabases : new ArrayList<String>(new LemnaTecDataExchange().getDatabases());
+			listOfDatabases = listOfDatabases != null ? listOfDatabases : new ArrayList<String>(new LTdataExchange().getDatabases());
 			Collections.sort(listOfDatabases, new Comparator<String>() {
 				@Override
 				public int compare(String arg0, String arg1) {
-					if (LemnaTecDataExchange.known(arg0) && !LemnaTecDataExchange.known(arg1))
+					if (LTdataExchange.known(arg0) && !LTdataExchange.known(arg1))
 						return -1;
-					if (!LemnaTecDataExchange.known(arg0) && LemnaTecDataExchange.known(arg1))
+					if (!LTdataExchange.known(arg0) && LTdataExchange.known(arg1))
 						return 1;
 					return arg0.compareTo(arg1);
 				}
 			});
 			ArrayList<NavigationButton> unsorted = new ArrayList<NavigationButton>();
-			NavigationButton nb = new NavigationButton(new ActionLemnaTecDatabaseCollection(unsorted), src.getGUIsetting());
+			NavigationButton nb = new NavigationButton(new ActionLTdtabaseCollection(unsorted), src.getGUIsetting());
 			int n = 0;
 			int idx = -1;
 			int max = listOfDatabases.size();
@@ -103,19 +103,19 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			for (String db : listOfDatabases) {
 				idx++;
 				status.setCurrentStatusValueFine(idx / (double) max * 100d);
-				if (!LemnaTecDataExchange.known(db))
+				if (!LTdataExchange.known(db))
 					continue;
 				status.setCurrentStatusText1(n + " experiments");
 				try {
 					if (!experimentMap.containsKey(db)) {
-						ArrayList<ExperimentHeaderInterface> res = new LemnaTecDataExchange().
+						ArrayList<ExperimentHeaderInterface> res = new LTdataExchange().
 								getExperimentsInDatabase(login, db, status);
 						n += res.size();
 						experimentMap.put(db, res);
 					}
 					ArrayList<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 					if (experiments.size() > 0) {
-						if (!LemnaTecDataExchange.known(db))
+						if (!LTdataExchange.known(db))
 							unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
 						else
 							result.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
@@ -136,8 +136,8 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 			
 			result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
-			if (IAPoptions.getInstance().getBoolean("LemnaTec-Site-Documentation", "show_icon", true)) {
-				HTTPfolderSource doku = new LemnaTecDokuSource();
+			if (IAPoptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
+				HTTPfolderSource doku = new LTdocuSource();
 				NavigationButton dokuButton = new NavigationButton(new ActionNavigateDataSource(doku), src.getGUIsetting());
 				result.add(dokuButton);
 			}
@@ -166,7 +166,7 @@ public class ActionLemnaTecNavigation extends AbstractNavigationAction implement
 	
 	@Override
 	public String getDefaultTitle() {
-		return "LemnaTec";
+		return "Imaging System";
 	}
 	
 }

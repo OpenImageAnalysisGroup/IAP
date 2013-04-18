@@ -47,7 +47,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionClearClipboard;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionMergeClipboard;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
@@ -224,7 +224,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 				this.set.add(nb);
 			}
 			for (ExperimentReference clipboardItem : guiSettting.getClipboardItems()) {
-				NavigationAction na = new ActionMongoOrLemnaTecExperimentNavigation(clipboardItem);
+				NavigationAction na = new ActionMongoOrLTexperimentNavigation(clipboardItem);
 				NavigationButton nb = new NavigationButton("Clipboard item " + clipboardItem.getExperimentName() + "", na, guiSettting);
 				nb.setRightAligned(true);
 				this.set.add(nb);

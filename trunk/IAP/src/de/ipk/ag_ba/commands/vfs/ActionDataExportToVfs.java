@@ -42,7 +42,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -403,7 +403,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 										.getFileName());
 					else
 						if (bm.getLabelURL().getPrefix()
-								.startsWith(LemnaTecFTPhandler.PREFIX)) {
+								.startsWith(LTftpHandler.PREFIX)) {
 							String fn = bm.getLabelURL().getDetail();
 							zefn = "label_"
 									+ substanceName
@@ -463,7 +463,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								+ getFileExtension(oldRefUrl.getFileName());
 					else
 						if (oldRefUrl.getPrefix().startsWith(
-								LemnaTecFTPhandler.PREFIX)) {
+								LTftpHandler.PREFIX)) {
 							String fn = oldRefUrl.getDetail();
 							zefn = "label_oldreference_"
 									+ substanceName

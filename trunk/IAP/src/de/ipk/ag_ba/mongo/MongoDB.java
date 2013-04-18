@@ -63,8 +63,8 @@ import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operation.ImageConverter;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -585,7 +585,7 @@ public class MongoDB {
 						}
 						if (user == null ||
 								h.getImportusername() != null && h.getImportusername().equals(user) ||
-								LemnaTecDataExchange.getAdministrators().contains(user) ||
+								LTdataExchange.getAdministrators().contains(user) ||
 								h.getCoordinator().toUpperCase().contains(user.toUpperCase()))
 							res.add(h);
 						idx++;
@@ -1295,7 +1295,7 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				if (url != null && url.getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+				if (url != null && url.getPrefix().equals(LTftpHandler.PREFIX)) {
 					if (getEnsureIndex())
 						db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 					
@@ -1328,7 +1328,7 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				if (url != null && url.getPrefix().equals(LemnaTecFTPhandler.PREFIX)) {
+				if (url != null && url.getPrefix().equals(LTftpHandler.PREFIX)) {
 					if (getEnsureIndex())
 						db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
 					

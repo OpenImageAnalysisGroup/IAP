@@ -12,8 +12,8 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import com.mongodb.gridfs.GridFSDBFile;
 
-import de.ipk.ag_ba.commands.lemnatec.ActionGridFSscreenshotMonitoring;
-import de.ipk.ag_ba.commands.lemnatec.ActionWebCamView;
+import de.ipk.ag_ba.commands.lt.ActionGridFSscreenshotMonitoring;
+import de.ipk.ag_ba.commands.lt.ActionWebCamView;
 import de.ipk.ag_ba.commands.mongodb.ActionMassCopyHistory;
 import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.commands.system_status.ActionBackupHistory;
@@ -47,19 +47,12 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 		infoset.clear();
 		resultNavigationButtons.clear();
 		
-		// BackgroundTaskHelper.isTaskWithGivenReferenceRunning(referenceObject)
-		
 		if (MongoDB.getDefaultCloud() != null) {
 			resultNavigationButtons.add(new NavigationButton(new ActionScreenshotStorage("Enable/Disable Desktop Screenshot Sharing"), src.getGUIsetting()));
 		}
 		
 		for (WebCamInfo ur : IAPservice.getActiveWebCamURLs()) {
 			IOurl url = new IOurl(ur.getUrl());
-			
-			// "root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=" +
-			// System.currentTimeMillis();
-			// imageSrc = "http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=1280x960&Quality=Clarity";
-			
 			resultNavigationButtons.add(
 					ActionWebCamView.getLemnaCamButton(src.getGUIsetting(),
 							"Show camera view (" + ur.getName() + ")", ur.getName(), url));

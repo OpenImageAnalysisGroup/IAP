@@ -43,7 +43,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -926,16 +926,16 @@ public class ExperimentSaver implements RunnableOnDB {
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		}
 		if (image.getURL() != null && image.getURL().getPrefix().startsWith("mongo_") && image.getURL().getDetail().startsWith("lemna-db.")) {
-			image.getURL().setPrefix(LemnaTecFTPhandler.PREFIX);
+			image.getURL().setPrefix(LTftpHandler.PREFIX);
 		}
 		if (image.getLabelURL() != null && image.getLabelURL().getPrefix().startsWith("mongo_") && image.getLabelURL().getDetail().startsWith("lemna-db.")) {
-			image.getLabelURL().setPrefix(LemnaTecFTPhandler.PREFIX);
+			image.getLabelURL().setPrefix(LTftpHandler.PREFIX);
 		}
 		
 		// check if the source URL has been imported before, it is assumed that the source URL content
 		// is not modified
 		if (image.getURL() != null &&
-				(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX) ||
+				(image.getURL().getPrefix().equals(LTftpHandler.PREFIX) ||
 				image.getURL().getPrefix().startsWith("hsm_"))) {
 			if (keepRemoteURLs_safe_space)
 				return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
@@ -1029,7 +1029,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		String hashLabel = hashes[1];
 		
 		if (image.getURL() != null &&
-				(image.getURL().getPrefix().equals(LemnaTecFTPhandler.PREFIX)) ||
+				(image.getURL().getPrefix().equals(LTftpHandler.PREFIX)) ||
 				image.getURL().getPrefix().startsWith("hsm_")) {
 			if (MongoDB.getEnsureIndex())
 				db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
@@ -1097,7 +1097,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	}
 	
 	protected static boolean processLabelData(boolean keepRemoteURLs_safe_space, IOurl labelURL) {
-		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LemnaTecFTPhandler.PREFIX)
+		return !keepRemoteURLs_safe_space || (labelURL != null && (labelURL.getPrefix().equals(LTftpHandler.PREFIX)
 				|| labelURL.getPrefix().startsWith("hsm_")));
 	}
 	

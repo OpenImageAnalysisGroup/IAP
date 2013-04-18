@@ -17,20 +17,20 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 /**
  * @author klukas
  */
-public class LemnaTecDokuSource extends HTTPfolderSource {
+public class LTdocuSource extends HTTPfolderSource {
 	
-	public LemnaTecDokuSource() {
+	public LTdocuSource() {
 		super(getLib(),
-				IAPoptions.getInstance().getString("LemnaTec-Site-Documentation", "title",
+				IAPoptions.getInstance().getString("Imaging-System-Documentation", "title",
 						"Documentation"),
-				IAPoptions.getInstance().getString("LemnaTec-Site-Documentation", "url",
+				IAPoptions.getInstance().getString("Imaging-System-Documentation", "url",
 						"http://ba-13.ipk-gatersleben.de/LemnaTec/"),
-				IAPoptions.getInstance().getStringAll("LemnaTec-Site-Documentation", "filename_mask",
+				IAPoptions.getInstance().getStringAll("Imaging-System-Documentation", "filename_mask",
 						new String[] { ".pdf" }),
 				IAPmain.loadIcon("img/dataset.png"), IAPmain.loadIcon("img/ext/folder.png"));
-		setDescription(IAPoptions.getInstance().getString("LemnaTec-Site-Documentation", "description",
-				"<h2>LemnaTec Technical Documentation</h2>"
-						+ "This function provides access to the dokumentation delivered with the LemnaTec systems."));
+		setDescription(IAPoptions.getInstance().getString("Imaging-System-Documentation", "description",
+				"<h2>Technical Documentation</h2>"
+						+ "This function provides access to the dokumentation delivered with the automated imaging systems."));
 	}
 	
 	@Override
@@ -39,19 +39,19 @@ public class LemnaTecDokuSource extends HTTPfolderSource {
 	}
 	
 	private static Library getLib() {
-		Library libLemnaTecDocu = new Library();
-		if (IAPoptions.getInstance().getBoolean("LemnaTec-Site-Documentation",
+		Library libImagingSystemDocu = new Library();
+		if (IAPoptions.getInstance().getBoolean("Imaging-System-Documentation",
 				"user_doc_show_icon", true)) {
-			libLemnaTecDocu.add(new Book(
-					IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
+			libImagingSystemDocu.add(new Book(
+					IAPoptions.getInstance().getString("Imaging-System-Documentation",
 							"title", "Documentation"), // warning: needs to be the same title as above
-					IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
-							"user_doc_title", "IPK Naming Standards"),
-					new IOurl(IAPoptions.getInstance().getString("LemnaTec-Site-Documentation",
+					IAPoptions.getInstance().getString("Imaging-System-Documentation",
+							"user_doc_title", "Naming Standards"),
+					new IOurl(IAPoptions.getInstance().getString("Imaging-System-Documentation",
 							"user_doc_url", "http://ba-13.ipk-gatersleben.de/standards.pdf")),
 					"img/ext/paper.png"));
 		}
-		return libLemnaTecDocu;
+		return libImagingSystemDocu;
 	}
 	
 }

@@ -94,8 +94,8 @@ import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
@@ -1052,8 +1052,8 @@ public class IAPservice {
 			RunnableWithMappingData resultReceiver) throws Exception {
 		ExperimentInterface experiment = null;
 		if (header.getDatabaseId() != null
-				&& header.getDatabaseId().startsWith("lemnatec:"))
-			experiment = new de.ipk.ag_ba.postgresql.LemnaTecDataExchange().getExperiment(header,
+				&& header.getDatabaseId().startsWith("lt:"))
+			experiment = new de.ipk.ag_ba.postgresql.LTdataExchange().getExperiment(header,
 					false,
 					status);
 		else
@@ -1070,7 +1070,7 @@ public class IAPservice {
 	}
 	
 	public static void monitorExperimentDataProgress() throws IOException, ClassNotFoundException, SQLException, InterruptedException {
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		System.out.println(SystemAnalysis.getCurrentTime() + ">START OBSERVING EXPERIMENT PROGRESS...");
 		IAPmail m = new IAPmail();
 		String host = SystemAnalysisExt.getHostName();
@@ -1084,10 +1084,10 @@ public class IAPservice {
 			c.add("# Remark: If the email-address klukas@ipk-gatersleben.de is missing, it is automatically included in the send-command.");
 			// c.add("# example config: 1116BA, auto, 10,30, klukas@ipk-gatersleben.de   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
-			LemnaTecDataExchange lde = new LemnaTecDataExchange();
+			LTdataExchange lde = new LTdataExchange();
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
-			for (String database : new LemnaTecDataExchange().getDatabases()) {
+			for (String database : new LTdataExchange().getDatabases()) {
 				try {
 					el.addAll(lde.getExperimentsInDatabase(null, database));
 				} catch (Exception e) {
@@ -1162,7 +1162,7 @@ public class IAPservice {
 					e.printStackTrace();
 				}
 			} else {
-				LemnaTecDataExchange lde = new LemnaTecDataExchange();
+				LTdataExchange lde = new LTdataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
 				TreeSet<String> validDatabases = new TreeSet<String>();
 				boolean checkAll = false;
@@ -1396,7 +1396,7 @@ public class IAPservice {
 	};
 	
 	private static String[] templateWebCamtURLs = new String[] {
-			"root:lemnatec@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=[time]",
+			"user:pass@http://lemnacam.ipk-gatersleben.de/jpg/image.jpg?timestamp=[time]",
 			"http://ba-10.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity",
 			"http://ba-16.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity",
 			"http://ba-17.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity"

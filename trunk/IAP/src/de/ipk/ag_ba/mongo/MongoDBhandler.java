@@ -29,7 +29,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 
 public class MongoDBhandler extends AbstractResourceIOHandler {
 	private final String prefix;
@@ -75,7 +75,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 					try {
 						if (url.getDetail().indexOf(".") > 0) {
 							for (ResourceIOHandler rh : ResourceIOManager.getInstance().getHandlers())
-								if (rh instanceof LemnaTecFTPhandler) {
+								if (rh instanceof LTftpHandler) {
 									InputStream is;
 									IOurl url2 = new IOurl(url);
 									url2.setPrefix(rh.getPrefix());

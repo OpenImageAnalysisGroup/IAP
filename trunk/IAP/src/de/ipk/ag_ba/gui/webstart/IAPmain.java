@@ -49,7 +49,7 @@ import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
 import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
@@ -244,7 +244,7 @@ public class IAPmain extends JApplet {
 	private void registerIOhandlers() {
 		// ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
 		// ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos())
 			ResourceIOManager.registerIOHandler(m.getHandler());
 	}

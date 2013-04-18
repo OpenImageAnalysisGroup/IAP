@@ -8,7 +8,7 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.DeletionCommand;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -63,7 +63,7 @@ public class ActionExperimentHistory extends AbstractNavigationAction {
 			String t = SystemAnalysis.getCurrentTime(time);
 			ExperimentReference exp = new ExperimentReference(ei);
 			exp.m = m;
-			res.add(0, new NavigationButton(t, new ActionMongoOrLemnaTecExperimentNavigation(exp), src.getGUIsetting()));
+			res.add(0, new NavigationButton(t, new ActionMongoOrLTexperimentNavigation(exp), src.getGUIsetting()));
 		}
 		res.add(0, new NavigationButton(new ActionTrash(history.values(), DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS, m), src.getGUIsetting()));
 		return res;

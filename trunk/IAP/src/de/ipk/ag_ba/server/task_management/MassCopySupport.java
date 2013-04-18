@@ -26,8 +26,8 @@ import de.ipk.ag_ba.commands.mongodb.ActionMongoDbCompact;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
-import de.ipk.ag_ba.postgresql.LemnaTecFTPhandler;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
+import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -55,7 +55,7 @@ public class MassCopySupport {
 	private MassCopySupport() {
 		new MultimodalDataHandlingAddon();
 		
-		ResourceIOManager.registerIOHandler(new LemnaTecFTPhandler());
+		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos()) {
 			ResourceIOManager.registerIOHandler(m.getHandler());
 		}
@@ -206,9 +206,9 @@ public class MassCopySupport {
 	private void copyMissingOrNewData(boolean analyzeEachCopiedExperiment) throws SQLException, ClassNotFoundException, Exception, InterruptedException {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
 		status.setCurrentStatusText1("Start sync...");
-		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LemnaTec to MongoDBs (MASS COPY)", false);
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LT Imaging System to MongoDBs (MASS COPY)", false);
 		
-		LemnaTecDataExchange lt = new LemnaTecDataExchange();
+		LTdataExchange lt = new LTdataExchange();
 		ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
 		ArrayList<IdTime> mongoIdsArr = new ArrayList<IdTime>();
 		final ArrayList<IdTime> toSave = new ArrayList<IdTime>();

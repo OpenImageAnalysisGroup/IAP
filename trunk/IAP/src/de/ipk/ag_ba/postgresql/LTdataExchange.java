@@ -61,7 +61,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas, entzian
  */
-public class LemnaTecDataExchange implements ExperimentLoader {
+public class LTdataExchange implements ExperimentLoader {
 	private final String user;
 	private final String password;
 	private final String port;
@@ -69,9 +69,9 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	
 	private static final String driver = "org.postgresql.Driver";
 	
-	public LemnaTecDataExchange() {
+	public LTdataExchange() {
 		user = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
-		password = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//password", "LemnaTec");
+		password = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
 		port = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
 		host = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
 	}
@@ -187,16 +187,16 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 				ehi.setExperimentname(name);
 				
 				ehi.setDatabase(database);
-				ehi.setDatabaseId("lemnatec:" + database + ":" + ehi.getExperimentName());
-				ehi.setOriginDbId("lemnatec:" + database + ":" + ehi.getExperimentName());
+				ehi.setDatabaseId("lt:" + database + ":" + ehi.getExperimentName());
+				ehi.setOriginDbId("lt:" + database + ":" + ehi.getExperimentName());
 				ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
-				ehi.setImportusergroup("LemnaTec");
-				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
-				if (system == LemnaTecSystem.Barley) {
+				ehi.setImportusergroup("Imaging System");
+				LTsystem system = LTsystem.getTypeFromDatabaseName(database);
+				if (system == LTsystem.Barley) {
 					ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
-					ehi.setImportusergroup("LemnaTec (BGH)");
+					ehi.setImportusergroup("Imaging System (BGH)");
 				} else
-					if (system == LemnaTecSystem.Maize) {
+					if (system == LTsystem.Maize) {
 						if (name.length() >= 6 && name.toUpperCase().endsWith("RAPS"))
 							ehi.setExperimenttype(IAPexperimentTypes.Raps + "");
 						else
@@ -204,14 +204,14 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 								ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
 							else
 								ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse + "");
-						ehi.setImportusergroup("LemnaTec (CGH)");
+						ehi.setImportusergroup("Imaging System (CGH)");
 					} else
-						if (system == LemnaTecSystem.Phytochamber) {
+						if (system == LTsystem.Phytochamber) {
 							ehi.setExperimenttype(IAPexperimentTypes.Phytochamber + "");
-							ehi.setImportusergroup("LemnaTec (APH)");
+							ehi.setImportusergroup("Imaging System (APH)");
 						} else {
 							ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse + "");
-							ehi.setImportusergroup("LemnaTec (Other)");
+							ehi.setImportusergroup("Imaging System (Other)");
 						}
 				// ehi.setSequence("");
 				ehi.setSizekb(-1);
@@ -342,7 +342,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 			
 			if (user != null && !getAdministrators().contains(user)) {
 				// remove experiments from result which should not be visible to users
-				LemnaTecSystem system = LemnaTecSystem.getTypeFromDatabaseName(database);
+				LTsystem system = LTsystem.getTypeFromDatabaseName(database);
 				if (!system.isPreAuthenticated(user))
 					for (ExperimentHeaderInterface ehi : people.keySet()) {
 						if (!people.get(ehi).contains(user)) {
@@ -1030,7 +1030,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 						if (fn != null) {
 							if (fn.contains("/"))
 								fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-							IOurl url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
+							IOurl url = LTftpHandler.getImagingSystemFTPurl(experimentReq.getDatabase() + "/"
 									+ sn.getPath_image_config_blob(), sn.getId_tag()
 									+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 							if (optStatus != null)
@@ -1051,7 +1051,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					
 					IOurl url;
 					if (experimentReq.getDatabase() != null)
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
+						url = LTftpHandler.getImagingSystemFTPurl(experimentReq.getDatabase() + "/"
 								+ sn.getPath_image(), sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 					else {
 						url = FileSystemHandler.getURL(new File(sn.getPath_image()));
@@ -1063,7 +1063,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 					if (fn != null) {
 						if (fn.contains("/"))
 							fn = fn.substring(fn.lastIndexOf("/") + "/".length());
-						url = LemnaTecFTPhandler.getLemnaTecFTPurl(experimentReq.getDatabase() + "/"
+						url = LTftpHandler.getImagingSystemFTPurl(experimentReq.getDatabase() + "/"
 								+ sn.getPath_null_image(),
 								"ref_" + sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/") + "/".length()) + ".png"
 								// sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
@@ -1112,8 +1112,8 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 		experiment.getHeader().setSequence(seq);
 		
 		if (experimentReq != null) {
-			experiment.getHeader().setDatabaseId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
-			experiment.getHeader().setOriginDbId("lemnatec:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+			experiment.getHeader().setDatabaseId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+			experiment.getHeader().setOriginDbId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		}
 		
 		if (seq != null && StringManipulationTools.containsAny(seq, getMetaNamesSeedDates())) {
@@ -1352,7 +1352,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	
 	@Override
 	public boolean canHandle(String databaseId) {
-		return databaseId.startsWith(LemnaTecFTPhandler.PREFIX + ":");
+		return databaseId.startsWith(LTftpHandler.PREFIX + ":");
 	}
 	
 	public ArrayList<String> getMetaDataMeasurementLabels(String db) throws ClassNotFoundException, SQLException {
@@ -1471,7 +1471,7 @@ public class LemnaTecDataExchange implements ExperimentLoader {
 	
 	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh,
 			ArrayList<Snapshot> snapshots, HashMap<String, Condition> optIdTag2condition) throws ClassNotFoundException, SQLException {
-		return new LemnaTecDataExchange().getExperiment(eh, false, null, snapshots, optIdTag2condition);
+		return new LTdataExchange().getExperiment(eh, false, null, snapshots, optIdTag2condition);
 	}
 	
 	public static String getDefaultSelection(Integer optCol, String heading, ArrayList<String> possibleValues) {

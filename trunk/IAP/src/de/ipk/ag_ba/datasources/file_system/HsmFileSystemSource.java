@@ -25,7 +25,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
@@ -146,7 +146,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 		if (login == null)
 			return true;
 		else {
-			if (LemnaTecDataExchange.getAdministrators().contains(login))
+			if (LTdataExchange.getAdministrators().contains(login))
 				return true;
 			if (eh.getImportusername().equals(login))
 				return true;

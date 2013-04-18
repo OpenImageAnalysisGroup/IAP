@@ -4,13 +4,13 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -37,7 +37,7 @@ public class ActionLemnaUser extends AbstractNavigationAction implements Navigat
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		for (ExperimentHeaderInterface id : ids) {
 			ExperimentReference exp = new ExperimentReference(id);
-			result.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(exp), src.getGUIsetting()));
+			result.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(exp), src.getGUIsetting()));
 		}
 		return result;
 	}

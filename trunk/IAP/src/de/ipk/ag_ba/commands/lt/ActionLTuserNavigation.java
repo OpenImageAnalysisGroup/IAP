@@ -4,7 +4,7 @@
 /*
  * Created on Oct 8, 2010 by Christian Klukas
  */
-package de.ipk.ag_ba.commands.lemnatec;
+package de.ipk.ag_ba.commands.lt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,18 +18,18 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.Snapshot;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
  * @author klukas
  */
-public class ActionLemnaTecUserNavigation extends AbstractNavigationAction implements NavigationAction {
+public class ActionLTuserNavigation extends AbstractNavigationAction implements NavigationAction {
 	
 	private final String user;
 	
-	public ActionLemnaTecUserNavigation(String user) {
+	public ActionLTuserNavigation(String user) {
 		super("Show user list and their experiments");
 		this.user = user;
 	}
@@ -64,7 +64,7 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 			return;
 		status.setCurrentStatusValueFine(-1);
 		status.setCurrentStatusText1("Query Databases");
-		Collection<String> dbs = new LemnaTecDataExchange().getDatabases();
+		Collection<String> dbs = new LTdataExchange().getDatabases();
 		status.setCurrentStatusValueFine(0);
 		long snapshots = 0;
 		int users = 0;
@@ -82,7 +82,7 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 			status.setCurrentStatusValueFine(idx / (double) max * 100d);
 			try {
 				status.setCurrentStatusText1(n + " experiments");
-				Collection<ExperimentHeaderInterface> res = new LemnaTecDataExchange().getExperimentsInDatabase(user, db, null);
+				Collection<ExperimentHeaderInterface> res = new LTdataExchange().getExperimentsInDatabase(user, db, null);
 				n += res.size();
 				for (ExperimentHeaderInterface experiment : res) {
 					String id = experiment.getDatabase() + ":" + experiment.getExperimentName();
@@ -106,7 +106,7 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 							experimentNames.add(id);
 						}
 					} else
-						for (Snapshot s : new LemnaTecDataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
+						for (Snapshot s : new LTdataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
 								experiment.getExperimentName())) {
 							String c = s.getCreator();
 							if (c.length() == 0)
@@ -151,7 +151,7 @@ public class ActionLemnaTecUserNavigation extends AbstractNavigationAction imple
 				+ (error > 0 ? "<li>Empty databases: " + error + " ("
 						+ StringManipulationTools.getStringList(errorList, ", ") + ")" : "")
 				+ "</ul>"
-				+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LemnaTec PC, while imaging takes place.<br><br>"
+				+ "<br>Remark: Multiple users may contribute data to a single experiment. This depends on which user is logged-in into a LT PC, while imaging takes place.<br><br>"
 				+ "Complete list of snapshot-creators (" + usersUnformatted.size() + ", unformatted): "
 				+ StringManipulationTools.getStringList(getArray(usersUnformatted), ", ");
 		

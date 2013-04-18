@@ -14,12 +14,12 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.load_lt.InfoFile;
 import de.ipk.ag_ba.commands.load_lt.TableDataHeadingRow;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLemnaTecExperimentNavigation;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.postgresql.LemnaTecDataExchange;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.Snapshot;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -168,7 +168,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 									}
 									imageSnapshot.setCamera_label(infoForCameraSnapshot.get("Camera label"));
 									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
-									imageSnapshot.setCamera_label(LemnaTecDataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
+									imageSnapshot.setCamera_label(LTdataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
 									String ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.png";
 									if (storageCheck) {
 										File ff = new File(ffn);
@@ -214,7 +214,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (heading == null)
 					heading = new TableDataHeadingRow(null); // default heading info
 				ArrayList<TableDataStringRow> md = metadata.get(fn);
-				LemnaTecDataExchange.extendId2ConditionList(optIdTag2condition, heading, md);
+				LTdataExchange.extendId2ConditionList(optIdTag2condition, heading, md);
 			}
 		}
 		// get experiment from snapshot info...
@@ -245,7 +245,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (storageCheck)
 					eh.setSizekb(overallStorageSizeInBytes / 1024);
 				eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
-				e = LemnaTecDataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
+				e = LTdataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
 				getStatusProvider().setCurrentStatusText1("Created " + eh.getExperimentName() + ".");
 				getStatusProvider().setCurrentStatusText2("Create Experiment Structures...");
 				loaded_experiments.put(e.getName(), new ExperimentReference(e));
@@ -266,7 +266,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (loaded_experiments != null && loaded_experiments.size() > 0)
 			for (ExperimentReference loaded_experiment : loaded_experiments.values())
-				res.add(new NavigationButton(new ActionMongoOrLemnaTecExperimentNavigation(loaded_experiment), src.getGUIsetting()));
+				res.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(loaded_experiment), src.getGUIsetting()));
 		return res;
 	}
 	
