@@ -399,7 +399,12 @@ public class IAPmain extends JApplet {
 			System.err.println("Internal error: Plugin Description files could not be loaded.");
 			System.err.println("-- Program needs to be stopped");
 			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-					+ "Program execution can not continue.<br>" + "The application needs to be closed.</html>");
+					+ "Program execution can not continue.<br>" + "The application needs to be closed.<br>" +
+					"<br>" +
+					"Create description files by executing the script createfilelist.cmd from the console (Linux/Mac)<br>" +
+					"or by executing createfilelist.bat directly from within Eclipse (works only on Windows).<br>" +
+					"These scripts are stored and available within the 'make' project." +
+					"</html>");
 			System.err.println("EXIT");
 			System.exit(1);
 		}

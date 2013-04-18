@@ -69,6 +69,8 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	private static final String driver = "org.postgresql.Driver";
 	
+	private static boolean debug = false;
+	
 	public LTdataExchange() {
 		user = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
 		password = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
@@ -106,14 +108,14 @@ public class LTdataExchange implements ExperimentLoader {
 		try {
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			
-			if (Debug.TEST)
-				Debug.print(sqlText);
+			if (debug)
+				System.out.println(sqlText);
 			
 			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
-				if (Debug.TEST)
-					Debug.print("aktuelle Zeile: ", rs.getString(1));
+				if (debug)
+					System.out.println("Current Row: " + rs.getString(1));
 				
 				String dbName = rs.getString(1);
 				
@@ -730,9 +732,9 @@ public class LTdataExchange implements ExperimentLoader {
 				+ database;
 		Connection connection = DriverManager.getConnection(path, user, password);
 		
-		if (Debug.TEST) {
+		if (debug) {
 			DatabaseMetaData meta = connection.getMetaData(); // Metadata
-			Debug.print("Connection successful:", meta.getDatabaseProductName() + " " + meta.getDatabaseProductVersion());
+			System.out.println("Connection successful: " + meta.getDatabaseProductName() + " " + meta.getDatabaseProductVersion());
 		}
 		
 		return connection;
