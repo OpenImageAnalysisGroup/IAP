@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
 /**
  * @author entzian
  */
+@Deprecated
 public class PixelSegmentation implements Segmentation {
 	
 	private final int[][] src_image;

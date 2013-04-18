@@ -65,7 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 /**
  * A number of commonly used image operation commands.
  * 
- * @author Entzian, Klukas, Pape
+ * @author Klukas, Pape, Entzian
  */
 
 public class ImageOperation {

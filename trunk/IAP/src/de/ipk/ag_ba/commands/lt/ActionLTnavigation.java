@@ -38,6 +38,8 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	
 	public ActionLTnavigation() {
 		super("Access LT-DB");
+		@SuppressWarnings("unused")
+		LTdataExchange ltInitVariablesAndSettings = new LTdataExchange();
 	}
 	
 	public void setLogin(String user) {
