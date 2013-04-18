@@ -287,7 +287,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		if (getInput)
 			return "Select Input Folder...";
 		else
-			return "Load LT File Export";
+			return "Load DB-Imp.-Exp. Dataset";
 	}
 	
 	@Override
