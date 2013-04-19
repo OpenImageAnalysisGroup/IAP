@@ -40,7 +40,7 @@ public class GetSubstances implements Runnable {
 			for (SubstanceInterface substance : experiment.getExperiment()) {
 				String sn = substance.getName();
 				if (validPrefix == null || (validPrefix != null && sn.startsWith(validPrefix))) {
-					if (validPrefix != null && sn.startsWith(validPrefix))
+					if (validPrefix != null && sn.startsWith(validPrefix) && sn.length() > validPrefix.length())
 						sn = sn.substring(validPrefix.length() + ".".length());
 					if (sn.contains(".")) {
 						String pre = (validPrefix != null ? validPrefix + "." : "") + sn.split("\\.")[0];

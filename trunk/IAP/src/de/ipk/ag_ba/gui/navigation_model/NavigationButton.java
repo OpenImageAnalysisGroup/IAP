@@ -177,9 +177,11 @@ public class NavigationButton implements StyleAware {
 			title = overrideTitle;
 		
 		long compTime = System.currentTimeMillis() - processingStart;
-		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000)
+		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000) {
+			if (title != null && title.contains("<br>") && !title.startsWith("<html>"))
+				return "<html><center>" + title;
 			return title;
-		else {
+		} else {
 			// if (requestsTitleUpdates() && !isProcessing())
 			// return title;
 			String dots = "";
