@@ -321,7 +321,7 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		float[] hsv = new float[3];
 		Color.RGBtoHSB(r, g, b, hsv);
 		
-		IJ.showStatus("red=" + pad(r) + ", green=" + pad(g) + ", blue=" + pad(b) + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H=" + hsv[0] + ", S="
+		IJ.showStatus("r=" + pad(r) + ",g=" + pad(g) + ",b=" + pad(b) + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H=" + hsv[0] + ", S="
 				+ hsv[1] + ", V=" + hsv[2]);
 		
 	}

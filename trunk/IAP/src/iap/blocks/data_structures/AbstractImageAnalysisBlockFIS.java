@@ -115,10 +115,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null && isChangingImages())
-			debugStack.addImage("Input for " + task, input().getOverviewImage(
-					SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
-					), task);
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", true)) {
+			if (getBoolean("enabled", true))
+				debugStack.addImage("Input for " + task, input().getOverviewImage(
+						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
+						), task);
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", false)) {
 			if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
 				if (input().masks() != null)
 					input().masks().fluo().show("Mask-Input for step: " + task);

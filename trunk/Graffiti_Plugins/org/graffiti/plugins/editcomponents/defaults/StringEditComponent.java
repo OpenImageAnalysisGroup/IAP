@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: StringEditComponent.java,v 1.2 2013-03-29 13:18:35 klukas Exp $
+// $Id: StringEditComponent.java,v 1.3 2013-04-19 09:17:37 klukas Exp $
 
 package org.graffiti.plugins.editcomponents.defaults;
 
@@ -40,7 +40,7 @@ import org.graffiti.plugin.editcomponent.AbstractValueEditComponent;
  * <code>StringEditComponent</code> provides an edit component for editing
  * strings. The edit field has just one line.
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * @see org.graffiti.plugin.editcomponent.AbstractValueEditComponent
  * @see javax.swing.text.JTextComponent
  * @see TextAreaEditComponent
@@ -99,7 +99,7 @@ public class StringEditComponent
 			} else {
 				textComp = new JTextField(getDisplayable().getValue().toString());
 				try {
-					if (getDisplayable().getName().equalsIgnoreCase("password")) {
+					if (getDisplayable().getName().toUpperCase().contains("PASSWORD")) {
 						textComp = new JPasswordField(getDisplayable().getValue().toString());
 					}
 				} catch (Exception e) {

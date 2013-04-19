@@ -1320,8 +1320,7 @@ public class LTdataExchange implements ExperimentLoader {
 				rs.close();
 				ps.close();
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("ERROR: " + e.getMessage());
+				System.out.println(SystemAnalysis.getCurrentTime() + ">" + e.getMessage());
 			}
 		} finally {
 			closeDatabaseConnection(connection);
