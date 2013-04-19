@@ -2115,9 +2115,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				float[] hsv = new float[3];
 				Color.RGBtoHSB(r, g, b, hsv);
 				
-				return (", value=" + v[0] + "," + v[1] + "," + v[2] + " // L=" + Li + ", a=" + ai + ", b=" + bi + " // H="
-						+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ", S="
-						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ", V=" + StringManipulationTools.formatNumber(hsv[2], "#.###"));
+				return ("/" + v[0] + "," + v[1] + "," + v[2] + "/L" + Li + ",a" + ai + ",b" + bi + "/H"
+						+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ",S"
+						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V" + StringManipulationTools.formatNumber(hsv[2], "#.###"));
 			default:
 				return ("");
 		}
