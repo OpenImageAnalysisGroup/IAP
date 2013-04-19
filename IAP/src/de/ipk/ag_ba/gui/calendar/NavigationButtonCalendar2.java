@@ -43,8 +43,12 @@ public class NavigationButtonCalendar2 extends NavigationButton implements Style
 	
 	@Override
 	public String getTitle() {
-		if (style == null || style != ButtonDrawStyle.TEXT)
-			return super.getTitle();
+		if (style == null || style != ButtonDrawStyle.TEXT) {
+			String res = super.getTitle();
+			if (res != null && res.contains("<br>") && !res.startsWith("<html>"))
+				return "<html>" + res;
+			return res;
+		}
 		
 		String title = super.getTitle();
 		
@@ -55,6 +59,8 @@ public class NavigationButtonCalendar2 extends NavigationButton implements Style
 			String date = sdfMonthSpecific.format(cal.getTime());
 			title = title + " (" + date + ")";
 		}
+		if (title != null && title.contains("<br>") && !title.startsWith("<html>"))
+			return "<html>" + title;
 		return title;
 	}
 	
