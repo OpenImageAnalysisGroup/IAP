@@ -28,7 +28,7 @@ public class DataMappingId implements Comparable<DataMappingId> {
 		this.timeU = timeU;
 		this.replicateId = replicateId;
 		String d = "_§_";
-		this.sid = expName + d + seriesName + d + timeP + d + timeU + d + replicateId;
+		this.sid = expName + d + seriesName + d + sampleId + d + timeP + d + timeU + d + replicateId;
 	}
 	
 	public static DataMappingId getEmptyDataMappingWithoutReplicateInformation(

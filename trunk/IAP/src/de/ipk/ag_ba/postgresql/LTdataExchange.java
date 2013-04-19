@@ -70,6 +70,10 @@ public class LTdataExchange implements ExperimentLoader {
 	private static final String driver = "org.postgresql.Driver";
 	
 	private static boolean debug = false;
+	/**
+	 * specifies if the camera images are stored as "top.vis", ... instead of the old style "vis.top", ...
+	 */
+	public static boolean positionFirst = true;
 	
 	public LTdataExchange() {
 		user = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
@@ -691,7 +695,13 @@ public class LTdataExchange implements ExperimentLoader {
 		for (String id : SystemOptions.getInstance().getStringAll(
 				"Import", "Top-View-Camera-Config-Substrings", new String[] { "TOP", " TV", "_TV_" }))
 			if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
-				res += "top";
+				if (positionFirst) {
+					res = "top." + res;
+					if (res.endsWith("."))
+						res = res.substring(0, res.length() - 1);
+				} else {
+					res += "top";
+				}
 				topFound = true;
 				break;
 			}
@@ -699,7 +709,13 @@ public class LTdataExchange implements ExperimentLoader {
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
 				if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
-					res += "side";
+					if (positionFirst) {
+						res = "side." + res;
+						if (res.endsWith("."))
+							res = res.substring(0, res.length() - 1);
+					} else {
+						res += "side";
+					}
 					break;
 				}
 		return res;
@@ -1012,7 +1028,7 @@ public class LTdataExchange implements ExperimentLoader {
 					
 					Double position = null;
 					String pre = "Side";
-					if (sn.getCamera_label() != null && sn.getCamera_label().contains(".top"))
+					if (sn.getCamera_label() != null && sn.getCamera_label().contains("top"))
 						pre = "Top";
 					String a = sn.getUserDefinedCameraLabel();
 					try {
