@@ -464,7 +464,10 @@ public class IAPservice {
 					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
-						key += name.substring(name.lastIndexOf("."));
+						if (LTdataExchange.positionFirst)
+							key += name.substring(0, name.indexOf("."));
+						else
+							key += name.substring(name.lastIndexOf("."));
 					searchKey = key + "";
 					break;
 				}
@@ -477,7 +480,10 @@ public class IAPservice {
 					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
-						key += name.substring(name.lastIndexOf("."));
+						if (LTdataExchange.positionFirst)
+							key += name.substring(0, name.indexOf("."));
+						else
+							key += name.substring(name.lastIndexOf("."));
 					if (searchKey.equalsIgnoreCase(key)) {
 						result.add(id);
 					}

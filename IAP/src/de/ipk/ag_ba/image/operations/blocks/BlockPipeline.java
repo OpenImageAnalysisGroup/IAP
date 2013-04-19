@@ -138,7 +138,7 @@ public class BlockPipeline {
 		boolean debug = SystemOptions.getInstance().getBoolean("IAP", "Debug-Pipeline-Execution", false);
 		int tPrintBlockTime = SystemOptions.getInstance().getInteger("IAP", "Info-Print-Block-Execution-Time", 30);
 		
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", false)) {
 			int n = 0;
 			
 			System.out.println("\n##Blocks##");

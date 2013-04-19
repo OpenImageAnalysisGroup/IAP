@@ -20,6 +20,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.StringManipulationTools;
+
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
@@ -75,9 +77,19 @@ public class DBEtreeCellRenderer extends DefaultTreeCellRenderer implements Tree
 					if (cameraRendererIcon != null) {
 						if (mtn.getTargetEntity() != null && (mtn.getTargetEntity() instanceof SubstanceInterface)) {
 							String n = ((SubstanceInterface) mtn.getTargetEntity()).getName();
-							if ((n.endsWith(".top") || n.endsWith(".side")) &&
-									(n.startsWith("vis.") || n.startsWith("fluo.") || n.startsWith("nir.") || n.startsWith("ir.")))
+							// new style
+							// could be checked statically using LTdataExchange.positionFirst
+							// but having both cases handled here, ensures that also old datasets show
+							// the custom icon for the camera images
+							if (StringManipulationTools.count(n, ".") == 1 &&
+									(n.startsWith("top.") || n.startsWith("side.")) &&
+									(n.endsWith(".vis") || n.endsWith(".fluo") || n.endsWith(".nir") || n.endsWith(".ir")))
 								label.setIcon(cameraRendererIcon);
+							else
+								// old style
+								if ((n.endsWith(".top") || n.endsWith(".side")) &&
+										(n.startsWith("vis.") || n.startsWith("fluo.") || n.startsWith("nir.") || n.startsWith("ir.")))
+									label.setIcon(cameraRendererIcon);
 						}
 					}
 		}
