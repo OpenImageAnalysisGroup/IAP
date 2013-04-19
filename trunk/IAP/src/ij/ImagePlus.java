@@ -2061,17 +2061,17 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			return getFFTLocation(x, height - y - 1, cal);
 		// y = Analyzer.updateY(y, height);
 		if (!IJ.altKeyDown()) {
-			String s = " x=" + d2s(cal.getX(x)) + ", y=" + d2s(cal.getY(y, height));
+			String s = "x" + d2s(cal.getX(x)) + ",y" + d2s(cal.getY(y, height));
 			if (getStackSize() > 1) {
 				int z = isDisplayedHyperStack() ? getSlice() - 1 : getCurrentSlice() - 1;
-				s += ", z=" + d2s(cal.getZ(z));
+				s += ",z" + d2s(cal.getZ(z));
 			}
 			return s;
 		} else {
-			String s = " x=" + x + ", y=" + y;
+			String s = "x" + x + ",y" + y;
 			if (getStackSize() > 1) {
 				int z = isDisplayedHyperStack() ? getSlice() - 1 : getCurrentSlice() - 1;
-				s += ", z=" + z;
+				s += ",z" + z;
 			}
 			return s;
 		}
