@@ -1265,6 +1265,7 @@ public class LTdataExchange implements ExperimentLoader {
 			
 			String expType = header.getExperimentType();
 			String species = IAPexperimentTypes.getSpeciesFromExperimentType(expType);
+			String initSpecies = species;
 			
 			ps.setString(1, header.getExperimentName());
 			HashSet<String> printedMetaData = new HashSet<String>();
@@ -1307,6 +1308,10 @@ public class LTdataExchange implements ExperimentLoader {
 							if (includeMetaDataType)
 								metaValue = metaName + ": " + metaValue;
 							String currentVal = res.get(plantID).getField(ciSel);
+							if (ciSel == ConditionInfo.SPECIES && (currentVal != null && currentVal.equals(initSpecies))) {
+								res.get(plantID).setField(ciSel, null);
+								currentVal = null;
+							}
 							if (currentVal != null && currentVal.equals(ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING))
 								currentVal = null;
 							if (currentVal == null || currentVal.trim().isEmpty())
