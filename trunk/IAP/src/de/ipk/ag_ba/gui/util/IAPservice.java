@@ -615,7 +615,6 @@ public class IAPservice {
 			} else
 				if (type.equals("Maize")) {
 					ggd_baseline = SystemOptions.getInstance().getDouble("Growing-Degree-Days", "Maize-Baseline", 10);
-					ggd_baseline = 10;
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Maize, "
 							+ ggd_baseline + " °C");
 				} else {
