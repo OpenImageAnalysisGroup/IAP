@@ -5,25 +5,12 @@ import java.util.ArrayList;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataLoadingFromUserSelectedVFStarget extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReference;
-	private final MongoDB m;
-	
 	public ActionDataLoadingFromUserSelectedVFStarget(String tooltip) {
 		super(tooltip);
-		m = null;
-		experimentReference = null;
-	}
-	
-	public ActionDataLoadingFromUserSelectedVFStarget(String tooltip, MongoDB m, ArrayList<ExperimentReference> experimentReference) {
-		super(tooltip);
-		this.m = m;
-		this.experimentReference = experimentReference;
 	}
 	
 	@Override
@@ -48,12 +35,12 @@ public class ActionDataLoadingFromUserSelectedVFStarget extends AbstractNavigati
 			if (p == VfsFileProtocol.LOCAL)
 				continue;
 			NavigationAction navigationAction = new ActionDataLoadingFromUserSpecficVFStarget(
-					"Load from remote site using " + p, m, experimentReference, p);
+					"Load from remote site using " + p, p);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
 		{
 			NavigationAction navigationAction = new ActionDataLoadingFromUserSpecficVFStarget(
-					"Load from local file system", m, experimentReference, VfsFileProtocol.LOCAL);
+					"Load from local file system", VfsFileProtocol.LOCAL);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
 		return res;
