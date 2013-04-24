@@ -98,7 +98,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				if (IAPmain.getRunMode() == IAPrunMode.WEB)
 					res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 				
-				if (!SystemAnalysis.isHeadless())
+				if (!SystemAnalysis.isHeadless() && IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0) > 0)
 					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 				if (!SystemAnalysis.isHeadless()) {
 					res.add(new NavigationButton(new ActionMongoDatabaseManagement(

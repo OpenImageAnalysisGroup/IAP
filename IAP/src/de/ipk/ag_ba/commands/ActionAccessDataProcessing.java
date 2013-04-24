@@ -53,23 +53,15 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 			phenoDBcommands.add(uploadDataEntity);
 		}
 		
-		boolean addLoadExportedVFSicon = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
-		if (addLoadExportedVFSicon &&
-				SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true)) {
+		boolean addLoadExportedIcons = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
+		boolean showLoadLocalOrRemote = SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true);
+		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
+		if (addLoadExportedIcons && (showLoadLocalOrRemote || showLoadLTfileExport)) {
 			NavigationAction loadedExportedVfsAction = new ActionLoadDataSet("Load dataset from local or remote storage");
-			NavigationButton loadExportedVfsButton = new NavigationButton(loadedExportedVfsAction, "Load Exported Dataset",
-					"img/ext/gpl2/Gnome-Document-Open-64.png",
-					"img/ext/gpl2/Gnome-Document-Open-64.png",
+			NavigationButton loadExportedVfsButton = new NavigationButton(
+					loadedExportedVfsAction,
 					src != null ? src.getGUIsetting() : guiSetting);
 			phenoDBcommands.add(loadExportedVfsButton);
-		}
-		
-		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
-		if (showLoadLTfileExport) {
-			NavigationButton ltl = new NavigationButton(
-					new ActionLoadLTexportFileHierarchy("Load DB-Import-Export Tool dataset from folder hierarchy"),
-					src != null ? src.getGUIsetting() : guiSetting);
-			phenoDBcommands.add(ltl);
 		}
 		
 		boolean lt = IAPoptions.getInstance().getBoolean("LT-DB", "show_icon", true);

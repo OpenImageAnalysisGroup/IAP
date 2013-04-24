@@ -38,7 +38,7 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Remote Storage";
+		return "To Remote Storage Location";
 	}
 	
 	@Override
