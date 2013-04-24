@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.FlexibleImageStack;
 import de.ipk.ag_ba.image.structures.FlexibleImageType;
 
 /**
@@ -41,22 +42,54 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 			ImageOperation processedMask = mask.io().show("in mask", debug).copy();
 			int HSVfilters = getInt("Number of HSV " + optics + " filters", 1);
 			FlexibleImage imageUnChanged = image.copy();
+			FlexibleImageStack st = null;
+			if (getBoolean("Debug Mask Manipulation", false))
+				st = new FlexibleImageStack();
 			for (int filter = 1; filter <= HSVfilters; filter++) {
 				String pf = optics + " filter " + filter + " ";
-				processedMask = processedMask
-						.blur(getDouble(pf + " blur", 1)).show("in mask blurred", debug)
-						.filterRemoveHSV(
-								getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
-								getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
-								getDouble(pf + "min S", 0),
-								getDouble(pf + "max S", 1),
-								getDouble(pf + "min V", 0),
-								getDouble(pf + "max V", (200d / 255d))).show(pf + " res", debug);
+				ImageOperation blurred = processedMask.blur(getDouble(pf + " blur", 1)).show("in mask blurred", debug);
+				boolean manip = getBoolean(pf + "manipulate mask", false);
+				if (!manip) {
+					processedMask = blurred.filterRemoveHSV(
+							getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
+							getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
+							getDouble(pf + "min S", 0),
+							getDouble(pf + "max S", 1),
+							getDouble(pf + "min V", 0),
+							getDouble(pf + "max V", (200d / 255d))).show(pf + " res", debug);
+				} else {
+					ImageOperation filteredContent = blurred.filterRemainHSV(
+							getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
+							getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
+							getDouble(pf + "min S", 0),
+							getDouble(pf + "max S", 1),
+							getDouble(pf + "min V", 0),
+							getDouble(pf + "max V", (200d / 255d))).show(pf + " res", false);
+					int dilate = getInt(pf + "mask dilate 1", 0);
+					int erode = getInt(pf + "mask erode 2", 0);
+					int dilate2 = getInt(pf + "mask dilate 3", 0);
+					if (st != null)
+						st.addImage("mask " + filter, filteredContent.getImage());
+					if (dilate > 0)
+						filteredContent = filteredContent.dilate(dilate);
+					if (erode > 0)
+						filteredContent = filteredContent.erode(erode);
+					if (dilate2 > 0)
+						filteredContent = filteredContent.dilate(dilate2);
+					if (st != null)
+						st.addImage("mask " + filter + ", modified", filteredContent.getImage());
+					processedMask.show(pf + " processed mask", getBoolean("Debug Mask Manipulation", false));
+					mask.show(pf + " mask", getBoolean("Debug Mask Manipulation", false));
+					processedMask = processedMask.xor(mask).show(pf + " xor res", getBoolean("Debug Mask Manipulation", false));
+					mask = processedMask.getImage();
+				}
 				processedMask = processedMask.and(mask);
 				image = image.io().applyMask(
 						processedMask.closing(getInt(pf + "dilate", 2), getInt(pf + "erode", 4)).getImage(),
 						options.getBackground()).getImage();
 			}
+			if (st != null && st.size() > 0)
+				st.show("Debug mask");
 			// blur introduces new pixel areas, so the original mask is applied here, to shrink it down
 			// so that the result does not introduce new pixel areas, only less (filter operation)
 			processedMask = imageUnChanged.io().applyMask(processedMask.getImage(), options.getBackground());

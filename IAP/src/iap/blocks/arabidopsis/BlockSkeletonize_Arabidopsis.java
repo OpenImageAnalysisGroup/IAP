@@ -197,7 +197,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			ioo = null;
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);
-				fis.print("SKEL2");
+				fis.show("SKEL2");
 			}
 			// number of repeats is 1/4 of maximum leaf width, but the actual number of repeats (not 4x) is stored
 			if (leafWidthInPixels2 != null && leafWidthInPixels2 > 0 && !Double.isNaN(leafWidthInPixels2) && !Double.isInfinite(leafWidthInPixels2)) {

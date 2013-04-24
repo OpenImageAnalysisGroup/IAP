@@ -74,7 +74,7 @@ public class FlexibleImageStack {
 		new MyFileSaver(image).saveAsTiffStack(os);
 	}
 	
-	public void print(String title) {
+	public void show(String title) {
 		if (SystemAnalysis.isHeadless())
 			return;
 		ImagePlus image = new ImagePlus();
@@ -104,5 +104,9 @@ public class FlexibleImageStack {
 			win.pack();
 			IAPservice.showImageJ();
 		}
+	}
+	
+	public int size() {
+		return stack == null ? 0 : stack.getSize();
 	}
 }

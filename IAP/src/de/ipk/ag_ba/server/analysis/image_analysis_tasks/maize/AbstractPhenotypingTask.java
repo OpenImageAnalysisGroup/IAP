@@ -894,7 +894,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				System.out.println("[s");
 				MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 				debugImageStack.saveAsLayeredTif(mos);
-				debugImageStack.print("NNN");
+				debugImageStack.show("NNN");
 				buf = mos.getBuff();
 				System.out.println("f]");
 			} else {

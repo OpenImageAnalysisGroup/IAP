@@ -192,7 +192,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				FlexibleImageStack fis = new FlexibleImageStack();
 				fis.addImage("probably bloom area", probablyBloomFluo);
 				fis.addImage("input image", proc);
-				fis.print("bloom area");
+				fis.show("bloom area");
 			}
 			
 			HashSet<Point> knownBloompoints = skel2d.detectBloom(vis, probablyBloomFluo, xf, yf);
@@ -304,7 +304,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			} while (filled > 0);
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);
-				fis.print("SKEL2");
+				fis.show("SKEL2");
 			}
 			// number of repeats is 1/4 of maximum leaf width, but the actual number of repeats (not 4x) is stored
 			if (leafWidthInPixels2 != null && leafWidthInPixels2 > 0 && !Double.isNaN(leafWidthInPixels2) && !Double.isInfinite(leafWidthInPixels2)) {

@@ -4479,7 +4479,9 @@ public class ImageOperation {
 				int bpixel = ba[x][y];
 				if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
 					aa[x][y] = BACKGROUND_COLORint;
-				}
+				} else
+					if (apixel == BACKGROUND_COLORint)
+						aa[x][y] = bpixel;
 			}
 		return new FlexibleImage(aa).io();
 	}

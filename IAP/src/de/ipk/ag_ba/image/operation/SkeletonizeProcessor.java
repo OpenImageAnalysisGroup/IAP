@@ -99,7 +99,7 @@ public class SkeletonizeProcessor {
 			loop++;
 		} while (foundBorderVoxel);
 		if (fis != null) {
-			fis.print("LOOP");
+			fis.show("LOOP");
 		}
 		for (int x = 1; x < voxelresolutionX - 1; x++) {
 			if (x2y2colorSkeleton.containsKey(x)) {

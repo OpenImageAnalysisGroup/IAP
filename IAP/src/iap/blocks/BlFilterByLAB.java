@@ -62,7 +62,7 @@ public class BlFilterByLAB extends AbstractSnapshotAnalysisBlockFIS {
 					fis.addImage(pf + " result", processedMask.getImage(), null);
 			}
 			if (debug)
-				fis.print(optics + "result");
+				fis.show(optics + "result");
 			return processedMask.getImage();
 		}
 	}

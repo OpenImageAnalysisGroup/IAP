@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.SystemOptions;
 
+import de.ipk.ag_ba.commands.load_dataset.ActionLoadDataSet;
 import de.ipk.ag_ba.commands.lt.ActionLTnavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
@@ -55,7 +56,7 @@ public class ActionAccessDataProcessing extends AbstractNavigationAction {
 		boolean addLoadExportedVFSicon = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
 		if (addLoadExportedVFSicon &&
 				SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true)) {
-			NavigationAction loadedExportedVfsAction = null;
+			NavigationAction loadedExportedVfsAction = new ActionLoadDataSet("Load dataset from local or remote storage");
 			NavigationButton loadExportedVfsButton = new NavigationButton(loadedExportedVfsAction, "Load Exported Dataset",
 					"img/ext/gpl2/Gnome-Document-Open-64.png",
 					"img/ext/gpl2/Gnome-Document-Open-64.png",

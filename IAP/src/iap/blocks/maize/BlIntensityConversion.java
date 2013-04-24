@@ -42,7 +42,7 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 			/**
 			 * @see IntensityAnalysis: r_intensityClassic, g_.., b_...
 			 */
-			fis.print("HHH");
+			fis.show("HHH");
 			// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		}
 		
