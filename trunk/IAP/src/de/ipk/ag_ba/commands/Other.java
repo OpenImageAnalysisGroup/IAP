@@ -82,13 +82,19 @@ public class Other {
 	
 	public static NavigationButton getCalendarEntity(
 			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, GUIsetting guiSettings) {
+		return getCalendarEntity(group2ei, m, guiSettings, true);
+	}
+	
+	public static NavigationButton getCalendarEntity(
+			final TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, final MongoDB m, GUIsetting guiSettings,
+			boolean showOnlySpecificDay) {
 		
 		final ObjectRef refCalEnt = new ObjectRef();
 		final ObjectRef refCalGui = new ObjectRef();
 		
 		NavigationAction calendarAction = new ActionCalendar(refCalEnt, refCalGui, group2ei, m);
 		NavigationButtonCalendar2 calendarEntity = new NavigationButtonCalendar2("Calendar", "img/ext/calendar48.png", calendarAction, guiSettings);
-		calendarEntity.setShowSpecificDay(true);
+		calendarEntity.setShowSpecificDay(showOnlySpecificDay);
 		refCalEnt.setObject(calendarEntity);
 		return calendarEntity;
 	}

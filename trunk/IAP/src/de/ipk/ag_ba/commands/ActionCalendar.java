@@ -42,7 +42,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 	private final MongoDB m;
 	
 	public ActionCalendar(ObjectRef refCalEnt, ObjectRef refCalGui, TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> group2ei, MongoDB m) {
-		super("Review or modify experiment plan calendar");
+		super("Locate experiments in the calendar view");
 		this.refCalEnt = refCalEnt;
 		this.refCalGui = refCalGui;
 		this.group2ei = group2ei;

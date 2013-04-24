@@ -24,6 +24,8 @@ import de.ipk.ag_ba.commands.mongodb.ActionDomainLogout;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -58,10 +60,17 @@ public class HsmFileSystemSource extends FileSystemSource {
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		Collection<NavigationButton> res = new ArrayList<NavigationButton>();
-		res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
-		res.add(Other.getCalendarEntity(
-				this.getAllExperimentsNewestByGroup(),
-				null, src.getGUIsetting()));
+		if (IAPmain.getRunMode() == IAPrunMode.WEB)
+			res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
+		try {
+			if (!read)
+				readDataSource();
+			res.add(Other.getCalendarEntity(
+					this.getAllExperimentsNewestByGroup(),
+					null, src.getGUIsetting(), false));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return res;
 	}

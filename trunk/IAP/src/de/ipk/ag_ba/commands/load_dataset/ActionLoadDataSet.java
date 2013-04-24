@@ -27,6 +27,7 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		boolean showLoadLocalOrRemote = SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true);
 		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
+		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", false);
 		
 		if (showLoadLTfileExport) {
 			NavigationButton ltl = new NavigationButton(
@@ -39,6 +40,9 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 			res.add(new NavigationButton(new ActionDataLoadingFromUserSelectedFileSystemFolder(
 					"Load dataset from local file system"), src.getGUIsetting()));
 		
+		if (vfs)
+			; // add command to load from any VFS protocoll
+			
 		return res;
 	}
 	

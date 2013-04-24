@@ -6,35 +6,31 @@ import java.util.ArrayList;
 import org.OpenFileDialogService;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReference;
-	private final MongoDB m;
-	
 	public ActionDataLoadingFromUserSelectedFileSystemFolder(String tooltip) {
 		super(tooltip);
-		m = null;
-		experimentReference = null;
 	}
 	
-	public ActionDataLoadingFromUserSelectedFileSystemFolder(String tooltip, MongoDB m, ArrayList<ExperimentReference> experimentReference) {
-		super(tooltip);
-		this.m = m;
-		this.experimentReference = experimentReference;
-	}
+	private ActionHsmDataSourceNavigation vfsAction;
+	private NavigationButton src;
+	private File currentDirectory;
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		if (experimentReference == null)
-			return;
-		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
+		this.src = src;
+		if (currentDirectory == null)
+			currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
 		if (currentDirectory != null) {
 			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
 					"user.dir",
@@ -47,8 +43,31 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 					false,
 					false,
 					null);
-			for (ExperimentReference er : experimentReference)
-				vfs.saveExperiment(m, er, getStatusProvider());
+			VirtualFileSystemVFS2 vfsEntry = vfs;
+			Library lib = new Library();
+			String ico = IAPimages.getFolderRemoteClosed();
+			String ico2 = IAPimages.getFolderRemoteOpen();
+			String ico3 = IAPimages.getFolderRemoteClosed();
+			if (vfsEntry.getTransferProtocolName().contains("UDP")) {
+				ico = "img/ext/network-workgroup.png";
+				ico2 = "img/ext/network-workgroup-power.png";
+				ico3 = IAPimages.getFolderRemoteClosed();
+			}
+			if (vfsEntry.getDesiredIcon() != null) {
+				ico = vfsEntry.getDesiredIcon();
+				ico2 = vfsEntry.getDesiredIcon();
+				ico3 = vfsEntry.getDesiredIcon();
+			}
+			VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
+					new String[] {},
+					IAPmain.loadIcon(ico),
+					IAPmain.loadIcon(ico2),
+					IAPmain.loadIcon(ico3));
+			ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+			for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
+				action.addAdditionalEntity(new NavigationButton(na, guiSetting));
+			}
+			this.vfsAction = action;
 		}
 	}
 	
@@ -59,12 +78,24 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 	
 	@Override
 	public String getDefaultTitle() {
-		return "From Local File System";
+		return "Local File System";
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		if (vfsAction != null) {
+			try {
+				vfsAction.performActionCalculateResults(src);
+				res.addAll(vfsAction.getResultNewActionSet());
+			} catch (Exception e) {
+				e.printStackTrace();
+				// add error icon
+			}
+		}
+		if (res.size() == 0)
+			currentDirectory = null;
+		return res;
 	}
 	
 }

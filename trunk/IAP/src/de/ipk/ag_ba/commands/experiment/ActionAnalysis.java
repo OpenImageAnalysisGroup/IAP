@@ -73,14 +73,15 @@ public class ActionAnalysis extends AbstractNavigationAction {
 					src.getGUIsetting()));
 			
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
-			if (enableRemoteTaskExecution)
-				for (MongoDB m : MongoDB.getMongos()) {
-					actions.add(new NavigationButton(
-							new ActionPerformGridAnalysis(
-									new PipelineDesc(null, ioStringProvider, null, null),
-									m, experimentReference),
-							src.getGUIsetting()));
-				}
+			if (m != null)
+				if (enableRemoteTaskExecution)
+					for (MongoDB m : MongoDB.getMongos()) {
+						actions.add(new NavigationButton(
+								new ActionPerformGridAnalysis(
+										new PipelineDesc(null, ioStringProvider, null, null),
+										m, experimentReference),
+								src.getGUIsetting()));
+					}
 		}
 		
 		// actions.add(new NavigationButton(
