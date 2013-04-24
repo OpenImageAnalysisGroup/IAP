@@ -307,7 +307,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									
 									NumericMeasurementInterface a = match
 											.iterator().next();
-									snapshot.print("Snapshot "
+									snapshot.show("Snapshot "
 											+ a.getQualityAnnotation()
 											+ " "
 											+ a.getParentSample()
@@ -403,7 +403,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 															512, sp);
 												}
 											}
-											fis.print("Foreground images");
+											fis.show("Foreground images");
 										} catch (Exception e) {
 											e.printStackTrace();
 										}

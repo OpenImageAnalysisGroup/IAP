@@ -338,7 +338,7 @@ public class FlexibleImageSet {
 			fis.addImage("nir", nir);
 		if (ir != null)
 			fis.addImage("ir", ir);
-		fis.print(title);
+		fis.show(title);
 	}
 	
 	public FlexibleImage getImage(FlexibleImageType inp) {
