@@ -153,7 +153,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 			return "INTERNAL ERROR: target db is NULL";
 		else
 			return (task.isEmpty() ? "" : "") +
-					"Copy to " + m.getDisplayName() + (task.isEmpty() ? "" : "<br>" + task);
+					"To " + m.getDisplayName() + (task.isEmpty() ? "" : "<br>" + task);
 	}
 	
 	@Override

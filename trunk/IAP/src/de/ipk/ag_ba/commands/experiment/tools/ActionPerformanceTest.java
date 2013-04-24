@@ -176,7 +176,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
 				experimentResult), src.getGUIsetting())) {
 			if (ne.getTitle().contains("Put data")) {
-				ne.setTitle("Analyze with VANTED");
+				ne.setTitle("Analyze in IAP-Data-Navigator");
 				res.add(ne);
 			}
 		}
