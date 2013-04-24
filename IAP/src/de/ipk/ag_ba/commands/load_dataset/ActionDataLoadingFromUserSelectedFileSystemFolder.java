@@ -33,7 +33,7 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 			currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
 		if (currentDirectory != null) {
 			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
-					"user.dir",
+					"user.dir." + System.currentTimeMillis(),
 					VfsFileProtocol.LOCAL,
 					"User Selected Directory",
 					"File I/O", "",
@@ -78,7 +78,12 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Local File System";
+		if (currentDirectory == null)
+			return "Local File System";
+		else
+			return "<html>Local File System<br><small><font color='gray'>"
+					+ currentDirectory
+					+ "</font></small>";
 	}
 	
 	@Override

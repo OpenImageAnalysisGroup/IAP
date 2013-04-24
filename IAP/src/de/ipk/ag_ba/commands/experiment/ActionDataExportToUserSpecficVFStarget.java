@@ -83,9 +83,9 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		if (experimentReference == null)
 			return;
-		String pref = "remote." + (p + "").toLowerCase();
+		String pref = "remote." + (p + "").toLowerCase() + "." + System.currentTimeMillis();
 		if (saveVFS)
-			pref = "vfs." + StringManipulationTools.getFileSystemName(vfsName).toLowerCase();
+			pref = "vfs." + StringManipulationTools.getFileSystemName(vfsName).toLowerCase() + "." + System.currentTimeMillis();
 		VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
 				pref,
 				p,

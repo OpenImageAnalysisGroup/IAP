@@ -37,7 +37,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
 		if (currentDirectory != null) {
 			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
-					"user.dir",
+					"user.dir." + System.currentTimeMillis(),
 					VfsFileProtocol.LOCAL,
 					"User Selected Directory",
 					"File I/O", "",
