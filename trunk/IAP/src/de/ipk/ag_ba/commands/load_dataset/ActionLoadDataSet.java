@@ -41,8 +41,9 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 					"Load dataset from local file system"), src.getGUIsetting()));
 		
 		if (vfs)
-			; // add command to load from any VFS protocoll
-			
+			res.add(new NavigationButton(new ActionDataLoadingFromUserSelectedVFStarget(
+					"Load dataset from remote server"), src.getGUIsetting()));
+		
 		return res;
 	}
 	
