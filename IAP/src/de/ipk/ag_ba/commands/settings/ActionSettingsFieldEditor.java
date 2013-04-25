@@ -9,6 +9,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
 
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -149,12 +150,24 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 						boolean isStringArray = ss.length > 1;
 						if (isString) {
 							if (setting.toLowerCase().contains("password")) {
-								Object[] i = MyInputHelper.getInput(
-										"WARNING: The <u>password will be saved as clear text</u> in the settings-ini-file!" +
-												"<br>Click 'Cancel' to interrupt the process of " +
-												"editing the password.", "WARNING");
-								if (i == null)
-									return;
+								if (!SystemOptions.getInstance("secret", null).getBoolean("Information for user",
+										"Warning about symmetric encryption and secret file displayed", false)) {
+									Object[] i = MyInputHelper.getInput(
+											"Passwords are saved using symetric encryption in the settings-ini-file.<br>" +
+													"The encryption/decription key is stored in the file 'secret'.<br>" +
+													"Adjust access rights to the 'secret' file in the application settings folder, if needed.<br><br>" +
+													"<b>This information is only displayed once.</b><br><br>" +
+													"Click 'Cancel' if you need further information.",
+											"Information");
+									if (i == null)
+										return;
+									SystemOptions.getInstance("secret", null).setBoolean("Information for user",
+											"Warning about symmetric encryption and secret file displayed", true);
+									SystemOptions.getInstance("secret", null).setString("Information for user",
+											"User name", SystemAnalysis.getUserName());
+									SystemOptions.getInstance("secret", null).setString("Information for user",
+											"Message displayed", SystemAnalysis.getCurrentTime());
+								}
 							}
 							Object[] inp = MyInputHelper.getInput("You may modify the text:",
 									"Modify "
