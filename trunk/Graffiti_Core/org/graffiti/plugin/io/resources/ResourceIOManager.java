@@ -34,7 +34,7 @@ public class ResourceIOManager {
 	public synchronized static void registerIOHandler(ResourceIOHandler handler) {
 		ResourceIOHandler mh = getHandlerFromPrefix(handler.getPrefix());
 		if (mh != null) {
-			;// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IO Handler with Prefix " + handler.getPrefix() + " is already registered.");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IO Handler with Prefix " + handler.getPrefix() + " is already registered.");
 		} else
 			getInstance().handlers.add(handler);
 	}
