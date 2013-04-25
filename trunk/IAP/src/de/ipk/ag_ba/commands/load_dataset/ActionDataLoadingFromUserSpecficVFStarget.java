@@ -47,13 +47,13 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 		ParameterOptions po = new ParameterOptions(
 				"<html><br>Please specify remote access information:<br>&nbsp;",
 				new Object[] {
-						"Host name/IP", "",
-						"User name", "user",
-						"Password", "pass",
+						"Host name/IP", host,
+						"User name", user,
+						"Password", pass,
 						"Sub-directory", "",
 						"", new JLabel("<html>&nbsp;"),
 						"<html>Create permanent<br>VFS entry", false,
-						"Save Password", false,
+						"Save Password", savePassWithVFS,
 						"VFS entry name", "Storage 1",
 						"", new JLabel("<html><small><font color='gray'>"
 								+ "The VFS entry is only created if the connection<br>"

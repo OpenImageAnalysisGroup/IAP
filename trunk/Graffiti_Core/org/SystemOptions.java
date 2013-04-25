@@ -349,7 +349,8 @@ public class SystemOptions {
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				if (addDefaultIfNeeded) {
-					ini.put(group, setting, defaultValue + "");
+					String storeValue = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, defaultValue);
+					ini.put(group, setting, storeValue + "");
 					store(group, setting);
 				}
 				return defaultValue;
@@ -357,7 +358,7 @@ public class SystemOptions {
 				if (r == null || r.equals("null"))
 					return null;
 				else
-					return r;
+					return ExternalPasswordStorage.decryptValueIfNeeded(group, setting, r);
 			}
 		}
 	}
@@ -410,6 +411,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
+			value = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, value);
 			ini.put(group, setting, value + "");
 			store(group, setting);
 		}
