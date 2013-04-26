@@ -38,4 +38,8 @@ public class VirtualFileSystemHandler extends AbstractResourceIOHandler {
 	public Long getStreamLength(IOurl url) throws Exception {
 		return vfs.getFileLength(url);
 	}
+	
+	public VirtualFileSystem getVFS() {
+		return vfs;
+	}
 }

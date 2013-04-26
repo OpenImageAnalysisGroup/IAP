@@ -38,15 +38,15 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	private final VfsFileProtocol vfs_type;
 	private final String description;
 	private final String protocoll;
-	private final String host;
-	private final String user;
+	private String host;
+	private String user;
 	private String pass;
 	private boolean askForPassword = false;
-	private final String folder;
+	private String folder;
 	private final String prefix;
-	private final boolean useForMongoFileStorage;
-	private final boolean useOnlyForMongoFileStorage;
-	private final String useForMongoFileStorageCloudName;
+	private boolean useForMongoFileStorage;
+	private boolean useOnlyForMongoFileStorage;
+	private String useForMongoFileStorageCloudName;
 	
 	public VirtualFileSystemVFS2(
 			String prefix,
@@ -481,5 +481,37 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 				pass = null;
 		}
 		return pass;
+	}
+	
+	public String getUser() {
+		return user;
+	}
+	
+	public void setHost(String host) {
+		this.host = host;
+	}
+	
+	public void setUser(String user) {
+		this.user = user;
+	}
+	
+	public void setFolder(String dir) {
+		this.folder = dir;
+	}
+	
+	public void setUseForMongo(boolean useForMongoFileStorage) {
+		this.useForMongoFileStorage = useForMongoFileStorage;
+	}
+	
+	public void setMongoFileStorageName(String useForMongoFileStorageCloudName) {
+		this.useForMongoFileStorageCloudName = useForMongoFileStorageCloudName;
+	}
+	
+	public void setUseOnlyForMongoFileStorage(boolean useOnlyForMongoFileStorage) {
+		this.useOnlyForMongoFileStorage = useOnlyForMongoFileStorage;
+	}
+	
+	public void setPassword(String pass) {
+		this.pass = pass;
 	}
 }
