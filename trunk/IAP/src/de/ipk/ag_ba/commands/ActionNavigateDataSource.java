@@ -19,6 +19,7 @@ public class ActionNavigateDataSource extends AbstractNavigationAction {
 	private NavigationButton src;
 	private final DataSourceLevel dataSourceLevel;
 	private ArrayList<NavigationButton> actions;
+	private Object errorMsg;
 	
 	public ActionNavigateDataSource(DataSourceLevel dataSourceLevel) {
 		super("Open " + dataSourceLevel.getName());
@@ -49,10 +50,16 @@ public class ActionNavigateDataSource extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		errorMsg = null;
 		actions = new ArrayList<NavigationButton>();
 		
-		for (NavigationButton nb : getDataSourceLevel().getAdditionalEntities(src)) {
-			actions.add(nb);
+		try {
+			for (NavigationButton nb : getDataSourceLevel().getAdditionalEntities(src)) {
+				actions.add(nb);
+			}
+		} catch (RuntimeException e) {
+			errorMsg = e.getMessage();
+			return;
 		}
 		
 		for (Book b : getDataSourceLevel().getReferenceInfos()) {
@@ -101,6 +108,8 @@ public class ActionNavigateDataSource extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
+		if (errorMsg != null)
+			return new MainPanelComponent("<h3>Data source could not be accessed</h3>Error Message: " + errorMsg);
 		if (getDataSourceLevel().getDescription() != null)
 			return new MainPanelComponent(getDataSourceLevel().getDescription());
 		else

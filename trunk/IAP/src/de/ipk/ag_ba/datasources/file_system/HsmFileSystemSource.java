@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import org.ErrorMsg;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.Other;
@@ -71,9 +70,9 @@ public class HsmFileSystemSource extends FileSystemSource {
 					null, src.getGUIsetting(), false));
 		} catch (Exception e) {
 			if (e.getCause() != null && e.getCause().getCause() != null)
-				ErrorMsg.addErrorMessage(e.getCause().getCause() + "");
+				throw new RuntimeException(e.getCause().getCause() + "");
 			else
-				ErrorMsg.addErrorMessage(e);
+				throw new RuntimeException(e);
 		}
 		
 		return res;
