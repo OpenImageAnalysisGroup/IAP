@@ -79,6 +79,8 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 		try {
 			if (!read)
 				readDataSource();
+			if (thisLevel == null)
+				return new ArrayList<DataSourceLevel>();
 			return thisLevel.getSubLevels();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -140,6 +142,8 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 		try {
 			if (!read)
 				readDataSource();
+			if (thisLevel == null)
+				return new ArrayList<Book>();
 			return thisLevel.getReferenceInfos();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);

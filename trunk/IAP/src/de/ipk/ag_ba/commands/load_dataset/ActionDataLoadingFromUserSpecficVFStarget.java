@@ -24,7 +24,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 	
 	private VfsFileProtocol p;
 	
-	private String host, user, pass, directory, vfsName;
+	private String host = "", user = "", pass = "", directory = "", vfsName;
 	private boolean saveVFS = false, savePassWithVFS = false;
 	private ActionHsmDataSourceNavigation vfsAction;
 	private NavigationButton src;
@@ -50,7 +50,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 						"Host name/IP", host,
 						"User name", user,
 						"Password", pass,
-						"Sub-directory", "",
+						"Sub-directory", directory,
 						"", new JLabel("<html>&nbsp;"),
 						"<html>Create permanent<br>VFS entry", false,
 						"Save Password", savePassWithVFS,
@@ -96,7 +96,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 				"temporary defined " + p + " I/O",
 				host,
 				user,
-				pass,
+				pass == null || pass.isEmpty() ? "?" : pass,
 				directory,
 				false,
 				false,

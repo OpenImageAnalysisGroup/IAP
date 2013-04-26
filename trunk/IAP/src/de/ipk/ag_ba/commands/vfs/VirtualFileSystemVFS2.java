@@ -21,6 +21,7 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk.vanted.util.VfsFileObjectUtil;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.PriorityLock;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.PriorityLock.Priority;
@@ -39,7 +40,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	private final String protocoll;
 	private final String host;
 	private final String user;
-	private final String pass;
+	private String pass;
+	private boolean askForPassword = false;
 	private final String folder;
 	private final String prefix;
 	private final boolean useForMongoFileStorage;
@@ -101,18 +103,24 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		if (optSubDirectory != null)
 			path = path + "/" + optSubDirectory;
 		
-		VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
-				host, path, user, pass);
-		if (!file.exists()) {
-			if (doPrintStatus())
-				System.out.println(">>>>>> create directory " + path);
-			file.mkdir();
+		try {
+			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
+					host, path, user, getPass());
+			if (!file.exists()) {
+				if (doPrintStatus())
+					System.out.println(">>>>>> create directory " + path);
+				file.mkdir();
+			}
+			ArrayList<String> res = new ArrayList<String>();
+			for (String s : file.list()) {
+				res.add(s);
+			}
+			return res;
+		} catch (Exception e) {
+			if (askForPassword)
+				pass = "?";
+			throw e;
 		}
-		ArrayList<String> res = new ArrayList<String>();
-		for (String s : file.list()) {
-			res.add(s);
-		}
-		return res;
 	}
 	
 	private boolean doPrintStatus() {
@@ -133,14 +141,20 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	public VfsFileObject newVfsFile(String fileNameInclSubFolderPathName, boolean absoluteDirName) throws Exception {
-		if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("/"))
-			fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("/".length());
-		if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("\\"))
-			fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("\\".length());
-		return VfsFileObjectUtil.createVfsFileObject(
-				vfs_type, host,
-				(absoluteDirName ? "" : folder + "/") +
-						fileNameInclSubFolderPathName, user, pass);
+		try {
+			if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("/"))
+				fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("/".length());
+			if (fileNameInclSubFolderPathName != null && fileNameInclSubFolderPathName.startsWith("\\"))
+				fileNameInclSubFolderPathName = fileNameInclSubFolderPathName.substring("\\".length());
+			return VfsFileObjectUtil.createVfsFileObject(
+					vfs_type, host,
+					(absoluteDirName ? "" : folder + "/") +
+							fileNameInclSubFolderPathName, user, getPass());
+		} catch (Exception e) {
+			if (askForPassword)
+				pass = "?";
+			throw e;
+		}
 	}
 	
 	public VfsFileProtocol getProtocolType() {
@@ -454,5 +468,14 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			return lastSpeed;
 		} else
 			return "";
+	}
+	
+	private String getPass() {
+		if (pass != null && pass.equals("?")) {
+			askForPassword = true;
+			pass = (String) MyInputHelper.getInput("For accessing " + host + " as user " + user + " you need to provide a password:",
+					"Enter Password", "Password", "")[0];
+		}
+		return pass;
 	}
 }
