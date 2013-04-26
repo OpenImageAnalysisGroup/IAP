@@ -25,7 +25,6 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
-import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -131,7 +130,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 		}
 		if (databaseTarget == null) {
-			ArrayList<VirtualFileSystemVFS2> vl = VirtualFileSystemFolderStorage.getKnown(true);
+			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown(true);
 			if (IAPmain.getRunMode() != IAPrunMode.WEB) {
 				if (vl != null && vl.size() >= 1) {
 					if (prefix != null) {

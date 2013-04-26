@@ -130,6 +130,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 						}
 				}
 				eh.setAttributesFromMap(properties);
+				System.out.println(eh.getDatabaseId());
 			}
 			
 			@Override
