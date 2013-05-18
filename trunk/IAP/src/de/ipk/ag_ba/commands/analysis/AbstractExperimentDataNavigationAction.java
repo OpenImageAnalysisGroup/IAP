@@ -27,8 +27,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavigationAction {
-	private static final long serialVersionUID = 1L;
+public abstract class AbstractExperimentDataNavigationAction extends AbstractNavigationAction implements ExperimentDataNavigationAction {
 	
 	protected MongoDB m;
 	
@@ -37,7 +36,7 @@ public abstract class AbstractExperimentAnalysisNavigation extends AbstractNavig
 	
 	private NavigationButton src;
 	
-	public AbstractExperimentAnalysisNavigation(MongoDB m, ExperimentReference experiment) {
+	public AbstractExperimentDataNavigationAction(MongoDB m, ExperimentReference experiment) {
 		super("Analyse Experiment Data Set");
 		this.m = m;
 		this.experiment = experiment;

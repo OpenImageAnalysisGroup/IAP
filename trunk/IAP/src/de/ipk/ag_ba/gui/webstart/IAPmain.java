@@ -49,6 +49,7 @@ import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
 import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;
+import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
@@ -104,7 +105,7 @@ public class IAPmain extends JApplet {
 		jf.add("Center", iap.getContentPane());
 		jf.pack();
 		try {
-			jf.setIconImage(GravistoService.loadImage(IAPmain.class, "img/favicon.ico", 48, 48));
+			jf.setIconImage(AbstractIAPplugin.getIAPicon().getImage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
