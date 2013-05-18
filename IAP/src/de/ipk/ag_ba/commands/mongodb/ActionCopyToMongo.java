@@ -7,7 +7,7 @@
 
 package de.ipk.ag_ba.commands.mongodb;
 
-import de.ipk.ag_ba.commands.analysis.AbstractExperimentAnalysisNavigation;
+import de.ipk.ag_ba.commands.analysis.AbstractExperimentDataNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -18,7 +18,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionCopyToMongo extends AbstractExperimentAnalysisNavigation {
+public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 	
 	private boolean active;
 	private final boolean saveAnnotation;
