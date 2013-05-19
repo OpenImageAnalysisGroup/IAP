@@ -14,7 +14,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -23,6 +23,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
@@ -94,7 +95,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			String dbID = experiment.getHeader().getDatabaseId();
 			
-			ExperimentInterface experimentToBeAnalysed = experiment.getData(m);
+			ExperimentInterface experimentToBeAnalysed = experiment.getData();
 			sw.printTime();
 			if (status != null)
 				status.setCurrentStatusText2("Load time: " + sw.getTimeString());
@@ -338,17 +339,12 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		// res.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(experimentResult),
-		// src != null ? src.getGUIsetting() : null));
+		ExperimentReference ref = new ExperimentReference(experimentResult);
+		ref.m = m;
 		
-		// if (m != null)
-		// res.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(experimentResult)),
-		// "Save Result (db '" + m.getDatabaseName() + "')", "img/ext/user-desktop.png", src != null ? src.getGUIsetting() : null)); //
-		// PoweredMongoDBgreen.png"));
+		for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(ref, true))
+			res.add(new NavigationButton(adp, src != null ? src.getGUIsetting() : null));
 		
-		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
-				new ExperimentReference(experimentResult), experimentResult.getHeader(),
-				false, src != null ? src.getGUIsetting() : null, m);
 		return res;
 	}
 	

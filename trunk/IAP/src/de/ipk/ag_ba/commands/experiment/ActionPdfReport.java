@@ -7,19 +7,18 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportSetupMainPropertiesStep1;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionToggle;
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
-public class ActionPdfReport extends AbstractNavigationAction {
-	private final ExperimentReference experimentReference;
-	private final MongoDB m;
+public class ActionPdfReport extends AbstractNavigationAction implements ActionDataProcessing {
+	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	TreeSet<String> cs = new TreeSet<String>();
 	TreeSet<String> ss = new TreeSet<String>();
@@ -28,17 +27,15 @@ public class ActionPdfReport extends AbstractNavigationAction {
 	TreeSet<String> gc = new TreeSet<String>();
 	TreeSet<String> ts = new TreeSet<String>();
 	
-	public ActionPdfReport(String tooltip, ExperimentReference experimentReference, MongoDB m) {
+	public ActionPdfReport(String tooltip) {
 		super(tooltip);
-		this.experimentReference = experimentReference;
-		this.m = m;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		
-		ExperimentInterface e = experimentReference.getData(m, false, status);
+		ExperimentInterface e = experimentReference.getData(false, status);
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
 				String condition = ci.getConditionName();
@@ -112,7 +109,7 @@ public class ActionPdfReport extends AbstractNavigationAction {
 		actions.add(
 				new NavigationButton(
 						new ActionNumericDataReportSetupMainPropertiesStep1(
-								m, experimentReference, false, false,
+								experimentReference, false, false,
 								toggles),
 						guiSetting));
 		
@@ -161,5 +158,15 @@ public class ActionPdfReport extends AbstractNavigationAction {
 					new ActionToggle("Group by " + c + "?", "Group by " + c, tso), src.getGUIsetting()));
 		}
 		return actions;
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.experimentReference = experimentReference;
 	}
 }

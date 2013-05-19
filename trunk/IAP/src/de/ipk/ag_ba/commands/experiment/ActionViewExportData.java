@@ -8,28 +8,23 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
  */
-public class ActionViewExportData extends AbstractNavigationAction {
-	private final MongoDB m;
-	private final ExperimentReference experiment;
+public class ActionViewExportData extends AbstractNavigationAction implements ActionDataProcessing {
+	private ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	
-	public ActionViewExportData(MongoDB m, ExperimentReference experiment) {
+	public ActionViewExportData() {
 		super("Show or export numeric or image data");
-		this.m = m;
-		this.experiment = experiment;
 	}
 	
 	@Override
@@ -37,9 +32,9 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		this.src = src;
 		try {
 			status.setCurrentStatusText1("Load Data");
-			experiment.getData(m);
+			experiment.getData();
 			status.setCurrentStatusText1("");
-			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(m, experiment,
+			SupplementaryFilePanelMongoDB sfp = new SupplementaryFilePanelMongoDB(experiment,
 					experiment.getExperimentName());
 			mpc = new MainPanelComponent(sfp);
 		} catch (Exception e) {
@@ -61,14 +56,14 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		
-		res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(m, experiment, true), src.getGUIsetting()));
+		res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(experiment.m, experiment, true), src.getGUIsetting()));
 		
 		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
 		res.add(new NavigationButton(new ActionNumericExportCommands(
-				"Export Numeric Data", toggles, m, experiment), src.getGUIsetting()));
+				"Export Numeric Data", toggles, experiment), src.getGUIsetting()));
 		
-		res.add(new NavigationButton(new ActionDataExportZIP(m, experiment), src.getGUIsetting()));
-		res.add(new NavigationButton(new ActionDataExportTar(m, experiment), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDataExportZIP(experiment), src.getGUIsetting()));
+		res.add(new NavigationButton(new ActionDataExportTar(experiment), src.getGUIsetting()));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
 		return res;
@@ -79,17 +74,27 @@ public class ActionViewExportData extends AbstractNavigationAction {
 		return mpc;
 	}
 	
-	public static NavigationButton getFileManagerEntity(MongoDB m,
-			final ExperimentReference experimentRef, GUIsetting guiSetting) {
-		NavigationAction fileManagerAction = new ActionViewExportData(m, experimentRef);
-		NavigationButton fileManager = new NavigationButton(fileManagerAction, "View/Export Data",
-				"img/ext/user-desktop.png",
-				// "img/ext/applications-system.png",
-				guiSetting);
-		return fileManager;
-	}
-	
 	public ExperimentReference getExperimentReference() {
 		return experiment;
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		return "View/Export Data";
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/ext/user-desktop.png";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.experiment = experimentReference;
 	}
 }

@@ -10,8 +10,8 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -20,6 +20,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ThreeDreconstruction;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.VolumeStatistics;
@@ -76,7 +77,7 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 		widthFactor = (Integer) inp[1];
 		ArrayList<Sample3D> workset = new ArrayList<Sample3D>();
 		try {
-			ExperimentInterface res = experiment.getData(m).clone();
+			ExperimentInterface res = experiment.getData().clone();
 			
 			// src.title = src.title + ": processing";
 			
@@ -124,19 +125,19 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			statisticsResult.getHeader().setDatabaseId("");
 			
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-			ip.setExperimentInfo(m, statisticsResult.getHeader(), true, statisticsResult);
+			ip.setExperimentInfo(experiment.m, statisticsResult.getHeader(), true, statisticsResult);
 			mpc = new MainPanelComponent(ip, true);
 			
-			storedActions.add(ActionViewExportData.getFileManagerEntity(m,
-					new ExperimentReference(statisticsResult), src.getGUIsetting()));
+			ActionViewExportData viewAction = new ActionViewExportData();
+			viewAction.setExperimentReference(new ExperimentReference(statisticsResult));
+			storedActions.add(new NavigationButton(viewAction, src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m, new ExperimentReference(
 					statisticsResult)), "Save Result", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLTexperimentNavigation.getDefaultActions(storedActions,
-					new ExperimentReference(statisticsResult),
-					statisticsResult
-							.getHeader(), false, src.getGUIsetting(), m);
+			for (ActionDataProcessing adp : IAPpluginManager.getInstance()
+					.getExperimentProcessingActions(new ExperimentReference(statisticsResult), true))
+				storedActions.add(new NavigationButton(adp, guiSetting));
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;

@@ -17,40 +17,37 @@ import javax.swing.JComponent;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 /**
  * @author klukas
  */
 public abstract class AbstractExperimentDataNavigationAction extends AbstractNavigationAction implements ExperimentDataNavigationAction {
 	
-	protected MongoDB m;
-	
 	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 	protected ExperimentReference experiment;
 	
 	private NavigationButton src;
 	
-	public AbstractExperimentDataNavigationAction(MongoDB m, ExperimentReference experiment) {
+	public AbstractExperimentDataNavigationAction(ExperimentReference experiment) {
 		super("Analyse Experiment Data Set");
-		this.m = m;
 		this.experiment = experiment;
-		
 	}
 	
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		actions.clear();
 		ExperimentReference exp = experiment;
 		try {
-			exp.setExperimentData(experiment.getData(m));
-			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, exp,
-								src.getGUIsetting()))
-				actions.add(ne);
+			exp.setExperimentData(experiment.getData());
+			exp.m = experiment.m;
+			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(exp, true))
+				actions.add(new NavigationButton(adp, src.getGUIsetting()));
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
@@ -61,7 +58,8 @@ public abstract class AbstractExperimentDataNavigationAction extends AbstractNav
 	public MainPanelComponent getResultMainPanel() {
 		try {
 			MyExperimentInfoPanel info = new MyExperimentInfoPanel();
-			info.setExperimentInfo(m, experiment.getData(m).getHeader(), true, experiment.getData(m));
+			ExperimentInterface ex = experiment.getData();
+			info.setExperimentInfo(experiment.m, ex.getHeader(), true, ex);
 			JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);
 			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);

@@ -61,7 +61,7 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 		this.src = src;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			

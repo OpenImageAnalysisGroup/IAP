@@ -18,6 +18,10 @@ cd ../../..
 
 cd IPK-Plugins/build/classes
 find . | grep "\.xml$" > plugins4.txt
+cd ../../..
+
+cd IAP/bin
+find . | grep "\.xml$" > pluginsIAP.txt
 
 echo create Cluster Plugin List
 echo "./org/graffiti/plugins/views/defaults/plugin.xml" > plugins_cluster.txt
@@ -132,6 +136,6 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/flatfile/plugin.
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/exporters/matrix/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/collapsed_graph_producer/plugin.xml" >> plugins_exclude.txt
 
-cd ../../..
+cd ../..
 cd make
 echo "READY"

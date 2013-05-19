@@ -23,4 +23,10 @@ public interface DataSource extends ResourceIOHandler, DataSourceLevel, Experime
 	 * @throws Exception
 	 */
 	public void readDataSource() throws Exception;
+	
+	/**
+	 * @return Null (no group, added at main level, or a group information, so that a tool icon is added,
+	 *         which provides access to a number of data source items.
+	 */
+	public DataSourceGroup getDataSourceGroup();
 }

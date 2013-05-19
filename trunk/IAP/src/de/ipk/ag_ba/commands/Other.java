@@ -11,59 +11,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
 import org.ObjectRef;
-import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
 import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
 
 /**
  * @author klukas
  */
 public class Other {
-	
-	public static ArrayList<NavigationButton> getProcessExperimentDataWithVantedEntities(final MongoDB m, final ExperimentReference experimentName,
-			GUIsetting guIsetting) {
-		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
-		
-		ArrayList<AbstractExperimentDataProcessor> validProcessors = new ArrayList<AbstractExperimentDataProcessor>();
-		ArrayList<AbstractExperimentDataProcessor> optIgnoredProcessors = null;
-		for (ExperimentDataProcessor ep : ExperimentDataProcessingManager.getExperimentDataProcessors())
-			// check if ep is not ignored
-			if (optIgnoredProcessors == null || !optIgnoredProcessors.contains(ep.getClass())) {
-				validProcessors.add((AbstractExperimentDataProcessor) ep);
-			}
-		
-		for (Object o : validProcessors) {
-			final AbstractExperimentDataProcessor pp = (AbstractExperimentDataProcessor) o;
-			NavigationAction action = new ActionShowDataWithinVANTED("Analyze Data", pp, m, experimentName);
-			NavigationButton ne = new NavigationButton(action, pp.getShortName(), "img/vanted1_0.png",
-					guIsetting);
-			
-			ImageIcon i = pp.getIcon();
-			if (i != null) {
-				i = new ImageIcon(GravistoService.getScaledImage(i.getImage(), -48, 48));
-				ne.setIcon(i, "img/vanted1_0.png");
-			}
-			
-			result.add(ne);
-		}
-		
-		return result;
-	}
 	
 	public static NavigationButton getServerStatusEntity(GUIsetting guIsetting) {
 		return getServerStatusEntity("System Status", guIsetting);

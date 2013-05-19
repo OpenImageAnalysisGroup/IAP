@@ -21,7 +21,6 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.DatabaseStorageResultWithURL;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -34,13 +33,11 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	DataSetFilePanel panel;
 	MongoTreeNode targetTreeNode;
 	JTree expTree;
-	private final MongoDB m;
 	
-	public MyDropTarget(MongoDB m, DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
+	public MyDropTarget(DataSetFilePanel panel, MongoTreeNode targetTreeNode, JTree expTree) {
 		this.panel = panel;
 		this.targetTreeNode = targetTreeNode;
 		this.expTree = expTree;
-		this.m = m;
 	}
 	
 	public boolean isTargetReadOnly() {
@@ -192,7 +189,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 	}
 	
 	public void addImageOrFileToDatabase(final File file, final boolean deleteUponCompletion) throws InterruptedException {
-		final DataSetFileButton imageButton = new DataSetFileButton(m, targetTreeNode,
+		final DataSetFileButton imageButton = new DataSetFileButton(targetTreeNode,
 				"<html><body><b>" + DataSetFileButton.getMaxString(file.getName()) + //$NON-NLS-1$
 						"</b><br>" + file.length() / 1024 + " KB</body></html>", null, null, false); //$NON-NLS-1$//$NON-NLS-2$
 		imageButton.setProgressValue(-1);
@@ -231,7 +228,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.setToolTipText(file.getName());
 				
 				if (file.canRead()) {
-					if (m == null) {
+					if (targetTreeNode.getExperiment().m == null) {
 						MappingDataEntity target = targetTreeNode.getTargetEntity();
 						BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false,
 								targetTreeNode.getTargetEntity());
@@ -241,9 +238,10 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 						imageButton.hideProgressbar();
 					} else {
 						imageButton.setProgressValue(-1);
-						DatabaseStorageResultWithURL res = DataExchangeHelperForExperiments.insertHashedFile(m, file,
-								imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(),
-								imageButton, targetTreeNode.getTargetEntity());
+						DatabaseStorageResultWithURL res = targetTreeNode.getExperiment().getIoHelper()
+								.insertHashedFile(file,
+										imageButton.createTempPreviewImage(), imageButton.getIsJavaImage(),
+										imageButton, targetTreeNode.getTargetEntity());
 						// ((BinaryMeasurement) bif.getEntity()).getURL().setDetail(md5.getMD5());
 						if (res.getResult() == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 							SupplementaryFilePanelMongoDB.showError("The file " + file.getName()
@@ -265,7 +263,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					}
 					targetTreeNode.setSizeDirty(true);
 					try {
-						targetTreeNode.updateSizeInfo(m, targetTreeNode.getSizeChangedListener());
+						targetTreeNode.updateSizeInfo(targetTreeNode.getSizeChangedListener());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

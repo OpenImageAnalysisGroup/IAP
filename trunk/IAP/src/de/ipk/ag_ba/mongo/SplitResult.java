@@ -99,7 +99,7 @@ public class SplitResult {
 					+ optPreviousResultsToBeMerged.getHeader().getImportdate() + ")";
 			System.out.println(msg);
 			MongoDB.saveSystemMessage(msg);
-			e = optPreviousResultsToBeMerged.getData(m);
+			e = optPreviousResultsToBeMerged.getData();
 		}
 		
 		long tFinish = System.currentTimeMillis();
@@ -149,7 +149,7 @@ public class SplitResult {
 			System.out.println(" // merged in " + s.getTime() + " ms");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + "<br>" +
-							"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
+						"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
 			
 			if (s.getTime() > 30000)
 				s.printTime();

@@ -39,7 +39,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 		int snapshotsPerJob = 100;
 		this.numberOfJobs = experimentReference.getHeader().getNumberOfFiles() / 3 / snapshotsPerJob;
 		try {
-			ExperimentInterface e = experimentReference.getData(m);
+			ExperimentInterface e = experimentReference.getData();
 			List<NumericMeasurementInterface> images = Substance3D.getAllFiles(e, MeasurementNodeType.IMAGE);
 			TreeSet<String> ids = new TreeSet<String>();
 			if (images != null) {

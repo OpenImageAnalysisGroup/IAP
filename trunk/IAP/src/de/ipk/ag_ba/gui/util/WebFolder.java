@@ -335,6 +335,14 @@ public class WebFolder {
 	
 	public static NavigationButton getURLactionButtton(String title, final IOurl referenceURL, String image,
 			GUIsetting guiSetting) {
+		NavigationAction action = getURLaction(title, referenceURL, image);
+		NavigationButton website = new NavigationButton(action, title, image, guiSetting);
+		website.setToolTipText("Open " + referenceURL);
+		
+		return website;
+	}
+	
+	public static NavigationAction getURLaction(final String title, final IOurl referenceURL, final String img) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			IOurl trueURL = null;
 			
@@ -360,6 +368,16 @@ public class WebFolder {
 			}
 			
 			@Override
+			public String getDefaultTitle() {
+				return title;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return img;
+			}
+			
+			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				return null;
 			}
@@ -379,9 +397,6 @@ public class WebFolder {
 				return trueURL;
 			}
 		};
-		NavigationButton website = new NavigationButton(action, title, image, guiSetting);
-		website.setToolTipText("Open " + referenceURL);
-		
-		return website;
+		return action;
 	}
 }

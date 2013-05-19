@@ -15,10 +15,10 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.ReportRow;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -28,9 +28,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReport extends AbstractNavigationAction {
+public class ActionNumericDataReport extends AbstractNavigationAction implements ActionDataProcessing {
 	
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	private JTable table;
@@ -40,10 +39,8 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 		super(tooltip);
 	}
 	
-	public ActionNumericDataReport(MongoDB m, ExperimentReference experimentReference) {
+	public ActionNumericDataReport() {
 		this("Show/export numeric data report");
-		this.m = m;
-		this.experimentReference = experimentReference;
 	}
 	
 	@Override
@@ -73,7 +70,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 		this.src = src;
 		ArrayList<String> cols = new ArrayList<String>();
 		Object[] columns;
-		ExperimentInterface experiment = experimentReference.getData(m);
+		ExperimentInterface experiment = experimentReference.getData();
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		if (SystemAnalysis.isHeadless()) {
 			// cols.add("Plant");
@@ -164,15 +161,21 @@ public class ActionNumericDataReport extends AbstractNavigationAction {
 		return experimentReference;
 	}
 	
-	public MongoDB getMongoInstance() {
-		return m;
-	}
-	
 	public String getCSVheader() {
 		return "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator +
 				"Variety" + separator + "GrowthCondition" + separator + "Treatment" + separator + "Sequence" + separator +
 				"Day" + separator + "Time" + separator + "Day (Int)" + separator + "Day (Float)" + separator + "Weight A (g)" + separator +
 				"Weight B (g)" + separator + "Water (weight-diff)" + separator + "RGB" + separator + "Fluo" + separator + "Nir"
 				+ separator + "Other\r\n";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.experimentReference = experimentReference;
 	}
 }

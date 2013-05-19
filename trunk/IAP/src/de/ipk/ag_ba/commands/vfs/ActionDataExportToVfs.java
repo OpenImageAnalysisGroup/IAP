@@ -144,8 +144,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		try {
 			for (ExperimentReference experimentReference : experimentReferences) {
 				status.setCurrentStatusText1("Clone Experiment");
-				ExperimentInterface experiment = experimentReference.getData(
-						m);
+				ExperimentInterface experiment = experimentReference.getData();
 				
 				if (!skipClone)
 					experiment = experiment.clone();

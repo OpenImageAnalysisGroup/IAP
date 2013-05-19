@@ -61,7 +61,6 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.FlexibleImage;
 import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -100,8 +99,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private JMenuItem removeOneFromDatabaseCmd;
 	private JMenuItem removeAllFromDatabaseCmd;
 	
-	MongoDB m;
-	
 	JProgressBar progress;
 	private final MongoTreeNode targetTreeNode;
 	public MyImageIcon myImage;
@@ -120,7 +117,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		return myImage.imageAvailable;
 	}
 	
-	public DataSetFileButton(final MongoDB m,
+	public DataSetFileButton(
 			final MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
 			ImageIcon previewImage, boolean isNoImageButton) {
 		super();
@@ -136,8 +133,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 		this.targetTreeNode = targetTreeNode;
-		
-		this.m = m;
 		
 		addMouseListener(new MouseListener() {
 			@Override
@@ -457,8 +452,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							PipelineDesc pd = new PipelineDesc(null, targetTreeNode.getExperiment().getIniIoProvider(), null, null);
 							UserDefinedImageAnalysisPipelineTask iat =
 									new UserDefinedImageAnalysisPipelineTask(pd);
-							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(m, targetTreeNode, iat);
-							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(m, targetTreeNode, iat);
+							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
 							jp.add(debugPipelineTest0a);
 							jp.add(debugPipelineTest00a);
 						} catch (Exception err) {
@@ -480,8 +475,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					boolean added = false;
 					
 					for (final AbstractPhenotypingTask iat : pl) {
-						JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(m, targetTreeNode, iat);
-						JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(m, targetTreeNode, iat);
+						JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+						JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
 						
 						ta.add(debugPipelineTest0a);
 						ta.add(debugPipelineTest00a);
@@ -548,11 +543,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		validate();
 	}
 	
-	public DataSetFileButton(MongoDB m, MongoTreeNode projectNode,
+	public DataSetFileButton(MongoTreeNode projectNode,
 			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle) {
-		this(
-				m,
-				projectNode,
+		this(projectNode,
 				"<html><body><b>" +
 						(imageResult == null ? "<center>" + customNonImageTitle :
 								getMaxString(strip(
@@ -713,19 +706,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									VolumeData volume = (VolumeData) mde;
 									if (volume != null)
 										DataExchangeHelperForExperiments
-												.downloadFile(m, imageResult
-														.getHashMain(), tfMain,
+												.downloadFile(targetTreeNode.getExperiment().m, imageResult.getHashMain(), tfMain,
 														DataSetFileButton.this,
 														MongoCollection.VOLUMES);
 								} catch (Exception e) {
 									DataExchangeHelperForExperiments
-											.downloadFile(m,
+											.downloadFile(targetTreeNode.getExperiment().m,
 													imageResult.getHashMain(),
 													tfMain,
 													DataSetFileButton.this,
 													MongoCollection.IMAGES);
 									DataExchangeHelperForExperiments
-											.downloadFile(m, imageResult
+											.downloadFile(targetTreeNode.getExperiment().m, imageResult
 													.getFileNameLabel(),
 													tfLabel,
 													DataSetFileButton.this,
@@ -984,7 +976,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
 			try {
-				targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+				targetTreeNode.updateSizeInfo(sizeChangedListener);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -1000,7 +992,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			p.repaint();
 			targetTreeNode.setSizeDirty(true);
 			try {
-				targetTreeNode.updateSizeInfo(m, sizeChangedListener);
+				targetTreeNode.updateSizeInfo(sizeChangedListener);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -1319,7 +1311,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		this.additionalFileNameInfo = additionalFileNameInfo;
 	}
 	
-	private JMenuItem getMenuItemAnalyseFromMainImage(final MongoDB m, final MongoTreeNode targetTreeNode, final AbstractPhenotypingTask iat) {
+	private JMenuItem getMenuItemAnalyseFromMainImage(final MongoTreeNode targetTreeNode, final AbstractPhenotypingTask iat) {
 		JMenuItem debugPipelineTest0a = new JMenuItem(
 				StringManipulationTools.removeHTMLtags(iat.getName()) + " (Image+Reference)");
 		debugPipelineTest0a.addActionListener(new ActionListener() {
@@ -1337,7 +1329,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						System.out.println("Image Set Match: " + nmi + " // Subtance: " + nmi.getParentSample().getParentCondition().getParentSubstance().getName());
 					BlockPipeline.debugTryAnalysis(
 							targetTreeNode.getExperiment(),
-							match, m,
+							match,
 							iat);
 				} catch (Exception err) {
 					JOptionPane.showMessageDialog(null, "Error: "
@@ -1353,7 +1345,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		return debugPipelineTest0a;
 	}
 	
-	private JMenuItem getMenuItemAnalyseFromLabelImage(final MongoDB m, final MongoTreeNode targetTreeNode, final AbstractPhenotypingTask iat) {
+	private JMenuItem getMenuItemAnalyseFromLabelImage(final MongoTreeNode targetTreeNode, final AbstractPhenotypingTask iat) {
 		JMenuItem debugPipelineTest00a = new JMenuItem(
 				StringManipulationTools.removeHTMLtags(iat.getName()) + " (Reference+Old Reference)");
 		debugPipelineTest00a.addActionListener(new ActionListener() {
@@ -1364,12 +1356,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							.getMatchForReference(imageResult
 									.getBinaryFileInfo()
 									.getFileNameMain(),
-									targetTreeNode.getExperiment().getExperiment(),
-									m);
+									targetTreeNode.getExperiment().getExperiment());
 					
 					BlockPipeline.debugTryAnalysis(
 							targetTreeNode.getExperiment(),
-							match, m,
+							match,
 							iat);
 				} catch (Exception err) {
 					JOptionPane.showMessageDialog(null, "Error: "

@@ -8,7 +8,6 @@ import info.clearthought.layout.TableLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
@@ -206,11 +205,6 @@ public class IAPmain extends JApplet {
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");
-		JComponent advancedNavigation = IAPgui.getMainGUIcontent(myStatus, false, null);
-		add(advancedNavigation, "0,0");
-		setVisible(true);
-		validate();
-		repaint();
 		
 		Thread t = new Thread() {
 			
@@ -228,6 +222,13 @@ public class IAPmain extends JApplet {
 		};
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
+		
+		JComponent advancedNavigation = IAPgui.getMainGUIcontent(myStatus, false, null);
+		add(advancedNavigation, "0,0");
+		setVisible(true);
+		validate();
+		repaint();
+		
 	}
 	
 	private void setupLogger() {
@@ -343,6 +344,7 @@ public class IAPmain extends JApplet {
 		URL r2 = cl.getResource("plugins2.txt");
 		URL r3 = cl.getResource("plugins3.txt");
 		URL r4 = cl.getResource("plugins4.txt");
+		URL r5 = cl.getResource("pluginsIAP.txt");
 		
 		URL rExcl = cl.getResource("plugins_exclude.txt");
 		
@@ -354,22 +356,13 @@ public class IAPmain extends JApplet {
 			locations.addAll(new TextFile(r2));
 			locations.addAll(new TextFile(r3));
 			locations.addAll(new TextFile(r4));
-			
+			locations.addAll(new TextFile(r5));
 			locations.add("./MultimodalDataHandling.xml");
 			// locations.add("./HIVE.xml");
 			
 			locations.remove("");
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
-			
-			// for (String ss : locations) {
-			// // System.out.println(ss);
-			// if (ss.indexOf("addon") >= 0) {
-			// locations_exclude.add(ss);
-			// System.out.println("Disable plugin " + ss);
-			// }
-			//
-			// }
 			
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
 				String remove = it.next();
@@ -542,34 +535,6 @@ public class IAPmain extends JApplet {
 	
 	private static SystemOptions getOptions() {
 		return IAPoptions.getInstance();
-	}
-	
-	public static String getHSMfolder() {
-		boolean enabled = getOptions().getBoolean("ARCHIVE", "enabled", false);
-		String folder = getOptions().getString("ARCHIVE", "folder", getHSMfolderDefault());
-		if (enabled)
-			return folder;
-		else
-			return null;
-	}
-	
-	private static String getHSMfolderDefault() {
-		try {
-			if (new File("/media/nfs/hsm").exists())
-				return "/media/nfs/hsm";
-			else
-				if (new File("/Volumes/HSM").exists())
-					return "/Volumes/HSM";
-				else
-					if (new File("E:/austausch/HSM").exists())
-						return "E:/austausch/HSM";
-					else
-						return ReleaseInfo.getAppSubdirFolder("local-iap-hsm");
-		} catch (Exception e) {
-			System.out.println("ERROR: HSM file system folder not accessible: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;

@@ -34,7 +34,6 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -52,10 +51,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class ActionDataExportZIP extends AbstractNavigationAction implements SpecialCommandLineSupport {
+public class ActionDataExportZIP extends AbstractNavigationAction implements SpecialCommandLineSupport, ActionDataProcessing {
 	
-	private MongoDB m;
-	private ExperimentReference experimentReference;
+	private ExperimentReference er;
 	private String fn;
 	private String mb;
 	private int files;
@@ -66,10 +64,9 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		super(tooltip);
 	}
 	
-	public ActionDataExportZIP(MongoDB m, ExperimentReference experimentReference) {
+	public ActionDataExportZIP(ExperimentReference experimentReference) {
 		this("Create ZIP file");
-		this.m = m;
-		this.experimentReference = experimentReference;
+		this.er = experimentReference;
 	}
 	
 	@Override
@@ -146,9 +143,9 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		this.errorMessage = null;
 		try {
 			OutputStream os;
-			
+			ExperimentReference experimentReference = er;
 			status.setCurrentStatusText1("Load Experiment");
-			ExperimentInterface experiment = experimentReference.getData(m);
+			ExperimentInterface experiment = experimentReference.getData();
 			
 			String fsinfo = "";
 			
@@ -384,14 +381,6 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		}
 	}
 	
-	public ExperimentReference getExperimentReference() {
-		return experimentReference;
-	}
-	
-	public MongoDB getMongoInstance() {
-		return m;
-	}
-	
 	long startTime;
 	File ff;
 	
@@ -431,5 +420,16 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 				"File size " + fs / 1024 / 1024 + " MB, " +
 				"t=" + SystemAnalysis.getWaitTimeShort(System.currentTimeMillis() - startTime - 1000) + ", " +
 				"speed=" + StringManipulationTools.formatNumber(mbps, "#.#") + " MB/s");
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.er = experimentReference;
 	}
 }

@@ -17,6 +17,7 @@ import org.graffiti.plugin.io.resources.HTTPhandler;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.DataSource;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.HTTPdataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
@@ -173,5 +174,11 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	@Override
 	public boolean canHandle(String databaseId) {
 		return false;
+	}
+	
+	@Override
+	public DataSourceGroup getDataSourceGroup() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

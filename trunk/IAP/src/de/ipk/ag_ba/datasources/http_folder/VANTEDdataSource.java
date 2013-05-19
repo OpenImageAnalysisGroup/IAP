@@ -14,6 +14,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -27,8 +28,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 public class VANTEDdataSource extends HTTPfolderSource {
 	private static final String VANTED = "VANTED Resources";
 	
-	public VANTEDdataSource() {
-		super(getLibrary(),
+	public VANTEDdataSource(DataSourceGroup dsg) {
+		super(dsg, getLibrary(),
 				VANTED,
 				"http://vanted.ipk-gatersleben.de/examplefiles/",
 				new String[] { ".gml", ".graphml" },

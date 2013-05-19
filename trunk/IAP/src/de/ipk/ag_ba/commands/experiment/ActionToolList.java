@@ -10,18 +10,17 @@ import de.ipk.ag_ba.commands.experiment.tools.ActionSaveWebCamImagesSelectSource
 import de.ipk.ag_ba.commands.experiment.tools.ActionShowXML;
 import de.ipk.ag_ba.commands.experiment.tools.ActionSortSubstances;
 import de.ipk.ag_ba.commands.experiment.tools.ActionTestMongoIoReadSpeed;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 
-public class ActionToolList extends AbstractNavigationAction {
-	private final MongoDB m;
-	private final ExperimentReference experimentReference;
+public class ActionToolList extends AbstractNavigationAction implements ActionDataProcessing {
+	private MongoDB m;
+	private ExperimentReference experimentReference;
 	
-	public ActionToolList(String tooltip, MongoDB m, ExperimentReference experimentReference) {
+	public ActionToolList(String tooltip) {
 		super(tooltip);
-		this.m = m;
-		this.experimentReference = experimentReference;
 	}
 	
 	@Override
@@ -52,5 +51,16 @@ public class ActionToolList extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/gpl2/Gnome-System-Run-64.png";// IAPimages.getToolbox();
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experimentReference = experimentReference;
 	}
 }

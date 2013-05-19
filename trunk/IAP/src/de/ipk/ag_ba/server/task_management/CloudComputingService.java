@@ -8,7 +8,6 @@ package de.ipk.ag_ba.server.task_management;
 
 import info.StopWatch;
 
-import java.io.File;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
@@ -17,10 +16,6 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.datasource.Library;
-import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
-import de.ipk.ag_ba.gui.IAPoptions;
-import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -219,17 +214,17 @@ public class CloudComputingService {
 		if (io != null)
 			s.printTime();
 		
-		String hsm = IAPmain.getHSMfolder();
-		if (hsm != null && new File(hsm).exists()) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">HSM Folder: " + hsm);
-			Library lib = new Library();
-			HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
-					IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
-					hsm,
-					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-					IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-					IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
-		}
+		// String hsm = IAPmain.getHSMfolder();
+		// if (hsm != null && new File(hsm).exists()) {
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">HSM Folder: " + hsm);
+		// Library lib = new Library();
+		// HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
+		// IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
+		// hsm,
+		// IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+		// IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+		// IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
+		// }
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
 		

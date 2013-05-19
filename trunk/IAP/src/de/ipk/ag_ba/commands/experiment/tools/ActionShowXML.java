@@ -45,7 +45,7 @@ public class ActionShowXML extends AbstractNavigationAction {
 		xmlOutput.clear();
 		try {
 			getStatusProvider().setCurrentStatusText1("Generate XML...");
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			for (Document document : Experiment.getDocuments(res, getStatusProvider(), false)) {
 				String xml = "";
 				try {

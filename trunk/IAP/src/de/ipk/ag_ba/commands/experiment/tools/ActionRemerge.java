@@ -44,7 +44,7 @@ public class ActionRemerge extends AbstractNavigationAction {
 		this.src = src;
 		operationResult = "";
 		try {
-			ExperimentInterface e = experiment.getData(m);
+			ExperimentInterface e = experiment.getData();
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus = status;
 			// if (optStatus != null)
 			// optStatus.setCurrentStatusText1("Get mapping path objects");

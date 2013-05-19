@@ -133,8 +133,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 		this.errorMessage = null;
 		try {
 			status.setCurrentStatusText1("Clone Experiment");
-			final ExperimentInterface experiment = experimentReference.getData(
-					m).clone();
+			final ExperimentInterface experiment = experimentReference.getData().clone();
 			
 			status.setCurrentStatusText1("Store Files...");
 			

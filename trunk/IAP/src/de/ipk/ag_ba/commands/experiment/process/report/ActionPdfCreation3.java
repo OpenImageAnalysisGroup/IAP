@@ -45,7 +45,6 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -54,9 +53,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
-	
-	private MongoDB m;
+public class ActionPdfCreation3 extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
 	private ExperimentReference experimentReference;
 	
 	ArrayList<String> lastOutput = new ArrayList<String>();
@@ -75,7 +72,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	private String optCustomSubset;
 	private ExportSetting optCustomSubsetDef;
 	
-	public ActionNumericDataReportCompleteFinishedStep3(String tooltip,
+	public ActionPdfCreation3(String tooltip,
 			boolean exportIndividualAngles,
 			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
 		super(tooltip);
@@ -84,8 +81,8 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportCompleteFinishedStep3(
-			MongoDB m, ExperimentReference experimentReference,
+	public ActionPdfCreation3(
+			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			boolean exportIndividualAngles,
 			boolean xlsx,
@@ -93,14 +90,14 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
 			ThreadSafeOptions tsoBootstrapN,
 			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
-		this(m, experimentReference, divideDatasetBy, exportIndividualAngles, xlsx,
+		this(experimentReference, divideDatasetBy, exportIndividualAngles, xlsx,
 				togglesFiltering, togglesInterestingProperties,
 				tsoBootstrapN,
 				tsoSplitFirst, tsoSplitSecond, null, null);
 	}
 	
-	public ActionNumericDataReportCompleteFinishedStep3(
-			MongoDB m, ExperimentReference experimentReference,
+	public ActionPdfCreation3(
+			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			boolean exportIndividualAngles,
 			boolean xlsx,
@@ -114,7 +111,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 				exportIndividualAngles, xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
-		this.m = m;
 		this.experimentReference = experimentReference;
 		this.togglesFiltering = togglesFiltering;
 		this.togglesInterestingProperties = togglesInterestingProperties;
@@ -330,7 +326,7 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		ExperimentInterface experiment = experimentReference.getData(m, false, getStatusProvider());
+		ExperimentInterface experiment = experimentReference.getData(false, getStatusProvider());
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
@@ -864,10 +860,6 @@ public class ActionNumericDataReportCompleteFinishedStep3 extends AbstractNaviga
 	
 	public ExperimentReference getExperimentReference() {
 		return experimentReference;
-	}
-	
-	public MongoDB getMongoInstance() {
-		return m;
 	}
 	
 	public static String getCSVheader() {

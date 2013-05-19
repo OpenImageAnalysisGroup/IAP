@@ -67,7 +67,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.errorMessage = null;
 		status.setCurrentStatusText1("Load Experiment");
-		ExperimentInterface experiment = experimentReference.getData(m);
+		ExperimentInterface experiment = experimentReference.getData();
 		
 		String fsinfo = "";
 		

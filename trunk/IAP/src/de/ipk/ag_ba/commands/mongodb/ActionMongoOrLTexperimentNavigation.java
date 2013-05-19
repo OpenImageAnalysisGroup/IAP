@@ -9,24 +9,21 @@ package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
-import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.DeletionCommand;
-import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.experiment.ActionExperimentHistory;
-import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
-import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
@@ -37,12 +34,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 public class ActionMongoOrLTexperimentNavigation extends
 		AbstractNavigationAction implements RunnableWithMappingData {
 	private NavigationButton src;
-	private String domainUser;
 	private final String tt;
 	private String displayName;
 	private ExperimentReference experimentReference;
 	private boolean requestTitleUpdates = true;
 	private boolean oldAnalysis;
+	private String domainUser;
 	
 	public ActionMongoOrLTexperimentNavigation(
 			ExperimentReference exp) {
@@ -82,20 +79,11 @@ public class ActionMongoOrLTexperimentNavigation extends
 		
 		ExperimentHeaderInterface header = experimentReference.getHeader();
 		
-		boolean add = true;
-		if (header != null && header.inTrash())
-			add = false;
-		else {
-			add = true;
-		}
-		if (add) {
+		if (header != null && !header.inTrash()) {
 			boolean imageAnalysis = true;
-			getDefaultActions(
-					actions,
-					experimentReference,
-					header,
-					imageAnalysis,
-					src.getGUIsetting(), experimentReference.m);
+			for (ActionDataProcessing adp : IAPpluginManager.getInstance()
+					.getExperimentProcessingActions(experimentReference, imageAnalysis))
+				actions.add(new NavigationButton(adp, src.getGUIsetting()));
 		}
 		if (header.getHistory() != null && !header.getHistory().isEmpty()) {
 			actions.add(new NavigationButton(
@@ -123,30 +111,6 @@ public class ActionMongoOrLTexperimentNavigation extends
 		}
 		
 		return actions;
-	}
-	
-	public static void getDefaultActions(ArrayList<NavigationButton> actions,
-			ExperimentReference experiment, ExperimentHeaderInterface header,
-			boolean imageAnalysis, GUIsetting guiSetting, MongoDB m) {
-		if (experiment == null)
-			return;
-		try {
-			for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(
-					m, experiment, imageAnalysis,
-					guiSetting))
-				actions.add(ne);
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		if (imageAnalysis)
-			for (NavigationButton ne : Other
-					.getProcessExperimentDataWithVantedEntities(m,
-							experiment, guiSetting)) {
-				if (ne.getTitle().contains("Put data")) {
-					ne.setTitle("Show in IAP-Data-Navigator");
-					actions.add(ne);
-				}
-			}
 	}
 	
 	@Override

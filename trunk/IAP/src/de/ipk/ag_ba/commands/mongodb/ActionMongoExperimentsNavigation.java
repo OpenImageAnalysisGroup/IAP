@@ -672,6 +672,16 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	}
 	
 	@Override
+	public String getDefaultNavigationImage() {
+		return "img/ext/network-mongo.png";
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/ext/network-mongo-gray.png";
+	}
+	
+	@Override
 	public boolean requestTitleUpdates() {
 		return false;
 	}

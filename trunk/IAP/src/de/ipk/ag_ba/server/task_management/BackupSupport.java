@@ -1,8 +1,5 @@
 package de.ipk.ag_ba.server.task_management;
 
-import info.StopWatch;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,19 +13,10 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.commands.datasource.Library;
-import de.ipk.ag_ba.commands.experiment.hsm.ActionDataExportToHsmFolder;
-import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPoptions;
-import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
-import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 public class BackupSupport {
@@ -80,20 +68,20 @@ public class BackupSupport {
 		tT.run();
 		t.scheduleAtFixedRate(tT, new Date(), 1 * 60 * 1000);
 		print("INFO: BACKUP SUPPORT READY");
-		String hsmFolder = IAPmain.getHSMfolder();
-		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			if (new File(hsmFolder).canRead())
-				print("INFO: HSM FOLDER CAN BE READ");
-			else
-				print("ERROR: HSM FOLDER CAN NOT BE READ");
-			if (new File(hsmFolder).canWrite())
-				print("INFO: HSM FOLDER IS WRITABLE");
-			else
-				print("ERROR: CAN NOT WRITE TO HSM FOLDER");
-			
-		} else {
-			print("WARNING: HSM FOLDER NOT AVAILABLE: " + hsmFolder);
-		}
+		// String hsmFolder = IAPmain.getHSMfolder();
+		// if (hsmFolder != null && new File(hsmFolder).exists()) {
+		// if (new File(hsmFolder).canRead())
+		// print("INFO: HSM FOLDER CAN BE READ");
+		// else
+		// print("ERROR: HSM FOLDER CAN NOT BE READ");
+		// if (new File(hsmFolder).canWrite())
+		// print("INFO: HSM FOLDER IS WRITABLE");
+		// else
+		// print("ERROR: CAN NOT WRITE TO HSM FOLDER");
+		//
+		// } else {
+		// print("WARNING: HSM FOLDER NOT AVAILABLE: " + hsmFolder);
+		// }
 	}
 	
 	public void makeBackup() {
@@ -120,144 +108,135 @@ public class BackupSupport {
 	}
 	
 	private void makeBackupInnerCall() {
-		try {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">START BACKUP SYNC");
-			
-			StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: Imaging System to HSM Backup", false);
-			
-			LTdataExchange lt = new LTdataExchange();
-			ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
-			ArrayList<IdTime> hsmIdArr = new ArrayList<IdTime>();
-			ArrayList<IdTime> toSave = new ArrayList<IdTime>();
-			
-			for (String db : lt.getDatabases()) {
-				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
-					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
-							ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
-				}
-			}
-			
-			String hsmFolder = IAPmain.getHSMfolder();
-			if (hsmFolder != null && new File(hsmFolder).exists()) {
-				print("Archive Folder: " + hsmFolder);
-				Library lib = new Library();
-				HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
-						IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
-						hsmFolder,
-						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-						IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-						IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
-				dataSourceHsm.readDataSource();
-				for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
-					if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
-						print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
-						return;
-					}
-					
-					if (hsmExp.getOriginDbId() != null)
-						hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(),
-								hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
-					else
-						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
-				}
-			}
-			
-			for (IdTime it : ltIdArr) {
-				String db = it.getExperimentHeader().getDatabase();
-				if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
-					print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-					continue;
-				} else
-					if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
-						print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-						continue;
-					}
-				
-				boolean found = false;
-				for (IdTime h : hsmIdArr) {
-					if (h.equals(it)) {
-						if (it.time.getTime() - h.time.getTime() > 1000) {
-							print("BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
-							toSave.add(it);
-						}
-						found = true;
-						break;
-					}
-				}
-				
-				if (!found) {
-					toSave.add(it);
-					print("BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
-							+ it.getExperimentHeader().getDatabase() + ")");
-				}
-			}
-			
-			print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
-			MongoDB m = MongoDB.getDefaultCloud();
-			for (IdTime it : toSave) {
-				if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
-					print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
-					return;
-				}
-				ExperimentHeaderInterface src = it.getExperimentHeader();
-				print("START BACKUP OF EXPERIMENT: " + it.Id);
-				
-				ExperimentReference er = new ExperimentReference(src);
-				
-				ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(m, er,
-						hsmFolder);
-				boolean enabled = true;
-				copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
-				copyAction.performActionCalculateResults(null);
-				print("FINISHED BACKUP OF EXPERIMENT: " + it.Id);
-			}
-			s.printTime();
-		} catch (Exception e1) {
-			print("ERROR: BACKUP INNER-CALL ERROR (" + e1.getMessage() + ")");
-		}
+		/*
+		 * try {
+		 * System.out.println(SystemAnalysis.getCurrentTime() + ">START BACKUP SYNC");
+		 * StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: Imaging system experimnent backup", false);
+		 * LTdataExchange lt = new LTdataExchange();
+		 * ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();
+		 * ArrayList<IdTime> hsmIdArr = new ArrayList<IdTime>();
+		 * ArrayList<IdTime> toSave = new ArrayList<IdTime>();
+		 * for (String db : lt.getDatabases()) {
+		 * for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
+		 * ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
+		 * ltExp.getImportdate(), ltExp, ltExp.getNumberOfFiles()));
+		 * }
+		 * }
+		 * String hsmFolder = IAPmain.getHSMfolder();
+		 * if (hsmFolder != null && new File(hsmFolder).exists()) {
+		 * print("Archive Folder: " + hsmFolder);
+		 * Library lib = new Library();
+		 * HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
+		 * IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
+		 * hsmFolder,
+		 * IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+		 * IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
+		 * IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
+		 * dataSourceHsm.readDataSource();
+		 * for (ExperimentHeaderInterface hsmExp : dataSourceHsm.getAllExperimentsNewest()) {
+		 * if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
+		 * print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
+		 * return;
+		 * }
+		 * if (hsmExp.getOriginDbId() != null)
+		 * hsmIdArr.add(new IdTime(null, hsmExp.getOriginDbId(),
+		 * hsmExp.getImportdate(), null, hsmExp.getNumberOfFiles()));
+		 * else
+		 * System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NULL EXPERIMENT IN HSM!");
+		 * }
+		 * }
+		 * for (IdTime it : ltIdArr) {
+		 * String db = it.getExperimentHeader().getDatabase();
+		 * if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
+		 * print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+		 * continue;
+		 * } else
+		 * if (it.getExperimentHeader().getExperimentName().equals("unknown")) {
+		 * print("DATASET IGNORED (INVALID UKNOWN EXPERIMENT NAME): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+		 * continue;
+		 * }
+		 * boolean found = false;
+		 * for (IdTime h : hsmIdArr) {
+		 * if (h.equals(it)) {
+		 * if (it.time.getTime() - h.time.getTime() > 1000) {
+		 * print("BACKUP NEEDED (NEW DATA): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
+		 * toSave.add(it);
+		 * }
+		 * found = true;
+		 * break;
+		 * }
+		 * }
+		 * if (!found) {
+		 * toSave.add(it);
+		 * print("BACKUP NEEDED (NEW EXPERIMENT): " + it.Id + " (DB: "
+		 * + it.getExperimentHeader().getDatabase() + ")");
+		 * }
+		 * }
+		 * print("START BACKUP OF " + toSave.size() + " EXPERIMENTS!");
+		 * MongoDB m = MongoDB.getDefaultCloud();
+		 * for (IdTime it : toSave) {
+		 * if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false)) {
+		 * print("INFO: BACKUP PROCEDURE HAS BEEN STOPPED, BECAUSE BACKUP OPERATION IS CURRENTLY DISABLED");
+		 * return;
+		 * }
+		 * ExperimentHeaderInterface src = it.getExperimentHeader();
+		 * print("START BACKUP OF EXPERIMENT: " + it.Id);
+		 * ExperimentReference er = new ExperimentReference(src);
+		 * ActionDataExportToHsmFolder copyAction = new ActionDataExportToHsmFolder(m, er,
+		 * hsmFolder);
+		 * boolean enabled = true;
+		 * copyAction.setStatusProvider(new BackgroundTaskConsoleLogger("", "", enabled));
+		 * copyAction.performActionCalculateResults(null);
+		 * print("FINISHED BACKUP OF EXPERIMENT: " + it.Id);
+		 * }
+		 * s.printTime();
+		 * } catch (Exception e1) {
+		 * print("ERROR: BACKUP INNER-CALL ERROR (" + e1.getMessage() + ")");
+		 * }
+		 */
 	}
 	
 	public void scheduleBackup() {
-		String hsmFolder = IAPmain.getHSMfolder();
-		if (hsmFolder != null && new File(hsmFolder).exists()) {
-			print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED");
-			Timer t = new Timer("IAP 24h-Backup-Timer");
-			long period = 1000 * 60 * 60 * IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_intervall_h", 24); // 24 Hours
-			TimerTask tT = new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(1000);
-						
-						String hsmFolder = IAPmain.getHSMfolder();
-						if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false))
-							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
-						else {
-							print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
-							BackupSupport sb = BackupSupport.getInstance();
-							sb.makeBackup();
-						}
-					} catch (InterruptedException e) {
-						print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
-					}
-				}
-			};
-			Date startTime = new Date(); // current day at 23:59:39
-			int startHour = IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", 24);
-			if (startHour >= 0) {
-				if (startHour < 1 || startHour > 24) {
-					startHour = 24;
-					IAPoptions.getInstance().setInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", startHour);
-				}
-				startTime.setHours(startHour - 1);
-				startTime.setMinutes(59);
-				startTime.setSeconds(59);
-				t.scheduleAtFixedRate(tT, startTime, period);
-			} else
-				print("WARNING: INVALID STARTUP-TIME (below 0), BACKUP HAS NOT BEEN SCHEDULED!");
-		} else {
-			print("WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
-		}
+		// String hsmFolder = IAPmain.getHSMfolder();
+		// if (hsmFolder != null && new File(hsmFolder).exists()) {
+		// print("AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") HAS BEEN SCHEDULED");
+		// Timer t = new Timer("IAP 24h-Backup-Timer");
+		// long period = 1000 * 60 * 60 * IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_intervall_h", 24); // 24 Hours
+		// TimerTask tT = new TimerTask() {
+		// @Override
+		// public void run() {
+		// try {
+		// Thread.sleep(1000);
+		//
+		// String hsmFolder = IAPmain.getHSMfolder();
+		// if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Atomatic Copy to Archive//enabled", false))
+		// print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - BUT THE FEATURE IS CURRENTLY DISABLED");
+		// else {
+		// print("IT IS NOW TIME FOR AUTOMATIC BACKUP FROM LT TO HSM (" + hsmFolder + ") - THE FEATURE IS CURRENTLY ENABLED - PROCEEDING");
+		// BackupSupport sb = BackupSupport.getInstance();
+		// sb.makeBackup();
+		// }
+		// } catch (InterruptedException e) {
+		// print("INFO: PROCESSING INTERRUPTED (" + e.getMessage() + ")");
+		// }
+		// }
+		// };
+		// Date startTime = new Date(); // current day at 23:59:39
+		// int startHour = IAPoptions.getInstance().getInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", 24);
+		// if (startHour >= 0) {
+		// if (startHour < 1 || startHour > 24) {
+		// startHour = 24;
+		// IAPoptions.getInstance().setInteger("Watch-Service", "Atomatic Copy to Archive//backup_starttime_h", startHour);
+		// }
+		// startTime.setHours(startHour - 1);
+		// startTime.setMinutes(59);
+		// startTime.setSeconds(59);
+		// t.scheduleAtFixedRate(tT, startTime, period);
+		// } else
+		// print("WARNING: INVALID STARTUP-TIME (below 0), BACKUP HAS NOT BEEN SCHEDULED!");
+		// } else {
+		// print("WARNING: NO AUTOMATIC BACKUP SCHEDULED! HSM FOLDER NOT AVAILABLE (" + hsmFolder + ")");
+		// }
 	}
 	
 	public String getHistory(int maxLines, String pre, final String preLine, String lineBreak, String follow) {
