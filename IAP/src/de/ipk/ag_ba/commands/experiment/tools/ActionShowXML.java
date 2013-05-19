@@ -11,6 +11,7 @@ import org.jdom.JDOMException;
 import org.w3c.dom.Document;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -22,21 +23,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM
 /**
  * @author klukas
  */
-public class ActionShowXML extends AbstractNavigationAction {
-	
+public class ActionShowXML extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
 	ArrayList<String> xmlOutput = new ArrayList<String>();
 	
-	public ActionShowXML(MongoDB m, ExperimentReference experiment) {
-		super("Show Experiment-Data as XML");
-		this.m = m;
-		this.experiment = experiment;
-	}
-	
 	public ActionShowXML() {
-		super("Show Experiment as XML");
+		super("Show Experiment-Data as XML");
 	}
 	
 	@Override
@@ -94,5 +88,17 @@ public class ActionShowXML extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		return "Show XML";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 }

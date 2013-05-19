@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -16,17 +17,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ActionSortSubstances extends AbstractNavigationAction {
-	
+public class ActionSortSubstances extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
-	
-	public ActionSortSubstances(MongoDB m, ExperimentReference experiment) {
-		super("Sort substances and conditions by name");
-		this.m = m;
-		this.experiment = experiment;
-	}
 	
 	public ActionSortSubstances() {
 		super("Sort substances and conditions by name");
@@ -73,5 +67,17 @@ public class ActionSortSubstances extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		return "Sort Substances and Conditions by Name";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 }

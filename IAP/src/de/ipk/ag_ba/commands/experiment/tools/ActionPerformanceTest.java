@@ -8,6 +8,7 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -32,7 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class ActionPerformanceTest extends AbstractNavigationAction {
+public class ActionPerformanceTest extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
@@ -44,15 +45,9 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 	private int workOnSubset;
 	private int numberOfSubsets;
 	
-	public ActionPerformanceTest(MongoDB m, ExperimentReference experiment) {
-		super("Test performance by reading experiment content");
-		this.m = m;
-		this.experiment = experiment;
-		this.experimentResult = null;
-	}
-	
 	public ActionPerformanceTest() {
-		super("Test performance");
+		super("Test performance by reading experiment content");
+		this.experimentResult = null;
 	}
 	
 	@Override
@@ -193,6 +188,18 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		return "Performance Test";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 	
 	// @Override

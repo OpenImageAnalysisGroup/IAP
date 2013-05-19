@@ -8,7 +8,6 @@ import org.ErrorMsg;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.GenericPluginAdapter;
 
-import de.ipk.ag_ba.commands.analysis.ExperimentDataNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -32,11 +31,6 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	}
 	
 	@Override
-	public ExperimentDataNavigationAction[] getExperimentDataNavigationActions() {
-		return new ExperimentDataNavigationAction[] {};
-	}
-	
-	@Override
 	public ImageAnalysisBlockFIS[] getImageAnalysisBlocks() {
 		return new ImageAnalysisBlockFIS[] {};
 	}
@@ -56,6 +50,11 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	
 	@Override
 	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference er) {
+		return new ActionDataProcessing[] {};
+	}
+	
+	@Override
+	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference er) {
 		return new ActionDataProcessing[] {};
 	}
 }
