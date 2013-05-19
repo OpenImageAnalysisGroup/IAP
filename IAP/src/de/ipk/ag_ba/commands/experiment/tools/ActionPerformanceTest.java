@@ -8,13 +8,13 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.Other;
-import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -63,7 +63,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 			return;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
@@ -169,17 +169,14 @@ public class ActionPerformanceTest extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, new ExperimentReference(
-				experimentResult), false, src.getGUIsetting()))
-			res.add(ne);
 		
-		for (NavigationButton ne : Other.getProcessExperimentDataWithVantedEntities(m, new ExperimentReference(
-				experimentResult), src.getGUIsetting())) {
-			if (ne.getTitle().contains("Put data")) {
-				ne.setTitle("Analyze in IAP-Data-Navigator");
-				res.add(ne);
-			}
+		ExperimentReference experimentReference = new ExperimentReference(experimentResult);
+		experimentReference.m = m;
+		
+		for (NavigationAction na : IAPpluginManager.getInstance().getExperimentProcessingActions(experimentReference, true)) {
+			res.add(new NavigationButton(na, src.getGUIsetting()));
 		}
+		
 		return res;
 	}
 	

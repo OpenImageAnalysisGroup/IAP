@@ -85,7 +85,7 @@ public class ActionDeleteSelectedAnalysisSplitResults extends AbstractNavigation
 				ExperimentReference eD = new ExperimentReference(ei.getOriginDbId());
 				String pe = eD.getExperimentName();
 				ExperimentReference er = new ExperimentReference(ei, m);
-				Experiment ee = (Experiment) er.getData(m);
+				Experiment ee = (Experiment) er.getData();
 				ehl.add(ei);
 				String expN = ei.getExperimentName();
 				int ml = ee.getNumberOfMeasurementValues();

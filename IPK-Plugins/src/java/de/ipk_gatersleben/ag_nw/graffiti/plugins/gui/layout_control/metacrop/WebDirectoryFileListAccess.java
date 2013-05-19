@@ -11,6 +11,8 @@ import java.util.HashSet;
 
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+
 public class WebDirectoryFileListAccess {
 	
 	public static Collection<PathwayWebLinkItem> getMetaCropListItems() throws IOException {
@@ -42,12 +44,13 @@ public class WebDirectoryFileListAccess {
 	}
 	
 	public static Collection<PathwayWebLinkItem> getWebDirectoryFileListItems(String webAddress,
-						String[] validExtensions, boolean showGraphExtensions) throws IOException {
+			String[] validExtensions, boolean showGraphExtensions) throws IOException {
 		ArrayList<PathwayWebLinkItem> result = new ArrayList<PathwayWebLinkItem>();
 		String address = webAddress;
 		String pref = address;
 		
 		// Create a URL for the desired page
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Listing remote data source items (" + address + ")");
 		URL url = new URL(address);
 		
 		// Read all the text returned by the server

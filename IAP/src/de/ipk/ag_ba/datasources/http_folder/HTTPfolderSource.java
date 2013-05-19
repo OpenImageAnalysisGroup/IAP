@@ -17,6 +17,7 @@ import org.graffiti.plugin.io.resources.HTTPhandler;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.DataSource;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -40,9 +41,11 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private HTTPdataSourceLevel thisLevel;
 	private final Library lib;
 	private String description;
+	private DataSourceGroup dsg;
 	
-	public HTTPfolderSource(Library lib, String dataSourceName, String url, String[] validExtensions,
+	public HTTPfolderSource(DataSourceGroup dsg, Library lib, String dataSourceName, String url, String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+		this.dsg = dsg;
 		this.lib = lib;
 		this.url = url;
 		this.validExtensions = validExtensions;
@@ -155,5 +158,10 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	@Override
 	public boolean canHandle(String databaseId) {
 		return false;
+	}
+	
+	@Override
+	public DataSourceGroup getDataSourceGroup() {
+		return dsg;
 	}
 }

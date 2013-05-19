@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 
 import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
@@ -63,17 +62,16 @@ public class GUIsetting {
 		return found;
 	}
 	
-	public void addClipboardItem(ExperimentReference experimentReference, MongoDB m) {
+	public void addClipboardItem(ExperimentReference experimentReference) {
 		// add only the header to the clipboard, as storing the whole experiment may
 		// require a lot of memory
 		if (experimentReference.getHeader().getDatabaseId() != null && !experimentReference.getHeader().getDatabaseId().isEmpty()) {
 			ExperimentReference er = new ExperimentReference(experimentReference.getHeader());
 			clipboardExperiments.add(er);
 			clipboardExperimentDatabaseIds.add(er.getHeader().getDatabaseId());
-			er.m = m;
+			er.m = experimentReference.m;
 		} else {
 			clipboardExperiments.add(experimentReference);
-			experimentReference.m = m;
 		}
 		
 	}

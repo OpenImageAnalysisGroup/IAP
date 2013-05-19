@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.experiment;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,12 +11,13 @@ import javax.swing.JComponent;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
+import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
@@ -23,30 +25,27 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
-public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
+public final class ActionShowDataWithinVANTED extends AbstractNavigationAction implements ActionDataProcessing {
 	private final AbstractExperimentDataProcessor pp;
-	private final MongoDB m;
-	private final ExperimentReference experimentName;
+	private ExperimentReference experimentName;
 	MainPanelComponent mpc;
 	private NavigationButton src;
 	
-	public ActionShowDataWithinVANTED(String tooltip, AbstractExperimentDataProcessor pp, MongoDB m, ExperimentReference experimentName) {
+	public ActionShowDataWithinVANTED(String tooltip, AbstractExperimentDataProcessor pp) {
 		super(tooltip);
 		this.pp = pp;
-		this.m = m;
-		this.experimentName = experimentName;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) {
 		this.src = src;
 		try {
-			ExperimentInterface ed = experimentName.getData(m);
+			ExperimentInterface ed = experimentName.getData();
 			Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(ed);
 			ed = MappingData3DPath.merge(md, true);
 			if (ed != null) {
 				SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(
-						m, experimentName,
+						experimentName,
 						experimentName.getExperimentName());
 				ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
 						optSupplementaryPanel, null);
@@ -83,5 +82,38 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction {
 	@Override
 	public boolean isProvidingActions() {
 		return false;
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return true;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.experimentName = experimentReference;
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return "img/vanted1_0.png";
+	}
+	
+	@Override
+	public NavigationImage getImageIconInactive() {
+		try {
+			return new NavigationImage((BufferedImage) pp.getIcon().getImage(), null);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	@Override
+	public NavigationImage getImageIconActive() {
+		try {
+			return new NavigationImage((BufferedImage) pp.getIcon().getImage(), null);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

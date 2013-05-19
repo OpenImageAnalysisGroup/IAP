@@ -44,7 +44,7 @@ public class ActionResetConditionFromImageName extends AbstractNavigationAction 
 		this.src = src;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			TreeMap<Integer, ArrayList<String>> replId2fileNames = new TreeMap<Integer, ArrayList<String>>();
 			for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(res)) {
 				if (nmi instanceof BinaryMeasurement) {

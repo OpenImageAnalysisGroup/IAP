@@ -293,7 +293,7 @@ public class BlockPipeline {
 	public static void debugTryAnalysis(
 			final ExperimentReference er,
 			final Collection<NumericMeasurementInterface> input,
-			final MongoDB m, AbstractPhenotypingTask analysisTask) {
+			AbstractPhenotypingTask analysisTask) {
 		final ExperimentInterface e = er.getExperiment();
 		final AbstractPhenotypingTask analysisTaskFinal = analysisTask;
 		final LinkedHashSet<Sample3D> samples = new LinkedHashSet<Sample3D>();
@@ -313,7 +313,7 @@ public class BlockPipeline {
 		
 		analysisTaskFinal.setInput(
 				AbstractPhenotypingTask.getWateringInfo(e),
-				samples, input, m, 0, 1);
+				samples, input, er.m, 0, 1);
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
@@ -380,7 +380,7 @@ public class BlockPipeline {
 							@Override
 							public void run() {
 								analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
-								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, m, 0, 1);
+								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
 								BackgroundTaskHelper.issueSimpleTaskInWindow(
 										analysisTaskFinal.getName(), "Analyze...",
 										backgroundTask,

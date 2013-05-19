@@ -22,14 +22,17 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 	
 	private boolean active;
 	private final boolean saveAnnotation;
+	private MongoDB m;
 	
 	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment) {
-		super(m, experiment);
+		super(experiment);
+		this.m = m;
 		saveAnnotation = false;
 	}
 	
 	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment, boolean annotationSave) {
-		super(m, experiment);
+		super(experiment);
+		this.m = m;
 		this.saveAnnotation = annotationSave;
 	}
 	
@@ -66,7 +69,7 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 		try {
 			active = true;
 			
-			ExperimentInterface exp = experiment.getData(m); // .clone();
+			ExperimentInterface exp = experiment.getData();
 			
 			exp.getHeader().setOriginDbId(exp.getHeader().getDatabaseId() + "");
 			

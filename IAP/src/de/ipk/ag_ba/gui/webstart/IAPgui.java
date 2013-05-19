@@ -77,15 +77,6 @@ public class IAPgui {
 		// overView.setTitle("Initialize");
 		// overView.setProcessing(true);
 		
-		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
-		try {
-			home.performActionCalculateResults(overView);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
-		actionPanel.setEntitySet(home.getResultNewActionSet());
-		
 		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
 			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
 			@Override
@@ -116,6 +107,15 @@ public class IAPgui {
 		// JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
 		// actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		// actionPanel.setScrollpane(actionScroller);
+		
+		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
+		try {
+			home.performActionCalculateResults(overView);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
+		actionPanel.setEntitySet(home.getResultNewActionSet());
 		
 		JLabel lbl;
 		if (!secondWindow && IAPmain.myClassKnown) {

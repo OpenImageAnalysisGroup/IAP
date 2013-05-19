@@ -12,23 +12,20 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 public class ActionAssignAnalysisTemplate extends AbstractNavigationAction implements NavigationAction {
 	
 	private String iniFileName;
 	private String title;
 	private ExperimentReference exp;
-	private MongoDB m;
 	
 	public ActionAssignAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionAssignAnalysisTemplate(MongoDB m, ExperimentReference exp,
+	public ActionAssignAnalysisTemplate(ExperimentReference exp,
 			String iniFileName, String tooltip, String title) {
 		this(tooltip);
-		this.m = m;
 		this.exp = exp;
 		this.iniFileName = iniFileName;
 		this.title = title;
@@ -39,18 +36,18 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
 		ini = StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
-		if (m != null) {
+		if (exp.m != null) {
 			try {
-				m.saveExperimentHeader(exp.getHeader());
+				exp.m.saveExperimentHeader(exp.getHeader());
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
 						+ exp.getExperimentName()
 						+ " in storage location "
-						+ m.getDatabaseName() + ".");
+						+ exp.m.getDatabaseName() + ".");
 				if (exp.getIniIoProvider() != null && exp.getIniIoProvider().getInstance() != null)
 					exp.getIniIoProvider().getInstance().reload();
 				else
-					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), m));
+					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), exp.m));
 			} catch (Exception e) {
 				e.printStackTrace();
 				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");

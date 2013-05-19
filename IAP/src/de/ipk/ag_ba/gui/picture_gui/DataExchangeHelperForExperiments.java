@@ -43,7 +43,7 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
-import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCompleteFinishedStep3;
+import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -74,8 +74,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  */
 public class DataExchangeHelperForExperiments {
 	
-	public static int getSizeOfExperiment(MongoDB m,
-			ExperimentInterface experimentName) {
+	public static int getSizeOfExperiment(ExperimentReference m) {
 		return -1;
 	}
 	
@@ -167,19 +166,19 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mtdbe, final JTree expTree, final MongoDB m)
+			final MongoTreeNode mtdbe, final JTree expTree)
 			throws InterruptedException {
 		MyThread r = new MyThread(new Runnable() {
 			@Override
 			public void run() {
-				addFilesToPanel(filePanel, mtdbe, expTree, m);
+				addFilesToPanel(filePanel, mtdbe, expTree);
 			}
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r, 1000, 0, true);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mt, final JTree expTree, MongoDB m) {
+			final MongoTreeNode mt, final JTree expTree) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -194,7 +193,7 @@ public class DataExchangeHelperForExperiments {
 				MappingDataEntity mde = mt.getTargetEntity();
 				
 				String files = mde.getFiles();
-				if (m != null && files != null && !files.isEmpty()) {
+				if (files != null && !files.isEmpty()) {
 					for (String url_string : files.split(";")) {
 						IOurl url = new IOurl(url_string);
 						BinaryFileInfo bfi = new BinaryFileInfo(url, null, false, mde);
@@ -365,7 +364,7 @@ public class DataExchangeHelperForExperiments {
 					previewImage = null;
 					previewLoadAndConstructNeeded = true;
 				}
-				final DataSetFileButton imageButton = new DataSetFileButton(m,
+				final DataSetFileButton imageButton = new DataSetFileButton(
 						mt, imageResult, previewImage, mt.isReadOnly(), false, null);
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
@@ -404,8 +403,7 @@ public class DataExchangeHelperForExperiments {
 		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
-			MongoDB m = null;
-			final DataSetFileButton chartingButton = new DataSetFileButton(m,
+			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, "Create Data Chart");
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
@@ -438,8 +436,7 @@ public class DataExchangeHelperForExperiments {
 		{
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
-			MongoDB m = null;
-			final DataSetFileButton chartingButton = new DataSetFileButton(m,
+			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, "Export Data (XLSX)");
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
@@ -450,7 +447,7 @@ public class DataExchangeHelperForExperiments {
 					String fn = FileHelper.getFileName(".xlsx", "Create File", defaultFileName);
 					if (fn != null) {
 						boolean xlsx = true;
-						ActionNumericDataReportCompleteFinishedStep3 action = new ActionNumericDataReportCompleteFinishedStep3(null,
+						ActionPdfCreation3 action = new ActionPdfCreation3(
 								null, null, false, xlsx, null, null,
 								null, null, null);
 						action.setExperimentReference(

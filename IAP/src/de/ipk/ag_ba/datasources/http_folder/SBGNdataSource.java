@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
@@ -19,8 +20,8 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
  */
 public class SBGNdataSource extends HTTPfolderSource {
 	
-	public SBGNdataSource() {
-		super(getLibrary(), "SBGN-ED", "http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
+	public SBGNdataSource(DataSourceGroup dsg) {
+		super(dsg, getLibrary(), "SBGN-ED", "http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
 				new String[] { ".gml", ".graphml" }, IAPmain.loadIcon("img/sbgn.png"),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		setDescription("<h2>SBGN-ED - Editing, Translating and Validating of SBGN Maps</h2>"
@@ -37,8 +38,8 @@ public class SBGNdataSource extends HTTPfolderSource {
 	private static Library getLibrary() {
 		Library lib = new Library();
 		lib.add(new Book("SBGN-ED", "SBGN-ED", new IOurl("http://vanted.ipk-gatersleben.de/addons/sbgn-ed/"), "img/browser.png"));
-		lib.add(new Book("", "SBGN Specification", new IOurl("http://www.nature.com/nbt/journal/v27/n8/full/nbt.1558.html"), "img/dataset.png"));
-		lib.add(new Book("", "Reference", new IOurl("http://bioinformatics.oxfordjournals.org/content/26/18/2340.short"), "img/dataset.png"));
+		lib.add(new Book("SBGN-ED", "SBGN Specification", new IOurl("http://www.nature.com/nbt/journal/v27/n8/full/nbt.1558.html"), "img/dataset.png"));
+		lib.add(new Book("SBGN-ED", "Reference", new IOurl("http://bioinformatics.oxfordjournals.org/content/26/18/2340.short"), "img/dataset.png"));
 		lib.add(new Book("Activity Flow", "Nat. Proc. (AF)", new IOurl("http://precedings.nature.com/documents/3724")));
 		lib.add(new Book("Entity Relationship", "Nat. Proc. (ER)", new IOurl("http://precedings.nature.com/documents/3719"), "img/dataset.png"));
 		lib.add(new Book("Process Description", "Nat. Proc. (PD)", new IOurl("http://precedings.nature.com/documents/3721"), "img/dataset.png"));

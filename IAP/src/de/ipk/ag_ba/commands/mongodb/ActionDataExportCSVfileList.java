@@ -3,7 +3,7 @@ package de.ipk.ag_ba.commands.mongodb;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCompleteFinishedStep3;
+import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -52,7 +52,7 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 		errors.clear();
 		
 		boolean xlsx = false;
-		ActionNumericDataReportCompleteFinishedStep3 action = new ActionNumericDataReportCompleteFinishedStep3(m,
+		ActionPdfCreation3 action = new ActionPdfCreation3(
 				null, null, false, xlsx, null, null,
 				null, null, null);
 		for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {

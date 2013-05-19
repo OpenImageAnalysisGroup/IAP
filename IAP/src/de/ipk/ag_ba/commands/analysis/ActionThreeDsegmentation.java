@@ -8,8 +8,8 @@ import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.VolumeSegmentation;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
@@ -55,7 +56,7 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 		this.src = src;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			res = res.clone();
 			
 			// src.title = src.title + ": processing";
@@ -97,21 +98,19 @@ public class ActionThreeDsegmentation extends AbstractNavigationAction {
 					ci.setExperimentName(ci.getExperimentName() + " (segmented)");
 			
 			MyExperimentInfoPanel ip = new MyExperimentInfoPanel();
-			ip.setExperimentInfo(m, res.getHeader(), true, res);
+			ip.setExperimentInfo(experiment.m, res.getHeader(), true, res);
 			mpc = new MainPanelComponent(ip, true);
 			
-			storedActions.add(ActionViewExportData.getFileManagerEntity(m, new ExperimentReference(res),
-					src.getGUIsetting()));
+			ActionViewExportData viewAction = new ActionViewExportData();
+			viewAction.setExperimentReference(new ExperimentReference(res));
+			storedActions.add(new NavigationButton(viewAction, src.getGUIsetting()));
 			
 			storedActions.add(new NavigationButton(new ActionCopyToMongo(m,
 					new ExperimentReference(res)), "Store Dataset", "img/ext/user-desktop.png", src.getGUIsetting())); // PoweredMongoDBgreen.png"));
 			
-			ActionMongoOrLTexperimentNavigation.getDefaultActions(storedActions,
-					new ExperimentReference(res), res.getHeader(), false,
-					src.getGUIsetting(), m);
-			// TODO: create show with VANTED action with these action commands:
-			// AIPmain.showVANTED();
-			// ExperimentDataProcessingManager.getInstance().processIncomingData(statisticsResult);
+			for (ActionDataProcessing adp : IAPpluginManager.getInstance()
+					.getExperimentProcessingActions(new ExperimentReference(res), true))
+				storedActions.add(new NavigationButton(adp, guiSetting));
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			mpc = null;

@@ -7,12 +7,13 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -49,7 +50,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 			ids.add(id);
 			String seq = i.getHeader().getSequence() + "";
 			sequences.add(seq);
-			ExperimentInterface ei = i.getData(i.m, false, status);
+			ExperimentInterface ei = i.getData(false, status);
 			names.add(ei.getName());
 			ExperimentInterface eCopy = ei.clone();
 			if (firstExperimentStart == null)
@@ -125,16 +126,10 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		// res.add(ActionFileManager.getFileManagerEntity(null, new ExperimentReference(experimentResult),
-		// guiSetting));
-		//
-		// res.add(new NavigationButton(new ActionCopyToMongo(null, new ExperimentReference(experimentResult)),
-		// "Save Result", "img/ext/user-desktop.png", guiSetting));
+		for (ActionDataProcessing adp : IAPpluginManager.getInstance()
+				.getExperimentProcessingActions(new ExperimentReference(experimentResult), true))
+			res.add(new NavigationButton(adp, guiSetting));
 		
-		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
-				new ExperimentReference(experimentResult),
-				experimentResult.getHeader(),
-				false, guiSetting, null);
 		return res;
 	}
 	

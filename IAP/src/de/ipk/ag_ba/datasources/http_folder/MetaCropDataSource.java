@@ -11,6 +11,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
@@ -19,8 +20,8 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
  */
 public class MetaCropDataSource extends HTTPfolderSource {
 	
-	public MetaCropDataSource() {
-		super(getLib(),
+	public MetaCropDataSource(DataSourceGroup dsg) {
+		super(dsg, getLib(),
 				"MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
 				IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
 		setDescription("<h2>MetaCrop</h2>"

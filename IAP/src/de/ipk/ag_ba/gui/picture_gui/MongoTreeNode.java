@@ -3,7 +3,6 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionListener;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 
 /**
@@ -66,7 +65,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		// }
 	}
 	
-	public void updateSizeInfo(final MongoDB m, final ActionListener dataChangedListener) throws InterruptedException {
+	public void updateSizeInfo(final ActionListener dataChangedListener) throws InterruptedException {
 		if (getExperimentName() == null)
 			return;
 		if (!sizeDirty)
@@ -74,12 +73,12 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		sizeDirty = false;
 		
 		if (projectNode != null) {
-			projectNode.updateSizeInfo(m, dataChangedListener);
+			projectNode.updateSizeInfo(dataChangedListener);
 		} else {
 			MyThread infoThread = new MyThread(new Runnable() {
 				@Override
 				public void run() {
-					getCurrentProjectSize(m);
+					getCurrentProjectSize();
 					if (dataChangedListener != null)
 						dataChangedListener.actionPerformed(null);
 				}
@@ -89,9 +88,9 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		}
 	}
 	
-	void getCurrentProjectSize(MongoDB m) {
+	void getCurrentProjectSize() {
 		try {
-			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(m, experiment.getExperiment());
+			int sz = DataExchangeHelperForExperiments.getSizeOfExperiment(experiment);
 			if (sz != -1) {
 				if (sz < 1024)
 					size = sz + " KB";

@@ -11,13 +11,13 @@ import java.util.TreeMap;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
-import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.DataMappingTypeManagerInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -303,11 +303,11 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 		
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		
-		MongoDB m = null;
+		ExperimentReference ref = new ExperimentReference(experimentResult);
 		
-		ActionMongoOrLTexperimentNavigation.getDefaultActions(res,
-				new ExperimentReference(experimentResult), experimentResult.getHeader(),
-				false, src != null ? src.getGUIsetting() : null, m);
+		for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(ref, true))
+			res.add(new NavigationButton(adp, src != null ? src.getGUIsetting() : null));
+		
 		return res;
 	}
 	

@@ -21,7 +21,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -31,7 +30,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionNumericDataReportSetupInterestingTraitsStep2 extends AbstractNavigationAction {
 	
 	private boolean clustering;
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
@@ -58,7 +56,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportSetupInterestingTraitsStep2(MongoDB m, ExperimentReference experimentReference,
+	public ActionNumericDataReportSetupInterestingTraitsStep2(ExperimentReference experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles, boolean finalStep) {
 		this("Create report" +
@@ -66,7 +64,6 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 						: " PDF"),
 				exportIndividualAngles,
 				divideDatasetBy, xlsx);
-		this.m = m;
 		this.experimentReference = experimentReference;
 		this.toggles = toggles;
 		this.createPDFmode = finalStep;
@@ -123,8 +120,8 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
-				new ActionNumericDataReportCompleteFinishedStep3(
-						m, experimentReference, divideDatasetBy, false, false, toggles,
+				new ActionPdfCreation3(
+						experimentReference, divideDatasetBy, false, false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
 						tsoSplitFirst, tsoSplitSecond),
 				src.getGUIsetting()));
@@ -388,7 +385,4 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		return experimentReference;
 	}
 	
-	public MongoDB getMongoInstance() {
-		return m;
-	}
 }

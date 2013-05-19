@@ -37,7 +37,7 @@ public class ActionSortSubstances extends AbstractNavigationAction {
 		this.src = src;
 		
 		try {
-			ExperimentInterface res = experiment.getData(m);
+			ExperimentInterface res = experiment.getData();
 			((Experiment) res).sortSubstances();
 			((Experiment) res).sortConditions();
 		} catch (Exception e) {

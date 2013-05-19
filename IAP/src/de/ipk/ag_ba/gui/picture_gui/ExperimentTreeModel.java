@@ -12,23 +12,20 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
  * @author klukas
  */
 public class ExperimentTreeModel implements TreeModel {
 	
-	MongoDB m;
 	private final ExperimentReference experiment;
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 	
 	public ExperimentTreeModel(
-			ActionListener dataChangedListener, MongoDB m,
+			ActionListener dataChangedListener,
 			ExperimentReference exp,
 			boolean readOnly) {
-		this.m = m;
 		this.experiment = exp;
 		this.dataChangedListener = dataChangedListener;
 		this.isReadOnly = readOnly;
@@ -43,7 +40,7 @@ public class ExperimentTreeModel implements TreeModel {
 				experiment == null ? "NULL" : experiment.getExperimentName(), isReadOnly);
 		expNode.setSizeDirty(true);
 		try {
-			expNode.updateSizeInfo(m, dataChangedListener);
+			expNode.updateSizeInfo(dataChangedListener);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

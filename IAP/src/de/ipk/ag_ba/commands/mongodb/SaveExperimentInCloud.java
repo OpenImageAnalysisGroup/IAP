@@ -12,10 +12,11 @@ import org.OpenFileDialogService;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -88,9 +89,9 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						m.saveExperiment(newExperiment, status);
 					}
 					ExperimentReference exRef = new ExperimentReference(newExperiment);
-					for (NavigationButton ne : ImageAnalysisCommandManager.getCommands(m, exRef,
-							src.getGUIsetting()))
-						res.add(ne);
+					exRef.m = m;
+					for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(exRef, true))
+						res.add(new NavigationButton(adp, src.getGUIsetting()));
 				} catch (Exception e1) {
 					newExperiment = null;
 					ErrorMsg.addErrorMessage(e1);
@@ -150,7 +151,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (storeInMongo)
 			return "Add files";
 		else
-			return "Load files";
+			return "Process files";
 	}
 	
 	@Override

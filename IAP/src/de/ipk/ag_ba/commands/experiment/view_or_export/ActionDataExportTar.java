@@ -33,7 +33,6 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -49,7 +48,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class ActionDataExportTar extends AbstractNavigationAction implements SpecialCommandLineSupport {
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private String fn;
 	private String mb;
@@ -61,9 +59,8 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 		super(tooltip);
 	}
 	
-	public ActionDataExportTar(MongoDB m, ExperimentReference experimentReference) {
+	public ActionDataExportTar(ExperimentReference experimentReference) {
 		this("Create TAR file");
-		this.m = m;
 		this.experimentReference = experimentReference;
 	}
 	
@@ -142,7 +139,7 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 			OutputStream os;
 			
 			status.setCurrentStatusText1("Load Experiment");
-			ExperimentInterface experiment = experimentReference.getData(m);
+			ExperimentInterface experiment = experimentReference.getData();
 			
 			String fsinfo = "";
 			
@@ -380,10 +377,6 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 	
 	public ExperimentReference getExperimentReference() {
 		return experimentReference;
-	}
-	
-	public MongoDB getMongoInstance() {
-		return m;
 	}
 	
 	long startTime;

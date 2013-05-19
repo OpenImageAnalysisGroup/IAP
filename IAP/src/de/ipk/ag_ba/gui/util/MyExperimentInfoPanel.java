@@ -181,7 +181,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		outliers.setEnabled(enabled);
 	}
 	
-	private JComboBox getExperimentTypes(MongoDB m, String experimentType, boolean editPossible) {
+	private JComboBox getExperimentTypes(String experimentType, boolean editPossible) {
 		TreeSet<String> typeset = new TreeSet<String>();
 		if (experimentType != null)
 			typeset.add(experimentType);
@@ -249,7 +249,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		saveAction = runnable;
 	}
 	
-	public void setExperimentInfo(final MongoDB m,
+	public void setExperimentInfo(
+			final MongoDB m,
 			final ExperimentHeaderInterface experimentHeader,
 			boolean startEnabled, ExperimentInterface optExperiment) {
 		
@@ -285,7 +286,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
 		// getGroups(login, pass, experimentHeader.getImportusergroup(),
 		// editPossible);
-		experimentTypeSelection = getExperimentTypes(m, experimentHeader.getExperimentType(), editPossible);
+		experimentTypeSelection = getExperimentTypes(experimentHeader.getExperimentType(), editPossible);
 		expStart = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getStartdate() : new Date(0l));
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
@@ -311,12 +312,15 @@ public class MyExperimentInfoPanel extends JPanel {
 				"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or " +
 				"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
 		fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
-		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(niceValue(experimentHeader.getNumberOfFiles(), null)
-				+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
+		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(
+				niceValue(experimentHeader.getNumberOfFiles(), null)
+						+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
 		if (optExperiment != null)
-			fp.addGuiComponentRow(new JLabel("Numeric Values"), disable(new JTextField(niceValue(optExperiment.getNumberOfMeasurementValues(), null))), false);
+			fp.addGuiComponentRow(new JLabel("Numeric Values"), disable(new JTextField(
+					niceValue(optExperiment.getNumberOfMeasurementValues(), null))), false);
 		if (experimentHeader.getStorageTime() != null)
-			fp.addGuiComponentRow(new JLabel("Storage Time"), disable(new JTextField(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime()))),
+			fp.addGuiComponentRow(new JLabel("Storage Time"), disable(
+					new JTextField(SystemAnalysis.getCurrentTime(experimentHeader.getStorageTime().getTime()))),
 					false);
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		try {
@@ -324,7 +328,8 @@ public class MyExperimentInfoPanel extends JPanel {
 					new JLabel("Analysis Settings"),
 					disable(new JTextField(experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
 							""
-									+ SystemOptions.getInstance(null, new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
+									+ SystemOptions.getInstance(null,
+											new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
 											"pipeline_name", "(unnamed)", false) + " ("
 									+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
 									+ " lines)")), false);

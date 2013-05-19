@@ -21,7 +21,6 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -31,7 +30,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
@@ -52,7 +50,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 		this.toggles = toggles;
 	}
 	
-	public ActionNumericDataReportSetupMainPropertiesStep1(MongoDB m,
+	public ActionNumericDataReportSetupMainPropertiesStep1(
 			ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles) {
 		this("Specify report options" +
@@ -60,7 +58,6 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 						: " PDF"),
 				exportIndividualAngles,
 				xlsx, toggles);
-		this.m = m;
 		this.experimentReference = experimentReference;
 	}
 	
@@ -69,7 +66,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionNumericDataReportSetupInterestingTraitsStep2(
-						m, experimentReference, false, toggles, false, togglesForReport, false),
+						experimentReference, false, toggles, false, togglesForReport, false),
 				src.getGUIsetting()));
 		
 		for (NavigationButton s : settings)
@@ -169,7 +166,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 		TreeSet<String> gc = new TreeSet<String>();
 		TreeSet<String> ts = new TreeSet<String>();
 		
-		ExperimentInterface e = experimentReference.getData(m, false, status);
+		ExperimentInterface e = experimentReference.getData(false, status);
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
 				String condition = ci.getConditionName();

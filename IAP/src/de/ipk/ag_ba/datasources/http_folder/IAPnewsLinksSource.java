@@ -13,6 +13,7 @@ import java.util.Collection;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
@@ -23,9 +24,9 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
  */
 public class IAPnewsLinksSource extends HTTPfolderSource {
 	
-	public IAPnewsLinksSource() {
-		super(getLib(),
-				"News and Links", "http://ba-13.ipk-gatersleben.de/links/", new String[] { ".webloc" },
+	public IAPnewsLinksSource(DataSourceGroup dsg) {
+		super(dsg, getLib(),
+				"News and Links", "http://iap.ipk-gatersleben.de/links/", new String[] { ".webloc" },
 				IAPmain.loadIcon("img/public.png"), IAPmain.loadIcon("img/dataset.png"));
 		setDescription("<h2>Bookmarks</h2>"
 				+ "At this place interesting links regarding interesting bioinformatics " +

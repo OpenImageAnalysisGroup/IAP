@@ -494,7 +494,8 @@ public class IAPservice {
 		return result;
 	}
 	
-	public static Collection<NumericMeasurementInterface> getMatchForReference(IOurl fileNameMain, ExperimentInterface experiment, MongoDB m) {
+	public static Collection<NumericMeasurementInterface> getMatchForReference(IOurl fileNameMain,
+			ExperimentInterface experiment) {
 		Collection<NumericMeasurementInterface> pairs = getMatchFor(fileNameMain, experiment);
 		
 		Collection<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
@@ -1204,7 +1205,7 @@ public class IAPservice {
 									if (autoTimeingLastInfoDay != currentDay) {
 										try {
 											experimentId2minutesWithDataFromLastDay.put(ehi.getDatabaseId(), new BitSet(24 * 3600));
-											ExperimentInterface experimentData = new ExperimentReference(ehi).getData((MongoDB) null);
+											ExperimentInterface experimentData = new ExperimentReference(ehi).getData();
 											BitSet lastDaysMinutes = experimentId2minutesWithDataFromLastDay.get(ehi.getDatabaseId());
 											for (SampleInterface sample : new ExperimentCalculationService(experimentData).getSamplesFromYesterDay()) {
 												Sample3D s3d = (Sample3D) sample;

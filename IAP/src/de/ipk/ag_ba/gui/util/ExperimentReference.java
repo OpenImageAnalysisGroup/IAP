@@ -141,8 +141,8 @@ public class ExperimentReference {
 		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
 	}
 	
-	public ExperimentInterface getData(MongoDB m) throws Exception {
-		return getData(m, false, null);
+	public ExperimentInterface getData() throws Exception {
+		return getData(false, null);
 	}
 	
 	public static void registerExperimentLoader(ExperimentLoader loader) {
@@ -165,7 +165,7 @@ public class ExperimentReference {
 		return experiment;
 	}
 	
-	public ExperimentInterface getData(MongoDB m,
+	public ExperimentInterface getData(
 			boolean interactiveGetExperimentSize,
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		if (experiment != null)
@@ -229,7 +229,7 @@ public class ExperimentReference {
 	}
 	
 	public ExperimentInterface getData(BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
-		return getData(m, status != null, status);
+		return getData(status != null, status);
 	}
 	
 	private boolean isLoading = false;
@@ -296,5 +296,9 @@ public class ExperimentReference {
 	
 	public void setIniIoProvider(IniIoProvider iniProvider) {
 		storedIniProvider = iniProvider;
+	}
+	
+	public ExperimentIoHelper getIoHelper() {
+		return new ExperimentIoHelper(m);
 	}
 }

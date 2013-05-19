@@ -8,11 +8,9 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 	
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
 	
@@ -20,9 +18,8 @@ public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 		super(tooltip);
 	}
 	
-	public ActionSelectAnalysisTemplate(MongoDB m, ExperimentReference experimentReference) {
+	public ActionSelectAnalysisTemplate(ExperimentReference experimentReference) {
 		super("Assign customizable analysis pipeline to this experiment");
-		this.m = m;
 		this.experimentReference = experimentReference;
 	}
 	
@@ -47,7 +44,7 @@ public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 		try {
 			for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
 				actions.add(new NavigationButton(
-						new ActionAssignAnalysisTemplate(m, experimentReference, pd.getIniFileName(),
+						new ActionAssignAnalysisTemplate(experimentReference, pd.getIniFileName(),
 								"Assign " + pd.getName() + " analysis pipeline to experiment",
 								"<html><center>Use " + pd.getName() + ""),
 						src.getGUIsetting()));

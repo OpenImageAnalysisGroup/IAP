@@ -30,7 +30,6 @@ import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
 	private static final long serialVersionUID = 2171413300210427409L;
@@ -102,7 +101,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	DataSetFilePanel currentFilePanel = null;
 	
-	public SupplementaryFilePanelMongoDB(final MongoDB m, ExperimentReference doc,
+	public SupplementaryFilePanelMongoDB(ExperimentReference doc,
 			String experimentName) {
 		
 		final SupplementaryFilePanelMongoDB thisPanel = this;
@@ -130,7 +129,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		boolean readOnly = !(doc != null && doc.getHeader() != null
 				&& doc.getHeader().getDatabaseId() != null);
 		
-		expTree = new JTree(new ExperimentTreeModel(this, m, doc, readOnly));
+		expTree = new JTree(new ExperimentTreeModel(this, doc, readOnly));
 		
 		DBEtreeCellRenderer cir = new DBEtreeCellRenderer();
 		cir.setCameraRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getCamera(), 16)));
@@ -152,12 +151,12 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 					final MongoTreeNode mtdbe = (MongoTreeNode) mt;
 					MongoTreeNode projectNode = mtdbe.getProjectNode();
 					try {
-						projectNode.updateSizeInfo(m, thisPanel);
+						projectNode.updateSizeInfo(thisPanel);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
 					
-					MyDropTarget myDropTarget = new MyDropTarget(m, filePanel, mtdbe, expTree);
+					MyDropTarget myDropTarget = new MyDropTarget(filePanel, mtdbe, expTree);
 					currentDropTarget = myDropTarget;
 					filePanel.setDropTarget(myDropTarget);
 					
@@ -166,7 +165,6 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						public void run() {
 							filePanel.removeAll();
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
-							MongoTreeNode mtn = (MongoTreeNode) mt;
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
 								String msg = "<font color='black'>You may also use drag+drop to add files to the currently selected entity of the experiment";
 								filePanel.setHeader(true, msg, false, true);
@@ -180,7 +178,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							
 							removeTempFiles();
 							try {
-								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, m);
+								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}

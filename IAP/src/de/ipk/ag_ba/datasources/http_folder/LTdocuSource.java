@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 public class LTdocuSource extends HTTPfolderSource {
 	
 	public LTdocuSource() {
-		super(getLib(),
+		super(null, getLib(),
 				IAPoptions.getInstance().getString("Imaging-System-Documentation", "title",
 						"Documentation"),
 				IAPoptions.getInstance().getString("Imaging-System-Documentation", "url",

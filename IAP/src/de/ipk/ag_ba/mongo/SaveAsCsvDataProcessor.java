@@ -21,7 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.view.View;
 
-import de.ipk.ag_ba.commands.experiment.process.report.ActionNumericDataReportCompleteFinishedStep3;
+import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
@@ -49,7 +49,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			String fn = FileHelper.getFileName(
 					"xlsx",
 					"XLSX Spreadsheet File",
-					ActionNumericDataReportCompleteFinishedStep3.replaceInvalidChars(mappingData.getName()));
+					ActionPdfCreation3.replaceInvalidChars(mappingData.getName()));
 			if (fn == null)
 				return;
 			BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Processing data", "");
@@ -96,10 +96,10 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			cola.put(indexInfo.get(val), val);
 		StringBuilder indexHeader = new StringBuilder();
 		for (String val : cola.values())
-			indexHeader.append(ActionNumericDataReportCompleteFinishedStep3.separator + val);
+			indexHeader.append(ActionPdfCreation3.separator + val);
 		
 		StringBuilder csv = new StringBuilder();
-		String csvHeader = ActionNumericDataReportCompleteFinishedStep3.getCSVheader();
+		String csvHeader = ActionPdfCreation3.getCSVheader();
 		
 		csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 		csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
@@ -110,7 +110,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 		status.setCurrentStatusText2("Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 		
 		Workbook wb = xlsx ? new XSSFWorkbook() : null;
-		Sheet sheet = xlsx ? wb.createSheet(ActionNumericDataReportCompleteFinishedStep3.replaceInvalidChars(mappingData.getName())) : null;
+		Sheet sheet = xlsx ? wb.createSheet(ActionPdfCreation3.replaceInvalidChars(mappingData.getName())) : null;
 		ArrayList<String> excelColumnHeaders = new ArrayList<String>();
 		if (sheet != null) {
 			// create Header row
@@ -119,13 +119,13 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			String c = csv.toString().trim();
 			c = StringManipulationTools.stringReplace(c, "\r\n", "");
 			c = StringManipulationTools.stringReplace(c, "\n", "");
-			for (String h : c.split(ActionNumericDataReportCompleteFinishedStep3.separator)) {
+			for (String h : c.split(ActionPdfCreation3.separator)) {
 				row.createCell(col++).setCellValue(h);
 				excelColumnHeaders.add(h);
 			}
 			
 			mappingData = null;
-			ActionNumericDataReportCompleteFinishedStep3.setExcelSheetValues(
+			ActionPdfCreation3.setExcelSheetValues(
 					snapshots, sheet, excelColumnHeaders, status);
 			wb.write(new FileOutputStream(fn));
 			String tempDirectory = new File(fn).getParent();
