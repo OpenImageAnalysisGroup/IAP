@@ -79,4 +79,18 @@ public class IAPpluginManager {
 		processPlugins(r);
 		return dataProcessingActions;
 	}
+	
+	public Collection<ActionDataProcessing> getExperimentToolActions(
+			final ExperimentReference experimentReference) {
+		final Collection<ActionDataProcessing> dataProcessingActions = new ArrayList<ActionDataProcessing>();
+		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			public void processPlugin(IAPplugin p) {
+				for (ActionDataProcessing dp : p.getDataProcessingTools(experimentReference)) {
+					dataProcessingActions.add(dp);
+				}
+			}
+		};
+		processPlugins(r);
+		return dataProcessingActions;
+	}
 }

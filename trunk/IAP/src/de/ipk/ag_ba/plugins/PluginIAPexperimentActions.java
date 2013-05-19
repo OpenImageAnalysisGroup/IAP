@@ -33,7 +33,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		
 		actions.add(new ActionViewExportData());
 		actions.add(new ActionAnalysis("Analysis Tasks"));
-		actions.add(new ActionPdfReport("Create Report Files"));
+		actions.add(new ActionPdfReport("Automated diagram creation and report generation"));
 		
 		if (IAPmain.getRunMode() == IAPrunMode.WEB) {
 			actions.add(new ActionNumericDataReport());

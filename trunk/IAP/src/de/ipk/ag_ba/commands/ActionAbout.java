@@ -44,7 +44,7 @@ public class ActionAbout extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "About";
+		return "Help";
 	}
 	
 	@Override

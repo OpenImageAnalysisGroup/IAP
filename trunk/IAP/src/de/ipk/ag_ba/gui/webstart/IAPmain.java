@@ -210,11 +210,11 @@ public class IAPmain extends JApplet {
 			
 			@Override
 			public void run() {
-				if (IAPmain.myClassKnown) {
-					System.out.println("Reload Classes, Problems may occur");
-					ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
-				}
-				IAPmain.myClassKnown = true;
+				// if (IAPmain.myClassKnown) {
+				// System.out.println("Reload Classes, Problems may occur");
+				// ErrorMsg.addErrorMessage("Reload Classes, Problems may occur");
+				// }
+				// IAPmain.myClassKnown = true;
 				// System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
 				myAppletLoad(mainFrame1, myStatus);
 				// myAppletLoad(mainFrame2, myStatus);

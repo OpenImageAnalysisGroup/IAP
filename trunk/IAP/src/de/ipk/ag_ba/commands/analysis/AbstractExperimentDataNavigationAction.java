@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public abstract class AbstractExperimentDataNavigationAction extends AbstractNavigationAction implements ExperimentDataNavigationAction {
+public abstract class AbstractExperimentDataNavigationAction extends AbstractNavigationAction {
 	
 	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 	protected ExperimentReference experiment;

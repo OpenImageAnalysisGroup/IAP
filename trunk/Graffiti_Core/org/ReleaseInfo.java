@@ -63,7 +63,7 @@ public class ReleaseInfo implements HelperClass {
 				if (ReleaseInfo.isRunningAsApplet())
 					return false;
 				else
-					return SystemOptions.getInstance().getBoolean("VANTED", "debug_enable_addon_loading", false);
+					return !SystemOptions.getInstance().getBoolean("VANTED", "debug_disable_addon_loading", false);
 			case KEGG_ACCESS:
 				if ((new File(getAppFolderWithFinalSep() + "license_kegg_accepted")).exists())
 					return true;

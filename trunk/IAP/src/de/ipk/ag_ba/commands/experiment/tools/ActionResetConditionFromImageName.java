@@ -7,6 +7,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -23,17 +24,10 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class ActionResetConditionFromImageName extends AbstractNavigationAction {
-	
+public class ActionResetConditionFromImageName extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
-	
-	public ActionResetConditionFromImageName(MongoDB m, ExperimentReference experiment) {
-		super("Rebuild meta data and add file names to meta data");
-		this.m = m;
-		this.experiment = experiment;
-	}
 	
 	public ActionResetConditionFromImageName() {
 		super("Rebuild meta data and add file names to meta data");
@@ -101,5 +95,17 @@ public class ActionResetConditionFromImageName extends AbstractNavigationAction 
 	@Override
 	public String getDefaultTitle() {
 		return "Set sequence from image file name(s)";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 }

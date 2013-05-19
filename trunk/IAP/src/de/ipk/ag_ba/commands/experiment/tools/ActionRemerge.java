@@ -7,6 +7,7 @@ import org.ErrorMsg;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -22,18 +23,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class ActionRemerge extends AbstractNavigationAction {
-	
+public class ActionRemerge extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
 	private String operationResult = "";
-	
-	public ActionRemerge(MongoDB m, ExperimentReference experiment) {
-		super("Re-merge based on data annotation");
-		this.m = m;
-		this.experiment = experiment;
-	}
 	
 	public ActionRemerge() {
 		super("Re-merge based on data annotation");
@@ -141,5 +135,17 @@ public class ActionRemerge extends AbstractNavigationAction {
 		return "<html><center>" +
 				"Reconsider Annotation<br>" +
 				"(split and re-merge)</center>";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 }

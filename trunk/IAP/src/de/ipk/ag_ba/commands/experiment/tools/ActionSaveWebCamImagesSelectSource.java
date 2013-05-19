@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -14,20 +15,13 @@ import de.ipk.ag_ba.mongo.MongoDB;
 /**
  * @author klukas
  */
-public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction {
-	
+public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
 	ArrayList<String> xmlOutput = new ArrayList<String>();
 	
 	ArrayList<NavigationButton> resB = new ArrayList<NavigationButton>();
-	
-	public ActionSaveWebCamImagesSelectSource(MongoDB m, ExperimentReference experiment) {
-		super("Export WebCam Greenhouse Camera Images");
-		this.m = m;
-		this.experiment = experiment;
-	}
 	
 	public ActionSaveWebCamImagesSelectSource() {
 		super("Export WebCam Greenhouse Camera Images");
@@ -100,5 +94,17 @@ public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction
 	@Override
 	public String getDefaultTitle() {
 		return "Export WebCam Images";
+	}
+	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
 	}
 }

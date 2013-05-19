@@ -9,6 +9,7 @@ import org.ErrorMsg;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -31,7 +32,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 /**
  * @author klukas
  */
-public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction implements RemoteCapableAnalysisAction {
+public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction implements RemoteCapableAnalysisAction,
+		ActionDataProcessing {
 	private MongoDB m;
 	private ExperimentReference experiment;
 	NavigationButton src = null;
@@ -44,16 +46,8 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 	private String datasetID;
 	private Date optProcessOnlySampleDataNewerThanThisDate;
 	
-	public ActionTestMongoIoReadSpeed(MongoDB m, ExperimentReference experiment) {
-		super("Test performance by reading experiment content");
-		this.m = m;
-		this.experiment = experiment;
-		if (experiment != null && experiment.getHeader() != null)
-			this.datasetID = experiment.getHeader().getDatabaseId();
-	}
-	
 	public ActionTestMongoIoReadSpeed() {
-		super("Test performance");
+		super("Test performance by reading experiment content");
 	}
 	
 	@Override
@@ -202,4 +196,18 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 		return true;
 	}
 	
+	@Override
+	public boolean isImageAnalysisCommand() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.m = experimentReference.m;
+		this.experiment = experimentReference;
+		if (experiment != null && experimentReference.getHeader() != null)
+			this.datasetID = experimentReference.getHeader().getDatabaseId();
+		
+	}
 }
