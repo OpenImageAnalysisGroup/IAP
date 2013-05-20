@@ -65,6 +65,11 @@ public class VirtualFileSystemUdp extends VirtualFileSystem {
 	}
 	
 	@Override
+	public ArrayList<String> listFolders(String optSubDirectory) {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+	
+	@Override
 	public String toString() {
 		return name + " (" + protocolDescription + ")";
 	}

@@ -7,12 +7,15 @@
 
 package de.ipk.ag_ba.commands.datasource;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
 import org.StringManipulationTools;
+import org.apache.commons.io.IOUtils;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -51,7 +54,8 @@ public class Book {
 	}
 	
 	public String getTitle() {
-		return StringManipulationTools.stringReplace(title, ".webloc", "");
+		return StringManipulationTools.stringReplace(
+				StringManipulationTools.stringReplace(title, ".url", ""), ".webloc", "");
 	}
 	
 	public IOurl getUrl() {
@@ -69,12 +73,13 @@ public class Book {
 	public NavigationButton getNavigationButton(NavigationButton src, String icon) {
 		NavigationAction action = new AbstractUrlNavigationAction("Show in browser") {
 			IOurl trueURL = null;
+			String htmlTextPanel = null;
 			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) {
 				IOurl referenceURL = Book.this.getUrl();
 				if (trueURL == null)
-					if (referenceURL.endsWith(".webloc"))
+					if (referenceURL.endsWith(".url") || referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
 						} catch (Exception e) {
@@ -83,8 +88,28 @@ public class Book {
 							return;
 						}
 					else
-						trueURL = referenceURL;
+						if (referenceURL.endsWith(".txt") || referenceURL.endsWith(".htm") || referenceURL.endsWith(".html"))
+							try {
+								StringWriter writer = new StringWriter();
+								IOUtils.copy(referenceURL.getInputStream(), writer);
+								htmlTextPanel = writer.toString();
+								if (referenceURL.endsWith(".txt"))
+									htmlTextPanel = StringManipulationTools.txt2html(htmlTextPanel);
+							} catch (Exception e) {
+								MongoDB.saveSystemErrorMessage("Could not read content from " + referenceURL + ".", e);
+								AttributeHelper.showInBrowser(referenceURL);
+								return;
+							}
+						else
+							trueURL = referenceURL;
 				AttributeHelper.showInBrowser(trueURL);
+			}
+			
+			@Override
+			public MainPanelComponent getResultMainPanel() {
+				if (htmlTextPanel != null)
+					return new MainPanelComponent(htmlTextPanel);
+				return super.getResultMainPanel();
 			}
 			
 			@Override
@@ -101,7 +126,7 @@ public class Book {
 			public IOurl getURL() {
 				IOurl referenceURL = Book.this.getUrl();
 				if (trueURL == null)
-					if (referenceURL.endsWith(".webloc"))
+					if (referenceURL.endsWith(".url") || referenceURL.endsWith(".webloc"))
 						try {
 							trueURL = IAPservice.getURLfromWeblocFile(referenceURL);
 						} catch (Exception e) {

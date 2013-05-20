@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.vfs;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -63,6 +64,28 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 		} else
 			for (String f : ff.list())
 				res.add(f);
+		return res;
+	}
+	
+	@Override
+	public ArrayList<String> listFolders(String optSubDirectory) {
+		ArrayList<String> res = new ArrayList<String>();
+		File ff = new File(path + (optSubDirectory != null ? File.separator + optSubDirectory : ""));
+		if (!ff.exists()) {
+			boolean createSubFolder = false; // not needed
+			if (createSubFolder) {
+				ff.mkdirs();
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Directory " + ff.getAbsolutePath() + " has been created!");
+			}
+		} else
+			for (String f : ff.list(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return new File(dir, name).isDirectory();
+				}
+			})) {
+				res.add(f);
+			}
 		return res;
 	}
 	

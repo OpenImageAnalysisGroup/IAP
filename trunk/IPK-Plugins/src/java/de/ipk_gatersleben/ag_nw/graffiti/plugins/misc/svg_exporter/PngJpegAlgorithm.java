@@ -95,10 +95,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author klukas
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class PngJpegAlgorithm extends AbstractAlgorithm implements
-					NeedsSwingThread {
+		NeedsSwingThread {
 	
 	private PngJpegAlgorithmParams parameter = null;
 	
@@ -145,7 +145,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	// +
 	// "Nodes with a assigned reference URL will be processed, so that HTML links point to the referenced<br>"
 	// +
-	// "ressources. Use the command <u>Elements/Set Reference Information URL</u> to assign URLs to graph<br>"
+	// "resources. Use the command <u>Elements/Set Reference Information URL</u> to assign URLs to graph<br>"
 	// +
 	// "elements. The following reference information is considered in this order:<br><ol>"
 	// +
@@ -163,61 +163,61 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	public Parameter[] getParameters() {
 		
 		BooleanParameter bpTransparency = new BooleanParameter(
-							parameter.useTransparency(),
-							"Enable transparency support",
-							"<html>"
-												+ "If enabled, transparent images are created (if window background color is white).");
+				parameter.useTransparency(),
+				"Enable transparency support",
+				"<html>"
+						+ "If enabled, transparent images are created (if window background color is white).");
 		bpTransparency.setLeftAligned(true);
 		
 		BooleanParameter bpCreateHTMLmap = new BooleanParameter(
-							parameter.isCreateHTMLmap(),
-							"Create HTML image map",
-							"<html>"
-												+ "If enabled, a HTML page containing code for the display<br>"
-												+ "of the created bitmap image is created.<br>"
-												+ "Reference URL links are created, if they are defined for graph elements.");
+				parameter.isCreateHTMLmap(),
+				"Create HTML image map",
+				"<html>"
+						+ "If enabled, a HTML page containing code for the display<br>"
+						+ "of the created bitmap image is created.<br>"
+						+ "Reference URL links are created, if they are defined for graph elements.");
 		bpCreateHTMLmap.setLeftAligned(true);
 		
 		BooleanParameter bpIncludeURL = new BooleanParameter(
-							parameter.isIncludeURLinTooltip(),
-							"Include URLs in tooltips",
-							"<html>"
-												+ "If enabled, the link alt text, which is shown by some internet browsers when hovering over links<br>"
-												+ "will include the target URL.");
+				parameter.isIncludeURLinTooltip(),
+				"Include URLs in tooltips",
+				"<html>"
+						+ "If enabled, the link alt text, which is shown by some internet browsers when hovering over links<br>"
+						+ "will include the target URL.");
 		bpIncludeURL.setLeftAligned(true);
 		
 		BooleanParameter bpIncludeTooltip = new BooleanParameter(
-							parameter.isIncludeTooltip(),
-							"Include tooltip text",
-							"<html>"
-												+ "If enabled, the user defined node tooltip text is included in the output.");
+				parameter.isIncludeTooltip(),
+				"Include tooltip text",
+				"<html>"
+						+ "If enabled, the user defined node tooltip text is included in the output.");
 		bpIncludeTooltip.setLeftAligned(true);
 		
 		BooleanParameter bpCustomURLtarget = new BooleanParameter(parameter
-							.isCustomTarget(), "Open HTML Link in new Window",
-							"<html>If enabled, web-links are opened in a new window.");
+				.isCustomTarget(), "Open HTML Link in new Window",
+				"<html>If enabled, web-links are opened in a new window.");
 		bpCustomURLtarget.setLeftAligned(true);
 		
 		bpCreateHTMLmap.addDependentParameters(new BooleanParameter[] {
-							bpIncludeURL, bpIncludeTooltip, bpCustomURLtarget });
+				bpIncludeURL, bpIncludeTooltip, bpCustomURLtarget });
 		
 		JComponentParameter scaleJComponent = new JComponentParameter(
-							getImageSizeSetting(), "", null);
+				getImageSizeSetting(), "", null);
 		scaleJComponent.setLeftAligned(true);
 		
 		return new Parameter[] { scaleJComponent,
-							parameter.isCreateJPG() ? null : bpTransparency, bpCreateHTMLmap,
-							bpIncludeURL, bpIncludeTooltip, bpCustomURLtarget };
+				parameter.isCreateJPG() ? null : bpTransparency, bpCreateHTMLmap,
+				bpIncludeURL, bpIncludeTooltip, bpCustomURLtarget };
 	}
 	
 	private JComponent getImageSizeSetting() {
 		final JRadioButton radioZoom = new JRadioButton("Variable (Zoom)",
-							parameter.getScaleSetting() == SizeSetting.ZOOM);
+				parameter.getScaleSetting() == SizeSetting.ZOOM);
 		final JRadioButton radioFixed = new JRadioButton(
-							"Fixed Resolution (Pixels)",
-							parameter.getScaleSetting() == SizeSetting.FIXED);
+				"Fixed Resolution (Pixels)",
+				parameter.getScaleSetting() == SizeSetting.FIXED);
 		final JRadioButton radioDPI = new JRadioButton("Fixed Resolution (DPI)",
-							parameter.getScaleSetting() == SizeSetting.DPI);
+				parameter.getScaleSetting() == SizeSetting.DPI);
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(radioZoom);
 		bg.add(radioFixed);
@@ -228,75 +228,75 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		zoomLevels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parameter.setScaleZoomSetting((SizeSettingZoom) zoomLevels
-									.getSelectedItem());
+						.getSelectedItem());
 			}
 		});
 		
 		final JComboBox widthOrHeight = new JComboBox(new String[] { "Width:",
-							"Height:" });
+				"Height:" });
 		if (!parameter.isScaleFixedUseWidth())
 			widthOrHeight.setSelectedIndex(1);
 		
 		widthOrHeight.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parameter
-									.setScaleFixedUseWidth(widthOrHeight.getSelectedIndex() == 0);
+						.setScaleFixedUseWidth(widthOrHeight.getSelectedIndex() == 0);
 			}
 		});
 		final JSpinner widthHeightField = new JSpinner(new SpinnerNumberModel(
-							parameter.getScaleFixedUseWidthOrHeightValue(), 50, 10000, 50));
+				parameter.getScaleFixedUseWidthOrHeightValue(), 50, 10000, 50));
 		widthHeightField.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				parameter
-									.setScaleFixedUseWidthOrHeightValue((Integer) widthHeightField
-														.getValue());
+						.setScaleFixedUseWidthOrHeightValue((Integer) widthHeightField
+								.getValue());
 			}
 		});
 		final JComponent WxHsettings = TableLayout.get3Split(widthOrHeight,
-							new JLabel(), widthHeightField, TableLayout.PREFERRED, 0,
-							TableLayout.FILL);
+				new JLabel(), widthHeightField, TableLayout.PREFERRED, 0,
+				TableLayout.FILL);
 		
 		final JSpinner spinnerPrintSize = new JSpinner(new SpinnerNumberModel(
-							parameter.getScaleDPIprintSize(), 1, 237, 1));
+				parameter.getScaleDPIprintSize(), 1, 237, 1));
 		spinnerPrintSize.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				parameter.setScaleDPIprintSize((Integer) spinnerPrintSize
-									.getValue());
+						.getValue());
 			}
 		});
 		final JSpinner spinnerDPI = new JSpinner(new SpinnerNumberModel(parameter
-							.getScaleDPIprintDPI(), 10, 1200, 10));
+				.getScaleDPIprintDPI(), 10, 1200, 10));
 		spinnerDPI.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				parameter.setScaleDPIprintDPI((Integer) spinnerDPI.getValue());
 			}
 		});
 		final JComboBox dpiSizeMeasureCombo = new JComboBox(SizeSettingDPIunit
-							.values());
+				.values());
 		dpiSizeMeasureCombo.setSelectedItem(parameter.getScaleDPIprintSizeUnit());
 		dpiSizeMeasureCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parameter
-									.setScaleDPIprintSizeUnit((SizeSettingDPIunit) dpiSizeMeasureCombo
-														.getSelectedItem());
+						.setScaleDPIprintSizeUnit((SizeSettingDPIunit) dpiSizeMeasureCombo
+								.getSelectedItem());
 			}
 		});
 		
 		final JComponent dpiSettings = TableLayout.get3Split(TableLayout
-							.get3Split(new JLabel("Print measure:"), null, spinnerPrintSize,
-												TableLayout.PREFERRED, 5, TableLayout.PREFERRED), null,
-							TableLayout.get3Split(dpiSizeMeasureCombo, new JLabel(" DPI:"),
-												spinnerDPI, TableLayout.PREFERRED, TableLayout.PREFERRED,
-												TableLayout.PREFERRED), TableLayout.PREFERRED, 0,
-								TableLayout.PREFERRED);
+				.get3Split(new JLabel("Print measure:"), null, spinnerPrintSize,
+						TableLayout.PREFERRED, 5, TableLayout.PREFERRED), null,
+				TableLayout.get3Split(dpiSizeMeasureCombo, new JLabel(" DPI:"),
+						spinnerDPI, TableLayout.PREFERRED, TableLayout.PREFERRED,
+						TableLayout.PREFERRED), TableLayout.PREFERRED, 0,
+				TableLayout.PREFERRED);
 		
 		checkRadioState(radioZoom, radioFixed, radioDPI, zoomLevels, WxHsettings,
-							dpiSettings);
+				dpiSettings);
 		
 		ActionListener al = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkRadioState(radioZoom, radioFixed, radioDPI, zoomLevels,
-									WxHsettings, dpiSettings);
+						WxHsettings, dpiSettings);
 			}
 		};
 		radioZoom.addActionListener(al);
@@ -304,9 +304,9 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		radioDPI.addActionListener(al);
 		
 		JComponent rr = new JPanel(new TableLayout(new double[][] {
-							{ TableLayout.PREFERRED, 5, TableLayout.PREFERRED },
-							{ TableLayout.PREFERRED, 1, TableLayout.PREFERRED, 1,
-												TableLayout.PREFERRED } }));
+				{ TableLayout.PREFERRED, 5, TableLayout.PREFERRED },
+				{ TableLayout.PREFERRED, 1, TableLayout.PREFERRED, 1,
+						TableLayout.PREFERRED } }));
 		
 		rr.add(radioZoom, "0,0");
 		rr.add(zoomLevels, "2,0");
@@ -318,13 +318,13 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		rr.setBorder(BorderFactory.createTitledBorder("Output Size"));
 		
 		return TableLayout.getSplitVertical(new JLabel(), rr, 5,
-							TableLayout.PREFERRED);
+				TableLayout.PREFERRED);
 	}
 	
 	private void checkRadioState(final JRadioButton radioZoom,
-						final JRadioButton radioFixed, final JRadioButton radioDPI,
-						final JComboBox zoomLevels, final JComponent WxHsettings,
-						final JComponent dpiSettings) {
+			final JRadioButton radioFixed, final JRadioButton radioDPI,
+			final JComboBox zoomLevels, final JComponent WxHsettings,
+			final JComponent dpiSettings) {
 		zoomLevels.setVisible(radioZoom.isSelected());
 		WxHsettings.setVisible(radioFixed.isSelected());
 		dpiSettings.setVisible(radioDPI.isSelected());
@@ -348,23 +348,23 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			parameter.setUseTransparency(false);
 		} else
 			parameter.setUseTransparency(((BooleanParameter) params[i++])
-								.getBoolean());
+					.getBoolean());
 		parameter.setCreateHTMLmap(((BooleanParameter) params[i++]).getBoolean());
 		parameter.setIncludeURLinTooltip((((BooleanParameter) params[i++])
-							.getBoolean()));
+				.getBoolean()));
 		parameter.setIncludeTooltip((((BooleanParameter) params[i++])
-							.getBoolean()));
+				.getBoolean()));
 		parameter.setCustomTarget(((BooleanParameter) params[i++]).getBoolean());
 		
 		if (parameter.getScaleSetting() == SizeSetting.FIXED) {
 			if (parameter.isScaleFixedUseWidth()) {
 				parameter.setMaxWidth(parameter
-									.getScaleFixedUseWidthOrHeightValue());
+						.getScaleFixedUseWidthOrHeightValue());
 				parameter.setMaxHeight(-1);
 			} else {
 				parameter.setMaxWidth(-1);
 				parameter.setMaxHeight(parameter
-									.getScaleFixedUseWidthOrHeightValue());
+						.getScaleFixedUseWidthOrHeightValue());
 			}
 		} else {
 			parameter.setMaxWidth(-1);
@@ -418,7 +418,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		ObjectRef resultView = new ObjectRef();
 		a.attach(g, null);
 		a.execute(g, replaceExtension(g.getName(true), "png"), "png",
-							BufferedImage.TYPE_INT_RGB, resultView, null);
+				BufferedImage.TYPE_INT_RGB, resultView, null);
 	}
 	
 	public static BufferedImage createPNGimageFromGraphGetBI(Graph g, int maxW, int maxH) {
@@ -430,14 +430,14 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public static void createPNGimageFromGraph(Graph g,
-						String fullPathAndFileName, PngJpegAlgorithmParams settings) {
+			String fullPathAndFileName, PngJpegAlgorithmParams settings) {
 		PngJpegAlgorithm a = new PngJpegAlgorithm(false);
 		a.setParams(settings);
 		a.setAskBeforeOverwrite(false);
 		ObjectRef resultView = new ObjectRef();
 		a.attach(g, null);
 		a.execute(g, replaceExtension(fullPathAndFileName, "png"), "png",
-							BufferedImage.TYPE_INT_RGB, resultView, null);
+				BufferedImage.TYPE_INT_RGB, resultView, null);
 	}
 	
 	public void execute() {
@@ -451,10 +451,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		String fileName;
 		if (parameter.isCreateJPG())
 			fileName = PngJpegAlgorithm.getCachedFileName("jpg", graph, this,
-								refLastEvent, refLastFolder);
+					refLastEvent, refLastFolder);
 		else
 			fileName = PngJpegAlgorithm.getCachedFileName("png", graph, this,
-								refLastEvent, refLastFolder);
+					refLastEvent, refLastFolder);
 		
 		if (fileName == null)
 			return;
@@ -466,10 +466,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		if (parameter.useTransparency() && !parameter.isCreateJPG())
 			execute(graph, fileName, "png", BufferedImage.TYPE_4BYTE_ABGR,
-								resultView, null);
+					resultView, null);
 		else
 			execute(graph, fileName, parameter.isCreateJPG() ? "jpg" : "png",
-								BufferedImage.TYPE_INT_RGB, resultView, null);
+					BufferedImage.TYPE_INT_RGB, resultView, null);
 		
 	}
 	
@@ -515,7 +515,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	// }
 	
 	private void writeNode(double zoom, String pre, TextFile stream, Node node,
-						boolean backgroundURL) {
+			boolean backgroundURL) {
 		
 		String shape = AttributeHelper.getShape(node);
 		
@@ -528,7 +528,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			return;
 		}
 		if (shape
-							.equals("org.graffiti.plugins.views.defaults.RectangleNodeShape")) {
+				.equals("org.graffiti.plugins.views.defaults.RectangleNodeShape")) {
 			writeRectangle(zoom, pre, stream, node, backgroundURL);
 			return;
 		}
@@ -536,7 +536,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private void writeRectangle(double zoom, String pre, TextFile stream,
-						Node node, boolean backgroundURL) {
+			Node node, boolean backgroundURL) {
 		int x = (int) (AttributeHelper.getPositionX(node) * zoom);
 		int y = (int) (AttributeHelper.getPositionY(node) * zoom);
 		int width = (int) (AttributeHelper.getWidth(node) * zoom);
@@ -553,15 +553,15 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		String coords = x1 + "," + y1 + "," + x2 + "," + y2;
 		if (href != null && href.length() > 0)
 			stream.add(pre + "<area shape=\"rect\" " + href + " title=\"" + title
-								+ "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
+					+ "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
 		else
 			if (backgroundURL)
 				stream.add(pre + "<area shape=\"rect\" nohref=\"true\" coords=\""
-									+ coords + "\"/>");
+						+ coords + "\"/>");
 	}
 	
 	private void writeEllipse(double zoom, String pre, TextFile stream,
-						Node node, boolean backgroundURL) {
+			Node node, boolean backgroundURL) {
 		int x = (int) (AttributeHelper.getPositionX(node) * zoom);
 		int y = (int) (AttributeHelper.getPositionY(node) * zoom);
 		int width = (int) (AttributeHelper.getWidth(node) * zoom);
@@ -575,11 +575,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		if (href != null && href.length() > 0)
 			stream.add(pre + "<area shape=\"poly\" " + href + " title=\"" + title
-								+ "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
+					+ "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
 		else
 			if (backgroundURL)
 				stream.add(pre + "<area shape=\"poly\" nohref=\"true\" coords=\""
-									+ coords + "\"/>");
+						+ coords + "\"/>");
 	}
 	
 	private String getEllipseCoords(int x, int y, int a, int b) {
@@ -598,7 +598,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private void writeCircle(double zoom, String pre, TextFile stream,
-						Node node, boolean backgroundURL) {
+			Node node, boolean backgroundURL) {
 		int x = (int) (AttributeHelper.getPositionX(node) * zoom);
 		int y = (int) (AttributeHelper.getPositionY(node) * zoom);
 		int width = (int) (AttributeHelper.getWidth(node) * zoom);
@@ -613,11 +613,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		
 		if (href != null && href.length() > 0)
 			stream.add(pre + "<area shape=\"circle\" " + href + " title=\""
-								+ title + "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
+					+ title + "\" alt=\"" + alt + "\" coords=\"" + coords + "\"/>");
 		else
 			if (backgroundURL)
 				stream.add(pre + "<area shape=\"circle\" nohref=\"true\" coords=\""
-									+ coords + "\"/>");
+						+ coords + "\"/>");
 	}
 	
 	private String getHRef(Attributable ge) {
@@ -638,7 +638,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			u = linkProcessor.getProcessedLink(u);
 		
 		if (u != null && u.length() > 0 && this.targetString != null
-							&& this.targetString.length() > 0)
+				&& this.targetString.length() > 0)
 			return "href=\"" + u + "\"" + this.targetString;
 		else
 			if (u != null && u.length() > 0)
@@ -686,8 +686,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public void execute(final Graph targetGraph, final String filenameMain,
-						final String imageType, final int imageTypeVal, ObjectRef resultView,
-						final ImageFileResultProcessor imageFileResultProcessor) {
+			final String imageType, final int imageTypeVal, ObjectRef resultView,
+			final ImageFileResultProcessor imageFileResultProcessor) {
 		if (filenameMain == null)
 			return;
 		
@@ -701,11 +701,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		}
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-							"Create Image File...", "Please wait");
+				"Create Image File...", "Please wait");
 		
 		status.setCurrentStatusText2("Draw Image");
 		Collection<BufferedImageResult> result = getActiveGraphViewImage(
-							targetGraph, imageTypeVal, imageType, status);
+				targetGraph, imageTypeVal, imageType, status);
 		for (BufferedImageResult res : result) {
 			BufferedImage bi = res.getBufferedImage();
 			resultView.setObject(res.getView());
@@ -719,10 +719,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			
 			if (processMultipleViews && result.size() > 1) {
 				filename = filename.substring(0, filename.length()
-									- ".png".length())
-									+ ".view_"
-									+ res.getView().getClass().getSimpleName()
-									+ ".png";
+						- ".png".length())
+						+ ".view_"
+						+ res.getView().getClass().getSimpleName()
+						+ ".png";
 			}
 			
 			// save the image File
@@ -751,7 +751,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					// jpegEncoder.encode(bi, jpegEncodeParam);
 					// } else {
 					writePngFile(bi, file.getAbsolutePath(), parameter
-											.getScaleDPIprintDPI());
+							.getScaleDPIprintDPI());
 					// }
 				} else {
 					// if (parameter.isCreateJPG()) {
@@ -769,7 +769,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				status.setCurrentStatusValueFine(100d);
 				status.setCurrentStatusText2("File has been created");
 				MainFrame.showMessage("Created " + file.getAbsolutePath() + " ("
-									+ file.length() / 1024 + " KB)", MessageType.INFO);
+						+ file.length() / 1024 + " KB)", MessageType.INFO);
 				if (imageFileResultProcessor != null)
 					imageFileResultProcessor.processCreatedImageFile(file);
 			} catch (Exception e) {
@@ -777,16 +777,16 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			}
 			
 			createHTMLifRequested(filename, resultView, scale,
-								imageFileResultProcessor);
+					imageFileResultProcessor);
 		}
 		if ((processMultipleViews) || (storedLinks != null)) {
 			String fn = filenameMain;
 			fn = StringManipulationTools.stringReplace(filenameMain, ".png",
-								".tabbed.html");
+					".tabbed.html");
 			Collection<String> links = new ArrayList<String>();
 			for (BufferedImageResult r : result)
 				links.add(replaceExtension(new File(r.getFileName()).getName(),
-									"html"));
+						"html"));
 			if (storedLinks != null)
 				links.addAll(storedLinks);
 			if (saveScripts)
@@ -800,25 +800,25 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private void createHTMLifRequested(String fileName, ObjectRef resultView,
-						double scale, ImageFileResultProcessor imageFileResultProcessor) {
+			double scale, ImageFileResultProcessor imageFileResultProcessor) {
 		if (parameter.isCreateHTMLmap()) {
 			String ofn = fileName;
 			if (!parameter.isCreateJPG()) {
 				if (fileName.toUpperCase().endsWith(".PNG"))
 					fileName = fileName.substring(0, fileName.length()
-										- ".png".length());
+							- ".png".length());
 			} else {
 				if (fileName.toUpperCase().endsWith(".JPG"))
 					fileName = fileName.substring(0, fileName.length()
-										- ".JPG".length());
+							- ".JPG".length());
 				fileName = fileName.substring(0, fileName.length()
-									- ".JPEG".length());
+						- ".JPEG".length());
 			}
 			String mapFileName = fileName + ".html";
 			if (new File(mapFileName).exists() && isAskBeforeOverwrite()) {
 				Object[] res = MyInputHelper.getInput("File already exists:<br>"
-									+ "<b>" + mapFileName + "</b><br><br>" + "Overwrite?",
-									"File exists", new Object[] {});
+						+ "<b>" + mapFileName + "</b><br><br>" + "Overwrite?",
+						"File exists", new Object[] {});
 				if (res == null)
 					return;
 			}
@@ -830,22 +830,22 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				ofn = new File(ofn).getName();
 				if (!processMultipleViews && !ofn.contains("full.tab."))
 					ofn = StringManipulationTools.stringReplace(ofn, "gml.full.png",
-										"gml.full.tab.png");
+							"gml.full.tab.png");
 				String gn = graph.getName();
 				gn = StringManipulationTools.UnicodeToHtml(gn);
 				out.add("<html>");
 				out.add("<head>");
 				out.add("\t<title>Graph: " + gn + " (" + graph.getNumberOfNodes()
-									+ " nodes, " + graph.getNumberOfEdges() + " edges)</title>");
+						+ " nodes, " + graph.getNumberOfEdges() + " edges)</title>");
 				out.add("</head>");
 				out.add("<body >");
 				out.add("\t<img src=\"" + ofn + "\" border=\"0\" usemap=\"#" + gn
-									+ "\">");
+						+ "\">");
 				out.add("\t<map id=\"" + gn + "\" name=\"" + gn + "\">");
 				
 				String defaultURL = getHRef(graph);
 				boolean backgroundURL = defaultURL != null
-									&& defaultURL.length() > 0;
+						&& defaultURL.length() > 0;
 				// if (view!=null)
 				// for (Edge e : graph.getEdges()) {
 				// writeEdge(zoom, "\t\t", out, e, view.getComponentForElement(e));
@@ -870,7 +870,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				out.write(mapFileName);
 				if (imageFileResultProcessor != null)
 					imageFileResultProcessor.processCreatedWebsiteFile(new File(
-										mapFileName));
+							mapFileName));
 			} catch (IOException e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -878,23 +878,23 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private static void writePngFile(RenderedImage image, String filename,
-						int dotsPerInch) {
+			int dotsPerInch) {
 		
 		String dotsPerMeter = String.valueOf((int) (dotsPerInch / 0.0254) + 1);
 		
 		Iterator<ImageWriter> imageWriters = ImageIO
-							.getImageWritersByFormatName("png");
+				.getImageWritersByFormatName("png");
 		
 		while (imageWriters.hasNext()) {
 			ImageWriter iw = imageWriters.next();
 			
 			ImageWriteParam iwp = iw.getDefaultWriteParam();
 			IIOMetadata metadata = iw.getDefaultImageMetadata(
-								new ImageTypeSpecifier(image), iwp);
+					new ImageTypeSpecifier(image), iwp);
 			
 			String pngFormatName = metadata.getNativeMetadataFormatName();
 			IIOMetadataNode pngNode = (IIOMetadataNode) metadata
-								.getAsTree(pngFormatName);
+					.getAsTree(pngFormatName);
 			
 			IIOMetadataNode physNode = null;
 			NodeList childNodes = pngNode.getElementsByTagName("pHYs");
@@ -906,7 +906,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					physNode = (IIOMetadataNode) childNodes.item(0);
 				} else {
 					ErrorMsg
-										.addErrorMessage("Internal Error: found multiple pHYs nodes");
+							.addErrorMessage("Internal Error: found multiple pHYs nodes");
 				}
 			
 			physNode.setAttribute("pixelsPerUnitXAxis", dotsPerMeter);
@@ -933,20 +933,20 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public static String getCachedFileName(String extension, Graph graph,
-						Algorithm algorithm, ObjectRef lastEvent, ObjectRef lastFolder) {
+			Algorithm algorithm, ObjectRef lastEvent, ObjectRef lastFolder) {
 		String f = null;
 		if (algorithm.getActionEvent() != null
-							&& algorithm.getActionEvent() == lastEvent.getObject()) {
+				&& algorithm.getActionEvent() == lastEvent.getObject()) {
 			f = (String) lastFolder.getObject()
-								+ "/"
-								+ PngJpegAlgorithm.replaceExtension(graph.getName(false),
-													extension);
+					+ "/"
+					+ PngJpegAlgorithm.replaceExtension(graph.getName(false),
+							extension);
 			if (new File(f).exists()) {
 				if (JOptionPane.showConfirmDialog(GravistoService.getInstance()
-									.getMainFrame(),
-									"<html>Do you want to overwrite the existing file <i>" + f
-														+ "</i>?</html>", "Overwrite File?",
-									JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						.getMainFrame(),
+						"<html>Do you want to overwrite the existing file <i>" + f
+								+ "</i>?</html>", "Overwrite File?",
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 					// empty
 				} else {
 					f = null;
@@ -956,7 +956,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		}
 		if (f == null || !new File((String) lastFolder.getObject()).exists()) {
 			f = FileHelper.getFileName(extension, "Image File", PngJpegAlgorithm
-								.replaceExtension(graph.getName(false), extension));
+					.replaceExtension(graph.getName(false), extension));
 		}
 		
 		try {
@@ -965,8 +965,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				lastFolder.setObject(new File(f).getParent());
 			
 			if (f != null
-								&& !f.endsWith(PngJpegAlgorithm.replaceExtension(graph
-													.getName(false), extension))) {
+					&& !f.endsWith(PngJpegAlgorithm.replaceExtension(graph
+							.getName(false), extension))) {
 				lastEvent.setObject(null);
 				lastFolder.setObject(null);
 			}
@@ -981,12 +981,12 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public static Rectangle getViewRectFromSelection(View view,
-						Collection<GraphElement> graphElements) {
+			Collection<GraphElement> graphElements) {
 		return getViewRectFromSelection(view, graphElements, false);
 	}
 	
 	public static Rectangle getViewRectFromSelection(View view,
-						Collection<GraphElement> graphElements, boolean print) {
+			Collection<GraphElement> graphElements, boolean print) {
 		Rectangle viewRect = null;
 		for (GraphElement ge : graphElements) {
 			if (AttributeHelper.isHiddenGraphElement(ge))
@@ -1030,28 +1030,28 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public Collection<BufferedImageResult> getActiveGraphViewImage(
-						final Graph targetGraph, final int imageType,
-						final String fileExtension,
-						final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			final Graph targetGraph, final int imageType,
+			final String fileExtension,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		return getActiveGraphViewImage(targetGraph, imageType, fileExtension, optStatus, false);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Collection<BufferedImageResult> getActiveGraphViewImage(
-						final Graph targetGraph, final int imageType,
-						final String fileExtension,
-						final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-						boolean allowBackgroundThread) {
+			final Graph targetGraph, final int imageType,
+			final String fileExtension,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			boolean allowBackgroundThread) {
 		if (allowBackgroundThread || SwingUtilities.isEventDispatchThread())
 			return getActiveGraphViewImageOnSwingThread(targetGraph, imageType,
-								fileExtension, optStatus);
+					fileExtension, optStatus);
 		else {
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
 						Object o = getActiveGraphViewImageOnSwingThread(targetGraph,
-											imageType, fileExtension, optStatus);
+								imageType, fileExtension, optStatus);
 						tso.setParam(0, o);
 					}
 				});
@@ -1065,11 +1065,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private Collection<BufferedImageResult> getActiveGraphViewImageOnSwingThread(
-						Graph targetGraph, int imageType, String fileExtension,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			Graph targetGraph, int imageType, String fileExtension,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
 		EditorSession session = GravistoService.getInstance()
-							.getSessionFromGraph(targetGraph);
+				.getSessionFromGraph(targetGraph);
 		View view = null;
 		if (session == null) {
 			session = new EditorSession(targetGraph);
@@ -1097,18 +1097,18 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				mf = new MainFrame();
 			if (mf != null) {
 				JScrollPane sp = mf.showViewChooserDialog(session, true, null,
-								LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION,
-								new ConfigureViewAction() {
-									private View v;
-									
-									public void run() {
-										((IPKGraffitiView) v).threadedRedraw = false;
-									}
-									
-									public void storeView(View v) {
-										this.v = v;
-									}
-								});
+						LoadSetting.VIEW_CHOOSER_NEVER_SHOW_DONT_ADD_VIEW_TO_EDITORSESSION,
+						new ConfigureViewAction() {
+							private View v;
+							
+							public void run() {
+								((IPKGraffitiView) v).threadedRedraw = false;
+							}
+							
+							public void storeView(View v) {
+								this.v = v;
+							}
+						});
 				view = (View) sp.getViewport().getView();
 			}
 		} else {
@@ -1120,7 +1120,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		Collection<View> views = new ArrayList<View>();
 		if (processMultipleViews) {
 			EditorSession es = (EditorSession) MainFrame.getInstance()
-								.getEditorSessionForGraph(view.getGraph());
+					.getEditorSessionForGraph(view.getGraph());
 			if (es != null)
 				views.addAll(es.getViews());
 		}
@@ -1135,10 +1135,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			
 			ObjectRef scale = new ObjectRef();
 			BufferedImage bi = createImageFromView(imageType, fileExtension, vi,
-								backCol, optStatus, scale);
+					backCol, optStatus, scale);
 			if (bi != null) {
 				BufferedImageResult r = new BufferedImageResult(bi, (Double) scale
-									.getObject(), vi);
+						.getObject(), vi);
 				res.add(r);
 			}
 		}
@@ -1147,9 +1147,9 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private BufferedImage createImageFromView(int imageType,
-						String fileExtension, View view, Color backColor,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-						ObjectRef scale) {
+			String fileExtension, View view, Color backColor,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			ObjectRef scale) {
 		Graph graph = view.getGraph();
 		
 		if (graph == null)
@@ -1158,8 +1158,8 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			PaintStatusSupport pss = (PaintStatusSupport) view;
 			if (pss.statusDrawInProgress()) {
 				MainFrame.showMessageDialog(
-									"Please wait until current drawing has completed.",
-									"Image Creation in Progress");
+						"Please wait until current drawing has completed.",
+						"Image Creation in Progress");
 				return null;
 			}
 		}
@@ -1181,7 +1181,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			/*
 			 * dim = NodeTools.getMaximumXY(graph.getNodes(), 1.1, -10, -10, true);
 			 */
-
+			
 			viewRectangle = getViewRectFromSelection(view, graph.getGraphElements());
 			
 			double dimx = viewRectangle.getX() + viewRectangle.getWidth() + (viewRectangle.getX() > 0 ? viewRectangle.getX() : 0);
@@ -1207,14 +1207,14 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				dimSrc = new Vector2d(w, h);
 			} else {
 				ErrorMsg
-									.addErrorMessage("Internal Error: Creating image for this view type is not supported!");
+						.addErrorMessage("Internal Error: Creating image for this view type is not supported!");
 				return null;
 			}
 		}
 		
 		Vector2d dim = new Vector2d(dimSrc);
 		double outputScale = setDimAccordingToOutputSize(dimSrc, dim,
-							zoomScaleFromView);
+				zoomScaleFromView);
 		
 		if (parameter.getClipX() != -1 && dim.x > parameter.getClipX()) {
 			double scaleClip = parameter.getClipX() / dim.x + 0;
@@ -1231,11 +1231,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		Graphics2D g = bi.createGraphics();
 		
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-							RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-							RenderingHints.VALUE_ANTIALIAS_ON);
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_RENDERING,
-							RenderingHints.VALUE_RENDER_QUALITY);
+				RenderingHints.VALUE_RENDER_QUALITY);
 		
 		try {
 			if (MegaTools.getActiveTool() != null)
@@ -1243,12 +1243,12 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			
 			// clear background with active window background color
 			if (backColor.getRGB() != -1 || fileExtension.equalsIgnoreCase("jpg")
-								|| bi.getTransparency() == BufferedImage.OPAQUE) {
+					|| bi.getTransparency() == BufferedImage.OPAQUE) {
 				g.setColor(backColor);
 				g.fillRect(0, 0, (int) dim.x, (int) dim.y);
 			}
 			g.setTransform(new AffineTransform(outputScale, 0, 0, outputScale, 0,
-								0));
+					0));
 			
 			// paint graph
 			// boolean isOp = viewerComponent.isOpaque();
@@ -1272,9 +1272,9 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		} finally {
 			
 			if (view instanceof ZoomListener
-								&& Math.abs(zoomScaleFromView - 1) > 0.0001) {
+					&& Math.abs(zoomScaleFromView - 1) > 0.0001) {
 				AffineTransform at = new AffineTransform(zoomScaleFromView, 0, 0,
-									zoomScaleFromView, 0, 0);
+						zoomScaleFromView, 0, 0);
 				((ZoomListener) view).zoomChanged(at);
 			}
 			
@@ -1321,7 +1321,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	 *         transform of the output graphics.
 	 */
 	private double setDimAccordingToOutputSize(Vector2d dimSrc, Vector2d dim,
-						double zoomScaleFromView) {
+			double zoomScaleFromView) {
 		switch (parameter.getScaleSetting()) {
 			case ZOOM:
 				return processScaleZoom(dimSrc, dim, zoomScaleFromView);
@@ -1363,13 +1363,13 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 				break;
 			default:
 				ErrorMsg
-									.addErrorMessage("Internal Error: Unknown DPI output size unit.");
+						.addErrorMessage("Internal Error: Unknown DPI output size unit.");
 				targetPrintSizeInch = targetPrintSize;
 				break;
 		}
 		
 		int minimumOutputSize = (int) (targetPrintSizeInch * parameter
-							.getScaleDPIprintDPI());
+				.getScaleDPIprintDPI());
 		double scale;
 		if (dimSrc.x > dimSrc.y) {
 			scale = minimumOutputSize / dimSrc.x;
@@ -1389,7 +1389,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 		if (parameter.getMaxWidth() > 0) {
 			if (parameter.getMaxHeight() == -1)
 				dim.x = dimSrc.x < parameter.getMaxWidth() ? parameter
-									.getMaxWidth() : dimSrc.x;
+						.getMaxWidth() : dimSrc.x;
 			else
 				dim.x = parameter.getMaxWidth();
 			desiredScaleWidth = dim.x / dimSrc.x;
@@ -1399,7 +1399,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 			desiredScaleHeight = parameter.getMaxHeight() / dimSrc.y;
 		}
 		double scale = desiredScaleWidth < desiredScaleHeight ? desiredScaleWidth
-							: desiredScaleHeight;
+				: desiredScaleHeight;
 		if (parameter.getMaxWidth() <= 0) {
 			dim.x = dimSrc.x * scale;
 		}
@@ -1410,9 +1410,9 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private double processScaleZoom(Vector2d dimSrc, Vector2d dim,
-						double zoomScaleFromView) {
+			double zoomScaleFromView) {
 		double scale = parameter.getScaleZoomSetting()
-							.getScale(zoomScaleFromView);
+				.getScale(zoomScaleFromView);
 		dim.x = dimSrc.x * scale;
 		dim.y = dimSrc.y * scale;
 		return scale;
@@ -1444,18 +1444,18 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	public static BufferedImage getActiveGraphViewImage(Graph targetGraph,
-						int imageType, String fileExtension, PngJpegAlgorithmParams params,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int imageType, String fileExtension, PngJpegAlgorithmParams params,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		return getActiveGraphViewImage(targetGraph, imageType, fileExtension, params, optStatus, false);
 	}
 	
 	public static BufferedImage getActiveGraphViewImage(Graph targetGraph,
-						int imageType, String fileExtension, PngJpegAlgorithmParams params,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus, boolean allowBackgroundThread) {
+			int imageType, String fileExtension, PngJpegAlgorithmParams params,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, boolean allowBackgroundThread) {
 		PngJpegAlgorithm alg = new PngJpegAlgorithm(fileExtension.equals("jpg"));
 		alg.parameter = params;
 		return alg.getActiveGraphViewImage(targetGraph, imageType, fileExtension,
-							optStatus, allowBackgroundThread).iterator().next().getBufferedImage();
+				optStatus, allowBackgroundThread).iterator().next().getBufferedImage();
 	}
 	
 	public void setAskBeforeOverwrite(boolean askBeforeOverwrite) {
@@ -1472,7 +1472,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	 * @param string
 	 */
 	public static void createHTMLfor(String outputFileName, String mappingName,
-						Collection<String> links) {
+			Collection<String> links) {
 		outputFileName = replaceExtension(outputFileName, "html");
 		String ht = outputFileName;
 		TextFile out = new TextFile();
@@ -1502,7 +1502,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					isMapping = true;
 				}
 				ln = StringManipulationTools.UnicodeToHtml(ln.substring(0,
-									ln.indexOf(".")).replaceAll("_", " "));
+						ln.indexOf(".")).replaceAll("_", " "));
 				if (isImport)
 					ln += " (Metadata View)";
 				else
@@ -1510,11 +1510,11 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 						ln += " (Mapping View)";
 				
 				out.add("<li><a href=\"" + l + "\"><span>" + ln
-									+ "</span></a></li>");
+						+ "</span></a></li>");
 			}
 			out.add("</ul>");
 			out.add("<div id=\"img\"><img src=\"" + outputFileName
-								+ "\" border=\"0\"></div>");
+					+ "\" border=\"0\"></div>");
 			out.add("</body>");
 			out.add("</html>");
 			out.write(ht);
@@ -1524,7 +1524,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	}
 	
 	private static void createTabHTMLfor(String fn, String title,
-						Collection<String> links) {
+			Collection<String> links) {
 		TextFile out = new TextFile();
 		try {
 			String gn = StringManipulationTools.UnicodeToHtml(title);
@@ -1556,10 +1556,10 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 					ln = ln.substring(ln.lastIndexOf(".") + 1);
 				if (ln.indexOf(".") > 0)
 					ln = StringManipulationTools.UnicodeToHtml(ln.substring(0,
-										ln.indexOf(".")).replaceAll("_", " "));
+							ln.indexOf(".")).replaceAll("_", " "));
 				else
 					ln = StringManipulationTools.UnicodeToHtml(ln.replaceAll("_",
-										" "));
+							" "));
 				if (isImport)
 					ln += " (Metadata View)";
 				else
@@ -1567,7 +1567,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 						ln += " (Mapping View)";
 				
 				out.add("<li><a href=\"" + l + "\"><span>" + ln
-									+ "</span></a></li>");
+						+ "</span></a></li>");
 			}
 			out.add("</ul>");
 			out.add("</div>");
@@ -1581,7 +1581,7 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	
 	public static void saveScriptCode(String outputFileName) {
 		String path = new File(new File(outputFileName).getParent())
-							.getAbsolutePath();
+				.getAbsolutePath();
 		if (!new File(path + "/jquery").exists())
 			new File(path + "/jquery").mkdirs();
 		
@@ -1597,28 +1597,28 @@ public class PngJpegAlgorithm extends AbstractAlgorithm implements
 	
 	private static String getTabImportCodeAndSaveScripts(String outputFileName) {
 		return "  <link type=\"text/css\" href=\"jquery/base/ui.all.css\" rel=\"stylesheet\" />"
-							+ "<script type=\"text/javascript\" src=\"jquery/jquery-1.3.2.js\"></script>"
-							+ "<script type=\"text/javascript\" src=\"jquery/ui/ui.core.js\"></script>"
-							+ "<script type=\"text/javascript\" src=\"jquery/ui/ui.tabs.js\"></script>"
-							+ "<script type=\"text/javascript\">"
-							+ "$(document).ready(function(){"
-							+ "$(\"#tabs\").tabs();"
-							+ "$('#tabs ul li a').click(function () {location.hash = $(this).attr('href');window.scroll(0,0);});"
-							+ "});" + "</script>";
+				+ "<script type=\"text/javascript\" src=\"jquery/jquery-1.3.2.js\"></script>"
+				+ "<script type=\"text/javascript\" src=\"jquery/ui/ui.core.js\"></script>"
+				+ "<script type=\"text/javascript\" src=\"jquery/ui/ui.tabs.js\"></script>"
+				+ "<script type=\"text/javascript\">"
+				+ "$(document).ready(function(){"
+				+ "$(\"#tabs\").tabs();"
+				+ "$('#tabs ul li a').click(function () {location.hash = $(this).attr('href');window.scroll(0,0);});"
+				+ "});" + "</script>";
 	}
 	
 	private static void save(String folder, String fileName,
-						String targetFileName) {
+			String targetFileName) {
 		ClassLoader cl = PngJpegAlgorithm.class.getClassLoader();
 		
 		String path = PngJpegAlgorithm.class.getPackage().getName().replace('.',
-							'/');
+				'/');
 		try {
 			File tgt = new File(targetFileName);
 			FileOutputStream out = new FileOutputStream(tgt);
 			long sz = 0;
 			InputStream inpS = cl.getResourceAsStream(path + "/" + folder + "/"
-								+ fileName);
+					+ fileName);
 			InputStream in = inpS;
 			
 			int b;

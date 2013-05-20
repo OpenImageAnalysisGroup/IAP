@@ -30,7 +30,19 @@ public interface VfsFileObject {
 	
 	public void upload(VfsFileObject remoteFile) throws IOException;
 	
+	/**
+	 * List files and folders.
+	 * 
+	 * @return List of files and/or folders.
+	 * @throws IOException
+	 */
 	public String[] list() throws IOException;
+	
+	/**
+	 * @return List of folders.
+	 * @throws IOException
+	 */
+	public String[] listFolders() throws IOException;
 	
 	public String getName();
 	

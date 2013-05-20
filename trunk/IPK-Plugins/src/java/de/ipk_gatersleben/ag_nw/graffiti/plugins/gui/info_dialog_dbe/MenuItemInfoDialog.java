@@ -684,8 +684,8 @@ public class MenuItemInfoDialog
 	}
 	
 	@SuppressWarnings("deprecation")
-	protected void saveFiles() {
-		String targetFileName = FileHelper.getFileName("txt", "License text");
+	public void saveFiles() {
+		String targetFileName = FileHelper.getFileName("txt", "license text file");
 		if (targetFileName == null || targetFileName.length() <= 0) {
 			MainFrame.showMessageDialog("License text not saved!", "Operation aborted");
 			return;
@@ -727,7 +727,7 @@ public class MenuItemInfoDialog
 				"lesser.txt", "secondstring.txt", "spl.txt" };
 	}
 	
-	protected String getLibsText() {
+	public static String getLibsText() {
 		return getLibText(
 				"SecondString",
 				"a open-source Java-based package of approximate string-matching techniques",

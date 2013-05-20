@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -123,6 +124,17 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 			files[index++] = obj.getName().getBaseName();
 		}
 		return files;
+	}
+	
+	@Override
+	public String[] listFolders() throws IOException {
+		FileObject[] fs = file.getChildren();
+		ArrayList<String> directories = new ArrayList<String>();
+		for (FileObject obj : fs) {
+			if (obj.getType() == FileType.FOLDER)
+				directories.add(obj.getName().getBaseName());
+		}
+		return directories.toArray(new String[] {});
 	}
 	
 	@Override

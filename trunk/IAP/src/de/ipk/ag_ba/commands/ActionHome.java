@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
+import de.ipk.ag_ba.commands.about.ActionAbout;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;

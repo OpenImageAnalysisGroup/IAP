@@ -221,4 +221,12 @@ public class IAPimages {
 	public static String getRapeseedImage() {
 		return "img/rapeseed.png";
 	}
+	
+	public static String getImageFromFileExtension(String extension) {
+		if (extension.equals(".url") || extension.equals(".webloc"))
+			return "img/ext/gpl2/Gnome-Emblem-Web-64.png";
+		if (extension.equals(".txt") || extension.equals(".doc") || extension.equals(".docx"))
+			return "img/ext/gpl2/Gnome-Text-X-Generic-64.png";
+		return null;
+	}
 }

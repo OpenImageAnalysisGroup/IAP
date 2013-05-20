@@ -35,7 +35,7 @@ import org.GuiRow;
 import org.HelperClass;
 import org.JMButton;
 import org.ReleaseInfo;
-import org.SettingsHelperDefaultIsTrue;
+import org.SettingsHelperDefaultIsFalse;
 import org.StringManipulationTools;
 import org.SystemInfo;
 import org.graffiti.editor.MainFrame;
@@ -81,10 +81,10 @@ public class NewsHelper implements HelperClass {
 		
 		double[][] size = { { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border,
-												TableLayoutConstants.PREFERRED,
-												2 * border,
-												TableLayoutConstants.PREFERRED,
-												border } }; // Rows
+						TableLayoutConstants.PREFERRED,
+						2 * border,
+						TableLayoutConstants.PREFERRED,
+						border } }; // Rows
 		res.setLayout(new TableLayout(size));
 		
 		try {
@@ -136,14 +136,14 @@ public class NewsHelper implements HelperClass {
 		if (SystemInfo.isMac()) {
 			autoNews.putClientProperty("JComponent.sizeVariant", "mini");
 		}
-		boolean auto = new SettingsHelperDefaultIsTrue().isEnabled("download_release_infos");
+		boolean auto = new SettingsHelperDefaultIsFalse().isEnabled("download_release_infos");
 		autoNews.setSelected(auto);
 		
 		refreshFolderPanels();
 		
 		ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
 			public void run() {
-				boolean auto = new SettingsHelperDefaultIsTrue().isEnabled("download_release_infos");
+				boolean auto = new SettingsHelperDefaultIsFalse().isEnabled("download_release_infos");
 				if (auto) {
 					newsButton.setEnabled(false);
 					editFeeds.setEnabled(false);
@@ -156,7 +156,7 @@ public class NewsHelper implements HelperClass {
 							editFeeds.setEnabled(true);
 						}
 					},
-										newsButton);
+							newsButton);
 				}
 				StringBuilder warning = new StringBuilder();
 				int incomp = 0;
@@ -171,9 +171,9 @@ public class NewsHelper implements HelperClass {
 					}
 				if (warning.length() > 0) {
 					MainFrame.showMessage(" Active Add-on" +
-										(incomp > 1 ? "s are " : " is ") + "not tested with " + DBEgravistoHelper.DBE_GRAVISTO_VERSION + ": " +
-										warning.toString(),
-										MessageType.INFO, 20000);
+							(incomp > 1 ? "s are " : " is ") + "not tested with " + DBEgravistoHelper.DBE_GRAVISTO_VERSION + ": " +
+							warning.toString(),
+							MessageType.INFO, 20000);
 				}
 			}
 		});
@@ -197,13 +197,13 @@ public class NewsHelper implements HelperClass {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MainFrame.showMessageDialog("<html>RSS-Feeds are saved in a text-file, which will be opened<br>" +
-									"after pressing \"OK\".<br>" +
-									"Please use this format for editing:<br><br><code>" +
-									"name of new feed<br>" +
-									"URL1" + RSSFeedManager.urlSeparator + "URL2" + RSSFeedManager.urlSeparator + "URL3" + RSSFeedManager.urlSeparator
-									+ "...</code><br><br>" +
-									"The \"" + RSSFeedManager.urlSeparator + "\" is used to define more than one source feed<br>" +
-									"which will be shown in one newsfeed group.<br>", "Editing RSS-Feeds");
+						"after pressing \"OK\".<br>" +
+						"Please use this format for editing:<br><br><code>" +
+						"name of new feed<br>" +
+						"URL1" + RSSFeedManager.urlSeparator + "URL2" + RSSFeedManager.urlSeparator + "URL3" + RSSFeedManager.urlSeparator
+						+ "...</code><br><br>" +
+						"The \"" + RSSFeedManager.urlSeparator + "\" is used to define more than one source feed<br>" +
+						"which will be shown in one newsfeed group.<br>", "Editing RSS-Feeds");
 				RSSFeedManager.getInstance().checkRSSfile();
 				AttributeHelper.showInBrowser(RSSFeedManager.getInstance().getFeedtextfile());
 			}
@@ -215,14 +215,14 @@ public class NewsHelper implements HelperClass {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Object[] res = MyInputHelper.getInput("<html>Please specify the feeds name and its URLs.<br><br><small>Separate URLs by using the \"|\" symbol.",
-									"Subscribe to a News Feed", new Object[] {
-														"Feed Name", "News Feed",
-														"URL(s)", ""
-				});
+						"Subscribe to a News Feed", new Object[] {
+								"Feed Name", "News Feed",
+								"URL(s)", ""
+						});
 				if (res != null &&
-									res.length == 2 && res[0] != null &&
-									!(((String) res[0]).trim().equalsIgnoreCase("")) &&
-									!(((String) res[1]).trim().equalsIgnoreCase(""))) {
+						res.length == 2 && res[0] != null &&
+						!(((String) res[0]).trim().equalsIgnoreCase("")) &&
+						!(((String) res[1]).trim().equalsIgnoreCase(""))) {
 					String feeds = (String) res[1];
 					if (urlError(feeds))
 						return;
@@ -240,8 +240,8 @@ public class NewsHelper implements HelperClass {
 		res.removeAll();
 		
 		res.add(TableLayout.get3Split(newsButton, autoNews,
-							TableLayout.get3Split(null/* subscribeButton */, null, editFeeds, TableLayout.PREFERRED, 4, TableLayout.PREFERRED, 0, 0),
-							TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED), "1,1");
+				TableLayout.get3Split(null/* subscribeButton */, null, editFeeds, TableLayout.PREFERRED, 4, TableLayout.PREFERRED, 0, 0),
+				TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED), "1,1");
 		// res.add(TableLayout.get3Split(newsButton, autoNews,
 		// TableLayout.get3Split(editFeeds, null, closeButton, TableLayout.PREFERRED, 4, TableLayout.PREFERRED, 0, 0),
 		// TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED), "1,1");
@@ -272,14 +272,14 @@ public class NewsHelper implements HelperClass {
 		}
 		ActionListener res = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new SettingsHelperDefaultIsTrue().setEnabled("download_release_infos", autoNews.isSelected());
+				new SettingsHelperDefaultIsFalse().setEnabled("download_release_infos", autoNews.isSelected());
 			}
 		};
 		return res;
 	}
 	
 	private ActionListener getNewsDownloadAction(
-						final JTabbedPane tabbedPane, final JButton newsButton) {
+			final JTabbedPane tabbedPane, final JButton newsButton) {
 		
 		ActionListener res = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -326,15 +326,15 @@ public class NewsHelper implements HelperClass {
 	}
 	
 	public static void refreshNews(
-						final RSSFeedManager rfm,
-						final Runnable finishTask, final JButton optRefreshNewsButton) {
+			final RSSFeedManager rfm,
+			final Runnable finishTask, final JButton optRefreshNewsButton) {
 		
 		final ArrayList<FolderPanel> fpList = rfm.getNewsComponents();
 		final ArrayList<String> urls = rfm.getUrls();
 		final ArrayList<Boolean> removeHTML = rfm.getRemoveHTML();
 		
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("One moment...",
-							"Access news feed...");
+				"Access news feed...");
 		final HashMap<Integer, ArrayList<GuiRow>> idx2newsItems = new HashMap<Integer, ArrayList<GuiRow>>();
 		final DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
 		
@@ -393,8 +393,8 @@ public class NewsHelper implements HelperClass {
 										text = constructButtons(text, buttons, optRefreshNewsButton);
 										
 										JLabel c2 = new JLabelHTMLlink("<html><small><b>"
-															+ checkTextWidth(rfm, se.getTitle()) + "</b><br>"
-															+ checkTextWidth(rfm, text), se.getLink(), "Click to see full text in browser");
+												+ checkTextWidth(rfm, se.getTitle()) + "</b><br>"
+												+ checkTextWidth(rfm, text), se.getLink(), "Click to see full text in browser");
 										
 										JComponent buttonRow = TableLayout.getMultiSplit(buttons, TableLayoutConstants.PREFERRED, 4, 0, 8, 2);
 										c1 = getCustomizedLabel(c1);
@@ -404,7 +404,7 @@ public class NewsHelper implements HelperClass {
 											gr = new GuiRow(c1, c2);
 										else
 											gr = new GuiRow(c1, TableLayout
-																.getSplitVertical(c2, buttonRow, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED));
+													.getSplitVertical(c2, buttonRow, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED));
 										row2date.put(gr, d);
 										newsItems.add(gr);
 										news++;
@@ -445,10 +445,10 @@ public class NewsHelper implements HelperClass {
 					for (int a = 0; a < fpList.size(); a++) {
 						if (latestDates.get(a) != null && rfm.getDate(a) != null)
 							fpList.get(a).setCondensedState(
-												latestDates.get(a).toString().
-																	equalsIgnoreCase(rfm.getDate(a)));
+									latestDates.get(a).toString().
+											equalsIgnoreCase(rfm.getDate(a)));
 						else {
-							boolean auto = new SettingsHelperDefaultIsTrue().isEnabled("download_release_infos");
+							boolean auto = new SettingsHelperDefaultIsFalse().isEnabled("download_release_infos");
 							fpList.get(a).setCondensedState(auto);
 						}
 						String title = fpList.get(a).getTitle();
@@ -461,24 +461,24 @@ public class NewsHelper implements HelperClass {
 							Integer.parseInt(title.substring(title.lastIndexOf(" (") + 2, title.lastIndexOf(")")));
 							already_numbered = true;
 						}
-							catch (Exception e) {
-								already_numbered = false;
-							}
-							if (already_numbered)
-								title = title.substring(0, title.lastIndexOf(" ("));
-							int cnt = idx2newsItems.get(a).size();
-							fpList.get(a).setTitle(title + " (" + cnt + ")");
-							if (latestDates.get(a) != null)
-								rfm.setDate(a, latestDates.get(a).toString());
+						catch (Exception e) {
+							already_numbered = false;
 						}
-						status.setCurrentStatusValueFine(100);
-						status.setCurrentStatusText1("Access finished");
-						status.setCurrentStatusText2(news + " news item(s) found");
-					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
+						if (already_numbered)
+							title = title.substring(0, title.lastIndexOf(" ("));
+						int cnt = idx2newsItems.get(a).size();
+						fpList.get(a).setTitle(title + " (" + cnt + ")");
+						if (latestDates.get(a) != null)
+							rfm.setDate(a, latestDates.get(a).toString());
 					}
-					rfm.saveRegisteredFeeds();
+					status.setCurrentStatusValueFine(100);
+					status.setCurrentStatusText1("Access finished");
+					status.setCurrentStatusText2(news + " news item(s) found");
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
 				}
+				rfm.saveRegisteredFeeds();
+			}
 			
 			private String checkTextWidth(RSSFeedManager rfm, String text) {
 				if (rfm.getMaxCol() <= 0)
@@ -495,7 +495,7 @@ public class NewsHelper implements HelperClass {
 			 * [[preference:Download:url1|url2|...]] -> download file(s) to preference-folder
 			 **/
 			private String constructButtons(String text,
-								ArrayList<JComponent> buttons, final JButton newsButton) {
+					ArrayList<JComponent> buttons, final JButton newsButton) {
 				int a = 0;
 				for (String s : StringManipulationTools.removeTagsGetTextAndRemovedTexts(text, "[[", "]]")) {
 					if (a == 0)
@@ -518,30 +518,30 @@ public class NewsHelper implements HelperClass {
 										b.setEnabled(false);
 									} else {
 										b = GUIhelper.getWebsiteDownloadButton(title, null, System.getProperty("java.io.tmpdir") + ReleaseInfo.getFileSeparator(),
-															"<html>" +
-																				"Please manually download the following file(s):<br><br>" +
-																				"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
-																				"Then move the download file into the addon folder of the program!<br>" +
-																				"(the addon folder will be automatically opened in a few seconds)<br><br>",
-															urls,
-															"Manual Download",
-															null, new Runnable() {
-																public void run() {
-																	for (String u : urls) {
-																		if (u.toLowerCase().endsWith(".jar")) {
-																			if (u.indexOf("/") >= 0)
-																				u = u.substring(u.lastIndexOf("/") + "/".length());
-																			try {
-																				AddonManagerPlugin.getInstance().installAddon(System.getProperty("java.io.tmpdir"), u);
-																			} catch (Exception e) {
-																				ErrorMsg.addErrorMessage(e);
-																			} catch (Error err) {
-																				ErrorMsg.addErrorMessage("Unexpected error: " + err.getMessage());
-																			}
-																		}
-																	}
+												"<html>" +
+														"Please manually download the following file(s):<br><br>" +
+														"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
+														"Then move the download file into the addon folder of the program!<br>" +
+														"(the addon folder will be automatically opened in a few seconds)<br><br>",
+												urls,
+												"Manual Download",
+												null, new Runnable() {
+													public void run() {
+														for (String u : urls) {
+															if (u.toLowerCase().endsWith(".jar")) {
+																if (u.indexOf("/") >= 0)
+																	u = u.substring(u.lastIndexOf("/") + "/".length());
+																try {
+																	AddonManagerPlugin.getInstance().installAddon(System.getProperty("java.io.tmpdir"), u);
+																} catch (Exception e) {
+																	ErrorMsg.addErrorMessage(e);
+																} catch (Error err) {
+																	ErrorMsg.addErrorMessage("Unexpected error: " + err.getMessage());
 																}
-															});
+															}
+														}
+													}
+												});
 										((JButton) b).setText("Install Add-on");
 										((JButton) b).putClientProperty("addon-version", title);
 									}
@@ -549,18 +549,18 @@ public class NewsHelper implements HelperClass {
 								}
 								case PREFERENCE: {
 									b = GUIhelper.getWebsiteDownloadButton(title, null, ReleaseInfo.getAppFolderWithFinalSep(),
-														"<html>" +
-																			"Please manually download the following file(s):<br><br>" +
-																			"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
-																			"Then move the download file into the preferences folder of the program!<br>" +
-																			"(the preferences folder will be automatically opened in a few seconds)<br><br>", urls,
-														"Manual Download", null);
+											"<html>" +
+													"Please manually download the following file(s):<br><br>" +
+													"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
+													"Then move the download file into the preferences folder of the program!<br>" +
+													"(the preferences folder will be automatically opened in a few seconds)<br><br>", urls,
+											"Manual Download", null);
 									((JButton) b).addActionListener(new ActionListener() {
 										public void actionPerformed(ActionEvent e) {
 											MainFrame.showMessageDialog("<html>" +
-																"After the download is finished, please restart the<br>" +
-																"program to make updated/newly preferences or database files available!<br>" +
-																"Click OK to start download!", "Information");
+													"After the download is finished, please restart the<br>" +
+													"program to make updated/newly preferences or database files available!<br>" +
+													"Click OK to start download!", "Information");
 										}
 									});
 									((JButton) b).setText(title);
@@ -592,12 +592,12 @@ public class NewsHelper implements HelperClass {
 								}
 								case DOWNLOAD: {
 									b = GUIhelper.getWebsiteDownloadButton(title, null, null,
-														"<html>" +
-																			"Please manually download the following file(s):<br><br>" +
-																			"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
-																			"Then move the downloaded file into the desired location at your computer!<br><br>",
-														urls,
-														"Manual Download", null);
+											"<html>" +
+													"Please manually download the following file(s):<br><br>" +
+													"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +
+													"Then move the downloaded file into the desired location at your computer!<br><br>",
+											urls,
+											"Manual Download", null);
 									((JButton) b).addActionListener(new ActionListener() {
 										public void actionPerformed(ActionEvent e) {
 										}

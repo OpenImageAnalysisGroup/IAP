@@ -75,7 +75,6 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jaxrpc.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jcommon-0.9.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jruby.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/keggapi.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/mail.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/parser.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/optional.jar"/>

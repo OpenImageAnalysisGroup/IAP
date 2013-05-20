@@ -103,7 +103,7 @@ public class WebFolder {
 				if (lib != null) {
 					for (Book fpp : lib.getBooksInFolder("")) {
 						final Book fp = fpp;
-						NavigationAction action = new AbstractUrlNavigationAction("Open web-ressource") {
+						NavigationAction action = new AbstractUrlNavigationAction("Open web-resource") {
 							@Override
 							public void performActionCalculateResults(NavigationButton src) {
 								AttributeHelper.showInBrowser(fp.getUrl());
@@ -134,7 +134,7 @@ public class WebFolder {
 				
 				NavigationAction subFolderAction = null;
 				if (optSubFolderForFolderItems != null && optSubFolderForFolderItems.length() > 0) {
-					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Ressources",
+					subFolderAction = new EmptyNavigationAction(optSubFolderForFolderItems, "Show List of Web-Resources",
 							"img/ext/folder.png", "img/ext/folder-drag-accept_t.png");
 					NavigationButton subFolder = new NavigationButton(subFolderAction, src.getGUIsetting());
 					actions.add(subFolder);

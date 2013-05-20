@@ -58,7 +58,7 @@ public class HsmFileSystemSource extends FileSystemSource {
 	}
 	
 	@Override
-	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
+	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) throws Exception {
 		Collection<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (IAPmain.getRunMode() == IAPrunMode.WEB)
 			res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));

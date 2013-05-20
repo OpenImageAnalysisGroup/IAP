@@ -17,8 +17,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/jh.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/jruby.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/keggapi.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/mail.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/optional.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/parser.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/pdf-transcoder.jar"/>
@@ -48,7 +46,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="src" path="/Graffiti_Core"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
-	
 	<classpathentry kind="lib" path="/Graffiti_lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/core-1.8.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/staxmate-2.0.0.jar"/>

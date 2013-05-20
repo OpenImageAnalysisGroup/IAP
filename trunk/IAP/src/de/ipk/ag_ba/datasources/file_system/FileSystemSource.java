@@ -35,13 +35,13 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	protected final String url;
 	private final String[] validExtensions;
 	protected Collection<PathwayWebLinkItem> mainList;
-	private final NavigationImage mainDataSourceIconInactive;
-	private final NavigationImage mainDataSourceIconActive;
+	protected final NavigationImage mainDataSourceIconInactive;
+	protected final NavigationImage mainDataSourceIconActive;
 	private final String dataSourceName;
-	private final NavigationImage folderIcon;
+	protected final NavigationImage folderIcon;
 	protected boolean read;
 	protected DataSourceLevel thisLevel;
-	private final Library lib;
+	protected final Library lib;
 	private String description;
 	
 	public FileSystemSource(Library lib, String dataSourceName, String folder, String[] validExtensions,
@@ -161,7 +161,7 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	}
 	
 	@Override
-	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
+	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) throws Exception {
 		return new ArrayList<NavigationButton>();
 	}
 	

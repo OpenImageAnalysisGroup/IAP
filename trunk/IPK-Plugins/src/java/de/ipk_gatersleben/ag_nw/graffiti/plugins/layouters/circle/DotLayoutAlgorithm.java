@@ -105,22 +105,22 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new ObjectListParameter(getDOT(), "<html>" +
-												"Command",
-												"<html>DOT needs to be installed<br>" +
-																	"and needs to be available<br>" +
-																	"in the search path. See<br>" +
-																	"www.graphviz.org for details!", getLayouts()),
-							new IntegerParameter(increaseSize, "Increase Node Size", "If set, the node sizes will be increased (or decreased) for the layout"),
-							new BooleanParameter(layoutEdges, "Layout Edges", "If enabled, the edge routing is considered"),
-							new ObjectListParameter(dotOrientation, "Orientation (DOT)", "", new Object[] { "Left-Right", "Top-Down" }),
-							new BooleanParameter(sortChildren, "Sort Nodes", "If enabled, the ordering of nodes is determined by the ordering of their labels"),
-							new BooleanParameter(considerSameNodes, "Unify Subgraphs", "If enabled, subgraph nodes with the same labels are concurrently processed"),
-							new StringParameter(installPath, "<html>" +
-												"Program path<br>" +
-												"(optional)", "The path, where the layout programs are installed"),
-								new BooleanParameter(true, "Move graph to top-left",
-													"<html>If set, the graph will be moved to top-left,<br>after layouting has been completed") };
+				new ObjectListParameter(getDOT(), "<html>" +
+						"Command",
+						"<html>DOT needs to be installed<br>" +
+								"and needs to be available<br>" +
+								"in the search path. See<br>" +
+								"www.graphviz.org for details!", getLayouts()),
+				new IntegerParameter(increaseSize, "Increase Node Size", "If set, the node sizes will be increased (or decreased) for the layout"),
+				new BooleanParameter(layoutEdges, "Layout Edges", "If enabled, the edge routing is considered"),
+				new ObjectListParameter(dotOrientation, "Orientation (DOT)", "", new Object[] { "Left-Right", "Top-Down" }),
+				new BooleanParameter(sortChildren, "Sort Nodes", "If enabled, the ordering of nodes is determined by the ordering of their labels"),
+				new BooleanParameter(considerSameNodes, "Unify Subgraphs", "If enabled, subgraph nodes with the same labels are concurrently processed"),
+				new StringParameter(installPath, "<html>" +
+						"Program path<br>" +
+						"(optional)", "The path, where the layout programs are installed"),
+				new BooleanParameter(true, "Move graph to top-left",
+						"<html>If set, the graph will be moved to top-left,<br>after layouting has been completed") };
 	}
 	
 	private Collection<String> getLayouts() {
@@ -187,23 +187,23 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"This layout command requires the following Graphviz " +
-							"command-line layout commands to be available in the " +
-							"search path:<br>" +
-							"<ul>" +
-							"<li>dot - layout directed acyclic graphs" +
-							"<li>neato - spring model Kamada and Kawai" +
-							"<li>twopi - radial layout" +
-							"<li>circo - circular layout" +
-							"<li>fdp - spring model Fruchterman and Reingold" +
-							"</ul>" +
-							"<small>See www.graphviz.org for further details.<br>" +
-							"Try 'dot -V' at the command line, to see if this layouter is " +
-							"correctly installed and included in the search path.<br><br>" +
-							"Remark: Edge Layout may not work correctly for undirected graphs. " +
-							"Use the network tab and temporarily change the 'directed edges' setting before layouting " +
-							"the network." +
-							"</small>";
+				"This layout command requires the following Graphviz " +
+				"command-line layout commands to be available in the " +
+				"search path:<br>" +
+				"<ul>" +
+				"<li>dot - layout directed acyclic graphs" +
+				"<li>neato - spring model Kamada and Kawai" +
+				"<li>twopi - radial layout" +
+				"<li>circo - circular layout" +
+				"<li>fdp - spring model Fruchterman and Reingold" +
+				"</ul>" +
+				"<small>See www.graphviz.org for further details.<br>" +
+				"Try 'dot -V' at the command line, to see if this layouter is " +
+				"correctly installed and included in the search path.<br><br>" +
+				"Remark: Edge Layout may not work correctly for undirected graphs. " +
+				"Use the network tab and temporarily change the 'directed edges' setting before layouting " +
+				"the network." +
+				"</small>";
 	}
 	
 	@Override
@@ -275,11 +275,11 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 						llcc = layoutCommand.substring(0, layoutCommand.indexOf(" "));
 					String pp = llcc + " -Tdot '" + fileName + "' -o '" + fileName2 + "'";
 					Process p = Runtime.getRuntime().exec(new String[] {
-										installPath + llcc,
-										" -Tdot",
-										fileName,
-										"-o",
-										fileName2
+							installPath + llcc,
+							" -Tdot",
+							fileName,
+							"-o",
+							fileName2
 					});
 					// Process p = Runtime.getRuntime().exec(pp);
 					p.waitFor();
@@ -292,11 +292,11 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 						ApplyGraphLayout.applyLayoutFromGraphToGraph(selection, graph, layoutedGraph, getName(), layoutEdges);
 					} else {
 						MainFrame.getInstance().showMessageDialog("<html>" +
-											"External call to DOT layout did not produce output (file " + fileName + ")" +
-											"<br><br>Eventually the DOT program is not available in the search path or is not installed at all.<br>" +
-											"<br>Tried to execute:<br>" +
-											"> " + pp + "<br>" +
-											"Return code: " + p.exitValue());
+								"External call to DOT layout did not produce output (file " + fileName + ")" +
+								"<br><br>Eventually the DOT program is not available in the search path or is not installed at all.<br>" +
+								"<br>Tried to execute:<br>" +
+								"> " + pp + "<br>" +
+								"Return code: " + p.exitValue());
 					}
 				} else {
 					ErrorMsg.addErrorMessage("Could not create or save DOT file: " + fileName);
@@ -307,17 +307,17 @@ public class DotLayoutAlgorithm extends AbstractAlgorithm {
 				if (layoutCommand.indexOf(" ") >= 0)
 					command = layoutCommand.substring(0, layoutCommand.indexOf(" "));
 				MainFrame.showMessageDialog(
-									"<html>" +
-														"A I/O Error occurred. A possible source of the problem might be that the external layout program<br>" +
-														"could not be found. Please check if you are able to start the layout program &quot;" + command + "&quot;<br>" +
-														"from the command line of your operating system. This command line layout program needs to be<br>" +
-														"installed and needs to be included in the application search path.<br>" +
-														"Consult the www.graphviz.org website for information on how to download and install the layout<br>" +
-														"programs and consult web information ressources and operating system documentation for information<br>" +
-														"on how to include the installation path of the layouters in the search path of your operating system.<br>" +
-														"Further technical details of this error are available from the error-log (Help/Error Messages),<br>" +
-														"eventually other problem sources need to be considered.",
-									"Error");
+						"<html>" +
+								"A I/O Error occurred. A possible source of the problem might be that the external layout program<br>" +
+								"could not be found. Please check if you are able to start the layout program &quot;" + command + "&quot;<br>" +
+								"from the command line of your operating system. This command line layout program needs to be<br>" +
+								"installed and needs to be included in the application search path.<br>" +
+								"Consult the www.graphviz.org website for information on how to download and install the layout<br>" +
+								"programs and consult web information resources and operating system documentation for information<br>" +
+								"on how to include the installation path of the layouters in the search path of your operating system.<br>" +
+								"Further technical details of this error are available from the error-log (Help/Error Messages),<br>" +
+								"eventually other problem sources need to be considered.",
+						"Error");
 			} finally {
 				for (Node n : graph.getNodes()) {
 					if (!node2oldLabel.containsKey(n))

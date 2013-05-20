@@ -57,8 +57,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
  * DOCUMENT ME!
  */
 public class KeggNavigationToolbarComponent extends JToolBar implements
-					GraffitiComponent, ActionListener, ViewListener, SessionListener,
-					SelectionListener {
+		GraffitiComponent, ActionListener, ViewListener, SessionListener,
+		SelectionListener {
 	
 	// ~ Instance fields ========================================================
 	
@@ -84,17 +84,17 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 		this.prefComp = prefComp;
 		// myContent.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.SINGLE);
 		setLayout(new SingleFiledLayout(SingleFiledLayout.ROW,
-							SingleFiledLayout.FULL, 0));// double border = 0;
+				SingleFiledLayout.FULL, 0));// double border = 0;
 		
 		ClassLoader cl = this.getClass().getClassLoader();
 		String path = this.getClass().getPackage().getName().replace('.', '/');
 		
 		ImageIcon iconLoadKegg = new ImageIcon(cl.getResource(path
-							+ "/images/load_kegg.gif"));
+				+ "/images/load_kegg.gif"));
 		ImageIcon iconLoadPathway = new ImageIcon(cl.getResource(path
-							+ "/images/load_pathway.gif"));
+				+ "/images/load_pathway.gif"));
 		ImageIcon iconCollapsePathway = new ImageIcon(cl.getResource(path
-							+ "/images/collapse_pathway.gif"));
+				+ "/images/collapse_pathway.gif"));
 		int s = 0;
 		
 		jbLoadKegg = new JButton(iconLoadKegg);
@@ -138,14 +138,14 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 					return;
 				if (organismSelections.length < 1) {
 					MainFrame.showMessageDialog(
-										"No organism has been selected. Operation aborted.",
-										"Information");
+							"No organism has been selected. Operation aborted.",
+							"Information");
 					return;
 				}
 				if (organismSelections.length > 1) {
 					MainFrame.showMessageDialog(
-										"More than one organism has been selected, processing the first: " + organismSelections[0].toString(),
-										"Information");
+							"More than one organism has been selected, processing the first: " + organismSelections[0].toString(),
+							"Information");
 				}
 				OrganismEntry org = organismSelections[0];
 				Collection<Graph> gc = getKeggPathways(kegg, org, true, null);
@@ -172,7 +172,7 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 					if (kegg_map_link != null && kegg_map_link.startsWith("path:")) {
 						kegg_map_link = kegg_map_link.substring("path:".length());
 						if (kegg_type != null &&
-											(kegg_type.equalsIgnoreCase("map") || kegg_type.equalsIgnoreCase("ko"))) {
+								(kegg_type.equalsIgnoreCase("map") || kegg_type.equalsIgnoreCase("ko"))) {
 							if (kegg_map_link != null && kegg_map_link.length() > 0) {
 								LoadPathwayAttributeAction.loadMap(kegg_map_link, n.getGraph(), n, false);
 							}
@@ -184,9 +184,9 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 		if (e.getSource().equals(jbCollapsePathway)) {
 			Graph graph = activeSession.getGraph();
 			EditorSession session = GravistoService.getInstance()
-								.getMainFrame().getActiveEditorSession();
+					.getMainFrame().getActiveEditorSession();
 			Selection selection = session.getSelectionModel()
-								.getActiveSelection();
+					.getActiveSelection();
 			if (selection == null || selection.getNodes().size() <= 0) {
 				graph.getNodes();
 			} else {
@@ -209,8 +209,7 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 	private Collection<Graph> getKeggPathways(KeggHelper kegg, OrganismEntry org, boolean returnSuperPathway,
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws IOException, ServiceException {
 		List<Graph> result = new ArrayList<Graph>();
-		String url = "http://www.genome.ad.jp";
-		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(url, org, false, status);
+		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(org, false, status);
 		
 		Graph superGraph = new AdjListGraph();
 		HashMap<String, Node> mapNumber2superGraphNode = new HashMap<String, Node>();
@@ -240,7 +239,7 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 							Node superPathwayMapNode = mapNumber2superGraphNode.get(referencedMap);
 							if (!thisPathwayNode.getNeighbors().contains(superPathwayMapNode) && (!kpe.getMapName().equalsIgnoreCase(referencedMap))) {
 								Edge edge = superGraph.addEdge(thisPathwayNode, superPathwayMapNode, false, AttributeHelper.getDefaultGraphicsAttributeForEdge(
-													Color.BLACK, Color.BLACK, false));
+										Color.BLACK, Color.BLACK, false));
 								AttributeHelper.setDashInfo(edge, 5f, 5f);
 								// System.out.println("Connect Map Nodes: "+kpe.getMapName()+" <==> "+referencedMap);
 							}

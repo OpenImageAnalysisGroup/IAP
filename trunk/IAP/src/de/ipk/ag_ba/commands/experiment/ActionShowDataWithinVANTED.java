@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
 import org.ErrorMsg;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
@@ -49,7 +50,8 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction i
 						experimentName.getExperimentName());
 				ExperimentDataProcessingManager.getInstance().processData(ed, pp, null,
 						optSupplementaryPanel, null);
-				JComponent gui = IAPmain.showVANTED(true);
+				boolean showInline = SystemOptions.getInstance().getBoolean("VANTED", "debug-show-inline-iap", false);
+				JComponent gui = IAPmain.showVANTED(showInline);
 				// gui.setBorder(BorderFactory.createLoweredBevelBorder());
 				if (gui != null)
 					gui.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.DARK_GRAY));
