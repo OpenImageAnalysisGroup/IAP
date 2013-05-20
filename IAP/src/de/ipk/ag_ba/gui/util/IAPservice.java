@@ -147,10 +147,25 @@ public class IAPservice {
 	}
 	
 	public static NavigationButton getPathwayViewEntity(final PathwayWebLinkItem mmc, GUIsetting guiSettings) {
-		NavigationButton ne = new NavigationButton(new AbstractGraphUrlNavigationAction("Load web-folder content") {
+		NavigationButton ne = new NavigationButton(getPathwayViewAction(mmc), guiSettings);
+		return ne;
+	}
+	
+	public static AbstractGraphUrlNavigationAction getPathwayViewAction(final PathwayWebLinkItem mmc) {
+		return new AbstractGraphUrlNavigationAction("Load web-folder content") {
 			private NavigationButton src = null;
 			private final ObjectRef graphRef = new ObjectRef();
 			private final ObjectRef scrollpaneRef = new ObjectRef();
+			
+			@Override
+			public String getDefaultTitle() {
+				return mmc.toString();
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/graphfile_t.png";
+			}
 			
 			@Override
 			public IOurl getURL() {
@@ -195,18 +210,19 @@ public class IAPservice {
 					@Override
 					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-						res.add(src);
+						// res.add(src);
 						return res;
 					}
 					
 					@Override
 					public ArrayList<NavigationButton> getResultNewActionSet() {
-						return new ArrayList<NavigationButton>();
+						return null;// new ArrayList<NavigationButton>();
 					}
 					
 					@Override
 					public MainPanelComponent getResultMainPanel() {
-						JComponent gui = IAPmain.showVANTED(true);
+						boolean showInline = SystemOptions.getInstance().getBoolean("VANTED", "debug-show-inline-iap", false);
+						JComponent gui = IAPmain.showVANTED(showInline);
 						// if (gui != null)
 						// gui.setBorder(BorderFactory.createLoweredBevelBorder());
 						if (gui != null)
@@ -411,9 +427,7 @@ public class IAPservice {
 				return null;
 			}
 			
-		}, mmc.toString(), "img/graphfile_t.png", guiSettings);
-		
-		return ne;
+		};
 	}
 	
 	public static ArrayList<String> portScan(String hostname, BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -1679,6 +1693,10 @@ public class IAPservice {
 		String str;
 		while ((str = in.readLine()) != null) {
 			System.out.println(str);
+			if (str.startsWith("URL=")) {
+				result = str.substring("URL=".length());
+				break;
+			}
 			if (str.contains("<string>")) {
 				result = StringManipulationTools.removeHTMLtags(str).trim();
 				break;

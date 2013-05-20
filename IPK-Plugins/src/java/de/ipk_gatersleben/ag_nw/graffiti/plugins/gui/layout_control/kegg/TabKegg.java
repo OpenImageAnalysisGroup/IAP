@@ -46,8 +46,6 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.xml.rpc.ServiceException;
 
-import keggapi.KEGGLocator;
-
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.FeatureSet;
@@ -87,12 +85,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TabKegg extends InspectorTab
-					implements
-					ActionListener,
-					MultipleFileLoader {
+		implements
+		ActionListener,
+		MultipleFileLoader {
 	private static final long serialVersionUID = 1L;
 	
 	MyDefaultMutableTreeNode myRootNode;
@@ -106,7 +104,7 @@ public class TabKegg extends InspectorTab
 	HashMap<KeggPathwayEntry, MyDefaultMutableTreeNode> pathwayToTreeNode = new HashMap<KeggPathwayEntry, MyDefaultMutableTreeNode>();
 	
 	HashMap<MyDefaultMutableTreeNode, Collection<KeggPathwayEntry>> pathwaysOfTreeNode =
-						new HashMap<MyDefaultMutableTreeNode, Collection<KeggPathwayEntry>>();
+			new HashMap<MyDefaultMutableTreeNode, Collection<KeggPathwayEntry>>();
 	
 	final String noNode = "No node is selected.";
 	private boolean showAnalyzeOption;
@@ -115,11 +113,11 @@ public class TabKegg extends InspectorTab
 		double border = 5;
 		double[][] size = { { border, TableLayoutConstants.FILL, border }, // Columns
 				{ border,
-												TableLayout.PREFERRED,
-												TableLayout.PREFERRED,
-												TableLayoutConstants.FILL,
-												TableLayout.PREFERRED,
-												border } }; // Rows
+						TableLayout.PREFERRED,
+						TableLayout.PREFERRED,
+						TableLayoutConstants.FILL,
+						TableLayout.PREFERRED,
+						border } }; // Rows
 		this.setLayout(new TableLayout(size));
 		
 		getOrganismListFromKegg = new JMButton("<html>Select Organisms");
@@ -128,19 +126,19 @@ public class TabKegg extends InspectorTab
 		getOrganismListFromKegg.setOpaque(false);
 		
 		JComponent helpButton = FolderPanel.getHelpButton(
-							JLabelJavaHelpLink.getHelpActionListener("panel_kegg"), getBackground());
+				JLabelJavaHelpLink.getHelpActionListener("panel_kegg"), getBackground());
 		
 		JComponent orgList;
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp))
 			orgList =
-								TableLayout.getSplit(
-													getOrganismListFromKegg,
-													TableLayout.getSplit(
-																		new JLabel(""),
-																		helpButton,
-																		5, TableLayout.PREFERRED),
-													TableLayout.FILL,
-													TableLayout.PREFERRED);
+					TableLayout.getSplit(
+							getOrganismListFromKegg,
+							TableLayout.getSplit(
+									new JLabel(""),
+									helpButton,
+									5, TableLayout.PREFERRED),
+							TableLayout.FILL,
+							TableLayout.PREFERRED);
 		else
 			orgList = getOrganismListFromKegg;
 		
@@ -159,9 +157,9 @@ public class TabKegg extends InspectorTab
 					}
 				};
 				BackgroundTaskHelper bth = new BackgroundTaskHelper(workTask, ks,
-									"Pathway-Dataset Analysis",
-									"Pathway-Dataset Analysis",
-									true, false);
+						"Pathway-Dataset Analysis",
+						"Pathway-Dataset Analysis",
+						true, false);
 				bth.startWork(MainFrame.getInstance());
 			}
 		});
@@ -214,8 +212,8 @@ public class TabKegg extends InspectorTab
 				TreePath[] selPaths = keggTree.getSelectionPaths();
 				if (selPaths == null) {
 					MainFrame.showMessageDialog(
-										"Please select a pathway or pathway group from the tree above!",
-										"Information");
+							"Please select a pathway or pathway group from the tree above!",
+							"Information");
 				} else {
 					final SortedSet<KeggPathwayEntry> entries = new TreeSet<KeggPathwayEntry>();
 					for (TreePath path : selPaths) {
@@ -255,30 +253,31 @@ public class TabKegg extends InspectorTab
 		});
 		
 		JLabel keggDesc = new JLabel(
-							"<html><small>KEGG Pathway SOAP/Web-access:");
+				"<html><small>KEGG Pathway access:");
 		keggDesc.setBackground(null);
 		keggDesc.setOpaque(false);
 		
 		JComponent kgmlVersionSelection = KeggHelper.getKGMLversionSelectionCombobox();
 		
 		if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR)
-			orgList = TableLayout.getSplit(orgList, kgmlVersionSelection, TableLayout.FILL, TableLayout.PREFERRED);
+			orgList = TableLayout.getSplit(orgList, null/* kgmlVersionSelection */,
+					TableLayout.FILL, TableLayout.PREFERRED);
 		
 		JComponent searchPathway = TableLayout.getSplit(new JLabel("Search"), searchBox, TableLayout.PREFERRED, TableLayout.FILL);
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
 			this.add(
-								TableLayout.getSplitVertical(
-													keggDesc,
-													orgList,
-													TableLayout.PREFERRED, TableLayout.PREFERRED), "1,1");
+					TableLayout.getSplitVertical(
+							keggDesc,
+							orgList,
+							TableLayout.PREFERRED, TableLayout.PREFERRED), "1,1");
 		else
 			this.add(orgList, "1,1");
 		if (showAnalyzeOption && ReleaseInfo.getIsAllowedFeature(FeatureSet.DATAMAPPING))
 			this.add(TableLayout.getSplit(btnCheckMappingCount, btnResetMappingInfo, TableLayout.FILL, TableLayout.PREFERRED), "1,2");
 		this.add(pathwayTreeScroll, "1,3");
 		this.add(
-							TableLayout.get3SplitVertical(searchPathway, null, lowerPane, TableLayout.PREFERRED, 3, TableLayout.PREFERRED),
-							"1,4");
+				TableLayout.get3SplitVertical(searchPathway, null, lowerPane, TableLayout.PREFERRED, 3, TableLayout.PREFERRED),
+				"1,4");
 		
 		this.validate();
 	}
@@ -297,69 +296,69 @@ public class TabKegg extends InspectorTab
 	}
 	
 	private static void processPathwayLoading(final SortedSet<KeggPathwayEntry> entries, final int maxColumns,
-						final Boolean processMapLinks) {
+			final Boolean processMapLinks) {
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Load Pathways", "");
 		final Graph superGraph = new AdjListGraph(new ListenerManager());
 		BackgroundTaskHelper.issueSimpleTask("Load Pathway Selection", "Please wait...",
-							new Runnable() {
-								public void run() {
-									int maxCol = maxColumns - 1;
-									int col = 0;
-									double offX = 0;
-									double offY = 0;
-									double space = 50;
-									double maxHeightInColumn = 0;
-									double workLoad = entries.size();
-									double progress = 0;
-									for (KeggPathwayEntry myEntry : entries) {
-										if (status.wantsToStop()) {
-											status.setCurrentStatusText1("Processing incomplete!");
-											status.setCurrentStatusText2("Operation aborted.");
-											break;
-										}
-										Graph g = new AdjListGraph(new ListenerManager());
-										status.setCurrentStatusText1("Load Pathway:");
-										status.setCurrentStatusText2(myEntry.getMapName() + ": " + myEntry.getPathwayName());
-										KeggService.loadPathway(myEntry, g, null, false, false, getAutoPrettifyLabelSetting());
-										progress = progress + 1;
-										status.setCurrentStatusValueFine(100d * progress / workLoad);
-										
-										if (g != null && g.getNodes().size() > 0) {
-											Vector2d d = NodeTools.getMaximumXY(g.getNodes(), 1d, 0, 0, true);
-											for (Node n : g.getNodes()) {
-												NodeHelper nh = new NodeHelper(n);
-												Point2D p = nh.getPosition();
-												nh.setPosition(p.getX() + offX, p.getY() + offY);
-												nh.setClusterID("path:" + myEntry.getMapName());
-											}
-											offX += d.x;
-											offX += space;
-											superGraph.addGraph(g);
-											if (d.y > maxHeightInColumn)
-												maxHeightInColumn = d.y;
-											col++;
-											if (col > maxCol) {
-												offY += maxHeightInColumn;
-												offY += space;
-												offX = 0;
-												col = 0;
-												maxHeightInColumn = 0;
-											}
-										}
-									}
-									if (processMapLinks != null && processMapLinks)
-										processMapLinks(status, superGraph);
-									
-									status.setCurrentStatusText1("Processing complete. Initalize graph view.");
-									status.setCurrentStatusText2("Please wait. This may take a few moments.");
-									status.setCurrentStatusValueFine(-1);
+				new Runnable() {
+					public void run() {
+						int maxCol = maxColumns - 1;
+						int col = 0;
+						double offX = 0;
+						double offY = 0;
+						double space = 50;
+						double maxHeightInColumn = 0;
+						double workLoad = entries.size();
+						double progress = 0;
+						for (KeggPathwayEntry myEntry : entries) {
+							if (status.wantsToStop()) {
+								status.setCurrentStatusText1("Processing incomplete!");
+								status.setCurrentStatusText2("Operation aborted.");
+								break;
+							}
+							Graph g = new AdjListGraph(new ListenerManager());
+							status.setCurrentStatusText1("Load Pathway:");
+							status.setCurrentStatusText2(myEntry.getMapName() + ": " + myEntry.getPathwayName());
+							KeggService.loadPathway(myEntry, g, null, false, false, getAutoPrettifyLabelSetting());
+							progress = progress + 1;
+							status.setCurrentStatusValueFine(100d * progress / workLoad);
+							
+							if (g != null && g.getNodes().size() > 0) {
+								Vector2d d = NodeTools.getMaximumXY(g.getNodes(), 1d, 0, 0, true);
+								for (Node n : g.getNodes()) {
+									NodeHelper nh = new NodeHelper(n);
+									Point2D p = nh.getPosition();
+									nh.setPosition(p.getX() + offX, p.getY() + offY);
+									nh.setClusterID("path:" + myEntry.getMapName());
 								}
-							}, new Runnable() {
-								public void run() {
-									if (!status.wantsToStop())
-										MainFrame.getInstance().showGraph(superGraph, null);
+								offX += d.x;
+								offX += space;
+								superGraph.addGraph(g);
+								if (d.y > maxHeightInColumn)
+									maxHeightInColumn = d.y;
+								col++;
+								if (col > maxCol) {
+									offY += maxHeightInColumn;
+									offY += space;
+									offX = 0;
+									col = 0;
+									maxHeightInColumn = 0;
 								}
-							}, status);
+							}
+						}
+						if (processMapLinks != null && processMapLinks)
+							processMapLinks(status, superGraph);
+						
+						status.setCurrentStatusText1("Processing complete. Initalize graph view.");
+						status.setCurrentStatusText2("Please wait. This may take a few moments.");
+						status.setCurrentStatusValueFine(-1);
+					}
+				}, new Runnable() {
+					public void run() {
+						if (!status.wantsToStop())
+							MainFrame.getInstance().showGraph(superGraph, null);
+					}
+				}, status);
 	}
 	
 	protected void processPathwayLoading2(final SortedSet<KeggPathwayEntry> entries, final boolean processLabels) {
@@ -374,16 +373,16 @@ public class TabKegg extends InspectorTab
 		
 		if (entries.size() > 1) {
 			Object[] res = MyInputHelper.getInput(
-								"<html>" +
-													"The selected pathways may be loaded into separate windows,<br>" +
-													"or into a single window, where the pathways are layout initially in a grid,<br>" +
-													"so that they do not overlap. The number of columns, used for this grid-layout<br>" +
-													"may be modified with the corresponding setting.",
-								"Load into one view?",
-								new Object[] {
-													"Place pathways in a single view?", new Boolean(true),
-													"Maximum number of columns", new Integer(maxColumns),
-													(isKGMLed ? "Process map-link references?" : null), (isKGMLed ? new Boolean(true) : null)
+					"<html>" +
+							"The selected pathways may be loaded into separate windows,<br>" +
+							"or into a single window, where the pathways are layout initially in a grid,<br>" +
+							"so that they do not overlap. The number of columns, used for this grid-layout<br>" +
+							"may be modified with the corresponding setting.",
+					"Load into one view?",
+					new Object[] {
+							"Place pathways in a single view?", new Boolean(true),
+							"Maximum number of columns", new Integer(maxColumns),
+							(isKGMLed ? "Process map-link references?" : null), (isKGMLed ? new Boolean(true) : null)
 					});
 			if (res == null)
 				return;
@@ -434,9 +433,9 @@ public class TabKegg extends InspectorTab
 		enumerateTree(node, entries);
 		if (entries.size() <= 0)
 			MainFrame.showMessageDialog("<html>" +
-								"Please select a valid pathway entry!<br>" +
-								"(Do not forget to propagate the tree with the pathway list of at least on organism)",
-								"Error");
+					"Please select a valid pathway entry!<br>" +
+					"(Do not forget to propagate the tree with the pathway list of at least on organism)",
+					"Error");
 		else
 			processPathwayLoading2(entries, getAutoPrettifyLabelSetting());
 	}
@@ -495,44 +494,44 @@ public class TabKegg extends InspectorTab
 		if (e.getSource() == getOrganismListFromKegg) {
 			final Collection<OrganismEntry> organisms = new ArrayList<OrganismEntry>();
 			BackgroundTaskHelper.issueSimpleTask(
-								"Retrieve Organism-List",
-								"Please wait (SOAP call is issued)...",
-								new KEGGLocator().getKEGGPortAddress(),
-								new Runnable() {
-									public void run() {
-										try {
-											KeggHelper h = new KeggHelper();
-											organisms.addAll(h.getOrganisms());
-											KoService.getInformationLazy("");
-										} catch (IOException er) {
-											ErrorMsg.addErrorMessage(er);
-										} catch (ServiceException er) {
-											ErrorMsg.addErrorMessage(er);
-										}
-									}
-									
-								},
-								new Runnable() {
-									public void run() {
-										// organismList.add(new OrganismEntry("map", "Reference Pathways"));
-										if (organisms.size() <= 2) {
-											MainFrame
-																.showMessageDialog(
-																					"<html>Error: could not retrieve KEGG organism list!<br>Check the error log with <i>Help/Error Messages</i> for detailed information.",
-																					"Error");
-										} else {
-											OrganismEntry[] oe = getKEGGorganismFromUser(organisms);
-											if (oe != null)
-												updateTreeForOrganism(oe);
-										}
-										// for (OrganismEntry oe : organismList)
-										// selectOrganism.addItem(oe);
-										// if (selectOrganism.getItemCount()>0) {
-										// getOrganismListFromKegg.setText("<html>Select organism:");
-										// }
-									}
-									
-								});
+					"Retrieve Organism-List",
+					"Please wait (retrieve data)...",
+					"",
+					new Runnable() {
+						public void run() {
+							try {
+								KeggHelper h = new KeggHelper();
+								organisms.addAll(h.getOrganisms());
+								KoService.getInformationLazy("");
+							} catch (IOException er) {
+								ErrorMsg.addErrorMessage(er);
+							} catch (ServiceException er) {
+								ErrorMsg.addErrorMessage(er);
+							}
+						}
+						
+					},
+					new Runnable() {
+						public void run() {
+							// organismList.add(new OrganismEntry("map", "Reference Pathways"));
+							if (organisms.size() <= 2) {
+								MainFrame
+										.showMessageDialog(
+												"<html>Error: could not retrieve KEGG organism list!<br>Check the error log with <i>Help/Error Messages</i> for detailed information.",
+												"Error");
+							} else {
+								OrganismEntry[] oe = getKEGGorganismFromUser(organisms);
+								if (oe != null)
+									updateTreeForOrganism(oe);
+							}
+							// for (OrganismEntry oe : organismList)
+							// selectOrganism.addItem(oe);
+							// if (selectOrganism.getItemCount()>0) {
+							// getOrganismListFromKegg.setText("<html>Select organism:");
+							// }
+						}
+						
+					});
 		}
 		//
 		// if (e.getSource() == selectOrganism) {
@@ -549,13 +548,13 @@ public class TabKegg extends InspectorTab
 		organismSelection.setFixedCellHeight(new JLabel("<html>AyÖÄ").getPreferredSize().height);
 		
 		Collections.sort((List<OrganismEntry>) organisms,
-							new Comparator<OrganismEntry>() {
-								public int compare(final OrganismEntry arg0, OrganismEntry arg1) {
-									if (arg0.toString().contains("Reference"))
-										return -1;
-									return arg0.toString().compareTo(arg1.toString());
-								}
-							});
+				new Comparator<OrganismEntry>() {
+					public int compare(final OrganismEntry arg0, OrganismEntry arg1) {
+						if (arg0.toString().contains("Reference"))
+							return -1;
+						return arg0.toString().compareTo(arg1.toString());
+					}
+				});
 		for (OrganismEntry oe : organisms) {
 			organismSelection.getContents().addElement(oe);
 		}
@@ -599,14 +598,14 @@ public class TabKegg extends InspectorTab
 		
 		// MyOrganismSelectionDialog osd = new MyOrganismSelectionDialog();
 		Object[] result = MyInputHelper.getInput(
-							"Please select the desired organisms.<br>" +
-												"<small>You may use the Search-Field to locate the " +
-												"desired organism.",
-							"Select Organisms",
-							new Object[] {
-												"Select Organisms", organismSelectionScrollPane,
-												"Search", filter,
-												"", searchResult
+				"Please select the desired organisms.<br>" +
+						"<small>You may use the Search-Field to locate the " +
+						"desired organism.",
+				"Select Organisms",
+				new Object[] {
+						"Select Organisms", organismSelectionScrollPane,
+						"Search", filter,
+						"", searchResult
 				});
 		if (result != null && organismSelection.getSelectedValue() != null) {
 			Object[] ooo = organismSelection.getSelectedValues();
@@ -631,13 +630,13 @@ public class TabKegg extends InspectorTab
 				if (tn.getUserObject() != null && tn.getUserObject() instanceof KeggPathwayEntry) {
 					KeggPathwayEntry kpe = (KeggPathwayEntry) tn.getUserObject();
 					((JComponent) cmp).setToolTipText(
-										"<html><b>" + kpe.getMapName() + "</b>" +
-															" (" + kpe.getPathwayName() + ")" +
-															// "<br>"+
-												// "URL: "+kpe.getPathwayURLstring()+""+
-												kpe.getMappingCountDescription("<br>Data Mapping (<br>matching substances</b>/enzymes/compounds/nodes): ") +
-															"<br><br><center><b>Double-click to load pathway in a new network view</b></center>"
-										);
+							"<html><b>" + kpe.getMapName() + "</b>" +
+									" (" + kpe.getPathwayName() + ")" +
+									// "<br>"+
+									// "URL: "+kpe.getPathwayURLstring()+""+
+									kpe.getMappingCountDescription("<br>Data Mapping (<br>matching substances</b>/enzymes/compounds/nodes): ") +
+									"<br><br><center><b>Double-click to load pathway in a new network view</b></center>"
+							);
 				} else
 					((JComponent) cmp).setToolTipText("<html><b>Double-click to load a group of pathways<br>in separate network views or into a single one</b>");
 				return cmp;
@@ -657,31 +656,30 @@ public class TabKegg extends InspectorTab
 				final Collection<KeggPathwayEntry> pathways = new ArrayList<KeggPathwayEntry>();
 				final BackgroundTaskStatusProviderSupportingExternalCall status =
 						new BackgroundTaskStatusProviderSupportingExternalCallImpl("Refresh Pathway-List",
-								new KEGGLocator().getKEGGPortAddress());
+								"");
 				BackgroundTaskHelper.issueSimpleTask(
-									"Refresh Pathway-List",
-									"Please wait (SOAP/FTP call and pathway group lookup is performed)...",
-									new Runnable() {
-										public void run() {
-											try {
-												String url2 = "http://www.genome.ad.jp";
-												KeggHelper h = new KeggHelper();
-												pathways.addAll(h.getXMLpathways(url2, organism, true, status));
-											} catch (MalformedURLException er) {
-												ErrorMsg.addErrorMessage(er.getLocalizedMessage());
-											} catch (IOException er) {
-												ErrorMsg.addErrorMessage(er.getLocalizedMessage());
-											} catch (ServiceException e) {
-												ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-											}
-										}
-									},
-									new Runnable() {
-										public void run() {
-											pathwaysOfTreeNode.put(myRootNode2, pathways);
-											buildPathwayTree(null, myRootNode2, pathways);
-										}
-									}, status);
+						"Refresh Pathway-List",
+						"Please wait (SOAP/FTP call and pathway group lookup is performed)...",
+						new Runnable() {
+							public void run() {
+								try {
+									KeggHelper h = new KeggHelper();
+									pathways.addAll(h.getXMLpathways(organism, true, status));
+								} catch (MalformedURLException er) {
+									ErrorMsg.addErrorMessage(er.getLocalizedMessage());
+								} catch (IOException er) {
+									ErrorMsg.addErrorMessage(er.getLocalizedMessage());
+								} catch (ServiceException e) {
+									ErrorMsg.addErrorMessage(e.getLocalizedMessage());
+								}
+							}
+						},
+						new Runnable() {
+							public void run() {
+								pathwaysOfTreeNode.put(myRootNode2, pathways);
+								buildPathwayTree(null, myRootNode2, pathways);
+							}
+						}, status);
 			}
 		}
 	}
@@ -714,7 +712,7 @@ public class TabKegg extends InspectorTab
 	
 	@SuppressWarnings("unchecked")
 	private void buildPathwayTree(String searchText, MyDefaultMutableTreeNode myRootNode,
-						Collection<KeggPathwayEntry> keggPathways) {
+			Collection<KeggPathwayEntry> keggPathways) {
 		myRootNode.removeAllChildren();
 		Collection<MyDefaultMutableTreeNode> addLater = new ArrayList<MyDefaultMutableTreeNode>();
 		if (keggPathways == null)
@@ -791,20 +789,20 @@ public class TabKegg extends InspectorTab
 		boolean isKGMLed = (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR);
 		if (files.length > 1) {
 			Object[] res = MyInputHelper.getInput(
-								"<html>" +
-													"The selected files may be loaded into separate windows,<br>" +
-													"or into a single window, where the graphs are layout initially in a grid,<br>" +
-													"so that they do not overlap. The number of columns, used for this grid-layout<br>" +
-													"may be modified with the corresponding setting." +
-													(isKGMLed ? "<br>" +
-																		"In case multiple files (pathways) are loaded into one view, you may optionally<br>" +
-																		"resolve defined map links pointing from one loaded pathway to anthother." +
-																		"" : ""),
-								"Load into one view?",
-								new Object[] {
-													"Place graphs in a single view?", new Boolean(true),
-													"Maximum number of columns", new Integer(maxColumns),
-													(isKGMLed ? "Process map-link references?" : null), (isKGMLed ? new Boolean(true) : null)
+					"<html>" +
+							"The selected files may be loaded into separate windows,<br>" +
+							"or into a single window, where the graphs are layout initially in a grid,<br>" +
+							"so that they do not overlap. The number of columns, used for this grid-layout<br>" +
+							"may be modified with the corresponding setting." +
+							(isKGMLed ? "<br>" +
+									"In case multiple files (pathways) are loaded into one view, you may optionally<br>" +
+									"resolve defined map links pointing from one loaded pathway to anthother." +
+									"" : ""),
+					"Load into one view?",
+					new Object[] {
+							"Place graphs in a single view?", new Boolean(true),
+							"Maximum number of columns", new Integer(maxColumns),
+							(isKGMLed ? "Process map-link references?" : null), (isKGMLed ? new Boolean(true) : null)
 					});
 			if (res == null)
 				return;
@@ -832,80 +830,80 @@ public class TabKegg extends InspectorTab
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Load Pathways...", "");
 		final Graph superGraph = new AdjListGraph(new ListenerManager());
 		BackgroundTaskHelper.issueSimpleTask("Load Files", "Please wait...",
-							new Runnable() {
-								public void run() {
-									int maxCol = maxColumns - 1;
-									int col = 0;
-									double offX = 0;
-									double offY = 0;
-									double space = 50;
-									double maxHeightInColumn = 0;
-									double workLoad = files.length;
-									double progress = 0;
-									for (File file : files) {
-										if (status.wantsToStop()) {
-											status.setCurrentStatusText1("Processing incomplete!");
-											status.setCurrentStatusText2("Operation aborted.");
-											break;
-										}
-										status.setCurrentStatusText1("Load File:");
-										status.setCurrentStatusText2(file.getName());
-										Graph g = null;
-										try {
-											g = MainFrame.getInstance().getGraph(file);
-										} catch (Exception e) {
-											ErrorMsg.addErrorMessage(e);
-											continue;
-										}
-										progress = progress + 1;
-										status.setCurrentStatusValueFine(100d * progress / workLoad);
-										
-										if (g != null && g.getNodes().size() > 0) {
-											Vector2d d = NodeTools.getMaximumXY(g.getNodes(), 1d, 0, 0, true);
-											for (Node n : g.getNodes()) {
-												NodeHelper nh = new NodeHelper(n);
-												Point2D p = nh.getPosition();
-												nh.setPosition(p.getX() + offX, p.getY() + offY);
-												if (nh.getClusterID("").equals("")) {
-													String id22 = KeggGmlHelper.getKeggId(g);
-													if (id22 != null && id22.length() > 0)
-														nh.setClusterID(id22);
-													else
-														nh.setClusterID("file:" + file.getName());
-												}
-											}
-											for (Edge e : g.getEdges()) {
-												EdgeHelper.moveBends(e, offX, offY);
-											}
-											
-											offX += d.x;
-											offX += space;
-											superGraph.addGraph(g);
-											if (d.y > maxHeightInColumn)
-												maxHeightInColumn = d.y;
-											col++;
-											if (col > maxCol) {
-												offY += maxHeightInColumn;
-												offY += space;
-												offX = 0;
-												col = 0;
-												maxHeightInColumn = 0;
-											}
-										}
+				new Runnable() {
+					public void run() {
+						int maxCol = maxColumns - 1;
+						int col = 0;
+						double offX = 0;
+						double offY = 0;
+						double space = 50;
+						double maxHeightInColumn = 0;
+						double workLoad = files.length;
+						double progress = 0;
+						for (File file : files) {
+							if (status.wantsToStop()) {
+								status.setCurrentStatusText1("Processing incomplete!");
+								status.setCurrentStatusText2("Operation aborted.");
+								break;
+							}
+							status.setCurrentStatusText1("Load File:");
+							status.setCurrentStatusText2(file.getName());
+							Graph g = null;
+							try {
+								g = MainFrame.getInstance().getGraph(file);
+							} catch (Exception e) {
+								ErrorMsg.addErrorMessage(e);
+								continue;
+							}
+							progress = progress + 1;
+							status.setCurrentStatusValueFine(100d * progress / workLoad);
+							
+							if (g != null && g.getNodes().size() > 0) {
+								Vector2d d = NodeTools.getMaximumXY(g.getNodes(), 1d, 0, 0, true);
+								for (Node n : g.getNodes()) {
+									NodeHelper nh = new NodeHelper(n);
+									Point2D p = nh.getPosition();
+									nh.setPosition(p.getX() + offX, p.getY() + offY);
+									if (nh.getClusterID("").equals("")) {
+										String id22 = KeggGmlHelper.getKeggId(g);
+										if (id22 != null && id22.length() > 0)
+											nh.setClusterID(id22);
+										else
+											nh.setClusterID("file:" + file.getName());
 									}
-									if (processMapLinks != null && processMapLinks)
-										processMapLinks(status, superGraph);
-									
-									status.setCurrentStatusText1("Processing complete. Initalize graph view.");
-									status.setCurrentStatusText2("Please wait. This may take a few moments.");
-									status.setCurrentStatusValueFine(-1);
 								}
-							}, new Runnable() {
-								public void run() {
-									if (!status.wantsToStop())
-										MainFrame.getInstance().showGraph(superGraph, null);
+								for (Edge e : g.getEdges()) {
+									EdgeHelper.moveBends(e, offX, offY);
 								}
-							}, status);
+								
+								offX += d.x;
+								offX += space;
+								superGraph.addGraph(g);
+								if (d.y > maxHeightInColumn)
+									maxHeightInColumn = d.y;
+								col++;
+								if (col > maxCol) {
+									offY += maxHeightInColumn;
+									offY += space;
+									offX = 0;
+									col = 0;
+									maxHeightInColumn = 0;
+								}
+							}
+						}
+						if (processMapLinks != null && processMapLinks)
+							processMapLinks(status, superGraph);
+						
+						status.setCurrentStatusText1("Processing complete. Initalize graph view.");
+						status.setCurrentStatusText2("Please wait. This may take a few moments.");
+						status.setCurrentStatusValueFine(-1);
+					}
+				}, new Runnable() {
+					public void run() {
+						if (!status.wantsToStop())
+							MainFrame.getInstance().showGraph(superGraph, null);
+					}
+				}, status);
 		
 	}
 	

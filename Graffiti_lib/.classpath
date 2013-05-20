@@ -30,8 +30,6 @@
 	<classpathentry kind="lib" path="jaxrpc.jar"/>
 	<classpathentry kind="lib" path="jcommon-0.9.5.jar"/>
 	<classpathentry kind="lib" path="jruby.jar"/>
-	<classpathentry kind="lib" path="keggapi.jar"/>
-	<classpathentry kind="lib" path="mail.jar"/>
 	<classpathentry kind="lib" path="optional.jar"/>
 	<classpathentry kind="lib" path="parser.jar"/>
 	<classpathentry kind="lib" path="pdf-transcoder.jar"/>

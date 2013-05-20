@@ -15,7 +15,6 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 
 public class ActionNavigateDataSource extends AbstractNavigationAction {
-	
 	private NavigationButton src;
 	private final DataSourceLevel dataSourceLevel;
 	private ArrayList<NavigationButton> actions;
@@ -131,5 +130,4 @@ public class ActionNavigateDataSource extends AbstractNavigationAction {
 	public DataSourceLevel getDataSourceLevel() {
 		return dataSourceLevel;
 	}
-	
 }

@@ -7,16 +7,10 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe;
 
 import java.awt.Dimension;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeSet;
-
-import javax.xml.rpc.ServiceException;
-
-import keggapi.KEGGLocator;
-import keggapi.KEGGPortType;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProvider;
@@ -36,6 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.IndexAndString;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
 
@@ -114,17 +109,6 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 		int workLoad = nodes.size();
 		int cnt = 0;
 		int renameCount = 0;
-		KEGGPortType serv;
-		try {
-			if (reactionNameToId || reactionIdToEcName) {
-				KEGGLocator locator = new KEGGLocator();
-				serv = locator.getKEGGPort();
-			} else
-				serv = null;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-			serv = null;
-		}
 		
 		if (nodes == null || nodes.size() <= 0)
 			return;
@@ -195,7 +179,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 						String myTargetName = "";
 						for (IndexAndString ias : KeggGmlHelper.getKeggReactions(n)) {
 							try {
-								String[] enz = serv.get_enzymes_by_reaction(ias.getValue());
+								String[] enz = KeggHelper.get_enzymes_by_reaction(ias.getValue());
 								for (int i = 0; i < enz.length; i++) {
 									if (myTargetName.length() > 0)
 										myTargetName = myTargetName + ", " + enz[i];
@@ -206,7 +190,7 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 									targetName = myTargetName;
 									targetName = StringManipulationTools.stringReplace(targetName, "ec:", "");
 								}
-							} catch (RemoteException e) {
+							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
 						}

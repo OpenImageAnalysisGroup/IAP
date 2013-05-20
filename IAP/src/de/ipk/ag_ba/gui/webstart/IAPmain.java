@@ -44,6 +44,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
@@ -55,6 +56,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Experime
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DBEsplashScreen;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -199,6 +201,15 @@ public class IAPmain extends JApplet {
 		JPanel statusPanel = new JPanel();
 		
 		mainFrame1 = new MainFrame(GravistoMainHelper.getPluginManager(), uiPrefs, statusPanel, true);
+		
+		try {
+			mainFrame1.setIconImage(IAPimages.getImage("img/vanted1_0.png"));
+			// AbstractIAPplugin.getIAPicon().getImage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
+		}
+		
 		// mainFrame2 = new MainFrame(GravistoMainHelper.getNewPluginManager(), uiPrefs, statusPanel, true);
 		
 		setLayout(new TableLayout(new double[][] { { TableLayout.FILL }, { TableLayout.FILL } }));
@@ -481,9 +492,19 @@ public class IAPmain extends JApplet {
 				}
 			} else {
 				if (jf != null) {
-					jf.setVisible(false);
-					jf.setVisible(true);
+					// jf.setVisible(false);
+					// jf.setVisible(true);
 				}
+			}
+			if (jf != null) {
+				final JFrame jff = jf;
+				BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+					@Override
+					public void run() {
+						jff.toFront();
+						jff.repaint();
+					}
+				});
 			}
 		}
 		return null;
@@ -560,15 +581,18 @@ public class IAPmain extends JApplet {
 		res.add(fillLen("**", l));
 		res.add("***************************************************");
 		res.add(fillLen("**", l));
-		res.add(fillLenLA("*  System development:  *", " ", l, 2));
+		res.add(fillLenLA("*  Design and main development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Christian Klukas  *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Contribution to pipeline development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Jean-Michel Pape  *", " ", l, 2));
 		res.add(fillLen("**", l));
-		res.add(fillLenLA("*  External statistics and growth modelling:  *", " ", l, 2));
-		res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
-		res.add(fillLen("**", l));
+		boolean modellingAvailable = false;
+		if (modellingAvailable) {
+			res.add(fillLenLA("*  External statistics and growth modelling:  *", " ", l, 2));
+			res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
+			res.add(fillLen("**", l));
+		}
 		res.add(fillLenLA("*  Contribution to library code and external *", " ", l, 2));
 		res.add(fillLenLA("*     scripts: H. Rohn (PBI), A. Entzian  *", " ", l, 2));
 		res.add(fillLen("**", l));

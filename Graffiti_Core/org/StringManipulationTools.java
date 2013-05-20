@@ -896,4 +896,9 @@ public class StringManipulationTools implements HelperClass {
 		}
 		return getStringList(res, "\r\n");
 	}
+	
+	public static String txt2html(String txt) {
+		txt = stringReplace(txt, "\n", "<br>");
+		return "<html><code>" + txt + "</code>";
+	}
 }

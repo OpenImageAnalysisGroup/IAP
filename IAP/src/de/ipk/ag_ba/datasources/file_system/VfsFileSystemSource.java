@@ -24,13 +24,20 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
+import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.experiment.hsm.DataExportHelper;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
+import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.vanted.plugin.VfsFileObject;
@@ -51,51 +58,127 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	
 	protected final VirtualFileSystem url;
 	private final String[] validExtensions2;
+	private String subfolder;
+	ArrayList<NavigationAction> folderActions = new ArrayList<NavigationAction>();
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage mainDataSourceIconActive,
 			NavigationImage folderIcon) {
+		this(lib, dataSourceName, folder, validExtensions, mainDataSourceIcon, mainDataSourceIconActive, folderIcon, null);
+	}
+	
+	private VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
+			String[] validExtensions,
+			NavigationImage mainDataSourceIcon, NavigationImage mainDataSourceIconActive,
+			NavigationImage folderIcon, String subfolder) {
 		super(lib, dataSourceName,
 				(folder instanceof VirtualFileSystemFolderStorage ?
 						((VirtualFileSystemFolderStorage) folder).getTargetPathName() : null),
 				mainDataSourceIcon, mainDataSourceIcon, folderIcon);
 		this.url = folder;
 		validExtensions2 = validExtensions;
+		this.subfolder = subfolder;
 	}
 	
 	@Override
 	public void readDataSource() throws Exception {
 		this.read = true;
 		this.mainList = new ArrayList<PathwayWebLinkItem>();
-		// read index folder
-		String[] entries = url.listFiles(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME, new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".iap.index.csv");
-			}
-		});
-		
+		folderActions.clear();
 		HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data =
 				new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
-		
-		if (entries != null)
-			for (String fileName : entries) {
-				long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
-				
-				ExperimentHeader eh = getExperimentHeaderFromFileName(url, fileName);
-				
-				if (accessOK(eh)) {
-					String experimentName = eh.getExperimentName();
-					if (!experimentName2saveTime2data.containsKey(experimentName))
-						experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
-					experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
-					eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
-				}
-			}
-		
 		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
 		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
+		
+		// read folder content (if valid file extensions are not empty)
+		if (validExtensions2 != null && validExtensions2.length > 0) {
+			// read folders...
+			for (final String fn : url.listFolders(subfolder)) {
+				if (fn.equals(VirtualFileSystemVFS2.DIRECTORY_FOLDER_NAME) || fn.equals(VirtualFileSystemVFS2.DATA_FOLDER_NAME)
+						|| fn.equals(VirtualFileSystemVFS2.CONDITION_FOLDER_NAME) || fn.equals(VirtualFileSystemVFS2.ICON_FOLDER_NAME))
+					continue;
+				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(new Library(),
+						fn, url,
+						validExtensions2, mainDataSourceIconInactive, mainDataSourceIconInactive, folderIcon,
+						subfolder != null ? subfolder + File.separator + fn : fn);
+				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm) {
+					
+					@Override
+					public String getDefaultTitle() {
+						return fn;
+					}
+					
+				};
+				folderActions.add(action);
+			}
+			// WebDirectoryFileListAccess.getWebDirectoryFileListItems(url, validExtensions2, false);
+			// read files...
+			for (String fn : url.listFiles(subfolder, new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					boolean accept = false;
+					for (String validExt : validExtensions2) {
+						if (name.endsWith(validExt)) {
+							accept = true;
+							break;
+						}
+					}
+					return accept;
+				}
+			})) {
+				String folder = subfolder == null ? "" : subfolder + "/";
+				IOurl u = url.getIOurlFor(folder + fn);
+				if (fn.endsWith(".gml") || fn.endsWith(".graphml"))
+					folderActions.add(IAPservice.getPathwayViewAction(new PathwayWebLinkItem(fn, u, false)));
+				else {
+					String icon = null;
+					if (fn != null && fn.contains("."))
+						icon = IAPimages.getImageFromFileExtension(fn.substring(fn.lastIndexOf(".")));
+					if (icon != null)
+						lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u, icon));
+					else
+						lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u));
+				}
+			}
+		}
+		if (subfolder == null) {
+			// read index folder
+			String[] entries = url.listFiles(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME, new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".iap.index.csv");
+				}
+			});
+			
+			if (entries != null)
+				for (String fileName : entries) {
+					long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
+					
+					ExperimentHeader eh = getExperimentHeaderFromFileName(url, fileName);
+					
+					if (accessOK(eh)) {
+						String experimentName = eh.getExperimentName();
+						if (!experimentName2saveTime2data.containsKey(experimentName))
+							experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
+						experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
+						eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
+					}
+				}
+		}
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) throws Exception {
+		if (!read)
+			readDataSource();
+		Collection<NavigationButton> folderButtons = new ArrayList<NavigationButton>();
+		for (NavigationAction na : folderActions)
+			folderButtons.add(new NavigationButton(na, src.getGUIsetting()));
+		if (subfolder == null)
+			for (NavigationButton nb : super.getAdditionalEntities(src))
+				folderButtons.add(nb);
+		return folderButtons;
 	}
 	
 	public ExperimentHeader getExperimentHeaderFromFileName(final VirtualFileSystem vfs, final String fileName) throws Exception {
@@ -224,5 +307,14 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			checkedLevels.add(cl);
 		}
 		return res;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.datasources.DataSourceLevel#getBookReferencesAtThisLevel()
+	 */
+	@Override
+	public ArrayList<Book> getReferenceInfos() {
+		return lib.getBooksInFolder("");
 	}
 }

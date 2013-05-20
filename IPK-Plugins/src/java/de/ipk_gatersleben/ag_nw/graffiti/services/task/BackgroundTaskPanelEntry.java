@@ -24,6 +24,7 @@ import org.FolderPanel;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.SystemInfo;
+import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.gui.ToolButton;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.MyGraphicsTools;
@@ -261,6 +262,8 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 	 */
 	@Override
 	public void setStatusProvider(final BackgroundTaskStatusProvider statusProvider, String title, String taskMessage) {
+		if (taskMessage == null)
+			taskMessage = "" + System.currentTimeMillis();
 		taskMessage = StringManipulationTools.stringReplace(taskMessage, "<br>", " ").trim();
 		putClientProperty("title", taskMessage);
 		this.taskMessage = taskMessage;

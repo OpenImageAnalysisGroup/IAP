@@ -33,12 +33,12 @@ public class PluginInfoHelper implements HelperClass {
 	public static String pretifyPluginList(Collection<PluginEntry> pluginEntries) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><font face='arial'>" +
-							"<h3><font face='arial'>" + pluginEntries.size() + "  plugins are loaded, content overview:</h3>");
+				"<h3><font face='arial'>" + pluginEntries.size() + "  plugins are loaded, content overview:</h3>");
 		
 		sb.append(getPluginContentStatistics(pluginEntries));
 		
 		sb.append("<h3><font face='arial'>List of loaded plugins:</h3>" +
-							"<table border='1'>");
+				"<table border='1'>");
 		getPluginDescriptionTableHeader(sb);
 		for (PluginEntry dpe : pluginEntries) {
 			getPluginDescriptionHTMLtableRow(sb, dpe);
@@ -65,16 +65,16 @@ public class PluginInfoHelper implements HelperClass {
 		GenericPlugin gp = dpe.getPlugin();
 		PluginDescription pd = dpe.getDescription();
 		sb.append("<tr>");
-		sb.append("<td><font face='arial'>" + pd.getName() + "<br><small><br>" + pd.getAuthor() + "<br><br>" +
-							"" + pretifyPackageName(gp.getClass().getPackage().getName()) + "</small></td>");
+		sb.append("<td><font face='arial'>Plugin: " + pd.getName() + "<br><br>Author: " + pd.getAuthor() + "<br><br><small>" +
+				"" + pretifyPackageName(gp.getClass().getPackage().getName()) + "</small></td>");
 		sb.append("<td><font face='arial'>" +
-							getSummaryInfo(true, pd, gp) +
-							"</td>");
+				getSummaryInfo(true, pd, gp) +
+				"</td>");
 		sb.append("</tr>");
 	}
 	
 	private static String getPluginContentStatistics(
-						Collection<PluginEntry> pluginEntries) {
+			Collection<PluginEntry> pluginEntries) {
 		StringBuilder result = new StringBuilder();
 		HashMap<String, ArrayList<PluginEntry>> pluginsByPackage = new HashMap<String, ArrayList<PluginEntry>>();
 		for (PluginEntry pe : pluginEntries) {
@@ -173,9 +173,9 @@ public class PluginInfoHelper implements HelperClass {
 	
 	private static String pretifyPackageName(String name) {
 		return "" + StringManipulationTools.stringReplace(
-							StringManipulationTools.stringReplace(name,
-												".ag_nw.", ".<br>ag_nw."),
-							".plugins", ".<br>plugins") + "";
+				StringManipulationTools.stringReplace(name,
+						".ag_nw.", ".<br>ag_nw."),
+				".plugins", ".<br>plugins") + "";
 	}
 	
 	private static String getListenerList(GenericPlugin gp) {
@@ -347,11 +347,11 @@ public class PluginInfoHelper implements HelperClass {
 	}
 	
 	private static void checkContextMenuProcessing(Object gp,
-						StringBuilder sb, String in, String pre2) {
+			StringBuilder sb, String in, String pre2) {
 		if (gp instanceof ProvidesGeneralContextMenu
-							|| gp instanceof ProvidesNodeContextMenu
-							|| gp instanceof ProvidesEdgeContextMenu
-							|| gp instanceof ProvidesDirectMouseClickContextMenu) {
+				|| gp instanceof ProvidesNodeContextMenu
+				|| gp instanceof ProvidesEdgeContextMenu
+				|| gp instanceof ProvidesDirectMouseClickContextMenu) {
 			
 			sb.append(in);
 			
@@ -399,11 +399,11 @@ public class PluginInfoHelper implements HelperClass {
 				ddd = StringManipulationTools.getWordWrap(ddd, 60);
 		}
 		return (includeVersionAndAvailability ? getInfo("Version: ", pd.getVersion(), "<br>") : "") +
-							(includeVersionAndAvailability ? getInfo("Availability: ", pd.getAvailable(), "<br>") : "") +
-							getInfo("Description: ", ddd, "<br>") +
-							getInfo("Depends on: ", pretifyList(pd.getDependencies()), "<br>") +
-							getInfo("Reacts on: ", getListenerList(gp), "<br>") +
-							getInfo("Plugin Features:<br>", getFeatures("", gp), "");
+				(includeVersionAndAvailability ? getInfo("Availability: ", pd.getAvailable(), "<br>") : "") +
+				getInfo("Description: ", ddd, "<br>") +
+				getInfo("Depends on: ", pretifyList(pd.getDependencies()), "<br>") +
+				getInfo("Reacts on: ", getListenerList(gp), "<br>") +
+				getInfo("Plugin Features:<br>", getFeatures("", gp), "");
 	}
 	
 	private static String getAlgorithmName(Algorithm a, String name) {

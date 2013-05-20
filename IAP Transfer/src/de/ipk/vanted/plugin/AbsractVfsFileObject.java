@@ -66,6 +66,11 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	}
 	
 	@Override
+	public String[] listFolders() throws IOException {
+		throw new UnsupportedOperationException("Not implemented!");
+	}
+	
+	@Override
 	public boolean mkdir() throws IOException {
 		throw new UnsupportedOperationException("Not implemented!");
 	}

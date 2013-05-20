@@ -33,7 +33,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 public class VirtualFileSystemVFS2 extends VirtualFileSystem implements DatabaseTarget {
 	public static final String DIRECTORY_FOLDER_NAME = "index";
 	public static final String DATA_FOLDER_NAME = "data";
-	private static final String CONDITION_FOLDER_NAME = "conditions";
+	public static final String CONDITION_FOLDER_NAME = "conditions";
+	public static final String ICON_FOLDER_NAME = "icons";
 	
 	private final VfsFileProtocol vfs_type;
 	private final String description;
@@ -113,6 +114,32 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			}
 			ArrayList<String> res = new ArrayList<String>();
 			for (String s : file.list()) {
+				res.add(s);
+			}
+			return res;
+		} catch (Exception e) {
+			if (askForPassword)
+				pass = "?";
+			throw e;
+		}
+	}
+	
+	@Override
+	public ArrayList<String> listFolders(String optSubDirectory) throws Exception {
+		String path = folder;
+		if (optSubDirectory != null)
+			path = path + "/" + optSubDirectory;
+		
+		try {
+			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
+					host, path, user, getPass());
+			if (!file.exists()) {
+				if (doPrintStatus())
+					System.out.println(">>>>>> create directory " + path);
+				file.mkdir();
+			}
+			ArrayList<String> res = new ArrayList<String>();
+			for (String s : file.listFolders()) {
 				res.add(s);
 			}
 			return res;
@@ -241,7 +268,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
 		if (url.getDetail() != null && url.getDetail().startsWith("data")) {
-			VfsFileObject file = newVfsFile("icons" + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
+			VfsFileObject file = newVfsFile(ICON_FOLDER_NAME + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
 			if (file != null && file.exists()) {
 				InputStream is = file.getInputStream();
 				if (is != null)
@@ -356,7 +383,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		if (subPath.startsWith(DIRECTORY_FOLDER_NAME) || subPath.startsWith(CONDITION_FOLDER_NAME))
 			throw new UnsupportedOperationException("Invalid storage subpath calculated for experiment " + experimentHeader.getExperimentName()
 					+ ". May not start with " + DIRECTORY_FOLDER_NAME + " or " + CONDITION_FOLDER_NAME + "!");
-		String res = "icons" + File.separator + subPath;
+		String res = ICON_FOLDER_NAME + File.separator + subPath;
 		// if (!new File(res).exists())
 		// new File(res).mkdirs();
 		return res + File.separator + filterBadChars(zefn);

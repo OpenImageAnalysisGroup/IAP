@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,11 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.xml.rpc.ServiceException;
-
-import keggapi.Definition;
-import keggapi.KEGGLocator;
-import keggapi.KEGGPortType;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProvider;
@@ -491,10 +485,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 		if (orthologs) {
 			try {
 				String org = StringManipulationTools.removeNumbersFromString(mapName);
-				KEGGLocator locator = new KEGGLocator();
-				KEGGPortType serv;
-				serv = locator.getKEGGPort();
-				String[] def = serv.get_kos_by_pathway("path:" + mapName);
+				String[] def = KeggHelper.get_kos_by_pathway(mapName);
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
@@ -509,10 +500,10 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 									AttributeHelper.setAttribute(n, "kegg", "present",
 											"putative");
 									if (convertTypeToGeneWhenProcessingOrthologs) {
-										Definition[] genes = serv.get_genes_by_ko(keggID,
+										String[] genes = KeggHelper.get_genes_by_ko(keggID,
 												org);
-										for (Definition d : genes) {
-											genelist.add(d.getEntry_id());
+										for (String d : genes) {
+											genelist.add(d);
 										}
 									}
 									matched = true;
@@ -536,18 +527,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						KeggGmlHelper.setKeggType(n, "gene");
 					}
 				}
-			} catch (ServiceException e) {
-				ErrorMsg.addErrorMessage(e);
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		if (enzymes) {
 			try {
-				KEGGLocator locator = new KEGGLocator();
-				KEGGPortType serv;
-				serv = locator.getKEGGPort();
-				String[] def = serv.get_enzymes_by_pathway("path:" + mapName);
+				String[] def = KeggHelper.get_enzymes_by_pathway("path:" + mapName);
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
@@ -569,18 +555,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						}
 					}
 				}
-			} catch (ServiceException e) {
-				ErrorMsg.addErrorMessage(e);
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		if (glycans) {
 			try {
-				KEGGLocator locator = new KEGGLocator();
-				KEGGPortType serv;
-				serv = locator.getKEGGPort();
-				String[] def = serv.get_glycans_by_pathway("path:" + mapName);
+				String[] def = KeggHelper.get_glycans_by_pathway("path:" + mapName);
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
@@ -602,18 +583,13 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						}
 					}
 				}
-			} catch (ServiceException e) {
-				ErrorMsg.addErrorMessage(e);
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		if (compounds) {
 			try {
-				KEGGLocator locator = new KEGGLocator();
-				KEGGPortType serv;
-				serv = locator.getKEGGPort();
-				String[] def = serv.get_compounds_by_pathway("path:" + mapName);
+				String[] def = KeggHelper.get_compounds_by_pathway("path:" + mapName);
 				for (Node n : graph.getNodes()) {
 					boolean matched = false;
 					String kID = (String) AttributeHelper.getAttributeValue(n,
@@ -635,9 +611,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 						}
 					}
 				}
-			} catch (ServiceException e) {
-				ErrorMsg.addErrorMessage(e);
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}

@@ -59,11 +59,11 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		String mapNumber = StringManipulationTools.getNumbersFromString(val);
 		if (!KeggFTPinfo.keggFTPavailable) {
 			// http://www.genome.jp/kegg-bin/download?entry=hsa00010&format=kgml
-			URL url = new URL("http://www.genome.jp/kegg-bin/download?entry=" + map + mapNumber + "&format=kgml");
+			URL url = new URL("http://rest.kegg.jp/get/" + map + mapNumber + "/kgml");
 			return url;
 		} else {
-			URL url = new URL("http://www.genome.ad.jp"
-					+ "/kegg/KGML/KGML_v" + KeggHelper.getKgmlVersion() + "/" + map + "/" + map + mapNumber + ".xml");
+			URL url = new URL("http://rest.kegg.jp"
+					+ "/get/" + map + "/" + map + mapNumber + "/kgml");
 			
 			if (KeggHelper.getKgmlVersion().equals("0.7.0")) {
 				boolean isMetab = KeggFTPinfo.getInstance().isMetabolic(mapName, null);
@@ -79,10 +79,10 @@ public class KeggPathwayEntry implements Comparable<Object> {
 				if (!mapID.equals("ko") && !mapID.equals("ec"))
 					mapID = "organisms/" + mapID;
 				
-				String metabolic = isMetab ? "metabolic" : "non-metabolic";
+				// String metabolic = isMetab ? "metabolic" : "non-metabolic";
 				
-				url = new URL("ftp://ftp.genome.jp"
-						+ "/pub/kegg/xml/kgml/" + metabolic + "/" + mapID + "/" + map + mapNumber + ".xml");
+				url = new URL("http://rest.kegg.jp"
+						+ "/get/" + map + mapNumber + "/kgml");
 			}
 			return url;
 		}
@@ -165,7 +165,7 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		try {
 			String organismName3letters = mapName.substring(0, 3);
 			String file = pathwayURL.getFile();
-			file = StringManipulationTools.stringReplace(file, "/" + organismName3letters + "/" + organismName3letters, "/map/map");
+			file = StringManipulationTools.stringReplace(file, "/" + organismName3letters, "/map");
 			URL url = new URL(
 					pathwayURL.getProtocol(),
 					pathwayURL.getHost(),

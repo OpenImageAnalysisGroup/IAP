@@ -10,7 +10,6 @@ import info.clearthought.layout.TableLayoutConstants;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -19,11 +18,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.xml.rpc.ServiceException;
-
-import keggapi.Definition;
-import keggapi.KEGGLocator;
-import keggapi.KEGGPortType;
-import keggapi.PathwayElement;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -39,7 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * HTML Parser
  * 
  * @author Christian Klukas
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class KeggHelper implements HelperClass {
 	
@@ -65,40 +59,10 @@ public class KeggHelper implements HelperClass {
 	 * @throws ServiceException
 	 */
 	public Collection<KeggPathwayEntry> getXMLpathways(
-			String serverURL, OrganismEntry organism, boolean stripOrganismName,
+			OrganismEntry organism, boolean stripOrganismName,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws IOException, ServiceException {
-		
-		KEGGLocator locator = new KEGGLocator();
-		KEGGPortType serv = locator.getKEGGPort();
-		Definition[] def = serv.list_pathways(organism.getShortName());
-		ArrayList<KeggPathwayEntry> result = new ArrayList<KeggPathwayEntry>();
-		int unknown = 0;
-		if (def != null)
-			for (int i = 0; i < def.length; i++) {
-				String mapNumber = def[i].getEntry_id().replaceFirst("path:", "");
-				boolean ok = true;
-				if (isKEGGftpDownloadVersion(kgmlVersion)) {
-					ok = KeggFTPinfo.getInstance().isKnown(mapNumber, status);
-					if (!KeggFTPinfo.keggFTPavailable)
-						ok = true;
-					if (!ok)
-						unknown++;
-				}
-				
-				if (ok)
-					result.add(
-							new KeggPathwayEntry(
-									def[i].getDefinition(),
-									stripOrganismName,
-									mapNumber,
-									getGroupFromMapNumber(mapNumber, def[i].getDefinition())
-							// getGroupFromMapName(def[i].getDefinition())
-							));
-			}
-		if (unknown > 0) {
-			System.out.println("Information: based on FTP directory listing " + unknown + " patways, included in SOAP return are filtered out for display.");
-		}
+		Collection<KeggPathwayEntry> result = list_pathways(organism.getShortName(), stripOrganismName);
 		return result;
 	}
 	
@@ -132,194 +96,131 @@ public class KeggHelper implements HelperClass {
 		}
 	}
 	
-	public static PathwayElement[] getKeggElmentsOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
-		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			PathwayElement[] pe = serv.get_elements_by_pathway(pathwayId);
-			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
+	// public static PathwayElement[] getKeggElmentsOfMap(String pathwayId) {
+	// KEGGLocator locator = new KEGGLocator();
+	// try {
+	// KEGGPortType serv = locator.getKEGGPort();
+	// PathwayElement[] pe = serv.get_elements_by_pathway(pathwayId);
+	// return pe;
+	// } catch (ServiceException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// } catch (RemoteException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// return null;
+	// }
+	//
 	public static String[] getKeggEnzymesOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_enzymes_by_pathway(pathwayId);
+			String[] pe = KeggHelper.get_enzymes_by_pathway(pathwayId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
 	
 	public static String[] getKeggKOsOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_kos_by_pathway(pathwayId);
+			String[] pe = get_kos_by_pathway(pathwayId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
 	
 	public static String[] getKeggEnzymesByReactionId(String reactionId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_enzymes_by_reaction(reactionId);
+			String[] pe = get_enzymes_by_reaction(reactionId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
 	
 	public static String[] getKeggReactionsOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_reactions_by_pathway(pathwayId);
+			String[] pe = get_reactions_by_pathway(pathwayId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
 	
-	public static String callKeggDBGETbfind(String search) {
-		KEGGLocator locator = new KEGGLocator();
-		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			return serv.bfind(search);
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
-	public static String callKeggDBGETbget(String search) {
-		KEGGLocator locator = new KEGGLocator();
-		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			return serv.bget(search);
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
-	public static String callKeggDBGETbtit(String search) {
-		KEGGLocator locator = new KEGGLocator();
-		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			return serv.btit(search);
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
-	public static String callKeggDBGETbinfo(String search) {
-		KEGGLocator locator = new KEGGLocator();
-		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			return serv.binfo(search);
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
+	// public static String callKeggDBGETbfind(String search) {
+	// KEGGLocator locator = new KEGGLocator();
+	// try {
+	// KEGGPortType serv = locator.getKEGGPort();
+	// return serv.bfind(search);
+	// } catch (ServiceException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// } catch (RemoteException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// return null;
+	// }
+	//
+	// public static String callKeggDBGETbget(String search) {
+	// KEGGLocator locator = new KEGGLocator();
+	// try {
+	// KEGGPortType serv = locator.getKEGGPort();
+	// return serv.bget(search);
+	// } catch (ServiceException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// } catch (RemoteException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// return null;
+	// }
+	//
+	// public static String callKeggDBGETbtit(String search) {
+	// KEGGLocator locator = new KEGGLocator();
+	// try {
+	// KEGGPortType serv = locator.getKEGGPort();
+	// return serv.btit(search);
+	// } catch (ServiceException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// } catch (RemoteException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// return null;
+	// }
+	//
+	// public static String callKeggDBGETbinfo(String search) {
+	// KEGGLocator locator = new KEGGLocator();
+	// try {
+	// KEGGPortType serv = locator.getKEGGPort();
+	// return serv.binfo(search);
+	// } catch (ServiceException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// } catch (RemoteException e) {
+	// ErrorMsg.addErrorMessage(e);
+	// }
+	// return null;
+	// }
+	//
 	public static String[] getKeggCompoundsOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_compounds_by_pathway(pathwayId);
+			String[] pe = get_compounds_by_pathway(pathwayId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
 	
 	public static String[] getKeggGenesOfMap(String pathwayId) {
-		KEGGLocator locator = new KEGGLocator();
 		try {
-			KEGGPortType serv = locator.getKEGGPort();
-			String[] pe = serv.get_genes_by_pathway(pathwayId);
+			String[] pe = get_genes_by_pathway(pathwayId);
 			return pe;
-		} catch (ServiceException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
 	}
-	
-	// public static String[] getGroupFromMapName(String mapName) {
-	// if (mapName.contains("-"))
-	// mapName = mapName.substring(0, mapName.indexOf("-"));
-	// mapName = mapName.trim();
-	// ClassLoader cl = KeggHelper.class.getClassLoader();
-	// String path = KeggHelper.class.getPackage().getName().replace('.', '/');
-	// InputStream inp = cl.getResourceAsStream(path+"/ko.txt");
-	// BufferedReader br = new BufferedReader(new InputStreamReader(inp));
-	// String line = null;
-	// String lastH1 = null;
-	// String lastSubCatH2 = null;
-	// String lastPathwayH3 = null;
-	// try {
-	// while ((line = br.readLine())!=null) {
-	// if (line.startsWith("	")) {
-	// // "	"
-	// lastPathwayH3 = line.substring("	".length());
-	// if (lastPathwayH3.indexOf("	")>0)
-	// lastPathwayH3 = lastPathwayH3.substring(0, lastPathwayH3.indexOf("	"));
-	// if (lastPathwayH3.indexOf(mapName)>=0) {
-	// String[] result = { lastH1, lastSubCatH2 };
-	// br.close();
-	// return result;
-	// }
-	// } else
-	// if (line.indexOf(". ")>0)
-	// lastH1 = line;
-	// else
-	// lastSubCatH2 = line;
-	//
-	// }
-	// br.close();
-	// } catch (IOException e) {
-	// ErrorMsg.addErrorMessage(e);
-	// return new String[] { "KO not available", "Unknown Category (IO Error)"};
-	// }
-	// return new String[] { "KO not available", "(non-specific)"};
-	// }
 	
 	private static String getDigits(String mapNumber) {
 		String result = "";
@@ -337,8 +238,6 @@ public class KeggHelper implements HelperClass {
 		if (cachedOrganismList.size() > 1) {
 			return cachedOrganismList;
 		}
-		KEGGLocator locator = new KEGGLocator();
-		KEGGPortType serv = locator.getKEGGPort();
 		ArrayList<OrganismEntry> result = new ArrayList<OrganismEntry>();
 		if (KeggFTPinfo.keggFTPavailable) {
 			OrganismEntry mapEnty = new OrganismEntry("map", "Reference Pathways (MAP)");
@@ -351,11 +250,17 @@ public class KeggHelper implements HelperClass {
 		// OrganismEntry otEnty = new OrganismEntry("ko", "Reference Pathways (OT)");
 		// result.add(otEnty);
 		try {
-			Definition[] def = serv.list_organisms();
-			for (int i = 0; i < def.length; i++)
-				result.add(new OrganismEntry(def[i].getEntry_id(), def[i].getDefinition()));
+			// http://rest.kegg.jp/list/organism
+			// T01001 hsa Homo sapiens (human) Eukaryotes;Animals;Vertebrates;Mammals
+			// T01005 ptr Pan troglodytes (chimpanzee) Eukaryotes;Animals;Vertebrates;Mammals
+			// T02283 pps Pan paniscus (bonobo) Eukaryotes;Animals;Vertebrates;Mammals
+			// T02442 ggo Gorilla gorilla gorilla (western lowland gorilla) Eukaryotes;Animals;Vertebrates;Mammals
+			// T01416 pon Pongo abelii (Sumatran orangutan) Eukaryotes;Animals;Vertebrates;Mammals
+			Collection<OrganismEntry> orgs = list_organisms();
+			for (OrganismEntry oe : orgs)
+				result.add(oe);
 		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(StringManipulationTools.stringReplace(e.getMessage(), "java.net.", ""));
+			ErrorMsg.addErrorMessage(e.getMessage());
 		}
 		cachedOrganismList.clear();
 		cachedOrganismList.addAll(result);
@@ -365,12 +270,10 @@ public class KeggHelper implements HelperClass {
 	public Collection<String> getLinkedPathwayIDs(String pathway_id)
 			throws IOException, ServiceException {
 		ArrayList<String> result = new ArrayList<String>();
-		KEGGLocator locator = new KEGGLocator();
-		KEGGPortType serv = locator.getKEGGPort();
 		if (!pathway_id.startsWith("path:"))
 			pathway_id = "path:" + pathway_id;
 		try {
-			String[] links = serv.get_linked_pathways(pathway_id);
+			String[] links = get_linked_pathways(pathway_id);
 			for (String l : links)
 				result.add(l.replaceFirst("path:", ""));
 		} catch (Exception e) {
@@ -428,5 +331,61 @@ public class KeggHelper implements HelperClass {
 				KeggFTPinfo.keggFTPavailable ?
 						result : null, // new JLabel("<html><small>&nbsp;(in case of problems,<br>&nbsp;select 0.6 instead of 0.6.1)"),
 				TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED); // , TableLayout.PREFERRED);
+	}
+	
+	private Collection<KeggPathwayEntry> list_pathways(String shortName, boolean stripOrganismName) {
+		// REST API: http://rest.kegg.jp/list/pathway/hsa
+		// http://rest.kegg.jp/list/pathway
+		return null;
+	}
+	
+	public Collection<OrganismEntry> list_organisms() {
+		// http://rest.kegg.jp/list/organism
+		return null;
+	}
+	
+	public static String[] get_kos_by_pathway(String mapName) {
+		// REST API: http://rest.kegg.jp/link/ko/map00010
+		return null;
+	}
+	
+	public static String[] get_enzymes_by_pathway(String pathwayId) {
+		// REST API: http://rest.kegg.jp/link/enzyme/map00010
+		return null;
+	}
+	
+	public static String[] get_reactions_by_pathway(String pathwayId) {
+		// REST API: http://rest.kegg.jp/link/rn/map00010
+		return null;
+	}
+	
+	public static String[] get_genes_by_pathway(String pathwayId) {
+		// REST API: http://rest.kegg.jp/link/genes/hsa00010
+		return null;
+	}
+	
+	public static String[] get_compounds_by_pathway(String pathwayId) {
+		// REST API: http://rest.kegg.jp/link/compound/map00010
+		return null;
+	}
+	
+	public static String[] get_glycans_by_pathway(String pathwayId) {
+		// REST API: (does not work: http://rest.kegg.jp/link/glycan/hsa00020 )
+		return null;
+	}
+	
+	public static String[] get_genes_by_ko(String keggID, String org) {
+		// REST API: http://rest.kegg.jp/find/genes/K00400+mmp
+		return null;
+	}
+	
+	public static String[] get_enzymes_by_reaction(String value) {
+		// REST API: http://rest.kegg.jp/link/enzyme/rn:R01070
+		return null;
+	}
+	
+	private String[] get_linked_pathways(String pathway_id) {
+		// REST API: Unclear (http://rest.kegg.jp/link/pathway/map00010 does not work)
+		return null;
 	}
 }

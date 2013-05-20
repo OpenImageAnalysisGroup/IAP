@@ -1136,7 +1136,7 @@ public class GravistoService implements HelperClass {
 	 * ToDo Test this method (untested copy).
 	 */
 	@SuppressWarnings("unchecked")
-	public static void saveRessource(Class reference, String folder, String fileName, String targetFileName)
+	public static void saveResource(Class reference, String folder, String fileName, String targetFileName)
 			throws IOException {
 		ClassLoader cl = reference.getClassLoader();
 		

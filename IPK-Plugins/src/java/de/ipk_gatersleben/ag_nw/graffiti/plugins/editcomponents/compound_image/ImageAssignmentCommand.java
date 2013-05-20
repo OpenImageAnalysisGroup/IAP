@@ -49,15 +49,15 @@ public class ImageAssignmentCommand extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"With this command a image file may be assigned to the selected nodes.<br>" +
-							"The image files are linked and not included in the graph file. Thus you should specify<br>" +
-							"a accessible ressource, as the file is downloaded or loaded from the specified URL.<br>" +
-							"The image files will be cached on disk to speed up later loading and processing of the<br>" +
-							"graph.<br>" +
-							"Use the Node attribute editor to change the positioning of the image.<br>" +
-							"Default init position of the images is outside of the nodes.<br>" +
-							"In case the image position is set to `centered', the node size will be<br>" +
-							"increased in case the image does not fit into the node shape.";
+				"With this command a image file may be assigned to the selected nodes.<br>" +
+				"The image files are linked and not included in the graph file. Thus you should specify<br>" +
+				"a accessible resource, as the file is downloaded or loaded from the specified URL.<br>" +
+				"The image files will be cached on disk to speed up later loading and processing of the<br>" +
+				"graph.<br>" +
+				"Use the Node attribute editor to change the positioning of the image.<br>" +
+				"Default init position of the images is outside of the nodes.<br>" +
+				"In case the image position is set to `centered', the node size will be<br>" +
+				"increased in case the image does not fit into the node shape.";
 	}
 	
 	@Override
@@ -80,13 +80,13 @@ public class ImageAssignmentCommand extends AbstractAlgorithm {
 		});
 		
 		return new Parameter[] {
-							new org.graffiti.plugin.parameter.JComponentParameter(info.clearthought.layout.TableLayout.getSplit(tf, bt, -1.0d, -2.0), "Image URL",
-												"A (web)-URL to an image file"),
-							// new StringParameter("", "Image URL",
+				new org.graffiti.plugin.parameter.JComponentParameter(info.clearthought.layout.TableLayout.getSplit(tf, bt, -1.0d, -2.0), "Image URL",
+						"A (web)-URL to an image file"),
+				// new StringParameter("", "Image URL",
 				// "A URL to a image file"),
 				new ObjectListParameter(imagePos, "Initial Image Position",
-												"You may change the image position at a later point in time from the Node side panel",
-												CompoundImagePositionAttributeEditor.getPosiblePositions(false)) };
+						"You may change the image position at a later point in time from the Node side panel",
+						CompoundImagePositionAttributeEditor.getPosiblePositions(false)) };
 	}
 	
 	@Override

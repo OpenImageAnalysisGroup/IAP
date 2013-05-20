@@ -33,7 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jcommon-0.9.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/jruby.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/keggapi.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/optional.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/pdf-transcoder.jar"/>

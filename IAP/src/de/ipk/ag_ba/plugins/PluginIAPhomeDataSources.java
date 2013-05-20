@@ -33,7 +33,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 			
 			@Override
 			public String getTooltip() {
-				return "External Tools and Ressources";
+				return "External Tools and Resources";
 			}
 			
 			@Override
@@ -55,7 +55,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 			
 			@Override
 			public String getIntroductionText() {
-				return "<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics ressources, "
+				return "<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics resources, "
 						+ "developed at the IPK. The included data sources and tools have been "
 						+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
 						+ "partly with contributions from the group Bioinformatics and Information Technology. "

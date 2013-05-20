@@ -145,6 +145,8 @@ public abstract class VirtualFileSystem {
 	 */
 	public abstract ArrayList<String> listFiles(String optSubDirectory) throws Exception;
 	
+	public abstract ArrayList<String> listFolders(String optSubDirectory) throws Exception;
+	
 	public abstract IOurl getIOurlFor(String fileName);
 	
 	public void saveExperiment(MongoDB m, ExperimentReference experimentReference,
@@ -207,7 +209,7 @@ public abstract class VirtualFileSystem {
 			ico3 = vfsEntry.getDesiredIcon();
 		}
 		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
-				new String[] {},
+				new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 				IAPmain.loadIcon(ico),
 				IAPmain.loadIcon(ico2),
 				IAPmain.loadIcon(ico3));

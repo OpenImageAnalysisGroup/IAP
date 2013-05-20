@@ -13,13 +13,15 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
+import org.SystemOptions;
+
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ActionShowVANTED extends AbstractNavigationAction {
 	
-	private final boolean showInline = true;
+	private boolean showInline = SystemOptions.getInstance().getBoolean("VANTED", "debug-show-inline-iap", false);
 	private NavigationButton src;
 	
 	public ActionShowVANTED() {
@@ -34,7 +36,8 @@ public class ActionShowVANTED extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		res.add(src);
+		if (showInline)
+			res.add(src);
 		return res;
 	}
 	

@@ -102,10 +102,10 @@ public class GraphHelperBio implements HelperClass {
 	}
 	
 	public static Edge addEdgeIfNotExistant(
-						Graph graph,
-						Node nodeA, Node nodeB,
-						boolean directed,
-						CollectionAttribute graphicsAttributeForEdge) {
+			Graph graph,
+			Node nodeA, Node nodeB,
+			boolean directed,
+			CollectionAttribute graphicsAttributeForEdge) {
 		// if (directed)
 		// if (nodeA.getOutNeighbors().contains(nodeB)) {
 		// for (Edge e : nodeA.getAllOutEdges()) {
@@ -175,25 +175,23 @@ public class GraphHelperBio implements HelperClass {
 	 * @throws ServiceException
 	 */
 	public static Collection<Graph> getKeggPathways(KeggHelper kegg, OrganismEntry org,
-						boolean returnSuperPathway,
-						boolean returnFullSuperPathway,
-						boolean loadFullGraphsForSuperPathwayOverview_falls_means_use_Soap,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws IOException, ServiceException {
+			boolean returnSuperPathway,
+			boolean returnFullSuperPathway,
+			boolean loadFullGraphsForSuperPathwayOverview_falls_means_use_Soap,
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws IOException, ServiceException {
 		List<Graph> result = new ArrayList<Graph>();
-		String url = "http://www.genome.ad.jp";
-		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(url, org, false, statusProvider);
+		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(org, false, statusProvider);
 		if (loadFullGraphsForSuperPathwayOverview_falls_means_use_Soap)
 			processFullMapLoading(returnSuperPathway, returnFullSuperPathway, result, pathways, statusProvider);
 		else
-			processSOAPoverviewLoading(result, pathways, statusProvider, org, url);
+			processSOAPoverviewLoading(result, pathways, statusProvider, org);
 		return result;
 	}
 	
 	private static void processSOAPoverviewLoading(List<Graph> result,
-						Collection<KeggPathwayEntry> pathways,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider,
-						OrganismEntry org,
-						String serverURL) {
+			Collection<KeggPathwayEntry> pathways,
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider,
+			OrganismEntry org) {
 		Graph superGraph = new AdjListGraph();
 		HashMap<String, Node> mapNumber2superGraphNode = new HashMap<String, Node>();
 		PositionGridGenerator pgg = new PositionGridGenerator(200, 50, 1000);
@@ -228,13 +226,13 @@ public class GraphHelperBio implements HelperClass {
 						org.getShortName();
 						String mapNumber = l.replaceFirst("path:", "");
 						KeggPathwayEntry kpe =
-											new KeggPathwayEntry(
-																l,
-																false,
-																mapNumber,
-																KeggHelper.getGroupFromMapNumber(mapNumber, "")
-											// KeggHelper.getGroupFromMapName("--")
-											);
+								new KeggPathwayEntry(
+										l,
+										false,
+										mapNumber,
+										KeggHelper.getGroupFromMapNumber(mapNumber, "")
+								// KeggHelper.getGroupFromMapName("--")
+								);
 						checkTheseMaps.add(kpe.getMapName());
 						Node mapNode = GraphHelperBio.addMapNode(superGraph, kpe);
 						pretifyMapNode(pgg, mapNumber2superGraphNode, kpe, mapNode);
@@ -245,7 +243,7 @@ public class GraphHelperBio implements HelperClass {
 					else {
 						if (!sourceNode.getOutNeighbors().contains(targetNode)) {
 							Edge ne = superGraph.addEdge(sourceNode, targetNode, false, AttributeHelper.getDefaultGraphicsAttributeForEdge(Color.BLACK, Color.BLACK,
-												false));
+									false));
 							AttributeHelper.setDashInfo(ne, 5, 5);
 							// AttributeHelper.setBorderWidth(ne, 5);
 							// AttributeHelper.setArrowSize(ne, 6);
@@ -289,8 +287,8 @@ public class GraphHelperBio implements HelperClass {
 	}
 	
 	private static void processFullMapLoading(boolean returnSuperPathway, boolean returnFullSuperPathway, List<Graph> result,
-						Collection<KeggPathwayEntry> pathways,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+			Collection<KeggPathwayEntry> pathways,
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		Graph superGraph = new AdjListGraph();
 		HashMap<String, Node> mapNumber2superGraphNode = new HashMap<String, Node>();
 		statusProvider.setCurrentStatusText1("Process Pathways...");
@@ -356,7 +354,7 @@ public class GraphHelperBio implements HelperClass {
 							Node superPathwayMapNode = mapNumber2superGraphNode.get(referencedMap);
 							if (!thisPathwayNode.getNeighbors().contains(superPathwayMapNode) && (!kpe.getMapName().equalsIgnoreCase(referencedMap))) {
 								Edge edge = superGraph.addEdge(thisPathwayNode, superPathwayMapNode, false, AttributeHelper.getDefaultGraphicsAttributeForEdge(
-													Color.BLACK, Color.BLACK, false));
+										Color.BLACK, Color.BLACK, false));
 								AttributeHelper.setDashInfo(edge, 5f, 5f);
 								// System.out.println("Connect Map Nodes: "+kpe.getMapName()+" <==> "+referencedMap);
 							}
@@ -400,21 +398,21 @@ public class GraphHelperBio implements HelperClass {
 	}
 	
 	public static void mergeNodesWithSameLabel(
-						List<Node> nodes,
-						final boolean selectOnlyTrueOrMergeIsFalse,
-						boolean extendSelection,
-						boolean considerCluster) {
+			List<Node> nodes,
+			final boolean selectOnlyTrueOrMergeIsFalse,
+			boolean extendSelection,
+			boolean considerCluster) {
 		mergeNodesWithSameLabel(nodes, selectOnlyTrueOrMergeIsFalse, extendSelection, considerCluster, false, true);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public static void mergeNodesWithSameLabel(
-						List<Node> nodes,
-						final boolean selectOnlyTrueOrMergeIsFalse,
-						boolean extendSelection,
-						boolean considerCluster,
-						boolean considerPositionPlusMinus10,
-						boolean retainClusterIDs) {
+			List<Node> nodes,
+			final boolean selectOnlyTrueOrMergeIsFalse,
+			boolean extendSelection,
+			boolean considerCluster,
+			boolean considerPositionPlusMinus10,
+			boolean retainClusterIDs) {
 		
 		if (selectOnlyTrueOrMergeIsFalse && extendSelection) {
 			selectNodesWithSameLabelBasedOnCurrentSelection(nodes);
