@@ -26,7 +26,7 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	}
 	
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getInputStream() throws Exception {
 		throw new UnsupportedOperationException("Not implemented!");
 	}
 	

@@ -1,5 +1,6 @@
 package de.ipk.vanted.util;
 
+import org.ErrorMsg;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.StringUtils;
@@ -111,6 +112,7 @@ public class VfsFileObjectUtil {
 		fo = fsm.resolveFile(con, opts);
 		if (fo == null) {
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT RESOLVE FILE: " + filePath);
+			ErrorMsg.addErrorMessage("COULD NOT RESOLVE FILE: " + filePath);
 			return null;
 		}
 		VfsFileObject vfsFileObj = new VfsFileObjectImpl(fo);
