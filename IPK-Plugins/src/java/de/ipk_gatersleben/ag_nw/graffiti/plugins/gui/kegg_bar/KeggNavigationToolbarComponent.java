@@ -154,9 +154,7 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 				else {
 					MainFrame.showMessageDialog("KEGG Super-Pathway could not be constructed!", "Error");
 				}
-			} catch (IOException e1) {
-				ErrorMsg.addErrorMessage(e1);
-			} catch (ServiceException e1) {
+			} catch (Exception e1) {
 				ErrorMsg.addErrorMessage(e1);
 			}
 			
@@ -207,7 +205,7 @@ public class KeggNavigationToolbarComponent extends JToolBar implements
 	 * @throws ServiceException
 	 */
 	private Collection<Graph> getKeggPathways(KeggHelper kegg, OrganismEntry org, boolean returnSuperPathway,
-			BackgroundTaskStatusProviderSupportingExternalCall status) throws IOException, ServiceException {
+			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		List<Graph> result = new ArrayList<Graph>();
 		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(org, false, status);
 		

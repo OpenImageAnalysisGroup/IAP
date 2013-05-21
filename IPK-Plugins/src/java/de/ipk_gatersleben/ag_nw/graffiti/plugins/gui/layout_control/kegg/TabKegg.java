@@ -18,7 +18,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -85,7 +84,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TabKegg extends InspectorTab
 		implements
@@ -547,14 +546,16 @@ public class TabKegg extends InspectorTab
 		organismSelection.setFixedCellWidth(580);
 		organismSelection.setFixedCellHeight(new JLabel("<html>AyÖÄ").getPreferredSize().height);
 		
-		Collections.sort((List<OrganismEntry>) organisms,
-				new Comparator<OrganismEntry>() {
-					public int compare(final OrganismEntry arg0, OrganismEntry arg1) {
-						if (arg0.toString().contains("Reference"))
-							return -1;
-						return arg0.toString().compareTo(arg1.toString());
-					}
-				});
+		// Collections.sort((List<OrganismEntry>) organisms,
+		// new Comparator<OrganismEntry>() {
+		// public int compare(final OrganismEntry arg0, OrganismEntry arg1) {
+		// if (arg0.getHierarchy().equals("Reference") && arg1.getHierarchy().equals("Reference"))
+		// return arg0.getDefinition().compareTo(arg1.getDefinition());
+		// if (arg0.getHierarchy().equals("Reference"))
+		// return -1;
+		// return arg0.toString().compareTo(arg1.toString());
+		// }
+		// });
 		for (OrganismEntry oe : organisms) {
 			organismSelection.getContents().addElement(oe);
 		}
@@ -665,12 +666,8 @@ public class TabKegg extends InspectorTab
 								try {
 									KeggHelper h = new KeggHelper();
 									pathways.addAll(h.getXMLpathways(organism, true, status));
-								} catch (MalformedURLException er) {
+								} catch (Exception er) {
 									ErrorMsg.addErrorMessage(er.getLocalizedMessage());
-								} catch (IOException er) {
-									ErrorMsg.addErrorMessage(er.getLocalizedMessage());
-								} catch (ServiceException e) {
-									ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 								}
 							}
 						},

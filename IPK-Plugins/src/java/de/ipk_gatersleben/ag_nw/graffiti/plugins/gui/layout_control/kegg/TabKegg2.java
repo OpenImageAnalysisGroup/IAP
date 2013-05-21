@@ -91,7 +91,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TabKegg2 extends InspectorTab
 		implements SessionListener, AttributeListener {
@@ -399,9 +399,7 @@ public class TabKegg2 extends InspectorTab
 									Collection<Graph> gc = null;
 									try {
 										gc = GraphHelperBio.getKeggPathways(kegg, org, true, false, true, statusProvider);
-									} catch (IOException e1) {
-										ErrorMsg.addErrorMessage(e1);
-									} catch (ServiceException e1) {
+									} catch (Exception e1) {
 										ErrorMsg.addErrorMessage(e1);
 									}
 									if (gc != null && gc.size() == 1)
@@ -465,9 +463,7 @@ public class TabKegg2 extends InspectorTab
 									Collection<Graph> gc = null;
 									try {
 										gc = GraphHelperBio.getKeggPathways(kegg, org, true, false, false, statusProvider);
-									} catch (IOException e1) {
-										ErrorMsg.addErrorMessage(e1);
-									} catch (ServiceException e1) {
+									} catch (Exception e1) {
 										ErrorMsg.addErrorMessage(e1);
 									}
 									if (gc != null && gc.size() == 1) {
@@ -535,9 +531,7 @@ public class TabKegg2 extends InspectorTab
 									Collection<Graph> gc = null;
 									try {
 										gc = GraphHelperBio.getKeggPathways(kegg, org, false, true, true, statusProvider);
-									} catch (IOException e1) {
-										ErrorMsg.addErrorMessage(e1);
-									} catch (ServiceException e1) {
+									} catch (Exception e1) {
 										ErrorMsg.addErrorMessage(e1);
 									}
 									if (gc != null && gc.size() == 1)
