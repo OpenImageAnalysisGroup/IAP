@@ -6,8 +6,6 @@
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_organisms.OrganismInfo;
-
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
@@ -19,23 +17,11 @@ public class OrganismEntry {
 	private boolean showHierarchy;
 	private String hierarchy = "";
 	
-	public OrganismEntry(String shortName, String title) {
+	public OrganismEntry(String shortName, String title, String hierarchy) {
 		this.shortName = shortName;
 		this.title = title;
-		this.showHierarchy = true;
-		if (showHierarchy) {
-			hierarchy = OrganismInfo.getOrganismHierarchyInfo(
-								shortName, "/", title);
-		}
-	}
-	
-	public OrganismEntry(boolean showHierarchy, String shortName, String title) {
-		this.shortName = shortName;
-		this.title = title;
-		this.showHierarchy = showHierarchy;
-		if (showHierarchy) {
-			hierarchy = OrganismInfo.getOrganismHierarchyInfo(shortName, "/", title);
-		}
+		this.showHierarchy = hierarchy != null && !hierarchy.isEmpty();
+		this.hierarchy = hierarchy;
 	}
 	
 	@Override
@@ -45,7 +31,7 @@ public class OrganismEntry {
 				return "- " + title + " - " + shortName;
 			else
 				return "<html><font color='gray'><small>" + hierarchy + ":</small></font> "
-									+ title + "<font color='gray'><small> (" + shortName + ")";
+						+ title + "<font color='gray'><small> (" + shortName + ")";
 		} else {
 			return title + " - " + shortName;
 		}
@@ -57,5 +43,9 @@ public class OrganismEntry {
 	
 	public String getDefinition() {
 		return title;
+	}
+	
+	public String getHierarchy() {
+		return hierarchy;
 	}
 }

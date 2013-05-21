@@ -13,11 +13,13 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -86,6 +88,8 @@ import scenario.ScenarioService;
 /**
  * Provides access to global variables, needed for various extensions to
  * Graffiti. Plugins can use the Preferences structure to save settings.
+ * 
+ * @author Christian Klukas
  */
 public class GravistoService implements HelperClass {
 	
@@ -1359,5 +1363,14 @@ public class GravistoService implements HelperClass {
 			}
 		
 		return null;
+	}
+	
+	public static void processUrlTextContent(IOurl url, LineProcessor lineProcessor) throws Exception {
+		BufferedReader in = new BufferedReader(new InputStreamReader(url.getInputStream()));
+		String str;
+		while ((str = in.readLine()) != null) {
+			lineProcessor.process(str);
+		}
+		in.close();
 	}
 }

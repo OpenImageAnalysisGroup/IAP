@@ -24,7 +24,10 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.HelperClass;
 import org.StringManipulationTools;
+import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.LineProcessor;
 import org.graffiti.graph.Node;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_brite.BriteService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
@@ -33,7 +36,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * HTML Parser
  * 
  * @author Christian Klukas
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class KeggHelper implements HelperClass {
 	
@@ -52,16 +55,14 @@ public class KeggHelper implements HelperClass {
 	/**
 	 * @param status
 	 * @return Vector full of <code>KeggPathwayEntry</code>s
-	 * @throws IOException
-	 *            An exception.
 	 * @throws ServiceException
 	 * @throws ServiceException
-	 * @throws ServiceException
+	 * @throws Exception
 	 */
 	public Collection<KeggPathwayEntry> getXMLpathways(
 			OrganismEntry organism, boolean stripOrganismName,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
-			throws IOException, ServiceException {
+			throws Exception {
 		Collection<KeggPathwayEntry> result = list_pathways(organism.getShortName(), stripOrganismName);
 		return result;
 	}
@@ -240,12 +241,12 @@ public class KeggHelper implements HelperClass {
 		}
 		ArrayList<OrganismEntry> result = new ArrayList<OrganismEntry>();
 		if (KeggFTPinfo.keggFTPavailable) {
-			OrganismEntry mapEnty = new OrganismEntry("map", "Reference Pathways (MAP)");
+			OrganismEntry mapEnty = new OrganismEntry("map", "Reference Pathways (MAP)", "Reference");
 			result.add(mapEnty);
 		}
-		OrganismEntry koEnty = new OrganismEntry("ko", "Reference Pathways (KO)");
+		OrganismEntry koEnty = new OrganismEntry("ko", "Reference Pathways (KO)", "Reference");
 		result.add(koEnty);
-		OrganismEntry rnEnty = new OrganismEntry("ec", "Reference Pathways (EC)");
+		OrganismEntry rnEnty = new OrganismEntry("ec", "Reference Pathways (EC)", "Reference");
 		result.add(rnEnty);
 		// OrganismEntry otEnty = new OrganismEntry("ko", "Reference Pathways (OT)");
 		// result.add(otEnty);
@@ -333,15 +334,36 @@ public class KeggHelper implements HelperClass {
 				TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED); // , TableLayout.PREFERRED);
 	}
 	
-	private Collection<KeggPathwayEntry> list_pathways(String shortName, boolean stripOrganismName) {
+	private Collection<KeggPathwayEntry> list_pathways(String shortName,
+			final boolean stripOrganismName) throws Exception {
 		// REST API: http://rest.kegg.jp/list/pathway/hsa
 		// http://rest.kegg.jp/list/pathway
-		return null;
+		final Collection<KeggPathwayEntry> pathways = new ArrayList<KeggPathwayEntry>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/list/pathway/" + shortName),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						pathways.add(new KeggPathwayEntry(fields[1], stripOrganismName, fields[0],
+								new String[] { "Unknwon", "Pathway Group" }));
+					}
+				});
+		
+		return pathways;
 	}
 	
-	public Collection<OrganismEntry> list_organisms() {
+	public Collection<OrganismEntry> list_organisms() throws Exception {
 		// http://rest.kegg.jp/list/organism
-		return null;
+		final Collection<OrganismEntry> orgs = new ArrayList<OrganismEntry>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/list/organism"),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						orgs.add(new OrganismEntry(fields[1], fields[2], fields[3].replace(";", "/")));
+					}
+				});
+		return orgs;
 	}
 	
 	public static String[] get_kos_by_pathway(String mapName) {

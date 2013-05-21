@@ -178,7 +178,7 @@ public class GraphHelperBio implements HelperClass {
 			boolean returnSuperPathway,
 			boolean returnFullSuperPathway,
 			boolean loadFullGraphsForSuperPathwayOverview_falls_means_use_Soap,
-			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws IOException, ServiceException {
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
 		List<Graph> result = new ArrayList<Graph>();
 		Collection<KeggPathwayEntry> pathways = kegg.getXMLpathways(org, false, statusProvider);
 		if (loadFullGraphsForSuperPathwayOverview_falls_means_use_Soap)
