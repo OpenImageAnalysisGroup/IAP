@@ -7,10 +7,7 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.kegg_bar;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.xml.rpc.ServiceException;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProvider;
@@ -220,9 +217,7 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 			}
 			progress = 100d;
 			stop = false;
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (ServiceException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}

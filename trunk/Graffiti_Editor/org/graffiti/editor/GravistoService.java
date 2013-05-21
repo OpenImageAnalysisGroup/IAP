@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,6 +62,7 @@ import org.ReleaseInfo;
 import org.Scalr;
 import org.Scalr.Method;
 import org.StringManipulationTools;
+import org.SystemOptions;
 import org.graffiti.editor.actions.RunAlgorithm;
 import org.graffiti.editor.dialog.DefaultParameterDialog;
 import org.graffiti.editor.dialog.ParameterDialog;
@@ -1372,5 +1375,50 @@ public class GravistoService implements HelperClass {
 			lineProcessor.process(str);
 		}
 		in.close();
+	}
+	
+	public static void setProxy() {
+		boolean useProxy = SystemOptions.getInstance().getBoolean("Network", "http-proxy-enabled", false);
+		String proxyUrl = SystemOptions.getInstance().getString("Network", "http-proxy-host", "");
+		Integer proxyPort = SystemOptions.getInstance().getInteger("Network", "http-proxy-port", 3128);
+		
+		boolean useSocksProxy = SystemOptions.getInstance().getBoolean("Network", "socks-proxy-enabled", false);
+		String socksProxyUrl = SystemOptions.getInstance().getString("Network", "socks-proxy-host", "");
+		Integer socksProxyPort = SystemOptions.getInstance().getInteger("Network", "socks-proxy-port", 1080);
+		
+		boolean useProxyAuth = SystemOptions.getInstance().getBoolean("Network", "Proxy-Authentication-enable", false);
+		final String proxyUser = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-proxy-user", "");
+		final String proxyPass = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-proxy-password", "");
+		
+		if (useProxy) {
+			// HTTP/HTTPS Proxy
+			System.setProperty("http.proxyHost", proxyUrl);
+			System.setProperty("http.proxyPort", proxyPort + "");
+			System.setProperty("https.proxyHost", proxyUrl);
+			System.setProperty("https.proxyPort", proxyPort + "");
+			if (useProxyAuth) {
+				System.setProperty("http.proxyUser", proxyUser);
+				System.setProperty("http.proxyPassword", proxyPass);
+			}
+		}
+		if (useSocksProxy) {
+			// SOCKS Proxy
+			System.setProperty("socksProxyHost", socksProxyUrl);
+			System.setProperty("socksProxyPort", socksProxyPort + "");
+			if (useProxyAuth) {
+				System.setProperty("java.net.socks.username", proxyUser);
+				System.setProperty("java.net.socks.password", proxyPass);
+			}
+		}
+		if (useProxyAuth && (useProxy || useSocksProxy))
+			Authenticator.setDefault(
+					new Authenticator() {
+						@Override
+						public PasswordAuthentication getPasswordAuthentication() {
+							return new PasswordAuthentication(
+									proxyUser, proxyPass.toCharArray());
+						}
+					}
+					);
 	}
 }

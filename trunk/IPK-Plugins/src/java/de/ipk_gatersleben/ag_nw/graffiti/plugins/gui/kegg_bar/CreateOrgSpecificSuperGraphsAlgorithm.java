@@ -7,11 +7,9 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.kegg_bar;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 
 import javax.swing.JFileChooser;
-import javax.xml.rpc.ServiceException;
 
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
@@ -36,11 +34,11 @@ public class CreateOrgSpecificSuperGraphsAlgorithm extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new BooleanParameter(checkOrthologs, "Check Orthologs", "If selected, the organism specific ortholog information is processed"),
-							new BooleanParameter(convertKOsToGenes, "Convert KOs to Genes", "(requires 'Check Orthologs')"),
-							new BooleanParameter(checkEnzymes, "Check Enzymes", "If selected, the organism specific enzymes are enumerated"),
-							new BooleanParameter(checkGlycans, "Check Glycans", "If selected, the organism specific glycans are enumerated"),
-							new BooleanParameter(checkCompounds, "Check Compounds", "If selected, the organism specific compounds are enumerated") };
+				new BooleanParameter(checkOrthologs, "Check Orthologs", "If selected, the organism specific ortholog information is processed"),
+				new BooleanParameter(convertKOsToGenes, "Convert KOs to Genes", "(requires 'Check Orthologs')"),
+				new BooleanParameter(checkEnzymes, "Check Enzymes", "If selected, the organism specific enzymes are enumerated"),
+				new BooleanParameter(checkGlycans, "Check Glycans", "If selected, the organism specific glycans are enumerated"),
+				new BooleanParameter(checkCompounds, "Check Compounds", "If selected, the organism specific compounds are enumerated") };
 	}
 	
 	@Override
@@ -56,13 +54,12 @@ public class CreateOrgSpecificSuperGraphsAlgorithm extends AbstractAlgorithm {
 			KeggHelper kegg = new KeggHelper();
 			Collection<OrganismEntry> organisms = kegg.getOrganisms();
 			organismSelection = TabKegg.getKEGGorganismFromUser(organisms);
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (ServiceException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
 	
+	@Override
 	public String getName() {
 		return null; // start from kegg tab 2
 		// return "Create ALL Organism-Specific SG from current SG";
@@ -80,6 +77,7 @@ public class CreateOrgSpecificSuperGraphsAlgorithm extends AbstractAlgorithm {
 		super.check();
 	}
 	
+	@Override
 	public void execute() {
 		if (organismSelection == null || organismSelection.length <= 0) {
 			MainFrame.showMessageDialog("No organism has been selected. Processing aborted.", "Information");
@@ -93,7 +91,7 @@ public class CreateOrgSpecificSuperGraphsAlgorithm extends AbstractAlgorithm {
 			File file = fc.getSelectedFile();
 			String targetFolder = file.getPath();
 			AllSuperGraphsCreator workTask = new AllSuperGraphsCreator(graph, targetFolder, organismSelection,
-								checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, convertKOsToGenes);
+					checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, convertKOsToGenes);
 			BackgroundTaskHelper.issueSimpleTask("Organism Specific Super Graphs", "Please wait...", workTask, null, workTask);
 		}
 	}

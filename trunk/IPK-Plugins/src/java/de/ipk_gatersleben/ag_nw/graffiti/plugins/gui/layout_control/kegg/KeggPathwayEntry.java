@@ -8,7 +8,6 @@
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +15,7 @@ import java.net.URL;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.Vector2d;
+import org.graffiti.plugin.io.resources.IOurl;
 
 /**
  * @author Christian Klukas
@@ -196,18 +196,18 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		this.mappingCount = mappingCount;
 	}
 	
-	public InputStream getOpenInputStream() throws IOException {
+	public InputStream getOpenInputStream() throws Exception {
 		if (openInputStream != null)
 			return openInputStream;
 		else {
 			if (!isColorEnzymesAndUseReferencePathway()) {
 				URL url = getPathwayURL();
 				if (url != null)
-					return url.openStream();
+					return new IOurl(url.toString()).getInputStream();
 				else
 					return null;
 			} else
-				return getPathwayURL(true).openStream();
+				return new IOurl(getPathwayURL(true).toString()).getInputStream();
 		}
 	}
 	
@@ -297,6 +297,7 @@ public class KeggPathwayEntry implements Comparable<Object> {
 		}
 	}
 	
+	@Override
 	public int compareTo(Object o) {
 		KeggPathwayEntry kpe = (KeggPathwayEntry) o;
 		if (getOrganismLetters().equals("map") && kpe.getOrganismLetters().equals("ko"))

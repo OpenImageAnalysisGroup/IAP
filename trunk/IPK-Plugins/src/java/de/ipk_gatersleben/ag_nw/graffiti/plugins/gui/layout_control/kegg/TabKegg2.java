@@ -9,7 +9,6 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.xml.rpc.ServiceException;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -91,7 +89,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class TabKegg2 extends InspectorTab
 		implements SessionListener, AttributeListener {
@@ -409,9 +407,7 @@ public class TabKegg2 extends InspectorTab
 									}
 								}
 							}, null, statusProvider);
-				} catch (IOException e1) {
-					ErrorMsg.addErrorMessage(e1);
-				} catch (ServiceException e1) {
+				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
 				}
 			}
@@ -480,9 +476,7 @@ public class TabKegg2 extends InspectorTab
 									}
 								}
 							}, null, statusProvider);
-				} catch (IOException e1) {
-					ErrorMsg.addErrorMessage(e1);
-				} catch (ServiceException e1) {
+				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
 				}
 			}
@@ -542,9 +536,7 @@ public class TabKegg2 extends InspectorTab
 								}
 							}, null, statusProvider);
 					
-				} catch (IOException e1) {
-					ErrorMsg.addErrorMessage(e1);
-				} catch (ServiceException e1) {
+				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
 				}
 			}

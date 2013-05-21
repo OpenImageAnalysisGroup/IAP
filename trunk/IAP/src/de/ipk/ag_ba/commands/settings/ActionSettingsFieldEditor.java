@@ -154,8 +154,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										"Warning about symmetric encryption and secret file displayed", false)) {
 									Object[] i = MyInputHelper.getInput(
 											"Passwords are saved using symetric encryption in the settings-ini-file.<br>" +
-													"The encryption/decription key is stored in the file 'secret'.<br>" +
-													"Adjust access rights to the 'secret' file in the application settings folder, if needed.<br><br>" +
+													"The encryption/decryption key is stored in the file 'secret'.<br>" +
+													"If needed, adjust access rights to the 'secret' file in the application settings folder.<br><br>" +
 													"<b>This information is only displayed once.</b><br><br>" +
 													"Click 'Cancel' if you need further information.",
 											"Information");
