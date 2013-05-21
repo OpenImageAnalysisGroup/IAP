@@ -52,7 +52,7 @@ public interface VfsFileObject {
 	
 	public OutputStream getOutputStream() throws IOException;
 	
-	public InputStream getInputStream() throws IOException;
+	public InputStream getInputStream() throws Exception;
 	
 	public FileObject getFile();
 	
