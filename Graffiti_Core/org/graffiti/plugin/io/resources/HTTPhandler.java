@@ -5,11 +5,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.HttpBasicAuth;
+import org.SystemOptions;
 
 public class HTTPhandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "http";
 	
+	@Override
 	public String getPrefix() {
 		return PREFIX;
 	}
@@ -24,8 +26,14 @@ public class HTTPhandler extends AbstractResourceIOHandler {
 				String pass = userPass.split(":")[1];
 				String uuu = url.toString().split("@", 2)[1];
 				return HttpBasicAuth.downloadFileWithAuth(uuu, user, pass);
-			} else
-				return new URL(url.toString()).openStream();
+			} else {
+				URLConnection con = new URL(url.toString()).openConnection();
+				con.setConnectTimeout(SystemOptions.getInstance().getInteger("VFS", "http-connect-timeout", 10000));
+				con.setReadTimeout(SystemOptions.getInstance().getInteger("VFS", "http-read-timeout", 30000));
+				InputStream in = con.getInputStream();
+				return in;
+				// return new URL(url.toString()).openStream();
+			}
 		} else
 			return null;
 	}

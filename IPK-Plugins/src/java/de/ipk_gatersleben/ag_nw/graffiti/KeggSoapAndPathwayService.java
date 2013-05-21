@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
@@ -23,7 +22,6 @@ import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
 import org.graffiti.selection.Selection;
-import org.jdom.JDOMException;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.DatabaseBasedLabelReplacementService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggPathwayEntry;
@@ -66,11 +64,7 @@ public class KeggSoapAndPathwayService
 			try {
 				return KeggService.getKeggPathwayGravistoGraph(keggPathwayEntries
 						.get(index), false, enzymeColor);
-			} catch (MalformedURLException er) {
-				ErrorMsg.addErrorMessage(er);
-			} catch (IOException er) {
-				ErrorMsg.addErrorMessage(er);
-			} catch (JDOMException er) {
+			} catch (Exception er) {
 				ErrorMsg.addErrorMessage(er);
 			}
 			return null;

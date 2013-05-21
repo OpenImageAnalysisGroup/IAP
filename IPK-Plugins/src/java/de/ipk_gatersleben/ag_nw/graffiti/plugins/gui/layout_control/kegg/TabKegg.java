@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +42,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
-import javax.xml.rpc.ServiceException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -84,7 +82,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 /**
  * @author $author$
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TabKegg extends InspectorTab
 		implements
@@ -147,9 +145,11 @@ public class TabKegg extends InspectorTab
 		
 		btnCheckMappingCount.setOpaque(false);
 		btnCheckMappingCount.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final KeggService ks = new KeggService();
 				Runnable workTask = new Runnable() {
+					@Override
 					public void run() {
 						ks.processKeggTree(keggTree, pathwayToTreeNode);
 						keggTree.repaint();
@@ -166,6 +166,7 @@ public class TabKegg extends InspectorTab
 		
 		btnResetMappingInfo.setOpaque(false);
 		btnResetMappingInfo.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final List<KeggPathwayEntry> keggPathways = new ArrayList<KeggPathwayEntry>();
 				for (KeggPathwayEntry kpe : pathwayToTreeNode.keySet())
@@ -185,6 +186,7 @@ public class TabKegg extends InspectorTab
 		JScrollPane pathwayTreeScroll = new JScrollPane(keggTree);
 		
 		MouseListener ml = new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				int selRow = keggTree.getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = keggTree.getPathForLocation(e.getX(), e.getY());
@@ -207,6 +209,7 @@ public class TabKegg extends InspectorTab
 		
 		loadPathway.addActionListener(new ActionListener() {
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				TreePath[] selPaths = keggTree.getSelectionPaths();
 				if (selPaths == null) {
@@ -231,8 +234,10 @@ public class TabKegg extends InspectorTab
 		});
 		final JTextField searchBox = new JTextField("");
 		searchBox.addKeyListener(new KeyListener() {
+			@Override
 			public void keyTyped(KeyEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						String searchText = searchBox.getText();
 						// keggPathways
@@ -244,9 +249,11 @@ public class TabKegg extends InspectorTab
 				});
 			}
 			
+			@Override
 			public void keyPressed(KeyEvent e) {
 			}
 			
+			@Override
 			public void keyReleased(KeyEvent e) {
 			}
 		});
@@ -286,6 +293,7 @@ public class TabKegg extends InspectorTab
 		replaceLabels.setOpaque(false);
 		replaceLabels.setToolTipText("Click to modify active graph node labels");
 		replaceLabels.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				GravistoService.getInstance().runAlgorithm(new InterpreteLabelNamesAlgorithm(), e);
 			}
@@ -300,6 +308,7 @@ public class TabKegg extends InspectorTab
 		final Graph superGraph = new AdjListGraph(new ListenerManager());
 		BackgroundTaskHelper.issueSimpleTask("Load Pathway Selection", "Please wait...",
 				new Runnable() {
+					@Override
 					public void run() {
 						int maxCol = maxColumns - 1;
 						int col = 0;
@@ -353,6 +362,7 @@ public class TabKegg extends InspectorTab
 						status.setCurrentStatusValueFine(-1);
 					}
 				}, new Runnable() {
+					@Override
 					public void run() {
 						if (!status.wantsToStop())
 							MainFrame.getInstance().showGraph(superGraph, null);
@@ -396,6 +406,7 @@ public class TabKegg extends InspectorTab
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Load pathways:", "");
 			
 			Runnable backgroundTask1 = new Runnable() {
+				@Override
 				public void run() {
 					int max = entries.size();
 					int i = 0;
@@ -487,6 +498,7 @@ public class TabKegg extends InspectorTab
 	public void transactionStarted(TransactionEvent e) {
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// String url = null;
 		
@@ -497,20 +509,20 @@ public class TabKegg extends InspectorTab
 					"Please wait (retrieve data)...",
 					"",
 					new Runnable() {
+						@Override
 						public void run() {
 							try {
 								KeggHelper h = new KeggHelper();
 								organisms.addAll(h.getOrganisms());
 								KoService.getInformationLazy("");
-							} catch (IOException er) {
-								ErrorMsg.addErrorMessage(er);
-							} catch (ServiceException er) {
+							} catch (Exception er) {
 								ErrorMsg.addErrorMessage(er);
 							}
 						}
 						
 					},
 					new Runnable() {
+						@Override
 						public void run() {
 							// organismList.add(new OrganismEntry("map", "Reference Pathways"));
 							if (organisms.size() <= 2) {
@@ -571,18 +583,22 @@ public class TabKegg extends InspectorTab
 		
 		filter.addKeyListener(new KeyListener() {
 			
+			@Override
 			public void keyPressed(KeyEvent e) {
 				//
 				
 			}
 			
+			@Override
 			public void keyReleased(KeyEvent e) {
 				//
 				
 			}
 			
+			@Override
 			public void keyTyped(KeyEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@Override
 					public void run() {
 						String filterText = filter.getText().toUpperCase();
 						
@@ -625,6 +641,7 @@ public class TabKegg extends InspectorTab
 		keggTree.setCellRenderer(new TreeCellRenderer() {
 			DefaultTreeCellRenderer tcr = new DefaultTreeCellRenderer();
 			
+			@Override
 			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 				Component cmp = tcr.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 				DefaultMutableTreeNode tn = (DefaultMutableTreeNode) value;
@@ -662,6 +679,7 @@ public class TabKegg extends InspectorTab
 						"Refresh Pathway-List",
 						"Please wait (SOAP/FTP call and pathway group lookup is performed)...",
 						new Runnable() {
+							@Override
 							public void run() {
 								try {
 									KeggHelper h = new KeggHelper();
@@ -672,6 +690,7 @@ public class TabKegg extends InspectorTab
 							}
 						},
 						new Runnable() {
+							@Override
 							public void run() {
 								pathwaysOfTreeNode.put(myRootNode2, pathways);
 								buildPathwayTree(null, myRootNode2, pathways);
@@ -764,6 +783,7 @@ public class TabKegg extends InspectorTab
 				level2.add(myNewNode);
 		}
 		Collections.sort((List<MyDefaultMutableTreeNode>) addLater, new Comparator() {
+			@Override
 			public int compare(Object o1, Object o2) {
 				MyDefaultMutableTreeNode n1 = (MyDefaultMutableTreeNode) o1;
 				MyDefaultMutableTreeNode n2 = (MyDefaultMutableTreeNode) o2;
@@ -776,6 +796,7 @@ public class TabKegg extends InspectorTab
 		((DefaultTreeModel) keggTree.getModel()).reload();
 	}
 	
+	@Override
 	public void loadGraphInBackground(File[] files, ActionEvent ae) {
 		boolean inOneView = false;
 		Boolean processMapLinks = null;
@@ -828,6 +849,7 @@ public class TabKegg extends InspectorTab
 		final Graph superGraph = new AdjListGraph(new ListenerManager());
 		BackgroundTaskHelper.issueSimpleTask("Load Files", "Please wait...",
 				new Runnable() {
+					@Override
 					public void run() {
 						int maxCol = maxColumns - 1;
 						int col = 0;
@@ -896,6 +918,7 @@ public class TabKegg extends InspectorTab
 						status.setCurrentStatusValueFine(-1);
 					}
 				}, new Runnable() {
+					@Override
 					public void run() {
 						if (!status.wantsToStop())
 							MainFrame.getInstance().showGraph(superGraph, null);

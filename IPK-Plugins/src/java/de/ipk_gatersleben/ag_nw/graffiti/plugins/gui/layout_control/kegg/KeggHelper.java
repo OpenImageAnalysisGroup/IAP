@@ -36,7 +36,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * HTML Parser
  * 
  * @author Christian Klukas
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class KeggHelper implements HelperClass {
 	
@@ -234,9 +234,8 @@ public class KeggHelper implements HelperClass {
 	
 	private static Collection<OrganismEntry> cachedOrganismList = new ArrayList<OrganismEntry>();
 	
-	public synchronized Collection<OrganismEntry> getOrganisms()
-			throws IOException, ServiceException {
-		if (cachedOrganismList.size() > 1) {
+	public synchronized Collection<OrganismEntry> getOrganisms() throws Exception {
+		if (cachedOrganismList.size() > 2) {
 			return cachedOrganismList;
 		}
 		ArrayList<OrganismEntry> result = new ArrayList<OrganismEntry>();
@@ -257,6 +256,7 @@ public class KeggHelper implements HelperClass {
 			// T02283 pps Pan paniscus (bonobo) Eukaryotes;Animals;Vertebrates;Mammals
 			// T02442 ggo Gorilla gorilla gorilla (western lowland gorilla) Eukaryotes;Animals;Vertebrates;Mammals
 			// T01416 pon Pongo abelii (Sumatran orangutan) Eukaryotes;Animals;Vertebrates;Mammals
+			GravistoService.setProxy();
 			Collection<OrganismEntry> orgs = list_organisms();
 			for (OrganismEntry oe : orgs)
 				result.add(oe);
@@ -315,6 +315,7 @@ public class KeggHelper implements HelperClass {
 	public static JComponent getKGMLversionSelectionCombobox() {
 		final JComboBox result = new JComboBox(new String[] { "0.7.0", "0.6.1", "0.6", "0.5", "0.4", "0.3", "0.2", "0.1" });
 		result.addItemListener(new ItemListener() {
+			@Override
 			public void itemStateChanged(ItemEvent e) {
 				String sel = (String) result.getSelectedItem();
 				setKgmlVersion(sel);
@@ -366,48 +367,122 @@ public class KeggHelper implements HelperClass {
 		return orgs;
 	}
 	
-	public static String[] get_kos_by_pathway(String mapName) {
+	public static String[] get_kos_by_pathway(String pathwayId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/ko/map00010
-		return null;
+		final Collection<String> kos = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/ko/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						kos.add(fields[1]);
+					}
+				});
+		return kos.toArray(new String[] {});
 	}
 	
-	public static String[] get_enzymes_by_pathway(String pathwayId) {
+	public static String[] get_enzymes_by_pathway(String pathwayId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/enzyme/map00010
-		return null;
+		final Collection<String> enzymes = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/enzyme/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						enzymes.add(fields[1]);
+					}
+				});
+		return enzymes.toArray(new String[] {});
 	}
 	
-	public static String[] get_reactions_by_pathway(String pathwayId) {
+	public static String[] get_reactions_by_pathway(String pathwayId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/rn/map00010
-		return null;
+		final Collection<String> rns = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/rn/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						rns.add(fields[1]);
+					}
+				});
+		return rns.toArray(new String[] {});
 	}
 	
-	public static String[] get_genes_by_pathway(String pathwayId) {
+	public static String[] get_genes_by_pathway(String pathwayId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/genes/hsa00010
-		return null;
+		final Collection<String> genes = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/genes/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						genes.add(fields[1]);
+					}
+				});
+		return genes.toArray(new String[] {});
 	}
 	
-	public static String[] get_compounds_by_pathway(String pathwayId) {
+	public static String[] get_compounds_by_pathway(String pathwayId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/compound/map00010
-		return null;
+		final Collection<String> compounds = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/compound/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						compounds.add(fields[1]);
+					}
+				});
+		return compounds.toArray(new String[] {});
 	}
 	
-	public static String[] get_glycans_by_pathway(String pathwayId) {
+	public static String[] get_glycans_by_pathway(String pathwayId) throws Exception {
 		// REST API: (does not work: http://rest.kegg.jp/link/glycan/hsa00020 )
-		return null;
+		if (true)
+			throw new UnsupportedOperationException("ToDo: add correct call to remote API");
+		final Collection<String> glycans = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/glycan/" + pathwayId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						glycans.add(fields[1]);
+					}
+				});
+		return glycans.toArray(new String[] {});
 	}
 	
-	public static String[] get_genes_by_ko(String keggID, String org) {
+	public static String[] get_genes_by_ko(String keggID, String org) throws Exception {
 		// REST API: http://rest.kegg.jp/find/genes/K00400+mmp
-		return null;
+		final Collection<String> genes = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/find/genes/" + keggID + "+" + org),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						genes.add(fields[0]);
+					}
+				});
+		return genes.toArray(new String[] {});
 	}
 	
-	public static String[] get_enzymes_by_reaction(String value) {
+	public static String[] get_enzymes_by_reaction(String reactionId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/enzyme/rn:R01070
-		return null;
+		final Collection<String> enzymes = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl(" http://rest.kegg.jp/link/enzyme/" + reactionId),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						enzymes.add(fields[1]);
+					}
+				});
+		return enzymes.toArray(new String[] {});
 	}
 	
 	private String[] get_linked_pathways(String pathway_id) {
 		// REST API: Unclear (http://rest.kegg.jp/link/pathway/map00010 does not work)
-		return null;
+		throw new UnsupportedOperationException("ToDo: add correct call to remote API");
 	}
 }

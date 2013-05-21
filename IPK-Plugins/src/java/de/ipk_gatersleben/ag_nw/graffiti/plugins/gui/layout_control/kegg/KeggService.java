@@ -6,7 +6,6 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.Vector2d;
+import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.graph.AdjListGraph;
@@ -40,7 +40,6 @@ import org.graffiti.plugin.algorithm.PreconditionException;
 import org.graffiti.selection.Selection;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
@@ -128,7 +127,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 				Graph myGraph = null;
 				try {
 					myGraph = KeggService.getKeggPathwayGravistoGraph(myEntry,
-							false /* true */, enzymeColor);
+							true, enzymeColor);
 					
 					if (processLabels) {
 						MainFrame.showMessage("Interpret database identifiers",
@@ -175,11 +174,8 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				} catch (JDOMException e) {
-					ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-				} catch (IOException e) {
-					MainFrame.showMessage("Not available: "
-							+ myEntry.getPathwayURLstring(), MessageType.INFO);
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
 				}
 				String detailInfo;
 				if (myGraph == null) {
@@ -417,15 +413,14 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 	}
 	
 	public static Graph getKeggPathwayGravistoGraph(KeggPathwayEntry myEntry,
-			boolean showErrorMessages, Color enzymeColors) throws JDOMException,
-			IOException, MalformedURLException {
+			boolean showErrorMessages, Color enzymeColors) throws Exception {
 		return getKeggPathwayGravistoGraph(myEntry, showErrorMessages,
 				enzymeColors, true);
 	}
 	
 	public static Graph getKeggPathwayGravistoGraph(KeggPathwayEntry myEntry,
 			boolean showErrorMessages, Color enzymeColors, boolean includeMapNodes)
-			throws JDOMException, IOException, MalformedURLException {
+			throws Exception {
 		
 		InputStream inpStream = null;
 		Graph myGraph = new AdjListGraph();
@@ -439,6 +434,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 			
 			inpStream = myEntry.getOpenInputStream();
 			if (inpStream != null) {
+				GravistoService.setProxy();
 				doc = builder.build(inpStream);
 				// Lesen des Wurzelelements des JDOM-Dokuments doc
 				Element kegg = doc.getRootElement();
@@ -712,9 +708,7 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 							keggTree.repaint();
 						}
 						progressVal = ++cnt * 100 / keggPathways.size();
-					} catch (JDOMException e) {
-						ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-					} catch (IOException e) {
+					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 					}
 				}

@@ -6,11 +6,8 @@
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.kegg_bar;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.xml.rpc.ServiceException;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
@@ -39,6 +36,7 @@ public class ColorizeSuperGraphAlgorithm extends AbstractAlgorithm {
 	private boolean checkGlycans = false;
 	private boolean checkCompounds = false;
 	
+	@Override
 	public String getName() {
 		return null; // start from kegg tab 2
 		// return "Create Organism-Specific KEGG Super-Graph";
@@ -47,18 +45,18 @@ public class ColorizeSuperGraphAlgorithm extends AbstractAlgorithm {
 	@Override
 	public String getDescription() {
 		return "<html>" +
-							"This algorithm enumerates a list of pathways, which are the source of the active<br>" +
-							"(super)pathway. It then uses the KEGG SOAP API to enumerate the specified elements<br>" +
-							"for a given organism and marks elements that are returned for the selected organism.";
+				"This algorithm enumerates a list of pathways, which are the source of the active<br>" +
+				"(super)pathway. It then uses the KEGG SOAP API to enumerate the specified elements<br>" +
+				"for a given organism and marks elements that are returned for the selected organism.";
 	}
 	
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new BooleanParameter(checkOrthologs, "Check Orthologs (KO IDs)", "If selected, the organism specific KO based entries are processed"),
-							new BooleanParameter(checkEnzymes, "Check Enzymes", "If selected, the organism specific Enzyme ID based entries are processed"),
-							new BooleanParameter(checkGlycans, "Check Glycans", "If selected, the organism specific Glycan ID based entries are processed"),
-							new BooleanParameter(checkCompounds, "Check Compounds", "If selected, the organism specific Compound ID based entries are processed") };
+				new BooleanParameter(checkOrthologs, "Check Orthologs (KO IDs)", "If selected, the organism specific KO based entries are processed"),
+				new BooleanParameter(checkEnzymes, "Check Enzymes", "If selected, the organism specific Enzyme ID based entries are processed"),
+				new BooleanParameter(checkGlycans, "Check Glycans", "If selected, the organism specific Glycan ID based entries are processed"),
+				new BooleanParameter(checkCompounds, "Check Compounds", "If selected, the organism specific Compound ID based entries are processed") };
 	}
 	
 	@Override
@@ -83,14 +81,13 @@ public class ColorizeSuperGraphAlgorithm extends AbstractAlgorithm {
 		super.check();
 	}
 	
+	@Override
 	public void execute() {
 		final Collection<OrganismEntry> organisms = new ArrayList<OrganismEntry>();
 		try {
 			KeggHelper h = new KeggHelper();
 			organisms.addAll(h.getOrganisms());
-		} catch (IOException er) {
-			ErrorMsg.addErrorMessage(er);
-		} catch (ServiceException er) {
+		} catch (Exception er) {
 			ErrorMsg.addErrorMessage(er);
 		}
 		if (organisms == null)
@@ -100,14 +97,14 @@ public class ColorizeSuperGraphAlgorithm extends AbstractAlgorithm {
 			return;
 		if (organismSelections.length < 1) {
 			MainFrame.showMessageDialog(
-								"No organism has been selected. Operation aborted.",
-								"Information");
+					"No organism has been selected. Operation aborted.",
+					"Information");
 			return;
 		}
 		if (organismSelections.length > 1) {
 			MainFrame.showMessageDialog(
-								"More than one organism has been selected, processing the first: " + organismSelections[0].toString(),
-								"Information");
+					"More than one organism has been selected, processing the first: " + organismSelections[0].toString(),
+					"Information");
 		}
 		organismSelection = organismSelections[0];
 		
@@ -169,42 +166,43 @@ public class ColorizeSuperGraphAlgorithm extends AbstractAlgorithm {
 		final Graph ggg = graph;
 		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Please wait...", "");
 		BackgroundTaskHelper.issueSimpleTask("Enumerate organism specific elements", "Please wait...",
-							new Runnable() {
-								public void run() {
-									status.setCurrentStatusText1("Process covered maps (" + coveredMaps.size() + ")...");
-									double workLoad = coveredMaps.size();
-									double progress = 0;
-									String covering = "";
-									if (checkOrthologs)
-										covering += ", orthologs";
-									if (checkEnzymes)
-										covering += ", enzymes";
-									if (checkGlycans)
-										covering += ", glycans";
-									if (checkCompounds)
-										covering += ", compounds";
-									if (covering.startsWith(", "))
-										covering = covering.substring(", ".length());
-									for (String map : coveredMaps) {
-										status.setCurrentStatusText1("Process covered maps (" + (int) (progress + 1) + "/" + coveredMaps.size() + ")...");
-										status.setCurrentStatusText2("Request and process " + covering + " of map " + map);
-										KeggService.colorizeEnzymesGlycansCompounds(ggg, map, KeggService.getDefaultEnzymeColor(), false,
-															checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, checkOrthologs);
-										progress = progress + 1;
-										status.setCurrentStatusValueFine(100d * progress / workLoad);
-										if (status.wantsToStop()) {
-											break;
-										}
-									}
-									if (status.wantsToStop()) {
-										status.setCurrentStatusValueFine(100d);
-										status.setCurrentStatusText1("Processing incomplete!");
-										status.setCurrentStatusText2("Operation aborted.");
-									} else {
-										status.setCurrentStatusText1("Processing complete!");
-										status.setCurrentStatusText2("");
-									}
-								}
-							}, null, status);
+				new Runnable() {
+					@Override
+					public void run() {
+						status.setCurrentStatusText1("Process covered maps (" + coveredMaps.size() + ")...");
+						double workLoad = coveredMaps.size();
+						double progress = 0;
+						String covering = "";
+						if (checkOrthologs)
+							covering += ", orthologs";
+						if (checkEnzymes)
+							covering += ", enzymes";
+						if (checkGlycans)
+							covering += ", glycans";
+						if (checkCompounds)
+							covering += ", compounds";
+						if (covering.startsWith(", "))
+							covering = covering.substring(", ".length());
+						for (String map : coveredMaps) {
+							status.setCurrentStatusText1("Process covered maps (" + (int) (progress + 1) + "/" + coveredMaps.size() + ")...");
+							status.setCurrentStatusText2("Request and process " + covering + " of map " + map);
+							KeggService.colorizeEnzymesGlycansCompounds(ggg, map, KeggService.getDefaultEnzymeColor(), false,
+									checkOrthologs, checkEnzymes, checkGlycans, checkCompounds, checkOrthologs);
+							progress = progress + 1;
+							status.setCurrentStatusValueFine(100d * progress / workLoad);
+							if (status.wantsToStop()) {
+								break;
+							}
+						}
+						if (status.wantsToStop()) {
+							status.setCurrentStatusValueFine(100d);
+							status.setCurrentStatusText1("Processing incomplete!");
+							status.setCurrentStatusText2("Operation aborted.");
+						} else {
+							status.setCurrentStatusText1("Processing complete!");
+							status.setCurrentStatusText2("");
+						}
+					}
+				}, null, status);
 	}
 }
