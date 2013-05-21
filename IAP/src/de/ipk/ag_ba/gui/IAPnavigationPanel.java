@@ -58,16 +58,17 @@ import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
  * @author klukas
  */
-public class MyNavigationPanel extends JPanel implements ActionListener {
+public class IAPnavigationPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<NavigationButton> set;
 	private final JComponent graphPanel;
-	private MyNavigationPanel theOther;
+	private IAPnavigationPanel theOther;
 	private final PanelTarget target;
 	private final JPanel actionPanelRight;
 	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.FLAT;
@@ -78,7 +79,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	private int maxYY;
 	private GUIsetting guiSettting;
 	
-	public MyNavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
+	public IAPnavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
 		this.graphPanel = graphPanel;
 		this.actionPanelRight = actionPanelRight;
@@ -122,6 +123,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
+	private NavigationButtonFilter optNavigationButtonFilter;
 	
 	private ActionListener getNewWindowListener() {
 		return getNewWindowListener(null);
@@ -134,36 +136,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 						"IAP Cloud Storage, Analysis and Visualization System");
-				final JFrame jff = new JFrame(tt);
-				if (optCustomStartAction != null)
-					jff.setTitle(optCustomStartAction.getDefaultTooltip());
-				jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
-				BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-						"", "");
-				jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction), "0,0");
-				jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				jff.setLocationByPlatform(true);
-				jff.setSize(800, 600);
-				try {
-					int n = nWindows.getInt();
-					String w = "Application-Default-Icon-64.png";
-					if (n % 4 == 0)
-						w = "Gnome-Colors-Emblem-Desktop-64.png";
-					if (n % 4 == 1)
-						w = "Gnome-Colors-Emblem-Desktop-Orange-64.png";
-					if (n % 4 == 2)
-						w = "Gnome-Colors-Emblem-Desktop-Red-64.png";
-					if (n % 4 == 3)
-						w = "Gnome-Colors-Emblem-Green-64.png";
-					jff.setIconImage(GravistoService.loadImage(IAPmain.class, "img/ext/gpl2/" + w, 64, 64));
-					nWindows.addInt(1);
-				} catch (Exception err) {
-					err.printStackTrace();
-					ErrorMsg.addErrorMessage(err);
-				}
-				jff.setVisible(true);
-				jff.validate();
-				jff.repaint();
+				final JFrame jff = getIAPwindow(optCustomStartAction, tt, 800, 600);
 				final Runnable rr = new Runnable() {
 					@Override
 					public void run() {
@@ -209,28 +182,45 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	public void setEntitySet(ArrayList<NavigationButton> set) {
 		if (set == null)
 			return;
-		this.set = new ArrayList<NavigationButton>(set);
+		if (optNavigationButtonFilter == null)
+			this.set = new ArrayList<NavigationButton>(set);
+		else {
+			this.set = new ArrayList<NavigationButton>();
+			for (NavigationButton nb : set)
+				if (accept(nb))
+					this.set.add(nb);
+		}
 		if (target == PanelTarget.ACTION) {
 			if (guiSettting.getClipboardItems().size() > 0) {
 				NavigationAction na = new ActionClearClipboard("Remove all entries from the clipboard");
 				NavigationButton nb = new NavigationButton(na, guiSettting);
 				nb.setRightAligned(true);
-				this.set.add(nb);
+				if (accept(nb))
+					this.set.add(nb);
 			}
 			if (guiSettting.getClipboardItems().size() > 1) {
 				NavigationAction na = new ActionMergeClipboard("Merge clipboard data set");
 				NavigationButton nb = new NavigationButton(na, guiSettting);
 				nb.setRightAligned(true);
-				this.set.add(nb);
+				if (accept(nb))
+					this.set.add(nb);
 			}
 			for (ExperimentReference clipboardItem : guiSettting.getClipboardItems()) {
 				NavigationAction na = new ActionMongoOrLTexperimentNavigation(clipboardItem);
 				NavigationButton nb = new NavigationButton("Clipboard item " + clipboardItem.getExperimentName() + "", na, guiSettting);
 				nb.setRightAligned(true);
-				this.set.add(nb);
+				if (accept(nb))
+					this.set.add(nb);
 			}
 		}
 		updateGUI();
+	}
+	
+	private boolean accept(NavigationButton nb) {
+		if (optNavigationButtonFilter == null || optNavigationButtonFilter.accept(nb))
+			return true;
+		else
+			return false;
 	}
 	
 	private void updateGUI() {
@@ -367,7 +357,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 						if (target != null) {
 							if (Bookmark.add(ne.getTitle(), target, i)) {
 								if (!set.isEmpty())
-									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+									set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, IAPnavigationPanel.this,
 											theOther, graphPanel, null, null, style);
 							} else
 								MainFrame.getInstance().showMessageDialog("Could not add bookmark.");
@@ -450,7 +440,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 							MainFrame.getInstance().showMessageDialog("Could not delete bookmark.");
 						} else {
 							if (!set.isEmpty())
-								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, MyNavigationPanel.this,
+								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, IAPnavigationPanel.this,
 										theOther, graphPanel, null, null, style);
 						}
 					}
@@ -503,11 +493,11 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 		return c2;
 	}
 	
-	public void setTheOther(MyNavigationPanel theOther) {
+	public void setTheOther(IAPnavigationPanel theOther) {
 		this.theOther = theOther;
 	}
 	
-	public MyNavigationPanel getTheOther() {
+	public IAPnavigationPanel getTheOther() {
 		return theOther;
 	}
 	
@@ -543,7 +533,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							JComponent jc = MyNavigationPanel.this;
+							JComponent jc = IAPnavigationPanel.this;
 							while (jc.getParent() != null && jc.getParent() instanceof JComponent)
 								jc = (JComponent) jc.getParent();
 							jc.revalidate();
@@ -612,7 +602,7 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 			gp = new GradientPaint(0, 0, new Color(240, 240, 240), 0, h, new Color(210, 230, 210));
 		else {
 			Color c2;
-			c2 = MyNavigationPanel.getTabColor();
+			c2 = IAPnavigationPanel.getTabColor();
 			
 			gp = new GradientPaint(0, 0, new Color(250, 250, 250), 0, h, c2);
 		}
@@ -630,6 +620,49 @@ public class MyNavigationPanel extends JPanel implements ActionListener {
 	
 	public void setGuiSetting(GUIsetting guiSetting) {
 		this.guiSettting = guiSetting;
+	}
+	
+	public static JFrame getIAPwindow(final NavigationAction optCustomStartAction, String windowTitle, int width, int height) {
+		return getIAPwindow(optCustomStartAction, windowTitle, width, height, null);
+	}
+	
+	public static JFrame getIAPwindow(final NavigationAction optCustomStartAction, String windowTitle, int width, int height,
+			NavigationButtonFilter optNavigationButtonFilter) {
+		final JFrame jff = new JFrame(windowTitle);
+		if (optCustomStartAction != null)
+			jff.setTitle(optCustomStartAction.getDefaultTooltip());
+		jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
+		BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+				"", "");
+		jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction, optNavigationButtonFilter), "0,0");
+		jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		jff.setLocationByPlatform(true);
+		jff.setSize(width, height);
+		try {
+			int n = nWindows.getInt();
+			String w = "Application-Default-Icon-64.png";
+			if (n % 4 == 0)
+				w = "Gnome-Colors-Emblem-Desktop-64.png";
+			if (n % 4 == 1)
+				w = "Gnome-Colors-Emblem-Desktop-Orange-64.png";
+			if (n % 4 == 2)
+				w = "Gnome-Colors-Emblem-Desktop-Red-64.png";
+			if (n % 4 == 3)
+				w = "Gnome-Colors-Emblem-Green-64.png";
+			jff.setIconImage(GravistoService.loadImage(IAPmain.class, "img/ext/gpl2/" + w, 64, 64));
+			nWindows.addInt(1);
+		} catch (Exception err) {
+			err.printStackTrace();
+			ErrorMsg.addErrorMessage(err);
+		}
+		jff.setVisible(true);
+		jff.validate();
+		jff.repaint();
+		return jff;
+	}
+	
+	public void setNavigationButtonFilter(NavigationButtonFilter optNavigationButtonFilter) {
+		this.optNavigationButtonFilter = optNavigationButtonFilter;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package org.graffiti.plugin.io.resources;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.ErrorMsg;
 
@@ -88,14 +89,8 @@ public class IOurl {
 		return ResourceIOManager.getInputStream(this);
 	}
 	
-	public IOurl save() throws Exception {
-		ResourceIOHandler mh = ResourceIOManager.getHandlerFromPrefix(getPrefix());
-		return mh.save(this);
-	}
-	
-	public IOurl saveAs(String targetFileName) throws Exception {
-		ResourceIOHandler mh = ResourceIOManager.getHandlerFromPrefix(getPrefix());
-		return mh.saveAs(this, targetFileName);
+	public OutputStream getOutputStream() throws Exception {
+		return ResourceIOManager.getOutputStream(this);
 	}
 	
 	public String getFileNameDecoded() {

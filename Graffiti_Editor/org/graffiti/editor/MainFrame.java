@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.11 2013-02-20 06:06:17 klukas Exp $
+// $Id: MainFrame.java,v 1.12 2013-05-21 19:11:11 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -191,7 +191,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 		UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -1247,16 +1247,23 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		updateActions();
 	}
 	
+	public Graph loadGraph(String fileName, URL url) {
+		return loadGraph(fileName, new MyInputStreamCreator(url));
+	}
+	
+	public Graph loadGraph(String fileName, IOurl url) {
+		return loadGraph(fileName, new MyInputStreamCreator(url));
+	}
+	
 	/**
 	 * Loads a graph from a file;
 	 * 
 	 * @param file
 	 *           File containing the graph;
 	 */
-	public Graph loadGraph(String fileName, URL url) {
+	public Graph loadGraph(String fileName, MyInputStreamCreator ic) {
 		String ext = fileName.substring(fileName.lastIndexOf("."));
 		try {
-			MyInputStreamCreator ic = new MyInputStreamCreator(url);
 			InputSerializer is = manager.ioManager.createInputSerializer(ic.getNewInputStream(), ext);
 			if (is == null) {
 				ErrorMsg.addErrorMessage("Graph " + fileName + " could not be loaded. InputSerializer is NULL.");
@@ -1272,7 +1279,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 			EditorSession es = new EditorSession(g);
 			
 			try {
-				es.setFileName(url.toString());
+				es.setFileName(ic.toString());
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -1283,15 +1290,9 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 			JOptionPane.showMessageDialog(null,
 					sBundle.getString("fileFormatError").replaceAll("\\[err\\]", e1.getLocalizedMessage()),
 					sBundle.getString("fileFormatErrorTitle"), JOptionPane.ERROR_MESSAGE);
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage("Graph " + fileName + " could not be loaded. IO Exception<br>" + "Exception: <code>"
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage("Graph " + fileName + " could not be loaded.<br>" + "Exception: <code>"
 					+ e.getLocalizedMessage() + "</code>");
-		} catch (IllegalAccessException e) {
-			ErrorMsg.addErrorMessage("Graph " + fileName + " could not be loaded. IllegalAccessException<br>"
-					+ "Exception: <code>" + e.getLocalizedMessage() + "</code>");
-		} catch (InstantiationException e) {
-			ErrorMsg.addErrorMessage("Graph " + fileName + " could not be loaded. InstantiationException<br>"
-					+ "Exception: <code>" + e.getLocalizedMessage() + "</code>");
 		}
 		return null;
 	}
@@ -1317,13 +1318,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 			g.setName(u);
 			g.setModified(false);
 			return g;
-		} catch (org.graffiti.plugin.io.ParserException e1) {
-			ErrorMsg.addErrorMessage(e1);
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (IllegalAccessException e) {
-			ErrorMsg.addErrorMessage(e);
-		} catch (InstantiationException e) {
+		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 		return null;
@@ -4003,10 +3998,11 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	}
 	
 	public void warnUserAboutFileSaveProblem(Exception ioe) {
-		MainFrame.showMessageDialog("<html>Saving file caused and error (" + ioe.getMessage() + "),<br>"
-				+ "To avoid data loss, try saving the file in a different format,<br>"
-				+ "as a different file in a different place.<br>"
-				+ "Consider to print the graph view, to avoid complete loss<br>" + "of information.", "Error");
+		MainFrame.showMessageDialog("<html>"
+				+ "Saving file caused and error:<br><br>"
+				+ "<b>" + ioe.getMessage() + "</b>.<br><br>"
+				+ "To avoid data loss, try saving the file in a different format<br>"
+				+ "or in a different storage location.", "Could not save file");
 	}
 	
 	public JDesktopPane getDesktop() {

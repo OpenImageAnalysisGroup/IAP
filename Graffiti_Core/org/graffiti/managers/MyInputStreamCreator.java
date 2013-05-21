@@ -2,10 +2,11 @@ package org.graffiti.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
+
+import org.graffiti.plugin.io.resources.IOurl;
 
 public class MyInputStreamCreator {
 	
@@ -13,6 +14,7 @@ public class MyInputStreamCreator {
 	private boolean gzip;
 	private File file;
 	private URL url;
+	private IOurl ioURL;
 	
 	public MyInputStreamCreator(boolean gzip, String absolutePath) {
 		this.absolutePath = absolutePath;
@@ -23,11 +25,26 @@ public class MyInputStreamCreator {
 		this.file = file;
 	}
 	
+	@Override
+	public String toString() {
+		if (url != null)
+			return url.toString();
+		else
+			if (ioURL != null)
+				return ioURL.toString();
+			else
+				return super.toString();
+	}
+	
 	public MyInputStreamCreator(URL url) {
 		this.url = url;
 	}
 	
-	public InputStream getNewInputStream() throws IOException {
+	public MyInputStreamCreator(IOurl ioURL) {
+		this.ioURL = ioURL;
+	}
+	
+	public InputStream getNewInputStream() throws Exception {
 		if (absolutePath != null) {
 			if (gzip)
 				return new GZIPInputStream(new FileInputStream(absolutePath));
@@ -38,6 +55,8 @@ public class MyInputStreamCreator {
 			return new FileInputStream(file);
 		if (url != null)
 			return url.openStream();
+		if (ioURL != null)
+			return ioURL.getInputStream();
 		return null;
 	}
 	

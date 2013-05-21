@@ -29,7 +29,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.ActionSettings;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
-import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -359,7 +359,7 @@ public class BlockPipeline {
 						openSettingsButton.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
-								MyNavigationPanel mnp = new MyNavigationPanel(PanelTarget.NAVIGATION, null, null);
+								IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
 								NavigationAction ac = new ActionSettings(null, er.getIniIoProvider(),
 										"Change analysis settings (experiment " + er.getExperimentName()
 												+ ")", "Modify settings");

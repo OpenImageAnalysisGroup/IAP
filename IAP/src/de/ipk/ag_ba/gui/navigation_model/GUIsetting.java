@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 
 /**
@@ -23,23 +23,23 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
  */
 public class GUIsetting {
 	
-	private final MyNavigationPanel navigationPanel;
-	private final MyNavigationPanel actionPanel;
+	private final IAPnavigationPanel navigationPanel;
+	private final IAPnavigationPanel actionPanel;
 	private final JPanel graphPanel;
 	private final LinkedHashSet<ExperimentReference> clipboardExperiments = new LinkedHashSet<ExperimentReference>();
 	private final HashSet<String> clipboardExperimentDatabaseIds = new HashSet<String>();
 	
-	public GUIsetting(MyNavigationPanel navigationPanel, MyNavigationPanel actionPanel, JPanel graphPanel) {
+	public GUIsetting(IAPnavigationPanel navigationPanel, IAPnavigationPanel actionPanel, JPanel graphPanel) {
 		this.navigationPanel = navigationPanel;
 		this.actionPanel = actionPanel;
 		this.graphPanel = graphPanel;
 	}
 	
-	public MyNavigationPanel getNavigationPanel() {
+	public IAPnavigationPanel getNavigationPanel() {
 		return navigationPanel;
 	}
 	
-	public MyNavigationPanel getActionPanel() {
+	public IAPnavigationPanel getActionPanel() {
 		return actionPanel;
 	}
 	

@@ -8,16 +8,16 @@ package de.ipk.ag_ba.gui.webstart;
 
 import javax.swing.JViewport;
 
-import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 
 /**
  * @author klukas
  */
 public class MyViewPort extends JViewport {
 	private static final long serialVersionUID = 1L;
-	private final MyNavigationPanel panel;
+	private final IAPnavigationPanel panel;
 	
-	public MyViewPort(MyNavigationPanel panel) {
+	public MyViewPort(IAPnavigationPanel panel) {
 		super();
 		this.panel = panel;
 	}

@@ -1,10 +1,14 @@
 package de.ipk.ag_ba.commands.vfs;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.graffiti.plugin.io.resources.AbstractResourceIOHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
+
+import de.ipk.vanted.plugin.VfsFileObject;
 
 public class VirtualFileSystemHandler extends AbstractResourceIOHandler {
 	
@@ -17,6 +21,14 @@ public class VirtualFileSystemHandler extends AbstractResourceIOHandler {
 	@Override
 	public String getPrefix() {
 		return vfs.getPrefix();
+	}
+	
+	@Override
+	public OutputStream getOutputStream(IOurl targetFilename) throws Exception {
+		VfsFileObject fo = vfs.getFileObjectFor(targetFilename.getFileName());
+		if (!fo.isWriteable())
+			throw new IOException("Target file is not writable");
+		return fo.getOutputStream();
 	}
 	
 	@Override

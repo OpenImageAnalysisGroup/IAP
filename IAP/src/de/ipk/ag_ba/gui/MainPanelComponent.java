@@ -67,7 +67,7 @@ public class MainPanelComponent {
 				if (optCustomBackgroundColor != null)
 					jep.setBackground(optCustomBackgroundColor);
 				else
-					jep.setBackground(Colors.brighten(MyNavigationPanel.getTabColor(), 0.8, 1.2));
+					jep.setBackground(Colors.brighten(IAPnavigationPanel.getTabColor(), 0.8, 1.2));
 			} else
 				jep.setOpaque(false);
 			jep.addHyperlinkListener(new HyperlinkListener() {

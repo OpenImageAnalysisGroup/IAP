@@ -25,14 +25,15 @@ import org.ErrorMsg;
 import org.ReleaseInfo;
 
 import de.ipk.ag_ba.commands.ActionHome;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.MyNavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
+import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -44,22 +45,31 @@ public class IAPgui {
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow,
 			NavigationAction optCustomHomeAction) {
+		return getMainGUIcontent(myStatus, secondWindow, optCustomHomeAction, null);
+	}
+	
+	public static JComponent getMainGUIcontent(
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
+			boolean secondWindow,
+			NavigationAction optCustomHomeAction,
+			NavigationButtonFilter optNavigationButtonFilter) {
 		
 		final JPanel graphPanel = new JPanel();
 		
-		graphPanel.setBackground(MyNavigationPanel.getTabColor());
+		graphPanel.setBackground(IAPnavigationPanel.getTabColor());
 		graphPanel.setOpaque(true);
 		graphPanel.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
 		int vgap = 5;
 		int hgap = 10;
 		
-		final MyNavigationPanel navigationPanel = new MyNavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
+		final IAPnavigationPanel navigationPanel = new IAPnavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
 		navigationPanel.setOpaque(false);
 		navigationPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 		
 		JPanel actionPanelRight = new JPanel();
-		final MyNavigationPanel actionPanel = new MyNavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
+		final IAPnavigationPanel actionPanel = new IAPnavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
+		actionPanel.setNavigationButtonFilter(optNavigationButtonFilter);
 		actionPanel.setOpaque(false);
 		actionPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 		
@@ -167,8 +177,8 @@ public class IAPgui {
 			System.out.println("ERRRRRRRRRRR");
 		NavigationButton button = src.getGUIsetting().getNavigationPanel().getEntitySet(false).iterator().next();
 		
-		final MyNavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
-		final MyNavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
+		final IAPnavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
+		final IAPnavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
 		final JComponent graphPanel = src.getGUIsetting().getGraphPanel();
 		
 		Runnable rrr = new Runnable() {
@@ -180,8 +190,8 @@ public class IAPgui {
 		button.executeNavigation(PanelTarget.ACTION, navigationPanel, actionPanel, graphPanel, null, rrr, null);
 	}
 	
-	private static void navigateTo(String target, final MyNavigationPanel navigationPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel) {
+	private static void navigateTo(String target, final IAPnavigationPanel navigationPanel,
+			final IAPnavigationPanel actionPanel, final JComponent graphPanel) {
 		
 		if (target == null || target.length() == 0)
 			return;
@@ -200,9 +210,9 @@ public class IAPgui {
 		HashMap<String, NavigationButton> knownEntities = new HashMap<String, NavigationButton>();
 		
 		for (NavigationButton ne : actionPanel.getEntitySet(target.length() > 0)) {
-			knownEntities.put(MyNavigationPanel.replaceBadChars(ne.getTitle()), ne);
+			knownEntities.put(IAPnavigationPanel.replaceBadChars(ne.getTitle()), ne);
 			if (ne.getTitle().contains("(")) {
-				String t = MyNavigationPanel.replaceBadChars(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim());
+				String t = IAPnavigationPanel.replaceBadChars(ne.getTitle().substring(0, ne.getTitle().lastIndexOf("(")).trim());
 				System.out.println(t);
 				knownEntities.put(t, ne);
 			}

@@ -37,7 +37,7 @@ import org.graffiti.editor.GravistoService;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
@@ -497,14 +497,14 @@ public class NavigationButton implements StyleAware {
 		r.run();
 	}
 	
-	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
+	public void executeNavigation(final PanelTarget target, final IAPnavigationPanel navPanel,
+			final IAPnavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
 			final Runnable optFinishAction, final ButtonDrawStyle style) {
 		executeNavigation(target, navPanel, actionPanel, graphPanel, n1, optFinishAction, false, style);
 	}
 	
-	public void executeNavigation(final PanelTarget target, final MyNavigationPanel navPanel,
-			final MyNavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
+	public void executeNavigation(final PanelTarget target, final IAPnavigationPanel navPanel,
+			final IAPnavigationPanel actionPanel, final JComponent graphPanel, final JButton n1,
 			final Runnable optFinishAction, final boolean recursive,
 			final ButtonDrawStyle style) {
 		final NavigationButton srcNavGraphicslEntity = this;
@@ -628,7 +628,7 @@ public class NavigationButton implements StyleAware {
 									}
 								ArrayList<NavigationButton> res = na.getResultNewNavigationSet(prior);
 								if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
-									String path = MyNavigationPanel.getTargetPath(res);
+									String path = IAPnavigationPanel.getTargetPath(res);
 									IAPgui.navigateTo(path, NavigationButton.this);
 								} else
 									navPanel.setEntitySet(res);
@@ -640,7 +640,7 @@ public class NavigationButton implements StyleAware {
 								NavigationButton del = null;
 								if (set != null)
 									if (set != null && set.size() > 0 && set.get(set.size() - 1) == null) {
-										String path = MyNavigationPanel.getTargetPath(set);
+										String path = IAPnavigationPanel.getTargetPath(set);
 										IAPgui.navigateTo(path, NavigationButton.this);
 										reload = true;
 									} else {
@@ -685,7 +685,7 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public static JComponent getNavigationButton(final ButtonDrawStyle style, final NavigationButton n,
-			final PanelTarget target, final MyNavigationPanel navPanel, final MyNavigationPanel actionPanel,
+			final PanelTarget target, final IAPnavigationPanel navPanel, final IAPnavigationPanel actionPanel,
 			final JComponent graphPanel) {
 		
 		if (n.getGUI() != null)

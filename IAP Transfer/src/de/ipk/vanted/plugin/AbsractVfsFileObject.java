@@ -52,7 +52,7 @@ public abstract class AbsractVfsFileObject implements VfsFileObject {
 	
 	@Override
 	public boolean isWriteable() throws FileSystemException {
-		throw new UnsupportedOperationException("Not implemented!");
+		throw new UnsupportedOperationException("IsWriteable can't be checked for this protocoll");
 	}
 	
 	@Override
