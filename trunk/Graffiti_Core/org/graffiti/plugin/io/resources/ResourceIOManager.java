@@ -70,6 +70,27 @@ public class ResourceIOManager {
 		}
 	}
 	
+	static OutputStream getOutputStream(IOurl url) throws Exception {
+		if (url == null) {
+			System.err.println("Could not create outputstream from NULL url!");
+			return null;
+		}
+		ResourceIOHandler mh = getHandlerFromPrefix(url.getPrefix());
+		if (mh == null && url.getPrefix() != null && url.getPrefix().contains("@"))
+			mh = getHandlerFromPrefix(url.getPrefix().split("@", 2)[1]);
+		if (mh == null) {
+			System.err.println("Could not get handler from URL " + url.toString() + "!");
+			return null;
+		} else {
+			OutputStream os = mh.getOutputStream(url);
+			if (os != null)
+				return os;
+			else {
+				return null;
+			}
+		}
+	}
+	
 	/**
 	 * @return new url or null, if not copied
 	 */

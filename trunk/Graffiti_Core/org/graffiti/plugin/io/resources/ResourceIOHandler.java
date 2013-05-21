@@ -1,6 +1,7 @@
 package org.graffiti.plugin.io.resources;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public interface ResourceIOHandler {
 	
@@ -19,9 +20,7 @@ public interface ResourceIOHandler {
 	 */
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config) throws Exception;
 	
-	public IOurl saveAs(IOurl source, String targetFilename) throws Exception;
-	
-	public IOurl save(IOurl source) throws Exception;
+	public OutputStream getOutputStream(IOurl targetFilename) throws Exception;
 	
 	/**
 	 * @param url

@@ -176,11 +176,19 @@ public class IAPservice {
 			public void performActionCalculateResults(NavigationButton src) {
 				this.src = src;
 				
-				IOurl url;
 				try {
-					url = mmc.getURL();
-					final Graph g = MainFrame.getGraph(url, url.getFileName());
-					graphRef.setObject(g);
+					final IOurl url = mmc.getURL();
+					if (loadDirect) {
+						BackgroundTaskHelper.executeLaterOnSwingTask(50, new Runnable() {
+							@Override
+							public void run() {
+								MainFrame.getInstance().loadGraph(url.getFileName(), url);
+							}
+						});
+					} else {
+						final Graph g = MainFrame.getGraph(url, url.getFileName());
+						graphRef.setObject(g);
+					}
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
@@ -189,12 +197,15 @@ public class IAPservice {
 			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-				res.add(src);
+				if (!loadDirect)
+					res.add(src);
 				return res;
 			}
 			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
+				if (loadDirect)
+					return null;
 				ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 				
 				NavigationAction editInVantedAction = new AbstractNavigationAction("Show Graph in IAP Online-Version of VANTED") {
@@ -254,6 +265,8 @@ public class IAPservice {
 			
 			@Override
 			public MainPanelComponent getResultMainPanel() {
+				if (loadDirect)
+					return null;
 				try {
 					Graph g = (Graph) graphRef.getObject();
 					if (g != null) {

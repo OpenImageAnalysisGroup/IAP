@@ -5,13 +5,15 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: FileSaveAction.java,v 1.1 2011-01-31 09:04:22 klukas Exp $
+// $Id: FileSaveAction.java,v 1.2 2013-05-21 19:11:11 klukas Exp $
 
 package org.graffiti.editor.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
@@ -19,6 +21,7 @@ import org.graffiti.editor.MessageType;
 import org.graffiti.help.HelpContext;
 import org.graffiti.managers.IOManager;
 import org.graffiti.plugin.actions.GraffitiAction;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.OutputSerializer;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -29,10 +32,10 @@ import org.graffiti.session.SessionManager;
 /**
  * The action for saving a graph.
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class FileSaveAction
-					extends GraffitiAction {
+		extends GraffitiAction {
 	// ~ Instance fields ========================================================
 	
 	private static final long serialVersionUID = 1L;
@@ -56,7 +59,7 @@ public class FileSaveAction
 	 *           DOCUMENT ME!
 	 */
 	public FileSaveAction(MainFrame mainFrame, IOManager ioManager,
-						SessionManager sessionManager) {
+			SessionManager sessionManager) {
 		super("file.save", mainFrame, "filemenu_save");
 		this.ioManager = ioManager;
 		this.sessionManager = sessionManager;
@@ -93,12 +96,9 @@ public class FileSaveAction
 			
 			if (file.canWrite()) {
 				ioManager.createOutputSerializer("." + ext);
-				
 				// runtime error check, if exception, ioManager can not
 				// handle current file for saving.
 			} else {
-				if (true) // new method for vanted v2.1
-					return false;
 				IOurl url = new IOurl(fullName);
 				if (ResourceIOManager.getHandlerFromPrefix(url.getPrefix()) != null)
 					return true;
@@ -146,38 +146,49 @@ public class FileSaveAction
 		
 		File file = new File(fullName);
 		
-		if (file.canWrite()) {
-			try {
-				OutputSerializer os = ioManager.createOutputSerializer(ext);
-				if (os == null) {
-					MainFrame.showMessageDialog("Unknown outputserializer for file extension " + ext, "Error");
-				} else {
-					os.write(new FileOutputStream(file), getGraph());
-					FileHandlingManager.getInstance().throwFileSaved(file, ext, getGraph());
-					getGraph().setModified(false);
-					long fs = file.length();
-					MainFrame.showMessage("Graph saved to file " + file.getAbsolutePath() + " (" + (fs / 1024) + "KB)", MessageType.INFO);
-					// a recent menu entry will be already built, if a graph is loaded or "saved as"... so we dont need to add a menu entry here
-					// MainFrame.getInstance().addNewRecentFileMenuItem(file);
-				}
-			} catch (Exception ioe) {
-				ErrorMsg.addErrorMessage(ioe);
-				MainFrame.getInstance().warnUserAboutFileSaveProblem(ioe);
-			}
-			
-			mainFrame.fireSessionDataChanged(session);
-		} else {
-			if (true) {// new method for vanted v2.1
-				MainFrame.showMessageDialog("<html>Error: Graph could not be saved (file not writeable).", "Error");
-				System.err.println("Error: file not writable. (FileSave-Action).");
+		try {
+			OutputSerializer os = ioManager.createOutputSerializer(ext);
+			if (os == null) {
+				MainFrame.showMessageDialog("Unknown outputserializer for file extension " + ext, "Error");
 			} else {
-				try {
+				String target;
+				final ThreadSafeOptions fs = new ThreadSafeOptions();
+				if (file.canWrite()) {
+					OutputStream out = new FileOutputStream(file);
+					target = file.getAbsolutePath();
+					os.write(out, getGraph());
+					out.close();
+					fs.setLong(file.length());
+				} else {
 					IOurl url = new IOurl(fullName);
-					url.save();
-				} catch (Exception e1) {
-					MainFrame.getInstance().saveActiveFileAs();
+					final OutputStream ooo = url.getOutputStream();
+					OutputStream out = new OutputStream() {
+						@Override
+						public void write(int b) throws IOException {
+							ooo.write(b);
+							fs.addLong(1);
+						}
+						
+						@Override
+						public void close() throws IOException {
+							ooo.close();
+						}
+						
+					};
+					target = url.toString();
+					os.write(out, getGraph());
+					out.close();
 				}
+				FileHandlingManager.getInstance().throwFileSaved(file, ext, getGraph());
+				getGraph().setModified(false);
+				MainFrame.showMessage("Graph saved to " + target + " (" + (fs.getLong() / 1024) + " KB)", MessageType.INFO);
+				// a recent menu entry will be already built, if a graph is loaded or "saved as"... so we dont need to add a menu entry here
+				// MainFrame.getInstance().addNewRecentFileMenuItem(file);
+				
 			}
+			mainFrame.fireSessionDataChanged(session);
+		} catch (Exception ioe) {
+			MainFrame.getInstance().warnUserAboutFileSaveProblem(ioe);
 		}
 	}
 	

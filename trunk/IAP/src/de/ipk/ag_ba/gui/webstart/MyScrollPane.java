@@ -10,16 +10,16 @@ import java.awt.Dimension;
 
 import javax.swing.JScrollPane;
 
-import de.ipk.ag_ba.gui.MyNavigationPanel;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 
 /**
  * @author klukas
  */
 public class MyScrollPane extends JScrollPane {
 	private static final long serialVersionUID = 1L;
-	private final MyNavigationPanel panel;
+	private final IAPnavigationPanel panel;
 	
-	public MyScrollPane(MyNavigationPanel panel, boolean border) {
+	public MyScrollPane(IAPnavigationPanel panel, boolean border) {
 		super(panel);
 		this.panel = panel;
 		if (!border)

@@ -100,8 +100,8 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 	public static File getFile(IOurl url) {
 		return new File(
 				URLDecoder.decode(
-
-				url.getDetail()
+						
+						url.getDetail()
 						) + IOurl.SEPERATOR + url.getFileName());
 	}
 	
@@ -121,15 +121,15 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 		return new IOurl(DEFAULT_PREFIX, file.getParent(), file.getName());
 	}
 	
-	@Override
-	public IOurl saveAs(IOurl source, String targetFilename) throws Exception {
-		if (source.getPrefix().equals(DEFAULT_PREFIX)) {
-			ResourceIOConfigObject config = new FileSystemIOConfig(source.getDetail());
-			return copyDataAndReplaceURLPrefix(source.getInputStream(), targetFilename, config);
-		} else
-			throw new UnsupportedOperationException("Details are missing!");
-	}
-	
+	// @Override
+	// public IOurl saveAs(IOurl source, String targetFilename) throws Exception {
+	// if (source.getPrefix().equals(DEFAULT_PREFIX)) {
+	// ResourceIOConfigObject config = new FileSystemIOConfig(source.getDetail());
+	// return copyDataAndReplaceURLPrefix(source.getInputStream(), targetFilename, config);
+	// } else
+	// throw new UnsupportedOperationException("Details are missing!");
+	// }
+	//
 	@Override
 	public Long getStreamLength(IOurl url) {
 		File f = getFile(url);

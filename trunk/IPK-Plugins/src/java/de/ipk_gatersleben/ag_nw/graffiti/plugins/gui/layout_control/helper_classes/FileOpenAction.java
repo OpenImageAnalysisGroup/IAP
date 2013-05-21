@@ -8,13 +8,12 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: FileOpenAction.java,v 1.1 2011-01-31 09:00:09 klukas Exp $
+// $Id: FileOpenAction.java,v 1.2 2013-05-21 19:11:47 klukas Exp $
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
@@ -30,14 +29,13 @@ import org.graffiti.managers.MyInputStreamCreator;
 import org.graffiti.managers.ViewManager;
 import org.graffiti.plugin.actions.GraffitiAction;
 import org.graffiti.plugin.io.InputSerializer;
-import org.graffiti.plugin.io.ParserException;
 import org.graffiti.session.EditorSession;
 
 /**
  * The action for the file open dialog.
  */
 public class FileOpenAction
-					extends GraffitiAction {
+		extends GraffitiAction {
 	// ~ Instance fields ========================================================
 	
 	private static final long serialVersionUID = 1L;
@@ -107,7 +105,7 @@ public class FileOpenAction
 		OpenFileDialogService.setActiveDirectoryFor(fc);
 		
 		int returnVal = fc.showDialog(mainFrame,
-							sBundle.getString("menu.file.open"));
+				sBundle.getString("menu.file.open"));
 		
 		OpenFileDialogService.setActiveDirectoryFrom(fc.getCurrentDirectory());
 		
@@ -118,35 +116,24 @@ public class FileOpenAction
 			// System.err.println(fileName);
 			if (fileName.indexOf(".") == -1) {
 				fileName = file.getName() +
-									((GenericFileFilter) fc.getFileFilter()).getExtension();
+						((GenericFileFilter) fc.getFileFilter()).getExtension();
 			}
 			
 			// System.err.println(fileName);
 			String ext = fileName.substring(fileName.lastIndexOf("."));
 			
 			try {
+				MyInputStreamCreator ic = new MyInputStreamCreator(file);
+				InputSerializer is = ioManager.createInputSerializer(ic.getNewInputStream(), ext);
 				
-				try {
-					MyInputStreamCreator ic = new MyInputStreamCreator(file);
-					InputSerializer is = ioManager.createInputSerializer(ic.getNewInputStream(), ext);
-					
-					Graph g = null;
-					g = is.read(ic.getNewInputStream());
-					
-					EditorSession es = new EditorSession(g);
-					es.setFileName(file.getAbsolutePath());
-					return mainFrame.showViewChooserDialog(es, true, evt);
-				} catch (ParserException pe) {
-					showError(pe.getLocalizedMessage());
-				} catch (IOException ioe) {
-					showError(ioe.getLocalizedMessage());
-				}
-			} catch (IllegalAccessException iae) {
-				iae.printStackTrace(System.err);
-				showError(iae.getLocalizedMessage());
-			} catch (InstantiationException ie) {
-				ie.printStackTrace(System.err);
-				showError(ie.getLocalizedMessage());
+				Graph g = null;
+				g = is.read(ic.getNewInputStream());
+				
+				EditorSession es = new EditorSession(g);
+				es.setFileName(file.getAbsolutePath());
+				return mainFrame.showViewChooserDialog(es, true, evt);
+			} catch (Exception pe) {
+				showError(pe.getLocalizedMessage());
 			}
 		}
 		return null;

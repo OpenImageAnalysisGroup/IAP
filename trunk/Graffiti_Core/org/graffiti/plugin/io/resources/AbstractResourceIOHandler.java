@@ -4,24 +4,20 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
 public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
 	@Override
-	public IOurl saveAs(IOurl source, String targetFilename) throws Exception {
-		throw new UnsupportedOperationException("Save not implemented for IO handler " + this.getClass().getCanonicalName());
-	}
-	
-	@Override
-	public IOurl save(IOurl source) throws Exception {
-		return saveAs(source, source.getFileName());
-	}
-	
-	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
 		return getPreviewInputStream(url, 128);
+	}
+	
+	@Override
+	public OutputStream getOutputStream(IOurl targetFilename) throws Exception {
+		throw new UnsupportedOperationException("OutputStream-creation not available for this storage location");
 	}
 	
 	@Override
