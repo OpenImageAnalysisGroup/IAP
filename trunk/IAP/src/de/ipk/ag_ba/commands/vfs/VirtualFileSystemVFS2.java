@@ -69,6 +69,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		this.user = user;
 		this.pass = pass;
 		this.folder = folder;
+		
 		this.useForMongoFileStorage = useForMongoFileStorage;
 		this.useOnlyForMongoFileStorage = useOnlyForMongoFileStorage;
 		this.useForMongoFileStorageCloudName = useForMongoFileStorageCloudName;

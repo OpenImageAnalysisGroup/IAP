@@ -255,6 +255,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	private void registerIOhandlers() {
+		GravistoService.setProxy();
 		// ResourceIOManager.registerIOHandler(LoadedVolumeHandler.getInstance());
 		// ResourceIOManager.registerIOHandler(LoadedImageHandler.getInstance());
 		ResourceIOManager.registerIOHandler(new LTftpHandler());

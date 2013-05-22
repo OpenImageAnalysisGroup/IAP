@@ -72,45 +72,47 @@ public abstract class VirtualFileSystem {
 			boolean useOnlyForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Use only for Mongo-DB storage", false);
 			String useForMongoFileStorageCloudName = SystemOptions.getInstance().getString("VFS-" + idx, "Mongo-DB database name", "");
 			
-			VirtualFileSystem v = null;
-			
-			for (ResourceIOHandler rh : ResourceIOManager.getInstance().getHandlers()) {
-				if (rh instanceof VirtualFileSystemHandler) {
-					VirtualFileSystemHandler vfsh = (VirtualFileSystemHandler) rh;
-					if (url_prefix != null && url_prefix.equals(vfsh.getPrefix())) {
-						VirtualFileSystem vfs = vfsh.getVFS();
-						v = vfs;
+			if (en) {
+				VirtualFileSystem v = null;
+				
+				for (ResourceIOHandler rh : ResourceIOManager.getInstance().getHandlers()) {
+					if (rh instanceof VirtualFileSystemHandler) {
+						VirtualFileSystemHandler vfsh = (VirtualFileSystemHandler) rh;
+						if (url_prefix != null && url_prefix.equals(vfsh.getPrefix())) {
+							VirtualFileSystem vfs = vfsh.getVFS();
+							v = vfs;
+						}
 					}
 				}
-			}
-			if (v == null)
-				v = new VirtualFileSystemVFS2(
-						url_prefix, vfs_type,
-						desc, protocol_desc,
-						host,
-						user, pass,
-						dir,
-						useForMongoFileStorage,
-						useOnlyForMongoFileStorage,
-						useForMongoFileStorageCloudName);
-			else {
-				if (v instanceof VirtualFileSystemVFS2) {
-					VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) v;
-					v2.setHost(host);
-					if (!("" + user).equals("" + v2.getUser()))
-						v2.setPassword(pass);
-					v2.setUser(user);
-					v2.setFolder(dir);
-					v2.setUseForMongo(useForMongoFileStorage);
-					v2.setMongoFileStorageName(useForMongoFileStorageCloudName);
-					v2.setUseOnlyForMongoFileStorage(useOnlyForMongoFileStorage);
+				if (v == null)
+					v = new VirtualFileSystemVFS2(
+							url_prefix, vfs_type,
+							desc, protocol_desc,
+							host,
+							user, pass,
+							dir,
+							useForMongoFileStorage,
+							useOnlyForMongoFileStorage,
+							useForMongoFileStorageCloudName);
+				else {
+					if (v instanceof VirtualFileSystemVFS2) {
+						VirtualFileSystemVFS2 v2 = (VirtualFileSystemVFS2) v;
+						v2.setHost(host);
+						if (!("" + user).equals("" + v2.getUser()))
+							v2.setPassword(pass);
+						v2.setUser(user);
+						v2.setFolder(dir);
+						v2.setUseForMongo(useForMongoFileStorage);
+						v2.setMongoFileStorageName(useForMongoFileStorageCloudName);
+						v2.setUseOnlyForMongoFileStorage(useOnlyForMongoFileStorage);
+					}
 				}
+				if (excludeNonUserItems && useOnlyForMongoFileStorage) {
+					// don't add such item to the result
+				} else
+					if (en && enabled && idx <= realN)
+						res.add(v);
 			}
-			if (excludeNonUserItems && useOnlyForMongoFileStorage) {
-				// don't add such item to the result
-			} else
-				if (en && enabled && idx <= realN)
-					res.add(v);
 		}
 		
 		return res;
