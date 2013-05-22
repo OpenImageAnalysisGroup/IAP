@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessingManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataProcessor;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.PutIntoSidePanel;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -43,9 +44,13 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		actions.add(new ActionToolList("Performance test and sort substances tool commands"));
 		actions.add(new ActionCopyToClipboard());
 		
-		for (ActionDataProcessing ne : getProcessExperimentDataWithVantedEntities()) {
-			actions.add(ne);
-		}
+		ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
+		actions.add(action);
+		
+		if (false)
+			for (ActionDataProcessing ne : getProcessExperimentDataWithVantedEntities()) {
+				actions.add(ne);
+			}
 		
 		if (experimentReference != null)
 			for (ActionDataProcessing adp : actions)

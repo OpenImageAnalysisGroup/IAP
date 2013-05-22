@@ -15,6 +15,14 @@ public class PutIntoSidePanel extends AbstractExperimentDataProcessor {
 	private ExperimentInterface md;
 	private JComponent optGui;
 	
+	public PutIntoSidePanel() {
+		super();
+	}
+	
+	public PutIntoSidePanel(boolean register) {
+		super(register);
+	}
+	
 	@Override
 	public String getName() {
 		return "Put data in 'Experiments' tab";

@@ -588,8 +588,10 @@ public class NavigationButton implements StyleAware {
 											gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui,
 											TableLayout.PREFERRED, TableLayout.FILL);
 								} else
-									gui = gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui;
-								graphPanel.add(gui, "0,0");
+									if (gui != null)
+										gui = gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui;
+								if (gui != null)
+									graphPanel.add(gui, "0,0");
 								graphPanel.revalidate();
 								graphPanel.repaint();
 							} else {

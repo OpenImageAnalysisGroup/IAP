@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -123,6 +122,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		target.setToolTipText("Drag & Drop supported");
 		final String title = target.getText();
 		FileDrop.Listener fdl = new FileDrop.Listener() {
+			@Override
 			public void filesDropped(File[] files) {
 				if (files != null && files.length > 0) {
 					ArrayList<File> mfiles = new ArrayList<File>();
@@ -135,6 +135,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		};
 		
 		Runnable dragdetected = new Runnable() {
+			@Override
 			public void run() {
 				MainFrame.showMessage(
 						"<html><b>Drag &amp; Drop action detected:</b> release mouse button to load annotation data",
@@ -144,6 +145,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		};
 		
 		Runnable dragenddetected = new Runnable() {
+			@Override
 			public void run() {
 				// MainFrame.showMessage("Drag & Drop action canceled",
 				// MessageType.INFO);
@@ -157,6 +159,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		target.setToolTipText("Drag & Drop supported");
 		final String title = target.getText();
 		FileDrop.Listener fdl = new FileDrop.Listener() {
+			@Override
 			public void filesDropped(File[] files) {
 				if (files != null && files.length > 0) {
 					ArrayList<File> mfiles = new ArrayList<File>();
@@ -168,6 +171,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		};
 		
 		Runnable dragdetected = new Runnable() {
+			@Override
 			public void run() {
 				MainFrame.showMessage("<html><b>Drag &amp; Drop action detected:</b> "
 						+ "release mouse button to load array annotation data", MessageType.PERMANENT_INFO);
@@ -176,6 +180,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		};
 		
 		Runnable dragenddetected = new Runnable() {
+			@Override
 			public void run() {
 				// MainFrame.showMessage("Drag & Drop action canceled",
 				// MessageType.INFO);
@@ -221,6 +226,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		}
 		closeTab.setOpaque(false);
 		closeTab.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				ExperimentDataInfoPane.this.md = null;
 				shownExpPanes.remove(thisPane);
@@ -236,29 +242,37 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		}
 		saveXMLdoc.setOpaque(false);
 		saveXMLdoc.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				File xmlFile = OpenFileDialogService.getSaveFile(new String[] { "xls", "bin", "xml" }, "Experiment-Data (*.xls, *.bin, *.xml)");
+				File xmlFile = OpenFileDialogService.getSaveFile(new String[] { "xlsx", "bin", "xml" }, "Experiment-Data (*.xlsx, *.bin, *.xml)");
 				if (xmlFile != null) {
 					
-					if (xmlFile.getName().toLowerCase().endsWith(".xls"))
-						ExperimentDataFileWriter.writeExcel(xmlFile, md);
-					else
+					if (xmlFile.getName().toLowerCase().endsWith(".xlsx")) {
+						try {
+							ExperimentDataFileWriter.writeExcel(xmlFile, md);
+							AttributeHelper.showInFileBrowser(xmlFile.getParent(), xmlFile.getName());
+						} catch (Exception e1) {
+							ErrorMsg.addErrorMessage(e1);
+						}
+						
+					} else
 						if (xmlFile.getName().toLowerCase().endsWith(".bin") || xmlFile.getName().toLowerCase().endsWith(".xml")) {
 							// XMLOutputter out = new XMLOutputter();
 							// OutputStream stream;
 							try {
 								TextFile.write(xmlFile.toString(), md.toString());
+								AttributeHelper.showInFileBrowser(xmlFile.getParent(), xmlFile.getName());
 								// stream = new FileOutputStream(xmlFile);
 								// org.jdom.Document dd = JDOM2DOM.getJDOMfromDOM(getDocument());
 								// out.output(dd, stream);
 								// stream.close();
-							} catch (FileNotFoundException err) {
-								ErrorMsg.addErrorMessage(err);
-							} catch (IOException err) {
-								ErrorMsg.addErrorMessage(err);
+								AttributeHelper.showInFileBrowser(xmlFile.getParent(), xmlFile.getName());
+							} catch (Exception e1) {
+								ErrorMsg.addErrorMessage(e1);
 							}
 						} else
-							MainFrame.showMessageDialog("Wrong file type chosen. Please save as *.xml, *.bin or *.xls", "Export Error");
+							MainFrame
+									.showMessageDialog("Invalid file type (file name extension). Please save as *.bin (native), *.xml or *.xlsx", "File Format Error");
 				}
 			}
 		});
@@ -271,6 +285,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		showTableData.setOpaque(false);
 		showTableData.setEnabled(td != null);
 		showTableData.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				td.showDataDialog();
 			}
@@ -439,6 +454,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 			buttonCommands.add(b);
 			final AbstractExperimentDataProcessor pp = (AbstractExperimentDataProcessor) p;
 			b.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					ExperimentInterface experimentData = getDocumentData();
 					
@@ -491,6 +507,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	private ActionListener getRemoveAnnotationCommand(final JButton addIdentifiers) {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				Object[] res = MyInputHelper.getInput("<html>"
 						+ "By leaving the search text empty, all alternative identifiers besides the main ID will<br>"
@@ -560,6 +577,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	private ActionListener getAddAlternativeIdentifiersIdsCommand(final JButton addIdentifiers) {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Collection<File> excelFiles = OpenExcelFileDialogService.getExcelOrAnnotationFiles();
 				processAnnotationFileLoading(md, addIdentifiers, excelFiles);
@@ -579,6 +597,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	private ActionListener getAddAffyIdentifiersCommand(final JButton addIdentifiers) {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Collection<File> excelFiles = OpenExcelFileDialogService.getAffyOrAgilAnnotationFiles();
 				processAffyAnnotationFileLoading(md, addIdentifiers, excelFiles);
@@ -588,6 +607,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	private ActionListener replaceSubstanceIdsCommand() {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int maxID = 0;
 				HashMap<Integer, String> exampleValues = new HashMap<Integer, String>();
@@ -696,6 +716,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 				"Analyze Dataset", "XPATH query");
 		BackgroundTaskHelper.issueSimpleTask("Post-Processing", "XPATH query", new Runnable() {
 			
+			@Override
 			public void run() {
 				ExperimentInterface doc = md;
 				status.setCurrentStatusText2("Get Experiment-Name...");
@@ -766,6 +787,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 				
 			}
 		}, new Runnable() {
+			@Override
 			public void run() {
 				updateView(components, timecomponents, onePlant);
 				
@@ -897,26 +919,33 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 	
 	protected void validateXML() {
 		Thread t = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				if (fpExperimentInfo.isVisible()) {
 					final String result = "Show XML";
 					SwingUtilities.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							JLabel lbl = new JLabel("<html><font color='gray'>" + result);
 							lbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 							lbl.addMouseListener(new MouseListener() {
+								@Override
 								public void mouseReleased(MouseEvent e) {
 								}
 								
+								@Override
 								public void mousePressed(MouseEvent e) {
 								}
 								
+								@Override
 								public void mouseExited(MouseEvent e) {
 								}
 								
+								@Override
 								public void mouseEntered(MouseEvent e) {
 								}
 								
+								@Override
 								public void mouseClicked(MouseEvent e) {
 									showXMLdata(md);
 								}
@@ -938,6 +967,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		final ArrayList<JComponent> fTimecomponents = new ArrayList<JComponent>(timecomponents);
 		// final ArrayList<Boolean> fOnePlant = new ArrayList<Boolean>(onePlant);
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				ArrayList<JComponent> cc = new ArrayList<JComponent>(fComponents);
 				fpExperimentInfo.clearGuiComponentList();
@@ -960,6 +990,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				MainFrame.showMessageDialog("<html>"
 						+ "While it is recommended to add all replicate data into the data-sets,<br>"
@@ -1000,6 +1031,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 				"of all equal Genotypes/Conditions treated as replicates, therefor removing double Genotypes/Conditions.");
 		result.setOpaque(false);
 		result.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 						"Merging Biological Replicates", "Please wait...");
@@ -1093,6 +1125,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 					"Process Data", "Please wait...");
 			BackgroundTaskHelper.issueSimpleTask("Additional Identifiers", "Process Data", new Runnable() {
+				@Override
 				public void run() {
 					ArrayList<StringBuilder> statusMessages = new ArrayList<StringBuilder>();
 					int i = 0;
@@ -1214,6 +1247,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 					"Process Data", "Please wait...");
 			BackgroundTaskHelper.issueSimpleTask("Additional Identifiers", "Process Data", new Runnable() {
+				@Override
 				public void run() {
 					ArrayList<StringBuilder> statusMessages = new ArrayList<StringBuilder>();
 					int i = 0;
@@ -1285,6 +1319,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		}
 	}
 	
+	@Override
 	public void sessionChanged(Session s) {
 		View v = s != null ? s.getActiveView() : null;
 		for (MappingButton b : dataMappingCommandButtons) {
@@ -1294,6 +1329,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 		}
 	}
 	
+	@Override
 	public void sessionDataChanged(Session s) {
 		sessionChanged(s);
 	}

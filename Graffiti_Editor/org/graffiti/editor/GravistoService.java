@@ -1387,8 +1387,8 @@ public class GravistoService implements HelperClass {
 		Integer socksProxyPort = SystemOptions.getInstance().getInteger("Network", "socks-proxy-port", 1080);
 		
 		boolean useProxyAuth = SystemOptions.getInstance().getBoolean("Network", "Proxy-Authentication-enable", false);
-		final String proxyUser = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-proxy-user", "");
-		final String proxyPass = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-proxy-password", "");
+		final String proxyUser = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-user", "");
+		final String proxyPass = SystemOptions.getInstance().getString("Network", "Proxy-Authentication-password", "");
 		
 		if (useProxy) {
 			// HTTP/HTTPS Proxy

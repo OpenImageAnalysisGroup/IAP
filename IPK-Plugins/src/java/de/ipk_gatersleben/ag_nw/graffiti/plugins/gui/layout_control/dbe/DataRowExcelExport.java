@@ -9,18 +9,18 @@ import java.util.Map.Entry;
  * Holds an ordered List of ConditionInterface, SampleInterface and NumericMeasurementInterface.
  * The List of these Data-Structure can easy use in ExperimentDataFileWriter with an Iterator.
  * 
- * @author Sebastian Fröhlich
+ * @author Sebastian Fröhlich (PBI), error correction (conversion of string values to numeric values) Christian Klukas (BA)
  */
 public class DataRowExcelExport implements Comparable, Comparator {
 	
 	int conditionID;
 	int timeID;
 	int replicateID;
-	HashMap<String, String> values;
+	HashMap<String, Double> values;
 	String timeUnit;
 	
 	public DataRowExcelExport() {
-		values = new HashMap<String, String>();
+		values = new HashMap<String, Double>();
 	}
 	
 	public int getConditionID() {
@@ -47,19 +47,16 @@ public class DataRowExcelExport implements Comparable, Comparator {
 		this.replicateID = replicateID;
 	}
 	
-	public String get(String key) {
+	public Double get(String key) {
 		return values.get(key);
 	}
 	
-	public String getValue(int i) {
+	public Double getValue(int i) {
 		return values.get(i);
 	}
 	
-	public void addValue(String substanceName, double value) {
-		if (Double.isNaN(value))
-			values.put(substanceName, "NaN");
-		else
-			values.put(substanceName, "" + value);
+	public void addValue(String substanceName, Double value) {
+		values.put(substanceName, value);
 	}
 	
 	@Override
@@ -69,9 +66,9 @@ public class DataRowExcelExport implements Comparable, Comparator {
 		str += "timeID: " + timeID + " " + timeUnit + " ; ";
 		str += "repID: " + replicateID;
 		str += " value: ";
-		Iterator<Entry<String, String>> itEntries = values.entrySet().iterator();
+		Iterator<Entry<String, Double>> itEntries = values.entrySet().iterator();
 		while (itEntries.hasNext()) {
-			Entry<String, String> entry = itEntries.next();
+			Entry<String, Double> entry = itEntries.next();
 			str += entry.getKey() + "=" + entry.getValue() + "; ";
 		}
 		return str;
@@ -85,7 +82,7 @@ public class DataRowExcelExport implements Comparable, Comparator {
 		this.timeUnit = timeUnit;
 	}
 	
-	public HashMap<String, String> getValues() {
+	public HashMap<String, Double> getValues() {
 		return values;
 	}
 	

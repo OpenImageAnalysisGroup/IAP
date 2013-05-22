@@ -45,6 +45,7 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction i
 			Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(ed);
 			ed = MappingData3DPath.merge(md, true);
 			if (ed != null) {
+				ed.numberConditions();
 				SupplementaryFilePanelMongoDB optSupplementaryPanel = new SupplementaryFilePanelMongoDB(
 						experimentName,
 						experimentName.getExperimentName());
@@ -94,6 +95,11 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction i
 	@Override
 	public void setExperimentReference(ExperimentReference experimentReference) {
 		this.experimentName = experimentReference;
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		return pp.getName();
 	}
 	
 	@Override
