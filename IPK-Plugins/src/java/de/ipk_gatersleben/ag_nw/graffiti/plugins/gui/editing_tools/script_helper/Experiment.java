@@ -455,7 +455,7 @@ public class Experiment implements ExperimentInterface {
 				r.append("</experimentdata>");
 			}
 			if (status != null)
-				status.setCurrentStatusText2("Created String repreentation");
+				status.setCurrentStatusText2("Created String representation");
 		}
 	}
 	
@@ -555,7 +555,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-	
+
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
