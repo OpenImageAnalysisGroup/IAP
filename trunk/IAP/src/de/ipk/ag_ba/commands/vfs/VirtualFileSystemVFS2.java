@@ -37,7 +37,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	public static final String ICON_FOLDER_NAME = "icons";
 	
 	private final VfsFileProtocol vfs_type;
-	private final String description;
+	private String description;
 	private final String protocoll;
 	private String host;
 	private String user;
@@ -541,5 +541,9 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	
 	public void setPassword(String pass) {
 		this.pass = pass;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

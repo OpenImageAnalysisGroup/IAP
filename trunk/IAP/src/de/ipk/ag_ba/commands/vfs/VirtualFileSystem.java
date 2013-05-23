@@ -105,6 +105,7 @@ public abstract class VirtualFileSystem {
 						v2.setUseForMongo(useForMongoFileStorage);
 						v2.setMongoFileStorageName(useForMongoFileStorageCloudName);
 						v2.setUseOnlyForMongoFileStorage(useOnlyForMongoFileStorage);
+						v2.setDescription(desc);
 					}
 				}
 				if (excludeNonUserItems && useOnlyForMongoFileStorage) {
