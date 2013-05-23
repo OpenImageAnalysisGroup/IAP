@@ -6,12 +6,17 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.provider.AbstractFileObject;
+import org.apache.commons.vfs2.provider.http.HttpFileSystem;
+import org.apache.commons.vfs2.provider.http.HttpFileSystemConfigBuilder;
+import org.jsoup.Jsoup;
 
 public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
@@ -117,6 +122,11 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public String[] list() throws IOException {
+		if (!file.getFileSystem().hasCapability(Capability.LIST_CHILDREN)) {
+			if (file.getFileSystem().getClass().isAssignableFrom(HttpFileSystem.class)) {
+				return httpListFiles(false);
+			}
+		}
 		FileObject[] fs = file.getChildren();
 		String[] files = new String[fs.length];
 		int index = 0;
@@ -128,6 +138,11 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public String[] listFolders() throws IOException {
+		if (!file.getFileSystem().hasCapability(Capability.LIST_CHILDREN)) {
+			if (file.getFileSystem().getClass().isAssignableFrom(HttpFileSystem.class)) {
+				return httpListFiles(true);
+			}
+		}
 		FileObject[] fs = file.getChildren();
 		ArrayList<String> directories = new ArrayList<String>();
 		for (FileObject obj : fs) {
@@ -135,6 +150,58 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 				directories.add(obj.getName().getBaseName());
 		}
 		return directories.toArray(new String[] {});
+	}
+	
+	private String[] httpListFiles(boolean onlyFoldersTrue_onlyFilesFalse) throws FileSystemException, IOException {
+		String uri = file.getName().getURI();
+		if (!uri.endsWith("/")) {
+			uri = uri + "/";
+		}
+		InputStream inputStream = file.getInputStream();
+		org.jsoup.nodes.Document doc = null;
+		try {
+			String urlCharset = HttpFileSystemConfigBuilder.getInstance().getUrlCharset(file.getFileSystem().getFileSystemOptions());
+			doc = Jsoup.parse(inputStream, urlCharset, uri);
+		} finally {
+			inputStream.close();
+		}
+		org.jsoup.select.Elements links = doc.select("a");
+		List<String> urls = new ArrayList<String>();
+		for (org.jsoup.nodes.Element link : links) {
+			String url = link.attr("abs:href");
+			// not a child
+			if (!url.contains(uri)) {
+				continue;
+			}
+			String relativeUrl = link.attr("href").trim();
+			// remove parameters
+			int indexOfParam = relativeUrl.indexOf('?');
+			if (indexOfParam != -1) {
+				relativeUrl = relativeUrl.substring(0, indexOfParam);
+			}
+			// skip references to root or empty
+			if ("/".equals(relativeUrl) || relativeUrl.isEmpty()) {
+				continue;
+			}
+			if (onlyFoldersTrue_onlyFilesFalse && !relativeUrl.endsWith("/"))
+				continue;
+			if (!onlyFoldersTrue_onlyFilesFalse && relativeUrl.endsWith("/"))
+				continue;
+			int indexOfSlash = relativeUrl.indexOf('/');
+			
+			if (indexOfSlash > 0) {
+				// forbid adding subfolders
+				relativeUrl = relativeUrl.substring(0, indexOfSlash);
+			}
+			String decoded;
+			try {
+				decoded = decode(relativeUrl.toCharArray(), "UTF-8");
+			} catch (Exception e) {
+				throw new IOException(e);
+			}
+			urls.add(decoded);
+		}
+		return urls.toArray(new String[urls.size()]);
 	}
 	
 	@Override
@@ -212,5 +279,23 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 		} catch (NoSuchMethodException nsme) {
 			return 0;
 		}
+	}
+	
+	protected static String decode(char[] component, String charset) throws Exception {
+		byte[] oct = new String(component).getBytes(charset);
+		
+		int length = oct.length;
+		int oi = 0;
+		for (int ii = 0; ii < length; oi++) {
+			byte aByte = (byte) oct[ii++];
+			if (aByte == '%' && ii + 2 <= length) {
+				byte high = (byte) Character.digit((char) oct[ii++], 16);
+				byte low = (byte) Character.digit((char) oct[ii++], 16);
+				aByte = (byte) ((high << 4) + low);
+			}
+			oct[oi] = (byte) aByte;
+		}
+		
+		return new String(oct, 0, oi, charset);
 	}
 }
