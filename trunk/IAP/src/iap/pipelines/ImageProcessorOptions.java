@@ -175,7 +175,7 @@ public class ImageProcessorOptions {
 	}
 	
 	public Double getREAL_MARKER_DISTANCE() {
-		Double realDist = getDoubleSetting(null, "Real Blue Marker Distance", -1);
+		Double realDist = getDoubleSetting(null, "Real Blue Marker Distance", 1350);
 		if (realDist < 0)
 			return null;
 		else

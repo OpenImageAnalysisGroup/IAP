@@ -49,12 +49,12 @@ public class BlFilterByLAB extends AbstractSnapshotAnalysisBlockFIS {
 			if (getBoolean("process " + optics, true)) {
 				String pf = "";
 				processedMask = processedMask.filterRemoveLAB(
-						getInt("min L", 0),
-						getInt("max L", 0),
+						getInt("min L", 120),
+						getInt("max L", 255),
 						getInt("min A", 0),
-						getInt("max A", 0),
-						getInt("min B", 0),
-						getInt("max B", 0),
+						getInt("max A", 127),
+						getInt("min B", 127),
+						getInt("max B", 255),
 						options.getBackground(),
 						getBoolean(pf + "invert", false));
 				

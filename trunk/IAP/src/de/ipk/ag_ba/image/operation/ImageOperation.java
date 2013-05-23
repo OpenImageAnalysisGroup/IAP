@@ -4376,6 +4376,7 @@ public class ImageOperation {
 					}
 				}
 			}
+		ba = null;
 		return new FlexibleImage(aa).io();
 	}
 	

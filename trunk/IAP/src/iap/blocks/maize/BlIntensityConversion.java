@@ -26,7 +26,7 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage(), null);
-		double min = 240;
+		double min = 220;
 		FlexibleImage resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, getDouble("minimum-intensity-classic", min)).getImage();
 		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, getDouble("minimum-intensity-chloro", min)).getImage();
 		min = getDouble("minimum-intensity-phenol", 240);
@@ -46,7 +46,7 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 			// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		}
 		
-		if (!getBoolean("show conversion", true)) {
+		if (!getBoolean("show conversion", false)) {
 			r = io.copy().applyMask(r, options.getBackground()).getImage();
 		}
 		
