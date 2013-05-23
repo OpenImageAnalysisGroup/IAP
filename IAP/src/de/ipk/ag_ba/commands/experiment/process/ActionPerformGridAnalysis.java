@@ -50,7 +50,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 			}
 			
 			if (ids.size() > 1)
-				this.numberOfJobs = ids.size() / 4;
+				this.numberOfJobs = ids.size() / 2;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}

@@ -13,7 +13,7 @@ import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.BlNirFilterSide_nir;
 import iap.blocks.BlRemoveSmallClustersFromVisFluo;
 import iap.blocks.BlReplaceEmptyOriginalImages;
-import iap.blocks.BlUseFluoMaskToClearOtherImages;
+import iap.blocks.BlUseFluoMaskToClearOther;
 import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.BlockClosingVis;
 import iap.blocks.BlockCutFromSide;
@@ -89,17 +89,17 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
 				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
 				BlNirFilterSide_nir.class.getCanonicalName(),
-				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
+				BlUseFluoMaskToClearOther.class.getCanonicalName(),
 				BlCalcNirSkeleton.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
-
+				
 				// calculation of numeric values
 				BlCalcWidthAndHeight.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcIntensity.class.getCanonicalName(),
 				BlConvexHull.class.getCanonicalName(),
-
+				
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				BlockDrawSkeleton.class.getCanonicalName(),

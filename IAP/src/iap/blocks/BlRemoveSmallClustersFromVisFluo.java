@@ -34,9 +34,9 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 		FlexibleImage res, mask = input().masks().vis().show("vis input", debug);
 		
 		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
-				getInt("Noise-Size-Vis-Area", 2),
-				getInt("Noise-Size-Vis-Dimension-Absolute", (mask.getWidth() / 100) / 2),
-				options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", false)).getImage();
+				getInt("Noise-Size-Vis-Area", 20 * 20),
+				getInt("Noise-Size-Vis-Dimension-Absolute", 20),
+				options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null)
 			res.show("vis result", debug);
 		return res;
@@ -50,8 +50,8 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 		return new ImageOperation(input().masks().fluo().show("input fluo", debug)).copy().
 				dilate(getInt("dilation fluo", 0)).
 				removeSmallClusters(ngUse,
-						getInt("Noise-Size-Fluo-Area", 20),
-						getInt("Noise-Size-Fluo-Dimension-Absolute", 20),
+						getInt("Noise-Size-Fluo-Area", 10 * 10),
+						getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
 						options.getNeighbourhood(), options.getCameraPosition(), null,
 						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
 				.getImage();
