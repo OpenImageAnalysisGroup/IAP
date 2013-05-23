@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: MainFrame.java,v 1.12 2013-05-21 19:11:11 klukas Exp $
+// $Id: MainFrame.java,v 1.13 2013-05-23 10:56:53 klukas Exp $
 
 package org.graffiti.editor;
 
@@ -191,7 +191,7 @@ import scenario.ScenarioService;
 /**
  * Constructs a new graffiti frame, which contains the main gui components.
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class MainFrame extends JFrame implements SessionManager, SessionListener, PluginManagerListener,
 		UndoableEditListener, EditorDefaultValues, IOManager.IOManagerListener, ViewManager.ViewManagerListener,
@@ -1342,8 +1342,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	final ExecutorService loader = Executors.newFixedThreadPool(1);
 	
 	public void loadGraphInBackground(final File[] proposedFiles, final ActionEvent ae, boolean autoSwitch)
-			
-			throws IllegalAccessException, InstantiationException {
+
+	throws IllegalAccessException, InstantiationException {
 		final ArrayList<File> files = new ArrayList<File>();
 		
 		HashSet<File> filesToBeIgnored = new HashSet<File>();
@@ -3404,6 +3404,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		}
 	}
 	
+	public static boolean doCloseApplicationOnWindowClose = false;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.awt.Component#processEvent(java.awt.AWTEvent)
@@ -3411,8 +3413,13 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	@Override
 	protected void processEvent(AWTEvent e) {
 		super.processEvent(e);
-		if (e.getID() == 201)
-			closeGravisto();
+		if (doCloseApplicationOnWindowClose) {
+			if (e.getID() == 201)
+				closeGravisto();
+		} else {
+			if (e.getID() == 201)
+				setVisible(false);
+		}
 	}
 	
 	// /**
