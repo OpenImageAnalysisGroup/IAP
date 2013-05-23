@@ -40,6 +40,8 @@ import org.graffiti.editor.SplashScreenInterface;
 import org.graffiti.managers.pluginmgr.PluginManagerException;
 import org.graffiti.options.GravistoPreferences;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
+import org.graffiti.plugin.view.View;
+import org.graffiti.session.Session;
 
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -488,6 +490,7 @@ public class IAPmain extends JApplet {
 					return gui;
 				} else {
 					jf.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+					MainFrame.doCloseApplicationOnWindowClose = false;
 					jf.setVisible(true);
 					MainFrame.getInstance().getViewManager().viewChanged(null);
 				}
@@ -503,7 +506,13 @@ public class IAPmain extends JApplet {
 					@Override
 					public void run() {
 						jff.toFront();
-						jff.repaint();
+						jff.requestFocusInWindow();
+						Session s = MainFrame.getInstance().getActiveSession();
+						if (s != null) {
+							View targetView = s.getActiveView();
+							if (targetView != null)
+								MainFrame.getInstance().setActiveSession(s, targetView);
+						}
 					}
 				});
 			}
