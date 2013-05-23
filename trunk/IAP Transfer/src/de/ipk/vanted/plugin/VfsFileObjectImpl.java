@@ -193,16 +193,24 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public void setLastModified(long time) throws Exception {
-		Method m = file.getClass().getDeclaredMethod("doSetLastModifiedTime", long.class);
-		m.setAccessible(true);
-		m.invoke(file, time);
+		try {
+			Method m = file.getClass().getDeclaredMethod("doSetLastModifiedTime", long.class);
+			m.setAccessible(true);
+			m.invoke(file, time);
+		} catch (NoSuchMethodException nsme) {
+			// empty
+		}
 	}
 	
 	@Override
 	public long getLastModified() throws Exception {
-		Method m = file.getClass().getDeclaredMethod("doGetLastModifiedTime", (Class[]) null);
-		m.setAccessible(true);
-		Object o = m.invoke(file, (Object[]) null);
-		return (Long) o;
+		try {
+			Method m = file.getClass().getDeclaredMethod("doGetLastModifiedTime", (Class[]) null);
+			m.setAccessible(true);
+			Object o = m.invoke(file, (Object[]) null);
+			return (Long) o;
+		} catch (NoSuchMethodException nsme) {
+			return 0;
+		}
 	}
 }
