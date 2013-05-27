@@ -5,6 +5,7 @@ import ij.ImagePlus;
 import ij.Prefs;
 import ij.gui.Roi;
 import ij.io.FileSaver;
+import ij.measure.Calibration;
 import ij.measure.ResultsTable;
 import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
@@ -2386,6 +2387,11 @@ public class ImageOperation {
 		sema.release(cpus);
 		s.printTime();
 		analyzeCube(result);
+		
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
+		ImagePlus ip = new ImagePlus();
+		ip.setGlobalCalibration(new Calibration());
+		
 		return result;
 	}
 	
@@ -4942,5 +4948,48 @@ public class ImageOperation {
 			return distanceSum / area;
 		else
 			return java.lang.Double.NaN;
+	}
+	
+	/**
+	 * Values <=0 mean, clear until non-background is found
+	 */
+	public ImageOperation cropAbs(int leftX, int rightX, int topY, int bottomY) {
+		int background = ImageOperation.BACKGROUND_COLORint;
+		int[][] img = getImageAs2dArray();
+		
+		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {
+			TopBottomLeftRight ext = getExtremePoints(background);
+			if (ext != null) {
+				if (leftX < 0)
+					leftX = ext.getLeftX();
+				if (rightX < 0)
+					rightX = ext.getRightX();
+				if (topY < 0)
+					topY = ext.getTopY();
+				if (bottomY < 0)
+					bottomY = ext.getBottomY();
+			}
+		}
+		
+		if (rightX - leftX <= 0 || bottomY - topY <= 0) {
+			// if (rightX - leftX < 0 || bottomY - topY < 0)
+			// System.out.println("WARNING: cropAbs detected negative crop desire...");
+			return this;
+		}
+		
+		int[][] res = new int[rightX - leftX][bottomY - topY];
+		for (int x = 0; x < rightX - leftX; x++) {
+			for (int y = 0; y < bottomY - topY; y++) {
+				if (x + leftX < img.length && y + topY < img[0].length)
+					res[x][y] = img[x + leftX][y + topY];
+				else
+					continue;
+				// System.out.println("warning cropimage to small");
+			}
+		}
+		if (res.length > 0)
+			return new ImageOperation(res).show("cropAbs", false);
+		else
+			return null;
 	}
 }

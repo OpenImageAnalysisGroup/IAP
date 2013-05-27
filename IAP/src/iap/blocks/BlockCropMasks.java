@@ -4,8 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
@@ -17,7 +17,7 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected Image processVISmask() {
 		if (input() != null && input().masks() != null && input().masks().vis() != null)
-			return input().masks().vis().crop();
+			return input().masks().vis().io().crop().getImage();
 		else
 			return null;
 	}
@@ -25,7 +25,7 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected Image processFLUOmask() {
 		if (input() != null && input().masks() != null && input().masks().fluo() != null)
-			return input().masks().fluo().crop();
+			return input().masks().fluo().io().crop().getImage();
 		else
 			return null;
 	}
@@ -33,7 +33,7 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	protected Image processNIRmask() {
 		if (input() != null && input().masks() != null && input().masks().nir() != null)
-			return input().masks().nir().crop();
+			return input().masks().nir().io().crop().getImage();
 		else
 			return null;
 	}
