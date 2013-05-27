@@ -93,4 +93,19 @@ public class IAPpluginManager {
 		processPlugins(r);
 		return dataProcessingActions;
 	}
+	
+	public Collection<String> getSettingHelp(final String iniFileName, final String section, final String setting) {
+		final Collection<String> helpTexts = new ArrayList<String>();
+		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			public void processPlugin(IAPplugin p) {
+				Collection<String> htc = p.getHelpForSettings(iniFileName, section, setting);
+				if (htc != null)
+					for (String dp : htc) {
+						helpTexts.add(dp);
+					}
+			}
+		};
+		processPlugins(r);
+		return helpTexts;
+	}
 }
