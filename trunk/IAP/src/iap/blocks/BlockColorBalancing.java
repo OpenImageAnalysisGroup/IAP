@@ -6,8 +6,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Recolor pictures according to white point (or black point for fluo).
@@ -74,7 +74,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 				double side = 0.3; // value for white balancing (side width)
 				Image nir = input().images().nir();
 				// White Balancing
-				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.io().crop().getImage(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
 			}
 		}
@@ -88,7 +88,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 				double side = 0.3; // value for white balancing (side width)
 				Image nir = input().masks().nir();
 				// White Balancing
-				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
+				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.io().crop().getImage(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
 			}
 		}

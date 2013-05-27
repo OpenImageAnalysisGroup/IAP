@@ -5,8 +5,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
@@ -20,7 +20,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	protected Image processVISimage() {
 		if (input() != null && input().images() != null && input().images().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().vis().crop();
+				return input().images().vis().io().crop().getImage();
 			} else {
 				int potCut = -1;
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) == null) {
@@ -32,7 +32,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
 				
-				return input().images().vis().cropAbs(-1, -1, -1, potCut);
+				return input().images().vis().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
 			return null;
@@ -42,7 +42,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	protected Image processFLUOimage() {
 		if (input() != null && input().images() != null && input().images().fluo() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().fluo().crop();
+				return input().images().fluo().io().crop().getImage();
 			} else {
 				int potCut = -1;
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) == null) {
@@ -54,7 +54,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
 				// potCut = (int) getProperties().getNumericProperty(0, 1,
 				// PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
-				return input().images().fluo().cropAbs(-1, -1, -1, -1);// potCut);
+				return input().images().fluo().io().cropAbs(-1, -1, -1, -1).getImage();// potCut);
 			}
 		} else
 			return null;
@@ -64,7 +64,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	protected Image processNIRimage() {
 		if (input() != null && input().images() != null && input().images().nir() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().nir().crop();
+				return input().images().nir().io().crop().getImage();
 			} else {
 				int potCut = -1;
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
@@ -76,7 +76,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
 				//
-				return input().images().nir().cropAbs(-1, -1, -1, potCut);
+				return input().images().nir().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
 			return null;
@@ -86,7 +86,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	protected Image processIRimage() {
 		if (input() != null && input().images() != null && input().images().ir() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().ir().crop();
+				return input().images().ir().io().crop().getImage();
 			} else {
 				int potCut = -1;
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
@@ -98,7 +98,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
 				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
 				//
-				return input().images().ir().cropAbs(-1, -1, -1, potCut);
+				return input().images().ir().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
 			return null;

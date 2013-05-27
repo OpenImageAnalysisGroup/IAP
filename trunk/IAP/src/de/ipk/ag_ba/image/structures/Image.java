@@ -31,7 +31,6 @@ import de.ipk.ag_ba.image.operation.Channel;
 import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.image.operation.ImageDisplay;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 
 /**
  * @author klukas
@@ -110,6 +109,7 @@ public class Image {
 		this.w = w;
 		this.h = h;
 		int a = 255;
+		@SuppressWarnings("unused")
 		int alpha = ((a & 0xFF) << 24);
 		int[] img = new int[w * h];
 		for (int idx = 0; idx < img.length; idx++) {
@@ -228,10 +228,6 @@ public class Image {
 		}
 	}
 	
-	private Image resizeD(double w, double h) {
-		return resize((int) w, (int) h);
-	}
-	
 	public Image resize(int w, int h, boolean retainAspecRatio) {
 		if (!retainAspecRatio)
 			return resize(w, h);
@@ -240,29 +236,20 @@ public class Image {
 			double rH = h / (double) getHeight();
 			if (rW - 1 > 0) {
 				if (rW > rH)
-					return resizeD(getWidth() * rH, getHeight() * rH);
+					return resize((int) (getWidth() * rH), (int) (getHeight() * rH));
 				else
-					return resizeD(getWidth() * rW, getHeight() * rW);
+					return resize((int) (getWidth() * rW), (int) (getHeight() * rW));
 			} else {
 				if (rW < rH)
-					return resizeD(getWidth() * rH, getHeight() * rH);
+					return resize((int) (getWidth() * rH), (int) (getHeight() * rH));
 				else
-					return resizeD(getWidth() * rW, getHeight() * rW);
+					return resize((int) (getWidth() * rW), (int) (getHeight() * rW));
 			}
 		}
 	}
 	
 	public int[][] getAs2A() {
-		int[][] cache2A = null;
-		// boolean useCache = true; // 7777777777777777777777777777 false
-		// if (!useCache)
-		// return ImageConverter.convertIJto2A(image);
-		//
-		// if (cache2A == null)
-		cache2A = ImageConverter.convertIJto2A(image);
-		// else
-		// System.out.println("CACHED 2A");
-		return cache2A;
+		return ImageConverter.convertIJto2A(image);
 	}
 	
 	public CameraType getCameraType() {
@@ -275,36 +262,6 @@ public class Image {
 	
 	public void setCameraType(CameraType type) {
 		this.cameraType = type;
-	}
-	
-	public Image crop() {
-		ImageOperation io = new ImageOperation(image);
-		io = io.crop();
-		return io.getImage();
-	}
-	
-	// public FlexibleImage cropKeepingAspectRatio() {
-	// ImageOperation io = new ImageOperation(image);
-	// io = io.cropKeepingAspectRatio();
-	// return io.getImage();
-	// }
-	
-	/**
-	 * @param pLeft
-	 *           0..1 percentage cut left
-	 * @param pRight
-	 *           0..1 percentage cut right
-	 * @param pTop
-	 *           0..1 percentage cut top
-	 * @param pBottom
-	 *           0..1 percentage cut bottom
-	 * @return
-	 */
-	public Image crop(double pLeft, double pRight, double pTop,
-			double pBottom) {
-		ImageOperation io = new ImageOperation(image);
-		io = io.crop(pLeft, pRight, pTop, pBottom);
-		return io.getImage();
 	}
 	
 	/**
@@ -325,50 +282,6 @@ public class Image {
 	
 	public ImageOperation io() {
 		return new ImageOperation(this, getCameraType());
-	}
-	
-	/**
-	 * Values <=0 mean, clear until non-background is found
-	 */
-	public Image cropAbs(int leftX, int rightX, int topY, int bottomY) {
-		ImageOperation io = new ImageOperation(image);
-		int background = ImageOperation.BACKGROUND_COLORint;
-		int[][] img = getAs2A();
-		
-		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {
-			TopBottomLeftRight ext = io.getExtremePoints(background);
-			if (ext != null) {
-				if (leftX < 0)
-					leftX = ext.getLeftX();
-				if (rightX < 0)
-					rightX = ext.getRightX();
-				if (topY < 0)
-					topY = ext.getTopY();
-				if (bottomY < 0)
-					bottomY = ext.getBottomY();
-			}
-		}
-		
-		if (rightX - leftX <= 0 || bottomY - topY <= 0) {
-			// if (rightX - leftX < 0 || bottomY - topY < 0)
-			// System.out.println("WARNING: cropAbs detected negative crop desire...");
-			return io.getImage();
-		}
-		
-		int[][] res = new int[rightX - leftX][bottomY - topY];
-		for (int x = 0; x < rightX - leftX; x++) {
-			for (int y = 0; y < bottomY - topY; y++) {
-				if (x + leftX < img.length && y + topY < img[0].length)
-					res[x][y] = img[x + leftX][y + topY];
-				else
-					continue;
-				// System.out.println("warning cropimage to small");
-			}
-		}
-		if (res.length > 0)
-			return new Image(res).show("DABA", false);
-		else
-			return null;
 	}
 	
 	public float[] getFloatChannel(Channel r) {
