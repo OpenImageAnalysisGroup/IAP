@@ -7,8 +7,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author Klukas
@@ -16,11 +16,11 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		
 		boolean debug = getBoolean("debug", false);
 		
-		FlexibleImage nir = input().images().nir();
+		Image nir = input().images().nir();
 		
 		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10)
 			return nir;
@@ -70,20 +70,20 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		
-		return new FlexibleImage(nirArray).show("NIR pot removed", debug);
+		return new Image(nirArray).show("NIR pot removed", debug);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 }

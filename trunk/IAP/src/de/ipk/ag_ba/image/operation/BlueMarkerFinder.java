@@ -13,13 +13,13 @@ import java.util.TreeSet;
 
 import org.Vector2d;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class BlueMarkerFinder {
 	
 	boolean debug = false;
 	
-	private final FlexibleImage input;
+	private final Image input;
 	private ResultsTable resultTable;
 	private final double scale;
 	private final CameraPosition typ;
@@ -27,7 +27,7 @@ public class BlueMarkerFinder {
 	private final int inputImageWidth;
 	private ImageOperation markerPositionsImage;
 	
-	public BlueMarkerFinder(FlexibleImage image, double scale, CameraPosition typ, boolean maize, boolean debug) {
+	public BlueMarkerFinder(Image image, double scale, CameraPosition typ, boolean maize, boolean debug) {
 		this.input = image;
 		this.scale = scale;
 		this.typ = typ;

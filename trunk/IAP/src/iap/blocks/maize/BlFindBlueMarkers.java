@@ -11,9 +11,9 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author pape, klukas
@@ -22,7 +22,7 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
 	ArrayList<MarkerPair> numericResult;
-	FlexibleImage markerMask;
+	Image markerMask;
 	
 	@Override
 	protected void prepare() {
@@ -38,9 +38,9 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		numericResult.clear();
-		FlexibleImage vis = input().masks().vis();
+		Image vis = input().masks().vis();
 		if (vis == null)
 			vis = input().images().vis();
 		
@@ -128,7 +128,7 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		return max;
 	}
 	
-	private FlexibleImage getMarkers(FlexibleImage image, ArrayList<MarkerPair> result) {
+	private Image getMarkers(Image image, ArrayList<MarkerPair> result) {
 		double s = getDouble("Scale-factor-decrease-img-and-mask", 1); // options.getDoubleSetting(Setting.SCALE_FACTOR_DECREASE_IMG_AND_MASK);
 		ImageOperation io = image.io().searchBlueMarkers(result, s * s / 1.2, options.getCameraPosition(), true,
 				getBoolean("delted located blue markers", true), debug);
@@ -136,7 +136,7 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		if (debug)
 			new ImageOperation(processedImages.vis()).drawMarkers(numericResult).show("Marker Positions", debug);
@@ -147,14 +147,14 @@ public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

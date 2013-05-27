@@ -7,9 +7,9 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Create a simulated, dummy reference image (in case the reference image is NULL).
@@ -27,9 +27,9 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().images().vis() != null && input().masks().vis() == null) {
-			FlexibleImage n = input().images().vis();
+			Image n = input().images().vis();
 			int w = n.getWidth();
 			int h = n.getHeight();
 			return n.copy().io().canvas().fillRect(0, 0, w, h, new Color(
@@ -41,7 +41,7 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().images().fluo() != null && input().masks().fluo() == null)
 			return input().images().fluo().copy().io().
 					blur(getInt("dummy-fluo-blur", 2)).
@@ -57,8 +57,8 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage n = input().images().nir();
+	protected Image processNIRmask() {
+		Image n = input().images().nir();
 		if (n != null && input().masks().nir() == null) {
 			int w = n.getWidth();
 			int h = n.getHeight();
@@ -71,21 +71,21 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

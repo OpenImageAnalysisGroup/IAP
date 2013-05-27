@@ -11,9 +11,9 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Clear bamboo stick in visible image. Use lab filter to select the stick pixels (starting from top).
@@ -25,7 +25,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		boolean doBambooRemoval = getBoolean("REMOVE_BAMBOO_STICK", false);
 		if (!doBambooRemoval)
 			return;
@@ -39,14 +39,14 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 				if (extremePoints != null) {
 					int h = processedMasks.fluo().getHeight();
 					int temp = (int) ((extremePoints.getTopY() / (double) processedMasks.vis().getHeight()) * processedMasks.fluo().getHeight());
-					FlexibleImage fi = new ImageOperation(processedMasks.fluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
+					Image fi = new ImageOperation(processedMasks.fluo()).clearImageAbove(temp - 0.03 * h, background).getImage();
 					processedMasks.setFluo(fi.show("Fluo Result", show));
 				}
 			}
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		boolean doBambooRemoval = getBoolean("REMOVE_BAMBOO_STICK", false);
 		if (!doBambooRemoval)
 			return input().masks().vis();
@@ -59,7 +59,7 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 		return null;
 	}
 	
-	private FlexibleImage clearBamboo(FlexibleImage mask) {
+	private Image clearBamboo(Image mask) {
 		int widthQuarter = mask.getWidth() / 4;
 		int width = mask.getWidth();
 		int height = mask.getHeight();
@@ -68,7 +68,7 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 		int pixelsInCluster = 0;
 		int numberOfClusterPerLine = 0;
 		boolean maize = true;
-		FlexibleImage yellow = new ImageOperation(labFilter(mask, mask,
+		Image yellow = new ImageOperation(labFilter(mask, mask,
 				150, 255, 108, 165, 127, 255, options.getCameraPosition(), maize)).opening(1, 1).getImage();
 		
 		int[] yellowarr = yellow.getAs1A();
@@ -99,9 +99,9 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 			}
 		}
 		if (lastX > 0 && n > 10)
-			return new FlexibleImage(width, height, origarr).io().canvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB(), 0).getImage();
+			return new Image(width, height, origarr).io().canvas().fillRect(lastX - 8, y - 16, 16, 32, new Color(0, 0, 254).getRGB(), 0).getImage();
 		else
-			return new FlexibleImage(width, height, origarr);
+			return new Image(width, height, origarr);
 	}
 	
 	private int clearLine(int w, int[] orig, int[] yellow, int y, int background, int clusterSize) {
@@ -133,7 +133,7 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 		}
 	}
 	
-	private FlexibleImage labFilter(FlexibleImage workMask, FlexibleImage originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
+	private Image labFilter(Image workMask, Image originalImage, int lowerValueOfL, int upperValueOfL, int lowerValueOfA,
 			int upperValueOfA, int lowerValueOfB, int upperValueOfB, CameraPosition typ,
 			boolean maize) {
 		
@@ -150,22 +150,22 @@ public class BlockRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlockFI
 				lowerValueOfB, upperValueOfB,
 				back, typ, maize);
 		
-		FlexibleImage mask = new FlexibleImage(width, height, result);
+		Image mask = new Image(width, height, result);
 		
 		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	

@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.gui.ImageWindow;
 import info.clearthought.layout.TableLayout;
 
@@ -23,9 +22,9 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
 
-public class FlexibleImageStack {
+public class ImageStack {
 	
-	ImageStack stack;
+	ij.ImageStack stack;
 	
 	boolean sizeKnown = false;
 	
@@ -35,17 +34,17 @@ public class FlexibleImageStack {
 	
 	private final ArrayList<String> settingsPaths = new ArrayList<String>();
 	
-	public void addImage(String label, FlexibleImage image) {
+	public void addImage(String label, Image image) {
 		addImage(label, image, null);
 	}
 	
-	public void addImage(String label, FlexibleImage image, String optSettingsPath) {
+	public void addImage(String label, Image image, String optSettingsPath) {
 		image = image.copy();
 		if (!sizeKnown) {
 			sizeKnown = true;
 			this.w = image.getWidth();
 			this.h = image.getHeight();
-			stack = new ImageStack(w, h);
+			stack = new ij.ImageStack(w, h);
 		} else {
 			if (w > 1 && h > 1)
 				image = image.resize(w, h);

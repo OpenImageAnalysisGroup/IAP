@@ -4,9 +4,9 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MyThread;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnalysisBlockFIS {
 	
@@ -17,12 +17,12 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	@Override
-	protected FlexibleMaskAndImageSet run() throws InterruptedException {
+	protected MaskAndImageSet run() throws InterruptedException {
 		if (!getBoolean("enabled", true))
 			return input();
 		int parentPriority = getParentPriority();
-		final FlexibleImageSet processedImages = new FlexibleImageSet(input().images());
-		final FlexibleImageSet processedMasks = new FlexibleImageSet(input().images());
+		final ImageSet processedImages = new ImageSet(input().images());
+		final ImageSet processedMasks = new ImageSet(input().images());
 		
 		try {
 			prepare();
@@ -126,7 +126,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 			ErrorMsg.addErrorMessage(e);
 		}
 		
-		return new FlexibleMaskAndImageSet(processedImages, processedMasks);
+		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
 	protected int getParentPriority() {
@@ -137,45 +137,45 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		this.prio = prio;
 	}
 	
-	protected FlexibleImage processVISimage() {
+	protected Image processVISimage() {
 		return input().images().vis();
 	}
 	
-	protected FlexibleImage processFLUOimage() {
+	protected Image processFLUOimage() {
 		return input().images().fluo();
 	}
 	
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (input() != null && input().images() != null)
 			return input().images().nir();
 		else
 			return null;
 	}
 	
-	protected FlexibleImage processIRimage() {
+	protected Image processIRimage() {
 		if (input() != null && input().images() != null)
 			return input().images().ir();
 		else
 			return null;
 	}
 	
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		return input().masks().vis();
 	}
 	
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return input().masks().fluo();
 	}
 	
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		return input().masks().nir();
 	}
 	
-	protected FlexibleImage processIRmask() {
+	protected Image processIRmask() {
 		return input().masks().ir();
 	}
 	
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		// empty
 	}
 }

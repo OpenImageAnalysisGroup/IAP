@@ -20,7 +20,7 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectEdgesAlgorithm;
@@ -33,7 +33,7 @@ public class SkeletonGraph {
 	private final int w;
 	private final int h;
 	private final int[][] skelImg;
-	FlexibleImage debugImg;
+	Image debugImg;
 	private AdjListGraph graph;
 	private final int background = -16777216;
 	private final int visitedDuringSearch = Color.GRAY.getRGB();
@@ -47,7 +47,7 @@ public class SkeletonGraph {
 	public SkeletonGraph(int w, int h, int[] skelImg1a) {
 		this.w = w;
 		this.h = h;
-		this.skelImg = new FlexibleImage(w, h, skelImg1a).getAs2A();
+		this.skelImg = new Image(w, h, skelImg1a).getAs2A();
 	}
 	
 	public void createGraph(int[] optClusterIDsPixels) {
@@ -76,7 +76,7 @@ public class SkeletonGraph {
 		}
 		
 		if (DEBUG) {
-			FlexibleImage fi = new FlexibleImage(skelImg).show("TO BE ANALYZED...");
+			Image fi = new Image(skelImg).show("TO BE ANALYZED...");
 			debugImg = fi.copy();
 		}
 		if (DEBUG)

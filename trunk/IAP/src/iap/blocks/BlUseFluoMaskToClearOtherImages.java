@@ -8,9 +8,9 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -21,23 +21,23 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		super.prepare();
 		if (input().masks().fluo() != null && input().masks().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
-				FlexibleImage fluoMask = clearImageSide(input().masks().fluo(), input().masks().vis(), 0.05d);
+				Image fluoMask = clearImageSide(input().masks().fluo(), input().masks().vis(), 0.05d);
 				input().masks().setFluo(fluoMask);
 			} else {
-				FlexibleImage fluoMask = clearImageSide(input().masks().fluo(), input().masks().vis(), 0.01d);
+				Image fluoMask = clearImageSide(input().masks().fluo(), input().masks().vis(), 0.01d);
 				input().masks().setFluo(fluoMask);
 			}
 		}
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null || input().masks().fluo() == null)
 			return input().masks().vis();
 		
-		FlexibleImage input = input().masks().vis();
+		Image input = input().masks().vis();
 		
-		FlexibleImage visMask;
+		Image visMask;
 		
 		if (options.getCameraPosition() == CameraPosition.TOP)
 			visMask = input.copy();
@@ -47,7 +47,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (input().masks().fluo() != null) {
 				// apply enlarged fluo mask to vis
-				FlexibleImage mask = input().masks().fluo().copy().io().
+				Image mask = input().masks().fluo().copy().io().
 						crop(0.06, 0.08, 0.04, 0.02).show("Cropped Fluo Mask", false).
 						blur(getDouble("blur VIS mask", 20)).
 						binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred fluo mask", debug).getImage();
@@ -63,17 +63,17 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (input().images().nir() == null || input().masks().fluo() == null)
 			return input().masks().nir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = input().masks().nir();
+			Image input = input().masks().nir();
 			
 			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.01);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage input = input().masks().nir();
+			Image input = input().masks().nir();
 			
 			return clearImageTop(input, input().masks().fluo());
 		}
@@ -81,24 +81,24 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (input().images().nir() == null || input().masks().fluo() == null)
 			return input().images().nir();
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = input().images().nir();
+			Image input = input().images().nir();
 			
 			return clearImageSide(input, input().masks().fluo(), 0.01);
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage input = input().images().nir();
+			Image input = input().images().nir();
 			
 			return clearImageTop(input, input().masks().fluo());
 		}
 		return input().masks().nir();
 	}
 	
-	private FlexibleImage clearImageSide(FlexibleImage inputToCut, FlexibleImage imageSource, double cutTop) {
+	private Image clearImageSide(Image inputToCut, Image imageSource, double cutTop) {
 		if (inputToCut == null || imageSource == null)
 			return null;
 		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
@@ -110,7 +110,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		
 		double scaleFactor = inputToCut.getWidth() / (double) imageSource.getWidth();
 		
-		if (inputToCut.getType() == FlexibleImageType.NIR)
+		if (inputToCut.getCameraType() == CameraType.NIR)
 			background = options.getNirBackground();
 		
 		int bl = background; // Color.RED.getRGB();
@@ -140,7 +140,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 					.getImage();
 	}
 	
-	private FlexibleImage clearImageTop(FlexibleImage input, FlexibleImage fluo) {
+	private Image clearImageTop(Image input, Image fluo) {
 		ImageOperation ioInput = new ImageOperation(input);
 		int background = options.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
@@ -165,7 +165,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		if (processedMasks.nir() == null || processedMasks.fluo() == null) {
 			processedMasks.setNir(input().masks().nir());
 			return;
@@ -176,7 +176,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		if (processedMasks.fluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
-			FlexibleImage mask = processedMasks.fluo().copy().io().blur(3).
+			Image mask = processedMasks.fluo().copy().io().blur(3).
 					binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred vis mask", debug).getImage();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,
@@ -193,7 +193,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		}
 		// }
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = processedMasks.nir();
+			Image input = processedMasks.nir();
 			
 			processedMasks.setNir(clearImageSide(input, processedMasks.fluo(), 0.01).io().
 					replaceColorsScanLine(back, gray).show("RRRR").getImage());
@@ -201,7 +201,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.TOP) {
-			FlexibleImage input = processedMasks.nir();
+			Image input = processedMasks.nir();
 			
 			processedMasks.setNir(clearImageTop(input, processedMasks.fluo()));
 			return;
@@ -209,18 +209,18 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 }

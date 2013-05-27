@@ -16,8 +16,8 @@ import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -39,7 +39,7 @@ public class BlCalcWidthAndHeight extends
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		
 		int background = options.getBackground();
 		
@@ -48,7 +48,7 @@ public class BlCalcWidthAndHeight extends
 		
 		boolean useFluo = false;// options.isMaize();
 		
-		FlexibleImage visRes = input().masks().vis();
+		Image visRes = input().masks().vis();
 		if (visRes == null)
 			return null;
 		
@@ -77,7 +77,7 @@ public class BlCalcWidthAndHeight extends
 		}
 		final int vertYsoilLevelF = vertYsoilLevel;
 		
-		FlexibleImage img = useFluo ? input().masks().fluo()
+		Image img = useFluo ? input().masks().fluo()
 				: input().masks().vis();
 		if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
@@ -103,8 +103,8 @@ public class BlCalcWidthAndHeight extends
 						getProperties().addImagePostProcessor(
 								new RunnableOnImageSet() {
 									@Override
-									public FlexibleImage postProcessVis(
-											FlexibleImage visRes) {
+									public Image postProcessVis(
+											Image visRes) {
 										if (vertYsoilLevelF > 0)
 											visRes = visRes
 													.io()
@@ -191,7 +191,7 @@ public class BlCalcWidthAndHeight extends
 		return visRes;
 	}
 	
-	private TopBottomLeftRight getWidthAndHeightSide(FlexibleImage vis,
+	private TopBottomLeftRight getWidthAndHeightSide(Image vis,
 			int background, int vertYsoilLevel) {
 		TopBottomLeftRight temp = new ImageOperation(vis)
 				.getExtremePoints(background);
@@ -219,14 +219,14 @@ public class BlCalcWidthAndHeight extends
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

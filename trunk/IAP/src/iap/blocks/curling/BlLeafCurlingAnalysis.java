@@ -12,13 +12,13 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.skeleton.Limb;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import flanagan.math.FourierTransform;
 
 public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		
 		boolean debug = getBoolean("debug", false);
 		
@@ -29,7 +29,7 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 		if (!getBoolean("enabled", false))
 			return input().masks().vis();
 		
-		FlexibleImage img1 = input().masks().vis().copy();
+		Image img1 = input().masks().vis().copy();
 		
 		ImageOperation dist = img1.io().skel()
 				.calculateDistanceToBorder(true, ImageOperation.BACKGROUND_COLORint)
@@ -112,14 +112,14 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

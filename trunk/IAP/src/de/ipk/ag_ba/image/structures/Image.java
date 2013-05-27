@@ -11,7 +11,6 @@ import ij.ImagePlus;
 import ij.process.ColorProcessor;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,11 +36,11 @@ import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 /**
  * @author klukas
  */
-public class FlexibleImage {
+public class Image {
 	
 	private final ImagePlus image;
 	private final int w, h;
-	private FlexibleImageType type = FlexibleImageType.UNKNOWN;
+	private CameraType cameraType = CameraType.UNKNOWN;
 	private String fileName;
 	
 	@Override
@@ -50,18 +49,18 @@ public class FlexibleImage {
 				+ " " + image.getBitDepth() + " bit" : "NULL IMAGE";
 	}
 	
-	public FlexibleImage(BufferedImage bufferedImage) {
+	public Image(BufferedImage bufferedImage) {
 		this(ImageConverter.convertBItoIJ(bufferedImage));
 	}
 	
-	public FlexibleImage(BufferedImage bufferedImage, FlexibleImageType type) {
+	public Image(BufferedImage bufferedImage, CameraType type) {
 		this(ImageConverter.convertBItoIJ(bufferedImage));
-		this.type = type;
+		this.cameraType = type;
 	}
 	
 	private static WeakHashMap<String, BufferedImage> url2image = new WeakHashMap<String, BufferedImage>();
 	
-	public FlexibleImage(IOurl url) throws IOException, Exception {
+	public Image(IOurl url) throws IOException, Exception {
 		BufferedImage img = null;
 		// synchronized (url2image) {
 		img = url2image.get(url + "");
@@ -89,25 +88,25 @@ public class FlexibleImage {
 			this.fileName = url.getFileName();
 	}
 	
-	public FlexibleImage(ImagePlus image) {
+	public Image(ImagePlus image) {
 		this.image = image;
 		this.w = image.getWidth();
 		this.h = image.getHeight();
 	}
 	
-	public FlexibleImage(int w, int h, int[] image) {
+	public Image(int w, int h, int[] image) {
 		this(ImageConverter.convert1AtoIJ(w, h, image));
 	}
 	
-	public FlexibleImage(int[][] img) {
+	public Image(int[][] img) {
 		this(ImageConverter.convert2AtoIJ(img));
 	}
 	
-	public FlexibleImage(Image image) {
+	public Image(java.awt.Image image) {
 		this(new ImagePlus("Image", image));
 	}
 	
-	public FlexibleImage(int w, int h, float[] channelR, float[] channelG, float[] channelB) {
+	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB) {
 		this.w = w;
 		this.h = h;
 		int a = 255;
@@ -126,27 +125,27 @@ public class FlexibleImage {
 		image = ImageConverter.convert1AtoIJ(w, h, img);
 	}
 	
-	public FlexibleImage(int w, int h, double[][] labImage) {
+	public Image(int w, int h, double[][] labImage) {
 		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}
 	
-	public FlexibleImage(int w, int h, float[][] labImage) {
+	public Image(int w, int h, float[][] labImage) {
 		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}
 	
-	public FlexibleImage(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
+	public Image(Image grayR, Image grayG, Image grayB) {
 		this(grayR.getWidth(), grayR.getHeight(), getImgFromRGB(grayR, grayG, grayB));
 	}
 	
-	public FlexibleImage(Object ref, String name) {
+	public Image(Object ref, String name) {
 		this(IAPservice.getImage(ref, name));
 	}
 	
-	public FlexibleImage(InputStream is) throws IOException {
+	public Image(InputStream is) throws IOException {
 		this(ImageIO.read(is));
 	}
 	
-	private static int[] getImgFromRGB(FlexibleImage grayR, FlexibleImage grayG, FlexibleImage grayB) {
+	private static int[] getImgFromRGB(Image grayR, Image grayG, Image grayB) {
 		int[] r = grayR.getAs1A();
 		int[] g = grayG.getAs1A();
 		int[] b = grayB.getAs1A();
@@ -177,14 +176,14 @@ public class FlexibleImage {
 		return h;
 	}
 	
-	public FlexibleImage show(String title, boolean doIt) {
+	public Image show(String title, boolean doIt) {
 		if (doIt)
 			return show(title);
 		else
 			return this;
 	}
 	
-	public FlexibleImage show(String title) {
+	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			ImageDisplay.show(
 					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint,
@@ -218,7 +217,7 @@ public class FlexibleImage {
 		return cache;
 	}
 	
-	public FlexibleImage resize(int w, int h) {
+	public Image resize(int w, int h) {
 		if (w == getWidth() && h == getHeight()) { // 999999999999999999999999999999
 			return this;// copy();
 		} else {
@@ -229,11 +228,11 @@ public class FlexibleImage {
 		}
 	}
 	
-	private FlexibleImage resizeD(double w, double h) {
+	private Image resizeD(double w, double h) {
 		return resize((int) w, (int) h);
 	}
 	
-	public FlexibleImage resize(int w, int h, boolean retainAspecRatio) {
+	public Image resize(int w, int h, boolean retainAspecRatio) {
 		if (!retainAspecRatio)
 			return resize(w, h);
 		else {
@@ -266,19 +265,19 @@ public class FlexibleImage {
 		return cache2A;
 	}
 	
-	public FlexibleImageType getType() {
-		return type;
+	public CameraType getCameraType() {
+		return cameraType;
 	}
 	
-	public FlexibleImage copy() {
-		return new FlexibleImage(getAsImagePlus().duplicate());
+	public Image copy() {
+		return new Image(getAsImagePlus().duplicate());
 	}
 	
-	public void setType(FlexibleImageType type) {
-		this.type = type;
+	public void setCameraType(CameraType type) {
+		this.cameraType = type;
 	}
 	
-	public FlexibleImage crop() {
+	public Image crop() {
 		ImageOperation io = new ImageOperation(image);
 		io = io.crop();
 		return io.getImage();
@@ -301,7 +300,7 @@ public class FlexibleImage {
 	 *           0..1 percentage cut bottom
 	 * @return
 	 */
-	public FlexibleImage crop(double pLeft, double pRight, double pTop,
+	public Image crop(double pLeft, double pRight, double pTop,
 			double pBottom) {
 		ImageOperation io = new ImageOperation(image);
 		io = io.crop(pLeft, pRight, pTop, pBottom);
@@ -325,13 +324,13 @@ public class FlexibleImage {
 	}
 	
 	public ImageOperation io() {
-		return new ImageOperation(this, getType());
+		return new ImageOperation(this, getCameraType());
 	}
 	
 	/**
 	 * Values <=0 mean, clear until non-background is found
 	 */
-	public FlexibleImage cropAbs(int leftX, int rightX, int topY, int bottomY) {
+	public Image cropAbs(int leftX, int rightX, int topY, int bottomY) {
 		ImageOperation io = new ImageOperation(image);
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int[][] img = getAs2A();
@@ -367,7 +366,7 @@ public class FlexibleImage {
 			}
 		}
 		if (res.length > 0)
-			return new FlexibleImage(res).show("DABA", false);
+			return new Image(res).show("DABA", false);
 		else
 			return null;
 	}

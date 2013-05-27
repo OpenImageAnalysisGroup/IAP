@@ -34,13 +34,12 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ImageSet;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
@@ -71,7 +70,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int workOnSubset;
 	private int numberOfSubsets;
 	private boolean forceDebugStack;
-	private ArrayList<FlexibleImageStack> forcedDebugStacks;
+	private ArrayList<ImageStack> forcedDebugStacks;
 	private int prio;
 	private MongoDB m;
 	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
@@ -167,10 +166,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public void debugOverrideAndEnableDebugStackStorage(boolean enable) {
 		this.forceDebugStack = enable;
-		this.forcedDebugStacks = new ArrayList<FlexibleImageStack>();
+		this.forcedDebugStacks = new ArrayList<ImageStack>();
 	}
 	
-	public ArrayList<FlexibleImageStack> getForcedDebugStackStorageResult() {
+	public ArrayList<ImageStack> getForcedDebugStackStorageResult() {
 		return forcedDebugStacks;
 	}
 	
@@ -206,26 +205,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			final int workloadSnapshots = workload_imageSetsWithSpecificAngles.size();
-			int snapshotsWithNotAllNeededImageTypes = 0;
 			int side = 0;
 			int top = 0;
 			for (TreeMap<Long, TreeMap<String, ImageSet>> plants : workload_imageSetsWithSpecificAngles.values())
 				for (TreeMap<String, ImageSet> imageSetWithSpecificAngle : plants.values())
 					for (ImageSet md : imageSetWithSpecificAngle.values()) {
-						if (!md.hasAllNeededImageTypes()) {
-							snapshotsWithNotAllNeededImageTypes++;
-							System.out.println(md.getVIS() + " / " + md.getFLUO()
-									+ " / " + md.getNIR() + "/" + md.getIR());
-						}
-						if (md.isSide())
+						if (md.isSideImage())
 							side++;
 						else
 							top++;
 					}
-			if (snapshotsWithNotAllNeededImageTypes > 0)
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">WARNING: not all three images available for "
-						+ snapshotsWithNotAllNeededImageTypes + " snapshots!");
 			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
@@ -381,13 +370,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 					if (status.wantsToStop())
 						continue;
-					if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS() != null) {
-						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS()
+					if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getVisInfo() != null) {
+						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getVisInfo()
 								.getParentSample();
 						inSamples.put(time, inSample);
 					} else
 						continue;
-					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVIS();
+					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getVisInfo();
 					
 					Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
@@ -560,26 +549,25 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).containsKey(
 								imageConfigurationAndRotationAngle)) {
 							sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).put(
-									imageConfigurationAndRotationAngle,
-									new ImageSet(null, null, null, null, id.getParentSample()));
+									imageConfigurationAndRotationAngle, new ImageSet());
 						}
 						ImageSet is = sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).get(
 								imageConfigurationAndRotationAngle);
 						
-						is.setSide(imageConfiguration.isSide());
+						is.setIsSide(imageConfiguration.isSide());
 						if ((imageConfiguration.isSide() && side) || (!imageConfiguration.isSide() && top)) {
 							if (imageConfiguration == ImageConfiguration.RgbSide
 									|| imageConfiguration == ImageConfiguration.RgbTop)
-								is.setVis(id);
+								is.setVisInfo(id);
 							if (imageConfiguration == ImageConfiguration.FluoSide
 									|| imageConfiguration == ImageConfiguration.FluoTop)
-								is.setFluo(id);
+								is.setFluoInfo(id);
 							if (imageConfiguration == ImageConfiguration.NirSide
 									|| imageConfiguration == ImageConfiguration.NirTop)
-								is.setNir(id);
+								is.setNirInfo(id);
 							if (imageConfiguration == ImageConfiguration.IrSide
 									|| imageConfiguration == ImageConfiguration.IrTop)
-								is.setIr(id);
+								is.setIrInfo(id);
 						}
 					}
 				}
@@ -590,20 +578,20 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			TreeSet<String> replicateIDandQualityList = new TreeSet<String>();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				for (ImageSet i : is.values()) {
-					if (i.getVIS() != null) {
-						String val = i.getVIS().getReplicateID() + ";" + i.getVIS().getQualityAnnotation();
+					if (i.getVisInfo() != null) {
+						String val = i.getVisInfo().getReplicateID() + ";" + i.getVisInfo().getQualityAnnotation();
 						replicateIDandQualityList.add(val);
 					} else
-						if (i.getFLUO() != null) {
-							String val = i.getFLUO().getReplicateID() + ";" + i.getFLUO().getQualityAnnotation();
+						if (i.getFluoInfo() != null) {
+							String val = i.getFluoInfo().getReplicateID() + ";" + i.getFluoInfo().getQualityAnnotation();
 							replicateIDandQualityList.add(val);
 						} else
-							if (i.getNIR() != null) {
-								String val = i.getNIR().getReplicateID() + ";" + i.getNIR().getQualityAnnotation();
+							if (i.getNirInfo() != null) {
+								String val = i.getNirInfo().getReplicateID() + ";" + i.getNirInfo().getQualityAnnotation();
 								replicateIDandQualityList.add(val);
 							} else
-								if (i.getIR() != null) {
-									String val = i.getIR().getReplicateID() + ";" + i.getIR().getQualityAnnotation();
+								if (i.getIrInfo() != null) {
+									String val = i.getIrInfo().getReplicateID() + ";" + i.getIrInfo().getQualityAnnotation();
 									replicateIDandQualityList.add(val);
 								}
 				}
@@ -626,21 +614,21 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (is.size() == 0)
 					continue;
 				String val = null;
-				if (is.firstEntry().getValue().getVIS() != null)
-					val = is.firstEntry().getValue().getVIS().getReplicateID() + ";" +
-							is.firstEntry().getValue().getVIS().getQualityAnnotation();
+				if (is.firstEntry().getValue().getVisInfo() != null)
+					val = is.firstEntry().getValue().getVisInfo().getReplicateID() + ";" +
+							is.firstEntry().getValue().getVisInfo().getQualityAnnotation();
 				else
-					if (is.firstEntry().getValue().getFLUO() != null)
-						val = is.firstEntry().getValue().getFLUO().getReplicateID() + ";" +
-								is.firstEntry().getValue().getFLUO().getQualityAnnotation();
+					if (is.firstEntry().getValue().getFluoInfo() != null)
+						val = is.firstEntry().getValue().getFluoInfo().getReplicateID() + ";" +
+								is.firstEntry().getValue().getFluoInfo().getQualityAnnotation();
 					else
-						if (is.firstEntry().getValue().getNIR() != null)
-							val = is.firstEntry().getValue().getNIR().getReplicateID() + ";" +
-									is.firstEntry().getValue().getNIR().getQualityAnnotation();
+						if (is.firstEntry().getValue().getNirInfo() != null)
+							val = is.firstEntry().getValue().getNirInfo().getReplicateID() + ";" +
+									is.firstEntry().getValue().getNirInfo().getQualityAnnotation();
 						else
-							if (is.firstEntry().getValue().getIR() != null)
-								val = is.firstEntry().getValue().getIR().getReplicateID() + ";" +
-										is.firstEntry().getValue().getIR().getQualityAnnotation();
+							if (is.firstEntry().getValue().getIrInfo() != null)
+								val = is.firstEntry().getValue().getIrInfo().getReplicateID() + ";" +
+										is.firstEntry().getValue().getIrInfo().getQualityAnnotation();
 				if (val == null)
 					continue;
 				
@@ -655,10 +643,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
 				Long time = null;
 				for (ImageData id : new ImageData[] {
-						is.firstEntry().getValue().getVIS(),
-						is.firstEntry().getValue().getFLUO(),
-						is.firstEntry().getValue().getNIR(),
-						is.firstEntry().getValue().getIR() }) {
+						is.firstEntry().getValue().getVisInfo(),
+						is.firstEntry().getValue().getFluoInfo(),
+						is.firstEntry().getValue().getNirInfo(),
+						is.firstEntry().getValue().getIrInfo() }) {
 					if (id == null)
 						continue;
 					time = id.getParentSample().getSampleFineTimeOrRowId();
@@ -692,7 +680,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private MyThread saveImage(
 			final int tray, final int tray_cnt,
-			final ImageData id, final FlexibleImage image,
+			final ImageData id, final Image image,
 			final byte[] optLabelImageContent, final String labelFileExtension)
 			throws InterruptedException {
 		Runnable r = new Runnable() {
@@ -877,8 +865,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			int tray, int tray_cnt,
 			ImageSet id,
 			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
-			FlexibleImageStack debugImageStack, FlexibleImage resVis,
-			FlexibleImage resFluo, FlexibleImage resNir, FlexibleImage resIr, int parentPriority)
+			ImageStack debugImageStack, Image resVis,
+			Image resFluo, Image resNir, Image resIr, int parentPriority)
 			throws InterruptedException {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
@@ -910,17 +898,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					inIr.addAnnotationField("oldreference", inIr
 							.getLabelURL().toString());
 				
-				if (id.getVIS() != null && id.getVIS().getURL() != null)
-					inVis.setLabelURL(id.getVIS().getURL().copy());
+				if (id.getVisInfo() != null && id.getVisInfo().getURL() != null)
+					inVis.setLabelURL(id.getVisInfo().getURL().copy());
 				
-				if (id.getFLUO() != null && id.getFLUO().getURL() != null)
-					inFluo.setLabelURL(id.getFLUO().getURL().copy());
-				if (inNir != null && id != null && id.getNIR() != null
-						&& id.getNIR().getURL() != null)
-					inNir.setLabelURL(id.getNIR().getURL().copy());
-				if (inIr != null && id != null && id.getIR() != null
-						&& id.getIR().getURL() != null)
-					inIr.setLabelURL(id.getIR().getURL().copy());
+				if (id.getFluoInfo() != null && id.getFluoInfo().getURL() != null)
+					inFluo.setLabelURL(id.getFluoInfo().getURL().copy());
+				if (inNir != null && id != null && id.getNirInfo() != null
+						&& id.getNirInfo().getURL() != null)
+					inNir.setLabelURL(id.getNirInfo().getURL().copy());
+				if (inIr != null && id != null && id.getIrInfo() != null
+						&& id.getIrInfo().getURL() != null)
+					inIr.setLabelURL(id.getIrInfo().getURL().copy());
 			}
 			MyThread a = null, b = null, c = null, d = null, ra = null, rb = null, rc = null, rd = null;
 			
@@ -973,10 +961,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final int workloadSnapshotAngles, int parentPriority)
 			throws Exception {
 		ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
-		ImageData inVis = id.getVIS() != null ? id.getVIS().copy() : null;
-		ImageData inFluo = id.getFLUO() != null ? id.getFLUO().copy() : null;
-		ImageData inNir = id.getNIR() != null ? id.getNIR().copy() : null;
-		ImageData inIr = id.getIR() != null ? id.getIR().copy() : null;
+		ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
+		ImageData inFluo = id.getFluoInfo() != null ? id.getFluoInfo().copy() : null;
+		ImageData inNir = id.getNirInfo() != null ? id.getNirInfo().copy() : null;
+		ImageData inIr = id.getIrInfo() != null ? id.getIrInfo().copy() : null;
 		
 		if (inVis == null && inFluo == null && inNir == null && inIr == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
@@ -984,13 +972,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			return null;
 		}
 		
-		final FlexibleImageSet input = new FlexibleImageSet();
-		final FlexibleImageSet inputMasks = new FlexibleImageSet();
+		final ImageSet input = new ImageSet();
+		final ImageSet inputMasks = new ImageSet();
 		
 		input.setImageInfo(inVis, inFluo, inNir, inIr);
 		inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
 		
-		boolean side = id.isSide();
+		boolean side = id.isSideImage();
 		
 		ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
 		
@@ -1001,11 +989,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		else
 			options.setCameraPosition(CameraPosition.TOP);
 		
-		HashMap<Integer, FlexibleImageStack> debugImageStack = null;
+		HashMap<Integer, ImageStack> debugImageStack = null;
 		boolean addDebugImages = IAPmain
 				.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
 		if (addDebugImages || forceDebugStack) {
-			debugImageStack = new HashMap<Integer, FlexibleImageStack>();
+			debugImageStack = new HashMap<Integer, ImageStack>();
 		}
 		
 		HashMap<Integer, BlockResultSet> analysisResults = null;
@@ -1020,9 +1008,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					debugImageStack);
 			
 			for (Integer key : ret.keySet()) {
-				FlexibleImageSet pipelineResult = ret != null ? ret.get(key).getMaskAndImageSet().images() : null;
+				ImageSet pipelineResult = ret != null ? ret.get(key).getMaskAndImageSet().images() : null;
 				if (pipelineResult != null) {
-					FlexibleImage resVis = null, resFluo = null, resNir = null, resIr = null;
+					Image resVis = null, resFluo = null, resNir = null, resIr = null;
 					resVis = pipelineResult.vis();
 					resFluo = pipelineResult.fluo();
 					resNir = pipelineResult.nir();

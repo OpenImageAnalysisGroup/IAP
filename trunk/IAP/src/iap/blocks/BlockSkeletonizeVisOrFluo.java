@@ -21,9 +21,9 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -46,15 +46,15 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	}
 	
 	@Override
-	protected synchronized FlexibleImage processVISmask() {
-		FlexibleImage vis = input().masks().vis();
+	protected synchronized Image processVISmask() {
+		Image vis = input().masks().vis();
 		if (!getBoolean("skeletonize VIS", true))
 			return vis;
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMaskBeforSkeleton.png");
-		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
-		FlexibleImage res = vis;
+		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
+		Image res = vis;
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
+			Image viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
 					// .closing(3, 3)
 					// .erode()
 					.border(5)
@@ -64,23 +64,23 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null)
 						getProperties().setImage("skeleton", sk);
-					FlexibleImage rrr = getProperties().getImage("beforeBloomEnhancement");
+					Image rrr = getProperties().getImage("beforeBloomEnhancement");
 					if (rrr != null)
 						res = rrr;
 				}
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = vis.copy().io()// .medianFilter32Bit()
+			Image viswork = vis.copy().io()// .medianFilter32Bit()
 					.dilate(getInt("Dilate", 2))
 					.blur(getInt("Blur", 1))
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -91,16 +91,16 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	}
 	
 	@Override
-	protected synchronized FlexibleImage processFLUOmask() {
-		FlexibleImage vis = input().masks().vis();
+	protected synchronized Image processFLUOmask() {
+		Image vis = input().masks().vis();
 		if (!getBoolean("skeletonize FLUO", false))
 			return input().masks().fluo();
-		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
+		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
-		FlexibleImage res = fluo.copy();
+		Image res = fluo.copy();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = fluo.copy().io()// .medianFilter32Bit()
+			Image viswork = fluo.copy().io()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 1))
 					.dilate(getInt("Dilate-Cnt-Fluo", 1))
 					.blur(getDouble("Blur-Fluo", 4))
@@ -108,7 +108,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean(new BlockDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -118,7 +118,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				}
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
-			FlexibleImage viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
+			Image viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
 					// .erode(1)
 					.dilate(getInt("Dilate-Cnt-Fluo", 4))
 					// .blur(1)
@@ -126,7 +126,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -138,7 +138,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		return input().masks().fluo();
 	}
 	
-	public synchronized FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
+	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).getImage()));
 		skel2d.findEndpointsAndBranches2();
@@ -162,8 +162,8 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		int bloomLimbCount = 0;
 		if (getBoolean("Detect Bloom", false)) {
-			FlexibleImage proc = fluo;
-			FlexibleImage probablyBloomFluo = null;
+			Image proc = fluo;
+			Image probablyBloomFluo = null;
 			if (!getBoolean("consider fluo image for bloom detection", true)) {
 				proc = vis.copy();
 				probablyBloomFluo = proc.io().filterRemainHSV(
@@ -189,7 +189,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 						getImage();
 			}
 			if (debug2) {
-				FlexibleImageStack fis = new FlexibleImageStack();
+				ImageStack fis = new ImageStack();
 				fis.addImage("probably bloom area", probablyBloomFluo);
 				fis.addImage("input image", proc);
 				fis.show("bloom area");
@@ -213,12 +213,12 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				for (int x = 0; x < w; x++)
 					for (int y = 0; y < height; y++)
 						tempImage[x][y] = clear;
-				FlexibleImage clearImage = new FlexibleImage(tempImage).copy();
+				Image clearImage = new Image(tempImage).copy();
 				int black = Color.BLACK.getRGB();
 				for (Point p : branchPoints)
 					if (p.x >= 0 && p.y >= 0 && p.x < w && p.y < height)
 						tempImage[p.x][p.y] = black;
-				FlexibleImage temp = new FlexibleImage(tempImage);
+				Image temp = new Image(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0d).getImage();
 				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
@@ -234,7 +234,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 						ttt[p.x][p.y] = clear;
-				temp = new FlexibleImage(ttt).io().show("FINAL", debug).getImage();
+				temp = new Image(ttt).io().show("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int filled;
 				ImageOperation tio = temp.io();
@@ -250,15 +250,15 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		leafcount = skel2d.endlimbs.size();
 		// System.out.println("C Leaf count: " + leafcount);
-		FlexibleImage skelres = skel2d.getAsFlexibleImage();
+		Image skelres = skel2d.getAsFlexibleImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
 		leafcount -= bloomLimbCount;
 		
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
-		FlexibleImage result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
+		Image result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
 		result.show("res", false);
-		FlexibleImage result2 = skel2d.copyONOriginalImage(vis);
+		Image result2 = skel2d.copyONOriginalImage(vis);
 		result2.show("res2", false);
 		
 		// ***Saved***
@@ -267,7 +267,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			FlexibleImage inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
+			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -276,7 +276,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 					inp2d[p.x][p.y] = clear;
 			
-			inputImage = new FlexibleImage(inp2d);
+			inputImage = new Image(inp2d);
 			
 			ImageCanvas canvas = inputImage.io().canvas();
 			ArrayList<Point> branchPoints = skel2d.getBranches();
@@ -292,7 +292,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;
 			int filled;
-			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageStack fis = debug ? new ImageStack() : null;
 			ImageOperation ioo = inputImage.io();
 			do {
 				filled = ioo.countFilledPixels();
@@ -360,7 +360,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 		return skel2d.getAsFlexibleImage();
 	}
 	
-	private synchronized FlexibleImage MapOriginalOnSkelUseingMedian(FlexibleImage skeleton, FlexibleImage original, int back) {
+	private synchronized Image MapOriginalOnSkelUseingMedian(Image skeleton, Image original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
 		int[] img = skeleton.getAs1A().clone();
@@ -377,7 +377,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 			} else
 				img[i] = img[i];
 		}
-		return new FlexibleImage(w, h, img);
+		return new Image(w, h, img);
 	}
 	
 	private int median(int center, int above, int left, int right, int below) {
@@ -414,7 +414,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	 * @param input
 	 * @return
 	 */
-	private synchronized FlexibleImage getInvert(FlexibleImage input) {
+	private synchronized Image getInvert(Image input) {
 		int[][] img = input.getAs2A();
 		int width = img.length;
 		int height = img[0].length;
@@ -432,7 +432,7 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 				}
 			}
 		}
-		return new FlexibleImage(res);
+		return new Image(res);
 	}
 	
 	@Override
@@ -546,18 +546,18 @@ public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS 
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 }

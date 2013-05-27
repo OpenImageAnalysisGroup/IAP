@@ -6,11 +6,11 @@ import java.awt.Color;
 import java.util.Stack;
 
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class BorderImageOperation {
 	
-	private final FlexibleImage image;
+	private final Image image;
 	private ResultsTableWithUnits rt;
 	
 	public BorderImageOperation(ImageOperation imageOperation) {
@@ -46,7 +46,7 @@ public class BorderImageOperation {
 		
 		int border = borderDetection(backgroundColor, borderColor, removeInnerBorders, in, w, h, out);
 		
-		ImageOperation res = new ImageOperation(new FlexibleImage(out));
+		ImageOperation res = new ImageOperation(new Image(out));
 		
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
@@ -200,7 +200,7 @@ public class BorderImageOperation {
 			filled += floodFill(out, w, h, background, fill, w - 1, y);
 		}
 		// sw.printTime(0);
-		ImageOperation res = new ImageOperation(new FlexibleImage(out));
+		ImageOperation res = new ImageOperation(new Image(out));
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
 		rt.incrementCounter();

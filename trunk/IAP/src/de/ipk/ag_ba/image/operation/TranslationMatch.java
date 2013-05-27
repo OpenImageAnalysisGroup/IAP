@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Moves an image vertically or horizontally to match the given image (mainImage).
@@ -29,7 +29,7 @@ public class TranslationMatch {
 		mainImagePatternForImageColumns = mainImage.calculateHorizontalPattern();
 	}
 	
-	public void calcOffsetVerticalY(FlexibleImage img) {
+	public void calcOffsetVerticalY(Image img) {
 		if (img == null) {
 			offsetVertY = 0;
 			return;
@@ -58,7 +58,7 @@ public class TranslationMatch {
 		}
 	}
 	
-	public void calcOffsetHorizontalX(FlexibleImage img) {
+	public void calcOffsetHorizontalX(Image img) {
 		if (img == null) {
 			offsetHorX = 0;
 			return;
@@ -84,7 +84,7 @@ public class TranslationMatch {
 		}
 	}
 	
-	public FlexibleImage translate(FlexibleImage toBeTransalated) {
+	public Image translate(Image toBeTransalated) {
 		return toBeTransalated.io().translate(offsetHorX, offsetVertY).canvas().
 				drawSideHistogram(corrsVert, debug).drawTopHistogram(corrsHor, debug).getImage();
 	}

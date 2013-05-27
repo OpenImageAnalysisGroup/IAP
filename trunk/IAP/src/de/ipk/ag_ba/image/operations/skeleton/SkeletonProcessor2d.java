@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class SkeletonProcessor2d {
 	
@@ -46,7 +46,7 @@ public class SkeletonProcessor2d {
 		return "invalid color";
 	}
 	
-	public SkeletonProcessor2d(FlexibleImage inp) {
+	public SkeletonProcessor2d(Image inp) {
 		this.skelImg = inp.getAs2A().clone();
 		// TODO findEndpointsAndBranches(); all in one, do it later
 	}
@@ -420,7 +420,7 @@ public class SkeletonProcessor2d {
 	 * Not Mask based
 	 */
 	public void findEndpointsAndBranches2() {
-		new FlexibleImage(skelImg).copy().show("TTTT", false);
+		new Image(skelImg).copy().show("TTTT", false);
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
@@ -576,11 +576,11 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void print(String title, boolean show) {
-		new FlexibleImage(this.skelImg).show(title, show);
+		new Image(this.skelImg).show(title, show);
 	}
 	
-	public FlexibleImage getAsFlexibleImage() {
-		return new FlexibleImage(this.skelImg);
+	public Image getAsFlexibleImage() {
+		return new Image(this.skelImg);
 	}
 	
 	private boolean isBranch(Point inp) {
@@ -633,7 +633,7 @@ public class SkeletonProcessor2d {
 		return res;
 	}
 	
-	public FlexibleImage copyONOriginalImage(FlexibleImage vis) {
+	public Image copyONOriginalImage(Image vis) {
 		int[][] plantImg = vis.getAs2A();
 		int w = Math.min(skelImg.length, plantImg.length);
 		int h = Math.min(skelImg[0].length, plantImg[0].length);
@@ -660,10 +660,10 @@ public class SkeletonProcessor2d {
 				}
 			}
 		}
-		return new FlexibleImage(plantImg);
+		return new Image(plantImg);
 	}
 	
-	public HashSet<Point> detectBloom(FlexibleImage vis, FlexibleImage fluo, double xf, double yf) {
+	public HashSet<Point> detectBloom(Image vis, Image fluo, double xf, double yf) {
 		ArrayList<Limb> topLimbs = getTopEndlimbs(1);
 		ArrayList<Limb> bloomLimbs = new ArrayList<Limb>();
 		
@@ -693,7 +693,7 @@ public class SkeletonProcessor2d {
 		return res;
 	}
 	
-	private boolean checkBamboEnd(Limb l, FlexibleImage vis, double xf, double yf) {
+	private boolean checkBamboEnd(Limb l, Image vis, double xf, double yf) {
 		if (vis == null || l == null || l.points == null || vis.getHeight() <= 0)
 			return false;
 		
@@ -712,7 +712,7 @@ public class SkeletonProcessor2d {
 			return false;
 	}
 	
-	private boolean checkBloomColorOnVis(Limb l, FlexibleImage vis, double xf, double yf) {
+	private boolean checkBloomColorOnVis(Limb l, Image vis, double xf, double yf) {
 		if (vis == null || l == null || l.points == null)
 			return false;
 		
@@ -749,7 +749,7 @@ public class SkeletonProcessor2d {
 			return false;
 	}
 	
-	private boolean checkBloomColorOnFluo(Limb l, FlexibleImage fluo, double xf, double yf) {
+	private boolean checkBloomColorOnFluo(Limb l, Image fluo, double xf, double yf) {
 		if (fluo == null || l == null || l.points == null)
 			return false;
 		int[][] visImg = fluo.getAs2A();
@@ -803,7 +803,7 @@ public class SkeletonProcessor2d {
 		return maxLimbs;
 	}
 	
-	public FlexibleImage calcProbablyBloomImage(FlexibleImage image, double hueBloom) {
+	public Image calcProbablyBloomImage(Image image, double hueBloom) {
 		int[][] visImg = image.getAs2A();
 		int h = image.getHeight();
 		int w = image.getWidth();
@@ -836,7 +836,7 @@ public class SkeletonProcessor2d {
 				res[x][y] = (0xFF << 24 | ((int) distToYellow & 0xFF) << 16) | (((int) distToYellow & 0xFF) << 8) | (((int) distToYellow & 0xFF) << 0);
 			}
 		}
-		return new FlexibleImage(res);
+		return new Image(res);
 	}
 	
 	public Limb getMinLimbY() {

@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Detects the border pixels of the image objects. Uses the coordinates of the
@@ -30,7 +30,7 @@ public class ConvexHullCalculator {
 	
 	private int borderPixels;
 	
-	private FlexibleImage customImage;
+	private Image customImage;
 	
 	/**
 	 * The imageOperation - ResultTable is retained and extended (if available)
@@ -93,7 +93,7 @@ public class ConvexHullCalculator {
 			polygon = null;
 	}
 	
-	public ConvexHullCalculator setCustomBackgroundImageForDrawing(FlexibleImage customImage) {
+	public ConvexHullCalculator setCustomBackgroundImageForDrawing(Image customImage) {
 		this.customImage = customImage;
 		return this;
 	}
@@ -210,7 +210,7 @@ public class ConvexHullCalculator {
 				}
 				
 				if (drawPCLine) {
-					FlexibleImage inDrawing = res.getImage();
+					Image inDrawing = res.getImage();
 					ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
 					if (span2.getP1() != null && span2.getP1l() != null) {
 						a = a.drawLine(span2.getP1(), span2.getP1l(), Color.ORANGE.getRGB(), 0.5, 1);

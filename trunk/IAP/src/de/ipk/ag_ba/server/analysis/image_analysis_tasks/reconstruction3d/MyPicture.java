@@ -24,7 +24,7 @@ import org.SystemAnalysis;
 
 import qmwi.kseg.som.SOM_ColorReduce;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /*
  * Created on Dec 17, 2009 by Christian Klukas
@@ -116,7 +116,7 @@ public class MyPicture {
 		width = bufferedImage.getWidth();
 		height = bufferedImage.getHeight();
 		
-		img = new FlexibleImage(bufferedImage).getAs2A();
+		img = new Image(bufferedImage).getAs2A();
 		
 		// blur image
 		// int blr = 0;// (int) ((double) width / mg.getResolution() * blurfactor);
@@ -149,7 +149,7 @@ public class MyPicture {
 		return 1d * nottransp / allp < 0.3;
 	}
 	
-	public boolean setPictureData(FlexibleImage image, double angle,
+	public boolean setPictureData(Image image, double angle,
 			ThreeDmodelGenerator mg
 			// ,
 			// TransparencyAnalysis ta,

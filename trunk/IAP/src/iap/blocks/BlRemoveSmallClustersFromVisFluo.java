@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Small parts
@@ -28,10 +28,10 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		FlexibleImage res, mask = input().masks().vis().show("vis input", debug);
+		Image res, mask = input().masks().vis().show("vis input", debug);
 		
 		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
 				getInt("Noise-Size-Vis-Area", 20 * 20),
@@ -43,7 +43,7 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null)
 			return null;
 		
@@ -58,18 +58,18 @@ public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBl
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

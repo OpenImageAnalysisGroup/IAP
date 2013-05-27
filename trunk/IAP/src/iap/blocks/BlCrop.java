@@ -5,8 +5,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISimage() {
+	protected Image processVISimage() {
 		if (input() != null && input().images() != null && input().images().vis() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().vis().crop();
@@ -39,7 +39,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() {
+	protected Image processFLUOimage() {
 		if (input() != null && input().images() != null && input().images().fluo() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().fluo().crop();
@@ -61,7 +61,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (input() != null && input().images() != null && input().images().nir() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().nir().crop();
@@ -83,7 +83,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processIRimage() {
+	protected Image processIRimage() {
 		if (input() != null && input().images() != null && input().images().ir() != null) {
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().ir().crop();
@@ -105,17 +105,17 @@ public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

@@ -1,17 +1,17 @@
 package iap.blocks.data_structures;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	
-	protected FlexibleImage processImage(FlexibleImage image) {
+	protected Image processImage(Image image) {
 		return image;
 	}
 	
-	protected abstract FlexibleImage processMask(FlexibleImage mask);
+	protected abstract Image processMask(Image mask);
 	
 	@Override
-	protected FlexibleImage processVISimage() {
+	protected Image processVISimage() {
 		if (input().images().vis() != null)
 			return processImage(input().images().vis());
 		else
@@ -19,7 +19,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() {
+	protected Image processFLUOimage() {
 		if (input().images().fluo() != null)
 			return processImage(input().images().fluo());
 		else
@@ -27,7 +27,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (input().images().nir() != null)
 			return processImage(input().images().nir());
 		else
@@ -35,7 +35,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processIRimage() {
+	protected Image processIRimage() {
 		if (input().images().nir() != null)
 			return processImage(input().images().ir());
 		else
@@ -43,7 +43,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() != null)
 			return processMask(input().masks().vis());
 		else
@@ -51,7 +51,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().masks().fluo() != null)
 			return processMask(input().masks().fluo());
 		else
@@ -59,7 +59,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (input().masks().nir() != null)
 			return processMask(input().masks().nir());
 		else
@@ -67,7 +67,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processIRmask() {
+	protected Image processIRmask() {
 		if (input().masks().ir() != null)
 			return processMask(input().masks().ir());
 		else

@@ -13,8 +13,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.intensity.Histogram;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.
@@ -54,7 +54,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() != null) {
 			
 			ImageOperation io = new ImageOperation(input().masks().vis().copy()).show("BEFORE TRIMM", debug).erode(getInt("Erode-Cnt-Vis", 2));
@@ -129,7 +129,7 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().masks().fluo() != null) {
 			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).
 					erode(getInt("Erode-Cnt-Fluo", 2));
@@ -146,8 +146,8 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage nirSkel = getProperties().getImage("nir_skeleton");
+	protected Image processNIRmask() {
+		Image nirSkel = getProperties().getImage("nir_skeleton");
 		if (nirSkel != null) {
 			int nirSkeletonFilledPixels = nirSkel.io().countFilledPixels();
 			double nirSkeletonIntensitySum = nirSkel.io().intensitySumOfChannel(false, true, false, false);
@@ -215,8 +215,8 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processIRmask() {
-		FlexibleImage irSkel = null;
+	protected Image processIRmask() {
+		Image irSkel = null;
 		// getProperties().getImage("ir_skeleton");
 		if (input().masks().ir() != null)
 			irSkel = input().masks().ir().io().skeletonize(false).getImage();
@@ -262,17 +262,17 @@ public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

@@ -13,8 +13,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -47,9 +47,9 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	}
 	
 	@Override
-	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(ImageProcessorOptions options, FlexibleImageSet input, FlexibleImageSet optInputMasks,
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(ImageProcessorOptions options, ImageSet input, ImageSet optInputMasks,
 			int maxThreadsPerImage,
-			HashMap<Integer, FlexibleImageStack> debugStack) throws Exception {
+			HashMap<Integer, ImageStack> debugStack) throws Exception {
 		HashSet<Integer> rotationAngles = new HashSet<Integer>();
 		if (input != null && input.getVisInfo() != null && input.getVisInfo().getParentSample() != null) {
 			SampleInterface inSample = input.getVisInfo().getParentSample();

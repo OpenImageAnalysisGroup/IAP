@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Detect the zoom level of the scanned image.
@@ -21,8 +21,8 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage img = input().masks().vis();
+	protected Image processVISmask() {
+		Image img = input().masks().vis();
 		if (img != null) {
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
@@ -42,15 +42,15 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 	
 }

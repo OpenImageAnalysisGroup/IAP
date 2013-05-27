@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import org.junit.Test;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * @author klukas
@@ -535,7 +535,7 @@ public class ColorUtil {
 		}
 	}
 	
-	public static LinkedList<double[]> getLABfromRGB(FlexibleImage workImage, boolean exactAndSlow) {
+	public static LinkedList<double[]> getLABfromRGB(Image workImage, boolean exactAndSlow) {
 		LinkedList<double[]> labList = new LinkedList<double[]>();
 		
 		int[] workArray = workImage.getAs1A();

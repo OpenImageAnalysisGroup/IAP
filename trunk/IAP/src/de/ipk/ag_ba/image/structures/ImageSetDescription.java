@@ -16,7 +16,7 @@ public class ImageSetDescription {
 	private final ImageDescription nirMaskDesc;
 	private final ImageDescription irMaskDesc;
 	
-	public ImageSetDescription(FlexibleMaskAndImageSet baseForComparison) {
+	public ImageSetDescription(MaskAndImageSet baseForComparison) {
 		visDesc = new ImageDescription(baseForComparison.images().vis());
 		fluoDesc = new ImageDescription(baseForComparison.images().fluo());
 		nirDesc = new ImageDescription(baseForComparison.images().nir());
@@ -28,11 +28,11 @@ public class ImageSetDescription {
 		irMaskDesc = new ImageDescription(baseForComparison.masks().ir());
 	}
 	
-	public boolean isDifferentTo(FlexibleMaskAndImageSet compareWith) {
+	public boolean isDifferentTo(MaskAndImageSet compareWith) {
 		return !getDifferenceDescription(compareWith).isEmpty();
 	}
 	
-	public String getDifferenceDescription(FlexibleMaskAndImageSet compareWith) {
+	public String getDifferenceDescription(MaskAndImageSet compareWith) {
 		ArrayList<String> changes = new ArrayList<String>();
 		StringManipulationTools.addIfNotEmpty(changes, visDesc.getChange("vis img", compareWith.images().vis()));
 		StringManipulationTools.addIfNotEmpty(changes, fluoDesc.getChange("fluo img", compareWith.images().fluo()));

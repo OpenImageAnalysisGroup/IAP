@@ -3,8 +3,8 @@ package de.ipk.ag_ba.image.operation;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
 
 public class SkeletonizeProcessor {
 	
@@ -37,7 +37,7 @@ public class SkeletonizeProcessor {
 		
 		boolean debug = false;
 		
-		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+		ImageStack fis = debug ? new ImageStack() : null;
 		
 		do {
 			foundBorderVoxel = false;
@@ -94,7 +94,7 @@ public class SkeletonizeProcessor {
 			borderX.clear();
 			borderY.clear();
 			if (fis != null) {
-				fis.addImage("Loop " + loop, new FlexibleImage(img).copy());
+				fis.addImage("Loop " + loop, new Image(img).copy());
 			}
 			loop++;
 		} while (foundBorderVoxel);

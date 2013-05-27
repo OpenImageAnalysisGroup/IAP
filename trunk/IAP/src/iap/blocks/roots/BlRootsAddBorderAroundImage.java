@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.awt.Color;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Add border of N pixels around the images (visible)
@@ -15,8 +15,8 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
  */
 public class BlRootsAddBorderAroundImage extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage img = input().images().vis();
+	protected Image processVISimage() {
+		Image img = input().images().vis();
 		int white = new Color(255, 255, 255).getRGB();
 		if (img != null)
 			img = img
@@ -31,16 +31,16 @@ public class BlRootsAddBorderAroundImage extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	

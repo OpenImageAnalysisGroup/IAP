@@ -1,13 +1,13 @@
 package iap.pipelines;
 
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 public class StringAndFlexibleMaskAndImageSet {
 	
 	private String settings;
-	private FlexibleMaskAndImageSet maskAndImageSet;
+	private MaskAndImageSet maskAndImageSet;
 	
-	public StringAndFlexibleMaskAndImageSet(String settings, FlexibleMaskAndImageSet maskAndImageSet) {
+	public StringAndFlexibleMaskAndImageSet(String settings, MaskAndImageSet maskAndImageSet) {
 		this.settings = settings;
 		this.maskAndImageSet = maskAndImageSet;
 	}
@@ -16,11 +16,11 @@ public class StringAndFlexibleMaskAndImageSet {
 		return settings;
 	}
 	
-	public FlexibleMaskAndImageSet getMaskAndImageSet() {
+	public MaskAndImageSet getMaskAndImageSet() {
 		return maskAndImageSet;
 	}
 	
-	public void setMaskAndImageSet(FlexibleMaskAndImageSet processed) {
+	public void setMaskAndImageSet(MaskAndImageSet processed) {
 		maskAndImageSet = processed;
 	}
 	

@@ -10,8 +10,8 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author Klukas
@@ -66,8 +66,8 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = input().masks().vis();
+	protected Image processVISmask() {
+		Image vis = input().masks().vis();
 		if (blackBeltMask == null || vis == null)
 			return vis;
 		vis = input().masks().vis().io().applyMask(blackBeltMask.getImage().copy(),
@@ -76,8 +76,8 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage fluo = input().masks().fluo();
+	protected Image processFLUOmask() {
+		Image fluo = input().masks().fluo();
 		if (blackBeltMask == null || fluo == null)
 			return fluo;
 		fluo = input().masks().fluo().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
@@ -86,8 +86,8 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage nir = input().masks().nir();
+	protected Image processNIRmask() {
+		Image nir = input().masks().nir();
 		if (blackBeltMask == null || nir == null)
 			return nir;
 		nir = input().masks().nir().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
@@ -95,19 +95,19 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 		return nir;
 	}
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 }

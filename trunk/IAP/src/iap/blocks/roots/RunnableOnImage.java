@@ -1,9 +1,9 @@
 package iap.blocks.roots;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public interface RunnableOnImage {
 	
-	public FlexibleImage postProcess(FlexibleImage in);
+	public Image postProcess(Image in);
 	
 }

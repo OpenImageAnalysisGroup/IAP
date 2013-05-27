@@ -8,9 +8,9 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Uses a lab-based pixel filter(s) for the vis/fluo images.
@@ -28,21 +28,21 @@ public class BlFilterByLAB extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		return process("VIS", input().images().vis(), input().masks().vis());
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return process("FLUO", input().images().fluo(), input().masks().fluo());
 	}
 	
-	private FlexibleImage process(String optics, FlexibleImage image, FlexibleImage mask) {
+	private Image process(String optics, Image image, Image mask) {
 		if (image == null || mask == null || !getBoolean("process " + optics, optics.equals("VIS")))
 			return mask;
 		else {
 			ImageOperation processedMask = input().masks().vis().io().copy();
-			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageStack fis = debug ? new ImageStack() : null;
 			if (fis != null)
 				fis.addImage(optics + " start", processedMask.getImage(), null);
 			
@@ -68,15 +68,15 @@ public class BlFilterByLAB extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

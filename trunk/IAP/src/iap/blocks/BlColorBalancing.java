@@ -12,8 +12,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PixelProcessor;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Recolor pictures according to white point (or black point for fluo).
@@ -32,10 +32,10 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISimage() {
+	protected Image processVISimage() {
 		if (input() == null || input().images() == null)
 			return null;
-		FlexibleImage vis = input().images().vis();
+		Image vis = input().images().vis();
 		if (vis == null)
 			return null;
 		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
@@ -88,8 +88,8 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = input().masks().vis();
+	protected Image processVISmask() {
+		Image vis = input().masks().vis();
 		if (vis == null)
 			return null;
 		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
@@ -109,7 +109,7 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * 
 	 * @author pape
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image, boolean verticalGradientSideView, int lThres, int abThres) {
+	private double[] getProbablyWhitePixels(Image image, boolean verticalGradientSideView, int lThres, int abThres) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -211,14 +211,14 @@ public class BlColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

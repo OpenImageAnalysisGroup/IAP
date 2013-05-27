@@ -3,7 +3,7 @@
  *************************************************************************/
 package de.ipk.ag_ba.image.operation;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Merges mask A with B. If the result is filled below 1/1000 of the area, not the nearly empty result mask is used but mask A (e.g. RGB).
@@ -82,7 +82,7 @@ public class MaskOperationDirect {
 		return deleted;
 	}
 	
-	public FlexibleImage apply(int[] mask, FlexibleImage image) {
+	public Image apply(int[] mask, Image image) {
 		int[] image1A = image.getAs1A();
 		
 		int i = 0;
@@ -92,7 +92,7 @@ public class MaskOperationDirect {
 			i++;
 		}
 		
-		return new FlexibleImage(image.getWidth(), image.getHeight(), image1A);
+		return new Image(image.getWidth(), image.getHeight(), image1A);
 	}
 	
 }

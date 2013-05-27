@@ -9,9 +9,9 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Uses a lab-based pixel filter for the vis images.
@@ -33,12 +33,12 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null || input().images().vis() == null)
 			return null;
 		else {
 			ImageOperation visMask = input().masks().vis().io().copy();
-			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageStack fis = debug ? new ImageStack() : null;
 			if (fis != null)
 				fis.addImage("start", visMask.getImage(), null);
 			
@@ -97,14 +97,14 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

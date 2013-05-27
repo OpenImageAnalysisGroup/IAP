@@ -27,15 +27,15 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 public class BlCutZoomedImages extends AbstractBlock {
 	
-	protected void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
-				final FlexibleMaskAndImageSet inputSet,
+	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
+				final MaskAndImageSet inputSet,
 				final BlockResultSet brs, final ImageProcessorOptions options,
 				final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
@@ -53,19 +53,19 @@ public class BlCutZoomedImages extends AbstractBlock {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					ImageAnalysisBlockFIS inst = (ImageAnalysisBlockFIS) blockType.newInstance();
-					FlexibleImageSet a = inputSet.images().copy();
-					FlexibleImageSet b = inputSet.masks().copy();
-					FlexibleMaskAndImageSet ab = new FlexibleMaskAndImageSet(a, b);
+					ImageSet a = inputSet.images().copy();
+					ImageSet b = inputSet.masks().copy();
+					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					((BlCutZoomedImages) inst).preventDebugValues = true;
 					inst.setInputAndOptions(ab, options, brs, blockPos, null);
 					ab = inst.process();
-					FlexibleImageSet in = ab.images();
+					ImageSet in = ab.images();
 					
-					FlexibleImage vis = in.getImage(inpImageType).copy();
+					Image vis = in.getImage(inpImageType).copy();
 					
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();
-					FlexibleImage selImage = ab.images().getImage(inpImageType);
+					Image selImage = ab.images().getImage(inpImageType);
 					if (selImage == null)
 						throw new Exception("Input image not available");
 					int f1 = options.getIntSetting(inst, "Debug-Crossfade-F1_5", 5);
@@ -153,24 +153,24 @@ public class BlCutZoomedImages extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processImage(FlexibleImage image) {
+	protected Image processImage(Image image) {
 		if (image == null)
 			return image;
 		return cut(image.io());
 	}
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
+	protected Image processMask(Image mask) {
 		return cut(mask.io());
 	}
 	
-	private FlexibleImage cut(ImageOperation img) {
+	private Image cut(ImageOperation img) {
 		double zoomX = Double.NaN;
 		double zoomY = Double.NaN;
 		double offX = Double.NaN;
 		double offY = Double.NaN;
 		String prefix = "UNKNOWN";
-		switch (img.getType()) {
+		switch (img.getCameraType()) {
 			case VIS:
 				prefix = "VIS";
 				break;
@@ -200,17 +200,17 @@ public class BlCutZoomedImages extends AbstractBlock {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

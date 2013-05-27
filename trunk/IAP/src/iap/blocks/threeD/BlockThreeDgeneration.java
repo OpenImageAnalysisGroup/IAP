@@ -15,8 +15,8 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.MyPicture;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;
@@ -33,13 +33,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 public class BlockThreeDgeneration extends AbstractBlock {
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
+	protected Image processMask(Image mask) {
 		return mask;
 	}
 	
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage fi = input().images() != null ? input().images().vis() : null;
+	protected Image processVISimage() {
+		Image fi = input().images() != null ? input().images().vis() : null;
 		if (fi != null) {
 			getProperties().setImage("img.vis.3D", fi.show("CLEARED", false));
 		} else {
@@ -79,7 +79,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 					BlockResultSet bp = allResultsForSnapshot.get(tray).get(angle);
 					distHorizontal = options.getCalculatedBlueMarkerDistance();
 					realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-					FlexibleImage vis = bp.getImage("img.vis.3D");
+					Image vis = bp.getImage("img.vis.3D");
 					bp.setImage("img.vis.3D", null);
 					if (vis != null) {
 						
@@ -367,16 +367,16 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 }

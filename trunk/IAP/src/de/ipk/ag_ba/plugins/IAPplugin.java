@@ -24,7 +24,7 @@ public interface IAPplugin extends GenericPlugin {
 	 * @return A list of remote data source providers for pathways, web-links or other
 	 *         types of datasets.
 	 */
-	public DataSource[] getHomeDataSources();
+	public DataSource[] getDataSources();
 	
 	/**
 	 * Override this method to provide the system information about a list

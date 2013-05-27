@@ -1,23 +1,23 @@
 package iap.blocks.maize;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlockRemoveVerticalAndHorizontalStructures_vis extends BlockRemoveVerticalAndHorizontalStructuresFromVisFluo {
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
+	protected Image processMask(Image mask) {
 		if (mask == null)
 			return null;
-		if (mask.getType() == FlexibleImageType.UNKNOWN) {
+		if (mask.getCameraType() == CameraType.UNKNOWN) {
 			System.out.println("ERROR: Unknown image type!!!");
 			return mask;
 		}
-		if (mask.getType() == FlexibleImageType.NIR)
+		if (mask.getCameraType() == CameraType.NIR)
 			return mask;
-		if (mask.getType() == FlexibleImageType.FLUO)
+		if (mask.getCameraType() == CameraType.FLUO)
 			return mask;
-		if (mask.getType() == FlexibleImageType.VIS)
+		if (mask.getCameraType() == CameraType.VIS)
 			return process(process(mask));
 		
 		return mask;

@@ -7,9 +7,9 @@ import java.util.HashSet;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas, entzian
@@ -28,15 +28,15 @@ public class BlLoadImagesIfNeeded extends
 		if (input() != null) {
 			if (input().images() != null)
 				input().setImages(
-						new FlexibleImageSet(input().images()));
+						new ImageSet(input().images()));
 			if (input().masks() != null) {
-				input().setMasks(new FlexibleImageSet(input().masks()));
+				input().setMasks(new ImageSet(input().masks()));
 			}
 			if (input().images().vis() == null
 					&& input().images().getVisInfo() != null) {
 				IOurl url = input().images().getVisInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setVis(fi);
 				} catch (Error e) {
@@ -54,7 +54,7 @@ public class BlLoadImagesIfNeeded extends
 					&& input().images().getFluoInfo() != null) {
 				IOurl url = input().images().getFluoInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setFluo(fi);
 				} catch (Error e) {
@@ -72,7 +72,7 @@ public class BlLoadImagesIfNeeded extends
 					&& input().images().getNirInfo() != null) {
 				IOurl url = input().images().getNirInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setNir(fi);
 				} catch (Error e) {
@@ -90,7 +90,7 @@ public class BlLoadImagesIfNeeded extends
 					&& input().images().getIrInfo() != null) {
 				IOurl url = input().images().getIrInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setIr(fi);
 				} catch (Error e) {
@@ -111,7 +111,7 @@ public class BlLoadImagesIfNeeded extends
 	private void checkForStrangeTVtestImageAndReplaceWithNull() {
 		if (input().images().vis() != null) {
 			// check for TV test image
-			FlexibleImage i = input().images().vis();
+			Image i = input().images().vis();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -122,7 +122,7 @@ public class BlLoadImagesIfNeeded extends
 		}
 		if (input().images().fluo() != null) {
 			// check for TV test image
-			FlexibleImage i = input().images().fluo();
+			Image i = input().images().fluo();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -133,7 +133,7 @@ public class BlLoadImagesIfNeeded extends
 		}
 		if (input().images().nir() != null) {
 			// check for TV test image
-			FlexibleImage i = input().images().nir();
+			Image i = input().images().nir();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -144,7 +144,7 @@ public class BlLoadImagesIfNeeded extends
 		}
 		if (input().masks().vis() != null) {
 			// check for TV test image
-			FlexibleImage i = input().masks().vis();
+			Image i = input().masks().vis();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -155,7 +155,7 @@ public class BlLoadImagesIfNeeded extends
 		}
 		if (input().masks().fluo() != null) {
 			// check for TV test image
-			FlexibleImage i = input().masks().fluo();
+			Image i = input().masks().fluo();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -166,7 +166,7 @@ public class BlLoadImagesIfNeeded extends
 		}
 		if (input().masks().nir() != null) {
 			// check for TV test image
-			FlexibleImage i = input().masks().nir();
+			Image i = input().masks().nir();
 			if (i.getWidth() == getInt("TV_TEST_IMAGE_WIDTH", 768)
 					&& i.getHeight() == getInt("TV_TEST_IMAGE_HEIGHT", 576)) {
 				System.out
@@ -191,18 +191,18 @@ public class BlLoadImagesIfNeeded extends
 	// }
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 }

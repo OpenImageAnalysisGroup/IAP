@@ -34,7 +34,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -187,7 +187,7 @@ public class IAPmail {
 					tso.setInt(((MyByteArrayInputStream) is).getCount());
 					// SystemAnalysis.simulateHeadless = false;
 					if (resize) {
-						FlexibleImage img = new FlexibleImage(is);
+						Image img = new Image(is);
 						if (img.getWidth() > 640 || img.getHeight() > 480) {
 							double sc1 = 640d / img.getWidth();
 							double sc2 = 480d / img.getHeight();

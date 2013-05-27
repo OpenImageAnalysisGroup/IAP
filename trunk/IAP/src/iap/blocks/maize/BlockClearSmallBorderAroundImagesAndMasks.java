@@ -7,8 +7,8 @@ import iap.blocks.data_structures.AbstractBlock;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas
@@ -21,7 +21,7 @@ public class BlockClearSmallBorderAroundImagesAndMasks extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processImage(FlexibleImage image) {
+	protected Image processImage(Image image) {
 		if (image != null)
 			return image.io().border((int) (0.01d * image.getWidth())).getImage();
 		else
@@ -29,7 +29,7 @@ public class BlockClearSmallBorderAroundImagesAndMasks extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
+	protected Image processMask(Image mask) {
 		if (mask != null)
 			return mask.io().border((int) (0.01d * mask.getWidth())).getImage();
 		else
@@ -37,22 +37,22 @@ public class BlockClearSmallBorderAroundImagesAndMasks extends AbstractBlock {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 }

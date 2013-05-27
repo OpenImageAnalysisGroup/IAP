@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Improve flower visibility for visible mask.
@@ -17,7 +17,7 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 	protected int closeOperations = -1;
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
 		else
@@ -28,7 +28,7 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 				return input().masks().vis();
 	}
 	
-	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
+	private Image closing(Image mask, Image image) {
 		int lThresh = 200; // 100
 		int bThresh = 140; // 0, 127
 		int aDiffFromZero = 50; // 25
@@ -39,7 +39,7 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 		int[] in = mask.copy().getAs1A();
 		
 		// erodeRetainingLines()
-		FlexibleImage workImage = closing(mask.io().getImage(), options.getBackground(), lThresh, bThresh, aDiffFromZero);
+		Image workImage = closing(mask.io().getImage(), options.getBackground(), lThresh, bThresh, aDiffFromZero);
 		// run twice, because on the input image above "erode" is called once
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);
@@ -53,7 +53,7 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 				in[i] = workImg[i];
 		}
 		
-		return new FlexibleImage(w, h, in);
+		return new Image(w, h, in);
 	}
 	
 	// private static FlexibleImage closingWithMask(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int closingRepeat, int lThresh, int
@@ -129,7 +129,7 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 	// ImageOperation.labCube
 	// }
 	
-	private static FlexibleImage closing(FlexibleImage flMask, int iBackgroundFill, int lThresh, int bThresh,
+	private static Image closing(Image flMask, int iBackgroundFill, int lThresh, int bThresh,
 			int aDiffFromZero) {
 		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
@@ -182,21 +182,21 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 				}
 			}
 		}
-		return new FlexibleImage(image);
+		return new Image(image);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 }

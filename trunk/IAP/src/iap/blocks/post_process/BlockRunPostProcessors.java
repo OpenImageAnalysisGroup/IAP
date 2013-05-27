@@ -5,15 +5,15 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
 public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage fi = input().masks().vis();
+	protected Image processVISmask() {
+		Image fi = input().masks().vis();
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
@@ -25,8 +25,8 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage fi = input().images().vis();
+	protected Image processVISimage() {
+		Image fi = input().images().vis();
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISImage.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
@@ -43,22 +43,22 @@ public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

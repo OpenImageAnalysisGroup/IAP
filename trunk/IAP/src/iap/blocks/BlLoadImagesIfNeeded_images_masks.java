@@ -7,9 +7,9 @@ import java.util.HashSet;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author entzian, klukas
@@ -27,16 +27,16 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 		if (input() != null) {
 			if (input().images() != null)
 				input().setImages(
-						new FlexibleImageSet(input().images()));
+						new ImageSet(input().images()));
 			if (input().masks() != null)
 				input()
-						.setMasks(new FlexibleImageSet(input().masks()));
+						.setMasks(new ImageSet(input().masks()));
 			
 			if (input().images().vis() == null
 					&& input().images().getVisInfo() != null && getBoolean("Load VIS", true)) {
 				IOurl url = input().images().getVisInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setVis(fi);
 					if (fi.getWidth() < 200)
@@ -53,7 +53,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					url = input().images().getVisInfo().getLabelURL();
 					if (url != null) {
 						try {
-							FlexibleImage fi = new FlexibleImage(url);
+							Image fi = new Image(url);
 							if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 								input().masks().setVis(fi);
 						} catch (Error e) {
@@ -71,7 +71,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					&& input().images().getFluoInfo() != null && getBoolean("Load FLUO", true)) {
 				IOurl url = input().images().getFluoInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setFluo(fi);
 				} catch (Error e) {
@@ -85,7 +85,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					url = input().images().getFluoInfo().getLabelURL();
 					if (url != null) {
 						try {
-							FlexibleImage fi = new FlexibleImage(url);
+							Image fi = new Image(url);
 							if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 								input().masks().setFluo(fi);
 						} catch (Error e) {
@@ -103,7 +103,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					&& input().images().getNirInfo() != null && getBoolean("Load NIR", true)) {
 				IOurl url = input().images().getNirInfo().getURL();
 				try {
-					FlexibleImage fi = new FlexibleImage(url);
+					Image fi = new Image(url);
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setNir(fi);
 				} catch (Error e) {
@@ -117,7 +117,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 					url = input().images().getNirInfo().getLabelURL();
 					if (url != null) {
 						try {
-							FlexibleImage fi = new FlexibleImage(url);
+							Image fi = new Image(url);
 							if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 								input().masks().setNir(fi);
 						} catch (Error e) {
@@ -136,7 +136,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 				&& input().images().getIrInfo() != null && getBoolean("Load IR", true)) {
 			IOurl url = input().images().getIrInfo().getURL();
 			try {
-				FlexibleImage fi = new FlexibleImage(url);
+				Image fi = new Image(url);
 				if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 					input().images().setIr(fi);
 			} catch (Error e) {
@@ -150,7 +150,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 				url = input().images().getIrInfo().getLabelURL();
 				if (url != null) {
 					try {
-						FlexibleImage fi = new FlexibleImage(url);
+						Image fi = new Image(url);
 						if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 							input().masks().setIr(fi);
 					} catch (Error e) {
@@ -169,7 +169,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 	
 	private void checkForStrangeTVtestImageAndReplaceWithNull() {
 		if (input().images().vis() != null) {
-			FlexibleImage i = input().images().vis();
+			Image i = input().images().vis();
 			if (i.getWidth() < 200)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
@@ -179,7 +179,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 		}
 		if (input().images().fluo() != null) {
-			FlexibleImage i = input().images().fluo();
+			Image i = input().images().fluo();
 			if (i.getWidth() < 200)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW FLUO RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
@@ -189,7 +189,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 		}
 		if (input().images().nir() != null) {
-			FlexibleImage i = input().images().nir();
+			Image i = input().images().nir();
 			if (i.getWidth() < 200)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
@@ -199,7 +199,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 		}
 		if (input().masks().vis() != null) {
-			FlexibleImage i = input().masks().vis();
+			Image i = input().masks().vis();
 			if (i.getWidth() < 200)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS MASK RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
@@ -209,7 +209,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 		}
 		if (input().masks().fluo() != null) {
-			FlexibleImage i = input().masks().fluo();
+			Image i = input().masks().fluo();
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
@@ -217,7 +217,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 			}
 		}
 		if (input().masks().nir() != null) {
-			FlexibleImage i = input().masks().nir();
+			Image i = input().masks().nir();
 			if (i.getWidth() < 200)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR MASK RES: " + i);
 			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
@@ -229,7 +229,7 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		if (processedImages.vis() != null
 				&& processedMasks.vis() != null
@@ -262,18 +262,18 @@ public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisB
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 }

@@ -19,23 +19,24 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class FlexibleImageSet {
+public class ImageSet {
 	
-	private FlexibleImage vis;
-	private FlexibleImage fluo;
-	private FlexibleImage nir;
-	private FlexibleImage ir;
+	private Image vis;
+	private Image fluo;
+	private Image nir;
+	private Image ir;
 	private ImageData visInfo;
 	private ImageData fluoInfo;
 	private ImageData nirInfo;
 	private ImageData irInfo;
+	private boolean isSideImage;
 	
-	public FlexibleImageSet() {
+	public ImageSet() {
 		// empty
 		// use setVis, ...
 	}
 	
-	public FlexibleImageSet(FlexibleImageSet copyImageInfoFromThisSet) {
+	public ImageSet(ImageSet copyImageInfoFromThisSet) {
 		if (copyImageInfoFromThisSet != null) {
 			visInfo = copyImageInfoFromThisSet.visInfo;
 			fluoInfo = copyImageInfoFromThisSet.fluoInfo;
@@ -44,15 +45,15 @@ public class FlexibleImageSet {
 		}
 	}
 	
-	public FlexibleImageSet(FlexibleImage vis, FlexibleImage fluo, FlexibleImage nir, FlexibleImage ir) {
+	public ImageSet(Image vis, Image fluo, Image nir, Image ir) {
 		if (vis != null)
-			vis.setType(FlexibleImageType.VIS);
+			vis.setCameraType(CameraType.VIS);
 		if (fluo != null)
-			fluo.setType(FlexibleImageType.FLUO);
+			fluo.setCameraType(CameraType.FLUO);
 		if (nir != null)
-			nir.setType(FlexibleImageType.NIR);
+			nir.setCameraType(CameraType.NIR);
 		if (ir != null)
-			ir.setType(FlexibleImageType.IR);
+			ir.setCameraType(CameraType.IR);
 		
 		this.vis = vis;
 		this.fluo = fluo;
@@ -60,34 +61,34 @@ public class FlexibleImageSet {
 		this.ir = ir;
 	}
 	
-	public FlexibleImageSet(BufferedImage vis, BufferedImage fluo, BufferedImage nir, BufferedImage ir) {
-		this.vis = new FlexibleImage(vis, FlexibleImageType.VIS);
-		this.fluo = new FlexibleImage(fluo, FlexibleImageType.FLUO);
-		this.nir = new FlexibleImage(nir, FlexibleImageType.NIR);
-		this.ir = new FlexibleImage(ir, FlexibleImageType.IR);
+	public ImageSet(BufferedImage vis, BufferedImage fluo, BufferedImage nir, BufferedImage ir) {
+		this.vis = new Image(vis, CameraType.VIS);
+		this.fluo = new Image(fluo, CameraType.FLUO);
+		this.nir = new Image(nir, CameraType.NIR);
+		this.ir = new Image(ir, CameraType.IR);
 	}
 	
-	public FlexibleImage vis() {
+	public Image vis() {
 		if (vis != null)
-			vis.setType(FlexibleImageType.VIS);
+			vis.setCameraType(CameraType.VIS);
 		return vis;
 	}
 	
-	public FlexibleImage fluo() {
+	public Image fluo() {
 		if (fluo != null)
-			fluo.setType(FlexibleImageType.FLUO);
+			fluo.setCameraType(CameraType.FLUO);
 		return fluo;
 	}
 	
-	public FlexibleImage nir() {
+	public Image nir() {
 		if (nir != null)
-			nir.setType(FlexibleImageType.NIR);
+			nir.setCameraType(CameraType.NIR);
 		return nir;
 	}
 	
-	public FlexibleImage ir() {
+	public Image ir() {
 		if (ir != null)
-			ir.setType(FlexibleImageType.IR);
+			ir.setCameraType(CameraType.IR);
 		return ir;
 	}
 	
@@ -136,46 +137,46 @@ public class FlexibleImageSet {
 	 * @return A set of eventually modified (resized) images, all of the same
 	 *         size.
 	 */
-	public FlexibleImageSet equalize() {
+	public ImageSet equalize() {
 		int w = getLargestWidth();
 		int h = getLargestHeight();
 		// PrintImage.printImage(fluo);
-		return new FlexibleImageSet(
+		return new ImageSet(
 				vis != null ? vis.resize(w, h, true) : null,
 				fluo != null ? fluo.resize(w, h, true) : null,
 				nir != null ? nir.resize(w, h, true) : null,
 				ir != null ? ir.resize(w, h, true) : null);
 	}
 	
-	public void setVis(FlexibleImage vis) {
+	public void setVis(Image vis) {
 		if (vis != null)
-			vis.setType(FlexibleImageType.VIS);
+			vis.setCameraType(CameraType.VIS);
 		this.vis = vis;
 	}
 	
-	public void setFluo(FlexibleImage fluo) {
+	public void setFluo(Image fluo) {
 		if (fluo != null)
-			fluo.setType(FlexibleImageType.FLUO);
+			fluo.setCameraType(CameraType.FLUO);
 		this.fluo = fluo;
 	}
 	
-	public void setNir(FlexibleImage nir) {
+	public void setNir(Image nir) {
 		if (nir != null)
-			nir.setType(FlexibleImageType.NIR);
+			nir.setCameraType(CameraType.NIR);
 		this.nir = nir;
 	}
 	
-	public void setIr(FlexibleImage ir) {
+	public void setIr(Image ir) {
 		if (ir != null)
-			ir.setType(FlexibleImageType.NIR);
+			ir.setCameraType(CameraType.NIR);
 		this.ir = ir;
 	}
 	
-	public void set(FlexibleImage flexibleImage) {
+	public void set(Image flexibleImage) {
 		if (flexibleImage == null) {
 			throw new UnsupportedOperationException("FlexibleImage is NULL");
 		}
-		switch (flexibleImage.getType()) {
+		switch (flexibleImage.getCameraType()) {
 			case VIS:
 				setVis(flexibleImage);
 				break;
@@ -193,8 +194,8 @@ public class FlexibleImageSet {
 		}
 	}
 	
-	public FlexibleImageSet copy() {
-		FlexibleImageSet res = new FlexibleImageSet(
+	public ImageSet copy() {
+		ImageSet res = new ImageSet(
 				vis != null ? vis.copy() : null,
 				fluo != null ? fluo.copy() : null,
 				nir != null ? nir.copy() : null,
@@ -206,46 +207,46 @@ public class FlexibleImageSet {
 		return res;
 	}
 	
-	public FlexibleImageSet resize(double scaleVis, double scaleFluo, double scaleNir, double scaleIr) {
-		FlexibleImage scaledVis = vis != null ? new ImageOperation(vis).resize(scaleVis).getImage() : null;
-		FlexibleImage scaledFluo = fluo != null ? new ImageOperation(fluo).resize(scaleFluo).getImage() : null;
-		FlexibleImage scaledNir = nir != null ? new ImageOperation(nir).resize(scaleNir).getImage() : null;
-		FlexibleImage scaledIr = ir != null ? new ImageOperation(ir).resize(scaleIr).getImage() : null;
-		return new FlexibleImageSet(scaledVis, scaledFluo, scaledNir, scaledIr);
+	public ImageSet resize(double scaleVis, double scaleFluo, double scaleNir, double scaleIr) {
+		Image scaledVis = vis != null ? new ImageOperation(vis).resize(scaleVis).getImage() : null;
+		Image scaledFluo = fluo != null ? new ImageOperation(fluo).resize(scaleFluo).getImage() : null;
+		Image scaledNir = nir != null ? new ImageOperation(nir).resize(scaleNir).getImage() : null;
+		Image scaledIr = ir != null ? new ImageOperation(ir).resize(scaleIr).getImage() : null;
+		return new ImageSet(scaledVis, scaledFluo, scaledNir, scaledIr);
 	}
 	
-	public FlexibleImageSet invert() {
-		FlexibleImage v = new ImageOperation(vis).invert().getImage();
-		FlexibleImage f = new ImageOperation(fluo).invert().getImage();
-		FlexibleImage n = new ImageOperation(nir).invert().getImage();
-		FlexibleImage i = new ImageOperation(ir).invert().getImage();
-		return new FlexibleImageSet(v, f, n, i);
+	public ImageSet invert() {
+		Image v = new ImageOperation(vis).invert().getImage();
+		Image f = new ImageOperation(fluo).invert().getImage();
+		Image n = new ImageOperation(nir).invert().getImage();
+		Image i = new ImageOperation(ir).invert().getImage();
+		return new ImageSet(v, f, n, i);
 	}
 	
-	public FlexibleImageSet draw(FlexibleImageSet masks, int background) {
-		FlexibleImage v = new ImageOperation(vis).draw(masks.vis(), background);
-		FlexibleImage f = new ImageOperation(fluo).draw(masks.fluo(), background);
-		FlexibleImage n = new ImageOperation(nir).draw(masks.nir(), background);
-		FlexibleImage i = new ImageOperation(ir).draw(masks.ir(), background);
-		return new FlexibleImageSet(v, f, n, i);
+	public ImageSet draw(ImageSet masks, int background) {
+		Image v = new ImageOperation(vis).draw(masks.vis(), background);
+		Image f = new ImageOperation(fluo).draw(masks.fluo(), background);
+		Image n = new ImageOperation(nir).draw(masks.nir(), background);
+		Image i = new ImageOperation(ir).draw(masks.ir(), background);
+		return new ImageSet(v, f, n, i);
 	}
 	
-	public ArrayList<FlexibleImage> getImages() {
-		ArrayList<FlexibleImage> res = new ArrayList<FlexibleImage>();
+	public ArrayList<Image> getImages() {
+		ArrayList<Image> res = new ArrayList<Image>();
 		if (vis != null) {
-			vis.setType(FlexibleImageType.VIS);
+			vis.setCameraType(CameraType.VIS);
 			res.add(vis);
 		}
 		if (fluo != null) {
-			fluo.setType(FlexibleImageType.FLUO);
+			fluo.setCameraType(CameraType.FLUO);
 			res.add(fluo);
 		}
 		if (nir != null) {
-			nir.setType(FlexibleImageType.NIR);
+			nir.setCameraType(CameraType.NIR);
 			res.add(nir);
 		}
 		if (ir != null) {
-			ir.setType(FlexibleImageType.IR);
+			ir.setCameraType(CameraType.IR);
 			res.add(ir);
 		}
 		return res;
@@ -329,7 +330,7 @@ public class FlexibleImageSet {
 	}
 	
 	public void print(String title) {
-		FlexibleImageStack fis = new FlexibleImageStack();
+		ImageStack fis = new ImageStack();
 		if (vis != null)
 			fis.addImage("vis", vis);
 		if (fluo != null)
@@ -341,7 +342,7 @@ public class FlexibleImageSet {
 		fis.show(title);
 	}
 	
-	public FlexibleImage getImage(FlexibleImageType inp) {
+	public Image getImage(CameraType inp) {
 		switch (inp) {
 			case VIS:
 				return vis;
@@ -355,7 +356,7 @@ public class FlexibleImageSet {
 		return null;
 	}
 	
-	public ImageData getImageInfo(FlexibleImageType inp) {
+	public ImageData getImageInfo(CameraType inp) {
 		switch (inp) {
 			case VIS:
 				return visInfo;
@@ -367,5 +368,13 @@ public class FlexibleImageSet {
 				return irInfo;
 		}
 		return null;
+	}
+	
+	public void setIsSide(boolean isSide) {
+		this.isSideImage = isSide;
+	}
+	
+	public boolean isSideImage() {
+		return isSideImage;
 	}
 }

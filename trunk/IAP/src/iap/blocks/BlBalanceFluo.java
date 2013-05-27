@@ -8,8 +8,8 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Recolor pictures according to black point for fluo.
@@ -31,9 +31,9 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() {
-		FlexibleImage input = input().images().fluo();
-		FlexibleImage res;
+	protected Image processFLUOimage() {
+		Image input = input().images().fluo();
+		Image res;
 		boolean invert = true;
 		if (input != null)
 			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
@@ -43,9 +43,9 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage input = input().masks().fluo();
-		FlexibleImage res;
+	protected Image processFLUOmask() {
+		Image input = input().masks().fluo();
+		Image res;
 		boolean invert = true;
 		if (input != null)
 			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
@@ -59,7 +59,7 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	 * 
 	 * @author pape, klukas
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image, double size,
+	private double[] getProbablyWhitePixels(Image image, double size,
 			BlockProperty bpleft, BlockProperty bpright) {
 		image = image.io().crop().getImage();
 		int width = image.getWidth();
@@ -110,7 +110,7 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 		return new double[] { r * 255, g * 255, b * 255 };
 	}
 	
-	public FlexibleImage balance(FlexibleImage input, int whitePoint, boolean invert) {
+	public Image balance(Image input, int whitePoint, boolean invert) {
 		return balance(input, input, whitePoint, invert);
 	}
 	
@@ -119,7 +119,7 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	 *           - inverts the image (used for fluo)
 	 * @return
 	 */
-	public FlexibleImage balance(FlexibleImage input, FlexibleImage inputUsedForColorAnalysis,
+	public Image balance(Image input, Image inputUsedForColorAnalysis,
 			int whitePoint, boolean invert) {
 		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y);
 		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y);
@@ -129,10 +129,10 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 		if (inputUsedForColorAnalysis == input)
 			inputUsedForColorAnalysis = input.copy();
 		
-		FlexibleImage res = input;
+		Image res = input;
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (input != null) {
-				FlexibleImage nir = input;
+				Image nir = input;
 				// White Balancing
 				double[] pix;
 				if (invert) {
@@ -188,7 +188,7 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 		return res;
 	}
 	
-	private double[] getProbablyWhitePixelsforNir(FlexibleImage inputUsedForColorAnalysis) {
+	private double[] getProbablyWhitePixelsforNir(Image inputUsedForColorAnalysis) {
 		int w = inputUsedForColorAnalysis.getWidth();
 		int h = inputUsedForColorAnalysis.getHeight();
 		
@@ -258,14 +258,14 @@ public class BlBalanceFluo extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

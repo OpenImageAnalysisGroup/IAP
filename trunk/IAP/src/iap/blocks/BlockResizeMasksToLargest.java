@@ -4,8 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Resize masks images to largest width and height.
@@ -24,17 +24,17 @@ public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS 
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		return input().masks().vis().resize(w, h);
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return input().masks().fluo().resize(w, h);
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (input().masks().nir() != null)
 			return input().masks().nir().resize(w, h);
 		else
@@ -56,20 +56,20 @@ public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS 
 	// return getInput().getImages().getNir().resize(w, h);
 	// }
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 }

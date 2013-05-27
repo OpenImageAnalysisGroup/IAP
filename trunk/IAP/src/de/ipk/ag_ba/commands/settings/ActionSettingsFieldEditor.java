@@ -15,7 +15,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 class ActionSettingsFieldEditor extends AbstractNavigationAction {
@@ -209,15 +209,15 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 											String is = "<font color='blue'>";
 											String ie = "</font>";
 											
-											String vi = gs + (inst.getInputTypes().contains(FlexibleImageType.VIS) ? "V" : "&darr;") + ge;
-											String fi = rs + (inst.getInputTypes().contains(FlexibleImageType.FLUO) ? "F" : "&darr;") + re;
-											String ni = ns + (inst.getInputTypes().contains(FlexibleImageType.NIR) ? "N" : "&darr;") + ne;
-											String ii = is + (inst.getInputTypes().contains(FlexibleImageType.IR) ? "I" : "&darr;") + ie;
+											String vi = gs + (inst.getCameraInputTypes().contains(CameraType.VIS) ? "V" : "&darr;") + ge;
+											String fi = rs + (inst.getCameraInputTypes().contains(CameraType.FLUO) ? "F" : "&darr;") + re;
+											String ni = ns + (inst.getCameraInputTypes().contains(CameraType.NIR) ? "N" : "&darr;") + ne;
+											String ii = is + (inst.getCameraInputTypes().contains(CameraType.IR) ? "I" : "&darr;") + ie;
 											
-											String vo = gs + (inst.getOutputTypes().contains(FlexibleImageType.VIS) ? "V" : "&darr;") + ge;
-											String fo = rs + (inst.getOutputTypes().contains(FlexibleImageType.FLUO) ? "F" : "&darr;") + re;
-											String no = ns + (inst.getOutputTypes().contains(FlexibleImageType.NIR) ? "N" : "&darr;") + ne;
-											String io = is + (inst.getOutputTypes().contains(FlexibleImageType.IR) ? "I" : "&darr;") + ie;
+											String vo = gs + (inst.getCameraOutputTypes().contains(CameraType.VIS) ? "V" : "&darr;") + ge;
+											String fo = rs + (inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "F" : "&darr;") + re;
+											String no = ns + (inst.getCameraOutputTypes().contains(CameraType.NIR) ? "N" : "&darr;") + ne;
+											String io = is + (inst.getCameraOutputTypes().contains(CameraType.IR) ? "I" : "&darr;") + ie;
 											
 											inf = "<html><table border='0'><tr><td>" + inf + "</td><td><font color='gray' size='-2'><code>"
 													+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""

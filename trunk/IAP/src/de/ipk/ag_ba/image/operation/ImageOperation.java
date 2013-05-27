@@ -57,9 +57,9 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -71,7 +71,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ImageOperation {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
-	private FlexibleImageType type;
+	private CameraType cameraType;
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
@@ -97,14 +97,14 @@ public class ImageOperation {
 		this(ImageConverter.convertBItoIJ(image));
 	}
 	
-	public ImageOperation(FlexibleImage image) {
+	public ImageOperation(Image image) {
 		this(image.getAsImagePlus());
-		setType(image.getType());
+		setCameraType(image.getCameraType());
 	}
 	
-	public ImageOperation(FlexibleImage image, ResultsTableWithUnits resultTable) {
+	public ImageOperation(Image image, ResultsTableWithUnits resultTable) {
 		this(image.getAsImagePlus(), resultTable);
-		setType(image.getType());
+		setCameraType(image.getCameraType());
 	}
 	
 	public ImageOperation(int[] image, int width, int height) {
@@ -120,18 +120,18 @@ public class ImageOperation {
 		setResultsTable(rt);
 	}
 	
-	public ImageOperation(FlexibleImage flexibleImage, FlexibleImageType type) {
+	public ImageOperation(Image flexibleImage, CameraType type) {
 		this(flexibleImage);
-		setType(type);
+		setCameraType(type);
 	}
 	
-	private ImageOperation setType(FlexibleImageType type) {
-		this.type = type;
+	private ImageOperation setCameraType(CameraType type) {
+		this.cameraType = type;
 		return this;
 	}
 	
-	public FlexibleImageType getType() {
-		return type;
+	public CameraType getCameraType() {
+		return cameraType;
 	}
 	
 	/**
@@ -192,7 +192,7 @@ public class ImageOperation {
 		return new ImageOperation(target);
 	}
 	
-	public ImageOperation replaceColors(int search, FlexibleImage replace) {
+	public ImageOperation replaceColors(int search, Image replace) {
 		int[] source = getImageAs1dArray();
 		int[] target = new int[source.length];
 		
@@ -273,7 +273,7 @@ public class ImageOperation {
 				image.setProcessor(p);
 			} catch (Exception e) {
 				// System.out.println("img : " + image);
-				image.setProcessor(new FlexibleImage(width, height, new int[width * height]).getAsImagePlus().getProcessor());
+				image.setProcessor(new Image(width, height, new int[width * height]).getAsImagePlus().getProcessor());
 			}
 			
 		}
@@ -406,7 +406,7 @@ public class ImageOperation {
 				in[idx++] = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			}
 		}
-		return new ImageOperation(new FlexibleImage(image.getWidth(), image.getHeight(), in));// .dilate();
+		return new ImageOperation(new Image(image.getWidth(), image.getHeight(), in));// .dilate();
 	}
 	
 	public ConvexHullCalculator hull() {
@@ -435,7 +435,7 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
-	public ImageOperation applyMask_ResizeMaskIfNeeded(FlexibleImage mask,
+	public ImageOperation applyMask_ResizeMaskIfNeeded(Image mask,
 			int background) {
 		
 		if (image.getWidth() != mask.getWidth()
@@ -473,7 +473,7 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
-	public ImageOperation applyMask(FlexibleImage mask, int background) {
+	public ImageOperation applyMask(Image mask, int background) {
 		
 		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
 		
@@ -497,7 +497,7 @@ public class ImageOperation {
 			}
 		}
 		
-		return new ImageOperation(originalImage).show("HHHH (deleted " + del + ")", false).setType(getType());
+		return new ImageOperation(originalImage).show("HHHH (deleted " + del + ")", false).setCameraType(getCameraType());
 	}
 	
 	/**
@@ -514,7 +514,7 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
-	public ImageOperation applyMaskInversed_ResizeMaskIfNeeded(FlexibleImage mask,
+	public ImageOperation applyMaskInversed_ResizeMaskIfNeeded(Image mask,
 			int background) {
 		
 		if (image.getWidth() != mask.getWidth()
@@ -590,7 +590,7 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
-	public ImageOperation applyMask_ResizeSourceIfNeeded(FlexibleImage mask,
+	public ImageOperation applyMask_ResizeSourceIfNeeded(Image mask,
 			int background) {
 		
 		ImageOperation io = this;
@@ -959,7 +959,7 @@ public class ImageOperation {
 	 *           number of times the code should be run
 	 */
 	@Deprecated
-	public ImageOperation dilateNG(int n, FlexibleImage inputImageForNewPixels) {
+	public ImageOperation dilateNG(int n, Image inputImageForNewPixels) {
 		int[] imagePixels = getImageAs1dArray();
 		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
 		int back = ImageOperation.BACKGROUND_COLORint;
@@ -1054,7 +1054,7 @@ public class ImageOperation {
 		byteProcessor.skeletonize();
 		
 		if (fixBackgroundColor768) {
-			int[][] res = new FlexibleImage(byteProcessor.getBufferedImage()).getAs2A();
+			int[][] res = new Image(byteProcessor.getBufferedImage()).getAs2A();
 			for (int x = 0; x < res.length; x++)
 				for (int y = 0; y < res[0].length; y++)
 					if (res[x][y] == -768)
@@ -1225,7 +1225,7 @@ public class ImageOperation {
 	
 	public ImageOperation clearArea(int bx, int by, int bw, int bh,
 			int iBackgroundFill, boolean clearOutsideTrue_insideFalse) {
-		int[][] imgArr = new FlexibleImage(image).getAs2A();
+		int[][] imgArr = new Image(image).getAs2A();
 		int bx2 = bx + bw;
 		int by2 = by + bh;
 		int w = image.getWidth();
@@ -1246,7 +1246,7 @@ public class ImageOperation {
 	
 	public ImageOperation clearCircularArea(int bx, int by, int d,
 			int iBackgroundFill) {
-		int[][] imgArr = new FlexibleImage(image).getAs2A();
+		int[][] imgArr = new Image(image).getAs2A();
 		Vector2d center = new Vector2d(bx, by);
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -1285,7 +1285,7 @@ public class ImageOperation {
 	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, int cutOffVertHorOfImage,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
-		FlexibleImage workImage = new FlexibleImage(image);
+		Image workImage = new Image(image);
 		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				(int) (image.getWidth() * image.getHeight() * cutOffPercentageOfImage), cutOffVertHorOfImage, nb, typ,
@@ -1296,7 +1296,7 @@ public class ImageOperation {
 	public ImageOperation removeSmallClusters(boolean nextGeneration, int cutOffAreaSizeOfImage, int cutOffVertHorOfImage,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
-		FlexibleImage workImage = new FlexibleImage(image);
+		Image workImage = new Image(image);
 		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
@@ -1329,7 +1329,7 @@ public class ImageOperation {
 	
 	public ImageOperation show(String title, boolean doIt) {
 		if (doIt)
-			new FlexibleImage(image).show(title);
+			new Image(image).show(title);
 		return this;
 	}
 	
@@ -1439,9 +1439,9 @@ public class ImageOperation {
 		}
 	}
 	
-	public FlexibleImage getImage() {
-		FlexibleImage res = new FlexibleImage(image);
-		res.setType(getType());
+	public Image getImage() {
+		Image res = new Image(image);
+		res.setCameraType(getCameraType());
 		return res;
 	}
 	
@@ -1450,7 +1450,7 @@ public class ImageOperation {
 		return new ImageOperation(getImage());
 	}
 	
-	public FlexibleImage draw(FlexibleImage fi, int background) {
+	public Image draw(Image fi, int background) {
 		int[] img = getImageAs1dArray();
 		int[] over = fi.getAs1A();
 		int idx = 0;
@@ -1459,7 +1459,7 @@ public class ImageOperation {
 				img[idx++] = o;
 			else
 				idx++;
-		return new FlexibleImage(image.getWidth(), image.getHeight(), img);
+		return new Image(image.getWidth(), image.getHeight(), img);
 	}
 	
 	public ImageOperation blur(double radius) {
@@ -1517,9 +1517,9 @@ public class ImageOperation {
 		}
 	}
 	
-	public static FlexibleImage removeSmallPartsOfImage(
+	public static Image removeSmallPartsOfImage(
 			boolean nextGeneration,
-			FlexibleImage workImage, int iBackgroundFill,
+			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		boolean considerArea = false;
@@ -1539,9 +1539,9 @@ public class ImageOperation {
 	 * @param optClusterSizeReturn
 	 * @return
 	 */
-	public static FlexibleImage removeSmallPartsOfImage(
+	public static Image removeSmallPartsOfImage(
 			boolean nextGeneration,
-			FlexibleImage workImage, int iBackgroundFill,
+			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
@@ -1549,9 +1549,9 @@ public class ImageOperation {
 				considerArea, null);
 	}
 	
-	public static FlexibleImage removeSmallPartsOfImage(
+	public static Image removeSmallPartsOfImage(
 			boolean nextGeneration,
-			FlexibleImage workImage, int iBackgroundFill,
+			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea, RunnableWithVetoRight veto) {
@@ -1650,7 +1650,7 @@ public class ImageOperation {
 		
 		int w = workImage.getWidth();
 		int h = workImage.getHeight();
-		return new FlexibleImage(w, h, rgbArray);
+		return new Image(w, h, rgbArray);
 	}
 	
 	/**
@@ -1712,7 +1712,7 @@ public class ImageOperation {
 			// FlexibleImage b = new FlexibleImage(res);
 			// a.print("A");
 			// b.print("B");
-			return new ImageOperation(new FlexibleImage(res));
+			return new ImageOperation(new Image(res));
 		} else
 			return this;
 	}
@@ -1785,7 +1785,7 @@ public class ImageOperation {
 			}
 		}
 		
-		return new ImageOperation(new FlexibleImage(res));
+		return new ImageOperation(new Image(res));
 	}
 	
 	public ImageOperation filterByHSV_value(double t, int clearColor) {
@@ -2018,7 +2018,7 @@ public class ImageOperation {
 	 * 
 	 * @param oi
 	 */
-	public static FlexibleImage thresholdLAB3(int width, int height,
+	public static Image thresholdLAB3(int width, int height,
 			int[] imagePixels, int[] resultImage,
 			int lowerValueOfL, int upperValueOfL,
 			int lowerValueOfA, int upperValueOfA,
@@ -2138,7 +2138,7 @@ public class ImageOperation {
 			}
 		}
 		if (oi != null)
-			return new FlexibleImage(oi);
+			return new Image(oi);
 		else
 			return null;
 	}
@@ -2196,7 +2196,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new FlexibleImage(width, height, resultImage).io();
+		return new Image(width, height, resultImage).io();
 	}
 	
 	public ImageOperation hq_thresholdLAB_multi_color_or_and_not(
@@ -2253,7 +2253,7 @@ public class ImageOperation {
 				}
 			}
 		}
-		return new FlexibleImage(w, h, resultImage).io();
+		return new Image(w, h, resultImage).io();
 	}
 	
 	private boolean hq_anyMatch(int Li, int ai, int bi,
@@ -2761,7 +2761,7 @@ public class ImageOperation {
 	
 	public ImageOperation convertBinary2rgb() {
 		int[] bi = ImageConverter.convertBIto1A(image.getProcessor().getBufferedImage());
-		return new ImageOperation(new FlexibleImage(image.getWidth(), image.getHeight(), bi));
+		return new ImageOperation(new Image(image.getWidth(), image.getHeight(), bi));
 	}
 	
 	/**
@@ -2856,7 +2856,7 @@ public class ImageOperation {
 			if (r.getDistanceSum() < minResult.getDistanceSum())
 				minResult = r;
 		}
-		FlexibleImage imageResult = new FlexibleImage(img);
+		Image imageResult = new Image(img);
 		return new MainAxisCalculationResult(imageResult, minResult, centroid);
 	}
 	
@@ -2931,13 +2931,13 @@ public class ImageOperation {
 	 *           "Subtract create" = image - input
 	 * @return
 	 */
-	public ImageOperation subtractImages(FlexibleImage input, String param) {
+	public ImageOperation subtractImages(Image input, String param) {
 		ImageCalculator ic = new ImageCalculator();
 		ImagePlus result = ic.run(param, image, input.getAsImagePlus());
 		return new ImageOperation(result);
 	}
 	
-	public ImageOperation getOriginalImageFromMask(FlexibleImage imageInput, int background) {
+	public ImageOperation getOriginalImageFromMask(Image imageInput, int background) {
 		int[] originalArray = imageInput.getAs1A();
 		int[] resultMask = getImageAs1dArray();
 		int w = imageInput.getWidth();
@@ -2949,7 +2949,7 @@ public class ImageOperation {
 			else
 				idx++;
 		}
-		return new ImageOperation(new FlexibleImage(w, h, resultMask));
+		return new ImageOperation(new Image(w, h, resultMask));
 	}
 	
 	/**
@@ -3468,7 +3468,7 @@ public class ImageOperation {
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion, boolean debug) {
 		int r, g, b, c;
 		float Li, ai, bi;
-		FlexibleImage marked = null;
+		Image marked = null;
 		ImageCanvas canvas = null;
 		if (debug) {
 			canvas = new ImageOperation(image).copy().canvas();
@@ -3664,18 +3664,18 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps, boolean debug) {
-		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
-		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
-		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
-		return new FlexibleImage(r, g, b).io();
+		Image r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		Image g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		Image b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug).getImage();
+		return new Image(r, g, b).io();
 	}
 	
 	public ImageOperation rmCircleShadeFixedRGB(double whiteLevel_180d, int steps, boolean debug,
 			double s0, double ss) {
-		FlexibleImage r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
-		FlexibleImage g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
-		FlexibleImage b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
-		return new FlexibleImage(r, g, b).io();
+		Image r = getR().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
+		Image g = getG().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
+		Image b = getB().rmCircleShadeFixedGray(whiteLevel_180d, steps, debug, s0, ss).getImage();
+		return new Image(r, g, b).io();
 	}
 	
 	/**
@@ -3695,7 +3695,7 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), img).io();
 	}
 	
 	/**
@@ -3715,7 +3715,7 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), img).io();
 	}
 	
 	/**
@@ -3735,7 +3735,7 @@ public class ImageOperation {
 			
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new FlexibleImage(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), img).io();
 	}
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug) {
@@ -3892,9 +3892,9 @@ public class ImageOperation {
 		return new ImageOperation(getImage());
 	}
 	
-	public ImageOperation unsharpedMask(FlexibleImage inp, double weight, double sigma) {
+	public ImageOperation unsharpedMask(Image inp, double weight, double sigma) {
 		double[] fac = { weight, weight, weight };
-		FlexibleImage blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
+		Image blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
 		blured.show("blured");
 		return new ImageOperation(inp).show("orig").subtractImages(blured, "").show("sub");
 	}
@@ -3915,7 +3915,7 @@ public class ImageOperation {
 			um.run(fp);
 		}
 		
-		return new ImageOperation(new FlexibleImage(w, h, channelR, channelG, channelB));
+		return new ImageOperation(new Image(w, h, channelR, channelG, channelB));
 	}
 	
 	/**
@@ -3925,7 +3925,7 @@ public class ImageOperation {
 	 * @param image2
 	 * @return Difference image (differences (half of it) are stored inside the LAB color space).
 	 */
-	public ImageOperation subtractImages(FlexibleImage image2) {
+	public ImageOperation subtractImages(Image image2) {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
 		float[][] labImage1 = getImage().getLab(false);
@@ -3945,10 +3945,10 @@ public class ImageOperation {
 			labImage1[1][idx] = aDiff / 255f + 1;
 			labImage1[2][idx] = bDiff / 255f + 1;
 		}
-		return new FlexibleImage(w, h, labImage1).io();
+		return new Image(w, h, labImage1).io();
 	}
 	
-	public ImageOperation subtractGrayImages(FlexibleImage image2) {
+	public ImageOperation subtractGrayImages(Image image2) {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
 		int[] img1 = getImageAs1dArray();
@@ -3971,7 +3971,7 @@ public class ImageOperation {
 			res[idx] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			
 		}
-		return new FlexibleImage(w, h, res).io();
+		return new Image(w, h, res).io();
 	}
 	
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
@@ -4121,11 +4121,11 @@ public class ImageOperation {
 		return new ImageCanvas(getImage());
 	}
 	
-	public ImageOperation drawSkeleton(FlexibleImage image2, boolean doItReally, int background) {
+	public ImageOperation drawSkeleton(Image image2, boolean doItReally, int background) {
 		return drawSkeleton2(image2, 1, doItReally, background);
 	}
 	
-	public ImageOperation drawSkeleton2(FlexibleImage image2, int size, boolean doItReally, int background) {
+	public ImageOperation drawSkeleton2(Image image2, int size, boolean doItReally, int background) {
 		int[][] res = getImageAs2dArray();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
@@ -4247,7 +4247,7 @@ public class ImageOperation {
 	 * @param background
 	 * @return
 	 */
-	public ImageOperation removePixel(FlexibleImage inp, int background) {
+	public ImageOperation removePixel(Image inp, int background) {
 		int[] img = getImageAs1dArray();
 		int[] mask = inp.getAs1A();
 		int[] res = new int[img.length];
@@ -4268,7 +4268,7 @@ public class ImageOperation {
 	 * @param background
 	 * @return
 	 */
-	public ImageOperation removePixel(FlexibleImage inp, int background, int l, int a, int b) {
+	public ImageOperation removePixel(Image inp, int background, int l, int a, int b) {
 		int[] img = getImageAs1dArray();
 		int[] mask = inp.getAs1A();
 		int width = inp.getWidth();
@@ -4324,7 +4324,7 @@ public class ImageOperation {
 		return new Lab(sumL / (double) length, sumA / (double) length, sumB / (double) length);
 	}
 	
-	public ImageOperation debug(FlexibleImageStack fis, String msg, boolean debug) {
+	public ImageOperation debug(ImageStack fis, String msg, boolean debug) {
 		if (debug && fis != null && msg != null)
 			fis.addImage(msg, getImage());
 		return this;
@@ -4357,7 +4357,7 @@ public class ImageOperation {
 	/**
 	 * @return The combined image (a and b where a pixels are background).
 	 */
-	public ImageOperation or(FlexibleImage b) {
+	public ImageOperation or(Image b) {
 		if (b == null)
 			return this;
 		int[][] aa = getImageAs2dArray();
@@ -4377,10 +4377,10 @@ public class ImageOperation {
 				}
 			}
 		ba = null;
-		return new FlexibleImage(aa).io();
+		return new Image(aa).io();
 	}
 	
-	public ImageOperation crossfade(FlexibleImage b, int f1, int f2, int f3) {
+	public ImageOperation crossfade(Image b, int f1, int f2, int f3) {
 		if (b == null)
 			return this;
 		int[][] aa = getImageAs2dArray();
@@ -4402,14 +4402,14 @@ public class ImageOperation {
 				else
 					aa[x][y] = bpixel;
 			}
-		return new FlexibleImage(aa).io();
+		return new Image(aa).io();
 	}
 	
-	public ImageOperation crossfade(FlexibleImage b) {
+	public ImageOperation crossfade(Image b) {
 		return crossfade(b, 5, 2, 1);
 	}
 	
-	public ImageOperation crossfade(FlexibleImage b, FlexibleImage c) {
+	public ImageOperation crossfade(Image b, Image c) {
 		if (c == null)
 			return crossfade(b);
 		if (b == null || c == null)
@@ -4441,13 +4441,13 @@ public class ImageOperation {
 					else
 						aa[x][y] = cpixel;
 			}
-		return new FlexibleImage(aa).io();
+		return new Image(aa).io();
 	}
 	
 	/**
 	 * @return The combined image (a and b where a pixels are background).
 	 */
-	public ImageOperation and(FlexibleImage b) {
+	public ImageOperation and(Image b) {
 		if (b == null)
 			return this;
 		int[][] aa = getImageAs2dArray();
@@ -4464,10 +4464,10 @@ public class ImageOperation {
 				} else
 					aa[x][y] = BACKGROUND_COLORint;
 			}
-		return new FlexibleImage(aa).io();
+		return new Image(aa).io();
 	}
 	
-	public ImageOperation xor(FlexibleImage b) {
+	public ImageOperation xor(Image b) {
 		if (b == null)
 			return this;
 		int[][] aa = getImageAs2dArray();
@@ -4484,7 +4484,7 @@ public class ImageOperation {
 					if (apixel == BACKGROUND_COLORint)
 						aa[x][y] = bpixel;
 			}
-		return new FlexibleImage(aa).io();
+		return new Image(aa).io();
 	}
 	
 	public ImageOperation filterGray(int minBrightness, int maxAdiff, int maxBdiff) {
@@ -4525,14 +4525,14 @@ public class ImageOperation {
 		return image.getWidth();
 	}
 	
-	public static FlexibleImage createColoredImage(int w, int h, Color col) {
+	public static Image createColoredImage(int w, int h, Color col) {
 		int[] img = new int[w * h];
 		int ci = col.getRGB();
 		int wh = w * h;
 		for (int i = 0; i < wh; i++) {
 			img[i] = ci;
 		}
-		return new FlexibleImage(w, h, img);
+		return new Image(w, h, img);
 	}
 	
 	public ImageOperation filterRGB(int rMax, int gMax, int bMax) {
@@ -4686,15 +4686,15 @@ public class ImageOperation {
 				res[y][x] = in[x][y];
 			}
 		}
-		return new FlexibleImage(res).io();
+		return new Image(res).io();
 	}
 	
 	public TranslationMatch prepareTranslationMatch(boolean debug) {
 		return new TranslationMatch(this, debug);
 	}
 	
-	public static ImageOperation median(ArrayList<FlexibleImage> images) {
-		FlexibleImage first = images.iterator().next();
+	public static ImageOperation median(ArrayList<Image> images) {
+		Image first = images.iterator().next();
 		int[][] values = new int[images.size()][];
 		for (int i = 0; i < images.size(); i++) {
 			int[] pixels = images.get(i).getAs1A();
@@ -4721,7 +4721,7 @@ public class ImageOperation {
 			int b = (int) statsB.getPercentile(50);
 			median[p] = new Color(r, g, b).getRGB();
 		}
-		return new FlexibleImage(w, h, median).io();
+		return new Image(w, h, median).io();
 	}
 	
 	public ImageOperation adjustWidthHeightRatio(int w, int h, int epsilon) {
@@ -4734,7 +4734,8 @@ public class ImageOperation {
 			int verticalTooTooMuch = getHeight() - targetHeight;
 			int b = verticalTooTooMuch / 2;
 			ImageOperation res = new ImageOperation(new int[ow][targetHeight]);
-			res = res.canvas().fillRect(0, 0, ow, targetHeight, BACKGROUND_COLORint).drawImage(this.getImage(), 0, -b).getImage().io().setType(getType());
+			res = res.canvas().fillRect(0, 0, ow, targetHeight, BACKGROUND_COLORint).drawImage(this.getImage(), 0, -b).getImage().io()
+					.setCameraType(getCameraType());
 			return res;
 		}
 	}

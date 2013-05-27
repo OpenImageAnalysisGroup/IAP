@@ -4,8 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input() != null && input().masks() != null && input().masks().vis() != null)
 			return input().masks().vis().crop();
 		else
@@ -23,7 +23,7 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input() != null && input().masks() != null && input().masks().fluo() != null)
 			return input().masks().fluo().crop();
 		else
@@ -31,7 +31,7 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (input() != null && input().masks() != null && input().masks().nir() != null)
 			return input().masks().nir().crop();
 		else
@@ -39,16 +39,16 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

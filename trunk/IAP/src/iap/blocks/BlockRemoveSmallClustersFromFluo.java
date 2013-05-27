@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Small parts
@@ -21,7 +21,7 @@ public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBl
 	public static boolean ngUse = true;
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
 				getDouble("Noise-Size-Fluo-Area", (0.001d) / 20),
 				getDouble("Noise-Size-Fluo-Dimension", (input().masks().fluo().getWidth() / 100) * 2),
@@ -29,16 +29,16 @@ public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBl
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
