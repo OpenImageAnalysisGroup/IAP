@@ -5,7 +5,7 @@ public class ImageDescription {
 	boolean isNull = false;
 	int w, h;
 	
-	public ImageDescription(FlexibleImage baseForDescription) {
+	public ImageDescription(Image baseForDescription) {
 		if (baseForDescription == null) {
 			isNull = true;
 			w = 0;
@@ -17,7 +17,7 @@ public class ImageDescription {
 		}
 	}
 	
-	public String getChange(String desc, FlexibleImage updated) {
+	public String getChange(String desc, Image updated) {
 		String res = "";
 		if (!isNull && updated == null) {
 			res = res += ", " + desc + " set to null";

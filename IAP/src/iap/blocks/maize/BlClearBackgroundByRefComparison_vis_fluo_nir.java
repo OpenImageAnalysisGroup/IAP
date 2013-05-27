@@ -10,9 +10,9 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Clears the background by comparison of foreground and background.
@@ -38,7 +38,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		
 		if (getBoolean("copy only vis image to mask", false)) {
 			if (input().images().vis() != null) {
@@ -47,10 +47,10 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		}
 		
 		if (input().images().vis() != null && input().masks().vis() == null) {
-			FlexibleImage in = input().images().vis();
-			FlexibleImage simulatedGreen = in.io().copy().filterByHSV(getDouble("Clear-background-vis-color-distance", 0.1), Color.GREEN.getRGB()).
+			Image in = input().images().vis();
+			Image simulatedGreen = in.io().copy().filterByHSV(getDouble("Clear-background-vis-color-distance", 0.1), Color.GREEN.getRGB()).
 					show("simulated background green", debug).getImage();
-			FlexibleImage simulatedGreen2 = in
+			Image simulatedGreen2 = in
 					.io()
 					.copy()
 					.filterByHSV(
@@ -60,7 +60,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 									getInt("Clear-background-vis-color-green-G", 118),
 									getInt("Clear-background-vis-color-green-B", 50)).getRGB())
 					.show("simulated background green 2", debug).getImage();
-			FlexibleImage simulatedBlue = in
+			Image simulatedBlue = in
 					.io()
 					.copy()
 					.filterByHSV(
@@ -70,14 +70,14 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 									getInt("Clear-background-vis-color-blue-G", 36),
 									getInt("Clear-background-vis-color-blue-B", 76)).getRGB())
 					.show("simulated background blue", debug).getImage();
-			FlexibleImage simBlueGreen = simulatedBlue.io().or(simulatedGreen).or(simulatedGreen2).show("simulated green and blue", debug).getImage();
+			Image simBlueGreen = simulatedBlue.io().or(simulatedGreen).or(simulatedGreen2).show("simulated green and blue", debug).getImage();
 			input().masks().setVis(in.io().xor(simBlueGreen).show("sim xor", debug).getImage());
 		}
 		
 		if (input().images().vis() != null && input().masks().vis() != null) {
-			FlexibleImage visImg = input().images().vis().show("In VIS", debug);
-			FlexibleImage visMsk = input().masks().vis().show("In Mask", debug);
-			FlexibleImage cleared = visImg
+			Image visImg = input().images().vis().show("In VIS", debug);
+			Image visMsk = input().masks().vis().show("In Mask", debug);
+			Image cleared = visImg
 					.io()
 					.compare()
 					.compareImages("vis", visMsk.io().blur(getDouble("Clear-background-vis-blur", 2.0)).show("Blurred Mask", debug).getImage(),
@@ -97,7 +97,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		
 		if (getBoolean("copy only fluo image to mask", false)) {
 			if (input().images().fluo() != null) {
@@ -106,9 +106,9 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		}
 		
 		if (input().images().fluo() != null && input().masks().fluo() != null) {
-			FlexibleImage fluo = input().images().fluo();
+			Image fluo = input().images().fluo();
 			
-			FlexibleImage result = new ImageOperation(fluo.io().copy()
+			Image result = new ImageOperation(fluo.io().copy()
 					.blur(getDouble("Clear-background-fluo-blur", 1.0)).show("Blurred fluo image", false)
 					.medianFilter32Bit()
 					.getImage()).compare()
@@ -123,7 +123,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			double blueCurbWidthBarley0_1 = 0;
 			double blueCurbHeightEndBarly0_8 = 1;
 			if (getBoolean("Filter FLUO with LAB", false)) {
-				FlexibleImage toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
+				Image toBeFiltered = result.io().hq_thresholdLAB_multi_color_or_and_not(
 						// black background and green pot (fluo of white pot)
 						getIntArray("Clear-background-fluo-min-l-array", new Integer[] { -1, 200 - 40, 50 - 4, 0 }),
 						getIntArray("Clear-background-fluo-max-l-array", new Integer[] { 115, 200 + 20, 50 + 4, 50 }),
@@ -151,8 +151,8 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage nir = input().images().nir();
+	protected Image processNIRimage() {
+		Image nir = input().images().nir();
 		if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
 			// remove horizontal bar
 			if (nir != null) {
@@ -163,7 +163,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		
 		if (getBoolean("copy only nir image to mask", false)) {
 			if (input().images().nir() != null) {
@@ -178,7 +178,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			input().masks().setNir(ImageOperation.createColoredImage(w, h, new Color(180, 180, 180)));
 		}
 		if (input().images().nir() != null && input().masks().nir() != null) {
-			FlexibleImage nir = input().masks().nir();
+			Image nir = input().masks().nir();
 			if (getBoolean("Remove Constant Horizontal Bar from NIR", false)) {
 				// remove horizontal bar
 				nir = filterHorBar(nir).show("removed constant bar", debug);
@@ -186,7 +186,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 			if (getBoolean("Process NIR Mask", true)) {
 				int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
 				int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
-				FlexibleImage msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
+				Image msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
 						.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
 						.show("result nir", debug).getImage();
 				return input().images().nir().io().applyMask(msk, options.getBackground()).getImage();
@@ -197,7 +197,7 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 		}
 	}
 	
-	private FlexibleImage filterHorBar(FlexibleImage nirImage) {
+	private Image filterHorBar(Image nirImage) {
 		int[][] in = nirImage.getAs2A();
 		int width = nirImage.getWidth();
 		int height = nirImage.getHeight();
@@ -222,12 +222,12 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 				}
 			}
 		}
-		FlexibleImage res = new FlexibleImage(in).show("DEBUG", debug);
+		Image res = new Image(in).show("DEBUG", debug);
 		return res;
 	}
 	
 	@Override
-	protected FlexibleImage processIRmask() {
+	protected Image processIRmask() {
 		if (input().images().ir() != null)
 			return input().images().ir().copy();
 		else
@@ -235,10 +235,10 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage i = processedImages.nir();
-			FlexibleImage m = processedMasks.nir();
+			Image i = processedImages.nir();
+			Image m = processedMasks.nir();
 			if (i != null && m != null) {
 				i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
 				i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
@@ -249,17 +249,17 @@ public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnaps
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

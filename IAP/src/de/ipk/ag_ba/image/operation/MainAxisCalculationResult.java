@@ -2,21 +2,21 @@ package de.ipk.ag_ba.image.operation;
 
 import org.Vector2d;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class MainAxisCalculationResult {
 	
-	private final FlexibleImage imageResult;
+	private final Image imageResult;
 	private final DistanceSumAndPixelCount minResult;
 	private Vector2d centroid;
 	
-	public MainAxisCalculationResult(FlexibleImage imageResult, DistanceSumAndPixelCount minResult, Vector2d centroid2) {
+	public MainAxisCalculationResult(Image imageResult, DistanceSumAndPixelCount minResult, Vector2d centroid2) {
 		this.imageResult = imageResult;
 		this.minResult = minResult;
 		this.centroid = centroid2;
 	}
 	
-	public FlexibleImage getImageResult() {
+	public Image getImageResult() {
 		return imageResult;
 	}
 	

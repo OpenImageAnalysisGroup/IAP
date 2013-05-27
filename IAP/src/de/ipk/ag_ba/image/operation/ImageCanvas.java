@@ -8,13 +8,13 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class ImageCanvas {
 	
-	private FlexibleImage image;
+	private Image image;
 	
-	public ImageCanvas(FlexibleImage image) {
+	public ImageCanvas(Image image) {
 		this.image = image;
 	}
 	
@@ -75,7 +75,7 @@ public class ImageCanvas {
 					img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 				}
 			}
-		image = new FlexibleImage(wi, hi, img);
+		image = new Image(wi, hi, img);
 		return this;
 	}
 	
@@ -95,7 +95,7 @@ public class ImageCanvas {
 					img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 				}
 			}
-		image = new FlexibleImage(wi, hi, img);
+		image = new Image(wi, hi, img);
 		return this;
 	}
 	
@@ -178,7 +178,7 @@ public class ImageCanvas {
 		return this;
 	}
 	
-	public FlexibleImage getImage() {
+	public Image getImage() {
 		return image;
 	}
 	
@@ -215,7 +215,7 @@ public class ImageCanvas {
 	}
 	
 	public void updateFromGraphics() {
-		image = new FlexibleImage(buf);
+		image = new Image(buf);
 	}
 	
 	/**
@@ -297,7 +297,7 @@ public class ImageCanvas {
 		return ic;
 	}
 	
-	public ImageCanvas drawImage(FlexibleImage image2, int ox, int oy) {
+	public ImageCanvas drawImage(Image image2, int ox, int oy) {
 		image = image.io().drawAndFillRect(ox, oy, image2.getAs2A()).getImage();
 		return this;
 	}

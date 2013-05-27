@@ -6,8 +6,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.awt.Color;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * pipeline processing for nir image
@@ -17,15 +17,15 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		boolean debug = getBoolean("debug", false);
-		FlexibleImage nirMask = input().masks().nir();
+		Image nirMask = input().masks().nir();
 		
 		if (!getBoolean("enabled", true)) {
 			return nirMask;
 		}
 		
-		FlexibleImage origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
+		Image origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = 180;
 		if (nirMask != null) {
 			double f;
@@ -48,16 +48,16 @@ public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 }

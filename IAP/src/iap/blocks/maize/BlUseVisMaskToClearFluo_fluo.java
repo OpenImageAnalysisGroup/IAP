@@ -7,9 +7,9 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Clears the fluo image, based on the vis mask.
@@ -27,14 +27,14 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().masks().vis() == null || input().masks().fluo() == null)
 			return input().masks().fluo();
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			// apply enlarged VIS mask to fluo
 			ImageOperation fluo = input().masks().fluo().copy().io().show("FLUO", debug);
 			int b = (int) (input().masks().vis().getWidth() * 0.3);
-			FlexibleImage mask = input().masks().vis().copy().io().
+			Image mask = input().masks().vis().copy().io().
 					addBorder(b, b / 2, (b / 2), options.getBackground()).
 					crop(0.23, 0.03, 0.285, 0.09).
 					blur(getDouble("blur", 25)).
@@ -49,7 +49,7 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		if (processedMasks.nir() == null || processedMasks.fluo() == null ||
 				processedMasks.vis() == null) {
 			processedMasks.setNir(input().masks().nir());
@@ -69,7 +69,7 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 			}
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
-			FlexibleImage mask = processedMasks.vis().copy().io().or(
+			Image mask = processedMasks.vis().copy().io().or(
 					input().masks().fluo()
 					).show("OR operation", debug).blur(20).
 					binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred vis mask", debug).getImage();
@@ -89,17 +89,17 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

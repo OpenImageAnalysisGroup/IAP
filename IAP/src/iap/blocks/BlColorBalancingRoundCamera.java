@@ -5,8 +5,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas
@@ -33,11 +33,11 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processVISimage() {
+	protected Image processVISimage() {
 		if (input().images().vis() == null || !getBoolean("process VIS image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().vis();
 		
-		FlexibleImage input = input().images().vis();
+		Image input = input().images().vis();
 		int steps = getInt("Shade-Steps-Vis", 50);
 		
 		return input.io().rmCircleShadeFixedRGB(whiteLevel_255d_VIS, steps, debug,
@@ -45,11 +45,11 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null || !getBoolean("process VIS mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().vis();
 		
-		FlexibleImage input = input().masks().vis();
+		Image input = input().masks().vis();
 		int steps = getInt("Shade-Steps-Vis", 50);
 		
 		return input.io().rmCircleShadeFixedRGB(whiteLevel_255d_VIS, steps, debug,
@@ -57,11 +57,11 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (input().images().nir() == null || !getBoolean("process NIR image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().nir();
 		
-		FlexibleImage input = input().images().nir();
+		Image input = input().images().nir();
 		int steps = getInt("Shade-Steps-NIR", 180);
 		
 		return input.io().flipVert().rmCircleShadeFixedGray(whiteLevel_180d_NIR, steps, debug,
@@ -69,11 +69,11 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (input().masks().nir() == null || !getBoolean("process NIR mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().nir();
 		
-		FlexibleImage input = input().masks().nir();
+		Image input = input().masks().nir();
 		int steps = getInt("Shade-Steps-NIR", 180);
 		
 		return input.io().flipVert().rmCircleShadeFixedGray(whiteLevel_180d_NIR, steps, debug,
@@ -81,15 +81,15 @@ public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

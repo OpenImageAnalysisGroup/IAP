@@ -17,7 +17,7 @@ import org.Vector2i;
 import de.ipk.ag_ba.image.operation.ImageConverter;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.Position;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * @author entzian
@@ -62,7 +62,7 @@ public class PixelSegmentation implements Segmentation {
 	
 	private final boolean calculatePerimeterAndRatio;
 	
-	public PixelSegmentation(FlexibleImage in, NeighbourhoodSetting setting) {
+	public PixelSegmentation(Image in, NeighbourhoodSetting setting) {
 		int[] rgbArray = in.getAs1A();
 		int w = in.getWidth();
 		int h = in.getHeight();
@@ -649,7 +649,7 @@ public class PixelSegmentation implements Segmentation {
 				{ 0, 1, 0, 0, 0, 0, 0 },
 				{ 1, 1, 0, 0, 0, 0, 0 } };
 		//
-		PixelSegmentation test = new PixelSegmentation(new FlexibleImage(eingabe_image), NeighbourhoodSetting.NB4);
+		PixelSegmentation test = new PixelSegmentation(new Image(eingabe_image), NeighbourhoodSetting.NB4);
 		// PixelSegmentation test = new PixelSegmentation(testArray, NeighbourhoodSetting.NB4);
 		test.doPixelSegmentation(3);
 		// PrintImage.printImage(ImageConverter.convert2ABto2AcolorFull(test.getImageMask()));

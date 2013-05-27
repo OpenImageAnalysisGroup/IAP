@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 import org.graffiti.editor.GravistoService;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * @author entzian, klukas
@@ -21,7 +21,7 @@ public class ImageDisplay {
 		image.show(text);
 	}
 	
-	public static void show(FlexibleImage image, String text) {
+	public static void show(Image image, String text) {
 		show(image.getAsBufferedImage(), text);
 	}
 	

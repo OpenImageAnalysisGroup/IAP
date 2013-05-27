@@ -6,25 +6,25 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlockClosingVis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
 		return closing(input().masks().vis(), input().images().vis());
 	}
 	
-	private FlexibleImage closing(FlexibleImage mask, FlexibleImage image) {
+	private Image closing(Image mask, Image image) {
 		int n = getInt("Closing-Cnt", 3);
-		FlexibleImage workImage = closing(mask, image, options.getBackground(), n);
+		Image workImage = closing(mask, image, options.getBackground(), n);
 		return workImage;
 	}
 	
-	private static FlexibleImage closing(FlexibleImage flMask, FlexibleImage flImage, int iBackgroundFill, int closingRepeat) {
+	private static Image closing(Image flMask, Image flImage, int iBackgroundFill, int closingRepeat) {
 		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
@@ -62,16 +62,16 @@ public class BlockClosingVis extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 }

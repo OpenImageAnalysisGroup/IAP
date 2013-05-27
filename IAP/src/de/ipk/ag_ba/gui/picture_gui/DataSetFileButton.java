@@ -12,7 +12,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -59,8 +58,8 @@ import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -166,7 +165,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										IOurl s = imageResult
 												.getBinaryFileInfo()
 												.getFileNameMain();
-										FlexibleImage fi = new FlexibleImage(s);
+										Image fi = new Image(s);
 										fi.show("Main Image");
 									} catch (Exception err) {
 										JOptionPane
@@ -193,7 +192,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										IOurl s = imageResult
 												.getBinaryFileInfo()
 												.getFileNameLabel();
-										FlexibleImage fi = new FlexibleImage(s);
+										Image fi = new Image(s);
 										fi.show("Reference Image");
 									} catch (Exception err) {
 										MainFrame.getInstance().showMessageDialog("Reference image could not be loaded: " + err.getMessage());
@@ -225,7 +224,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												
 												if (oldRef != null) {
 													IOurl u = new IOurl(oldRef);
-													FlexibleImage fi = new FlexibleImage(
+													Image fi = new Image(
 															u);
 													fi.show("Annotation Image");
 												} else
@@ -259,12 +258,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getFileNameMain(),
 												targetTreeNode.getExperiment().getExperiment());
 								if (match.size() > 0) {
-									FlexibleImageStack snapshot = new FlexibleImageStack();
+									ImageStack snapshot = new ImageStack();
 									for (NumericMeasurementInterface nmi : match) {
 										if (nmi instanceof ImageData) {
 											ImageData id = (ImageData) nmi;
 											if (id.getURL() != null) {
-												FlexibleImage fi = new FlexibleImage(
+												Image fi = new Image(
 														id.getURL());
 												snapshot.addImage(
 														id.getSubstanceName(),
@@ -276,7 +275,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										if (nmi instanceof ImageData) {
 											ImageData id = (ImageData) nmi;
 											if (id.getLabelURL() != null) {
-												FlexibleImage fi = new FlexibleImage(
+												Image fi = new Image(
 														id.getLabelURL());
 												snapshot.addImage(
 														"Reference "
@@ -289,7 +288,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										if (nmi instanceof ImageData) {
 											ImageData id = (ImageData) nmi;
 											if (id.getAnnotationField("oldreference") != null) {
-												FlexibleImage fi = new FlexibleImage(
+												Image fi = new Image(
 														new IOurl(
 																id.getAnnotationField("oldreference")));
 												snapshot.addImage(
@@ -382,14 +381,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													.getNumberOfCPUs(), 1, sp);
 											Collection<NumericMeasurementInterface> out = task
 													.getOutput();
-											FlexibleImageStack fis = new FlexibleImageStack();
+											ImageStack fis = new ImageStack();
 											for (NumericMeasurementInterface nmi : out) {
 												if (nmi instanceof LoadedImage) {
 													LoadedImage li = (LoadedImage) nmi;
 													fis.addImage(
 															((LoadedImage) nmi)
 																	.getPositionIn3D(),
-															new FlexibleImage(
+															new Image(
 																	li.getLoadedImage()));
 												}
 												if (nmi instanceof LoadedVolumeExtension) {
@@ -883,7 +882,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							"Unknown Image Format",
 							JOptionPane.INFORMATION_MESSAGE);
 				else {
-					FlexibleImage fi = new FlexibleImage(myImage.fileURLmain);
+					Image fi = new Image(myImage.fileURLmain);
 					fi.show("Image View - " + myImage.fileURLmain.getFileNameDecoded());
 				}
 			} catch (Exception e) {
@@ -899,9 +898,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		if (evt.getSource() == showImageCmdLabel) {
 			try {
-				FlexibleImage fi = null;
+				Image fi = null;
 				try {
-					fi = new FlexibleImage(myImage.fileURLlabel);
+					fi = new Image(myImage.fileURLlabel);
 				} catch (Exception err) {
 					// try to load as TIFF..
 				}
@@ -1152,7 +1151,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 * @return PreviewImage-File
 	 */
 	public File createTempPreviewImage() {
-		Image img = myImage.getImage();
+		java.awt.Image img = myImage.getImage();
 		BufferedImage bi = new BufferedImage(img.getWidth(this),
 				img.getHeight(this), BufferedImage.TYPE_INT_ARGB);
 		bi.getGraphics().drawImage(img, 0, 0, this);
@@ -1252,7 +1251,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getURL() != null) {
-										FlexibleImage fi = new FlexibleImage(
+										Image fi = new Image(
 												id.getURL());
 										fi.show(id.getSubstanceName() + " // "
 												+ pre);
@@ -1264,7 +1263,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getLabelURL() != null) {
-										FlexibleImage fi = new FlexibleImage(
+										Image fi = new Image(
 												id.getLabelURL());
 										fi.show("Reference "
 												+ id.getSubstanceName()
@@ -1277,7 +1276,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getAnnotationField("oldreference") != null) {
-										FlexibleImage fi = new FlexibleImage(
+										Image fi = new Image(
 												new IOurl(
 														id.getAnnotationField("oldreference")));
 										fi.show("Annotation "

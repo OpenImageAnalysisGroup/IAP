@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.operation;
 
 import java.awt.Color;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * compares distance(L a b Values) of two images(pixel by pixel), returns a new image under following conditions:
@@ -14,17 +14,17 @@ import de.ipk.ag_ba.image.structures.FlexibleImage;
  */
 public class ImageComparator {
 	
-	private final FlexibleImage inputImage;
+	private final Image inputImage;
 	
-	public ImageComparator(FlexibleImage input) {
+	public ImageComparator(Image input) {
 		this.inputImage = input;
 	}
 	
-	public ImageOperation compareImages(String desc, FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background) {
+	public ImageOperation compareImages(String desc, Image referenceImage, double lDiffA, double lDiffB, double abDiff, int background) {
 		return compareImages(desc, referenceImage, lDiffA, lDiffB, abDiff, background, false);
 	}
 	
-	public ImageOperation compareImages(String desc, FlexibleImage referenceImage, double lDiffA, double lDiffB, double abDiff, int background,
+	public ImageOperation compareImages(String desc, Image referenceImage, double lDiffA, double lDiffB, double abDiff, int background,
 			boolean adaptiveDependingOnIntensity) {
 		
 		if (inputImage != null && referenceImage != null) {
@@ -102,11 +102,11 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 		}
 		if (showDiff)
-			new FlexibleImage(width, height, diff).show("difference: " + desc);
-		return new ImageOperation(new FlexibleImage(width, height, result));
+			new Image(width, height, diff).show("difference: " + desc);
+		return new ImageOperation(new Image(width, height, result));
 	}
 	
-	public ImageOperation compareGrayImages(FlexibleImage referenceImage, double maxDiffBlack, double maxDiffWhite, int background) {
+	public ImageOperation compareGrayImages(Image referenceImage, double maxDiffBlack, double maxDiffWhite, int background) {
 		boolean invert = false;
 		if (maxDiffBlack < 0 && maxDiffWhite < 0) {
 			invert = true;
@@ -138,6 +138,6 @@ public class ImageComparator {
 				result[index] = imgInp[index];
 			}
 		}
-		return new ImageOperation(new FlexibleImage(width, height, result));
+		return new ImageOperation(new Image(width, height, result));
 	}
 }

@@ -10,22 +10,22 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageAnalysisBlockFIS {
 	
-	public void setInputAndOptions(FlexibleMaskAndImageSet input, ImageProcessorOptions options, BlockResultSet settings, int blockPositionInPipeline,
-			FlexibleImageStack debugStack);
+	public void setInputAndOptions(MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet settings, int blockPositionInPipeline,
+			ImageStack debugStack);
 	
-	public FlexibleMaskAndImageSet process() throws InterruptedException;
+	public MaskAndImageSet process() throws InterruptedException;
 	
-	public HashSet<FlexibleImageType> getInputTypes();
+	public HashSet<CameraType> getCameraInputTypes();
 	
-	public HashSet<FlexibleImageType> getOutputTypes();
+	public HashSet<CameraType> getCameraOutputTypes();
 	
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,

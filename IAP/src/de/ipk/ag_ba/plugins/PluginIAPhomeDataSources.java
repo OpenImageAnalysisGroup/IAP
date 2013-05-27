@@ -65,7 +65,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 	}
 	
 	@Override
-	public DataSource[] getHomeDataSources() {
+	public DataSource[] getDataSources() {
 		ArrayList<DataSource> result = new ArrayList<DataSource>();
 		
 		result.add(new IAPnewsLinksSource(dsg));

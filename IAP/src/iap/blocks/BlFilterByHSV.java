@@ -8,9 +8,9 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Uses a HSV-based pixel filter(s) for the vis/fluo/nir images.
@@ -20,31 +20,31 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		return process("VIS", input().images().vis(), input().masks().vis());
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return process("FLUO", input().images().fluo(), input().masks().fluo());
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		return process("NIR", input().images().nir(), input().masks().nir());
 	}
 	
-	private FlexibleImage process(String optics, FlexibleImage image, FlexibleImage mask) {
+	private Image process(String optics, Image image, Image mask) {
 		if (image == null || mask == null || !getBoolean("process " + optics, optics.equals("VIS")))
 			return mask;
 		else {
 			boolean debug = false;
 			ImageOperation processedMask = mask.io().show("in mask", debug).copy();
 			int HSVfilters = getInt("Number of HSV " + optics + " filters", 1);
-			FlexibleImage imageUnChanged = image.copy();
-			FlexibleImageStack st = null;
+			Image imageUnChanged = image.copy();
+			ImageStack st = null;
 			if (getBoolean("Debug Mask Manipulation", false))
-				st = new FlexibleImageStack();
+				st = new ImageStack();
 			for (int filter = 1; filter <= HSVfilters; filter++) {
 				String pf = optics + " filter " + filter + " ";
 				ImageOperation blurred = processedMask.blur(getDouble(pf + " blur", 1)).show("in mask blurred", debug);
@@ -98,16 +98,16 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

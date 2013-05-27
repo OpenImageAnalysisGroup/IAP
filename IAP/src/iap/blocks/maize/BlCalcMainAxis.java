@@ -14,8 +14,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MainAxisCalculationResult;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Calculates the main axis rotation for visible top images. All other image
@@ -33,7 +33,7 @@ public class BlCalcMainAxis extends
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP
 				&& input().masks().vis() != null) {
 			MainAxisCalculationResult macr = getAngle(input().masks()
@@ -72,7 +72,7 @@ public class BlCalcMainAxis extends
 		return input().masks().vis();
 	}
 	
-	private MainAxisCalculationResult getAngle(FlexibleImage image) {
+	private MainAxisCalculationResult getAngle(Image image) {
 		return new ImageOperation(image).calculateTopMainAxis(options
 				.getBackground());
 	}
@@ -89,14 +89,14 @@ public class BlCalcMainAxis extends
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

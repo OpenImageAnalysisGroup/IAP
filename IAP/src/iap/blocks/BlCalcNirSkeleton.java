@@ -4,8 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * pipeline processing for nir image
@@ -15,14 +15,14 @@ import de.ipk.ag_ba.image.structures.FlexibleImageType;
 public class BlCalcNirSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		boolean debug = getBoolean("debug", false);
 		boolean useNirSkeleton = getBoolean("Calculate_Skeleton", true);
-		FlexibleImage nirMask = input().masks().nir();
+		Image nirMask = input().masks().nir();
 		if (nirMask != null) {
 			input().masks().setNir(nirMask);
 			if (useNirSkeleton) {
-				FlexibleImage sk = nirMask.io().skeletonize(false).getImage();
+				Image sk = nirMask.io().skeletonize(false).getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, options.getBackground());
 					getProperties().setImage("nir_skeleton", sk.show("SKELETON", debug));
@@ -32,7 +32,7 @@ public class BlCalcNirSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 		return nirMask;
 	}
 	
-	private FlexibleImage mapOriginalOnSkel(FlexibleImage skeleton, FlexibleImage original, int back) {
+	private Image mapOriginalOnSkel(Image skeleton, Image original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
 		int[] img = skeleton.getAs1A();// .clone();
@@ -43,19 +43,19 @@ public class BlCalcNirSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 			} else
 				img[i] = img[i];
 		}
-		return new FlexibleImage(w, h, img);
+		return new Image(w, h, img);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
 		return res;
 	}
 }

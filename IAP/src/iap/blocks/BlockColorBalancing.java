@@ -6,8 +6,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Recolor pictures according to white point (or black point for fluo).
@@ -19,8 +19,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	static boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage vis = input().images().vis();
+	protected Image processVISimage() {
+		Image vis = input().images().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
@@ -33,8 +33,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage vis = input().masks().vis();
+	protected Image processVISmask() {
+		Image vis = input().masks().vis();
 		if (vis == null)
 			return null;
 		ImageOperation io = new ImageOperation(vis);
@@ -47,8 +47,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() {
-		FlexibleImage fluo = input().images().fluo();
+	protected Image processFLUOimage() {
+		Image fluo = input().images().fluo();
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
@@ -58,8 +58,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage fluo = input().masks().fluo();
+	protected Image processFLUOmask() {
+		Image fluo = input().masks().fluo();
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
@@ -68,11 +68,11 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
+	protected Image processNIRimage() {
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (input().images().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = input().images().nir();
+				Image nir = input().images().nir();
 				// White Balancing
 				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
@@ -82,11 +82,11 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
+	protected Image processNIRmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP) {
 			if (input().masks().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
-				FlexibleImage nir = input().masks().nir();
+				Image nir = input().masks().nir();
 				// White Balancing
 				double[] pix = BlockColorBalancing.getProbablyWhitePixels(nir.crop(), side);// 0.08);
 				return new ImageOperation(nir).imageBalancing(255, pix).getImage();
@@ -100,7 +100,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	 * 
 	 * @author pape
 	 */
-	public static double[] getProbablyWhitePixels(FlexibleImage image, double size) {
+	public static double[] getProbablyWhitePixels(Image image, double size) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int w = (int) (width * size);
@@ -122,20 +122,20 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

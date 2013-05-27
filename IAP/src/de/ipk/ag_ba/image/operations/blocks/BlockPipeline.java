@@ -34,8 +34,8 @@ import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -83,7 +83,7 @@ public class BlockPipeline {
 	private static long lastOutput = 0;
 	
 	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
-			FlexibleMaskAndImageSet input, HashMap<Integer, FlexibleImageStack> debugStack,
+			MaskAndImageSet input, HashMap<Integer, ImageStack> debugStack,
 			HashMap<Integer, BlockResultSet> blockResults,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
@@ -108,7 +108,7 @@ public class BlockPipeline {
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
-			FlexibleImageStack ds = debugStack != null ? new FlexibleImageStack() : null;
+			ImageStack ds = debugStack != null ? new ImageStack() : null;
 			BlockResultSet results = new BlockResults();
 			options.setTrayCnt(idx, executionTrayCount);
 			res.put(idx, executeInnerCall(options, new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status));
@@ -120,7 +120,7 @@ public class BlockPipeline {
 	}
 	
 	private StringAndFlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
-			StringAndFlexibleMaskAndImageSet input, FlexibleImageStack debugStack,
+			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
 			BlockResultSet results,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
@@ -369,12 +369,12 @@ public class BlockPipeline {
 					}
 					int idx = 1;
 					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
-					for (FlexibleImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
+					for (ImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
 						if (fisArr == null) {
 							idx++;
 							continue;
 						}
-						FlexibleImageStack fis = fisArr;
+						ImageStack fis = fisArr;
 						final int idxF = idx - 1;
 						fis.print(analysisTaskFinal.getName() + " // Result tray " + idx + "/" + nn, new Runnable() {
 							@Override

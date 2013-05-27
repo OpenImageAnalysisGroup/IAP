@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.operations.segmentation;
 
 import org.Vector2i;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class ClusterDetection implements Segmentation {
 	
@@ -17,7 +17,7 @@ public class ClusterDetection implements Segmentation {
 	private Vector2i[] widthAndHeight;
 	private int foregroundPixelCount;
 	
-	public ClusterDetection(FlexibleImage image, int background) {
+	public ClusterDetection(Image image, int background) {
 		this.img = image.getAs1A();
 		this.clu = new int[img.length];
 		this.w = image.getWidth();

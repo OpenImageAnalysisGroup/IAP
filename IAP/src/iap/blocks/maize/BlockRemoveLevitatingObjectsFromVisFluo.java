@@ -5,17 +5,17 @@ import java.util.HashSet;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input().masks().vis() == null || input().masks().vis() == null)
 			return null;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = input().masks().vis();
+			Image input = input().masks().vis();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
 			if (cut > 0 && cut < input().masks().vis().getHeight() * 0.5)
@@ -27,11 +27,11 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null || input().masks().fluo() == null)
 			return null;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			FlexibleImage input = input().masks().fluo();
+			Image input = input().masks().fluo();
 			int background = options.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, 20, background);
 			if (cut > 0 && cut < input().masks().fluo().getHeight() * 0.5)
@@ -42,7 +42,7 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 		return input().masks().fluo();
 	}
 	
-	private int searchSplitObjectsInYDirection(FlexibleImage input, int tolerance, int background) {
+	private int searchSplitObjectsInYDirection(Image input, int tolerance, int background) {
 		int[][] imgArray = input.getAs2A();
 		int width = input.getWidth();
 		int height = input.getHeight();
@@ -99,18 +99,18 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 	}
 
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 

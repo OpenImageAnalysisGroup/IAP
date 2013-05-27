@@ -13,9 +13,9 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -43,14 +43,14 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	@Override
 	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(
 			ImageProcessorOptions options,
-			FlexibleImageSet input,
-			FlexibleImageSet optInputMasks,
+			ImageSet input,
+			ImageSet optInputMasks,
 			int maxThreadsPerImage,
-			HashMap<Integer, FlexibleImageStack> debugStack)
+			HashMap<Integer, ImageStack> debugStack)
 			throws Exception {
 		BlockPipeline pipeline = getPipeline(options);
 		pipeline.setValidTrays(debugValidTrays);
-		FlexibleMaskAndImageSet workset = new FlexibleMaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
+		MaskAndImageSet workset = new MaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
 		HashMap<Integer, StringAndFlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
 		

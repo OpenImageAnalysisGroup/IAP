@@ -55,7 +55,7 @@ public class IAPpluginManager {
 		final Collection<DataSource> datasources = new ArrayList<DataSource>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
 			public void processPlugin(IAPplugin p) {
-				for (DataSource ds : p.getHomeDataSources()) {
+				for (DataSource ds : p.getDataSources()) {
 					datasources.add(ds);
 				}
 			}

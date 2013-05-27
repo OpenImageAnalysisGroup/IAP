@@ -20,9 +20,9 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -40,21 +40,21 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage vis = input().masks().vis();
-		FlexibleImage fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
+	protected Image processFLUOmask() {
+		Image vis = input().masks().vis();
+		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
-		FlexibleImage res = fluo.copy();
+		Image res = fluo.copy();
 		
 		boolean analyzeSide = false;
 		if (analyzeSide)
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-				FlexibleImage viswork = fluo.copy().show("fluo", debug);
+				Image viswork = fluo.copy().show("fluo", debug);
 				
 				if (viswork != null)
 					if (vis != null && fluo != null) {
-						FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+						Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 						if (sk != null) {
 							boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -65,11 +65,11 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
 			ImageOperation in = fluo.copy().io();
-			FlexibleImage viswork = in.blur(getDouble("blur fluo", 0d)).getImage().show("blur fluo res", debug);
+			Image viswork = in.blur(getDouble("blur fluo", 0d)).getImage().show("blur fluo res", debug);
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					FlexibleImage sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -81,7 +81,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		return input().masks().fluo();
 	}
 	
-	public FlexibleImage calcSkeleton(FlexibleImage inp, FlexibleImage vis, FlexibleImage fluo, FlexibleImage inpFLUOunchanged) {
+	public Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).show("input", debug).getImage()));
 		skel2d.findEndpointsAndBranches2();
@@ -109,11 +109,11 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				for (int x = 0; x < w; x++)
 					for (int y = 0; y < h; y++)
 						tempImage[x][y] = clear;
-				FlexibleImage clearImage = new FlexibleImage(tempImage).copy();
+				Image clearImage = new Image(tempImage).copy();
 				int black = Color.BLACK.getRGB();
 				for (Point p : branchPoints)
 					tempImage[p.x][p.y] = black;
-				FlexibleImage temp = new FlexibleImage(tempImage);
+				Image temp = new Image(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, true, false, black, black, black, null, 0d).getImage();
 				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
@@ -129,7 +129,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 						ttt[p.x][p.y] = clear;
-				temp = new FlexibleImage(ttt).io().show("FINAL", debug).getImage();
+				temp = new Image(ttt).io().show("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int skeletonLength;
 				do {
@@ -142,7 +142,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		}
 		
 		int leafcount = skel2d.endlimbs.size();
-		FlexibleImage skelres = skel2d.getAsFlexibleImage();
+		Image skelres = skel2d.getAsFlexibleImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
 		
 		if (debug)
@@ -158,7 +158,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			FlexibleImage inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
+			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -167,7 +167,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 					inp2d[p.x][p.y] = clear;
 			
-			inputImage = new FlexibleImage(inp2d);
+			inputImage = new Image(inp2d);
 			
 			ImageCanvas canvas = inputImage.io().canvas();
 			ArrayList<Point> branchPoints = skel2d.getBranches();
@@ -183,7 +183,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			// repeat erode operation until no filled pixel
 			Double leafWidthInPixels2 = 0d;
 			int skeletonLength;
-			FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+			ImageStack fis = debug ? new ImageStack() : null;
 			ImageOperation ioo = inputImage.io();
 			do {
 				ioo = ioo.skeletonize(false).show("SKELETON2", false);
@@ -247,7 +247,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		return skel2d.getAsFlexibleImage();
 	}
 	
-	private FlexibleImage MapOriginalOnSkelUseingMedian(FlexibleImage skeleton, FlexibleImage original, int back) {
+	private Image MapOriginalOnSkelUseingMedian(Image skeleton, Image original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
 		int[] img = skeleton.getAs1A().clone();
@@ -266,7 +266,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 			} else
 				img[i] = img[i];
 		}
-		return new FlexibleImage(w, h, img);
+		return new Image(w, h, img);
 	}
 	
 	private int median(int center, int above, int left, int right, int below) {
@@ -303,7 +303,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 	 * @param input
 	 * @return
 	 */
-	private FlexibleImage getInvert(FlexibleImage input) {
+	private Image getInvert(Image input) {
 		int[][] img = input.getAs2A();
 		int width = img.length;
 		int height = img[0].length;
@@ -321,7 +321,7 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 				}
 			}
 		}
-		return new FlexibleImage(res);
+		return new Image(res);
 	}
 	
 	@Override
@@ -432,18 +432,18 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 }

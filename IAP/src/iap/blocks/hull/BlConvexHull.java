@@ -19,8 +19,8 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -34,20 +34,20 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage image = input().masks().vis();
+	protected Image processVISmask() {
+		Image image = input().masks().vis();
 		ImageOperation res = processImage("vis.", image);
 		return res != null ? res.getImage() : null;
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage image = input().masks().fluo();
+	protected Image processFLUOmask() {
+		Image image = input().masks().fluo();
 		ImageOperation res = processImage("fluo.", image);
 		return res != null ? res.getImage() : null;
 	}
 	
-	private ImageOperation processImage(String prefix, FlexibleImage image) {
+	private ImageOperation processImage(String prefix, Image image) {
 		boolean debug = getBoolean("debug", false);
 		
 		ResultsTableWithUnits numericResults;
@@ -378,15 +378,15 @@ public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

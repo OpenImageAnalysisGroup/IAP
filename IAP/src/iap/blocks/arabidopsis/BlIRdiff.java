@@ -10,9 +10,9 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas
@@ -22,8 +22,8 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processIRmask() {
-		FlexibleImage warmBack = input().masks().ir();
+	protected Image processIRmask() {
+		Image warmBack = input().masks().ir();
 		if (warmBack != null) {
 			debug = getBoolean("debug", false);
 			ArrayList<Double> warmBackgroundValues = new ArrayList<Double>();
@@ -60,7 +60,7 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlockFIS {
 				res[i] = IAPservice.getIRintensityDifferenceColor(
 						IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
 						options.getBackground(), getDouble("temperature scaling", 10));
-			FlexibleImage gray = new FlexibleImage(warmBack.getWidth(), warmBack.getHeight(), res);
+			Image gray = new Image(warmBack.getWidth(), warmBack.getHeight(), res);
 			if (getBoolean("Adaptive Thresholding", false))
 				gray = gray.io().show("ADAPT IN", debug).
 						adaptiveThresholdForGrayscaleImage(
@@ -75,19 +75,19 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

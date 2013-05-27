@@ -23,7 +23,7 @@ public class ImageProcessorOptions {
 	
 	public static final double DEFAULT_MARKER_DIST = 1150d;
 	
-	private CameraPosition cameraTyp = CameraPosition.UNKNOWN;
+	private CameraPosition cameraPosition = CameraPosition.UNKNOWN;
 	private NeighbourhoodSetting neighbourhood = NeighbourhoodSetting.NB4;
 	private final int nirBackground = new Color(180, 180, 180).getRGB();
 	private int tray_idx;
@@ -52,7 +52,7 @@ public class ImageProcessorOptions {
 	}
 	
 	public void setCameraPosition(CameraPosition cameraTyp) {
-		this.cameraTyp = cameraTyp;
+		this.cameraPosition = cameraTyp;
 		
 	}
 	
@@ -61,7 +61,7 @@ public class ImageProcessorOptions {
 	}
 	
 	public CameraPosition getCameraPosition() {
-		return cameraTyp;
+		return cameraPosition;
 	}
 	
 	public int getBackground() {

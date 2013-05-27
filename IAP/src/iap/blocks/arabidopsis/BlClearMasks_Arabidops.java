@@ -4,8 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Create a simulated, dummy reference image (in case the reference image is NULL).
@@ -17,8 +17,8 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage img = input().images().vis();
+	protected Image processVISimage() {
+		Image img = input().images().vis();
 		if (img != null) {
 			return img.copy().io().border(40).getImage();
 		} else
@@ -26,8 +26,8 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage img = input().images().nir();
+	protected Image processNIRimage() {
+		Image img = input().images().nir();
 		if (img != null) {
 			return img.copy().io().translate(-3, 0).getImage();
 		} else
@@ -35,8 +35,8 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processVISmask() {
-		FlexibleImage img = input().images().vis();
+	protected Image processVISmask() {
+		Image img = input().images().vis();
 		if (img != null) {
 			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
@@ -44,8 +44,8 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
-		FlexibleImage img = input().images().fluo();
+	protected Image processFLUOmask() {
+		Image img = input().images().fluo();
 		if (img != null) {
 			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
@@ -53,8 +53,8 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage img = input().images().nir();
+	protected Image processNIRmask() {
+		Image img = input().images().nir();
 		if (img != null) {
 			return img.copy().io().fillRect2(0, 0, img.getWidth(), img.getHeight()).getImage();
 		} else
@@ -62,16 +62,16 @@ public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

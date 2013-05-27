@@ -7,8 +7,8 @@ import iap.blocks.data_structures.AbstractBlock;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Uses a lab-based pixel filter for the vis and fluo images.
@@ -24,8 +24,8 @@ public class BlRotate extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processImage(FlexibleImage image) {
-		double r = image != null ? getDouble("Rotate Main Image " + image.getType(), image.getType() == FlexibleImageType.IR ? -90d : 0d) : 0d;
+	protected Image processImage(Image image) {
+		double r = image != null ? getDouble("Rotate Main Image " + image.getCameraType(), image.getCameraType() == CameraType.IR ? -90d : 0d) : 0d;
 		if (image != null && Math.abs(r) > 0.001) {
 			if (image != null && Math.abs(r - 90) < 0.001)
 				image = image.io().rotate90().getImage();
@@ -39,8 +39,8 @@ public class BlRotate extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
-		double r = getDouble("Rotate Mask Image " + mask.getType(), mask.getType() == FlexibleImageType.IR ? -90d : 0d);
+	protected Image processMask(Image mask) {
+		double r = getDouble("Rotate Mask Image " + mask.getCameraType(), mask.getCameraType() == CameraType.IR ? -90d : 0d);
 		if (mask != null && Math.abs(r) > 0.001) {
 			if (mask != null && Math.abs(r - 90) < 0.001)
 				mask = mask.io().rotate90().getImage();
@@ -54,18 +54,18 @@ public class BlRotate extends AbstractBlock {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 	
 }

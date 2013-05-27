@@ -6,8 +6,8 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Clears all images around a circle in the middle
@@ -48,27 +48,27 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 		if (gridHn != 1 || gridVn != 1) {
 			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100;
 			// 3x2
-			FlexibleImage vis = input().images().vis();
+			Image vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, FlexibleImageType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(vis, CameraType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			// processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
-			FlexibleImage fluo = input().images().fluo();
+			Image fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, FlexibleImageType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(fluo, CameraType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
-			FlexibleImage nir = input().images().nir();
+			Image nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, FlexibleImageType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(nir, CameraType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			
-			FlexibleImage ir = input().images().ir();
+			Image ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().getImage();
-				processCuttingOfImage(ir, FlexibleImageType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(ir, CameraType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
 			}
 		}
 	}
 	
-	private void processCuttingOfImage(FlexibleImage img, FlexibleImageType type, double offY, double vertFillGrade, int cols, int rows) {
+	private void processCuttingOfImage(Image img, CameraType type, double offY, double vertFillGrade, int cols, int rows) {
 		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
 				img.getWidth() / 2,
 				img.getHeight() / 2);
@@ -78,8 +78,8 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 		int to = (int) r.getMinY();
 		int ri = (int) r.getMaxX();
 		int bo = (int) r.getMaxY();
-		FlexibleImage res = img.io().clearOutsideRectangle(le, to, ri, bo).getImage();
-		res.setType(type);
+		Image res = img.io().clearOutsideRectangle(le, to, ri, bo).getImage();
+		res.setCameraType(type);
 		input().images().set(res);
 	}
 	
@@ -104,8 +104,8 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processVISimage() {
-		FlexibleImage img = input().images().vis();
+	protected Image processVISimage() {
+		Image img = input().images().vis();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
@@ -120,8 +120,8 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOimage() {
-		FlexibleImage img = input().images().fluo();
+	protected Image processFLUOimage() {
+		Image img = input().images().fluo();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
@@ -136,8 +136,8 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage img = input().images().nir();
+	protected Image processNIRimage() {
+		Image img = input().images().nir();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
@@ -152,8 +152,8 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 	}
 	
 	@Override
-	protected FlexibleImage processIRimage() {
-		FlexibleImage img = input().images().ir();
+	protected Image processIRimage() {
+		Image img = input().images().ir();
 		if (img != null && !multiTray) {
 			if (options.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io()
@@ -168,17 +168,17 @@ public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnaps
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.IR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

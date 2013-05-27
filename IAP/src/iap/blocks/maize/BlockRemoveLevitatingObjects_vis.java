@@ -1,11 +1,11 @@
 package iap.blocks.maize;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class BlockRemoveLevitatingObjects_vis extends BlockRemoveLevitatingObjectsFromVisFluo {
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		return input().masks().fluo();
 	}
 	

@@ -5,18 +5,18 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlockDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		if (input() == null || input().masks() == null)
 			return null;
-		FlexibleImage plantImg = input().masks().vis();
+		Image plantImg = input().masks().vis();
 		boolean drawSkeleton = getBoolean("draw_skeleton", true);
-		FlexibleImage skel = getProperties().getImage("skeleton");
+		Image skel = getProperties().getImage("skeleton");
 		if (skel != null && plantImg != null)
 			return plantImg.io().drawSkeleton(skel, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 		else
@@ -24,12 +24,12 @@ public class BlockDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected FlexibleImage processFLUOmask() {
+	protected Image processFLUOmask() {
 		if (input() == null || input().masks() == null)
 			return null;
-		FlexibleImage plantImg = input().masks().fluo();
+		Image plantImg = input().masks().fluo();
 		boolean drawSkeleton = getBoolean("draw_skeleton", true);
-		FlexibleImage skel = getProperties().getImage("skeleton_fluo");
+		Image skel = getProperties().getImage("skeleton_fluo");
 		if (skel != null && plantImg != null)
 			return plantImg.io().drawSkeleton(skel, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 		else
@@ -37,15 +37,15 @@ public class BlockDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

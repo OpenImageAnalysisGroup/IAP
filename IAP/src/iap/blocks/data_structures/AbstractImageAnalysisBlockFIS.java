@@ -31,19 +31,19 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
-import de.ipk.ag_ba.image.structures.FlexibleMaskAndImageSet;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlockFIS {
 	
-	private FlexibleImageStack debugStack;
+	private ImageStack debugStack;
 	protected ImageProcessorOptions options;
-	private FlexibleMaskAndImageSet input;
+	private MaskAndImageSet input;
 	private BlockResultSet properties;
 	private int blockPositionInPipeline;
 	
@@ -76,9 +76,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void setInputAndOptions(FlexibleMaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
+	public void setInputAndOptions(MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
 			int blockPositionInPipeline,
-			FlexibleImageStack debugStack) {
+			ImageStack debugStack) {
 		this.input = input;
 		this.options = options;
 		this.properties = properties;
@@ -93,25 +93,25 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
 			if (input().images().vis() != null && input().masks().vis() != null)
-				debugPipelineBlock(this.getClass(), FlexibleImageType.VIS, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.VIS, input(), getProperties(), options, getBlockPosition(), this);
 			if (input().images().fluo() != null && input().masks().fluo() != null)
-				debugPipelineBlock(this.getClass(), FlexibleImageType.FLUO, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.FLUO, input(), getProperties(), options, getBlockPosition(), this);
 			if (input().images().nir() != null && input().masks().nir() != null)
-				debugPipelineBlock(this.getClass(), FlexibleImageType.NIR, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.NIR, input(), getProperties(), options, getBlockPosition(), this);
 			if (input().images().ir() != null && input().masks().ir() != null)
-				debugPipelineBlock(this.getClass(), FlexibleImageType.IR, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.IR, input(), getProperties(), options, getBlockPosition(), this);
 		}
 	}
 	
 	@Override
-	public final FlexibleMaskAndImageSet process() throws InterruptedException {
+	public final MaskAndImageSet process() throws InterruptedException {
 		StopWatch w = debugStart(this.getClass().getSimpleName());
-		FlexibleMaskAndImageSet res = run();
+		MaskAndImageSet res = run();
 		debugEnd(w);
 		return res;
 	}
 	
-	protected abstract FlexibleMaskAndImageSet run() throws InterruptedException;
+	protected abstract MaskAndImageSet run() throws InterruptedException;
 	
 	protected StopWatch debugStart(String task) {
 		if (debugStack != null && isChangingImages())
@@ -140,7 +140,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
-	public FlexibleMaskAndImageSet input() {
+	public MaskAndImageSet input() {
 		return input;
 	}
 	
@@ -263,8 +263,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
-	protected void debugPipelineBlock(final Class<?> blockType, final FlexibleImageType inpImageType,
-			final FlexibleMaskAndImageSet inputSet,
+	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
+			final MaskAndImageSet inputSet,
 			final BlockResultSet brs, final ImageProcessorOptions options,
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
@@ -281,15 +281,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					AbstractSnapshotAnalysisBlockFIS inst = (AbstractSnapshotAnalysisBlockFIS) blockType.newInstance();
-					FlexibleImageSet a = inputSet.images().copy();
-					FlexibleImageSet b = inputSet.masks().copy();
-					FlexibleMaskAndImageSet ab = new FlexibleMaskAndImageSet(a, b);
+					ImageSet a = inputSet.images().copy();
+					ImageSet b = inputSet.masks().copy();
+					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					inst.preventDebugValues = true;
 					inst.setInputAndOptions(ab, options, brs, blockPos, null);
 					ab = inst.process();
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();
-					FlexibleImage processingResultImage = ab.masks().getImage(inpImageType);
+					Image processingResultImage = ab.masks().getImage(inpImageType);
 					if (processingResultImage == null)
 						throw new Exception("Processed image not available");
 					

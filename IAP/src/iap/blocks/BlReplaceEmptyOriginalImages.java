@@ -6,8 +6,8 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlReplaceEmptyOriginalImages extends AbstractBlock {
@@ -18,8 +18,8 @@ public class BlReplaceEmptyOriginalImages extends AbstractBlock {
 	private final int lri = lr.getRGB();
 	
 	@Override
-	public FlexibleImage processImage(FlexibleImage image) {
-		FlexibleImageType it = image == null ? FlexibleImageType.UNKNOWN : image.getType();
+	public Image processImage(Image image) {
+		CameraType it = image == null ? CameraType.UNKNOWN : image.getCameraType();
 		if (image != null) {
 			if (image.io().countFilledPixels() == 0) {
 				ImageData imageInfo = null;
@@ -38,7 +38,7 @@ public class BlReplaceEmptyOriginalImages extends AbstractBlock {
 				}
 				try {
 					if (imageInfo != null) {
-						image = new FlexibleImage(imageInfo.getURL());
+						image = new Image(imageInfo.getURL());
 						int x = 0, y = 0, w = image.getWidth(), h = image.getHeight();
 						double alpha = 0.5;
 						int color = new Color(50, 50, 50).getRGB();
@@ -55,7 +55,7 @@ public class BlReplaceEmptyOriginalImages extends AbstractBlock {
 		if (image == null) {
 			int[] img = new int[sz * sz];
 			img = ImageOperation.fillArray(img, Color.WHITE.getRGB());
-			image = new FlexibleImage(sz, sz, img);
+			image = new Image(sz, sz, img);
 			image = image.io().drawLine(0, 0, sz, sz, lr, 5).drawLine(sz, 0, 0, sz, lr, 5).addBorder(5, 0, 0, lri)
 					.getImage();
 		}
@@ -63,25 +63,25 @@ public class BlReplaceEmptyOriginalImages extends AbstractBlock {
 	}
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
+	protected Image processMask(Image mask) {
 		return mask;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.FLUO);
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
-		res.add(FlexibleImageType.NIR);
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraOutputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

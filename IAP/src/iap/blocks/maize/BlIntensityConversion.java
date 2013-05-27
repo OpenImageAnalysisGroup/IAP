@@ -6,15 +6,15 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.FluoAnalysis;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
-	protected synchronized FlexibleImage processFLUOmask() {
+	protected synchronized Image processFLUOmask() {
 		
 		// getInput().getMasks().getFluo().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeFLUOMask2.png");
 		if (input().masks().fluo() == null) {
@@ -23,16 +23,16 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 		boolean debug = getBoolean("debug", false);
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(),
 				options.getBackground());
-		FlexibleImageStack fis = debug ? new FlexibleImageStack() : null;
+		ImageStack fis = debug ? new ImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage(), null);
 		double min = 220;
-		FlexibleImage resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, getDouble("minimum-intensity-classic", min)).getImage();
-		FlexibleImage resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, getDouble("minimum-intensity-chloro", min)).getImage();
+		Image resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, getDouble("minimum-intensity-classic", min)).getImage();
+		Image resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, getDouble("minimum-intensity-chloro", min)).getImage();
 		min = getDouble("minimum-intensity-phenol", 240);
 		
-		FlexibleImage resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
-		FlexibleImage r = new FlexibleImage(resClassic, resChlorophyll, resPhenol);
+		Image resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
+		Image r = new Image(resClassic, resChlorophyll, resPhenol);
 		
 		if (debug) {
 			fis.addImage("ClChPh", r, null);
@@ -54,7 +54,7 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	protected void postProcess(FlexibleImageSet processedImages, FlexibleImageSet processedMasks) {
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		super.postProcess(processedImages, processedMasks);
 		processedImages.setFluo(processedMasks.fluo());
 		if (processedMasks.fluo() != null)
@@ -62,14 +62,14 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.FLUO);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

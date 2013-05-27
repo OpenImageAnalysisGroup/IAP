@@ -13,14 +13,14 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockResults implements BlockResultSet {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
-	private final HashMap<String, FlexibleImage> storedImages = new HashMap<String, FlexibleImage>();
+	private final HashMap<String, Image> storedImages = new HashMap<String, Image>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
 	
@@ -378,13 +378,13 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void setImage(String id, FlexibleImage image) {
+	public void setImage(String id, Image image) {
 		storedImages.put(id, image);
 	}
 	
 	@Override
-	public FlexibleImage getImage(String id) {
-		FlexibleImage res = storedImages.get(id);
+	public Image getImage(String id) {
+		Image res = storedImages.get(id);
 		storedImages.remove(id);
 		return res;
 	}

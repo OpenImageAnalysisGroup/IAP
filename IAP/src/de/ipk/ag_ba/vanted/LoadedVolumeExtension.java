@@ -28,8 +28,8 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageStack;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.IntVolumeVisitor;
@@ -264,13 +264,13 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			optStatus.setCurrentStatusText2("Render side view GIF");
 			optStatus.setCurrentStatusValueFine(0);
 		}
-		FlexibleImageStack fis = new FlexibleImageStack();
+		ImageStack fis = new ImageStack();
 		while (degree < 360) {
 			BufferedImage result = new BufferedImage(getDimensionX(), getDimensionY(), BufferedImage.TYPE_INT_ARGB);
 			renderSideView(degree, result);
 			result = GravistoService.getScaledImage(result, width, height);
 			images.add(result);
-			fis.addImage("Deg " + degree, new FlexibleImage(result));
+			fis.addImage("Deg " + degree, new Image(result));
 			delayTimes.add("" + delay);
 			degree += degreeSteps;
 			if (optStatus != null) {

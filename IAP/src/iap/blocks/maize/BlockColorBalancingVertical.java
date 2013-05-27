@@ -7,8 +7,8 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -21,8 +21,8 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processNIRimage() {
-		FlexibleImage nir = input().images().nir();
+	protected Image processNIRimage() {
+		Image nir = input().images().nir();
 		if (!getBoolean("process NIR image", true))
 			return nir;
 		if (nir == null)
@@ -38,8 +38,8 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	protected FlexibleImage processNIRmask() {
-		FlexibleImage nir = input().masks().nir();
+	protected Image processNIRmask() {
+		Image nir = input().masks().nir();
 		if (!getBoolean("process NIR mask", true))
 			return nir;
 		if (nir == null)
@@ -59,7 +59,7 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	 * 
 	 * @author pape
 	 */
-	private double[] getProbablyWhitePixels(FlexibleImage image) {
+	private double[] getProbablyWhitePixels(Image image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -140,14 +140,14 @@ public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFI
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.NIR);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

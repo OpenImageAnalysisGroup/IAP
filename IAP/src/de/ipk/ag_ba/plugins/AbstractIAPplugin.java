@@ -26,7 +26,7 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	}
 	
 	@Override
-	public DataSource[] getHomeDataSources() {
+	public DataSource[] getDataSources() {
 		return new DataSource[] {};
 	}
 	

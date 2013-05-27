@@ -4,16 +4,16 @@ import iap.blocks.data_structures.AbstractBlock;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlSmoothShape extends AbstractBlock {
 	
 	private final boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processMask(FlexibleImage mask) {
-		if (mask != null && mask.getType() == FlexibleImageType.VIS) {
+	protected Image processMask(Image mask) {
+		if (mask != null && mask.getCameraType() == CameraType.VIS) {
 			return mask.io().applyMask_ResizeMaskIfNeeded(
 					mask.copy().io().erode(3).blur(2).erode().erode().show("blurred mask", debug).getImage(),
 					options.getBackground()).getImage();
@@ -22,14 +22,14 @@ public class BlSmoothShape extends AbstractBlock {
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 }

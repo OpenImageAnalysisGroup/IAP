@@ -11,7 +11,7 @@ import org.MarkComponent;
 
 import com.mongodb.gridfs.GridFS;
 
-import de.ipk.ag_ba.image.structures.FlexibleImage;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class UpdatingImagePanelForDB extends JPanel {
@@ -66,7 +66,7 @@ public class UpdatingImagePanelForDB extends JPanel {
 				
 				BufferedImage img;
 				// load img
-				image = new FlexibleImage(dc.getSavedScreenshot(filename, gridfs_webcam_files, status)).io()
+				image = new Image(dc.getSavedScreenshot(filename, gridfs_webcam_files, status)).io()
 						.blur(1)
 						.resize(getWidth(), getHeight()).sharpen().getAsBufferedImage();
 				repaint();

@@ -19,8 +19,8 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonGraph;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.FlexibleImage;
-import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Skeletonize the roots and store root lengths, and other parameters.
@@ -31,13 +31,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	boolean debug = false;
 	
 	@Override
-	protected FlexibleImage processVISmask() {
+	protected Image processVISmask() {
 		debug = getBoolean("debug", false);
 		int background = options.getBackground();
 		
 		ImageOperation img = null;
 		{
-			FlexibleImage i = input().masks().vis();
+			Image i = input().masks().vis();
 			if (i == null)
 				return null;
 			img = i.io().closing();
@@ -57,7 +57,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		
 		int[] unchangedSkeletonPixels = img.getImageAs1dArray();
 		
-		ImageOperation ioClusteredSkeltonImage = new FlexibleImage(
+		ImageOperation ioClusteredSkeltonImage = new Image(
 				inDilatedForSectionDetection.getWidth(),
 				inDilatedForSectionDetection.getHeight(),
 				cd.getImageClusterIdMask()).io();
@@ -104,7 +104,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
-		FlexibleImage ress = ioClusteredSkeltonImage.dilate(20).getImage();
+		Image ress = ioClusteredSkeltonImage.dilate(20).getImage();
 		return ress;
 	}
 	
@@ -219,7 +219,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 						try {
 							ImageOperation si = image.copy().dilate().skeletonize(true);// .resize(0.5d);
 							graphAnalysis(getClusterIDarray(image),
-									new FlexibleImage(si.getWidth(), si.getHeight(),
+									new Image(si.getWidth(), si.getHeight(),
 											si.getImageAs1dArray())
 											.show("input for graph analysis", debug).io(), rt, prefix);
 						} catch (Exception e) {
@@ -269,7 +269,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 		cd.detectClusters();
 		int clusters = cd.getClusterCount();
 		
-		ImageOperation ioClusteredSkeltonImage = new FlexibleImage(
+		ImageOperation ioClusteredSkeltonImage = new Image(
 				img.getWidth(),
 				img.getHeight(),
 				cd.getImageClusterIdMask()).io();
@@ -299,7 +299,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 	 * @param input
 	 * @return
 	 */
-	private FlexibleImage getInvert(FlexibleImage input) {
+	private Image getInvert(Image input) {
 		int[][] img = input.getAs2A();
 		int width = img.length;
 		int height = img[0].length;
@@ -317,19 +317,19 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlockFIS {
 				}
 			}
 		}
-		return new FlexibleImage(res);
+		return new Image(res);
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getInputTypes() {
-		HashSet<FlexibleImageType> res = new HashSet<FlexibleImageType>();
-		res.add(FlexibleImageType.VIS);
+	public HashSet<CameraType> getCameraInputTypes() {
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
 	@Override
-	public HashSet<FlexibleImageType> getOutputTypes() {
-		return getInputTypes();
+	public HashSet<CameraType> getCameraOutputTypes() {
+		return getCameraInputTypes();
 	}
 	
 }
