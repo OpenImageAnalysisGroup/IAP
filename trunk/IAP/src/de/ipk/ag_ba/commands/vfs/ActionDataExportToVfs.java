@@ -333,7 +333,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 													.getURL());
 									if (is == null || is.available() <= 0) {
 										System.out
-												.println("ERROR: Input stream contains no content for image with URL "
+												.println(SystemAnalysis.getCurrentTime() + ">ERROR: Input stream contains no content for image with URL "
 														+ bm.getURL());
 									}
 								}
@@ -341,8 +341,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								MyByteArrayInputStream previewStream = null;
 								if (previewData == null || previewData.length == 0) {
 									if (is != null) {
-										BufferedImage bimage = ImageIO.read(is);
-										previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+										try {
+											BufferedImage bimage = ImageIO.read(is);
+											previewStream = MyImageIOhelper.getPreviewImageStream(bimage);
+										} catch (Exception error) {
+											System.out
+													.println(SystemAnalysis.getCurrentTime() + ">ERROR: Input stream could not be loaded as an image for image with URL "
+															+ bm.getURL());
+										}
 									}
 								} else {
 									previewStream = new MyByteArrayInputStream(previewData, previewData.length);
@@ -354,7 +360,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 											exists, null, true);
 								else
 									System.out
-											.println("ERROR: Preview could not be created or saved.");
+											.println(SystemAnalysis.getCurrentTime() + ">ERROR: Preview could not be created or saved.");
 							} finally {
 								if (is != null)
 									is.close();
@@ -362,7 +368,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
-						System.out.println("ERROR PREVIEW STORAGE: "
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR PREVIEW STORAGE: "
 								+ e.getMessage() + " // " + zefn
 								+ " // - error is ignored");
 					}

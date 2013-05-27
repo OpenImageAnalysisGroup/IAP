@@ -424,7 +424,7 @@ public class SystemOptions {
 		} else {
 			Ini.Section section = ini.get(group);
 			if (section == null) {
-				getString(group, "hint", "Start a block name with # to disable it.");
+				getString(group, "hint", "Start an entry with # to disable it.");
 				section = ini.get(group);
 			}
 			String[] r = section.getAll(setting, String[].class);

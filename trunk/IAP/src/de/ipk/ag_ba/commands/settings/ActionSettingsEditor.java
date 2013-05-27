@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.settings;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import org.IniIoProvider;
@@ -8,8 +9,10 @@ import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 
 /**
  * @author klukas
@@ -69,6 +72,15 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 						guiSetting));
 			}
 		}
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		Collection<String> help = IAPpluginManager.getInstance().getSettingHelp(iniFileName, section, "Settings-Group");
+		if (help != null && !help.isEmpty())
+			return new MainPanelComponent(help);
+		else
+			return super.getResultMainPanel();
 	}
 	
 	@Override

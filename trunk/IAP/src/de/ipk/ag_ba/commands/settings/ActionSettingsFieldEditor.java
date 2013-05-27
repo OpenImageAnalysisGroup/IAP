@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.settings;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.ButtonGroup;
@@ -15,7 +16,8 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.FlexibleImageType;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 class ActionSettingsFieldEditor extends AbstractNavigationAction {
@@ -78,7 +80,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				value2button.put(sl, rb);
 			}
 			String s2 = setting.substring(0, setting.length() - "-radio-selection".length());
-			Object[] inp = MyInputHelper.getInput(
+			Object[] inp = MyInputHelper.getInput(getHelp() +
 					"Select the desired option from the listed entries:<br>",
 					s2, entries.toArray());
 			if (inp != null) {
@@ -107,7 +109,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 						.setBoolean(this.actionSettingsEditor.section, setting, enabled);
 			} else
 				if (isInteger) {
-					Object[] inp = MyInputHelper.getInput("Please enter a whole number:",
+					Object[] inp = MyInputHelper.getInput(getHelp() + "Please enter a whole number:",
 							"Modify "
 									+ setting,
 							setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
@@ -125,7 +127,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					}
 				} else
 					if (isFloat) {
-						Object[] inp = MyInputHelper.getInput("Please enter a (floating point) number:",
+						Object[] inp = MyInputHelper.getInput(getHelp() + "Please enter a (floating point) number:",
 								"Modify "
 										+ setting,
 								setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
@@ -169,7 +171,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 											"Message displayed", SystemAnalysis.getCurrentTime());
 								}
 							}
-							Object[] inp = MyInputHelper.getInput("You may modify the text:",
+							Object[] inp = MyInputHelper.getInput(getHelp() + "You may modify the text:",
 									"Modify "
 											+ setting,
 									setting, SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
@@ -229,7 +231,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 									}
 									entries.add(sl + "");
 								}
-								Object[] inp = MyInputHelper.getInput(
+								Object[] inp = MyInputHelper.getInput(getHelp() +
 										"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
 												"If an item contains '//', the entry is split into two items.<br>",
 										"Modify "
@@ -253,6 +255,25 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 								}
 							}
 					}
+	}
+	
+	private String getHelp() {
+		Collection<String> help = IAPpluginManager.getInstance().getSettingHelp(
+				this.actionSettingsEditor.iniFileName,
+				this.actionSettingsEditor.section, setting);
+		if (help != null && !help.isEmpty()) {
+			boolean empty = true;
+			for (String h : help)
+				if (!h.trim().isEmpty()) {
+					empty = false;
+					break;
+				}
+			if (empty)
+				return "";
+			else
+				return "<html>" + StringManipulationTools.getStringList(help, "<br><br>") + "<br><br>";
+		} else
+			return "";
 	}
 	
 	@Override
