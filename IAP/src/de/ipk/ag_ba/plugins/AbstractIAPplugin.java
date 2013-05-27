@@ -2,6 +2,8 @@ package de.ipk.ag_ba.plugins;
 
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 
+import java.util.Collection;
+
 import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
@@ -56,5 +58,10 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	@Override
 	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference er) {
 		return new ActionDataProcessing[] {};
+	}
+	
+	@Override
+	public Collection<String> getHelpForSettings(String iniFileName, String section, String setting) {
+		return null;
 	}
 }
