@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.ErrorMsg;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -157,7 +158,7 @@ public class LoadedImage extends ImageData implements LoadedData {
 		if (!pipe) {
 			MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
 			try {
-				ImageIO.write(image, "png", mos);
+				ImageIO.write(image, SystemOptions.getInstance().getString("IAP", "Result File Type", "png"), mos);
 				return new MyByteArrayInputStream(mos.getBuff(), mos.size());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -174,7 +175,7 @@ public class LoadedImage extends ImageData implements LoadedData {
 				@Override
 				public void run() {
 					try {
-						ImageIO.write(image, "png", pout);
+						ImageIO.write(image, SystemOptions.getInstance().getString("IAP", "Result File Type", "png"), pout);
 						pout.close();
 					} catch (IOException e) {
 						ErrorMsg.addErrorMessage(e);

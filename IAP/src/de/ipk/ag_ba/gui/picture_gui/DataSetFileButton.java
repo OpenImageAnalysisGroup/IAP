@@ -49,6 +49,7 @@ import org.ErrorMsg;
 import org.HomeFolder;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -58,8 +59,8 @@ import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
-import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
@@ -1157,13 +1158,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		bi.getGraphics().drawImage(img, 0, 0, this);
 		File tf;
 		try {
-			tf = File.createTempFile("dbe_clipboard_", ".png");
+			tf = File.createTempFile("dbe_clipboard_", "." + SystemOptions.getInstance().getString("IAP", "Preview File Type", "png"));
 		} catch (IOException e) {
 			return null;
 		}
 		SupplementaryFilePanelMongoDB.addTempFileToBeDeletedLater(tf);
 		try {
-			ImageIO.write(bi, "PNG", tf);
+			ImageIO.write(bi, SystemOptions.getInstance().getString("IAP", "Preview File Type", "png"), tf);
 		} catch (IOException e1) {
 			return null;
 		}

@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.ErrorMsg;
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 
 /**
@@ -62,7 +63,7 @@ public class MyImageIOhelper {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
 			
-			ImageIO.write(previewImage, "png", ios);
+			ImageIO.write(previewImage, SystemOptions.getInstance().getString("IAP", "Preview File Type", "png"), ios);
 			byte[] content = bos.toByteArray();
 			MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
 			return is;

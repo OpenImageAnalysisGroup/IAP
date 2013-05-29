@@ -34,9 +34,9 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
@@ -782,7 +782,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private String addTrayInfo(int tray, int tray_cnt, String fileName) {
 		if (tray_cnt > 1)
 			fileName = StringManipulationTools.stringReplace(fileName,
-					".png", "." + tray + "." + tray_cnt + ".png");
+					"." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"), "." + tray + "." + tray_cnt + "."
+							+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 		return fileName;
 	}
 	
@@ -915,19 +916,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (resVis != null)
 				ra = saveImage(
 						tray, tray_cnt,
-						inVis, resVis, buf, ".png");
+						inVis, resVis, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			if (resFluo != null)
 				rb = saveImage(
 						tray, tray_cnt,
-						inFluo, resFluo, buf, ".png");
+						inFluo, resFluo, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			if (resNir != null)
 				rc = saveImage(
 						tray, tray_cnt,
-						inNir, resNir, buf, ".png");
+						inNir, resNir, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			if (resIr != null)
 				rd = saveImage(
 						tray, tray_cnt,
-						inIr, resIr, buf, ".png");
+						inIr, resIr, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			
 			if (ra != null) {
 				a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);

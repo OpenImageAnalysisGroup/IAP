@@ -28,7 +28,7 @@ public class FtpFileSystemAccess {
 		for (String str : url.list()) {
 			{
 				boolean containsImageExtension = false;
-				for (String ext : new String[] { ".png" })
+				for (String ext : new String[] { ".png", ".jpg" })
 					if (str.endsWith(ext)) {
 						containsImageExtension = true;
 						break;
