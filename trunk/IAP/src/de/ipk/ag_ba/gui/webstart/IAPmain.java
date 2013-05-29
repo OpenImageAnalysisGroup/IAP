@@ -103,6 +103,10 @@ public class IAPmain extends JApplet {
 		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
+		
+		SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+		SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
+		
 		JFrame jf = new JFrame(title);
 		IAPmain iap = new IAPmain();
 		jf.add("Center", iap.getContentPane());

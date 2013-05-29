@@ -329,4 +329,9 @@ public class Image {
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
 	
+	public MyByteArrayInputStream getAsJPGstream() throws IOException {
+		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
+		ImageIO.write(getAsBufferedImage(), "JPG", output);
+		return new MyByteArrayInputStream(output.getBuffTrimmed());
+	}
 }

@@ -122,7 +122,7 @@ public class IAPmail {
 														+ "__"
 														+ bm.getURL().getFileName());
 										int size = addImageOrWebCamScreenshotToMail(aBody, bm.getURL().toString(),
-												attachmentName, message, mp, "image/png", true);
+												attachmentName, message, mp, "image/jpeg", true);
 										int sizeKB = size / 1024;
 										latestNumericData
 												.append("Image of "
@@ -192,7 +192,7 @@ public class IAPmail {
 							double sc1 = 640d / img.getWidth();
 							double sc2 = 480d / img.getHeight();
 							double sc = Math.min(sc1, sc2);
-							is = img.io().resize(sc, sc).getImage().getAsPNGstream();
+							is = img.io().resize(sc, sc).getImage().getAsJPGstream();
 						}
 					}
 				} catch (Exception e) {
@@ -259,7 +259,7 @@ public class IAPmail {
 			
 			@Override
 			public String getContentType() {
-				return "image/png";
+				return "image/jpeg";
 			}
 		}));
 		img.setFileName(screenshot.getScreenshotFileName());
