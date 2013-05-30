@@ -6,11 +6,14 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.FluoAnalysis;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk.ag_ba.image.structures.CameraType;
 
+/**
+ * @author Christian Klukas
+ */
 public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
@@ -46,9 +49,10 @@ public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
 			// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		}
 		
-		if (!getBoolean("show conversion", false)) {
-			r = io.copy().applyMask(r, options.getBackground()).getImage();
-		}
+		// the proper 3 channel image is required by BlIntensityAnalysis
+		// if (!getBoolean("show conversion", false)) {
+		// r = io.copy().applyMask(r, options.getBackground()).getImage();
+		// }
 		
 		return r;
 	}
