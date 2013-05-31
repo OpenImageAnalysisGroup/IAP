@@ -277,35 +277,39 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private int modifyConcurrencyDependingOnMemoryStatus(int nn) {
-		if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
-			System.out
-					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
-			nn = 1;
-		}
-		if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
-			System.out
-					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 1");
-			nn = 1;
-		}
-		if (SystemAnalysis.getMemoryMB() < 4000 && nn > 2) {
-			System.out
-					.println(SystemAnalysis.getCurrentTime()
-							+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 2");
-			nn = 2;
-		}
+		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
 		
-		if (nn > 1
-				&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-						.getMemoryMB() * 0.7d) {
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">HIGH MEMORY UTILIZATION, REDUCING CONCURRENCY");
-			nn = nn / 2;
-			if (nn < 1)
+		if (SystemOptions.getInstance().getBoolean("SYSTEM", "Reduce Workload in Low Memory Situation", false)) {
+			if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
+				System.out
+						.println(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
 				nn = 1;
+			}
+			if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
+				System.out
+						.println(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 1");
+				nn = 1;
+			}
+			if (SystemAnalysis.getMemoryMB() < 4000 && nn > 2) {
+				System.out
+						.println(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 2");
+				nn = 2;
+			}
+			
+			if (nn > 1
+					&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+							.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
+				System.out.println(SystemAnalysis.getCurrentTime()
+						+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+						+ "%), REDUCING CONCURRENCY");
+				nn = nn / 2;
+				if (nn < 1)
+					nn = 1;
+			}
 		}
-		
 		System.out
 				.println(SystemAnalysis.getCurrentTime()
 						+ ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
@@ -314,24 +318,28 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void startThread(Thread t) {
+		SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60);
+		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
 		t.setPriority(Thread.MIN_PRIORITY);
 		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * 0.6 && SystemAnalysis.getMemoryMB() > 4000
-				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", true)) {
+				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
+				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
 			System.out.println();
 			System.out
 					.print(SystemAnalysis.getCurrentTime()
-							+ ">HIGH MEMORY UTILIZATION (>60%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
+							+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
+							+ "%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
 							+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
 			System.gc();
 			System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
 					.getMemoryMB() + " MB)");
 		}
 		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * 0.6) {
+				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
 			System.out.println();
 			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">HIGH MEMORY UTILIZATION (>60%), REDUCING CONCURRENCY (THREAD.RUN)");
+					+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+					+ "%), REDUCING CONCURRENCY (THREAD.RUN)");
 			t.run();
 		} else {
 			t.start();
