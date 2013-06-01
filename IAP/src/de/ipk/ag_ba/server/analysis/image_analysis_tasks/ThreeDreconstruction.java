@@ -240,7 +240,7 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 								limg = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, limg, false, false);
 								
 								if (limg == null) {
-									ErrorMsg.addErrorMessage("Could not store processed input image in database target.");
+									// ErrorMsg.addErrorMessage("Could not store processed input image in database target.");
 								} else {
 									output.add(new ImageData(limg.getParentSample(), limg));
 									// if (getIsTopFromFileName(ffn)) {
@@ -277,13 +277,13 @@ public class ThreeDreconstruction implements ImageAnalysisTask {
 			switch (mgm) {
 				case SPACE_CARVING:
 					mg.calculateModel(status, modeOfOperation, 0, false);
-					return;
+					break;
 				case MOTION_SCAN:
 					mg.calculateModelMotionScan(status);
-					return;
+					break;
 				case DEPTH_SCAN:
 					mg.calculateModel(status, modeOfOperation, 0, true);
-					return;
+					break;
 			}
 			
 			volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResult());

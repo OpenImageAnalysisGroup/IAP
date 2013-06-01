@@ -6,13 +6,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.ErrorMsg;
+import org.IniIoProvider;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -24,6 +27,7 @@ import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.ThreeDreconstruction;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.VolumeStatistics;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -56,12 +60,26 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 	private int voxelresolution = 500;
 	private int widthFactor = 40;
 	
-	public ActionThreeDreconstruction(MongoDB m, ExperimentReference experiment) {
+	private boolean saveVolume = false;
+	private final IniIoProvider ioStringProvider;
+	
+	public ActionThreeDreconstruction(IniIoProvider ioStringProvider, ExperimentReference experiment) {
 		super("Create 3-D Volumes using Space Carving Technology");
-		this.m = m;
+		this.ioStringProvider = ioStringProvider;
 		this.experiment = experiment;
+		this.m = experiment.m;
 	}
 	
+	@Override
+	public String getDefaultTitle() {
+		return "3D-Reconstruction";
+	}
+
+	@Override
+	public String getDefaultImage() {
+		return "img/RotationReconstruction.png";
+	}
+
 	@Override
 	public void performActionCalculateResults(final NavigationButton src) {
 		if (storedActions.size() > 0)
@@ -70,11 +88,13 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 		this.src = src;
 		
 		Object[] inp = MyInputHelper.getInput("Please specify the cube resolution:", "3-D Reconstruction", new Object[] {
-				"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor });
+				"Resolution (X=Y=Z)", voxelresolution, "Trim Width? (0..100)", widthFactor ,
+				"Save Volume in MongoDB", saveVolume});
 		if (inp == null)
 			return;
 		voxelresolution = (Integer) inp[0];
 		widthFactor = (Integer) inp[1];
+		saveVolume = (Boolean) inp[2];
 		ArrayList<Sample3D> workset = new ArrayList<Sample3D>();
 		try {
 			ExperimentInterface res = experiment.getData().clone();
@@ -96,7 +116,8 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 			
 			VolumeStatistics volumeStatistics = new VolumeStatistics();
 			
-			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(true, m, m.getColls());
+			DatabaseTarget saveVolumesToDB = new DataBaseTargetMongoDB(saveVolume, m, m.getColls());
+			
 			
 			ThreeDreconstruction threeDreconstructionTask = new ThreeDreconstruction(saveVolumesToDB);
 			threeDreconstructionTask.setInput(
@@ -171,15 +192,5 @@ public class ActionThreeDreconstruction extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return mpc;
-	}
-	
-	public static NavigationButton getThreeDreconstructionTaskEntity(MongoDB m,
-			final ExperimentReference experiment, String title, final double epsilon, final double epsilon2,
-			GUIsetting guiSetting) {
-		
-		NavigationAction threeDreconstructionAction = new ActionThreeDreconstruction(m, experiment);
-		NavigationButton resultTaskButton = new NavigationButton(threeDreconstructionAction, title,
-				"img/RotationReconstruction.png", guiSetting);
-		return resultTaskButton;
 	}
 }

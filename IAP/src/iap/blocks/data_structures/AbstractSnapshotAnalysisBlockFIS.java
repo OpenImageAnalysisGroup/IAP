@@ -40,6 +40,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setVis(processVISimage());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process VIS image - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process VIS image");
 						}
@@ -50,8 +53,11 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setFluo(processFLUOimage());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process FLUO image - out of memory");
 						} catch (Exception e) {
-							reportError(e, "could not process FLU image");
+							reportError(e, "could not process FLUO image");
 						}
 					}
 				}, name + " process FLU image", parentPriority + 1, parentPriority, false),
@@ -60,6 +66,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setNir(processNIRimage());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process NIR image - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process NIR image");
 						}
@@ -70,6 +79,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedImages.setIr(processIRimage());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process IR image - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process IR image");
 						}
@@ -80,6 +92,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setVis(processVISmask());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process VIS mask - out of memory");
 						} catch (Exception e) {
 							e.printStackTrace();
 							reportError(e, "could not process VIS mask");
@@ -91,6 +106,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setFluo(processFLUOmask());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process FLUO mask - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process FLUO mask");
 						}
@@ -101,6 +119,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setNir(processNIRmask());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process NIR mask - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process NIR mask");
 						}
@@ -112,6 +133,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 					public void run() {
 						try {
 							processedMasks.setIr(processIRmask());
+						} catch (OutOfMemoryError er) {
+							er.printStackTrace();
+							reportError(er, "could not process IR mask - out of memory");
 						} catch (Exception e) {
 							reportError(e, "could not process IR mask");
 						}
