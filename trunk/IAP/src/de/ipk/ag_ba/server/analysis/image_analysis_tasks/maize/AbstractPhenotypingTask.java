@@ -939,20 +939,24 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						inIr, resIr, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			
 			if (ra != null) {
-				a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
-				waitThreads.add(a);
+				ra.run();
+				// a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
+				// waitThreads.add(a);
 			}
 			if (rb != null) {
-				b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
-				waitThreads.add(b);
+				rb.run();
+				// b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
+				// waitThreads.add(b);
 			}
 			if (rc != null) {
-				c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
-				waitThreads.add(c);
+				rc.run();
+				// c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
+				// waitThreads.add(c);
 			}
 			if (rd != null) {
-				d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
-				waitThreads.add(d);
+				rd.run();
+				// d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
+				// waitThreads.add(d);
 			}
 		}
 		return waitThreads;
