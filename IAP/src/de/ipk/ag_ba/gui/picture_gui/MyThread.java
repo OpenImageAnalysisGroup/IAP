@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 
+import org.ErrorMsg;
+
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -48,8 +50,9 @@ public class MyThread extends Thread implements Runnable {
 				runCode.run();
 			} catch (Error err1) {
 				err1.printStackTrace();
+				ErrorMsg.addErrorMessage(err1.getMessage());
 			} catch (Exception err2) {
-				err2.printStackTrace();
+				ErrorMsg.addErrorMessage(err2);
 			}
 		} finally {
 			finished = true;
