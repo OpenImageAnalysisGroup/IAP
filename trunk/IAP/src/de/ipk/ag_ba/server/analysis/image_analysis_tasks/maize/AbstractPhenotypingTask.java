@@ -420,7 +420,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										}
 									}
 								} catch (Exception e) {
-									e.printStackTrace();
+									ErrorMsg.addErrorMessage(e);
 								}
 							} finally {
 								innerLoopSemaphore.release();

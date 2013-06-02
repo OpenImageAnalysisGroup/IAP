@@ -236,7 +236,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					statisticsResult.getHeader().setOriginDbId(dbID);
 					statisticsResult.setHeader(statisticsResult.getHeader());
 					
-					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experimentToBeAnalysed.getHeader().getDatabaseId());
+					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experiment.getHeader().getDatabaseId());
 					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
 						ActionDataExportToVfs ac = new ActionDataExportToVfs(m, new ExperimentReference(statisticsResult), vfs);
 						ac.setSkipClone(true);
