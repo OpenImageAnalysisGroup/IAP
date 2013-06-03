@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
  */
-public class BlRemoveSmallClustersFromVisFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	public static boolean ngUse = true;
 	
 	private boolean debug = false;

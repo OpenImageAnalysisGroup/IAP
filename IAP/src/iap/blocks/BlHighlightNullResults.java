@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
-public class BlReplaceEmptyOriginalImages extends AbstractBlock {
+public class BlHighlightNullResults extends AbstractBlock {
 	
 	private static final int sz = 128 - 5;
 	

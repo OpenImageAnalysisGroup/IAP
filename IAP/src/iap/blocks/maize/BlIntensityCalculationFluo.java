@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 /**
  * @author Christian Klukas
  */
-public class BlIntensityConversion extends AbstractSnapshotAnalysisBlockFIS {
+public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected synchronized Image processFLUOmask() {

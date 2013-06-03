@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author pape, klukas
  */
-public class BlCalcNirSkeleton extends AbstractSnapshotAnalysisBlockFIS {
+public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processNIRmask() {

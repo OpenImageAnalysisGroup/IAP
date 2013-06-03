@@ -24,7 +24,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * @author klukas, pape
  *         status: ok, 23.11.2011, c. klukas
  */
-public class BlCalcIntensity extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private boolean debug = false;
 	private boolean debugRegionParts = false;

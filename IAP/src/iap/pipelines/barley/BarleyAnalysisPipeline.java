@@ -1,35 +1,35 @@
 package iap.pipelines.barley;
 
-import iap.blocks.BlBalanceFluo;
-import iap.blocks.BlCalcNirSkeleton;
-import iap.blocks.BlColorBalancing;
+import iap.blocks.BlColorBalanceFluo;
+import iap.blocks.BlSkeletonizeNir;
+import iap.blocks.BlColorBalanceVis;
 import iap.blocks.BlColorBalancingRoundCamera;
 import iap.blocks.BlCopyImagesApplyMask;
 import iap.blocks.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.BlCrop;
 import iap.blocks.BlLabFilterExt;
-import iap.blocks.BlLoadImagesIfNeeded_images_masks;
-import iap.blocks.BlMedianFilterFluo;
+import iap.blocks.BlLoadImages;
+import iap.blocks.BlMedianFilter;
 import iap.blocks.BlMoveMasksToImageSet;
-import iap.blocks.BlNirFilterSide_nir;
-import iap.blocks.BlRemoveSmallClustersFromVisFluo;
-import iap.blocks.BlReplaceEmptyOriginalImages;
+import iap.blocks.BlAdaptiveThresholdNir;
+import iap.blocks.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.BlHighlightNullResults;
 import iap.blocks.BlUseFluoMaskToClearOtherImages;
 import iap.blocks.BlockClearNirPotFromNir;
-import iap.blocks.BlockClosingVis;
+import iap.blocks.BlClosing;
 import iap.blocks.BlockCutFromSide;
-import iap.blocks.BlockSkeletonizeVisOrFluo;
-import iap.blocks.arabidopsis.BlCutZoomedImages;
+import iap.blocks.BlSkeletonizeVisFluo;
+import iap.blocks.arabidopsis.BlAlign;
 import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.curling.BlLeafCurlingAnalysis;
-import iap.blocks.hull.BlConvexHull;
-import iap.blocks.maize.BlCalcIntensity;
+import iap.blocks.hull.BlCalcConvexHull;
+import iap.blocks.maize.BlCalcColorHistograms;
 import iap.blocks.maize.BlCalcMainAxis;
 import iap.blocks.maize.BlCalcWidthAndHeight;
-import iap.blocks.maize.BlClearBackgroundByRefComparison_vis_fluo_nir;
-import iap.blocks.maize.BlFindBlueMarkers;
-import iap.blocks.maize.BlIntensityConversion;
-import iap.blocks.maize.BlockColorBalancingVertical;
+import iap.blocks.maize.BlRemoveBackground;
+import iap.blocks.maize.BlDetectBlueMarkers;
+import iap.blocks.maize.BlIntensityCalculationFluo;
+import iap.blocks.maize.BlColorBalanceNir;
 import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
@@ -59,42 +59,42 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		String[] defaultBlockList = new String[] {
-				BlLoadImagesIfNeeded_images_masks.class.getCanonicalName(),
-				BlCutZoomedImages.class.getCanonicalName(),
-				BlBalanceFluo.class.getCanonicalName(),
+				BlLoadImages.class.getCanonicalName(),
+				BlAlign.class.getCanonicalName(),
+				BlColorBalanceFluo.class.getCanonicalName(),
 				BlCreateDummyReferenceIfNeeded.class.getCanonicalName(),
-				BlColorBalancing.class.getCanonicalName(),
-				BlockColorBalancingVertical.class.getCanonicalName(),
+				BlColorBalanceVis.class.getCanonicalName(),
+				BlColorBalanceNir.class.getCanonicalName(),
 				BlColorBalancingRoundCamera.class.getCanonicalName(),
-				BlockColorBalancingVertical.class.getCanonicalName(),
-				BlClearBackgroundByRefComparison_vis_fluo_nir.class.getCanonicalName(),
-				BlFindBlueMarkers.class.getCanonicalName(),
+				BlColorBalanceNir.class.getCanonicalName(),
+				BlRemoveBackground.class.getCanonicalName(),
+				BlDetectBlueMarkers.class.getCanonicalName(),
 				// BlBalanceFluo.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
 				BlLabFilterExt.class.getCanonicalName(),
-				BlockClosingVis.class.getCanonicalName(),
+				BlClosing.class.getCanonicalName(),
 				BlIRdiff.class.getCanonicalName(),
-				BlIntensityConversion.class.getCanonicalName(),
+				BlIntensityCalculationFluo.class.getCanonicalName(),
 				BlockClearNirPotFromNir.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
-				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlRemoveSmallObjectsVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
-				BlNirFilterSide_nir.class.getCanonicalName(),
-				BlCalcNirSkeleton.class.getCanonicalName(),
+				BlAdaptiveThresholdNir.class.getCanonicalName(),
+				BlSkeletonizeNir.class.getCanonicalName(),
 				BlCopyImagesApplyMask.class.getCanonicalName(),
 
-				BlockSkeletonizeVisOrFluo.class.getCanonicalName(),
+				BlSkeletonizeVisFluo.class.getCanonicalName(),
 
 				// calculation of numeric values
 				BlLeafCurlingAnalysis.class.getCanonicalName(),
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
-				BlCalcIntensity.class.getCanonicalName(),
-				BlConvexHull.class.getCanonicalName(),
+				BlCalcColorHistograms.class.getCanonicalName(),
+				BlCalcConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 
@@ -102,7 +102,7 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
-				BlReplaceEmptyOriginalImages.class.getCanonicalName()
+				BlHighlightNullResults.class.getCanonicalName()
 		};
 		modifySettings(options);
 		return getPipelineFromBlockList(so, defaultBlockList);

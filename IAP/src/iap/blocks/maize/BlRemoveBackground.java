@@ -20,7 +20,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author pape, klukas, entzian
  */
-public class BlClearBackgroundByRefComparison_vis_fluo_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRemoveBackground extends AbstractSnapshotAnalysisBlockFIS {
 	
 	int back;
 	boolean debug;

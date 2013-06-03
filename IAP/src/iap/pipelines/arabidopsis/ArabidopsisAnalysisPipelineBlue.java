@@ -1,16 +1,16 @@
 package iap.pipelines.arabidopsis;
 
-import iap.blocks.BlBalanceFluo;
-import iap.blocks.BlColorBalancing;
+import iap.blocks.BlColorBalanceFluo;
+import iap.blocks.BlColorBalanceVis;
 import iap.blocks.BlCrop;
-import iap.blocks.BlLabFilter;
-import iap.blocks.BlMedianFilterFluo;
+import iap.blocks.BlLabFilterDepr;
+import iap.blocks.BlMedianFilter;
 import iap.blocks.BlMoveImagesToMasks;
 import iap.blocks.BlMoveMasksToImageSet;
-import iap.blocks.BlRemoveSmallClustersFromVisFluo;
-import iap.blocks.BlReplaceEmptyOriginalImages;
+import iap.blocks.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.BlHighlightNullResults;
 import iap.blocks.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
-import iap.blocks.arabidopsis.BlCutZoomedImages;
+import iap.blocks.arabidopsis.BlAlign;
 import iap.blocks.arabidopsis.BlIRdiff;
 import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
 import iap.blocks.arabidopsis.BlRotate;
@@ -18,10 +18,10 @@ import iap.blocks.arabidopsis.BlUseFluoMaskToClearIr;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClearNir_Arabidopsis;
 import iap.blocks.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
 import iap.blocks.arabidopsis.BlockSkeletonize_Arabidopsis;
-import iap.blocks.hull.BlConvexHull;
-import iap.blocks.maize.BlCalcIntensity;
+import iap.blocks.hull.BlCalcConvexHull;
+import iap.blocks.maize.BlCalcColorHistograms;
 import iap.blocks.maize.BlCalcWidthAndHeight;
-import iap.blocks.maize.BlIntensityConversion;
+import iap.blocks.maize.BlIntensityCalculationFluo;
 import iap.blocks.maize.BlockDrawSkeleton;
 import iap.blocks.post_process.BlockRunPostProcessors;
 import iap.pipelines.AbstractImageProcessor;
@@ -54,30 +54,30 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 		modifySettings(options);
 		String[] defaultBlockList = new String[] {
 				BlLoadImagesIfNeeded.class.getCanonicalName(),
-				BlBalanceFluo.class.getCanonicalName(),
-				BlColorBalancing.class.getCanonicalName(),
+				BlColorBalanceFluo.class.getCanonicalName(),
+				BlColorBalanceVis.class.getCanonicalName(),
 				BlRotate.class.getCanonicalName(),
-				BlCutZoomedImages.class.getCanonicalName(),
+				BlAlign.class.getCanonicalName(),
 				BlClearMasks_Arabidopsis_PotAndTrayProcessing.class.getCanonicalName(),
 				BlMoveImagesToMasks.class.getCanonicalName(),
-				BlLabFilter.class.getCanonicalName(),
-				BlIntensityConversion.class.getCanonicalName(),
-				BlMedianFilterFluo.class.getCanonicalName(),
-				BlRemoveSmallClustersFromVisFluo.class.getCanonicalName(),
+				BlLabFilterDepr.class.getCanonicalName(),
+				BlIntensityCalculationFluo.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlRemoveSmallObjectsVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClear_Arabidopsis_vis.class.getCanonicalName(),
 				BlUseFluoMaskToClearNir_Arabidopsis.class.getCanonicalName(),
 				BlIRdiff.class.getCanonicalName(),
 				BlUseFluoMaskToClearIr.class.getCanonicalName(),
 				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
 				BlCalcWidthAndHeight.class.getCanonicalName(),
-				BlCalcIntensity.class.getCanonicalName(),
-				BlConvexHull.class.getCanonicalName(),
+				BlCalcColorHistograms.class.getCanonicalName(),
+				BlCalcConvexHull.class.getCanonicalName(),
 				// postprocessing
 				BlockRunPostProcessors.class.getCanonicalName(),
 				BlockDrawSkeleton.class.getCanonicalName(),
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
-				BlReplaceEmptyOriginalImages.class.getCanonicalName()
+				BlHighlightNullResults.class.getCanonicalName()
 		};
 		
 		modifySettings(options);

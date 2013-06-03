@@ -3,32 +3,32 @@
  */
 package iap.blocks;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractBlock;
 
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Remove "peper and salt" noise from Fluo mask.
  * 
  * @author Pape, Klukas
  */
-public class BlMedianFilterFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlMedianFilterFluo extends AbstractBlock {
 	
 	@Override
-	protected Image processFLUOmask() {
-		if (input().masks().fluo() == null)
-			return null;
+	protected Image processMask(Image mask) {
+		if (mask == null || mask.getCameraType() != CameraType.FLUO)
+			return mask;
 		
-		Image medianMask = new ImageOperation(input().masks().fluo())
+		Image medianMask = new ImageOperation(mask)
 				.medianFilter32Bit()
-				.border(getInt("Median-fluo-border", 2))
+				.border(2)
 				.getImage();
 		
-		return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
+		return new ImageOperation(mask).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
 	}
 	
 	@Override

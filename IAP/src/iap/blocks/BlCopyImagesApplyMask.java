@@ -5,8 +5,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Resize masks images to largest width and height.
@@ -19,7 +19,6 @@ public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlockFIS {
 	protected Image processVISmask() {
 		Image visMask = input().masks().vis();
 		if (visMask != null) {
-			visMask = new ImageOperation(visMask).medianFilter32Bit().border(2).getImage();
 			return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(visMask, options.getBackground()).getImage();
 		} else
 			return null;

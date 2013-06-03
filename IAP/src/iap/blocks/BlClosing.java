@@ -2,62 +2,83 @@ package iap.blocks;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
+import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 
-/**
- * @author Entzian
- *         process the morphological method closing
- */
 public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {
-		if (input().masks().vis() == null)
-			return null;
-		
-		Image mask = input().masks().vis();
-		
-		int n = getInt("Closing-Cnt vis", 3);
-		if (!getBoolean("process VIS", false)) {
-			return mask;
-		}
-		
-		return closing(mask, n);
+		return closing(input().masks().vis(), input().images().vis(), getInt("VIS-count", 3));
 	}
 	
 	@Override
 	protected Image processFLUOmask() {
-		if (input().masks().fluo() == null)
-			return null;
-		
-		Image mask = input().masks().fluo();
-		
-		if (!getBoolean("process FLUO", false)) {
-			return mask;
-		}
-		
-		int n = getInt("Closing-Cnt fluo", 3);
-		return closing(mask, n);
+		return closing(input().masks().fluo(), input().images().fluo(), getInt("FLUO-count", 0));
 	}
 	
-	private static Image closing(Image mask, int closingRepeat) {
-		ImageOperation op = new ImageOperation(mask);
-		for (int ii = 0; ii < closingRepeat; ii++) {
+	@Override
+	protected Image processNIRmask() {
+		return closing(input().masks().nir(), input().images().nir(), getInt("NIR-count", 0));
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		return closing(input().masks().ir(), input().images().ir(), getInt("IR-count", 0));
+	}
+	
+	private Image closing(Image mask, Image image, int n) {
+		if(mask == null || image == null || n == 0) {
+			return mask;
+		}
+		return closing(mask, image, options.getBackground(), n);
+	}
+	
+	private static Image closing(Image flMask, Image flImage, int iBackgroundFill, int closingRepeat) {
+		int[] rgbArray = flMask.getAs1A();
+		int h = flMask.getHeight();
+		int w = flMask.getWidth();
+		
+		int hImage = flImage.getHeight();
+		int wImage = flImage.getWidth();
+		
+		if (hImage != h)
+			flImage.resize(w, h);
+		if (wImage != w)
+			flImage.resize(w, h);
+		
+		// int[] rgbNonModifiedArray = flImage.getAs1A();
+		int white = new Color(255, 255, 255).getRGB();
+		int[][] image = new int[w][h];
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				int off = x + y * w;
+				int color = rgbArray[off];
+				if (color != iBackgroundFill) {
+					image[x][y] = 0;
+				} else {
+					image[x][y] = white;
+				}
+			}
+		}
+		int cnt = 0;
+		ImageOperation op = new ImageOperation(image);
+		while (cnt < closingRepeat) {
 			op.closing();
+			cnt++;
 		}
 		
-		return op.getImage();
+		return flImage.io().and(op.getImage()).getImage();
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
-		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -65,7 +86,6 @@ public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 	public HashSet<CameraType> getCameraOutputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
-		res.add(CameraType.FLUO);
 		return res;
 	}
 }

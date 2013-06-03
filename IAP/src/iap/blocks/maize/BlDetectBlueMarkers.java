@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 /**
  * @author pape, klukas
  */
-public class BlFindBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
+public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
 	ArrayList<MarkerPair> numericResult;
