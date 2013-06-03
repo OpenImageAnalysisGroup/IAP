@@ -1,8 +1,8 @@
 package iap.pipelines.roots;
 
 import iap.blocks.BlMoveImagesToMasks;
-import iap.blocks.BlMoveMasksToImageSet;
 import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
+import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.roots.BlRootsAddBorderAroundImage;
 import iap.blocks.roots.BlRootsRemoveBoxAndNoise;
 import iap.blocks.roots.BlRootsSharpenImage;
