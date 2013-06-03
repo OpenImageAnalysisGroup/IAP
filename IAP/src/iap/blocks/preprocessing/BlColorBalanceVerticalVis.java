@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author pape, klukas
  */
-public class BlColorBalanceVis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
 	

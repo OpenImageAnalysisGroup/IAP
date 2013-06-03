@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 /**
  * @author klukas
  */
-public class BlColorBalancingRoundCamera extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private boolean debug = false;
 	private double whiteLevel_180d_NIR, whiteLevel_255d_VIS;

@@ -8,7 +8,7 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 
-public class BlockDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
+public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {

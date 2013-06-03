@@ -9,12 +9,12 @@ import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
-import iap.blocks.postprocessing.BlockDrawSkeleton;
-import iap.blocks.postprocessing.BlockRunPostProcessors;
+import iap.blocks.postprocessing.BlDrawSkeleton;
+import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
-import iap.blocks.preprocessing.BlColorBalanceFluo;
-import iap.blocks.preprocessing.BlColorBalanceNir;
-import iap.blocks.preprocessing.BlColorBalanceVis;
+import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
+import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
+import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlockCutFromSide;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
@@ -22,7 +22,7 @@ import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
-import iap.blocks.unused.BlColorBalancingRoundCamera;
+import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import iap.blocks.unused.BlCopyImagesApplyMask;
 import iap.blocks.unused.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.unused.BlCrop;
@@ -61,12 +61,12 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 		String[] defaultBlockList = new String[] {
 				BlLoadImages.class.getCanonicalName(),
 				BlAlign.class.getCanonicalName(),
-				BlColorBalanceFluo.class.getCanonicalName(),
+				BlColorBalanceVerticalFluo.class.getCanonicalName(),
 				BlCreateDummyReferenceIfNeeded.class.getCanonicalName(),
-				BlColorBalanceVis.class.getCanonicalName(),
-				BlColorBalanceNir.class.getCanonicalName(),
-				BlColorBalancingRoundCamera.class.getCanonicalName(),
-				BlColorBalanceNir.class.getCanonicalName(),
+				BlColorBalanceVerticalVis.class.getCanonicalName(),
+				BlColorBalanceVerticalNir.class.getCanonicalName(),
+				BlColorBalanceCircularVisNir.class.getCanonicalName(),
+				BlColorBalanceVerticalNir.class.getCanonicalName(),
 				BlRemoveBackground.class.getCanonicalName(),
 				BlDetectBlueMarkers.class.getCanonicalName(),
 				// BlBalanceFluo.class.getCanonicalName(),
@@ -96,9 +96,9 @@ public class BarleyAnalysisPipeline extends AbstractImageProcessor {
 				BlCalcColorHistograms.class.getCanonicalName(),
 				BlCalcConvexHull.class.getCanonicalName(),
 				// postprocessing
-				BlockRunPostProcessors.class.getCanonicalName(),
+				BlRunPostProcessors.class.getCanonicalName(),
 
-				BlockDrawSkeleton.class.getCanonicalName(),
+				BlDrawSkeleton.class.getCanonicalName(),
 
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),

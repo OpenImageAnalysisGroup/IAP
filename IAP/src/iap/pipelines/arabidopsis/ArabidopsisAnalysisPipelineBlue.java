@@ -5,11 +5,11 @@ import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
-import iap.blocks.postprocessing.BlockDrawSkeleton;
-import iap.blocks.postprocessing.BlockRunPostProcessors;
+import iap.blocks.postprocessing.BlDrawSkeleton;
+import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
-import iap.blocks.preprocessing.BlColorBalanceFluo;
-import iap.blocks.preprocessing.BlColorBalanceVis;
+import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
+import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
@@ -54,8 +54,8 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 		modifySettings(options);
 		String[] defaultBlockList = new String[] {
 				BlLoadImagesIfNeeded.class.getCanonicalName(),
-				BlColorBalanceFluo.class.getCanonicalName(),
-				BlColorBalanceVis.class.getCanonicalName(),
+				BlColorBalanceVerticalFluo.class.getCanonicalName(),
+				BlColorBalanceVerticalVis.class.getCanonicalName(),
 				BlRotate.class.getCanonicalName(),
 				BlAlign.class.getCanonicalName(),
 				BlClearMasks_Arabidopsis_PotAndTrayProcessing.class.getCanonicalName(),
@@ -73,8 +73,8 @@ public class ArabidopsisAnalysisPipelineBlue extends AbstractImageProcessor {
 				BlCalcColorHistograms.class.getCanonicalName(),
 				BlCalcConvexHull.class.getCanonicalName(),
 				// postprocessing
-				BlockRunPostProcessors.class.getCanonicalName(),
-				BlockDrawSkeleton.class.getCanonicalName(),
+				BlRunPostProcessors.class.getCanonicalName(),
+				BlDrawSkeleton.class.getCanonicalName(),
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlCrop.class.getCanonicalName(),
 				BlHighlightNullResults.class.getCanonicalName()
