@@ -1,16 +1,5 @@
 package iap.pipelines.arabidopsis;
 
-import iap.blocks.BlCrop;
-import iap.blocks.BlLabFilterDepr;
-import iap.blocks.BlMedianFilter;
-import iap.blocks.BlMoveImagesToMasks;
-import iap.blocks.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
-import iap.blocks.arabidopsis.BlIRdiff;
-import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
-import iap.blocks.arabidopsis.BlUseFluoMaskToClearIr;
-import iap.blocks.arabidopsis.BlUseFluoMaskToClearNir_Arabidopsis;
-import iap.blocks.arabidopsis.BlUseFluoMaskToClear_Arabidopsis_vis;
-import iap.blocks.arabidopsis.BlockSkeletonize_Arabidopsis;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -24,6 +13,17 @@ import iap.blocks.preprocessing.BlColorBalanceVis;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.unused.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
+import iap.blocks.unused.BlCrop;
+import iap.blocks.unused.BlIRdiff;
+import iap.blocks.unused.BlLabFilterDepr;
+import iap.blocks.unused.BlLoadImagesIfNeeded;
+import iap.blocks.unused.BlMedianFilter;
+import iap.blocks.unused.BlMoveImagesToMasks;
+import iap.blocks.unused.BlUseFluoMaskToClearIr;
+import iap.blocks.unused.BlUseFluoMaskToClearNir_Arabidopsis;
+import iap.blocks.unused.BlUseFluoMaskToClear_Arabidopsis_vis;
+import iap.blocks.unused.BlockSkeletonize_Arabidopsis;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 
