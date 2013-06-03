@@ -1,16 +1,6 @@
 package iap.pipelines.barley;
 
-import iap.blocks.BlColorBalancingRoundCamera;
-import iap.blocks.BlCopyImagesApplyMask;
-import iap.blocks.BlCreateDummyReferenceIfNeeded;
-import iap.blocks.BlCrop;
-import iap.blocks.BlLabFilterExt;
-import iap.blocks.BlMedianFilter;
-import iap.blocks.BlUseFluoMaskToClearOtherImages;
-import iap.blocks.BlockClearNirPotFromNir;
 import iap.blocks.acquisition.BlLoadImages;
-import iap.blocks.arabidopsis.BlIRdiff;
-import iap.blocks.curling.BlLeafCurlingAnalysis;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
@@ -32,6 +22,16 @@ import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.unused.BlColorBalancingRoundCamera;
+import iap.blocks.unused.BlCopyImagesApplyMask;
+import iap.blocks.unused.BlCreateDummyReferenceIfNeeded;
+import iap.blocks.unused.BlCrop;
+import iap.blocks.unused.BlIRdiff;
+import iap.blocks.unused.BlLabFilterExt;
+import iap.blocks.unused.BlLeafCurlingAnalysis;
+import iap.blocks.unused.BlMedianFilter;
+import iap.blocks.unused.BlUseFluoMaskToClearOtherImages;
+import iap.blocks.unused.BlockClearNirPotFromNir;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 

@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import iap.blocks.arabidopsis.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.unused.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;

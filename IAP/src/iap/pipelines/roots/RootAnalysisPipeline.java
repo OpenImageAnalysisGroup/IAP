@@ -1,12 +1,12 @@
 package iap.pipelines.roots;
 
-import iap.blocks.BlMoveImagesToMasks;
-import iap.blocks.arabidopsis.BlLoadImagesIfNeeded;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
-import iap.blocks.roots.BlRootsAddBorderAroundImage;
-import iap.blocks.roots.BlRootsRemoveBoxAndNoise;
-import iap.blocks.roots.BlRootsSharpenImage;
-import iap.blocks.roots.BlRootsSkeletonize;
+import iap.blocks.unused.BlLoadImagesIfNeeded;
+import iap.blocks.unused.BlMoveImagesToMasks;
+import iap.blocks.unused.BlRootsAddBorderAroundImage;
+import iap.blocks.unused.BlRootsRemoveBoxAndNoise;
+import iap.blocks.unused.BlRootsSharpenImage;
+import iap.blocks.unused.BlRootsSkeletonize;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 
