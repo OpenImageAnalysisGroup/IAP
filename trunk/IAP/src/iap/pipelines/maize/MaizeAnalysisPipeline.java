@@ -7,14 +7,14 @@ import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
+import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
-import iap.blocks.postprocessing.BlockDrawSkeleton;
-import iap.blocks.postprocessing.BlockRunPostProcessors;
+import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
-import iap.blocks.preprocessing.BlColorBalanceFluo;
-import iap.blocks.preprocessing.BlColorBalanceNir;
-import iap.blocks.preprocessing.BlColorBalanceVis;
+import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
+import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
+import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.preprocessing.BlockCutFromSide;
@@ -26,6 +26,7 @@ import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
+import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 
@@ -58,11 +59,11 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				// preprocessing
 				BlRotate.class.getCanonicalName(),
 				BlAlign.class.getCanonicalName(),
-				BlColorBalanceVis.class.getCanonicalName(),
+				BlColorBalanceVerticalVis.class.getCanonicalName(),
+				BlColorBalanceVerticalFluo.class.getCanonicalName(),
+				BlColorBalanceVerticalNir.class.getCanonicalName(),
+				BlColorBalanceCircularVisNir.class.getCanonicalName(),
 				BlDetectBlueMarkers.class.getCanonicalName(),
-				BlColorBalanceFluo.class.getCanonicalName(),
-				BlColorBalanceNir.class.getCanonicalName(),
-				BlColorBalanceFluo.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
 				
 				// segmentation
@@ -84,8 +85,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlCalcConvexHull.class.getCanonicalName(),
 				
 				// postprocessing
-				BlockRunPostProcessors.class.getCanonicalName(),
-				BlockDrawSkeleton.class.getCanonicalName(),
+				BlRunPostProcessors.class.getCanonicalName(),
+				BlDrawSkeleton.class.getCanonicalName(),
 				BlMoveMasksToImageSet.class.getCanonicalName(),
 				BlHighlightNullResults.class.getCanonicalName()
 		};

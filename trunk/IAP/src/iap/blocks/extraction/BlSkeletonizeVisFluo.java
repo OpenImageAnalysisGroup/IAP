@@ -1,7 +1,7 @@
 package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
-import iap.blocks.postprocessing.BlockDrawSkeleton;
+import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -110,7 +110,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null) {
-						boolean drawSkeleton = getBoolean(new BlockDrawSkeleton(), "draw_skeleton", true);
+						boolean drawSkeleton = getBoolean(new BlDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
 							getProperties().setImage("skeleton_fluo", sk);

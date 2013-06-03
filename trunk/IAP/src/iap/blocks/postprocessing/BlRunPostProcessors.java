@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
-public class BlockRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {
