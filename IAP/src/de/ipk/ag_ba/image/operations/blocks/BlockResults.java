@@ -170,6 +170,8 @@ public class BlockResults implements BlockResultSet {
 	public synchronized ArrayList<BlockPropertyValue> getPropertiesExactMatch(
 			String match) {
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		if (match == null || match.isEmpty())
+			return result;
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 		if (sv != null)
 			for (TreeMap<String, Double> tm : sv) {
