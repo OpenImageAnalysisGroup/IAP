@@ -18,6 +18,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author Klukas, entzian
  */
+@Deprecated
 public class BlLabFilterExt extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;

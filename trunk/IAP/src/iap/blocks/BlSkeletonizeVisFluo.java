@@ -33,7 +33,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author pape, klukas
  */
-public class BlockSkeletonizeVisOrFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
 	private boolean debug = false;
 	private boolean debug2 = false;

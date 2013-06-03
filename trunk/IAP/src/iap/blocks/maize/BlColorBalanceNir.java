@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 
-public class BlockColorBalancingVertical extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalanceNir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
 	

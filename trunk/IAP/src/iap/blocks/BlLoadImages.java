@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * @author entzian, klukas
  */
 
-public class BlLoadImagesIfNeeded_images_masks extends AbstractSnapshotAnalysisBlockFIS {
+public class BlLoadImages extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected boolean isChangingImages() {

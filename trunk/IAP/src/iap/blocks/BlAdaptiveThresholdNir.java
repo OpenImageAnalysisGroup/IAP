@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author pape, klukas
  */
-public class BlNirFilterSide_nir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processNIRmask() {

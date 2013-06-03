@@ -3,7 +3,7 @@ package iap.blocks.maize;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 
-public class BlockRemoveVerticalAndHorizontalStructures_vis extends BlockRemoveVerticalAndHorizontalStructuresFromVisFluo {
+public class BlockRemoveVerticalAndHorizontalStructures_vis extends BlockRemoveCameraLineArtifacts {
 	
 	@Override
 	protected Image processMask(Image mask) {

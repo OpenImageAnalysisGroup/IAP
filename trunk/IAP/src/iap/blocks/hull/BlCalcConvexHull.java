@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlConvexHull extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcConvexHull extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {

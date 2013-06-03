@@ -9,7 +9,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
 
-public class BlockRemoveSmallStructuresUsingOpeningFromTopVis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlOpeningTopVis extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {

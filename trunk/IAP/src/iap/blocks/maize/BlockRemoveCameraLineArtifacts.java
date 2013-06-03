@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 /**
  * @author Christian Klukas
  */
-public class BlockRemoveVerticalAndHorizontalStructuresFromVisFluo extends AbstractBlock {
+public class BlockRemoveCameraLineArtifacts extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {

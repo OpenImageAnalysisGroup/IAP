@@ -1,7 +1,7 @@
 package iap.pipelines.maize;
 
 import iap.blocks.BlCrop;
-import iap.blocks.BlReplaceEmptyOriginalImages;
+import iap.blocks.BlHighlightNullResults;
 import iap.blocks.threeD.BlockThreeDgeneration;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
@@ -41,7 +41,7 @@ public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 		// if (options != null)
 		// options.clearAndAddBooleanSetting(Setting.DRAW_SKELETON, false);
 		p.remove(BlCrop.class);
-		p.remove(BlReplaceEmptyOriginalImages.class);
+		p.remove(BlHighlightNullResults.class);
 		p.add(BlockThreeDgeneration.class);
 		return p;
 	}

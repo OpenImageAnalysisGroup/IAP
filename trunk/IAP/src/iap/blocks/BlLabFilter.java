@@ -4,7 +4,6 @@
 package iap.blocks;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
@@ -14,17 +13,13 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
- * Uses a lab-based pixel filter for the vis images.
+ * Uses a lab-based pixel filter(s) for the vis/fluo images.
  * 
  * @author Klukas
  */
-@Deprecated
 public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	boolean debug;
-	int LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS;
-	int LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS;
-	int LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS;
 	
 	@Override
 	protected void prepare() {
@@ -34,65 +29,41 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	protected Image processVISmask() {
-		if (input().masks().vis() == null || input().images().vis() == null)
-			return null;
-		else {
-			ImageOperation visMask = input().masks().vis().io().copy();
-			ImageStack fis = debug ? new ImageStack() : null;
-			if (fis != null)
-				fis.addImage("start", visMask.getImage(), null);
-			
-			if (getBoolean("Filter by HSV Color Space", false)) {
-				visMask = visMask
-						.blur(getDouble("Blur", 1))
-						.filterRemoveHSV(
-								getDouble("HSV-max-disctance", (1 / 2d - 1 / 3d)),
-								getDouble("HSV-hue", (2 / 3d)),
-								getDouble("HSV-max-lightness", (200d / 255d))); // filter out blue
-				visMask = input().images().vis().io().copy().applyMask(
-						visMask.closing(
-								getInt("Closing-count-dilate", 2),
-								getInt("Closing-count-erode", 4)).getImage(),
-						options.getBackground());
-				
-				if (fis != null)
-					fis.addImage("blue filtered by HSV", visMask.getImage(), null);
-			}
-			
-			if (getBoolean("Filter by LAB Color Space", true)) {
-				initLABfilterValues();
-				
-				visMask = visMask.filterRemoveLAB(
-						LAB_MIN_L_VALUE_VIS,
-						LAB_MAX_L_VALUE_VIS,
-						LAB_MIN_A_VALUE_VIS,
-						LAB_MAX_A_VALUE_VIS,
-						LAB_MIN_B_VALUE_VIS,
-						LAB_MAX_B_VALUE_VIS,
-						options.getBackground(), false);
-				
-				if (fis != null)
-					fis.addImage("main lab filter", visMask.getImage(), null);
-			}
-			return visMask.getImage().show("VISS", debug);
-		}
+		return process("VIS", input().images().vis(), input().masks().vis());
 	}
 	
-	private void initLABfilterValues() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
-			LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
-			LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-			LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-			LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 135);
-			LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-			LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
-		} else {
-			LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 0);
-			LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
-			LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);
-			LAB_MAX_A_VALUE_VIS = getInt("LAB_A_MAX", 255);
-			LAB_MIN_B_VALUE_VIS = getInt("LAB_B_MIN", 123);
-			LAB_MAX_B_VALUE_VIS = getInt("LAB_B_MAX", 255);
+	@Override
+	protected Image processFLUOmask() {
+		return process("FLUO", input().images().fluo(), input().masks().fluo());
+	}
+	
+	private Image process(String optics, Image image, Image mask) {
+		if (image == null || mask == null || !getBoolean("process " + optics, optics.equals("VIS")))
+			return mask;
+		else {
+			ImageOperation processedMask = input().masks().vis().io().copy();
+			ImageStack fis = debug ? new ImageStack() : null;
+			if (fis != null)
+				fis.addImage(optics + " start", processedMask.getImage(), null);
+			
+			if (getBoolean("process " + optics, true)) {
+				String pf = "";
+				processedMask = processedMask.filterRemoveLAB(
+						getInt("min L", 120),
+						getInt("max L", 255),
+						getInt("min A", 0),
+						getInt("max A", 127),
+						getInt("min B", 127),
+						getInt("max B", 255),
+						options.getBackground(),
+						getBoolean(pf + "invert", false));
+				
+				if (fis != null)
+					fis.addImage(pf + " result", processedMask.getImage(), null);
+			}
+			if (debug)
+				fis.show(optics + "result");
+			return processedMask.getImage();
 		}
 	}
 	
@@ -100,6 +71,7 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

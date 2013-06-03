@@ -32,7 +32,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
-public class BlCutZoomedImages extends AbstractBlock {
+public class BlAlign extends AbstractBlock {
 	
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
 				final MaskAndImageSet inputSet,
@@ -56,7 +56,7 @@ public class BlCutZoomedImages extends AbstractBlock {
 					ImageSet a = inputSet.images().copy();
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
-					((BlCutZoomedImages) inst).preventDebugValues = true;
+					((BlAlign) inst).preventDebugValues = true;
 					inst.setInputAndOptions(ab, options, brs, blockPos, null);
 					ab = inst.process();
 					ImageSet in = ab.images();
