@@ -1,9 +1,11 @@
 package iap.pipelines.maize;
 
 import iap.blocks.acquisition.BlLoadImages;
+import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
+import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
@@ -83,6 +85,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlCalcMainAxis.class.getCanonicalName(),
 				BlCalcColorHistograms.class.getCanonicalName(),
 				BlCalcConvexHull.class.getCanonicalName(),
+				BlCalcAreas.class.getCanonicalName(),
+				BlCalcVolumes.class.getCanonicalName(),
 				
 				// postprocessing
 				BlRunPostProcessors.class.getCanonicalName(),

@@ -166,11 +166,9 @@ public class ConvexHullCalculator {
 			rt.addValue("compactness.16",
 					(borderPixels * borderPixels / filledArea));
 			if (distHorizontal != null) {
-				rt.addValue("area.norm", filledArea * normFactorArea);
 				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
 				rt.addValue("border.length.norm", borderPixels * normFactor);
 			}
-			rt.addValue("area", filledArea);
 			rt.addValue("hull.area", polygon.area());
 			rt.addValue("border.length", borderPixels);
 			
@@ -180,15 +178,9 @@ public class ConvexHullCalculator {
 			
 			if (circumcircle != null) {
 				if (distHorizontal != null) {
-					// rt.addValue("hull.circumcircle.x.norm", circumcircle.x
-					// * normFactor);
-					// rt.addValue("hull.circumcircle.y.norm", circumcircle.y
-					// * normFactor);
 					rt.addValue("hull.circumcircle.d.norm", circumcircle.d
 							* normFactor);
 				}
-				// rt.addValue("hull.circumcircle.x", circumcircle.x);
-				// rt.addValue("hull.circumcircle.y", circumcircle.y);
 				rt.addValue("hull.circumcircle.d", circumcircle.d);
 			}
 			
@@ -205,8 +197,6 @@ public class ConvexHullCalculator {
 				if (distHorizontal != null) {
 					rt.addValue("hull.pc1.norm", span * normFactor);
 					rt.addValue("hull.pc2.norm", span2.getLengthPC2() * normFactor);
-					// rt.addValue("hull.centroid.x.norm", centroid.x * normFactor);
-					// rt.addValue("hull.centroid.y.norm", centroid.y * normFactor);
 				}
 				
 				if (drawPCLine) {
