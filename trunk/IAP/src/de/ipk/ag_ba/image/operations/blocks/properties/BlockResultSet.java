@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
-import ij.measure.ResultsTable;
-
 import java.util.ArrayList;
 import java.util.Set;
 
