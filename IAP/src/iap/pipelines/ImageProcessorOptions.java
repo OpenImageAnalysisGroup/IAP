@@ -111,7 +111,10 @@ public class ImageProcessorOptions {
 	}
 	
 	public String getSystemOptionStorageGroup() {
-		return "Block Properties - " + getCameraPosition();
+		if (getCameraPosition() != CameraPosition.UNKNOWN)
+			return getCameraPosition() + " settings";
+		else
+			return "Postprocessing";
 	}
 	
 	private void setOptSystemOptionStorage(SystemOptions optSystemOptionStorage) {

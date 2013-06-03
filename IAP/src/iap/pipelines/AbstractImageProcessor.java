@@ -91,7 +91,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 				inSample,
 				inImages,
 				analysisResults,
-				optStatus);
+				optStatus, options);
 	}
 	
 	@Override
