@@ -1,31 +1,31 @@
 package iap.pipelines.maize;
 
-import iap.blocks.BlAdaptiveThresholdNir;
-import iap.blocks.BlClosing;
-import iap.blocks.BlColorBalanceFluo;
-import iap.blocks.BlColorBalanceVis;
-import iap.blocks.BlHighlightNullResults;
-import iap.blocks.BlLabFilter;
-import iap.blocks.BlLoadImages;
-import iap.blocks.BlMedianFilterFluo;
-import iap.blocks.BlMoveMasksToImageSet;
-import iap.blocks.BlRemoveSmallObjectsVisFluo;
-import iap.blocks.BlSkeletonizeNir;
-import iap.blocks.BlSkeletonizeVisFluo;
-import iap.blocks.BlUseFluoMaskToClearOther;
-import iap.blocks.BlockCutFromSide;
-import iap.blocks.arabidopsis.BlAlign;
-import iap.blocks.arabidopsis.BlRotate;
-import iap.blocks.hull.BlCalcConvexHull;
-import iap.blocks.maize.BlCalcColorHistograms;
-import iap.blocks.maize.BlCalcMainAxis;
-import iap.blocks.maize.BlCalcWidthAndHeight;
-import iap.blocks.maize.BlColorBalanceNir;
-import iap.blocks.maize.BlDetectBlueMarkers;
-import iap.blocks.maize.BlIntensityCalculationFluo;
-import iap.blocks.maize.BlRemoveBackground;
-import iap.blocks.maize.BlockDrawSkeleton;
-import iap.blocks.post_process.BlockRunPostProcessors;
+import iap.blocks.acquisition.BlLoadImages;
+import iap.blocks.extraction.BlCalcColorHistograms;
+import iap.blocks.extraction.BlCalcConvexHull;
+import iap.blocks.extraction.BlCalcMainAxis;
+import iap.blocks.extraction.BlCalcWidthAndHeight;
+import iap.blocks.extraction.BlSkeletonizeNir;
+import iap.blocks.extraction.BlSkeletonizeVisFluo;
+import iap.blocks.postprocessing.BlHighlightNullResults;
+import iap.blocks.postprocessing.BlMoveMasksToImageSet;
+import iap.blocks.postprocessing.BlockDrawSkeleton;
+import iap.blocks.postprocessing.BlockRunPostProcessors;
+import iap.blocks.preprocessing.BlAlign;
+import iap.blocks.preprocessing.BlColorBalanceFluo;
+import iap.blocks.preprocessing.BlColorBalanceNir;
+import iap.blocks.preprocessing.BlColorBalanceVis;
+import iap.blocks.preprocessing.BlDetectBlueMarkers;
+import iap.blocks.preprocessing.BlRotate;
+import iap.blocks.preprocessing.BlockCutFromSide;
+import iap.blocks.segmentation.BlAdaptiveThresholdNir;
+import iap.blocks.segmentation.BlClosing;
+import iap.blocks.segmentation.BlIntensityCalculationFluo;
+import iap.blocks.segmentation.BlLabFilter;
+import iap.blocks.segmentation.BlMedianFilterFluo;
+import iap.blocks.segmentation.BlRemoveBackground;
+import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessorOptions;
 
@@ -52,7 +52,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 	@Override
 	public BlockPipeline getPipeline(ImageProcessorOptions options) {
 		String[] defaultBlockList = new String[] {
-				// data aquisition
+				// acquisition
 				BlLoadImages.class.getCanonicalName(),
 				
 				// preprocessing

@@ -1,7 +1,7 @@
 package iap.pipelines.maize;
 
 import iap.blocks.BlCrop;
-import iap.blocks.BlHighlightNullResults;
+import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.threeD.BlockThreeDgeneration;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
