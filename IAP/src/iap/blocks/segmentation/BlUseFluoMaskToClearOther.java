@@ -4,11 +4,13 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
- * @author Christian Klukas
+ * Apply the FLUO mask to other camera types, and the VIS mask back to the FLUO mask.
+ * 
+ * @author klukas
  */
 public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlockFIS {
 	

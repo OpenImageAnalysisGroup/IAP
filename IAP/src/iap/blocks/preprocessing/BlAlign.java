@@ -27,17 +27,23 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
+/**
+ * Move and zoom images of the different camera systems so that they align.
+ * 
+ * @author klukas
+ */
 public class BlAlign extends AbstractBlock {
 	
+	@Override
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
-				final MaskAndImageSet inputSet,
-				final BlockResultSet brs, final ImageProcessorOptions options,
-				final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
+			final MaskAndImageSet inputSet,
+			final BlockResultSet brs, final ImageProcessorOptions options,
+			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);

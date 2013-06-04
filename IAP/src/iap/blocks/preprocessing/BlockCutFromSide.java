@@ -6,12 +6,13 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageSide;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
+ * Clear the image (only masks) from top, bottom, left and right sides.
+ * 
  * @author Dijun Chen
- *         Clear the image (only masks) from top, bottom, left and right sides.
  */
 public class BlockCutFromSide extends AbstractBlock {
 	

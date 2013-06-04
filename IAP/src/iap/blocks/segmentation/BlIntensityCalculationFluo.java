@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
 /**
- * @author Christian Klukas
+ * @author klukas
  */
 public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlockFIS {
 	

@@ -5,10 +5,15 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
+/**
+ * Runs stored postprocessor code stored and created by previous analysis blocks.
+ * 
+ * @author klukas
+ */
 public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
