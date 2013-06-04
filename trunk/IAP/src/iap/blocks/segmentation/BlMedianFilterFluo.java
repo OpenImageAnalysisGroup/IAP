@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * Remove "peper and salt" noise from Fluo mask.
  * 
- * @author Pape, Klukas
+ * @author pape, klukas
  */
 public class BlMedianFilterFluo extends AbstractBlock {
 	

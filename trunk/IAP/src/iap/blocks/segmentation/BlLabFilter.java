@@ -8,14 +8,14 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Uses a lab-based pixel filter(s) for the vis/fluo images.
  * 
- * @author Klukas
+ * @author klukas
  */
 public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
 	

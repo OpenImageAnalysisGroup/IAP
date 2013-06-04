@@ -35,22 +35,33 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		if (getBoolean("process VIS", true))
-			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult);
+			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+		if (getBoolean("process VIS normalized", true))
+			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+		
 		if (getBoolean("process FLUO", true))
-			calculatePlantVolumeMeasures("fluo", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult);
+			calculatePlantVolumeMeasures("fluo", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+		if (getBoolean("process FLUO normalized", true))
+			calculatePlantVolumeMeasures("fluo", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+		
 		if (getBoolean("process NIR", false))
-			calculatePlantVolumeMeasures("nir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult);
+			calculatePlantVolumeMeasures("nir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+		if (getBoolean("process NIR normalized", false))
+			calculatePlantVolumeMeasures("nir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+		
 		if (getBoolean("process IR", false))
-			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult);
+			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+		if (getBoolean("process IR normalized", false))
+			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
 	}
 	
 	private void calculatePlantVolumeMeasures(
 			String cameraType,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult) {
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, boolean normalized) {
 		
-		String sideVisAreaTraitName = "RESULT_side." + cameraType + ".area";
+		String sideVisAreaTraitName = "RESULT_side." + cameraType + ".area" + (normalized ? ".norm" : "");
 		// String sideFluoAreaTraitName = "RESULT_side.fluo.filled.pixels";
 		// String sideFluoPhenolWeight = "RESULT_side.fluo.intensity.phenol.plant_weight";
 		// String topFluoFilledPixels = "RESULT_top.fluo.filled.pixels";
@@ -136,20 +147,20 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 				
 				if (areaStat.getN() > 0) {
 					summaryResult.setNumericProperty(getBlockPosition(),
-							sideVisAreaTraitName + ".min", areaStat.getMin(), "px^2");
+							sideVisAreaTraitName + ".min", areaStat.getMin(), normalized ? "mm^2" : "px^2");
 					summaryResult.setNumericProperty(getBlockPosition(),
-							sideVisAreaTraitName + ".max", areaStat.getMax(), "px^2");
+							sideVisAreaTraitName + ".max", areaStat.getMax(), normalized ? "mm^2" : "px^2");
 					summaryResult.setNumericProperty(getBlockPosition(),
-							sideVisAreaTraitName + ".median", areaStat.getPercentile(50), "px^2");
+							sideVisAreaTraitName + ".median", areaStat.getPercentile(50), normalized ? "mm^2" : "px^2");
 					summaryResult.setNumericProperty(getBlockPosition(),
-							sideVisAreaTraitName + ".avg", areaStat.getMean(), "px^2");
+							sideVisAreaTraitName + ".avg", areaStat.getMean(), normalized ? "mm^2" : "px^2");
 				}
 				
 				double topAreaSum = 0;
 				double topAreaCnt = 0;
 				for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-					for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area")) {
+					for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
 						if (v.getValue() != null) {
 							topAreaSum += v.getValue().doubleValue();
 							topAreaCnt += 1;
@@ -173,9 +184,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 								summaryResult.setNumericProperty(getBlockPosition(),
-										"RESULT_side." + cameraType + ".area.avg.wue", wue, "px^2/ml/day");
-								// System.out.println("[Absolute] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
-								// + new Date(time).toString() + ", used for side area growth of " + wue + " pixels per ml per day");
+										"RESULT_side." + cameraType + ".area.avg.wue" + (normalized ? ".norm" : ""), wue, "px^2/ml/day");
 								
 							}
 						}
@@ -183,9 +192,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 							double wue = relativeGrowthPerDay / waterUsePerDay;
 							if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 								summaryResult.setNumericProperty(getBlockPosition(),
-										"RESULT_side." + cameraType + ".area.avg.wue.relative", wue, "percent/ml/day");
-								// System.out.println("[Relative] Plant " + plantID + " has been watered with about " + waterUsePerDay.intValue() + " ml per day, at "
-								// + new Date(time).toString() + ", used for side area growth of " + wue + " percent per ml per day");
+										"RESULT_side." + cameraType + ".area.avg.wue.relative" + (normalized ? ".norm" : ""), wue, "percent/ml/day");
 								
 							}
 						}
@@ -202,15 +209,15 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 					double side = areaStat.getMax();
 					double volume_iap_max = Math.sqrt(side * side * avgTopArea);
 					summaryResult.setNumericProperty(getBlockPosition(),
-							"RESULT_volume." + cameraType + ".iap", volume_iap, "px^3");
+							"RESULT_volume." + cameraType + ".iap" + (normalized ? ".norm" : ""), volume_iap, "px^3");
 					summaryResult.setNumericProperty(getBlockPosition(),
-							"RESULT_volume." + cameraType + ".iap_max", volume_iap_max, "px^3");
+							"RESULT_volume." + cameraType + ".iap_max" + (normalized ? ".norm" : ""), volume_iap_max, "px^3");
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
 						double ratioPerDay = Math.pow(ratio, timeForOneDayD / ((time - lastTimeVolumeIAP)));
 						summaryResult.setNumericProperty(getBlockPosition(),
-								"RESULT_volume." + cameraType + ".iap.relative", ratioPerDay, "percent/day");
+								"RESULT_volume." + cameraType + ".iap.relative" + (normalized ? ".norm" : ""), ratioPerDay, "percent/day");
 						double days = (time - lastTimeVolumeIAP) / timeForOneDayD;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
 						
@@ -221,15 +228,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay) && !Double.isNaN(waterUsePerDay)) {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							summaryResult.setNumericProperty(getBlockPosition(),
-									"RESULT_volume." + cameraType + ".iap.wue", wue, "px^3/ml/day");
-							
-							if (false)
-								System.out.println("Plant " + plantID + " has been watered with about "
-										+ waterUsePerDay.intValue() + " ml per day, at "
-										+ new Date(time).toString() + ", used for side volume growth of "
-										+ wue + " pixels per ml per day, relative volume growth: "
-										+ ratioPerDay + ", volume: " + volume_iap + " --> " + lastTimeVolumeIAP);
-							
+									"RESULT_volume." + cameraType + ".iap.wue" + (normalized ? ".norm" : ""), wue, "px^3/ml/day");
 						}
 					}
 					
@@ -239,10 +238,10 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
 						double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
 						summaryResult.setNumericProperty(getBlockPosition(),
-								"RESULT_volume." + cameraType + ".lt", volume_lt, "px^3");
+								"RESULT_volume." + cameraType + ".lt" + (normalized ? ".norm" : ""), volume_lt, normalized ? "mm^3" : "px^3");
 						double area = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + avgTopArea;
 						summaryResult.setNumericProperty(getBlockPosition(),
-								"RESULT_volume." + cameraType + ".area090T", area, "px^2");
+								"RESULT_volume." + cameraType + ".area090T" + (normalized ? ".norm" : ""), area, normalized ? "mm^2" : "px^2");
 					}
 					
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
@@ -253,7 +252,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 						s3 = sideArea_for_angleNearestTo90;
 						double volume_prism = Math.sqrt(t1 * s2 * s3 / 2d * Math.sqrt(1 - Math.pow((s2 * s2 + s3 * s3 - s1 * s1) / (2d * s2 * s3), 2)));
 						summaryResult.setNumericProperty(getBlockPosition(),
-								"RESULT_volume." + cameraType + ".prism", volume_prism, "px^3");
+								"RESULT_volume." + cameraType + ".prism" + (normalized ? ".norm" : ""), volume_prism, normalized ? "mm^3" : "px^3");
 					}
 				}
 			}

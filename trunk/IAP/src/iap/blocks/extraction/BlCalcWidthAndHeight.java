@@ -16,12 +16,17 @@ import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * Calculates the plant width and height properties from the visible light image mask.
+ * 
+ * @author klukas
+ */
 public class BlCalcWidthAndHeight extends
 		AbstractSnapshotAnalysisBlockFIS {
 	
@@ -57,22 +62,22 @@ public class BlCalcWidthAndHeight extends
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (useFluo) {
 				if (getProperties().getNumericProperty(0, 1,
-							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
 					vertYsoilLevel = (int) getProperties()
-								.getNumericProperty(
-										0,
-										1,
-										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
-								.getValue();
+							.getNumericProperty(
+									0,
+									1,
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
+							.getValue();
 			} else {
 				if (getProperties().getNumericProperty(0, 1,
-							PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
 					vertYsoilLevel = (int) getProperties()
-								.getNumericProperty(
-										0,
-										1,
-										PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
-								.getValue();
+							.getNumericProperty(
+									0,
+									1,
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
+							.getValue();
 			}
 		}
 		final int vertYsoilLevelF = vertYsoilLevel;

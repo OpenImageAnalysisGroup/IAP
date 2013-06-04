@@ -21,15 +21,15 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * calculate the skeleton to detect the leafs and the tassel.
- * REQUIRES FLUO image for bloom detection.
+ * Calculates the skeleton to detect the leafs and the tassel.
+ * Requires the FLUO image for bloom detection.
  * 
  * @author pape, klukas
  */

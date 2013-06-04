@@ -6,10 +6,15 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * Replaces the null result or empty images with the input image, with a red border, to indicate a processing problem.
+ * 
+ * @author klukas
+ */
 public class BlHighlightNullResults extends AbstractBlock {
 	
 	private static final int sz = 128 - 5;

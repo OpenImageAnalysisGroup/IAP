@@ -7,11 +7,11 @@ import iap.blocks.data_structures.AbstractBlock;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Uses a lab-based pixel filter for the vis and fluo images.
+ * Rotates the images and masks according to the settings.
  * 
  * @author Klukas
  */

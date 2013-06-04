@@ -4,10 +4,15 @@ import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
+/**
+ * Replaces the main image set with the mask images.
+ * 
+ * @author klukas
+ */
 public class BlMoveMasksToImageSet extends AbstractImageAnalysisBlockFIS {
 	
 	@Override
