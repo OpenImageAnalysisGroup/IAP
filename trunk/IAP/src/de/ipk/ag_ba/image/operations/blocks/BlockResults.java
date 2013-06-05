@@ -26,8 +26,8 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized BlockProperty getNumericProperty(
-			int currentPositionInPipeline, int searchIndex, Enum<?> pName) {
-		String name = pName.name();
+			int currentPositionInPipeline, int searchIndex, String pName) {
+		String name = pName;
 		if (searchIndex <= 0
 				&& !storedNumerics.containsKey(currentPositionInPipeline
 						+ searchIndex))
@@ -61,12 +61,12 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized void setNumericProperty(int position, Enum<?> name,
+	public synchronized void setNumericProperty(int position, String name,
 			double value) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
 		
-		storedNumerics.get(position).put(name.name(), value);
+		storedNumerics.get(position).put(name, value);
 	}
 	
 	@Override
@@ -115,8 +115,8 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized int getNumberOfBlocksWithThisProperty(Enum<?> pName) {
-		String name = pName.name();
+	public synchronized int getNumberOfBlocksWithThisProperty(String pName) {
+		String name = pName;
 		int foundCount = 0;
 		for (int index = getBlockPosition(); index >= 0; index--) {
 			if (storedNumerics.containsKey(index)) {

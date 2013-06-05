@@ -11,9 +11,9 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author pape, klukas
@@ -56,13 +56,13 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 				reportError((Exception) null, "getProperties returns NULL");
 			for (MarkerPair mp : numericResult) {
 				if (mp.getLeft() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i), mp.getLeft().x / w);
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1), mp.getLeft().y / h);
+					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getLeft().x / w);
+					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getLeft().y / h);
 				}
 				i += 2;
 				if (mp.getRight() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i), mp.getRight().x / w);
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1), mp.getRight().y / h);
+					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getRight().x / w);
+					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getRight().y / h);
 				}
 				i += 2;
 				n++;
@@ -81,22 +81,22 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	
 	// distances vertical
 	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult, int imageWidth) {
-		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y) != null
-				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y) != null) {
-			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y).getValue() * imageWidth;
-			double markerPosTwoLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y).getValue() * imageWidth;
+		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName()) != null
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName()) != null) {
+			double markerPosOneLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName()).getValue() * imageWidth;
+			double markerPosTwoLeft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName()).getValue() * imageWidth;
 			
-			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT, Math.abs(markerPosTwoLeft - markerPosOneLeft));
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(), Math.abs(markerPosTwoLeft - markerPosOneLeft));
 			if (debug)
 				System.out.println("dist_vertical: " + (markerPosTwoLeft - markerPosOneLeft));
 		}
 		
-		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y) != null
-				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y) != null) {
-			double markerPosOneRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y).getValue() * imageWidth;
-			double markerPosTwoRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y).getValue() * imageWidth;
+		if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName()) != null
+				&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName()) != null) {
+			double markerPosOneRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName()).getValue() * imageWidth;
+			double markerPosTwoRight = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName()).getValue() * imageWidth;
 			
-			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT, Math.abs(markerPosTwoRight - markerPosOneRight));
+			getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(), Math.abs(markerPosTwoRight - markerPosOneRight));
 			if (debug)
 				System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
 		}
@@ -112,6 +112,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 		}
 		
 		int maxDist = max(distances);
+		getProperties().setNumericProperty(0, options.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
 		
 		if (maxDist > 0)
 			options.setCalculatedBlueMarkerDistance(maxDist);

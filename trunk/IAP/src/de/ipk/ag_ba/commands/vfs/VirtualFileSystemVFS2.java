@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.commands.vfs;
 
+import info.StopWatch;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +19,9 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
+import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk.vanted.util.VfsFileObjectUtil;
@@ -453,6 +457,81 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			InputStream threeDvolumePreviewIcon,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		//
+		ExperimentHeaderInterface ehi = volume.getParentSample().getParentCondition().getExperimentHeader();
+		long snapshotTime = volume.getParentSample().getSampleFineTimeOrRowId();
+		String pre = "";
+		String firstPre = "";
+		String finalMainName = null;
+		{ // save main
+			String desiredFileName = volume.getURL().getFileName();
+			if (desiredFileName != null && desiredFileName.contains("#"))
+				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+			String substanceName = volume.getSubstanceName();
+			desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, volume, volume);// + "#" + desiredFileName;
+			finalMainName = desiredFileName;
+			// if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
+			// pre = optFileNameMainAndLabelPrefix[0];
+			// firstPre = pre;
+			// }
+			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+			MyByteArrayInputStream mainStream = ResourceIOManager.getInputStreamMemoryCached(volume.getInputStream());
+			if (mainStream != null && mainStream.getCount() > 0)
+				saveStream(targetFileNameFullRes, mainStream, false, mainStream.getCount());
+			
+			IOurl url = volume.getURL();
+			
+			String fullPath = new File(targetFileNameFullRes).getParent();
+			String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
+			if (url != null) {
+				url.setPrefix(getPrefix());
+				url.setDetail(subPath);
+				if (!pre.isEmpty())
+					url.setFileName(pre + desiredFileName);
+				else
+					url.setFileName(desiredFileName);
+			}
+		}
+		// if (limg.getLabelURL() != null && !ignoreLabelURL) { // save label
+		// String desiredFileName = limg.getLabelURL().getFileName();
+		// if (desiredFileName != null && desiredFileName.contains("#"))
+		// desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+		// if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 1) {
+		// pre = optFileNameMainAndLabelPrefix[1];
+		// String substanceName = limg.getSubstanceName();
+		// desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+		// }
+		// String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+		// MyByteArrayInputStream labelStream = ResourceIOManager.getInputStreamMemoryCached(
+		// limg.getLabelURL().getInputStream());
+		// if (labelStream != null && labelStream.getCount() > 0)
+		// saveStream(targetFileNameFullRes, labelStream, false, labelStream.getCount());
+		//
+		// IOurl url = limg.getLabelURL();
+		//
+		// String fullPath = new File(targetFileNameFullRes).getParent();
+		// String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
+		// if (url != null) {
+		// url.setPrefix(getPrefix());
+		// url.setDetail(subPath);
+		// if (!pre.isEmpty())
+		// url.setFileName(pre + desiredFileName);
+		// else
+		// url.setFileName(desiredFileName);
+		// }
+		// }
+		{
+			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi,
+					snapshotTime, firstPre + finalMainName.split("#")[0]);
+			
+			if (threeDvolumePreviewIcon == null) {
+				StopWatch ss = new StopWatch(SystemAnalysis.getCurrentTime() + ">CREATE GIF 512x512", true);
+				threeDvolumePreviewIcon = IOmodule.getThreeDvolumeRenderViewGif((LoadedVolumeExtension) volume, optStatus);
+				ss.printTime();
+			}
+			MyByteArrayInputStream previewStream = (MyByteArrayInputStream) threeDvolumePreviewIcon;// MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
+			if (previewStream != null && previewStream.getCount() > 0)
+				saveStream(targetFileNamePreview, previewStream, false, previewStream.getCount());
+		}
 	}
 	
 	public static VirtualFileSystemVFS2 getKnownFromDatabaseId(String databaseId) {

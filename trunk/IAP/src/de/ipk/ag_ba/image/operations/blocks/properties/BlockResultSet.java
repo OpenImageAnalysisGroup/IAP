@@ -23,19 +23,19 @@ public interface BlockResultSet {
 	 *         value.
 	 */
 	public BlockProperty getNumericProperty(int currentPositionInPipeline,
-			int searchIndex, Enum<?> name);
+			int searchIndex, String name);
 	
 	/**
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericProperty(int position, Enum<?> name, double value);
+	public void setNumericProperty(int position, String name, double value);
 	
 	public int getBlockPosition();
 	
 	public int getNumberOfBlocksWithPropertyResults();
 	
-	public int getNumberOfBlocksWithThisProperty(Enum<?> pName);
+	public int getNumberOfBlocksWithThisProperty(String pName);
 	
 	/**
 	 * @see PropertyNames

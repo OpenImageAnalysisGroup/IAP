@@ -177,7 +177,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 																+ ". Command execution error.",
 														"Error",
 														JOptionPane.INFORMATION_MESSAGE);
-										ErrorMsg.addErrorMessage(err);
 										return;
 									}
 								}

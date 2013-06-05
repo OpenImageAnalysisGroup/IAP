@@ -465,7 +465,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								options);
 				processStatisticalOutputOnGlobalLevel(inSamples, postprocessingResults);
 			} catch (Exception e) {
-				e.printStackTrace();
+				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		tso.addInt(1);
@@ -841,6 +841,47 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		for (Long time : analysisResults.keySet())
 			for (Integer tray : analysisResults.get(time).keySet()) {
 				boolean multipleTrays = analysisResults.get(time).keySet().size() > 1;
+				for (String volumeID : analysisResults.get(time).get(tray).getVolumeNames()) {
+					VolumeData v = analysisResults.get(time).get(tray).getVolume(volumeID);
+					if (v != null) {
+						analysisResults.get(time).get(tray).setVolume(volumeID, null);
+						
+						try {
+							StopWatch s = new StopWatch(
+									SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
+							if (databaseTarget != null) {
+								SampleInterface oSample = v.getParentSample();
+								ConditionInterface oCond = v.getParentSample().getParentCondition();
+								SubstanceInterface oSubst = v.getParentSample().getParentCondition().getParentSubstance();
+								SubstanceInterface nSubst = oSubst.clone();
+								ConditionInterface nCond = oCond.clone(nSubst);
+								nSubst.add(nCond);
+								SampleInterface nSamp = oSample.clone(nCond);
+								v.setParentSample(nSamp);
+								v.getParentSample().getParentCondition().getParentSubstance().setName("volume");
+								
+								databaseTarget.saveVolume((LoadedVolume) v, (Sample3D) v.getParentSample(),
+										m, null, null);
+								VolumeData volumeInDatabase = new VolumeData(v.getParentSample(), v);
+								volumeInDatabase.getURL().setPrefix(
+										databaseTarget.getPrefix());
+								volumeInDatabase.getURL().setDetail(
+										v.getURL().getDetail());
+								output.add(volumeInDatabase);
+							} else {
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">Volume kept in memory: " + v);
+								output.add(v);
+							}
+							s.printTime();
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: Could not save volume data: "
+									+ e.getMessage());
+							ErrorMsg.addErrorMessage(e);
+						}
+					}
+				}
 				for (BlockPropertyValue bpv : analysisResults.get(time).get(tray).getPropertiesSearch("RESULT_")) {
 					if (bpv.getName() == null)
 						continue;

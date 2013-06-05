@@ -14,8 +14,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MainAxisCalculationResult;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Calculates the main axis rotation for visible top images. All other image
@@ -54,9 +54,9 @@ public class BlCalcMainAxis extends
 				// getProperties().setNumericProperty(0,
 				// PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE,
 				// normalizedDistanceToMainAxis);
-				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X,
+				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X.getName(),
 						macr.getCentroid().x);
-				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y,
+				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y.getName(),
 						macr.getCentroid().y);
 				
 				ResultsTableWithUnits rt = new ResultsTableWithUnits();
