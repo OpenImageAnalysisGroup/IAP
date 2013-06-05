@@ -255,7 +255,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				bm.setURL(null);
 			} else {
 				status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles)
-						/ files / 2d);
+						/ files);
 				{
 					// store data
 					String zefn = null;
