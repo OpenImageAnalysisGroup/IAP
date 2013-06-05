@@ -258,7 +258,7 @@ public class LoadedVolumeExtension extends LoadedVolume {
 		
 		int degreeSteps = 10; // 2
 		int degree = 0;
-		int delay = 3;
+		int delay = 5;
 		if (optStatus != null) {
 			optStatus.setCurrentStatusText1("Processing 3-D Volume");
 			optStatus.setCurrentStatusText2("Render side view GIF");

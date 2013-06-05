@@ -41,8 +41,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	}
 	
 	@Override
-	protected Image processVISimage() {
-		Image fi = input().images() != null ? input().images().vis() : null;
+	protected Image processVISmask() {
+		Image fi = input().images() != null ? input().masks().vis() : null;
 		if (fi != null) {
 			getProperties().setImage("img.vis.3D", fi.show("CLEARED", false));
 		} else {
