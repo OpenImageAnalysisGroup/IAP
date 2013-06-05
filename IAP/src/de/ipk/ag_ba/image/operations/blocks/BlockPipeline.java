@@ -189,7 +189,7 @@ public class BlockPipeline {
 			updateBlockStatistics(1);
 		}
 		
-		results.clearStore();
+		// results.clearStore();
 		
 		long b = System.currentTimeMillis();
 		

@@ -62,21 +62,21 @@ public class BlCalcWidthAndHeight extends
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
 			if (useFluo) {
 				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName()) != null)
 					vertYsoilLevel = (int) getProperties()
 							.getNumericProperty(
 									0,
 									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO)
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName())
 							.getValue();
 			} else {
 				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName()) != null)
 					vertYsoilLevel = (int) getProperties()
 							.getNumericProperty(
 									0,
 									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS)
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName())
 							.getValue();
 			}
 		}
