@@ -64,8 +64,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			for (Integer tray : allResultsForSnapshot.get(time).keySet()) {
 				BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 				
-				int voxelresolution = 500;
-				int widthFactor = 40;
+				int voxelresolution = getInt("Voxel Resolution", 300);
+				int widthFactor = getInt("Content Width", 40);
 				GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 				
 				ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor);
@@ -125,7 +125,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 								plantVolume * corr * corr * corr, "mm^3");
 					}
 					
-					boolean createVolumeDataset = true;
+					boolean createVolumeDataset = getBoolean("Create Volume Dataset", false);
 					LoadedVolumeExtension volume = null;
 					if (createVolumeDataset) {
 						Sample sample = inSample;
@@ -161,14 +161,14 @@ public class BlockThreeDgeneration extends AbstractBlock {
 						volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 						summaryResult.setVolume("RESULT_plant_model", volume);
 					}
-					boolean create3Dskeleton = true;
+					boolean create3Dskeleton = getBoolean("Create 3D Skeleton", true);
 					if (create3Dskeleton) {
 						if (optStatus != null)
-							optStatus.setCurrentStatusText1("Create 3-D probability skeleton");
+							optStatus.setCurrentStatusText1("Create 3-D skeleton");
 						createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
 								(LoadedVolume) volume.clone(volume.getParentSample()));
 					}
-					boolean create3DadvancedProbabilitySkeleton = true;
+					boolean create3DadvancedProbabilitySkeleton = getBoolean("Create 3-D probability skeleton", true);
 					if (create3DadvancedProbabilitySkeleton) {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("Create advanced 3-D probability skeleton");
