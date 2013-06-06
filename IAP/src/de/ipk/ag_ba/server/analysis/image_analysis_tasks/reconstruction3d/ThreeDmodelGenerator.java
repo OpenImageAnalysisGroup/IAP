@@ -74,11 +74,12 @@ public class ThreeDmodelGenerator {
 	public void calculateModel(final BackgroundTaskStatusProviderSupportingExternalCall status,
 			GenerationMode colorMode, int maxIndexedColorCount, boolean processDepthImages) throws InterruptedException {
 		
-		status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
-				+ ")");
-		status.setCurrentStatusText2("Using " + SystemAnalysis.getNumberOfCPUs() + " threads");
-		status.setCurrentStatusValueFine(0);
-		
+		if (status != null) {
+			status.setCurrentStatusText1("Init cube cut (" + maxVoxelPerSide + "x" + maxVoxelPerSide + "x" + maxVoxelPerSide
+					+ ")");
+			status.setCurrentStatusText2("Using " + SystemAnalysis.getNumberOfCPUs() + " threads");
+			status.setCurrentStatusValueFine(0);
+		}
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final ThreadSafeOptions tsoRunCount = new ThreadSafeOptions();
 		tso.setInt(0);
@@ -90,30 +91,35 @@ public class ThreeDmodelGenerator {
 					cuttt2(status, tso, tsoRunCount, fp, processDepthImages),
 					"cube cut " + p.getAngle(), 20, 19, false));
 			
-			if (status.wantsToStop())
+			if (status != null && status.wantsToStop())
 				break;
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
-		
-		status.setCurrentStatusValue(0);
+		if (status != null)
+			status.setCurrentStatusValue(0);
 		
 		if (colorMode != GenerationMode.GRAYSCALE_PROBABILITY)
 			if (pictures != null && pictures.size() > 0) {
 				// colorize cube
 				if (colorMode == GenerationMode.COLORED) {
-					status.setCurrentStatusText1("Find Common Image Colors (SOM)...");
-					status.setCurrentStatusText2("");
+					if (status != null) {
+						status.setCurrentStatusText1("Find Common Image Colors (SOM)...");
+						status.setCurrentStatusText2("");
+					}
 					palette = pictures.iterator().next().getColorPalette(maxIndexedColorCount, status);
 				}
-				status.setCurrentStatusText1("Normalize Cube...");
+				if (status != null)
+					status.setCurrentStatusText1("Normalize Cube...");
 				// status.setCurrentStatusText2("");
 				generateNormalizedByteCube(colorMode);
-				status.setCurrentStatusText1("Colorize Cube...");
+				if (status != null)
+					status.setCurrentStatusText1("Colorize Cube...");
 				// status.setCurrentStatusText2("");
 				colorModelRGB(pictures, palette, status, colorMode == GenerationMode.COLORED_RGBA);
 			}
 		
-		status.setCurrentStatusText1("Cube Construction Finished");
+		if (status != null)
+			status.setCurrentStatusText1("Cube Construction Finished");
 		// status.setCurrentStatusText2("");
 		
 		if (!status.wantsToStop())
