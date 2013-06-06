@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: SpinnerEditComponent.java,v 1.1 2011-01-31 09:04:30 klukas Exp $
+// $Id: SpinnerEditComponent.java,v 1.2 2013-06-06 10:27:00 klukas Exp $
 
 package org.graffiti.plugin.editcomponent;
 
@@ -14,8 +14,9 @@ import java.text.ParseException;
 
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.JSpinner.NumberEditor;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 
 import org.graffiti.attributes.ByteAttribute;
@@ -28,10 +29,10 @@ import org.graffiti.plugin.parameter.IntegerParameter;
 /**
  * DOCUMENT ME!
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class SpinnerEditComponent
-					extends AbstractValueEditComponent {
+		extends AbstractValueEditComponent {
 	// ~ Instance fields ========================================================
 	
 	/** The default step width for floating point numbers. */
@@ -48,21 +49,35 @@ public class SpinnerEditComponent
 	 * @param disp
 	 *           DOCUMENT ME!
 	 */
-	public SpinnerEditComponent(Displayable disp) {
+	public SpinnerEditComponent(final Displayable disp) {
 		super(disp);
 		
 		SpinnerNumberModel model;
 		
 		if (disp instanceof IntegerAttribute || disp instanceof ByteAttribute ||
-							disp instanceof LongAttribute || disp instanceof ShortAttribute ||
-							disp instanceof IntegerParameter) {
+				disp instanceof LongAttribute || disp instanceof ShortAttribute ||
+				disp instanceof IntegerParameter) {
 			model = new SpinnerNumberModel(new Integer(0), null, null, new Integer(1));
 		} else {
 			model = new SpinnerNumberModel(new Double(0d), null, null,
-								DEFAULT_STEP);
+					DEFAULT_STEP);
 		}
 		
-		this.jSpinner = new JSpinner(model);
+		this.jSpinner = new JSpinner(model) {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			protected JComponent createEditor(SpinnerModel model)
+			{
+				if (disp instanceof IntegerAttribute || disp instanceof ByteAttribute ||
+						disp instanceof LongAttribute || disp instanceof ShortAttribute ||
+						disp instanceof IntegerParameter) {
+					return super.createEditor(model);
+				} else {
+					return new NumberEditor(this, "0.00000");// needed decimal format
+				}
+			}
+		};
 		
 		// this.spinner = new JSpinner();
 		// this.spinner.setBorder(BorderFactory.createEmptyBorder());
@@ -83,6 +98,7 @@ public class SpinnerEditComponent
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public JComponent getComponent() {
 		jSpinner.setMinimumSize(new Dimension(0, 30));
 		jSpinner.setPreferredSize(new Dimension(50, 30));
@@ -104,6 +120,7 @@ public class SpinnerEditComponent
 	 * Sets the current value of the <code>Attribute</code> in the
 	 * corresponding <code>JComponent</code>.
 	 */
+	@Override
 	public void setEditFieldValue() {
 		if (showEmpty) {
 			((JSpinner.DefaultEditor) this.jSpinner.getEditor()).getTextField().setText(EMPTY_STRING);
@@ -133,6 +150,7 @@ public class SpinnerEditComponent
 	/**
 	 * Sets the value of the displayable specified in the <code>JComponent</code>. But only if it is different.
 	 */
+	@Override
 	public void setValue() {
 		if (jSpinner.getEditor() != null && jSpinner.getEditor() instanceof NumberEditor) {
 			NumberEditor ne = (NumberEditor) jSpinner.getEditor();

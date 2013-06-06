@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: NumberEditComponent.java,v 1.1 2011-01-31 09:04:29 klukas Exp $
+// $Id: NumberEditComponent.java,v 1.2 2013-06-06 10:27:00 klukas Exp $
 
 package org.graffiti.plugin.editcomponent;
 
@@ -28,7 +28,7 @@ import org.graffiti.plugin.Displayable;
  * @see javax.swing.JTextField
  */
 public abstract class NumberEditComponent
-					extends AbstractValueEditComponent {
+		extends AbstractValueEditComponent {
 	// ~ Instance fields ========================================================
 	
 	/** The gui element of this component. */
@@ -56,6 +56,7 @@ public abstract class NumberEditComponent
 	 * @return the <code>JComponent</code> associated with this value edit
 	 *         component.
 	 */
+	@Override
 	public JComponent getComponent() {
 		// System.out.println(displayable.getName());
 		JComponent defaultResult = spinnerEditComponent.getComponent();
@@ -89,6 +90,7 @@ public abstract class NumberEditComponent
 	 * Sets the current value of the <code>Attribute</code> in the
 	 * corresponding <code>JComponent</code>.
 	 */
+	@Override
 	public void setEditFieldValue() {
 		spinnerEditComponent.setEditFieldValue();
 	}
@@ -116,6 +118,7 @@ public abstract class NumberEditComponent
 	 * Sets the value of the displayable specified in the <code>JComponent</code>. Calls setAttribute in the associated spinner,
 	 * i.e. it only changes the value if it is different.
 	 */
+	@Override
 	public void setValue() {
 		// System.out.println(spinnerEditComponent+"");
 		spinnerEditComponent.setValue();
