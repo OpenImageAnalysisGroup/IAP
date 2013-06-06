@@ -257,7 +257,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}
 					}, preThreadName);
-					startThread(t);
+					if (SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
+						t.run();
+					else
+						startThread(t);
+					
 				} catch (Exception eeee) {
 					if (!freed.getBval(0, false))
 						maxCon.release(1);
