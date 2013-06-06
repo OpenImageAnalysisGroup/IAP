@@ -758,7 +758,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		try {
 			LoadedImage lib = result;
 			if (storeResultInDatabase != null) {
-				result = storeResultInDatabase.saveImage(new String[] { "main_", "label_" }, result, false, true);
+				result = storeResultInDatabase.saveImage(new String[] { "", "label_" }, result, false, true);
 				// add processed image to result
 				if (result != null)
 					return new ImageData(result.getParentSample(), result);
