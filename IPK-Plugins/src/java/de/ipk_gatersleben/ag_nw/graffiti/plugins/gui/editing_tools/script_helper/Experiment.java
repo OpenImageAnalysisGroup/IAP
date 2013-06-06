@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -555,7 +556,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-
+	
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
@@ -866,7 +867,7 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public static String[] getTimes(ExperimentInterface experimentData) {
-		TreeSet<String> times = new TreeSet<String>();
+		LinkedHashSet<String> times = new LinkedHashSet<String>();
 		if (experimentData != null)
 			for (SubstanceInterface md : experimentData) {
 				for (ConditionInterface sd : md) {
