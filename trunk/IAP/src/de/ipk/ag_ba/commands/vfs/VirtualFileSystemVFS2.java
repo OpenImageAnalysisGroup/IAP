@@ -319,6 +319,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
 			String substanceName = limg.getSubstanceName();
 			desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+			desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getURL().getFileNameExtension().length()) + "."
+					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
 			finalMainName = desiredFileName;
 			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
 				pre = optFileNameMainAndLabelPrefix[0];
@@ -350,6 +352,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 				pre = optFileNameMainAndLabelPrefix[1];
 				String substanceName = limg.getSubstanceName();
 				desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+				desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getLabelURL().getFileNameExtension().length()) + "."
+						+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
 			}
 			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			MyByteArrayInputStream labelStream = ResourceIOManager.getInputStreamMemoryCached(
@@ -373,6 +377,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		{
 			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi,
 					snapshotTime, firstPre + finalMainName.split("#")[0]);
+			targetFileNamePreview = targetFileNamePreview.substring(0, targetFileNamePreview.length() - limg.getURL().getFileNameExtension().length()) + "."
+					+ SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
 			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
 			if (previewStream != null && previewStream.getCount() > 0)
 				saveStream(targetFileNamePreview, previewStream, false, previewStream.getCount());

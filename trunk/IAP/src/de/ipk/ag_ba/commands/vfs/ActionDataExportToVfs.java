@@ -29,9 +29,11 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -261,9 +263,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					String zefn = null;
 					try {
 						zefn = determineBinaryFileName(t, substanceName, nm, bm);
+						zefn = zefn.substring(0, zefn.lastIndexOf(".")) + "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+						zefn = zefn.contains("#") ? zefn.split("#")[0] : zefn;
 						final VfsFileObject targetFile = vfs.newVfsFile(
 								hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t, zefn.contains("#") ? zefn.split("#")[0] : zefn), true);
+										experiment.getHeader(), t,
+										zefn), true);
 						boolean exists = targetFile.exists()
 								&& targetFile.length() > 0;
 						targetExists = exists;
@@ -279,7 +284,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 											+ " // WILL RETRY IN 2 MINUTES // "
 											+ SystemAnalysis
 													.getCurrentTime());
-							Thread.sleep(10 * 60 * 1000);
+							Thread.sleep(2 * 60 * 1000);
 							// try 2nd time after 10 minutes
 							fileContent = copyBinaryFileContentToTarget(
 									experiment, written, hsmManager, es,
@@ -610,6 +615,16 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							if (in == null)
 								System.out.println("No input for " + url);
 							else {
+								String sourceFileExtension = url.getFileNameExtension();
+								String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions
+										.getInstance().getString("IAP", "Result File Type", "png");
+								if (sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
+									// convert from PNG to JPG, if needed
+									BufferedImage img = ImageIO.read(in);
+									MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
+									ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
+									in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());
+								}
 								synchronized (es) {
 									String fn;
 									if (isIconStorage)

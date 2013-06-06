@@ -146,7 +146,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 									plantVolume * corr * corr * corr, "mm^3");
 						}
 						
-						boolean createVolumeDataset = getBoolean("Create Volume Dataset", true);
+						boolean saveVolumeDataset = getBoolean("Save Volume Dataset", true);
 						LoadedVolumeExtension volume = null;
 						Sample sample = inSample;
 						volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResultCopy());
@@ -187,24 +187,26 @@ public class BlockThreeDgeneration extends AbstractBlock {
 												.getSampleFineTimeOrRowId())) + ".argb_volume");
 						
 						volume.setColorDepth(VolumeColorDepth.RGBA.toString());
-						if (createVolumeDataset) {
+						if (saveVolumeDataset) {
 							summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
 						}
-						boolean create3Dskeleton = getBoolean("Create 3D Skeleton", true);
+						boolean create3Dskeleton = getBoolean("Calculate 3D Skeleton", true);
+						boolean save3Dskeleton = getBoolean("Save 3D Skeleton", true);
 						if (create3Dskeleton) {
 							if (optStatus != null)
 								optStatus.setCurrentStatusText1("Create 3-D skeleton");
 							createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
-									(LoadedVolume) volume.clone(volume.getParentSample()));
+									(LoadedVolume) volume.clone(volume.getParentSample()), save3Dskeleton);
 						}
-						boolean create3DadvancedProbabilitySkeleton = getBoolean("Create 3-D probability skeleton", true);
+						boolean create3DadvancedProbabilitySkeleton = getBoolean("Calculate 3-D probability skeleton", true);
+						boolean save3DadvancedProbabilitySkeleton = getBoolean("Save 3-D probability skeleton", true);
 						if (create3DadvancedProbabilitySkeleton) {
 							if (optStatus != null)
-								optStatus.setCurrentStatusText1("Create advanced 3-D probability skeleton");
+								optStatus.setCurrentStatusText1("Calculate 3-D probability skeleton");
 							int[][][] probabilityCube = mg.getByteCubeResult();
 							createAdvancedProbabilitySkeleton(
 									summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
-									(LoadedVolume) volume.clone(volume.getParentSample()));
+									(LoadedVolume) volume.clone(volume.getParentSample()), save3DadvancedProbabilitySkeleton);
 						}
 					}
 				}
@@ -218,7 +220,7 @@ public class BlockThreeDgeneration extends AbstractBlock {
 	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution,
 			ThreeDmodelGenerator mg,
 			Double distHorizontal,
-			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume) {
+			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume, boolean save3Dskeleton) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create simple 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -294,7 +296,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			n = SystemAnalysis.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 1)";
 		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
 		lve.getURL().setFileName(n + ".(plant skeleton).argb_volume");
-		summaryResult.setVolume("RESULT_volume.plant3d.skeleton.cube", lve);
+		if (save3Dskeleton)
+			summaryResult.setVolume("RESULT_volume.plant3d.skeleton.cube", lve);
 		
 		s.printTime();
 	}
@@ -306,7 +309,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			ThreeDmodelGenerator mg,
 			Double distHorizontal,
 			Double realMarkerDistHorizontal,
-			int[][][] probabilityCube, LoadedVolume volume) {
+			int[][][] probabilityCube, LoadedVolume volume,
+			boolean save3DadvancedProbabilitySkeleton) {
 		int empty = 0;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -382,8 +386,8 @@ public class BlockThreeDgeneration extends AbstractBlock {
 			n = SystemAnalysis.getCurrentTime() + " (NO VOLUME NAME, NULL ERROR 2)";
 		n = StringManipulationTools.stringReplace(n, ".argb_volume", "");
 		lve.getURL().setFileName(n + ".(plant probability skeleton).argb_volume");
-		
-		summaryResult.setVolume("RESULT_volume.plant3d.probability.skeleton.cube", lve);
+		if (save3DadvancedProbabilitySkeleton)
+			summaryResult.setVolume("RESULT_volume.plant3d.probability.skeleton.cube", lve);
 		
 		s.printTime();
 	}
