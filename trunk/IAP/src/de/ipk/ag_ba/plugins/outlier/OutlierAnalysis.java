@@ -78,8 +78,32 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		calculationResults.clear();
+		
+		String savedSelTime = selTimepoint;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table><tr><th>Time</th><th>Number of outlier plants</th></tr>");
+		
+		for (String t : Experiment.getTimes(experimentReference.getData())) {
+			status.setCurrentStatusText1("Analyze Outlier Counts");
+			status.setCurrentStatusText2(t);
+			selTimepoint = t;
+			TreeMap<String, LinkedHashMap<String, Boolean>> plantid2property2topOrLowPercentile =
+					new TreeMap<String, LinkedHashMap<String, Boolean>>();
+			processData(plantid2property2topOrLowPercentile);
+			sb.append("<tr><td>" + t + "</td><td>" + plantid2property2topOrLowPercentile.size());
+		}
+		sb.append("</table>");
+		calculationResults.clear();
+		calculationResults.add(sb.toString());
+		
+		selTimepoint = savedSelTime;
 		TreeMap<String, LinkedHashMap<String, Boolean>> plantid2property2topOrLowPercentile =
 				new TreeMap<String, LinkedHashMap<String, Boolean>>();
+		processData(plantid2property2topOrLowPercentile);
+	}
+	
+	private void processData(TreeMap<String, LinkedHashMap<String, Boolean>> plantid2property2topOrLowPercentile) throws Exception {
 		ArrayList<Double> numericValues = new ArrayList<Double>();
 		ArrayList<String> plantIDs = new ArrayList<String>();
 		HashSet<String> allPlantIDs = new HashSet<String>();
