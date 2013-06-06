@@ -170,7 +170,7 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><table>");
 		sb.append("<tr><th colspan='" + (maxDescCount + 1) + "'>Processed " + traitCount + " traits and " + plantIDcount + " plant IDs</th></tr>");
-		sb.append("<tr><th>Plant ID</td><th colspan='" + maxDescCount + "'>Traits</th></tr>");
+		sb.append("<tr><th>" + plantid2property2topOrLowPercentile.size() + " Plants</td><th colspan='" + maxDescCount + "'>Traits</th></tr>");
 		for (String p : plantid2property2topOrLowPercentile.keySet()) {
 			sb.append("<tr><td>" + p + "</td>");
 			LinkedHashMap<String, Boolean> traitChange = plantid2property2topOrLowPercentile.get(p);
