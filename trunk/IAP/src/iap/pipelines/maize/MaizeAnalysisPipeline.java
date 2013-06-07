@@ -1,5 +1,6 @@
 package iap.pipelines.maize;
 
+import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -57,7 +58,8 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 		String[] defaultBlockList = new String[] {
 				// acquisition
 				BlLoadImages.class.getCanonicalName(),
-				
+				BlCreateDummyReferenceIfNeeded.class.getCanonicalName(),
+
 				// preprocessing
 				BlRotate.class.getCanonicalName(),
 				BlAlign.class.getCanonicalName(),
@@ -67,7 +69,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlColorBalanceCircularVisNir.class.getCanonicalName(),
 				BlDetectBlueMarkers.class.getCanonicalName(),
 				BlockCutFromSide.class.getCanonicalName(),
-				
+
 				// segmentation
 				BlRemoveBackground.class.getCanonicalName(),
 				BlIntensityCalculationFluo.class.getCanonicalName(),
@@ -77,7 +79,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlMedianFilterFluo.class.getCanonicalName(),
 				BlRemoveSmallObjectsVisFluo.class.getCanonicalName(),
 				BlUseFluoMaskToClearOther.class.getCanonicalName(),
-				
+
 				// feature extraction
 				BlSkeletonizeVisFluo.class.getCanonicalName(),
 				BlSkeletonizeNir.class.getCanonicalName(),
@@ -87,7 +89,7 @@ public class MaizeAnalysisPipeline extends AbstractImageProcessor {
 				BlCalcConvexHull.class.getCanonicalName(),
 				BlCalcAreas.class.getCanonicalName(),
 				BlCalcVolumes.class.getCanonicalName(),
-				
+
 				// postprocessing
 				BlRunPostProcessors.class.getCanonicalName(),
 				BlDrawSkeleton.class.getCanonicalName(),

@@ -16,6 +16,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -42,14 +43,11 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	
 	@Override
 	protected Image processVISmask() {
-		Image fi = input().images() != null ? input().masks().vis() : null;
+		Image fi = input().masks() != null ? input().masks().vis() : null;
 		if (fi != null) {
-			getProperties().setImage("img.vis.3D", fi.show("CLEARED", false));
-		} else {
-			System.out.println();
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO VIS IMAGE TO BE STORED FOR LATER 3D GENRATION!");
+			getProperties().setImage("img.vis.3D", fi);
 		}
-		return super.processVISimage();
+		return fi;
 	}
 	
 	@Override
@@ -98,8 +96,11 @@ public class BlThreeDreconstruction extends AbstractBlock {
 								distHorizontal = options.getCalculatedBlueMarkerDistance();
 							
 							if (distHorizontal == null)
-								if (angle.startsWith("side"))
-									distHorizontal = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance").getValue();
+								if (angle.startsWith("side")) {
+									BlockProperty val = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance");
+									if (val != null)
+										distHorizontal = val.getValue();
+								}
 							realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
 							Image vis = bp.getImage("img.vis.3D");
 							bp.setImage("img.vis.3D", null);

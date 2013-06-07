@@ -122,7 +122,7 @@ public class ThreeDmodelGenerator {
 			status.setCurrentStatusText1("Cube Construction Finished");
 		// status.setCurrentStatusText2("");
 		
-		if (!status.wantsToStop())
+		if (status != null && !status.wantsToStop())
 			status.setCurrentStatusValueFine(100d);
 	}
 	
@@ -193,18 +193,19 @@ public class ThreeDmodelGenerator {
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		final double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		final double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
-		if (status!=null) {
-		status.setCurrentStatusText1("Colorize Cube");
-		status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
-		
+		if (status != null) {
+			status.setCurrentStatusText1("Colorize Cube");
+			status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
+		}
 		ArrayList<MyThread> wait = new ArrayList<MyThread>();
 		double x;
 		x = -cubeSideLengthX / 2d;
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
-			if (status.wantsToStop())
+			if (status != null && status.wantsToStop())
 				break;
 			final double xF = x;
-			status.setCurrentStatusValueFine(100d * xi / maxVoxelPerSide);
+			if (status != null)
+				status.setCurrentStatusValueFine(100d * xi / maxVoxelPerSide);
 			final int xiF = xi;
 			MyThread w = BackgroundThreadDispatcher.addTask(new Runnable() {
 				@Override
@@ -333,7 +334,7 @@ public class ThreeDmodelGenerator {
 		double smallProgressStep = progressStep / maxVoxelPerSide;
 		boolean isTopViewPicture = p.getIsTop();
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
-			if (status.wantsToStop())
+			if (status != null && status.wantsToStop())
 				break;
 			// if (xi % 100 == 0)
 			// status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
@@ -349,7 +350,8 @@ public class ThreeDmodelGenerator {
 				y += voxelSizeY;
 			}
 			x += voxelSizeX;
-			status.setCurrentStatusValueFineAdd(smallProgressStep);
+			if (status != null)
+				status.setCurrentStatusValueFineAdd(smallProgressStep);
 		}
 	}
 	
@@ -371,7 +373,7 @@ public class ThreeDmodelGenerator {
 		boolean isTopViewPicture = p.getIsTop();
 		// System.out.println("CUTTT 2... (angle: " + angle + ")");
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
-			if (status.wantsToStop())
+			if (status != null && status.wantsToStop())
 				break;
 			if (status != null)
 				status.setCurrentStatusText1("Process " + vcnt + " VOXELS " + ((int) (100d * xi / maxVoxelPerSide)) + "%...");
@@ -387,7 +389,8 @@ public class ThreeDmodelGenerator {
 				y += voxelSizeY;
 			}
 			x += voxelSizeX;
-			status.setCurrentStatusValueFineAdd(smallProgressStep);
+			if (status != null)
+				status.setCurrentStatusValueFineAdd(smallProgressStep);
 		}
 	}
 	
@@ -493,17 +496,19 @@ public class ThreeDmodelGenerator {
 		//
 		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
 		//
-		status.setCurrentStatusValue(-1);
-		//
-		status.setCurrentStatusText1("Finished scanline 0 / " + maxVoxelPerSide);
-		status.setCurrentStatusText2("Reconstructing Motion Structure");
+		if (status != null) {
+			status.setCurrentStatusValue(-1);
+			//
+			status.setCurrentStatusText1("Finished scanline 0 / " + maxVoxelPerSide);
+			status.setCurrentStatusText2("Reconstructing Motion Structure");
+		}
 		for (int vvx = 0; vvx < maxVoxelPerSide; vvx++) {
 			final int vx = vvx;
 			run.submit(new Runnable() {
 				@Override
 				public void run() {
 					for (int vy = 0; vy < maxVoxelPerSide; vy++) {
-						if (status.wantsToStop())
+						if (status != null && status.wantsToStop())
 							return;
 						int ix = (int) (vx * scaleX + vx * 50 / widthFactor);
 						int iy = (int) (vy * scaleY);
@@ -521,8 +526,10 @@ public class ThreeDmodelGenerator {
 						}
 					}
 					tso.addInt(1);
-					status.setCurrentStatusText1("Finished scanline " + vx + " / " + maxVoxelPerSide);
-					status.setCurrentStatusValueFine(100d * ((tso.getInt()) / (double) maxVoxelPerSide));
+					if (status != null) {
+						status.setCurrentStatusText1("Finished scanline " + vx + " / " + maxVoxelPerSide);
+						status.setCurrentStatusValueFine(100d * ((tso.getInt()) / (double) maxVoxelPerSide));
+					}
 				}
 			});
 		}
@@ -533,7 +540,8 @@ public class ThreeDmodelGenerator {
 			ErrorMsg.addErrorMessage(e);
 		} // wait max 7 days for result
 			//
-		status.setCurrentStatusValue(0);
+		if (status != null)
+			status.setCurrentStatusValue(0);
 		//
 	}
 	

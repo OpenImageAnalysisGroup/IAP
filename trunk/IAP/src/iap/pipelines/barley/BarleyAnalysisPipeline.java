@@ -1,5 +1,6 @@
 package iap.pipelines.barley;
 
+import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
@@ -24,7 +25,6 @@ import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import iap.blocks.unused.BlCopyImagesApplyMask;
-import iap.blocks.unused.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.unused.BlCrop;
 import iap.blocks.unused.BlIRdiff;
 import iap.blocks.unused.BlLabFilterExt;
