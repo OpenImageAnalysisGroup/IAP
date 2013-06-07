@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * Comprehensive corn image analysis pipeline, processing VIS, FLUO and NIR images. Depends on reference images for initial comparison
  * and foreground / background separation.
  * 
- * @author klukas, pape
+ * @author klukas
  */
 public class MaizeAnalysisPipelineWith3D extends MaizeAnalysisPipeline {
 	

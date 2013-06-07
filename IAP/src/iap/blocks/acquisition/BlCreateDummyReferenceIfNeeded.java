@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.acquisition;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
