@@ -193,6 +193,7 @@ public class ThreeDmodelGenerator {
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		final double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
 		final double voxelSizeZ = cubeSideLengthZ / maxVoxelPerSide;
+		if (status!=null) {
 		status.setCurrentStatusText1("Colorize Cube");
 		status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
 		
