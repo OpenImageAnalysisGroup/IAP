@@ -847,6 +847,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	public static String replaceInvalidChars(String experimentName) {
 		String res = StringManipulationTools.stringReplace(experimentName, ":", "_");
 		res = StringManipulationTools.stringReplace(res, "\\", "");
+		res = StringManipulationTools.stringReplace(res, "[", "|");
+		res = StringManipulationTools.stringReplace(res, "]", "|");
 		return res;
 	}
 	
