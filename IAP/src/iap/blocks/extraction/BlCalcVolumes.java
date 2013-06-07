@@ -160,12 +160,13 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 				double topAreaCnt = 0;
 				for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-					for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
-						if (v.getValue() != null) {
-							topAreaSum += v.getValue().doubleValue();
-							topAreaCnt += 1;
+					if (rt != null)
+						for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
+							if (v.getValue() != null) {
+								topAreaSum += v.getValue().doubleValue();
+								topAreaCnt += 1;
+							}
 						}
-					}
 				}
 				
 				if (areaCnt > 0) {

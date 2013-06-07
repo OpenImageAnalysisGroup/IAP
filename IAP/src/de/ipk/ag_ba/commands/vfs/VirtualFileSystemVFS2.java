@@ -257,8 +257,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			VfsFileObject file = newVfsFile(fn);
 			if (file == null)
 				return null;
-			if (!file.exists())
+			if (!file.exists()) {
+				System.out.println("Could not find file: " + file.getFile());
 				return null;
+			}
 			MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
 			readCounter.addLong(is.getCount());
 			if (doPrintStatus())
