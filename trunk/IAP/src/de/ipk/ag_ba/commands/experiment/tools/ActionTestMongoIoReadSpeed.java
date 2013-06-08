@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.commands.experiment.tools;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.TreeMap;
 
@@ -18,14 +17,11 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
@@ -81,15 +77,12 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 			
 			PerformanceAnalysisTask task = new PerformanceAnalysisTask();
 			TreeMap<Long, String> times = new TreeMap<Long, String>();
-			Collection<NumericMeasurementInterface> statRes = new ArrayList<NumericMeasurementInterface>();
-			
 			long t1 = System.currentTimeMillis();
 			task.setInput(
 					AbstractPhenotypingTask.getWateringInfo(res),
 					workload, null, m, workOnSubset, numberOfSubsets);
 			task.performAnalysis(1, 1, status);
 			long t2 = System.currentTimeMillis();
-			statRes.addAll(task.getOutput());
 			// String ss = "T(s)\t" + ((t2 - t1) / 1000);
 			// times.put((t2 - t1), ss);
 			// System.out.println("------------------------------------------------------------");
@@ -99,18 +92,7 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 			// System.out.println(s);
 			// }
 			
-			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
-			
-			{
-				for (NumericMeasurementInterface m : statRes) {
-					if (m == null)
-						System.out.println("ERROR NULL");
-					else
-						newStatisticsData.add(new MappingData3DPath(m));
-				}
-			}
-			
-			final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
+			final ExperimentInterface statisticsResult = task.getOutput();
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
 			statisticsResult.getHeader().setDatabaseId("");

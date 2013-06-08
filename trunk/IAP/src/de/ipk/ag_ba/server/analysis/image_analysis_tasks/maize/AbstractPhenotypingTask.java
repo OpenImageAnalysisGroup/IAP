@@ -45,6 +45,7 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
@@ -54,8 +55,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
@@ -64,7 +67,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
-	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
+	private ExperimentInterface output = new Experiment();
 	
 	protected DatabaseTarget databaseTarget;
 	private int workOnSubset;
@@ -189,7 +192,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			status.setCurrentStatusValue(0);
 			status.setCurrentStatusText1("Initiate " + getName());
 			status.setCurrentStatusText2("");
-			output = new ArrayList<NumericMeasurementInterface>();
+			output = new Experiment();
 			
 			/**
 			 * ____A MAP FROM PLANT ID TO
@@ -497,11 +500,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									databaseTarget.getPrefix());
 							volumeInDatabase.getURL().setDetail(
 									v.getURL().getDetail());
-							output.add(volumeInDatabase);
+							outputAdd(volumeInDatabase);
 						} else {
 							System.out.println(SystemAnalysis.getCurrentTime()
 									+ ">Volume kept in memory: " + v);
-							output.add(v);
+							outputAdd(v);
 						}
 						s.printTime();
 					} catch (Exception e) {
@@ -712,7 +715,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									tray, tray_cnt);
 							if (imageRef != null) {
 								if (output != null)
-									output.add(imageRef);
+									outputAdd(imageRef);
 							} else {
 								System.out.println(SystemAnalysis.getCurrentTime()
 										+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
@@ -737,13 +740,18 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							System.out.println("ERROR #1");
 						} else {
 							if (output != null)
-								output.add(imageRef);
+								outputAdd(imageRef);
 						}
 					}
 				}
 			}
 		};
 		return new MyThread(r, "Save Image");
+	}
+	
+	private synchronized void outputAdd(NumericMeasurementInterface meas) {
+		MappingData3DPath mp = new MappingData3DPath(meas, false);
+		Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result,
@@ -800,8 +808,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public Collection<NumericMeasurementInterface> getOutput() {
-		Collection<NumericMeasurementInterface> result = output;
+	public ExperimentInterface getOutput() {
+		ExperimentInterface result = output;
 		output = null;
 		return result;
 	}
@@ -829,7 +837,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
 				
 				if (output != null)
-					output.add(m);
+					outputAdd(m);
 			}
 		}
 	}
@@ -871,11 +879,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										databaseTarget.getPrefix());
 								volumeInDatabase.getURL().setDetail(
 										v.getURL().getDetail());
-								output.add(volumeInDatabase);
+								outputAdd(volumeInDatabase);
 							} else {
 								System.out.println(SystemAnalysis.getCurrentTime()
 										+ ">Volume kept in memory: " + v);
-								output.add(v);
+								outputAdd(v);
 							}
 							s.printTime();
 						} catch (Exception e) {
@@ -909,7 +917,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							m.setPosition(template.getPosition());
 							m.setPositionUnit(template.getPositionUnit());
 						}
-						output.add(m);
+						outputAdd(m);
 					}
 				}
 			}

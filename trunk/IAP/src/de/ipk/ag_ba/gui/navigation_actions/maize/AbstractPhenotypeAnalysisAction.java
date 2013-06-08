@@ -3,7 +3,6 @@ package de.ipk.ag_ba.gui.navigation_actions.maize;
 import info.StopWatch;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 
 import org.ErrorMsg;
@@ -28,14 +27,12 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -49,7 +46,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	protected ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
-	protected Experiment experimentResult;
+	protected ExperimentInterface experimentResult;
 	
 	private long startTime;
 	
@@ -159,25 +156,22 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			if (status != null)
 				status.setCurrentStatusText1("Analysis finished");
 			
-			final ArrayList<MappingData3DPath> newStatisticsData = new ArrayList<MappingData3DPath>();
-			Collection<NumericMeasurementInterface> statRes = task.getOutput();
+			final ExperimentInterface statisticsResult = task.getOutput();
 			
-			if (statRes == null) {
+			if (statisticsResult == null) {
 				System.err.println("Error: no statistics result");
-				ErrorMsg.addErrorMessage("no statistics result");
-			} else {
-				for (NumericMeasurementInterface m : statRes) {
-					if (m == null)
-						System.out.println("Error: null value in statistical result set");
-					else
-						newStatisticsData.add(new MappingData3DPath(m));
+				this.experimentResult = null;
+				if (getResultReceiver() == null)
+					mpc = new MainPanelComponent("Stop requested, processing aborted, output set to NULL.");
+				else {
+					getResultReceiver().setExperimenData(null);
+					getResultReceiver().run();
 				}
-			}
-			
-			if (statRes != null) {
+				ErrorMsg.addErrorMessage("no statistics result");
+				
+			} else {
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
-				final Experiment statisticsResult = new Experiment(MappingData3DPath.merge(newStatisticsData, false));
 				statisticsResult.setHeader(experiment.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
@@ -187,7 +181,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					}
 				}
 				
-				System.out.println("Statistics results: " + newStatisticsData.size());
+				System.out.println("Statistics results: " + statisticsResult.getNumberOfMeasurementValues());
 				// System.out.println("Statistics results within Experiment: " + statisticsResult.getNumberOfMeasurementValues());
 				statisticsResult.getHeader().setDatabaseId("");
 				if (statisticsResult.size() > 0) {
@@ -263,14 +257,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText1("Processing finished");
 				}
 				this.experimentResult = statisticsResult;
-			} else {
-				this.experimentResult = null;
-				if (getResultReceiver() == null)
-					mpc = new MainPanelComponent("Stop requested, processing aborted, output set to NULL.");
-				else {
-					getResultReceiver().setExperimenData(null);
-					getResultReceiver().run();
-				}
 			}
 			if (status != null) {
 				status.setCurrentStatusValue(-1);

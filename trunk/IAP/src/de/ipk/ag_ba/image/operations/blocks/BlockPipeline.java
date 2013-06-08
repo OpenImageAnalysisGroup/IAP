@@ -44,6 +44,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -324,9 +325,9 @@ public class BlockPipeline {
 				try {
 					analysisTaskFinal.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1,
 							status);
-					Collection<NumericMeasurementInterface> out = analysisTaskFinal.getOutput();
+					ExperimentInterface out = analysisTaskFinal.getOutput();
 					if (out != null)
-						for (NumericMeasurementInterface nmi : out) {
+						for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
 							if (nmi instanceof NumericMeasurement) {
 								NumericMeasurement nm = (NumericMeasurement) nmi;
 								String sub = nm.getParentSample().getParentCondition().getParentSubstance().getName();
