@@ -21,8 +21,12 @@ import de.ipk.ag_ba.server.analysis.ThreeDsegmentationColored;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
@@ -50,8 +54,13 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public Collection<NumericMeasurementInterface> getOutput() {
-		return output;
+	public ExperimentInterface getOutput() {
+		Experiment res = new Experiment();
+		for (NumericMeasurementInterface nmi : output) {
+			Substance3D.addAndMerge(res, new MappingData3DPath(nmi, false).getSubstance(), false);
+		}
+		output.clear();
+		return res;
 	}
 	
 	@Override

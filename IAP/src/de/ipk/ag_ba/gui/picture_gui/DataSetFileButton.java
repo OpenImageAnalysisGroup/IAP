@@ -379,10 +379,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										try {
 											task.performAnalysis(SystemAnalysis
 													.getNumberOfCPUs(), 1, sp);
-											Collection<NumericMeasurementInterface> out = task
-													.getOutput();
+											ExperimentInterface out = task.getOutput();
 											ImageStack fis = new ImageStack();
-											for (NumericMeasurementInterface nmi : out) {
+											for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
 												if (nmi instanceof LoadedImage) {
 													LoadedImage li = (LoadedImage) nmi;
 													fis.addImage(
