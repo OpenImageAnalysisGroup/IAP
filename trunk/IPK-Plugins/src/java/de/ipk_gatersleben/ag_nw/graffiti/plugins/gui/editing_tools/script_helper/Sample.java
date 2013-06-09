@@ -299,7 +299,7 @@ public class Sample implements SampleInterface {
 	/*
 	 * Delegate Methods
 	 */
-	
+
 	@Override
 	public boolean add(NumericMeasurementInterface e) {
 		return measurements.add(e);
@@ -399,15 +399,15 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public int compareTo(SampleInterface sd) {
+		if (getTime() < sd.getTime())
+			return -1;
+		if (getTime() > sd.getTime())
+			return 1;
 		String u1 = getTimeUnit();
 		String u2 = sd.getTimeUnit();
 		u1 = (u1 != null ? u1 : "");
 		u2 = (u2 != null ? u2 : "");
-		int res = u1.compareTo(u2);
-		if (res != 0)
-			return res;
-		else
-			return getTime() < sd.getTime() ? -1 : (getTime() == sd.getTime() ? 0 : 1);
+		return u1.compareTo(u2);
 	}
 	
 	// @Override
