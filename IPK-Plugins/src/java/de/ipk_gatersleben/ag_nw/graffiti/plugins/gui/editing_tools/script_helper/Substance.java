@@ -177,78 +177,123 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substance, boolean ignoreSnapshotFineTime) {
+	public static void addAndMerge(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
-		for (SubstanceInterface m : result)
-			if (substance.compareTo(m) == 0) {
-				targetSubstance = m;
-				// if (result.contains(substance) && targetSubstance != substance)
-				// result.remove(substance);
-				break;
+		SubstanceInterface substanceWithNewData;
+		synchronized (result) {
+			substanceWithNewData = newMeasurement.getParentSample().getParentCondition().getParentSubstance();
+			for (SubstanceInterface m : result)
+				if (substanceWithNewData.compareTo(m) == 0) {
+					targetSubstance = m;
+					break;
+				}
+			
+			if (targetSubstance == null) {
+				// completely new substance with all new data
+				result.add(substanceWithNewData);
+				return;
 			}
-		
-		if (targetSubstance == null) {
-			targetSubstance = substance;
-			// if (!result.contains(targetSubstance)) {
-			result.add(targetSubstance);
-			return;
-			// }
 		}
-		
-		for (ConditionInterface cond : new ArrayList<ConditionInterface>(substance)) {
-			cond.setParent(targetSubstance);
-			addAndMergeConditionData(result, targetSubstance, cond, ignoreSnapshotFineTime);
+		synchronized (substanceWithNewData) {
+			ArrayList<ConditionInterface> newConditions = new ArrayList<ConditionInterface>(substanceWithNewData.size());
+			for (ConditionInterface eventuallyNewCondition : substanceWithNewData) {
+				ConditionInterface nc = processCondition(result, targetSubstance, eventuallyNewCondition, ignoreSnapshotFineTime, true);
+				if (nc != null) {
+					nc.setExperimentHeader(result.getHeader());
+					nc.setParent(targetSubstance);
+					newConditions.add(nc);
+				}
+			}
+			targetSubstance.addAll(newConditions);
 		}
 	}
 	
-	private static void addAndMergeConditionData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface condition,
-			boolean ignoreSnapshotFineTime) {
+	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
+		SubstanceInterface targetSubstance = null;
+		synchronized (result) {
+			for (SubstanceInterface m : result)
+				if (substanceWithNewData.compareTo(m) == 0) {
+					targetSubstance = m;
+					break;
+				}
+			
+			if (targetSubstance == null) {
+				// completely new substance with all new data
+				result.add(substanceWithNewData);
+				return;
+			}
+		}
+		synchronized (substanceWithNewData) {
+			ArrayList<ConditionInterface> newConditions = new ArrayList<ConditionInterface>(substanceWithNewData.size());
+			for (ConditionInterface eventuallyNewCondition : substanceWithNewData) {
+				ConditionInterface nc = processCondition(result, targetSubstance, eventuallyNewCondition, ignoreSnapshotFineTime, false);
+				if (nc != null) {
+					nc.setExperimentHeader(result.getHeader());
+					nc.setParent(targetSubstance);
+					newConditions.add(nc);
+				}
+			}
+			targetSubstance.addAll(newConditions);
+		}
+	}
+	
+	private static ConditionInterface processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
+			ConditionInterface condition,
+			boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement) {
 		ConditionInterface targetCondition = null;
-		for (ConditionInterface cond : targetSubstance)
-			if (cond.compareTo(condition) == 0) {
-				targetCondition = cond;
-				// if (targetSubstance.contains(condition) && targetCondition != condition)
-				// targetSubstance.remove(condition);
-				break;
+		synchronized (targetSubstance) {
+			for (ConditionInterface cond : targetSubstance)
+				if (cond.compareTo(condition) == 0) {
+					targetCondition = cond;
+					break;
+				}
+			
+			if (targetCondition == null) {
+				return condition;
 			}
-		
-		if (targetCondition == null) {
-			targetCondition = condition;
-			// if (!targetSubstance.contains(condition)) {
-			targetSubstance.add(condition);
-			targetCondition.setExperimentHeader(targetExperiment.getHeader());
-			return;
-			// }
 		}
-		for (SampleInterface sample : new ArrayList<SampleInterface>(condition)) {
-			sample.setParent(targetCondition);
-			addAndMergeSampleData(targetExperiment, targetSubstance, targetCondition, sample, ignoreSnapshotFineTime);
+		synchronized (condition) {
+			for (SampleInterface sample : condition) {
+				sample.setParent(targetCondition);
+			}
+			ArrayList<SampleInterface> newSamples = new ArrayList<SampleInterface>(condition.size());
+			for (SampleInterface sample : condition) {
+				SampleInterface si = processSample(targetExperiment, targetSubstance, targetCondition, sample, ignoreSnapshotFineTime, forSureNewMeasurement);
+				if (si != null)
+					newSamples.add(si);
+			}
+			condition.addAll(newSamples);
 		}
+		return null;
 	}
 	
-	private static void addAndMergeSampleData(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance, ConditionInterface targetCondition,
-			SampleInterface sample, boolean ignoreSnapshotFineTime) {
+	private static SampleInterface processSample(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
+			ConditionInterface targetCondition,
+			SampleInterface sample, boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement) {
 		SampleInterface targetSample = null;
-		for (SampleInterface s : targetCondition)
-			if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
-				targetSample = s;
-				// if (targetCondition.contains(sample) && targetSample != sample)
-				// targetCondition.remove(sample);
-				break;
+		synchronized (targetCondition) {
+			for (SampleInterface s : targetCondition)
+				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
+					targetSample = s;
+					break;
+				}
+			
+			if (targetSample == null) {
+				return sample;
 			}
-		
-		if (targetSample == null) {
-			targetSample = sample;
-			// if (!targetSample.contains(sample)) {
-			targetCondition.add(targetSample);
-			return;
-			// }
 		}
-		for (NumericMeasurementInterface m : sample.toArray(new NumericMeasurementInterface[] {})) {
-			m.setParentSample(targetSample);
-			if (!targetSample.contains(m))
-				targetSample.add(m);
+		synchronized (targetSample) {
+			for (NumericMeasurementInterface m : sample) {
+				m.setParentSample(targetSample);
+			}
+			if (targetSample == sample)
+				return null;
+			for (NumericMeasurementInterface m : sample) {
+				if (forSureNewMeasurement || !targetSample.contains(m))
+					targetSample.add(m);
+			}
 		}
+		return null;
 	}
 	
 	@Override

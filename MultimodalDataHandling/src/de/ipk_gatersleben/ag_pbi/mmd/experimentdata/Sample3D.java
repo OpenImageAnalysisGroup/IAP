@@ -181,15 +181,16 @@ public class Sample3D extends Sample {
 	@Override
 	public int compareTo(SampleInterface sd) {
 		if (sd instanceof Sample3D) {
-			String u3 = getComponent();
-			String u4 = ((Sample3D) sd).getComponent();
-			u3 = (u3 != null ? u3 : "");
-			u4 = (u4 != null ? u4 : "");
 			int res = super.compareTo(sd);
 			if (res != 0)
 				return res;
-			else
+			else {
+				String u3 = getComponent();
+				String u4 = ((Sample3D) sd).getComponent();
+				u3 = (u3 != null ? u3 : "");
+				u4 = (u4 != null ? u4 : "");
 				return u3.compareTo(u4);
+			}
 		} else
 			return super.compareTo(sd);
 		

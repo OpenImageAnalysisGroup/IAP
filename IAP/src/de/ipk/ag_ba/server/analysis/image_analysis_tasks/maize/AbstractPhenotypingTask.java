@@ -55,7 +55,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -262,8 +261,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}, preThreadName);
 					if (SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
 						t.run();
-					else
+					else {
 						startThread(t);
+						Thread.sleep(100);
+					}
 					
 				} catch (Exception eeee) {
 					if (!freed.getBval(0, false))
@@ -750,8 +751,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
-		MappingData3DPath mp = new MappingData3DPath(meas, false);
-		Substance3D.addAndMerge(output, mp.getSubstance(), false);
+		// MappingData3DPath mp = new MappingData3DPath(meas, true);
+		Substance3D.addAndMerge(output, meas, false);
+		// Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
 	
 	protected ImageData saveImageAndUpdateURL(LoadedImage result,
