@@ -749,7 +749,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return new MyThread(r, "Save Image");
 	}
 	
-	private synchronized void outputAdd(NumericMeasurementInterface meas) {
+	private void outputAdd(NumericMeasurementInterface meas) {
 		MappingData3DPath mp = new MappingData3DPath(meas, false);
 		Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
