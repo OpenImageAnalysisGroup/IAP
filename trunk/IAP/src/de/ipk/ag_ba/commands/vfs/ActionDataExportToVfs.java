@@ -615,10 +615,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							if (in == null)
 								System.out.println("No input for " + url);
 							else {
-								String sourceFileExtension = url.getFileNameExtension();
+								String sourceFileExtension = url != null ? url.getFileNameExtension() : null;
 								String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions
 										.getInstance().getString("IAP", "Result File Type", "png");
-								if (sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
+								if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
 									// convert from PNG to JPG, if needed
 									BufferedImage img = ImageIO.read(in);
 									MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
