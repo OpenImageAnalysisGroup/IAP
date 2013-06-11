@@ -132,8 +132,10 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			}
 			if (workload.size() == 0) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">NO WORKLOAD! PROCESSING IS SKIPPED");
-				getResultReceiver().setExperimenData(null);
-				getResultReceiver().run();
+				if (getResultReceiver() != null) {
+					getResultReceiver().setExperimenData(null);
+					getResultReceiver().run();
+				}
 				return;
 			}
 			
@@ -324,13 +326,13 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		
-		ExperimentReference ref = new ExperimentReference(experimentResult);
-		ref.m = m;
-		
-		for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(ref, true))
-			res.add(new NavigationButton(adp, src != null ? src.getGUIsetting() : null));
-		
+		if (experimentResult != null) {
+			ExperimentReference ref = new ExperimentReference(experimentResult);
+			ref.m = m;
+			
+			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(ref, true))
+				res.add(new NavigationButton(adp, src != null ? src.getGUIsetting() : null));
+		}
 		return res;
 	}
 	
