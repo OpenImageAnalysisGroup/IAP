@@ -256,8 +256,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				targetExists = true;
 				bm.setURL(null);
 			} else {
-				status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles)
-						/ files);
+				status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files);
 				{
 					// store data
 					String zefn = null;
@@ -292,7 +291,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									null, false);
 						}
 						if (exists) {
-							files--;
 							idx--;
 							knownFiles++;
 						}
