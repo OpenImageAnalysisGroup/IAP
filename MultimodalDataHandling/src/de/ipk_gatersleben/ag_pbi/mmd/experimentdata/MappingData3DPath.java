@@ -110,7 +110,7 @@ public class MappingData3DPath {
 					Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
 					idx.addInt(1);
 					if (optStatus != null)
-						optStatus.setCurrentStatusValueFine(100d / (double) max * idx.getInt());
+						optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
 					if (optStatus != null)
 						optStatus.setCurrentStatusText2("Path Object " + idx.getInt() + "/" + max);
 				}

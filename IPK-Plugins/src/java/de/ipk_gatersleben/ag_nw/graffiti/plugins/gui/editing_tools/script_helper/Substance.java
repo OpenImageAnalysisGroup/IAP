@@ -262,7 +262,7 @@ public class Substance implements SubstanceInterface {
 				if (si != null)
 					newSamples.add(si);
 			}
-			condition.addAll(newSamples);
+			targetCondition.addAll(newSamples);
 		}
 		return null;
 	}
