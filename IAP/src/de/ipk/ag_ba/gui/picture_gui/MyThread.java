@@ -7,11 +7,14 @@
 
 package de.ipk.ag_ba.gui.picture_gui;
 
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
@@ -22,7 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 public class MyThread extends Thread implements Runnable {
 	
-	public static final boolean NEW_SCHEDULER = true;
+	public static final boolean NEW_SCHEDULER = false;
 	
 	private boolean finished = false;
 	private boolean started = false;
@@ -30,6 +33,9 @@ public class MyThread extends Thread implements Runnable {
 	private final Semaphore sem;
 	private String name;
 	private final Runnable runCode;
+	
+	private static ThreadSafeOptions runningTasks = new ThreadSafeOptions();
+	private static ArrayList<MyThread> waitingTasks = new ArrayList<MyThread>(SystemAnalysis.getNumberOfCPUs());
 	
 	private Runnable finishTask;
 	
@@ -45,7 +51,7 @@ public class MyThread extends Thread implements Runnable {
 	public void run() {
 		try {
 			started = true;
-			// super.run();
+			runningTasks.addLong(1);
 			try {
 				runCode.run();
 			} catch (Error err1) {
@@ -57,10 +63,11 @@ public class MyThread extends Thread implements Runnable {
 		} finally {
 			finished = true;
 			sem.release();
+			runningTasks.addLong(-1);
 			if (finishTask != null)
 				finishTask.run();
 		}
-		// System.out.print("f");
+		checkWaitTasks();
 	}
 	
 	public boolean isFinished() {
@@ -72,6 +79,8 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public Object getResult() throws InterruptedException {
+		if (!started)
+			startNG(null, false);
 		synchronized (this) {
 			if (r instanceof RunnableForResult) {
 				sem.acquire();
@@ -115,26 +124,70 @@ public class MyThread extends Thread implements Runnable {
 		return "Background Task " + name;
 	}
 	
-	public void startNG(ExecutorService es, boolean interactive) {
+	public synchronized void startNG(ThreadPoolExecutor es, boolean threadedExecution) {
 		if (!started) {
 			started = true;
-			boolean direct = !interactive;
+			boolean direct = !threadedExecution;
 			if (direct)
 				run();
 			else
 				if (NEW_SCHEDULER) {
 					try {
-						es.submit(this);
+						es.execute(this);
 					} catch (RejectedExecutionException rje) {
 						run();
 					}
 				} else {
-					start();
+					if (runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+						start();
+					} else {
+						if (!memorized()) {
+							run();
+						}
+					}
 				}
 		}
 	}
 	
+	private boolean memorized() {
+		synchronized (waitingTasks) {
+			// if (waitingTasks.size() < 20000) {// SystemAnalysis.getNumberOfCPUs()) {
+			waitingTasks.add(this);
+			return true;
+			// } else
+			// return false;
+		}
+	}
+	
+	public static void checkWaitTasks() {
+		MyThread t = null;
+		synchronized (waitingTasks) {
+			do {
+				if (waitingTasks.size() > 0 && runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+					t = waitingTasks.remove(waitingTasks.size() - 1);
+				}
+			} while (t != null && t.started);
+		}
+		if (t != null)
+			t.startNG(null, true);
+	}
+	
 	public void setFinishrunnable(Runnable finishTask) {
 		this.finishTask = finishTask;
+	}
+	
+	public void messageTaskIsWaiting() {
+		runningTasks.addLong(-1);
+		checkWaitTasks();
+	}
+	
+	public void messageTaskIsRunningAfterWait() {
+		runningTasks.addLong(1);
+	}
+	
+	public void memTask() {
+		if (!memorized()) {
+			run();
+		}
 	}
 }
