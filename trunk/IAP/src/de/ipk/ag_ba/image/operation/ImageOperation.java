@@ -4992,4 +4992,65 @@ public class ImageOperation {
 		else
 			return null;
 	}
+	
+	/**
+	 * Calculation of the distance map. MaxStep defines the precision of the algorithm (1 - correct result), by using a high Stepsize the algorithm
+	 * becomes much faster, but produces noise. While using a high Stepsize a GaussianBlur or a medianfilter is quite handy to supress noise.
+	 * 
+	 * @param maxStep
+	 *           should be > 0
+	 * @return 2d array
+	 */
+	public ImageOperation distanceMap() {
+		int background = BACKGROUND_COLORint;
+		int borderColor = Color.CYAN.getRGB();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] img = getImageAs2dArray();
+		ImageOperation io = new ImageOperation(getImageAs2dArray()).border().borderDetection(background, borderColor, false);
+		int borderLength = (int) io.getResultsTable().getValue("border", 0);
+		int[][] borderMap = io.getImageAs2dArray();
+		int[] borderList = getBorderList(borderMap, borderLength);
+		int[][] distMap = new int[w][h];
+		int xtemp;
+		int ytemp;
+		int dist = Integer.MAX_VALUE;
+		int disttemp = 0;
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (img[x][y] != background && borderMap[x][y] == background) { // Foreground, no borderpixel
+					for (int i = 0; i < borderList.length; i += 2) { // iterate borderlist
+						xtemp = borderList[i];
+						ytemp = borderList[i + 1];
+						disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
+						if (disttemp < dist)
+							dist = disttemp;
+					}
+					distMap[x][y] = dist;
+				}
+				dist = Integer.MAX_VALUE;
+			}
+		}
+		
+		return new ImageOperation(distMap);
+	}
+	
+	private int[] getBorderList(int[][] borderMap, int borderLength) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[] borderList = new int[borderLength * 2];
+		int i = 0;
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (borderMap[x][y] != BACKGROUND_COLORint) {
+					borderList[i] = x;
+					borderList[i + 1] = y;
+					i += 2;
+				}
+			}
+		}
+		return borderList;
+	}
 }
