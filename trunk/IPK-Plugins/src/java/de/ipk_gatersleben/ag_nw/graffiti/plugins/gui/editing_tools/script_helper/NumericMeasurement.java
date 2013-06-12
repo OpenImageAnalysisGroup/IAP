@@ -11,17 +11,17 @@ import org.jdom.Element;
 public class NumericMeasurement implements NumericMeasurementInterface {
 	private double value = Double.NaN;
 	private int replicateID;
-	private SampleInterface parentSample;
+	private SampleInterface clonedSample;
 	private String unit;
 	private String quality;
 	private String files;
 	
 	public NumericMeasurement(SampleInterface parent) {
-		this.parentSample = parent;
+		this.clonedSample = parent;
 	}
 	
 	public NumericMeasurement(SampleInterface parent, Map<?, ?> attributemap) {
-		this.parentSample = parent;
+		this.clonedSample = parent;
 		if (attributemap.containsKey("replicates"))
 			setReplicateID((Integer) attributemap.get("replicates"));
 		if (attributemap.containsKey("unit"))
@@ -48,16 +48,25 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 			setUnit(((NumericMeasurement) copyFrom).getUnit());
 		}
 		
-		SubstanceInterface md = copyFrom.getParentSample().getParentCondition().getParentSubstance().clone();
-		md.setName(newSubstanceName);
-		ConditionInterface series = copyFrom.getParentSample().getParentCondition().clone(md);
+		SubstanceInterface clonedSubstance = copyFrom.getParentSample().getParentCondition().getParentSubstance().clone();
+		clonedSubstance.setName(newSubstanceName);
+		ConditionInterface clonedCondition = copyFrom.getParentSample().getParentCondition().clone(clonedSubstance);
 		if (optNewExperimentName != null)
-			series.setExperimentName(optNewExperimentName);
-		series.setParent(md);
-		parentSample = copyFrom.getParentSample().clone(series);
-		parentSample.setParent(series);
+			clonedCondition.setExperimentName(optNewExperimentName);
+		clonedCondition.setParent(clonedSubstance);
+		clonedSample = copyFrom.getParentSample().clone(clonedCondition);
+		clonedSample.setParent(clonedCondition);
 		
 		setFiles(copyFrom.getFiles());
+		synchronized (clonedSubstance) {
+			clonedSubstance.add(clonedCondition);
+		}
+		synchronized (clonedCondition) {
+			clonedCondition.add(clonedSample);
+		}
+		synchronized (clonedSample) {
+			clonedSample.add(this);
+		}
 	}
 	
 	@Override
@@ -90,7 +99,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public SampleInterface getParentSample() {
-		return parentSample;
+		return clonedSample;
 	}
 	
 	@Override
@@ -193,7 +202,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void setParentSample(SampleInterface sample) {
-		parentSample = sample;
+		clonedSample = sample;
 	}
 	
 	@Override
