@@ -240,7 +240,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					progress++;
 					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID + ")";
 					status.setCurrentStatusText1(preThreadName);
-					Thread t = new Thread(new Runnable() {
+					Runnable t = new Runnable() {
 						@Override
 						public void run() {
 							try {
@@ -258,11 +258,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								freed.setBval(0, true);
 							}
 						}
-					}, preThreadName);
+					};
 					if (SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
 						t.run();
 					else {
-						startThread(t);
+						startThread(t, preThreadName);
 						Thread.sleep(100);
 					}
 					
@@ -325,10 +325,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return nn;
 	}
 	
-	private void startThread(Thread t) {
+	private void startThread(Runnable t, String name) throws InterruptedException {
 		SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60);
 		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
-		t.setPriority(Thread.MIN_PRIORITY);
 		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
 				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
 				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
@@ -350,7 +349,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					+ "%), REDUCING CONCURRENCY (THREAD.RUN)");
 			t.run();
 		} else {
-			t.start();
+			// t.setPriority(Thread.MIN_PRIORITY);
+			// t.start();
+			BackgroundThreadDispatcher.addTask(t, name, 0, 0, true).getResult();
 		}
 	}
 	
@@ -381,7 +382,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				threadsToStart += imageSetWithSpecificAngle.get(time).keySet().size();
 			}
-			final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
+			// final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 					if (status.wantsToStop())
@@ -394,14 +395,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						continue;
 					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
 					
-					Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
-							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
+					// Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+					// inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
 					
-					final boolean releaseCon = optMaxCon.tryAcquire();
-					if (!releaseCon)
-						System.out.print(">RUN");
-					else
-						System.out.print(">START");
+					// final boolean releaseCon = optMaxCon.tryAcquire();
+					// if (!releaseCon)
+					// System.out.print(">RUN");
+					// else
+					// System.out.print(">START");
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {
@@ -431,35 +432,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									ErrorMsg.addErrorMessage(e);
 								}
 							} finally {
-								innerLoopSemaphore.release();
-								if (releaseCon)
-									optMaxCon.release();
+								// innerLoopSemaphore.release();
+								// if (releaseCon)
+								// optMaxCon.release();
 								
 							}
 						}
 					};
-					innerLoopSemaphore.acquire();
-					if (releaseCon) {
-						Thread innerThread = new Thread(r);
-						innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
-								inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
-						innerThread.setPriority(Thread.MIN_PRIORITY);
-						
-						innerThread.start();
-					} else
-						r.run();
+					// innerLoopSemaphore.acquire();
+					// if (releaseCon) {
+					// Thread innerThread = new Thread(r);
+					// innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
+					// inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
+					// innerThread.setPriority(Thread.MIN_PRIORITY);
+					//
+					// innerThread.start();
+					
+					waitThreads.add(BackgroundThreadDispatcher.addTask(r, "Inner thread " + preThreadName + ", "
+								+ SystemAnalysis.getCurrentTime(time) + ", " +
+								inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", "
+								+ configAndAngle + ")", 0, 0, true));
+					// } else
+					// r.run();
 				}
 			}
-			innerLoopSemaphore.acquire(threadsToStart);
-			innerLoopSemaphore.release(threadsToStart);
+			// innerLoopSemaphore.acquire(threadsToStart);
+			// innerLoopSemaphore.release(threadsToStart);
 		}
-		Thread.currentThread().setName("Analyse " + plantID + " (process saving)");
+		// Thread.currentThread().setName("Analyse " + plantID + " (process saving)");
 		// System.out.println();
 		// System.out.print("[WAIT");
 		if (waitThreads != null && waitThreads.size() > 0)
 			BackgroundThreadDispatcher.waitFor(waitThreads);
 		// System.out.println("]");
-		Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
+		// Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {

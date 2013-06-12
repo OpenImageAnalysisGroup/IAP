@@ -2,16 +2,12 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -29,7 +25,6 @@ public class BackgroundThreadDispatcher {
 	
 	private static BackgroundThreadDispatcher myInstance = new BackgroundThreadDispatcher();
 	
-	private final Thread sheduler = null;
 	private StatusDisplay frame;
 	
 	public static void setFrameInstance(StatusDisplay mainFrame) {
@@ -48,7 +43,8 @@ public class BackgroundThreadDispatcher {
 		if (t == null)
 			return null;
 		
-		t.startNG(myInstance.es, interactive);
+		// t.startNG(null/* myInstance.es */, interactive);
+		t.memTask();
 		
 		return t;
 	}
@@ -134,22 +130,22 @@ public class BackgroundThreadDispatcher {
 	private static long lastPrint = 0;
 	private static long lastGC = 0;
 	
-	ExecutorService es = new ThreadPoolExecutor(
-			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
-			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
-			SystemAnalysis.getRealNumberOfCPUs(), // SystemAnalysis.getNumberOfCPUs(),
-			TimeUnit.SECONDS,
-			new ArrayBlockingQueue<Runnable>(SystemAnalysis.getNumberOfCPUs(), true),
-			new ThreadFactory() {
-				int idx = 1;
-				
-				@Override
-				public Thread newThread(Runnable r) {
-					Thread res = new Thread(r, "Background Pool Thread " + idx);
-					idx++;
-					return res;
-				}
-			});
+	// ThreadPoolExecutor es = new ThreadPoolExecutor(
+	// 0,
+	// SystemAnalysis.getNumberOfCPUs(),
+	// 5, // SystemAnalysis.getNumberOfCPUs(),
+	// TimeUnit.SECONDS,
+	// new ArrayBlockingQueue<Runnable>(SystemAnalysis.getRealNumberOfCPUs(), false),
+	// new ThreadFactory() {
+	// int idx = 1;
+	//
+	// @Override
+	// public Thread newThread(Runnable r) {
+	// Thread res = new Thread(r, "Background Pool Thread " + idx);
+	// idx++;
+	// return res;
+	// }
+	// });
 	
 	public static void waitFor(MyThread[] threads) throws InterruptedException {
 		HashSet<MyThread> t = new HashSet<MyThread>();
@@ -162,9 +158,17 @@ public class BackgroundThreadDispatcher {
 	}
 	
 	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
+		threads = new ArrayList<MyThread>(threads);
+		if (Thread.currentThread() instanceof MyThread)
+			((MyThread) Thread.currentThread()).messageTaskIsWaiting();
 		for (MyThread m : threads) {
+			if (!m.isStarted())
+				m.run();
 			m.getResult();
+			MyThread.checkWaitTasks();
 		}
+		if (Thread.currentThread() instanceof MyThread)
+			((MyThread) Thread.currentThread()).messageTaskIsRunningAfterWait();
 	}
 	
 	private static void updateTaskStatistics() {

@@ -27,9 +27,9 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		try {
 			prepare();
 		} catch (Error err1) {
-			reportError(err1, "BLOCK PREPARE ERROR: " + err1.getLocalizedMessage());
+			reportError(err1, "BLOCK PREPARE ERROR: " + err1.getMessage());
 		} catch (Exception err2) {
-			reportError(err2, "BLOCK PREPARE EXCEPTION: " + err2.getLocalizedMessage());
+			reportError(err2, "BLOCK PREPARE EXCEPTION: " + err2.getMessage());
 		}
 		
 		String name = this.getClass().getSimpleName();
@@ -125,7 +125,6 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						} catch (Exception e) {
 							reportError(e, "could not process NIR mask");
 						}
-						
 					}
 				}, name + " process NIR mask", parentPriority + 1, parentPriority, true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
@@ -139,14 +138,12 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 						} catch (Exception e) {
 							reportError(e, "could not process IR mask");
 						}
-						
 					}
 				}, name + " process IR mask", parentPriority + 1, parentPriority, true) });
 		
 		try {
 			postProcess(processedImages, processedMasks);
 		} catch (Exception e) {
-			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 		
