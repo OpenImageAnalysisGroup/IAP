@@ -9,7 +9,7 @@ import org.StringManipulationTools;
  */
 public class Snapshot {
 	
-	private String creator, measurement_label, id_tag, camera_label, path_image, path_null_image;
+	private String creator, measurement_label, id_tag, camera_label, camera_config, path_image, path_null_image;
 	private Timestamp time_stamp;
 	private double weight_before = Double.NaN, weight_after = Double.NaN;
 	private int water_amount;
@@ -22,7 +22,7 @@ public class Snapshot {
 	public String toString() {
 		return "creator=" + creator + ", label=" + measurement_label + ", id_tag=" + id_tag + ", camera_label="
 				+ camera_label + ", user_camera_label=" + userDefinedCameraLabel + ", image=" + path_image
-				+ ", null_image=" + path_null_image + ", config_blob=" + path_image_config_blob;
+				+ ", null_image=" + path_null_image + ", config_blob=" + path_image_config_blob + ", camera-config=" + camera_config;
 		
 	}
 	
@@ -59,6 +59,15 @@ public class Snapshot {
 	
 	public String getCamera_label() {
 		return camera_label;
+	}
+	
+	public void setCamera_config(String camera_config) {
+		this.camera_config = camera_config == null ? null : StringManipulationTools.stringReplace(StringManipulationTools.removeNumbersFromString(camera_config),
+				"__", "_");
+	}
+	
+	public String getCamera_config() {
+		return camera_config;
 	}
 	
 	public void setPath_image(String path_image) {

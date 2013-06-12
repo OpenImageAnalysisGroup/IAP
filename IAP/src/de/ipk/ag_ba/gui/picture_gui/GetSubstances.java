@@ -85,6 +85,8 @@ public class GetSubstances implements Runnable {
 				String title = substanceName;
 				if (validPrefix != null && title.contains("."))
 					title = title.substring(title.lastIndexOf(".") + ".".length());
+				if (substance.getInfo() != null && !substance.isEmpty())
+					title = "<html>" + title + " <font color='gray'><small>(" + substance.getInfo() + ")";
 				MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
 						substance, title, readOnly); //$NON-NLS-1$//$NON-NLS-2$
 				

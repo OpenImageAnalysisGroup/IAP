@@ -579,6 +579,7 @@ public class LTdataExchange implements ExperimentLoader {
 					snapshot.setWeight_before(w);
 				
 				snapshot.setCamera_label(rs.getString("compname"));
+				snapshot.setCamera_config(rs.getString("compname"));
 				// System.out.println("LABLAB: " + rs.getString("compname"));
 				snapshot.setXfactor(rs.getDouble("xfactor"));
 				snapshot.setYfactor(rs.getDouble("yfactor"));
@@ -648,6 +649,7 @@ public class LTdataExchange implements ExperimentLoader {
 				if (lbl.isEmpty())
 					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO CAMERA CONFIG FOR IMAGE-CONFIG '" + camLbl + "'!");
 				snapshot.setCamera_label(lbl);// rs.getString("compname"));
+				snapshot.setCamera_config(camLbl);
 				snapshot.setXfactor(0);// rs.getDouble("xfactor"));
 				snapshot.setYfactor(0);// rs.getDouble("yfactor"));
 				
@@ -1012,6 +1014,7 @@ public class LTdataExchange implements ExperimentLoader {
 					
 					Substance s = new Substance();
 					s.setName(sn.getCamera_label());
+					s.setInfo(sn.getCamera_config());
 					
 					Condition condition = new Condition(s, conditionTemplate.getAttributeMap());
 					condition.setExperimentInfo(experimentReq);
