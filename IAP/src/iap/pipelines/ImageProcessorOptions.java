@@ -34,6 +34,8 @@ public class ImageProcessorOptions {
 	
 	private String inf;
 	
+	private String customNullBlockPrefix;
+	
 	public ImageProcessorOptions(SystemOptions options) {
 		this.optSystemOptionStorage = options;
 	}
@@ -56,13 +58,16 @@ public class ImageProcessorOptions {
 	public void setCameraInfos(CameraPosition cameraTyp, String cameraConfig, String lateOrEarly) {
 		this.cameraPosition = cameraTyp;
 		
-		if (lateOrEarly != null && cameraConfig == null)
-			inf = " (" + lateOrEarly + ")";
+		if (lateOrEarly == null && cameraConfig == null)
+			inf = null;
 		else
-			if (cameraConfig != null && lateOrEarly == null)
-				inf = " for " + cameraConfig;
+			if (lateOrEarly != null && cameraConfig == null)
+				inf = " (" + lateOrEarly + ")";
 			else
-				inf = " for " + cameraConfig + "(" + lateOrEarly + ")";
+				if (cameraConfig != null && lateOrEarly == null)
+					inf = " for " + cameraConfig;
+				else
+					inf = " for " + cameraConfig + " (" + lateOrEarly + ")";
 		
 	}
 	
@@ -120,17 +125,21 @@ public class ImageProcessorOptions {
 		this.setOptSystemOptionStorage(systemOptionStorage);
 	}
 	
+	public void setCustomNullBlockPrefix(String customNullBlockPrefix) {
+		this.customNullBlockPrefix = customNullBlockPrefix;
+	}
+	
 	public String getSystemOptionStorageGroup() {
 		if (inf != null) {
 			if (getCameraPosition() != CameraPosition.UNKNOWN)
 				return getCameraPosition() + " settings" + inf;
 			else
-				return "Postprocessing" + inf;
+				return (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing") + inf;
 		} else {
 			if (getCameraPosition() != CameraPosition.UNKNOWN)
 				return getCameraPosition() + " settings";
 			else
-				return "Postprocessing";
+				return (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing");
 		}
 	}
 	
