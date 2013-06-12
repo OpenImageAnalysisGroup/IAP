@@ -145,19 +145,20 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		this.errorMessage = null;
 		try {
 			for (ExperimentReference experimentReference : experimentReferences) {
-				status.setCurrentStatusText1("Clone Experiment");
 				ExperimentInterface experiment = experimentReference.getData();
 				
-				if (!skipClone)
+				if (!skipClone) {
+					status.setCurrentStatusText1("Clone Experiment");
 					experiment = experiment.clone();
+				}
 				
 				status.setCurrentStatusText1("Store Files...");
 				
 				if (!skipClone)
 					experiment.setHeader(experimentReference.getHeader().clone());
 				
-				experiment.getHeader().setOriginDbId(
-						experimentReference.getHeader().getDatabaseId());
+				if (experimentReference.getHeader().getDatabaseId() != null && !experimentReference.getHeader().getDatabaseId().isEmpty())
+					experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
 				final ThreadSafeOptions written = new ThreadSafeOptions();
 				
 				this.files = determineNumberOfFilesInDataset(experiment);
@@ -172,7 +173,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				long startTime = System.currentTimeMillis();
 				
-				ExecutorService es = Executors.newFixedThreadPool(2);
+				ExecutorService es = Executors.newFixedThreadPool(SystemOptions.getInstance().getInteger("VFS", "Copy save threads", 4));
 				
 				boolean simulate = false;
 				
@@ -377,7 +378,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					}
 				}
 			String pre = "";
-			status.setCurrentStatusText1(pre + "files: " + (knownFiles + files)
+			status.setCurrentStatusText1(pre + "files: " + files
 					+ ", copied: " + idx
 					+ (knownFiles > 0 ? ", skipped: " + knownFiles + "" : ""));
 			

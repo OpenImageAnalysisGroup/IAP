@@ -6,7 +6,6 @@ import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
@@ -108,10 +107,11 @@ public class DataChartComponentWindow extends JFrame {
 		splitPane.setDividerLocation(getWidth() - 300);
 		splitPane.setDividerSize(10);
 		splitPane.setOneTouchExpandable(true);
-		add(TableLayout.getSplitVertical(new JLabel("ToDo - some settings and filter options"),
+		add(TableLayout.getSplitVertical(null, // new JLabel("ToDo - some settings and filter options"),
 				splitPane, TableLayout.PREFERRED, TableLayout.FILL), "0,0");
 	}
 	
+	@SuppressWarnings("unused")
 	private void setDefaultChartDisplay(Graph graph, Node ge, String title) {
 		int idx = 0;
 		Boolean mFalse = new Boolean(false);

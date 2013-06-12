@@ -556,7 +556,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-	
+
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
@@ -1289,7 +1289,8 @@ public class Experiment implements ExperimentInterface {
 		Experiment experiment = new Experiment();
 		if (toBeExtracted.isEmpty())
 			return experiment;
-		experiment.setHeader(toBeExtracted.iterator().next().iterator().next().getExperimentHeader().clone());
+		if (!toBeExtracted.iterator().next().isEmpty())
+			experiment.setHeader(toBeExtracted.iterator().next().iterator().next().getExperimentHeader().clone());
 		for (SubstanceInterface sub : toBeExtracted) {
 			SubstanceInterface su = sub.clone();
 			for (ConditionInterface c : sub) {
