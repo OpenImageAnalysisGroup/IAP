@@ -39,6 +39,8 @@ public class MyThread extends Thread implements Runnable {
 	
 	private Runnable finishTask;
 	
+	private boolean mem;
+	
 	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
 		this.runCode = r;
@@ -55,7 +57,6 @@ public class MyThread extends Thread implements Runnable {
 			try {
 				runCode.run();
 			} catch (Error err1) {
-				err1.printStackTrace();
 				ErrorMsg.addErrorMessage(err1.getMessage());
 			} catch (Exception err2) {
 				ErrorMsg.addErrorMessage(err2);
@@ -80,7 +81,7 @@ public class MyThread extends Thread implements Runnable {
 	
 	public Object getResult() throws InterruptedException {
 		if (!started)
-			startNG(null, false);
+			run();
 		synchronized (this) {
 			if (r instanceof RunnableForResult) {
 				sem.acquire();
@@ -125,8 +126,7 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public synchronized void startNG(ThreadPoolExecutor es, boolean threadedExecution) {
-		if (!started) {
-			started = true;
+		if (!started && !mem) {
 			boolean direct = !threadedExecution;
 			if (direct)
 				run();
@@ -139,6 +139,7 @@ public class MyThread extends Thread implements Runnable {
 					}
 				} else {
 					if (runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+						started = true;
 						start();
 					} else {
 						if (!memorized()) {
@@ -150,6 +151,7 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	private boolean memorized() {
+		mem = true;
 		synchronized (waitingTasks) {
 			// if (waitingTasks.size() < 20000) {// SystemAnalysis.getNumberOfCPUs()) {
 			waitingTasks.add(this);
@@ -165,11 +167,12 @@ public class MyThread extends Thread implements Runnable {
 			do {
 				if (waitingTasks.size() > 0 && runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
 					t = waitingTasks.remove(waitingTasks.size() - 1);
-				}
+				} else
+					t = null;
 			} while (t != null && t.started);
 		}
-		if (t != null)
-			t.startNG(null, true);
+		if (t != null && !t.started)
+			t.start();
 	}
 	
 	public void setFinishrunnable(Runnable finishTask) {
