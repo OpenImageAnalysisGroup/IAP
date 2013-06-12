@@ -645,6 +645,8 @@ public class LTdataExchange implements ExperimentLoader {
 				
 				String camLbl = rs.getString("camera_label");
 				String lbl = getIAPcameraNameFromConfigLabel(camLbl);
+				if (lbl.isEmpty())
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO CAMERA CONFIG FOR IMAGE-CONFIG '" + camLbl + "'!");
 				snapshot.setCamera_label(lbl);// rs.getString("compname"));
 				snapshot.setXfactor(0);// rs.getDouble("xfactor"));
 				snapshot.setYfactor(0);// rs.getDouble("yfactor"));
@@ -856,7 +858,7 @@ public class LTdataExchange implements ExperimentLoader {
 		HashSet<Long> processedSnapshotTimes = new HashSet<Long>();
 		for (Snapshot sn : snapshots) {
 			if (sn.getId_tag().length() <= 0) {
-				System.out.println("Warning: snapshot with empty ID tag is ignored.");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: snapshot with empty ID tag is ignored.");
 				continue;
 			}
 			

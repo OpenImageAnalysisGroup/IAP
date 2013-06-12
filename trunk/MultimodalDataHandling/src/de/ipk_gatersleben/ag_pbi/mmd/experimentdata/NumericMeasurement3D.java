@@ -188,7 +188,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		}
 		
 		if (optStatus != null)
-			optStatus.setCurrentStatusText2("Merge Path Objects");
+			optStatus.setCurrentStatusText2("Merge path objects...");
 		
 		int initialCapacity = 0;
 		for (ArrayList<MappingData3DPath> values : result.values())
@@ -198,7 +198,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		for (ArrayList<MappingData3DPath> values : result.values())
 			mappingpaths.addAll(values);
 		
-		Experiment res = new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime));
+		Experiment res = new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime, optStatus));
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Finished Construction");
 		return res;
