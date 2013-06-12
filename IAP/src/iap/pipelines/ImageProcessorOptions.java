@@ -32,6 +32,8 @@ public class ImageProcessorOptions {
 	private int unit_test_steps;
 	private SystemOptions optSystemOptionStorage;
 	
+	private String inf;
+	
 	public ImageProcessorOptions(SystemOptions options) {
 		this.optSystemOptionStorage = options;
 	}
@@ -51,8 +53,16 @@ public class ImageProcessorOptions {
 		}
 	}
 	
-	public void setCameraPosition(CameraPosition cameraTyp) {
+	public void setCameraInfos(CameraPosition cameraTyp, String cameraConfig, String lateOrEarly) {
 		this.cameraPosition = cameraTyp;
+		
+		if (lateOrEarly != null && cameraConfig == null)
+			inf = " (" + lateOrEarly + ")";
+		else
+			if (cameraConfig != null && lateOrEarly == null)
+				inf = " for " + cameraConfig;
+			else
+				inf = " for " + cameraConfig + "(" + lateOrEarly + ")";
 		
 	}
 	
@@ -111,10 +121,17 @@ public class ImageProcessorOptions {
 	}
 	
 	public String getSystemOptionStorageGroup() {
-		if (getCameraPosition() != CameraPosition.UNKNOWN)
-			return getCameraPosition() + " settings";
-		else
-			return "Postprocessing";
+		if (inf != null) {
+			if (getCameraPosition() != CameraPosition.UNKNOWN)
+				return getCameraPosition() + " settings" + inf;
+			else
+				return "Postprocessing" + inf;
+		} else {
+			if (getCameraPosition() != CameraPosition.UNKNOWN)
+				return getCameraPosition() + " settings";
+			else
+				return "Postprocessing";
+		}
 	}
 	
 	private void setOptSystemOptionStorage(SystemOptions optSystemOptionStorage) {

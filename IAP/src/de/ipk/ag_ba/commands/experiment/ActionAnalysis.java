@@ -53,7 +53,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 		if (experimentReference.getHeader().getSettings() != null &&
 				!experimentReference.getHeader().getSettings().isEmpty()) {
 			NavigationAction ac = new ActionSettings(null, ioStringProvider,
-					"Change analysis settings", "Modify settings");
+					"Change analysis settings", "Export/Modify settings");
 			SystemOptions so = SystemOptions.getInstance(null, ioStringProvider);
 			String pipeLineName = so.getString("DESCRIPTION", "pipeline_name", null);
 			String ttt = SystemAnalysis.getCurrentTime();
@@ -63,6 +63,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 					"Export the analysis pipline settings in the new template file " + StringManipulationTools.getFileSystemName(pipeLineName + "." + ttt)
 							+ ".pipeline.ini",
 					"Export", ttt);
+			// actions.add(new NavigationButton(acExport, src.getGUIsetting()));
 			ac.addAdditionalEntity(new NavigationButton(acExport, src.getGUIsetting()));
 			actions.add(new NavigationButton(ac, src.getGUIsetting()));
 			
