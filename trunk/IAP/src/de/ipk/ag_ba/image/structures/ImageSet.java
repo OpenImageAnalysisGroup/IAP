@@ -29,7 +29,7 @@ public class ImageSet {
 	private ImageData fluoInfo;
 	private ImageData nirInfo;
 	private ImageData irInfo;
-	private boolean isSideImage;
+	private boolean isSideImageSet;
 	
 	public ImageSet() {
 		// empty
@@ -259,6 +259,22 @@ public class ImageSet {
 		this.setIrInfo(irInfo);
 	}
 	
+	public ImageData getAnyInfo() {
+		if (visInfo != null)
+			return visInfo;
+		else
+			if (fluoInfo != null)
+				return fluoInfo;
+			else
+				if (nirInfo != null)
+					return nirInfo;
+				else
+					if (irInfo != null)
+						return irInfo;
+					else
+						return null;
+	}
+	
 	public void setVisInfo(ImageData visInfo) {
 		this.visInfo = visInfo;
 	}
@@ -371,10 +387,10 @@ public class ImageSet {
 	}
 	
 	public void setIsSide(boolean isSide) {
-		this.isSideImage = isSide;
+		this.isSideImageSet = isSide;
 	}
 	
 	public boolean isSideImage() {
-		return isSideImage;
+		return isSideImageSet;
 	}
 }
