@@ -212,7 +212,7 @@ public class Substance implements SubstanceInterface {
 		SubstanceInterface targetSubstance = null;
 		synchronized (result) {
 			for (SubstanceInterface m : result)
-				if (substanceWithNewData.compareTo(m) == 0) {
+				if (substanceWithNewData.equals(m)) {
 					targetSubstance = m;
 					break;
 				}
@@ -243,7 +243,7 @@ public class Substance implements SubstanceInterface {
 		ConditionInterface targetCondition = null;
 		synchronized (targetSubstance) {
 			for (ConditionInterface cond : targetSubstance)
-				if (cond.compareTo(condition) == 0) {
+				if (cond.equals(condition)) {
 					targetCondition = cond;
 					break;
 				}
