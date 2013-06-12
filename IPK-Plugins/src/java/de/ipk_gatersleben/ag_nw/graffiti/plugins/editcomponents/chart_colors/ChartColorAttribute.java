@@ -248,7 +248,7 @@ public class ChartColorAttribute extends StringAttribute {
 		boolean set = false;
 		ArrayList<Color> colorList = Colors.getGrayColors(barCount);
 		int i = 0;
-		if (value.equals(notSet)) {
+		if (value.equals(notSet) && !colorList.isEmpty()) {
 			// value="null:null";
 			Color newColor = colorList.get(i++);
 			value = getColorCode(newColor) + ":" + getColorCode(Color.BLACK) + "";
