@@ -159,11 +159,13 @@ public class BackgroundThreadDispatcher {
 	
 	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
 		threads = new ArrayList<MyThread>(threads);
+		for (MyThread m : threads)
+			if (!m.isStarted())
+				m.startNG(null, true);
 		if (Thread.currentThread() instanceof MyThread)
 			((MyThread) Thread.currentThread()).messageTaskIsWaiting();
+		MyThread.checkWaitTasks();
 		for (MyThread m : threads) {
-			if (!m.isStarted())
-				m.run();
 			m.getResult();
 			MyThread.checkWaitTasks();
 		}
