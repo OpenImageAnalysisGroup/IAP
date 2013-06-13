@@ -228,7 +228,8 @@ public class ExperimentLoader implements RunnableOnDB {
 		synchronized (experiment) {
 			boolean add = true;
 			for (SubstanceInterface so : experiment)
-				if (so.compareTo(s3d) == 0) {
+				if (so.equals(s3d)) {
+					so.addAll(s3d);
 					s3d = (Substance3D) so;
 					add = false;
 				}
