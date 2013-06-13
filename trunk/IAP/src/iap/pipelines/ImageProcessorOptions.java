@@ -7,7 +7,7 @@
 
 package iap.pipelines;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.awt.Color;
 
@@ -147,7 +147,7 @@ public class ImageProcessorOptions {
 		this.optSystemOptionStorage = optSystemOptionStorage;
 	}
 	
-	public boolean getBooleanSetting(ImageAnalysisBlockFIS block, String title, boolean defaultValue) {
+	public boolean getBooleanSetting(ImageAnalysisBlock block, String title, boolean defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else
@@ -155,13 +155,13 @@ public class ImageProcessorOptions {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
-	private String getSettingName(ImageAnalysisBlockFIS block, String title) {
+	private String getSettingName(ImageAnalysisBlock block, String title) {
 		return block != null ?
 				block.getClass().getCanonicalName() + "//" + title :
 				title;
 	}
 	
-	public double getDoubleSetting(ImageAnalysisBlockFIS block, String title, double defaultValue) {
+	public double getDoubleSetting(ImageAnalysisBlock block, String title, double defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else
@@ -169,7 +169,7 @@ public class ImageProcessorOptions {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
-	public int getIntSetting(ImageAnalysisBlockFIS block, String title, int defaultValue) {
+	public int getIntSetting(ImageAnalysisBlock block, String title, int defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else
@@ -177,7 +177,7 @@ public class ImageProcessorOptions {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
-	public String getStringSetting(ImageAnalysisBlockFIS block, String title, String defaultValue) {
+	public String getStringSetting(ImageAnalysisBlock block, String title, String defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else
@@ -185,7 +185,7 @@ public class ImageProcessorOptions {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
-	public Integer[] getIntArraySetting(ImageAnalysisBlockFIS block, String title, Integer[] defaultValue) {
+	public Integer[] getIntArraySetting(ImageAnalysisBlock block, String title, Integer[] defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
 		else

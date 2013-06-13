@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.commands.settings;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -212,7 +212,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										
 										String type = "";
 										try {
-											ImageAnalysisBlockFIS inst = (ImageAnalysisBlockFIS) Class.forName(sl).newInstance();
+											ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl).newInstance();
 											switch (inst.getBlockType()) {
 												case ACQUISITION:
 													type = "<span style=\"background-color:#DDFFDD\">";

@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.plugins;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.Collection;
 
@@ -10,6 +10,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
  * @author Christian Klukas
@@ -36,7 +37,7 @@ public interface IAPplugin extends GenericPlugin {
 	 * 
 	 * @return A list of image analysis blocks.
 	 */
-	public ImageAnalysisBlockFIS[] getImageAnalysisBlocks();
+	public ImageAnalysisBlock[] getImageAnalysisBlocks();
 	
 	/**
 	 * @param experimentReference
@@ -69,4 +70,14 @@ public interface IAPplugin extends GenericPlugin {
 	 * @return Null (no custom help), or one or more setting text paragraphs. You may use HTML tags, to format the help text.
 	 */
 	public Collection<String> getHelpForSettings(String iniFileName, String section, String setting);
+	
+	/**
+	 * Override this method to provide additional analysis templates to the user. These templates
+	 * are automatically saved and may be modified by the user. A stored template (.pipeline.ini) file
+	 * will not be updated or changed, if the add-on for a plugin provides a new version of a template.
+	 * 
+	 * @return A list of templates (containing a block list, a pipeline name and description, which will be
+	 *         available to the user.
+	 */
+	public AnalysisPipelineTemplate[] getAnalysisTemplates();
 }

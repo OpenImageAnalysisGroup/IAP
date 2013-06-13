@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.plugins;
+package de.ipk.ag_ba.plugins.data_sources;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +14,7 @@ import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
+import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**

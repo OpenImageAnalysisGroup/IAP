@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.plugins;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.Collection;
 
@@ -15,12 +15,12 @@ import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
  * @author Christian Klukas
  */
-public class AbstractIAPplugin extends GenericPluginAdapter implements
-		IAPplugin {
+public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin {
 	
 	@Override
 	public NavigationAction[] getHomeNavigationActions() {
@@ -33,10 +33,11 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	}
 	
 	@Override
-	public ImageAnalysisBlockFIS[] getImageAnalysisBlocks() {
-		return new ImageAnalysisBlockFIS[] {};
+	public ImageAnalysisBlock[] getImageAnalysisBlocks() {
+		return new ImageAnalysisBlock[] {};
 	}
 	
+	@Override
 	public ImageIcon getIcon() {
 		return getIAPicon();
 	}
@@ -62,6 +63,11 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements
 	
 	@Override
 	public Collection<String> getHelpForSettings(String iniFileName, String section, String setting) {
+		return null;
+	}
+	
+	@Override
+	public AnalysisPipelineTemplate[] getAnalysisTemplates() {
 		return null;
 	}
 }

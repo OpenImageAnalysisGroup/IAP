@@ -10,7 +10,7 @@
 
 	<plugindesc>
 	     <name>IAP experiment commands</name>
-             <main>de.ipk.ag_ba.plugins.PluginIAPexperimentActions</main>
+             <main>de.ipk.ag_ba.plugins.actions.PluginIAPexperimentActions</main>
              <version>1.0</version>
              <available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>

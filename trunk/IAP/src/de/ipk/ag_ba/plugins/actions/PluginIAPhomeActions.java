@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.plugins;
+package de.ipk.ag_ba.plugins.actions;
 
 import java.util.ArrayList;
 
@@ -13,6 +13,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**

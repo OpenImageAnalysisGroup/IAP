@@ -44,14 +44,12 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
-import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.HomeFolder;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -61,25 +59,14 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.Maize3DanalysisTask;
-import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.UserDefinedImageAnalysisPipelineTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -323,102 +310,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 					
-					JMenuItem debugPipelineTest5 = new JMenuItem(
-							"Maize 3-D Analysis (Snapshot Images+References)");
-					debugPipelineTest5.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							try {
-								ExperimentInterface experiment = targetTreeNode
-										.getExperiment().getExperiment();
-								
-								Collection<NumericMeasurementInterface> match = IAPservice
-										.getMatchFor(imageResult
-												.getBinaryFileInfo()
-												.getFileNameMain(), experiment);
-								
-								ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
-								
-								for (SubstanceInterface m : experiment) {
-									Substance3D m3 = (Substance3D) m;
-									for (ConditionInterface s : m3) {
-										Condition3D s3 = (Condition3D) s;
-										for (SampleInterface sd : s3) {
-											Sample3D sd3 = (Sample3D) sd;
-											boolean found = false;
-											search: for (NumericMeasurementInterface nmi : sd3) {
-												for (NumericMeasurementInterface nmiHIT : match) {
-													if (nmi == nmiHIT) {
-														found = true;
-														break search;
-													}
-												}
-											}
-											if (found)
-												workload.add(sd3);
-										}
-									}
-								}
-								
-								final ThreadSafeOptions tso = new ThreadSafeOptions();
-								tso.setInt(1);
-								
-								final Maize3DanalysisTask task = new Maize3DanalysisTask(
-										new PipelineDesc(null,
-												targetTreeNode.getExperiment().getIniIoProvider(),
-												Maize3DanalysisTask.DEFAULT_NAME,
-												Maize3DanalysisTask.DEFAULT_DESC)
-										);
-								task.setInput(AbstractPhenotypingTask.getWateringInfo(experiment), workload, null, null, 0, 1);
-								
-								final BackgroundTaskStatusProviderSupportingExternalCall sp = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-										"Maize 3-D Reconstruction", "");
-								Runnable backgroundTask = new Runnable() {
-									@Override
-									public void run() {
-										try {
-											task.performAnalysis(SystemAnalysis
-													.getNumberOfCPUs(), 1, sp);
-											ExperimentInterface out = task.getOutput();
-											ImageStack fis = new ImageStack();
-											for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
-												if (nmi instanceof LoadedImage) {
-													LoadedImage li = (LoadedImage) nmi;
-													fis.addImage(
-															((LoadedImage) nmi)
-																	.getPositionIn3D(),
-															new Image(
-																	li.getLoadedImage()));
-												}
-												if (nmi instanceof LoadedVolumeExtension) {
-													LoadedVolumeExtension lve = (LoadedVolumeExtension) nmi;
-													lve.getSideViewGif(512,
-															512, sp);
-												}
-											}
-											fis.show("Foreground images");
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}
-								};
-								BackgroundTaskHelper.issueSimpleTaskInWindow(
-										"Maize 3-D Debug Test",
-										"Initialize...", backgroundTask, null,
-										sp);
-								
-							} catch (Exception err) {
-								JOptionPane.showMessageDialog(null, "Error: "
-										+ err.getMessage()
-										+ ". Command execution error.",
-										"Error",
-										JOptionPane.INFORMATION_MESSAGE);
-								ErrorMsg.addErrorMessage(err);
-								return;
-							}
-						}
-					});
-					
 					jp.add(debugPipelineTestShowMainImage);
 					jp.add(debugPipelineTestShowReferenceImage);
 					jp.add(debugPipelineTestShowImage);
@@ -478,11 +369,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						
 						ta.add(debugPipelineTest0a);
 						ta.add(debugPipelineTest00a);
-						added = true;
-					}
-					
-					if (true) {
-						ta.add(debugPipelineTest5);
 						added = true;
 					}
 					
