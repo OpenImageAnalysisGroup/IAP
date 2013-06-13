@@ -72,6 +72,8 @@ public class MyThread extends Thread implements Runnable {
 	@Override
 	public void run() {
 		synchronized (this) {
+			if (runCode == null)
+				return;
 			try {
 				started = true;
 				runningTasks.addLong(1);
