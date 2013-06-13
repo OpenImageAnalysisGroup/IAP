@@ -351,7 +351,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		} else {
 			// t.setPriority(Thread.MIN_PRIORITY);
 			// t.start();
-			BackgroundThreadDispatcher.addTask(t, name, 0, 0, true).getResult();
+			BackgroundThreadDispatcher.addTask(t, name, 0, 0, true);
 		}
 	}
 	
