@@ -68,6 +68,6 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 	
 	@Override
 	public AnalysisPipelineTemplate[] getAnalysisTemplates() {
-		return null;
+		return new AnalysisPipelineTemplate[] {};
 	}
 }

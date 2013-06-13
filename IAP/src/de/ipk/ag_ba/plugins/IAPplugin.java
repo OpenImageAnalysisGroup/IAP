@@ -13,6 +13,9 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
+ * IAP extension API. Use AbstractIAPplugin to more easily provide a subset of all possible new
+ * feature types.
+ * 
  * @author Christian Klukas
  */
 public interface IAPplugin extends GenericPlugin {
