@@ -1,6 +1,7 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -20,9 +21,9 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -445,5 +446,10 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

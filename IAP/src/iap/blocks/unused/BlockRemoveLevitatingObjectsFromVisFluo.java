@@ -1,12 +1,14 @@
 package iap.blocks.unused;
 
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
+
 import java.util.HashSet;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -97,7 +99,7 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 		}
 		return 0; // no plant
 	}
-
+	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
@@ -113,5 +115,10 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 		res.add(CameraType.FLUO);
 		return res;
 	}
-
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
+	}
+	
 }

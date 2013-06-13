@@ -1,13 +1,14 @@
 package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * pipeline processing for nir image
@@ -59,5 +60,10 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlockFIS {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.NIR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

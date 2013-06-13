@@ -1,13 +1,14 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.MaskOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Merges the given masks. Only parts which are confirmed as non-background
@@ -75,6 +76,11 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 	
 }

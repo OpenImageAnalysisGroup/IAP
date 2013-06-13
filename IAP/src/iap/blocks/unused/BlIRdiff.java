@@ -1,6 +1,7 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -10,9 +11,9 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas
@@ -89,5 +90,10 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

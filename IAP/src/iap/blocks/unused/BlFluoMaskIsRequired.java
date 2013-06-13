@@ -1,11 +1,12 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Optionally removes VIS/NIR/IR if no Fluo Can be Found
@@ -46,5 +47,10 @@ public class BlFluoMaskIsRequired extends AbstractBlock {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.ACQUISITION;
 	}
 }

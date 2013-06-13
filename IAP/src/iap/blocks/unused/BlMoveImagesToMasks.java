@@ -1,6 +1,7 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
@@ -32,6 +33,11 @@ public class BlMoveImagesToMasks extends AbstractImageAnalysisBlockFIS {
 		res.add(CameraType.NIR);
 		res.add(CameraType.IR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 	
 }

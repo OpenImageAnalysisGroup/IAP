@@ -1,6 +1,7 @@
 package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -220,5 +221,10 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlockFIS 
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 }

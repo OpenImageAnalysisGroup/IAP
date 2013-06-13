@@ -1,6 +1,7 @@
 package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -69,5 +70,10 @@ public class BlCalcConvexHull extends AbstractBlock {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

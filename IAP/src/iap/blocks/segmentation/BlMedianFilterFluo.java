@@ -4,6 +4,7 @@
 package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
@@ -43,6 +44,11 @@ public class BlMedianFilterFluo extends AbstractBlock {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 	
 }

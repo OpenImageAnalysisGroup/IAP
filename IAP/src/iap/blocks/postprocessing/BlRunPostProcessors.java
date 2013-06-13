@@ -1,6 +1,7 @@
 package iap.blocks.postprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
@@ -65,6 +66,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.POSTPROCESSING;
 	}
 	
 }

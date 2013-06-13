@@ -4,14 +4,15 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * @author Klukas
@@ -94,6 +95,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 				options.getBackground()).getImage().show("Black belt removed from nir", debug);
 		return nir;
 	}
+	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
@@ -109,5 +111,10 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlockFIS {
 		res.add(CameraType.NIR);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

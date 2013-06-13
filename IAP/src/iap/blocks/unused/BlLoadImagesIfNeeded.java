@@ -1,15 +1,16 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas, entzian
@@ -204,5 +205,10 @@ public class BlLoadImagesIfNeeded extends
 		res.add(CameraType.NIR);
 		res.add(CameraType.IR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.ACQUISITION;
 	}
 }

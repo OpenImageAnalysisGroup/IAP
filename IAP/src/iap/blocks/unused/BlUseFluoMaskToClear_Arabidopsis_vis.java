@@ -1,12 +1,13 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
  * @author Christian Klukas
@@ -73,6 +74,11 @@ public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalys
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 	
 }

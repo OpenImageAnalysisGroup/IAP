@@ -1,15 +1,16 @@
 package iap.blocks.acquisition;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author entzian, klukas
@@ -275,5 +276,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlockFIS {
 		res.add(CameraType.IR);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.ACQUISITION;
 	}
 }

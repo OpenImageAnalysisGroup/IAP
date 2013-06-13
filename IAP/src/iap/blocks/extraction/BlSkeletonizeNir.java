@@ -1,11 +1,12 @@
 package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * pipeline processing for nir image
@@ -57,5 +58,10 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlockFIS {
 	public HashSet<CameraType> getCameraOutputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

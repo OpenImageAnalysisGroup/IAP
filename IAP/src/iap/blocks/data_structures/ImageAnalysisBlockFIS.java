@@ -10,8 +10,8 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -49,4 +49,6 @@ public interface ImageAnalysisBlockFIS {
 	 * order as the array returned by <code>getParameter</code>.
 	 */
 	public void setParameters(Parameter[] params);
+	
+	public BlockType getBlockType();
 }

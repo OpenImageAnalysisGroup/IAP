@@ -1,6 +1,7 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.skeleton.Limb;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 import flanagan.math.FourierTransform;
 
 public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
@@ -121,5 +122,10 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }
