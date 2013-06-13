@@ -24,7 +24,7 @@ import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;

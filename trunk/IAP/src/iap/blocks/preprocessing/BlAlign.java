@@ -3,7 +3,7 @@ package iap.blocks.preprocessing;
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.pipelines.ImageProcessorOptions;
 import info.clearthought.layout.TableLayout;
 
@@ -59,7 +59,7 @@ public class BlAlign extends AbstractBlock {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					ImageAnalysisBlockFIS inst = (ImageAnalysisBlockFIS) blockType.newInstance();
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) blockType.newInstance();
 					ImageSet a = inputSet.images().copy();
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);

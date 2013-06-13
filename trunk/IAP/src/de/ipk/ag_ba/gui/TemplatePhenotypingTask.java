@@ -11,10 +11,10 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
-class TemplatePhenotypingTask extends AbstractPhenotypingTask {
+public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 	private final AnalysisPipelineTemplate template;
 	
-	TemplatePhenotypingTask(PipelineDesc pd, AnalysisPipelineTemplate template) {
+	public TemplatePhenotypingTask(PipelineDesc pd, AnalysisPipelineTemplate template) {
 		super(pd);
 		this.template = template;
 	}

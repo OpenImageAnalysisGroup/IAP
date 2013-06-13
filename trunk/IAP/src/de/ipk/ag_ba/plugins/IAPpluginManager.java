@@ -1,17 +1,23 @@
 package de.ipk.ag_ba.plugins;
 
+import iap.pipelines.ImageProcessorOptions;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
+import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.TemplatePhenotypingTask;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
 /**
  * @author Christian Klukas
@@ -130,5 +136,17 @@ public class IAPpluginManager {
 		};
 		processPlugins(r);
 		return templates;
+	}
+
+	public static void writePipelineInis() throws Exception {
+		for (final AnalysisPipelineTemplate template : getInstance().getAnalysisTemplates()) {
+			PipelineDesc pd = new PipelineDesc(
+					StringManipulationTools.getFileSystemName(template.getTitle()) + ".pipeline.ini",
+					null,
+					template.getTitle(),
+					template.getDescription());
+			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
+			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions()));
+		}
 	}
 }

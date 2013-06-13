@@ -3,8 +3,6 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.UserDefinedImageAnalysisPipelineTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
 
 public class ImageAnalysisTasks {
 	
