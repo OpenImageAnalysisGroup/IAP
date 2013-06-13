@@ -204,7 +204,9 @@ public class Substance implements SubstanceInterface {
 					newConditions.add(nc);
 				}
 			}
-			targetSubstance.addAll(newConditions);
+			synchronized (targetSubstance) {
+				targetSubstance.addAll(newConditions);
+			}
 		}
 	}
 	
@@ -233,7 +235,9 @@ public class Substance implements SubstanceInterface {
 					newConditions.add(nc);
 				}
 			}
-			targetSubstance.addAll(newConditions);
+			synchronized (targetSubstance) {
+				targetSubstance.addAll(newConditions);
+			}
 		}
 	}
 	
@@ -262,7 +266,9 @@ public class Substance implements SubstanceInterface {
 				if (si != null)
 					newSamples.add(si);
 			}
-			targetCondition.addAll(newSamples);
+			synchronized (targetCondition) {
+				targetCondition.addAll(newSamples);
+			}
 		}
 		return null;
 	}
