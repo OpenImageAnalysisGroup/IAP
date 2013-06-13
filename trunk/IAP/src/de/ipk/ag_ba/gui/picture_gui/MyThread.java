@@ -29,10 +29,9 @@ public class MyThread extends Thread implements Runnable {
 	
 	private boolean finished = false;
 	private boolean started = false;
-	private final Runnable r;
 	private final Semaphore sem;
 	private String name;
-	private final Runnable runCode;
+	private Runnable runCode;
 	
 	private static ThreadSafeOptions runningTasks = new ThreadSafeOptions();
 	private static ArrayList<MyThread> waitingTasks = new ArrayList<MyThread>(SystemAnalysis.getNumberOfCPUs());
@@ -41,10 +40,15 @@ public class MyThread extends Thread implements Runnable {
 	
 	private boolean mem;
 	
+	private boolean isRunningInThread;
+	
+	private Object runableResult;
+	
 	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
 		this.runCode = r;
-		this.r = r;
+		if (r == null)
+			System.out.println("ERR");
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		sem.acquire();
 	}
@@ -55,7 +59,13 @@ public class MyThread extends Thread implements Runnable {
 			started = true;
 			runningTasks.addLong(1);
 			try {
-				runCode.run();
+				Runnable r = runCode;
+				runCode = null;
+				if (r == null)
+					System.out.println("ERR");
+				r.run();
+				if (r instanceof RunnableForResult)
+					runableResult = ((RunnableForResult) r).getResult();
 			} catch (Error err1) {
 				ErrorMsg.addErrorMessage(err1.getMessage());
 			} catch (Exception err2) {
@@ -69,6 +79,22 @@ public class MyThread extends Thread implements Runnable {
 				finishTask.run();
 		}
 		checkWaitTasks();
+		if (isRunningInThread) {
+			MyThread t;
+			do {
+				t = getWaitingTask();
+				if (t != null && !t.started)
+					t.run();
+				checkWaitTasks();
+			} while (t != null);
+		}
+	}
+	
+	@Override
+	public synchronized void start() {
+		this.isRunningInThread = true;
+		this.started = true;
+		super.start();
 	}
 	
 	public boolean isFinished() {
@@ -83,20 +109,13 @@ public class MyThread extends Thread implements Runnable {
 		if (!started)
 			run();
 		synchronized (this) {
-			if (r instanceof RunnableForResult) {
-				sem.acquire();
-				sem.release();
-				RunnableForResult rc = (RunnableForResult) r;
-				if (!finished)
-					System.err.println("INTERNAL ERROR MYTHREAD 1 (NOT FINISHED!)");
-				return rc.getResult();
-			} else {
-				sem.acquire();
-				sem.release();
-				if (!finished)
-					System.err.println("INTERNAL ERROR MYTHREAD 2 (NOT FINISHED)");
-				return null;
-			}
+			sem.acquire();
+			sem.release();
+			if (!finished)
+				ErrorMsg.addErrorMessage("INTERNAL ERROR MYTHREAD (NOT FINISHED!)");
+			Object res = runableResult;
+			runableResult = null;
+			return res;
 		}
 	}
 	
@@ -170,9 +189,25 @@ public class MyThread extends Thread implements Runnable {
 				} else
 					t = null;
 			} while (t != null && t.started);
+			if (t != null && !t.started)
+				t.start();
 		}
-		if (t != null && !t.started)
-			t.start();
+	}
+	
+	public static MyThread getWaitingTask() {
+		MyThread t = null;
+		synchronized (waitingTasks) {
+			do {
+				if (waitingTasks.size() > 0 && runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+					t = waitingTasks.remove(waitingTasks.size() - 1);
+				} else
+					t = null;
+			} while (t != null && t.started);
+			if (t != null && !t.started)
+				return t;
+			else
+				return null;
+		}
 	}
 	
 	public void setFinishrunnable(Runnable finishTask) {
