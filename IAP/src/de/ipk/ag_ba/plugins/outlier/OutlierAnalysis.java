@@ -26,6 +26,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * @author Christian Klukas
+ */
 public class OutlierAnalysis extends AbstractNavigationAction implements ActionDataProcessing {
 	
 	private ExperimentReference experimentReference;

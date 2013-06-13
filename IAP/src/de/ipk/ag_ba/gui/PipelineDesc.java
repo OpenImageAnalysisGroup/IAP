@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.gui;
 
-import iap.pipelines.ImageProcessorOptions;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -12,8 +10,6 @@ import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.plugins.IAPpluginManager;
-import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
 public class PipelineDesc {
 	
@@ -42,19 +38,10 @@ public class PipelineDesc {
 		return name;
 	}
 	
-	// private static String barleyFN = "Barley_Analysis.pipeline.ini";
-	// public static PipelineDesc getPipelineDefault() {
-	// return new PipelineDesc(
-	// barleyFN, null,
-	// "Barley Analysis", "Analyze Phenotype (Barley)");
-	// }
-	
 	public static ArrayList<PipelineDesc> getSavedPipelineTemplates() throws Exception {
-		
-		writePipelineInis();
+		IAPpluginManager.writePipelineInis();
 		
 		ArrayList<PipelineDesc> res = new ArrayList<PipelineDesc>();
-		// res.add(PipelineDesc.getPipelineDefault());
 		FilenameFilter ff = new FilenameFilter() {
 			@Override
 			public boolean accept(File f, String name) {
@@ -67,18 +54,6 @@ public class PipelineDesc {
 			res.add(new PipelineDesc(fn, null, fnt, fnt));
 		}
 		return res;
-	}
-	
-	private static void writePipelineInis() throws Exception {
-		for (final AnalysisPipelineTemplate template : IAPpluginManager.getInstance().getAnalysisTemplates()) {
-			PipelineDesc pd = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(template.getTitle()) + ".pipeline.ini",
-					null,
-					template.getTitle(),
-					template.getDescription());
-			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
-			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions()));
-		}
 	}
 	
 	public SystemOptions getOptions() {
