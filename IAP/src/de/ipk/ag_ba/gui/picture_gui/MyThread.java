@@ -94,14 +94,20 @@ public class MyThread extends Thread implements Runnable {
 			if (finishTask != null)
 				finishTask.run();
 		}
-		checkWaitTasks();
 		if (isRunningInThread) {
 			MyThread t;
 			do {
 				t = getWaitingTask();
 				if (t != null && !t.started)
 					t.run();
-				checkWaitTasks();
+				else {
+					try {
+						Thread.sleep(20);
+						t = getWaitingTask();
+					} catch (InterruptedException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
 			} while (t != null);
 		}
 	}
@@ -188,11 +194,11 @@ public class MyThread extends Thread implements Runnable {
 	private boolean memorized() {
 		mem = true;
 		synchronized (waitingTasks) {
-			// if (waitingTasks.size() < 20000) {// SystemAnalysis.getNumberOfCPUs()) {
-			waitingTasks.add(this);
-			return true;
-			// } else
-			// return false;
+			if (waitingTasks.size() < SystemAnalysis.getNumberOfCPUs()) {
+				waitingTasks.add(this);
+				return true;
+			} else
+				return false;
 		}
 	}
 	
@@ -214,7 +220,7 @@ public class MyThread extends Thread implements Runnable {
 		MyThread t = null;
 		synchronized (waitingTasks) {
 			do {
-				if (waitingTasks.size() > 0 && runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+				if (waitingTasks.size() > 0 && runningTasks.getLong() < 4 * SystemAnalysis.getNumberOfCPUs()) {
 					t = waitingTasks.remove(waitingTasks.size() - 1);
 				} else
 					t = null;
