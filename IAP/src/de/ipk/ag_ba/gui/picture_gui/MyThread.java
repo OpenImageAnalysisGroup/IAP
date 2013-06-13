@@ -104,6 +104,8 @@ public class MyThread extends Thread implements Runnable {
 					try {
 						Thread.sleep(20);
 						t = getWaitingTask();
+						if (t != null && !t.started)
+							t.run();
 					} catch (InterruptedException e) {
 						ErrorMsg.addErrorMessage(e);
 					}
