@@ -71,32 +71,33 @@ public class MyThread extends Thread implements Runnable {
 	
 	@Override
 	public void run() {
-		synchronized (this) {
-			if (runCode == null)
-				return;
+		started = true;
+		if (runCode == null) {
+			System.out.println(SystemAnalysis.getCurrentTime() + "WARNING: (internal error) RunCode already null");
+			Thread.dumpStack();
+			return;
+		}
+		try {
+			runningTasks.addLong(1);
 			try {
-				started = true;
-				runningTasks.addLong(1);
-				try {
-					Runnable r = runCode;
-					runCode = null;
-					if (r == null)
-						System.out.println("ERR");
-					r.run();
-					if (r instanceof RunnableForResult)
-						runableResult = ((RunnableForResult) r).getResult();
-				} catch (Error err1) {
-					ErrorMsg.addErrorMessage(err1.getMessage());
-				} catch (Exception err2) {
-					ErrorMsg.addErrorMessage(err2);
-				}
-			} finally {
-				finished = true;
-				sem.release();
-				runningTasks.addLong(-1);
-				if (finishTask != null)
-					finishTask.run();
+				Runnable r = runCode;
+				runCode = null;
+				if (r == null)
+					System.out.println("ERR");
+				r.run();
+				if (r instanceof RunnableForResult)
+					runableResult = ((RunnableForResult) r).getResult();
+			} catch (Error err1) {
+				ErrorMsg.addErrorMessage(err1.getMessage());
+			} catch (Exception err2) {
+				ErrorMsg.addErrorMessage(err2);
 			}
+		} finally {
+			finished = true;
+			sem.release();
+			runningTasks.addLong(-1);
+			if (finishTask != null)
+				finishTask.run();
 		}
 		if (isRunningInThread) {
 			MyThread t;
