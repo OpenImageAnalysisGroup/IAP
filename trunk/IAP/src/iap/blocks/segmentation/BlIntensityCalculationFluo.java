@@ -80,6 +80,6 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlockFIS
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.FEATURE_EXTRACTION;
+		return BlockType.SEGMENTATION;
 	}
 }
