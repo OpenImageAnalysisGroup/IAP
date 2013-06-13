@@ -8,6 +8,8 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,6 +46,9 @@ public class MyThread extends Thread implements Runnable {
 	
 	private Object runableResult;
 	
+	@SuppressWarnings("unused")
+	private static Timer waitThread = initTimer();
+	
 	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
 		this.runCode = r;
@@ -51,6 +56,17 @@ public class MyThread extends Thread implements Runnable {
 			System.out.println("ERR");
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		sem.acquire();
+	}
+	
+	private static Timer initTimer() {
+		Timer res = new Timer("Wait Thread Check", true);
+		res.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				MyThread.checkWaitTasks();
+			}
+		}, 100, 100);
+		return res;
 	}
 	
 	@Override

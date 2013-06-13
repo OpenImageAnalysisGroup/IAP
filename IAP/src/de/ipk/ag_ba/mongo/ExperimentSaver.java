@@ -225,8 +225,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 		final int substanceCount = sl.size();
 		while (!sl.isEmpty()) {
-			final SubstanceInterface s = sl.get(0);
-			sl.remove(0);
+			final SubstanceInterface s = sl.remove(0);
 			// if (status != null && status.wantsToStop())
 			// break;
 			Runnable rrr = new Runnable() {
