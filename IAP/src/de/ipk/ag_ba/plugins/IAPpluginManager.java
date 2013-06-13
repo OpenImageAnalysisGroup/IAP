@@ -137,9 +137,9 @@ public class IAPpluginManager {
 		processPlugins(r);
 		return templates;
 	}
-
-	public static void writePipelineInis() throws Exception {
-		for (final AnalysisPipelineTemplate template : getInstance().getAnalysisTemplates()) {
+	
+	public void writePipelineInis() throws Exception {
+		for (final AnalysisPipelineTemplate template : getAnalysisTemplates()) {
 			PipelineDesc pd = new PipelineDesc(
 					StringManipulationTools.getFileSystemName(template.getTitle()) + ".pipeline.ini",
 					null,

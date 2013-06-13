@@ -39,7 +39,7 @@ public class PipelineDesc {
 	}
 	
 	public static ArrayList<PipelineDesc> getSavedPipelineTemplates() throws Exception {
-		IAPpluginManager.writePipelineInis();
+		IAPpluginManager.getInstance().writePipelineInis();
 		
 		ArrayList<PipelineDesc> res = new ArrayList<PipelineDesc>();
 		FilenameFilter ff = new FilenameFilter() {
