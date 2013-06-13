@@ -1,13 +1,14 @@
 package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -32,7 +33,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 	}
 	
 	private Image closing(Image mask, Image image, int n) {
-		if(mask == null || image == null || n == 0) {
+		if (mask == null || image == null || n == 0) {
 			return mask;
 		}
 		return closing(mask, image, options.getBackground(), n);
@@ -87,5 +88,10 @@ public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

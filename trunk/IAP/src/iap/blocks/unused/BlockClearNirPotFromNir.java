@@ -4,11 +4,12 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * @author Klukas
@@ -85,5 +86,10 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlockFIS {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.NIR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

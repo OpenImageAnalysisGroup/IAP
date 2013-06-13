@@ -1,12 +1,13 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Improve flower visibility for visible mask.
@@ -198,5 +199,10 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlockFIS 
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

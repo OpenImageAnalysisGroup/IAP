@@ -1,6 +1,7 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlockFIS {
 	
@@ -134,10 +135,10 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		double offsetFactorT = getDouble("Offset Factor Top", 0.05);
 		double offsetFactorB = getDouble("Offset Factor Bottom", 0.15);
 		return ioInputForCut.clearImageLeft(positions.getLeftX() * (1 - offsetFactorL), bl).
-					clearImageRight(positions.getRightX() * (1 + offsetFactorR), br)
-					.clearImageAbove(positions.getTopY() * (1 - offsetFactorT), ba)
-					.clearImageBottom((int) (positions.getBottomY() * (1 + offsetFactorB)), ba)
-					.getImage();
+				clearImageRight(positions.getRightX() * (1 + offsetFactorR), br)
+				.clearImageAbove(positions.getTopY() * (1 - offsetFactorT), ba)
+				.clearImageBottom((int) (positions.getBottomY() * (1 + offsetFactorB)), ba)
+				.getImage();
 	}
 	
 	private Image clearImageTop(Image input, Image fluo) {
@@ -222,5 +223,10 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		res.add(CameraType.NIR);
 		res.add(CameraType.IR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 }

@@ -1,6 +1,7 @@
 package iap.blocks.threeD;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -416,5 +417,10 @@ public class BlThreeDreconstruction extends AbstractBlock {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

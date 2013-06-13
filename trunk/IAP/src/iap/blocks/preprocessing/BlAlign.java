@@ -2,6 +2,7 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.ImageAnalysisBlockFIS;
 import iap.pipelines.ImageProcessorOptions;
 import info.clearthought.layout.TableLayout;
@@ -218,5 +219,10 @@ public class BlAlign extends AbstractBlock {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 }

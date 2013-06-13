@@ -1,11 +1,12 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 // this might not be needed
 /**
@@ -119,6 +120,11 @@ public class BlockRemoveCameraLineArtifacts extends AbstractBlock {
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 	
 }

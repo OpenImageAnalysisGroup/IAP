@@ -4,11 +4,13 @@
 package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Remove "peper and salt" noise from Fluo mask.
@@ -19,7 +21,7 @@ public class BlMedianFilter extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
-		if (mask == null || ! getBoolean("Process " + mask.getCameraType(), true))
+		if (mask == null || !getBoolean("Process " + mask.getCameraType(), true))
 			return mask;
 		
 		Image medianMask = new ImageOperation(mask)
@@ -48,6 +50,11 @@ public class BlMedianFilter extends AbstractBlock {
 		res.add(CameraType.NIR);
 		res.add(CameraType.IR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 	
 }

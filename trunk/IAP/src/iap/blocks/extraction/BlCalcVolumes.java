@@ -1,6 +1,7 @@
 package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -313,5 +314,10 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

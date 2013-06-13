@@ -1,6 +1,7 @@
 package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
@@ -66,6 +67,11 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlockFIS 
 		res.add(CameraType.FLUO);
 		res.add(CameraType.NIR);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.SEGMENTATION;
 	}
 	
 }

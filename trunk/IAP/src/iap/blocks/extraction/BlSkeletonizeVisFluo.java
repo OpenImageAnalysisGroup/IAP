@@ -1,6 +1,7 @@
 package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -559,5 +560,10 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlockFIS {
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		return res;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

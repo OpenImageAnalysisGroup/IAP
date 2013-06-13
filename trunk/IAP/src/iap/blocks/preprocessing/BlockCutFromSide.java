@@ -1,6 +1,7 @@
 package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -67,6 +68,11 @@ public class BlockCutFromSide extends AbstractBlock {
 				.clearImage(ImageSide.Bottom, cutoffBottom, background)
 				.getImage();
 		return result;
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 	
 }

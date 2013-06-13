@@ -4,6 +4,7 @@
 package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -157,5 +158,10 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
+	}
+	
+	@Override
+	public BlockType getBlockType() {
+		return BlockType.PREPROCESSING;
 	}
 }
