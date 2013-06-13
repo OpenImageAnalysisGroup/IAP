@@ -6,11 +6,11 @@
 
 <plugin>
 	<author>Christian Klukas</author>
-	<description>Adds commands to the experiment tool command set</description>
+	<description>Adds maize, barley, arabidopsis and root analysis templates to IAP</description>
 
 	<plugindesc>
-	     <name>IAP experiment tool commands</name>
-             <main>de.ipk.ag_ba.plugins.PluginIAPexperimentToolActions</main>
+	     <name>IAP analysis templates</name>
+             <main>de.ipk.ag_ba.plugins.pipelines.PluginIAPanalyisTemplates</main>
              <version>1.0</version>
              <available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>

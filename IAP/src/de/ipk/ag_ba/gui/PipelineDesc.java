@@ -11,11 +11,9 @@ import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisSmallBlueRubberTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.arabidopsis.ArabidopsisAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.barley.BarleyAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.MaizeAnalysisTask;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.roots.RootsAnalysisTask;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
+import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
 public class PipelineDesc {
 	
@@ -72,50 +70,14 @@ public class PipelineDesc {
 	}
 	
 	private static void writePipelineInis() throws Exception {
-		{
-			PipelineDesc pRoot = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(RootsAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
+		for (final AnalysisPipelineTemplate template : IAPpluginManager.getInstance().getAnalysisTemplates()) {
+			PipelineDesc pd = new PipelineDesc(
+					StringManipulationTools.getFileSystemName(template.getTitle()) + ".pipeline.ini",
 					null,
-					RootsAnalysisTask.DEFAULT_NAME,
-					RootsAnalysisTask.DEFAULT_DESC);
-			RootsAnalysisTask rt = new RootsAnalysisTask(pRoot);
-			rt.getImageProcessor().getPipeline(new ImageProcessorOptions(pRoot.getOptions()));
-		}
-		{
-			PipelineDesc pBarley = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(BarleyAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
-					null,
-					BarleyAnalysisTask.DEFAULT_NAME,
-					BarleyAnalysisTask.DEFAULT_DESC);
-			BarleyAnalysisTask bt = new BarleyAnalysisTask(pBarley);
-			bt.getImageProcessor().getPipeline(new ImageProcessorOptions(pBarley.getOptions()));
-		}
-		{
-			PipelineDesc pMaize = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(MaizeAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
-					null,
-					MaizeAnalysisTask.DEFAULT_NAME,
-					MaizeAnalysisTask.DEFAULT_DESC);
-			MaizeAnalysisTask mt = new MaizeAnalysisTask(pMaize);
-			mt.getImageProcessor().getPipeline(new ImageProcessorOptions(pMaize.getOptions()));
-		}
-		{
-			PipelineDesc pPhyto = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(ArabidopsisAnalysisTask.DEFAULT_NAME) + ".pipeline.ini",
-					null,
-					ArabidopsisAnalysisTask.DEFAULT_NAME,
-					ArabidopsisAnalysisTask.DEFAULT_DESC);
-			ArabidopsisAnalysisTask pt = new ArabidopsisAnalysisTask(pPhyto);
-			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pPhyto.getOptions()));
-		}
-		{
-			PipelineDesc pBrPhyto = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_NAME) + ".pipeline.ini",
-					null,
-					ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_NAME,
-					ArabidopsisAnalysisSmallBlueRubberTask.DEFAULT_DESC);
-			ArabidopsisAnalysisSmallBlueRubberTask pbt = new ArabidopsisAnalysisSmallBlueRubberTask(pBrPhyto);
-			pbt.getImageProcessor().getPipeline(new ImageProcessorOptions(pBrPhyto.getOptions()));
+					template.getTitle(),
+					template.getDescription());
+			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
+			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions()));
 		}
 	}
 	

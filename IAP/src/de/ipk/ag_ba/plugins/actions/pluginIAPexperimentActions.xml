@@ -6,11 +6,11 @@
 
 <plugin>
 	<author>Christian Klukas</author>
-	<description>Adds home data source items to IAP</description>
+	<description>Adds commands to the experiment tool command set</description>
 
 	<plugindesc>
-	     <name>IAP data source items</name>
-             <main>de.ipk.ag_ba.plugins.PluginIAPhomeDataSources</main>
+	     <name>IAP experiment tool commands</name>
+             <main>de.ipk.ag_ba.plugins.actions.PluginIAPexperimentToolActions</main>
              <version>1.0</version>
              <available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>

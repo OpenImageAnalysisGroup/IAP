@@ -11,7 +11,11 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
+/**
+ * @author Christian Klukas
+ */
 public class IAPpluginManager {
 	private static IAPpluginManager instance = new IAPpluginManager();
 	
@@ -41,6 +45,7 @@ public class IAPpluginManager {
 	public Collection<NavigationAction> getHomeActions() {
 		final Collection<NavigationAction> actions = new ArrayList<NavigationAction>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
 			public void processPlugin(IAPplugin p) {
 				for (NavigationAction na : p.getHomeNavigationActions()) {
 					actions.add(na);
@@ -54,6 +59,7 @@ public class IAPpluginManager {
 	public Collection<DataSource> getHomeDataSources() {
 		final Collection<DataSource> datasources = new ArrayList<DataSource>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
 			public void processPlugin(IAPplugin p) {
 				for (DataSource ds : p.getDataSources()) {
 					datasources.add(ds);
@@ -69,6 +75,7 @@ public class IAPpluginManager {
 			final boolean imageAnalysis) {
 		final Collection<ActionDataProcessing> dataProcessingActions = new ArrayList<ActionDataProcessing>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
 			public void processPlugin(IAPplugin p) {
 				for (ActionDataProcessing dp : p.getDataProcessingActions(experimentReference)) {
 					if ((imageAnalysis && dp.isImageAnalysisCommand()) || !dp.isImageAnalysisCommand())
@@ -84,6 +91,7 @@ public class IAPpluginManager {
 			final ExperimentReference experimentReference) {
 		final Collection<ActionDataProcessing> dataProcessingActions = new ArrayList<ActionDataProcessing>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
 			public void processPlugin(IAPplugin p) {
 				for (ActionDataProcessing dp : p.getDataProcessingTools(experimentReference)) {
 					dataProcessingActions.add(dp);
@@ -97,6 +105,7 @@ public class IAPpluginManager {
 	public Collection<String> getSettingHelp(final String iniFileName, final String section, final String setting) {
 		final Collection<String> helpTexts = new ArrayList<String>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
 			public void processPlugin(IAPplugin p) {
 				Collection<String> htc = p.getHelpForSettings(iniFileName, section, setting);
 				if (htc != null)
@@ -107,5 +116,19 @@ public class IAPpluginManager {
 		};
 		processPlugins(r);
 		return helpTexts;
+	}
+	
+	public Collection<AnalysisPipelineTemplate> getAnalysisTemplates() {
+		final Collection<AnalysisPipelineTemplate> templates = new ArrayList<AnalysisPipelineTemplate>();
+		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
+			public void processPlugin(IAPplugin p) {
+				for (AnalysisPipelineTemplate template : p.getAnalysisTemplates()) {
+					templates.add(template);
+				}
+			}
+		};
+		processPlugins(r);
+		return templates;
 	}
 }

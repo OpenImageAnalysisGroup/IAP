@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.unused.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
@@ -37,7 +37,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.analysis.image_analysis_tasks.maize.AbstractPhenotypingTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -48,20 +48,20 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * A list of image analysis "blocks" ({@link ImageAnalysisBlockFIS}) which may
+ * A list of image analysis "blocks" ({@link ImageAnalysisBlock}) which may
  * be executed one after another.
  * 
  * @author klukas
  */
 public class BlockPipeline {
 	
-	private final ArrayList<Class<? extends ImageAnalysisBlockFIS>> blocks = new ArrayList<Class<? extends ImageAnalysisBlockFIS>>();
+	private final ArrayList<Class<? extends ImageAnalysisBlock>> blocks = new ArrayList<Class<? extends ImageAnalysisBlock>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
 	
 	/**
-	 * Adds a image analysis block to the pipeline (needs to implement {@link ImageAnalysisBlockFIS}).
+	 * Adds a image analysis block to the pipeline (needs to implement {@link ImageAnalysisBlock}).
 	 */
-	public void add(Class<? extends ImageAnalysisBlockFIS> blockClass) {
+	public void add(Class<? extends ImageAnalysisBlock> blockClass) {
 		blocks.add(blockClass);
 	}
 	
@@ -94,9 +94,9 @@ public class BlockPipeline {
 		// the load-image-block then needs to cut out image 1/6, 2/6, ...
 		// and place the section in the middle of the image for further processing
 		int executionTrayCount = 1;
-		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (blockClass != null && (blockClass == BlClearMasks_Arabidopsis_PotAndTrayProcessing.class)) {
-				ImageAnalysisBlockFIS inst = blockClass.newInstance();
+				ImageAnalysisBlock inst = blockClass.newInstance();
 				int hg = options.getIntSetting(inst, "Well Grid Horizontal", 1);
 				int wg = options.getIntSetting(inst, "Well Grid Vertical", 1);
 				int n = hg * wg;
@@ -143,18 +143,18 @@ public class BlockPipeline {
 			int n = 0;
 			
 			System.out.println("\n##Blocks##");
-			for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+			for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 				System.out.println("Block " + n + "=" + blockClass.getSimpleName());
 				n++;
 			}
 			System.out.println("##Output##");
 		}
 		
-		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
+		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;
 			
-			ImageAnalysisBlockFIS block = null;
+			ImageAnalysisBlock block = null;
 			try {
 				block = blockClass.newInstance();
 			} catch (Exception e) {
@@ -411,8 +411,8 @@ public class BlockPipeline {
 			InterruptedException {
 		TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult = new TreeMap<Long, HashMap<Integer, BlockResultSet>>();
 		int index = 0;
-		for (Class<? extends ImageAnalysisBlockFIS> blockClass : blocks) {
-			ImageAnalysisBlockFIS block = blockClass.newInstance();
+		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
+			ImageAnalysisBlock block = blockClass.newInstance();
 			block.setInputAndOptions(null, options, null, index++, null);
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,

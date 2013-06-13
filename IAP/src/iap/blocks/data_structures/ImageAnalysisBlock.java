@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
-public interface ImageAnalysisBlockFIS {
+public interface ImageAnalysisBlock {
 	
 	public void setInputAndOptions(MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet settings, int blockPositionInPipeline,
 			ImageStack debugStack);

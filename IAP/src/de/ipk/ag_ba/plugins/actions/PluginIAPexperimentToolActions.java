@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.plugins;
+package de.ipk.ag_ba.plugins.actions;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,7 @@ import de.ipk.ag_ba.commands.experiment.tools.ActionSortSubstances;
 import de.ipk.ag_ba.commands.experiment.tools.ActionTestMongoIoReadSpeed;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk.ag_ba.plugins.outlier.OutlierAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 

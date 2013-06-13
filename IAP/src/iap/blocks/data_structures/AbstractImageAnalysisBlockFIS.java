@@ -39,7 +39,7 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
-public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlockFIS {
+public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlock {
 	
 	private ImageStack debugStack;
 	protected ImageProcessorOptions options;
@@ -55,7 +55,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
-	public boolean getBoolean(ImageAnalysisBlockFIS block, String setting, boolean defaultValue) {
+	public boolean getBoolean(ImageAnalysisBlock block, String setting, boolean defaultValue) {
 		return options.getBooleanSetting(block, setting, defaultValue);
 	}
 	

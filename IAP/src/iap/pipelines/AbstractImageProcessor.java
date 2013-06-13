@@ -3,7 +3,7 @@
  *************************************************************************/
 package iap.pipelines;
 
-import iap.blocks.data_structures.ImageAnalysisBlockFIS;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -26,6 +26,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	
 	private final HashMap<Integer, BlockResultSet> settings;
 	private int[] debugValidTrays;
+	protected BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	public AbstractImageProcessor() {
 		this(new HashMap<Integer, BlockResultSet>());
@@ -114,10 +115,10 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 				if (b != null && !b.startsWith("#") && !b.trim().isEmpty()) {
 					try {
 						Class<?> c = Class.forName(b);
-						if (ImageAnalysisBlockFIS.class.isAssignableFrom(c))
-							p.add((Class<? extends ImageAnalysisBlockFIS>) c);
+						if (ImageAnalysisBlock.class.isAssignableFrom(c))
+							p.add((Class<? extends ImageAnalysisBlock>) c);
 						else
-							System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlockFIS.class.getCanonicalName()
+							System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlock.class.getCanonicalName()
 									+ "! (block is not added to pipeline!)");
 					} catch (ClassNotFoundException cnfe) {
 						System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block). Pipeline: "
@@ -127,4 +128,15 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			}
 		return p;
 	}
+	
+	@Override
+	public void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status) {
+		this.status = status;
+	}
+	
+	@Override
+	public BackgroundTaskStatusProviderSupportingExternalCall getStatus() {
+		return status;
+	}
+	
 }
