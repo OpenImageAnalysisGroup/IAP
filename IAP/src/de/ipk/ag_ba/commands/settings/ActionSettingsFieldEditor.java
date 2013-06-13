@@ -190,38 +190,76 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 							}
 						} else
 							if (isStringArray) {
-								ArrayList<String> entries = new ArrayList<String>();
+								String specialHelp = "";
+								ArrayList<Object> entries = new ArrayList<Object>();
 								int line = 1;
 								for (String sl : ss) {
 									if (!setting.equals("block"))
 										entries.add("Item " + (line++));
 									else {
+										specialHelp = "The block item list shows differently colored rectangles to visually more easily separate<br>" +
+												"the data acquisition, preprocessing, segmentation, feature-extraction and postprocessing blocks.<br>" +
+												"The package name in the text field also indicates the purpose of a particular block.<br>" +
+												"The input and output information boxes (IN/OUT) indicate whether a block (potentially) processes<br>" +
+												"visible light images, fluorescence images, near-infrared and/or infrared images (in this order).<br>" +
+												"If the box is filled, the block processes images from a certain type as input and/or output.<br>" +
+												"If it is not filled, the corresponding image is not processed (for IN) or remains unchanged (OUT).<br>" +
+												"All of this informtion is derived from static meta-data. Depending on availability of input<br>" +
+												"images and block settings, images from certain camera types are not processed by the blocks.<br><br>";
 										String inf = "Step " + (line++);
 										if (line <= 10)
 											inf = "Step 0" + (line - 1);
+										
+										String type = "";
 										try {
 											ImageAnalysisBlockFIS inst = (ImageAnalysisBlockFIS) Class.forName(sl).newInstance();
-											
+											switch (inst.getBlockType()) {
+												case ACQUISITION:
+													type = "<span style=\"background-color:#DDFFDD\">";
+													break;
+												case FEATURE_EXTRACTION:
+													type = "<span style=\"background-color:#DDDDFF\">";
+													break;
+												case POSTPROCESSING:
+													type = "<span style=\"background-color:#DDFFFF\">";
+													break;
+												case PREPROCESSING:
+													type = "<span style=\"background-color:#FFFFDD\">";
+													break;
+												case SEGMENTATION:
+													type = "<span style=\"background-color:#FFDDDD\">";
+													break;
+												default:
+													break;
+											}
+											if (!type.isEmpty())
+												type += "<font color='gray' size='-4'>" +
+														"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+														"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></span>";
 											String gs = "<font color='green'>";
 											String ge = "</font>";
 											String rs = "<font color='red'>";
 											String re = "</font>";
-											String ns = "<font color='darkgray'>";
+											String ns = "<font color='gray'>";
 											String ne = "</font>";
 											String is = "<font color='blue'>";
 											String ie = "</font>";
 											
-											String vi = gs + (inst.getCameraInputTypes().contains(CameraType.VIS) ? "V" : "&darr;") + ge;
-											String fi = rs + (inst.getCameraInputTypes().contains(CameraType.FLUO) ? "F" : "&darr;") + re;
-											String ni = ns + (inst.getCameraInputTypes().contains(CameraType.NIR) ? "N" : "&darr;") + ne;
-											String ii = is + (inst.getCameraInputTypes().contains(CameraType.IR) ? "I" : "&darr;") + ie;
+											String vi = gs + (inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+											String fi = rs + (inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+											String ni = ns + (inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+											String ii = is + (inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
 											
-											String vo = gs + (inst.getCameraOutputTypes().contains(CameraType.VIS) ? "V" : "&darr;") + ge;
-											String fo = rs + (inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "F" : "&darr;") + re;
-											String no = ns + (inst.getCameraOutputTypes().contains(CameraType.NIR) ? "N" : "&darr;") + ne;
-											String io = is + (inst.getCameraOutputTypes().contains(CameraType.IR) ? "I" : "&darr;") + ie;
+											String vo = gs + (inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+											String fo = rs + (inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+											String no = ns + (inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+											String io = is + (inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
 											
-											inf = "<html><table border='0'><tr><td>" + inf + "</td><td><font color='gray' size='-2'><code>"
+											inf = "<html>" +
+													"<table border='0'><tr>" +
+													"<td>" + type + "</td>" +
+													"<td>" + inf
+													+ "</td><td><font color='gray' size='-2'><code>"
 													+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""
 													+ "<br> OUT&#9656; " + vo + " " + fo + " " + no + " " + io + "</code></font></td></tr></table>";
 										} catch (Exception e) {
@@ -231,9 +269,9 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 									}
 									entries.add(sl + "");
 								}
-								Object[] inp = MyInputHelper.getInput(getHelp() +
+								Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
 										"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
-												"If an item contains '//', the entry is split into two items.<br>",
+										"Add '//' and then additional text to a line, to add/insert a new line.<br>",
 										"Modify "
 												+ setting, entries.toArray());
 								if (inp != null) {

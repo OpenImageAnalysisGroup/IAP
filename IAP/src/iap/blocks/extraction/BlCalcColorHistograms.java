@@ -279,6 +279,6 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlockFIS {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.ACQUISITION;
+		return BlockType.FEATURE_EXTRACTION;
 	}
 }

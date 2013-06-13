@@ -5,7 +5,7 @@
 // Copyright (c) 2001-2004 Gravisto Team, University of Passau
 //
 // ==============================================================================
-// $Id: DefaultParameterDialog.java,v 1.5 2012-11-07 14:42:07 klukas Exp $
+// $Id: DefaultParameterDialog.java,v 1.6 2013-06-13 15:11:30 klukas Exp $
 
 package org.graffiti.editor.dialog;
 
@@ -66,7 +66,7 @@ import org.graffiti.session.Session;
 /**
  * The default implementation of a parameter dialog.
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class DefaultParameterDialog extends AbstractParameterDialog implements
 		ActionListener, WindowListener {
@@ -580,7 +580,14 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		for (int i = 0; i < p.length; i++) {
 			Object desc = parameters[i * 2];
 			String nameTitle, nameTooltip;
-			String nameDesc = (String) desc;
+			String nameDesc;
+			if (desc instanceof String)
+				nameDesc = (String) desc;
+			else
+				if (desc instanceof JLabel)
+					nameDesc = ((JLabel) desc).getText();
+				else
+					nameDesc = null;
 			if (nameDesc != null && nameDesc.indexOf("@@") > 0) {
 				nameTitle = nameDesc.substring(0, nameDesc.indexOf("@@"));
 				nameTooltip = nameDesc.substring(nameDesc.indexOf("@@") + "@@".length());
