@@ -15,9 +15,6 @@ import javax.swing.JButton;
 
 import org.graffiti.editor.MainFrame;
 
-/**
- * TODO
- */
 public abstract class GraffitiButton
 					extends JButton
 					implements GraffitiComponent {

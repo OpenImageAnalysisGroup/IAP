@@ -139,7 +139,7 @@ public class DialogableTextField
 		 * @return the text in the textfield.
 		 */
 		public String getText() {
-			return null; // TODO
+			return null; 
 		}
 	}
 }

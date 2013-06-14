@@ -1802,7 +1802,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 					((EditorSession) sess).getSelectionModel().addSelectionListener((SelectionListener) plugin);
 				}
 				
-				// TODO: check what todo if non-EditorSession ...
+				// missing: check what todo if non-EditorSession ...
 			}
 		}
 	}
@@ -1857,7 +1857,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 							if (((EditorSession) sess).getSelectionModel() != null)
 								((EditorSession) sess).getSelectionModel().addSelectionListener((SelectionListener) tools[i]);
 						}
-						// TODO: check what todo if non-EditorSession ...
+						// missing: check what todo if non-EditorSession ...
 					}
 				}
 			}

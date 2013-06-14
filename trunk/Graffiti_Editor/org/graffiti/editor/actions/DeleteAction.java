@@ -51,7 +51,7 @@ public class DeleteAction extends SelectionAction {
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**

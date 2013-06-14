@@ -59,7 +59,7 @@ public class CutAction extends SelectionAction {
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**

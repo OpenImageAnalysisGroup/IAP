@@ -119,8 +119,6 @@ public class GraphConstraintChecker
 			try {
 				gc.validate(g);
 			} catch (UnsatisfiedConstraintException e) {
-				// TODO save e.getMessage() together with other unsatisfied
-				// constraints
 				message.concat("\n" + e.getMessage());
 			}
 		}

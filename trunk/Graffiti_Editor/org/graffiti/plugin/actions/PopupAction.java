@@ -49,7 +49,7 @@ public class PopupAction
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public class PopupAction
 	 */
 	@Override
 	public String getName() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**

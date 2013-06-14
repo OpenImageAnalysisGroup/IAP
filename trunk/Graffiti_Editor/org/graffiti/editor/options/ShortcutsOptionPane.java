@@ -45,7 +45,7 @@ public class ShortcutsOptionPane
 	 */
 	@Override
 	protected void initDefault() {
-		// TODO
+		// 
 	}
 	
 	/*
@@ -53,7 +53,7 @@ public class ShortcutsOptionPane
 	 */
 	@Override
 	protected void saveDefault() {
-		// TODO
+		// 
 	}
 	
 	// ~ Inner Classes ==========================================================
@@ -80,7 +80,7 @@ public class ShortcutsOptionPane
 		 *           list of keybindings.
 		 */
 		ShortcutsModel(String name, List<?> bindings) {
-			// TODO
+			// 
 		}
 		
 		/**
@@ -111,7 +111,7 @@ public class ShortcutsOptionPane
 		 * @return DOCUMENT ME!
 		 */
 		public Object getValueAt(int row, int col) {
-			return null; // TODO
+			return null; // 
 		}
 	}
 	
