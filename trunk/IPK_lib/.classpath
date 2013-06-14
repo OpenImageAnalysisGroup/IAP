@@ -58,5 +58,7 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-pool-1.3.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
+	<classpathentry kind="lib" path="/IAP/lib/platform.jar"/>
+	<classpathentry kind="lib" path="/IAP/lib/jna.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

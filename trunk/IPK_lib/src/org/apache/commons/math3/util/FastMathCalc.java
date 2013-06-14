@@ -98,7 +98,6 @@ class FastMathCalc {
      * @param TANGENT_TABLE_A table of the most significant part of the tangents
      * @param TANGENT_TABLE_B table of the most significant part of the tangents
      */
-    @SuppressWarnings("unused")
     private static void buildSinCosTables(double[] SINE_TABLE_A, double[] SINE_TABLE_B,
                                           double[] COSINE_TABLE_A, double[] COSINE_TABLE_B,
                                           int SINE_TABLE_LEN, double[] TANGENT_TABLE_A, double[] TANGENT_TABLE_B) {

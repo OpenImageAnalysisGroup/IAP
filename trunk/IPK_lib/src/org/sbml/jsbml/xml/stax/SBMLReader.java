@@ -548,13 +548,11 @@ public class SBMLReader {
 
 			// StartDocument
 			if (event.isStartDocument()) {
-				@SuppressWarnings("unused")
 				StartDocument startDocument = (StartDocument) event;
 				// nothing to do
 			}
 			// EndDocument
 			else if (event.isEndDocument()) {
-				@SuppressWarnings("unused")
 				EndDocument endDocument = (EndDocument) event;
 				// nothing to do?
 			}

@@ -244,6 +244,8 @@ public class JDBCXYDataset extends AbstractXYDataset implements XYDataset,
 					}
 				} catch (SQLException e) {
 					columnTypes[column] = Types.NULL;
+					statement.close();
+					resultSet.close();
 					throw e;
 				}
 			}

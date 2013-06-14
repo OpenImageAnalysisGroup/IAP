@@ -49,7 +49,7 @@ public class RegressionResults implements Serializable {
     /** boolean flag for variance covariance matrix in symm compressed storage */
     private final boolean isSymmetricVCD;
     /** rank of the solution */
-    @SuppressWarnings("unused")
+    
     private final int rank;
     /** number of observations on which results are based */
     private final long nobs;
@@ -62,7 +62,6 @@ public class RegressionResults implements Serializable {
      *  Set the default constructor to private access
      *  to prevent inadvertent instantiation
      */
-    @SuppressWarnings("unused")
     private RegressionResults() {
         this.parameters = null;
         this.varCovData = null;
