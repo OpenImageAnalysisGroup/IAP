@@ -43,6 +43,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.visualisations.gradient.GradientCharts;
 
 public class MultimodalDataHandlingAddon extends EditorPluginAdapter {
 	
+	@SuppressWarnings("unchecked")
 	public MultimodalDataHandlingAddon() {
 		
 		registerHandlersAndTemplates();

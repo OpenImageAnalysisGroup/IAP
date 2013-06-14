@@ -149,6 +149,7 @@ public class VisualiseFluxDataAlgorithm extends AbstractEditorAlgorithm {
 		redraw(false);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private JPanel createPanel() {
 		selectedCondition = uniqueconditions.iterator().next();
 		selectedSample = samples.get(0);

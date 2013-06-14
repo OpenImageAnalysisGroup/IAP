@@ -12,7 +12,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class SampleAverage3D extends SampleAverage {
 	
-	@SuppressWarnings("unchecked")
 	public SampleAverage3D(SampleInterface sample, Map map) {
 		super(sample, map);
 	}
