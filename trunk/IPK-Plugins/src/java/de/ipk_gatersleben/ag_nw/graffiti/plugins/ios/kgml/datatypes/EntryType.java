@@ -42,6 +42,7 @@ public enum EntryType {
 		return null;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public String toString() {
 		switch (this) {
@@ -53,6 +54,7 @@ public enum EntryType {
 		return super.toString();
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	public String getDescription() {
 		switch (this) {
 			case unspecified:

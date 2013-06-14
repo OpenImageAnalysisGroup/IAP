@@ -22,6 +22,7 @@ import javax.swing.border.EtchedBorder;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Relation;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MyRelationList extends JList {
 	RelationTypeEditor relationTypeEditor;
 	SubComponentTypesEditor subComponentTypesEditor;

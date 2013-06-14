@@ -28,7 +28,7 @@ import java.util.Observer;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes","unchecked"})
 abstract class Chunk<T extends Chunk> {
 	T conj;
 	
@@ -214,7 +214,7 @@ class XChunk extends Chunk<YChunk> {
 	
 }
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes"})
 class ChunkEdge implements Comparable<ChunkEdge> {
 	Chunk chunk;
 	
@@ -237,7 +237,7 @@ class ChunkEdge implements Comparable<ChunkEdge> {
 	}
 }
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class QPRectanglePlacement extends Observable implements RectanglePlacement, Observer {
 	static Logger logger = Logger.getLogger(QPRectanglePlacement.class.getName());
 	

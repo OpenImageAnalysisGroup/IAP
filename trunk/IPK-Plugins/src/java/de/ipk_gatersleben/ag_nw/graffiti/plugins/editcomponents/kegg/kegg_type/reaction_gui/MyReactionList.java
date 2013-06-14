@@ -24,6 +24,7 @@ import org.ErrorMsg;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Reaction;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MyReactionList extends JList {
 	ReactionIdEditor reactionIdEditor;
 	ReactionTypeSelection reactionTypeSelection;

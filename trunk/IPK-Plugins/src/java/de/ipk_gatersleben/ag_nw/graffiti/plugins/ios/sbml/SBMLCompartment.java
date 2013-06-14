@@ -13,6 +13,7 @@ import org.sbml.jsbml.xml.XMLNode;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.exporters.sbml.SBML_SBase_Writer;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.sbml.SBML_SBase_Reader;
 
+@SuppressWarnings("unused")
 public class SBMLCompartment {
 
 	/**

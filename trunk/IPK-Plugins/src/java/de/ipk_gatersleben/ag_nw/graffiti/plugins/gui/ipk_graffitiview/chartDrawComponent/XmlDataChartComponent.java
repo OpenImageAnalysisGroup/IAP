@@ -299,6 +299,8 @@ public class XmlDataChartComponent extends JComponent {
 				return createLegendChart(co);
 			case HIDDEN:
 				return null;
+		default:
+			break;
 		}
 		ErrorMsg.addErrorMessage("Unknown chart type: " + chartType);
 		return null;

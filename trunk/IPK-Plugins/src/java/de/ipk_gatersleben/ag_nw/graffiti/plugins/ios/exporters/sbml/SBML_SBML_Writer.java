@@ -41,7 +41,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml.SBMLParameterHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml.SBMLSpeciesHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml.SBML_Constants;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml.SBML_XML_ReaderWriterPlugin;
-
+@SuppressWarnings("unused")
 public class SBML_SBML_Writer extends SBML_SBase_Writer {
 	private Model _model;
 	

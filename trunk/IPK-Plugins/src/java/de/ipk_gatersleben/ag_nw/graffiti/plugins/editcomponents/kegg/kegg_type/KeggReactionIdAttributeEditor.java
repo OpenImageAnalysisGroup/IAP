@@ -61,6 +61,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.ReactionType
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class KeggReactionIdAttributeEditor
 					extends AbstractValueEditComponent
 					implements ActionListener {

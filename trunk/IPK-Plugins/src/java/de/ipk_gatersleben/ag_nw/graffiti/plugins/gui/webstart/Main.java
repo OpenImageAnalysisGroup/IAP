@@ -296,10 +296,8 @@ public class Main {
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		Main e = new Main(true,
+		new Main(true,
 				DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon);
-		if (e == null)
-			System.err.println("MainFrame not created.");
 	}
 	
 	public static void startVanted(String[] args, String adn) {

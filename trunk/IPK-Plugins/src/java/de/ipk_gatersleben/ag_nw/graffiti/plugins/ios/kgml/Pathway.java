@@ -139,8 +139,6 @@ public class Pathway {
 		if (f == null || !f.exists()) {
 			if (f != null)
 				System.err.println("FILE NOT FOUND: " + f.getAbsolutePath());
-			else
-				System.err.println("FILE NOT FOUND: (null)");
 			return;
 		}
 		if (batch) {

@@ -6,7 +6,7 @@ package placement;
  * Based on implementation by Mark Allen Weiss from the book "Data Stuctures & Algorithm Analysis in Java" - Prentice Hall 1999
  */
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class MinPairingHeap<T extends Comparable> {
 	
 	/**

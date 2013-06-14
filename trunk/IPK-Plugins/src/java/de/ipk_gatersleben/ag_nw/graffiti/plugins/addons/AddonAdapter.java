@@ -29,10 +29,7 @@ public abstract class AddonAdapter extends IPK_EditorPluginAdapter {
 	public ImageIcon getIcon() {
 		try {
 			ImageIcon icon = new ImageIcon(GravistoService.getResource(GenericPluginAdapter.class, "addon-icon", "png"));
-			if (icon != null)
-				return icon;
-			else
-				return super.getIcon();
+			return icon;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return super.getIcon();

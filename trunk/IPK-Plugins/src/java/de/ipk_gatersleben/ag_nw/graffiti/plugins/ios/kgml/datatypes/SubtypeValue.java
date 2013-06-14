@@ -21,6 +21,7 @@ public class SubtypeValue {
 		this.value = fromId.toString();
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	public static String getValue(SubtypeName fromName) {
 		if (fromName != null)
 			switch (fromName) {

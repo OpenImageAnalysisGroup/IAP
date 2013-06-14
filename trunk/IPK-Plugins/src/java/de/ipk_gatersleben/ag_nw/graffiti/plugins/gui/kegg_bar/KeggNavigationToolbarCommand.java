@@ -79,6 +79,7 @@ public class KeggNavigationToolbarCommand extends AbstractUndoableEdit {
 		return "Undo " + StringManipulationTools.removeHTMLtags(desc);
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void redo() throws CannotRedoException {
 		

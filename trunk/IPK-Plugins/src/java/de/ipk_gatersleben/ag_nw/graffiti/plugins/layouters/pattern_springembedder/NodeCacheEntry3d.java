@@ -14,6 +14,7 @@ import org.graffiti.graph.Node;
  * 
  * @author klukas
  */
+@SuppressWarnings({"rawtypes"})
 public class NodeCacheEntry3d {
 	
 	/**
@@ -48,13 +49,11 @@ public class NodeCacheEntry3d {
 	 * Vector with <code>patterNodes</code> Objects, which store the
 	 * information about all connected patterns.
 	 */
-	@SuppressWarnings("unchecked")
 	public ArrayList patternNodes;
 	
 	/**
 	 * Contains the connected nodes (NodeCacheEntrys)
 	 */
-	@SuppressWarnings("unchecked")
 	public ArrayList connectedNodes;
 	
 	/**

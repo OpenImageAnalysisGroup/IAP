@@ -46,6 +46,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Reaction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.EntryType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.KeggId;
 
+@SuppressWarnings("deprecation")
 public class CompoundListEditor extends JComponent {
 	private static final long serialVersionUID = 1L;
 	private MutableList subProdSelection = new MutableList(new DefaultListModel());

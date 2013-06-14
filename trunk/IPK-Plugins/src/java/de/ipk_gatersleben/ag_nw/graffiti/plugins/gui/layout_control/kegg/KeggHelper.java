@@ -38,6 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * @author Christian Klukas
  * @version $Revision: 1.6 $
  */
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class KeggHelper implements HelperClass {
 	
 	private static String kgmlVersion = "0.6.1";

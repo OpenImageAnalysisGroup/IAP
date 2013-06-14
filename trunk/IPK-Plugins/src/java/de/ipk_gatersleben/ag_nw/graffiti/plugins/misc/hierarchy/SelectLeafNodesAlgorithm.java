@@ -27,6 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 /**
  * @author Christian Klukas
  */
+@SuppressWarnings({"rawtypes"})
 public class SelectLeafNodesAlgorithm
 					extends AbstractAlgorithm
 					implements ActionListener, ProvidesNodeContextMenu {
