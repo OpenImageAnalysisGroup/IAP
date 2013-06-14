@@ -400,18 +400,6 @@ public class PluginSelector
 		
 		/**
 		 * Returns the component at the given index in the list.
-		 * 
-		 * @param list
-		 *           DOCUMENT ME!
-		 * @param value
-		 *           DOCUMENT ME!
-		 * @param modelIndex
-		 *           DOCUMENT ME!
-		 * @param isSelected
-		 *           DOCUMENT ME!
-		 * @param cellHasFocus
-		 *           DOCUMENT ME!
-		 * @return DOCUMENT ME!
 		 */
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
@@ -421,34 +409,16 @@ public class PluginSelector
 			
 			PluginEntry e = (PluginEntry) value;
 			
-			// TODO setIcon() (perhaps, but creating an instance of the plugin
-			// to get the plugin's icon is somehow a bad idea)
 			setText(displayString(e.getDescription()));
 			setToolTipText(displayToolTip(e));
 			
 			return c;
 		}
 		
-		/**
-		 * DOCUMENT ME!
-		 * 
-		 * @param d
-		 *           DOCUMENT ME!
-		 * @return DOCUMENT ME!
-		 */
 		public static String displayString(PluginDescription d) {
-			return d.getName(); // + " - " + d.getMain();
-			
-			// return d.getName() + "  (" + d.getVersion() + ")";
+			return d.getName();
 		}
 		
-		/**
-		 * DOCUMENT ME!
-		 * 
-		 * @param e
-		 *           DOCUMENT ME!
-		 * @return DOCUMENT ME!
-		 */
 		public static String displayToolTip(PluginEntry e) {
 			PluginDescription d = e.getDescription();
 			

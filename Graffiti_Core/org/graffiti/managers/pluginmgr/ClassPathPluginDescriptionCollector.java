@@ -112,7 +112,7 @@ public class ClassPathPluginDescriptionCollector
 	 */
 	protected boolean isPluginDescription(String fileName) {
 		// Maybe rename the string to "plugin.xml" or "graffiti-plugin.xml"
-		return fileName.endsWith(".xml"); // TODO remove hard coded string
+		return fileName.endsWith(".xml");
 	}
 	
 	/**
@@ -147,7 +147,6 @@ public class ClassPathPluginDescriptionCollector
 	 * @return DOCUMENT ME!
 	 */
 	private boolean isPluginFile(String fileName) {
-		// TODO remove hard coded strings
 		return fileName.endsWith(".jar") || fileName.endsWith(".zip");
 	}
 	

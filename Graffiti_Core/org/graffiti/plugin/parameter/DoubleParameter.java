@@ -87,34 +87,19 @@ public class DoubleParameter
 		return value;
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
 	@Override
 	public Comparable<?> getMax() {
-		return null; // TODO
+		return null;
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
 	@Override
 	public Comparable<?> getMin() {
-		return null; // TODO
+		return null;
 	}
-	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
+
 	@Override
 	public boolean isValid() {
-		return false; // TODO
+		return false;
 	}
 	
 	/**
@@ -125,7 +110,6 @@ public class DoubleParameter
 	 */
 	@Override
 	public void setValue(Object value) {
-		// TODO
 		this.value = (Double) value;
 	}
 	
