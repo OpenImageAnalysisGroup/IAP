@@ -84,7 +84,6 @@ public class MillerUpdatingRegression implements UpdatingMultipleLinearRegressio
      *  Set the default constructor to private access
      *  to prevent inadvertent instantiation
      */
-    @SuppressWarnings("unused")
     private MillerUpdatingRegression() {
         this.d = null;
         this.hasIntercept = false;
