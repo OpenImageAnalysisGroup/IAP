@@ -31,8 +31,7 @@ public class Condition3D extends Condition {
 		return coord;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Condition3D(SubstanceInterface s3d, Map attributemap) {
+	public Condition3D(SubstanceInterface s3d, @SuppressWarnings("rawtypes") Map attributemap) {
 		super(s3d, attributemap);
 	}
 	

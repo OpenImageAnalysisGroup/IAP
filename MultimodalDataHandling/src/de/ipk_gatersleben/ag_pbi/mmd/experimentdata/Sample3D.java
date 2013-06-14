@@ -39,7 +39,7 @@ public class Sample3D extends Sample {
 		// binaryMeasurements = new ArrayList<NumericMeasurementInterface>();
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Sample3D(Condition3D parent, Map map) {
 		this(parent);
 		for (Object k : map.keySet()) {
@@ -112,17 +112,16 @@ public class Sample3D extends Sample {
 	// return binaryMeasurements;
 	// }
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean setData(Element sampleElement) {
-		List attributeList = sampleElement.getAttributes();
+		List<?> attributeList = sampleElement.getAttributes();
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
 				setAttribute(a);
 			}
 		}
-		List childrenList = sampleElement.getChildren();
+		List<?> childrenList = sampleElement.getChildren();
 		for (Object o : childrenList) {
 			if (o instanceof Element) {
 				Element childElement = (Element) o;

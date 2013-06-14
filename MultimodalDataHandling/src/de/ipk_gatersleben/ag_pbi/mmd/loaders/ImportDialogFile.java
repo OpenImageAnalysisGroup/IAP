@@ -40,6 +40,7 @@ import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ImportDialogFile extends JPanel {
 	private static final long serialVersionUID = 1L;
 	

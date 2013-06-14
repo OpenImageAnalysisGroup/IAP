@@ -83,6 +83,7 @@ public class MyImageIOhelper {
 		return image;
 	}
 	
+	@SuppressWarnings("unused")
 	private static BufferedImage createCompatibleImage(BufferedImage image) {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice gs = ge.getDefaultScreenDevice();

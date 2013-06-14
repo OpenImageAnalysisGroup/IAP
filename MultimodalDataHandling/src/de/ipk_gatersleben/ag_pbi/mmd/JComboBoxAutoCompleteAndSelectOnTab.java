@@ -28,6 +28,7 @@ import javax.swing.text.PlainDocument;
 
 // the autocompletion is taken from
 // http://www.java.happycodings.com/Java_Swing/code5.html
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class JComboBoxAutoCompleteAndSelectOnTab extends JComboBox implements JComboBox.KeySelectionManager, FocusListener {
 	
 	private static final long serialVersionUID = 1L;
