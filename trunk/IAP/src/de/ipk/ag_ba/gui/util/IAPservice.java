@@ -453,6 +453,7 @@ public class IAPservice {
 				Socket s = new Socket();
 				s.connect(new InetSocketAddress(hostname, port), 100);
 				res.add("Open port: " + port);
+				s.close();
 			} catch (Exception ex) {
 				// not listening on this port
 			}
@@ -1691,6 +1692,7 @@ public class IAPservice {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static Image getImage(Class ref, String name) {
 		URL url = GravistoService.getResource(ref, name);
 		if (url == null)

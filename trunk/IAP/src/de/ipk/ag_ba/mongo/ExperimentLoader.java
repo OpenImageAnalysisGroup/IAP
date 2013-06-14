@@ -345,7 +345,7 @@ public class ExperimentLoader implements RunnableOnDB {
 		}
 	}
 	
-	private Map filter(Map map) {
+	private Map<String, Object> filter(Map<String, Object> map) {
 		if (map == null || map.isEmpty())
 			return map;
 		for (Object key : map.keySet().toArray()) {

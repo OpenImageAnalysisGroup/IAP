@@ -71,7 +71,6 @@ public class DisplayHistogram extends JComponent implements MouseMotionListener 
 	 * @param title
 	 *           the title of the plot.
 	 */
-	@SuppressWarnings("restriction")
 	public DisplayHistogram(Histogram histogramR, Histogram histogramG, Histogram histogramB, String title) {
 		this.title = title;
 		init(histogramR, histogramG, histogramB);
@@ -81,7 +80,6 @@ public class DisplayHistogram extends JComponent implements MouseMotionListener 
 	/**
 	 * Override the default bin width (for plotting)
 	 */
-	@SuppressWarnings("restriction")
 	public void setBinWidth(int newWidth) {
 		binWidth = newWidth;
 		width = histogramR.getNumBins(0) * binWidth;
@@ -148,7 +146,6 @@ public class DisplayHistogram extends JComponent implements MouseMotionListener 
 	/**
 	 * This method will paint the component.
 	 */
-	@SuppressWarnings("restriction")
 	protected void paintComponent(Graphics g) {
 		try {
 			Graphics2D g2d = (Graphics2D) g;
@@ -275,7 +272,6 @@ public class DisplayHistogram extends JComponent implements MouseMotionListener 
 	/**
 	 * @param histogram2
 	 */
-	@SuppressWarnings("restriction")
 	public void init(Histogram histogramR, Histogram histogramG, Histogram histogramB) {
 		this.histogramR = histogramR;
 		// Calculate the components dimensions.

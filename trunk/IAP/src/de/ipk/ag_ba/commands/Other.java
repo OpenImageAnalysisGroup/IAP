@@ -62,6 +62,7 @@ public class Other {
 		return calendarEntity;
 	}
 	
+	@SuppressWarnings("unused")
 	private static void checkServerAvailabilityByPing(HashMap<String, ArrayList<String>> infoset, String name,
 			String role, String host) {
 		infoset.put(name, new ArrayList<String>());
