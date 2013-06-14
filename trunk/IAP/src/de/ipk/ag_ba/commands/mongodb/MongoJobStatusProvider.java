@@ -89,31 +89,27 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	
 	@Override
 	public void setCurrentStatusValueFine(double value) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 	
 	@Override
 	public boolean wantsToStop() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
 	@Override
 	public void setCurrentStatusText1(String status) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void setCurrentStatusText2(String status) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void setCurrentStatusValueFineAdd(double smallProgressStep) {
-		// TODO Auto-generated method stub
 		
 	}
 	

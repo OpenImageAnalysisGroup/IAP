@@ -132,7 +132,6 @@ public class IOmodule {
 	}
 	
 	public static InputStream getNetworkPreviewIcon(LoadedNetwork ln, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

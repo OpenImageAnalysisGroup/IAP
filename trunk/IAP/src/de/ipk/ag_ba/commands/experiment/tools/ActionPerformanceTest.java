@@ -166,7 +166,6 @@ public class ActionPerformanceTest extends AbstractNavigationAction implements A
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

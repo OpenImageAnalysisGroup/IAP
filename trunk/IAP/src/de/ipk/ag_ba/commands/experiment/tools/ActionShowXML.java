@@ -92,7 +92,6 @@ public class ActionShowXML extends AbstractNavigationAction implements ActionDat
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

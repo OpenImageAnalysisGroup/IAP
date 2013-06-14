@@ -192,31 +192,26 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public void setCurrentStatusValueFine(double value) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public boolean wantsToStop() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public void setCurrentStatusText1(String status) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void setCurrentStatusText2(String status) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -227,7 +222,6 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public void setPrefix1(String prefix1) {
-				// TODO Auto-generated method stub
 				
 			}
 		};

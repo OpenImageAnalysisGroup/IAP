@@ -48,7 +48,6 @@ public class SkeletonProcessor2d {
 	
 	public SkeletonProcessor2d(Image inp) {
 		this.skelImg = inp.getAs2A().clone();
-		// TODO findEndpointsAndBranches(); all in one, do it later
 	}
 	
 	public SkeletonProcessor2d(int[][] image) {
@@ -203,7 +202,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	private Point[] getNearestLimb(Limb l) {
-		// TODO improvement: first sort y, pre/succ calc dist -> O(nlogn)
+		// missing improvement: first sort y, pre/succ calc dist -> O(nlogn)
 		int dist = Integer.MAX_VALUE;
 		Point ini = l.initialpoint;
 		Point res = null;

@@ -880,7 +880,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			// if (user.equals(Consts.ROOTUSERNAME.toString())) { // TODO
+			// if (user.equals(Consts.ROOTUSERNAME.toString())) { 
 			Thread t = new Thread(new Runnable() {
 				@Override
 				public void run() {

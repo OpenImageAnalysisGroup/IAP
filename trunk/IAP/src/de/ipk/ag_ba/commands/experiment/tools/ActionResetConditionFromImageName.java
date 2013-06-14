@@ -99,7 +99,6 @@ public class ActionResetConditionFromImageName extends AbstractNavigationAction 
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
