@@ -219,7 +219,7 @@ public class EnzymeService extends MemoryHog
 		BufferedReader input;
 		input = getFileReader("enzyme.dat");
 		if (input == null) {
-			// TODO: Somehow report missing files...
+			ErrorMsg.addErrorMessage("Info: 'enzyme.dat'-file could not be loaded!");
 		} else {
 			String line = null;
 			try {

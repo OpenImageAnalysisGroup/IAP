@@ -293,7 +293,7 @@ public class MenuItemInfoDialog
 			}
 			
 			private void closeHelp() {
-				// TODO
+				
 			}
 		};
 	}

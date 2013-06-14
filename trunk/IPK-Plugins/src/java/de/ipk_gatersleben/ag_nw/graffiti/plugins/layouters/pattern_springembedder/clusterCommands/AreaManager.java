@@ -5,7 +5,7 @@ import org.graffiti.graph.Graph;
 public class AreaManager {
 	
 	public AreaManager(Graph g) {
-		// TODO Auto-generated constructor stub
+		// 
 	}
 	
 	public void claimNodePositions() {

@@ -303,7 +303,6 @@ public class SBML_SBML_Writer extends SBML_SBase_Writer {
 	private void createExtendedLayoutModel(Graph g) {
 		ExtendedLayoutModel extendedLayoutModel = new ExtendedLayoutModel(_model);
 		_model.addExtension(SBMLHelper.SBML_LAYOUT_EXTENSION_NAMESPACE, extendedLayoutModel);
-		// TODO performance tunning: global list with unique layoutIDs as string
 		SBMLSpeciesHelper speciesHelper = new SBMLSpeciesHelper(g);
 		List<Node> nodeList = speciesHelper.getSpeciesNodes();
 		Iterator<Node> itSpeicesNodes = nodeList.iterator();

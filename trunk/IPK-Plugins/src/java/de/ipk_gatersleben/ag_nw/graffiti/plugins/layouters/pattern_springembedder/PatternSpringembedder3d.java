@@ -477,7 +477,7 @@ public class PatternSpringembedder3d
 					distanceY = workB.y - workA.y;
 					distanceZ = workB.z - workA.z;
 					if (distance > 0) {
-						// TODO: CK: Vorschlag von Falk:
+						// idea: CK: Vorschlag von Falk:
 						// Target-length of edge could be modified
 						// by correlation factor!!!!
 						// the higher the correlation, the longer the

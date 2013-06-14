@@ -62,7 +62,7 @@ public class KeggId {
 	}
 	
 	public boolean isGeneProductOfGivenOrganism() {
-		// TODO: difficult to check, would need to check for correct organism code
+		// difficult to check, would need to check for correct organism code
 		return id.contains(":");
 	}
 	

@@ -215,7 +215,7 @@ public class BundleParallelEdges extends AbstractAlgorithm {
 					}
 				}
 			
-			// TODO: sort the edge-bendpoints in such a way, that the edge crossings between cluster-pairs will be minimized
+			// missing: sort the edge-bendpoints in such a way, that the edge crossings between cluster-pairs will be minimized
 			
 		} finally {
 			this.graph.getListenerManager().transactionFinished(this);

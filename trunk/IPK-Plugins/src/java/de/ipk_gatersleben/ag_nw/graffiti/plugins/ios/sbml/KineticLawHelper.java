@@ -268,20 +268,17 @@ public class KineticLawHelper implements AttributeListener {
 	
 	@Override
 	public void transactionFinished(TransactionEvent e, BackgroundTaskStatusProviderSupportingExternalCall status) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void transactionStarted(TransactionEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void postAttributeAdded(AttributeEvent e) {
-		// TODO Auto-generated method stub
-		
+
 	}
 	
 	@Override
@@ -490,25 +487,21 @@ public class KineticLawHelper implements AttributeListener {
 	
 	@Override
 	public void postAttributeRemoved(AttributeEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void preAttributeAdded(AttributeEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void preAttributeChanged(AttributeEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void preAttributeRemoved(AttributeEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 }

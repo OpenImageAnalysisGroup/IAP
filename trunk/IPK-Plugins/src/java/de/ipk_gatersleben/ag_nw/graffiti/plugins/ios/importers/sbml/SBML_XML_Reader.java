@@ -44,7 +44,6 @@ public class SBML_XML_Reader extends AbstractInputSerializer {
 	
 	public SBML_XML_Reader() {
 		// System.out.println("SBML_XML_Reader with layout constructor");
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**
@@ -308,7 +307,6 @@ public class SBML_XML_Reader extends AbstractInputSerializer {
 				finalString = finalString.append(bufferedReader.readLine());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String content = finalString.toString();
@@ -316,13 +314,11 @@ public class SBML_XML_Reader extends AbstractInputSerializer {
 		try {
 			reader.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			bufferedReader.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (content.contains("sbml") && content.contains("model")

@@ -148,9 +148,6 @@ public class XGMMLContentHandler extends XGMMLHandler {
 			AttributeHelper.setOutlineColor(currentNode, this.outlineColor);
 		if (this.fillColor != null)
 			AttributeHelper.setFillColor(currentNode, fillColor);
-		
-		// TODO: Implement further node attributes like
-		// .setFont(new Font(this.fontName, Font.PLAIN, 10));
 	}
 	
 	/**

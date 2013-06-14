@@ -33,7 +33,6 @@ import org.graffiti.plugin.parameter.Parameter;
  * @author Joerg Bartelheimer
  */
 
-/* TODO: Layout of non-horizontal/vertical grids */
 @SuppressWarnings("unchecked")
 public class RTTreeLayout extends AbstractAlgorithm {
 	

@@ -323,13 +323,6 @@ public class BioPAX_OWL_Reader extends AbstractInputSerializer
 		Model model = null;
 		try
 		{
-			// TODO: Validator doesn't work right
-			
-			/*
-			 * TODO: FileName as attribute on the graph
-			 * System.out.println(g.getName());
-			 */
-			
 			// convert model into graph
 			BioPAXIOHandler handler = new SimpleIOHandler();
 			

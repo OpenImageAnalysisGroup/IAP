@@ -33,10 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 
 public class ExperimentLoader {
 	
-	public static final String[] supportedMagicFieldStrings = new String[] { "V1.0", "V1.0T", "V1.1", "V1.1T", "V1.2", "V1.2T" }; // TODO:
-	
-	// some
-	// missing?
+	public static final String[] supportedMagicFieldStrings = new String[] { "V1.0", "V1.0T", "V1.1", "V1.1T", "V1.2", "V1.2T" };
 	
 	public static boolean canLoadFile(File f) {
 		String fileName = f.getName();

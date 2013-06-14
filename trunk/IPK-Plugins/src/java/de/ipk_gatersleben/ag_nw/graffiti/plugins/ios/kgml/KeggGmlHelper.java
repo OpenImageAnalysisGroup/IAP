@@ -166,7 +166,6 @@ public class KeggGmlHelper implements HelperClass {
 		return (String) AttributeHelper.getAttributeValue(nodeOrEdge, "kegg", "kegg_reaction_type" + index, null, "");
 	}
 	
-	// TODO: Improve performance
 	public static ArrayList<IndexAndString> getKeggReactionTypes(Attributable nodeOrEdge) {
 		ArrayList<IndexAndString> result = new ArrayList<IndexAndString>();
 		try {
@@ -185,12 +184,12 @@ public class KeggGmlHelper implements HelperClass {
 	}
 	
 	public static void setKeggGraphicsTitle(Node n, String name) {
-		// TODO: process special characters! which are not allowed in GML
+		// missing: process special characters! which are not allowed in GML
 		AttributeHelper.setLabel(n, name);
 	}
 	
 	public static String getKeggGraphicsTitle(Node n) {
-		// TODO: process special characters, they are allowed in KGML/XML, but not in GML
+		// missing: process special characters, they are allowed in KGML/XML, but not in GML
 		return AttributeHelper.getLabel(n, null);
 	}
 	

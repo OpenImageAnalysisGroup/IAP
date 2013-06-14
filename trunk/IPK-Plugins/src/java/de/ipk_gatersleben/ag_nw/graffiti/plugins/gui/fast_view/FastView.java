@@ -745,7 +745,7 @@ public class FastView
 	 * @see org.graffiti.plugin.view.View#clearComponents()
 	 */
 	public void clearComponents() {
-		// TODO!!! clearComponents
+		// 
 	}
 	
 	public Graph getGraph() {

@@ -383,7 +383,6 @@ public class ZoomFitChangeComponent extends JToolBar implements
 		try {
 			currentZoom.inverseTransform(mouseCoord, mouseCoord);
 		} catch (NoninvertibleTransformException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 //		

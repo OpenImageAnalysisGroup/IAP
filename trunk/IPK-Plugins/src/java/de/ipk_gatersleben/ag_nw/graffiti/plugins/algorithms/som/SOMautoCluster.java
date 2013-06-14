@@ -13,7 +13,6 @@ public class SOMautoCluster extends AbstractAlgorithm {
 	
 	public String getName() {
 		return null; // "SOM-Auto-Cluster Data";
-		// TODO
 	}
 	
 	/*

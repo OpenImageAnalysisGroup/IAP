@@ -251,7 +251,6 @@ public class SOMservice implements BackgroundTaskStatusProvider, BackgroundTaskS
 	
 	@Override
 	public void setPrefix1(String prefix1) {
-		// TODO Auto-generated method stub
 		
 	}
 }
