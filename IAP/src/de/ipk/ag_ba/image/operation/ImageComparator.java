@@ -2,6 +2,8 @@ package de.ipk.ag_ba.image.operation;
 
 import java.awt.Color;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -79,8 +81,8 @@ public class ImageComparator {
 				try {
 					diff[index] = new Color((float) Math.abs(l / 255d), (float) (a / 255d), (float) (b / 255d)).getRGB();
 				} catch (Exception e) {
-					System.out.println("LAB: " + l + " " + a + " " + b);
-					// TODO: handle exception
+					System.err.println("LAB: " + l + " " + a + " " + b);
+					ErrorMsg.addErrorMessage(e);
 				}
 				
 			}

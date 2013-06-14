@@ -178,7 +178,6 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	
 	@Override
 	public DataSourceGroup getDataSourceGroup() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

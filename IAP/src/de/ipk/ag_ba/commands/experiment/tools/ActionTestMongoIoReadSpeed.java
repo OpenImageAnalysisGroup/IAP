@@ -180,7 +180,6 @@ public class ActionTestMongoIoReadSpeed extends AbstractNavigationAction impleme
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

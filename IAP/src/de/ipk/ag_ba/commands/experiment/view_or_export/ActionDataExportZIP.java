@@ -424,7 +424,6 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

@@ -31,6 +31,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		this.m = m;
 		
 		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
+			@SuppressWarnings("unused")
 			private String hostInfo, status3;
 			private double lastStatus = -1;
 			
@@ -54,6 +55,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(10 * 1000);// 5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
 					int tasksWithinLastMinute = 0;
+					@SuppressWarnings("unused")
 					int pipelinesPerHour = 0;
 					int lastPipelineTimeMin = -1;
 					int lastPipelineTimeMax = -1;
@@ -134,31 +136,27 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			
 			@Override
 			public void setCurrentStatusValueFine(double value) {
-				// TODO Auto-generated method stub
+				// 
 				
 			}
 			
 			@Override
 			public boolean wantsToStop() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
 			@Override
 			public void setCurrentStatusText1(String status) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void setCurrentStatusText2(String status) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
-				// TODO Auto-generated method stub
 				
 			}
 			
@@ -169,7 +167,6 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			
 			@Override
 			public void setPrefix1(String prefix1) {
-				// TODO Auto-generated method stub
 				
 			}
 		};

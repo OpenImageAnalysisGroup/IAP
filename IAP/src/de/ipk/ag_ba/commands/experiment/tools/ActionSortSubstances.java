@@ -71,7 +71,6 @@ public class ActionSortSubstances extends AbstractNavigationAction implements Ac
 	
 	@Override
 	public boolean isImageAnalysisCommand() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
