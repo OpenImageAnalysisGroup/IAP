@@ -108,7 +108,6 @@ public class DICOMVolumeLoaderInstance extends VolumeLoaderInstance {
 			if (VolumeColorDepth.getDepthFromString(vd.getColorDepth()) == VolumeColorDepth.BIT8) {
 				byte[][][] volume = new byte[vd.getDimensionX()][vd.getDimensionY()][vd.getDimensionZ()];
 				
-				// TODO: sorting of images should be better respected
 				for (String dcmFile : dcmfiles) {
 					byte[] image = ((DataBufferByte) (new SourceImage(file.getParent() + "/" + dcmFile).getBufferedImage()).getRaster().getDataBuffer()).getData();
 					

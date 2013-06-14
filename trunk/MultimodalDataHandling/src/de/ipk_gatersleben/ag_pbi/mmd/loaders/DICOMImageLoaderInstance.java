@@ -66,8 +66,7 @@ public class DICOMImageLoaderInstance extends ImageLoaderInstance {
 					byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 					int cnt = 0;
 					for (short s : ((DataBufferUShort) oldImage.getRaster().getDataBuffer()).getData())
-						data[cnt++] = (byte) (s & 0x00FF); // TODO: not the right
-					// conversion!!!
+						data[cnt++] = (byte) (s & 0x00FF); // TODO: not the right conversion!!!
 					break;
 				case 24: // do the same as for 32
 				case 32:
