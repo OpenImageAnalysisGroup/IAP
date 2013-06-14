@@ -52,7 +52,7 @@ public class AttributeParameter
 	 *           the new <code>Attribute</code> the <code>AttributeParameter</code> represents.
 	 */
 	public void setAttribute(Attribute value) {
-		// TODO
+		// 
 	}
 	
 	/**

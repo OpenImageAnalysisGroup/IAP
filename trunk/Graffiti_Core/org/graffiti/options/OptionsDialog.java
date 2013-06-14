@@ -173,11 +173,8 @@ public class OptionsDialog
 		// first selected OptionPane is displayed on startup.
 		paneTree.getSelectionModel().addTreeSelectionListener(this);
 		
-		// paneTree.expandPath(new TreePath( TODO
-		// new Object[] { paneTree.getModel().getRoot(), editGroup }));
 		paneTree.setSelectionRow(0);
 		
-		// parent.hideWaitCursor(); TODO
 		pack();
 		setLocationRelativeTo(parent);
 		setVisible(true);
@@ -250,10 +247,9 @@ public class OptionsDialog
 		((OptionGroup) m.getRoot()).save();
 		
 		/* This will fire the PROPERTIES_CHANGED event */
-
-		// editor.propertiesChanged(); TODO
+		// editor.propertiesChanged(); 
 		// Save settings to disk
-		// editor.prefs.sync(); TODO
+		// editor.prefs.sync();
 		// get rid of this dialog if necessary
 		if (dispose) {
 			dispose();

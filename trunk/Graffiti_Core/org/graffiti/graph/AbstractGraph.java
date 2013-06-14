@@ -201,7 +201,6 @@ public abstract class AbstractGraph extends AbstractAttributable implements
 				if (directed != edge.isDirected()) {
 					edge.setDirected(directed);
 				}
-				// TODO think if we really want those attribute to be ADDED
 				if (directed) {
 					edge.setString("graphics.arrowtail", "");
 					edge.setString("graphics.arrowhead",

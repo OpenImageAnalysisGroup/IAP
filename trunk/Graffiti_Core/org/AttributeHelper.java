@@ -1329,8 +1329,6 @@ public class AttributeHelper implements HelperClass {
 		try {
 			ColorAttribute colorAtt = null;
 			
-			// TODO(Christian): is FRAMECOLOR the right constant for outline
-			// color??
 			if (hasAttribute(attributable, GraphicAttributeConstants.FRAMECOLOR)) {
 				colorAtt = (ColorAttribute) attributable.getAttribute(GraphicAttributeConstants.FRAMECOLOR);
 			} else {
@@ -1339,7 +1337,7 @@ public class AttributeHelper implements HelperClass {
 			
 			colorAtt.setColor(color);
 		} catch (Exception ex) {
-			ErrorMsg.addErrorMessage("Set-OutlineColor-Failure: " + ex.getLocalizedMessage());
+			ErrorMsg.addErrorMessage(ex);
 		}
 	}
 	

@@ -92,7 +92,7 @@ public class HelpContext {
 	 * @return DOCUMENT ME!
 	 */
 	public HelpContext findHelp(JComponent comp) {
-		return null; // TODO
+		return null;
 	}
 	
 	/**
