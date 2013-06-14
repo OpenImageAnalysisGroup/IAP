@@ -12,7 +12,6 @@ package org.graffiti.plugins.modes.defaults;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sound.midi.SysexMessage;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
