@@ -33,8 +33,6 @@ public class LoadSaveOptionsPane
 	 */
 	public LoadSaveOptionsPane() {
 		super("loadsave");
-		
-		// TODO
 	}
 	
 	// ~ Methods ================================================================
@@ -44,7 +42,7 @@ public class LoadSaveOptionsPane
 	 */
 	@Override
 	protected void initDefault() {
-		// TODO
+		// 
 	}
 	
 	/*
@@ -52,7 +50,7 @@ public class LoadSaveOptionsPane
 	 */
 	@Override
 	protected void saveDefault() {
-		// TODO
+		// 
 	}
 	
 	/*

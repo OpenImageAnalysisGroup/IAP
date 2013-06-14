@@ -119,7 +119,7 @@ public interface GraphElementComponentInterface {
 	 * calls <code>repaint()</code>.
 	 * 
 	 * @param coordSys
-	 *           TODO
+	 *           
 	 * @exception ShapeNotFoundException
 	 *               thrown when the shapeclass couldn't be
 	 *               resolved.

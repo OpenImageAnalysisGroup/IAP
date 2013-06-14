@@ -64,22 +64,10 @@ public class AddAttributeAction
 		return null;
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param e
-	 *           DOCUMENT ME!
-	 */
 	public void actionPerformed(ActionEvent e) {
-		// TODO
+		// 
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param e
-	 *           DOCUMENT ME!
-	 */
 	public void selectionChanged(SelectionEvent e) {
 		//
 	}

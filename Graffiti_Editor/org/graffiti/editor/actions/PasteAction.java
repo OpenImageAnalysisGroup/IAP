@@ -64,7 +64,7 @@ public class PasteAction extends SelectionAction {
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null;
 	}
 	
 	HashMap<String, Integer> pasteHash2Offset = new HashMap<String, Integer>();

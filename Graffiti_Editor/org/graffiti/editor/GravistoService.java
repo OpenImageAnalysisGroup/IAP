@@ -314,7 +314,6 @@ public class GravistoService implements HelperClass {
 			for (Iterator<JInternalFrame> it = frames.iterator(); it.hasNext();) {
 				JInternalFrame frame = it.next();
 				
-				// TODO check: a saved frame should never be null!
 				if (frame != null) {
 					if (frame instanceof GraffitiInternalFrame) {
 						if (frame.isSelected()) {

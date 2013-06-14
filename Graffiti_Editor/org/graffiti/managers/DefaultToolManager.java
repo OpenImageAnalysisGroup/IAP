@@ -12,6 +12,7 @@ package org.graffiti.managers;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.ErrorMsg;
 import org.graffiti.managers.pluginmgr.PluginDescription;
 import org.graffiti.plugin.EditorPlugin;
 import org.graffiti.plugin.GenericPlugin;
@@ -69,7 +70,7 @@ public class DefaultToolManager
 				if (mm != null) {
 					mm.addTool(theTools[i]);
 				} else {
-					// TODO: LOG ERROR
+					ErrorMsg.addErrorMessage("Could not properly process tool extension");
 				}
 			}
 		}

@@ -68,7 +68,7 @@ public class CopyAction extends SelectionAction {
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**

@@ -30,7 +30,7 @@ public class CloseViewAction
 	 * Constructs a new close view action.
 	 */
 	public CloseViewAction() {
-		super("action.view.close", null, "filemenu_close"); // TODO
+		super("action.view.close", null, "filemenu_close");
 	}
 	
 	// ~ Methods ================================================================

@@ -43,7 +43,7 @@ public class SelectAllAction
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null; 
 	}
 	
 	/**

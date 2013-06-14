@@ -11,9 +11,6 @@ package org.graffiti.plugin.gui;
 
 import javax.swing.JToolBar;
 
-/**
- * TODO
- */
 public class GraffitiToolbar
 					extends JToolBar
 					implements GraffitiContainer {

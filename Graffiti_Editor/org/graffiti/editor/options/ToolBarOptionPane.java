@@ -77,8 +77,6 @@ public class ToolBarOptionPane
 		
 		panel.add(new JLabel(sBundle.getString("options.toolbar.caption")));
 		add(BorderLayout.NORTH, panel);
-		
-		// TODO
 	}
 	
 	/*
@@ -86,7 +84,7 @@ public class ToolBarOptionPane
 	 */
 	@Override
 	protected void saveDefault() {
-		// TODO
+		// 
 	}
 	
 	// ~ Inner Classes ==========================================================

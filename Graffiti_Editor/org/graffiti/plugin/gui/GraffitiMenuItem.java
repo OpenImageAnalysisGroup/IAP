@@ -14,9 +14,6 @@ import javax.swing.JMenuItem;
 
 import org.graffiti.editor.MainFrame;
 
-/**
- * TODO
- */
 public class GraffitiMenuItem
 					extends JMenuItem
 					implements GraffitiComponent {

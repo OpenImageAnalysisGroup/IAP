@@ -29,7 +29,7 @@ public class CloneViewAction
 	 * Constructs a new clone view action.
 	 */
 	public CloneViewAction() {
-		super("action.view.clone", null, null); // TODO
+		super("action.view.clone", null, null);
 	}
 	
 	// ~ Methods ================================================================

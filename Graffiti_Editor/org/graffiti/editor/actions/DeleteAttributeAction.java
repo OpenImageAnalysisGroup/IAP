@@ -51,7 +51,7 @@ public class DeleteAttributeAction
 	 */
 	@Override
 	public HelpContext getHelpContext() {
-		return null; // TODO
+		return null;
 	}
 	
 	/**
@@ -64,24 +64,12 @@ public class DeleteAttributeAction
 		return null;
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param e
-	 *           DOCUMENT ME!
-	 */
 	public void actionPerformed(ActionEvent e) {
-		// TODO
+		// 
 	}
 	
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param e
-	 *           DOCUMENT ME!
-	 */
 	public void selectionChanged(SelectionEvent e) {
-		// TODO
+		// 
 	}
 	
 	/**
