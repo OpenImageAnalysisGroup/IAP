@@ -195,11 +195,14 @@ public class ResourceIOManager {
 		ResourceIOHandler handler = getHandlerFromPrefix(ioUrl.getPrefix());
 		if (handler == null) {
 			System.out.println("INFO: No handler for IO-URL: " + ioUrl);
+			output.close();
 			return null;
 		}
 		InputStream in = handler.getPreviewInputStream(ioUrl);
-		if (in == null)
+		if (in == null) {
+			output.close();
 			return null;
+		}
 		copyContent(in, output);
 		byte[] imageContent = output.getBuffTrimmed();
 		return imageContent;
