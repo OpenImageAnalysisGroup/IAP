@@ -150,7 +150,7 @@ public class TranspathService
 		statusVal = (int) startProgress;
 		InputSource input = getFileInputSource(fileName);
 		if (input == null) {
-			// TODO: Somehow report missing file
+			ErrorMsg.addErrorMessage("Info: transpath data file could not be loaded!");
 		} else {
 			try {
 				status1 = "Parse XML...";
@@ -396,7 +396,6 @@ public class TranspathService
 	
 	@Override
 	public String getCurrentStatusMessage3() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

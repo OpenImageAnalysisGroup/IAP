@@ -61,7 +61,7 @@ public class ChartAttributeComponent extends AbstractAttributeComponent
 						recreate();
 					}
 		} else {
-			// System.out.println("TODO: Process Attribute Change: "+attr.getPath()+attr.getName());
+			// Missing: Process Attribute Change: "+attr.getPath()+attr.getName());
 		}
 	}
 	

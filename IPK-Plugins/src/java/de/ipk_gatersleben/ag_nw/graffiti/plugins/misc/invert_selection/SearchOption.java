@@ -48,7 +48,7 @@ public class SearchOption {
 			return considerSearchLogic(idxOfAttr >= 0 && idxOfAttr < searchAttributeInteger);
 		} else {
 			switch (searchType) {
-				// TODO: similar to mathString for integer, boolean etc (respect alternative paths), in order to be able
+				// Missing: similar to mathString for integer, boolean etc (respect alternative paths), in order to be able
 				// to search also in the annotations for label-fontsize >= x
 				case searchString:
 					return considerSearchLogic(matchString(attr));

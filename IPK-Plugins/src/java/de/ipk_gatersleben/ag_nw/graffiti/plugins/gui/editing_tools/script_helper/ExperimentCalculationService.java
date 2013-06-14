@@ -429,7 +429,6 @@ public class ExperimentCalculationService {
 	}
 	
 	public static int getMinuteOfDayFromSampleTime(int time, Long sampleFineTimeOrRowId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 }

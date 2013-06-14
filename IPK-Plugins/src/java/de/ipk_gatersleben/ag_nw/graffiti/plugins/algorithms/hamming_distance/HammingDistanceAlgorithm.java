@@ -35,7 +35,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  */
 
 /*
- * TODO: implement in check:
+ * missing: implement in check:
  * - check if the graphs are directed,
  * - check if the graph contains distinguished node labels
  * (and also if they contain a label for each node!)

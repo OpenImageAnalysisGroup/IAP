@@ -292,14 +292,6 @@ public class EntryCreator {
 			public void actionPerformed(ActionEvent e) {
 				String searchText = searchInputField.getText();
 				EntryType et = EntryType.getEntryType((String) entryTypeSelection.getSelectedItem());
-				
-				// TODO: USE KEGG SOAP API HERE INSTEAD OF WEBSITE
-				// INTERPRETATION
-				
-				// String res = KeggHelper.callKeggDBGETbget(searchText);
-				//
-				// MainFrame.showMessageDialog("Res: "+res, "Info");
-				
 				String url = getSearchUrl(et, searchText, false);
 				// AttributeHelper.showInBrowser(url);
 				ArrayList<String> lines = AttributeHelper.getWebPageContent(url);

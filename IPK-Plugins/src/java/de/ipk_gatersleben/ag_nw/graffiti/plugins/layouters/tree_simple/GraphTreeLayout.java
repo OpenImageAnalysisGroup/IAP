@@ -37,7 +37,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.rt_tree.TreeContainer
  * @author Joerg Bartelheimer
  */
 
-/* TODO: Layout of non-horizontal/vertical grids */
 @SuppressWarnings("unchecked")
 public class GraphTreeLayout extends AbstractAlgorithm {
 	

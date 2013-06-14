@@ -3373,7 +3373,6 @@ public class SBMLHelper {
 			try {
 				ia.setFormula(getInitialAssignmentFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -3569,7 +3568,6 @@ public class SBMLHelper {
 			try {
 				rr.setFormula(getRateRuleFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -4013,7 +4011,6 @@ public class SBMLHelper {
 			try {
 				ar.setFormula(getAssignmentRuleFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -4147,7 +4144,6 @@ public class SBMLHelper {
 			try {
 				ar.setFormula(getAlgebraicRuleFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -4465,7 +4461,6 @@ public class SBMLHelper {
 		try {
 			con.setMath(ASTNode.parseFormula(getConstraintFunction(g, internHeadline)));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return con;
@@ -6244,7 +6239,6 @@ public class SBMLHelper {
 				try {
 					kl.setFormula(getKineticLawFunction(node));
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				int lpCount = localParameterCount(node);
@@ -7417,7 +7411,6 @@ public class SBMLHelper {
 				trigger.setFormula(getTriggerFunction(g, internHeadline));
 			}
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -7427,7 +7420,6 @@ public class SBMLHelper {
 			try {
 				prio.setFormula(getPriorityFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			event.setPriority(prio);
@@ -7437,7 +7429,6 @@ public class SBMLHelper {
 			try {
 				delay.setFormula(getDelayFunction(g, internHeadline));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			event.setDelay(delay);
@@ -7450,7 +7441,6 @@ public class SBMLHelper {
 			try {
 				ea.setFormula(getEventAssignmentFunction(g, internHeadline, i));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			event.addEventAssignment(ea);

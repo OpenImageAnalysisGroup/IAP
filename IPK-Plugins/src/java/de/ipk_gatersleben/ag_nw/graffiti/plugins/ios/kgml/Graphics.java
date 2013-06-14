@@ -116,7 +116,7 @@ public class Graphics {
 				
 			}
 			
-			// TODO: check if it is possible to easily find out if this is a gene product
+			// check if it is possible to easily find out if this is a gene product
 			// this value is eventually not important
 			boolean isGeneProduct = false;
 			

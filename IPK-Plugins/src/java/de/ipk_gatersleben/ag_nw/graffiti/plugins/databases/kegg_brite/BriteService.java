@@ -117,7 +117,7 @@ public class BriteService extends MemoryHog
 		}
 		BufferedReader input = getFileReader("brite");
 		if (input == null) {
-			// TODO: Somehow report missing file
+			ErrorMsg.addErrorMessage("Info: 'brite'-file could not be loaded!");
 		} else {
 			String line = null;
 			try {

@@ -113,7 +113,7 @@ public class DataSet {
 	 * kann z.B. unterschiedliche Länder enthalten Der Rückgabewert würde dann
 	 * der Anzahl an unterschiedlichen Ländern innerhalb des Datenbestandes
 	 * entsprechen.
-	 * TODO: Vorsicht: Falls eine Spalte nur Zahlen enthält, muss die Anzahl der
+	 * Vorsicht: Falls eine Spalte nur Zahlen enthält, muss die Anzahl der
 	 * Ausprägungen==1 sein. Dann wird nur _ein_ Eingabeneuron verwendet!!
 	 */
 	public int countAuspraegungen(Vector<SOMdataEntry> thedata, String group) {

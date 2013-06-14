@@ -16,7 +16,6 @@ public abstract class TranspathEntity implements TranspathEntityType {
 	private static HashMap<String, HashSet<String>> todo2examples = new HashMap<String, HashSet<String>>();
 	
 	public void processXMLentityValue(String environment, String value) {
-		// System.out.println("TODO : "+environment+" : "+value);
 		todo.add(environment);
 		if (!todo2examples.containsKey(environment))
 			todo2examples.put(environment, new HashSet<String>());

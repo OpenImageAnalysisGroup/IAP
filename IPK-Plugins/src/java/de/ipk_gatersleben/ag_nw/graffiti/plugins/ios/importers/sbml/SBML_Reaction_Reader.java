@@ -367,7 +367,6 @@ public class SBML_Reaction_Reader {
 						double x = position.getX();
 						double y = position.getY();
 						AttributeHelper.setPosition(reactionNode, x, y);
-						// TODO layout id might be set twice
 						String layoutId = reactionGlyph.getLayoutId();
 						AttributeHelper.setAttribute(reactionNode, SBML_Constants.SBML, SBML_Constants.SBML_LAYOUT_ID, layoutId);
 					} else {

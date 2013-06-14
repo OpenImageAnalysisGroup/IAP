@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.ReactionType
 public class Reaction {
 	private String name;
 	private ReactionType type;
-	// TODO: find out meaning and find altSubstrate and altProduct elements in XML
+	// Missing: find out meaning and find altSubstrate and altProduct elements in XML
 	// private IdRef altSubstrateName;
 	// private IdRef altProductName;
 	private Collection<Entry> allPossibleSubstrates;

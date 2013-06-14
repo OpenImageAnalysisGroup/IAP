@@ -165,7 +165,7 @@ public class MetatoolWriter implements OutputSerializer {
 	}
 	
 	private boolean isExternalMetabolite(String lbl) {
-		// TODO: or something else? errorcheck!
+		// or something else? errorcheck!
 		return lbl != null && lbl.endsWith("_ex");
 	}
 	

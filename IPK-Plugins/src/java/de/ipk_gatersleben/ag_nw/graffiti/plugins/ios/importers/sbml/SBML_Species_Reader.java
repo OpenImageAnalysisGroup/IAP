@@ -230,7 +230,6 @@ public class SBML_Species_Reader {
 						double x = position.getX();
 						double y = position.getY();
 						AttributeHelper.setPosition(speciesNode, x, y);
-						// TODO layout id might be set twice
 						String layoutId = speciesGlyph.getLayoutId();
 						AttributeHelper.setAttribute(speciesNode, SBML_Constants.SBML, SBML_Constants.SBML_LAYOUT_ID, layoutId);
 					}

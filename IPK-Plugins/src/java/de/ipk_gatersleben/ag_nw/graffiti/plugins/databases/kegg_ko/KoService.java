@@ -173,33 +173,6 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 			koDBrelease = "database download " + modifiedTime + "";
 		} else
 			koDBrelease = modifiedTime;
-		// status1 = "Read Version Info...";
-		// BufferedReader input = getFileReader("ligand.txt");
-		// if (input==null) {
-		// // TODO: Somehow report missing file
-		// } else {
-		// String line = null;
-		// try {
-		// while ((line = input.readLine()) != null) {
-		// // System.out.println(line);
-		// if (line.contains(relTagDB)) {
-		// koDBrelease = line.trim();
-		// break;
-		// }
-		// }
-		// status2 = "KEGG KO - "+koDBrelease;
-		// } catch (IOException e) {
-		// status2 = "Error reading version info!";
-		// ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-		// } finally {
-		// if (input != null)
-		// try {
-		// input.close();
-		// } catch (IOException e1) {
-		// ErrorMsg.addErrorMessage(e1.getLocalizedMessage());
-		// }
-		// }
-		// }
 	}
 	
 	/**
@@ -216,7 +189,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		BufferedReader input = getFileReader("ko");
 		int cnt = 1;
 		if (input == null) {
-			// TODO: Somehow report missing file
+			ErrorMsg.addErrorMessage("Info: 'ko'-file could not be loaded!");
 		} else {
 			String line = null;
 			String lastStartTag = "";

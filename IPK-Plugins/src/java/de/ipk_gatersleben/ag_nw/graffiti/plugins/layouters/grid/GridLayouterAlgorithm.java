@@ -24,10 +24,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
  * 
  * @author Falk Schreiber, Christian Klukas
  */
-
-/* TODO: Layout of non-horizontal/vertical grids */
-public class GridLayouterAlgorithm
-					extends AbstractAlgorithm {
+public class GridLayouterAlgorithm extends AbstractAlgorithm {
 	/*************************************************************/
 	/* Member variables */
 	/*************************************************************/

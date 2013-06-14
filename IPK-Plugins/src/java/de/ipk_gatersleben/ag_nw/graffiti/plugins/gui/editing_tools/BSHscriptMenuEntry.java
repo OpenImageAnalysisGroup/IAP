@@ -183,13 +183,11 @@ public class BSHscriptMenuEntry extends JMenuItem {
 				
 				@Override
 				public String getCurrentStatusMessage3() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 				
 				@Override
 				public void setPrefix1(String prefix1) {
-					// TODO Auto-generated method stub
 					
 				}
 			};
