@@ -44,6 +44,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.Mutable
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Entry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Relation;
 
+@SuppressWarnings("deprecation")
 public class SrcTargetEditor extends JPanel {
 	private static final long serialVersionUID = 1L;
 	

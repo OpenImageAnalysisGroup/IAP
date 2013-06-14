@@ -26,6 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.Id;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.KeggId;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.ReactionType;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Reaction {
 	private String name;
 	private ReactionType type;
@@ -441,7 +442,6 @@ public class Reaction {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static Collection<Reaction> getReactionElementsFromGraphEdges(
 			Collection<Entry> entries,
 			Collection<Edge> graphEdges,

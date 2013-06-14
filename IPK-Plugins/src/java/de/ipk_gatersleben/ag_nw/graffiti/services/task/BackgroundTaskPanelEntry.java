@@ -24,7 +24,6 @@ import org.FolderPanel;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.SystemInfo;
-import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.gui.ToolButton;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.MyGraphicsTools;

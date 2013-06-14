@@ -208,10 +208,7 @@ public class KgmlEdMain {
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		KgmlEdMain e = new KgmlEdMain(true,
-							DBEgravistoHelper.DBE_GRAVISTO_VERSION, args);
-		if (e == null)
-			System.err.println("MainFrame not created.");
+		new KgmlEdMain(true, DBEgravistoHelper.DBE_GRAVISTO_VERSION, args);
 	}
 }
 

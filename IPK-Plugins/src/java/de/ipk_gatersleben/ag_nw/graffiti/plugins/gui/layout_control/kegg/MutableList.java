@@ -6,6 +6,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MutableList extends JList {
 	private static final long serialVersionUID = 1L;
 	

@@ -70,6 +70,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover
  * 
  * @author Christian Klukas
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class GraphHelper implements HelperClass {
 	
 	/**
@@ -224,7 +225,6 @@ public class GraphHelper implements HelperClass {
 		return hashSet;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void getConnectedNodes(Node startNode, boolean directed, Set<Node> result) {
 		Stack<Node> stack = new Stack<Node>();
 		
@@ -1062,7 +1062,6 @@ public class GraphHelper implements HelperClass {
 		return sortedNodes;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void selectGraphElements(Collection<GraphElement> elements) {
 		try {
 			EditorSession es = findSession((Collection) elements);
@@ -1073,7 +1072,6 @@ public class GraphHelper implements HelperClass {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void selectGraphElements(boolean clearBefore, Collection<GraphElement> elements) {
 		try {
 			EditorSession es = findSession((Collection) elements);
@@ -1122,7 +1120,6 @@ public class GraphHelper implements HelperClass {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void unselectGraphElements(Collection<GraphElement> elements) {
 		try {
 			EditorSession es = findSession((Collection) elements);
@@ -1172,12 +1169,10 @@ public class GraphHelper implements HelperClass {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void selectNodes(Collection<Node> nodes) {
 		selectGraphElements((Collection) nodes);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void selectNodes(boolean clearBefore, Collection<Node> nodes) {
 		selectGraphElements(clearBefore, (Collection) nodes);
 	}
@@ -2106,7 +2101,6 @@ public class GraphHelper implements HelperClass {
 				newEdges.clear();
 			}
 			
-			@SuppressWarnings("unchecked")
 			@Override
 			public void redo() throws CannotRedoException {
 				Graph myGraph = null;
@@ -2160,7 +2154,6 @@ public class GraphHelper implements HelperClass {
 				}
 			}
 			
-			@SuppressWarnings("unchecked")
 			@Override
 			public void undo() throws CannotUndoException {
 				Graph myGraph = null;

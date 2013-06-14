@@ -21,6 +21,7 @@ import org.graffiti.plugin.view.View;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ExperimentDataProcessingManager {
 	
 	private static ListOrderedSet processors = new ListOrderedSet();
@@ -31,8 +32,7 @@ public class ExperimentDataProcessingManager {
 			processors.add(edp);
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static Collection<ExperimentDataProcessor> getExperimentDataProcessors() {
 		synchronized (processors) {
 			return processors.asList();
@@ -53,14 +53,12 @@ public class ExperimentDataProcessingManager {
 		processIncomingData(mdsOrDocuments, null, null, null, processor);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void processIncomingData(final ExperimentInterface mdsOrDocuments, final JComponent optSupplementaryPanel,
 						List<Class> optIgnoredProcessors,
 						final HashMap<Class, List<Runnable>> postprocessors) {
 		processIncomingData(mdsOrDocuments, optSupplementaryPanel, optIgnoredProcessors, postprocessors, null);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void processIncomingData(final ExperimentInterface mdsOrDocuments,
 						final JComponent optSupplementaryPanel, List<Class> optIgnoredProcessors,
 						final HashMap<Class, List<Runnable>> postprocessors,

@@ -48,6 +48,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.exporters.sbml.SBML_SBase_Writer;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.sbml.SBML_SBase_Reader;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class SBMLHelper {
 	
 	/**
@@ -63,6 +64,7 @@ public class SBMLHelper {
 	
 	private static boolean isInitializedReaction = false;
 	private static boolean isInitializedKineticLaw = false;
+
 	private static boolean isInitializedLocalParameter = false;
 	
 	private static int parameterCount = 1;

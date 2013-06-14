@@ -496,10 +496,7 @@ public class GravistoMain extends JApplet {
 		
 		ReleaseInfo.setHelpIntroductionText(s);
 		
-		GravistoMain e = new GravistoMain(true,
-				DBEgravistoHelper.DBE_GRAVISTO_VERSION);
-		if (e == null)
-			System.err.println("MainFrame not created.");
+		new GravistoMain(true, DBEgravistoHelper.DBE_GRAVISTO_VERSION);
 	}
 }
 

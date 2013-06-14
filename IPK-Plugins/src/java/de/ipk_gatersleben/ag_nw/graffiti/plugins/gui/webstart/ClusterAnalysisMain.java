@@ -249,9 +249,7 @@ public class ClusterAnalysisMain {
 		// if (r2 == null)
 		// ErrorMsg
 		// .addErrorMessage("Error: Default Graph file could not be loaded from resource.");
-		ClusterAnalysisMain e = new ClusterAnalysisMain();
-		if (e == null)
-			System.err.println("MainFrame not created.");
+		new ClusterAnalysisMain();
 	}
 }
 

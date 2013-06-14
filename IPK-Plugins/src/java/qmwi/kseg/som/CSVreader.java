@@ -27,6 +27,7 @@ public class CSVreader {
 				currentLine.replace(',', '.');
 				mainData.addEntry(currentLine);
 			}
+			reader.close();
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e.getMessage());
 		} catch (IOException e) {

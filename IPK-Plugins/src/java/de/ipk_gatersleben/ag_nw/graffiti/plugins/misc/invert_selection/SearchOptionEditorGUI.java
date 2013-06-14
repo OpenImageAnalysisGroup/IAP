@@ -401,6 +401,10 @@ public class SearchOptionEditorGUI extends JComponent {
 				case searchDouble:
 					add(jTextFieldDouble, "6,1");
 					break;
+			case searchColor:
+				break;
+			default:
+				break;
 			}
 		}
 		repaint();

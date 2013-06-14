@@ -69,6 +69,7 @@ public enum AttributeCalculation {
 		return "INTERNAL ERROR, UNKNOWN ENUM CONSTANT!";
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	public double performOperation(double a, double b) {
 		if (requiresA() && Double.isNaN(a))
 			return Double.NaN;
@@ -198,6 +199,7 @@ public enum AttributeCalculation {
 		return false;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	public boolean transformsDataList() {
 		switch (this) {
 			case rang_AA:

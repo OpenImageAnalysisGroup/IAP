@@ -36,7 +36,7 @@ import com.sun.org.apache.xpath.internal.objects.XBoolean;
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class XPathHelper implements HelperClass {
 	
 	public static String noGivenTimeStringConstant = "- not specified -";

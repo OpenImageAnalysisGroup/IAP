@@ -84,6 +84,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  * @author $author$
  * @version $Revision: 1.4 $
  */
+@SuppressWarnings("deprecation")
 public class TabKegg extends InspectorTab
 		implements
 		ActionListener,

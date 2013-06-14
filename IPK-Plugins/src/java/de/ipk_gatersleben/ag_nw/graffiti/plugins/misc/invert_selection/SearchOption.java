@@ -58,6 +58,10 @@ public class SearchOption {
 					return considerSearchLogic(matchDouble(attr));
 				case searchInteger:
 					return considerSearchLogic(matchInteger(attr));
+			case searchColor:
+				break;
+			default:
+				break;
 			}
 			return false;
 		}
@@ -83,6 +87,10 @@ public class SearchOption {
 				case searchInteger:
 					scope.add(new ValueAndGraphElement(getInteger(ge), ge));
 					break;
+			case searchColor:
+				break;
+			default:
+				break;
 			}
 		}
 		scope = getSortedListWithoutNullValues(scope, getSearchOperation() == SearchOperation.topN);

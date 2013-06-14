@@ -47,6 +47,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.ExperimentDataDragAndDropHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
+@SuppressWarnings({"rawtypes", "unchecked", "unused"})
 public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	private static final long serialVersionUID = 1L;
@@ -193,7 +194,6 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void loadExcelOrBinaryFiles() {
 		final Collection<File> fileList = OpenExcelFileDialogService.getExcelOrBinaryFiles();
 		if (fileList != null) {
@@ -265,7 +265,6 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 		final String title = target.getText();
 		FileDrop.Listener fdl = new FileDrop.Listener() {
 			@Override
-			@SuppressWarnings("unchecked")
 			public void filesDropped(File[] files) {
 				if (files != null && files.length > 0) {
 					ArrayList<File> mfiles = new ArrayList<File>();

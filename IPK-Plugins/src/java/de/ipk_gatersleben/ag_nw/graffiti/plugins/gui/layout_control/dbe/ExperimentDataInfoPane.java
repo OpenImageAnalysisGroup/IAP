@@ -454,6 +454,7 @@ public class ExperimentDataInfoPane extends JComponent implements SessionListene
 			buttonCommands.add(b);
 			final AbstractExperimentDataProcessor pp = (AbstractExperimentDataProcessor) p;
 			b.addActionListener(new ActionListener() {
+				@SuppressWarnings("deprecation")
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					ExperimentInterface experimentData = getDocumentData();

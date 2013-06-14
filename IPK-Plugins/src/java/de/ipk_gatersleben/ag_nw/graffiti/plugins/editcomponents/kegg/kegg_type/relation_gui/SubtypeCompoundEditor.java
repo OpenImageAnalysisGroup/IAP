@@ -44,6 +44,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Entry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.Relation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.IdRef;
 
+@SuppressWarnings({"rawtypes"})
 public class SubtypeCompoundEditor extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
@@ -117,6 +118,7 @@ public class SubtypeCompoundEditor extends JPanel {
 		removeSubtypeCompound.setOpaque(false);
 		
 		addSubtypeCompoundCmd.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
 				if (entrySelection.getSelectedValues() == null || entrySelection.getSelectedValues().length <= 0)
 					MainFrame.showMessageDialog("Please select a item to be added!", "No item selected");
@@ -135,6 +137,7 @@ public class SubtypeCompoundEditor extends JPanel {
 			}
 		});
 		removeSubtypeCompound.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
 				if (subProdSelection.getSelectedValues() == null || subProdSelection.getSelectedValues().length <= 0)
 					MainFrame.showMessageDialog("Please select a item to be removed!", "No item selected");
@@ -182,6 +185,7 @@ public class SubtypeCompoundEditor extends JPanel {
 						final HashMap<Entry, Node> entry2graphNode,
 						final MutableList entrySelection) {
 		return new ListSelectionListener() {
+			@SuppressWarnings("deprecation")
 			public void valueChanged(ListSelectionEvent se) {
 				HashSet<Node> nodes = new HashSet<Node>();
 				for (Object o : entrySelection.getSelectedValues()) {
@@ -205,6 +209,7 @@ public class SubtypeCompoundEditor extends JPanel {
 		};
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void updateRelationSelection(Relation r) {
 		this.currentRelation = r;
 		subProdSelection.getContents().clear();

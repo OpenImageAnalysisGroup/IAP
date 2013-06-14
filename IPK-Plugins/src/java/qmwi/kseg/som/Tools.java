@@ -5,13 +5,14 @@ package qmwi.kseg.som;
 
 import java.util.Vector;
 
-// Hilfsklasse f�r Routinen die mit einem Datenbestand arbeiten k�nnen
+// Hilfsklasse für Routinen die mit einem Datenbestand arbeiten können
 // Zuordnung zu "DataSet" eventuell sinnvoller...
 // Mit der allgemeinen Konvention, dass wenn der "Vector data" == null ist,
 // die Daten von der eigenen Instanz verwendet werden
+@SuppressWarnings("unused")
 public class Tools {
 	
-	// Liefert alle Eintr�ge des Datenbestandes data zur�ck, die in der Spalte "column"
+	// Liefert alle Einträge des Datenbestandes data zur�ck, die in der Spalte "column"
 	// dem Wert "entry" entsprechen
 	@SuppressWarnings("unchecked")
 	public static Vector<?> getAllWhere(Vector data, int column, String entry) {
@@ -24,7 +25,7 @@ public class Tools {
 		return result;
 	}
 	
-	// Liefert alle Eintr�ge des Datenbestandes data zur�ck, die in der Spalte "column"
+	// Liefert alle Einträge des Datenbestandes data zurück, die in der Spalte "column"
 	// dem Wert "entry" entsprechen
 	public static int getBreite(int nodecount) {
 		// Annahme: _quadratische_ Karte

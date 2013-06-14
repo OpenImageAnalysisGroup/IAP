@@ -38,11 +38,6 @@ public class PrintTool {
 												? (Printable) view
 												: null;
 		
-		if (view == null) {
-			MainFrame.showMessageDialog("Can not print this kind of view.", "Error");
-			return;
-		}
-		
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName(ReleaseInfo.getRunningReleaseStatus().toString() + " print " + view.getGraph().getName(true));
 		printJob.setPrintable(printObject);
