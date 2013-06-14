@@ -1127,6 +1127,7 @@ public class GravistoService implements HelperClass {
 					bis.close();
 				}
 			}
+			zipFile.close();
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
