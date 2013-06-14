@@ -97,6 +97,7 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static File getFile(IOurl url) {
 		return new File(
 				URLDecoder.decode(
