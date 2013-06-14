@@ -50,7 +50,6 @@ public class MyImageIcon extends ImageIcon {
 		initImageData(observer, width, height, fileMain, fileLabel, bfi);
 	}
 	
-	@SuppressWarnings({ "restriction" })
 	public synchronized void initImageData(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		this.bfi = bfi;

@@ -29,5 +29,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/mail.jar"/>
 	<classpathentry kind="lib" path="/IAP Transfer/lib/commons-vfs2-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/mongo.jar"/>
+	<classpathentry kind="src" path="/IPK_lib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

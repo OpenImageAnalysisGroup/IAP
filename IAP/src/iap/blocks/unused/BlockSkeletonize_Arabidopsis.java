@@ -276,27 +276,6 @@ public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlockF
 		return temp[2];
 	}
 	
-	private int avg(int mask, int plant) {
-		int r, g, b, r2, g2, b2;
-		r = (mask & 0xff0000) >> 16;
-		g = (mask & 0x00ff00) >> 8;
-		b = (mask & 0x0000ff);
-		
-		r2 = (plant & 0xff0000) >> 16;
-		g2 = (plant & 0x00ff00) >> 8;
-		b2 = (plant & 0x0000ff);
-		
-		float ll = ImageOperation.labCube[r][g][b];
-		float la = ImageOperation.labCube[r][g][b + 256];
-		float lb = ImageOperation.labCube[r][g][b + 512];
-		
-		float l2l = ImageOperation.labCube[r2][g2][b2];
-		float l2a = ImageOperation.labCube[r2][g2][b2 + 256];
-		float l2b = ImageOperation.labCube[r2][g2][b2 + 512];
-		double of = 0.7;
-		double off = 0.3;
-		return new Color_CIE_Lab(Math.min(ll, l2l), la * of + l2a * off, lb * of + l2b * off).getRGB();
-	}
 	
 	/**
 	 * Function to invert skeleton image, invert from class imageoperation does not work

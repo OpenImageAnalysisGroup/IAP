@@ -1220,6 +1220,7 @@ public class LTdataExchange implements ExperimentLoader {
 						read = in.read(temp);
 					}
 					buf = out.getBuff();
+					out.close();
 				} catch (Exception err) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: NO ROTATION ANGLE FOR URL " + url);
 					return Double.NaN;

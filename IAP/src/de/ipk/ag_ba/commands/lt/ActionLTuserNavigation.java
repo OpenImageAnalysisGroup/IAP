@@ -158,7 +158,7 @@ public class ActionLTuserNavigation extends AbstractNavigationAction implements 
 		status.setCurrentStatusText1("");
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ArrayList getArray(TreeSet<String> usersUnformatted) {
 		ArrayList result = new ArrayList();
 		for (String s : usersUnformatted)

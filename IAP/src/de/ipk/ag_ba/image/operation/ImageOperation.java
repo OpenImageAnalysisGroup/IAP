@@ -61,6 +61,7 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.labcube.ImageOperationLabCube;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -1550,6 +1551,7 @@ public class ImageOperation {
 				considerArea, null);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static Image removeSmallPartsOfImage(
 			boolean nextGeneration,
 			Image workImage, int iBackgroundFill,
@@ -2391,7 +2393,7 @@ public class ImageOperation {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
 		ImagePlus ip = new ImagePlus();
 		ip.setGlobalCalibration(new Calibration());
-		
+		ImageOperationLabCube.labCube = result;
 		return result;
 	}
 	

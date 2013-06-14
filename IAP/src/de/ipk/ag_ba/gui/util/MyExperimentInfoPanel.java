@@ -155,6 +155,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		return res;
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
 			JTextField outliers,
@@ -181,6 +182,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		outliers.setEnabled(enabled);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private JComboBox getExperimentTypes(String experimentType, boolean editPossible) {
 		TreeSet<String> typeset = new TreeSet<String>();
 		if (experimentType != null)
@@ -205,6 +207,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		return res;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unused", "unchecked" })
 	private JComboBox getGroups(String user, String pass, String userGroup, boolean editPossible) {
 		String[] groups = new String[] { userGroup };
 		if (user != null && !user.equalsIgnoreCase("internet") && editPossible) {

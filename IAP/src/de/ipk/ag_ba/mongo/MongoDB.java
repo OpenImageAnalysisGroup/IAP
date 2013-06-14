@@ -1032,6 +1032,7 @@ public class MongoDB {
 		return printed;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Map filter(Map map) {
 		if (map == null || map.isEmpty())
 			return map;
