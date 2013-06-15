@@ -1400,7 +1400,7 @@ public class MongoDB {
 	public static void saveSystemErrorMessage(String error, Exception e) {
 		if (e == null) {
 			saveSystemMessage(error);
-			IAPmain.errorCheck();
+			IAPmain.errorCheck(error);
 			return;
 		}
 		System.err.println(SystemAnalysis.getCurrentTime() + ">" + error);
@@ -1409,7 +1409,7 @@ public class MongoDB {
 				".<br>Stack-trace:<br>" +
 				e.getStackTrace() != null ?
 				StringManipulationTools.getStringList(e.getStackTrace(), "<br>") : "(no stacktrace)");
-		IAPmain.errorCheck();
+		IAPmain.errorCheck(error);
 	}
 	
 	public boolean isDbHostReachable() {
