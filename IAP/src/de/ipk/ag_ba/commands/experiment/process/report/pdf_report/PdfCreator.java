@@ -26,7 +26,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -139,9 +139,9 @@ public class PdfCreator {
 					
 					final DataInputStream ls_in = new DataInputStream(ls_proc.getInputStream());
 					final DataInputStream ls_in2 = new DataInputStream(ls_proc.getErrorStream());
-					MyThread t1 = null;
+					LocalComputeJob t1 = null;
 					try {
-						t1 = new MyThread(new Runnable() {
+						t1 = new LocalComputeJob(new Runnable() {
 							@Override
 							public void run() {
 								String response;
@@ -167,9 +167,9 @@ public class PdfCreator {
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
-					MyThread t2 = null;
+					LocalComputeJob t2 = null;
 					try {
-						t2 = new MyThread(new Runnable() {
+						t2 = new LocalComputeJob(new Runnable() {
 							@Override
 							public void run() {
 								String response;
@@ -197,9 +197,9 @@ public class PdfCreator {
 						e1.printStackTrace();
 					}
 					try {
-						t1.start();
-						t2.start();
-						BackgroundThreadDispatcher.waitFor(new MyThread[] { t1, t2 });
+						BackgroundThreadDispatcher.addTask(t1);
+						BackgroundThreadDispatcher.addTask(t2);
+						BackgroundThreadDispatcher.waitFor(new LocalComputeJob[] { t1, t2 });
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

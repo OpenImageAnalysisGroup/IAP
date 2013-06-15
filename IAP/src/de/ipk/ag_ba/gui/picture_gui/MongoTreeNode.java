@@ -75,7 +75,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		if (projectNode != null) {
 			projectNode.updateSizeInfo(dataChangedListener);
 		} else {
-			MyThread infoThread = new MyThread(new Runnable() {
+			LocalComputeJob infoThread = new LocalComputeJob(new Runnable() {
 				@Override
 				public void run() {
 					getCurrentProjectSize();
@@ -84,7 +84,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 				}
 			}, "determine project node size");
 			// infoThread.setPriority(Thread.MIN_PRIORITY);
-			BackgroundThreadDispatcher.addTask(infoThread, 1, 0, true);
+			BackgroundThreadDispatcher.addTask(infoThread);
 		}
 	}
 	

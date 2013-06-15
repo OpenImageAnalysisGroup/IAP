@@ -519,9 +519,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				downloadNeeded = false;
 				setProgressValue(-1);
 				showProgressbar();
-				MyThread download;
+				LocalComputeJob download;
 				try {
-					download = new MyThread(new Runnable() {
+					download = new LocalComputeJob(new Runnable() {
 						@Override
 						public void run() {
 							downloadInProgress = true;
@@ -655,7 +655,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							});
 						}
 					}, "database download");
-					BackgroundThreadDispatcher.addTask(download, 1 + 1000, 0, true);
+					BackgroundThreadDispatcher.addTask(download);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

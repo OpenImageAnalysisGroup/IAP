@@ -31,6 +31,7 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -3494,7 +3495,8 @@ public class ImageOperation {
 		int[][] img2d = getImageAs2dArray();
 		float[] p;
 		if (LThresh < 0) {
-			ArrayList<Float> lArray = new ArrayList<Float>();
+			int lArrayFilled = 0;
+			Float[] lArray = new Float[w * h];
 			for (int x = x1; x < x1 + w; x++) {
 				for (int y = y1; y < y1 + h; y++) {
 					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
@@ -3512,24 +3514,24 @@ public class ImageOperation {
 					// sum under following conditions
 					if (searchWhiteTrue) {
 						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-							lArray.add(Li);
+							lArray[lArrayFilled++] = Li;
 						}
 					} else {
 						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-							lArray.add(Li);
+							lArray[lArrayFilled++] = Li;
 						}
 					}
 				}
 			}
-			if (lArray.size() > 0) {
-				int index = (int) (lArray.size() * (-LThresh / 100d)) - 1;
-				index = lArray.size() - index;
-				Collections.sort(lArray);
+			if (lArrayFilled > 0) {
+				int index = (int) (lArrayFilled * (-LThresh / 100d)) - 1;
+				index = lArrayFilled - index;
+				Arrays.sort(lArray, 0, lArrayFilled);
 				if (index < 0)
 					index = 0;
-				if (index >= lArray.size())
-					index = lArray.size() - 1;
-				LThresh = lArray.get(index).intValue() - 1;
+				if (index >= lArrayFilled)
+					index = lArrayFilled - 1;
+				LThresh = lArray[index].intValue() - 1;
 			}
 			
 		}

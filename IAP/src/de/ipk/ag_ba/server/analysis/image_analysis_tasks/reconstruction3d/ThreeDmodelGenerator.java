@@ -13,7 +13,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 
@@ -84,7 +84,7 @@ public class ThreeDmodelGenerator {
 		final ThreadSafeOptions tsoRunCount = new ThreadSafeOptions();
 		tso.setInt(0);
 		tsoRunCount.setInt(0);
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		for (MyPicture p : pictures) {
 			final MyPicture fp = p;
 			wait.add(BackgroundThreadDispatcher.addTask(
@@ -197,7 +197,7 @@ public class ThreeDmodelGenerator {
 			status.setCurrentStatusText1("Colorize Cube");
 			status.setCurrentStatusText2(rgb ? "RGBA Mode active" : "Indexed Color Mode active");
 		}
-		ArrayList<MyThread> wait = new ArrayList<MyThread>();
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		double x;
 		x = -cubeSideLengthX / 2d;
 		for (int xi = 0; xi < maxVoxelPerSide; xi++) {
@@ -207,7 +207,7 @@ public class ThreeDmodelGenerator {
 			if (status != null)
 				status.setCurrentStatusValueFine(100d * xi / maxVoxelPerSide);
 			final int xiF = xi;
-			MyThread w = BackgroundThreadDispatcher.addTask(new Runnable() {
+			LocalComputeJob w = BackgroundThreadDispatcher.addTask(new Runnable() {
 				@Override
 				public void run() {
 					double y = -cubeSideLengthY / 2d;

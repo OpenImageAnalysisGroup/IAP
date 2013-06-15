@@ -13,6 +13,7 @@ import javax.swing.Timer;
 
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.picture_gui.system.ThreadExecution;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 
 /**
@@ -35,29 +36,15 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	public static MyThread addTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
-		return addTask(new MyThread(r, name), userPriority, parentPriority, interactive);
+	public static LocalComputeJob addTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
+		return addTask(new LocalComputeJob(r, name));
 	}
 	
-	public static MyThread addTask(MyThread t, int userPriority, int parentPriority, boolean interactive) {
+	public static LocalComputeJob addTask(LocalComputeJob t) {
 		if (t == null)
 			return null;
 		
-		// t.startNG(null/* myInstance.es */, interactive);
-		t.memTask();
-		
-		return t;
-	}
-	
-	public static MyThread memTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
-		return memTask(new MyThread(r, name), userPriority, parentPriority, interactive);
-	}
-	
-	public static MyThread memTask(MyThread t, int userPriority, int parentPriority, boolean interactive) {
-		if (t == null)
-			return null;
-		
-		t.memTask(true);
+		ThreadExecution.getInstance().memTask(t);
 		
 		return t;
 	}
@@ -111,7 +98,7 @@ public class BackgroundThreadDispatcher {
 			t.start();
 	}
 	
-	private boolean highMemoryLoad(LinkedList<MyThread> runningTasks) {
+	private boolean highMemoryLoad(LinkedList<LocalComputeJob> runningTasks) {
 		if (runningTasks.size() < 1)
 			return false;
 		Runtime r = Runtime.getRuntime();
@@ -160,9 +147,9 @@ public class BackgroundThreadDispatcher {
 	// }
 	// });
 	
-	public static void waitFor(MyThread[] threads) throws InterruptedException {
-		HashSet<MyThread> t = new HashSet<MyThread>();
-		for (MyThread m : threads)
+	public static void waitFor(LocalComputeJob[] threads) throws InterruptedException {
+		HashSet<LocalComputeJob> t = new HashSet<LocalComputeJob>();
+		for (LocalComputeJob m : threads)
 			if (m != null)
 				t.add(m);
 		
@@ -170,34 +157,21 @@ public class BackgroundThreadDispatcher {
 			waitFor(t);
 	}
 	
-	public static void waitFor(Collection<MyThread> threads) throws InterruptedException {
-		threads = new ArrayList<MyThread>(threads);
-		for (MyThread m : threads)
-			if (!m.isStarted())
-				m.startNG(null, true);
-		if (Thread.currentThread() instanceof MyThread)
-			((MyThread) Thread.currentThread()).messageTaskIsWaiting();
-		MyThread.checkWaitTasks();
-		for (MyThread m : threads) {
+	public static void waitFor(Collection<LocalComputeJob> threads) throws InterruptedException {
+		threads = new ArrayList<LocalComputeJob>(threads);
+		for (LocalComputeJob m : threads) {
 			m.getResult();
-			MyThread.checkWaitTasks();
 		}
-		if (Thread.currentThread() instanceof MyThread)
-			((MyThread) Thread.currentThread()).messageTaskIsRunningAfterWait();
 	}
 	
-	public static void waitButDontRun(ArrayList<MyThread> threads) throws InterruptedException {
-		threads = new ArrayList<MyThread>(threads);
-		if (Thread.currentThread() instanceof MyThread)
-			((MyThread) Thread.currentThread()).messageTaskIsWaiting();
+	public static void waitButDontRun(ArrayList<LocalComputeJob> threads) throws InterruptedException {
+		threads = new ArrayList<LocalComputeJob>(threads);
 		do {
-			MyThread m = threads.get(0);
+			LocalComputeJob m = threads.get(0);
 			if (m.isFinished())
 				threads.remove(0);
 			Thread.sleep(100);
 		} while (threads.size() > 0);
-		if (Thread.currentThread() instanceof MyThread)
-			((MyThread) Thread.currentThread()).messageTaskIsRunningAfterWait();
 	}
 	
 	private static void updateTaskStatistics() {

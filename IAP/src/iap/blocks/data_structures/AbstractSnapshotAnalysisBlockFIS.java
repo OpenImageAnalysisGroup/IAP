@@ -3,7 +3,7 @@ package iap.blocks.data_structures;
 import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
@@ -34,7 +34,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		
 		String name = this.getClass().getSimpleName();
 		
-		final MyThread[] work = new MyThread[] {
+		final LocalComputeJob[] work = new LocalComputeJob[] {
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
