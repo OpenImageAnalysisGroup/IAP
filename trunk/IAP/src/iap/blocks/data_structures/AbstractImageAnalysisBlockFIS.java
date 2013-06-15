@@ -177,7 +177,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
-		IAPmain.errorCheck();
+		IAPmain.errorCheck(errorMessage);
 	}
 	
 	@Override

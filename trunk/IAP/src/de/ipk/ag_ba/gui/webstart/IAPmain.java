@@ -178,14 +178,14 @@ public class IAPmain extends JApplet {
 				public void reportError(Exception exception) {
 					if (exception != null)
 						exception.printStackTrace();
-					IAPmain.errorCheck();
+					IAPmain.errorCheck(exception.getMessage());
 				}
 				
 				@Override
 				public void reportError(String errorMessage) {
 					if (errorMessage != null)
 						System.err.println(errorMessage);
-					IAPmain.errorCheck();
+					IAPmain.errorCheck(errorMessage);
 				}
 			});
 		}
@@ -630,7 +630,9 @@ public class IAPmain extends JApplet {
 		return string;
 	}
 	
-	public static void errorCheck() {
+	public static void errorCheck(String errorMessage) {
+		if (errorMessage!=null && errorMessage.toUpperCase().startsWith("INFO:"))
+			return;
 		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error (" + IAPmain.getRunMode() + ")",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
 		int errNum = SystemOptions.getInstance().getInteger(

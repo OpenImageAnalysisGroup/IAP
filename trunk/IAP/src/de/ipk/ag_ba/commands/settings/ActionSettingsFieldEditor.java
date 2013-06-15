@@ -7,8 +7,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
+import org.GuiRow;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -267,7 +271,10 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										}
 										entries.add(inf);
 									}
-									entries.add(sl + "");
+									JComboBox dropDown = new JComboBox<>(new String[] { "Load Images", "Segmentation" });
+									JTextField textField = new JTextField(sl + "");
+									GuiRow gr = new GuiRow(dropDown, textField);
+									entries.add(gr.getRowGui());// + "");
 								}
 								Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
 										"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
@@ -280,6 +287,13 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										for (Object o : inp) {
 											if (o != null && o instanceof String) {
 												String es = (String) o;
+												for (String nn : es.split("//")) {
+													newValues.add(nn);
+												}
+											}
+											if (o != null && o instanceof JComponent) {
+												GuiRow gr = (GuiRow) ((JComponent) o).getClientProperty("guiRow");
+												String es = ((JTextField) gr.right).getText();
 												for (String nn : es.split("//")) {
 													newValues.add(nn);
 												}
