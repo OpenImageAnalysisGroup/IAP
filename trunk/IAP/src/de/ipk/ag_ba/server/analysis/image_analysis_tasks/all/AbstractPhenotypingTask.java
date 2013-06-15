@@ -326,33 +326,33 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void startThread(Runnable t, String name) throws InterruptedException {
-		SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60);
-		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
-		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
-				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
-			System.out.println();
-			System.out
-					.print(SystemAnalysis.getCurrentTime()
-							+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
-							+ "%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
-							+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
-			System.gc();
-			System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
-					.getMemoryMB() + " MB)");
-		}
-		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
-			System.out.println();
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
-					+ "%), REDUCING CONCURRENCY (THREAD.RUN)");
-			t.run();
-		} else {
-			// t.setPriority(Thread.MIN_PRIORITY);
-			// t.start();
-			BackgroundThreadDispatcher.addTask(t, name, 0, 0, true);
-		}
+		// SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60);
+		// SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
+		// if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+		// .getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
+		// && SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
+		// System.out.println();
+		// System.out
+		// .print(SystemAnalysis.getCurrentTime()
+		// + ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
+		// + "%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
+		// + "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
+		// System.gc();
+		// System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
+		// .getMemoryMB() + " MB)");
+		// }
+		// if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+		// .getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
+		// System.out.println();
+		// System.out.println(SystemAnalysis.getCurrentTime()
+		// + ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+		// + "%), REDUCING CONCURRENCY (THREAD.RUN)");
+		// t.run();
+		// } else {
+		// // t.setPriority(Thread.MIN_PRIORITY);
+		// // t.start();
+		BackgroundThreadDispatcher.addTask(t, name);
+		// }
 	}
 	
 	private int getParentPriority() {
@@ -419,7 +419,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										}
 									}
 								};
-								waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis", 0, 0, true));
+								waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis"));
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
@@ -429,7 +429,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					waitThreads.add(BackgroundThreadDispatcher.addTask(r, "Inner thread " + preThreadName + ", "
 							+ SystemAnalysis.getCurrentTime(time) + ", " +
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", "
-							+ configAndAngle + ")", 0, 0, true));
+							+ configAndAngle + ")"));
 				} // for side angle
 			} // for each time point
 		} // if image data available
