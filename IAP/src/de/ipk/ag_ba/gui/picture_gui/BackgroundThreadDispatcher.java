@@ -36,7 +36,7 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	public static LocalComputeJob addTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
+	public static LocalComputeJob addTask(Runnable r, String name) throws InterruptedException {
 		return addTask(new LocalComputeJob(r, name));
 	}
 	

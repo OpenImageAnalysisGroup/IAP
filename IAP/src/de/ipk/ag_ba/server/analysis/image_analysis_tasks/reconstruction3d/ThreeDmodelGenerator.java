@@ -89,7 +89,7 @@ public class ThreeDmodelGenerator {
 			final MyPicture fp = p;
 			wait.add(BackgroundThreadDispatcher.addTask(
 					cuttt2(status, tso, tsoRunCount, fp, processDepthImages),
-					"cube cut " + p.getAngle(), 20, 19, false));
+					"cube cut " + p.getAngle()));
 			
 			if (status != null && status.wantsToStop())
 				break;
@@ -219,7 +219,7 @@ public class ThreeDmodelGenerator {
 						y += voxelSizeY;
 					}
 				}
-			}, "color rgb cube slice " + xi, 20, 19, false);
+			}, "color rgb cube slice " + xi);
 			wait.add(w);
 			x += voxelSizeX;
 		}
