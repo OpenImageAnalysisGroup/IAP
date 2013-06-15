@@ -72,18 +72,23 @@ public class MyThread extends Thread implements Runnable {
 	@Override
 	public void run() {
 		started = true;
-		if (runCode == null) {
-			System.out.println(SystemAnalysis.getCurrentTime() + "WARNING: (internal error) RunCode already null");
-			Thread.dumpStack();
-			return;
+		synchronized (runCode) {
+			if (runCode == null) {
+				System.out.println(SystemAnalysis.getCurrentTime() + "WARNING: (internal error) RunCode already null");
+				Thread.dumpStack();
+				return;
+			}
 		}
 		try {
 			runningTasks.addLong(1);
 			try {
-				Runnable r = runCode;
-				runCode = null;
+				Runnable r;
+				synchronized (runCode) {
+					r = runCode;
+					runCode = null;
+				}
 				if (r == null)
-					System.out.println("ERR");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: INTERNAL ERROR - MYTHREAD RUNCODE IS NULL");
 				r.run();
 				if (r instanceof RunnableForResult)
 					runableResult = ((RunnableForResult) r).getResult();
