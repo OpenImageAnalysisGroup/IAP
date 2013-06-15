@@ -67,4 +67,10 @@ public class ObjectRef implements HelperClass {
 		else
 			data = v;
 	}
+	
+	public synchronized Object removeObject() {
+		Object r = data;
+		data = null;
+		return r;
+	}
 }
