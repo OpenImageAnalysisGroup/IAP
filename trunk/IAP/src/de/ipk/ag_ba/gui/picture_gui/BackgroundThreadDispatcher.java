@@ -13,7 +13,7 @@ import javax.swing.Timer;
 
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.gui.picture_gui.system.ThreadExecution;
+import de.ipk.ag_ba.gui.picture_gui.system.ThreadManager;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 
 /**
@@ -44,7 +44,7 @@ public class BackgroundThreadDispatcher {
 		if (t == null)
 			return null;
 		
-		ThreadExecution.getInstance().memTask(t);
+		ThreadManager.getInstance().memTask(t);
 		
 		return t;
 	}

@@ -9,9 +9,9 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 
-public class ThreadExecution {
+public class ThreadManager {
 	
-	private static ThreadExecution instance = new ThreadExecution();
+	private static ThreadManager instance = new ThreadManager();
 	
 	SystemOptions so = SystemOptions.getInstance();
 	
@@ -19,8 +19,8 @@ public class ThreadExecution {
 	
 	private final ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
 	
-	private ThreadExecution() {
-		Timer res = new Timer("ThreadExecution", true);
+	private ThreadManager() {
+		Timer res = new Timer("Thread Management", true);
 		res.scheduleAtFixedRate(new TimerTask() {
 			boolean[] started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 2];
 			
@@ -52,7 +52,7 @@ public class ThreadExecution {
 									threadArray[idx] = new RunnerThread(jobs);
 									started[idx] = true;
 									threadArray[idx].setDaemon(false);
-									threadArray[idx].setName("exec " + (idx + 1));
+									threadArray[idx].setName("Job Execution " + (idx + 1));
 									threadArray[idx].start();
 								}
 								idx++;
@@ -79,7 +79,7 @@ public class ThreadExecution {
 		}, 1000, 1000);
 	}
 	
-	public static ThreadExecution getInstance() {
+	public static ThreadManager getInstance() {
 		return instance;
 	}
 	
