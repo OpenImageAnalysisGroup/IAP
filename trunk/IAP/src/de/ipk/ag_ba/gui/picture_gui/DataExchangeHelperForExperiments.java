@@ -168,13 +168,13 @@ public class DataExchangeHelperForExperiments {
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
 			final MongoTreeNode mtdbe, final JTree expTree)
 			throws InterruptedException {
-		MyThread r = new MyThread(new Runnable() {
+		LocalComputeJob r = new LocalComputeJob(new Runnable() {
 			@Override
 			public void run() {
 				addFilesToPanel(filePanel, mtdbe, expTree);
 			}
 		}, "add files to panel");
-		BackgroundThreadDispatcher.addTask(r, 1000, 0, true);
+		BackgroundThreadDispatcher.addTask(r);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
@@ -184,7 +184,7 @@ public class DataExchangeHelperForExperiments {
 		final StopObject stop = new StopObject(false);
 		
 		boolean cleared = false;
-		final ArrayList<MyThread> executeLater = new ArrayList<MyThread>();
+		final ArrayList<LocalComputeJob> executeLater = new ArrayList<LocalComputeJob>();
 		Substance3D sub = null;
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
@@ -395,7 +395,7 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
-	private static void processChartGenerator(ArrayList<MyThread> executeLater, MappingDataEntity mde, final Substance3D sub,
+	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater, MappingDataEntity mde, final Substance3D sub,
 			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop) {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
@@ -477,7 +477,7 @@ public class DataExchangeHelperForExperiments {
 	
 	private static Runnable processIcon(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree, final StopObject stop,
-			final ArrayList<MyThread> executeLater,
+			final ArrayList<LocalComputeJob> executeLater,
 			final BinaryFileInfo binaryFileInfo,
 			final DataSetFileButton imageButton,
 			final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
@@ -503,9 +503,9 @@ public class DataExchangeHelperForExperiments {
 					filePanel.repaint();
 					filePanel.getScrollpane().validate();
 					if (previewLoadAndConstructNeededF) {
-						MyThread t;
+						LocalComputeJob t;
 						try {
-							t = new MyThread(new Runnable() {
+							t = new LocalComputeJob(new Runnable() {
 								@Override
 								public void run() {
 									if (mt == expTree.getSelectionPath()
@@ -558,9 +558,9 @@ public class DataExchangeHelperForExperiments {
 								public void run() {
 									boolean isLast = fIsLast;
 									if (isLast)
-										for (MyThread ttt : executeLater)
+										for (LocalComputeJob ttt : executeLater)
 											BackgroundThreadDispatcher.addTask(
-													ttt, -1 + 1000, 0, true);
+													ttt);
 								}
 							});
 				} else

@@ -117,9 +117,9 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 		final Object data = data0;
 		
 		if (data != null) {
-			MyThread t;
+			LocalComputeJob t;
 			try {
-				t = new MyThread(new Runnable() {
+				t = new LocalComputeJob(new Runnable() {
 					@Override
 					public void run() {
 						for (int i = 0; i < ((java.util.List) data).size(); i++) {
@@ -145,14 +145,14 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 						tso.setBval(0, true); // finished
 					}
 				}, "process dropped files");
-				BackgroundThreadDispatcher.addTask(t, 1, 0, true);
+				BackgroundThreadDispatcher.addTask(t);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
 		}
-		MyThread t;
+		LocalComputeJob t;
 		try {
-			t = new MyThread(new Runnable() {
+			t = new LocalComputeJob(new Runnable() {
 				
 				@Override
 				public void run() {
@@ -181,7 +181,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					}
 				}
 			}, "add image to database");
-			BackgroundThreadDispatcher.addTask(t, 1, 0, true);
+			BackgroundThreadDispatcher.addTask(t);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -202,7 +202,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 			panel.getScrollpane().validate();
 		}
 		
-		MyThread t = new MyThread(new Runnable() {
+		LocalComputeJob t = new LocalComputeJob(new Runnable() {
 			@Override
 			public void run() {
 				MyImageIcon iconA;
@@ -272,7 +272,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					file.delete();
 			}
 		}, "store image in database");
-		BackgroundThreadDispatcher.addTask(t, -1, 0, true);
+		BackgroundThreadDispatcher.addTask(t);
 	}
 	
 	public void processDirectory(File file) throws InterruptedException {

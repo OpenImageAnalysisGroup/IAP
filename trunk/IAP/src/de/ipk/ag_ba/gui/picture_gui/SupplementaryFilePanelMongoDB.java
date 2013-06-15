@@ -70,7 +70,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			final File files[] = fc.getSelectedFiles();
 			
 			try {
-				MyThread writeThread = new MyThread(new Runnable() {
+				LocalComputeJob writeThread = new LocalComputeJob(new Runnable() {
 					@Override
 					public void run() {
 						
@@ -92,7 +92,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 						
 					}
 				}, "file strage thread");
-				BackgroundThreadDispatcher.addTask(writeThread, -1, 0, true);
+				BackgroundThreadDispatcher.addTask(writeThread);
 			} catch (Exception err) {
 				JOptionPane.showMessageDialog(null, "Error: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}

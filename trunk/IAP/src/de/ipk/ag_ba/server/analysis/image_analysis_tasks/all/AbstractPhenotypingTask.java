@@ -28,7 +28,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.MyThread;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -376,7 +376,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
 		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
 		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
-		final ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
+		final ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		if (imageSetWithSpecificAngle != null) {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
@@ -426,7 +426,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						}
 					};
 					
-					waitThreads.add(BackgroundThreadDispatcher.memTask(r, "Inner thread " + preThreadName + ", "
+					waitThreads.add(BackgroundThreadDispatcher.addTask(r, "Inner thread " + preThreadName + ", "
 							+ SystemAnalysis.getCurrentTime(time) + ", " +
 							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", "
 							+ configAndAngle + ")", 0, 0, true));
@@ -669,7 +669,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public abstract ImageProcessor getImageProcessor() throws Exception;
 	
-	private MyThread saveImage(
+	private LocalComputeJob saveImage(
 			final int tray, final int tray_cnt,
 			final ImageData id, final Image image,
 			final byte[] optLabelImageContent, final String labelFileExtension)
@@ -722,7 +722,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		};
-		return new MyThread(r, "Save Image");
+		return new LocalComputeJob(r, "Save Image");
 	}
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
@@ -900,7 +900,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 	}
 	
-	private ArrayList<MyThread> processAndOrSaveResultImages(
+	private ArrayList<LocalComputeJob> processAndOrSaveResultImages(
 			int tray, int tray_cnt,
 			ImageSet id,
 			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
@@ -909,7 +909,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
-		ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
+		ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		if (forceDebugStack) {
 			while (forcedDebugStacks.size() < tray_cnt)
 				forcedDebugStacks.add(null);
@@ -949,7 +949,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						&& id.getIrInfo().getURL() != null)
 					inIr.setLabelURL(id.getIrInfo().getURL().copy());
 			}
-			MyThread a = null, b = null, c = null, d = null, ra = null, rb = null, rc = null, rd = null;
+			LocalComputeJob a = null, b = null, c = null, d = null, ra = null, rb = null, rc = null, rd = null;
 			
 			if (resVis != null)
 				ra = saveImage(
@@ -969,16 +969,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						inIr, resIr, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			
 			if (ra != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false));
+				waitThreads.add(BackgroundThreadDispatcher.addTask(ra));
 			}
 			if (rb != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false));
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rb));
 			}
 			if (rc != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false));
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rc));
 			}
 			if (rd != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false));
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rd));
 			}
 		}
 		return waitThreads;
@@ -995,7 +995,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority)
 			throws Exception {
-		ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
+		ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
 		ImageData inFluo = id.getFluoInfo() != null ? id.getFluoInfo().copy() : null;
 		ImageData inNir = id.getNirInfo() != null ? id.getNirInfo().copy() : null;
