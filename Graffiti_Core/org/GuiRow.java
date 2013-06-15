@@ -6,6 +6,8 @@
  */
 package org;
 
+import info.clearthought.layout.TableLayout;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
@@ -24,5 +26,14 @@ public class GuiRow {
 			right = new JLabel("");
 		this.left = left;
 		this.right = right;
+	}
+
+	/**
+	 * @return JComponent shopwing the two fields. The GuiRow object is saved in a client property of the returned object.
+	 */
+	public JComponent getRowGui() {
+		JComponent res = TableLayout.getSplit(left, right, TableLayout.PREFERRED, TableLayout.FILL);
+		res.putClientProperty("guiRow", this);
+		return res;
 	}
 }
