@@ -49,6 +49,19 @@ public class BackgroundThreadDispatcher {
 		return t;
 	}
 	
+	public static MyThread memTask(Runnable r, String name, int userPriority, int parentPriority, boolean interactive) throws InterruptedException {
+		return memTask(new MyThread(r, name), userPriority, parentPriority, interactive);
+	}
+	
+	public static MyThread memTask(MyThread t, int userPriority, int parentPriority, boolean interactive) {
+		if (t == null)
+			return null;
+		
+		t.memTask(true);
+		
+		return t;
+	}
+	
 	/**
 	 * Get the number of running+scheduled tasks.
 	 * 
@@ -169,6 +182,20 @@ public class BackgroundThreadDispatcher {
 			m.getResult();
 			MyThread.checkWaitTasks();
 		}
+		if (Thread.currentThread() instanceof MyThread)
+			((MyThread) Thread.currentThread()).messageTaskIsRunningAfterWait();
+	}
+	
+	public static void waitButDontRun(ArrayList<MyThread> threads) throws InterruptedException {
+		threads = new ArrayList<MyThread>(threads);
+		if (Thread.currentThread() instanceof MyThread)
+			((MyThread) Thread.currentThread()).messageTaskIsWaiting();
+		do {
+			MyThread m = threads.get(0);
+			if (m.isFinished())
+				threads.remove(0);
+			Thread.sleep(100);
+		} while (threads.size() > 0);
 		if (Thread.currentThread() instanceof MyThread)
 			((MyThread) Thread.currentThread()).messageTaskIsRunningAfterWait();
 	}

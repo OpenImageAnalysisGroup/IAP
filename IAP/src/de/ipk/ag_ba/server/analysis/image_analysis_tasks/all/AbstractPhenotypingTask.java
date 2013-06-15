@@ -244,7 +244,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						@Override
 						public void run() {
 							try {
-								processSnapshot(
+								processPlant(
 										plandID2time2waterData,
 										plantIDf, preThreadName,
 										maximumThreadCountOnImageLevel,
@@ -363,7 +363,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.prio = prio;
 	}
 	
-	private void processSnapshot(
+	private void processPlant(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			String plantID, String preThreadName,
 			final int maximumThreadCountOnImageLevel,
@@ -378,11 +378,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
 		final ArrayList<MyThread> waitThreads = new ArrayList<MyThread>();
 		if (imageSetWithSpecificAngle != null) {
-			int threadsToStart = 0;
-			for (final Long time : imageSetWithSpecificAngle.keySet()) {
-				threadsToStart += imageSetWithSpecificAngle.get(time).keySet().size();
-			}
-			// final Semaphore innerLoopSemaphore = BackgroundTaskHelper.lockGetSemaphore(null, threadsToStart);
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 					if (status.wantsToStop())
@@ -395,77 +390,51 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						continue;
 					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
 					
-					// Thread.currentThread().setName(preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
-					// inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
-					
-					// final boolean releaseCon = optMaxCon.tryAcquire();
-					// if (!releaseCon)
-					// System.out.print(">RUN");
-					// else
-					// System.out.print(">START");
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {
 							try {
-								try {
-									ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
-											imageSetWithSpecificAngle.get(time).get(configAndAngle),
-											maximumThreadCountOnImageLevel, status,
-											workloadEqualAngleSnapshotSets,
-											getParentPriority());
-									synchronized (waitThreads) {
-										waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
-									}
-									HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
-									processVolumeOutput(inSamples.get(time), results);
-									if (results != null) {
-										synchronized (analysisInput) {
-											if (!analysisInput.containsKey(time))
-												analysisInput.put(time, new TreeMap<String, ImageData>());
-											if (!analysisResults.containsKey(time))
-												analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-											analysisInput.get(time).put(configAndAngle, inImage);
-											analysisResults.get(time).put(configAndAngle, results);
+								final ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
+										imageSetWithSpecificAngle.get(time).get(configAndAngle),
+										maximumThreadCountOnImageLevel, status,
+										workloadEqualAngleSnapshotSets,
+										getParentPriority());
+								synchronized (waitThreads) {
+									waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
+								}
+								Runnable waitResults = new Runnable() {
+									@Override
+									public void run() {
+										HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
+										processVolumeOutput(inSamples.get(time), results);
+										if (results != null) {
+											synchronized (analysisInput) {
+												if (!analysisInput.containsKey(time))
+													analysisInput.put(time, new TreeMap<String, ImageData>());
+												if (!analysisResults.containsKey(time))
+													analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+												analysisInput.get(time).put(configAndAngle, inImage);
+												analysisResults.get(time).put(configAndAngle, results);
+											}
 										}
 									}
-								} catch (Exception e) {
-									ErrorMsg.addErrorMessage(e);
-								}
-							} finally {
-								// innerLoopSemaphore.release();
-								// if (releaseCon)
-								// optMaxCon.release();
-								
+								};
+								waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis", 0, 0, true));
+							} catch (Exception e) {
+								ErrorMsg.addErrorMessage(e);
 							}
 						}
 					};
-					// innerLoopSemaphore.acquire();
-					// if (releaseCon) {
-					// Thread innerThread = new Thread(r);
-					// innerThread.setName("Inner thread " + preThreadName + ", " + SystemAnalysis.getCurrentTime(time) + ", " +
-					// inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", " + configAndAngle + ")");
-					// innerThread.setPriority(Thread.MIN_PRIORITY);
-					//
-					// innerThread.start();
 					
-					waitThreads.add(BackgroundThreadDispatcher.addTask(r, "Inner thread " + preThreadName + ", "
-								+ SystemAnalysis.getCurrentTime(time) + ", " +
-								inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", "
-								+ configAndAngle + ")", 0, 0, true));
-					// } else
-					// r.run();
-				}
-			}
-			// innerLoopSemaphore.acquire(threadsToStart);
-			// innerLoopSemaphore.release(threadsToStart);
-		}
-		// Thread.currentThread().setName("Analyse " + plantID + " (process saving)");
-		// System.out.println();
-		// System.out.print("[WAIT");
+					waitThreads.add(BackgroundThreadDispatcher.memTask(r, "Inner thread " + preThreadName + ", "
+							+ SystemAnalysis.getCurrentTime(time) + ", " +
+							inImage.getParentSample().getTimeUnit() + " " + inImage.getParentSample().getTime() + ", "
+							+ configAndAngle + ")", 0, 0, true));
+				} // for side angle
+			} // for each time point
+		} // if image data available
 		if (waitThreads != null && waitThreads.size() > 0)
-			BackgroundThreadDispatcher.waitFor(waitThreads);
-		// System.out.println("]");
-		// Thread.currentThread().setName("Analyse " + plantID + " (post-processing)");
+			BackgroundThreadDispatcher.waitButDontRun(waitThreads);
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
@@ -822,7 +791,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return result;
 	}
 	
-	private void processStatisticalOutputImages(ImageData inVis, HashMap<Integer, BlockResultSet> analysisResults) {
+	private void processNumericResults(ImageData inVis, HashMap<Integer, BlockResultSet> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
@@ -1000,24 +969,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						inIr, resIr, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
 			
 			if (ra != null) {
-				ra.run();
-				// a = BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false);
-				// waitThreads.add(a);
+				waitThreads.add(BackgroundThreadDispatcher.addTask(ra, parentPriority + 1, 5, false));
 			}
 			if (rb != null) {
-				rb.run();
-				// b = BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false);
-				// waitThreads.add(b);
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rb, parentPriority + 1, 5, false));
 			}
 			if (rc != null) {
-				rc.run();
-				// c = BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false);
-				// waitThreads.add(c);
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rc, parentPriority + 1, 5, false));
 			}
 			if (rd != null) {
-				rd.run();
-				// d = BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false);
-				// waitThreads.add(d);
+				waitThreads.add(BackgroundThreadDispatcher.addTask(rd, parentPriority + 1, 5, false));
 			}
 		}
 		return waitThreads;
@@ -1127,14 +1088,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		
 		if (analysisResults != null) {
-			processStatisticalOutputImages(inVis, analysisResults);
+			processNumericResults(inVis, analysisResults);
 			
 		}
 		return new ResultsAndWaitThreads(analysisResults, waitThreads);
-		// } else {
-		// System.err.println("ERROR: Not all three snapshots images could be loaded!");
-		// return null;
-		// }
 	}
 	
 	private BackgroundTaskStatusProviderSupportingExternalCallImpl getStatusProcessor(final BackgroundTaskStatusProviderSupportingExternalCall status,

@@ -10,11 +10,11 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.ErrorMsg;
+import org.ObjectRef;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -26,14 +26,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
  * @author klukas
  */
 public class MyThread extends Thread implements Runnable {
-	
-	public static final boolean NEW_SCHEDULER = false;
-	
 	private boolean finished = false;
-	private boolean started = false;
 	private final Semaphore sem;
 	private String name;
-	private Runnable runCode;
+	private final ObjectRef runCode;
 	
 	private static ThreadSafeOptions runningTasks = new ThreadSafeOptions();
 	private static ArrayList<MyThread> waitingTasks = new ArrayList<MyThread>(SystemAnalysis.getNumberOfCPUs());
@@ -42,8 +38,6 @@ public class MyThread extends Thread implements Runnable {
 	
 	private boolean mem;
 	
-	private boolean isRunningInThread;
-	
 	private Object runableResult;
 	
 	@SuppressWarnings("unused")
@@ -51,9 +45,8 @@ public class MyThread extends Thread implements Runnable {
 	
 	public MyThread(Runnable r, String name) throws InterruptedException {
 		this.name = name;
-		this.runCode = r;
-		if (r == null)
-			System.out.println("ERR");
+		this.runCode = new ObjectRef();
+		runCode.setObject(r);
 		sem = BackgroundTaskHelper.lockGetSemaphore(null, 1);
 		sem.acquire();
 	}
@@ -71,22 +64,22 @@ public class MyThread extends Thread implements Runnable {
 	
 	@Override
 	public void run() {
-		started = true;
+		Runnable r;
 		synchronized (runCode) {
-			if (runCode == null) {
-				System.out.println(SystemAnalysis.getCurrentTime() + "WARNING: (internal error) RunCode already null");
-				Thread.dumpStack();
+			boolean tt = isRunningInThread();
+			if (isStarted()) {
+				if (tt)
+					System.out.print(">W");
 				return;
-			}
+			} else
+				r = (Runnable) runCode.removeObject();
+			if (tt)
+				System.out.print(">START");
 		}
+		
 		try {
 			runningTasks.addLong(1);
 			try {
-				Runnable r;
-				synchronized (runCode) {
-					r = runCode;
-					runCode = null;
-				}
 				if (r == null)
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: INTERNAL ERROR - MYTHREAD RUNCODE IS NULL");
 				r.run();
@@ -104,17 +97,22 @@ public class MyThread extends Thread implements Runnable {
 			if (finishTask != null)
 				finishTask.run();
 		}
-		if (isRunningInThread) {
+		if (isRunningInThread()) {
 			MyThread t;
 			do {
 				t = getWaitingTask();
-				if (t != null && !t.started)
+				if (t != null && !t.isStarted()) {
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						ErrorMsg.addErrorMessage(e);
+					}
 					t.run();
-				else {
+				} else {
 					try {
 						Thread.sleep(20);
 						t = getWaitingTask();
-						if (t != null && !t.started)
+						if (t != null && !t.isStarted())
 							t.run();
 					} catch (InterruptedException e) {
 						ErrorMsg.addErrorMessage(e);
@@ -124,11 +122,20 @@ public class MyThread extends Thread implements Runnable {
 		}
 	}
 	
+	private boolean isRunningInThread() {
+		// System.out.println("Stack Size: " + Thread.currentThread().getStackTrace().length);
+		return Thread.currentThread().getStackTrace().length < 6;
+	}
+	
 	@Override
 	public synchronized void start() {
-		this.isRunningInThread = true;
-		this.started = true;
-		super.start();
+		synchronized (runCode) {
+			if (runCode.getObject() == null) {
+				return;
+			} else {
+				super.start();
+			}
+		}
 	}
 	
 	public boolean isFinished() {
@@ -136,11 +143,11 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public boolean isStarted() {
-		return started;
+		return runCode.getObject() == null;
 	}
 	
 	public Object getResult() throws InterruptedException {
-		if (!started)
+		if (!isStarted())
 			run();
 		synchronized (this) {
 			sem.acquire();
@@ -179,34 +186,25 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public synchronized void startNG(ThreadPoolExecutor es, boolean threadedExecution) {
-		if (!started && !mem) {
+		if (!isStarted() && !mem) {
 			boolean direct = !threadedExecution;
 			if (direct)
 				run();
 			else
-				if (NEW_SCHEDULER) {
-					try {
-						es.execute(this);
-					} catch (RejectedExecutionException rje) {
-						run();
-					}
+				if (runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
+					start();
 				} else {
-					if (runningTasks.getLong() < SystemAnalysis.getNumberOfCPUs()) {
-						started = true;
-						start();
-					} else {
-						if (!memorized()) {
-							run();
-						}
+					if (!memorized(false)) {
+						run();
 					}
 				}
 		}
 	}
 	
-	private boolean memorized() {
+	private boolean memorized(boolean forceMem) {
 		mem = true;
 		synchronized (waitingTasks) {
-			if (waitingTasks.size() < SystemAnalysis.getNumberOfCPUs()) {
+			if (forceMem || waitingTasks.size() < SystemAnalysis.getNumberOfCPUs() * 4) {
 				waitingTasks.add(this);
 				return true;
 			} else
@@ -222,9 +220,10 @@ public class MyThread extends Thread implements Runnable {
 					t = waitingTasks.remove(waitingTasks.size() - 1);
 				} else
 					t = null;
-			} while (t != null && t.started);
-			if (t != null && !t.started)
+			} while (t != null && t.isStarted());
+			if (t != null && !t.isStarted()) {
 				t.start();
+			}
 		}
 	}
 	
@@ -236,8 +235,8 @@ public class MyThread extends Thread implements Runnable {
 					t = waitingTasks.remove(waitingTasks.size() - 1);
 				} else
 					t = null;
-			} while (t != null && t.started);
-			if (t != null && !t.started)
+			} while (t != null && t.isStarted());
+			if (t != null && !t.isStarted())
 				return t;
 			else
 				return null;
@@ -258,7 +257,13 @@ public class MyThread extends Thread implements Runnable {
 	}
 	
 	public void memTask() {
-		if (!memorized()) {
+		if (!memorized(false)) {
+			run();
+		}
+	}
+	
+	public void memTask(boolean forceMem) {
+		if (!memorized(forceMem)) {
 			run();
 		}
 	}

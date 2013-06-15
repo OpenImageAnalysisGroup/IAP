@@ -34,7 +34,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 		
 		String name = this.getClass().getSimpleName();
 		
-		BackgroundThreadDispatcher.waitFor(new MyThread[] {
+		final MyThread[] work = new MyThread[] {
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -139,14 +139,20 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 							reportError(e, "could not process IR mask");
 						}
 					}
-				}, name + " process IR mask", parentPriority + 1, parentPriority, true) });
+				}, name + " process IR mask", parentPriority + 1, parentPriority, true) };
 		
-		try {
-			postProcess(processedImages, processedMasks);
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					BackgroundThreadDispatcher.waitFor(work);
+					postProcess(processedImages, processedMasks);
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+		};
+		BackgroundThreadDispatcher.addTask(r, "process block data", 0, 0, true).getResult();
 		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
