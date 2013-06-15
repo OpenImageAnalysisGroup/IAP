@@ -26,44 +26,53 @@ public class ThreadManager {
 			
 			@Override
 			public void run() {
-				if (jobs.size() > 0) {
-					int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
-					int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
-					if (getRunningCount() > maxCnt) {
-						// ask threads to stop execution
-						int tooMany = getRunningCount() - maxCnt;
-						int askedToStop = 0;
-						if (tooMany > 0) {
-							for (int idx = threadArray.length - 1; idx >= 0; idx--) {
-								if (started[idx]) {
-									threadArray[idx].pleaseStop();
-									askedToStop++;
+				synchronized (jobs) {
+					if (jobs.size() > 0) {
+						ArrayList<LocalComputeJob> remove = new ArrayList<LocalComputeJob>();
+						for (LocalComputeJob j : jobs)
+							if (j.isFinished())
+								remove.add(j);
+						for (LocalComputeJob j : remove)
+							jobs.remove(j);
+						
+						int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
+						int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
+						if (getRunningCount() > maxCnt) {
+							// ask threads to stop execution
+							int tooMany = getRunningCount() - maxCnt;
+							int askedToStop = 0;
+							if (tooMany > 0) {
+								for (int idx = threadArray.length - 1; idx >= 0; idx--) {
+									if (started[idx]) {
+										threadArray[idx].pleaseStop();
+										askedToStop++;
+									}
+									if (askedToStop >= tooMany)
+										break;
 								}
-								if (askedToStop >= tooMany)
-									break;
 							}
-						}
-					} else
-						while (getRunningCount() < maxCnt) {
-							// start new executor threads
-							int idx = 0;
-							for (boolean s : started) {
-								if (!s) {
-									threadArray[idx] = new RunnerThread(jobs);
-									started[idx] = true;
-									threadArray[idx].setDaemon(false);
-									threadArray[idx].setName("Job Execution " + (idx + 1));
-									threadArray[idx].start();
+						} else
+							while (getRunningCount() < maxCnt) {
+								// start new executor threads
+								int idx = 0;
+								for (boolean s : started) {
+									if (!s) {
+										threadArray[idx] = new RunnerThread(jobs);
+										started[idx] = true;
+										threadArray[idx].setDaemon(false);
+										threadArray[idx].setName("Job Execution " + (idx + 1));
+										threadArray[idx].start();
+									}
+									idx++;
+									if (getRunningCount() >= maxCnt)
+										break;
 								}
-								idx++;
-								if (getRunningCount() >= maxCnt)
-									break;
 							}
-						}
-					for (int idx = 0; idx < threadArray.length; idx++) {
-						if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
-							threadArray[idx] = null;
-							started[idx] = false;
+						for (int idx = 0; idx < threadArray.length; idx++) {
+							if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
+								threadArray[idx] = null;
+								started[idx] = false;
+							}
 						}
 					}
 				}

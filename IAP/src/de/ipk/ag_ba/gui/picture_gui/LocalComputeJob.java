@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class LocalComputeJob implements Runnable {
 	private boolean finished = false;
 	private final Semaphore sem;
-	private String name;
+	private final String name;
 	private final ObjectRef runCode;
 	private Runnable finishTask;
 	
@@ -67,11 +67,6 @@ public class LocalComputeJob implements Runnable {
 		}
 	}
 	
-	private boolean isRunningInThread() {
-		// System.out.println("Stack Size: " + Thread.currentThread().getStackTrace().length);
-		return Thread.currentThread().getStackTrace().length < 6;
-	}
-	
 	public boolean isFinished() {
 		return finished;
 	}
@@ -92,22 +87,6 @@ public class LocalComputeJob implements Runnable {
 			runableResult = null;
 			return res;
 		}
-	}
-	
-	public String getNameNG() {
-		return name;
-	}
-	
-	public void setNameNG(String name) {
-		this.name = name;
-	}
-	
-	public boolean isAliveNG() {
-		return !finished;
-	}
-	
-	public Runnable getRunCode() {
-		return this;
 	}
 	
 	@Override

@@ -434,7 +434,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			} // for each time point
 		} // if image data available
 		if (waitThreads != null && waitThreads.size() > 0)
-			BackgroundThreadDispatcher.waitButDontRun(waitThreads);
+			BackgroundThreadDispatcher.waitFor(waitThreads);
+		// / BackgroundThreadDispatcher.waitButDontRun(waitThreads);
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
