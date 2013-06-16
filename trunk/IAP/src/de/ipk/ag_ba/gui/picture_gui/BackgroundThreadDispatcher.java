@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import javax.swing.Timer;
 
@@ -37,14 +36,22 @@ public class BackgroundThreadDispatcher {
 	}
 	
 	public static LocalComputeJob addTask(Runnable r, String name) throws InterruptedException {
-		return addTask(new LocalComputeJob(r, name));
+		return addTask(r, name, false);
+	}
+	
+	public static LocalComputeJob addTask(Runnable r, String name, boolean forceMem) throws InterruptedException {
+		return addTask(new LocalComputeJob(r, name), forceMem);
 	}
 	
 	public static LocalComputeJob addTask(LocalComputeJob t) {
+		return addTask(t, false);
+	}
+	
+	public static LocalComputeJob addTask(LocalComputeJob t, boolean forceMem) {
 		if (t == null)
 			return null;
 		
-		ThreadManager.getInstance().memTask(t);
+		ThreadManager.getInstance().memTask(t, forceMem);
 		
 		return t;
 	}
@@ -97,55 +104,6 @@ public class BackgroundThreadDispatcher {
 		if (!SystemAnalysis.isHeadless())
 			t.start();
 	}
-	
-	private boolean highMemoryLoad(LinkedList<LocalComputeJob> runningTasks) {
-		if (runningTasks.size() < 1)
-			return false;
-		Runtime r = Runtime.getRuntime();
-		long used = r.totalMemory() - r.freeMemory();
-		long max = r.maxMemory();
-		long free = max - used;
-		if (free < max * 0.1d) {
-			if (System.currentTimeMillis() - lastPrint > 1000) {
-				lastPrint = System.currentTimeMillis();
-				System.out.println(SystemAnalysis.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
-						+ " MB");
-			}
-			if (System.currentTimeMillis() - lastGC > 1000 * 30) {
-				lastGC = System.currentTimeMillis();
-				System.out.println(SystemAnalysis.getCurrentTime() + ">high memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
-						+ " MB --- GARBAGE COLLECTION");
-				System.gc();
-				used = r.totalMemory() - r.freeMemory();
-				max = r.maxMemory();
-				free = max - used;
-				System.out.println(SystemAnalysis.getCurrentTime() + ">new memory load: " + (used / 1024 / 1024) + " MB used, max: " + (max / 1024 / 1024)
-						+ " MB");
-			}
-			return true;
-		} else
-			return false;
-	}
-	
-	private static long lastPrint = 0;
-	private static long lastGC = 0;
-	
-	// ThreadPoolExecutor es = new ThreadPoolExecutor(
-	// 0,
-	// SystemAnalysis.getNumberOfCPUs(),
-	// 5, // SystemAnalysis.getNumberOfCPUs(),
-	// TimeUnit.SECONDS,
-	// new ArrayBlockingQueue<Runnable>(SystemAnalysis.getRealNumberOfCPUs(), false),
-	// new ThreadFactory() {
-	// int idx = 1;
-	//
-	// @Override
-	// public Thread newThread(Runnable r) {
-	// Thread res = new Thread(r, "Background Pool Thread " + idx);
-	// idx++;
-	// return res;
-	// }
-	// });
 	
 	public static void waitFor(LocalComputeJob[] threads) throws InterruptedException {
 		HashSet<LocalComputeJob> t = new HashSet<LocalComputeJob>();

@@ -262,7 +262,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					if (SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
 						t.run();
 					else {
-						startThread(t, preThreadName);
+						BackgroundThreadDispatcher.addTask(t, preThreadName, true);
 						Thread.sleep(100);
 					}
 					
@@ -282,10 +282,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		if (status.wantsToStop())
 			output = null;
-	}
-	
-	private void startThread(Runnable t, String name) throws InterruptedException {
-		BackgroundThreadDispatcher.addTask(t, name);
 	}
 	
 	private int getParentPriority() {

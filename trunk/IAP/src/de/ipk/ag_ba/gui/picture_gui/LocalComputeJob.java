@@ -13,6 +13,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.picture_gui.system.ThreadManager;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
@@ -76,8 +77,10 @@ public class LocalComputeJob implements Runnable {
 	}
 	
 	public Object getResult() throws InterruptedException {
-		if (!isStarted())
+		if (!isStarted()) {
+			ThreadManager.getInstance().directlyRunning(this);
 			run();
+		}
 		synchronized (this) {
 			sem.acquire();
 			sem.release();
