@@ -36,6 +36,8 @@ public class ThreadManager {
 							jobs.remove(j);
 						
 						int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
+						desiredThreadCount = modifyConcurrencyDependingOnMemoryStatus(desiredThreadCount);
+						
 						int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
 						if (getRunningCount() > maxCnt) {
 							// ask threads to stop execution
@@ -78,6 +80,49 @@ public class ThreadManager {
 				}
 			}
 			
+			private int modifyConcurrencyDependingOnMemoryStatus(int nn) {
+				SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
+				
+				if (SystemOptions.getInstance().getBoolean("SYSTEM", "Reduce Workload in Low Memory Situation", false)) {
+					if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
+						System.out
+								.println(SystemAnalysis.getCurrentTime()
+										+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
+						nn = 1;
+					}
+					if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
+						System.out
+								.println(SystemAnalysis.getCurrentTime()
+										+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 1");
+						nn = 1;
+					}
+					if (SystemAnalysis.getMemoryMB() < 4000 && nn > 2) {
+						System.out
+								.println(SystemAnalysis.getCurrentTime()
+										+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 2");
+						nn = 2;
+					}
+					
+					if (nn > 1
+							&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+									.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+									/ 100d) {
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">HIGH MEMORY UTILIZATION (>"
+								+ SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+								+ "%), REDUCING CONCURRENCY");
+						nn = nn / 2;
+						if (nn < 1)
+							nn = 1;
+					}
+				}
+				// System.out
+				// .println(SystemAnalysis.getCurrentTime()
+				// + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
+				// + nn + ")");
+				return nn;
+			}
+			
 			private int getRunningCount() {
 				int res = 0;
 				for (boolean s : started)
@@ -93,8 +138,30 @@ public class ThreadManager {
 	}
 	
 	public void memTask(LocalComputeJob t) {
-		synchronized (jobs) {
-			jobs.add(t);
+		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
+				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
+			System.out.println();
+			System.out
+					.print(SystemAnalysis.getCurrentTime()
+							+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
+							+ "%), ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB()
+							+ "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
+			System.gc();
+			System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
+					.getMemoryMB() + " MB)");
+		}
+		if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
+			System.out.println();
+			System.out.println(SystemAnalysis.getCurrentTime()
+					+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+					+ "%), REDUCING CONCURRENCY (THREAD.RUN)");
+			t.run();
+		} else {
+			synchronized (jobs) {
+				jobs.add(t);
+			}
 		}
 	}
 }
