@@ -140,13 +140,18 @@ public class ThreadManager {
 	private static long lastPrint = 0;
 	private static long lastGC = 0;
 	
+	private static long runIdx = 0;
+	
 	public void memTask(LocalComputeJob t, boolean forceMem) {
 		if (forceMem) {
 			synchronized (jobs) {
 				jobs.add(t);
 			}
 		} else {
-			if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+			runIdx++;
+			if (runIdx > 2000)
+				runIdx = 0;
+			if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
 					.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
 					&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
 				if (System.currentTimeMillis() - lastPrint > 1000) {
@@ -167,7 +172,7 @@ public class ThreadManager {
 							.getMemoryMB() + " MB)");
 				}
 			}
-			if (SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+			if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
 					.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
 				System.out.println();
 				System.out.println(SystemAnalysis.getCurrentTime()
