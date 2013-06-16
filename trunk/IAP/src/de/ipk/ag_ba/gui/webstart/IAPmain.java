@@ -106,6 +106,8 @@ public class IAPmain extends JApplet {
 		
 		SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
 		SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
+		SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60);
+		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
 		
 		JFrame jf = new JFrame(title);
 		IAPmain iap = new IAPmain();
@@ -631,7 +633,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void errorCheck(String errorMessage) {
-		if (errorMessage!=null && errorMessage.toUpperCase().startsWith("INFO:"))
+		if (errorMessage != null && errorMessage.toUpperCase().startsWith("INFO:"))
 			return;
 		boolean errClose = SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of error (" + IAPmain.getRunMode() + ")",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
