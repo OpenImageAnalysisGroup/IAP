@@ -34,8 +34,12 @@ public class SystemAnalysis {
 	 * 
 	 * @return
 	 */
+	private static int realCPU = -1;
+	
 	public static int getRealNumberOfCPUs() {
-		return Runtime.getRuntime().availableProcessors();
+		if (realCPU < 0)
+			realCPU = Runtime.getRuntime().availableProcessors();
+		return realCPU;
 	}
 	
 	public static void setUseFullCpuPower(boolean b) {
