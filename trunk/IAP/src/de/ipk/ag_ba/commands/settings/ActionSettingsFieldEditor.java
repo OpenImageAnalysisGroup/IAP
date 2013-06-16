@@ -271,7 +271,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										}
 										entries.add(inf);
 									}
-									JComboBox dropDown = new JComboBox<>(new String[] { "Load Images", "Segmentation" });
+									JComboBox dropDown = new JComboBox(new String[] { "Load Images", "Segmentation" });
 									JTextField textField = new JTextField(sl + "");
 									GuiRow gr = new GuiRow(dropDown, textField);
 									entries.add(gr.getRowGui());// + "");
