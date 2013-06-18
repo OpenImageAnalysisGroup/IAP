@@ -93,6 +93,8 @@ public class BlThreeDreconstruction extends AbstractBlock {
 						Double realMarkerDistHorizontal = null;
 						if (allResultsForSnapshot != null && allResultsForSnapshot.keySet() != null)
 							for (String angle : allResultsForSnapshot.keySet()) {
+								if (allResultsForSnapshot.get(angle) == null)
+									continue;
 								BlockResultSet bp = allResultsForSnapshot.get(angle).get(tray);
 								if (bp == null)
 									continue;
