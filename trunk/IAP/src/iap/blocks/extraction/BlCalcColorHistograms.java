@@ -1,6 +1,6 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import org.SystemAnalysis;
 import org.Vector2d;
-import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -25,7 +24,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author klukas, pape
  *         status: ok, 23.11.2011, c. klukas
  */
-public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean debug = false;
 	private boolean debugRegionParts = false;
@@ -249,17 +248,6 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlockFIS {
 			return io.getImage();
 		} else
 			return null;
-	}
-	
-	@Override
-	public Parameter[] getParameters() {
-		// no parameters are needed
-		return new Parameter[] {};
-	}
-	
-	@Override
-	public void setParameters(Parameter[] params) {
-		super.setParameters(params);
 	}
 	
 	@Override

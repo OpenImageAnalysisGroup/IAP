@@ -24,17 +24,16 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
-import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -180,17 +179,6 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		IAPmain.errorCheck(errorMessage);
 	}
 	
-	@Override
-	public Parameter[] getParameters() {
-		// empty
-		return null;
-	}
-	
-	@Override
-	public void setParameters(Parameter[] params) {
-		// empty
-	}
-	
 	protected String getRemarkSetting(String remarkID, String defaultReturn) {
 		ImageData info = input() != null && input.images() != null ? input().images().getVisInfo() : null;
 		if (info == null)
@@ -280,7 +268,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					AbstractSnapshotAnalysisBlockFIS inst = (AbstractSnapshotAnalysisBlockFIS) blockType.newInstance();
+					AbstractSnapshotAnalysisBlock inst = (AbstractSnapshotAnalysisBlock) blockType.newInstance();
 					ImageSet a = inputSet.images().copy();
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);

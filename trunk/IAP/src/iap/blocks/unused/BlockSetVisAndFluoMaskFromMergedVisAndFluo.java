@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.Image;
  *           The input masks (should contain cleared background).
  * @return A single 1/0 mask.
  */
-public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

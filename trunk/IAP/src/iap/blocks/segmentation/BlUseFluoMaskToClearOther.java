@@ -1,6 +1,6 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
  * 
  * @author klukas
  */
-public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug = false;
 	

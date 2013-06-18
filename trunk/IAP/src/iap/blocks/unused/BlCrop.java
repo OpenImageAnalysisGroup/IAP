@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlCrop extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISimage() {

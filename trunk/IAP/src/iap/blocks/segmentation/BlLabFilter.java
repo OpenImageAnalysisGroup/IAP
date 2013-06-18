@@ -3,7 +3,7 @@
  */
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
  * 
  * @author klukas
  */
-public class BlLabFilter extends AbstractSnapshotAnalysisBlockFIS {
+public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	

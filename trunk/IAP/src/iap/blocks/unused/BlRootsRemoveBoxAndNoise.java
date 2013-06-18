@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 	
 	int white = Color.WHITE.getRGB();
 	int black = Color.BLACK.getRGB();

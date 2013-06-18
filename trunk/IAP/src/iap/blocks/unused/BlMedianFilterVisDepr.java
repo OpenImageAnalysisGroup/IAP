@@ -3,7 +3,7 @@
  */
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author Klukas
  */
 @Deprecated
-public class BlMedianFilterVisDepr extends AbstractSnapshotAnalysisBlockFIS {
+public class BlMedianFilterVisDepr extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

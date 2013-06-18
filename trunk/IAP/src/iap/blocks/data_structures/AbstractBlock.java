@@ -2,7 +2,7 @@ package iap.blocks.data_structures;
 
 import de.ipk.ag_ba.image.structures.Image;
 
-public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlockFIS {
+public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	protected Image processImage(Image image) {
 		return image;

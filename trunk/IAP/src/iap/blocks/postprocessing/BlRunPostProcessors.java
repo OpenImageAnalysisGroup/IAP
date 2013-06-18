@@ -1,6 +1,6 @@
 package iap.blocks.postprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.server.analysis.ImageConfiguration;
  * 
  * @author klukas
  */
-public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

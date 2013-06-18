@@ -3,7 +3,7 @@
  */
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -20,7 +20,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
  * @author Klukas
  */
 @Deprecated
-public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlockFIS {
+public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	int LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS;

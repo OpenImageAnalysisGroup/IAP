@@ -1,6 +1,6 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-public class BlClosing extends AbstractSnapshotAnalysisBlockFIS {
+public class BlClosing extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

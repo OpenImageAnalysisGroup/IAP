@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlock {
 	
 	private int w;
 	private int h;

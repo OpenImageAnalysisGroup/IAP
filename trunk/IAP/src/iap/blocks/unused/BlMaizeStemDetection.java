@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
@@ -31,7 +31,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlockFIS {
+public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 	boolean debug = false;
 	
 	@Override

@@ -3,7 +3,7 @@
  */
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
  * 
  * @author pape, klukas, entzian
  */
-public class BlRemoveBackground extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 	
 	int back;
 	boolean debug;

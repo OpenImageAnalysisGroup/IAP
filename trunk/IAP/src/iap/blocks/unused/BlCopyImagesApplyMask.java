@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -35,20 +34,6 @@ public interface ImageAnalysisBlock {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
-	
-	/**
-	 * Returns a list of <code>Parameter</code> that are set for this
-	 * algorithm.
-	 * 
-	 * @return a collection of <code>Parameter</code> that are needed by the <code>Algorithm</code>.
-	 */
-	public Parameter[] getParameters();
-	
-	/**
-	 * Sets the parameters for this algorithm. Must have the same types and
-	 * order as the array returned by <code>getParameter</code>.
-	 */
-	public void setParameters(Parameter[] params);
 	
 	public BlockType getBlockType();
 }

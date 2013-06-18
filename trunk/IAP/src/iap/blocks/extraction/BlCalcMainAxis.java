@@ -3,13 +3,11 @@
  */
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
-
-import org.graffiti.plugin.parameter.Parameter;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MainAxisCalculationResult;
@@ -26,7 +24,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author pape, klukas
  */
 public class BlCalcMainAxis extends
-		AbstractSnapshotAnalysisBlockFIS {
+		AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -76,17 +74,6 @@ public class BlCalcMainAxis extends
 	private MainAxisCalculationResult getAngle(Image image) {
 		return new ImageOperation(image).calculateTopMainAxis(options
 				.getBackground());
-	}
-	
-	@Override
-	public Parameter[] getParameters() {
-		// no parameters are needed
-		return new Parameter[] {};
-	}
-	
-	@Override
-	public void setParameters(Parameter[] params) {
-		super.setParameters(params);
 	}
 	
 	@Override

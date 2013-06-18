@@ -21,7 +21,7 @@ import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
-import iap.blocks.preprocessing.BlockCutFromSide;
+import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
@@ -66,7 +66,7 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				new BlColorBalanceVerticalNir(),
 				new BlColorBalanceCircularVisNir(),
 				new BlDetectBlueMarkers(),
-				new BlockCutFromSide(),
+				new BlCutFromSide(),
 				
 				// segmentation
 				new BlRemoveBackground(),

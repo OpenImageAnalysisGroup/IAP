@@ -1,6 +1,6 @@
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	
