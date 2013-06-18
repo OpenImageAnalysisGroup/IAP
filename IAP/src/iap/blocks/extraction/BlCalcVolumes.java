@@ -1,6 +1,6 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.Date;
@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlCalcVolumes extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(

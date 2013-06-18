@@ -1,6 +1,6 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -21,7 +21,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * 
  * @author klukas
  */
-public class BlCalcAreas extends AbstractSnapshotAnalysisBlockFIS {
+public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {

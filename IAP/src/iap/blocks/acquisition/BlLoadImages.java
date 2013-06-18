@@ -1,6 +1,6 @@
 package iap.blocks.acquisition;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
  * @author entzian, klukas
  */
 
-public class BlLoadImages extends AbstractSnapshotAnalysisBlockFIS {
+public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected boolean isChangingImages() {

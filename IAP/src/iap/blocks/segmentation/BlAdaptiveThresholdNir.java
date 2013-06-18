@@ -1,6 +1,6 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {

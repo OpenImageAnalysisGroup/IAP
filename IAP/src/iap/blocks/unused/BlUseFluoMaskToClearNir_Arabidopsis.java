@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author Christian Klukas
  */
-public class BlUseFluoMaskToClearNir_Arabidopsis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClearNir_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 	boolean debug = false;
 	
 	@Override

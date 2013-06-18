@@ -3,7 +3,7 @@
  */
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author pape, klukas
  */
-public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlockFIS {
+public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	ArrayList<MarkerPair> numericResult;

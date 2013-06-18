@@ -3,7 +3,7 @@
  */
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author Klukas
  */
-public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlockFIS {
+public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	private ImageOperation soilMask;

@@ -1,6 +1,6 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 /**
  * @author klukas
  */
-public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected synchronized Image processFLUOmask() {

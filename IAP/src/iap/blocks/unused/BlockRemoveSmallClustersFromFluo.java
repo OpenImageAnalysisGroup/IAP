@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.Image;
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
  */
-public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBlock {
 	
 	public static boolean ngUse = true;
 	

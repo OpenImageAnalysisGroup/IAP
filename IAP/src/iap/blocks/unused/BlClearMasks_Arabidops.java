@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlockFIS {
+public class BlClearMasks_Arabidops extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug = false;
 	

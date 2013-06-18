@@ -13,9 +13,9 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * Clear the image (only masks) from top, bottom, left and right sides.
  * 
- * @author Dijun Chen
+ * @author Dijun Chen, Christian Klukas
  */
-public class BlockCutFromSide extends AbstractBlock {
+public class BlCutFromSide extends AbstractBlock {
 	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {

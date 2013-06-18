@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author klukas
  */
-public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlockFIS {
+public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean debug = false;
 	private double whiteLevel_180d_NIR, whiteLevel_255d_VIS;

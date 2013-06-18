@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Point;
@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import flanagan.math.FourierTransform;
 
-public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlockFIS {
+public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		

@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 
-public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlockFIS {
+public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug = false;
 	

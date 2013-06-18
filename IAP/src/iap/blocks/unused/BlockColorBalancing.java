@@ -1,6 +1,6 @@
 package iap.blocks.unused;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlockFIS;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlockColorBalancing extends AbstractSnapshotAnalysisBlockFIS {
+public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 	
 	static boolean debug = false;
 	
