@@ -47,7 +47,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS image");
 						}
 					}
-				}, name + " process VIS image", parentPriority + 1, parentPriority, true),
+				}, name + " process VIS image", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -60,7 +60,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO image");
 						}
 					}
-				}, name + " process FLU image", parentPriority + 1, parentPriority, true),
+				}, name + " process FLU image", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -73,7 +73,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR image");
 						}
 					}
-				}, name + " process NIR image", 1, parentPriority, true),
+				}, name + " process NIR image", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -86,7 +86,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR image");
 						}
 					}
-				}, name + " process NIR image", 1, parentPriority, true),
+				}, name + " process NIR image", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -100,7 +100,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS mask");
 						}
 					}
-				}, name + " process VIS mask", parentPriority + 1, parentPriority, true),
+				}, name + " process VIS mask", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -113,7 +113,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO mask");
 						}
 					}
-				}, name + " process FLU mask", parentPriority + 1, parentPriority, true),
+				}, name + " process FLU mask", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -126,7 +126,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR mask");
 						}
 					}
-				}, name + " process NIR mask", parentPriority + 1, parentPriority, true),
+				}, name + " process NIR mask", true),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -139,7 +139,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR mask");
 						}
 					}
-				}, name + " process IR mask", parentPriority + 1, parentPriority, true) };
+				}, name + " process IR mask", true) };
 		
 		Runnable r = new Runnable() {
 			@Override
@@ -152,7 +152,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 				}
 			}
 		};
-		BackgroundThreadDispatcher.addTask(r, "process block data", 0, 0, true).getResult();
+		BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
 		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
