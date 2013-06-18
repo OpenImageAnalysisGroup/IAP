@@ -91,28 +91,31 @@ public class BlThreeDreconstruction extends AbstractBlock {
 						ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 						Double distHorizontal = null;
 						Double realMarkerDistHorizontal = null;
-						for (String angle : allResultsForSnapshot.keySet()) {
-							BlockResultSet bp = allResultsForSnapshot.get(angle).get(tray);
-							if (distHorizontal == null)
-								distHorizontal = options.getCalculatedBlueMarkerDistance();
-							
-							if (distHorizontal == null)
-								if (angle.startsWith("side")) {
-									BlockProperty val = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance");
-									if (val != null)
-										distHorizontal = val.getValue();
-								}
-							realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-							Image vis = bp.getImage("img.vis.3D");
-							bp.setImage("img.vis.3D", null);
-							if (angle.startsWith("side"))
-								if (vis != null) {
-									MyPicture p = new MyPicture();
-									double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
-									p.setPictureData(vis, ang / 180d * Math.PI, mg);
-									pictures.add(p);
-								}
-						}
+						if (allResultsForSnapshot != null && allResultsForSnapshot.keySet() != null)
+							for (String angle : allResultsForSnapshot.keySet()) {
+								BlockResultSet bp = allResultsForSnapshot.get(angle).get(tray);
+								if (bp == null)
+									continue;
+								if (distHorizontal == null)
+									distHorizontal = options.getCalculatedBlueMarkerDistance();
+								
+								if (distHorizontal == null)
+									if (angle.startsWith("side")) {
+										BlockProperty val = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance");
+										if (val != null)
+											distHorizontal = val.getValue();
+									}
+								realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
+								Image vis = bp.getImage("img.vis.3D");
+								bp.setImage("img.vis.3D", null);
+								if (angle.startsWith("side"))
+									if (vis != null) {
+										MyPicture p = new MyPicture();
+										double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
+										p.setPictureData(vis, ang / 180d * Math.PI, mg);
+										pictures.add(p);
+									}
+							}
 						if (pictures.size() > 2) {
 							mg.setRoundViewImages(pictures);
 							mg.calculateModel(null/* optStatus */, modeOfOperation, 0, false);
