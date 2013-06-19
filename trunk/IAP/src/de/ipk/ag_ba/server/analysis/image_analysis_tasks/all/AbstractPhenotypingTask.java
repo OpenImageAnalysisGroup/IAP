@@ -733,10 +733,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (bpv.getName() == null)
 					continue;
 				
-				NumericMeasurement3D m = new NumericMeasurement3D(inVis,
-						bpv.getName(), inVis.getParentSample().getParentCondition()
-								.getExperimentName()
-								+ " (" + getName() + ")");
+				NumericMeasurement3D m = new NumericMeasurement3D(inVis, bpv.getName(), null);
 				m.setAnnotation(null);
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
