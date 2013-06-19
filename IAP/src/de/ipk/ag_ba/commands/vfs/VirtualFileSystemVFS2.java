@@ -316,64 +316,74 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		String firstPre = "";
 		String finalMainName = null;
 		{ // save main
-			String desiredFileName = limg.getURL().getFileName();
-			if (desiredFileName != null && desiredFileName.contains("#"))
-				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
-			String substanceName = limg.getSubstanceName();
-			desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
-			desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getURL().getFileNameExtension().length()) + "."
-					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
-			finalMainName = desiredFileName;
-			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
-				pre = optFileNameMainAndLabelPrefix[0];
-				firstPre = pre;
-			}
-			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
-			MyByteArrayInputStream mainStream = ResourceIOManager.getInputStreamMemoryCached(limg.getInputStream());
-			if (mainStream != null && mainStream.getCount() > 0)
-				saveStream(targetFileNameFullRes, mainStream, false, mainStream.getCount());
-			
-			IOurl url = limg.getURL();
-			
-			String fullPath = new File(targetFileNameFullRes).getParent();
-			String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
-			if (url != null) {
-				url.setPrefix(getPrefix());
-				url.setDetail(subPath);
-				if (!pre.isEmpty())
-					url.setFileName(pre + desiredFileName);
-				else
-					url.setFileName(desiredFileName);
+			boolean alreadyInSameStorageLocation = false;
+			if (limg.getURL() != null && limg.getURL().getPrefix() != null && limg.getURL().getPrefix().equals(getPrefix()))
+				alreadyInSameStorageLocation = true;
+			if (!alreadyInSameStorageLocation) {
+				String desiredFileName = limg.getURL().getFileName();
+				if (desiredFileName != null && desiredFileName.contains("#"))
+					desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+				String substanceName = limg.getSubstanceName();
+				desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+				desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getURL().getFileNameExtension().length()) + "."
+						+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+				finalMainName = desiredFileName;
+				if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
+					pre = optFileNameMainAndLabelPrefix[0];
+					firstPre = pre;
+				}
+				String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+				MyByteArrayInputStream mainStream = ResourceIOManager.getInputStreamMemoryCached(limg.getInputStream());
+				if (mainStream != null && mainStream.getCount() > 0)
+					saveStream(targetFileNameFullRes, mainStream, false, mainStream.getCount());
+				
+				IOurl url = limg.getURL();
+				
+				String fullPath = new File(targetFileNameFullRes).getParent();
+				String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
+				if (url != null) {
+					url.setPrefix(getPrefix());
+					url.setDetail(subPath);
+					if (!pre.isEmpty())
+						url.setFileName(pre + desiredFileName);
+					else
+						url.setFileName(desiredFileName);
+				}
 			}
 		}
 		if (limg.getLabelURL() != null && !ignoreLabelURL) { // save label
-			String desiredFileName = limg.getLabelURL().getFileName();
-			if (desiredFileName != null && desiredFileName.contains("#"))
-				desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
-			if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 1) {
-				pre = optFileNameMainAndLabelPrefix[1];
-				String substanceName = limg.getSubstanceName();
-				desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
-				desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getLabelURL().getFileNameExtension().length()) + "."
-						+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
-			}
-			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
-			MyByteArrayInputStream labelStream = ResourceIOManager.getInputStreamMemoryCached(
-					limg.getLabelURL().getInputStream());
-			if (labelStream != null && labelStream.getCount() > 0)
-				saveStream(targetFileNameFullRes, labelStream, false, labelStream.getCount());
-			
-			IOurl url = limg.getLabelURL();
-			
-			String fullPath = new File(targetFileNameFullRes).getParent();
-			String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
-			if (url != null) {
-				url.setPrefix(getPrefix());
-				url.setDetail(subPath);
-				if (!pre.isEmpty())
-					url.setFileName(pre + desiredFileName);
-				else
-					url.setFileName(desiredFileName);
+			boolean alreadyInSameStorageLocation = false;
+			if (limg.getLabelURL() != null && limg.getLabelURL().getPrefix() != null && limg.getLabelURL().getPrefix().equals(getPrefix()))
+				alreadyInSameStorageLocation = true;
+			if (!alreadyInSameStorageLocation) {
+				String desiredFileName = limg.getLabelURL().getFileName();
+				if (desiredFileName != null && desiredFileName.contains("#"))
+					desiredFileName = desiredFileName.substring(desiredFileName.indexOf("#") + 1);
+				if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 1) {
+					pre = optFileNameMainAndLabelPrefix[1];
+					String substanceName = limg.getSubstanceName();
+					desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
+					desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getLabelURL().getFileNameExtension().length()) + "."
+							+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+				}
+				String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
+				MyByteArrayInputStream labelStream = ResourceIOManager.getInputStreamMemoryCached(
+						limg.getLabelURL().getInputStream());
+				if (labelStream != null && labelStream.getCount() > 0)
+					saveStream(targetFileNameFullRes, labelStream, false, labelStream.getCount());
+				
+				IOurl url = limg.getLabelURL();
+				
+				String fullPath = new File(targetFileNameFullRes).getParent();
+				String subPath = fullPath.startsWith(getTargetPathName()) ? fullPath.substring(getTargetPathName().length()) : fullPath;
+				if (url != null) {
+					url.setPrefix(getPrefix());
+					url.setDetail(subPath);
+					if (!pre.isEmpty())
+						url.setFileName(pre + desiredFileName);
+					else
+						url.setFileName(desiredFileName);
+				}
 			}
 		}
 		{
