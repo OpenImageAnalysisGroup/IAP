@@ -36,9 +36,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.SystemAnalysis;
@@ -49,6 +49,8 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.editor.GravistoService;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -63,7 +65,6 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * A number of commonly used image operation commands.
@@ -2298,9 +2299,8 @@ public class ImageOperation {
 		if (cpus > 6)
 			cpus = cpus / 2;
 		
-		final Semaphore sema = BackgroundTaskHelper.lockGetSemaphore(null, cpus);
-		
 		final float cont = 16f / 116f;
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>(256);
 		for (int rr = 0; rr < 256; rr++) {
 			final int red = rr;
 			final float rd = (red / 255f);
@@ -2371,24 +2371,20 @@ public class ImageOperation {
 							p[blue + 512] = bb;
 						}
 					}
-					sema.release(1);
 				}
 			};
 			try {
-				sema.acquire(1);
+				wait.add(BackgroundThreadDispatcher.addTask(r, "LAB cube calcualtion"));
 			} catch (InterruptedException e) {
-				throw new Error("LAB construction has been interrupted (AA)");
+				ErrorMsg.addErrorMessage(e);
 			}
-			Thread t = new Thread(r, "LAB CUBE " + rr);
-			t.start();
 		}
-		try {
-			sema.acquire(cpus);
-		} catch (InterruptedException e) {
-			throw new Error("LAB construction has been interrupted (BB)");
-		}
-		sema.release(cpus);
 		s.printTime();
+		try {
+			BackgroundThreadDispatcher.waitFor(wait);
+		} catch (InterruptedException e) {
+			ErrorMsg.addErrorMessage(e);
+		}
 		analyzeCube(result);
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
