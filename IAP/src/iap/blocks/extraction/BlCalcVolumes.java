@@ -56,7 +56,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
 	}
 	
-	private void calculatePlantVolumeMeasures(
+	private synchronized void calculatePlantVolumeMeasures(
 			String cameraType,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
