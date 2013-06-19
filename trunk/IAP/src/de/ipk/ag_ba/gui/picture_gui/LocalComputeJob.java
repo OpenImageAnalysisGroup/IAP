@@ -81,11 +81,11 @@ public class LocalComputeJob implements Runnable {
 			ThreadManager.getInstance().directlyRunning(this);
 			run();
 		}
+		sem.acquire();
+		sem.release();
+		if (!finished)
+			ErrorMsg.addErrorMessage("INTERNAL ERROR MYTHREAD (NOT FINISHED!)");
 		synchronized (this) {
-			sem.acquire();
-			sem.release();
-			if (!finished)
-				ErrorMsg.addErrorMessage("INTERNAL ERROR MYTHREAD (NOT FINISHED!)");
 			Object res = runableResult;
 			runableResult = null;
 			return res;
