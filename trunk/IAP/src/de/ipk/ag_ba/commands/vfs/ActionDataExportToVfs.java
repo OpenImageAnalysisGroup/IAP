@@ -68,6 +68,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private int files, knownFiles, errorCount;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
+	private boolean skipFilesAlreadyInStorageLocation = true;
 	private boolean includeMainImages = true;
 	private boolean includeReferenceImages = true;
 	private boolean includeAnnotationImages = true;
@@ -103,6 +104,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				"<html>"
 						+ "This commands copies the experiment and its connected binary data to the<br>"
 						+ "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
+						"Don't copy again, if already in storage location", skipFilesAlreadyInStorageLocation,
 						"Copy images", includeMainImages,
 						"Copy reference images", includeReferenceImages,
 						"Copy annotation images", includeAnnotationImages });
@@ -113,6 +115,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		super.setParameters(parameters);
 		if (parameters != null && parameters.length == 3) {
 			int idx = 0;
+			skipFilesAlreadyInStorageLocation = (Boolean) parameters[idx++];
 			includeMainImages = (Boolean) parameters[idx++];
 			includeReferenceImages = (Boolean) parameters[idx++];
 			includeAnnotationImages = (Boolean) parameters[idx++];
@@ -187,7 +190,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								} else
 									idx = storeData(experiment, written, idx,
 											hsmManager, startTime, es,
-											substanceName, nm);
+											substanceName, nm, skipFilesAlreadyInStorageLocation);
 							}
 						}
 				}
@@ -242,7 +245,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final ThreadSafeOptions written, int idx,
 			final HSMfolderTargetDataManager hsmManager, long startTime,
 			ExecutorService es, final String substanceName,
-			NumericMeasurementInterface nm) {
+			NumericMeasurementInterface nm, boolean dontStoreIfAlreadyInSameStorageLocationAvailable) {
 		
 		// copy main binary VfsFile (url)
 		if (nm instanceof BinaryMeasurement) {
@@ -253,60 +256,68 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
 			final Long t = nm.getParentSample().getSampleFineTimeOrRowId();
-			if (!includeMainImages) {
+			
+			if (dontStoreIfAlreadyInSameStorageLocationAvailable && unchangedURL != null && unchangedURL.getPrefix() != null
+					&& unchangedURL.getPrefix().equals(hsmManager.getPrefix())) {
+				// it is already saved at this storage location (but possible in another sub-folder)
 				targetExists = true;
-				bm.setURL(null);
-			} else {
-				status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files);
-				{
-					// store data
-					String zefn = null;
-					try {
-						zefn = determineBinaryFileName(t, substanceName, nm, bm);
-						zefn = zefn.substring(0, zefn.lastIndexOf(".")) + "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
-						zefn = zefn.contains("#") ? zefn.split("#")[0] : zefn;
-						final VfsFileObject targetFile = vfs.newVfsFile(
-								hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t,
-										zefn), true);
-						boolean exists = targetFile.exists()
-								&& targetFile.length() > 0;
-						targetExists = exists;
+				idx--;
+				knownFiles++;
+			} else
+				if (!includeMainImages) {
+					targetExists = true;
+					bm.setURL(null);
+				} else {
+					status.setCurrentStatusValueFine(100d * ((idx++) + knownFiles) / files);
+					{
+						// store data
+						String zefn = null;
 						try {
-							fileContent = copyBinaryFileContentToTarget(
-									experiment, written, hsmManager, es,
-									bm.getURL(), null, t, targetFile, exists,
-									null, false);
+							zefn = determineBinaryFileName(t, substanceName, nm, bm);
+							zefn = zefn.substring(0, zefn.lastIndexOf(".")) + "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+							zefn = zefn.contains("#") ? zefn.split("#")[0] : zefn;
+							final VfsFileObject targetFile = vfs.newVfsFile(
+									hsmManager.prepareAndGetDataFileNameAndPath(
+											experiment.getHeader(), t,
+											zefn), true);
+							boolean exists = targetFile.exists()
+									&& targetFile.length() > 0;
+							targetExists = exists;
+							try {
+								fileContent = copyBinaryFileContentToTarget(
+										experiment, written, hsmManager, es,
+										bm.getURL(), null, t, targetFile, exists,
+										null, false);
+							} catch (Exception e) {
+								System.out
+										.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
+												+ e.getMessage()
+												+ " // WILL RETRY IN 2 MINUTES // "
+												+ SystemAnalysis
+														.getCurrentTime());
+								Thread.sleep(2 * 60 * 1000);
+								// try 2nd time after 10 minutes
+								fileContent = copyBinaryFileContentToTarget(
+										experiment, written, hsmManager, es,
+										bm.getURL(), null, t, targetFile, exists,
+										null, false);
+							}
+							if (exists) {
+								idx--;
+								knownFiles++;
+							}
 						} catch (Exception e) {
 							System.out
 									.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
 											+ e.getMessage()
-											+ " // WILL RETRY IN 2 MINUTES // "
-											+ SystemAnalysis
-													.getCurrentTime());
-							Thread.sleep(2 * 60 * 1000);
-							// try 2nd time after 10 minutes
-							fileContent = copyBinaryFileContentToTarget(
-									experiment, written, hsmManager, es,
-									bm.getURL(), null, t, targetFile, exists,
-									null, false);
+											+ " // "
+											+ zefn
+											+ " // "
+											+ SystemAnalysis.getCurrentTime());
+							errorCount++;
 						}
-						if (exists) {
-							idx--;
-							knownFiles++;
-						}
-					} catch (Exception e) {
-						System.out
-								.println("ERROR: DATA TRANSFER AND DATA STORAGE: "
-										+ e.getMessage()
-										+ " // "
-										+ zefn
-										+ " // "
-										+ SystemAnalysis.getCurrentTime());
-						errorCount++;
 					}
 				}
-			}
 			
 			if (!targetExists)
 				if (nm instanceof ImageData) {
@@ -396,58 +407,62 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			if (bm.getLabelURL() == null)
 				return idx;
 			
-			if (!includeReferenceImages) {
-				bm.setLabelURL(null);
-			} else {
-				long t = nm.getParentSample().getSampleFineTimeOrRowId();
-				
-				final String zefn;
-				try {
-					if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
-						zefn = "label_"
-								+ substanceName
-								+ "_"
-								+ bm.getLabelURL().getDetail()
-								+ getFileExtension(bm.getLabelURL()
-										.getFileName());
-					else
-						if (bm.getLabelURL().getPrefix()
-								.startsWith(LTftpHandler.PREFIX)) {
-							String fn = bm.getLabelURL().getDetail();
+			if (dontStoreIfAlreadyInSameStorageLocationAvailable && bm.getLabelURL() != null && bm.getLabelURL().getPrefix() != null
+					&& bm.getLabelURL().getPrefix().equals(hsmManager.getPrefix())) {
+				// it is already saved at this storage location (but possible in another sub-folder)
+			} else
+				if (!includeReferenceImages) {
+					bm.setLabelURL(null);
+				} else {
+					long t = nm.getParentSample().getSampleFineTimeOrRowId();
+					
+					final String zefn;
+					try {
+						if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
 							zefn = "label_"
 									+ substanceName
 									+ "_"
-									+ fn.substring(fn.lastIndexOf("/")
-											+ "/".length())
+									+ bm.getLabelURL().getDetail()
 									+ getFileExtension(bm.getLabelURL()
 											.getFileName());
-						} else
-							zefn = "label_"
-									+ determineBinaryFileName(t, substanceName, nm,
-											bm);
+						else
+							if (bm.getLabelURL().getPrefix()
+									.startsWith(LTftpHandler.PREFIX)) {
+								String fn = bm.getLabelURL().getDetail();
+								zefn = "label_"
+										+ substanceName
+										+ "_"
+										+ fn.substring(fn.lastIndexOf("/")
+												+ "/".length())
+										+ getFileExtension(bm.getLabelURL()
+												.getFileName());
+							} else
+								zefn = "label_"
+										+ determineBinaryFileName(t, substanceName, nm,
+												bm);
+						
+						final VfsFileObject targetFile = vfs.newVfsFile(
+								hsmManager.prepareAndGetDataFileNameAndPath(
+										experiment.getHeader(), t, zefn), true);
+						
+						copyBinaryFileContentToTarget(experiment, written,
+								hsmManager, es, bm.getLabelURL(), null, t,
+								targetFile, targetFile.exists(), null, false);
+						
+					} catch (Exception e) {
+						System.out.println("ERROR: DATA DATA TRANSFER AND STORAGE: "
+								+ e.getMessage() + " // "
+								+ SystemAnalysis.getCurrentTime());
+						e.printStackTrace();
+						errorCount++;
+					}
+					long currTime = System.currentTimeMillis();
 					
-					final VfsFileObject targetFile = vfs.newVfsFile(
-							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn), true);
-					
-					copyBinaryFileContentToTarget(experiment, written,
-							hsmManager, es, bm.getLabelURL(), null, t,
-							targetFile, targetFile.exists(), null, false);
-					
-				} catch (Exception e) {
-					System.out.println("ERROR: DATA DATA TRANSFER AND STORAGE: "
-							+ e.getMessage() + " // "
-							+ SystemAnalysis.getCurrentTime());
-					e.printStackTrace();
-					errorCount++;
+					double speed = written.getLong() * 1000d
+							/ (currTime - startTime) / 1024d / 1024d;
+					status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
+							+ " MB, " + (int) speed + " MB/s");
 				}
-				long currTime = System.currentTimeMillis();
-				
-				double speed = written.getLong() * 1000d
-						/ (currTime - startTime) / 1024d / 1024d;
-				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, " + (int) speed + " MB/s");
-			}
 		}
 		
 		// copy old reference label binary VfsFile (oldreference annotation)
@@ -456,65 +471,69 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			String oldRef = id.getAnnotationField("oldreference");
 			if (oldRef == null || oldRef.isEmpty())
 				return idx;
-			if (!includeAnnotationImages) {
-				String updatedOldReference = "";
-				id.replaceAnnotationField("oldreference", updatedOldReference);
-			} else {
-				final IOurl oldRefUrl = new IOurl(oldRef);
-				
-				long t = nm.getParentSample().getSampleFineTimeOrRowId();
-				
-				final String zefn;
-				try {
-					if (oldRefUrl.getPrefix().startsWith("mongo_"))
-						zefn = "label_oldreference_" + substanceName + "_"
-								+ oldRefUrl.getDetail()
-								+ getFileExtension(oldRefUrl.getFileName());
-					else
-						if (oldRefUrl.getPrefix().startsWith(
-								LTftpHandler.PREFIX)) {
-							String fn = oldRefUrl.getDetail();
-							zefn = "label_oldreference_"
-									+ substanceName
-									+ "_"
-									+ fn.substring(fn.lastIndexOf("/")
-											+ "/".length())
-									+ getFileExtension(oldRefUrl.getFileName());;
-						} else
-							zefn = "label_oldreference_"
-									+ determineBinaryFileName(t, substanceName, nm,
-											id);
+			final IOurl oldRefUrl = new IOurl(oldRef);
+			if (dontStoreIfAlreadyInSameStorageLocationAvailable && oldRefUrl != null && oldRefUrl.getPrefix() != null
+					&& oldRefUrl.getPrefix().equals(hsmManager.getPrefix())) {
+				// it is already saved at this storage location (but possible in another sub-folder)
+			} else
+				if (!includeAnnotationImages) {
+					String updatedOldReference = "";
+					id.replaceAnnotationField("oldreference", updatedOldReference);
+				} else {
 					
-					final VfsFileObject targetFile = vfs.newVfsFile(
-							hsmManager.prepareAndGetDataFileNameAndPath(
-									experiment.getHeader(), t, zefn), true);
-					Runnable postProcess = new Runnable() {
-						@Override
-						public void run() {
-							String updatedOldReference = oldRefUrl.toString();
-							id.replaceAnnotationField("oldreference",
-									updatedOldReference);
-						}
-					};
-					copyBinaryFileContentToTarget(experiment, written,
-							hsmManager, es, oldRefUrl, null, t, targetFile,
-							targetFile.exists(), postProcess, false);
-				} catch (Exception e) {
-					System.out
-							.println("ERROR: DATA DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
-									+ e.getMessage()
-									+ " // "
-									+ SystemAnalysis.getCurrentTime());
-					e.printStackTrace();
-					errorCount++;
+					long t = nm.getParentSample().getSampleFineTimeOrRowId();
+					
+					final String zefn;
+					try {
+						if (oldRefUrl.getPrefix().startsWith("mongo_"))
+							zefn = "label_oldreference_" + substanceName + "_"
+									+ oldRefUrl.getDetail()
+									+ getFileExtension(oldRefUrl.getFileName());
+						else
+							if (oldRefUrl.getPrefix().startsWith(
+									LTftpHandler.PREFIX)) {
+								String fn = oldRefUrl.getDetail();
+								zefn = "label_oldreference_"
+										+ substanceName
+										+ "_"
+										+ fn.substring(fn.lastIndexOf("/")
+												+ "/".length())
+										+ getFileExtension(oldRefUrl.getFileName());;
+							} else
+								zefn = "label_oldreference_"
+										+ determineBinaryFileName(t, substanceName, nm,
+												id);
+						
+						final VfsFileObject targetFile = vfs.newVfsFile(
+								hsmManager.prepareAndGetDataFileNameAndPath(
+										experiment.getHeader(), t, zefn), true);
+						Runnable postProcess = new Runnable() {
+							@Override
+							public void run() {
+								String updatedOldReference = oldRefUrl.toString();
+								id.replaceAnnotationField("oldreference",
+										updatedOldReference);
+							}
+						};
+						copyBinaryFileContentToTarget(experiment, written,
+								hsmManager, es, oldRefUrl, null, t, targetFile,
+								targetFile.exists(), postProcess, false);
+					} catch (Exception e) {
+						System.out
+								.println("ERROR: DATA DATA TRANSFER AND STORAGE OF OLDREFERENCE: "
+										+ e.getMessage()
+										+ " // "
+										+ SystemAnalysis.getCurrentTime());
+						e.printStackTrace();
+						errorCount++;
+					}
+					long currTime = System.currentTimeMillis();
+					
+					double speed = written.getLong() * 1000d
+							/ (currTime - startTime) / 1024d / 1024d;
+					status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
+							+ " MB, " + (int) speed + " MB/s");
 				}
-				long currTime = System.currentTimeMillis();
-				
-				double speed = written.getLong() * 1000d
-						/ (currTime - startTime) / 1024d / 1024d;
-				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, " + (int) speed + " MB/s");
-			}
 		}
 		
 		return idx;
@@ -603,7 +622,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return es.submit(new Callable<MyByteArrayInputStream>() {
 			@Override
 			public MyByteArrayInputStream call() throws Exception {
-				// BackgroundTaskHelper.lockAquire(hsmFolder, 1);
 				MyByteArrayInputStream in = null;
 				try {
 					try {
@@ -617,6 +635,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 								String sourceFileExtension = url != null ? url.getFileNameExtension() : null;
 								String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions
 										.getInstance().getString("IAP", "Result File Type", "png");
+								if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
+									sourceFileExtension = sourceFileExtension.substring(".".length());
 								if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
 									// convert from PNG to JPG, if needed
 									BufferedImage img = ImageIO.read(in);
