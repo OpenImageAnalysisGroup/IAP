@@ -71,6 +71,15 @@ public class BlCutFromSide extends AbstractBlock {
 	}
 	
 	@Override
+	protected Image processImage(Image image) {
+		boolean dontCut = getBoolean("Cut Only Mask Images", false);
+		if (dontCut)
+			return super.processImage(image);
+		else
+			return processMask(image);
+	}
+	
+	@Override
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
