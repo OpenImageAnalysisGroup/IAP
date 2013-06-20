@@ -393,7 +393,15 @@ public class PdfCreator {
 			if (res != null) {
 				InputStream inpStream = res.openStream();
 				if (inpStream != null) {
-					ResourceIOManager.copyContent(inpStream, out);
+					if (!SystemAnalysis.isWindowsRunning() && file.endsWith(".cmd")) {
+						String cnt = TextFile.read(inpStream, -1);
+						cnt = StringManipulationTools.stringReplace(cnt, "\r\n", "\n");
+						TextFile txt = new TextFile();
+						for (String line : cnt.split("\n"))
+							txt.add(line);
+						txt.write(out);
+					} else
+						ResourceIOManager.copyContent(inpStream, out);
 					output.put(System.nanoTime(), "INFO: Copy OK: " + path + "/" + file);
 				} else
 					output.put(System.nanoTime(), "ERROR: EXCEPTION: " + "Can't get input stream for resource: " + path + "/" + file);

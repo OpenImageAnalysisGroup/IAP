@@ -6428,14 +6428,6 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 		} else if (!is.null(typ) && typ == LIB) {
 			return(TRUE)
 		} else {
-#			if (!file.exists(REPORT.FILE)) {
-#				text <- "\\documentclass{article} \\newline
-#						\\begin{document} \\newline
-#						There was an error! \\newline
-#						\\end{document}"
-#				
-#				write(x = text, append = FALSE, file = REPORT.FILE)
-#			}
 			ckeckIfReportTexIsThere(errorText = geterrmessage())		############# DEBUG
 			write(x = "no Output! The whole script stops!", append = FALSE, file = ERROR.TOTAL.FILE)
 		}
@@ -6826,8 +6818,8 @@ ckeckIfReportTexIsThere <- function(errorText = "", typ = NULL, debug = FALSE) {
 	}
 	
 	if (!file.exists(REPORT.FILE)) {
-		text <- "\\documentclass{article} \\newline
-				\\begin{document} \\newline"
+		text <- "\\documentclass{article}
+				\\begin{document} "
 
 		if (!(!is.null(typ) && (typ == LIB.UPDATE || typ == LIB))) {
 			text <- paste(text, "There was an error! \\newline", sep="")

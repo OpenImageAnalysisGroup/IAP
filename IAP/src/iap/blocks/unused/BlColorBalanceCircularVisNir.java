@@ -35,11 +35,11 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	
 	@Override
 	protected Image processVISimage() {
+		int steps = getInt("Shade-Steps-Vis", 50);
 		if (input().images().vis() == null || !getBoolean("process VIS image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().vis();
 		
 		Image input = input().images().vis();
-		int steps = getInt("Shade-Steps-Vis", 50);
 		
 		return input.io().rmCircleShadeFixedRGB(whiteLevel_255d_VIS, steps, debug,
 				s0_VIS, ss_VIS).getImage();
@@ -47,11 +47,11 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	
 	@Override
 	protected Image processVISmask() {
+		int steps = getInt("Shade-Steps-Vis", 50);
 		if (input().masks().vis() == null || !getBoolean("process VIS mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().vis();
 		
 		Image input = input().masks().vis();
-		int steps = getInt("Shade-Steps-Vis", 50);
 		
 		return input.io().rmCircleShadeFixedRGB(whiteLevel_255d_VIS, steps, debug,
 				s0_VIS, ss_VIS).getImage();
@@ -59,11 +59,11 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	
 	@Override
 	protected Image processNIRimage() {
+		int steps = getInt("Shade-Steps-NIR", 180);
 		if (input().images().nir() == null || !getBoolean("process NIR image", options.getCameraPosition() != CameraPosition.TOP))
 			return input().images().nir();
 		
 		Image input = input().images().nir();
-		int steps = getInt("Shade-Steps-NIR", 180);
 		
 		return input.io().flipVert().rmCircleShadeFixedGray(whiteLevel_180d_NIR, steps, debug,
 				s0_NIR, ss_NIR).flipVert().getImage();
@@ -71,11 +71,11 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	
 	@Override
 	protected Image processNIRmask() {
+		int steps = getInt("Shade-Steps-NIR", 180);
 		if (input().masks().nir() == null || !getBoolean("process NIR mask", options.getCameraPosition() != CameraPosition.TOP))
 			return input().masks().nir();
 		
 		Image input = input().masks().nir();
-		int steps = getInt("Shade-Steps-NIR", 180);
 		
 		return input.io().flipVert().rmCircleShadeFixedGray(whiteLevel_180d_NIR, steps, debug,
 				s0_NIR, ss_NIR).flipVert().getImage();

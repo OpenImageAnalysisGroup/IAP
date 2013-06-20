@@ -21,31 +21,31 @@ echo "Update package? : ${15}"
 echo "Debug? : ${16}"
 echo "Catch error? : ${17}"
 
-if[-f report.aux]; then
-	del /s report.aux
+if [ -f report.aux ]; then
+	rm /s report.aux
 fi
 
-if[-f report.out]; then
-	del /s report.out
+if [ -f report.out ]; then
+	rm /s report.out
 fi
 
-if[-f report.tex]; then
-	del /s report.tex
+if [ -f report.tex ]; then
+	rm /s report.tex
 fi
 
-if[-f report.pdf]; then
-	del /s report.pdf
+if [ -f report.pdf ]; then
+	rm /s report.pdf
 fi
 
-if[-d plots]; then
+if [ -d plots ]; then
 	rd /s /q plots
 fi
 
-if[-d plotTex]; then
+if [ -d plotTex ]; then
 	rd /s /q plotTex
 fi
 
-if[-d section]; then
+if [ -d section ]; then
 	rd /s /q section
 fi
 
