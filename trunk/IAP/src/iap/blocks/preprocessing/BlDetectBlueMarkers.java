@@ -6,11 +6,14 @@ package iap.blocks.preprocessing;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MarkerPair;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -163,5 +166,65 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
+	}
+	
+	public static java.awt.geom.Rectangle2D.Double getRelativeBlueMarkerRectangle(BlockResults res) {
+		BlockProperty leftX1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName());
+		BlockProperty leftX2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_X.getName());
+		BlockProperty leftX3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_X.getName());
+		
+		BlockProperty rightX1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName());
+		BlockProperty rightX2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_X.getName());
+		BlockProperty rightX3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_X.getName());
+		
+		BlockProperty leftY1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName());
+		BlockProperty leftY2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName());
+		BlockProperty leftY3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName());
+		
+		BlockProperty rightY1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName());
+		BlockProperty rightY2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName());
+		BlockProperty rightY3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName());
+		
+		Double mostLeftX = min(leftX1, leftX2, leftX3);
+		Double mostRightX = max(rightX1, rightX2, rightX3);
+		
+		Double mostTopY = min(leftY1, leftY2, leftY3, rightY1, rightY2, rightY3);
+		Double mostBottomY = max(leftY1, leftY2, leftY3, rightY1, rightY2, rightY3);
+		
+		if (mostLeftX != null && mostRightX != null && mostTopY != null && mostBottomY != null)
+			return new Rectangle2D.Double(mostLeftX, mostTopY, mostRightX - mostLeftX, mostBottomY - mostBottomY);
+		else
+			return null;
+	}
+	
+	private static Double min(BlockProperty... bp) {
+		double min = Double.MAX_VALUE;
+		for (BlockProperty b : bp) {
+			if (b != null) {
+				double v = b.getValue();
+				if (v < min)
+					min = v;
+			}
+		}
+		if (min < Double.MAX_VALUE)
+			return min;
+		else
+			return null;
+		
+	}
+	
+	private static Double max(BlockProperty... bp) {
+		double max = Double.MIN_VALUE;
+		for (BlockProperty b : bp) {
+			if (b != null) {
+				double v = b.getValue();
+				if (v > max)
+					max = v;
+			}
+		}
+		if (max > Double.MIN_VALUE)
+			return max;
+		else
+			return null;
 	}
 }

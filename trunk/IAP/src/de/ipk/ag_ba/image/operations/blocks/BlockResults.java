@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import iap.blocks.preprocessing.BlDetectBlueMarkers;
+
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,8 +57,7 @@ public class BlockResults implements BlockResultSet {
 				if (d == null)
 					return null;
 				else
-					return new BlockProperty(d, currentPositionInPipeline
-							+ searchIndex);
+					return new BlockProperty(d, currentPositionInPipeline + searchIndex);
 			}
 		}
 	}
@@ -442,5 +444,9 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public boolean isNumericStoreEmpty() {
 		return storedNumerics.isEmpty();
+	}
+	
+	public Rectangle2D.Double getRelativeBlueMarkerRectangle() {
+		return BlDetectBlueMarkers.getRelativeBlueMarkerRectangle(this);
 	}
 }
