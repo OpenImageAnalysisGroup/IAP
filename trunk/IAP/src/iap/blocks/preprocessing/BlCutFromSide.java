@@ -46,9 +46,9 @@ public class BlCutFromSide extends AbstractBlock {
 		
 		boolean doCutMarker = getBoolean("Cut " + mask.getCameraType() + " (Marker-based)", true);
 		
-		double cutoffMarkerSide = getDouble("Marker cut left and right offset " + mask.getCameraType() + " (percent)", 5) / 100d;
-		double cutoffMarkerTop = getDouble("Marker cut top offset " + mask.getCameraType() + " (percent)", 10) / 100d;
-		double cutoffMarkerBottom = getDouble("Marker cut bottom offset " + mask.getCameraType() + " (percent)", 10) / 100d;
+		double cutoffMarkerSide = getDouble("Marker cut left and right offset " + mask.getCameraType() + " (percent)", 15) / 100d;
+		double cutoffMarkerTop = getDouble("Marker cut top offset " + mask.getCameraType() + " (percent)", 30) / 100d;
+		double cutoffMarkerBottom = getDouble("Marker cut bottom offset " + mask.getCameraType() + " (percent)", 0) / 100d;
 		
 		boolean doCutFixed = getBoolean("Cut " + mask.getCameraType(), false);
 		
@@ -76,9 +76,10 @@ public class BlCutFromSide extends AbstractBlock {
 			Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
 			if (r != null) {
 				double cutLeft = r.x - cutoffMarkerSide;
-				double cutRight = r.x + r.width + cutoffMarkerSide;
+				double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
 				double cutTop = r.y - cutoffMarkerTop;
-				double cutBottom = r.y + cutoffMarkerBottom;
+				double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
+				
 				result = result
 						.clearImage(ImageSide.Left, cutLeft, background)
 						.clearImage(ImageSide.Right, cutRight, background)

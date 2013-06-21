@@ -192,7 +192,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		Double mostBottomY = max(leftY1, leftY2, leftY3, rightY1, rightY2, rightY3);
 		
 		if (mostLeftX != null && mostRightX != null && mostTopY != null && mostBottomY != null)
-			return new Rectangle2D.Double(mostLeftX, mostTopY, mostRightX - mostLeftX, mostBottomY - mostBottomY);
+			return new Rectangle2D.Double(mostLeftX, mostTopY, mostRightX - mostLeftX, mostBottomY - mostTopY);
 		else
 			return null;
 	}
