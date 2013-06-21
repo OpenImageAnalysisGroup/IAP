@@ -4,9 +4,12 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.ImageSide;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -41,15 +44,21 @@ public class BlCutFromSide extends AbstractBlock {
 			return null;
 		}
 		
-		boolean doCut = getBoolean("Cut " + mask.getCameraType(), false);
+		boolean doCutMarker = getBoolean("Cut " + mask.getCameraType() + " (Marker-based)", true);
 		
-		if (!doCut)
-			return mask;
+		double cutoffMarkerSide = getDouble("Marker cut left and right offset " + mask.getCameraType() + " (percent)", 5) / 100d;
+		double cutoffMarkerTop = getDouble("Marker cut top offset " + mask.getCameraType() + " (percent)", 10) / 100d;
+		double cutoffMarkerBottom = getDouble("Marker cut bottom offset " + mask.getCameraType() + " (percent)", 10) / 100d;
+		
+		boolean doCutFixed = getBoolean("Cut " + mask.getCameraType(), false);
 		
 		double cutoffLeft = getDouble("Cut-off " + mask.getCameraType() + " from left (percent)", 0) / 100d;
 		double cutoffRight = getDouble("Cut-off " + mask.getCameraType() + " from right (percent)", 0) / 100d;
 		double cutoffTop = getDouble("Cut-off " + mask.getCameraType() + " from top (percent)", 0) / 100d;
 		double cutoffBottom = getDouble("Cut-off " + mask.getCameraType() + " from bottom (percent)", 0) / 100d;
+		
+		if (!doCutMarker && !doCutFixed)
+			return mask;
 		
 		int background = options.getBackground();
 		
@@ -61,13 +70,31 @@ public class BlCutFromSide extends AbstractBlock {
 		if (getBoolean("debug", false)) {
 			background = Color.BLUE.getRGB();
 		}
-		Image result = mask.io()
-				.clearImage(ImageSide.Left, cutoffLeft, background)
-				.clearImage(ImageSide.Right, cutoffRight, background)
-				.clearImage(ImageSide.Top, cutoffTop, background)
-				.clearImage(ImageSide.Bottom, cutoffBottom, background)
-				.getImage();
-		return result;
+		ImageOperation result = mask.io();
+		
+		if (doCutMarker) {
+			Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
+			if (r != null) {
+				double cutLeft = r.x - cutoffMarkerSide;
+				double cutRight = r.x + r.width + cutoffMarkerSide;
+				double cutTop = r.y - cutoffMarkerTop;
+				double cutBottom = r.y + cutoffMarkerBottom;
+				result = result
+						.clearImage(ImageSide.Left, cutLeft, background)
+						.clearImage(ImageSide.Right, cutRight, background)
+						.clearImage(ImageSide.Top, cutTop, background)
+						.clearImage(ImageSide.Bottom, cutBottom, background);
+			}
+		}
+		
+		if (doCutFixed)
+			result = result
+					.clearImage(ImageSide.Left, cutoffLeft, background)
+					.clearImage(ImageSide.Right, cutoffRight, background)
+					.clearImage(ImageSide.Top, cutoffTop, background)
+					.clearImage(ImageSide.Bottom, cutoffBottom, background);
+		
+		return result.getImage();
 	}
 	
 	@Override
