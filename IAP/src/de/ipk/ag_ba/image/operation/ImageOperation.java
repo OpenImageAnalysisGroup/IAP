@@ -3754,6 +3754,7 @@ public class ImageOperation {
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug,
 			double s0, double ss) {
+		
 		int[][] img = getImageAs2dArray();
 		int w = img.length;
 		int h = img[0].length;
@@ -3783,27 +3784,32 @@ public class ImageOperation {
 		try {
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
-					distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
-					pix = img[x][y] & 0x0000ff;
-					// if (y <= h / 2)
-					double idx = (calibrationCurveFromTopLeftToCenter.length / (double) maxDistToCenter * distToCenter);
-					
-					if (idx < 0)
-						idx = 0;
-					else
-						if (idx >= calibrationCurveFromTopLeftToCenter.length)
-							idx = calibrationCurveFromTopLeftToCenter.length - 1;
-					
-					fac = whiteLevel_180d / func.value(len - idx);
-					
-					pix = (int) Math.ceil(pix * fac);
-					if (pix > 255)
-						pix = 255;
-					else
-						if (pix < 0)
-							pix = 0;
-					
-					res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
+					pix = img[x][y];
+					if (pix == BACKGROUND_COLORint)
+						res[x][y] = pix;
+					else {
+						pix = pix & 0x0000ff;
+						distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
+						
+						double idx = calibrationCurveFromTopLeftToCenter.length * distToCenter / (double) maxDistToCenter;
+						
+						if (idx < 0)
+							idx = 0;
+						else
+							if (idx >= calibrationCurveFromTopLeftToCenter.length)
+								idx = calibrationCurveFromTopLeftToCenter.length - 1;
+						
+						fac = whiteLevel_180d / func.value(len - idx);
+						
+						pix = (int) Math.ceil(pix * fac);
+						if (pix > 255)
+							pix = 255;
+						else
+							if (pix < 0)
+								pix = 0;
+						
+						res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
+					}
 				}
 			}
 		} catch (Exception e) {

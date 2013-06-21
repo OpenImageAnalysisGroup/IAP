@@ -31,6 +31,7 @@ import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.blocks.unused.BlColorBalanceCircularVisNir;
+import iap.blocks.unused.BlCrop;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -92,6 +93,7 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				new BlRunPostProcessors(),
 				new BlDrawSkeleton(),
 				new BlMoveMasksToImageSet(),
+				new BlCrop(),
 				new BlHighlightNullResults()
 		};
 	}

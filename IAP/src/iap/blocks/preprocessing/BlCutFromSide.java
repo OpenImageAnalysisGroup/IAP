@@ -44,25 +44,16 @@ public class BlCutFromSide extends AbstractBlock {
 			return null;
 		}
 		
-		boolean doCutMarker = getBoolean("Cut " + mask.getCameraType() + " (Marker-based)", true);
-		
-		double cutoffMarkerSide = getDouble("Marker cut left and right offset " + mask.getCameraType() + " (percent)", 15) / 100d;
-		double cutoffMarkerTop = getDouble("Marker cut top offset " + mask.getCameraType() + " (percent)", 30) / 100d;
-		double cutoffMarkerBottom = getDouble("Marker cut bottom offset " + mask.getCameraType() + " (percent)", 0) / 100d;
+		boolean doCutMarker = getBoolean("Crop (Marker-based)", true);
 		
 		boolean doCutFixed = getBoolean("Cut " + mask.getCameraType(), false);
-		
-		double cutoffLeft = getDouble("Cut-off " + mask.getCameraType() + " from left (percent)", 0) / 100d;
-		double cutoffRight = getDouble("Cut-off " + mask.getCameraType() + " from right (percent)", 0) / 100d;
-		double cutoffTop = getDouble("Cut-off " + mask.getCameraType() + " from top (percent)", 0) / 100d;
-		double cutoffBottom = getDouble("Cut-off " + mask.getCameraType() + " from bottom (percent)", 0) / 100d;
 		
 		if (!doCutMarker && !doCutFixed)
 			return mask;
 		
 		int background = options.getBackground();
 		
-		if (mask.getCameraType() == CameraType.NIR) {
+		if (getBoolean("Use gray NIR background", false) && mask.getCameraType() == CameraType.NIR) {
 			int gray = new Color(180, 180, 180).getRGB();
 			background = gray;
 		}
@@ -72,29 +63,61 @@ public class BlCutFromSide extends AbstractBlock {
 		}
 		ImageOperation result = mask.io();
 		
-		if (doCutMarker) {
-			Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
-			if (r != null) {
-				double cutLeft = r.x - cutoffMarkerSide;
-				double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
-				double cutTop = r.y - cutoffMarkerTop;
-				double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
-				
-				result = result
-						.clearImage(ImageSide.Left, cutLeft, background)
-						.clearImage(ImageSide.Right, cutRight, background)
-						.clearImage(ImageSide.Top, cutTop, background)
-						.clearImage(ImageSide.Bottom, cutBottom, background);
+		boolean cropMarker = true;
+		if (!cropMarker)
+			if (doCutMarker) {
+				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
+				if (r != null) {
+					double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
+					double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
+					double cutoffMarkerBottom = getDouble("Marker cut bottom offset (percent)", 0) / 100d;
+					
+					double cutLeft = r.x - cutoffMarkerSide;
+					double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
+					double cutTop = r.y - cutoffMarkerTop;
+					double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
+					
+					result = result
+							.clearImage(ImageSide.Left, cutLeft, background)
+							.clearImage(ImageSide.Right, cutRight, background)
+							.clearImage(ImageSide.Top, cutTop, background)
+							.clearImage(ImageSide.Bottom, cutBottom, background);
+				}
 			}
-		}
 		
-		if (doCutFixed)
+		if (doCutFixed) {
+			double cutoffLeft = getDouble("Cut-off " + mask.getCameraType() + " from left (percent)", 0) / 100d;
+			double cutoffRight = getDouble("Cut-off " + mask.getCameraType() + " from right (percent)", 0) / 100d;
+			double cutoffTop = getDouble("Cut-off " + mask.getCameraType() + " from top (percent)", 0) / 100d;
+			double cutoffBottom = getDouble("Cut-off " + mask.getCameraType() + " from bottom (percent)", 0) / 100d;
+			
 			result = result
 					.clearImage(ImageSide.Left, cutoffLeft, background)
 					.clearImage(ImageSide.Right, cutoffRight, background)
 					.clearImage(ImageSide.Top, cutoffTop, background)
 					.clearImage(ImageSide.Bottom, cutoffBottom, background);
+		}
 		
+		if (cropMarker)
+			if (doCutMarker) {
+				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
+				// crop according to markers
+				double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
+				double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
+				double cutoffMarkerBottom = getDouble("Marker cut bottom offset (percent)", 0) / 100d;
+				
+				double cutLeft = r.x - cutoffMarkerSide;
+				double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
+				double cutTop = r.y - cutoffMarkerTop;
+				double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
+				
+				cutLeft = Math.max(0, Math.min(1, cutLeft));
+				cutRight = Math.max(0, Math.min(1, cutRight));
+				cutTop = Math.max(0, Math.min(1, cutTop));
+				cutBottom = Math.max(0, Math.min(1, cutBottom));
+				
+				result = result.crop(cutLeft, cutRight, cutTop, cutBottom);
+			}
 		return result.getImage();
 	}
 	
