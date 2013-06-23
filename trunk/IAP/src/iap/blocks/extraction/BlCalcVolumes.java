@@ -56,20 +56,13 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
 	}
 	
-	private synchronized void calculatePlantVolumeMeasures(
+	private void calculatePlantVolumeMeasures(
 			String cameraType,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, boolean normalized) {
 		
 		String sideVisAreaTraitName = "RESULT_side." + cameraType + ".area" + (normalized ? ".norm" : "");
-		// String sideFluoAreaTraitName = "RESULT_side.fluo.filled.pixels";
-		// String sideFluoPhenolWeight = "RESULT_side.fluo.intensity.phenol.plant_weight";
-		// String topFluoFilledPixels = "RESULT_top.fluo.filled.pixels";
-		// String topFluoPhenolWeight = "RESULT_top.fluo.intensity.phenol.plant_weight";
-		// String traitResFluoVolume = "RESULT_volume.fluo.iap";
-		// String traitResFluoVolumeUnit = "px^3";
-		// String traitfluoPlantWeight = "RESULT_volume.fluo.plant_weight.iap";
 		
 		String plantID = null;
 		
@@ -83,6 +76,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			if (allResultsForSnapshot == null)
+				continue;
 			if (!time2summaryResult.containsKey(time)) {
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
 			}
@@ -105,6 +100,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				DescriptiveStatistics areaStat = new DescriptiveStatistics();
 				
 				for (String key : allResultsForSnapshot.keySet()) {
+					if (allResultsForSnapshot.get(key) == null)
+						continue;
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					if (rt == null || rt.isNumericStoreEmpty())
 						continue;
@@ -159,15 +156,20 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				
 				double topAreaSum = 0;
 				double topAreaCnt = 0;
-				for (String key : allResultsForSnapshot.keySet()) {
-					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-					if (rt != null)
-						for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
-							if (v.getValue() != null) {
-								topAreaSum += v.getValue().doubleValue();
-								topAreaCnt += 1;
+				synchronized (allResultsForSnapshot) {
+					TreeSet<String> ks = new TreeSet<String>(allResultsForSnapshot.keySet());
+					for (String key : ks) {
+						if (allResultsForSnapshot.get(key) == null)
+							continue;
+						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+						if (rt != null)
+							for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
+								if (v.getValue() != null) {
+									topAreaSum += v.getValue().doubleValue();
+									topAreaCnt += 1;
+								}
 							}
-						}
+					}
 				}
 				
 				if (areaCnt > 0) {

@@ -172,24 +172,24 @@ public class ThreadManager {
 							.getMemoryMB() + " MB)");
 				}
 			}
-			if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-					.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
-				System.out.println();
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
-						+ "%), REDUCING CONCURRENCY (THREAD.RUN)");
-				t.run();
-			} else {
-				boolean run = false;
-				synchronized (jobs) {
-					if (jobs.size() > SystemAnalysis.getRealNumberOfCPUs() * 2)
-						run = true;
-					else
-						jobs.add(t);
-				}
-				if (run)
-					t.run();
+			// if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+			// .getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
+			// System.out.println();
+			// System.out.println(SystemAnalysis.getCurrentTime()
+			// + ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
+			// + "%), REDUCING CONCURRENCY (THREAD.RUN)");
+			// t.run();
+			// } else {
+			boolean run = false;
+			synchronized (jobs) {
+				if (jobs.size() > SystemAnalysis.getRealNumberOfCPUs() * 2)
+					run = true;
+				else
+					jobs.add(t);
 			}
+			if (run)
+				t.run();
+			// }
 		}
 	}
 	

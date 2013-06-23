@@ -101,22 +101,25 @@ public class BlCutFromSide extends AbstractBlock {
 		if (cropMarker)
 			if (doCutMarker) {
 				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
-				// crop according to markers
-				double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
-				double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
-				double cutoffMarkerBottom = getDouble("Marker cut bottom offset (percent)", 0) / 100d;
 				
-				double cutLeft = r.x - cutoffMarkerSide;
-				double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
-				double cutTop = r.y - cutoffMarkerTop;
-				double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
-				
-				cutLeft = Math.max(0, Math.min(1, cutLeft));
-				cutRight = Math.max(0, Math.min(1, cutRight));
-				cutTop = Math.max(0, Math.min(1, cutTop));
-				cutBottom = Math.max(0, Math.min(1, cutBottom));
-				
-				result = result.crop(cutLeft, cutRight, cutTop, cutBottom);
+				if (r != null) {
+					// crop according to markers
+					double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
+					double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
+					double cutoffMarkerBottom = getDouble("Marker cut bottom offset (percent)", 0) / 100d;
+					
+					double cutLeft = r.x - cutoffMarkerSide;
+					double cutRight = 1 - (r.x + r.width + cutoffMarkerSide);
+					double cutTop = r.y - cutoffMarkerTop;
+					double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
+					
+					cutLeft = Math.max(0, Math.min(1, cutLeft));
+					cutRight = Math.max(0, Math.min(1, cutRight));
+					cutTop = Math.max(0, Math.min(1, cutTop));
+					cutBottom = Math.max(0, Math.min(1, cutBottom));
+					
+					result = result.crop(cutLeft, cutRight, cutTop, cutBottom);
+				}
 			}
 		return result.getImage();
 	}
