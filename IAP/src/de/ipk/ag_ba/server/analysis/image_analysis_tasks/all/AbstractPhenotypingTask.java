@@ -340,10 +340,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											synchronized (analysisInput) {
 												if (!analysisInput.containsKey(time))
 													analysisInput.put(time, new TreeMap<String, ImageData>());
-												if (!analysisResults.containsKey(time))
-													analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-												analysisInput.get(time).put(configAndAngle, inImage);
-												analysisResults.get(time).put(configAndAngle, results);
+												synchronized (analysisResults) {
+													if (!analysisResults.containsKey(time))
+														analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+													analysisInput.get(time).put(configAndAngle, inImage);
+													analysisResults.get(time).put(configAndAngle, results);
+												}
 											}
 										}
 									}
@@ -362,9 +364,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				} // for side angle
 			} // for each time point
 		} // if image data available
-		if (waitThreads != null && waitThreads.size() > 0)
-			BackgroundThreadDispatcher.waitFor(waitThreads);
-		// / BackgroundThreadDispatcher.waitButDontRun(waitThreads);
+		BackgroundThreadDispatcher.waitFor(waitThreads);
 		if (!analysisResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
