@@ -99,10 +99,17 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				double distanceTo90 = Double.MAX_VALUE;
 				DescriptiveStatistics areaStat = new DescriptiveStatistics();
 				
-				for (String key : allResultsForSnapshot.keySet()) {
+				TreeSet<String> ks;
+				synchronized (allResultsForSnapshot) {
+					ks = new TreeSet<String>(allResultsForSnapshot.keySet());
+				}
+				for (String key : ks) {
 					if (allResultsForSnapshot.get(key) == null)
 						continue;
-					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+					BlockResultSet rt;
+					synchronized (allResultsForSnapshot) {
+						rt = allResultsForSnapshot.get(key).get(tray);
+					}
 					if (rt == null || rt.isNumericStoreEmpty())
 						continue;
 					for (BlockPropertyValue v : rt.getPropertiesExactMatch(sideVisAreaTraitName)) {
@@ -157,11 +164,15 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				double topAreaSum = 0;
 				double topAreaCnt = 0;
 				synchronized (allResultsForSnapshot) {
-					TreeSet<String> ks = new TreeSet<String>(allResultsForSnapshot.keySet());
-					for (String key : ks) {
-						if (allResultsForSnapshot.get(key) == null)
-							continue;
-						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+					TreeSet<String> ks2 = new TreeSet<String>(allResultsForSnapshot.keySet());
+					for (String key : ks2) {
+						BlockResultSet rt;
+						synchronized (allResultsForSnapshot) {
+							HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
+							if (kk == null)
+								continue;
+							rt = allResultsForSnapshot.get(key).get(tray);
+						}
 						if (rt != null)
 							for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
 								if (v.getValue() != null) {
