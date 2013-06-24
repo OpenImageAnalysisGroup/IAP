@@ -137,5 +137,4 @@ public class BlCutFromSide extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
-	
 }
