@@ -801,9 +801,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				for (BlockPropertyValue bpv : analysisResults.get(time).get(tray).getPropertiesSearch("RESULT_")) {
 					if (bpv.getName() == null)
 						continue;
+					String name = bpv.getName();
+					if (name.contains("_cut.")) {
+						name = name.substring(0, name.indexOf("_cut."));
+					}
 					
 					NumericMeasurement3D m = new NumericMeasurement3D(
-							new NumericMeasurement(inSamples.get(time)), bpv.getName(), inSamples.get(time)
+							new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
 									.getParentCondition().getExperimentName()
 									+ " ("
 									+ getName() + ")");
