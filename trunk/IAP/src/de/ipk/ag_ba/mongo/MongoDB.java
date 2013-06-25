@@ -179,7 +179,7 @@ public class MongoDB {
 	// conditions
 	
 	private MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
-		if (databaseName == null || databaseName.contains("_") || databaseName.contains("/"))
+		if (databaseName == null || databaseName.contains("/")) // databaseName.contains("_") ||
 			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
 		this.databaseName = databaseName;

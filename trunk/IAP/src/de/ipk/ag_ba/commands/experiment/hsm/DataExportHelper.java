@@ -610,7 +610,7 @@ public class DataExportHelper {
 								.prepareAndGetTargetFileForConditionIndex(conditionIndexFileName));
 	}
 	
-	private void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
+	private synchronized void storeIndexFile(final HSMfolderTargetDataManager hsmManager,
 			long tsave, int eidx, HashMap<File, String> tempFile2fileName,
 			ExperimentInterface ei) throws IOException {
 		String indexFileName = tsave + "_" + eidx + "_"
@@ -629,7 +629,7 @@ public class DataExportHelper {
 				.prepareAndGetTargetFileForContentIndex(indexFileName));
 	}
 	
-	public static void writeExperimentHeaderToIndexFile(ExperimentHeaderInterface ei, OutputStream indexFileOutputStream, int measurements) throws IOException {
+	public static synchronized void writeExperimentHeaderToIndexFile(ExperimentHeaderInterface ei, OutputStream indexFileOutputStream, int measurements) throws IOException {
 		TextFile indexFileContent = new TextFile();
 		LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
 		ei.fillAttributeMap(header, measurements);
