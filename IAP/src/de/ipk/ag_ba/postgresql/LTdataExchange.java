@@ -1265,7 +1265,7 @@ public class LTdataExchange implements ExperimentLoader {
 		Connection connection = openConnectionToDatabase(header.getDatabase());
 		try {
 			String sqlText = "SELECT id_tag, meta_data_name, meta_data_value, meta_data_type " + "FROM  meta_info_src "
-					+ "WHERE measure_label = ?";
+					+ "WHERE measure_label = ? ORDER BY meta_data_name";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			
