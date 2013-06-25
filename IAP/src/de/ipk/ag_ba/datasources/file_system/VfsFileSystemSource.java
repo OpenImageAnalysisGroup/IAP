@@ -58,7 +58,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	
 	protected final VirtualFileSystem url;
 	private final String[] validExtensions2;
-	private String subfolder;
+	private final String subfolder;
 	ArrayList<NavigationAction> folderActions = new ArrayList<NavigationAction>();
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
@@ -181,7 +181,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		return folderButtons;
 	}
 	
-	public ExperimentHeader getExperimentHeaderFromFileName(final VirtualFileSystem vfs, final String fileName) throws Exception {
+	public synchronized ExperimentHeader getExperimentHeaderFromFileName(final VirtualFileSystem vfs, final String fileName) throws Exception {
 		final ExperimentHeader eh = new ExperimentHeader();
 		
 		eh.setDatabaseId(vfs.getPrefix() + ":index" + File.separator + fileName);
@@ -193,39 +193,45 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public void readSourceForUpdate() throws Exception {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Get current header from file (" + fileName + ")");
-				HashMap<String, String> properties = new HashMap<String, String>();
-				InputStream is = indexFile.getInputStream();
-				TextFile tf = new TextFile(is, -1);
-				properties.put("_id", prefix + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
-				String lastItemId = null;
-				for (String p : tf) {
-					if (StringManipulationTools.count(p, ",") >= 2) {
-						String[] entry = p.split(",", 3);
-						properties.put(entry[1], entry[2]);
-						lastItemId = entry[1];
-					} else
-						if (lastItemId != null) {
-							properties.put(lastItemId,
-									properties.get(lastItemId)
-											+ System.getProperty("line.separator")
-											+ p);
-						}
+				synchronized (url) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Get current header from file (" + fileName + ")");
+					HashMap<String, String> properties = new HashMap<String, String>();
+					InputStream is = indexFile.getInputStream();
+					TextFile tf = new TextFile(is, -1);
+					properties.put("_id", prefix + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+					String lastItemId = null;
+					for (String p : tf) {
+						if (StringManipulationTools.count(p, ",") >= 2) {
+							String[] entry = p.split(",", 3);
+							properties.put(entry[1], entry[2]);
+							lastItemId = entry[1];
+						} else
+							if (lastItemId != null) {
+								properties.put(lastItemId,
+										properties.get(lastItemId)
+												+ System.getProperty("line.separator")
+												+ p);
+							}
+					}
+					eh.setAttributesFromMap(properties);
+					System.out.println(eh.getDatabaseId());
 				}
-				eh.setAttributesFromMap(properties);
-				System.out.println(eh.getDatabaseId());
 			}
 			
 			@Override
 			public Long getLastModified() throws Exception {
-				return indexFile.getLastModified();
+				synchronized (url) {
+					return indexFile.getLastModified();
+				}
 			}
 			
 			@Override
 			public Long saveUpdatedProperties() throws Exception {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
-				DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
-				return indexFile.getLastModified();
+				synchronized (url) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
+					DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
+					return indexFile.getLastModified();
+				}
 			}
 		};
 		
