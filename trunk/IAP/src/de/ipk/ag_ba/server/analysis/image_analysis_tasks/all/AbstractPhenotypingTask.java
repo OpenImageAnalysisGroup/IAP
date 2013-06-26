@@ -293,7 +293,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private void processPlant(
-			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
+			TreeMap<String, TreeMap<Long, Double>> plantID2time2waterData2,
 			String plantID, String preThreadName,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
@@ -303,7 +303,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
-		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
+		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
 		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
 		final ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		if (imageSetWithSpecificAngle != null) {
@@ -340,11 +340,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 											synchronized (analysisInput) {
 												if (!analysisInput.containsKey(time))
 													analysisInput.put(time, new TreeMap<String, ImageData>());
-												synchronized (analysisResults) {
-													if (!analysisResults.containsKey(time))
-														analysisResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+												synchronized (plantResults) {
+													if (!plantResults.containsKey(time))
+														plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
 													analysisInput.get(time).put(configAndAngle, inImage);
-													analysisResults.get(time).put(configAndAngle, results);
+													plantResults.get(time).put(configAndAngle, results);
 												}
 											}
 										}
@@ -365,18 +365,18 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			} // for each time point
 		} // if image data available
 		BackgroundThreadDispatcher.waitFor(waitThreads);
-		if (!analysisResults.isEmpty()) {
+		if (!plantResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
 				ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
 				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 				postprocessingResults = getImageProcessor()
-						.postProcessPipelineResults(
-								plandID2time2waterData2,
+						.postProcessPlantResults(
+								plantID2time2waterData2,
 								inSamples, analysisInput,
-								analysisResults, status,
+								plantResults, status,
 								options);
-				processStatisticalOutputOnGlobalLevel(inSamples, postprocessingResults);
+				addPostprocessingResults(inSamples, postprocessingResults);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -746,7 +746,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 	}
 	
-	private void processStatisticalOutputOnGlobalLevel(
+	private void addPostprocessingResults(
 			TreeMap<Long, Sample3D> inSamples,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> analysisResults) {
 		if (output == null) {
@@ -985,7 +985,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
-			HashMap<Integer, StringAndFlexibleMaskAndImageSet> ret = imageProcessor.pipeline(options,
+			HashMap<Integer, StringAndFlexibleMaskAndImageSet> ret = imageProcessor.execute(options,
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);
 			
@@ -1009,7 +1009,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								img.setQualityAnnotation(img.getQualityAnnotation() + "_" + key);
 					}
 					
-					analysisResults = imageProcessor.getSettings();
+					analysisResults = imageProcessor.getNumericResults();
 					waitThreads.addAll(processAndOrSaveResultImages(
 							key, options.getTrayCnt(),
 							id, inVis2, inFluo2, inNir2, inIr2,
