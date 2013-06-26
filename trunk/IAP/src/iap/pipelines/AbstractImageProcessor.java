@@ -42,7 +42,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * de.ipk.ag_ba.image.structures.FlexibleImageSet, int, de.ipk.ag_ba.image.structures.FlexibleImageStack, boolean, boolean)
 	 */
 	@Override
-	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(
 			ImageProcessorOptions options,
 			ImageSet input,
 			ImageSet optInputMasks,
@@ -70,7 +70,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
 	 */
 	@Override
-	public HashMap<Integer, BlockResultSet> getSettings() {
+	public HashMap<Integer, BlockResultSet> getNumericResults() {
 		return settings;
 	}
 	
@@ -78,7 +78,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
 	@Override
-	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResults(
+	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,

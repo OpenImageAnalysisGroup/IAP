@@ -14,13 +14,13 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageProcessor {
 	
-	public abstract HashMap<Integer, StringAndFlexibleMaskAndImageSet> pipeline(
+	public abstract HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(
 			ImageProcessorOptions options,
 			ImageSet input, ImageSet optInputMasks, int maxThreadsPerImage,
 			HashMap<Integer, ImageStack> debugStack)
 			throws Exception;
 	
-	public abstract HashMap<Integer, BlockResultSet> getSettings();
+	public abstract HashMap<Integer, BlockResultSet> getNumericResults();
 	
 	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);
 	
@@ -28,7 +28,7 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResults(
+	public abstract TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
