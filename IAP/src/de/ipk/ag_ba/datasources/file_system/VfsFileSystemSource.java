@@ -220,9 +220,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public Long getLastModified() throws Exception {
-				synchronized (url) {
-					return indexFile.getLastModified();
-				}
+				return indexFile.getLastModified();
 			}
 			
 			@Override
