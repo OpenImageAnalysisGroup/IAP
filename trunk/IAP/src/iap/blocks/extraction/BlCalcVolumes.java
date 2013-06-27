@@ -81,8 +81,12 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			if (!time2summaryResult.containsKey(time)) {
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
 			}
+			TreeSet<String> ks;
+			synchronized (allResultsForSnapshot) {
+				ks = new TreeSet<String>(allResultsForSnapshot.keySet());
+			}
 			TreeSet<Integer> allTrays = new TreeSet<Integer>();
-			for (String key : allResultsForSnapshot.keySet()) {
+			for (String key : ks) {
 				allTrays.addAll(allResultsForSnapshot.get(key).keySet());
 			}
 			if (time2summaryResult.get(time).isEmpty())
@@ -99,10 +103,6 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				double distanceTo90 = Double.MAX_VALUE;
 				DescriptiveStatistics areaStat = new DescriptiveStatistics();
 				
-				TreeSet<String> ks;
-				synchronized (allResultsForSnapshot) {
-					ks = new TreeSet<String>(allResultsForSnapshot.keySet());
-				}
 				for (String key : ks) {
 					if (allResultsForSnapshot.get(key) == null)
 						continue;
