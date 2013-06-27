@@ -368,15 +368,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (!plantResults.isEmpty()) {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
 			try {
-				ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
-				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
-				postprocessingResults = getImageProcessor()
-						.postProcessPlantResults(
-								plantID2time2waterData2,
-								inSamples, analysisInput,
-								plantResults, status,
-								options);
-				addPostprocessingResults(inSamples, postprocessingResults);
+				synchronized (AbstractPhenotypingTask.class) {
+					ImageProcessorOptions options = new ImageProcessorOptions(pd.getOptions());
+					options.setUnitTestInfo(unit_test_idx, unit_test_steps);
+					postprocessingResults = getImageProcessor()
+							.postProcessPlantResults(
+									plantID2time2waterData2,
+									inSamples, analysisInput,
+									plantResults, status,
+									options);
+					addPostprocessingResults(inSamples, postprocessingResults);
+				}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
