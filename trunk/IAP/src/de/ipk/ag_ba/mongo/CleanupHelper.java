@@ -76,12 +76,12 @@ public class CleanupHelper implements RunnableOnDB {
 		}
 		
 		msg = "Clean-up: Stored binary files: " + numberOfBinaryFilesInDatabaseOrExtern + " // "
-				+ " from these " + numberOfBinaryFilesInDatabaseOrExtern + " are stored externally in VFS // "
+				+ " from these " + numberOfBinaryFilesExternalyStored + " are stored externally in VFS // "
 				+ SystemAnalysis.getCurrentTime();
 		System.out.println(msg);
 		MongoDB.saveSystemMessage(msg);
 		res.append("Clean-up: Stored binary files: " + numberOfBinaryFilesInDatabaseOrExtern
-				+ " // from these " + numberOfBinaryFilesInDatabaseOrExtern + " are stored in VFS // "
+				+ " // from these " + numberOfBinaryFilesExternalyStored + " are stored in VFS // "
 				+ SystemAnalysis.getCurrentTime() + "<br>");
 		status.setCurrentStatusText2(
 				(numberOfBinaryFilesInDatabaseOrExtern - numberOfBinaryFilesExternalyStored)
