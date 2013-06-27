@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
-import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -79,9 +78,9 @@ public class BlockResults implements BlockResultSet {
 		
 		storedNumerics.get(position).put(name, value);
 		
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
-			System.out.println(position + ";" + name + ";" + value + ";" + unit);
-		}
+		// if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", true)) {
+		// System.out.println(position + ";" + name + ";" + value + ";" + unit);
+		// }
 		
 		if (unit != null) {
 			name2unit.put(name, unit);
