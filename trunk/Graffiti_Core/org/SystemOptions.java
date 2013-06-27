@@ -63,20 +63,20 @@ public class SystemOptions {
 				t.start();
 				updateCheckThread = t;
 			}
+			
+			this.iniFileName = iniFileName;
+			this.iniIO = iniIO;
+			if (iniIO != null) {
+				ini = new Ini(new StringReader(iniIO.getString()));
+				WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
+				readIniAndPrepareProviderCheck(wr);
+				return;
+			}
+			readIniAndPrepareFileCheck(iniFileName);
 		}
-		
-		this.iniFileName = iniFileName;
-		this.iniIO = iniIO;
-		if (iniIO != null) {
-			ini = new Ini(new StringReader(iniIO.getString()));
-			WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
-			readIniAndPrepareProviderCheck(wr);
-			return;
-		}
-		readIniAndPrepareFileCheck(iniFileName);
 	}
 	
-	private void readIniAndPrepareProviderCheck(final WeakReference<IniIoProvider> iniIOref) {
+	private synchronized void readIniAndPrepareProviderCheck(final WeakReference<IniIoProvider> iniIOref) {
 		if (iniIOref == null)
 			return;
 		if (iniIOref.get() == null)
@@ -125,7 +125,7 @@ public class SystemOptions {
 		updateCheckTasks.add(updateChecker);
 	}
 	
-	private void readIniAndPrepareFileCheck(final String iniFileName) {
+	private synchronized void readIniAndPrepareFileCheck(final String iniFileName) {
 		fileIniInstances.put(iniFileName, this);
 		ini = readIniFileOrProvider();
 		
@@ -531,7 +531,7 @@ public class SystemOptions {
 		changeListeners.get(key).add(runnable);
 	}
 	
-	private String getKey(String section, String setting) {
+	private synchronized String getKey(String section, String setting) {
 		return section + ":" + setting;
 	}
 	
@@ -568,7 +568,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public String getStringRadioSelection(String group, String setting,
+	public synchronized String getStringRadioSelection(String group, String setting,
 			ArrayList<String> possibleValues, String defaultSelection, boolean addDefaultIfNeeded) {
 		String settingTemplateEmpty = possibleValues != null ? StringManipulationTools.getStringList(possibleValues, "//") : null;
 		String settingTemplateDefaultSelected = settingTemplateEmpty != null ? StringManipulationTools.stringReplace(
@@ -590,7 +590,7 @@ public class SystemOptions {
 		return defaultSelection;
 	}
 	
-	public String getIniValue() throws IOException {
+	public synchronized String getIniValue() throws IOException {
 		StringWriter sw = new StringWriter();
 		ini.store(sw);
 		return sw.toString();
