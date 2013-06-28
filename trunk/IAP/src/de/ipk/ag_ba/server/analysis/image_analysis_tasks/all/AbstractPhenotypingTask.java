@@ -618,6 +618,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (id != null && id.getParentSample() != null) {
 							LoadedImage loadedImage = new LoadedImage(id,
 									image.getAsBufferedImage());
+							loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 							ImageData imageRef = saveImageAndUpdateURL(
 									loadedImage, databaseTarget, false,
 									tray, tray_cnt);
@@ -736,6 +737,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				
 				NumericMeasurement3D m = new NumericMeasurement3D(inVis, bpv.getName(), null);
+				m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 				m.setAnnotation(null);
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
@@ -773,6 +775,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								SubstanceInterface oSubst = v.getParentSample().getParentCondition().getParentSubstance();
 								SubstanceInterface nSubst = oSubst.clone();
 								ConditionInterface nCond = oCond.clone(nSubst);
+								nSubst.setInfo(null); // remove information about source camera
 								nSubst.add(nCond);
 								SampleInterface nSamp = oSample.clone(nCond);
 								v.setParentSample(nSamp);
