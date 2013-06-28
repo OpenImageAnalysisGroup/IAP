@@ -24,6 +24,7 @@ public class MySnapshotFilter implements SnapshotFilter {
 				globalOutlierDays[idx] = day;
 			} catch (Exception e) {
 				globalOutlierDays[idx] = Integer.MAX_VALUE;
+				globalOutlierArr[idx] = o.trim();
 			}
 			idx++;
 		}
@@ -53,7 +54,8 @@ public class MySnapshotFilter implements SnapshotFilter {
 			for (String o : globalOutlierArr) {
 				if (plantId != null && o != null && o.endsWith("*") && !o.contains("/") && o.length() >= 2) {
 					o = o.substring(0, o.length() - 1);
-					return plantId.startsWith(o);
+					if (plantId.startsWith(o))
+						return true;
 				} else
 					if (plantId != null && plantId.equals(o))
 						return true;
@@ -65,7 +67,6 @@ public class MySnapshotFilter implements SnapshotFilter {
 								return d >= fromD;
 							} catch (Exception e) {
 								System.out.println("Problematic outlier definition (ignored): " + o);
-								return false;
 							}
 						} else
 							if (d != null && d.equals(o))
