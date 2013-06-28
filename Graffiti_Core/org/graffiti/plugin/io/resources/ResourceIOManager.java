@@ -152,14 +152,14 @@ public class ResourceIOManager {
 		long written = 0;
 		try {
 			if (maxIO <= 0) {
-				byte[] buffer = new byte[0xFFFF];
+				byte[] buffer = new byte[0x7FFF];
 				for (int len; (len = in.read(buffer)) != -1;) {
 					out.write(buffer, 0, len);
 					written += len;
 				}
 			} else {
 				long read = 0;
-				byte[] buffer = new byte[0xFFFF];
+				byte[] buffer = new byte[0x7FFF];
 				for (int len; (len = in.read(buffer)) != -1;) {
 					read += len;
 					if (read < maxIO) {
