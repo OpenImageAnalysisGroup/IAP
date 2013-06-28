@@ -21,7 +21,7 @@ public class RunnerThread extends Thread {
 			LocalComputeJob nextTask = null;
 			synchronized (jobs) {
 				if (jobs.isEmpty())
-					stopRequested();
+					pleaseStop = true;
 				else
 					nextTask = jobs.remove(jobs.size() - 1);
 			}
@@ -34,7 +34,7 @@ public class RunnerThread extends Thread {
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
-		} while (!pleaseStop);
+		} while (!stopRequested());
 	}
 	
 	public void pleaseStop() {
