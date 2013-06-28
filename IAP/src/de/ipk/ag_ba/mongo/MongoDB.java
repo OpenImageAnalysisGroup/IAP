@@ -239,8 +239,8 @@ public class MongoDB {
 					String key = optHosts + ";" + database;
 					if (m.get(key) == null) {
 						Builder mob = new MongoClientOptions.Builder();
-						mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1));
-						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 1 * 60 * 1000));
+						mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5));
+						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000));
 						mob.threadsAllowedToBlockForConnectionMultiplier(SystemOptions.getInstance().getInteger("GRID-STORAGE",
 								"threads allowed to wait for connection",
 								1000000));
