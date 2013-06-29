@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
@@ -24,7 +23,6 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
-import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
@@ -43,6 +41,8 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
@@ -71,10 +71,6 @@ public class ExperimentSaver implements RunnableOnDB {
 	private final BackgroundTaskStatusProviderSupportingExternalCall status;
 	private final ThreadSafeOptions err;
 	private DB db;
-	
-	private final boolean multiThreadedStorage =
-			SystemOptions.getInstance().getBoolean("GRID-STORAGE",
-					"Multi-Threaded Safe Operation", false);
 	
 	private final HashType hashType;
 	private final MongoDBhandler mh;
@@ -218,12 +214,9 @@ public class ExperimentSaver implements RunnableOnDB {
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
 		errorCount.setLong(0);
-		int nLock = multiThreadedStorage ?
-				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads substance saving", 1)
-				: 1;
-		final Semaphore lock = new Semaphore(nLock, true);
 		final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 		final int substanceCount = sl.size();
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		while (!sl.isEmpty()) {
 			final SubstanceInterface s = sl.remove(0);
 			// if (status != null && status.wantsToStop())
@@ -242,20 +235,12 @@ public class ExperimentSaver implements RunnableOnDB {
 						e.printStackTrace();
 						errorCount.addLong(1);
 						errors.append("<li>Error saving substance " + s.getName());
-					} finally {
-						lock.release(1);
 					}
 				}
 			};
-			lock.acquire(1);
-			Thread t = new Thread(rrr, "Thread Substance Saving " + s.getName());
-			if (multiThreadedStorage)
-				t.start();
-			else
-				t.run();
+			wait.add(BackgroundThreadDispatcher.addTask(rrr, "Substance Saving " + s.getName()));
 		} // substance
-		lock.acquire(nLock);
-		lock.release(nLock);
+		BackgroundThreadDispatcher.waitFor(wait);
 		
 		System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
@@ -347,12 +332,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
 		final HashSet<String> savedUrls = new HashSet<String>();
-		
-		int nLock = multiThreadedStorage ?
-				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads condition saving", 1)
-				: 1;
-		final Semaphore lock = new Semaphore(nLock, true);
-		
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		for (final ConditionInterface c : s) {
 			Runnable rr = new Runnable() {
 				@Override
@@ -368,21 +348,12 @@ public class ExperimentSaver implements RunnableOnDB {
 						e.printStackTrace();
 						errorCount.addLong(1);
 						errors.append("<li>" + e.getMessage());
-					} finally {
-						lock.release(1);
 					}
 				}
 			};
-			lock.acquire(1);
-			Thread t = new Thread(rr);
-			t.setName("Process condition " + c.getName());
-			if (multiThreadedStorage)
-				t.start();
-			else
-				t.run();
+			wait.add(BackgroundThreadDispatcher.addTask(rr, "Process condition " + c.getName()));
 		} // condition
-		lock.acquire(nLock);
-		lock.release(nLock);
+		BackgroundThreadDispatcher.waitFor(wait);
 		processSubstanceSaving(status, substances, substance, conditionIDs);
 		substanceIDs.add((substance).getString("_id"));
 	}
@@ -511,8 +482,8 @@ public class ExperimentSaver implements RunnableOnDB {
 			ArrayList<String> conditionIDs,
 			ConditionInterface c,
 			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
-		// if (status != null && status.wantsToStop())
-		// break;
+		
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		
 		BasicDBObject condition;
 		synchronized (attributes) {
@@ -520,12 +491,6 @@ public class ExperimentSaver implements RunnableOnDB {
 			c.fillAttributeMap(attributes);
 			condition = new BasicDBObject(filter(attributes));
 		}
-		
-		int nLock = multiThreadedStorage ?
-				SystemOptions.getInstance().getInteger("GRID-STORAGE", "threads image saving", 2)
-				: 1;
-		boolean fair = true;
-		final Semaphore lock = new Semaphore(nLock, fair);
 		
 		List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
 		for (SampleInterface sa : c) {
@@ -645,54 +610,40 @@ public class ExperimentSaver implements RunnableOnDB {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						try {
-							boolean waited = false;
-							while (!storageResults.isEmpty()) {
-								waited = true;
-								// System.out.println(SystemAnalysis.getCurrentTime() + ">WAITING FOR DATA: " + storageResults.size() + " FILES NEED YET TO BE COPIED");
-								Future<DatabaseStorageResult> fres = storageResults.poll();
-								ImageData id = imageDataQueue.poll();
-								DatabaseStorageResult res;
-								try {
-									res = fres.get();
-									// if (res != null && status != null)
-									// status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
-									if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-										errorCount.addLong(1);
-										errors.append("<li>" + id.getURL().getFileName());
-									} else {
-										synchronized (attributes) {
-											attributes.clear();
-											id.fillAttributeMap(attributes);
-											BasicDBObject dbo = new BasicDBObject(filter(attributes));
-											dbImages.add(dbo);
-										}
-									}
-									count.addLong(1);
-									if (status != null)
-										updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount,
-												startTime);
-								} catch (Exception e) {
-									e.printStackTrace();
+						while (!storageResults.isEmpty()) {
+							Future<DatabaseStorageResult> fres = storageResults.poll();
+							ImageData id = imageDataQueue.poll();
+							DatabaseStorageResult res;
+							try {
+								res = fres.get();
+								// if (res != null && status != null)
+								// status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
+								if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
 									errorCount.addLong(1);
-									errors.append("<li>" + e.getMessage());
+									errors.append("<li>" + id.getURL().getFileName());
+								} else {
+									synchronized (attributes) {
+										attributes.clear();
+										id.fillAttributeMap(attributes);
+										BasicDBObject dbo = new BasicDBObject(filter(attributes));
+										dbImages.add(dbo);
+									}
 								}
+								count.addLong(1);
+								if (status != null)
+									updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount,
+											startTime);
+							} catch (Exception e) {
+								e.printStackTrace();
+								errorCount.addLong(1);
+								errors.append("<li>" + e.getMessage());
 							}
-							// if (waited)
-							// System.out.println(SystemAnalysis.getCurrentTime() + ">WAITING FOR DATA FINISHED");
-							if (dbImages.size() > 0)
-								sample.put("images", dbImages);
-						} finally {
-							lock.release(1);
 						}
+						if (dbImages.size() > 0)
+							sample.put("images", dbImages);
 					}
 				};
-				lock.acquire(1);
-				Thread t = new Thread(r, "Sample storage thread");
-				if (multiThreadedStorage)
-					t.start();
-				else
-					t.run();
+				wait.add(BackgroundThreadDispatcher.addTask(r, "Sample storage thread"));
 			}
 			if (dbVolumes.size() > 0)
 				sample.put("volumes", dbVolumes);
@@ -700,8 +651,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				sample.put("networks", dbVolumes);
 		} // sample
 		
-		lock.acquire(nLock);
-		lock.release(nLock);
+		BackgroundThreadDispatcher.waitFor(wait);
 		
 		condition.put("samples", dbSamples);
 		try {
