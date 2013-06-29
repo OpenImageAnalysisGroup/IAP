@@ -161,7 +161,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			final ExperimentInterface statisticsResult = task.getOutput();
 			
 			if (statisticsResult == null) {
-				System.err.println("Error: no statistics result");
+				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
 				this.experimentResult = null;
 				if (getResultReceiver() == null)
 					mpc = new MainPanelComponent("Stop requested, processing aborted, output set to NULL.");
@@ -169,8 +169,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					getResultReceiver().setExperimenData(null);
 					getResultReceiver().run();
 				}
-				ErrorMsg.addErrorMessage("no statistics result");
-				
 			} else {
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
