@@ -1005,7 +1005,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL())) {
 					// if (savedUrls.contains(skipLabelUrl))
 					// skipLabelSaving = true;
-					isLabel = image.getLabelURL() != null // && !skipLabelSaving
+					isLabel = !skipProcessingOfLabel && image.getLabelURL() != null // && !skipLabelSaving
 					? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed()
 							: null;
 				}
