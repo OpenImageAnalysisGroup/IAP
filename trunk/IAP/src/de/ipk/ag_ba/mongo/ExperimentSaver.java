@@ -1062,8 +1062,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		if (hashLabel != null && image.getLabelURL() != null) {
 			image.getLabelURL().setPrefix(mh.getPrefix());
 			image.getLabelURL().setDetail(hashLabel);
-		} else
-			System.out.println("UxUU");
+		}
 		
 		if (hashLabel == null && skipProcessingOfLabel)
 			fffLabel = true;
