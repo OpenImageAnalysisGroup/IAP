@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
@@ -225,109 +227,135 @@ public class MongoDB {
 			throw (Exception) err.getParam(0, null);
 	}
 	
+	private static ThreadSafeOptions dbLastAccess = new ThreadSafeOptions();
+	private static int dbMaxCon = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
+	private static Semaphore runningOps = new Semaphore(dbMaxCon, true);
+	
 	private void processDB(String database, String optHosts, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
 		Exception e = null;
-		try {
-			boolean ok = false;
-			int nrep = 0;
-			int repeats = 0;
-			// BackgroundTaskHelper.lockAquire(dataBase, 2);
-			do {
-				try {
-					DB db;
-					String key = optHosts + ";" + database;
-					if (m.get(key) == null) {
-						Builder mob = new MongoClientOptions.Builder();
-						mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5));
-						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000));
-						mob.threadsAllowedToBlockForConnectionMultiplier(SystemOptions.getInstance().getInteger("GRID-STORAGE",
-								"threads allowed to wait for connection",
-								1000000));
-						mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000));
-						mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
-						mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
-						mob.writeConcern(WriteConcern.SAFE);
-						
-						MongoClientOptions mco = mob.build();
-						
-						StopWatch s = new StopWatch("INFO: new MongoClient(...)", false);
-						if (optHosts == null || optHosts.length() == 0) {
-							MongoClient mc = new MongoClient("localhost", mco);
-							m.put(key, mc);
-						} else {
-							List<ServerAddress> seeds = new ArrayList<ServerAddress>();
-							for (String h : optHosts.split(","))
-								seeds.add(new ServerAddress(h));
-							m.put(key, new MongoClient(seeds, mco));
-						}
-						m.get(key).getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1);
-						m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 1 * 60 * 1000);
-						m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000);
-						m.get(key).getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
-						m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
-								"threads allowed to wait for connection",
-								1000000);
-						m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000);
-						s.printTime(1000);
-						if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
-							DB dbAdmin = m.get(key).getDB("admin");
-							try {
-								s = new StopWatch("INFO: dbAdmin.authenticate()");
-								dbAdmin.authenticate(optLogin, optPass.toCharArray());
-								s.printTime(1000);
+		String key = optHosts + ";" + database;
+		// int maxS = SystemOptions.getInstance().getInteger("GRID-STORAGE", "idle reconnect time_s", 30);
+		// if (maxS > 0 && true) {
+		// if (System.currentTimeMillis() - dbLastAccess.getLong() > maxS * 1000) {
+		// MongoClient mc = m.get(key);
+		// if (mc != null) {
+		// runningOps.acquire(dbMaxCon);
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Closing DB connection (" + key + ") (connection was previously idle for more than "
+		// +
+		// maxS + " sec., for " + ((System.currentTimeMillis() - dbLastAccess.getLong()) / 1000) + " sec.)");
+		// CommandResult err = mc.getDB(databaseName).getLastError(WriteConcern.SAFE);
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Get Last Error: " + err);
+		// mc.close();
+		// m.remove(key);
+		// authenticatedDBs.remove(mc);
+		// runningOps.release(dbMaxCon);
+		// }
+		// }
+		// dbLastAccess.setLong(System.currentTimeMillis());
+		// }
+		boolean ok = false;
+		int nrep = 0;
+		int repeats = 1;
+		do {
+			try {
+				DB db;
+				synchronized (this.getClass()) {
+					createMongoConnection(database, optHosts, optLogin, optPass, key);
+					db = m.get(key).getDB(database);
+				}
+				if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains(database))
+					if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
+						try {
+							boolean auth = db.authenticate(optLogin, optPass.toCharArray());
+							if (!auth) {
+								// throw new Exception("Invalid MongoDB login data provided!");
+							} else {
 								if (authenticatedDBs.get(m.get(key)) == null)
 									authenticatedDBs.put(m.get(key), new HashSet<String>());
 								authenticatedDBs.get(m.get(key)).add(database);
-							} catch (Exception err) {
-								// System.err.println("ERROR: " + err.getMessage());
 							}
+						} catch (Exception err) {
+							System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: Authentication error: " + err.getMessage());
 						}
 					}
-					db = m.get(key).getDB(database);
-					
-					if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains(database))
-						if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
-							try {
-								boolean auth = db.authenticate(optLogin, optPass.toCharArray());
-								if (!auth) {
-									// throw new Exception("Invalid MongoDB login data provided!");
-								} else {
-									if (authenticatedDBs.get(m.get(key)) == null)
-										authenticatedDBs.put(m.get(key), new HashSet<String>());
-									authenticatedDBs.get(m.get(key)).add(database);
-								}
-							} catch (Exception err) {
-								// System.err.println("ERROR: " + err.getMessage());
-							}
-						}
-					
-					boolean initStatusCollection = false;
-					if (initStatusCollection && !dbsAnalyzedForCollectionSettings.contains(database)) {
-						checkforCollectionsInitialization(db, "status_maize", 100, 50000);
-						checkforCollectionsInitialization(db, "status_barley", 100, 50000);
-						checkforCollectionsInitialization(db, "status_phyto", 100, 50000);
-						dbsAnalyzedForCollectionSettings.add(database);
-					}
-					
-					runnableOnDB.setDB(db);
-					runnableOnDB.run();
-					ok = true;
-					e = null;
-				} catch (Exception err) {
-					err.printStackTrace();
-					System.out.println("EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T=" + IAPservice.getCurrentTimeAsNiceString());
-					e = err;
-					if (repeats - 1 > 0)
-						Thread.sleep(60 * 1000);
+				
+				boolean initStatusCollection = false;
+				if (initStatusCollection && !dbsAnalyzedForCollectionSettings.contains(database)) {
+					checkforCollectionsInitialization(db, "status_maize", 100, 50000);
+					checkforCollectionsInitialization(db, "status_barley", 100, 50000);
+					checkforCollectionsInitialization(db, "status_phyto", 100, 50000);
+					dbsAnalyzedForCollectionSettings.add(database);
 				}
-				repeats--;
-			} while (!ok && repeats > 0);
-		} finally {
-			// BackgroundTaskHelper.lockRelease(dataBase);
-		}
+				
+				runnableOnDB.setDB(db);
+				runnableOnDB.run();
+				ok = true;
+				e = null;
+			} catch (Exception err) {
+				err.printStackTrace();
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: EXEC " + (nrep - repeats + 1) + " ERROR: " + err.getLocalizedMessage() + " T="
+						+ IAPservice.getCurrentTimeAsNiceString());
+				e = err;
+				if (repeats - 1 > 0)
+					Thread.sleep(60 * 1000);
+			}
+			repeats--;
+		} while (!ok && repeats > 0);
 		if (e != null)
 			throw e;
+	}
+	
+	private void createMongoConnection(String database, String optHosts, String optLogin, String optPass, String key) throws UnknownHostException {
+		if (m.get(key) == null) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Establish DB connection (" + key + ")");
+			Builder mob = new MongoClientOptions.Builder();
+			mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5));
+			mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000));
+			mob.threadsAllowedToBlockForConnectionMultiplier(SystemOptions.getInstance().getInteger("GRID-STORAGE",
+					"threads allowed to wait for connection",
+					10000));
+			mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000));
+			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
+			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
+			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
+			
+			MongoClientOptions mco = mob.build();
+			
+			StopWatch s = new StopWatch("INFO: new MongoClient(...)", false);
+			if (optHosts == null || optHosts.length() == 0) {
+				MongoClient mc = new MongoClient("localhost", mco);
+				m.put(key, mc);
+			} else {
+				List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+				for (String h : optHosts.split(","))
+					seeds.add(new ServerAddress(h));
+				MongoClient mc = new MongoClient(seeds, mco);
+				m.put(key, mc);
+			}
+			m.get(key).getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 1);
+			m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 1 * 60 * 1000);
+			m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000);
+			m.get(key).getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
+			m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
+					"threads allowed to wait for connection",
+					1000000);
+			m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000);
+			s.printTime(1000);
+			if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
+				DB dbAdmin = m.get(key).getDB("admin");
+				try {
+					s = new StopWatch("INFO: dbAdmin.authenticate()");
+					dbAdmin.authenticate(optLogin, optPass.toCharArray());
+					s.printTime(1000);
+					if (authenticatedDBs.get(m.get(key)) == null)
+						authenticatedDBs.put(m.get(key), new HashSet<String>());
+					authenticatedDBs.get(m.get(key)).add(database);
+				} catch (Exception err) {
+					// System.err.println("ERROR: " + err.getMessage());
+				}
+			}
+		}
 	}
 	
 	private void checkforCollectionsInitialization(DB db, String cappedCollectionName, int maxObjects, int maxBytes) {
@@ -1003,31 +1031,37 @@ public class MongoDB {
 		BasicDBList ll = new BasicDBList();
 		for (Object o : l)
 			ll.add(new ObjectId(o + ""));
-		DBCursor condL = collCond.find(
-				new BasicDBObject("_id", new BasicDBObject("$in", ll))
-				, new BasicDBObject()
-						.append("_id", new Integer(1))
-						.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
-						.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
-						.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
-				).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
-		for (DBObject cond : condL) {
-			// find objects in "condition" collection, but only fields images, volumes, networks
-			synchronized (visitCondition) {
-				visitCondition.processDBid(cond.get("_id") + "");
+		DBCursor condL = null;
+		try {
+			condL = collCond.find(
+					new BasicDBObject("_id", new BasicDBObject("$in", ll))
+					, new BasicDBObject()
+							.append("_id", new Integer(1))
+							.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
+							.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
+							.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
+			for (DBObject cond : condL) {
+				// find objects in "condition" collection, but only fields images, volumes, networks
+				synchronized (visitCondition) {
+					visitCondition.processDBid(cond.get("_id") + "");
+				}
+				visitCondition(s3d, cond, visitBinary);
+				if (optStatusProvider != null)
+					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 			}
-			visitCondition(s3d, cond, visitBinary);
-			if (optStatusProvider != null)
-				optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
-		}
-		if (l.size() != condL.size()) {
-			if (!printed) {
-				String msg = "WARNING: " + (l.size() - condL.size()) + " condition could not be retrieved for experiment " + header.getExperimentName();
-				System.out.println(msg);
-				saveSystemMessage(msg);
-				printed = true;
-				invalid.setBval(0, true);
+			if (l.size() != condL.size()) {
+				if (!printed) {
+					String msg = "WARNING: " + (l.size() - condL.size()) + " condition could not be retrieved for experiment " + header.getExperimentName();
+					System.out.println(msg);
+					saveSystemMessage(msg);
+					printed = true;
+					invalid.setBval(0, true);
+				}
 			}
+		} finally {
+			if (condL != null)
+				condL.close();
 		}
 		return printed;
 	}

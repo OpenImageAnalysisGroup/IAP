@@ -885,7 +885,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						&& id.getIrInfo().getURL() != null)
 					inIr.setLabelURL(id.getIrInfo().getURL().copy());
 			}
-			LocalComputeJob a = null, b = null, c = null, d = null, ra = null, rb = null, rc = null, rd = null;
+			LocalComputeJob ra = null, rb = null, rc = null, rd = null;
 			
 			if (resVis != null)
 				ra = saveImage(
@@ -1022,12 +1022,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		}
-		
+		BackgroundThreadDispatcher.waitFor(waitThreads);
 		if (analysisResults != null) {
 			processNumericResults(inVis, analysisResults);
 			
 		}
-		return new ResultsAndWaitThreads(analysisResults, waitThreads);
+		return new ResultsAndWaitThreads(analysisResults, new ArrayList<LocalComputeJob>());
 	}
 	
 	private BackgroundTaskStatusProviderSupportingExternalCallImpl getStatusProcessor(final BackgroundTaskStatusProviderSupportingExternalCall status,

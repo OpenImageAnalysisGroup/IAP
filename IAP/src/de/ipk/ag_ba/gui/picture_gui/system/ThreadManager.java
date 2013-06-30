@@ -1,8 +1,10 @@
 package de.ipk.ag_ba.gui.picture_gui.system;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Semaphore;
 
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -17,64 +19,65 @@ public class ThreadManager {
 	
 	RunnerThread[] threadArray = new RunnerThread[SystemAnalysis.getRealNumberOfCPUs() * 2];
 	
-	private final ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
+	private final LinkedList<LocalComputeJob> jobs = new LinkedList<LocalComputeJob>();
+	private final Semaphore jobModification = new Semaphore(1, true);
 	
 	private ThreadManager() {
-		Timer res = new Timer("Thread Management", true);
+		Timer res = new Timer("Background Thread Management", true);
 		res.scheduleAtFixedRate(new TimerTask() {
 			boolean[] started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 2];
 			
 			@Override
 			public void run() {
-				synchronized (jobs) {
-					if (jobs.size() > 0) {
-						ArrayList<LocalComputeJob> remove = new ArrayList<LocalComputeJob>();
-						for (LocalComputeJob j : jobs)
-							if (j.isFinished())
-								remove.add(j);
-						for (LocalComputeJob j : remove)
-							jobs.remove(j);
-						
-						int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
-						desiredThreadCount = modifyConcurrencyDependingOnMemoryStatus(desiredThreadCount);
-						
-						int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
-						if (getRunningCount() > maxCnt) {
-							// ask threads to stop execution
-							int tooMany = getRunningCount() - maxCnt;
-							int askedToStop = 0;
-							if (tooMany > 0) {
-								for (int idx = threadArray.length - 1; idx >= 0; idx--) {
-									if (started[idx]) {
-										threadArray[idx].pleaseStop();
-										askedToStop++;
-									}
-									if (askedToStop >= tooMany)
-										break;
+				if (jobs.size() > 0) {
+					ArrayList<LocalComputeJob> remove = new ArrayList<LocalComputeJob>();
+					jobModification.acquireUninterruptibly();
+					for (LocalComputeJob j : jobs)
+						if (j.isFinished())
+							remove.add(j);
+					for (LocalComputeJob j : remove)
+						jobs.remove(j);
+					jobModification.release();
+					
+					int desiredThreadCount = SystemAnalysis.getNumberOfCPUs() - 1;
+					desiredThreadCount = modifyConcurrencyDependingOnMemoryStatus(desiredThreadCount);
+					
+					int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
+					if (getRunningCount() > maxCnt) {
+						// ask threads to stop execution
+						int tooMany = getRunningCount() - maxCnt;
+						int askedToStop = 0;
+						if (tooMany > 0) {
+							for (int idx = threadArray.length - 1; idx >= 0; idx--) {
+								if (started[idx]) {
+									threadArray[idx].pleaseStop();
+									askedToStop++;
 								}
+								if (askedToStop >= tooMany)
+									break;
 							}
-						} else
-							while (getRunningCount() < maxCnt) {
-								// start new executor threads
-								int idx = 0;
-								for (boolean s : started) {
-									if (!s) {
-										threadArray[idx] = new RunnerThread(jobs);
-										started[idx] = true;
-										threadArray[idx].setDaemon(false);
-										threadArray[idx].setName("Job Execution " + (idx + 1));
-										threadArray[idx].start();
-									}
-									idx++;
-									if (getRunningCount() >= maxCnt)
-										break;
+						}
+					} else
+						while (getRunningCount() < maxCnt) {
+							// start new executor threads
+							int idx = 0;
+							for (boolean s : started) {
+								if (!s) {
+									threadArray[idx] = new RunnerThread(jobs, jobModification);
+									started[idx] = true;
+									threadArray[idx].setDaemon(false);
+									threadArray[idx].setName("Background Thread " + (idx + 1));
+									threadArray[idx].start();
 								}
+								idx++;
+								if (getRunningCount() >= maxCnt)
+									break;
 							}
-						for (int idx = 0; idx < threadArray.length; idx++) {
-							if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
-								threadArray[idx] = null;
-								started[idx] = false;
-							}
+						}
+					for (int idx = 0; idx < threadArray.length; idx++) {
+						if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
+							threadArray[idx] = null;
+							started[idx] = false;
 						}
 					}
 				}
@@ -112,10 +115,10 @@ public class ThreadManager {
 								+ SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
 								+ "%), REDUCING CONCURRENCY");
 						nn = nn / 2;
-						if (nn < 1)
-							nn = 1;
 					}
 				}
+				if (nn < 0)
+					nn = 0;
 				// System.out
 				// .println(SystemAnalysis.getCurrentTime()
 				// + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
@@ -143,59 +146,58 @@ public class ThreadManager {
 	private static long runIdx = 0;
 	
 	public void memTask(LocalComputeJob t, boolean forceMem) {
+		boolean run = false;
 		if (forceMem) {
-			synchronized (jobs) {
-				jobs.add(t);
-			}
+			jobModification.acquireUninterruptibly();
+			jobs.add(t);
+			jobModification.release();
 		} else {
 			runIdx++;
-			if (runIdx > 2000)
-				runIdx = 0;
-			if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-					.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
-					&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
-				if (System.currentTimeMillis() - lastPrint > 1000) {
-					lastPrint = System.currentTimeMillis();
-					System.out
-							.print(SystemAnalysis.getCurrentTime()
-									+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
-									+ "%), Memory Load: " + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB");
-				}
-				if (System.currentTimeMillis() - lastGC > 1000 * 30) {
-					lastGC = System.currentTimeMillis();
-					System.out.println();
-					System.out
-							.print(SystemAnalysis.getCurrentTime()
-									+ ">ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
-					System.gc();
-					System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
-							.getMemoryMB() + " MB)");
-				}
-			}
-			// if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
-			// .getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70) / 100d) {
-			// System.out.println();
-			// System.out.println(SystemAnalysis.getCurrentTime()
-			// + ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
-			// + "%), REDUCING CONCURRENCY (THREAD.RUN)");
-			// t.run();
-			// } else {
-			boolean run = false;
-			synchronized (jobs) {
-				if (jobs.size() > SystemAnalysis.getRealNumberOfCPUs() * 2)
-					run = true;
-				else
-					jobs.add(t);
-			}
-			if (run)
-				t.run();
-			// }
 		}
+		if (runIdx > 2000)
+			runIdx = 0;
+		if (runIdx > 1000 && SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
+				.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60) / 100d
+				&& SystemOptions.getInstance().getBoolean("SYSTEM", "Issue GC upon high memory use", false)) {
+			if (System.currentTimeMillis() - lastPrint > 1000) {
+				lastPrint = System.currentTimeMillis();
+				System.out
+						.print(SystemAnalysis.getCurrentTime()
+								+ ">HIGH MEMORY UTILIZATION (>" + SystemOptions.getInstance().getInteger("SYSTEM", "Issue GC Memory Usage Threshold Percent", 60)
+								+ "%), Memory Load: " + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB");
+			}
+			if (System.currentTimeMillis() - lastGC > 1000 * 30) {
+				lastGC = System.currentTimeMillis();
+				System.out.println();
+				System.out
+						.print(SystemAnalysis.getCurrentTime()
+								+ ">ISSUE GARBAGE COLLECTION (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB)... ");
+				System.gc();
+				System.out.println("FINISHED GC (" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis
+						.getMemoryMB() + " MB)");
+			}
+		}
+		int maxWait = SystemAnalysis.getRealNumberOfCPUs() * 4;
+		jobModification.acquireUninterruptibly();
+		if (jobs.size() > maxWait)
+			run = true;
+		else {
+			jobs.add(t);
+			try {
+				Thread.sleep(2);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		jobModification.release();
+		
+		if (run)
+			t.run();
 	}
 	
 	public void directlyRunning(LocalComputeJob localComputeJob) {
-		synchronized (jobs) {
-			jobs.remove(localComputeJob);
-		}
+		jobModification.acquireUninterruptibly();
+		jobs.remove(localComputeJob);
+		jobModification.release();
 	}
 }
