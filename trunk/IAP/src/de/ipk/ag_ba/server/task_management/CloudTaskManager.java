@@ -56,10 +56,10 @@ public class CloudTaskManager {
 					}
 				}
 			});
-			timerThread.setName("CloudTaskManager (" + (isProcess() ? "active" : "inactive") + ")");
+			timerThread.setName("Compute Grid Job Execution Manager (" + (isProcess() ? "active" : "inactive") + ")");
 			timerThread.start();
 		}
-		timerThread.setName("CloudTaskManager (" + (isProcess() ? "active" : "inactive") + ")");
+		timerThread.setName("Compute Grid Job Execution Manager (" + (isProcess() ? "active" : "inactive") + ")");
 	}
 	
 	private boolean isProcess() {

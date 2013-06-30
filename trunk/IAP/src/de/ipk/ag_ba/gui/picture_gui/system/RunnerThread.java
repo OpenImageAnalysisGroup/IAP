@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui.system;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 import org.ErrorMsg;
 
@@ -9,22 +10,25 @@ import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 public class RunnerThread extends Thread {
 	
 	private boolean pleaseStop;
-	private final ArrayList<LocalComputeJob> jobs;
+	private final LinkedList<LocalComputeJob> jobs;
+	private final Semaphore jobModification;
 	
-	public RunnerThread(ArrayList<LocalComputeJob> jobs) {
+	public RunnerThread(LinkedList<LocalComputeJob> jobs, Semaphore jobModification) {
 		this.jobs = jobs;
+		this.jobModification = jobModification;
 	}
 	
 	@Override
 	public void run() {
 		do {
 			LocalComputeJob nextTask = null;
-			synchronized (jobs) {
-				if (jobs.isEmpty())
-					pleaseStop = true;
-				else
-					nextTask = jobs.remove(jobs.size() - 1);
+			jobModification.acquireUninterruptibly();
+			if (jobs.isEmpty())
+				pleaseStop = true;
+			else {
+				nextTask = jobs.removeLast();
 			}
+			jobModification.release();
 			try {
 				if (nextTask == null)
 					Thread.sleep(50);
