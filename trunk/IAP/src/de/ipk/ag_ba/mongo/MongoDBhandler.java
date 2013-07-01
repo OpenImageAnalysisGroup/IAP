@@ -64,13 +64,13 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 	public InputStream getInputStream(final IOurl url) throws Exception {
 		final ObjectRef or = new ObjectRef();
 		final ObjectRef err = new ObjectRef();
+		final boolean getRemoteLTdataNotSavedInMongo = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Load missing input from LT storage", true);
 		
 		m.processDB(new RunnableOnDB() {
 			private DB db;
 			
 			@Override
 			public void run() {
-				boolean getRemoteLTdataNotSavedInMongo = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Load missing input from LT storage", true);
 				if (getRemoteLTdataNotSavedInMongo) {
 					try {
 						if (url.getDetail().indexOf(".") > 0) {
