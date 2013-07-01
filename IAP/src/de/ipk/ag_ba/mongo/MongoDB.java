@@ -256,7 +256,7 @@ public class MongoDB {
 		// }
 		boolean ok = false;
 		int nrep = 0;
-		int repeats = 1;
+		int repeats = 3;
 		do {
 			try {
 				DB db;
