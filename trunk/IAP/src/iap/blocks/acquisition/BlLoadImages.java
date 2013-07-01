@@ -41,7 +41,7 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().images().setVis(fi);
 					if (fi.getWidth() < 200)
-						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + fi + " / " + url.getInputStream());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + fi + " / " + url);
 					
 				} catch (Error e) {
 					System.out.println(SystemAnalysis.getCurrentTime()
