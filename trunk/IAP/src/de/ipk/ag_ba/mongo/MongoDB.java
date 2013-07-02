@@ -407,7 +407,7 @@ public class MongoDB {
 						BasicDBList sl = (BasicDBList) expRef.get("substance_ids");
 						if (sl != null) {
 							for (Object so : sl) {
-								DBRef subr = new DBRef(db, "substances", new ObjectId(so.toString()));
+								DBRef subr = so != null ? new DBRef(db, "substances", new ObjectId(so.toString())) : null;
 								if (subr != null) {
 									DBObject substance = subr.fetch();
 									if (substance != null) {
