@@ -256,7 +256,7 @@ public class MongoDB {
 		// }
 		boolean ok = false;
 		int nrep = 0;
-		int repeats = SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry count in case of error", 3) + 1;
+		int repeats = 5;// SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry count in case of error", 3) + 1;
 		do {
 			try {
 				DB db;
