@@ -318,6 +318,7 @@ public class MongoDB {
 			mob.socketTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 1 * 60 * 1000));
 			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 1 * 60 * 1000));
 			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
+			mob.socketKeepAlive(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true));
 			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
 			
 			MongoClientOptions mco = mob.build();
@@ -341,6 +342,7 @@ public class MongoDB {
 					"threads allowed to wait for connection",
 					1000);
 			m.get(key).getMongoOptions().socketTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 1 * 60 * 1000);
+			m.get(key).getMongoOptions().socketKeepAlive = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true);
 			
 			s.printTime(1000);
 			if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
