@@ -163,23 +163,47 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				
 				double topAreaSum = 0;
 				double topAreaCnt = 0;
+				
+				boolean ignoreNormalizedData = normalized && getBoolean("Ignore Normalized Top Data", false);
+				
 				synchronized (allResultsForSnapshot) {
 					TreeSet<String> ks2 = new TreeSet<String>(allResultsForSnapshot.keySet());
-					for (String key : ks2) {
-						BlockResultSet rt;
-						synchronized (allResultsForSnapshot) {
-							HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
-							if (kk == null)
-								continue;
-							rt = allResultsForSnapshot.get(key).get(tray);
-						}
-						if (rt != null)
-							for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
-								if (v.getValue() != null) {
-									topAreaSum += v.getValue().doubleValue();
-									topAreaCnt += 1;
-								}
+					if (!normalized || (normalized && !ignoreNormalizedData)) {
+						for (String key : ks2) {
+							BlockResultSet rt;
+							synchronized (allResultsForSnapshot) {
+								HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
+								if (kk == null)
+									continue;
+								rt = allResultsForSnapshot.get(key).get(tray);
 							}
+							if (rt != null)
+								for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
+									if (v.getValue() != null) {
+										topAreaSum += v.getValue().doubleValue();
+										topAreaCnt += 1;
+									}
+								}
+						}
+					}
+					if (normalized && ignoreNormalizedData) {
+						// use not normalized top data if normalized side data is available but no normalized top data
+						for (String key : ks2) {
+							BlockResultSet rt;
+							synchronized (allResultsForSnapshot) {
+								HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
+								if (kk == null)
+									continue;
+								rt = allResultsForSnapshot.get(key).get(tray);
+							}
+							if (rt != null)
+								for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area")) {
+									if (v.getValue() != null) {
+										topAreaSum += v.getValue().doubleValue();
+										topAreaCnt += 1;
+									}
+								}
+						}
 					}
 				}
 				
@@ -257,6 +281,9 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 						double area = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + avgTopArea;
 						summaryResult.setNumericProperty(getBlockPosition(),
 								"RESULT_volume." + cameraType + ".area090T" + (normalized ? ".norm" : ""), area, normalized ? "mm^2" : "px^2");
+						double areaLog = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + Math.log(avgTopArea) / 3;
+						summaryResult.setNumericProperty(getBlockPosition(),
+								"RESULT_volume." + cameraType + ".area090LogT" + (normalized ? ".norm" : ""), areaLog, normalized ? "mm^2" : "px^2");
 					}
 					
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
