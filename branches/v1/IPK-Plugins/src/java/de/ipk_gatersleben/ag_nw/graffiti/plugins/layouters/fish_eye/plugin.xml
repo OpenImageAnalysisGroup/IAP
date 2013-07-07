@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>IPK team</author>
+	<description>A fish eye layouter.</description>
+
+	<plugindesc>
+	     <name>FishEyeLayoutPlugin</name>
+             <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.fish_eye.FishEyeLayoutPlugin</main>
+             <version>0.0.1</version>
+             <available>This is fish eye layouter plugin.</available>
+        </plugindesc>
+</plugin>
