@@ -1,0 +1,17 @@
+// @Nodes:Number Nodes
+import org.graffiti.graph.Node;
+import org.graffiti.session.EditorSession;
+import org.graffiti.editor.MainFrame;
+
+session = MainFrame.getInstance().getActiveEditorSession();
+nodes = session.getSelectionModel().getActiveSelection().getNodes();
+if (nodes.size()<=0)
+	nodes = graph.getNodes();
+graph.getListenerManager().transactionStarted(this);
+idx = 1;
+for (n : nodes) {
+	label = org.AttributeHelper.getLabel(n, "");
+	if (label.length()<=0) // don't overwrite existing labels
+		org.AttributeHelper.setLabel(n, new Integer(idx++).toString());
+}
+graph.getListenerManager().transactionFinished(this);
