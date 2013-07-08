@@ -103,4 +103,15 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	public void setStoredLastUpdateTime(long storedLastUpdateTime) {
 		this.storedLastUpdateTime = storedLastUpdateTime;
 	}
+	
+	@Override
+	public boolean isAbleToSaveData() {
+		if (m != null)
+			return true;
+		else
+			if (headerHelper != null)
+				return headerHelper.isAbleToSaveData();
+			else
+				return false;
+	}
 }

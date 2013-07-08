@@ -8,4 +8,6 @@ public interface ExperimentHeaderHelper {
 	
 	public Long saveUpdatedProperties() throws Exception;
 	
+	public boolean isAbleToSaveData();
+	
 }

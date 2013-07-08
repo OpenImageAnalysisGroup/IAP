@@ -231,6 +231,11 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 					return indexFile.getLastModified();
 				}
 			}
+			
+			@Override
+			public boolean isAbleToSaveData() {
+				return vfs.isAbleToSaveData();
+			}
 		};
 		
 		ehh.readSourceForUpdate();

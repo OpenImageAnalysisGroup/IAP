@@ -103,4 +103,9 @@ public class VirtualFileSystemUdp extends VirtualFileSystem {
 	public VfsFileObject getFileObjectFor(String fileName) throws Exception {
 		throw new UnsupportedOperationException("Not implemented");
 	}
+	
+	@Override
+	public boolean isAbleToSaveData() {
+		return false;
+	}
 }

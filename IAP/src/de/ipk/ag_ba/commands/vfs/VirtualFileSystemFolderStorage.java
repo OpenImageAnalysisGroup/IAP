@@ -122,4 +122,9 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 				VfsFileProtocol.LOCAL,
 				path, fn, null, null);
 	}
+	
+	@Override
+	public boolean isAbleToSaveData() {
+		return true;
+	}
 }

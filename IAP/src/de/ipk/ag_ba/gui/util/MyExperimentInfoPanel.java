@@ -329,13 +329,14 @@ public class MyExperimentInfoPanel extends JPanel {
 		try {
 			fp.addGuiComponentRow(
 					new JLabel("Analysis Settings"),
-					disable(new JTextField(experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
-							""
-									+ SystemOptions.getInstance(null,
-											new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
-											"pipeline_name", "(unnamed)", false) + " ("
-									+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
-									+ " lines)")), false);
+					disable(new JTextField(
+							experimentHeader == null || experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
+									""
+											+ SystemOptions.getInstance(null,
+													new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
+													"pipeline_name", "(unnamed)", false) + " ("
+											+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
+											+ " lines)")), false);
 		} catch (Exception err) {
 			fp.addGuiComponentRow(new JLabel("Analysis Settings"),
 					disable(new JTextField("(improperly defined: error " + err.getMessage() + ")")), false);

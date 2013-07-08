@@ -603,14 +603,8 @@ public class IAPmain extends JApplet {
 		res.add(fillLenLA("*  Contribution to pipeline development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Jean-Michel Pape  *", " ", l, 2));
 		res.add(fillLen("**", l));
-		boolean modellingAvailable = false;
-		if (modellingAvailable) {
-			res.add(fillLenLA("*  External statistics and growth modelling:  *", " ", l, 2));
-			res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
-			res.add(fillLen("**", l));
-		}
-		res.add(fillLenLA("*  Contribution to library code and external *", " ", l, 2));
-		res.add(fillLenLA("*     scripts: H. Rohn (PBI), A. Entzian  *", " ", l, 2));
+		res.add(fillLenLA("*  External post-processing:  *", " ", l, 2));
+		res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add("***************************************************");
 		return res;
