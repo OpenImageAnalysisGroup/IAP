@@ -18,4 +18,6 @@ public interface IniIoProvider {
 	public long storedLastUpdateTime();
 	
 	public void setStoredLastUpdateTime(long mt);
+	
+	public boolean isAbleToSaveData();
 }

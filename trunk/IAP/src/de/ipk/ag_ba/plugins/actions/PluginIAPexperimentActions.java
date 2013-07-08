@@ -34,7 +34,8 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
 		
 		actions.add(new ActionViewExportData());
-		actions.add(new ActionAnalysis("Analysis Tasks"));
+		if (experimentReference.getIniIoProvider() != null && experimentReference.getIniIoProvider().isAbleToSaveData())
+			actions.add(new ActionAnalysis("Analysis Tasks"));
 		actions.add(new ActionPdfReport("Automated diagram creation and report generation"));
 		
 		if (IAPmain.getRunMode() == IAPrunMode.WEB) {

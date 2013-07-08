@@ -38,20 +38,22 @@ public abstract class VirtualFileSystem {
 	public static ArrayList<VirtualFileSystem> getKnown(boolean excludeNonUserItems) {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>(knownFileSystems);
 		
-		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", false);
-		int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
+		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", true);
+		int n = SystemOptions.getInstance().getInteger("VFS", "n", 1);
 		int realN = n;
 		if (n < 1)
-			n = 1;
+			n = 2;
 		
 		for (int idx = 1; idx <= n; idx++) {
-			boolean en = SystemOptions.getInstance().getBoolean("VFS-" + idx, "enabled", false);
-			String url_prefix = SystemOptions.getInstance().getString("VFS-" + idx, "url_prefix", "desktop");
+			boolean en = SystemOptions.getInstance().getBoolean("VFS-" + idx, "enabled",
+					idx == 1 ? true : false);
+			String url_prefix = SystemOptions.getInstance().getString("VFS-" + idx, "url_prefix",
+					idx == 1 ? "web-example" : "desktop");
 			String desc = SystemOptions.getInstance().getString("VFS-" + idx, "description",
-					"Desktop/VFS");
-			VfsFileProtocol vfs_type = VfsFileProtocol.LOCAL;
-			String types = VfsFileProtocol.LOCAL + "";
-			if (idx > 1) {
+					idx == 1 ? "Example Dataset" : "Desktop/VFS");
+			VfsFileProtocol vfs_type = idx == 1 ? VfsFileProtocol.HTTP : VfsFileProtocol.LOCAL;
+			String types = vfs_type + "";
+			if (idx > 2) {
 				String s = StringManipulationTools.getStringList(VfsFileProtocol.values(), ",");
 				types = "#valid: " + s;
 			}
@@ -62,12 +64,13 @@ public abstract class VirtualFileSystem {
 				SystemOptions.getInstance().setString("VFS-" + idx, "vfs_type", types);
 			}
 			String protocol_desc = SystemOptions.getInstance().getString("VFS-" + idx, "protocol_description",
-					idx < 2 ? "local file I/O" : "#protocol description");
-			String host = SystemOptions.getInstance().getString("VFS-" + idx, "host", idx < 2 ? "" : "#IP/hostname");
+					idx == 1 ? "HTTP download" : (idx < 3 ? "local file I/O" : "#protocol description"));
+			String host = SystemOptions.getInstance().getString("VFS-" + idx, "host",
+					idx == 1 ? "iap.ipk-gatersleben.de" : (idx < 3 ? "" : "#IP/hostname"));
 			String user = SystemOptions.getInstance().getString("VFS-" + idx, "user", idx < 2 ? "null" : "");
 			String pass = SystemOptions.getInstance().getString("VFS-" + idx, "password", idx < 2 ? "null" : "");
 			String dir = SystemOptions.getInstance().getString("VFS-" + idx, "directory",
-					idx < 2 ? ReleaseInfo.getDesktopFolder() + File.separator + "IAP" : "#/subdir");
+					idx == 1 ? "datasets" : (idx < 3 ? ReleaseInfo.getDesktopFolder() + File.separator + "IAP" : "#/subdir"));
 			boolean useForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Store Mongo-DB files", false);
 			boolean useOnlyForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Use only for Mongo-DB storage", false);
 			String useForMongoFileStorageCloudName = SystemOptions.getInstance().getString("VFS-" + idx, "Mongo-DB database name", "");
@@ -224,4 +227,6 @@ public abstract class VirtualFileSystem {
 		vfsSrc.setToolTipText("Target: " + vfsEntry.getTargetPathName() + " via " + vfsEntry.getTransferProtocolName());
 		return vfsSrc;
 	}
+	
+	public abstract boolean isAbleToSaveData();
 }

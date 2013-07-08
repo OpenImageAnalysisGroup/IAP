@@ -643,4 +643,26 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	@Override
+	public boolean isAbleToSaveData() {
+		switch (vfs_type) {
+			case FTP:
+				return true;
+			case FTPS:
+				return true;
+			case HTTP:
+				return false;
+			case HTTPS:
+				return false;
+			case LOCAL:
+				return true;
+			case SFTP:
+				return true;
+			case WebDAV:
+				return true;
+			default:
+				return false;
+		}
+	}
 }
