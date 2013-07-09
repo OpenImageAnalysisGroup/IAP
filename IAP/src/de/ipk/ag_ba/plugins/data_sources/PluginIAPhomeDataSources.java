@@ -12,6 +12,7 @@ import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.RimasDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
+import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
@@ -69,12 +70,14 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 	public DataSource[] getDataSources() {
 		ArrayList<DataSource> result = new ArrayList<DataSource>();
 		
-		result.add(new IAPnewsLinksSource(dsg));
-		result.add(new RimasDataSource(dsg));
-		result.add(new MetaCropDataSource(dsg));
-		result.add(new SBGNdataSource(dsg));
-		result.add(new VANTEDdataSource(dsg));
-		
+		boolean toolLinks = IAPoptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", false);
+		if (toolLinks) {
+			result.add(new IAPnewsLinksSource(dsg));
+			result.add(new RimasDataSource(dsg));
+			result.add(new MetaCropDataSource(dsg));
+			result.add(new SBGNdataSource(dsg));
+			result.add(new VANTEDdataSource(dsg));
+		}
 		return result.toArray(new DataSource[] {});
 	}
 }
