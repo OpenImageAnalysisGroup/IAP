@@ -29,14 +29,15 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("process VIS and FLUO", true) && processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to VIS
 			if (processedMasks.vis() != null) {
-				double f = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
+				double fW = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
+				double fH = (double) processedMasks.vis().getHeight() / (double) processedMasks.fluo().getHeight();
 				processedMasks.setVis(
 						processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 								processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on vis", 40)).getImage(),
 								back).show("FILTERED VIS IMAGE", debug).getImage());
 				processedMasks.setFluo(
 						processedMasks.fluo().io().copy().applyMask(
-								processedMasks.vis().io().resize(1d / f, 1d / f).blur(getDouble("blur vis mask on fluo", 40d)).getImage(),
+								processedMasks.vis().io().resize(1d / fW, 1d / fH).blur(getDouble("blur vis mask on fluo", 40d)).getImage(),
 								back).show("FILTERED FLUO IMAGE", debug).getImage());
 			}
 		}
