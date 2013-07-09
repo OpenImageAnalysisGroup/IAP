@@ -328,7 +328,7 @@ public class Experiment implements ExperimentInterface {
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean mergeExperimentsReturnOnlyOne) throws Exception {
 		
-		HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>> experimentName2substanceName2Conditions = new HashMap<String, LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>>();
+		HashMap<String, LinkedHashMap<SubstanceInterface, LinkedHashMap<String, ConditionInterface>>> experimentName2substanceName2Conditions = new HashMap<String, LinkedHashMap<SubstanceInterface, LinkedHashMap<String, ConditionInterface>>>();
 		
 		String experimentNameForAll = null;
 		
@@ -336,9 +336,6 @@ public class Experiment implements ExperimentInterface {
 			status.setCurrentStatusText2("Extracting metadata from elements");
 		if (mappingDataList != null)
 			for (SubstanceInterface substance : mappingDataList) {
-				String substanceName = substance.getName();
-				if (substanceName == null)
-					ErrorMsg.addErrorMessage("INTERNAL ERROR: Substance-Name is NULL!");
 				for (ConditionInterface condition : substance) {
 					String expName = condition.getExperimentName();
 					if (mergeExperimentsReturnOnlyOne
@@ -351,31 +348,30 @@ public class Experiment implements ExperimentInterface {
 							.containsKey(expName))
 						experimentName2substanceName2Conditions
 								.put(expName,
-										new LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>>());
+										new LinkedHashMap<SubstanceInterface, LinkedHashMap<String, ConditionInterface>>());
 					
 					if (!experimentName2substanceName2Conditions.get(expName)
-							.containsKey(substanceName))
+							.containsKey(substance))
 						experimentName2substanceName2Conditions
 								.get(expName)
-								.put(substanceName,
-										new LinkedHashMap<String, ConditionInterface>());
+								.put(substance, new LinkedHashMap<String, ConditionInterface>());
 					
 					if (!experimentName2substanceName2Conditions
 							.get(expName)
-							.get(substanceName)
+							.get(substance)
 							.containsKey(
 									((Condition) condition)
 											.getConditionName(false))) {
 						experimentName2substanceName2Conditions
 								.get(expName)
-								.get(substanceName)
+								.get(substance)
 								.put(((Condition) condition)
 										.getConditionName(false),
 										condition);
 					} else {
 						experimentName2substanceName2Conditions
 								.get(expName)
-								.get(substanceName)
+								.get(substance)
 								.get(((Condition) condition)
 										.getConditionName(false))
 								.addAll(condition);
@@ -411,12 +407,12 @@ public class Experiment implements ExperimentInterface {
 				r.append("<experimentdata>");
 				
 				int measurementcount = 0;
-				LinkedHashMap<String, LinkedHashMap<String, ConditionInterface>> substances2conditions =
+				LinkedHashMap<SubstanceInterface, LinkedHashMap<String, ConditionInterface>> substances2conditions =
 						experimentName2substanceName2Conditions.get(expName);
 				ConditionInterface c1 = substances2conditions.values()
 						.iterator().next().values().iterator().next();
 				
-				for (String substance : substances2conditions.keySet()) {
+				for (SubstanceInterface substance : substances2conditions.keySet()) {
 					for (ConditionInterface sd : substances2conditions.get(substance).values()) {
 						for (SampleInterface sample : sd)
 							measurementcount += sample.size();
@@ -432,24 +428,16 @@ public class Experiment implements ExperimentInterface {
 				}
 				r.append("<measurements>");
 				
-				for (String substance : substances2conditions.keySet()) {
+				for (SubstanceInterface substance : substances2conditions.keySet()) {
 					if (status != null)
-						status.setCurrentStatusText2("Process " + substance);
-					
-					SubstanceInterface s = null;
-					
-					for (SubstanceInterface sub : mappingDataList)
-						if (sub.getName().equals(substance))
-							s = sub;
-					{
-						StringBuilder rr = new StringBuilder();
-						s.getSubstanceString(rr);
-						for (ConditionInterface sd : substances2conditions.get(substance).values()) {
-							sd.getStringForDocument(rr);
-						}
-						rr.append("</substance>");
-						r.append(rr.toString());
+						status.setCurrentStatusText2("Process " + substance.getName());
+					StringBuilder rr = new StringBuilder();
+					substance.getSubstanceString(rr);
+					for (ConditionInterface sd : substances2conditions.get(substance).values()) {
+						sd.getStringForDocument(rr);
 					}
+					rr.append("</substance>");
+					r.append(rr.toString());
 				}
 				
 				r.append("</measurements>");
@@ -556,7 +544,7 @@ public class Experiment implements ExperimentInterface {
 	/*
 	 * Delegate methods
 	 */
-
+	
 	@Override
 	public synchronized boolean isEmpty() {
 		for (SubstanceInterface s : this)
