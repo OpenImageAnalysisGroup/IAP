@@ -29,8 +29,8 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 		this.ss_NIR = getDouble("NIR calibration rectangle final size plus", 15d);
 		
 		this.whiteLevel_255d_VIS = getDouble("VIS target brightness", 255d);
-		this.s0_VIS = getDouble("VIS calibration rectangle start size", 45d);
-		this.ss_VIS = getDouble("VIS calibration rectangle final size plus", 15d);
+		this.s0_VIS = getDouble("VIS calibration rectangle start size", 75d);
+		this.ss_VIS = getDouble("VIS calibration rectangle final size plus", 45d);
 	}
 	
 	@Override
