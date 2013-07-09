@@ -51,11 +51,11 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 			if (getBoolean("process " + optics, true)) {
 				String pf = "";
 				processedMask = processedMask.filterRemoveLAB(
-						getInt("min L", options.getCameraPosition() == CameraPosition.TOP ? 120 : 130),
+						getInt("min L", options.getCameraPosition() == CameraPosition.TOP ? 120 : 120),
 						getInt("max L", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
 						getInt("min A", options.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
-						getInt("max A", options.getCameraPosition() == CameraPosition.TOP ? 127 : 120),
-						getInt("min B", options.getCameraPosition() == CameraPosition.TOP ? 127 : 127),
+						getInt("max A", options.getCameraPosition() == CameraPosition.TOP ? 138 : 138),
+						getInt("min B", options.getCameraPosition() == CameraPosition.TOP ? 125 : 125),
 						getInt("max B", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
 						options.getBackground(),
 						getBoolean(pf + "invert", false));
