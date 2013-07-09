@@ -62,12 +62,13 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				// preprocessing
 				new BlRotate(),
 				new BlAlign(),
+				new BlDetectBlueMarkers(),
+				new BlCutFromSide(),
+				
 				new BlColorBalanceVerticalVis(),
 				new BlColorBalanceVerticalFluo(),
 				new BlColorBalanceVerticalNir(),
 				new BlColorBalanceCircularVisNir(),
-				new BlDetectBlueMarkers(),
-				new BlCutFromSide(),
 				
 				// segmentation
 				new BlRemoveBackground(),

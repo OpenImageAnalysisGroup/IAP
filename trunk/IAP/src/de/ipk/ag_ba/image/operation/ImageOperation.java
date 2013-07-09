@@ -479,13 +479,12 @@ public class ImageOperation {
 	 */
 	public ImageOperation applyMask(Image mask, int background) {
 		
-		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
+		// copy().crossfade(mask.copy(), 2, 4, 3).show("OVERLAY");
 		
 		int[][] maskPixels = mask.getAs2A();
 		int[][] originalImage = getImageAs2dArray();
 		int mW = mask.getWidth();
 		int mH = mask.getHeight();
-		int del = 0;
 		for (int x = 0; x < getWidth(); x++) {
 			for (int y = 0; y < getHeight(); y++) {
 				int maskPixel;
@@ -496,12 +495,11 @@ public class ImageOperation {
 				
 				if (maskPixel == background) {
 					originalImage[x][y] = background;
-					del++;
 				}
 			}
 		}
 		
-		return new ImageOperation(originalImage).show("HHHH (deleted " + del + ")", false).setCameraType(getCameraType());
+		return new ImageOperation(originalImage).setCameraType(getCameraType());
 	}
 	
 	/**

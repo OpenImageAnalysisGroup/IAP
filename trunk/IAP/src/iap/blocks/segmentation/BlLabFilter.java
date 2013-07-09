@@ -5,6 +5,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
@@ -50,12 +51,12 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 			if (getBoolean("process " + optics, true)) {
 				String pf = "";
 				processedMask = processedMask.filterRemoveLAB(
-						getInt("min L", 120),
-						getInt("max L", 255),
-						getInt("min A", 0),
-						getInt("max A", 127),
-						getInt("min B", 127),
-						getInt("max B", 255),
+						getInt("min L", options.getCameraPosition() == CameraPosition.TOP ? 120 : 130),
+						getInt("max L", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
+						getInt("min A", options.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
+						getInt("max A", options.getCameraPosition() == CameraPosition.TOP ? 127 : 120),
+						getInt("min B", options.getCameraPosition() == CameraPosition.TOP ? 127 : 127),
+						getInt("max B", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
 						options.getBackground(),
 						getBoolean(pf + "invert", false));
 				
