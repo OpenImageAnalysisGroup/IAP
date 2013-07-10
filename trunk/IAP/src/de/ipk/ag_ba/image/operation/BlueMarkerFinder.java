@@ -21,15 +21,13 @@ public class BlueMarkerFinder {
 	
 	private final Image input;
 	private ResultsTable resultTable;
-	private final double scale;
 	private final CameraPosition typ;
 	private final boolean maize;
 	private final int inputImageWidth;
 	private ImageOperation markerPositionsImage;
 	
-	public BlueMarkerFinder(Image image, double scale, CameraPosition typ, boolean maize, boolean debug) {
+	public BlueMarkerFinder(Image image, CameraPosition typ, boolean maize, boolean debug) {
 		this.input = image;
-		this.scale = scale;
 		this.typ = typ;
 		this.maize = maize;
 		this.inputImageWidth = this.input.getWidth();
@@ -38,7 +36,7 @@ public class BlueMarkerFinder {
 	
 	public void findCoordinates(int background) {
 		ImageOperation io1 = new ImageOperation(input);
-		double scaleFactor = scale;
+		double scaleFactor = 1 / 1.2d;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
 		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, ImageOperation.BACKGROUND_COLORint).getImage()

@@ -2823,10 +2823,9 @@ public class ImageOperation {
 	}
 	
 	public ImageOperation searchBlueMarkers(
-			ArrayList<MarkerPair> result,
-			double options, CameraPosition typ, boolean maize,
+			ArrayList<MarkerPair> result, CameraPosition typ, boolean maize,
 			boolean clearBlueMarkers, boolean debug) {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), options, typ, maize, debug);
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), typ, maize, debug);
 		
 		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint);
 		
