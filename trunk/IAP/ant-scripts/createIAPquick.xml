@@ -7,7 +7,7 @@
             <fileset dir="../IAP Transfer/bin"/>
             <fileset dir="../IAP/bin"/>
             <fileset dir="../Graffiti_Core/build/classes"/>
-            <fileset dir="../IAP CONSOLE/bin"/>
+            <!-- <fileset dir="../IAP CONSOLE/bin"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-codec-1.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-collections-3.2.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-logging-1.1.1.jar"/>
