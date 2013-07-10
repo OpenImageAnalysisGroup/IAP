@@ -14,7 +14,6 @@ import javax.swing.JLabel;
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.HelperClass;
-import org.Release;
 import org.ReleaseInfo;
 import org.UpdateInfoResult;
 import org.graffiti.editor.MainFrame;
@@ -76,24 +75,13 @@ public class RSSFeedManager implements HelperClass {
 	}
 	
 	private String getStandardFeedDefinition(String text) {
-		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR) {
-			String url1 = "http://sourceforge.net/export/rss2_projnews.php?group_id=196037" + urlSeparator
-					+ "http://kgml-ed.ipk-gatersleben.de/KGML-ED/Notes/rss.xml";
-			if (text.indexOf(url1) <= 0)
-				text = "KGML-ED Notes" + System.getProperty("line.separator") +
-						url1 + System.getProperty("line.separator");
-		} else {
-			// String url2 = "http://sourceforge.net/export/rss2_projnews.php?group_id=196037" + urlSeparator
-			// + "http://kgml-ed.ipk-gatersleben.de/KGML-ED/VANTED%20news/rss.xml";
-			// if (text.indexOf(url2) <= 0)
-			// text = "Development Notes" + System.getProperty("line.separator") +
-			// url2 + System.getProperty("line.separator");
-		}
-		String url3 = "http://vanted.ipk-gatersleben.de/literature.xml";
+		String url1 = "http://sourceforge.net/p/iapg2p/blog/feed"; // + urlSeparator + "http://kgml-ed.ipk-gatersleben.de/KGML-ED/Notes/rss.xml";
+		if (text.indexOf(url1) <= 0)
+			text = "Development News" + System.getProperty("line.separator") + url1 + System.getProperty("line.separator");
+		String url3 = "http://iap.ipk-gatersleben.de/literature.xml";
 		if (text.indexOf(url3) <= 0)
 			text += "Publications" + System.getProperty("line.separator") +
 					url3 + System.getProperty("line.separator");
-		
 		return text;
 	}
 	

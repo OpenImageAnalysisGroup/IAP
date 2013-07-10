@@ -96,6 +96,8 @@ public class ActionAbout extends AbstractNavigationAction {
 		
 		rr.add(new NavigationButton(new ActionFeedback("Send feedback mail"), guiSetting));
 		
+		rr.add(new NavigationButton(new ActionShowRSS("Show content of RSS news feeds"), guiSetting));
+		
 		return rr;
 	}
 }
