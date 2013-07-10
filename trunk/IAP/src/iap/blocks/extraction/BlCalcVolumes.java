@@ -186,7 +186,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 								}
 						}
 					}
-					if (normalized && ignoreNormalizedData) {
+					if (normalized && (ignoreNormalizedData || topAreaCnt == 0)) {
 						// use not normalized top data if normalized side data is available but no normalized top data
 						for (String key : ks2) {
 							BlockResultSet rt;
