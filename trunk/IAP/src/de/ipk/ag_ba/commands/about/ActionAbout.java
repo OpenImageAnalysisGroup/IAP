@@ -68,6 +68,9 @@ public class ActionAbout extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>();
+		
+		rr.add(new NavigationButton(new ActionShowRSS("Show content of RSS news feeds"), guiSetting));
+		
 		Book book = new Book(null, "<html><center>" +
 				"User Documentation<br>" +
 				"<font color='gray'><small>(online PDF)</small></font></center>",
@@ -95,8 +98,6 @@ public class ActionAbout extends AbstractNavigationAction {
 		rr.add(new NavigationButton(new ActionAboutLicense("List of external library licenses"), guiSetting));
 		
 		rr.add(new NavigationButton(new ActionFeedback("Send feedback mail"), guiSetting));
-		
-		rr.add(new NavigationButton(new ActionShowRSS("Show content of RSS news feeds"), guiSetting));
 		
 		return rr;
 	}

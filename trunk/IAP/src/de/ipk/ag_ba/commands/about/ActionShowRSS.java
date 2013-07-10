@@ -104,6 +104,7 @@ public class ActionShowRSS extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "News Feeds";
+		return "<html><center>News<br>" +
+				"<font color='gray'><small>(RSS feeds)</small></font></center>";
 	}
 }
