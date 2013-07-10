@@ -1,2 +1,0 @@
-#!/bin/bash
-scp vanted.jar vanted@vanted:htdocs/IAP/iap.jar
