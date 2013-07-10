@@ -93,6 +93,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			// waiting until all other plugins have been loaded, then load addons
 			Thread t = new Thread(new Runnable() {
 				
+				@Override
 				public void run() {
 					waitLoop: while (true) {
 						try {
@@ -183,67 +184,6 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		}
 	}
 	
-	// public void loadInitAddons() {
-	// long time = System.currentTimeMillis();
-	// // get the vanted-home-folder
-	// String folder = ReleaseInfo.getAppSubdirFolder("addons");
-	// File dir = new File(folder);
-	// String folderC = ReleaseInfo.getAppSubdirFolder("commands");
-	// File dirC = new File(folderC);
-	// if (dir.exists()) {// should be created by getAppSubdirFolder if
-	// // non-existent
-	// File deactivatedlist = new File(folder + File.separator
-	// + "deactivated.txt");
-	// if (!deactivatedlist.exists())
-	// try {
-	// deactivatedlist.createNewFile();
-	// } catch (IOException e1) {
-	// ErrorMsg.addErrorMessage(e1);
-	// }
-	//
-	// // deactivatedAddonsList =
-	// // getDeactivatedListFromFile(deactivatedlist);
-	//
-	// System.out.println("Trying to load init command add-ons... ");
-	// // for all jar-files in "plugins"
-	// for (File f : getJarFileList(dirC))
-	// addAddon(f);
-	// if (getJarFileList(dirC).length > 0)
-	// System.out.println("Init command add-ons loaded in "
-	// + (System.currentTimeMillis() - time) + "ms");
-	// else
-	// System.out.println("No init command add-ons found.");
-	// }
-	// }
-	
-	// public static void loadOptionalProgramFeatureAddons() {
-	// long time = System.currentTimeMillis();
-	//
-	// String folder = ReleaseInfo.getAppSubdirFolder("addons");
-	// File dir = new File(folder);
-	// if(dir.exists()) {//should be created by getAppSubdirFolder if
-	// non-existent
-	// File deactivatedlist = new File(folder+File.separator+"deactivated.txt");
-	// if(!deactivatedlist.exists())
-	// try {
-	// deactivatedlist.createNewFile();
-	// } catch (IOException e1) {
-	// ErrorMsg.addErrorMessage(e1);
-	// }
-	//
-	// deactivatedAddonsList = getDeactivatedListFromFile(deactivatedlist);
-	//
-	// System.out.println("Initialize optional program features...");
-	// //for all jar-files in "plugins"
-	// for(File f : getJarFileList(dirC))
-	// addAddon(f);
-	// if(getJarFileList(dirC).length>0)
-	// System.out.println("Optional program features initialized in "+(System.currentTimeMillis()-time)+"ms");
-	// else
-	// System.out.println("No optional program features found.");
-	// }
-	// }
-	
 	/**
 	 * Gets all jar files from Add-on directory.
 	 * 
@@ -257,6 +197,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			return new File[] {};
 		}
 		return dir.listFiles(new FileFilter() {
+			@Override
 			public boolean accept(File f) {
 				boolean result;
 				try {
@@ -337,6 +278,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 				if (isactive) {
 					if (!SwingUtilities.isEventDispatchThread()) {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								try {
 									MainFrame.getInstance().getPluginManager().loadPlugin(pd, xmlURL, false);
@@ -509,6 +451,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		// get rid of the buttons etc
 		SwingUtilities.invokeLater(new Runnable() {
 			
+			@Override
 			public void run() {
 				Session s = MainFrame.getInstance().getActiveSession();
 				if (s == null)
@@ -520,6 +463,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		
 		// get rid of the new tabs
 		BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
+			@Override
 			public void run() {
 				Session s = MainFrame.getInstance().getActiveSession();
 				if (((Inspector) MainFrame.getInstance().getInspectorPlugin()) != null)
@@ -701,10 +645,12 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	public void showManageAddonDialog(final String msg, final boolean highlightUpdate) {
 		showManageAddonDialog();
 		BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+			@Override
 			public void run() {
 				dialog.setTopText(msg);
 				if (highlightUpdate)
 					BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+						@Override
 						public void run() {
 							dialog.highlightFindUpdatesButton();
 						}
@@ -724,6 +670,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		}
 	}
 	
+	@Override
 	public boolean process(List<File> files) {
 		for (File f : files) {
 			if (f.getAbsolutePath().toLowerCase().endsWith(".jar")) {
@@ -757,6 +704,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		return instance.startupAddonsLoaded;
 	}
 	
+	@Override
 	public boolean canProcess(File f) {
 		return f.getAbsolutePath().toLowerCase().endsWith(".jar");
 	}
@@ -767,6 +715,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.DragAndDropHandler
 	 * #hasPriority()
 	 */
+	@Override
 	public boolean hasPriority() {
 		return false;
 	}

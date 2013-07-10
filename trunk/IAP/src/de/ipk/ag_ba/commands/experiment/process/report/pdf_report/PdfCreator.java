@@ -42,8 +42,6 @@ public class PdfCreator {
 	
 	private final File optTargetDirectoryOrTargetFile;
 	
-	private ArrayList<String> lastOutput;
-	
 	private boolean useIndividualReportNames;
 	
 	public PdfCreator(File optTargetDirectoryOrTargetFile) {
@@ -107,7 +105,6 @@ public class PdfCreator {
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "script debug function", false),
 				SystemOptions.getInstance().getBoolean("PDF Report Generation", "catch errors", true));
 		
-		this.lastOutput = lastOutput;
 		readAndModifyLaTexFile("reportDefGeneralSection.tex", exp);
 		
 		String name = tempDirectory.getAbsolutePath() + File.separator + "diagramIAP.cmd";
@@ -142,6 +139,7 @@ public class PdfCreator {
 					LocalComputeJob t1 = null;
 					try {
 						t1 = new LocalComputeJob(new Runnable() {
+							@SuppressWarnings("deprecation")
 							@Override
 							public void run() {
 								String response;
@@ -170,6 +168,7 @@ public class PdfCreator {
 					LocalComputeJob t2 = null;
 					try {
 						t2 = new LocalComputeJob(new Runnable() {
+							@SuppressWarnings("deprecation")
 							@Override
 							public void run() {
 								String response;

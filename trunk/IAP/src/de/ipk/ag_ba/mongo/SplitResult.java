@@ -138,7 +138,8 @@ public class SplitResult {
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
 			String msg = "loading: " + s1.getTime() + " ms";
-			System.out.print(tso.getInt() + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2] + " // loaded in " + s1.getTime() + " ms");
+			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: " + (tso.getInt() + 1) + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]
+					+ " // loaded in " + s1.getTime() + " ms");
 			if (optStatus != null)
 				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 			// for (String c : condS)
