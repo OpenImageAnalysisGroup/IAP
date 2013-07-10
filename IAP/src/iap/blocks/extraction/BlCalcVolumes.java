@@ -164,46 +164,23 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 				double topAreaSum = 0;
 				double topAreaCnt = 0;
 				
-				boolean ignoreNormalizedData = normalized && getBoolean("Ignore Normalized Top Data", false);
-				
 				synchronized (allResultsForSnapshot) {
 					TreeSet<String> ks2 = new TreeSet<String>(allResultsForSnapshot.keySet());
-					if (!normalized || (normalized && !ignoreNormalizedData)) {
-						for (String key : ks2) {
-							BlockResultSet rt;
-							synchronized (allResultsForSnapshot) {
-								HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
-								if (kk == null)
-									continue;
-								rt = allResultsForSnapshot.get(key).get(tray);
-							}
-							if (rt != null)
-								for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
-									if (v.getValue() != null) {
-										topAreaSum += v.getValue().doubleValue();
-										topAreaCnt += 1;
-									}
-								}
+					for (String key : ks2) {
+						BlockResultSet rt;
+						synchronized (allResultsForSnapshot) {
+							HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
+							if (kk == null)
+								continue;
+							rt = allResultsForSnapshot.get(key).get(tray);
 						}
-					}
-					if (normalized && (ignoreNormalizedData || topAreaCnt == 0)) {
-						// use not normalized top data if normalized side data is available but no normalized top data
-						for (String key : ks2) {
-							BlockResultSet rt;
-							synchronized (allResultsForSnapshot) {
-								HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
-								if (kk == null)
-									continue;
-								rt = allResultsForSnapshot.get(key).get(tray);
-							}
-							if (rt != null)
-								for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area")) {
-									if (v.getValue() != null) {
-										topAreaSum += v.getValue().doubleValue();
-										topAreaCnt += 1;
-									}
+						if (rt != null)
+							for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
+								if (v.getValue() != null) {
+									topAreaSum += v.getValue().doubleValue();
+									topAreaCnt += 1;
 								}
-						}
+							}
 					}
 				}
 				

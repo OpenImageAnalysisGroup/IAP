@@ -64,7 +64,7 @@ public class ImageProcessorOptions {
 			if (lateOrEarly != null && cameraConfig == null)
 				inf = " (" + lateOrEarly + ")";
 			else
-				if (cameraConfig == null && lateOrEarly != null)
+				if (cameraConfig != null && lateOrEarly == null)
 					inf = " for " + cameraConfig;
 				else
 					inf = " for " + cameraConfig + " (" + lateOrEarly + ")";
