@@ -17,6 +17,7 @@ import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.LTdocuSource;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -54,8 +55,20 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	 */
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		
 		return result;
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		if (listOfDatabases != null && listOfDatabases.size() > 0)
+			return super.getResultMainPanel();
+		else {
+			return new MainPanelComponent("<h1>Setup Required!</h1>" +
+					"No databases could be found. The most likely reason is, that the settings for accessing the database are not<br>" +
+					"correctly set. Click '<b>Start &gt; Settings &gt; Lt-db &gt; PostgreSQL</b>' and specify the database host name,<br>" +
+					"the database user name and password.<br><br>" +
+					"Click '<b>Start &gt; About &gt; User Documentation</b>' for more detailed instructions.");
+		}
 	}
 	
 	/*

@@ -596,7 +596,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	private String getPass() {
-		if (pass != null && pass.equals("?")) {
+		if (user != null && pass != null && pass.equals("?")) {
 			askForPassword = true;
 			Object[] inp = MyInputHelper.getInput("For accessing " + host + " as user " + user + " you need to provide a password:",
 					"Enter Password", "Password", "");

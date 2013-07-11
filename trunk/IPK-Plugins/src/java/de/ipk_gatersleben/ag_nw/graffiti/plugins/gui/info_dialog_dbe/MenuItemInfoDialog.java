@@ -137,9 +137,9 @@ public class MenuItemInfoDialog
 				}
 				
 				if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
-					copyR = "&copy; 2003-2012 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
+					copyR = "&copy; 2003-2013 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
 				else
-					copyR = "(c) 2003-2012 IPK-Gatersleben";
+					copyR = "(c) 2003-2013 IPK-Gatersleben";
 				
 				int num = 0;
 				num = MainFrame.getInstance().getPluginManager().getPluginEntries().size();
@@ -183,8 +183,10 @@ public class MenuItemInfoDialog
 												: "")
 										+
 										"<b>Development</b>"
-										+
-										"<br><br>"
+										+ "<br><br>"
+										+ "IAP-Data-Navigator is one of the core components of the Integrated Analysis<br>" +
+										"Platform (IAP). IAP is developed since May 2010 by the research group image<br>" +
+										"analysis, lead by C. Klukas.<br><br>"
 										+
 										"VANTED has been designed and implemented mainly by Christian Klukas in the<br>"
 										+
