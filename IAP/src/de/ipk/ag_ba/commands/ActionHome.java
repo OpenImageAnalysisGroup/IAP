@@ -48,7 +48,7 @@ public final class ActionHome extends AbstractNavigationAction {
 		NavigationButton serverStatusEntity = Other.getServerStatusEntity(src != null ? src.getGUIsetting() : null);
 		homePrimaryActions.add(serverStatusEntity);
 		
-		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", false);
+		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
 		if (vfs) {
 			// add VFS entries
 			for (VirtualFileSystem vfsEntry : VirtualFileSystem.getKnown(true)) {

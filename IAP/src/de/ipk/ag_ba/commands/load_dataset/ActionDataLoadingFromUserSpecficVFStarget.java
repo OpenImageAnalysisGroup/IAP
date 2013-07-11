@@ -22,9 +22,9 @@ import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigationAction implements NavigationAction {
 	
-	private VfsFileProtocol p;
+	private VfsFileProtocol vfsProtocol;
 	
-	private String host = "", user = "", pass = "", directory = "", vfsName;
+	private String host = "", user = "", pass = "", directory = "", description = "", vfsName;
 	private boolean saveVFS = false, savePassWithVFS = false;
 	private ActionHsmDataSourceNavigation vfsAction;
 	private NavigationButton src;
@@ -37,7 +37,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 	
 	public ActionDataLoadingFromUserSpecficVFStarget(String tooltip, VfsFileProtocol p) {
 		super(tooltip);
-		this.p = p;
+		this.vfsProtocol = p;
 	}
 	
 	@Override
@@ -45,19 +45,20 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 		if (vfsAction != null)
 			return null;
 		ParameterOptions po = new ParameterOptions(
-				"<html><br>Please specify remote access information:<br>&nbsp;",
+				"<html><br>Please specify " + (vfsProtocol != VfsFileProtocol.LOCAL ? "remote" : "") + " access information:<br>&nbsp;",
 				new Object[] {
-						"Host name/IP", host,
-						"User name", user,
-						"Password", pass,
-						"Sub-directory", directory,
+						vfsProtocol != VfsFileProtocol.LOCAL ? "Host name/IP" : null, vfsProtocol != VfsFileProtocol.LOCAL ? host : new JLabel(),
+						vfsProtocol != VfsFileProtocol.LOCAL ? "User name" : null, vfsProtocol != VfsFileProtocol.LOCAL ? user : new JLabel(),
+						vfsProtocol != VfsFileProtocol.LOCAL ? "Password" : null, vfsProtocol != VfsFileProtocol.LOCAL ? pass : new JLabel(),
+						vfsProtocol != VfsFileProtocol.LOCAL ? "Sub-directory" : "Directory", directory,
+						"Description", description,
 						"", new JLabel("<html>&nbsp;"),
 						"<html>Create permanent<br>VFS entry", false,
-						"Save Password", savePassWithVFS,
+						vfsProtocol != VfsFileProtocol.LOCAL ? "Save Password" : null, vfsProtocol != VfsFileProtocol.LOCAL ? savePassWithVFS : new JLabel(),
 						"VFS entry name", "Storage 1",
 						"", new JLabel("<html><small><font color='gray'>"
 								+ "The VFS entry is only created if the connection<br>"
-								+ "to the target site can be established. The main<br>"
+								+ "with the target site can be established. The main<br>"
 								+ "Copy command displays defined VFS entries as new<br>"
 								+ "targets. The Home action command displays them as<br>"
 								+ "additional storage sites. Click Settings do disable<br>" +
@@ -71,13 +72,18 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 	public void setParameters(Object[] parameters) {
 		super.setParameters(parameters);
 		int i = 0;
-		host = (String) parameters[i++];
-		user = (String) parameters[i++];
-		pass = (String) parameters[i++];
+		host = vfsProtocol != VfsFileProtocol.LOCAL ? (String) parameters[i++] : null;
+		user = vfsProtocol != VfsFileProtocol.LOCAL ? (String) parameters[i++] : null;
+		pass = vfsProtocol != VfsFileProtocol.LOCAL ? (String) parameters[i++] : null;
+		if (vfsProtocol == VfsFileProtocol.LOCAL)
+			i += 3;
 		directory = (String) parameters[i++];
+		description = (String) parameters[i++];
 		i++;
 		saveVFS = (Boolean) parameters[i++];
-		savePassWithVFS = (Boolean) parameters[i++];
+		savePassWithVFS = vfsProtocol != VfsFileProtocol.LOCAL ? (Boolean) parameters[i++] : false;
+		if (vfsProtocol == VfsFileProtocol.LOCAL)
+			i += 1;
 		vfsName = (String) parameters[i++];
 	}
 	
@@ -86,14 +92,16 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 		this.src = src;
 		if (vfsAction != null)
 			return;
-		String pref = "remote." + (p + "").toLowerCase() + "." + System.currentTimeMillis();
+		String pref = "remote." + (vfsProtocol + "").toLowerCase() + "." + System.currentTimeMillis();
 		if (saveVFS)
 			pref = "vfs." + StringManipulationTools.getFileSystemName(vfsName).toLowerCase() + "." + System.currentTimeMillis();
 		VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
 				pref,
-				p,
-				(user != null && !user.trim().isEmpty() ? user + "@" + host : host),
-				"temporary defined " + p + " I/O",
+				vfsProtocol,
+				vfsProtocol != VfsFileProtocol.LOCAL ?
+						(description.isEmpty() ? (user != null && !user.trim().isEmpty() ? user + "@" + host : host) : description) :
+						description,
+				"temporary defined " + vfsProtocol + " I/O",
 				host,
 				user,
 				pass == null || pass.isEmpty() ? "?" : pass,
@@ -134,8 +142,8 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 			SystemOptions.getInstance().setBoolean("VFS-" + idx, "enabled", true);
 			SystemOptions.getInstance().setString("VFS-" + idx, "url_prefix", pref);
 			SystemOptions.getInstance().setString("VFS-" + idx, "description", vfsName);
-			SystemOptions.getInstance().setString("VFS-" + idx, "vfs_type", p + "");
-			SystemOptions.getInstance().setString("VFS-" + idx, "protocol_description", p + " I/O");
+			SystemOptions.getInstance().setString("VFS-" + idx, "vfs_type", vfsProtocol + "");
+			SystemOptions.getInstance().setString("VFS-" + idx, "protocol_description", vfsProtocol + " I/O");
 			SystemOptions.getInstance().setString("VFS-" + idx, "host", host);
 			SystemOptions.getInstance().setString("VFS-" + idx, "user", user);
 			SystemOptions.getInstance().setString("VFS-" + idx, "password", savePassWithVFS ? pass : "?");
@@ -153,10 +161,10 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 	
 	@Override
 	public String getDefaultTitle() {
-		if (vfsAction == null)
-			return "" + p + "";
+		if (vfsAction == null || vfsEntry == null)
+			return "" + vfsProtocol + "";
 		else
-			return "<html>" + p + "<br><small><font color='gray'>"
+			return "<html>" + vfsProtocol + "<br><small><font color='gray'>"
 					+ vfsEntry
 					+ "</font></small>";
 	}

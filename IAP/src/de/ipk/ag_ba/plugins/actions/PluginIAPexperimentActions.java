@@ -29,6 +29,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IAP experiment action list plugin is beeing loaded");
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference experimentReference) {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
