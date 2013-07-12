@@ -1460,7 +1460,7 @@ public class IAPservice {
 			String ct = SystemOptions.getInstance().getString("Watch-Service",
 					"IP cameras//Content Type-" + (idx + 1), "image/jpg");
 			boolean e = SystemOptions.getInstance().getBoolean("Watch-Service",
-					"IP cameras//Webcam " + (idx + 1) + " enabled", true);
+					"IP cameras//Webcam " + (idx + 1) + " enabled", false);
 			if (e && n != null && !n.isEmpty() && u != null && !u.isEmpty())
 				urls.add(new WebCamInfo(u, n, ct));
 		}
