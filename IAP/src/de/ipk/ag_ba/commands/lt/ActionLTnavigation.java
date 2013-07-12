@@ -93,7 +93,8 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
 				result.add(new NavigationButton(new ActionLTlogout(), src.getGUIsetting()));
 			
-			result.add(new NavigationButton(new ActionLTuserNavigation(login), src.getGUIsetting()));
+			if (!listOfDatabases.isEmpty())
+				result.add(new NavigationButton(new ActionLTuserNavigation(login), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
