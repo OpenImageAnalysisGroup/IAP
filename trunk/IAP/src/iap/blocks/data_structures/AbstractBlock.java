@@ -36,7 +36,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processIRimage() {
-		if (input().images().nir() != null)
+		if (input().images().ir() != null)
 			return processImage(input().images().ir());
 		else
 			return null;

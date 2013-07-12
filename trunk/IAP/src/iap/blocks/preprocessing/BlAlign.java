@@ -146,17 +146,19 @@ public class BlAlign extends AbstractBlock {
 			}
 		});
 		
-		final JFrame jf = MainFrame.showMessageWindow(inpImageType.name() + " & FLUO", v);
-		jf.addHierarchyListener(new HierarchyListener() {
-			
-			@Override
-			public void hierarchyChanged(HierarchyEvent arg0) {
-				if (!jf.isVisible())
-					timer.stop();
-			}
-		});
-		timer.setRepeats(true);
-		timer.start();
+		if (inpImageType != CameraType.FLUO) {
+			final JFrame jf = MainFrame.showMessageWindow(inpImageType.name() + " & FLUO", v);
+			jf.addHierarchyListener(new HierarchyListener() {
+				
+				@Override
+				public void hierarchyChanged(HierarchyEvent arg0) {
+					if (!jf.isVisible())
+						timer.stop();
+				}
+			});
+			timer.setRepeats(true);
+			timer.start();
+		}
 	}
 	
 	@Override
