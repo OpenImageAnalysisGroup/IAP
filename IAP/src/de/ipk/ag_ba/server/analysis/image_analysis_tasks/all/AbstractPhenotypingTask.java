@@ -724,7 +724,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return result;
 	}
 	
-	private void processNumericResults(ImageData inVis, HashMap<Integer, BlockResultSet> analysisResults) {
+	private void processNumericResults(ImageData copyFrom, HashMap<Integer, BlockResultSet> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
@@ -736,7 +736,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (bpv.getName() == null)
 					continue;
 				
-				NumericMeasurement3D m = new NumericMeasurement3D(inVis, bpv.getName(), null);
+				NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
 				m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 				m.setAnnotation(null);
 				m.setValue(bpv.getValue());
@@ -1024,7 +1024,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		BackgroundThreadDispatcher.waitFor(waitThreads);
 		if (analysisResults != null) {
-			processNumericResults(inVis, analysisResults);
+			ImageData copyFrom = inVis;
+			if (copyFrom == null)
+				copyFrom = inFluo;
+			if (copyFrom == null)
+				copyFrom = inNir;
+			if (copyFrom == null)
+				copyFrom = inIr;
+			
+			processNumericResults(copyFrom, analysisResults);
 			
 		}
 		return new ResultsAndWaitThreads(analysisResults, new ArrayList<LocalComputeJob>());

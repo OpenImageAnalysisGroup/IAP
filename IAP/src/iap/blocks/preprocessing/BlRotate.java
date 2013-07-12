@@ -26,6 +26,8 @@ public class BlRotate extends AbstractBlock {
 	
 	@Override
 	protected Image processImage(Image image) {
+		if (image == null)
+			return null;
 		double r = image != null ? getDouble("Rotate Main Image " + image.getCameraType(), image.getCameraType() == CameraType.IR ? -90d : 0d) : 0d;
 		if (image != null && Math.abs(r) > 0.001) {
 			if (image != null && Math.abs(r - 90) < 0.001)
@@ -41,6 +43,8 @@ public class BlRotate extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
+		if (mask == null)
+			return null;
 		double r = getDouble("Rotate Mask Image " + mask.getCameraType(), mask.getCameraType() == CameraType.IR ? -90d : 0d);
 		if (mask != null && Math.abs(r) > 0.001) {
 			if (mask != null && Math.abs(r - 90) < 0.001)
