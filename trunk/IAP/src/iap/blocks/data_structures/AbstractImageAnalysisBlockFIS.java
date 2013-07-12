@@ -91,13 +91,13 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected void prepare() {
 		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
-			if (input().images().vis() != null && input().masks().vis() != null)
+			if (input().images().vis() != null || input().masks().vis() != null)
 				debugPipelineBlock(this.getClass(), CameraType.VIS, input(), getProperties(), options, getBlockPosition(), this);
-			if (input().images().fluo() != null && input().masks().fluo() != null)
+			if (input().images().fluo() != null || input().masks().fluo() != null)
 				debugPipelineBlock(this.getClass(), CameraType.FLUO, input(), getProperties(), options, getBlockPosition(), this);
-			if (input().images().nir() != null && input().masks().nir() != null)
+			if (input().images().nir() != null || input().masks().nir() != null)
 				debugPipelineBlock(this.getClass(), CameraType.NIR, input(), getProperties(), options, getBlockPosition(), this);
-			if (input().images().ir() != null && input().masks().ir() != null)
+			if (input().images().ir() != null || input().masks().ir() != null)
 				debugPipelineBlock(this.getClass(), CameraType.IR, input(), getProperties(), options, getBlockPosition(), this);
 		}
 	}

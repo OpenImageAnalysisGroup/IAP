@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author pape, klukas
  */
-public class BlockSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
+public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean debug = false;
 	

@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -12,38 +12,37 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author Christian Klukas
  */
-public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
+public class BlUseFluoMaskToClearNir extends AbstractSnapshotAnalysisBlock {
 	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
+		debug = getBoolean("debug", false);
 	}
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		debug = getBoolean("debug", false);
 		if (processedMasks.fluo() == null) {
 			return;
 		}
 		int back = options.getBackground();
 		if (processedMasks.fluo() != null) {
-			// apply enlarged FLUO mask to IR
-			if (processedMasks.ir() != null) {
-				if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("enabled", true)) {
-					processedMasks.setIr(
-							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io().addBorder(0, 0, 0, 0, options.getBackground())
-											.blur(getDouble("mask blur", 2)).getImage(),
-									back).show("FILTERED IR IMAGE", debug).getImage());
-				}
-				if (options.getCameraPosition() == CameraPosition.TOP && getBoolean("enabled", true)) {
-					processedMasks.setIr(
-							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
+			// apply enlarged FLUO mask to NIR
+			if (processedMasks.nir() != null) {
+				if (options.getCameraPosition() == CameraPosition.SIDE) {
+					processedMasks.setNir(
+							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()
-											// .addBorder(0, 0, 0, 0, options.getBackground())
-											.blur(getDouble("mask blur", 2)).getImage(),
-									back).show("FILTERED IR IMAGE", debug).getImage());
+											.blur(getDouble("blur fluo mask", 2d))
+											.getImage(),
+									back).show("FILTERED NIR IMAGE", debug).getImage());
+				}
+				if (options.getCameraPosition() == CameraPosition.TOP) {
+					processedMasks.setNir(
+							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(processedMasks.fluo().io().copy()
+									.blur(getDouble("blur fluo mask", 0d)).getImage(),
+									back).show("FILTERED NIR IMAGE", debug).getImage());
 				}
 			}
 		}
@@ -53,14 +52,14 @@ public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.FLUO);
-		res.add(CameraType.IR);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
-		res.add(CameraType.IR);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	

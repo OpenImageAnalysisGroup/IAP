@@ -1,30 +1,30 @@
 package de.ipk.ag_ba.plugins.pipelines.arabidopsis;
 
+import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
+import iap.blocks.extraction.BlSkeletonize_Arabidopsis;
+import iap.blocks.postprocessing.BlCrop;
 import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
+import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlRotate;
+import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
+import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
-import iap.blocks.unused.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
-import iap.blocks.unused.BlCrop;
-import iap.blocks.unused.BlIRdiff;
-import iap.blocks.unused.BlLabFilterDepr;
-import iap.blocks.unused.BlLoadImagesIfNeeded;
+import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
+import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
+import iap.blocks.segmentation.BlUseFluoMaskToClearVis;
 import iap.blocks.unused.BlMedianFilter;
 import iap.blocks.unused.BlMoveImagesToMasks;
-import iap.blocks.unused.BlUseFluoMaskToClearIr;
-import iap.blocks.unused.BlUseFluoMaskToClearNir_Arabidopsis;
-import iap.blocks.unused.BlUseFluoMaskToClear_Arabidopsis_vis;
-import iap.blocks.unused.BlockSkeletonize_Arabidopsis;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -54,17 +54,17 @@ public class ArabidopsisPipeline implements AnalysisPipelineTemplate {
 				new BlColorBalanceVerticalVis(),
 				new BlRotate(),
 				new BlAlign(),
-				new BlClearMasks_Arabidopsis_PotAndTrayProcessing(),
+				new BlClearMasks_WellProcessing(),
 				new BlMoveImagesToMasks(),
-				new BlLabFilterDepr(),
+				new BlLabFilter(),
 				new BlIntensityCalculationFluo(),
 				new BlMedianFilter(),
 				new BlRemoveSmallObjectsVisFluo(),
-				new BlUseFluoMaskToClear_Arabidopsis_vis(),
-				new BlUseFluoMaskToClearNir_Arabidopsis(),
+				new BlUseFluoMaskToClearVis(),
+				new BlUseFluoMaskToClearNir(),
 				new BlIRdiff(),
 				new BlUseFluoMaskToClearIr(),
-				new BlockSkeletonize_Arabidopsis(),
+				new BlSkeletonize_Arabidopsis(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),

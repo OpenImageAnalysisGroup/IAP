@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author Christian Klukas
  */
-public class BlUseFluoMaskToClear_Arabidopsis_vis extends AbstractSnapshotAnalysisBlock {
+public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug = false;
 	

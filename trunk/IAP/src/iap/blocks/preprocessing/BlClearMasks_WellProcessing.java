@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlClearMasks_Arabidopsis_PotAndTrayProcessing extends AbstractSnapshotAnalysisBlock {
+public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
 	
 	boolean multiTray = false;
 	

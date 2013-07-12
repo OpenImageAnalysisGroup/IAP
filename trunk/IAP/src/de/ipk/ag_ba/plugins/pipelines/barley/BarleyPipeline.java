@@ -9,6 +9,7 @@ import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
+import iap.blocks.postprocessing.BlCrop;
 import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
@@ -17,18 +18,17 @@ import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
-import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlCutFromSide;
+import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
+import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
+import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import iap.blocks.unused.BlCopyImagesApplyMask;
-import iap.blocks.unused.BlCrop;
-import iap.blocks.unused.BlIRdiff;
-import iap.blocks.unused.BlLabFilterExt;
 import iap.blocks.unused.BlLeafCurlingAnalysis;
 import iap.blocks.unused.BlMedianFilter;
 import iap.blocks.unused.BlUseFluoMaskToClearOtherImages;
@@ -73,7 +73,7 @@ public class BarleyPipeline implements AnalysisPipelineTemplate {
 				new BlMedianFilter(),
 				new BlMedianFilter(),
 				new BlMedianFilter(),
-				new BlLabFilterExt(),
+				new BlLabFilter(),
 				new BlClosing(),
 				new BlIRdiff(),
 				new BlIntensityCalculationFluo(),

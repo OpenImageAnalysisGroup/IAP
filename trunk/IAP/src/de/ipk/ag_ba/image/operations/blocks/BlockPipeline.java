@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.blocks.unused.BlClearMasks_Arabidopsis_PotAndTrayProcessing;
+import iap.blocks.unused.BlClearMasks_WellProcessing;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
@@ -95,7 +95,7 @@ public class BlockPipeline {
 		// and place the section in the middle of the image for further processing
 		int executionTrayCount = 1;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
-			if (blockClass != null && (blockClass == BlClearMasks_Arabidopsis_PotAndTrayProcessing.class)) {
+			if (blockClass != null && (blockClass == BlClearMasks_WellProcessing.class)) {
 				ImageAnalysisBlock inst = blockClass.newInstance();
 				int hg = options.getIntSetting(inst, "Well Grid Horizontal", 1);
 				int wg = options.getIntSetting(inst, "Well Grid Vertical", 1);
