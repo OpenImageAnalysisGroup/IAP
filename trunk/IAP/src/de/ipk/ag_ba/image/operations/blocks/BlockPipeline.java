@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.blocks.unused.BlClearMasks_WellProcessing;
+import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
