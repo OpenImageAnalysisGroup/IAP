@@ -437,7 +437,9 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 					if (lbl.contains(e.getX(), e.getY())) {
 						BookmarkAction ba = (BookmarkAction) action;
 						if (!ba.getBookmark().delete()) {
-							MainFrame.getInstance().showMessageDialog("Could not delete bookmark.");
+							MainFrame.getInstance().showMessageDialog(
+									"<html>Could not delete bookmark.<br><br>" +
+											"Please retry after a restart of the program.");
 						} else {
 							if (!set.isEmpty())
 								set.iterator().next().executeNavigation(PanelTarget.NAVIGATION, IAPnavigationPanel.this,

@@ -141,17 +141,17 @@ public class MongoDB {
 		String sec = "GRID-STORAGE-" + (idx + 1);
 		
 		boolean enabled = IAPoptions.getInstance().getBoolean(sec,
-				"enabled", idx == 0 ? true : false);
+				"enabled", false);
 		String displayName = IAPoptions.getInstance().getString(sec,
-				"title", idx == 0 ? "Storage 1 (BA-13)" : "Storage " + (idx + 1));
+				"title", "Storage " + (idx + 1));
 		String databaseName = IAPoptions.getInstance().getString(sec,
 				"database_name", "cloud" + (idx + 1));
 		String hostName = IAPoptions.getInstance().getString(sec,
 				"host", "ba-13.ipk-gatersleben.de");
 		String login = IAPoptions.getInstance().getString(sec,
-				"login", idx == 0 ? "iap" : null);
+				"login", null);
 		String password = IAPoptions.getInstance().getString(sec,
-				"password", idx == 0 ? "iap#2011" : null);
+				"password", null);
 		if (idx == 0) {
 			if (defaultCloudInstance == null) {
 				defaultCloudInstance = new MongoDB(displayName, databaseName, hostName,

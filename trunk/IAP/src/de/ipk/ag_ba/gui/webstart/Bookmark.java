@@ -77,6 +77,7 @@ public class Bookmark {
 		OutputStream fos = new FileOutputStream(getFileName(".png"));
 		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(fos);
 		ImageIO.write(icon, "png", ios);
+		fos.close();
 		
 		// save link info
 		TextFile tf = new TextFile();
@@ -88,10 +89,13 @@ public class Bookmark {
 	}
 	
 	public boolean delete() {
-		if (new File(getFileName()).exists()) {
+		if (new File(getFileName(".png")).exists() && new File(getFileName()).exists()) {
 			return new File(getFileName(".png")).delete() && new File(getFileName()).delete();
 		} else
-			return false;
+			if (new File(getFileName()).exists()) {
+				return new File(getFileName()).delete();
+			} else
+				return false;
 	}
 	
 	private String getFileName() {
