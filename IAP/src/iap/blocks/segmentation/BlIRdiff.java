@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -16,6 +16,9 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
+ * Calculates the relative temperature (as a gray image) from the IR image (difference of plant temperature and background temperature).
+ * The location and properties for the background identification can be parameterized.
+ * 
  * @author klukas
  */
 public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
