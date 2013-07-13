@@ -2,6 +2,7 @@ package de.ipk.ag_ba.plugins.pipelines.arabidopsis;
 
 import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -66,6 +67,7 @@ public class ArabidopsisPipeline implements AnalysisPipelineTemplate {
 				new BlUseFluoMaskToClearIr(),
 				new BlSkeletonize_Arabidopsis(),
 				new BlCalcWidthAndHeight(),
+				new BlCalcAreas(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
 				// postprocessing
