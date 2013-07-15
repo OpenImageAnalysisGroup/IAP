@@ -69,7 +69,7 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	private static final String driver = "org.postgresql.Driver";
 	
-	private static boolean debug = false;
+	private static boolean debug;
 	/**
 	 * specifies if the camera images are stored as "top.vis", ... instead of the old style "vis.top", ...
 	 */
@@ -112,13 +112,13 @@ public class LTdataExchange implements ExperimentLoader {
 		try {
 			PreparedStatement ps = connection.prepareStatement(sqlText);
 			
-			if (debug)
+			if (isDebug())
 				System.out.println(sqlText);
 			
 			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
-				if (debug)
+				if (isDebug())
 					System.out.println("Current Row: " + rs.getString(1));
 				
 				String dbName = rs.getString(1);
@@ -752,7 +752,7 @@ public class LTdataExchange implements ExperimentLoader {
 				+ database;
 		Connection connection = DriverManager.getConnection(path, user, password);
 		
-		if (debug) {
+		if (isDebug()) {
 			DatabaseMetaData meta = connection.getMetaData(); // Metadata
 			System.out.println("Connection successful: " + meta.getDatabaseProductName() + " " + meta.getDatabaseProductVersion());
 		}
@@ -1509,5 +1509,9 @@ public class LTdataExchange implements ExperimentLoader {
 			if (p.equalsIgnoreCase(heading))
 				return p;
 		return "Ignored Column";
+	}
+	
+	private static boolean isDebug() {
+		return IAPoptions.getInstance().getBoolean("LT-DB", "PostgreSQL//Print Debug Messages", false);
 	}
 }
