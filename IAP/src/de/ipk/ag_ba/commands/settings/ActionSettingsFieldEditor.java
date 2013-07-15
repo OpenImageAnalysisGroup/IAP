@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -271,9 +271,9 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										}
 										entries.add(inf);
 									}
-									JComboBox dropDown = new JComboBox(new String[] { "Load Images", "Segmentation" });
+									// JComboBox dropDown = new JComboBox(new String[] { "Load Images", "Segmentation" });
 									JTextField textField = new JTextField(sl + "");
-									GuiRow gr = new GuiRow(dropDown, textField);
+									GuiRow gr = new GuiRow(new JLabel(), textField);
 									entries.add(gr.getRowGui());// + "");
 								}
 								Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
