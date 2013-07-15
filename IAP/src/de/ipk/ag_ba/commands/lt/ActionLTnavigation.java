@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.Other;
@@ -34,7 +36,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	private String login;
 	private String pass;
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
-	private ArrayList<String> listOfDatabases = null;
+	private ArrayList<String> listOfDatabases = new ArrayList<String>();
 	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 	
 	public ActionLTnavigation() {
@@ -93,13 +95,14 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
 				result.add(new NavigationButton(new ActionLTlogout(), src.getGUIsetting()));
 			
+			listOfDatabases = listOfDatabases != null && !listOfDatabases.isEmpty() ? listOfDatabases : new ArrayList<String>(new LTdataExchange().getDatabases());
+			
 			if (!listOfDatabases.isEmpty())
 				result.add(new NavigationButton(new ActionLTuserNavigation(login), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 			allExperiments.get("").put("", new ArrayList<ExperimentHeaderInterface>());
-			listOfDatabases = listOfDatabases != null ? listOfDatabases : new ArrayList<String>(new LTdataExchange().getDatabases());
 			Collections.sort(listOfDatabases, new Comparator<String>() {
 				@Override
 				public int compare(String arg0, String arg1) {
@@ -148,9 +151,12 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			}
 			if (unsorted.size() > 0)
 				result.add(nb);
-			result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 			
-			result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
+			if (result.size() > 0)
+				result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
+			
+			if (result.size() > 0)
+				result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
 			if (IAPoptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
 				HTTPfolderSource doku = new LTdocuSource();
@@ -166,7 +172,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			
 		} catch (Exception e) {
 			// error
-			status.setCurrentStatusText2("Error: " + e.getMessage());
+			ErrorMsg.addErrorMessage(e);
 		}
 	}
 	
