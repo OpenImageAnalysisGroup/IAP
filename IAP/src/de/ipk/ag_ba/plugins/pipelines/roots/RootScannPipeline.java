@@ -20,12 +20,12 @@ public class RootScannPipeline implements AnalysisPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
-		return "Root Scan Analysis";
+		return "Scanned Roots Analysis";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Analyse Root Scans";
+		return "Analyse Scanned Roots";
 	}
 	
 	@Override
