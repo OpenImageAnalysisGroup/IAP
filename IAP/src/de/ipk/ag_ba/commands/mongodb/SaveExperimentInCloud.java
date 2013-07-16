@@ -151,7 +151,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (storeInMongo)
 			return "Add files";
 		else
-			return "Process files";
+			return "Load Files";
 	}
 	
 	@Override
