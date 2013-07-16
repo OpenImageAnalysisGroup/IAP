@@ -1054,7 +1054,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			return MyImageIOhelper.getPreviewImageStream(ImageIO.read(in));
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not create preview image stream: "
-					+ e2.getMessage());
+					+ e.getMessage());
 			return null;
 		}
 	}
