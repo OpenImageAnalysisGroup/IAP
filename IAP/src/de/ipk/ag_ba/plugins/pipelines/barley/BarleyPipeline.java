@@ -27,11 +27,11 @@ import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import iap.blocks.unused.BlCopyImagesApplyMask;
 import iap.blocks.unused.BlLeafCurlingAnalysis;
 import iap.blocks.unused.BlMedianFilter;
-import iap.blocks.unused.BlUseFluoMaskToClearOtherImages;
 import iap.blocks.unused.BlockClearNirPotFromNir;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
@@ -80,7 +80,7 @@ public class BarleyPipeline implements AnalysisPipelineTemplate {
 				new BlockClearNirPotFromNir(),
 				new BlMedianFilter(),
 				new BlRemoveSmallObjectsVisFluo(),
-				new BlUseFluoMaskToClearOtherImages(),
+				new BlUseFluoMaskToClearOther(),
 				new BlCutFromSide(),
 				new BlAdaptiveThresholdNir(),
 				new BlSkeletonizeNir(),
