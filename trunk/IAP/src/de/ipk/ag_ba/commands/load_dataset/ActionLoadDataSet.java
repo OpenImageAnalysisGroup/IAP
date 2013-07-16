@@ -6,6 +6,7 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionLoadLTexportFileHierarchy;
+import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -28,6 +29,10 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 		boolean showLoadLocalOrRemote = SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true);
 		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
 		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
+		boolean addLoadFilesIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", false);
+		
+		if (addLoadFilesIcon)
+			res.add(new NavigationButton(new SaveExperimentInCloud(false), src != null ? src.getGUIsetting() : guiSetting));
 		
 		if (showLoadLTfileExport) {
 			NavigationButton ltl = new NavigationButton(
