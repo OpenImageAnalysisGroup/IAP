@@ -48,7 +48,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		
 		img = img.binary(0, Color.WHITE.getRGB());
 		
-		ImageOperation inDilatedForSectionDetection = img.copy().dilate(10).show("Dilated image for section detection", debug);
+		ImageOperation inDilatedForSectionDetection = img.copy().dilate(getInt("Dilate for section detection", 5))
+				.show("Dilated image for section detection", debug);
 		
 		ClusterDetection cd = new ClusterDetection(inDilatedForSectionDetection.getImage(), ImageOperation.BACKGROUND_COLORint);
 		cd.detectClusters();
@@ -105,7 +106,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
-		Image ress = ioClusteredSkeltonImage.dilate(20).getImage();
+		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		return ress;
 	}
 	
@@ -173,7 +174,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	private ImageOperation skeletonizeImage(
 			String pre,
 			int background, ImageOperation img, ResultsTableWithUnits rt) {
-		ImageOperation inp = img.show("INPUT FOR SKEL", debug);
+		ImageOperation inp = img;
 		if (rt != null)
 			rt.addValue(pre + "roots.filled.pixels", inp.countFilledPixels());
 		ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
@@ -183,12 +184,12 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				widthHistogram(rt, image);
 		}
 		
-		inp = binary.skeletonize(false).show("INPUT FOR BRANCH DETECTION", debug);
+		inp = binary.skeletonize(true).show("INPUT FOR BRANCH DETECTION", debug);
 		
 		if (rt != null)
 			rt.addValue(pre + "roots.skeleton.length", inp.countFilledPixels());
 		
-		SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
+		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).getImage()); // getInvert(
 		skel.findEndpointsAndBranches();
 		
 		img = skel.getImageOperation().show("THE SKELETON", debug);
