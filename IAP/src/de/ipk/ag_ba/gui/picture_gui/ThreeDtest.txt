@@ -1,0 +1,95 @@
+	JMenuItem debugPipelineTest5 = new JMenuItem(
+							"Maize 3-D Analysis (Snapshot Images+References)");
+					debugPipelineTest5.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								ExperimentInterface experiment = targetTreeNode
+										.getExperiment().getExperiment();
+								
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchFor(imageResult
+												.getBinaryFileInfo()
+												.getFileNameMain(), experiment);
+								
+								ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
+								
+								for (SubstanceInterface m : experiment) {
+									Substance3D m3 = (Substance3D) m;
+									for (ConditionInterface s : m3) {
+										Condition3D s3 = (Condition3D) s;
+										for (SampleInterface sd : s3) {
+											Sample3D sd3 = (Sample3D) sd;
+											boolean found = false;
+											search: for (NumericMeasurementInterface nmi : sd3) {
+												for (NumericMeasurementInterface nmiHIT : match) {
+													if (nmi == nmiHIT) {
+														found = true;
+														break search;
+													}
+												}
+											}
+											if (found)
+												workload.add(sd3);
+										}
+									}
+								}
+								
+								final ThreadSafeOptions tso = new ThreadSafeOptions();
+								tso.setInt(1);
+								
+								final Maize3DanalysisTask task = new Maize3DanalysisTask(
+										new PipelineDesc(null,
+												targetTreeNode.getExperiment().getIniIoProvider(),
+												Maize3DanalysisTask.DEFAULT_NAME,
+												Maize3DanalysisTask.DEFAULT_DESC)
+										);
+								task.setInput(AbstractPhenotypingTask.getWateringInfo(experiment), workload, null, null, 0, 1);
+								
+								final BackgroundTaskStatusProviderSupportingExternalCall sp = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+										"Maize 3-D Reconstruction", "");
+								Runnable backgroundTask = new Runnable() {
+									@Override
+									public void run() {
+										try {
+											task.performAnalysis(SystemAnalysis
+													.getNumberOfCPUs(), 1, sp);
+											ExperimentInterface out = task.getOutput();
+											ImageStack fis = new ImageStack();
+											for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
+												if (nmi instanceof LoadedImage) {
+													LoadedImage li = (LoadedImage) nmi;
+													fis.addImage(
+															((LoadedImage) nmi)
+																	.getPositionIn3D(),
+															new Image(
+																	li.getLoadedImage()));
+												}
+												if (nmi instanceof LoadedVolumeExtension) {
+													LoadedVolumeExtension lve = (LoadedVolumeExtension) nmi;
+													lve.getSideViewGif(512,
+															512, sp);
+												}
+											}
+											fis.show("Foreground images");
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								};
+								BackgroundTaskHelper.issueSimpleTaskInWindow(
+										"Maize 3-D Debug Test",
+										"Initialize...", backgroundTask, null,
+										sp);
+								
+							} catch (Exception err) {
+								JOptionPane.showMessageDialog(null, "Error: "
+										+ err.getMessage()
+										+ ". Command execution error.",
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
