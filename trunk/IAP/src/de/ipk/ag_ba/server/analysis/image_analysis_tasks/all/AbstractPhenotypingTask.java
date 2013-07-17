@@ -221,7 +221,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
-			int nn = 2;// SystemAnalysis.getNumberOfCPUs();
+			int nn = SystemAnalysis.getNumberOfCPUs();
 			// nn = modifyConcurrencyDependingOnMemoryStatus(nn);
 			
 			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
@@ -259,11 +259,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}
 					};
-					if (SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
+					if (imageSetWithSpecificAngle_f.keySet().size() > SystemAnalysis.getNumberOfCPUs()
+							&& SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
 						t.run();
 					else {
 						BackgroundThreadDispatcher.addTask(t, preThreadName, true);
-						Thread.sleep(100);
+						// Thread.sleep(100);
 					}
 					
 				} catch (Exception eeee) {
