@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 import iap.blocks.data_structures.BlockType;

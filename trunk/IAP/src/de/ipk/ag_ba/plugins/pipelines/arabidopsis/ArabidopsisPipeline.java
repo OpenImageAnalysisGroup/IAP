@@ -16,16 +16,16 @@ import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlLabFilter;
+import iap.blocks.segmentation.BlMedianFilter;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
 import iap.blocks.segmentation.BlUseFluoMaskToClearVis;
-import iap.blocks.unused.BlMedianFilter;
-import iap.blocks.unused.BlMoveImagesToMasks;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**

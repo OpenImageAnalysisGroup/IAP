@@ -7,8 +7,6 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.awt.Color;
 import java.util.HashSet;
 
-import org.SystemAnalysis;
-
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PixelProcessor;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
@@ -47,43 +45,42 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true,
 					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
 		} else {
-			String remark = getRemarkSetting("vis.top.split.adjust", "");
-			if (remark != null && remark.length() > 0 && !remark.contains("n")) {
-				if (remark.contains("auto")) {
+			boolean adjustLeftRight = getBoolean("Adjust Left and Right Separately", false);
+			boolean adjustAuto = getBoolean("Automatic Adjustment Left and Right", false);
+			final double brightup = getDouble("Manual Brightness Correction Factor Right Side", 1);
+			if (adjustLeftRight || adjustAuto) {
+				if (adjustAuto) {
 					double[] pixLeft, pixRight;
-					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().show("left part", debug), false,
+					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().show("left part", debug),
+							!getBoolean("Adjust to Center Brightness", true),
 							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
-					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().show("right part", debug), false,
+					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().show("right part", debug),
+							!getBoolean("Adjust to Center Brightness", true),
 							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
 					return io.imageBalancing(255, pixLeft, pixRight).getImage().show("after", false);
 				} else {
-					try {
-						final Float brightup = Float.parseFloat(remark.trim());
-						io = io.adjustPixelValues(new PixelProcessor() {
-							float[] hsb = new float[3];
-							
-							@Override
-							public int processPixelForegroundValue(int x, int y, int rgb, int w, int h) {
-								if (x >= w / 2) {
-									int r = ((rgb >> 16) & 0xff);
-									int g = ((rgb >> 8) & 0xff);
-									int b = (rgb & 0xff);
-									Color.RGBtoHSB(r, g, b, hsb);
-									hsb[2] *= brightup;
-									if (hsb[2] > 1)
-										hsb[2] = 1;
-									return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-								} else
-									return rgb;
-							}
-						});
-					} catch (Exception e) {
-						System.out.println(SystemAnalysis.getCurrentTime() + ">Could not interpret remark setting 'top-half': '" + remark
-								+ "' (needs to be number indicating top-right brightness correction)");
-					}
+					io = io.adjustPixelValues(new PixelProcessor() {
+						float[] hsb = new float[3];
+						
+						@Override
+						public int processPixelForegroundValue(int x, int y, int rgb, int w, int h) {
+							if (x >= w / 2) {
+								int r = ((rgb >> 16) & 0xff);
+								int g = ((rgb >> 8) & 0xff);
+								int b = (rgb & 0xff);
+								Color.RGBtoHSB(r, g, b, hsb);
+								hsb[2] *= brightup;
+								if (hsb[2] > 1)
+									hsb[2] = 1;
+								return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+							} else
+								return rgb;
+						}
+					});
 				}
 			}
-			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+			pix = getProbablyWhitePixels(vis, !getBoolean("Adjust to Center Brightness", true),
+					getInt("vis-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
 		}
 		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
@@ -98,10 +95,11 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true,
+			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), !getBoolean("Adjust to Center Brightness", true),
 					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
 		else
-			pix = getProbablyWhitePixels(vis, false, getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
+			pix = getProbablyWhitePixels(vis, !getBoolean("Adjust to Center Brightness", true), getInt("vis-balance-l-threshold", -10),
+					getInt("vis-balance-ab-threshold", 10));
 		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
 	
