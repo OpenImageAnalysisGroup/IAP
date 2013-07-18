@@ -221,7 +221,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
-			int nn = SystemAnalysis.getNumberOfCPUs();
+			int nn = 2;// SystemAnalysis.getNumberOfCPUs();
 			// nn = modifyConcurrencyDependingOnMemoryStatus(nn);
 			
 			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
