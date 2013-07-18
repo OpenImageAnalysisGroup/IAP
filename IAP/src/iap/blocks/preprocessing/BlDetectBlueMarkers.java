@@ -146,7 +146,8 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private Image getMarkers(Image image, ArrayList<MarkerPair> result) {
-		ImageOperation io = image.io().searchBlueMarkers(result, options.getCameraPosition(), true, true, debug);
+		boolean clearBlueMarkers = getBoolean("Remove blue markers from image", true);
+		ImageOperation io = image.io().searchBlueMarkers(result, options.getCameraPosition(), true, clearBlueMarkers, debug);
 		return io != null ? io.getImage() : null;
 	}
 	
