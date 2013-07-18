@@ -2833,7 +2833,10 @@ public class ImageOperation {
 		
 		result.addAll(mergedCoordinates);
 		
-		return bmf.getClearedImage();
+		if (clearBlueMarkers)
+			return bmf.getClearedImage();
+		else
+			return getImage().io();
 	}
 	
 	public MainAxisCalculationResult calculateTopMainAxis(Vector2d centroid, int step, int background) {
