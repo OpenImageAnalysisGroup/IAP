@@ -1,7 +1,7 @@
 /**
  * 
  */
-package iap.blocks.unused;
+package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;

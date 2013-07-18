@@ -2,12 +2,12 @@ package de.ipk.ag_ba.plugins.pipelines.roots;
 
 import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.extraction.BlRootsSkeletonize;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
-import iap.blocks.unused.BlMoveImagesToMasks;
-import iap.blocks.unused.BlRootsAddBorderAroundImage;
-import iap.blocks.unused.BlRootsRemoveBoxAndNoise;
-import iap.blocks.unused.BlRootsSharpenImage;
-import iap.blocks.unused.BlRootsSkeletonize;
+import iap.blocks.preprocessing.BlMoveImagesToMasks;
+import iap.blocks.preprocessing.BlRootsAddBorderAroundImage;
+import iap.blocks.segmentation.BlRootsRemoveBoxAndNoise;
+import iap.blocks.segmentation.BlRootsSharpenImage;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**

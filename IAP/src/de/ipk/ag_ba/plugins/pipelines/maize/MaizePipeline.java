@@ -17,6 +17,7 @@ import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
+import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
@@ -31,7 +32,6 @@ import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
-import iap.blocks.unused.BlColorBalanceCircularVisNir;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**

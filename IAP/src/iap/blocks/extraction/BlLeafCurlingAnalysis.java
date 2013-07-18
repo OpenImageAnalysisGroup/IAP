@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
