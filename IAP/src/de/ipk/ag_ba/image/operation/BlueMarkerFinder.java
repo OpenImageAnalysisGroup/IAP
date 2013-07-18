@@ -35,7 +35,7 @@ public class BlueMarkerFinder {
 	}
 	
 	public void findCoordinates(int background) {
-		ImageOperation io1 = new ImageOperation(input);
+		ImageOperation io1 = new ImageOperation(input).copy();
 		double scaleFactor = 1 / 1.2d;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
@@ -49,8 +49,6 @@ public class BlueMarkerFinder {
 				.show("nach opening", debug)
 				.grayscale().show("nach gray", debug)
 				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", debug);
-		
-		io1.show("Input für Marker Search", debug);
 		
 		io1.show("Input für Marker Search", debug);
 		
