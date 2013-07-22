@@ -52,7 +52,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			@Override
 			public String getCurrentStatusMessage1() {
 				try {
-					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(10 * 1000);// 5 * 60 * 1000);
+					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(90 * 1000);// 5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
 					int tasksWithinLastMinute = 0;
 					@SuppressWarnings("unused")
@@ -136,7 +136,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			
 			@Override
 			public void setCurrentStatusValueFine(double value) {
-				// 
+				//
 				
 			}
 			

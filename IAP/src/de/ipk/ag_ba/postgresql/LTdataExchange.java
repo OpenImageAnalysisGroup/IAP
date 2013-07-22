@@ -1481,7 +1481,8 @@ public class LTdataExchange implements ExperimentLoader {
 		
 	}
 	
-	public static void extendId2ConditionList(HashMap<String, Condition> optIdTag2condition, TableDataHeadingRow heading, ArrayList<TableDataStringRow> md) {
+	public static void extendId2ConditionList(HashMap<String, Condition> optIdTag2condition, TableDataHeadingRow heading,
+			ArrayList<TableDataStringRow> md, boolean fileImport_useConditionIdForReplicateIdStorage) {
 		for (TableDataStringRow tdsr : md) {
 			String id = heading.getPlantID(tdsr);
 			if (id != null) {
@@ -1492,6 +1493,14 @@ public class LTdataExchange implements ExperimentLoader {
 				c.setSequence(heading.getSequence(tdsr));
 				c.setTreatment(heading.getTreatment(tdsr));
 				c.setGrowthconditions(heading.getGrowthconditions(tdsr));
+				if (fileImport_useConditionIdForReplicateIdStorage) {
+					try {
+						c.setRowId(Integer.parseInt(heading.getReplicateID(tdsr)));
+					} catch (Exception e) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + heading.getReplicateID(tdsr)
+								+ " is no valid whole number numeric replicate ID.");
+					}
+				}
 				optIdTag2condition.put(id, c);
 			}
 		}
