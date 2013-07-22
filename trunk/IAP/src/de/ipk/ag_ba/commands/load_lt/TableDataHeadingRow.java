@@ -12,7 +12,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDat
 public class TableDataHeadingRow {
 	
 	private Integer[] plantIDcol, speciesCol, genotypeCol,
-			treatmentCol, sequenceCol, varietyCol, growthconditionsCol;
+			treatmentCol, sequenceCol, varietyCol, growthconditionsCol, replicateIdCol;
 	
 	private final String separator;
 	
@@ -34,6 +34,8 @@ public class TableDataHeadingRow {
 					"No Heading Row//Columns_Variety", new Integer[] { -1 });
 			growthconditionsCol = SystemOptions.getInstance().getIntArray("Metadata",
 					"No Heading Row//Columns_Growthconditions", new Integer[] { 7 });
+			replicateIdCol = SystemOptions.getInstance().getIntArray("Metadata",
+					"No Heading Row//Columns_Replicate_Id (only for Load Files command)", new Integer[] { -1 });
 		} else {
 			ArrayList<Integer> plantIDcolARR = new ArrayList<Integer>();
 			ArrayList<Integer> speciesColARR = new ArrayList<Integer>();
@@ -42,10 +44,13 @@ public class TableDataHeadingRow {
 			ArrayList<Integer> sequenceColARR = new ArrayList<Integer>();
 			ArrayList<Integer> varietyColARR = new ArrayList<Integer>();
 			ArrayList<Integer> growthconditionsColARR = new ArrayList<Integer>();
+			ArrayList<Integer> replicateIdColARR = new ArrayList<Integer>();
 			
 			ArrayList<String> possibleValues = new ArrayList<String>();
 			possibleValues.add("Ignored Column");
 			possibleValues.add("Plant ID");
+			possibleValues.add("Replicate ID (for Load Files command)");
+			
 			for (ConditionInfo ci : ConditionInfo.values())
 				if (ci != ConditionInfo.IGNORED_FIELD)
 					if (ci != ConditionInfo.FILES)
@@ -68,13 +73,16 @@ public class TableDataHeadingRow {
 				if (sel != null && sel.equals("Plant ID")) {
 					plantIDcolARR.add(col);
 				} else
-					if (sel != null && !sel.equals("Ignored Column")) {
-						ConditionInfo ciSel = ConditionInfo.valueOfString(sel);
-						if (ciSel != null) {
-							ArrayList<Integer> arr = ci2arr.get(ciSel);
-							arr.add(col);
+					if (sel != null && sel.equals("Replicate ID (for Load Files command)")) {
+						replicateIdColARR.add(col);
+					} else
+						if (sel != null && !sel.equals("Ignored Column")) {
+							ConditionInfo ciSel = ConditionInfo.valueOfString(sel);
+							if (ciSel != null) {
+								ArrayList<Integer> arr = ci2arr.get(ciSel);
+								arr.add(col);
+							}
 						}
-					}
 			}
 			plantIDcol = plantIDcolARR.toArray(new Integer[] {});
 			speciesCol = speciesColARR.toArray(new Integer[] {});
@@ -83,6 +91,7 @@ public class TableDataHeadingRow {
 			sequenceCol = sequenceColARR.toArray(new Integer[] {});
 			varietyCol = varietyColARR.toArray(new Integer[] {});
 			growthconditionsCol = growthconditionsColARR.toArray(new Integer[] {});
+			replicateIdCol = replicateIdColARR.toArray(new Integer[] {});
 		}
 	}
 	
@@ -112,5 +121,9 @@ public class TableDataHeadingRow {
 	
 	public String getGrowthconditions(TableDataStringRow tdsr) {
 		return tdsr.getString(growthconditionsCol, separator);
+	}
+	
+	public String getReplicateID(TableDataStringRow tdsr) {
+		return tdsr.getString(replicateIdCol, separator);
 	}
 }

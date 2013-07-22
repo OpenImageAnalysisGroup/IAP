@@ -254,7 +254,8 @@ public class ExperimentLoader implements RunnableOnDB {
 			
 			BasicDBList ll = new BasicDBList();
 			for (Object o : l)
-				ll.add(new ObjectId(o + ""));
+				if (o != null)
+					ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
 					new BasicDBObject("_id", new BasicDBObject("$in", ll))
 					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);

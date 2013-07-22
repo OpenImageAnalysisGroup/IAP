@@ -59,6 +59,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		ArrayList<Snapshot> snapshots = new ArrayList<Snapshot>();
 		long overallStorageSizeInBytes = 0;
 		Timestamp storageTimeOfFirstInfoFile = null;
+		
 		boolean foundMetadata = false;
 		HashMap<String, ArrayList<TableDataStringRow>> metadata = new HashMap<String, ArrayList<TableDataStringRow>>();
 		HashMap<String, TableDataHeadingRow> metadataHeading = new HashMap<String, TableDataHeadingRow>();
@@ -215,7 +216,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 				if (heading == null)
 					heading = new TableDataHeadingRow(null); // default heading info
 				ArrayList<TableDataStringRow> md = metadata.get(fn);
-				LTdataExchange.extendId2ConditionList(optIdTag2condition, heading, md);
+				LTdataExchange.extendId2ConditionList(optIdTag2condition, heading, md, true);
 			}
 		}
 		// get experiment from snapshot info...
