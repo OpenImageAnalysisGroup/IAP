@@ -217,6 +217,30 @@ public class Image {
 		return cache;
 	}
 	
+	public int[] getAs1Ar() {
+		int[] img = getAs1A();
+		int[] res = new int[img.length];
+		for (int i = 0; i < img.length; i++)
+			res[i] = (img[i] & 0xff0000) >> 16;
+		return res;
+	}
+	
+	public int[] getAs1Ag() {
+		int[] img = getAs1A();
+		int[] res = new int[img.length];
+		for (int i = 0; i < img.length; i++)
+			res[i] = (img[i] & 0x00ff00) >> 8;
+		return res;
+	}
+	
+	public int[] getAs1Ab() {
+		int[] img = getAs1A();
+		int[] res = new int[img.length];
+		for (int i = 0; i < img.length; i++)
+			res[i] = (img[i] & 0x0000ff);
+		return res;
+	}
+	
 	public Image resize(int w, int h) {
 		if (w == getWidth() && h == getHeight()) { // 999999999999999999999999999999
 			return this;// copy();
