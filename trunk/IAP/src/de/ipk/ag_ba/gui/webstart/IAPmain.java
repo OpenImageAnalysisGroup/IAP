@@ -590,7 +590,7 @@ public class IAPmain extends JApplet {
 		res.add("***************************************************");
 		res.add(fillLen("**", l));
 		res.add(fillLen("*IAP - Integrated Analysis Platform*", l));
-		res.add(fillLen("**", l));
+		res.add(fillLen("*(V1.0.1)*", l));
 		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
 		res.add(fillLen("**", l));
 		res.add(fillLen("*(c) 2010-2013 IPK, Group Image Analysis*", l));
