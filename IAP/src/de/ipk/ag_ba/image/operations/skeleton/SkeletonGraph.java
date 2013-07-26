@@ -66,8 +66,9 @@ public class SkeletonGraph {
 					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
 					n.setInteger("x", x);
 					n.setInteger("y", y);
-					if (optClusterIDsPixels != null)
+					if (optClusterIDsPixels != null) {
 						new NodeHelper(n).setClusterID(optClusterIDsPixels[y * w + x] + "");
+					}
 					position2node.put(x + ";" + y, n);
 					if (DEBUG)
 						System.out.println("MEM: " + x + " // " + y);
