@@ -1513,6 +1513,8 @@ public class ImageOperation {
 					}
 				}
 				sumR /= n;
+				sumG /= n;
+				sumB /= n;
 				img[i] = (0xFF << 24 | (sumR & 0xFF) << 16) | ((sumG & 0xFF) << 8) | ((sumB & 0xFF) << 0);
 			}
 			return new ImageOperation(img, w, h);
