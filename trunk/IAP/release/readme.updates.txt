@@ -8,22 +8,18 @@ V1.0.1 (July 26, 2013):
 
 Upgrade procedure:
 
-1. Within IAP click "Settings > Show Config-File". Close IAP. Then delete 
-   previously saved or automatically generated pipeline definitions
-   (file names ending with .pipeline.ini).
-
-2. Unzip the downloaded iap.zip file and use the startup-scripts to start IAP.
+1. Unzip the downloaded iap.zip file and use the startup-scripts to start IAP.
    Modify the memory settings (-Xmx7g) within the windows or linux/mac start-
    script to fit your system configuration (e.g. system memory minus one or 
    two gigabytes).
 
-3. Confirm the proper update, by clicking "About", the first text box should
+2. Confirm the proper update, by clicking "About", the first text box should
    include the text "(V1.0.1)" below the program name.
    
   
 New installation:
 
-Perform step 2 and 3 of the upgrade procedure documentation. 
+Perform step 1 and 2 of the upgrade procedure documentation. 
 
 In case of problems/errors:
 
