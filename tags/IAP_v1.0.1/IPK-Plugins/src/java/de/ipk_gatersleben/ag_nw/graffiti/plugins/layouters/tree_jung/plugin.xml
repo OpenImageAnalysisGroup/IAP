@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Jung Developers</author>
+	<description>A good tree layouter taken from the Jung library.</description>
+
+	<plugindesc>
+	     <name>TreeLayoutJungPlugin</name>
+             <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.tree_jung.TreeLayoutJungPlugin</main>
+             <version>0.9</version>
+             <available>http://vanted.ipk-gatersleben.de/</available>
+        </plugindesc>
+</plugin>
