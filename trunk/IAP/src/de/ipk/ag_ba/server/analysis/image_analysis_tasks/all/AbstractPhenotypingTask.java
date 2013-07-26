@@ -168,7 +168,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		if (databaseTarget == null) {
 			ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(prefix);
-			if (vfs instanceof VirtualFileSystemHandler)
+			if (vfs != null && vfs instanceof VirtualFileSystemHandler)
 				databaseTarget = new HSMfolderTargetDataManager(vfs.getPrefix(), ((VirtualFileSystemHandler) vfs).getVFS().getTargetPathName());
 		}
 		return databaseTarget;

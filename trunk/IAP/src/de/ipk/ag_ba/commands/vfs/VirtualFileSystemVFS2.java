@@ -16,6 +16,7 @@ import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -557,6 +558,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		for (VirtualFileSystem k : getKnown(true))
 			if (k.getPrefix().equals(prefix))
 				return (VirtualFileSystemVFS2) k;
+		ResourceIOHandler h = ResourceIOManager.getHandlerFromPrefix(databaseId);
+		if (h != null && h instanceof VirtualFileSystemHandler)
+			if (((VirtualFileSystemHandler) h).getVFS() != null && ((VirtualFileSystemHandler) h).getVFS() instanceof VirtualFileSystemVFS2)
+				return (VirtualFileSystemVFS2) ((VirtualFileSystemHandler) h).getVFS();
 		return null;
 	}
 	
