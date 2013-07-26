@@ -22,9 +22,12 @@ import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemHandler;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -162,6 +165,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						databaseTarget = new HSMfolderTargetDataManager(sss.getPrefix(), sss.getTargetPathName());
 					}
 			}
+		}
+		if (databaseTarget == null) {
+			ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(prefix);
+			if (vfs instanceof VirtualFileSystemHandler)
+				databaseTarget = new HSMfolderTargetDataManager(vfs.getPrefix(), ((VirtualFileSystemHandler) vfs).getVFS().getTargetPathName());
 		}
 		return databaseTarget;
 	}
