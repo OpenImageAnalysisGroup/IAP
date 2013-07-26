@@ -137,7 +137,7 @@ public class Image {
 		this(grayR.getWidth(), grayR.getHeight(), getImgFromRGB(grayR, grayG, grayB));
 	}
 	
-	public Image(Object ref, String name) {
+	public Image(Object ref, String name) throws Exception {
 		this(IAPservice.getImage(ref, name));
 	}
 	
