@@ -275,8 +275,13 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		if (url.getDetail() != null && url.getDetail().startsWith("data")) {
-			VfsFileObject file = newVfsFile(ICON_FOLDER_NAME + url.getDetail().substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
+		String detail = url.getDetail();
+		if (detail != null && detail.startsWith("/"))
+			detail = detail.substring(1);
+		if (detail != null && detail.startsWith("\\"))
+			detail = detail.substring(1);
+		if (detail != null && detail.startsWith("data")) {
+			VfsFileObject file = newVfsFile(ICON_FOLDER_NAME + detail.substring("data".length()) + "/" + url.getFileName().split("#", 2)[0]);
 			if (file != null && file.exists()) {
 				InputStream is = file.getInputStream();
 				if (is != null)
@@ -558,7 +563,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		for (VirtualFileSystem k : getKnown(true))
 			if (k.getPrefix().equals(prefix))
 				return (VirtualFileSystemVFS2) k;
-		ResourceIOHandler h = ResourceIOManager.getHandlerFromPrefix(databaseId);
+		ResourceIOHandler h = ResourceIOManager.getHandlerFromPrefix(prefix);
 		if (h != null && h instanceof VirtualFileSystemHandler)
 			if (((VirtualFileSystemHandler) h).getVFS() != null && ((VirtualFileSystemHandler) h).getVFS() instanceof VirtualFileSystemVFS2)
 				return (VirtualFileSystemVFS2) ((VirtualFileSystemHandler) h).getVFS();
