@@ -10,8 +10,6 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysisBlockFIS {
 	
-	private int prio = 4;
-	
 	public AbstractSnapshotAnalysisBlock() {
 		super();
 	}
@@ -20,7 +18,6 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 	protected MaskAndImageSet run() throws InterruptedException {
 		if (!getBoolean("enabled", true))
 			return input();
-		int parentPriority = getParentPriority();
 		final ImageSet processedImages = new ImageSet(input().images());
 		final ImageSet processedMasks = new ImageSet(input().images());
 		
@@ -154,14 +151,6 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		};
 		BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
 		return new MaskAndImageSet(processedImages, processedMasks);
-	}
-	
-	protected int getParentPriority() {
-		return prio;
-	}
-	
-	public void setParentPriority(int prio) {
-		this.prio = prio;
 	}
 	
 	protected Image processVISimage() {
