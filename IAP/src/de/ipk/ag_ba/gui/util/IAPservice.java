@@ -13,12 +13,15 @@ import info.StopWatch;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +47,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -69,6 +74,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.AttributeComponent;
 import org.graffiti.plugin.view.GraphElementComponent;
@@ -81,6 +87,7 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
+import com.sun.media.jai.codec.SeekableStream;
 
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -1682,13 +1689,24 @@ public class IAPservice {
 		return MassCopySupport.getInstance();
 	}
 	
-	public static Image getImage(Object ref, String name) {
-		URL url = GravistoService.getResource(ref.getClass(), name);
-		if (url == null)
-			return null;
-		else {
-			return new ImageIcon(url).getImage();
+	public static Image getImage(Object ref, String name) throws Exception {
+		final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(
+				GravistoService.getIOurl(ref.getClass(), name, null).getInputStream());
+		SeekableStream ss = SeekableStream.wrapInputStream(in, true);
+		RenderedOp ro = JAI.create("stream", ss);
+		ColorModel cm = ro.getColorModel();
+		if (cm.getNumColorComponents() == 1 && cm.getPixelSize() == 8) {
+			// convert 8-bit gray scale image to RGB
+			System.out.println("GRAY");
+			BufferedImage bi = ro.getAsBufferedImage();
+			BufferedImage rgbImg = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2d = rgbImg.createGraphics();
+			g2d.drawImage(bi, 0, 0, null);
+			g2d.dispose();
+			return rgbImg;
+			// de.ipk.ag_ba.image.structures.Image gray = new de.ipk.ag_ba.image.structures.Image(ro.getAsBufferedImage());
 		}
+		return ro.getAsBufferedImage();
 	}
 	
 	@SuppressWarnings("rawtypes")
