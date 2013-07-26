@@ -111,7 +111,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		return ress;
 	}
 	
-	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix) throws Exception {
+	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix, boolean isThinnedImage)
+			throws Exception {
 		boolean graphAnalysis = getBoolean("graqh-based analysis", true);
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
@@ -224,7 +225,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 							graphAnalysis(getClusterIDarray(image),
 									new Image(si.getWidth(), si.getHeight(),
 											si.getImageAs1dArray())
-											.show("input for graph analysis", debug).io(), rt, prefix);
+											.show("input for graph analysis", debug).io(), rt, prefix, width > 1);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
