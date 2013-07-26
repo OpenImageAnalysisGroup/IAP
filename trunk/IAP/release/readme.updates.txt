@@ -8,8 +8,8 @@ V1.0.1 (July 26, 2013):
 
 Upgrade procedure:
 
-1. Within IAP click "Settings > Show Config-File". Close IAP. Then delete previously 
-   saved or automatically generated pipeline definitions
+1. Within IAP click "Settings > Show Config-File". Close IAP. Then delete 
+   previously saved or automatically generated pipeline definitions
    (file names ending with .pipeline.ini).
 
 2. Unzip the downloaded iap.zip file and use the startup-scripts to start IAP.
