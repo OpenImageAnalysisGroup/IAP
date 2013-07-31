@@ -18,13 +18,13 @@ public class BorderImageOperation {
 	
 	/**
 	 * Locates pixels at the border from background color to any other color. The border is detected by looking
-	 * at the 4-neighbourhood. The border is recolored according to the given parameter. Any other pixels are
+	 * at the 4-neighborhood. The border is recolored according to the given parameter. Any other pixels are
 	 * recolored to background.
 	 * In case the removeInnerBorders parameter is specified (set to true), a kind of flood fill starting from the borders
 	 * of the image is performed. This flood fill checks for any detected borders and retains the detected borders.
 	 * Borders not reachable from within the outside will be removed.
 	 * The number of border pixels is added to the ResultTable of the result (column 'border').
-	 * In case a ImageOperation resulttable is available in this object, it is extended and transfered to the result object.
+	 * In case a ImageOperation result table is available in this object, it is extended and transfered to the result object.
 	 * 
 	 * @param backgroundColor
 	 *           The color which is used to identify background pixels.
