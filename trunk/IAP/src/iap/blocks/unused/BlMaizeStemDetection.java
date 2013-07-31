@@ -117,13 +117,13 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
-			skel.findEndpointsAndBranches();
+			skel.findEndpointsAndBranches(null);
 			skel.calculateEndlimbsRecursive();
 			int nEndLimbs = skel.endlimbs.size();
 			String prefix = "prefix1";
 			rt.addValue(prefix + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-			sg.createGraph(optClusterIDsPixels);
+			sg.createGraph(optClusterIDsPixels, null, 10, null);
 			sg.deleteSelfLoops();
 			sg.removeParallelEdges();
 			sg.getGraph().numberGraphElements();
@@ -195,7 +195,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 			rt.addValue(pre + prefix2 + ".skeleton.length", inp.countFilledPixels());
 		
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(getInvert(inp.getImage()));
-		skel.findEndpointsAndBranches();
+		skel.findEndpointsAndBranches(null);
 		
 		img = skel.getImageOperation().show("THE SKELETON", debug);
 		
