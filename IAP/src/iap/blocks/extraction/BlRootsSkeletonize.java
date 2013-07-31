@@ -3,6 +3,7 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.unused.ClusterSizeAndClusterId;
+import iap.blocks.unused.RunnableOnImage;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -13,9 +14,12 @@ import java.util.TreeSet;
 
 import org.Colors;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
+import org.Vector2i;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.graph.Edge;
 
+import de.ipk.ag_ba.image.operation.DistanceCalculationMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
@@ -46,7 +50,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		}
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
-		
+		ImageOperation origImage = img.copy();
 		img = img.binary(0, Color.WHITE.getRGB());
 		
 		ImageOperation inDilatedForSectionDetection = img.copy().dilate(getInt("Dilate for section detection", 5))
@@ -56,7 +60,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		cd.detectClusters();
 		int clusters = cd.getClusterCount();
 		rt.addValue("roots.part.count", clusters);
-		img = skeletonizeImage("", background, img, rt);
+		ArrayList<RunnableOnImage> postProcessing = new ArrayList<RunnableOnImage>();
+		img = skeletonizeImage("", background, img, origImage, rt, postProcessing);
 		
 		int[] unchangedSkeletonPixels = img.getImageAs1dArray();
 		
@@ -108,21 +113,37 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
+		for (RunnableOnImage roi : postProcessing) {
+			try {
+				ress = roi.postProcess(ress);
+			} catch (Exception er) {
+				er.printStackTrace();
+			}
+		}
 		return ress;
 	}
 	
-	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix, boolean isThinnedImage)
+	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix,
+			boolean isThinnedImage, int[][] optDistanceMap, ArrayList<RunnableOnImage> postProcessing)
 			throws Exception {
 		boolean graphAnalysis = getBoolean("graqh-based analysis", true);
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
-			skel.findEndpointsAndBranches();
+			skel.findEndpointsAndBranches(null);
+			// skel.deleteShortEndLimbs(-20, false, new HashSet<Point>());
+			// new SkeletonProcessor2d(skel.skelImg);
+			// skel.background = SkeletonProcessor2d.getDefaultBackground();
+			// skel.findEndpointsAndBranches(null);
 			skel.calculateEndlimbsRecursive();
 			int nEndLimbs = skel.endlimbs.size();
 			rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
+			
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-			sg.createGraph(optClusterIDsPixels);
+			sg.createGraph(optClusterIDsPixels, optDistanceMap, 10, postProcessing);
+			new ImageOperation(optClusterIDsPixels, in.getWidth(), in.getHeight())
+					.debugPrintValueSetToConsole()
+					.debugIntToGrayScale().dilate(5);// .show("FCK", true);
 			sg.deleteSelfLoops();
 			sg.removeParallelEdges();
 			sg.getGraph().numberGraphElements();
@@ -134,7 +155,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 					for (Edge e : sg.getGraph().getEdges()) {
 						Double val = e.getDouble("len");
 						if (val != null) {
-							limbs.addValue(val);
+							limbs.addValue(val / 2);
 						}
 					}
 					if (resultPrefix.isEmpty())
@@ -149,7 +170,9 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 					rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 0);
 				} else {
 					rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
-					HashMap<Integer, Double> id2size = sg.calculateDiameter(null);
+					HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
+							sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing) :
+							sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
 					HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
 					int idx = 1;
 					for (Integer id : id2size.keySet()) {
@@ -160,13 +183,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 						int niceID = id;
 						if (id != -1)
 							niceID = co2i.get(id);
-						rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size());
+						rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size() - 1); // the largest graph is added twice (once more with id -1)
 						if (niceID >= 0) {
 							if (resultPrefix.isEmpty())
 								rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
-										id2size.get(id));
+										id2size.get(id) / 2);
 						} else
-							rt.addValue("roots" + resultPrefix + ".graph.diameter.max", id2size.get(id));
+							rt.addValue("roots" + resultPrefix + ".graph.diameter.max", id2size.get(id) / 2);
 					}
 				}
 			}
@@ -175,15 +198,16 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	
 	private ImageOperation skeletonizeImage(
 			String pre,
-			int background, ImageOperation img, ResultsTableWithUnits rt) {
+			int background, ImageOperation img, ImageOperation nonBinaryImage,
+			ResultsTableWithUnits rt, ArrayList<RunnableOnImage> postProcessing) {
 		ImageOperation inp = img;
 		if (rt != null)
 			rt.addValue(pre + "roots.filled.pixels", inp.countFilledPixels());
-		ImageOperation binary = inp.binary(Color.BLACK.getRGB(), background);
+		ImageOperation binary = inp;// .binary(Color.BLACK.getRGB(), background);
 		{
 			ImageOperation image = binary.copy();
 			if (rt != null)
-				widthHistogram(rt, image);
+				calculateWidthHistogram(rt, image, nonBinaryImage, postProcessing);
 		}
 		
 		inp = binary.skeletonize(true).show("INPUT FOR BRANCH DETECTION", debug);
@@ -192,26 +216,49 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			rt.addValue(pre + "roots.skeleton.length", inp.countFilledPixels());
 		
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).getImage()); // getInvert(
-		skel.findEndpointsAndBranches();
+		skel.findEndpointsAndBranches(postProcessing);
 		
 		img = skel.getImageOperation().show("THE SKELETON", debug);
 		
 		ArrayList<Point> branchPoints = skel.getBranches();
-		
+		for (final Point bp : branchPoints) {
+			postProcessing.add(new RunnableOnImage() {
+				
+				@Override
+				public Image postProcess(Image in) {
+					if (in != null)
+						return in.io().canvas().drawCircle(bp.x, bp.y, 5, Color.BLUE.getRGB(), 0, 1).getImage();
+					else
+						return null;
+				}
+			});
+		}
+		ArrayList<Point> eps = skel.getEndpoints();
+		for (final Point ep : eps) {
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					return in.io().canvas().drawCircle(ep.x, ep.y, 10, Color.RED.getRGB(), 0, 1).getImage();
+				}
+			});
+		}
 		if (rt != null)
 			rt.addValue(pre + "roots.skeleton.branchpoints", branchPoints.size());
 		if (rt != null)
-			rt.addValue(pre + "roots.skeleton.endpoints", skel.getEndpoints().size());
+			rt.addValue(pre + "roots.skeleton.endpoints", eps.size());
 		
 		return img;
 	}
 	
-	private void widthHistogram(ResultsTableWithUnits rt, ImageOperation image) {
+	private void calculateWidthHistogram(ResultsTableWithUnits rt, ImageOperation image,
+			ImageOperation nonBinaryImage,
+			ArrayList<RunnableOnImage> postProcessing) {
 		HashMap<Integer, Integer> width2len = new HashMap<Integer, Integer>();
 		// double area = 80;
 		int width = 1;
 		int pixelCnt;
 		image = image.resize(2);
+		nonBinaryImage = nonBinaryImage.resize(2);
 		do {
 			pixelCnt = image.copy().skeletonize(false).countFilledPixels();
 			if (pixelCnt > 0) {
@@ -221,11 +268,28 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 						prefix = ".thinned" + StringManipulationTools.formatNumber(width - 1, "00");
 					if (getBoolean("Calculate Graph Diameters", true)) {
 						try {
-							ImageOperation si = image.copy().dilate().skeletonize(true);// .resize(0.5d);
-							graphAnalysis(getClusterIDarray(image),
-									new Image(si.getWidth(), si.getHeight(),
-											si.getImageAs1dArray())
-											.show("input for graph analysis", debug).io(), rt, prefix, width > 1);
+							ImageOperation tobeSkeletonized = image.copy().dilate();
+							int[][] distanceMap = null;
+							ImageOperation skeletonImage = tobeSkeletonized.skeletonize(true);// .resize(0.5d);
+							if (width < 2) {
+								// first image, not thinned
+								
+								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION).getImageAs2dArray();
+								// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
+								// false);
+								
+								// calculate fraction based volume
+								// rt.addValue("roots.volume.int_based", volume);
+								DescriptiveStatistics skelStat = new DescriptiveStatistics();
+								for (Vector2i i : skeletonImage.getForegroundPixels())
+									skelStat.addValue(distanceMap[i.x][i.y] / 10d);
+								rt.addValue("roots.volume.frac_based", Math.PI * skelStat.getMean() * skelStat.getMean() * skelStat.getN());
+								
+								graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
+										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
+												skeletonImage.getImageAs1dArray())
+												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -239,63 +303,73 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		width--;
 		int over19 = 0;
 		double volume = 0;
-		for (int w = 1; w <= width; w++) {
-			Integer len = width2len.get(w);
-			if (len == null)
-				len = 0;
-			Integer subtract = 0;
+		for (int w = 1; w <= 20; w++) {
+			Integer currentLengthWider = width2len.get(w);
+			if (currentLengthWider == null)
+				currentLengthWider = 0;
+			Integer nextLengthThinner = 0;
 			if (w < width) {
-				subtract = width2len.get(w + 1);
-				if (subtract == null)
-					subtract = 0;
+				nextLengthThinner = width2len.get(w + 1);
+				if (nextLengthThinner == null)
+					nextLengthThinner = 0;
 			}
-			int realLen = len - subtract;
-			int www = width - w + 1;
+			int realLen = currentLengthWider - nextLengthThinner;
+			if (realLen < 0) {
+				realLen = 0;
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Negative skeleton length calculated for width " + w + ": " + realLen);
+			}
+			int www = w;// width - w + 1;
 			if (www > 19) {
 				over19 += realLen;
-				volume = Double.NaN;
 			} else {
-				rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(www, "00") + ".length", realLen);
+				int displayLen = realLen / 2 + (realLen >= w ? w - 1 : 0);
+				if (displayLen == 1)
+					displayLen = 0;
+				rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(www, "00") + ".length", displayLen);
 				// Volume = Length*Pi*(D/2)^2
-				if (realLen > 0 && www > 0)
-					volume += realLen * Math.PI * (www / 2d) * (www / 2d);
+				if (displayLen > 0 && www > 0)
+					volume += displayLen * Math.PI * www * www;
 			}
-			subtract += len;
+			nextLengthThinner += currentLengthWider;
 		}
-		if (over19 > 0)
-			rt.addValue("roots.skeleton.width.20.length", over19);
+		if (over19 > 0) {
+			rt.addValue("roots.skeleton.width.20.length", over19 / 2 + 20);
+			volume = Double.NaN;
+		}
 		if (!Double.isNaN(volume))
-			rt.addValue("roots.volume", volume);
+			rt.addValue("roots.volume.int_based", volume);
 	}
 	
 	private int[] getClusterIDarray(ImageOperation img) {
 		ClusterDetection cd = new ClusterDetection(img.getImage(), ImageOperation.BACKGROUND_COLORint);
 		cd.detectClusters();
-		int clusters = cd.getClusterCount();
+		// int clusters = cd.getClusterCount();
 		
 		ImageOperation ioClusteredSkeltonImage = new Image(
 				img.getWidth(),
 				img.getHeight(),
-				cd.getImageClusterIdMask()).io();
+				cd.getImageClusterIdMask()).io().debugPrintValueSetToConsole();
 		
-		ArrayList<Color> cols = Colors.get(clusters + 1);
-		int[] source = ioClusteredSkeltonImage.getImageAs1dArray();
-		int[] target = new int[source.length];
-		for (int i = 1; i < cols.size(); i++) {
-			int search = i;
-			int replace = cols.get(i).getRGB();
-			
-			int idx = 0;
-			for (int v : source) {
-				if (v != search)
-					target[idx++] = v;
-				else
-					target[idx++] = replace;
-			}
-		}
-		
-		return target;
+		return ioClusteredSkeltonImage.getImageAs1dArray();
 	}
+	
+	// colorize cluster image:
+	// ArrayList<Color> cols = Colors.get(clusters + 1);
+	// int[] source = ioClusteredSkeltonImage.getImageAs1dArray();
+	// int[] target = new int[source.length];
+	// for (int i = 1; i < cols.size(); i++) {
+	// int search = i;
+	// int replace = cols.get(i).getRGB();
+	//
+	// int idx = 0;
+	// for (int v : source) {
+	// if (v != search)
+	// target[idx++] = v;
+	// else
+	// target[idx++] = replace;
+	// }
+	// }
+	//
 	
 	/**
 	 * Function to invert skeleton image, invert from class imageoperation does not work
