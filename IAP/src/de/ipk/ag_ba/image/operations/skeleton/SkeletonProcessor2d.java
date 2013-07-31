@@ -889,4 +889,10 @@ public class SkeletonProcessor2d {
 	public ImageOperation getImageOperation() {
 		return new ImageOperation(skelImg);
 	}
+	
+	public static int countEndPoints(Image skeletonImage) {
+		SkeletonProcessor2d s = new SkeletonProcessor2d(skeletonImage);
+		s.findEndpointsAndBranches(null);
+		return s.endpoints.size();
+	}
 }
