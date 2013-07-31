@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
+import iap.blocks.unused.RunnableOnImage;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -323,8 +325,10 @@ public class SkeletonProcessor2d {
 	 * Do this at first!
 	 * Search and mark Endpoints and Branches, therefore the image will be converted to an binary image and checked with masks.
 	 * Also remove Dots.
+	 * 
+	 * @param postProcessing
 	 */
-	public void findEndpointsAndBranches() {
+	public void findEndpointsAndBranches(ArrayList<RunnableOnImage> postProcessing) {
 		int[][][] listEndpointMasks = new int[13][3][3];
 		int[][][] listBranchMasks = new int[18][3][3];
 		
@@ -412,6 +416,17 @@ public class SkeletonProcessor2d {
 					}
 				}
 			}
+		}
+		
+		if (postProcessing != null) {
+			final int[][] unchangedSkeleton = new Image(skelImg).getAs2A();
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).show("bbl").or(in)
+							.getImage();
+				}
+			});
 		}
 	}
 	
@@ -546,7 +561,7 @@ public class SkeletonProcessor2d {
 		forRemove.clear();
 		endpoints.clear();
 		branches.clear();
-		findEndpointsAndBranches();
+		findEndpointsAndBranches(null);
 	}
 	
 	/**
