@@ -68,7 +68,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (!knownColors.contains(p)) {
-					System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p) + " X=" + x + " / Y=" + y);
+					// System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p) + " X=" + x + " / Y=" + y);
 					knownColors.add(p);
 				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
@@ -90,7 +90,7 @@ public class SkeletonGraph {
 					}
 					ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing);
 					if (optClusterIDsPixels != null) {
-						System.out.println("NEW NODE: " + n + ": " + cid);
+						// System.out.println("NEW NODE: " + n + ": " + cid);
 						new NodeHelper(n).setClusterID(cid);
 					}
 					position2node.put(x + ";" + y, n);
@@ -233,7 +233,8 @@ public class SkeletonGraph {
 						Vector2i a = new Vector2i(x1, y1);
 						Vector2i b = new Vector2i(x2, y2);
 						if (a.distance(b) < minimumNodeDistance) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Merge nearby skeleton graph nodes: " + x1 + "/" + y1 + " near to " + x2 + "/" + y2);
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">Merge nearby skeleton graph nodes: " + x1 + "/" + y1 + " near to " + x2 + "/" +
+							// y2);
 							Collection<Node> workNodes = new ArrayList<Node>();
 							workNodes.add(n1);
 							workNodes.add(n2);
