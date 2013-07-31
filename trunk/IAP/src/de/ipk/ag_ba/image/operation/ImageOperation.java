@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -5010,14 +5011,20 @@ public class ImageOperation {
 	 * @return 2d array
 	 */
 	public ImageOperation distanceMap() {
+		return distanceMap(DistanceCalculationMode.INT_DISTANCE_SQARED);
+	}
+	
+	public ImageOperation distanceMap(DistanceCalculationMode mode) {
 		int background = BACKGROUND_COLORint;
 		int borderColor = Color.CYAN.getRGB();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] img = getImageAs2dArray();
-		ImageOperation io = new ImageOperation(getImageAs2dArray()).border().borderDetection(background, borderColor, false);
-		int borderLength = (int) io.getResultsTable().getValue("border", 0);
-		int[][] borderMap = io.getImageAs2dArray();
+		ImageOperation ioBorderPixels = new ImageOperation(getImageAs2dArray()).border().borderDetection(background,
+				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
+				false);
+		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
+		int[][] borderMap = ioBorderPixels.getImageAs2dArray();
 		int[] borderList = getBorderList(borderMap, borderLength);
 		int[][] distMap = new int[w][h];
 		int xtemp;
@@ -5031,11 +5038,32 @@ public class ImageOperation {
 					for (int i = 0; i < borderList.length; i += 2) { // iterate borderlist
 						xtemp = borderList[i];
 						ytemp = borderList[i + 1];
-						disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
+						if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION) {
+							// distance is multiplied by 10
+							double ddist = Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp))); // calc distance as double value
+							int c = img[x][y];
+							int grayLevel = c & 0x0000ff; // blue channel is interpreted as gray level (assumed gray image input)
+							// black = grayLevel 0, white = graylevel 255
+							// black pixel == fully filled pixel ==> subtract 0.0
+							// white pixel == marginally filled pixel ==> subtract 1.0
+							// now reduce distance accordingly
+							disttemp = (int) Math.ceil(10d * (ddist - grayLevel / 255d));
+						} else
+							if (mode == DistanceCalculationMode.INT_DISTANCE_SQARED)
+								disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
+							else
+								disttemp = (int) Math.ceil(Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)))); // calc distance
+								
 						if (disttemp < dist)
 							dist = disttemp;
 					}
-					distMap[x][y] = dist;
+					if (mode == DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY) {
+						if (dist > 25)
+							dist = 25;
+						dist = dist > 0 ? 255 - dist * 10 : 255;
+						distMap[x][y] = new Color(dist, dist, dist).getRGB();
+					} else
+						distMap[x][y] = dist;
 				}
 				dist = Integer.MAX_VALUE;
 			}
@@ -5060,5 +5088,47 @@ public class ImageOperation {
 			}
 		}
 		return borderList;
+	}
+	
+	public ImageOperation debugIntToGrayScale() {
+		int[][] img = getImageAs2dArray();
+		for (int x = 0; x < getWidth(); x++)
+			for (int y = 0; y < getHeight(); y++) {
+				int val = img[x][y];
+				if (val > 25)
+					val = 25;
+				val = val > 0 ? 255 - val * 10 : 255;
+				img[x][y] = new Color(val, val, val).getRGB();
+			}
+		return new ImageOperation(img);
+	}
+	
+	public ImageOperation debugPrintValueSetToConsole() {
+		int[][] img = getImageAs2dArray();
+		HashSet<Integer> printed = new HashSet<Integer>();
+		for (int y = 0; y < getHeight(); y++) {
+			for (int x = 0; x < getWidth(); x++) {
+				int val = img[x][y];
+				if (!printed.contains(val)) {
+					System.out.println("X=" + x + ", Y=" + y + ", VALUE=" + val);
+					printed.add(val);
+				}
+			}
+		}
+		return this;
+	}
+	
+	public ArrayList<Vector2i> getForegroundPixels() {
+		ArrayList<Vector2i> res = new ArrayList<Vector2i>();
+		int[][] img = getImageAs2dArray();
+		for (int y = 0; y < getHeight(); y++) {
+			for (int x = 0; x < getWidth(); x++) {
+				int val = img[x][y];
+				if (val != BACKGROUND_COLORint) {
+					res.add(new Vector2i(x, y));
+				}
+			}
+		}
+		return res;
 	}
 }
