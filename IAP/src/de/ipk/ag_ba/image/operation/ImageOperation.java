@@ -5011,10 +5011,17 @@ public class ImageOperation {
 	 * @return 2d array
 	 */
 	public ImageOperation distanceMap() {
-		return distanceMap(DistanceCalculationMode.INT_DISTANCE_SQARED);
+		return distanceMap(DistanceCalculationMode.INT_DISTANCE_SQARED, 1);
 	}
 	
-	public ImageOperation distanceMap(DistanceCalculationMode mode) {
+	/**
+	 * @param mode
+	 * @param scale
+	 *           Is used only for the mode INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, in this case it is assumed, that the
+	 *           input image was enlarged accordingly, and the fractional subtraction is then multiplied by this enlargement.
+	 * @return
+	 */
+	public ImageOperation distanceMap(DistanceCalculationMode mode, double scale) {
 		int background = BACKGROUND_COLORint;
 		int borderColor = Color.CYAN.getRGB();
 		int w = image.getWidth();
@@ -5022,7 +5029,7 @@ public class ImageOperation {
 		int[][] img = getImageAs2dArray();
 		ImageOperation ioBorderPixels = new ImageOperation(getImageAs2dArray()).border().borderDetection(background,
 				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
-				false);
+				false).show("BORDER PIXELS");
 		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
 		int[][] borderMap = ioBorderPixels.getImageAs2dArray();
 		int[] borderList = getBorderList(borderMap, borderLength);
@@ -5047,12 +5054,12 @@ public class ImageOperation {
 							// black pixel == fully filled pixel ==> subtract 0.0
 							// white pixel == marginally filled pixel ==> subtract 1.0
 							// now reduce distance accordingly
-							disttemp = (int) Math.ceil(10d * (ddist - grayLevel / 255d));
+							disttemp = (int) Math.round(10d * (1 + ddist - 2 * grayLevel / 255d));
 						} else
 							if (mode == DistanceCalculationMode.INT_DISTANCE_SQARED)
 								disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
 							else
-								disttemp = (int) Math.ceil(Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)))); // calc distance
+								disttemp = (int) Math.round(Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)))); // calc distance
 								
 						if (disttemp < dist)
 							dist = disttemp;
