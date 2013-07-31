@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
+import iap.blocks.unused.RunnableOnImage;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -107,23 +109,24 @@ public class ImageCanvas {
 	 * @param radius
 	 * @param color
 	 * @param alpha
+	 *           0 == solid
 	 *           - ! opacity, function corrupt
 	 * @param s
 	 *           - Stroke width
 	 * @return
 	 */
-	public ImageCanvas drawCircle(int mx, int my, int radius, int color, double alpha, int s) {
-		
+	public ImageCanvas drawCircle(int mx, int my, int radius, int color, double alpha, int strokeWidth) {
+		int s = strokeWidth;
 		int f = 1 - radius;
 		int ddF_x = 0;
 		int ddF_y = -2 * radius;
 		int x = 0;
 		int y = radius;
 		
-		fillRect(mx - s, my + radius - s, s + s, s + s, color, alpha);
-		fillRect(mx - s, my - radius - s, s + s, s + s, color, alpha);
-		fillRect(mx + radius - s, my - s, s + s, s + s, color, alpha);
-		fillRect(mx - radius - s, my - s, s + s, s + s, color, alpha);
+		fillRect(mx - s, my + radius - s, s, s, color, alpha);
+		fillRect(mx - s, my - radius - s, s, s, color, alpha);
+		fillRect(mx + radius - s, my - s, s, s, color, alpha);
+		fillRect(mx - radius - s, my - s, s, s, color, alpha);
 		while (x < y) {
 			if (f >= 0) {
 				y--;
@@ -134,14 +137,14 @@ public class ImageCanvas {
 			ddF_x += 2;
 			f += ddF_x + 1;
 			
-			fillRect(mx + x - s, my + y - s, s + s, s + s, color, alpha);
-			fillRect(mx - x - s, my + y - s, s + s, s + s, color, alpha);
-			fillRect(mx + x - s, my - y - s, s + s, s + s, color, alpha);
-			fillRect(mx - x - s, my - y - s, s + s, s + s, color, alpha);
-			fillRect(mx + y - s, my + x - s, s + s, s + s, color, alpha);
-			fillRect(mx - y - s, my + x - s, s + s, s + s, color, alpha);
-			fillRect(mx + y - s, my - x - s, s + s, s + s, color, alpha);
-			fillRect(mx - y - s, my - x - s, s + s, s + s, color, alpha);
+			fillRect(mx + x - s, my + y - s, s, s, color, alpha);
+			fillRect(mx - x - s, my + y - s, s, s, color, alpha);
+			fillRect(mx + x - s, my - y - s, s, s, color, alpha);
+			fillRect(mx - x - s, my - y - s, s, s, color, alpha);
+			fillRect(mx + y - s, my + x - s, s, s, color, alpha);
+			fillRect(mx - y - s, my + x - s, s, s, color, alpha);
+			fillRect(mx + y - s, my - x - s, s, s, color, alpha);
+			fillRect(mx - y - s, my - x - s, s, s, color, alpha);
 		}
 		return this;
 	}
@@ -300,6 +303,55 @@ public class ImageCanvas {
 	public ImageCanvas drawImage(Image image2, int ox, int oy) {
 		image = image.io().drawAndFillRect(ox, oy, image2.getAs2A()).getImage();
 		return this;
+	}
+	
+	public ImageCanvas text(int x, int y, String text, Color color) {
+		image.io().image.getProcessor().setColor(color);
+		image.io().image.getProcessor().drawString(text, x, y);
+		return this;
+	}
+	
+	public ImageCanvas drawRectangle(int x, int y, int w, int h, Color c, int thickness) {
+		int ci = c.getRGB();
+		return drawLine(x, y, x + w, y, ci, 0, thickness)
+				.drawLine(x + w, y, x + w, y + h, ci, 0, thickness)
+				.drawLine(x + w, y + w, x, y + h, ci, 0, thickness)
+				.drawLine(x, y + h, x, y, ci, 0, thickness);
+	}
+	
+	public ImageCanvas drawRectanglePoints(int x, int y, int w, int h, Color c, int thickness) {
+		int ci = c.getRGB();
+		return drawLine(x, y, x + 1, y + 1, ci, 0, thickness)
+				.drawLine(x + w, y, x + w + 1, y + 1, ci, 0, thickness)
+				.drawLine(x + w, y + w, x + w + 1, y + h + 1, ci, 0, thickness)
+				.drawLine(x, y + h, x + 1, y + h + 1, ci, 0, thickness);
+	}
+	
+	public static void markPoint(final int x, final int y, ArrayList<RunnableOnImage> postProcessing, final Color color) {
+		postProcessing.add(new RunnableOnImage() {
+			@Override
+			public Image postProcess(Image in) {
+				return in.io().canvas().drawRectanglePoints(x - 5, y - 5, 10, 10, color, 1).getImage();
+			}
+		});
+	}
+	
+	public static void markPoint2(final int x, final int y, ArrayList<RunnableOnImage> postProcessing) {
+		postProcessing.add(new RunnableOnImage() {
+			@Override
+			public Image postProcess(Image in) {
+				return in.io().canvas().drawRectanglePoints(x - 15, y - 15, 30, 30, Color.ORANGE, 1).getImage();
+			}
+		});
+	}
+	
+	public static void text(final int x, final int y, final String text, final Color color, ArrayList<RunnableOnImage> postProcessing) {
+		postProcessing.add(new RunnableOnImage() {
+			@Override
+			public Image postProcess(Image in) {
+				return in.io().canvas().text(x, y, text, color).getImage();
+			}
+		});
 	}
 	
 }
