@@ -257,10 +257,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		// double area = 80;
 		int width = 1;
 		int pixelCnt;
-		image = image.resize(2);
-		nonBinaryImage = nonBinaryImage.resize(2);
+		double scale = 2;
+		image = image.resize(scale);
+		nonBinaryImage = nonBinaryImage.resize(scale);
 		do {
-			pixelCnt = image.copy().skeletonize(false).countFilledPixels();
+			ImageOperation sk = image.copy().skeletonize(false);
+			
+			pixelCnt = sk.countFilledPixels();
 			if (pixelCnt > 0) {
 				if (width < 4) {
 					String prefix = "";
@@ -274,16 +277,17 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 							if (width < 2) {
 								// first image, not thinned
 								
-								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION).getImageAs2dArray();
+								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, scale).getImageAs2dArray();
 								// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
 								// false);
 								
 								// calculate fraction based volume
-								// rt.addValue("roots.volume.int_based", volume);
 								DescriptiveStatistics skelStat = new DescriptiveStatistics();
 								for (Vector2i i : skeletonImage.getForegroundPixels())
-									skelStat.addValue(distanceMap[i.x][i.y] / 10d);
-								rt.addValue("roots.volume.frac_based", Math.PI * skelStat.getMean() * skelStat.getMean() * skelStat.getN());
+									skelStat.addValue(distanceMap[i.x][i.y] / 10d / 2d);
+								int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
+								rt.addValue("roots.volume.frac_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
+										* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
 								
 								graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
