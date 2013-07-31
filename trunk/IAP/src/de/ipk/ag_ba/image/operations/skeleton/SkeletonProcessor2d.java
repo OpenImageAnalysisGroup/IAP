@@ -423,7 +423,7 @@ public class SkeletonProcessor2d {
 			postProcessing.add(new RunnableOnImage() {
 				@Override
 				public Image postProcess(Image in) {
-					return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).show("bbl").or(in)
+					return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).or(in)
 							.getImage();
 				}
 			});
