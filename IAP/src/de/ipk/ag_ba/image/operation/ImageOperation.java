@@ -5029,7 +5029,7 @@ public class ImageOperation {
 		int[][] img = getImageAs2dArray();
 		ImageOperation ioBorderPixels = new ImageOperation(getImageAs2dArray()).border().borderDetection(background,
 				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
-				false).show("BORDER PIXELS");
+				false);// .show("BORDER PIXELS");
 		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
 		int[][] borderMap = ioBorderPixels.getImageAs2dArray();
 		int[] borderList = getBorderList(borderMap, borderLength);
