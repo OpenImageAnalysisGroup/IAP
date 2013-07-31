@@ -28,6 +28,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
+import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.EdgeFollowingVetoEvaluation;
@@ -483,10 +484,12 @@ public class SkeletonGraph {
 	
 	/**
 	 * @param postProcessing
+	 * @param rt
 	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
-	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles, boolean isThinned, ArrayList<RunnableOnImage> postProcessing)
+	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles,
+			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt)
 			throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
@@ -512,6 +515,35 @@ public class SkeletonGraph {
 		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
 				+ System.currentTimeMillis() + ".gml";
 		
+		if (!isThinned) {
+			double vol = 0, vol2 = 0;
+			double lenA = 0;
+			double lenB = 0;
+			for (Edge e : graph.getEdges()) {
+				if (!e.getAttributes().getCollection().keySet().contains("w_median"))
+					continue;
+				double mm = e.getDouble("w_median");
+				double mv = e.getDouble("w_average");
+				mm = mm / 2d; // calculate radius from diameter
+				mv = mv / 2d; // calculate radius from diameter
+				double lin = e.getDouble("len") / 2;
+				double l1 = lin;
+				l1 = l1 + mm * 2d;
+				double l2 = lin + mv * 2d;
+				lenA += l1;
+				lenB += l2;
+				double v = Math.PI * mm * mm * l1;
+				double v2 = Math.PI * mv * mv * l2;
+				vol += v;
+				vol2 += v2;
+				// System.out.println("V_median: r=" + mm + ", l=" + l1 + " ==> v=" + v + " // vol_s=" + vol);
+				// System.out.println("V_mean:   r=" + mv + ", l=" + l2 + " ==> v=" + v2 + " // vol_s=" + vol2);
+			}
+			rt.addValue("roots.volume.graph_median_based", vol);
+			rt.addValue("roots.volume.graph_mean_based", vol2);
+			rt.addValue("roots.skeleton.length.graph_based", lenA);
+			rt.addValue("roots.skeleton.length.graph_based_tip_corr", lenB);
+		}
 		if (!isThinned)
 			for (Node ge : graph.getNodes()) {
 				if (ge.getNeighbors().size() != 1)
@@ -525,6 +557,7 @@ public class SkeletonGraph {
 						try {
 							double wi = nh.getEdges().iterator().next().getDouble("w_median");
 							double limb_len = nh.getEdges().iterator().next().getDouble("len") / 2;
+							limb_len += wi * 2;
 							canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W="
 									+ StringManipulationTools.formatNumber(wi, 1) + ", limbL=" + (int) limb_len, Color.BLACK);
 						} catch (Exception e) {
