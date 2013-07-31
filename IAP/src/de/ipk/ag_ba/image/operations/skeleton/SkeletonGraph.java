@@ -135,11 +135,13 @@ public class SkeletonGraph {
 						}
 						if (startNode == endNode)
 							break;
+						boolean del = false;
 						String cS = new NodeHelper(startNode).getClusterID("");
 						String cE = new NodeHelper(endNode).getClusterID("");
 						if (!cS.equals(cE)) {
 							System.out.println("Start cluster is different to end cluster:" + cS + " <=> " + cE + " // " + s + " -- " + e);
 							int i = 0;
+							del = true;
 							for (Vector2i ep : edgePoints)
 								if ((i++) % 20 == 0)
 									ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.LIGHT_GRAY);
@@ -148,7 +150,6 @@ public class SkeletonGraph {
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
 									+ (startNode == null || endNode == null ? "NULL" : ""));
 						if (startNode != null && endNode != null) {
-							boolean del = false;
 							if (startNode.getNeighbors().contains(endNode))
 								del = true;
 							Edge edge = graph.addEdge(startNode, endNode, true);
