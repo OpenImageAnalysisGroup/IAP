@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operation;
 
-import ij.measure.ResultsTable;
-
 import java.awt.Color;
 import java.util.Stack;
 
@@ -32,6 +30,8 @@ public class BorderImageOperation {
 	 *           The color which is used to identify background pixels.
 	 * @param borderColor
 	 *           The new color for border colors (other pixels will be set to background).
+	 *           If the new color is set to Integer.MAX_VALUE, the border color
+	 *           will be based on the input image.
 	 * @param removeInnerBorders
 	 *           If true, using a special algorithm (see above) only outside borders will be returned,
 	 *           borders not reachable from the image borders will be removed from the result.
@@ -100,7 +100,7 @@ public class BorderImageOperation {
 						int right = in[x + 1][y];
 						int below = in[x][y + 1];
 						if (above == backgroundColor || left == backgroundColor || right == backgroundColor || below == backgroundColor) {
-							tempOut[x][y] = bc;
+							tempOut[x][y] = borderColor != Integer.MAX_VALUE ? bc : in[x][y];
 							res++;
 						}
 					}
@@ -108,6 +108,8 @@ public class BorderImageOperation {
 			}
 		
 		if (removeInnerBorders) {
+			if (borderColor == Integer.MAX_VALUE)
+				throw new UnsupportedOperationException("This combination of removeInnerBorders and border coloring mode not supported");
 			boolean tr = true;
 			if (tr)
 				throw new UnsupportedOperationException("ToDo");
