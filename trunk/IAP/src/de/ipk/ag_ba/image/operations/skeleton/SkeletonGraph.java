@@ -1,16 +1,23 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
+import iap.blocks.unused.RunnableOnImage;
+
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import org.AttributeHelper;
+import org.ReleaseInfo;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.Vector2i;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.attributes.ObjectAttribute;
 import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Edge;
@@ -20,9 +27,12 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
+import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.EdgeFollowingVetoEvaluation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.MergeNodes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectEdgesAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
@@ -50,7 +60,7 @@ public class SkeletonGraph {
 		this.skelImg = new Image(w, h, skelImg1a).getAs2A();
 	}
 	
-	public void createGraph(int[] optClusterIDsPixels) {
+	public void createGraph(int[] optClusterIDsPixels, final int[][] optDistanceMap, int minimumNodeDistance, ArrayList<RunnableOnImage> postProcessing) {
 		this.graph = new AdjListGraph();
 		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
@@ -58,7 +68,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (!knownColors.contains(p)) {
-					// System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p));
+					System.out.println("Pixel Color: " + SkeletonProcessor2d.getColorDesc(p) + " X=" + x + " / Y=" + y);
 					knownColors.add(p);
 				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
@@ -66,8 +76,22 @@ public class SkeletonGraph {
 					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
 					n.setInteger("x", x);
 					n.setInteger("y", y);
+					String cid = "-";
+					if (optClusterIDsPixels != null)
+						cid = optClusterIDsPixels[y * w + x] + "";
+					
+					new NodeHelper(n).setLabel("C" + cid);
+					String dd = SkeletonProcessor2d.getColorDesc(p);
+					if (dd.equals("branch"))
+						dd = "____br";
+					if (dd.equals("endpoint")) {
+						ImageCanvas.markPoint2(x / 2, y / 2, postProcessing);
+						dd = "_ep";
+					}
+					ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing);
 					if (optClusterIDsPixels != null) {
-						new NodeHelper(n).setClusterID(optClusterIDsPixels[y * w + x] + "");
+						System.out.println("NEW NODE: " + n + ": " + cid);
+						new NodeHelper(n).setClusterID(cid);
 					}
 					position2node.put(x + ";" + y, n);
 					if (DEBUG)
@@ -103,11 +127,22 @@ public class SkeletonGraph {
 						Node startNode = position2node.get(s.x + ";" + s.y);
 						Node endNode = position2node.get(e.x + ";" + e.y);
 						if (endNode == null) {
-							if (DEBUG)
-								System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
+							System.out.println("START POINT NOT FOUND: " + s.x + " / " + s.y);
+						}
+						if (endNode == null) {
+							System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
 						}
 						if (startNode == endNode)
 							break;
+						String cS = new NodeHelper(startNode).getClusterID("");
+						String cE = new NodeHelper(endNode).getClusterID("");
+						if (!cS.equals(cE)) {
+							System.out.println("Start cluster is different to end cluster:" + cS + " <=> " + cE + " // " + s + " -- " + e);
+							int i = 0;
+							for (Vector2i ep : edgePoints)
+								if ((i++) % 20 == 0)
+									ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.LIGHT_GRAY);
+						}
 						if (DEBUG)
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
 									+ (startNode == null || endNode == null ? "NULL" : ""));
@@ -127,27 +162,89 @@ public class SkeletonGraph {
 							lastEndNode = endNode;
 							if (del)
 								graph.deleteEdge(edge);
+							else {
+								if (optDistanceMap != null) {
+									DescriptiveStatistics statWidth = new DescriptiveStatistics();
+									DescriptiveStatistics statReveresed = new DescriptiveStatistics();
+									
+									ArrayList<Vector2i> reversedList = new ArrayList<Vector2i>(edgePoints);
+									Collections.reverse(reversedList);
+									
+									for (Vector2i ep : edgePoints) {
+										double width = optDistanceMap[ep.x][ep.y] / 10d;
+										statWidth.addValue(width);
+										if (statWidth.getN() >= 20)
+											break;
+									}
+									for (Vector2i ep : reversedList) {
+										double width = optDistanceMap[ep.x][ep.y] / 10d;
+										statReveresed.addValue(width);
+										if (statReveresed.getN() >= 20)
+											break;
+									}
+									if (statReveresed.getMean() < statWidth.getMean()) {
+										statWidth = statReveresed;
+										edgePoints = reversedList;
+									}
+									int idx = 0;
+									for (Vector2i ep : edgePoints) {
+										if (idx == 40 || idx == edgePoints.size() - 1) {
+											double width = statWidth.getPercentile(50);
+											ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.YELLOW);
+											ImageCanvas.text(ep.x / 2, ep.y / 2 - 20, "W=" +
+													StringManipulationTools.formatNumber(width, 1)
+													+ ", L=" + edgePoints.size() / 2, Color.MAGENTA, postProcessing);
+										}
+										idx++;
+									}
+									
+									edge.setDouble("w_average", statWidth.getMean());
+									edge.setDouble("w_median", statWidth.getPercentile(50));
+									edge.setDouble("w_stddev", statWidth.getStandardDeviation());
+									edge.setDouble("w_kurtosis", statWidth.getKurtosis());
+									edge.setDouble("w_skewness", statWidth.getSkewness());
+									edge.setDouble("w_min", statWidth.getMin());
+									edge.setDouble("w_max", statWidth.getMax());
+									AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1)
+											+ ", L:" + statWidth.getN());
+								}
+							}
 						}
 					} while (foundLine);
 				}
 			}
 		}
-		boolean checkDist = false;
-		if (checkDist)
-			for (Node n1 : graph.getNodes()) {
-				for (Node n2 : graph.getNodes()) {
-					if (n1 == n2)
-						continue;
-					int x1 = n1.getInteger("x");
-					int y1 = n1.getInteger("y");
-					int x2 = n2.getInteger("x");
-					int y2 = n2.getInteger("y");
-					Vector2i a = new Vector2i(x1, y1);
-					Vector2i b = new Vector2i(x2, y2);
-					if (a.distance(b) < 5)
-						System.out.println("NNN: " + x1 + "/" + y1 + " near to " + x2 + "/" + y2);
+		boolean checkDist = minimumNodeDistance > 0;
+		if (checkDist) {
+			boolean mergeOccured;
+			do {
+				mergeOccured = false;
+				loop: for (Node n1 : graph.getNodes()) {
+					for (Node n2 : graph.getNodes()) {
+						if (n1 == n2)
+							continue;
+						if (!new NodeHelper(n1).getClusterID("-1").equals(new NodeHelper(n2).getClusterID("-1"))) {
+							continue;
+						}
+						int x1 = n1.getInteger("x");
+						int y1 = n1.getInteger("y");
+						int x2 = n2.getInteger("x");
+						int y2 = n2.getInteger("y");
+						Vector2i a = new Vector2i(x1, y1);
+						Vector2i b = new Vector2i(x2, y2);
+						if (a.distance(b) < minimumNodeDistance) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Merge nearby skeleton graph nodes: " + x1 + "/" + y1 + " near to " + x2 + "/" + y2);
+							Collection<Node> workNodes = new ArrayList<Node>();
+							workNodes.add(n1);
+							workNodes.add(n2);
+							MergeNodes.mergeNodesIntoSingleNode(graph, workNodes);
+							mergeOccured = true;
+							break loop;
+						}
+					}
 				}
-			}
+			} while (mergeOccured);
+		}
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges());
 	}
@@ -309,16 +406,20 @@ public class SkeletonGraph {
 	}
 	
 	/**
+	 * @param postProcessing
 	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
-	public HashMap<Integer, Double> calculateDiameter(String optGMLoutputFileName) throws Exception {
+	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList<RunnableOnImage> postProcessing, boolean thinned) throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
-		// System.out.println("Skeleton graph created. Number of components: " + gl.size());
+		System.out.println("Skeleton graph created. Number of components: " + gl.size());
 		Graph lcgg = null;
 		double largestDiameter = 0;
-		for (Graph gg : gl) {
+		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
+				+ System.currentTimeMillis() + ".gml";
+		final HashMap<Graph, List<GraphElement>> graphComponent2shortestPathElements = new HashMap<Graph, List<GraphElement>>();
+		for (final Graph gg : gl) {
 			if (gg.getNumberOfNodes() == 0)
 				continue;
 			Integer id = Integer.parseInt(new NodeHelper(gg.getNodes().iterator().next()).getClusterID(null));
@@ -329,10 +430,12 @@ public class SkeletonGraph {
 					gg.getGraphElements(),
 					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
 					optLengthReturn);
-			if (optGMLoutputFileName != null)
+			graphComponent2shortestPathElements.put(gg, elem);
+			if (optGMLoutputFileName != null && !thinned)
 				for (GraphElement ge : elem) {
 					if (ge instanceof Node) {
-						new NodeHelper((Node) ge).setFillColor(Color.YELLOW)
+						final NodeHelper nh = new NodeHelper((Node) ge);
+						nh.setFillColor(Color.YELLOW)
 								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
 					}
 				}
@@ -348,14 +451,224 @@ public class SkeletonGraph {
 		}
 		if (lcgg != null) {
 			lcgg.numberGraphElements();
+			final Graph lcggF = lcgg;
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					ImageCanvas canv = in.io().canvas();
+					List<GraphElement> elms = graphComponent2shortestPathElements.get(lcggF);
+					for (GraphElement ge : elms) {
+						if (ge instanceof Node) {
+							final NodeHelper nh = new NodeHelper((Node) ge);
+							
+							Point2D p = nh.getPosition();
+							canv.drawCircle(
+									(int) p.getX() / 2,
+									(int) p.getY() / 2, 18, Color.GREEN.getRGB(), 0, 2).getImage();
+						}
+					}
+					return canv.getImage();
+				}
+			});
 			if (optGMLoutputFileName != null) {
 				GMLWriter gw = new GMLWriter();
 				// ReleaseInfo.getDesktopFolder() + "/skel.gml")
-				gw.write(new FileOutputStream(optGMLoutputFileName), lcgg);
+				gw.write(new FileOutputStream(optGMLoutputFileName), graph);
 				System.out.println("Largest Component Diameter: " + (int) largestDiameter + ", saved graph in " + optGMLoutputFileName);
 			}
 		}
 		return id2size;
+	}
+	
+	/**
+	 * @param postProcessing
+	 * @param postProcessors
+	 * @return map from cluster ID 2 size, -1 to largest size
+	 */
+	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles, boolean isThinned, ArrayList<RunnableOnImage> postProcessing)
+			throws Exception {
+		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
+		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
+		// System.out.println("Skeleton graph created. Number of components: " + gl.size());
+		Graph lcgg = null;
+		double largestDiameter = 0;
+		
+		EdgeFollowingVetoEvaluation edgeVeto = new EdgeFollowingVetoEvaluation() {
+			@Override
+			public boolean followEdge(double currentThickness, Edge e) {
+				try {
+					double thickness = e.getDouble("w_median");
+					if (currentThickness >= thickness * 0.9) // follow the top 10% of root widths in case of branching
+						return true;
+					else
+						return false;
+				} catch (Exception err) {
+					return false;
+				}
+			}
+		};
+		
+		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
+				+ System.currentTimeMillis() + ".gml";
+		
+		if (!isThinned)
+			for (Node ge : graph.getNodes()) {
+				if (ge.getNeighbors().size() != 1)
+					continue;
+				final NodeHelper nh = new NodeHelper(ge);
+				postProcessing.add(new RunnableOnImage() {
+					@Override
+					public Image postProcess(Image in) {
+						Point2D p = nh.getPosition();
+						ImageCanvas canv = in.io().canvas();
+						try {
+							double wi = nh.getEdges().iterator().next().getDouble("w_median");
+							double limb_len = nh.getEdges().iterator().next().getDouble("len") / 2;
+							canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W="
+									+ StringManipulationTools.formatNumber(wi, 1) + ", limbL=" + (int) limb_len, Color.BLACK);
+						} catch (Exception e) {
+							canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W=ERROR: " + e.getMessage(), Color.RED);
+						}
+						return canv.getImage();
+					}
+				});
+			}
+		
+		HashMap<Graph, List<GraphElement>> graph2elems = new HashMap<Graph, List<GraphElement>>();
+		for (Graph gg : gl) {
+			if (gg.getNumberOfNodes() == 0)
+				continue;
+			Integer id = Integer.parseInt(new NodeHelper(gg.getNodes().iterator().next()).getClusterID("-1"));
+			if (id < 0) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Graph node has no assigned cluster ID (internal error)");
+				continue;
+			}
+			
+			if (optGMLoutputFileName != null)
+				System.out.print("Determine graph diameter: ");
+			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
+			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+					filterThickestStartingPoints(gg.getGraphElements(), postProcessing),
+					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
+					optLengthReturn,
+					edgeVeto, true);
+			graph2elems.put(gg, elem);
+			boolean first = true;
+			Double dia = optLengthReturn.getDouble();
+			final int diaF = dia.intValue();
+			
+			if (!isThinned)
+				for (GraphElement ge : elem) {
+					if (ge instanceof Node) {
+						final NodeHelper nh = new NodeHelper((Node) ge);
+						final boolean firstF = first;
+						first = false;
+						nh.setFillColor(Color.YELLOW)
+								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble() / 2);
+						postProcessing.add(new RunnableOnImage() {
+							@Override
+							public Image postProcess(Image in) {
+								Point2D p = nh.getPosition();
+								ImageCanvas canv = in.io().canvas();
+								if (firstF)
+									canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2), "L=" + diaF, Color.DARK_GRAY);
+								return canv.drawCircle(
+										(int) p.getX() / 2,
+										(int) p.getY() / 2, 18, Color.GREEN.getRGB(), 0, 2).getImage();
+							}
+						});
+					}
+				}
+			id2size.put(id, dia);
+			if (optGMLoutputFileName != null)
+				System.out.println(dia.intValue());
+			if (dia > largestDiameter) {
+				lcgg = gg;
+				largestDiameter = dia;
+				id2size.put(-1, dia);
+			}
+		}
+		if (!isThinned)
+			if (lcgg != null) {
+				lcgg.numberGraphElements();
+				final int largestDiaF = (int) largestDiameter;
+				boolean first = true;
+				for (GraphElement ge : graph2elems.get(lcgg)) {
+					if (ge instanceof Node) {
+						final boolean firstF = first;
+						first = false;
+						final NodeHelper nh = new NodeHelper((Node) ge);
+						postProcessing.add(new RunnableOnImage() {
+							@Override
+							public Image postProcess(Image in) {
+								Point2D p = nh.getPosition();
+								ImageCanvas canv = in.io().canvas();
+								if (firstF)
+									canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2), "L=" + largestDiaF, Color.RED);
+								
+								return canv.drawCircle(
+										(int) p.getX() / 2,
+										(int) p.getY() / 2, 21, Color.YELLOW.getRGB(), 0, 2).getImage();
+							}
+						});
+					}
+				}
+				
+				if (optGMLoutputFileName != null) {
+					GMLWriter gw = new GMLWriter();
+					// ReleaseInfo.getDesktopFolder() + "/skel.gml")
+					gw.write(new FileOutputStream(optGMLoutputFileName), graph);
+					System.out.println("Largest Component Diameter: " + (int) largestDiameter + ", saved graph in " + optGMLoutputFileName);
+				}
+			}
+		return id2size;
+	}
+	
+	/**
+	 * If the distance map was available during graph creation, the distance of the skeleton point to the border is available.
+	 * This distance is stored on the nodes, in the integer attribute "d".
+	 * This method should not return all graph elements, but only those with the maximum distance to the border, which
+	 * means, that only very thick starting points should be considered.
+	 */
+	private Collection<GraphElement> filterThickestStartingPoints(Collection<GraphElement> graphElements,
+			ArrayList<RunnableOnImage> postProcessors) {
+		double maximumWidth = -1;
+		final ArrayList<GraphElement> thickestStartingPoints = new ArrayList<GraphElement>();
+		for (GraphElement ge : graphElements) {
+			if (ge instanceof Node) {
+				Node n = (Node) ge;
+				if (n.getNeighbors().size() > 1)
+					continue;
+				try {
+					double d = n.getEdges().iterator().next().getDouble("w_median");
+					if (d * 0.9 > maximumWidth) {
+						thickestStartingPoints.clear();
+					}
+					if (d >= maximumWidth * 0.9) {
+						thickestStartingPoints.add(n);
+						maximumWidth = d;
+					}
+				} catch (Exception e) {
+					// attribute not available
+					// ignore this element
+				}
+			}
+		}
+		RunnableOnImage pp = new RunnableOnImage() {
+			
+			@Override
+			public Image postProcess(Image in) {
+				ImageCanvas c = in.io().canvas();
+				for (GraphElement ge : thickestStartingPoints) {
+					Node n = (Node) ge;
+					NodeHelper nh = new NodeHelper(n);
+					c = c.drawRectangle((int) nh.getX() / 2 - 10, (int) nh.getY() / 2 - 10, 20, 20, Color.BLUE, 2);
+				}
+				return c.getImage();
+			}
+		};
+		postProcessors.add(pp);
+		return thickestStartingPoints;
 	}
 	
 	public void removeParallelEdges() {
