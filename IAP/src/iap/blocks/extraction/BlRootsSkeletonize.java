@@ -27,6 +27,7 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonGraph;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 
 /**
  * Skeletonize the roots and store root lengths, and other parameters.
@@ -131,23 +132,18 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
 			skel.findEndpointsAndBranches(null);
-			// skel.deleteShortEndLimbs(-20, false, new HashSet<Point>());
-			// new SkeletonProcessor2d(skel.skelImg);
-			// skel.background = SkeletonProcessor2d.getDefaultBackground();
-			// skel.findEndpointsAndBranches(null);
-			skel.calculateEndlimbsRecursive();
-			int nEndLimbs = skel.endlimbs.size();
-			rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
-			
+			// skel.getAsFlexibleImage().show("BOBOBO");
+			// int nEndLimbs = skel.endlimbs.size();
+			// rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
+			in = skel.getImageOperation();
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-			sg.createGraph(optClusterIDsPixels, optDistanceMap, 10, postProcessing);
+			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove leaf segments shorter than", 40));
 			new ImageOperation(optClusterIDsPixels, in.getWidth(), in.getHeight())
 					// .debugPrintValueSetToConsole()
 					.debugIntToGrayScale().dilate(5);
-			sg.deleteSelfLoops();
-			sg.removeParallelEdges();
-			sg.getGraph().numberGraphElements();
+			
 			if (sg.getGraph().getNumberOfNodes() > 0) {
+				rt.addValue("roots" + resultPrefix + ".graph.leafnodes", GraphHelper.getLeafNodes(sg.getGraph()).size());
 				rt.addValue("roots" + resultPrefix + ".graph.nodes", sg.getGraph().getNumberOfNodes());
 				rt.addValue("roots" + resultPrefix + ".graph.edges", sg.getGraph().getNumberOfEdges());
 				{
@@ -160,37 +156,33 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 					}
 					if (resultPrefix.isEmpty())
 						if (limbs.getN() > 0) {
-							rt.addValue("roots" + resultPrefix + ".graph.limb.length.average", limbs.getMean());
-							rt.addValue("roots" + resultPrefix + ".graph.limb.length.stddev", limbs.getStandardDeviation());
-							rt.addValue("roots" + resultPrefix + ".graph.limb.length.skewness", limbs.getSkewness());
-							rt.addValue("roots" + resultPrefix + ".graph.limb.length.kurtosis", limbs.getKurtosis());
+							rt.addValue("roots" + resultPrefix + ".graph.edges.length.average", limbs.getMean());
+							rt.addValue("roots" + resultPrefix + ".graph.edges.length.stddev", limbs.getStandardDeviation());
+							rt.addValue("roots" + resultPrefix + ".graph.edges.length.skewness", limbs.getSkewness());
+							rt.addValue("roots" + resultPrefix + ".graph.edges.length.kurtosis", limbs.getKurtosis());
 						}
 				}
-				if (nEndLimbs > getInt("Maximum End-Limb-Count for Graph-Analysis", 2000)) {
-					rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 0);
-				} else {
-					rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
-					HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
-							sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt) :
-							sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
-					HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
-					int idx = 1;
-					for (Integer id : id2size.keySet()) {
-						if (id2size.get(id) <= 0)
-							continue;
-						if (id != -1 && !co2i.containsKey(id))
-							co2i.put(id, idx++);
-						int niceID = id;
-						if (id != -1)
-							niceID = co2i.get(id);
-						rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size() - 1); // the largest graph is added twice (once more with id -1)
-						if (niceID >= 0) {
-							if (resultPrefix.isEmpty())
-								rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
-										id2size.get(id) / 2);
-						} else
-							rt.addValue("roots" + resultPrefix + ".graph.diameter.max", id2size.get(id) / 2);
-					}
+				rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
+				HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
+						sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt) :
+						sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
+				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
+				int idx = 1;
+				for (Integer id : id2size.keySet()) {
+					if (id2size.get(id) <= 0)
+						continue;
+					if (id != -1 && !co2i.containsKey(id))
+						co2i.put(id, idx++);
+					int niceID = id;
+					if (id != -1)
+						niceID = co2i.get(id);
+					rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size() - 1); // the largest graph is added twice (once more with id -1)
+					if (niceID >= 0) {
+						if (resultPrefix.isEmpty())
+							rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
+									id2size.get(id) / 2);
+					} else
+						rt.addValue("roots" + resultPrefix + ".graph.diameter.max", id2size.get(id) / 2);
 				}
 			}
 		}
