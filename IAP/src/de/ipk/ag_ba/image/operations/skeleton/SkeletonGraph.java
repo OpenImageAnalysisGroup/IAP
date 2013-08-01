@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.AttributeHelper;
+import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -61,7 +63,8 @@ public class SkeletonGraph {
 		this.skelImg = new Image(w, h, skelImg1a).getAs2A();
 	}
 	
-	public void createGraph(int[] optClusterIDsPixels, final int[][] optDistanceMap, int minimumNodeDistance, ArrayList<RunnableOnImage> postProcessing) {
+	public void createGraph(int[] optClusterIDsPixels, final int[][] optDistanceMap, int minimumNodeDistance,
+			ArrayList<RunnableOnImage> postProcessing, int delteShortEndLimbsMinimumLength) {
 		this.graph = new AdjListGraph();
 		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
@@ -84,10 +87,10 @@ public class SkeletonGraph {
 					new NodeHelper(n).setLabel("C" + cid);
 					String dd = SkeletonProcessor2d.getColorDesc(p);
 					if (dd.equals("branch"))
-						dd = "____br";
+						dd = "____b";
 					if (dd.equals("endpoint")) {
 						ImageCanvas.markPoint2(x / 2, y / 2, postProcessing);
-						dd = "_ep";
+						dd = "_e";
 					}
 					ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing);
 					if (optClusterIDsPixels != null) {
@@ -107,7 +110,6 @@ public class SkeletonGraph {
 		}
 		if (DEBUG)
 			debugImg.show("MARKED POINTS");
-		// new FlexibleImage(skelImg).copy().print("BEFORE AAAAAAAA");
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
@@ -153,10 +155,7 @@ public class SkeletonGraph {
 							if (startNode.getNeighbors().contains(endNode))
 								del = true;
 							Edge edge = graph.addEdge(startNode, endNode, true);
-							ObjectAttribute oa = new ObjectAttribute("info");
-							oa.setValue(new LimbInfo(edgePoints));
-							edge.addAttribute(oa, "");
-							edge.setDouble("len", edgePoints.size());
+							edge.addAttribute(new ObjectAttribute("info", new LimbInfo(edgePoints)), "");
 							if (lastStartNode == startNode && lastEndNode == endNode) {
 								break;
 							}
@@ -164,56 +163,110 @@ public class SkeletonGraph {
 							lastEndNode = endNode;
 							if (del)
 								graph.deleteEdge(edge);
-							else {
-								if (optDistanceMap != null) {
-									DescriptiveStatistics statWidth = new DescriptiveStatistics();
-									DescriptiveStatistics statReveresed = new DescriptiveStatistics();
-									
-									ArrayList<Vector2i> reversedList = new ArrayList<Vector2i>(edgePoints);
-									Collections.reverse(reversedList);
-									
-									for (Vector2i ep : edgePoints) {
-										double width = optDistanceMap[ep.x][ep.y] / 10d;
-										statWidth.addValue(width);
-										if (statWidth.getN() >= 20)
-											break;
-									}
-									for (Vector2i ep : reversedList) {
-										double width = optDistanceMap[ep.x][ep.y] / 10d;
-										statReveresed.addValue(width);
-										if (statReveresed.getN() >= 20)
-											break;
-									}
-									if (statReveresed.getMean() < statWidth.getMean()) {
-										statWidth = statReveresed;
-										edgePoints = reversedList;
-									}
-									int idx = 0;
-									for (Vector2i ep : edgePoints) {
-										if (idx == 40 || idx == edgePoints.size() - 1) {
-											double width = statWidth.getPercentile(50);
-											ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.YELLOW);
-											ImageCanvas.text(ep.x / 2, ep.y / 2 - 20, "W=" +
-													StringManipulationTools.formatNumber(width, 1)
-													+ ", L=" + edgePoints.size() / 2, Color.MAGENTA, postProcessing);
-										}
-										idx++;
-									}
-									
-									edge.setDouble("w_average", statWidth.getMean());
-									edge.setDouble("w_median", statWidth.getPercentile(50));
-									edge.setDouble("w_stddev", statWidth.getStandardDeviation());
-									edge.setDouble("w_kurtosis", statWidth.getKurtosis());
-									edge.setDouble("w_skewness", statWidth.getSkewness());
-									edge.setDouble("w_min", statWidth.getMin());
-									edge.setDouble("w_max", statWidth.getMax());
-									AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1)
-											+ ", L:" + statWidth.getN());
-								}
-							}
 						}
 					} while (foundLine);
 				}
+			}
+		}
+		
+		for (int i = 0; i < 2; i++) {
+			ArrayList<Node> delN = new ArrayList<Node>();
+			for (Node leaf : GraphHelper.getLeafNodes(graph)) {
+				int n = 0;
+				double lenS = 0;
+				for (Edge e : leaf.getEdges()) {
+					ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+					lenS += edgePoints.size();
+					n++;
+				}
+				double len = lenS / n;
+				if (len < delteShortEndLimbsMinimumLength)
+					delN.add(leaf);
+			}
+			for (Node n : delN)
+				graph.deleteNode(n);
+			
+			deleteSelfLoops();
+			removeParallelEdges();
+			graph.numberGraphElements();
+			
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
+					"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
+			for (Node n : new ArrayList<Node>(graph.getNodes())) {
+				// remove nodes, with degree 2 (and merge pixel list)
+				if (n.getDegree() == 2) {
+					// add new edge, with edge pixel list from both edges, then delete that node
+					int nc = 0;
+					ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
+					for (Edge e : n.getEdges()) {
+						nc++;
+						ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+						ep.addAll(edgePoints);
+					}
+					if (nc != 2)
+						ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
+					else {
+						Iterator<Node> it = n.getNeighborsIterator();
+						Node a = it.next();
+						Node b = it.next();
+						if (it.hasNext())
+							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
+						else {
+							Edge e01 = graph.addEdge(a, b, false);
+							e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
+							graph.deleteNode(n);
+						}
+					}
+				}
+			}
+		}
+		
+		for (Edge edge : graph.getEdges()) {
+			ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) edge.getAttribute("info")).getValue()).getEdgePoints();
+			edge.setDouble("len", edgePoints.size());
+			if (optDistanceMap != null) {
+				DescriptiveStatistics statWidth = new DescriptiveStatistics();
+				DescriptiveStatistics statReveresed = new DescriptiveStatistics();
+				
+				ArrayList<Vector2i> reversedList = new ArrayList<Vector2i>(edgePoints);
+				Collections.reverse(reversedList);
+				
+				for (Vector2i ep : edgePoints) {
+					double width = optDistanceMap[ep.x][ep.y] / 10d;
+					statWidth.addValue(width);
+					if (statWidth.getN() >= 20)
+						break;
+				}
+				for (Vector2i ep : reversedList) {
+					double width = optDistanceMap[ep.x][ep.y] / 10d;
+					statReveresed.addValue(width);
+					if (statReveresed.getN() >= 20)
+						break;
+				}
+				if (statReveresed.getMean() < statWidth.getMean()) {
+					statWidth = statReveresed;
+					edgePoints = reversedList;
+				}
+				int idx = 0;
+				for (Vector2i ep : edgePoints) {
+					if (idx == 40 || idx == edgePoints.size() - 1) {
+						// double width = statWidth.getPercentile(50);
+						ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.YELLOW);
+						// ImageCanvas.text(ep.x / 2, ep.y / 2 - 20, "W=" +
+						// StringManipulationTools.formatNumber(width, 1)
+						// + ", L=" + edgePoints.size() / 2, Color.MAGENTA, postProcessing);
+					}
+					idx++;
+				}
+				
+				edge.setDouble("w_average", statWidth.getMean());
+				edge.setDouble("w_median", statWidth.getPercentile(50));
+				edge.setDouble("w_stddev", statWidth.getStandardDeviation());
+				edge.setDouble("w_kurtosis", statWidth.getKurtosis());
+				edge.setDouble("w_skewness", statWidth.getSkewness());
+				edge.setDouble("w_min", statWidth.getMin());
+				edge.setDouble("w_max", statWidth.getMax());
+				AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1));
 			}
 		}
 		boolean checkDist = minimumNodeDistance > 0;
@@ -248,6 +301,10 @@ public class SkeletonGraph {
 				}
 			} while (mergeOccured);
 		}
+		deleteSelfLoops();
+		removeParallelEdges();
+		graph.numberGraphElements();
+		
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges());
 	}
@@ -427,12 +484,12 @@ public class SkeletonGraph {
 				continue;
 			Integer id = Integer.parseInt(new NodeHelper(gg.getNodes().iterator().next()).getClusterID(null));
 			if (optGMLoutputFileName != null)
-				System.out.print("Determine graph diameter: ");
+				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Determine graph diameter: ");
 			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
 			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
 					gg.getGraphElements(),
 					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
-					optLengthReturn);
+					optLengthReturn, false);
 			graphComponent2shortestPathElements.put(gg, elem);
 			if (optGMLoutputFileName != null && !thinned)
 				for (GraphElement ge : elem) {
@@ -477,7 +534,8 @@ public class SkeletonGraph {
 				GMLWriter gw = new GMLWriter();
 				// ReleaseInfo.getDesktopFolder() + "/skel.gml")
 				gw.write(new FileOutputStream(optGMLoutputFileName), graph);
-				System.out.println("Largest Component Diameter: " + (int) largestDiameter + ", saved graph in " + optGMLoutputFileName);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
+						+ optGMLoutputFileName);
 			}
 		}
 		return id2size;
@@ -500,16 +558,37 @@ public class SkeletonGraph {
 		
 		EdgeFollowingVetoEvaluation edgeVeto = new EdgeFollowingVetoEvaluation() {
 			@Override
-			public boolean followEdge(double currentThickness, Edge e) {
-				try {
-					double thickness = e.getDouble("w_median");
-					if (currentThickness >= thickness * 0.9) // follow the top 10% of root widths in case of branching
-						return true;
-					else
-						return false;
-				} catch (Exception err) {
-					return false;
+			public boolean followEdge(Edge e) {
+				// don't follow edges, which are connected at each end to nodes, which have higher width edges connected with them
+				Node nodeA = e.getSource();
+				Node nodeB = e.getTarget();
+				if (nodeA == nodeB)
+					return false; // don't follow self-edges (shouldn't be in the dataset, anyway)
+				double thicknessOfEdgesNodeA = getMaxThicknessOfEdgesNotConnectedTo(nodeA, nodeB);
+				double thicknessOfEdgesNodeB = getMaxThicknessOfEdgesNotConnectedTo(nodeB, nodeA);
+				double tt = e.getDouble("w_median");
+				boolean aHigher = thicknessOfEdgesNodeA > 1.05 * tt;
+				boolean bHigher = thicknessOfEdgesNodeB > 1.05 * tt;
+				boolean aMiddleHigher = thicknessOfEdgesNodeA > 1.1 * tt;
+				boolean bMiddleHigher = thicknessOfEdgesNodeB > 1.1 * tt;
+				boolean aMuchHigher = thicknessOfEdgesNodeA > 1.5 * tt;
+				boolean bMuchHigher = thicknessOfEdgesNodeB > 1.5 * tt;
+				boolean invalid = (aMiddleHigher && bMiddleHigher) || (aMuchHigher && bHigher) || (bMuchHigher && aHigher);
+				if (invalid && e.getDouble("len") < 30)
+					invalid = false;
+				return !invalid;
+			}
+			
+			private double getMaxThicknessOfEdgesNotConnectedTo(Node node, Node notAllowed) {
+				double max = -1;
+				for (Edge e : node.getEdges()) {
+					if (e.getTarget() == notAllowed || e.getSource() == notAllowed)
+						continue;
+					double t = e.getDouble("w_median"); // (from thinner end of edge)
+					if (t > max)
+						max = t;
 				}
+				return max < 0 ? Double.MAX_VALUE : max;
 			}
 		};
 		
@@ -579,17 +658,45 @@ public class SkeletonGraph {
 				continue;
 			}
 			
-			if (optGMLoutputFileName != null)
-				System.out.print("Determine graph diameter: ");
-			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
-			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
-					filterThickestStartingPoints(gg.getGraphElements(), postProcessing),
-					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
-					optLengthReturn,
-					edgeVeto, true);
+			if (optGMLoutputFileName != null) {
+				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO Determine graph diameter: ");
+				new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG1.gml"), gg);
+			}
+			int delcnt = 0;
+			for (Edge e : new ArrayList<Edge>(gg.getEdges())) {
+				if (!edgeVeto.followEdge(e)) {
+					gg.deleteEdge(e);
+					delcnt++;
+				}
+			}
+			if (optGMLoutputFileName != null) {
+				System.out.println("Deleted " + delcnt + " edges!");
+				new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG2.gml"), gg);
+			}
+			
+			Collection<GraphElement> thickestStartingPoints = filterThickestStartingPoints(gg.getGraphElements(), postProcessing);
+			
+			List<GraphElement> elem = null;
+			Double dia = null;
+			double longestDia = 0;
+			for (GraphElement thick : thickestStartingPoints) {
+				ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
+				List<GraphElement> elemTest = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathStartAndEndPoints(
+						thick, gg.getGraphElements(),
+						new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
+						optLengthReturn, true);
+				Double diaTest = optLengthReturn.getDouble();
+				// System.out.println("DIA TEST: " + diaTest);
+				if (diaTest > longestDia) {
+					longestDia = diaTest;
+					elem = elemTest;
+					dia = diaTest;
+				}
+			}
+			if (dia == null)
+				continue;
 			graph2elems.put(gg, elem);
 			boolean first = true;
-			Double dia = optLengthReturn.getDouble();
 			final int diaF = dia.intValue();
 			
 			if (!isThinned)
@@ -599,7 +706,7 @@ public class SkeletonGraph {
 						final boolean firstF = first;
 						first = false;
 						nh.setFillColor(Color.YELLOW)
-								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble() / 2);
+								.setAttributeValue("shortest_path", "maxlen", dia / 2);
 						postProcessing.add(new RunnableOnImage() {
 							@Override
 							public Image postProcess(Image in) {
@@ -616,7 +723,7 @@ public class SkeletonGraph {
 				}
 			id2size.put(id, dia);
 			if (optGMLoutputFileName != null)
-				System.out.println(dia.intValue());
+				System.out.println(SystemAnalysis.getCurrentTime() + "INFO: Graph segment diameter (px): " + dia.intValue());
 			if (dia > largestDiameter) {
 				lcgg = gg;
 				largestDiameter = dia;
@@ -653,7 +760,8 @@ public class SkeletonGraph {
 					GMLWriter gw = new GMLWriter();
 					// ReleaseInfo.getDesktopFolder() + "/skel.gml")
 					gw.write(new FileOutputStream(optGMLoutputFileName), graph);
-					System.out.println("Largest Component Diameter: " + (int) largestDiameter + ", saved graph in " + optGMLoutputFileName);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
+							+ optGMLoutputFileName);
 				}
 			}
 		return id2size;
