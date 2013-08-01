@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.Vector2i;
 
@@ -19,12 +18,11 @@ public class LimbInfo {
 		edgePoints.addAll(info2.getEdgePoints());
 	}
 	
-	private Collection<Vector2i> getEdgePoints() {
+	public ArrayList<Vector2i> getEdgePoints() {
 		return edgePoints;
 	}
 	
 	public int getLinearMx() {
 		return 0;
 	}
-	
 }
