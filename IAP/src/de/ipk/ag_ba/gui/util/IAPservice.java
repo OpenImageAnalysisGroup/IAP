@@ -1695,9 +1695,9 @@ public class IAPservice {
 		SeekableStream ss = SeekableStream.wrapInputStream(in, true);
 		RenderedOp ro = JAI.create("stream", ss);
 		ColorModel cm = ro.getColorModel();
-		if (cm.getNumColorComponents() == 1 && cm.getPixelSize() == 8) {
+		if (true || (cm.getNumColorComponents() == 1 && cm.getPixelSize() == 8)) {
 			// convert 8-bit gray scale image to RGB
-			System.out.println("GRAY");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Image " + name + " is interpreted as a gray-scale image and specially converted.");
 			BufferedImage bi = ro.getAsBufferedImage();
 			BufferedImage rgbImg = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_RGB);
 			Graphics2D g2d = rgbImg.createGraphics();
