@@ -414,7 +414,11 @@ public class MongoDB {
 										BasicDBList cl = (BasicDBList) substance.get("condition_ids");
 										if (cl != null) {
 											for (Object oo : cl) {
-												collCond.remove(new BasicDBObject("_id", new ObjectId(oo.toString())));
+												if (oo == null)
+													System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not get condition list for substance "
+															+ substance.get("name") + " (id " + so + ")");
+												else
+													collCond.remove(new BasicDBObject("_id", new ObjectId(oo.toString())));
 											}
 										}
 									}
