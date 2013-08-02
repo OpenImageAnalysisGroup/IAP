@@ -208,13 +208,17 @@ public class SkeletonGraph {
 					else {
 						Iterator<Node> it = n.getNeighborsIterator();
 						Node a = it.next();
-						Node b = it.next();
-						if (it.hasNext())
-							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
-						else {
-							Edge e01 = graph.addEdge(a, b, false);
-							e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
-							graph.deleteNode(n);
+						if (!it.hasNext()) {
+							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
+						} else {
+							Node b = it.next();
+							if (it.hasNext())
+								ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
+							else {
+								Edge e01 = graph.addEdge(a, b, false);
+								e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
+								graph.deleteNode(n);
+							}
 						}
 					}
 				}
@@ -548,7 +552,7 @@ public class SkeletonGraph {
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
 	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles,
-			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt)
+			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt, final boolean VETO_SUPPORT)
 			throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
@@ -559,6 +563,8 @@ public class SkeletonGraph {
 		EdgeFollowingVetoEvaluation edgeVeto = new EdgeFollowingVetoEvaluation() {
 			@Override
 			public boolean followEdge(Edge e) {
+				if (!VETO_SUPPORT)
+					return true;
 				// don't follow edges, which are connected at each end to nodes, which have higher width edges connected with them
 				Node nodeA = e.getSource();
 				Node nodeB = e.getTarget();
