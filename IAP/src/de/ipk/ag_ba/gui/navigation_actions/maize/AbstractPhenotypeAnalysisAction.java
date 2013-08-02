@@ -300,7 +300,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					}
 					if (filterPlant) {
 						String qa = sd3.iterator().next().getQualityAnnotation();
-						if (!qa.contains(plantFilter))
+						if (qa != null && !qa.contains(plantFilter))
 							continue;
 					}
 					if (!containsAnOutlier)
