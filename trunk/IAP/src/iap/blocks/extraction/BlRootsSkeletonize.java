@@ -164,7 +164,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				}
 				rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
 				HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
-						sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt) :
+						sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt,
+								!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
 						sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
 				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
 				int idx = 1;
