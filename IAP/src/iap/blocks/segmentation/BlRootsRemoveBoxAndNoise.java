@@ -28,7 +28,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		if (img == null)
 			return null;
 		
-		ImageOperation io = img.copy().io().invert().thresholdBlueHigherThan(getInt("minimum blue intensity level", 3))
+		ImageOperation io = img.copy().io().invert().thresholdBlueHigherThan(getInt("minimum blue intensity level", 6))
 				.show("result of blue threshold", debug);
 		// remove pure white area inside the box
 		io = io.erode()
@@ -39,7 +39,8 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		io = io.replaceColor(options.getBackground(), blue);
 		io = io.threshold(getInt("minimum brightness", 10), options.getBackground(), blue)
 				.show("minimum brightness filtered", debug);
-		io = io.erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 60))
+		ImageOperation removeBlack = img.copy().io().blur(20).thresholdGrayClearLowerThan(150).show("large black area", debug);
+		io = io.erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 70))
 				.show("reduced area to ignore box border", debug);
 		io = io.erode().removeSmallElements(
 				getInt("Remove-All-Outside-Box_Noise-Size-Area", 800 * 800),
@@ -52,10 +53,21 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 				black, white,
 				getDouble("Adaptive_Thresholding_K", 0.02))
 				.show("result of adaptive thresholding", debug);
-		return r.removeSmallElements(
-				getInt("minimum root area (noise reduction)", 10),
-				getInt("minimum root dimension (noise reduction)", 10)).getImage()
-				.show("result image", debug);
+		
+		r.removeSmallElements(
+				getInt("minimum root area (noise reduction)", 20),
+				getInt("minimum root dimension (noise reduction)", 20)).getImage()
+				.show("removed small elements", debug);
+		
+		r = r.applyMask(removeBlack.getImage()).show("remove large black (final image)", debug);
+		
+		// ImageOperation detectThickElements = r.copy()
+		// .erode(4).show("thick 1 erode")
+		// // .dilate(5).show("thick 1 dilate")
+		// .dilate(15).show("thick 2 final area", debug);
+		// r = r.applyMaskInversed_ResizeMaskIfNeeded(detectThickElements.getImage()).show("REMOVED THICK ELEMENTS (result image)", debug);
+		
+		return r.getImage();
 	}
 	
 	@Override
