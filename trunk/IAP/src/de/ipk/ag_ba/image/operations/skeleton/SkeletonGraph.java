@@ -209,7 +209,7 @@ public class SkeletonGraph {
 						Iterator<Node> it = n.getNeighborsIterator();
 						Node a = it.next();
 						if (!it.hasNext()) {
-							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
+							// ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
 						} else {
 							Node b = it.next();
 							if (it.hasNext())
