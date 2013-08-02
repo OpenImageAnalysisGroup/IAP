@@ -48,13 +48,13 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 						ids.add(nmi.getQualityAnnotation());
 				}
 			}
-			
 			if (ids.size() > 1)
 				this.numberOfJobs = ids.size() / 2;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		
+		if (numberOfJobs < 20 && experimentReference.getHeader().getNumberOfFiles() > 1000)
+			numberOfJobs = numberOfJobs * 5;
 	}
 	
 	@Override
