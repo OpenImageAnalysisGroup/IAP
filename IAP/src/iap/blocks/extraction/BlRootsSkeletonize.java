@@ -194,8 +194,22 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			int background, ImageOperation img, ImageOperation nonBinaryImage,
 			ResultsTableWithUnits rt, ArrayList<RunnableOnImage> postProcessing) {
 		ImageOperation inp = img;
-		if (rt != null)
-			rt.addValue(pre + "roots.filled.pixels", inp.countFilledPixels());
+		if (rt != null) {
+			int n = inp.countFilledPixels();
+			rt.addValue(pre + "roots.filled.pixels", n);
+			double sumGray = 0;
+			for (int p : inp.getImageAs1dArray()) {
+				if (p == ImageOperation.BACKGROUND_COLORint)
+					continue;
+				int bf = (p & 0x0000ff);
+				int weight = 255 - bf; // white weight = 0, black weight = 1
+				sumGray += weight / 255d;
+			}
+			rt.addValue(pre + "roots.filled.gray_scale_sum", sumGray);
+			if (n > 0) {
+				rt.addValue(pre + "roots.filled.avg_gray", sumGray / n);
+			}
+		}
 		ImageOperation binary = inp;// .binary(Color.BLACK.getRGB(), background);
 		{
 			ImageOperation image = binary.copy();
