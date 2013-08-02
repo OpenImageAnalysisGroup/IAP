@@ -478,6 +478,10 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
+	public ImageOperation applyMask(Image mask) {
+		return applyMask(mask, BACKGROUND_COLORint);
+	}
+	
 	public ImageOperation applyMask(Image mask, int background) {
 		
 		// copy().crossfade(mask.copy(), 2, 4, 3).show("OVERLAY");
@@ -517,6 +521,10 @@ public class ImageOperation {
 	 *           considered as foreground.
 	 * @return The source image, filtered by the given mask.
 	 */
+	public ImageOperation applyMaskInversed_ResizeMaskIfNeeded(Image mask) {
+		return applyMaskInversed_ResizeMaskIfNeeded(mask, BACKGROUND_COLORint);
+	}
+	
 	public ImageOperation applyMaskInversed_ResizeMaskIfNeeded(Image mask,
 			int background) {
 		
@@ -2699,6 +2707,10 @@ public class ImageOperation {
 			idx++;
 		}
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
+	}
+	
+	public ImageOperation thresholdGrayClearLowerThan(int threshold) {
+		return thresholdGrayClearLowerThan(threshold, BACKGROUND_COLORint);
 	}
 	
 	public ImageOperation thresholdGrayClearLowerThan(int threshold, int back) {
