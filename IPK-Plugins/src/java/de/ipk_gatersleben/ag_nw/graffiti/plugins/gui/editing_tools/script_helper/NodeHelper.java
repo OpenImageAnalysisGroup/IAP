@@ -23,6 +23,7 @@ import org.AttributeHelper;
 import org.ErrorMsg;
 import org.HelperClass;
 import org.StringManipulationTools;
+import org.Vector2i;
 import org.graffiti.attributes.Attribute;
 import org.graffiti.attributes.AttributeExistsException;
 import org.graffiti.attributes.AttributeNotFoundException;
@@ -1182,5 +1183,9 @@ public class NodeHelper implements Node, HelperClass {
 			result.add(new NodeHelper(n));
 		}
 		return result;
+	}
+	
+	public Vector2i getPosition2i() {
+		return new Vector2i((int) getX(), (int) getY());
 	}
 }
