@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
+import de.ipk.ag_ba.image.operations.skeleton.RunnableWithBooleanResult;
 import de.ipk.ag_ba.image.structures.Image;
 
 public class ImageCanvas {
@@ -331,25 +332,48 @@ public class ImageCanvas {
 		postProcessing.add(new RunnableOnImage() {
 			@Override
 			public Image postProcess(Image in) {
-				return in.io().canvas().drawRectanglePoints(x - 5, y - 5, 10, 10, color, 1).getImage();
+				return in.io().canvas().drawRectanglePoints(x - 5, y - 5, 10, 10, color, 0).getImage();
 			}
 		});
 	}
 	
+	private static RunnableWithBooleanResult truePP = new RunnableWithBooleanResult() {
+		
+		@Override
+		public boolean enabled() {
+			return true;
+		}
+	};
+	
 	public static void markPoint2(final int x, final int y, ArrayList<RunnableOnImage> postProcessing) {
+		markPoint2(x, y, postProcessing, truePP);
+	}
+	
+	public static void markPoint2(final int x, final int y, ArrayList<RunnableOnImage> postProcessing, final RunnableWithBooleanResult check) {
 		postProcessing.add(new RunnableOnImage() {
 			@Override
 			public Image postProcess(Image in) {
-				return in.io().canvas().drawRectanglePoints(x - 15, y - 15, 30, 30, Color.ORANGE, 1).getImage();
+				if (check.enabled())
+					return in.io().canvas().drawRectanglePoints(x - 15, y - 15, 30, 30, Color.ORANGE, 0).getImage();
+				else
+					return in;
 			}
 		});
 	}
 	
 	public static void text(final int x, final int y, final String text, final Color color, ArrayList<RunnableOnImage> postProcessing) {
+		text(x, y, text, color, postProcessing, truePP);
+	}
+	
+	public static void text(final int x, final int y, final String text, final Color color, ArrayList<RunnableOnImage> postProcessing,
+			final RunnableWithBooleanResult check) {
 		postProcessing.add(new RunnableOnImage() {
 			@Override
 			public Image postProcess(Image in) {
-				return in.io().canvas().text(x, y, text, color).getImage();
+				if (check.enabled())
+					return in.io().canvas().text(x, y, text, color).getImage();
+				else
+					return in;
 			}
 		});
 	}
