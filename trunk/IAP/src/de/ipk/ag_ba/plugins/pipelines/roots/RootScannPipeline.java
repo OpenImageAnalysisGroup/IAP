@@ -4,6 +4,7 @@ import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlRootsSkeletonize;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
+import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRootsAddBorderAroundImage;
 import iap.blocks.segmentation.BlRootsRemoveBoxAndNoise;
@@ -37,6 +38,7 @@ public class RootScannPipeline implements AnalysisPipelineTemplate {
 				new BlRootsSharpenImage(),
 				new BlRootsRemoveBoxAndNoise(),
 				new BlRootsSkeletonize(),
+				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet()
 		};
 	}

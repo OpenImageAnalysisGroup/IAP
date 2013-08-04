@@ -77,29 +77,7 @@ public class SkeletonGraph {
 				}
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches
 						|| p == SkeletonProcessor2d.colorBloom) {
-					Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
-					n.setInteger("x", x);
-					n.setInteger("y", y);
-					String cid = "-";
-					if (optClusterIDsPixels != null)
-						cid = optClusterIDsPixels[y * w + x] + "";
-					
-					new NodeHelper(n).setLabel("C" + cid);
-					String dd = SkeletonProcessor2d.getColorDesc(p);
-					if (dd.equals("branch"))
-						dd = "____b";
-					if (dd.equals("endpoint")) {
-						ImageCanvas.markPoint2(x / 2, y / 2, postProcessing);
-						dd = "_e";
-					}
-					ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing);
-					if (optClusterIDsPixels != null) {
-						// System.out.println("NEW NODE: " + n + ": " + cid);
-						new NodeHelper(n).setClusterID(cid);
-					}
-					position2node.put(x + ";" + y, n);
-					if (DEBUG)
-						System.out.println("MEM: " + x + " // " + y);
+					createNodeForEndPointOrBranchPointInSkeletonImage(optClusterIDsPixels, postProcessing, position2node, x, y, p);
 				}
 			}
 		}
@@ -121,19 +99,30 @@ public class SkeletonGraph {
 					Node lastStartNode = null;
 					Node lastEndNode = null;
 					do {
-						ArrayList<Vector2i> edgePoints = traverseAndClearLineStartingFromStartPoint(new Vector2i(x, y));
+						ArrayList<Vector2i> edgePoints = traverseAndClearLineStartingFromStartPoint(startPoint);
 						foundLine = edgePoints.size() > 1;
 						if (DEBUG)
 							System.out.println(" " + startPoint + " // Path-Len: " + edgePoints.size());
-						Vector2i s = edgePoints.get(0);
+						Vector2i s = startPoint;// edgePoints.get(0);
 						Vector2i e = edgePoints.get(edgePoints.size() - 1);
 						Node startNode = position2node.get(s.x + ";" + s.y);
 						Node endNode = position2node.get(e.x + ";" + e.y);
-						if (endNode == null) {
-							System.out.println("START POINT NOT FOUND: " + s.x + " / " + s.y);
+						if (startNode == null) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: START POINT NOT FOUND: " + s.x + " / " + s.y);
+							break;
 						}
 						if (endNode == null) {
-							System.out.println("END POINT NOT FOUND: " + e.x + " / " + e.y);
+							for (int offX = -2; offX <= 2; offX++)
+								for (int offY = -2; offY <= 2; offY++) {
+									if (endNode == null)
+										endNode = position2node.get((e.x + offX) + ";" + (e.y + offY));
+								}
+							if (endNode != null)
+								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: END POINT FOUND BY SURROUND SEARCH: " + e.x + " / " + e.y);
+						}
+						if (endNode == null) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: END POINT NOT FOUND: " + e.x + " / " + e.y);
+							break;
 						}
 						if (startNode == endNode)
 							break;
@@ -169,9 +158,9 @@ public class SkeletonGraph {
 			}
 		}
 		
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 5; i++) {
 			ArrayList<Node> delN = new ArrayList<Node>();
-			for (Node leaf : GraphHelper.getLeafNodes(graph)) {
+			for (Node leaf : GraphHelper.getLeafNodesUndir(graph)) {
 				int n = 0;
 				double lenS = 0;
 				for (Edge e : leaf.getEdges()) {
@@ -227,6 +216,7 @@ public class SkeletonGraph {
 		
 		for (Edge edge : graph.getEdges()) {
 			ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) edge.getAttribute("info")).getValue()).getEdgePoints();
+			
 			edge.setDouble("len", edgePoints.size());
 			if (optDistanceMap != null) {
 				DescriptiveStatistics statWidth = new DescriptiveStatistics();
@@ -273,6 +263,17 @@ public class SkeletonGraph {
 				AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1));
 			}
 		}
+		ArrayList<Node> delll = new ArrayList<Node>();
+		for (Node n : graph.getNodes()) {
+			if (n.getDegree() == 1) {
+				double limb_len = n.getEdges().iterator().next().getDouble("len") / 2;
+				if (limb_len < delteShortEndLimbsMinimumLength)
+					delll.add(n);
+			}
+		}
+		for (Node nooo : delll)
+			graph.deleteNode(nooo);
+		
 		boolean checkDist = minimumNodeDistance > 0;
 		if (checkDist) {
 			boolean mergeOccured;
@@ -311,6 +312,41 @@ public class SkeletonGraph {
 		
 		if (DEBUG)
 			System.out.println("Skeletongraph: " + graph + " Nodes: " + graph.getNumberOfNodes() + " Edges: " + graph.getNumberOfEdges());
+	}
+	
+	private void createNodeForEndPointOrBranchPointInSkeletonImage(int[] optClusterIDsPixels, ArrayList<RunnableOnImage> postProcessing,
+			HashMap<String, Node> position2node, int x, int y, int p) {
+		final Node n = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(x, y));
+		n.setInteger("x", x);
+		n.setInteger("y", y);
+		String cid = "-";
+		if (optClusterIDsPixels != null)
+			cid = optClusterIDsPixels[y * w + x] + "";
+		
+		new NodeHelper(n).setLabel("C" + cid);
+		
+		RunnableWithBooleanResult delCheck = new RunnableWithBooleanResult() {
+			@Override
+			public boolean enabled() {
+				return n.getGraph() != null; // only if it has not been deleted by the graph post processing, e.g. short limb etc.
+			}
+		};
+		
+		String dd = SkeletonProcessor2d.getColorDesc(p);
+		if (dd.equals("branch"))
+			dd = "____b";
+		if (dd.equals("endpoint")) {
+			ImageCanvas.markPoint2(x / 2, y / 2, postProcessing, delCheck);
+			dd = "_e";
+		}
+		ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing, delCheck);
+		if (optClusterIDsPixels != null) {
+			// System.out.println("NEW NODE: " + n + ": " + cid);
+			new NodeHelper(n).setClusterID(cid);
+		}
+		position2node.put(x + ";" + y, n);
+		if (DEBUG)
+			System.out.println("MEM: " + x + " // " + y);
 	}
 	
 	private void tryRemove4crossings(AdjListGraph graph) {
@@ -416,11 +452,9 @@ public class SkeletonGraph {
 		result.add(new Vector2i(x, y));
 		skelImg[x][y] = visitedDuringSearch;
 		boolean found, stop;
-		int n = 0;
 		do {
 			found = false;
 			stop = false;
-			n++;
 			for (int xd = -1; xd <= 1; xd++)
 				for (int yd = -1; yd <= 1; yd++) {
 					if (x + xd < 0 || y + yd < 0 || x + xd >= w || y + yd >= h)
@@ -528,7 +562,7 @@ public class SkeletonGraph {
 							Point2D p = nh.getPosition();
 							canv.drawCircle(
 									(int) p.getX() / 2,
-									(int) p.getY() / 2, 18, Color.GREEN.getRGB(), 0, 2).getImage();
+									(int) p.getY() / 2, 12, Color.GREEN.getRGB(), 0, 1).getImage();
 						}
 					}
 					return canv.getImage();
@@ -556,6 +590,7 @@ public class SkeletonGraph {
 			throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
+		
 		// System.out.println("Skeleton graph created. Number of components: " + gl.size());
 		Graph lcgg = null;
 		double largestDiameter = 0;
@@ -580,7 +615,7 @@ public class SkeletonGraph {
 				boolean aMuchHigher = thicknessOfEdgesNodeA > 1.5 * tt;
 				boolean bMuchHigher = thicknessOfEdgesNodeB > 1.5 * tt;
 				boolean invalid = (aMiddleHigher && bMiddleHigher) || (aMuchHigher && bHigher) || (bMuchHigher && aHigher);
-				if (invalid && e.getDouble("len") < 30)
+				if (invalid && e.getDouble("len") < 80)
 					invalid = false;
 				return !invalid;
 			}
@@ -630,29 +665,58 @@ public class SkeletonGraph {
 			rt.addValue("roots.skeleton.length.graph_based", lenA);
 			rt.addValue("roots.skeleton.length.graph_based_tip_corr", lenB);
 		}
-		if (!isThinned)
-			for (Node ge : graph.getNodes()) {
-				if (ge.getNeighbors().size() != 1)
-					continue;
-				final NodeHelper nh = new NodeHelper(ge);
-				postProcessing.add(new RunnableOnImage() {
-					@Override
-					public Image postProcess(Image in) {
-						Point2D p = nh.getPosition();
-						ImageCanvas canv = in.io().canvas();
-						try {
-							double wi = nh.getEdges().iterator().next().getDouble("w_median");
-							double limb_len = nh.getEdges().iterator().next().getDouble("len") / 2;
-							limb_len += wi * 2;
-							canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W="
-									+ StringManipulationTools.formatNumber(wi, 1) + ", limbL=" + (int) limb_len, Color.BLACK);
-						} catch (Exception e) {
-							canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W=ERROR: " + e.getMessage(), Color.RED);
-						}
-						return canv.getImage();
+		if (!isThinned) {
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					ImageCanvas c = in.io().canvas();
+					for (GraphElement g : graph.getGraphElements()) {
+						if (g.getGraph() == null)
+							System.exit(2); // fck
 					}
-				});
-			}
+					
+					for (Node n : graph.getNodes()) {
+						NodeHelper nh = new NodeHelper(n);
+						Vector2i p = nh.getPosition2i().scale(0.5);
+						if (n.getGraph() == null)
+							c = c.drawCircle(p.x, p.y, 24, Color.BLACK.getRGB(), 0.5, 2);
+						else
+							if (n.getDegree() == 1) {
+								// double limb_len = n.getEdges().iterator().next().getDouble("len");
+								// if (limb_len < 20)
+								// c = c.drawCircle(p.x, p.y, 14, Color.RED.getRGB(), 0.5, 5);
+								// else
+								c = c.drawCircle(p.x, p.y, 4, Color.RED.getRGB(), 0.5, 1);
+							} else
+								c = c.drawCircle(p.x, p.y, 3, Color.BLUE.getRGB(), 0.5, 1);
+					}
+					return c.getImage();
+				}
+			});
+		}
+		
+		for (Node ge : graph.getNodes()) {
+			if (ge.getNeighbors().size() != 1)
+				continue;
+			final NodeHelper nh = new NodeHelper(ge);
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					Point2D p = nh.getPosition();
+					ImageCanvas canv = in.io().canvas();
+					try {
+						double wi = nh.getEdges().iterator().next().getDouble("w_median");
+						double limb_len = nh.getEdges().iterator().next().getDouble("len") / 2;
+						// limb_len += wi * 2;
+						canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "w="
+								+ StringManipulationTools.formatNumber(wi, 1) + ",L=" + (int) limb_len, Color.GRAY);
+					} catch (Exception e) {
+						canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "W=ERROR: " + e.getMessage(), Color.RED);
+					}
+					return canv.getImage();
+				}
+			});
+		}
 		
 		HashMap<Graph, List<GraphElement>> graph2elems = new HashMap<Graph, List<GraphElement>>();
 		for (Graph gg : gl) {
@@ -719,10 +783,10 @@ public class SkeletonGraph {
 								Point2D p = nh.getPosition();
 								ImageCanvas canv = in.io().canvas();
 								if (firstF)
-									canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2), "L=" + diaF, Color.DARK_GRAY);
+									canv.text((int) (p.getX() / 2 + 12), (int) (p.getY() / 2), "L=" + diaF, Color.DARK_GRAY);
 								return canv.drawCircle(
 										(int) p.getX() / 2,
-										(int) p.getY() / 2, 18, Color.GREEN.getRGB(), 0, 2).getImage();
+										(int) p.getY() / 2, 12, Color.PINK.getRGB(), 0, 1).getImage();
 							}
 						});
 					}
@@ -756,7 +820,7 @@ public class SkeletonGraph {
 								
 								return canv.drawCircle(
 										(int) p.getX() / 2,
-										(int) p.getY() / 2, 21, Color.YELLOW.getRGB(), 0, 2).getImage();
+										(int) p.getY() / 2, 21, Color.YELLOW.getRGB(), 0, 1).getImage();
 							}
 						});
 					}
@@ -784,6 +848,10 @@ public class SkeletonGraph {
 		double maximumWidth = -1;
 		final ArrayList<GraphElement> thickestStartingPoints = new ArrayList<GraphElement>();
 		for (GraphElement ge : graphElements) {
+			if (ge.getGraph() == null) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Internal error: graphelement list contains deleted elements!");
+				continue;
+			}
 			if (ge instanceof Node) {
 				Node n = (Node) ge;
 				if (n.getNeighbors().size() > 1)
