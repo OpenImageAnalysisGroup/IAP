@@ -70,7 +70,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover
  * 
  * @author Christian Klukas
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class GraphHelper implements HelperClass {
 	
 	/**
@@ -2002,6 +2002,20 @@ public class GraphHelper implements HelperClass {
 		}
 	}
 	
+	/**
+	 * Returns all nodes with degree equal to 1
+	 */
+	public static Set<Node> getLeafNodesUndir(Graph graph) {
+		LinkedHashSet<Node> result = new LinkedHashSet<Node>();
+		for (Node n : graph.getNodes())
+			if (n.getDegree() == 1)
+				result.add(n);
+		return result;
+	}
+	
+	/**
+	 * Returns all nodes with OUT degree equal to 0
+	 */
 	public static Set<Node> getLeafNodes(Graph graph) {
 		LinkedHashSet<Node> result = new LinkedHashSet<Node>();
 		for (Node n : graph.getNodes())
