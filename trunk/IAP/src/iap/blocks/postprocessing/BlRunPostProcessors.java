@@ -51,7 +51,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
-		Image fi = input().masks().vis();
+		Image fi = input().masks().fluo();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
@@ -67,7 +67,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOimage() {
-		Image fi = input().images().vis();
+		Image fi = input().images().fluo();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
@@ -83,7 +83,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {
-		Image fi = input().masks().vis();
+		Image fi = input().masks().nir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
@@ -99,7 +99,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRimage() {
-		Image fi = input().images().vis();
+		Image fi = input().images().nir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
@@ -115,7 +115,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processIRmask() {
-		Image fi = input().masks().vis();
+		Image fi = input().masks().ir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
@@ -131,7 +131,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processIRimage() {
-		Image fi = input().images().vis();
+		Image fi = input().images().ir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
