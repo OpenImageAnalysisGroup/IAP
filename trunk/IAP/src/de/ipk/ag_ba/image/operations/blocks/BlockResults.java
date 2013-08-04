@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
+import iap.blocks.unused.RunnableOnImage;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -447,5 +448,20 @@ public class BlockResults implements BlockResultSet {
 	
 	public Rectangle2D.Double getRelativeBlueMarkerRectangle() {
 		return BlDetectBlueMarkers.getRelativeBlueMarkerRectangle(this);
+	}
+	
+	@Override
+	public void addImagePostProcessor(final ImageConfiguration imageType, final RunnableOnImage runnableOnImage) {
+		addImagePostProcessor(new RunnableOnImageSet() {
+			@Override
+			public Image postProcessImage(Image image) {
+				return runnableOnImage.postProcess(image);
+			}
+			
+			@Override
+			public ImageConfiguration getConfig() {
+				return imageType;
+			}
+		});
 	}
 }
