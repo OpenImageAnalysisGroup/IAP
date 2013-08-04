@@ -109,7 +109,7 @@ public class BlCalcWidthAndHeight extends
 						getProperties().addImagePostProcessor(
 								new RunnableOnImageSet() {
 									@Override
-									public Image postProcessVis(
+									public Image postProcessImage(
 											Image visRes) {
 										if (vertYsoilLevelF > 0)
 											visRes = visRes
