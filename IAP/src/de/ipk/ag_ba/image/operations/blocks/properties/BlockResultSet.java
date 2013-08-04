@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
+import iap.blocks.unused.RunnableOnImage;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -64,10 +66,16 @@ public interface BlockResultSet {
 	
 	public void addImagePostProcessor(RunnableOnImageSet runnableOnImageSet);
 	
+	/**
+	 * Returns the relevant list of post processors, also removes these
+	 * post processors from internal storage, so that they can be retrieved only once.
+	 */
 	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(
-			ImageConfiguration rgbside);
+			ImageConfiguration imageConfig);
 	
 	public void clearStore();
 	
 	public boolean isNumericStoreEmpty();
+	
+	public void addImagePostProcessor(ImageConfiguration imageType, RunnableOnImage runnableOnImage);
 }
