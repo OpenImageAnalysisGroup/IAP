@@ -20,11 +20,14 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		Image fi = input().masks().vis();
-		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMask.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
-				fi = roi.postProcessVis(fi);
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.RgbTop)) {
+				fi = roi.postProcessImage(fi);
 			}
 		}
 		return fi;
@@ -33,11 +36,110 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISimage() {
 		Image fi = input().images().vis();
-		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISImage.png");
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
-				fi = roi.postProcessVis(fi);
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.RgbTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processFLUOmask() {
+		Image fi = input().masks().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.FluoTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processFLUOimage() {
+		Image fi = input().images().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.FluoTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processNIRmask() {
+		Image fi = input().masks().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.NirTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processNIRimage() {
+		Image fi = input().images().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.NirTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		Image fi = input().masks().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.IrTop)) {
+				fi = roi.postProcessImage(fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processIRimage() {
+		Image fi = input().images().vis();
+		if (fi != null) {
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
+				fi = roi.postProcessImage(fi);
+			}
+			for (RunnableOnImageSet roi : getProperties()
+					.getStoredPostProcessors(ImageConfiguration.IrTop)) {
+				fi = roi.postProcessImage(fi);
 			}
 		}
 		return fi;
