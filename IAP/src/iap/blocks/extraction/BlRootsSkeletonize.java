@@ -56,7 +56,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		ImageOperation origImage = img.copy();
 		img = img.binary(0, Color.WHITE.getRGB());
 		
-		ImageOperation inDilatedForSectionDetection = img.copy().dilate(getInt("Dilate for section detection", 2))
+		ImageOperation inDilatedForSectionDetection = img.copy().dilate(getInt("Dilate for section detection", 1))
 				.show("Dilated image for section detection", debug);
 		
 		ClusterDetection cd = new ClusterDetection(inDilatedForSectionDetection.getImage(), ImageOperation.BACKGROUND_COLORint);
