@@ -5046,35 +5046,12 @@ public class ImageOperation {
 		int[][] borderMap = ioBorderPixels.getImageAs2dArray();
 		int[] borderList = getBorderList(borderMap, borderLength);
 		int[][] distMap = new int[w][h];
-		int xtemp;
-		int ytemp;
 		int dist = Integer.MAX_VALUE;
-		int disttemp = 0;
-		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				if (img[x][y] != background && borderMap[x][y] == background) { // Foreground, no borderpixel
 					for (int i = 0; i < borderList.length; i += 2) { // iterate borderlist
-						xtemp = borderList[i];
-						ytemp = borderList[i + 1];
-						if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION) {
-							// distance is multiplied by 10
-							double ddist = Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp))); // calc distance as double value
-							int c = img[x][y];
-							int grayLevel = c & 0x0000ff; // blue channel is interpreted as gray level (assumed gray image input)
-							// black = grayLevel 0, white = graylevel 255
-							// black pixel == fully filled pixel ==> subtract 0.0
-							// white pixel == marginally filled pixel ==> subtract 1.0
-							// now reduce distance accordingly
-							disttemp = (int) Math.round(10d * (1 + ddist - 2 * grayLevel / 255d));
-						} else
-							if (mode == DistanceCalculationMode.INT_DISTANCE_SQARED)
-								disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
-							else
-								disttemp = (int) Math.round(Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)))); // calc distance
-								
-						if (disttemp < dist)
-							dist = disttemp;
+						dist = processBordertListPixel(mode, img, borderList, dist, x, y, i);
 					}
 					if (mode == DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY) {
 						if (dist > 25)
@@ -5089,6 +5066,33 @@ public class ImageOperation {
 		}
 		
 		return new ImageOperation(distMap);
+	}
+	
+	private int processBordertListPixel(DistanceCalculationMode mode, int[][] img, int[] borderList, int dist, int x, int y, int i) {
+		int xtemp;
+		int ytemp;
+		int disttemp;
+		xtemp = borderList[i];
+		ytemp = borderList[i + 1];
+		if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION) {
+			// distance is multiplied by 10
+			double ddist = Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp))); // calc distance as double value
+			int c = img[x][y];
+			int grayLevel = c & 0x0000ff; // blue channel is interpreted as gray level (assumed gray image input)
+			// black = grayLevel 0, white = graylevel 255
+			// black pixel == fully filled pixel ==> subtract 0.0
+			// white pixel == marginally filled pixel ==> subtract 1.0
+			// now reduce distance accordingly
+			disttemp = (int) Math.round(10d * (1 + ddist - 2 * grayLevel / 255d));
+		} else
+			if (mode == DistanceCalculationMode.INT_DISTANCE_SQARED)
+				disttemp = ((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)); // calc distance
+			else
+				disttemp = (int) Math.round(Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp)))); // calc distance
+				
+		if (disttemp < dist)
+			dist = disttemp;
+		return dist;
 	}
 	
 	private int[] getBorderList(int[][] borderMap, int borderLength) {
