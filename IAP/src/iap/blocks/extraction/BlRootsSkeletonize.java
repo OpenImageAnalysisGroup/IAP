@@ -182,14 +182,16 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 					int niceID = id;
 					if (id != -1)
 						niceID = co2i.get(id);
-					double sz = sizeList.remove(sizeList.size() - 1);// id2size.get(id) / 2;
 					if (niceID >= 0) {
+						double sz = sizeList.remove(sizeList.size() - 1);// id2size.get(id) / 2;
 						if (resultPrefix.isEmpty()) {
 							rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
 									sz);
 						}
-					} else
+					} else {
+						double sz = id2size.get(-1) / 2;
 						rt.addValue("roots" + resultPrefix + ".graph.diameter.max", sz);
+					}
 				}
 			}
 		}
