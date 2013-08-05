@@ -36,8 +36,8 @@ import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
@@ -702,10 +702,19 @@ public class NavigationButton implements StyleAware {
 			if (target == PanelTarget.ACTION && n.getIconInactive() != null && n.getIconInactive().getImage() != null) {
 				icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
 			} else {
-				if (target == PanelTarget.NAVIGATION)
-					icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS);
-				if (target != PanelTarget.NAVIGATION || icon == null)
-					icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS);
+				if (target == PanelTarget.NAVIGATION) {
+					icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false);
+					if (icon == null && n.getAction() != null) {
+						icon = GravistoService.loadIcon(n.getAction().getClass(), n.getNavigationImage(), -imgS, imgS, true);
+					}
+					
+				}
+				if (target != PanelTarget.NAVIGATION || icon == null) {
+					icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false);
+					if (icon == null && n.getAction() != null) {
+						icon = GravistoService.loadIcon(n.getAction().getClass(), n.getActionImage(), -imgS, imgS, true);
+					}
+				}
 			}
 		if (icon != null)
 			icon.setDescription(imgS + "");
