@@ -959,8 +959,12 @@ public class GravistoService implements HelperClass {
 	
 	private static WeakHashMap<String, BufferedImage> cachedIcons = new WeakHashMap<String, BufferedImage>();
 	
-	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {
+		return loadIcon(class1, name, w, h, true);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static ImageIcon loadIcon(Class class1, String name, int w, int h, boolean warnIfNotFound) {
 		String id = class1.getCanonicalName() + ";" + name + ";" + w + ";" + h;
 		BufferedImage ci = cachedIcons.get(id);
 		if (ci != null)
@@ -975,7 +979,8 @@ public class GravistoService implements HelperClass {
 		if (img != null)
 			cachedIcons.put(id, img);
 		else
-			System.out.println("Could not load icon " + name);
+			if (warnIfNotFound)
+				System.out.println("Could not load icon " + name);
 		return result;
 	}
 	
