@@ -99,6 +99,10 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void main(String[] args) {
+		main(args, null);
+	}
+	
+	public static void main(String[] args, String[] addons) {
 		setRunMode(IAPrunMode.SWING_MAIN);
 		System.out.println("Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
@@ -110,7 +114,7 @@ public class IAPmain extends JApplet {
 		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
 		
 		JFrame jf = new JFrame(title);
-		IAPmain iap = new IAPmain();
+		IAPmain iap = new IAPmain(addons);
 		jf.add("Center", iap.getContentPane());
 		jf.pack();
 		try {
@@ -168,6 +172,10 @@ public class IAPmain extends JApplet {
 	}
 	
 	public IAPmain() {
+		this(null);
+	}
+	
+	public IAPmain(final String[] addons) {
 		if (getRunMode() == IAPrunMode.UNKNOWN)
 			setRunMode(IAPrunMode.SWING_APPLET);
 		if (getRunMode() == IAPrunMode.SWING_APPLET)
@@ -235,7 +243,7 @@ public class IAPmain extends JApplet {
 				// }
 				// IAPmain.myClassKnown = true;
 				// System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
-				myAppletLoad(mainFrame1, myStatus);
+				myAppletLoad(mainFrame1, myStatus, addons);
 				// myAppletLoad(mainFrame2, myStatus);
 			}
 		};
@@ -271,7 +279,10 @@ public class IAPmain extends JApplet {
 			ResourceIOManager.registerIOHandler(m.getHandler());
 	}
 	
-	public void myAppletLoad(final MainFrame statusPanel, final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public void myAppletLoad(
+			final MainFrame statusPanel,
+			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
+			final String[] addons) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
@@ -379,6 +390,11 @@ public class IAPmain extends JApplet {
 			locations.addAll(new TextFile(r5));
 			locations.add("./MultimodalDataHandling.xml");
 			// locations.add("./HIVE.xml");
+			
+			if (addons != null)
+				for (String p : addons)
+					if (p != null)
+						locations.add("//" + p);
 			
 			locations.remove("");
 			ArrayList<String> locations_exclude = new ArrayList<String>();
