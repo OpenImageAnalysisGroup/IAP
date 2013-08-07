@@ -3,8 +3,6 @@ package de.ipk.ag_ba.mongo;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -23,6 +21,8 @@ import com.mongodb.DBRef;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -110,9 +110,10 @@ public class ExperimentLoader implements RunnableOnDB {
 		}
 		experiment.setHeader(header);
 		
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();;
+		
 		if (!quickLoaded) {
 			int nThreads = 10;
-			ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 			
 			DBObject expref = dbr.fetch();
 			if (expref != null) {
@@ -134,38 +135,39 @@ public class ExperimentLoader implements RunnableOnDB {
 				if (l != null) {
 					final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 					final int n = l.size();
-					for (Object o : l) {
+					for (final Object o : l) {
 						if (o == null)
 							continue;
-						DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-						if (subr != null) {
-							final DBObject substance = subr.fetch();
-							if (substance != null) {
-								if (optDBPbjectsOfSubstances != null)
-									optDBPbjectsOfSubstances.add(substance);
-								Runnable r = new Runnable() {
-									@Override
-									public void run() {
+						Runnable r = new Runnable() {
+							@Override
+							public void run() {
+								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+								if (subr != null) {
+									final DBObject substance = subr.fetch();
+									if (substance != null) {
+										if (optDBPbjectsOfSubstances != null)
+											optDBPbjectsOfSubstances.add(substance);
 										tsoIdxS.addInt(1);
 										processSubstance(db, experiment, substance, collCond, optStatusProvider,
 												100d / n, optDBPbjectsOfConditions,
 												tsoIdxS.getInt(), n);
 									}
-								};
-								executor.execute(r);
+								}
 							}
+						};
+						try {
+							wait.add(BackgroundThreadDispatcher.addTask(r, "Load " + o));
+						} catch (InterruptedException e) {
+							ErrorMsg.addErrorMessage(e);
 						}
 					}
 				}
 			}
 			
-			executor.shutdown();
-			while (!executor.isTerminated()) {
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException e) {
-					MongoDB.saveSystemErrorMessage("InterruptedException during experiment loading concurrency.", e);
-				}
+			try {
+				BackgroundThreadDispatcher.waitFor(wait);
+			} catch (InterruptedException e) {
+				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		
