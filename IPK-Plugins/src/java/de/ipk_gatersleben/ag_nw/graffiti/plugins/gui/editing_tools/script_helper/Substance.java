@@ -687,8 +687,17 @@ public class Substance implements SubstanceInterface {
 	public void setDataOfChildElement(Element childElement, Element experimentChildElement) {
 		if (childElement.getName().equals("line")) {
 			ConditionInterface c = Experiment.getTypeManager().getNewCondition(this);
-			if (c.setData(childElement, experimentChildElement))
+			if (c.setData(childElement, experimentChildElement)) {
+				if (c.getExperimentHeader() != null)
+					for (ConditionInterface cc : conditions) {
+						if (cc.getExperimentHeader() != null)
+							if (c.getExperimentHeader().compareTo(cc.getExperimentHeader()) == 0) {
+								c.setExperimentHeader(cc.getExperimentHeader());
+								break;
+							}
+					}
 				conditions.add(c);
+			}
 		}
 	}
 	
