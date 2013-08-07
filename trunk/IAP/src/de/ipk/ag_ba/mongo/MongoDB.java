@@ -311,12 +311,12 @@ public class MongoDB {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Establish DB connection (" + key + ")");
 			Builder mob = new MongoClientOptions.Builder();
 			mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5));
-			mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 1 * 60 * 1000));
+			mob.connectTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000));
 			mob.threadsAllowedToBlockForConnectionMultiplier(SystemOptions.getInstance().getInteger("GRID-STORAGE",
 					"threads allowed to wait for connection",
 					10000));
-			mob.socketTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 1 * 60 * 1000));
-			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 1 * 60 * 1000));
+			mob.socketTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000));
+			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
 			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
 			mob.socketKeepAlive(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true));
 			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
@@ -335,13 +335,13 @@ public class MongoDB {
 				m.put(key, mc);
 			}
 			m.get(key).getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
-			m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 1 * 60 * 1000);
-			m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 1 * 60 * 1000);
+			m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000);
+			m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000);
 			m.get(key).getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
 			m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
 					"threads allowed to wait for connection",
 					1000);
-			m.get(key).getMongoOptions().socketTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 1 * 60 * 1000);
+			m.get(key).getMongoOptions().socketTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000);
 			m.get(key).getMongoOptions().socketKeepAlive = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true);
 			
 			s.printTime(1000);
