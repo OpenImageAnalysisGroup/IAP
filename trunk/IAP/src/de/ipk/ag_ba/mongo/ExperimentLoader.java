@@ -113,8 +113,6 @@ public class ExperimentLoader implements RunnableOnDB {
 		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();;
 		
 		if (!quickLoaded) {
-			int nThreads = 10;
-			
 			DBObject expref = dbr.fetch();
 			if (expref != null) {
 				BasicDBList subList = (BasicDBList) expref.get("substances");
@@ -128,6 +126,7 @@ public class ExperimentLoader implements RunnableOnDB {
 						idxS++;
 						processSubstance(db, experiment, substance, collCond, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS, n);
 					}
+					subList = null;
 				}
 				if (MongoDB.getEnsureIndex())
 					db.getCollection("substances").ensureIndex("_id");
@@ -143,7 +142,8 @@ public class ExperimentLoader implements RunnableOnDB {
 							public void run() {
 								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
 								if (subr != null) {
-									final DBObject substance = subr.fetch();
+									DBObject substance = subr.fetch();
+									subr = null;
 									if (substance != null) {
 										if (optDBPbjectsOfSubstances != null)
 											optDBPbjectsOfSubstances.add(substance);
@@ -151,16 +151,21 @@ public class ExperimentLoader implements RunnableOnDB {
 										processSubstance(db, experiment, substance, collCond, optStatusProvider,
 												100d / n, optDBPbjectsOfConditions,
 												tsoIdxS.getInt(), n);
+										substance = null;
 									}
 								}
 							}
 						};
 						try {
-							wait.add(BackgroundThreadDispatcher.addTask(r, "Load " + o));
+							if (SystemAnalysis.getUsedMemoryInMB() * 2 > SystemAnalysis.getMemoryMB()) // more than 50% utilized?
+								r.run();
+							else
+								wait.add(BackgroundThreadDispatcher.addTask(r, "Load " + o));
 						} catch (InterruptedException e) {
 							ErrorMsg.addErrorMessage(e);
 						}
 					}
+					l = null;
 				}
 			}
 			
@@ -191,6 +196,9 @@ public class ExperimentLoader implements RunnableOnDB {
 			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
+		BasicDBList condList = (BasicDBList) substance.get("conditions");
+		BasicDBList l = (BasicDBList) substance.get("condition_ids");
+		substance = null;
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
@@ -225,8 +233,11 @@ public class ExperimentLoader implements RunnableOnDB {
 				}
 		}
 		
-		if (optStatusProvider != null)
-			optStatusProvider.setCurrentStatusText1("Load subset " + idxS + "/" + n + "<br><font color='gray'><small>(" + s3d.getName() + ")</small></font>");
+		if (optStatusProvider != null) {
+			String memInfo = StringManipulationTools.formatNumber(SystemAnalysis.getUsedMemoryInMB() * 100d / SystemAnalysis.getMemoryMB(), 0) + "%";
+			optStatusProvider.setCurrentStatusText1("Load subset " + idxS + "/" + n + ", " + memInfo + " RAM used<br><font color='gray'><small>(" + s3d.getName()
+					+ ")</small></font>");
+		}
 		synchronized (experiment) {
 			boolean add = true;
 			for (SubstanceInterface so : experiment)
@@ -238,7 +249,6 @@ public class ExperimentLoader implements RunnableOnDB {
 			if (add)
 				experiment.add(s3d);
 		}
-		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		if (condList != null) {
 			int nc = condList.size();
 			for (Object co : condList) {
@@ -247,10 +257,10 @@ public class ExperimentLoader implements RunnableOnDB {
 					optDBObjectsConditions.add(cond);
 				processCondition(s3d, cond, optStatusProvider, nc);
 			}
+			condList = null;
 		}
 		if (ensureIndex)
 			collCond.ensureIndex("_id");
-		BasicDBList l = (BasicDBList) substance.get("condition_ids");
 		if (l != null) {
 			double max = l.size();
 			
@@ -260,7 +270,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
 					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
+					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 100);
 			for (DBObject cond : condL) {
 				try {
 					if (optDBObjectsConditions != null)
@@ -272,18 +282,17 @@ public class ExperimentLoader implements RunnableOnDB {
 					ErrorMsg.addErrorMessage(e);
 				}
 			}
+			condL.close();
 		}
 	}
 	
 	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
 		Condition3D condition = new Condition3D(s3d, cond.toMap());
-		
+		condition.setExperimentHeader(header);
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
+		cond = null;
 		if (sampList != null) {
-			// if (optStatusProvider != null)
-			// optStatusProvider.setCurrentStatusText2("(n_c=" + (int) max + ", n_sa=" + sampList.size() + ")");
-			
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
 				Sample3D sample = new Sample3D(condition, sam.toMap());
