@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -27,6 +28,7 @@ import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -241,13 +243,13 @@ public class ExperimentReference {
 		synchronized (todoOnceDataIsAvailable) {
 			isLoading = true;
 			loaderStatus = status;
-			Thread t = new Thread(new Runnable() {
+			BackgroundThreadDispatcher.addTask(new Runnable() {
 				@Override
 				public void run() {
 					try {
 						experiment = getData(status);
 					} catch (Exception e) {
-						e.printStackTrace();
+						ErrorMsg.addErrorMessage(e);
 					} finally {
 						isLoading = false;
 						loaderStatus = null;
@@ -256,7 +258,7 @@ public class ExperimentReference {
 								try {
 									r.run();
 								} catch (Exception e) {
-									e.printStackTrace();
+									ErrorMsg.addErrorMessage(e);
 								}
 							}
 							todoOnceDataIsAvailable.clear();
@@ -264,7 +266,6 @@ public class ExperimentReference {
 					}
 				}
 			}, "Load experiment " + header.getExperimentName());
-			t.start();
 		}
 	}
 	
