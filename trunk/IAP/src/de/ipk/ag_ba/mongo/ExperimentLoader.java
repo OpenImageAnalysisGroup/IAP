@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.bson.types.ObjectId;
@@ -142,13 +143,12 @@ public class ExperimentLoader implements RunnableOnDB {
 							if (substance != null) {
 								if (optDBPbjectsOfSubstances != null)
 									optDBPbjectsOfSubstances.add(substance);
-								final int lss = l.size();
 								Runnable r = new Runnable() {
 									@Override
 									public void run() {
 										tsoIdxS.addInt(1);
 										processSubstance(db, experiment, substance, collCond, optStatusProvider,
-												100d / lss, optDBPbjectsOfConditions,
+												100d / n, optDBPbjectsOfConditions,
 												tsoIdxS.getInt(), n);
 									}
 								};
@@ -267,7 +267,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					if (optStatusProvider != null)
 						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 				} catch (Exception e) {
-					e.printStackTrace();
+					ErrorMsg.addErrorMessage(e);
 				}
 			}
 		}
