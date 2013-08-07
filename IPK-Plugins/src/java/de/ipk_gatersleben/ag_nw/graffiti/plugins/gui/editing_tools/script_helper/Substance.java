@@ -268,6 +268,7 @@ public class Substance implements SubstanceInterface {
 				targetSubstance.add(targetCondition);
 			}
 		}
+		targetExperiment.setHeader(targetExperiment.getHeader());
 		processSample(targetExperiment, targetSubstance, targetCondition, newMeasurement.getParentSample(),
 				ignoreSnapshotFineTime,
 				forSureNewMeasurement,
