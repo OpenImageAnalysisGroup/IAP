@@ -255,7 +255,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			IOurl unchangedURL = bm.getURL().copy();
 			boolean targetExists = false;
 			Future<MyByteArrayInputStream> fileContent = null;
-			final Long t = nm.getParentSample().getSampleFineTimeOrRowId();
+			Long ttt = nm.getParentSample().getSampleFineTimeOrRowId();
+			final Long t = ttt == null ? 0l : ttt;
 			
 			if (dontStoreIfAlreadyInSameStorageLocationAvailable && unchangedURL != null && unchangedURL.getPrefix() != null
 					&& unchangedURL.getPrefix().equals(hsmManager.getPrefix())) {
@@ -414,8 +415,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				if (!includeReferenceImages) {
 					bm.setLabelURL(null);
 				} else {
-					long t = nm.getParentSample().getSampleFineTimeOrRowId();
-					
+					Long t = nm.getParentSample().getSampleFineTimeOrRowId();
+					if (t == null)
+						t = 0l;
 					final String zefn;
 					try {
 						if (bm.getLabelURL().getPrefix().startsWith("mongo_"))
