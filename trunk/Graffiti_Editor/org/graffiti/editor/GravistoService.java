@@ -889,7 +889,7 @@ public class GravistoService implements HelperClass {
 		return panel;
 	}
 	
-	private static HashSet<MemoryHog> memoryHogs = new HashSet<MemoryHog>();
+	private static HashSet<MemoryHogInterface> memoryHogs = new HashSet<MemoryHogInterface>();
 	
 	public static JLabel getMemoryInfoLabel(final boolean shortInfo) {
 		final JLabel memLabel = new JLabel(getCurrentMemoryInfo(false));
@@ -1022,9 +1022,9 @@ public class GravistoService implements HelperClass {
 		return FileSystemHandler.getURL(f);
 	}
 	
-	public static void addKnownMemoryHog(MemoryHog memoryHog) {
+	public static void addKnownMemoryHog(MemoryHogInterface memoryHog) {
 		synchronized (memoryHogs) {
-			for (MemoryHog mh : memoryHogs)
+			for (MemoryHogInterface mh : memoryHogs)
 				if (mh.getClass() == memoryHog.getClass())
 					return;
 			memoryHogs.add(memoryHog);
@@ -1087,7 +1087,7 @@ public class GravistoService implements HelperClass {
 	public static void freeMemory(boolean freeAlsoMemoryHogs) {
 		if (freeAlsoMemoryHogs)
 			synchronized (memoryHogs) {
-				for (MemoryHog mh : memoryHogs) {
+				for (MemoryHogInterface mh : memoryHogs) {
 					mh.freeMemory();
 				}
 			}
