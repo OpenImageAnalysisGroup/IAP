@@ -57,7 +57,7 @@ public class ColorUtil {
 		int idx = 0;
 		for (Color check : palette) {
 			int diff = Math.abs(c.getRed() - check.getRed()) + Math.abs(c.getGreen() - check.getGreen())
-								+ Math.abs(c.getBlue() - check.getBlue());
+					+ Math.abs(c.getBlue() - check.getBlue());
 			if (diff < minDiff) {
 				minDiff = diff;
 				nearestColor = idx;
@@ -90,7 +90,7 @@ public class ColorUtil {
 			for (Color c : colorsOfGroup) {
 				Color_CIE_Lab lab = new Color_CIE_Lab(c.getRGB(), exactAndSlow);
 				if (res == null
-									|| (Math.abs(lab.getA()) + Math.abs(lab.getB()) > Math.abs(res.getA()) + Math.abs(res.getB())))
+						|| (Math.abs(lab.getA()) + Math.abs(lab.getB()) > Math.abs(res.getA()) + Math.abs(res.getB())))
 					res = lab;
 			}
 			return res.getColorXYZ().getColor();
@@ -392,7 +392,7 @@ public class ColorUtil {
 	}
 	
 	private static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
-						double CIE_b2) {
+			double CIE_b2) {
 		double WHT_L = 1;
 		double WHT_C = 1;
 		double WHT_H = 1; // Weight factor
@@ -442,7 +442,7 @@ public class ColorUtil {
 			xHX /= 2;
 		}
 		double xTX = 1 - 0.17 * Math.cos(dtor(xHX - 30)) + 0.24 * Math.cos(deg2rad(2 * xHX)) + 0.32
-							* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
+				* Math.cos(deg2rad(3 * xHX + 6)) - 0.20 * Math.cos(dtor(4 * xHX - 63));
 		double xPH = 30 * Math.exp(-((xHX - 275) / 25) * ((xHX - 275) / 25));
 		double xRC = 2 * Math.sqrt((Math.pow(xCY, 7)) / ((Math.pow(xCY, 7)) + (Math.pow(25, 7))));
 		double xSL = 1 + ((0.015 * ((xLX - 50) * (xLX - 50))) / Math.sqrt(20 + ((xLX - 50) * (xLX - 50))));
@@ -604,6 +604,7 @@ public class ColorUtil {
 			boolean filterBackground, int iBackgroundColor) {
 		int r, g, b;
 		float[] p;
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		if (filterBackground) {
 			int idx = 0;
 			for (int c : arrayRGB) {
@@ -616,7 +617,7 @@ public class ColorUtil {
 					g = ((c & 0x00ff00) >> 8);
 					b = (c & 0x0000ff);
 					
-					p = ImageOperation.labCube[r][g];
+					p = lab[r][g];
 					
 					arrayL[idx] = p[b];
 					arrayA[idx] = p[b + 256];
@@ -631,7 +632,7 @@ public class ColorUtil {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				p = ImageOperation.labCube[r][g];
+				p = lab[r][g];
 				
 				arrayL[idx] = p[b];
 				arrayA[idx] = p[b + 256];

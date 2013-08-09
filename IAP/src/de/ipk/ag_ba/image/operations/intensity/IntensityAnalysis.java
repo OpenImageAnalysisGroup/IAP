@@ -59,6 +59,7 @@ public class IntensityAnalysis {
 		int plantImagePixelCnt = 0;
 		int plantImagePixelCntVgreater0 = 0;
 		float[] hsb = new float[3];
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int c : pixels) {
 			if (c == background)
 				continue;
@@ -74,9 +75,9 @@ public class IntensityAnalysis {
 				int g = g_intensityChlorophyl;
 				int b = b_intensityPhenol;
 				
-				int Li = (int) ImageOperation.labCube[r][g][b];
-				int ai = (int) ImageOperation.labCube[r][g][b + 256];
-				int bi = (int) ImageOperation.labCube[r][g][b + 512];
+				int Li = (int) lab[r][g][b];
+				int ai = (int) lab[r][g][b + 256];
+				int bi = (int) lab[r][g][b + 512];
 				statsLabL.addValue(Li);
 				statsLabA.addValue(ai);
 				statsLabB.addValue(bi);

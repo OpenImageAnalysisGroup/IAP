@@ -734,7 +734,7 @@ public class SkeletonProcessor2d {
 		double lSum = 0, aSum = 0, bSum = 0;
 		int r = 0, g, b, n = 0;
 		float li, ai, bi;
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (Point p : l.points) {
 			int c = visImg[p.x][p.y];
 			
@@ -744,9 +744,9 @@ public class SkeletonProcessor2d {
 			g = ((c & 0x00ff00) >> 8); // G 0..1
 			b = (c & 0x0000ff); // B 0..1
 			
-			li = ImageOperation.labCube[r][g][b];
-			ai = ImageOperation.labCube[r][g][b + 256];
-			bi = ImageOperation.labCube[r][g][b + 512];
+			li = lab[r][g][b];
+			ai = lab[r][g][b + 256];
+			bi = lab[r][g][b + 512];
 			
 			lSum += li;
 			aSum += ai;
