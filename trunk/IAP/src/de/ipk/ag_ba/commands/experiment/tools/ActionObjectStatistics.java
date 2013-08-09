@@ -10,6 +10,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentStatistics;
 
 /**
  * @author klukas
@@ -31,7 +32,10 @@ public class ActionObjectStatistics extends AbstractNavigationAction implements 
 		try {
 			ExperimentInterface res = experiment.getData(false, getStatusProvider());
 			getStatusProvider().setCurrentStatusText1("Analyze Data...");
-			summaryHTML = ((Experiment) res).getExperimentStatistics().getSummaryHTML();
+			ExperimentStatistics stat = ((Experiment) res).getExperimentStatistics();
+			if (false)
+				System.out.println("Statistics:\n" + stat);
+			summaryHTML = stat.getSummaryHTML(false);
 			getStatusProvider().setCurrentStatusText1("Processing finished");
 		} catch (Exception e) {
 			getStatusProvider().setCurrentStatusText1("Processing error:");
