@@ -172,7 +172,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			} else {
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
-				statisticsResult.setHeader(experiment.getHeader().clone());
+				statisticsResult.setHeader(statisticsResult.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 				for (SubstanceInterface s : statisticsResult) {
@@ -208,8 +208,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText2("Save result data structure...");
 					}
 					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-					statisticsResult.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
-							experiment.getExperimentName());
+					String nn = getImageAnalysisTask().getName();
+					if (!nn.contains(experiment.getExperimentName() + ""))
+						nn = nn + " of " + experiment.getExperimentName();
+					nn = StringManipulationTools.stringReplace(nn, ":", "_");
+					statisticsResult.getHeader().setExperimentname(nn);
 					
 					statisticsResult.getHeader().setRemark(
 							(statisticsResult.getHeader().getRemark() != null && !statisticsResult.getHeader().getRemark().isEmpty() ? statisticsResult.getHeader()
