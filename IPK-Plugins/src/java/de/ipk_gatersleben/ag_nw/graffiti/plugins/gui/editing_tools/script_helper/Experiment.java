@@ -1303,4 +1303,8 @@ public class Experiment implements ExperimentInterface {
 		sl.add(toBeExtracted);
 		return copyAndExtractSubtanceInclusiveData(sl);
 	}
+	
+	public ExperimentStatistics getExperimentStatistics() {
+		return new ExperimentStatistics(this);
+	}
 }
