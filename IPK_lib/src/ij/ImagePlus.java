@@ -53,7 +53,6 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
 
-
 /**
  * An ImagePlus contain an ImageProcessor (2D image) or an ImageStack (3D, 4D or 5D image).
  * It also includes metadata (spatial calibration and possibly the directory/file where
@@ -2109,9 +2108,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				int r = v[0];
 				int g = v[1];
 				int b = v[2];
-				int Li = (int) ImageOperationLabCube.labCube[r][g][b];
-				int ai = (int) ImageOperationLabCube.labCube[r][g][b + 256];
-				int bi = (int) ImageOperationLabCube.labCube[r][g][b + 512];
+				int Li = (int) ImageOperationLabCube.labCube()[r][g][b];
+				int ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
+				int bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
 				
 				float[] hsv = new float[3];
 				Color.RGBtoHSB(r, g, b, hsv);

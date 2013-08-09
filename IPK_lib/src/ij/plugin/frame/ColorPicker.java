@@ -314,9 +314,9 @@ class ColorCanvas extends Canvas implements MouseListener, MouseMotionListener {
 		int g = (p & 0xff00) >> 8;
 		int b = p & 0xff;
 		
-		int Li = (int) ImageOperationLabCube.labCube[r][g][b];
-		int ai = (int) ImageOperationLabCube.labCube[r][g][b + 256];
-		int bi = (int) ImageOperationLabCube.labCube[r][g][b + 512];
+		int Li = (int) ImageOperationLabCube.labCube()[r][g][b];
+		int ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
+		int bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
 		
 		float[] hsv = new float[3];
 		Color.RGBtoHSB(r, g, b, hsv);
