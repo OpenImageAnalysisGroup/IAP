@@ -71,4 +71,10 @@ public enum MeasurementNodeType {
 		return this.toString() + (this == MeasurementNodeType.OMICS ? "" : "s");
 	}
 	
+	public static MeasurementNodeType[] binaryTypes() {
+		return new MeasurementNodeType[] {
+				VOLUME, IMAGE, NETWORK
+		};
+	}
+	
 }
