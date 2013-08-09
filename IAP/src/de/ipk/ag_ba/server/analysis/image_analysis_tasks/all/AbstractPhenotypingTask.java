@@ -35,6 +35,7 @@ import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.Image;
@@ -730,6 +731,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		ExperimentInterface result = output;
 		output = null;
+		ImageOperation.setLabCubeInstanceToNull();
 		return result;
 	}
 	
