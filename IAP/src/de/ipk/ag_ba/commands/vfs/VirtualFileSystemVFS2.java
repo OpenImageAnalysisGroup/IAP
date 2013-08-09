@@ -299,7 +299,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	
 	@Override
 	public long getFileLength(IOurl url) throws Exception {
-		VfsFileObject file = newVfsFile(url.getFileName());
+		String fn = url.getFileName();
+		if (fn != null && fn.contains("#"))
+			fn = fn.substring(0, fn.lastIndexOf("#"));
+		VfsFileObject file = newVfsFile(url.getDetail() + "/" + fn);
 		return file.length();
 	}
 	
