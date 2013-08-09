@@ -794,7 +794,7 @@ public class MongoDB {
 			@Override
 			public void run() {
 				if (header.getDatabaseId() == null)
-					System.out.println("Cant update experiment, as header DB id is null!");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Cant update experiment, as header DB id is null!");
 				ObjectId id = new ObjectId(header.getDatabaseId());
 				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), id);
 				DBObject expref = dbr.fetch();
