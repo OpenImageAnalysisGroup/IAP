@@ -268,6 +268,7 @@ public class Substance implements SubstanceInterface {
 				targetSubstance.add(targetCondition);
 			}
 		}
+		targetCondition.setParent(targetSubstance);
 		targetCondition.setExperimentHeader(targetExperiment.getHeader());
 		processSample(targetExperiment, targetSubstance, targetCondition, newMeasurement.getParentSample(),
 				ignoreSnapshotFineTime,
@@ -320,8 +321,10 @@ public class Substance implements SubstanceInterface {
 				}
 				
 			}
+			targetSample.setParent(targetCondition);
 		}
 		synchronized (targetSample) {
+			newMeasurement.setParentSample(targetSample);
 			if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement)))
 				targetSample.add(newMeasurement);
 		}
