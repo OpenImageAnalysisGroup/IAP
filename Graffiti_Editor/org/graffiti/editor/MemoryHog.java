@@ -15,7 +15,7 @@ import javax.swing.Timer;
 /**
  * @author klukas
  */
-public abstract class MemoryHog {
+public abstract class MemoryHog implements MemoryHogInterface {
 	
 	public MemoryHog() {
 		GravistoService.addKnownMemoryHog(this);
@@ -45,6 +45,10 @@ public abstract class MemoryHog {
 		lastUsageTime = System.currentTimeMillis();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.graffiti.editor.MemoryHogInterface#freeMemory()
+	 */
+	@Override
 	public abstract void freeMemory();
 	
 }
