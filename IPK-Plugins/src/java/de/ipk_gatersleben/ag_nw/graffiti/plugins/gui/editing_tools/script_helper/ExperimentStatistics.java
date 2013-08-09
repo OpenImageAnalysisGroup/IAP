@@ -3,6 +3,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import java.util.ArrayList;
 
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 public class ExperimentStatistics {
 	
@@ -47,11 +48,23 @@ public class ExperimentStatistics {
 		for (SubstanceInterface s : experiment) {
 			substanceStat.add(s);
 			for (ConditionInterface c : s) {
+				if (c.getParentSubstance() != s) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: INTERNAL PROBLEM: PARENT SUBSTANCE DIFFERS FROM SUBSTANCE");
+					substanceStat.add(c.getParentSubstance());
+				}
 				conditionStat.add(c);
 				exprimentHeaderStat.add(c.getExperimentHeader());
 				for (SampleInterface sa : c) {
+					if (sa.getParentCondition() != c) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: INTERNAL PROBLEM: PARENT CONDITION DIFFERS FROM CONDITION");
+						conditionStat.add(sa.getParentCondition());
+					}
 					sampleStat.add(sa);
 					for (NumericMeasurementInterface nmi : sa) {
+						if (nmi.getParentSample() != sa) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: INTERNAL PROBLEM: PARENT SAMPLE DIFFERS FROM SAMPLE");
+							sampleStat.add(nmi.getParentSample());
+						}
 						qualityTagStat.add(nmi.getQualityAnnotation());
 						if (!Double.isNaN(nmi.getValue())) {
 							numericStat.add(nmi);
