@@ -15,7 +15,6 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM;
@@ -24,7 +23,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM
  * @author klukas
  */
 public class ActionShowXML extends AbstractNavigationAction implements ActionDataProcessing {
-	private MongoDB m;
 	private ExperimentReference experiment;
 	private NavigationButton src;
 	ArrayList<String> xmlOutput = new ArrayList<String>();
@@ -39,7 +37,7 @@ public class ActionShowXML extends AbstractNavigationAction implements ActionDat
 		xmlOutput.clear();
 		try {
 			getStatusProvider().setCurrentStatusText1("Generate XML...");
-			ExperimentInterface res = experiment.getData();
+			ExperimentInterface res = experiment.getData(false, getStatusProvider());
 			for (Document document : Experiment.getDocuments(res, getStatusProvider(), false)) {
 				String xml = "";
 				try {
@@ -97,7 +95,6 @@ public class ActionShowXML extends AbstractNavigationAction implements ActionDat
 	
 	@Override
 	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
 		this.experiment = experimentReference;
 	}
 }
