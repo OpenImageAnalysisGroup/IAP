@@ -48,10 +48,10 @@ public class Color_CIE_Lab {
 		int red = (rgb & 0xff0000) >> 16;
 		int green = (rgb & 0x00ff00) >> 8;
 		int blue = (rgb & 0x0000ff);
-		
-		l = ImageOperation.labCube[red][green][blue];
-		a = ImageOperation.labCube[red][green][blue + 256];
-		b = ImageOperation.labCube[red][green][blue + 512];
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		l = lab[red][green][blue];
+		a = lab[red][green][blue + 256];
+		b = lab[red][green][blue + 512];
 	}
 	
 	public void setL(float l) {

@@ -49,6 +49,7 @@ import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MemoryHogInterface;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
@@ -66,6 +67,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
+import de.ipk.ag_ba.labcube.ImageOperationLabCubeInterface;
 
 /**
  * A number of commonly used image operation commands.
@@ -73,7 +75,7 @@ import de.ipk.ag_ba.labcube.ImageOperationLabCube;
  * @author Klukas, Pape, Entzian
  */
 
-public class ImageOperation {
+public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
@@ -85,7 +87,7 @@ public class ImageOperation {
 	 * A:[26.135635375976562,225.2710723876953]<br>
 	 * B:[8.081741333007812,222.49612426757812]
 	 */
-	public final static float[][][] labCube = getLabCube();
+	private static float[][][] labCube;
 	
 	// private Roi boundingBox;
 	
@@ -2051,7 +2053,7 @@ public class ImageOperation {
 			maxDiffAleftBright = maize ? 11 : 3; // 11; // 15 old barley 3
 			maxDiffArightBleft = maize ? 7 : 3;// 11; // old barley 3
 		}
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (y = 0; y < height; y++) {
 			int yw = y * width;
 			for (x = 0; x < width; x++) {
@@ -2062,9 +2064,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) ImageOperation.labCube[r][g][b];
-				ai = (int) ImageOperation.labCube[r][g][b + 256];
-				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				Li = (int) lab[r][g][b];
+				ai = (int) lab[r][g][b + 256];
+				bi = (int) lab[r][g][b + 512];
 				
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL)
 						&& (ai > lowerValueOfA) && (ai < upperValueOfA)
@@ -2094,9 +2096,9 @@ public class ImageOperation {
 								g = ((c & 0x00ff00) >> 8);
 								b = (c & 0x0000ff);
 								
-								Li = (int) ImageOperation.labCube[r][g][b];
-								ai = (int) ImageOperation.labCube[r][g][b + 256];
-								bi = (int) ImageOperation.labCube[r][g][b + 512];
+								Li = (int) ImageOperation.getLabCubeInstance()[r][g][b];
+								ai = (int) ImageOperation.getLabCubeInstance()[r][g][b + 256];
+								bi = (int) ImageOperation.getLabCubeInstance()[r][g][b + 512];
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFound = true;
@@ -2122,9 +2124,9 @@ public class ImageOperation {
 								g = ((c & 0x00ff00) >> 8);
 								b = (c & 0x0000ff);
 								
-								Li = (int) ImageOperation.labCube[r][g][b];
-								ai = (int) ImageOperation.labCube[r][g][b + 256];
-								bi = (int) ImageOperation.labCube[r][g][b + 512];
+								Li = (int) ImageOperation.getLabCubeInstance()[r][g][b];
+								ai = (int) ImageOperation.getLabCubeInstance()[r][g][b + 256];
+								bi = (int) ImageOperation.getLabCubeInstance()[r][g][b + 512];
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFoundL = true;
@@ -2179,7 +2181,7 @@ public class ImageOperation {
 		int[] imagePixels = getImageAs1dArray();
 		
 		int[] resultImage = new int[imagePixels.length];
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (y = 0; y < height; y++) {
 			int yw = y * width;
 			for (x = 0; x < width; x++) {
@@ -2190,9 +2192,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) ImageOperation.labCube[r][g][b];
-				ai = (int) ImageOperation.labCube[r][g][b + 256];
-				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				Li = (int) lab[r][g][b];
+				ai = (int) lab[r][g][b + 256];
+				bi = (int) lab[r][g][b + 512];
 				
 				if (resultImage[off] != background
 						&& (((Li > lowerValueOfL) && (Li < upperValueOfL)
@@ -2235,7 +2237,7 @@ public class ImageOperation {
 		int[] imagePixels = getImageAs1dArray();
 		
 		int[] resultImage = new int[imagePixels.length];
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (y = 0; y < h; y++) {
 			int yw = y * w;
 			for (x = 0; x < w; x++) {
@@ -2246,9 +2248,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) ImageOperation.labCube[r][g][b];
-				ai = (int) ImageOperation.labCube[r][g][b + 256];
-				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				Li = (int) lab[r][g][b];
+				ai = (int) lab[r][g][b + 256];
+				bi = (int) lab[r][g][b + 512];
 				
 				if (resultImage[off] != background
 						&& hq_anyMatch(Li, ai, bi, lowerValueOfA, lowerValueOfB, lowerValueOfL, upperValueOfA, upperValueOfB, upperValueOfL,
@@ -2399,7 +2401,6 @@ public class ImageOperation {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
 		ImagePlus ip = new ImagePlus();
 		ip.setGlobalCalibration(new Calibration());
-		ImageOperationLabCube.labCube = result;
 		return result;
 	}
 	
@@ -2456,7 +2457,7 @@ public class ImageOperation {
 		double sumB = 0;
 		
 		int count = 0;
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (x = x1; x < x1 + w; x++) {
 			for (y = y1; y < y1 + h; y++) {
 				
@@ -2466,9 +2467,9 @@ public class ImageOperation {
 				g = ((c & 0x00ff00) >> 8); // G 0..1
 				b = (c & 0x0000ff); // B 0..1
 				
-				Li = (int) ImageOperation.labCube[r][g][b];
-				ai = (int) ImageOperation.labCube[r][g][b + 256];
-				bi = (int) ImageOperation.labCube[r][g][b + 512];
+				Li = (int) lab[r][g][b];
+				ai = (int) lab[r][g][b + 256];
+				bi = (int) lab[r][g][b + 512];
 				
 				sumL += Li;
 				sumA += ai;
@@ -2733,6 +2734,7 @@ public class ImageOperation {
 	public ImageOperation thresholdLabBrightnessClearLowerThan(int threshold, int back) {
 		int[] res = getImageAs1dArray();
 		int idx = 0;
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int c : res) {
 			if (c == back) {
 				idx++;
@@ -2742,7 +2744,7 @@ public class ImageOperation {
 			int g = ((c & 0x00ff00) >> 8);
 			int b = (c & 0x0000ff);
 			
-			int Li = (int) ImageOperation.labCube[r][g][b];
+			int Li = (int) lab[r][g][b];
 			// ai = (int) ImageOperation.labCube[r][g][b + 256];
 			// bi = (int) ImageOperation.labCube[r][g][b + 512];
 			if (Li < threshold)
@@ -3505,6 +3507,7 @@ public class ImageOperation {
 		
 		int[][] img2d = getImageAs2dArray();
 		float[] p;
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		if (LThresh < 0) {
 			int lArrayFilled = 0;
 			Float[] lArray = new Float[w * h];
@@ -3516,7 +3519,7 @@ public class ImageOperation {
 					r = (c & 0xff0000) >> 16;
 					g = (c & 0x00ff00) >> 8;
 					b = c & 0x0000ff;
-					p = ImageOperation.labCube[r][g];
+					p = lab[r][g];
 					Li = p[b];
 					ai = p[b + 256];
 					bi = p[b + 512];
@@ -3554,7 +3557,7 @@ public class ImageOperation {
 				r = (c & 0xff0000) >> 16;
 				g = (c & 0x00ff00) >> 8;
 				b = c & 0x0000ff;
-				p = ImageOperation.labCube[r][g];
+				p = ImageOperation.getLabCubeInstance()[r][g];
 				Li = p[b];
 				ai = p[b + 256];
 				bi = p[b + 512];
@@ -4333,20 +4336,20 @@ public class ImageOperation {
 	}
 	
 	private Lab getLabAverage(int[] is) {
-		int rf, gf, bf, li, ai, bi;
+		int rf, gf, bf;
 		int sumL = 0;
 		int sumA = 0;
 		int sumB = 0;
 		int length = is.length;
-		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int i = 0; i < length; i++) {
 			rf = ((is[i] & 0xff0000) >> 16);
 			gf = ((is[i] & 0x00ff00) >> 8);
 			bf = (is[i] & 0x0000ff);
 			
-			sumL += (int) ImageOperation.labCube[rf][gf][bf];
-			sumA += (int) ImageOperation.labCube[rf][gf][bf + 256];
-			sumB += (int) ImageOperation.labCube[rf][gf][bf + 512];
+			sumL += (int) lab[rf][gf][bf];
+			sumA += (int) lab[rf][gf][bf + 256];
+			sumB += (int) lab[rf][gf][bf + 512];
 		}
 		return new Lab(sumL / (double) length, sumA / (double) length, sumB / (double) length);
 	}
@@ -4622,12 +4625,13 @@ public class ImageOperation {
 		float minDistL = Float.MAX_VALUE;
 		float minDistAB = Float.MAX_VALUE;
 		float minL = 0, minAa = 0, minBb = 0;
+		float[][][] lab = getLabCubeInstance();
 		for (int r = 0; r < 255; r++) {
 			for (int g = 0; g < 255; g++) {
 				for (int b = 0; b < 255; b++) {
-					float l2 = labCube[r][g][b];
-					float a2 = labCube[r][g][b + 256];
-					float b2 = labCube[r][g][b + 512];
+					float l2 = lab[r][g][b];
+					float a2 = lab[r][g][b + 256];
+					float b2 = lab[r][g][b + 512];
 					float distL = Math.abs(lf - l2);
 					float distAB = Math.abs(af - a2) + Math.abs(bf - b2);
 					if (distL < minDistL && distAB < minDistAB) {
@@ -5153,5 +5157,45 @@ public class ImageOperation {
 			}
 		}
 		return res;
+	}
+	
+	private static final Boolean syncLabCube = true;
+	
+	public static void setLabCubeInstanceToNull() {
+		synchronized (syncLabCube) {
+			labCube = null;
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: LabCube set to null.");
+		}
+	}
+	
+	private static boolean memoryHogRegistered = false;
+	
+	public static float[][][] getLabCubeInstance() {
+		synchronized (syncLabCube) {
+			if (labCube == null) {
+				labCube = getLabCube();
+				if (!memoryHogRegistered) {
+					GravistoService.addKnownMemoryHog(new MemoryHogInterface() {
+						@Override
+						public void freeMemory() {
+							ImageOperation.setLabCubeInstanceToNull();
+						}
+					});
+					ImageOperationLabCube.getter = new ImageOperationLabCubeInterface() {
+						@Override
+						public float[][][] getLabCube() {
+							return ImageOperation.getLabCube();
+						}
+					};
+				}
+				memoryHogRegistered = true;
+			}
+			return labCube;
+		}
+	}
+	
+	@Override
+	public void freeMemory() {
+		ImageOperation.setLabCubeInstanceToNull();
 	}
 }
