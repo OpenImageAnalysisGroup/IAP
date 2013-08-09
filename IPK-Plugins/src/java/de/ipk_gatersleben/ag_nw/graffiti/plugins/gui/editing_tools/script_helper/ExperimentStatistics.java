@@ -12,14 +12,26 @@ public class ExperimentStatistics {
 		this.experiment = experiment;
 	}
 	
-	public String getSummaryHTML() {
-		ObjectStat substanceStat = new ObjectStat("Substances");
-		ObjectStat conditionStat = new ObjectStat("Conditions");
-		ObjectStat sampleStat = new ObjectStat("Samples");
-		ObjectStat numericStat = new ObjectStat("Numeric Values");
-		ObjectStat binaryStat = new ObjectStat("Binary Entities");
-		ObjectStat exprimentHeaderStat = new ObjectStat("Experiment Headers");
-		ObjectStat qualityTagStat = new ObjectStat("Quality Tags");
+	@Override
+	public String toString() {
+		String s = getSummaryHTML(true);
+		s = StringManipulationTools.stringReplace(s, "<table>", "---------\n");
+		s = StringManipulationTools.stringReplace(s, "</table>", "---------\n");
+		s = StringManipulationTools.stringReplace(s, "</tr>", " |\n");
+		s = StringManipulationTools.stringReplace(s, "<td>", " |\t");
+		s = StringManipulationTools.stringReplace(s, "<th>", " |\t");
+		s = StringManipulationTools.removeHTMLtags(s);
+		return s;
+	}
+	
+	public String getSummaryHTML(boolean sh) {
+		ObjectStat substanceStat = new ObjectStat(sh ? "Sub" : "Substances");
+		ObjectStat conditionStat = new ObjectStat(sh ? "Cond" : "Conditions");
+		ObjectStat sampleStat = new ObjectStat(sh ? "Sam" : "Samples");
+		ObjectStat numericStat = new ObjectStat(sh ? "Num" : "Numeric Values");
+		ObjectStat binaryStat = new ObjectStat(sh ? "Bin" : "Binary Entities");
+		ObjectStat exprimentHeaderStat = new ObjectStat(sh ? "Hea" : "Experiment Headers");
+		ObjectStat qualityTagStat = new ObjectStat(sh ? "Qua" : "Quality Tags");
 		
 		ArrayList<ObjectStat> ol = new ArrayList<ObjectStat>();
 		ol.add(exprimentHeaderStat);
@@ -51,7 +63,7 @@ public class ExperimentStatistics {
 			}
 		}
 		
-		return "<table border='0'>" + ObjectStat.getTableHeader()
+		return "<table>" + ObjectStat.getTableHeader(sh)
 				+ StringManipulationTools.getStringList(ol, "") +
 				"</table>";
 	}

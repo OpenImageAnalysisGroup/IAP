@@ -40,8 +40,11 @@ public class ObjectStat {
 		objectSet.add(o);
 	}
 	
-	public static String getTableHeader() {
-		return "<tr><th></th><th>References</th><th>Instances</th><th>Set Size</th><th>Compare-To-Count</th></tr>";
+	public static String getTableHeader(boolean sh) {
+		if (sh)
+			return "<tr><th></th><th>Ref</th><th>Ins</th><th>Set</th><th>Com</th></tr>";
+		else
+			return "<tr><th></th><th>References</th><th>Instances</th><th>Set Size</th><th>Compare-To-Count</th></tr>";
 	}
 	
 	@Override
