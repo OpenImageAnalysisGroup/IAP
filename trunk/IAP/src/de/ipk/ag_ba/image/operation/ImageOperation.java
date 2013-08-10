@@ -3490,27 +3490,66 @@ public class ImageOperation implements MemoryHogInterface {
 	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion, boolean debug) {
 		int r, g, b, c;
 		float Li, ai, bi;
-		Image marked = null;
-		ImageCanvas canvas = null;
-		if (debug) {
-			canvas = new ImageOperation(image).copy().canvas();
-			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
-		}
 		// sums of RGB
 		int sumR = 0;
 		int sumG = 0;
 		int sumB = 0;
 		
 		int count = 0;
-		int imgw = getImage().getWidth();
-		int imgh = getImage().getHeight();
-		
-		int[][] img2d = getImageAs2dArray();
-		float[] p;
-		float[][][] lab = ImageOperation.getLabCubeInstance();
-		if (LThresh < 0) {
-			int lArrayFilled = 0;
-			Float[] lArray = new Float[w * h];
+		{
+			Image marked = null;
+			ImageCanvas canvas = null;
+			if (debug) {
+				canvas = new ImageOperation(image).copy().canvas();
+				marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
+			}
+			int imgw = getImage().getWidth();
+			int imgh = getImage().getHeight();
+			
+			int[][] img2d = getImageAs2dArray();
+			float[] p;
+			float[][][] lab = ImageOperation.getLabCubeInstance();
+			if (LThresh < 0) {
+				int lArrayFilled = 0;
+				Float[] lArray = new Float[w * h];
+				for (int x = x1; x < x1 + w; x++) {
+					for (int y = y1; y < y1 + h; y++) {
+						if (x < 0 || y < 0 || x >= imgw || y >= imgh)
+							continue;
+						c = img2d[x][y];
+						r = (c & 0xff0000) >> 16;
+						g = (c & 0x00ff00) >> 8;
+						b = c & 0x0000ff;
+						p = lab[r][g];
+						Li = p[b];
+						ai = p[b + 256];
+						bi = p[b + 512];
+						// if (Li < 200 && debug)
+						// System.out.println("li: " + Li + " r: " + r + " b: " + b + " g: " + g);
+						// sum under following conditions
+						if (searchWhiteTrue) {
+							if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+								lArray[lArrayFilled++] = Li;
+							}
+						} else {
+							if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+								lArray[lArrayFilled++] = Li;
+							}
+						}
+					}
+				}
+				if (lArrayFilled > 0) {
+					int index = (int) (lArrayFilled * (-LThresh / 100d)) - 1;
+					index = lArrayFilled - index;
+					Arrays.sort(lArray, 0, lArrayFilled);
+					if (index < 0)
+						index = 0;
+					if (index >= lArrayFilled)
+						index = lArrayFilled - 1;
+					LThresh = lArray[index].intValue() - 1;
+				}
+				
+			}
 			for (int x = x1; x < x1 + w; x++) {
 				for (int y = y1; y < y1 + h; y++) {
 					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
@@ -3519,7 +3558,7 @@ public class ImageOperation implements MemoryHogInterface {
 					r = (c & 0xff0000) >> 16;
 					g = (c & 0x00ff00) >> 8;
 					b = c & 0x0000ff;
-					p = lab[r][g];
+					p = ImageOperation.getLabCubeInstance()[r][g];
 					Li = p[b];
 					ai = p[b + 256];
 					bi = p[b + 512];
@@ -3527,69 +3566,35 @@ public class ImageOperation implements MemoryHogInterface {
 					// System.out.println("li: " + Li + " r: " + r + " b: " + b + " g: " + g);
 					// sum under following conditions
 					if (searchWhiteTrue) {
-						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-							lArray[lArrayFilled++] = Li;
+						if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+							sumR += r;
+							sumG += g;
+							sumB += b;
+							count++;
+							
+							if (debug && marked != null)
+								canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.6);
 						}
 					} else {
-						if ((ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-							lArray[lArrayFilled++] = Li;
+						if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
+							sumR += r;
+							sumG += g;
+							sumB += b;
+							count++;
+							
+							if (debug && marked != null)
+								canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.7);
 						}
 					}
 				}
 			}
-			if (lArrayFilled > 0) {
-				int index = (int) (lArrayFilled * (-LThresh / 100d)) - 1;
-				index = lArrayFilled - index;
-				Arrays.sort(lArray, 0, lArrayFilled);
-				if (index < 0)
-					index = 0;
-				if (index >= lArrayFilled)
-					index = lArrayFilled - 1;
-				LThresh = lArray[index].intValue() - 1;
-			}
-			
+			if (debug)
+				canvas.getImage().show("region scan for white balance", debug);
+			img2d = null;
+			p = null;
+			lab = null;
+			canvas = null;
 		}
-		for (int x = x1; x < x1 + w; x++) {
-			for (int y = y1; y < y1 + h; y++) {
-				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
-					continue;
-				c = img2d[x][y];
-				r = (c & 0xff0000) >> 16;
-				g = (c & 0x00ff00) >> 8;
-				b = c & 0x0000ff;
-				p = ImageOperation.getLabCubeInstance()[r][g];
-				Li = p[b];
-				ai = p[b + 256];
-				bi = p[b + 512];
-				// if (Li < 200 && debug)
-				// System.out.println("li: " + Li + " r: " + r + " b: " + b + " g: " + g);
-				// sum under following conditions
-				if (searchWhiteTrue) {
-					if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-						sumR += r;
-						sumG += g;
-						sumB += b;
-						count++;
-						
-						if (debug && marked != null)
-							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.6);
-					}
-				} else {
-					if (Li < LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
-						sumR += r;
-						sumG += g;
-						sumB += b;
-						count++;
-						
-						if (debug && marked != null)
-							canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.7);
-					}
-				}
-			}
-		}
-		if (debug)
-			canvas.getImage().show("region scan for white balance", debug);
-		
 		if (count < w * h * 0.1 && recursion < 30) {
 			if (searchWhiteTrue)
 				return getRGBAverage(x1, y1, w, h, (int) (LThresh * 0.8), (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
