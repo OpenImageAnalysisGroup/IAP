@@ -27,7 +27,6 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -225,7 +224,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 									" // processing time: " +
 									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
 									" // finished: " + SystemAnalysis.getCurrentTime());
-					System.out.println("Stat: " + ((Experiment) statisticsResult).getExperimentStatistics());
+					// System.out.println("Stat: " + ((Experiment) statisticsResult).getExperimentStatistics());
 					statisticsResult.getHeader().setOriginDbId(dbID);
 					statisticsResult.setHeader(statisticsResult.getHeader());
 					
