@@ -410,8 +410,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				id.replaceAnnotationField("oldreference", updatedOldReference);
 			} else {
 				
-				long t = nm.getParentSample().getSampleFineTimeOrRowId();
-				
+				Long t = nm.getParentSample().getSampleFineTimeOrRowId();
+				if (t == null)
+					if (experiment.getHeader().getStartdate() != null)
+						t = experiment.getHeader().getStartdate().getTime();
+					else
+						t = 0l;
 				final String zefn;
 				try {
 					if (oldRefUrl.getPrefix().startsWith("mongo_"))
