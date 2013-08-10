@@ -3558,7 +3558,7 @@ public class ImageOperation implements MemoryHogInterface {
 					r = (c & 0xff0000) >> 16;
 					g = (c & 0x00ff00) >> 8;
 					b = c & 0x0000ff;
-					p = ImageOperation.getLabCubeInstance()[r][g];
+					p = lab[r][g];
 					Li = p[b];
 					ai = p[b + 256];
 					bi = p[b + 512];
