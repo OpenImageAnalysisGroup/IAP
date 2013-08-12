@@ -233,8 +233,11 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
 		setSettings((String) map.get("settings"));
-		setDatabaseId(map.get("_id") + ""); // (String)
-		// map.get("excelfileid"));
+		if (map.containsKey("_id"))
+			setDatabaseId(map.get("_id") + "");
+		else
+			if (map.containsKey("excelfileid"))
+				setDatabaseId(map.get("excelfileid") + "");
 		setCoordinator((String) map.get("coordinator"));
 		setExperimenttype((String) map.get("experimenttype"));
 		setSequence((String) map.get("sequence"));
@@ -247,8 +250,14 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				Date aDate = format.parse((String) map.get("importdate"));
 				setImportdate(aDate);
 			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("importdate"));
+				try {
+					DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
+					Date aDate = format.parse((String) map.get("importdate"));
+					setImportdate(aDate);
+				} catch (Exception e2) {
+					ErrorMsg.addErrorMessage(e);
+					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("importdate"));
+				}
 			}
 		} else
 			setImportdate((Date) map.get("importdate"));
@@ -258,8 +267,14 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				Date aDate = format.parse((String) map.get("startdate"));
 				setStartdate(aDate);
 			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-				System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("startdate"));
+				try {
+					DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
+					Date aDate = format.parse((String) map.get("startdate"));
+					setStartdate(aDate);
+				} catch (Exception e2) {
+					ErrorMsg.addErrorMessage(e);
+					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("startdate"));
+				}
 			}
 		} else
 			setStartdate((Date) map.get("startdate"));
@@ -270,8 +285,14 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					Date aDate = format.parse((String) map.get("storagetime"));
 					setStorageTime(aDate);
 				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
+					try {
+						DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
+						Date aDate = format.parse((String) map.get("storagetime"));
+						setStorageTime(aDate);
+					} catch (Exception e2) {
+						ErrorMsg.addErrorMessage(e);
+						System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
+					}
 				}
 			}
 		} else
