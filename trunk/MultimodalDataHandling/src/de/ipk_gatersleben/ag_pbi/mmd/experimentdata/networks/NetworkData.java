@@ -116,13 +116,15 @@ public class NetworkData extends NumericMeasurement3D
 		return n;
 	}
 	
+	public static String typeName = "network";
+	
 	@Override
 	public void getString(StringBuilder r) {
-		r.append("<network");
+		r.append("<" + typeName);
 		getXMLAttributeString(r);
 		r.append(">");
 		getStringOfChildren(r);
-		r.append("</network>");
+		r.append("</" + typeName + ">");
 	}
 	
 	@Override
@@ -210,6 +212,7 @@ public class NetworkData extends NumericMeasurement3D
 		return group;
 	}
 	
+	@Override
 	public void setURL(IOurl url) {
 		this.url = url;
 	}
@@ -226,7 +229,7 @@ public class NetworkData extends NumericMeasurement3D
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		String u1 = getName() + " " + getSource() + " " + getGroup() + " " + getURL() + " " + getLabelURL();
 		String u2 = ((NetworkData) meas).getName() + " " + ((NetworkData) meas).getSource() + " "
-							+ ((NetworkData) meas).getGroup() + " " + ((NetworkData) meas).getURL() + " " + ((NetworkData) meas).getLabelURL();
+				+ ((NetworkData) meas).getGroup() + " " + ((NetworkData) meas).getURL() + " " + ((NetworkData) meas).getLabelURL();
 		return u1.equals(u2);
 	}
 	
@@ -259,18 +262,22 @@ public class NetworkData extends NumericMeasurement3D
 		return list;
 	}
 	
+	@Override
 	public String getPositionIn3D() {
 		return positionIn3D;
 	}
 	
+	@Override
 	public void setPositionIn3D(String positionIn3D) {
 		this.positionIn3D = positionIn3D;
 	}
 	
+	@Override
 	public String getRotation() {
 		return rotation;
 	}
 	
+	@Override
 	public void setRotation(String rotation) {
 		this.rotation = rotation;
 	}
