@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Christian Klukas</author>
+	<description>Provides help text for some of the settings of IAP</description>
+
+	<plugindesc>
+	     <name>IAP settings help</name>
+             <main>de.ipk.ag_ba.plugins.setting_help.PluginIAPsettingHelp</main>
+             <version>1.0</version>
+             <available>http://iap.ipk-gatersleben.de</available>
+	</plugindesc>
+</plugin>
