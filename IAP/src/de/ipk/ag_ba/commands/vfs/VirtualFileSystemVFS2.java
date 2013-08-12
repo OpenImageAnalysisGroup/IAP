@@ -250,6 +250,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		try {
+			InputStream res = null;
 			if (doLocking())
 				lock.lock(Priority.HIGH);
 			if (doPrintStatus())
@@ -262,11 +263,18 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 				System.out.println("Could not find file: " + file.getFile());
 				return null;
 			}
-			MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
-			readCounter.addLong(is.getCount());
+			boolean cachedLoader = false;
+			if (cachedLoader) {
+				MyByteArrayInputStream is = ResourceIOManager.getInputStreamMemoryCached(file.getInputStream());
+				readCounter.addLong(is.getCount());
+				res = is;
+			} else {
+				res = file.getInputStream();
+				readCounter.addLong(file.length());
+			}
 			if (doPrintStatus())
 				System.out.print("]");
-			return is;
+			return res;
 		} finally {
 			if (doLocking())
 				lock.unlock();
