@@ -1,8 +1,9 @@
-V1.0.2 (August 10, 2013)
+V1.0.2b (August 12, 2013)
 --------------------------------------------------------------------------------
 * Experiment header information about used storage space when saving to disk 
   (VFS) has been corrected
-* Reduced memory usage during loading of data sets from MongoDB databases
+* Reduced memory usage during loading of data sets from MongoDB databases and
+  from VFS
 * Reduced memory usage during data analysis
 
 
