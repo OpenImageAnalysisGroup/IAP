@@ -69,13 +69,15 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		}
 	}
 	
+	public static String typeName = "data";
+	
 	@Override
 	public void getString(StringBuilder r) {
-		r.append("<data");
+		r.append("<" + typeName);
 		getXMLAttributeString(r);
 		r.append(">");
 		getStringOfChildren(r);
-		r.append("</data>");
+		r.append("</" + typeName + ">");
 	}
 	
 	@Override
