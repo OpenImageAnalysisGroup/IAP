@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverageInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -227,7 +227,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 								.getMeasurementValues(myData, replicates, row);
 						// int numRepl = replicates.size();
 						// ADD AVERAGE ENTRY
-						SampleAverage averageEntry = Experiment.getTypeManager().getNewSampleAverage(sampleEntry);
+						SampleAverageInterface averageEntry = Experiment.getTypeManager().getNewSampleAverage(sampleEntry);
 						// ADD AVERAGE ATTRIBUTES: UNIT, REPLICATES, MIN, MAX, STDDEV
 						if (optMeasurementUnit != null && optMeasurementUnit.length() > 0)
 							averageEntry.setUnit(optMeasurementUnit);
