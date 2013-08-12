@@ -178,8 +178,8 @@ public class ExperimentReference {
 					return experiment;
 				String databaseId = header.getDatabaseId();
 				ExperimentInterface res = null; // weakId2exp.get(databaseId);
-				if (res != null)
-					return res;
+				// if (res != null)
+				// return res;
 				for (ExperimentLoader loader : knownExperimentLoaders) {
 					if (loader.canHandle(databaseId)) {
 						res = loader.getExperiment(header, interactiveGetExperimentSize, status);
@@ -199,7 +199,7 @@ public class ExperimentReference {
 							if (m != null)
 								res = m.getExperiment(header, interactiveGetExperimentSize, status);
 							else
-								res = this.m.getExperiment(header, interactiveGetExperimentSize, status);
+								res = null;
 				// weakId2exp.put(databaseId, res);
 				this.experiment = res;
 				if (res == null)
