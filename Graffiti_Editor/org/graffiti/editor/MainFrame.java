@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1342,8 +1343,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	final ExecutorService loader = Executors.newFixedThreadPool(1);
 	
 	public void loadGraphInBackground(final File[] proposedFiles, final ActionEvent ae, boolean autoSwitch)
-
-	throws IllegalAccessException, InstantiationException {
+			
+			throws IllegalAccessException, InstantiationException {
 		final ArrayList<File> files = new ArrayList<File>();
 		
 		HashSet<File> filesToBeIgnored = new HashSet<File>();
@@ -3763,10 +3764,24 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		}
 		if (validSessions.size() >= 1) {
 			EditorSession es = validSessions.iterator().next();
-			for (GraffitiInternalFrame f : activeFrames) {
+			for (final GraffitiInternalFrame f : activeFrames) {
 				if (f.getSession() == es) {
-					desktop.getDesktopManager().deiconifyFrame(f);
-					desktop.getDesktopManager().activateFrame(f);
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							
+							@Override
+							public void run() {
+								desktop.getDesktopManager().deiconifyFrame(f);
+								desktop.getDesktopManager().activateFrame(f);
+							}
+						});
+					} catch (InvocationTargetException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					try {
 						f.setSelected(true);
 					} catch (PropertyVetoException e) {
