@@ -29,10 +29,10 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.PositionableMeasurement;
 public class VolumeData extends NumericMeasurement3D implements BinaryMeasurement, PositionableMeasurement {
 	
 	private static final String[] additionalAttributeNames = new String[] {
-						"dimensionx", "dimensiony", "dimensionz",
-						"voxelsizex", "voxelsizey", "voxelsizez",
-						"colordepth", "id", "labelurl",
-						"colourarray", "positionInUniverse", "rotation" };
+			"dimensionx", "dimensiony", "dimensionz",
+			"voxelsizex", "voxelsizey", "voxelsizez",
+			"colordepth", "id", "labelurl",
+			"colourarray", "positionInUniverse", "rotation" };
 	protected int dimensionx;
 	protected int dimensiony;
 	protected int dimensionz;
@@ -121,13 +121,15 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 		return rowID;
 	}
 	
+	public static String typeName = "volume";
+	
 	@Override
 	public void getString(StringBuilder r) {
-		r.append("<volume");
+		r.append("<" + typeName);
 		getXMLAttributeString(r);
 		r.append(">");
 		getStringOfChildren(r);
-		r.append("</volume>");
+		r.append("</" + typeName + ">");
 	}
 	
 	@Override
@@ -149,9 +151,9 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 	public void getXMLAttributeString(StringBuilder r) {
 		super.getXMLAttributeString(r);
 		Substance.getAttributeString(r, additionalAttributeNames, new Object[] { getDimensionX(),
-							getDimensionY(), getDimensionZ(), getVoxelsizeX(), getVoxelsizeY(),
-							getVoxelsizeZ(), getColorDepth(), getRowID(),
-							getLabelURL() == null ? null : getLabelURL().toString(), getColourArray(), getPositionIn3D(), getRotation() });
+				getDimensionY(), getDimensionZ(), getVoxelsizeX(), getVoxelsizeY(),
+				getVoxelsizeZ(), getColorDepth(), getRowID(),
+				getLabelURL() == null ? null : getLabelURL().toString(), getColourArray(), getPositionIn3D(), getRotation() });
 	}
 	
 	@Override
@@ -288,12 +290,12 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 	@Override
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		String u1 = getRowID() + " " + " " + getDimensionX() + " " + getDimensionY() + " " + getDimensionZ() + " "
-							+ getVoxelsizeX() + " " + getVoxelsizeY() + " " + getVoxelsizeZ() + " " + getColorDepth() + " " + getURL();
+				+ getVoxelsizeX() + " " + getVoxelsizeY() + " " + getVoxelsizeZ() + " " + getColorDepth() + " " + getURL();
 		String u2 = ((VolumeData) meas).getRowID() + " " + +((VolumeData) meas).getDimensionX() + " "
-							+ ((VolumeData) meas).getDimensionY() + " " + ((VolumeData) meas).getDimensionZ() + " "
-							+ ((VolumeData) meas).getVoxelsizeX() + " " + ((VolumeData) meas).getVoxelsizeY() + " "
-							+ ((VolumeData) meas).getVoxelsizeZ() + " " + ((VolumeData) meas).getColorDepth() + " "
-							+ ((VolumeData) meas).getURL();
+				+ ((VolumeData) meas).getDimensionY() + " " + ((VolumeData) meas).getDimensionZ() + " "
+				+ ((VolumeData) meas).getVoxelsizeX() + " " + ((VolumeData) meas).getVoxelsizeY() + " "
+				+ ((VolumeData) meas).getVoxelsizeZ() + " " + ((VolumeData) meas).getColorDepth() + " "
+				+ ((VolumeData) meas).getURL();
 		return super.equalNumericMeasurement(meas) && u1.equals(u2);
 	}
 	
