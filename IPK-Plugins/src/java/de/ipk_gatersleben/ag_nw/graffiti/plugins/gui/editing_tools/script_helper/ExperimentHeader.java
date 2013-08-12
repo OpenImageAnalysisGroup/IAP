@@ -12,8 +12,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.AttributeHelper;
-import org.ErrorMsg;
 import org.ExperimentHeaderHelper;
+import org.SystemAnalysis;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -245,55 +245,22 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setImportusername((String) map.get("importusername"));
 		setImportusergroup((String) map.get("importusergroup"));
 		if (map.get("importdate") != null && map.get("importdate") instanceof String) {
-			try {
-				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
-				Date aDate = format.parse((String) map.get("importdate"));
+			Date aDate = getDate((String) map.get("importdate"));
+			if (aDate != null)
 				setImportdate(aDate);
-			} catch (Exception e) {
-				try {
-					DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
-					Date aDate = format.parse((String) map.get("importdate"));
-					setImportdate(aDate);
-				} catch (Exception e2) {
-					ErrorMsg.addErrorMessage(e);
-					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("importdate"));
-				}
-			}
 		} else
 			setImportdate((Date) map.get("importdate"));
 		if (map.get("startdate") != null && map.get("startdate") instanceof String) {
-			try {
-				DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
-				Date aDate = format.parse((String) map.get("startdate"));
+			Date aDate = getDate((String) map.get("startdate"));
+			if (aDate != null)
 				setStartdate(aDate);
-			} catch (Exception e) {
-				try {
-					DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
-					Date aDate = format.parse((String) map.get("startdate"));
-					setStartdate(aDate);
-				} catch (Exception e2) {
-					ErrorMsg.addErrorMessage(e);
-					System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("startdate"));
-				}
-			}
 		} else
 			setStartdate((Date) map.get("startdate"));
 		if (map.get("storagetime") != null && map.get("storagetime") instanceof String) {
 			if (!((String) map.get("storagetime")).equals("null")) {
-				try {
-					DateFormat format = new SimpleDateFormat("E MMM d HH:mm:ss z yyyy", new Locale("en"));
-					Date aDate = format.parse((String) map.get("storagetime"));
+				Date aDate = getDate((String) map.get("storagetime"));
+				if (aDate != null)
 					setStorageTime(aDate);
-				} catch (Exception e) {
-					try {
-						DateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm", new Locale("en"));
-						Date aDate = format.parse((String) map.get("storagetime"));
-						setStorageTime(aDate);
-					} catch (Exception e2) {
-						ErrorMsg.addErrorMessage(e);
-						System.out.println("Invalid Date Format: " + e.getMessage() + " // " + map.get("storagetime"));
-					}
-				}
 			}
 		} else
 			setStorageTime((Date) map.get("storagetime"));
@@ -309,6 +276,32 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			setOriginDbId((String) map.get("origin"));
 		if (map.get("outliers") != null && map.get("outliers") instanceof String)
 			setGlobalOutlierInfo((String) map.get("outliers"));
+	}
+	
+	@SuppressWarnings("deprecation")
+	private Date getDate(String dateString) {
+		String[] knownDateFormats = new String[] {
+				"E MMM d HH:mm:ss z yyyy",
+				"dd.MM.yy HH:mm",
+				"MM/dd/yy h:mm a" // 5/4/11 8:42 AM
+		};
+		for (String dateFormat : knownDateFormats) {
+			try {
+				DateFormat format = new SimpleDateFormat(dateFormat, new Locale("en"));
+				Date aDate = format.parse(dateString);
+				return aDate;
+			} catch (Exception e) {
+				// empty
+			}
+		}
+		try {
+			Date aDate = new Date(dateString);
+			return aDate;
+		} catch (Exception e) {
+			// empty
+		}
+		System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Date string can't be interpreted: " + dateString);
+		return null;
 	}
 	
 	public ExperimentHeader(String experimentname) {
