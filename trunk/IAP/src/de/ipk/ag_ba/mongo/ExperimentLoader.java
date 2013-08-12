@@ -91,7 +91,7 @@ public class ExperimentLoader implements RunnableOnDB {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">TRY QUICK XML BIN LOADING OF " + header.getDatabaseId() + ", "
 						+ header.getExperimentName());
 				InputStream in = fffMain.getInputStream();
-				Experiment e = Experiment.loadFromXmlBinInputStream(in, null);
+				Experiment e = Experiment.loadFromXmlBinInputStream(in, fffMain.getLength(), optStatusProvider);
 				experiment.addAll(e);
 				quickLoaded = true;
 				System.out.println(SystemAnalysis.getCurrentTime() + ">QUICK XML BIN LOADING OF " + header.getDatabaseId() + ", "
