@@ -1,0 +1,265 @@
+% 
+% Author: Entzian, Klukas (bug-fixing)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%% Klassen-Optionen
+\documentclass[%
+  paper=a4, % Stellt auf A4-Papier ein
+  pagesize, % Diese Option reicht die Papiergröße an
+            % alle Ausgabeformate weiter
+  DIV=calc, % Errechnet einen guten Satzspiegel
+%  BCOR=1cm, % Weil bei mir immer 1cm in der Bindung
+            % der Klemmmappe verschwindet
+  headings=small,% Für etwas kleinere Überschriften
+  english,   % englische Rechtschreibung d.\,h. (Silbentrennung)
+  oneside
+]{scrartcl}  % Eine Klasse für einseitige Texte mit Kapiteln  
+            %
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+%\usepackage[utf8]{inputenc} %ermöglicht die direkte Eingabe von Sonderzeichen
+\usepackage{fixltx2e}
+\usepackage[english]{babel} % Anpassung der Überschriften (chapter, chapitre,
+% Kapitel …) und die richtige Silbentrennung
+\usepackage[
+bookmarks=true,
+   % Lesezeichen erzeugen
+bookmarksopen=false,
+   % Lesezeichen nicht ausgeklappt
+bookmarksnumbered=true,
+   % Anzeige der Kapitelzahlen am Anfang der Namen der Lesezeichen
+pdfstartpage=1,
+   % Seite, welche automatisch geöffnet werden soll
+   % praktisch, wenn z.B. im Inhaltsverzeichnis gestartet
+   % werden soll oder eine Seite bearbeitet wird.
+baseurl=http://iap.ipk-gatersleben.de/,
+   % URL des PDF-Dokuments (oder Hintergrundinformationen)
+pdftitle={--experimentname--},
+   % Titel des PDF-Dokuments
+pdfauthor={A. Entzian, D. Chen, C. Klukas},
+   % Autor(Innen) des PDF-Dokuments
+%pdfsubject={Kurzbeschreibung als ein Satz},
+   % Inhaltsbeschreibung des PDF-Dokuments
+pdfkeywords={image analysis, phenotyping, Arabidopsis, barley, maize},
+   % Stichwortangabe zum PDF-Dokument
+breaklinks=true,
+   % ermöglicht einen Umbruch von URLs
+colorlinks=true,
+   % Einfärbung von Links
+linkcolor=black,
+   % Linkfarbe: schwarz
+anchorcolor=black,
+   % Ankerfarbe: schwarz
+citecolor=black,
+   % Literaturlinks: schwarz
+filecolor=black,
+   % Links zu lokalen Dateien: schwarz
+menucolor=black,
+   % Acrobat Menü Einträge: schwarz
+pagecolor=black,
+   % Links zu anderen Seiten im Text: schwarz
+urlcolor=black
+   % URL-Farbe: schwarz
+]{hyperref}
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{datetime}
+
+%%%%%%%%%%%%% Typografisch empfehlenswerte Pakete
+\usepackage{% 
+  %ellipsis, % Korrigiert den Weißraum um Auslassungspunkte
+  ragged2e, % Ermöglicht Flattersatz mit Silbentrennung
+ %marginnote,% Für bessere Randnotizen mit \marginnote statt
+            % \marginline 
+}
+% \usepackage[tracking=true]{microtype}% 
+%             % Microtype ist einfach super, aber lesen Sie
+%             % unbedingt die Anleitung um das Folgende zu
+%             % verstehen.
+% \DeclareMicrotypeSet*[tracking]{my}% 
+%   { font = */*/*/sc/* }% 
+% \SetTracking{ encoding = *, shape = sc }{ 45 }% Hier wird festgelegt,
+%             % dass alle Passagen in Kapitälchen automatisch leicht
+%             % gesperrt werden. Das Paket soul, das ich früher empfohlen
+%             % habe ist damit für diese Zwecke nicht mehr nötig.
+%             %
+
+\usepackage{%
+  lmodern, % A) Latin Modern Fonts sind die Nachfolger von Computer
+            % Modern, den LaTeX-Standardfonts
+%  hfoldsty % B) Diese Schrift stellt alle Ziffern, außer
+            % im Mathemodus, auf Minuskel- oder Mediäval-Ziffern um.
+            % Wenn Ihre pdfs unscharf aussehen installieren Sie bitte
+            % die cm-super-Fonts (Type1-Fonts).
+% charter   % C) Diese Zeile lädt die Charter als Schriftart
+}
+% \usepackage[osf,sc]{mathpazo}% D) So erreichen Sie Palatino als
+            % Schrift mit Minuskel-Ziffern und echten Kapitälchen
+            %
+
+%\usepackage{here}
+%\usepackage{scrpage2} 
+%\usepackage{tocloft}
+\usepackage{graphicx}
+%\usepackage{amsmath} 
+\usepackage{ifthen}
+\usepackage{longtable}
+% \usepackage[center]{caption}
+
+
+% —– Start: Angaben zur Formatierung von Überschriften —– %
+\usepackage{titletoc}
+% \titlecontents{Abschnitt}[Links]{Gesamtformatierung}{Vor dem %
+% Label}{Nach dem Label}{Abstandsfüller & Seitenzahl}[Rechts]
+%4.5 and 3.0
+%7.5 and 3.2
+%10.6 and 3.7
+\titlecontents{subsection}[4.5em]{}{\contentslabel{3.0em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{subsubsection}[7.5em]{}{\contentslabel{3.2em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{paragraph}[10.6em]{}{\contentslabel{3.7em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{subparagraph}[13.6em]{}{\contentslabel{4.1em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+% —– Ende: Angaben zur Formatierung von Überschriften —– %
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{24pt}{4pt} %-1\parskip
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+\titlespacing*{\paragraph}{0pt}{10pt}{4pt}
+\titlespacing*{\subparagraph}{0pt}{10pt}{4pt}
+
+\setcounter{tocdepth}{3} %5
+\setcounter{secnumdepth}{5} %5
+
+\setparsizes{\parindent}{10pt}{\parfillskip}
+ 
+\usepackage{etoolbox}
+\appto\chapterheadendvskip{\vspace{-1\parskip}}
+
+
+\makeatletter
+
+\providecommand{\tabularnewline}{\\}
+
+
+\def\ScaleIfNeededHeight{%
+	\ifdim\Gin@nat@height>0.9\textheight
+		0.9\textheight
+	\else
+		\Gin@nat@height
+	\fi 
+}
+
+\def\ScaleIfNeededWidth{%
+	\ifdim\Gin@nat@width > \linewidth
+		linewidth
+	\else
+		\Gin@nat@width
+	\fi 
+}
+
+\def\ConstForImageWidth{\textwidth}
+
+%\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{#1} \end{center} \end{figure}}{\begin{figure}[!htb] \centering \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{figure}}}
+%\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{figure}[H] \begin{center} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{center} \end{figure}}}
+\newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{#1} \end{OwnLoadImage}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
+\newcommand{\loadImageCap}[2]{\IfFileExists{#1}
+	{\begin{OwnLoadImageVSpace}
+			\includegraphics[width=\ScaleIfNeededWidth,keepaspectratio]{#1} \caption{#2} \label{fig:#1}
+			%[height=\ScaleIfNeededHeight,width=\ScaleIfNeededWidth,keepaspectratio]
+	 \end{OwnLoadImageVSpace}
+	}{\begin{OwnLoadImage}
+		\includegraphics[height=\ScaleIfNeededHeight,width=\ScaleIfNeededWidth,
+			keepaspectratio]{noValues.pdf} \caption{no image} 
+	  \end{OwnLoadImage}}}
+
+\newcommand{\loadTex}[1]{\IfFileExists{#1}{\input{#1}}{\begin{OwnLoadImage}
+\includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
+
+\newenvironment{OwnLoadImage}
+  {\par\noindent\minipage{\textwidth}\centering}
+  {\endminipage}
+
+\newenvironment{OwnLoadImageVSpace}
+  {\par\noindent\minipage{\textwidth}\vspace{0.3cm}\centering}
+  {\vspace{0.3cm}\endminipage}
+
+\newboolean{isFile1}
+
+\newcommand{\resetBoolean}{
+	\setboolean{isFile1}{false}
+	}
+
+\newcommand{\checkFileNoReset}[1]{
+	\IfFileExists{#1}{\setboolean{isFile1}{true}}{}
+	}
+
+\newboolean{isClearPage}
+\setboolean{isClearPage}{true}
+
+\newboolean{isClearPageSub}
+\setboolean{isClearPageSub}{true}
+
+\newcommand{\resetClear}{
+	\setboolean{isClearPage}{true}
+}
+
+\newcommand{\resetClearSub}{
+	\setboolean{isClearPageSub}{true}
+}
+
+
+\newcommand{\ownClearPage}{
+
+	\ifthenelse{\boolean{isClearPage}}{
+		\setboolean{isClearPage}{false}
+	}{
+		\clearpage
+	}
+}
+
+\newcommand{\ownClearPageSub}{
+
+	\ifthenelse{\boolean{isClearPageSub}}{
+		\setboolean{isClearPageSub}{false}
+	}{
+		\clearpage
+	}
+}
+
+% \usepackage{array}
+% \newcolumntype{C}[1]{>{\begin{center}}p{#1}<{\end{center}}}
+
+% \newboolean{forceClearPage}
+% \setboolean{forceClearPage}{true}
+% 
+% \newboolean{noForceClearPage}
+% \setboolean{noForceClearPage}{false}
+
+% \newcommand{\ownClearPage}[1]{
+% 	
+% 	\ifthenelse{#1}{
+% 		\setboolean{isClearPage}{true}
+% 		\clearpage	
+% 	}{
+% 		\ifthenelse{\boolean{isClearPage}}{
+% 			\setboolean{isClearPage}{false}
+% 		}{
+% 			\setboolean{isClearPage}{true}
+% 			\clearpage
+% 		}
+% 	}
+% }
+	
+
+% \newenvironment{OwnLoadImage}
+%   {\par\raggedbottom\null\vfill\noindent\minipage{\textwidth}\centering}
+%   {\endminipage\par\vfill\vfill}
+  
+\renewcommand{\topfraction}{.85} % maximaler Abstand von Seitenoberseite, bis zu welchem Gleitumgebungen noch plaziert werden dürfen
+\renewcommand{\bottomfraction}{.7} % maximaler Anteil welchen Gleitumgebungen am unteren Seitenrand einnehmen dürfen
+\renewcommand{\textfraction}{.15} % Anteil einer Seite mit Gleitumgebungen, welcher mindestens von Text belegt sein muss -> ansonsten kein Text auf der Seite
+\renewcommand{\floatpagefraction}{.66} % minimaler Seitenanteil welcher besetzt sein muss, bevor eine neue Seite für Gleitumgebungen angelegt wird
+\setcounter{topnumber}{3} % maximale Anzahl Gleitobjekte am oberen Seitenrand
+\setcounter{bottomnumber}{3} % maximale Anzahl Gleitobjekte am unteren Seitenrand
+\setcounter{totalnumber}{6} % maximale Anzahl Gleitobjekte pro Seite
+
+\makeatother
