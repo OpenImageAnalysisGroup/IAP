@@ -37,6 +37,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -1083,7 +1084,8 @@ public class Experiment implements ExperimentInterface {
 	public static ExperimentInterface loadFromIOurl(IOurl url, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Transfer Binary Data...");
+			optStatus.setCurrentStatusText1("Transfer Binary Data (" + ResourceIOManager.getHandlerFromPrefix(url.getPrefix()).getStreamLength(url) / 1024
+					/ 1024 + " MB)...");
 		
 		long start = System.currentTimeMillis();
 		
@@ -1099,30 +1101,32 @@ public class Experiment implements ExperimentInterface {
 					long transfered = ((MyByteArrayInputStream) is).available();
 					optStatus.setCurrentStatusText1("Binary Data Transferred (" + transfered / 1024 / 1024 + " MB , "
 							+ SystemAnalysis.getDataTransferSpeedString(transfered, start, end) + ")");
-				} else
-					optStatus.setCurrentStatusText1("Binary Data Transferred");
+				}
 			}
 		Experiment md = loadFromXmlBinInputStream(is, optStatus);
 		return md;
 	}
 	
 	public static Experiment loadFromXmlBinInputStream(InputStream is, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
-		// DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		// DocumentBuilder builder = factory.newDocumentBuilder();
-		// Document w3Doc = builder.parse(is);
-		// Experiment md = Experiment.getExperimentFromDOM(w3Doc);
-		// return md;
-		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Process XML structure...");
 		
-		SAXBuilder sb = new SAXBuilder();
-		org.jdom.Document doc = sb.build(is);
-		if (optStatus != null) {
-			optStatus.setCurrentStatusText1("Generate experiment structure...");
-			optStatus.setCurrentStatusText2("");
-		}
-		return Experiment.getExperimentFromJDOM(doc, optStatus);
+		boolean useDOM = false;
+		
+		if (useDOM) {
+			SAXBuilder sb = new SAXBuilder();
+			org.jdom.Document doc = sb.build(is);
+			if (optStatus != null) {
+				optStatus.setCurrentStatusText1("Generate experiment structure...");
+				optStatus.setCurrentStatusText2("");
+			}
+			return Experiment.getExperimentFromJDOM(doc, optStatus);
+		} else
+			return Experiment.getSAXhandler(is).getExperiment(optStatus);
+	}
+	
+	private static ExperimentSaxHandler getSAXhandler(InputStream is) {
+		return new ExperimentSaxHandler(is);
 	}
 	
 	@Override
