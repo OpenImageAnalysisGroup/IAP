@@ -10,5 +10,9 @@ public interface DataMappingTypeManagerInterface {
 	
 	public SubstanceInterface getNewSubstance();
 	
-	public SampleAverage getNewSampleAverage(SampleInterface sample);
+	public SampleAverageInterface getNewSampleAverage(SampleInterface sample);
+	
+	public NumericMeasurementInterface getNewMeasurementOfType(String type, SampleInterface sample);
+	
+	public boolean isKnownMeasurementType(String type);
 }
