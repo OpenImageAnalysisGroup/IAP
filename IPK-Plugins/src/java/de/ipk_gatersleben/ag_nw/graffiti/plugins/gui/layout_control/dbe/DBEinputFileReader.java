@@ -19,7 +19,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverageInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -250,7 +250,7 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 		ArrayList<ReplicateDouble> measurements = sample.getMeasurementValues();
 		// ADD AVERAGE ENTRY
 		
-		SampleAverage sa = Experiment.getTypeManager().getNewSampleAverage(s);
+		SampleAverageInterface sa = Experiment.getTypeManager().getNewSampleAverage(s);
 		s.setSampleAverage(sa);
 		
 		// ADD AVERAGE ATTRIBUTES: UNIT, REPLICATES, MIN, MAX, STDDEV
