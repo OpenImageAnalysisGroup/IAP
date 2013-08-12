@@ -1083,8 +1083,9 @@ public class Experiment implements ExperimentInterface {
 	
 	public static ExperimentInterface loadFromIOurl(IOurl url, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
+		long inputStramLength = ResourceIOManager.getHandlerFromPrefix(url.getPrefix()).getStreamLength(url);
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Transfer Binary Data (" + ResourceIOManager.getHandlerFromPrefix(url.getPrefix()).getStreamLength(url) / 1024
+			optStatus.setCurrentStatusText1("Transfer Binary Data (" + inputStramLength / 1024
 					/ 1024 + " MB)...");
 		
 		long start = System.currentTimeMillis();
@@ -1103,11 +1104,12 @@ public class Experiment implements ExperimentInterface {
 							+ SystemAnalysis.getDataTransferSpeedString(transfered, start, end) + ")");
 				}
 			}
-		Experiment md = loadFromXmlBinInputStream(is, optStatus);
+		Experiment md = loadFromXmlBinInputStream(is, inputStramLength, optStatus);
 		return md;
 	}
 	
-	public static Experiment loadFromXmlBinInputStream(InputStream is, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+	public static Experiment loadFromXmlBinInputStream(InputStream is, long inputStreamLength, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
+			throws Exception {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Process XML structure...");
 		
@@ -1122,11 +1124,11 @@ public class Experiment implements ExperimentInterface {
 			}
 			return Experiment.getExperimentFromJDOM(doc, optStatus);
 		} else
-			return Experiment.getSAXhandler(is).getExperiment(optStatus);
+			return Experiment.getSAXhandler(is, inputStreamLength).getExperiment(optStatus);
 	}
 	
-	private static ExperimentSaxHandler getSAXhandler(InputStream is) {
-		return new ExperimentSaxHandler(is);
+	private static ExperimentSaxHandler getSAXhandler(InputStream is, long inputStreamLength) {
+		return new ExperimentSaxHandler(is, inputStreamLength);
 	}
 	
 	@Override
