@@ -51,10 +51,8 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public String getDatabaseId();
 	
 	/**
-	 * This command does not yet work as intended (the ID is not retained in many
-	 * situations).
+	 * Warning: The ID is not retained in many situations.
 	 */
-	@Deprecated
 	public void setExperimentId(int experimentId);
 	
 	public int getExperimentId();
