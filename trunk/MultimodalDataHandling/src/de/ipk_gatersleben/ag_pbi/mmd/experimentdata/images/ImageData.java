@@ -102,13 +102,15 @@ public class ImageData extends NumericMeasurement3D implements
 		return id;
 	}
 	
+	public static String typeName = "image";
+	
 	@Override
 	public void getString(StringBuilder r) {
-		r.append("<image");
+		r.append("<" + typeName);
 		getXMLAttributeString(r);
 		r.append(">");
 		getStringOfChildren(r);
-		r.append("</image>");
+		r.append("</" + typeName + ">");
 	}
 	
 	@Override
