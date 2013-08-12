@@ -69,6 +69,8 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-cli-1.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-discovery.jar"/>
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-math-1.0.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xercesImpl.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xmlParserAPIs.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/dom4j-1.6.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/itext-1.4.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jaxen-full.jar"/>
@@ -86,8 +88,6 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/soap.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/vecmath1.2-1.14.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/wsdl4j.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xercesImpl.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xmlParserAPIs.jar"/>
 <!--            <zipfileset excludes="META-INF/*.SF" src="/Users/klukas/Applications/eclipse/plugins/org.junit4_4.5.0.v20090824/junit.jar"/> -->
 <!--            <zipfileset excludes="META-INF/*.SF" src="/Users/klukas/Applications/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/> -->
             <fileset dir="../Graffiti_Editor/build/classes"/>
