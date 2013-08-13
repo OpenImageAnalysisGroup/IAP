@@ -143,7 +143,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		
 		String name = attr.getName();
 		
-		if (name.equals("id")) {
+		if (name.startsWith("i")) { // name.equals("id")) {
 			// ignore ID
 			return;
 		}
@@ -152,7 +152,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		if (val != null && val.contains("~"))
 			val = StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#"));
 		
-		if (name.equals("replicates")) {
+		if (name.startsWith("r")) { // equals("replicates")) {
 			try {
 				if (attr.getValue().length() > 0) {
 					setReplicateID(Integer.parseInt(val));
@@ -162,17 +162,17 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 				ErrorMsg.addErrorMessage(e);
 			}
 		} else
-			if (name.equals("unit")) {
+			if (name.startsWith("u")) {// equals("unit")) {
 				try {
 					setUnit(val);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 			} else
-				if (name.equals("files")) {
+				if (name.startsWith("f")) {// equals("files")) {
 					setFiles(val);
 				} else
-					if (name.equals("quality")) {
+					if (name.startsWith("q")) {// equals("quality")) {
 						setQualityAnnotation(val);
 					}
 	}
