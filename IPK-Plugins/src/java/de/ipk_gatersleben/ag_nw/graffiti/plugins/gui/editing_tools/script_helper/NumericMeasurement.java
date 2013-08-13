@@ -140,36 +140,41 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	public void setAttribute(Attribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
-		attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
 		
-		if (attr.getName().equals("replicates")) {
+		String name = attr.getName();
+		
+		if (name.equals("id")) {
+			// ignore ID
+			return;
+		}
+		
+		String val = attr.getValue();
+		if (val != null && val.contains("~"))
+			val = StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#"));
+		
+		if (name.equals("replicates")) {
 			try {
-				if (attr.getValue().length() > 0)
-					setReplicateID(Integer.parseInt(attr.getValue()));
-				else
+				if (attr.getValue().length() > 0) {
+					setReplicateID(Integer.parseInt(val));
+				} else
 					setReplicateID(-1);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		} else
-			if (attr.getName().equals("unit")) {
+			if (name.equals("unit")) {
 				try {
-					setUnit(attr.getValue());
+					setUnit(val);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 			} else
-				if (attr.getName().equals("id")) {
-					// ignore ID
+				if (name.equals("files")) {
+					setFiles(val);
 				} else
-					if (attr.getName().equals("files")) {
-						setFiles(attr.getValue());
-					} else
-						if (attr.getName().equals("quality")) {
-							setQualityAnnotation(attr.getValue());
-						}
-		// } else
-		// System.err.println("Internal Error: Unknown Data Attribute: " + attr.getName());
+					if (name.equals("quality")) {
+						setQualityAnnotation(val);
+					}
 	}
 	
 	@Override

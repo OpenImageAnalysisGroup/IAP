@@ -183,8 +183,10 @@ public class ExperimentSaxHandler extends DefaultHandler {
 			processHeaderField(uri, localName, qName, attrs);
 	}
 	
+	ArrayList<Attribute> res = new ArrayList<Attribute>();
+	
 	private ArrayList<Attribute> getAttributes(Attributes attrs) {
-		ArrayList<Attribute> res = new ArrayList<Attribute>();
+		res.clear();
 		for (int i = 0; i < attrs.getLength(); i++)
 			res.add(new Attribute(attrs.getLocalName(i), attrs.getValue(i)));
 		return res;
