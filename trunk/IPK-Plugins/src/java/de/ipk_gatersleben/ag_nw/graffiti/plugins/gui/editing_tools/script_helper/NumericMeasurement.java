@@ -116,11 +116,11 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public boolean setData(Element averageElement) {
-		setValue(Double.NaN);
 		try {
 			String avg = averageElement.getValue();
 			setValue(Double.parseDouble(avg));
 		} catch (Exception e) {
+			setValue(Double.NaN);
 			ErrorMsg.addErrorMessage(e);
 		}
 		
