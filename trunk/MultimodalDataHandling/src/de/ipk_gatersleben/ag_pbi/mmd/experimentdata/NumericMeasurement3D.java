@@ -218,25 +218,26 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public void setAttribute(Attribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
-		
-		else
-			if (attr.getName().equals("value"))
+		else {
+			String name = attr.getName();
+			if (name.startsWith("v")) // equals("value"))
 				setValue(Double.parseDouble(attr.getValue()));
 			else
-				if (attr.getName().equals("position"))
+				if (name.equals("position"))
 					try {
 						setPosition(Double.parseDouble(attr.getValue()));
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
 					}
 				else
-					if (attr.getName().equals("positionUnit"))
+					if (name.equals("positionUnit"))
 						setPositionUnit(attr.getValue());
 					else
-						if (attr.getName().equals("annotation"))
+						if (name.startsWith("a")) // equals("annotation"))
 							setAnnotation(attr.getValue());
 						else
 							super.setAttribute(attr);
+		}
 	}
 	
 	public NumericMeasurementInterface copyDataAndPath() {
