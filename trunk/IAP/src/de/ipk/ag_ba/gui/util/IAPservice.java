@@ -1737,4 +1737,19 @@ public class IAPservice {
 		in.close();
 		return new IOurl(result);
 	}
+	
+	/**
+	 * @return for example: 'png' or 'jpg'
+	 */
+	public static String getTargetFileExtension(boolean isIconStorage, String sourceFileExtension) {
+		if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
+			sourceFileExtension = sourceFileExtension.substring(".".length());
+		String targetFileExtension = isIconStorage ?
+				SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") :
+				SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+		if (sourceFileExtension != null && (sourceFileExtension.endsWith("jpg") || sourceFileExtension.endsWith("jpeg")))
+			if (targetFileExtension != null && (targetFileExtension.endsWith("png") || targetFileExtension.endsWith("png")))
+				targetFileExtension = sourceFileExtension; // don't convert source JPG to PNG, makes not really sense
+		return targetFileExtension;
+	}
 }
