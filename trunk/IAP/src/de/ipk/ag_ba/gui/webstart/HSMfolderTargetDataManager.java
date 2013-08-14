@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -120,16 +121,26 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		return s;
 	}
 	
+	private final static WeakHashMap<ExperimentHeaderInterface, String> headerToTargetPath = new WeakHashMap<ExperimentHeaderInterface, String>();
+	
 	public String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime) {
 		GregorianCalendar cal = new GregorianCalendar();
 		if (optSnapshotTime != null)
 			cal.setTime(new Date(optSnapshotTime));
-		String pre = "";
-		if (experimentHeader.getExperimentType() != null && experimentHeader.getExperimentType().length() > 0)
-			pre = experimentHeader.getExperimentType() + File.separator;
-		return pre +
-				filterBadChars(experimentHeader.getCoordinator()) + File.separator +
-				filterBadChars(experimentHeader.getExperimentName()) +
+		String subDir;
+		synchronized (headerToTargetPath) {
+			subDir = headerToTargetPath.get(experimentHeader);
+			if (subDir == null) {
+				String pre = "";
+				if (experimentHeader.getExperimentType() != null && experimentHeader.getExperimentType().length() > 0)
+					pre = experimentHeader.getExperimentType() + File.separator;
+				subDir = pre +
+						filterBadChars(experimentHeader.getCoordinator()) + File.separator +
+						filterBadChars(experimentHeader.getExperimentName());
+				headerToTargetPath.put(experimentHeader, subDir);
+			}
+		}
+		return subDir +
 				(optSnapshotTime == null ? "" : File.separator +
 						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
 	}
