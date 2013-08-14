@@ -32,6 +32,7 @@ import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -720,10 +721,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private String addTrayInfo(int tray, int tray_cnt, String fileName) {
-		if (tray_cnt > 1)
+		if (tray_cnt > 1) {
+			String extension = fileName.substring(fileName.lastIndexOf(".") + ".".length());
 			fileName = StringManipulationTools.stringReplace(fileName,
-					"." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"), "." + tray + "." + tray_cnt + "."
-							+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
+					"." + extension, "." + tray + "." + tray_cnt + "."
+							+ extension);
+		}
 		return fileName;
 	}
 	
@@ -901,19 +904,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			if (resVis != null)
 				ra = saveImage(
 						tray, tray_cnt,
-						inVis, resVis, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
+						inVis, resVis, buf, "." + IAPservice.getTargetFileExtension(false, null));
 			if (resFluo != null)
 				rb = saveImage(
 						tray, tray_cnt,
-						inFluo, resFluo, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
+						inFluo, resFluo, buf, "." + IAPservice.getTargetFileExtension(false, null));
 			if (resNir != null)
 				rc = saveImage(
 						tray, tray_cnt,
-						inNir, resNir, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
+						inNir, resNir, buf, "." + IAPservice.getTargetFileExtension(false, null));
 			if (resIr != null)
 				rd = saveImage(
 						tray, tray_cnt,
-						inIr, resIr, buf, "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png"));
+						inIr, resIr, buf, "." + IAPservice.getTargetFileExtension(false, null));
 			
 			if (ra != null) {
 				waitThreads.add(BackgroundThreadDispatcher.addTask(ra));
