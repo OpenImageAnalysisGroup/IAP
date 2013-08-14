@@ -19,6 +19,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -343,7 +344,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 				String substanceName = limg.getSubstanceName();
 				desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
 				desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getURL().getFileNameExtension().length()) + "."
-						+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+						+ IAPservice.getTargetFileExtension(false, limg.getURL().getFileNameExtension());
 				finalMainName = desiredFileName;
 				if (optFileNameMainAndLabelPrefix != null && optFileNameMainAndLabelPrefix.length > 0) {
 					pre = optFileNameMainAndLabelPrefix[0];
@@ -381,7 +382,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 					String substanceName = limg.getSubstanceName();
 					desiredFileName = ActionDataExportToVfs.determineBinaryFileName(snapshotTime, substanceName, limg, limg);// + "#" + desiredFileName;
 					desiredFileName = desiredFileName.substring(0, desiredFileName.length() - limg.getLabelURL().getFileNameExtension().length()) + "."
-							+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+							+ IAPservice.getTargetFileExtension(false, limg.getLabelURL().getFileNameExtension());
 				}
 				String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 				MyByteArrayInputStream labelStream = ResourceIOManager.getInputStreamMemoryCached(
