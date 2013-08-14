@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -43,6 +41,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
@@ -257,7 +256,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			if (bm.getURL() != null) {
 				IOurl unchangedURL = bm.getURL().copy();
 				boolean targetExists = false;
-				Future<MyByteArrayInputStream> fileContent = null;
 				Long ttt = nm.getParentSample().getSampleFineTimeOrRowId();
 				// assign exact sample time, if available
 				final Long sampleFineTime = ttt == null ? 0l : ttt;
@@ -297,7 +295,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							String zefn = null;
 							try {
 								zefn = determineBinaryFileName(sampleFineTime, substanceName, nm, bm);
-								zefn = zefn.substring(0, zefn.lastIndexOf(".")) + "." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+								zefn = zefn.substring(0, zefn.lastIndexOf(".")) + "."
+										+ IAPservice.getTargetFileExtension(false, zefn.substring(zefn.lastIndexOf(".") + 1));
 								zefn = zefn.contains("#") ? zefn.split("#")[0] : zefn;
 								final VfsFileObject targetFile = vfs.newVfsFile(
 										hsmManager.prepareAndGetDataFileNameAndPath(
@@ -307,7 +306,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 										&& targetFile.length() > 0;
 								targetExists = exists;
 								try {
-									fileContent = copyBinaryFileContentToTarget(
+									copyBinaryFileContentToTarget(
 											experiment, written, hsmManager, es,
 											bm.getURL(), null, sampleFineTime, targetFile, exists,
 											null, false);
@@ -320,7 +319,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 															.getCurrentTime());
 									Thread.sleep(5 * 60 * 1000);
 									// try 2nd time after 5 minutes
-									fileContent = copyBinaryFileContentToTarget(
+									copyBinaryFileContentToTarget(
 											experiment, written, hsmManager, es,
 											bm.getURL(), null, sampleFineTime, targetFile, exists,
 											null, false);
@@ -344,7 +343,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				if (!targetExists)
 					if (nm instanceof ImageData) {
-						storePreviewIcon(experiment, written, hsmManager, es, substanceName, nm, bm, unchangedURL, fileContent, sampleFineTime);
+						storePreviewIcon(experiment, written, hsmManager, es, substanceName, nm, bm, unchangedURL, sampleFineTime);
 					}
 				String pre = "";
 				status.setCurrentStatusText1(pre + "files: " + files
@@ -353,11 +352,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				long currTime = System.currentTimeMillis();
 				
-				double speed = written.getLong() * 1000d / (currTime - startTime)
-						/ 1024d / 1024d;
 				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, " + (int) speed + " MB/s, skipped " + (skipped.getLong() / 1024 / 1024)
+						+ " MB, "
+						+ SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) +
+						", skipped " + (skipped.getLong() / 1024 / 1024)
 						+ " MB");
+				
 			}
 		}
 		
@@ -462,10 +462,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				}
 				long currTime = System.currentTimeMillis();
 				
-				double speed = written.getLong() * 1000d
-						/ (currTime - startTime) / 1024d / 1024d;
 				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, " + (int) speed + " MB/s");
+						+ " MB, "
+						+ SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) +
+						", skipped " + (skipped.getLong() / 1024 / 1024)
+						+ " MB");
 			}
 	}
 	
@@ -540,16 +541,17 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				}
 				long currTime = System.currentTimeMillis();
 				
-				double speed = written.getLong() * 1000d
-						/ (currTime - startTime) / 1024d / 1024d;
 				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, " + (int) speed + " MB/s");
+						+ " MB, "
+						+ SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) +
+						", skipped " + (skipped.getLong() / 1024 / 1024)
+						+ " MB");
+				
 			}
 	}
 	
 	private void storePreviewIcon(final ExperimentInterface experiment, final ThreadSafeOptions written, final HSMfolderTargetDataManager hsmManager,
-			ExecutorService es, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm, IOurl unchangedURL,
-			Future<MyByteArrayInputStream> fileContent, final Long t) {
+			ExecutorService es, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm, IOurl unchangedURL, final Long t) {
 		boolean targetExists;
 		// store preview icon
 		String zefn = null;
@@ -565,12 +567,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				InputStream is = null;
 				
 				byte[] previewData = ResourceIOManager.getPreviewImageContent(unchangedURL);
-				if (previewData == null || previewData.length == 0)
-					if (fileContent != null) {
-						MyByteArrayInputStream bis = fileContent.get();
-						if (bis != null)
-							is = bis.getNewStream();
-					}
 				try {
 					if (is == null && (previewData == null || previewData.length == 0)) {
 						is = ResourceIOManager
@@ -687,7 +683,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return files;
 	}
 	
-	private Future<MyByteArrayInputStream> copyBinaryFileContentToTarget(
+	private void copyBinaryFileContentToTarget(
 			final ExperimentInterface experiment,
 			final ThreadSafeOptions written,
 			final HSMfolderTargetDataManager hsmManager,
@@ -699,90 +695,73 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		while (written.getInt() > 0)
 			Thread.sleep(5);
 		written.addInt(1);
-		return es.submit(new Callable<MyByteArrayInputStream>() {
-			@Override
-			public MyByteArrayInputStream call() throws Exception {
-				MyByteArrayInputStream in = null;
-				try {
-					try {
-						if (!targetExists) {
-							in = url != null || optUrlContent == null ? ResourceIOManager
-									.getInputStreamMemoryCached(url)
-									: optUrlContent;
-							if (in == null)
-								System.out.println("No input for " + url);
-							else {
-								String sourceFileExtension = url != null ? url.getFileNameExtension() : null;
-								String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions
-										.getInstance().getString("IAP", "Result File Type", "png");
-								if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
-									sourceFileExtension = sourceFileExtension.substring(".".length());
-								if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
-									// convert from PNG to JPG, if needed
-									BufferedImage img = ImageIO.read(in);
-									MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
-									ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
-									in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());
-								}
-								synchronized (es) {
-									String fn;
-									if (isIconStorage)
-										fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
-												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-									else
-										fn = hsmManager.prepareAndGetDataFileNameAndPath(
-												experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-									
-									VfsFileObject f = vfs.newVfsFile(fn, true);
-									BufferedOutputStream bos = new BufferedOutputStream(
-											f.getOutputStream());
-									try {
-										if (in.getCount() > 0)
-											bos.write(in.getBuff(), 0,
-													in.getCount());
-									} finally {
-										bos.close();
-									}
-									written.addLong(in.getCount());
-									in.close();
-									if (t != null)
-										f.setLastModified(t);
-									// f.setWritable(false);
-									// f.setExecutable(false);
-									f.renameTo(targetFile, true);
-								}
-							}
+		
+		InputStream in = null;
+		try {
+			try {
+				if (!targetExists) {
+					in = url != null || optUrlContent == null ? url.getInputStream()
+							: optUrlContent;
+					if (in == null)
+						System.out.println("No input for " + url);
+					else {
+						String sourceFileExtension = url != null ? url.getFileNameExtension() : null;
+						if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
+							sourceFileExtension = sourceFileExtension.substring(".".length());
+						String targetFileExtension = IAPservice.getTargetFileExtension(isIconStorage, sourceFileExtension);
+						if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
+							// convert from PNG to JPG, if needed
+							BufferedImage img = ImageIO.read(in);
+							MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
+							ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
+							in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());
 						}
-						if (url != null) {
-							// System.out.println("Current URL: " + url);
-							// System.out.println("Target File Name: " + targetFile.getName());
-							url.setPrefix(vfs.getPrefix());
-							url.setDetail("");
-							String path = hsmManager
-									.prepareAndGetDataFileNameAndPath(
-											experiment.getHeader(), t,
-											targetFile.getName().split("#", 2)[0]);
-							// System.out.println("Path: " + path);
-							path = path.substring(hsmManager.getPath().length() + File.separator.length());
-							url.setDetail(path.substring(0, path.lastIndexOf(File.separator)));
-							path = path.substring(path.lastIndexOf(File.separator) + File.separator.length());
-							url.setFileName(path + "#"
-									+ extractLastFileName(url.getFileName()));
+						synchronized (es) {
+							String fn;
+							if (isIconStorage)
+								fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
+										experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+							else
+								fn = hsmManager.prepareAndGetDataFileNameAndPath(
+										experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+							
+							VfsFileObject f = vfs.newVfsFile(fn, true);
+							BufferedOutputStream bos = new BufferedOutputStream(f.getOutputStream());
+							written.addLong(ResourceIOManager.copyContent(in, bos, -1));
+							if (t != null)
+								f.setLastModified(t);
+							// f.setWritable(false);
+							// f.setExecutable(false);
+							f.renameTo(targetFile, true);
 						}
-						if (optPostProcess != null)
-							optPostProcess.run();
-					} catch (Exception e) {
-						e.printStackTrace();
-						System.out.println("ERROR: " + e.getMessage());
-						errorCount++;
 					}
-				} finally {
-					// BackgroundTaskHelper.lockRelease(hsmFolder);
-					written.addInt(-1);
 				}
-				return in != null ? in.getNewStream() : null;
+				if (url != null) {
+					// System.out.println("Current URL: " + url);
+					// System.out.println("Target File Name: " + targetFile.getName());
+					url.setPrefix(vfs.getPrefix());
+					url.setDetail("");
+					String path = hsmManager
+							.prepareAndGetDataFileNameAndPath(
+									experiment.getHeader(), t,
+									targetFile.getName().split("#", 2)[0]);
+					// System.out.println("Path: " + path);
+					path = path.substring(hsmManager.getPath().length() + File.separator.length());
+					url.setDetail(path.substring(0, path.lastIndexOf(File.separator)));
+					path = path.substring(path.lastIndexOf(File.separator) + File.separator.length());
+					url.setFileName(path + "#"
+							+ extractLastFileName(url.getFileName()));
+				}
+				if (optPostProcess != null)
+					optPostProcess.run();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("ERROR: " + e.getMessage());
+				errorCount++;
 			}
-		});
+		} finally {
+			written.addInt(-1);
+		}
 	}
 	
 	public static String determineBinaryFileName(long t, final String substanceName,
