@@ -64,7 +64,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 				} else {
 					try {
 						ExperimentReference er = new ExperimentReference(mappingData);
-						vfs.saveExperiment(null, er, new CommandLineBackgroundTaskStatusProvider(true));
+						vfs.saveExperiment(null, er, new CommandLineBackgroundTaskStatusProvider(true), false);
 						mappingData = null;
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
