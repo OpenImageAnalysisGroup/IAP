@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MeasurementFilter;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.Screenshot;
@@ -73,6 +74,7 @@ import org.graffiti.editor.LoadSetting;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -92,6 +94,7 @@ import com.sun.media.jai.codec.SeekableStream;
 import de.ipk.ag_ba.commands.AbstractGraphUrlNavigationAction;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
+import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.commands.experiment.process.report.SnapshotFilter;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -1751,5 +1754,60 @@ public class IAPservice {
 			if (targetFileExtension != null && (targetFileExtension.endsWith("png") || targetFileExtension.endsWith("png")))
 				targetFileExtension = sourceFileExtension; // don't convert source JPG to PNG, makes not really sense
 		return targetFileExtension;
+	}
+	
+	public static MeasurementFilter getMeasurementFilter(ExperimentHeaderInterface header) {
+		MeasurementFilter mf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), header.getGlobalOutlierInfo());
+		return mf;
+	}
+	
+	/**
+	 * @param experiment
+	 *           Experiment is modified.
+	 * @return number of removed measurements (numeric or binary)
+	 */
+	public static int removeOutliers(ExperimentInterface experiment) {
+		ArrayList<NumericMeasurementInterface> outlierList = new ArrayList<NumericMeasurementInterface>();
+		HashMap<SampleInterface, Integer> samplesWithOutliers2valueCnt = new HashMap<SampleInterface, Integer>();
+		
+		MeasurementFilter mf = IAPservice.getMeasurementFilter(experiment.getHeader());
+		for (SubstanceInterface s : experiment) {
+			for (ConditionInterface c : s) {
+				for (SampleInterface si : c) {
+					boolean isOutlier = false;
+					for (NumericMeasurementInterface n : si) {
+						if (mf.isGlobalOutlierOrSpecificOutlier(n)) {
+							isOutlier = true;
+							outlierList.add(n);
+						}
+					}
+					if (isOutlier)
+						samplesWithOutliers2valueCnt.put(si, si.size());
+				}
+			}
+		}
+		for (NumericMeasurementInterface o : outlierList) {
+			o.getParentSample().remove(o);
+		}
+		for (SampleInterface s : samplesWithOutliers2valueCnt.keySet()) {
+			s.recalculateSampleAverage();
+			if (s.size() == 0 && samplesWithOutliers2valueCnt.get(s) > 0)
+				s.getParentCondition().remove(s);
+		}
+		
+		int removed = outlierList.size();
+		if (removed > 0) {
+			String remark = experiment.getHeader().getRemark();
+			if (remark == null)
+				remark = "";
+			
+			if (!remark.trim().isEmpty())
+				remark = remark + " // ";
+			
+			remark = remark + "removed " + removed + " outlier measurements (" + SystemAnalysis.getUserName() + ", " + SystemAnalysis.getCurrentTime() + ")";
+			
+			experiment.getHeader().setRemark(remark);
+		}
+		return removed;
 	}
 }
