@@ -13,6 +13,7 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 	
 	private final ArrayList<ExperimentReference> experimentReference;
 	private final MongoDB m;
+	private boolean ignoreOutliers;
 	
 	public ActionDataExportToUserSelectedVFStarget(String tooltip) {
 		super(tooltip);
@@ -20,10 +21,12 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 		experimentReference = null;
 	}
 	
-	public ActionDataExportToUserSelectedVFStarget(String tooltip, MongoDB m, ArrayList<ExperimentReference> experimentReference) {
+	public ActionDataExportToUserSelectedVFStarget(String tooltip, MongoDB m,
+			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;
+		this.ignoreOutliers = ignoreOutliers;
 	}
 	
 	@Override
@@ -48,12 +51,12 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 			if (p == VfsFileProtocol.LOCAL)
 				continue;
 			NavigationAction navigationAction = new ActionDataExportToUserSpecficVFStarget(
-					"Copy to remote site using " + p, m, experimentReference, p);
+					"Copy to remote site using " + p, m, experimentReference, p, ignoreOutliers);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
 		{
 			NavigationAction navigationAction = new ActionDataExportToUserSpecficVFStarget(
-					"Copy to local file system", m, experimentReference, VfsFileProtocol.LOCAL);
+					"Copy to local file system", m, experimentReference, VfsFileProtocol.LOCAL, ignoreOutliers);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
 		return res;

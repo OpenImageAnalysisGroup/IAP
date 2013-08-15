@@ -17,17 +17,14 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	
 	private final ArrayList<ExperimentReference> experimentReference;
 	private final MongoDB m;
+	private final boolean ignoreOutliers;
 	
-	public ActionDataExportToUserSelectedFileSystemFolder(String tooltip) {
-		super(tooltip);
-		m = null;
-		experimentReference = null;
-	}
-	
-	public ActionDataExportToUserSelectedFileSystemFolder(String tooltip, MongoDB m, ArrayList<ExperimentReference> experimentReference) {
+	public ActionDataExportToUserSelectedFileSystemFolder(String tooltip, MongoDB m,
+			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;
+		this.ignoreOutliers = ignoreOutliers;
 	}
 	
 	@Override
@@ -47,8 +44,9 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 					false,
 					false,
 					null);
-			for (ExperimentReference er : experimentReference)
-				vfs.saveExperiment(m, er, getStatusProvider());
+			for (ExperimentReference er : experimentReference) {
+				vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers);
+			}
 		}
 	}
 	

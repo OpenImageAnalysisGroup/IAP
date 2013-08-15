@@ -25,6 +25,7 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	
 	private String host, user, pass, directory, vfsName;
 	private boolean saveVFS = false, savePassWithVFS = false;
+	private boolean ignoreOutliers;
 	
 	public ActionDataExportToUserSpecficVFStarget(String tooltip) {
 		super(tooltip);
@@ -32,12 +33,15 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 		experimentReference = null;
 	}
 	
-	public ActionDataExportToUserSpecficVFStarget(String tooltip, MongoDB m, ArrayList<ExperimentReference> experimentReference,
-			VfsFileProtocol p) {
+	public ActionDataExportToUserSpecficVFStarget(String tooltip, MongoDB m,
+			ArrayList<ExperimentReference> experimentReference,
+			VfsFileProtocol p,
+			boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;
 		this.p = p;
+		this.ignoreOutliers = ignoreOutliers;
 	}
 	
 	@Override
@@ -99,7 +103,7 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 				false,
 				null);
 		for (ExperimentReference er : experimentReference)
-			vfs.saveExperiment(m, er, getStatusProvider());
+			vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers);
 		if (saveVFS) {
 			IAPoptions.getInstance().setBoolean("VFS", "enabled", true);
 			int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
