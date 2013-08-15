@@ -357,7 +357,7 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Identify Outliers";
+		return "Extreme Traits";
 	}
 	
 	@Override
