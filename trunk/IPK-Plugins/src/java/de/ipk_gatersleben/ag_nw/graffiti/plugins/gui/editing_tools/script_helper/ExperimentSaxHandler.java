@@ -26,9 +26,11 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ExperimentSaxHandler extends DefaultHandler {
 	
+	long readCnt = 0;
+	long startTime = System.currentTimeMillis();
+	
 	private final class CountingInputStream extends InputStream {
 		private final BackgroundTaskStatusProviderSupportingExternalCall optStatus;
-		long readCnt = 0;
 		
 		private CountingInputStream(BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 			this.optStatus = optStatus;
@@ -47,25 +49,33 @@ public class ExperimentSaxHandler extends DefaultHandler {
 		
 		@Override
 		public int read(byte[] b) throws IOException {
-			return is.read(b);
+			int len = is.read(b);
+			readCnt += len;
+			return len;
 		}
 		
 		@Override
 		public int read(byte[] b, int off, int len) throws IOException {
-			readCnt += len;
 			if (optStatus != null) { // && ((readCnt % 1024) == 0)
 				optStatus.setCurrentStatusValueFine(100d * readCnt / inputStreamLength);
+				optStatus
+						.setCurrentStatusText1("Receive data (" +
+								readCnt / 1024 / 1024
+								+ " MB, " + SystemAnalysis.getDataTransferSpeedString(readCnt, startTime, System.currentTimeMillis()) + ")");
 			}
-			return is.read(b, off, len);
+			int l = is.read(b, off, len);
+			readCnt += l;
+			return l;
 		}
 		
 		@Override
 		public long skip(long n) throws IOException {
-			readCnt += n;
 			if (optStatus != null) { // && ((readCnt % 1024) == 0)
 				optStatus.setCurrentStatusValueFine(100d * readCnt / inputStreamLength);
 			}
-			return is.skip(n);
+			long l = is.skip(n);
+			readCnt += l;
+			return l;
 		}
 		
 		@Override
