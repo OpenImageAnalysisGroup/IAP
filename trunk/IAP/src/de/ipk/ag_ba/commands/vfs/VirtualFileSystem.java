@@ -156,9 +156,9 @@ public abstract class VirtualFileSystem {
 	public abstract IOurl getIOurlFor(String fileName);
 	
 	public void saveExperiment(MongoDB m, ExperimentReference experimentReference,
-			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider, boolean ignoreOutliers) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
-				(VirtualFileSystemVFS2) this);
+				(VirtualFileSystemVFS2) this, ignoreOutliers);
 		if (statusProvider != null)
 			a.setStatusProvider(statusProvider);
 		a.performActionCalculateResults(null);
