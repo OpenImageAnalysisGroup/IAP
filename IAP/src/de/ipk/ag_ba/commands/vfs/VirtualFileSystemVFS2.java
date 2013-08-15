@@ -261,7 +261,19 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			if (file == null)
 				return null;
 			if (!file.exists()) {
-				System.out.println("Could not find file: " + file.getFile());
+				if (fn.endsWith(".jpg")) {
+					String test_fn = fn.substring(0, fn.length() - ".jpg".length()) + ".png";
+					VfsFileObject test_file = newVfsFile(test_fn);
+					if (test_file.exists()) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: '" + fn + "' could not be found! Corrected problem by accessing '" + test_fn
+								+ "'");
+						fn = test_fn;
+						file = test_file;
+					}
+				}
+			}
+			if (!file.exists()) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not find file '" + file.getFile() + "'");
 				return null;
 			}
 			boolean cachedLoader = false;
