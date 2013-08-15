@@ -100,7 +100,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		return new ArrayList<NavigationButton>();
 	}
 	
 	@Override
@@ -319,9 +319,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 										hsmManager.prepareAndGetDataFileNameAndPath(
 												experiment.getHeader(), sampleFineTime,
 												zefn), true);
-								long len = targetFile.length();
-								boolean exists = targetFile.exists()
-										&& len > 0;
+								boolean exists = targetFile.exists();
+								long len = exists ? targetFile.length() : 0;
+								if (len == 0)
+									exists = false;
 								if (exists)
 									skipped.addLong(len);
 								targetExists = exists;
@@ -547,8 +548,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					final VfsFileObject targetFile = vfs.newVfsFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn), true);
-					long len = targetFile.length();
-					boolean exists = targetFile.exists() && len > 0;
+					boolean exists = targetFile.exists();
+					long len = exists ? targetFile.length() : 0;
+					if (len == 0)
+						exists = false;
 					if (exists)
 						skipped.addLong(len);
 					copyBinaryFileContentToTarget(experiment, written,
@@ -576,7 +579,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private void storePreviewIcon(final ExperimentInterface experiment, final ThreadSafeOptions written, ThreadSafeOptions skipped,
 			final HSMfolderTargetDataManager hsmManager,
 			ExecutorService es, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm, IOurl unchangedURL, final Long t) {
-		boolean targetExists;
 		// store preview icon
 		String zefn = null;
 		try {
@@ -584,12 +586,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final VfsFileObject targetFile = vfs.newVfsFile(
 					hsmManager.prepareAndGetPreviewFileNameAndPath(
 							experiment.getHeader(), t, zefn), true);
-			long len = targetFile.length();
-			boolean exists = targetFile.exists()
-					&& len > 0;
+			boolean exists = targetFile.exists();
+			long len = exists ? targetFile.length() : 0;
 			if (exists)
 				skipped.addLong(len);
-			targetExists = exists;
 			if (!exists) {
 				InputStream is = null;
 				

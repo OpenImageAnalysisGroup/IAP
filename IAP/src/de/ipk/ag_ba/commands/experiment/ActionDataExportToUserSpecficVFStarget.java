@@ -10,6 +10,7 @@ import org.SystemOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -26,6 +27,8 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	private String host, user, pass, directory, vfsName;
 	private boolean saveVFS = false, savePassWithVFS = false;
 	private boolean ignoreOutliers;
+	
+	private final ArrayList<MainPanelComponent> results = new ArrayList<MainPanelComponent>();
 	
 	public ActionDataExportToUserSpecficVFStarget(String tooltip) {
 		super(tooltip);
@@ -84,7 +87,17 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	}
 	
 	@Override
+	public MainPanelComponent getResultMainPanel() {
+		ArrayList<String> rl = new ArrayList<String>();
+		for (MainPanelComponent mc : results) {
+			rl.addAll(mc.getHTML());
+		}
+		return new MainPanelComponent(rl);
+	}
+	
+	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		results.clear();
 		if (experimentReference == null)
 			return;
 		String pref = "remote." + (p + "").toLowerCase() + "." + System.currentTimeMillis();
@@ -102,8 +115,9 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 				false,
 				false,
 				null);
-		for (ExperimentReference er : experimentReference)
-			vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers);
+		for (ExperimentReference er : experimentReference) {
+			results.add(vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers));
+		}
 		if (saveVFS) {
 			IAPoptions.getInstance().setBoolean("VFS", "enabled", true);
 			int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
