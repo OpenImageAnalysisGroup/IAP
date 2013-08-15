@@ -70,26 +70,29 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private int files, knownFiles, errorCount;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
-	private boolean skipFilesAlreadyInStorageLocation = true;
-	private boolean includeMainImages = true;
-	private boolean includeReferenceImages = true;
-	private boolean includeAnnotationImages = true;
+	private final boolean skipFilesAlreadyInStorageLocation = true;
+	private final boolean includeMainImages = true;
+	private final boolean includeReferenceImages = true;
+	private final boolean includeAnnotationImages = true;
 	private final VirtualFileSystemVFS2 vfs;
 	private boolean skipClone;
+	private final boolean ignoreOutliers;
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs) {
+			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
 		this.m = m;
+		this.ignoreOutliers = ignoreOutliers;
 		this.experimentReferences = new ArrayList<ExperimentReference>();
 		this.experimentReferences.add(experimentReference);
 		this.vfs = vfs;
 	}
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs) {
+			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
 		this.m = m;
+		this.ignoreOutliers = ignoreOutliers;
 		this.experimentReferences = new ArrayList<ExperimentReference>();
 		this.experimentReferences.addAll(experimentReference);
 		this.vfs = vfs;
@@ -102,26 +105,30 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	@Override
 	public ParameterOptions getParameters() {
-		return new ParameterOptions(
-				"<html>"
-						+ "This commands copies the experiment and its connected binary data to the<br>"
-						+ "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
-						"Don't copy again, if already in storage location", skipFilesAlreadyInStorageLocation,
-						"Copy images", includeMainImages,
-						"Copy reference images", includeReferenceImages,
-						"Copy annotation images", includeAnnotationImages });
+		return null; /*
+						 * new ParameterOptions(
+						 * "<html>"
+						 * + "This commands copies the experiment and its connected binary data to the<br>"
+						 * + "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
+						 * "Don't copy again, if already in storage location", skipFilesAlreadyInStorageLocation,
+						 * "Copy images", includeMainImages,
+						 * "Copy reference images", includeReferenceImages,
+						 * "Copy annotation images", includeAnnotationImages });
+						 */
 	}
 	
 	@Override
 	public void setParameters(Object[] parameters) {
 		super.setParameters(parameters);
-		if (parameters != null && parameters.length == 3) {
-			int idx = 0;
-			skipFilesAlreadyInStorageLocation = (Boolean) parameters[idx++];
-			includeMainImages = (Boolean) parameters[idx++];
-			includeReferenceImages = (Boolean) parameters[idx++];
-			includeAnnotationImages = (Boolean) parameters[idx++];
-		}
+		/*
+		 * if (parameters != null && parameters.length == 3) {
+		 * int idx = 0;
+		 * skipFilesAlreadyInStorageLocation = (Boolean) parameters[idx++];
+		 * includeMainImages = (Boolean) parameters[idx++];
+		 * includeReferenceImages = (Boolean) parameters[idx++];
+		 * includeAnnotationImages = (Boolean) parameters[idx++];
+		 * }
+		 */
 	}
 	
 	@Override
@@ -155,6 +162,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				if (!skipClone) {
 					status.setCurrentStatusText1("Clone Experiment");
 					experiment = experiment.clone();
+					experiment.setHeader(experimentReference.getHeader());
+					if (ignoreOutliers) {
+						status.setCurrentStatusText1("Process outliers");
+						IAPservice.removeOutliers(experiment);
+					}
+				} else {
+					if (ignoreOutliers)
+						throw new UnsupportedOperationException("Internal Error: Outliers can't be ignored, if cloning of experiment needs be skipped");
 				}
 				
 				status.setCurrentStatusText1("Store Files...");
@@ -224,12 +239,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
 								experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
 				experiment.getHeader().setStorageTime(new Date());
-				experiment.getHeader().setSizekb((written.getLong() + skipped.getLong()) / 1024);
+				long kb = (written.getLong() + skipped.getLong()) / 1024;
+				experiment.getHeader().setSizekb(kb);
+				int files = Substance3D.countMeasurementValues(experiment, MeasurementNodeType.binaryTypes());
+				experiment.getHeader().setNumberOfFiles(files);
 				
 				String indexFileName = createIndexFiles(experiment, hsmManager, status, experimentReference.getExperimentName());
 				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
 				status.setCurrentStatusValueFine(100d);
-				experiment.getHeader().setNumberOfFiles(Substance3D.countMeasurementValues(experiment, MeasurementNodeType.binaryTypes()));
 				this.mb = ((written.getLong() + skipped.getLong()) / 1024 / 1024) + "";
 				tso.setParam(2, true);
 			}
@@ -302,8 +319,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 										hsmManager.prepareAndGetDataFileNameAndPath(
 												experiment.getHeader(), sampleFineTime,
 												zefn), true);
+								long len = targetFile.length();
 								boolean exists = targetFile.exists()
-										&& targetFile.length() > 0;
+										&& len > 0;
+								if (exists)
+									skipped.addLong(len);
 								targetExists = exists;
 								try {
 									copyBinaryFileContentToTarget(
@@ -343,7 +363,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				if (!targetExists)
 					if (nm instanceof ImageData) {
-						storePreviewIcon(experiment, written, hsmManager, es, substanceName, nm, bm, unchangedURL, sampleFineTime);
+						storePreviewIcon(experiment, written, skipped, hsmManager, es, substanceName, nm, bm, unchangedURL, sampleFineTime);
 					}
 				String pre = "";
 				status.setCurrentStatusText1(pre + "files: " + files
@@ -527,7 +547,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					final VfsFileObject targetFile = vfs.newVfsFile(
 							hsmManager.prepareAndGetDataFileNameAndPath(
 									experiment.getHeader(), t, zefn), true);
-					
+					long len = targetFile.length();
+					boolean exists = targetFile.exists() && len > 0;
+					if (exists)
+						skipped.addLong(len);
 					copyBinaryFileContentToTarget(experiment, written,
 							hsmManager, es, bm.getLabelURL(), null, t,
 							targetFile, targetFile.exists(), null, false);
@@ -550,7 +573,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			}
 	}
 	
-	private void storePreviewIcon(final ExperimentInterface experiment, final ThreadSafeOptions written, final HSMfolderTargetDataManager hsmManager,
+	private void storePreviewIcon(final ExperimentInterface experiment, final ThreadSafeOptions written, ThreadSafeOptions skipped,
+			final HSMfolderTargetDataManager hsmManager,
 			ExecutorService es, final String substanceName, NumericMeasurementInterface nm, final BinaryMeasurement bm, IOurl unchangedURL, final Long t) {
 		boolean targetExists;
 		// store preview icon
@@ -560,8 +584,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final VfsFileObject targetFile = vfs.newVfsFile(
 					hsmManager.prepareAndGetPreviewFileNameAndPath(
 							experiment.getHeader(), t, zefn), true);
+			long len = targetFile.length();
 			boolean exists = targetFile.exists()
-					&& targetFile.length() > 0;
+					&& len > 0;
+			if (exists)
+				skipped.addLong(len);
 			targetExists = exists;
 			if (!exists) {
 				InputStream is = null;
