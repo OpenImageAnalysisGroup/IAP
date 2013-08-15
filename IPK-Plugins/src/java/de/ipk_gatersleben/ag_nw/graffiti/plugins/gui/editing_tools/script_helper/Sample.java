@@ -299,7 +299,7 @@ public class Sample implements SampleInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
 	@Override
 	public boolean add(NumericMeasurementInterface e) {
 		return measurements.add(e);
@@ -335,19 +335,26 @@ public class Sample implements SampleInterface {
 	 */
 	@Override
 	public boolean remove(Object o) {
-		if (o instanceof NumericMeasurement)
-			((NumericMeasurement) o).setParentSample(null);
+		((NumericMeasurementInterface) o).setParentSample(null);
 		return measurements.remove(o);
 	}
 	
 	@Override
 	public boolean removeAll(Collection<?> c) {
+		for (Object o : c) {
+			((NumericMeasurementInterface) o).setParentSample(null);
+		}
 		return measurements.removeAll(c);
 	}
 	
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return measurements.retainAll(c);
+		for (NumericMeasurementInterface n : measurements)
+			n.setParentSample(null);
+		boolean res = measurements.retainAll(c);
+		for (NumericMeasurementInterface n : measurements)
+			n.setParentSample(this);
+		return res;
 	}
 	
 	@Override
