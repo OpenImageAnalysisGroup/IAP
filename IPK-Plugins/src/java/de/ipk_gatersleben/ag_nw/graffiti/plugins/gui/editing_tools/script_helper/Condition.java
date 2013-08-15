@@ -761,7 +761,7 @@ public class Condition implements ConditionInterface {
 	/*
 	 * Delegate Methods
 	 */
-
+	
 	@Override
 	public boolean addAll(Collection<? extends SampleInterface> arg0) {
 		return samples.addAll(arg0);
@@ -789,17 +789,29 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public boolean remove(Object arg0) {
+		((SampleInterface) arg0).setParent(null);
 		return samples.remove(arg0);
 	}
 	
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
+		for (Object o : arg0) {
+			((SampleInterface) o).setParent(null);
+		}
 		return samples.removeAll(arg0);
 	}
 	
 	@Override
 	public boolean retainAll(Collection<?> arg0) {
-		return samples.retainAll(arg0);
+		for (SampleInterface o : samples)
+			o.setParent(null);
+		
+		boolean res = samples.retainAll(arg0);
+		
+		for (SampleInterface o : samples)
+			o.setParent(this);
+		
+		return res;
 	}
 	
 	@Override
