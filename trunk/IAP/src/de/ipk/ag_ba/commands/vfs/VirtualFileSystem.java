@@ -18,6 +18,7 @@ import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -155,13 +156,14 @@ public abstract class VirtualFileSystem {
 	
 	public abstract IOurl getIOurlFor(String fileName);
 	
-	public void saveExperiment(MongoDB m, ExperimentReference experimentReference,
+	public MainPanelComponent saveExperiment(MongoDB m, ExperimentReference experimentReference,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider, boolean ignoreOutliers) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
 				(VirtualFileSystemVFS2) this, ignoreOutliers);
 		if (statusProvider != null)
 			a.setStatusProvider(statusProvider);
 		a.performActionCalculateResults(null);
+		return a.getResultMainPanel();
 	}
 	
 	public String[] listFiles(String subdirectory, FilenameFilter optFilenameFilter) throws Exception {

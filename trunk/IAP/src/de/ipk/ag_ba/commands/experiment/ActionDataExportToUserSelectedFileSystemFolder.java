@@ -7,6 +7,7 @@ import org.OpenFileDialogService;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -18,6 +19,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	private final ArrayList<ExperimentReference> experimentReference;
 	private final MongoDB m;
 	private final boolean ignoreOutliers;
+	private final ArrayList<MainPanelComponent> results = new ArrayList<MainPanelComponent>();
 	
 	public ActionDataExportToUserSelectedFileSystemFolder(String tooltip, MongoDB m,
 			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
@@ -29,6 +31,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		results.clear();
 		if (experimentReference == null)
 			return;
 		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
@@ -45,9 +48,17 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 					false,
 					null);
 			for (ExperimentReference er : experimentReference) {
-				vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers);
+				results.add(vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers));
 			}
 		}
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		ArrayList<String> rl = new ArrayList<String>();
+		for (MainPanelComponent m : results)
+			rl.addAll(m.getHTML());
+		return new MainPanelComponent(rl);
 	}
 	
 	@Override
@@ -62,7 +73,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		return new ArrayList<NavigationButton>();
 	}
 	
 }
