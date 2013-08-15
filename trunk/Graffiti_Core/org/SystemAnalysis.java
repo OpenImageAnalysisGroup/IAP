@@ -284,17 +284,19 @@ public class SystemAnalysis {
 		double megaBytesPerMinute = megaBytesPerSecond * 60d;
 		double megaBytesPerHour = megaBytesPerMinute * 60d;
 		double megaBytesPerDay = megaBytesPerHour * 24d;
+		String fS = "#.#";
+		String fL = "#";
 		if (kiloBytesPerSecond < 1024)
-			return StringManipulationTools.formatNumber(kiloBytesPerSecond, "#.#") + " KB/s";
+			return StringManipulationTools.formatNumber(kiloBytesPerSecond, kiloBytesPerSecond > 10 ? fL : fS) + " KB/s";
 		if (megaBytesPerSecond > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerSecond, "#.#") + " MB/s";
+			return StringManipulationTools.formatNumber(megaBytesPerSecond, megaBytesPerSecond > 10 ? fL : fS) + " MB/s";
 		else
 			if (megaBytesPerMinute > 1)
-				return StringManipulationTools.formatNumber(megaBytesPerMinute, "#.#") + " MB/m";
+				return StringManipulationTools.formatNumber(megaBytesPerMinute, megaBytesPerMinute > 10 ? fL : fS) + " MB/m";
 		if (megaBytesPerHour > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerHour, "#.#") + " MB/h";
+			return StringManipulationTools.formatNumber(megaBytesPerHour, megaBytesPerHour > 10 ? fL : fS) + " MB/h";
 		else
-			return StringManipulationTools.formatNumber(megaBytesPerDay, "#.#") + " MB/d";
+			return StringManipulationTools.formatNumber(megaBytesPerDay, megaBytesPerDay > 10 ? fL : fS) + " MB/d";
 	}
 	
 	public static boolean isMacRunning() {
