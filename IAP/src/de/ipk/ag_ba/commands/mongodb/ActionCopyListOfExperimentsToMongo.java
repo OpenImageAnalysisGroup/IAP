@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -27,6 +28,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 	private MongoDB m;
 	private final ArrayList<ExperimentReference> experimentlist;
 	private String task = "";
+	private boolean ignoreOutliers;
 	
 	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReference> experiment) {
 		super("Copy a list of experiments to this storage location");
@@ -36,9 +38,10 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		saveAnnotation = false;
 	}
 	
-	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReference> experiment, boolean annotationSave) {
+	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReference> experiment, boolean annotationSave, boolean ignoreOutliers) {
 		super("Copy a list of experiments to this storage location");
 		this.m = m;
+		this.ignoreOutliers = ignoreOutliers;
 		this.experimentlist = new ArrayList<ExperimentReference>();
 		experimentlist.addAll(experiment);
 		this.saveAnnotation = annotationSave;
@@ -117,7 +120,12 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 				status.setCurrentStatusText1("Load " + experiment.getExperimentName());
 				task = "Load " + experiment.getExperimentName() + " (" + i + "/" + n + ")";
 				ExperimentInterface exp = experiment.getData(status); // .clone();
-				
+				if (ignoreOutliers) {
+					status.setCurrentStatusText1("Clone Experiment");
+					exp = exp.clone();
+					status.setCurrentStatusText1("Process Outliers");
+					IAPservice.removeOutliers(exp);
+				}
 				exp.getHeader().setOriginDbId(exp.getHeader().getDatabaseId() + "");
 				status.setCurrentStatusText1("Copy " + exp.getName());
 				task = "Copy " + exp.getName() + " (" + i + "/" + n + ")";
