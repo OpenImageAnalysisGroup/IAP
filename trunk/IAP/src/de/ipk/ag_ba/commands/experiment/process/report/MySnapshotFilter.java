@@ -6,6 +6,7 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 
 public class MySnapshotFilter implements SnapshotFilter {
 	
@@ -46,8 +47,8 @@ public class MySnapshotFilter implements SnapshotFilter {
 	}
 	
 	@Override
-	public boolean filterOut(String plantId, Integer d) {
-		if (d == Integer.MAX_VALUE)
+	public boolean filterOut(String plantId, Integer timePoint) {
+		if (timePoint == Integer.MAX_VALUE)
 			return false;
 		if (globalOutlierArr.length > 0) {
 			int idx = 0;
@@ -64,30 +65,30 @@ public class MySnapshotFilter implements SnapshotFilter {
 							try {
 								String fromDay = o.substring((plantId + "/").length());
 								int fromD = Integer.parseInt(fromDay);
-								return d >= fromD;
+								return timePoint >= fromD;
 							} catch (Exception e) {
 								System.out.println("Problematic outlier definition (ignored): " + o);
 							}
 						} else
-							if (d != null && d.equals(o))
+							if (timePoint != null && timePoint.equals(o))
 								return true;
 							else
-								if (d != null) {
+								if (timePoint != null) {
 									int day = globalOutlierDays[idx];
 									if (day < Integer.MAX_VALUE)
-										if (o.contains(">=") && d >= day)
+										if (o.contains(">=") && timePoint >= day)
 											return true;
 										else
-											if (o.contains(">") && d > day)
+											if (o.contains(">") && timePoint > day)
 												return true;
 											else
-												if (o.contains("<=") && d <= day)
+												if (o.contains("<=") && timePoint <= day)
 													return true;
 												else
-													if (o.contains("<") && d < day)
+													if (o.contains("<") && timePoint < day)
 														return true;
 													else
-														if (o.contains("=") && d == day)
+														if (o.contains("=") && timePoint == day)
 															return true;
 									
 								}
@@ -131,5 +132,19 @@ public class MySnapshotFilter implements SnapshotFilter {
 				value = "(not specified)";
 		
 		return value.equals(content);
+	}
+	
+	@Override
+	public boolean isGlobalOutlierOrSpecificOutlier(Object measurement) {
+		NumericMeasurement3D nmi = (NumericMeasurement3D) measurement;
+		boolean isGlobalOutlier = filterOut(nmi.getQualityAnnotation(), nmi.getParentSample().getTime());
+		if (isGlobalOutlier)
+			return true;
+		else {
+			String f = nmi.getAnnotationField("outlier");
+			if (f != null && f.equals("1"))
+				return true;
+		}
+		return false;
 	}
 }
