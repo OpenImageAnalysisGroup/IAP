@@ -41,7 +41,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 			Object[] sel = MyInputHelper.getInput("Select the database-target:", "Storage System", new Object[] {
 					"MongoDB", MongoDB.getMongos(),
 					"Store not in MongoDB but in VFS?", false,
-					"VFS", VirtualFileSystem.getKnown(true)
+					"VFS", VirtualFileSystem.getKnown(true, true)
 			});
 			
 			if (sel == null)
