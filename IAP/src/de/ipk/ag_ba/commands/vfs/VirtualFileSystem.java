@@ -37,6 +37,10 @@ public abstract class VirtualFileSystem {
 	private static LinkedHashSet<VirtualFileSystemVFS2> knownFileSystems = new LinkedHashSet<VirtualFileSystemVFS2>();
 	
 	public static ArrayList<VirtualFileSystem> getKnown(boolean excludeNonUserItems) {
+		return getKnown(excludeNonUserItems, true);
+	}
+	
+	public static ArrayList<VirtualFileSystem> getKnown(boolean excludeNonUserItems, boolean excludeReadOnly) {
 		ArrayList<VirtualFileSystem> res = new ArrayList<VirtualFileSystem>(knownFileSystems);
 		
 		boolean enabled = SystemOptions.getInstance().getBoolean("VFS", "enabled", true);
@@ -116,7 +120,8 @@ public abstract class VirtualFileSystem {
 					// don't add such item to the result
 				} else
 					if (en && enabled && idx <= realN)
-						res.add(v);
+						if (!excludeReadOnly || v.isAbleToSaveData())
+							res.add(v);
 			}
 		}
 		
