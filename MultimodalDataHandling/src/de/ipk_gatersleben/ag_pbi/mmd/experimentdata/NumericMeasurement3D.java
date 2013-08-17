@@ -70,14 +70,14 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public String toString() {
 		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0) {
 			if (position != null && positionUnit != null)
-				return "" + getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ", " + getQualityAnnotation() + ")";
+				return getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ", " + getQualityAnnotation() + ")";
 			else
-				return "" + getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
+				return getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
 		} else {
 			if (position != null && positionUnit != null)
-				return "" + getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ")";
+				return getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ")";
 			else
-				return "" + getValue() + " " + getUnit();
+				return getValue() + " " + getUnit();
 		}
 	}
 	
