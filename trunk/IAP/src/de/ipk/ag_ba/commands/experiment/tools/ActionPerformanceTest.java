@@ -99,21 +99,18 @@ public class ActionPerformanceTest extends AbstractNavigationAction implements A
 			
 			statisticsResult.getHeader().setDatabaseId("");
 			if (resultReceiver == null) {
-				if (status != null)
-					status.setCurrentStatusText1("Store Result");
-				
-				if (m == null)
-					m = MongoDB.getDefaultCloud();
-				if (m != null && statisticsResult != null)
+				if (m != null && statisticsResult != null) {
+					if (status != null)
+						status.setCurrentStatusText1("Store Result");
+					
 					m.saveExperiment(statisticsResult, status);
+				}
 				
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
 				
 				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
-				// mpc = new MainPanelComponent(TableLayout.getSplit(info, sfp,
-				// TableLayout.PREFERRED, TableLayout.FILL));
 				mpc = new MainPanelComponent(info, true);
 			} else {
 				mpc = new MainPanelComponent("Running in batch-mode. Partial result is not shown at this place.");
