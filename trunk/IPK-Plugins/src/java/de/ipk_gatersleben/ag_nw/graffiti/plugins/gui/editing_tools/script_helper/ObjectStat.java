@@ -13,8 +13,17 @@ public class ObjectStat {
 	private int compareCnt = 0;
 	private int equalCnt = 0;
 	
+	private int simpleCounter = 0;
+	
 	public ObjectStat(String property) {
 		this.property = property;
+	}
+	
+	public void add(Object o, boolean useArrayAndSet) {
+		if (useArrayAndSet)
+			add(o);
+		else
+			simpleCounter++;
 	}
 	
 	public void add(Object o) {
@@ -51,7 +60,10 @@ public class ObjectStat {
 	public String toString() {
 		int objCnt = objectArray.size();
 		int setCnt = objectSet.size();
-		return "<tr><td>" + property + "</td><td>" + objCnt + "</td><td>" + equalCnt + "</td><td>" + setCnt + "</td><td>" + compareCnt + "</td></tr>";
+		if (simpleCounter > 0)
+			return "<tr><td>" + property + "</td><td>" + simpleCounter + "</td><td colspan='3'>not computed</td></tr>";
+		else
+			return "<tr><td>" + property + "</td><td>" + objCnt + "</td><td>" + equalCnt + "</td><td>" + setCnt + "</td><td>" + compareCnt + "</td></tr>";
 	}
 	
 }

@@ -2,6 +2,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 
 import java.util.ArrayList;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
@@ -15,7 +16,7 @@ public class ExperimentStatistics {
 	
 	@Override
 	public String toString() {
-		String s = getSummaryHTML(true);
+		String s = getSummaryHTML(true, null);
 		s = StringManipulationTools.stringReplace(s, "<table>", "---------\n");
 		s = StringManipulationTools.stringReplace(s, "</table>", "---------\n");
 		s = StringManipulationTools.stringReplace(s, "</tr>", " |\n");
@@ -25,14 +26,15 @@ public class ExperimentStatistics {
 		return s;
 	}
 	
-	public String getSummaryHTML(boolean sh) {
-		ObjectStat substanceStat = new ObjectStat(sh ? "Sub" : "Substances");
-		ObjectStat conditionStat = new ObjectStat(sh ? "Cond" : "Conditions");
-		ObjectStat sampleStat = new ObjectStat(sh ? "Sam" : "Samples");
-		ObjectStat numericStat = new ObjectStat(sh ? "Num" : "Numeric Values");
-		ObjectStat binaryStat = new ObjectStat(sh ? "Bin" : "Binary Entities");
-		ObjectStat exprimentHeaderStat = new ObjectStat(sh ? "Hea" : "Experiment Headers");
-		ObjectStat qualityTagStat = new ObjectStat(sh ? "Qua" : "Quality Tags");
+	public String getSummaryHTML(boolean shortTitles,
+			BackgroundTaskStatusProviderSupportingExternalCall backgroundTaskStatusProviderSupportingExternalCall) {
+		ObjectStat substanceStat = new ObjectStat(shortTitles ? "Sub" : "Substances");
+		ObjectStat conditionStat = new ObjectStat(shortTitles ? "Cond" : "Conditions");
+		ObjectStat sampleStat = new ObjectStat(shortTitles ? "Sam" : "Samples");
+		ObjectStat numericStat = new ObjectStat(shortTitles ? "Num" : "Numeric Values");
+		ObjectStat binaryStat = new ObjectStat(shortTitles ? "Bin" : "Binary Entities");
+		ObjectStat exprimentHeaderStat = new ObjectStat(shortTitles ? "Hea" : "Experiment Headers");
+		ObjectStat qualityTagStat = new ObjectStat(shortTitles ? "Qua" : "Quality Tags");
 		
 		ArrayList<ObjectStat> ol = new ArrayList<ObjectStat>();
 		ol.add(exprimentHeaderStat);
@@ -44,7 +46,8 @@ public class ExperimentStatistics {
 		ol.add(qualityTagStat);
 		
 		exprimentHeaderStat.add(experiment.getHeader());
-		
+		int workload = experiment.size();
+		int idx = 0;
 		for (SubstanceInterface s : experiment) {
 			substanceStat.add(s);
 			for (ConditionInterface c : s) {
@@ -67,16 +70,19 @@ public class ExperimentStatistics {
 						}
 						qualityTagStat.add(nmi.getQualityAnnotation());
 						if (!Double.isNaN(nmi.getValue())) {
-							numericStat.add(nmi);
+							numericStat.add(nmi, false);
 						} else {
-							binaryStat.add(nmi);
+							binaryStat.add(nmi, false);
 						}
 					}
 				}
 			}
+			idx++;
+			if (backgroundTaskStatusProviderSupportingExternalCall != null)
+				backgroundTaskStatusProviderSupportingExternalCall.setCurrentStatusValueFine(100d * idx / workload);
 		}
 		
-		return "<table>" + ObjectStat.getTableHeader(sh)
+		return "<table>" + ObjectStat.getTableHeader(shortTitles)
 				+ StringManipulationTools.getStringList(ol, "") +
 				"</table>";
 	}
