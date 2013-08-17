@@ -42,9 +42,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ArrayList<NumericMeasurementInterface> output = new ArrayList<NumericMeasurementInterface>();
 	
-	private MongoDB m;
 	private int workLoadIndex;
-	private int workLoadSize;
 	
 	private final TextFile errors = new TextFile();
 	
@@ -59,9 +57,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			Collection<NumericMeasurementInterface> optValidMeasurements, MongoDB m,
 			int workLoadIndex, int workLoadSize) {
 		this.input = input;
-		this.m = m;
 		this.workLoadIndex = workLoadIndex;
-		this.workLoadSize = workLoadSize;
 	}
 	
 	@Override
@@ -290,7 +286,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 													" (" + maximumThreadCountParallelImages + " thread(s)" : "") +
 											", ok: " + okCnt + ", errors: " + errorCnt + ")");
 									{
-										NumericMeasurement m = new NumericMeasurement(id, "read speed", id.getParentSample()
+										NumericMeasurement m = new NumericMeasurement(id, "overall read speed", id.getParentSample()
 												.getParentCondition().getExperimentName()
 												+ " (" + getName() + ")");
 										setAnno(maximumThreadCountParallelImages, m);
@@ -299,6 +295,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 										m.setReplicateID(1);
 										m.getParentSample().setTime((int) ((time - tsoStartTime.getLong()) / 1000l));
 										m.getParentSample().setTimeUnit("sec");
+										m.setQualityAnnotation(null);
 										output.add(m);
 									}
 								}
@@ -491,6 +488,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			m.setUnit("MB/s");
 			m.getParentSample().setTime((int) ((end - tsoStartTime.getLong()) / 1000l));
 			m.getParentSample().setTimeUnit("sec");
+			m.setQualityAnnotation(null);
 			if (end - start > 0)
 				output.add(m);
 		}
