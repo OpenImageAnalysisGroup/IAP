@@ -241,4 +241,12 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	public void setFiles(String files) {
 		this.files = files;
 	}
+	
+	@Override
+	public String toString() {
+		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0)
+			return getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
+		else
+			return getValue() + " " + getUnit();
+	}
 }
