@@ -33,9 +33,7 @@ public class ActionObjectStatistics extends AbstractNavigationAction implements 
 			ExperimentInterface res = experiment.getData(false, getStatusProvider());
 			getStatusProvider().setCurrentStatusText1("Analyze Data...");
 			ExperimentStatistics stat = ((Experiment) res).getExperimentStatistics();
-			if (false)
-				System.out.println("Statistics:\n" + stat);
-			summaryHTML = stat.getSummaryHTML(false);
+			summaryHTML = stat.getSummaryHTML(false, getStatusProvider());
 			getStatusProvider().setCurrentStatusText1("Processing finished");
 		} catch (Exception e) {
 			getStatusProvider().setCurrentStatusText1("Processing error:");
