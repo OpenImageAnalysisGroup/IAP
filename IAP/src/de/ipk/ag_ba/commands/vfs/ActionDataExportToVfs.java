@@ -7,6 +7,7 @@
 package de.ipk.ag_ba.commands.vfs;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -753,8 +754,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 										experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
 							
 							VfsFileObject f = vfs.newVfsFile(fn, true);
-							BufferedOutputStream bos = new BufferedOutputStream(f.getOutputStream());
-							written.addLong(ResourceIOManager.copyContent(in, bos, -1));
+							written.addLong(ResourceIOManager.copyContent(
+									new BufferedInputStream(in),
+									new BufferedOutputStream(f.getOutputStream()),
+									-1));
 							if (t != null)
 								f.setLastModified(t);
 							// f.setWritable(false);
