@@ -102,4 +102,9 @@ public class Vector2d {
 	public double angle(Vector2d end) {
 		return Math.atan2(end.y - y, end.x - x);
 	}
+	
+	public void translate(double leftX, double topY) {
+		this.x += leftX;
+		this.y += topY;
+	}
 }
