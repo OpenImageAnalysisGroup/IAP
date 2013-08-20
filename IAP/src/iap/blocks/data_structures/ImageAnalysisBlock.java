@@ -36,4 +36,6 @@ public interface ImageAnalysisBlock {
 			throws InterruptedException;
 	
 	public BlockType getBlockType();
+	
+	public void setPreventDebugValues(boolean b);
 }

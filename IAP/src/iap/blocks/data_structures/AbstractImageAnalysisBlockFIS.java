@@ -88,6 +88,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected boolean debugValues;
 	protected boolean preventDebugValues;
 	
+	@Override
+	public void setPreventDebugValues(boolean b) {
+		preventDebugValues = b;
+	}
+	
 	protected void prepare() {
 		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
@@ -270,16 +275,18 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					AbstractSnapshotAnalysisBlock inst = (AbstractSnapshotAnalysisBlock) blockType.newInstance();
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) blockType.newInstance();
 					ImageSet a = inputSet.images().copy();
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
-					inst.preventDebugValues = true;
+					inst.setPreventDebugValues(true);
 					inst.setInputAndOptions(ab, options, brs, blockPos, null);
 					ab = inst.process();
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();
 					Image processingResultImage = ab.masks().getImage(inpImageType);
+					if (processingResultImage == null)
+						processingResultImage = ab.images().getImage(inpImageType);
 					if (processingResultImage == null)
 						throw new Exception("Processed image not available");
 					
