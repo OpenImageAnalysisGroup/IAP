@@ -22,7 +22,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Previously only XML DOM objects could be parsed, but this class uses the SAX
  * event model, and thus requires much less RAM than the previous approach.
  * 
- * @author klukas
+ * @author Klukas
  */
 public class ExperimentSaxHandler extends DefaultHandler {
 	
