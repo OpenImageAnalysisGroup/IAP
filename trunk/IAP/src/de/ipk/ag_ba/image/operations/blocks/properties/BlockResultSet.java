@@ -67,8 +67,7 @@ public interface BlockResultSet {
 	public void addImagePostProcessor(RunnableOnImageSet runnableOnImageSet);
 	
 	/**
-	 * Returns the relevant list of post processors, also removes these
-	 * post processors from internal storage, so that they can be retrieved only once.
+	 * Returns the relevant list of post processors.
 	 */
 	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(ImageConfiguration imageConfig);
 	
@@ -77,4 +76,6 @@ public interface BlockResultSet {
 	public boolean isNumericStoreEmpty();
 	
 	public void addImagePostProcessor(ImageConfiguration imageType, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask);
+	
+	public void clearStoredPostprocessors();
 }

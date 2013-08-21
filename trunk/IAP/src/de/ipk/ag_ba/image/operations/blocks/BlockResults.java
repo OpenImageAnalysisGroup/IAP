@@ -423,8 +423,6 @@ public class BlockResults implements BlockResultSet {
 				res.add(ros);
 			}
 		}
-		for (RunnableOnImageSet ros : res)
-			storedPostProcessors.remove(ros);
 		return res;
 	}
 	
@@ -474,5 +472,10 @@ public class BlockResults implements BlockResultSet {
 					return mask;
 			}
 		});
+	}
+	
+	@Override
+	public void clearStoredPostprocessors() {
+		storedPostProcessors.clear();
 	}
 }

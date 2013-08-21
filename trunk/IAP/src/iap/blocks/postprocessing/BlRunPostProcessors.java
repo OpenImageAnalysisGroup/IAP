@@ -8,6 +8,7 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
 /**
@@ -31,6 +32,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 			}
 		}
 		return fi;
+	}
+	
+	@Override
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
+		getProperties().clearStoredPostprocessors();
 	}
 	
 	@Override
