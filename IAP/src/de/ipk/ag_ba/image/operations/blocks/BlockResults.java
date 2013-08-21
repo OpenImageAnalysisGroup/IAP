@@ -451,16 +451,27 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void addImagePostProcessor(final ImageConfiguration imageType, final RunnableOnImage runnableOnImage) {
+	public void addImagePostProcessor(final ImageConfiguration imageType, final RunnableOnImage runnableOnImage, final RunnableOnImage runnableOnMask) {
 		addImagePostProcessor(new RunnableOnImageSet() {
 			@Override
 			public Image postProcessImage(Image image) {
-				return runnableOnImage.postProcess(image);
+				if (runnableOnImage != null)
+					return runnableOnImage.postProcess(image);
+				else
+					return image;
 			}
 			
 			@Override
 			public ImageConfiguration getConfig() {
 				return imageType;
+			}
+			
+			@Override
+			public Image postProcessMask(Image mask) {
+				if (runnableOnMask != null)
+					return runnableOnMask.postProcess(mask);
+				else
+					return mask;
 			}
 		});
 	}
