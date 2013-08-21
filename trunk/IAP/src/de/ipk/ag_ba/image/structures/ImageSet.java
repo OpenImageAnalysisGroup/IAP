@@ -176,22 +176,7 @@ public class ImageSet {
 		if (flexibleImage == null) {
 			throw new UnsupportedOperationException("FlexibleImage is NULL");
 		}
-		switch (flexibleImage.getCameraType()) {
-			case VIS:
-				setVis(flexibleImage);
-				break;
-			case FLUO:
-				setFluo(flexibleImage);
-				break;
-			case NIR:
-				setNir(flexibleImage);
-				break;
-			case IR:
-				setIr(flexibleImage);
-				break;
-			case UNKNOWN:
-				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
-		}
+		setImage(flexibleImage.getCameraType(), flexibleImage);
 	}
 	
 	public ImageSet copy() {
@@ -392,5 +377,24 @@ public class ImageSet {
 	
 	public boolean isSideImage() {
 		return isSideImageSet;
+	}
+	
+	public void setImage(CameraType ct, Image flexibleImage) {
+		switch (ct) {
+			case VIS:
+				setVis(flexibleImage);
+				break;
+			case FLUO:
+				setFluo(flexibleImage);
+				break;
+			case NIR:
+				setNir(flexibleImage);
+				break;
+			case IR:
+				setIr(flexibleImage);
+				break;
+			case UNKNOWN:
+				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
+		}
 	}
 }
