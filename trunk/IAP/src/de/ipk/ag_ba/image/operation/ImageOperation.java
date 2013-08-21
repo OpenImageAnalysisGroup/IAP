@@ -5189,7 +5189,7 @@ public class ImageOperation implements MemoryHogInterface {
 					ImageOperationLabCube.getter = new ImageOperationLabCubeInterface() {
 						@Override
 						public float[][][] getLabCube() {
-							return ImageOperation.getLabCube();
+							return ImageOperation.getLabCubeInstance();
 						}
 					};
 				}
