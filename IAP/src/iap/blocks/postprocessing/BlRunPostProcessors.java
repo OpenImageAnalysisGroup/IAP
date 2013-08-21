@@ -23,11 +23,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbSide)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.RgbTop)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 		}
 		return fi;
@@ -55,11 +55,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.FluoTop)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 		}
 		return fi;
@@ -87,11 +87,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.NirTop)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 		}
 		return fi;
@@ -119,11 +119,11 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 			for (RunnableOnImageSet roi : getProperties()
 					.getStoredPostProcessors(ImageConfiguration.IrTop)) {
-				fi = roi.postProcessImage(fi);
+				fi = roi.postProcessMask(fi);
 			}
 		}
 		return fi;
