@@ -1106,9 +1106,29 @@ public class ImageOperation implements MemoryHogInterface {
 		
 	}
 	
-	public ImageOperation gamma(double value) {
-		image.getProcessor().gamma(value);
-		return new ImageOperation(image.getProcessor().getBufferedImage());
+	public ImageOperation gamma(double gamma) {
+		int[] img2d = getImageAs1dArray();
+		int width = getImage().getWidth();
+		int height = getImage().getHeight();
+		float rf, gf, bf;
+		int[] result = new int[width * height];
+		int idx = 0;
+		
+		gamma = 1 / gamma;
+		
+		for (int c : img2d) {
+			
+			rf = ((c & 0xff0000) >> 16);
+			gf = ((c & 0x00ff00) >> 8);
+			bf = (c & 0x0000ff);
+			
+			rf = (float) (Math.pow((rf / 255), gamma));
+			gf = (float) (Math.pow((gf / 255), gamma));
+			bf = (float) (Math.pow((bf / 255), gamma));
+			
+			result[idx++] = new Color(rf, gf, bf).getRGB();
+		}
+		return new ImageOperation(result, width, height);
 	}
 	
 	/**
@@ -2385,7 +2405,7 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 			};
 			try {
-				wait.add(BackgroundThreadDispatcher.addTask(r, "LAB cube calcualtion"));
+				wait.add(BackgroundThreadDispatcher.addTask(r, "LAB cube calculation"));
 			} catch (InterruptedException e) {
 				ErrorMsg.addErrorMessage(e);
 			}
