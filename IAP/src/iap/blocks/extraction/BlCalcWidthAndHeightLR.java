@@ -173,6 +173,11 @@ public class BlCalcWidthAndHeightLR extends
 										public ImageConfiguration getConfig() {
 											return ImageConfiguration.RgbSide;
 										}
+										
+										@Override
+										public Image postProcessMask(Image mask) {
+											return mask;
+										}
 									});
 						}
 					

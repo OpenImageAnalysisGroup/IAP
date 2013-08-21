@@ -117,7 +117,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
-			getProperties().addImagePostProcessor(ImageConfiguration.RgbTop, roi);
+			getProperties().addImagePostProcessor(ImageConfiguration.RgbTop, roi, null);
 		}
 		return ress;
 	}
