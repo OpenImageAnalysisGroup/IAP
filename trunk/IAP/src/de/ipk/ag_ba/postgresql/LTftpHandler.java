@@ -74,6 +74,8 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 				String detail = url.getDetail();
 				detail = detail.split("/", 2)[1];
 				String dir = detail.substring(0, detail.lastIndexOf("/"));
+				if (!localCopyPath.endsWith(File.separator) && !localCopyPath.endsWith("/"))
+					localCopyPath = localCopyPath + File.separator;
 				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
 				File f = new File(localCopyPath + dir + File.separator + fn);
 				if (f.exists())
