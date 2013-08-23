@@ -16,29 +16,29 @@ import de.ipk.ag_ba.image.structures.Image;
  */
 public class ImageDisplay {
 	
-	public static void show(ImagePlus image, String text) {
+	public static ImagePlus show(ImagePlus image, String text) {
 		image.setTitle(text);
 		image.show(text);
+		return image;
 	}
 	
-	public static void show(Image image, String text) {
-		show(image.getAsBufferedImage(), text);
+	public static ImagePlus show(Image image, String text) {
+		return show(image.getAsBufferedImage(), text);
 	}
 	
-	public static void show(BufferedImage image, String text) {
-		show(image, text, ImageDisplayOption.IMAGEJ);
+	public static ImagePlus show(BufferedImage image, String text) {
+		return show(image, text, ImageDisplayOption.IMAGEJ);
 	}
 	
-	public static void show(BufferedImage image, String text, ImageDisplayOption typ) {
+	public static ImagePlus show(BufferedImage image, String text, ImageDisplayOption typ) {
 		switch (typ) {
 			case GRAVISTO_SERVICE:
 				printGravistoService(image, text);
 				break;
 			
 			case IMAGEJ:
-				printImagej(image, text);
-				break;
-			
+				return printImagej(image, text);
+				
 			case CONSOLE:
 				printToConsole(ImageConverter.convertBIto2A(image), text);
 				break;
@@ -48,6 +48,7 @@ public class ImageDisplay {
 				break;
 		
 		}
+		return null;
 	}
 	
 	private static void printToConsole(int[][] image, String text) {
@@ -59,9 +60,10 @@ public class ImageDisplay {
 		}
 	}
 	
-	private static void printImagej(BufferedImage image, String text) {
+	private static ImagePlus printImagej(BufferedImage image, String text) {
 		ImagePlus img = ImageConverter.convertBItoIJ(image);
 		img.show(text);
+		return img;
 	}
 	
 	private static void printGravistoService(BufferedImage image, String text) {
