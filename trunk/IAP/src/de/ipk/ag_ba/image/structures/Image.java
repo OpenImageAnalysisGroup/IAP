@@ -37,7 +37,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
  */
 public class Image {
 	
-	private final ImagePlus image;
+	private ImagePlus image;
 	private final int w, h;
 	private CameraType cameraType = CameraType.UNKNOWN;
 	private String fileName;
@@ -183,9 +183,11 @@ public class Image {
 			return this;
 	}
 	
+	ImagePlus debugOutputview;
+	
 	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
-			ImageDisplay.show(
+			debugOutputview = ImageDisplay.show(
 					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint,
 							new Color(
 									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Red)", 115))),
@@ -361,5 +363,11 @@ public class Image {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
 		ImageIO.write(getAsBufferedImage(), "JPG", output);
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
+	}
+	
+	public void update(Image update) {
+		if (debugOutputview != null)
+			debugOutputview.setProcessor(update.getAsImagePlus().getProcessor());
+		this.image = update.getAsImagePlus();
 	}
 }
