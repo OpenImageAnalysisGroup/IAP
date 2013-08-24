@@ -89,6 +89,10 @@ public class TableData {
 		// System.out.println("Transposed Data from row "+fromRow+". Source ["+mCol+" x "+mRow+"] -> Target ["+tCol+" x "+tRow+"]");
 	}
 	
+	public static TableData getTableData(File file, boolean throwErrors) {
+		return ExperimentDataFileReader.getExcelTableData(file, -1, null, null, throwErrors);
+	}
+	
 	public static TableData getTableData(File file) {
 		return ExperimentDataFileReader.getExcelTableData(file, -1, null, null);
 	}
