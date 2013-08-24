@@ -48,7 +48,13 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			File inp = OpenFileDialogService.getDirectoryFromUser("Select Input Folder");
 			getInput = false;
 			if (inp != null && inp.isDirectory()) {
-				processDir(inp);
+				try {
+					processDir(inp);
+				} catch (UnsupportedOperationException ue) {
+					messages.add(ue.getMessage());
+				} catch (Exception ue) {
+					messages.add("Unexpected error: " + ue.getMessage());
+				}
 			}
 		}
 		this.src = src;
@@ -86,26 +92,37 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 			if (snapshotDirName.endsWith(".csv") || snapshotDirName.endsWith(".xlsx") || snapshotDirName.endsWith(".xls")) {
 				foundMetadata = true;
 				String fn = inp + File.separator + snapshotDirName;
-				TableData td = TableData.getTableData(new File(fn));
-				if (metadata.get(fn) == null)
-					metadata.put(fn, new ArrayList<TableDataStringRow>());
-				ArrayList<TableDataStringRow> lines = td.getRowsAsStringValues();
-				if (lines.size() > 0) {
-					TableDataStringRow firstLine = lines.get(0);
-					boolean foundHeadingIndicator = false;
-					String headingIndicator = SystemOptions.getInstance().getString("File Import", "Meta-Data-Heading-Indicator", "Genotype");
-					for (String v : firstLine.getValues()) {
-						if (v != null && v.equalsIgnoreCase(headingIndicator)) {
-							foundHeadingIndicator = true;
-							break;
+				TableData td = null;
+				try {
+					File f = new File(fn);
+					if (!f.getName().startsWith("~$"))
+						td = TableData.getTableData(f, true);
+				} catch (Exception e) {
+					throw new UnsupportedOperationException("Could not load meta data file '" + fn + "'.<br>" +
+							"Please make sure that the file is not currently loaded in another program!<br>" +
+							"Observed Error: " + e.getMessage());
+				}
+				if (td != null) {
+					if (metadata.get(fn) == null)
+						metadata.put(fn, new ArrayList<TableDataStringRow>());
+					ArrayList<TableDataStringRow> lines = td.getRowsAsStringValues();
+					if (lines.size() > 0) {
+						TableDataStringRow firstLine = lines.get(0);
+						boolean foundHeadingIndicator = false;
+						String headingIndicator = SystemOptions.getInstance().getString("File Import", "Meta-Data-Heading-Indicator", "Genotype");
+						for (String v : firstLine.getValues()) {
+							if (v != null && v.equalsIgnoreCase(headingIndicator)) {
+								foundHeadingIndicator = true;
+								break;
+							}
+						}
+						if (foundHeadingIndicator) {
+							lines.remove(0);
+							metadataHeading.put(fn, new TableDataHeadingRow(firstLine.getMap()));
 						}
 					}
-					if (foundHeadingIndicator) {
-						lines.remove(0);
-						metadataHeading.put(fn, new TableDataHeadingRow(firstLine.getMap()));
-					}
+					metadata.get(fn).addAll(lines);
 				}
-				metadata.get(fn).addAll(lines);
 			}
 			File f = new File(inp.getPath() + File.separator + snapshotDirName);
 			snapshotDirName = f.getAbsolutePath();
