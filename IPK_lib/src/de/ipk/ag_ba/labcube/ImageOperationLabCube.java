@@ -5,6 +5,9 @@ public class ImageOperationLabCube {
 	public static ImageOperationLabCubeInterface getter;
 	
 	public static float[][][] labCube() {
-		return getter.getLabCube();
+		if (getter != null)
+			return getter.getLabCube();
+		else
+			return null;
 	}
 }
