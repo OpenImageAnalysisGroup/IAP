@@ -994,9 +994,19 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		int g = c.getGreen();
 		int b = c.getBlue();
 		
-		int Li = (int) ImageOperationLabCube.labCube()[r][g][b];
-		int ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
-		int bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
+		int Li, ai, bi;
+		{
+			float[][][] lab = ImageOperationLabCube.labCube();
+			if (lab != null) {
+				Li = (int) lab[r][g][b];
+				ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
+				bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
+			} else {
+				Li = -1;
+				ai = -1;
+				bi = -1;
+			}
+		}
 		
 		float[] hsv = new float[3];
 		Color.RGBtoHSB(r, g, b, hsv);
