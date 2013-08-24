@@ -1,33 +1,51 @@
+See end of file for upgrade procedure.
+
 V1.0.3 (August 24, 2013)
 --------------------------------------------------------------------------------
-* Corrected the problem, that two of the same analysis-submit buttons where 
+* Fix (change 11):
+  Corrected the problem, that two of the same analysis-submit buttons where 
   shown, in case two mongodb databases have been configured. Now only one
   button is shown.
-* There was a performance degradation when using the 'Show Image' context menu 
-  command in the image grid view or when using the Analysis test-command.
-* When using the Load, DB-ImportExport command, the metadata file can't be
-  opened at the same time in Excel or another program. IAP now shows a warning/
-  error message in this situation. Before, data loading was not possible,
-  with no error message.
-* Added hints on next workflow steps, after clicking the 'Load > DB-Imp.-Exp. 
+* Fix (change 10):
+  There was a performance degradation/error (new in V1.0.2) when moving the 
+  mouse over the image display. When using the 'Show Image' context 
+  menu command in the image grid view and the Analysis test-command.
+* Fix (change 9):
+  When using the 'Load > DB-DB-Imp.-Exp. Dataset' command, the meta data 
+  file was not allowed to be open at the same time in Excel. IAP now handles
+  this situation without an error. In case of other loading errors a error 
+  message is shown. 
+* Fix (change 8):
+  When saving experiments or performing an analysis on local disc, the special
+  characters '[', ':' and ']' caused problems. These characters, if included 
+  in the experiment name, are handled now correctly.  
+* New (change 7):
+  Added hints on next workflow steps, after clicking the 'Load > DB-Imp.-Exp. 
   Dataset' command.
-  
+* New (change 6):
+  Update output counter, when saving analysis output to local disk. Status 
+  is shown during analysis.   
   
 V1.0.2b (August 12, 2013)
 --------------------------------------------------------------------------------
-* Experiment header information about used storage space when saving to disk 
+* Fix (change 5):
+  Experiment header information about used storage space when saving to disk 
   (VFS) has been corrected
-* Reduced memory usage during loading of data sets from MongoDB databases and
+* New (change 4):
+  Reduced memory usage during loading of data sets from MongoDB databases and
   from VFS
-* Reduced memory usage during data analysis
+* New (change 3):
+  Reduced memory usage during data analysis
 
 
 V1.0.1 (July 26, 2013)
 --------------------------------------------------------------------------------
-* A problem has been fixed, which prevented the proper analysis of data sets, 
+* Fix (change 2):
+  A problem has been fixed, which prevented the proper analysis of data sets, 
   loaded from a temporary VFS location (e.g. using the data set-loading command, 
   to access a local file system folder).
-* Analysis blocks, used for Barley and Arabidopsis analysis have been moved to 
+* New (change 1):
+  Analysis blocks, used for Barley and Arabidopsis analysis have been moved to 
   their proper package locations (similar to the Maize analysis blocks).
 
 
@@ -39,7 +57,7 @@ Upgrade procedure
    two gigabytes).
 
 2. Confirm the proper update, by clicking "About". The first text box should
-   include the text "(V1.0.2)" below the program name.
+   include the text "(V1.0.3)" below the program name.
    
   
 New installation
