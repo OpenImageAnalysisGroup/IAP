@@ -22,7 +22,6 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.mongo.MongoDB;
 
 public class ActionAnalysis extends AbstractNavigationAction implements ActionDataProcessing {
 	ExperimentReference experimentReference;
@@ -74,13 +73,11 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
 			if (experimentReference.m != null)
 				if (enableRemoteTaskExecution)
-					for (MongoDB m : MongoDB.getMongos()) {
-						actions.add(new NavigationButton(
-								new ActionPerformGridAnalysis(
-										new PipelineDesc(null, ioStringProvider, null, null),
-										experimentReference.m, experimentReference),
-								src.getGUIsetting()));
-					}
+					actions.add(new NavigationButton(
+							new ActionPerformGridAnalysis(
+									new PipelineDesc(null, ioStringProvider, null, null),
+									experimentReference.m, experimentReference),
+							src.getGUIsetting()));
 		}
 		
 		// actions.add(new NavigationButton(
