@@ -40,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.kegg_expression.TextFileColumnInformation;
 
 public abstract class ExperimentDataFileReader
-					implements BackgroundTaskStatusProvider {
+		implements BackgroundTaskStatusProvider {
 	protected String status1 = "-";
 	protected String status2 = "";
 	private boolean please_stop = false;
@@ -69,9 +69,9 @@ public abstract class ExperimentDataFileReader
 			}
 			
 			if (excelFile.getName().toUpperCase().endsWith(".CSV") ||
-								excelFile.getName().toUpperCase().endsWith(".DAT") ||
-								excelFile.getName().toUpperCase().endsWith(".TXT") ||
-								excelFile.getName().toUpperCase().endsWith(".LIST")) {
+					excelFile.getName().toUpperCase().endsWith(".DAT") ||
+					excelFile.getName().toUpperCase().endsWith(".TXT") ||
+					excelFile.getName().toUpperCase().endsWith(".LIST")) {
 				processCSVExcelFile(myData, fin, -1, optValidColumn, null);
 			} else {
 				/*
@@ -96,16 +96,25 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	public static TableData getExcelTableData(File excelFile,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		return getExcelTableData(excelFile, maximumRowToBeProcessed, optValidColumns,
+				optStatus, false);
+	}
+	
+	public static TableData getExcelTableData(File excelFile,
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			boolean throwErrors) {
 		final TableData myData = new TableData();
 		try {
 			FileInputStream fin = new FileInputStream(excelFile);
 			if (excelFile.getName().toUpperCase().endsWith(".CSV") ||
-								excelFile.getName().toUpperCase().endsWith(".DAT") ||
-								excelFile.getName().toUpperCase().endsWith(".TXT") ||
-								excelFile.getName().toUpperCase().endsWith(".LIST")) {
+					excelFile.getName().toUpperCase().endsWith(".DAT") ||
+					excelFile.getName().toUpperCase().endsWith(".TXT") ||
+					excelFile.getName().toUpperCase().endsWith(".LIST")) {
 				processCSVExcelFile(myData, fin, maximumRowToBeProcessed, optValidColumns, optStatus);
 			} else {
 				/*
@@ -120,34 +129,38 @@ public abstract class ExperimentDataFileReader
 			}
 			return myData;
 		} catch (InvalidFormatException e) {
+			if (throwErrors)
+				throw new UnsupportedOperationException(e);
 			ErrorMsg.addErrorMessage("Could not read excel file: " + e);
 			return null;
 		} catch (Exception e) {
+			if (throwErrors)
+				throw new UnsupportedOperationException(e);
 			ErrorMsg.addErrorMessage("Could not read file: " + e);
 			return null;
 		}
 	}
 	
 	public static TableData getExcelTableData(String tableData,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		final TableData myData = new TableData();
 		processCSVExcelFile(myData, tableData, maximumRowToBeProcessed, optValidColumns, optStatus);
 		return myData;
 	}
 	
 	public static TableData getExcelTableData(BufferedReader csvFile,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		TableData myData = new TableData();
 		processCSVExcelFile(myData, csvFile, maximumRowToBeProcessed, optValidColumns, optStatus);
 		return myData;
 	}
 	
 	public static TableData getCSVdata(File textFile,
-						ArrayList<String> arrayList, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			ArrayList<String> arrayList, BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		try {
 			HashSet<Integer> validColumns = new HashSet<Integer>();
 			TableData headerData = new TableData();
@@ -175,18 +188,18 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	private static void processCSVExcelFile(TableData myData, BufferedReader in,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		processCSVExcelFile(myData, in, maximumRowToBeProcessed, optValidColumns, optStatus, null);
 	}
 	
 	@SuppressWarnings("deprecation")
 	private static void processCSVExcelFile(TableData myData, BufferedReader in,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-						HashSet<Integer> validColumns) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			HashSet<Integer> validColumns) {
 		int row = 0;
 		try {
 			String s;
@@ -282,9 +295,9 @@ public abstract class ExperimentDataFileReader
 	
 	@SuppressWarnings("deprecation")
 	private static void processCSVExcelFile(TableData myData, String ins,
-						int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			int maximumRowToBeProcessed,
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		int row = 0;
 		boolean first = true;
 		String separator = "";
@@ -382,22 +395,22 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	private static void processCSVExcelFile(TableData myData, FileInputStream fin, int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		BufferedReader in = new BufferedReader(new InputStreamReader(fin));
 		processCSVExcelFile(myData, in, maximumRowToBeProcessed, optValidColumns, optStatus);
 	}
 	
 	private static void processCSVExcelFile(TableData myData, FileInputStream fin, int maximumRowToBeProcessed,
-						ArrayList<TextFileColumnInformation> optValidColumns,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-						HashSet<Integer> optValidColumnsNew) {
+			ArrayList<TextFileColumnInformation> optValidColumns,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			HashSet<Integer> optValidColumnsNew) {
 		BufferedReader in = new BufferedReader(new InputStreamReader(fin));
 		processCSVExcelFile(myData, in, maximumRowToBeProcessed, optValidColumns, optStatus, optValidColumnsNew);
 	}
 	
 	private static void processBinaryExcelFile(final TableData myData, FileInputStream fin,
-						final int maximumRowToBeProcessed, ArrayList<TextFileColumnInformation> optValidColumn) throws IOException {
+			final int maximumRowToBeProcessed, ArrayList<TextFileColumnInformation> optValidColumn) throws IOException {
 		POIFSFileSystem poifs = new POIFSFileSystem(fin);
 		InputStream din = poifs.createDocumentInputStream("Workbook"); //$NON-NLS-1$
 		HSSFRequest req = new HSSFRequest();
@@ -413,39 +426,43 @@ public abstract class ExperimentDataFileReader
 		
 		// req.addListenerForAllRecords(new HSSFListener()
 		req.addListener(new HSSFListener() {
+			@Override
 			public void processRecord(Record rec) {
 				LabelSSTRecord recT = (LabelSSTRecord) rec;
 				if (maximumRowToBeProcessed < 0 || recT.getRow() < maximumRowToBeProcessed)
 					myData.addCellData(
-										recT.getColumn(),
-										recT.getRow(),
-										myData.getStringRec().getString(recT.getSSTIndex()));
+							recT.getColumn(),
+							recT.getRow(),
+							myData.getStringRec().getString(recT.getSSTIndex()));
 			}
 		}, LabelSSTRecord.sid);
 		
 		req.addListener(new HSSFListener() {
+			@Override
 			public void processRecord(Record rec) {
 				NumberRecord recT = (NumberRecord) rec;
 				if (maximumRowToBeProcessed < 0 || recT.getRow() < maximumRowToBeProcessed)
 					myData.addCellData(
-										recT.getColumn(),
-										recT.getRow(),
-										new Double(recT.getValue()));
+							recT.getColumn(),
+							recT.getRow(),
+							new Double(recT.getValue()));
 			}
 		}, NumberRecord.sid);
 		
 		req.addListener(new HSSFListener() {
+			@Override
 			public void processRecord(Record rec) {
 				FormulaRecord recT = (FormulaRecord) rec;
 				if (maximumRowToBeProcessed < 0 || recT.getRow() < maximumRowToBeProcessed)
 					myData.addCellData(
-										recT.getColumn(),
-										recT.getRow(),
-										new Double(recT.getValue()));
+							recT.getColumn(),
+							recT.getRow(),
+							new Double(recT.getValue()));
 			}
 		}, FormulaRecord.sid);
 		
 		req.addListener(new HSSFListener() {
+			@Override
 			public void processRecord(Record rec) {
 				SSTRecord recT = (SSTRecord) rec;
 				myData.setStringRec(recT);
@@ -457,7 +474,7 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	private static void processExcelFile(TableData myData, FileInputStream fin,
-						final int maximumRowToBeProcessed) throws IOException, InvalidFormatException {
+			final int maximumRowToBeProcessed) throws IOException, InvalidFormatException {
 		try {
 			Workbook workbook = WorkbookFactory.create(fin);
 			Sheet sheet = workbook.getSheetAt(0);
@@ -495,7 +512,7 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	public ExperimentInterface getXMLdata(File excelFile, TableData myData,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider) {
 		if (excelFile != null)
 			fileName = excelFile.getName();
 		else
@@ -507,7 +524,7 @@ public abstract class ExperimentDataFileReader
 	}
 	
 	public abstract ExperimentInterface getXMLDataFromExcelTable(File excelFile, TableData myData,
-						BackgroundTaskStatusProviderSupportingExternalCall statusProvider);
+			BackgroundTaskStatusProviderSupportingExternalCall statusProvider);
 	
 	/**
 	 * @return
@@ -592,34 +609,42 @@ public abstract class ExperimentDataFileReader
 		return result;
 	}
 	
+	@Override
 	public int getCurrentStatusValue() {
 		return (int) progressDouble;
 	}
 	
+	@Override
 	public void setCurrentStatusValue(int value) {
 		progressDouble = new Double(value);
 	}
 	
+	@Override
 	public double getCurrentStatusValueFine() {
 		return progressDouble;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage1() {
 		return status1;
 	}
 	
+	@Override
 	public String getCurrentStatusMessage2() {
 		return status2;
 	}
 	
+	@Override
 	public void pleaseStop() {
 		please_stop = true;
 	}
 	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}
 	
+	@Override
 	public void pleaseContinueRun() {
 		// empty
 	}
