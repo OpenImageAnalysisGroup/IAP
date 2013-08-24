@@ -1,3 +1,18 @@
+V1.0.3 (August 24, 2013)
+--------------------------------------------------------------------------------
+* Corrected the problem, that two of the same analysis-submit buttons where 
+  shown, in case two mongodb databases have been configured. Now only one
+  button is shown.
+* There was a performance degradation when using the 'Show Image' context menu 
+  command in the image grid view or when using the Analysis test-command.
+* When using the Load, DB-ImportExport command, the metadata file can't be
+  opened at the same time in Excel or another program. IAP now shows a warning/
+  error message in this situation. Before, data loading was not possible,
+  with no error message.
+* Added hints on next workflow steps, after clicking the 'Load > DB-Imp.-Exp. 
+  Dataset' command.
+  
+  
 V1.0.2b (August 12, 2013)
 --------------------------------------------------------------------------------
 * Experiment header information about used storage space when saving to disk 
