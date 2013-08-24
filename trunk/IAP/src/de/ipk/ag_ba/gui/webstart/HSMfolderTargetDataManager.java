@@ -117,6 +117,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		s = StringManipulationTools.stringReplace(s, "%44", ",");
 		s = StringManipulationTools.stringReplace(s, "%45", "-");
 		s = StringManipulationTools.stringReplace(s, "%46", ".");
+		s = StringManipulationTools.stringReplace(s, "%91", "[");
+		s = StringManipulationTools.stringReplace(s, "%58", "."); // : is not valid for file name
+		s = StringManipulationTools.stringReplace(s, "%93", "]");
 		s = StringManipulationTools.stringReplace(s, "..", "%46%46");
 		return s;
 	}
