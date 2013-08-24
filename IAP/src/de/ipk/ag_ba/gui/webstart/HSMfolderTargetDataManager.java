@@ -22,6 +22,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -258,7 +259,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 				pre = optFileNameMainAndLabelPrefix[0];
 			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			InputStream mainStream = limg.getInputStream();
-			ResourceIOManager.copyContent(mainStream, new FileOutputStream(new File(targetFileNameFullRes)));
+			VirtualFileSystemVFS2.writeCounter.addLong(ResourceIOManager.copyContent(mainStream, new FileOutputStream(new File(targetFileNameFullRes))));
 			
 			IOurl url = limg.getURL();
 			
@@ -284,7 +285,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			}
 			String targetFileNameFullRes = prepareAndGetDataFileNameAndPath(ehi, snapshotTime, pre + desiredFileName.split("#")[0]);
 			InputStream labelStream = limg.getLabelURL().getInputStream();
-			ResourceIOManager.copyContent(labelStream, new FileOutputStream(new File(targetFileNameFullRes)));
+			VirtualFileSystemVFS2.writeCounter.addLong(ResourceIOManager.copyContent(labelStream, new FileOutputStream(new File(targetFileNameFullRes))));
 			
 			IOurl url = limg.getLabelURL();
 			
@@ -302,7 +303,7 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		{
 			String targetFileNamePreview = prepareAndGetPreviewFileNameAndPath(ehi, snapshotTime, pre + finalMainName.split("#")[0]);
 			MyByteArrayInputStream previewStream = MyImageIOhelper.getPreviewImageStream(limg.getLoadedImage());
-			ResourceIOManager.copyContent(previewStream, new FileOutputStream(new File(targetFileNamePreview)));
+			VirtualFileSystemVFS2.writeCounter.addLong(ResourceIOManager.copyContent(previewStream, new FileOutputStream(new File(targetFileNamePreview))));
 		}
 		if (!keepRemoteURLs_safe_space) {
 			// copy label and annotation files...
