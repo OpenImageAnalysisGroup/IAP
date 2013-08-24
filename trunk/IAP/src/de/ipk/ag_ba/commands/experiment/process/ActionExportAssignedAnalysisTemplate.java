@@ -44,7 +44,7 @@ public class ActionExportAssignedAnalysisTemplate extends AbstractNavigationActi
 		
 		String pn = so.getString("DESCRIPTION", "pipeline_name", null, false);
 		if (pn != null && !pn.isEmpty())
-			iniContent = StringManipulationTools.stringReplace(iniContent, "pipeline_name = " + pn, "pipeline_name = " + pn + " " + timestamp + "");
+			iniContent = StringManipulationTools.stringReplace(iniContent, "pipeline_name = " + pn, "pipeline_name = " + pn + " [" + timestamp + "]");
 		
 		TextFile.write(ReleaseInfo.getAppFolderWithFinalSep() + exportFileName, iniContent);
 		if (IAPmain.getRunMode() == IAPrunMode.SWING_APPLET || IAPmain.getRunMode() == IAPrunMode.SWING_MAIN)
