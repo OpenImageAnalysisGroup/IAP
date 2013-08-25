@@ -37,12 +37,20 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import com.toedter.calendar.JDateChooser;
 
 import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
+import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemHandler;
+import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -63,6 +71,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	JTextField editName;
+	JTextField editDBid;
 	JTextField coordinator;
 	JTextField groupVisibility;
 	JComboBox experimentTypeSelection;
@@ -73,6 +82,8 @@ public class MyExperimentInfoPanel extends JPanel {
 	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
+	
+	private ExperimentReference experimentReference;
 	
 	public MyExperimentInfoPanel() {
 		// empty
@@ -95,6 +106,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				});
 			}
 		};
+		this.experimentReference = experimentReference;
 		experimentReference.runAsDataBecomesAvailable(r);
 	}
 	
@@ -285,6 +297,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		fp.addCollapseListenerDialogSizeUpdate();
 		
 		editName = new JTextField(experimentHeader.getExperimentName());
+		editDBid = new JTextField(experimentHeader.getDatabaseId() + "");
 		coordinator = new JTextField(experimentHeader.getCoordinator());
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
 		// getGroups(login, pass, experimentHeader.getImportusergroup(),
@@ -297,7 +310,8 @@ public class MyExperimentInfoPanel extends JPanel {
 		sequence = new JTextField(experimentHeader.getSequence());
 		
 		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
-		fp.addGuiComponentRow(new JLabel("ID"), disable(new JTextField(experimentHeader.getDatabaseId() + "")), false);
+		
+		fp.addGuiComponentRow(new JLabel("ID"), disable(editDBid), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 				false);
 		fp.addGuiComponentRow(new JLabel("Origin"), disable(new JTextField(experimentHeader.getOriginDbId() + "")), false);
@@ -371,6 +385,7 @@ public class MyExperimentInfoPanel extends JPanel {
 				saveB.setText("Save Changes");
 				if (restore) {
 					editName.setText(experimentHeader.getExperimentName());
+					editDBid.setText(experimentHeader.getDatabaseId());
 					coordinator.setText(experimentHeader.getCoordinator());
 					groupVisibility.setText(experimentHeader.getImportusergroup());
 					// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
@@ -408,25 +423,72 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
-							// Changing the experiment header is currently not
-							// supported for VFS locations
-							// the problem is, that a changed experiment name
-							// or coordinator, etc. causes a problem in finding
-							// the data file
-							// if (experimentHeader.getExperimentHeaderHelper() != null) {
-							// if (experimentHeader.getExperimentHeaderHelper().saveUpdatedProperties(
-							// BackgroundTaskHelper.getStatusHelperFor(saveB)) > 0)
-							// saveB.setText("Updated (saved)");
-							// else
-							// saveB.setText("Updated (in memory)");
-							// } else {
-							if (m != null)
-								m.saveExperimentHeader(experimentHeader);
-							if (m != null)
-								saveB.setText("Updated (in database)");
-							else
-								saveB.setText("Updated (in memory)");
-							// }
+							if (experimentHeader.getExperimentHeaderHelper() != null) {
+								saveB.setText("Save data...");
+								boolean ok = false;
+								String dbId = experimentHeader != null ? experimentHeader.getDatabaseId() : null;
+								if (dbId != null) {
+									String id = dbId.contains(":") ? dbId.substring(0, dbId.indexOf(":")) : null;
+									if (id != null && !id.isEmpty()) {
+										ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(id);
+										if (vfs instanceof VirtualFileSystemHandler) {
+											VirtualFileSystemHandler vv = (VirtualFileSystemHandler) vfs;
+											if (vv.getVFS() instanceof VirtualFileSystemVFS2) {
+												VirtualFileSystemVFS2 vv2 = (VirtualFileSystemVFS2) vv.getVFS();
+												if (vv2.isAbleToSaveData()) {
+													final ActionDataExportToVfs acc = getCopyAction(experimentReference, vv2);
+													acc.setStatusProvider(BackgroundTaskHelper.getStatusHelperFor(saveB));
+													BackgroundTaskHelper.issueSimpleTask("Save header changes", "Save changes", new Runnable() {
+														@Override
+														public void run() {
+															try {
+																HSMfolderTargetDataManager.clearPathCache();
+																acc.setSkipClone(true);
+																acc.setSkipUpdateDBid(true);
+																acc.performActionCalculateResults(null);
+																experimentReference.getHeader().getExperimentHeaderHelper().saveUpdatedProperties(acc.getStatusProvider());
+															} catch (Exception e) {
+																acc.getStatusProvider().setCurrentStatusText1("Error: " + e.getMessage());
+															}
+														}
+													}, new Runnable() {
+														@Override
+														public void run() {
+															editName.setText(experimentHeader.getExperimentName());
+															editDBid.setText(experimentHeader.getDatabaseId());
+															coordinator.setText(experimentHeader.getCoordinator());
+															groupVisibility.setText(experimentHeader.getImportusergroup());
+															// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
+															if (experimentHeader.getExperimentType() != null)
+																experimentTypeSelection.setSelectedItem(experimentHeader.getExperimentType());
+															else
+																experimentTypeSelection.setSelectedIndex(0);
+															expStart.setDate(experimentHeader.getStartdate());
+															expEnd.setDate(experimentHeader.getImportdate());
+															sequence.setText(experimentHeader.getSequence());
+															remark.setText(experimentHeader.getRemark());
+															outliers.setText(experimentHeader.getGlobalOutlierInfo());
+															saveB.setText(acc.postResult);
+														}
+													});
+													ok = true;
+												}
+											}
+										}
+									}
+								}
+								if (!ok)
+									saveB.setText("Updated (saved)");
+								// MyExperimentInfoPanel.this.setExperimentInfo(m, experimentHeader,
+								// true, null);
+							} else {
+								if (m != null)
+									m.saveExperimentHeader(experimentHeader);
+								if (m != null)
+									saveB.setText("Updated (in database)");
+								else
+									saveB.setText("Updated (in memory)");
+							}
 						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
@@ -471,6 +533,53 @@ public class MyExperimentInfoPanel extends JPanel {
 		
 		// setBorder(BorderFactory.createEtchedBorder());
 		setBorder(BorderFactory.createLoweredBevelBorder());
+	}
+	
+	protected ActionDataExportToVfs getCopyAction(ExperimentReference experiment, VirtualFileSystemVFS2 vv2) {
+		return new ActionDataExportToVfs(experiment.m, experiment, vv2, false, null) {
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				setSkipClone(true);
+				super.performActionCalculateResults(src);
+			}
+			
+			@Override
+			public boolean isProvidingActions() {
+				return true;
+			}
+			
+			@Override
+			public boolean requestTitleUpdates() {
+				return false;
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				String res = "Save Annotation Changes" + (postResult != null ? "<br>" + postResult : "");
+				return res;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return null;
+			}
+			
+			@Override
+			public MainPanelComponent getResultMainPanel() {
+				return null;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				return currentSet;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/ext/gpl2/Gnome-Emblem-Downloads-64.png";
+			}
+		};
 	}
 	
 	private JComponent tooltip(JComponent jc, String to) {
