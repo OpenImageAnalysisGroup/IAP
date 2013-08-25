@@ -76,7 +76,7 @@ public class ExperimentReference {
 			if (databaseID.indexOf(":") > 0) {
 				String pre = databaseID.substring(0, databaseID.indexOf(":"));
 				for (Boolean ignorePrefix : new Boolean[] { Boolean.FALSE, Boolean.TRUE })
-					for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(true)) {
+					for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(true, false)) {
 						if (pre.equals(vfs.getPrefix()) | ignorePrefix) {
 							if (ignorePrefix)
 								databaseID = databaseID.substring(databaseID.indexOf(":") + ":".length());
