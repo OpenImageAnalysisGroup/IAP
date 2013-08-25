@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -28,6 +29,7 @@ import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.experiment.hsm.DataExportHelper;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
@@ -60,6 +62,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	private final String[] validExtensions2;
 	private final String subfolder;
 	ArrayList<NavigationAction> folderActions = new ArrayList<NavigationAction>();
+	LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
@@ -83,6 +86,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	
 	@Override
 	public void readDataSource() throws Exception {
+		trashed.clear();
 		this.read = true;
 		this.mainList = new ArrayList<PathwayWebLinkItem>();
 		folderActions.clear();
@@ -151,20 +155,26 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 				}
 			});
 			
-			if (entries != null)
+			if (entries != null) {
+				
 				for (String fileName : entries) {
 					long saveTime = Long.parseLong(fileName.substring(0, fileName.indexOf("_")));
 					
 					ExperimentHeader eh = getExperimentHeaderFromFileName(url, fileName);
 					
 					if (accessOK(eh)) {
-						String experimentName = eh.getExperimentName();
-						if (!experimentName2saveTime2data.containsKey(experimentName))
-							experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
-						experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
-						eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
+						if (eh.inTrash())
+							trashed.add(eh);
+						else {
+							String experimentName = eh.getExperimentName();
+							if (!experimentName2saveTime2data.containsKey(experimentName))
+								experimentName2saveTime2data.put(experimentName, new TreeMap<Long, ExperimentHeaderInterface>());
+							experimentName2saveTime2data.get(experimentName).put(saveTime, eh);
+							eh.addHistoryItems(experimentName2saveTime2data.get(experimentName));
+						}
 					}
 				}
+			}
 		}
 	}
 	
@@ -178,6 +188,16 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		if (subfolder == null)
 			for (NavigationButton nb : super.getAdditionalEntities(src))
 				folderButtons.add(nb);
+		
+		return folderButtons;
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+		Collection<NavigationButton> folderButtons = super.getAdditionalEntitiesShownAtEndOfList(src);
+		if (trashed.size() > 0) {
+			folderButtons.add(new NavigationButton(ActionMongoExperimentsNavigation.getTrashedExperimentsAction(trashed, null), src.getGUIsetting()));
+		}
 		return folderButtons;
 	}
 	
@@ -186,19 +206,29 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		
 		eh.setDatabaseId(vfs.getPrefix() + ":index" + File.separator + fileName);
 		
-		final String prefix = vfs.getPrefix();
+		ExperimentHeaderHelper ehh = getExperimentHeaderHelper(vfs, fileName, eh);
 		
+		ehh.readSourceForUpdate();
+		
+		eh.setExperimentHeaderHelper(ehh);
+		
+		return eh;
+	}
+	
+	public static ExperimentHeaderHelper getExperimentHeaderHelper(final VirtualFileSystem vfs, final String fileName,
+			final ExperimentHeaderInterface eh)
+			throws Exception {
 		final VfsFileObject indexFile = vfs.getFileObjectFor(HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
 		ExperimentHeaderHelper ehh = new ExperimentHeaderHelper() {
 			
 			@Override
 			public void readSourceForUpdate() throws Exception {
-				synchronized (url) {
+				synchronized (vfs) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Get current header from file (" + fileName + ")");
 					HashMap<String, String> properties = new HashMap<String, String>();
 					InputStream is = indexFile.getInputStream();
 					TextFile tf = new TextFile(is, -1);
-					properties.put("_id", prefix + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
+					properties.put("_id", vfs.getPrefix() + ":" + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME + File.separator + fileName);
 					String lastItemId = null;
 					for (String p : tf) {
 						if (StringManipulationTools.count(p, ",") >= 2) {
@@ -225,7 +255,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public Long saveUpdatedProperties(BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
-				synchronized (url) {
+				synchronized (vfs) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
 					DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
 					return indexFile.getLastModified();
@@ -236,18 +266,19 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			public boolean isAbleToSaveData() {
 				return vfs.isAbleToSaveData();
 			}
+			
+			@Override
+			public String getFileName() {
+				return fileName;
+			}
 		};
-		
-		ehh.readSourceForUpdate();
-		
-		eh.setExperimentHeaderHelper(ehh);
-		
-		return eh;
+		return ehh;
 	}
 	
 	@Override
 	public ExperimentInterface getExperiment(ExperimentHeaderInterface header, boolean interactiveGetExperimentSize,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		HSMfolderTargetDataManager.clearPathCache();
 		String hsmFolder = header.getDatabaseId();
 		String fileName = hsmFolder.substring(hsmFolder.lastIndexOf(File.separator) + File.separator.length());
 		
