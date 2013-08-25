@@ -873,11 +873,13 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
 			HashMap<VfsFileObject, String> tempFile2fileName, ExperimentInterface ei)
 			throws Exception {
-		String conditionIndexFileName = tsave + "_" + eidx + "_"
-				+ ei.getHeader().getImportusername() + "_" + ei.getName()
-				+ ".iap.index.csv";
-		conditionIndexFileName = StringManipulationTools.stringReplace(
-				conditionIndexFileName, ":", "-");
+		String conditionIndexFileName =
+				
+				tsave + "_" + eidx + "_"
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_"
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getName())
+						+ ".iap.index.csv";
+		
 		VfsFileObject conditionFile = vfs.newVfsFile(
 				hsmManager
 						.prepareAndGetTargetFileForConditionIndex("in_progress_"
@@ -942,9 +944,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private String storeIndexFile(final HSMfolderTargetDataManager hsmManager,
 			long tsave, int eidx, HashMap<VfsFileObject, String> tempFile2fileName,
 			ExperimentInterface ei) throws Exception {
-		String indexFileName = tsave + "_" + eidx + "_"
-				+ ei.getHeader().getImportusername() + "_" + ei.getName()
-				+ ".iap.index.csv";
+		String indexFileName =
+				
+				tsave + "_" + eidx + "_"
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_" +
+						HSMfolderTargetDataManager.filterBadChars(ei.getName())
+						+ ".iap.index.csv";
 		indexFileName = StringManipulationTools.stringReplace(indexFileName,
 				":", "-");
 		
@@ -958,7 +963,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				ei.getNumberOfMeasurementValues());
 		String experimentName = ei.getName();
 		for (String key : header.keySet()) {
-			indexFileContent.add(experimentName + "," + key + ","
+			indexFileContent.add(HSMfolderTargetDataManager.filterBadChars(experimentName) + "," + key + ","
 					+ header.get(key));
 		}
 		indexFileContent.write(indexFile.getOutputStream());
@@ -991,7 +996,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		if (ei.getStartDate() != null)
 			f.setLastModified(ei.getStartDate().getTime());
 		String xmlFileName = tsave + "_" + eidx + "_"
-				+ ei.getHeader().getImportusername() + "_" + ei.getName()
+				+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_"
+				+ HSMfolderTargetDataManager.filterBadChars(ei.getName())
 				+ ".iap.vanted.bin";
 		xmlFileName = StringManipulationTools.stringReplace(xmlFileName, ":",
 				"-");
