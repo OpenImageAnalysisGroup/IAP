@@ -121,7 +121,8 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 		for (VirtualFileSystem vx : vl) {
 			if (vx instanceof VirtualFileSystemVFS2) {
 				VirtualFileSystemVFS2 v = (VirtualFileSystemVFS2) vx;
-				res.add(new NavigationButton(new ActionDataExportToVfs(m, experimentReferences, v, !includeOutliers.getBval(0, false)), guiSetting));
+				res.add(new NavigationButton(new ActionDataExportToVfs(m,
+						experimentReferences, v, !includeOutliers.getBval(0, false), null), guiSetting));
 			}
 		}
 		
