@@ -164,7 +164,7 @@ public abstract class VirtualFileSystem {
 	public MainPanelComponent saveExperiment(MongoDB m, ExperimentReference experimentReference,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider, boolean ignoreOutliers) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
-				(VirtualFileSystemVFS2) this, ignoreOutliers);
+				(VirtualFileSystemVFS2) this, ignoreOutliers, null);
 		if (statusProvider != null)
 			a.setStatusProvider(statusProvider);
 		a.performActionCalculateResults(null);
