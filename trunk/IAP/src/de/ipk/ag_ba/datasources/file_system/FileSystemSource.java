@@ -152,16 +152,23 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 		}
 	}
 	
+	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	
+	@Override
 	public String getDescription() {
 		return description;
 	}
 	
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) throws Exception {
+		return new ArrayList<NavigationButton>();
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
 	}
 	
