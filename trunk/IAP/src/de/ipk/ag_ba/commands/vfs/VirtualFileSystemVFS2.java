@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -20,6 +19,7 @@ import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -471,16 +471,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	private String filterBadChars(String string) {
-		String s = StringManipulationTools.UnicodeToURLsyntax(string);
-		s = StringManipulationTools.stringReplace(s, "%32", " ");
-		s = StringManipulationTools.stringReplace(s, "%95", "_");
-		s = StringManipulationTools.stringReplace(s, "%40", "(");
-		s = StringManipulationTools.stringReplace(s, "%41", ")");
-		s = StringManipulationTools.stringReplace(s, "%44", ",");
-		s = StringManipulationTools.stringReplace(s, "%45", "-");
-		s = StringManipulationTools.stringReplace(s, "%46", ".");
-		s = StringManipulationTools.stringReplace(s, "..", "%46%46");
-		return s;
+		return HSMfolderTargetDataManager.filterBadChars(string);
 	}
 	
 	public static String digit2(int i) {
