@@ -108,20 +108,22 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		return res + File.separator + filterBadChars(zefn);
 	}
 	
-	private String filterBadChars(String string) {
+	public static String filterBadChars(String string) {
 		String s = StringManipulationTools.UnicodeToURLsyntax(string);
+		s = StringManipulationTools.stringReplace(s, "-", "%45");
 		s = StringManipulationTools.stringReplace(s, "%167", "§");
 		s = StringManipulationTools.stringReplace(s, "%32", " ");
 		s = StringManipulationTools.stringReplace(s, "%95", "_");
 		s = StringManipulationTools.stringReplace(s, "%40", "(");
 		s = StringManipulationTools.stringReplace(s, "%41", ")");
-		s = StringManipulationTools.stringReplace(s, "%44", ",");
+		s = StringManipulationTools.stringReplace(s, "%44", "_"); // ,
 		s = StringManipulationTools.stringReplace(s, "%45", "-");
 		s = StringManipulationTools.stringReplace(s, "%46", ".");
-		s = StringManipulationTools.stringReplace(s, "%91", "[");
-		s = StringManipulationTools.stringReplace(s, "%58", "."); // : is not valid for file name
-		s = StringManipulationTools.stringReplace(s, "%93", "]");
 		s = StringManipulationTools.stringReplace(s, "..", "%46%46");
+		s = StringManipulationTools.stringReplace(s, "%91", "[");
+		s = StringManipulationTools.stringReplace(s, "%58", "_"); // : is not valid for file name
+		s = StringManipulationTools.stringReplace(s, "%93", "]");
+		s = StringManipulationTools.stringReplace(s, "%", "-");
 		return s;
 	}
 	
