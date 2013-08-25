@@ -90,4 +90,10 @@ public class HsmFtpMainDataSourceLevel implements DataSourceLevel {
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
 	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+		return new ArrayList<NavigationButton>();
+	}
+	
 }
