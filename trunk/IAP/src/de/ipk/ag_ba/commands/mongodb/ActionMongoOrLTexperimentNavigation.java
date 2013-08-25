@@ -98,16 +98,16 @@ public class ActionMongoOrLTexperimentNavigation extends
 						.getImportusername().equals(
 								SystemAnalysis.getUserName()))
 				|| !SystemAnalysis.isHeadless()) {
-			if (experimentReference.m != null)
-				if (header.inTrash()) {
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.UNTRASH, src.getGUIsetting(), experimentReference.m));
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.DELETE, src.getGUIsetting(), experimentReference.m));
-				} else {
-					actions.add(ActionTrash.getTrashEntity(header,
-							DeletionCommand.TRASH, src.getGUIsetting(), experimentReference.m));
-				}
+			// if (experimentReference.m != null)
+			if (header.inTrash()) {
+				actions.add(ActionTrash.getTrashEntity(header,
+						DeletionCommand.UNTRASH, src.getGUIsetting(), experimentReference.m));
+				actions.add(ActionTrash.getTrashEntity(header,
+						DeletionCommand.DELETE, src.getGUIsetting(), experimentReference.m));
+			} else {
+				actions.add(ActionTrash.getTrashEntity(header,
+						DeletionCommand.TRASH, src.getGUIsetting(), experimentReference.m));
+			}
 		}
 		
 		return actions;
