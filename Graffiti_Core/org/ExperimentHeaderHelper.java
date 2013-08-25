@@ -10,4 +10,6 @@ public interface ExperimentHeaderHelper {
 	
 	public boolean isAbleToSaveData();
 	
+	public String getFileName();
+	
 }
