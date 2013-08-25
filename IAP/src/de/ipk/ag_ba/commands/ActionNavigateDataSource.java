@@ -92,6 +92,14 @@ public class ActionNavigateDataSource extends AbstractNavigationAction {
 					er, src.getGUIsetting());
 			actions.add(ne);
 		}
+		try {
+			for (NavigationButton nb : getDataSourceLevel().getAdditionalEntitiesShownAtEndOfList(src)) {
+				actions.add(nb);
+			}
+		} catch (RuntimeException e) {
+			errorMsg = e.getMessage();
+			return;
+		}
 	}
 	
 	private String makePretty(String fileName) {
