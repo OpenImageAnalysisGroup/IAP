@@ -224,7 +224,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			}
 			
 			@Override
-			public Long saveUpdatedProperties() throws Exception {
+			public Long saveUpdatedProperties(BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 				synchronized (url) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
 					DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
@@ -262,7 +262,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Load Experiment");
-		IOurl u = url.getIOurlFor(experimentDirectory + File.separator + fileNameOfExperimentFile);
+		IOurl u = url.getIOurlFor(experimentDirectory + "/" + fileNameOfExperimentFile);
 		String prefix = u.getPrefix();
 		ExperimentInterface md = Experiment.loadFromIOurl(u, optStatus);
 		if (optStatus != null)
