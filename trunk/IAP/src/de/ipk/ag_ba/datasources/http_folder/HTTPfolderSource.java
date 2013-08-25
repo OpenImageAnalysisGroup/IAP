@@ -41,7 +41,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private HTTPdataSourceLevel thisLevel;
 	private final Library lib;
 	private String description;
-	private DataSourceGroup dsg;
+	private final DataSourceGroup dsg;
 	
 	public HTTPfolderSource(DataSourceGroup dsg, Library lib, String dataSourceName, String url, String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
@@ -136,16 +136,23 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 		}
 	}
 	
+	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	
+	@Override
 	public String getDescription() {
 		return description;
 	}
 	
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
+		return new ArrayList<NavigationButton>();
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
 		return new ArrayList<NavigationButton>();
 	}
 	
