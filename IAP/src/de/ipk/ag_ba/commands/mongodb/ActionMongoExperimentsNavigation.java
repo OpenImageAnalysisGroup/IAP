@@ -247,7 +247,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return res;
 	}
 	
-	private NavigationAction getTrashedExperimentsAction(final LinkedHashSet<ExperimentHeaderInterface> trashed, final MongoDB m) {
+	public static NavigationAction getTrashedExperimentsAction(final LinkedHashSet<ExperimentHeaderInterface> trashed, final MongoDB m) {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
 			
 			private NavigationButton src;
