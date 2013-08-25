@@ -23,7 +23,6 @@ import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
-import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
@@ -68,7 +67,7 @@ public class Image {
 		// else
 		// System.out.println("- ~ "+url);
 		if (img == null) {
-			InputStream is = ResourceIOManager.getInputStreamMemoryCached(url);
+			InputStream is = url.getInputStream();
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			img = ImageIO.read(is);
