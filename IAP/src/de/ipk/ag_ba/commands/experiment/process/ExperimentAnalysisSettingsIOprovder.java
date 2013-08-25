@@ -58,7 +58,7 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 						+ m.getDatabaseName() + ".");
 			} else {
 				if (header.getExperimentHeaderHelper() != null) {
-					res = header.getExperimentHeaderHelper().saveUpdatedProperties();
+					res = header.getExperimentHeaderHelper().saveUpdatedProperties(null);
 				}
 			}
 		} catch (Exception e) {
