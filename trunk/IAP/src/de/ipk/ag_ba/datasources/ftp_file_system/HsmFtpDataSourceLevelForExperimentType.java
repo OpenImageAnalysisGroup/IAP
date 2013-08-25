@@ -97,6 +97,11 @@ public class HsmFtpDataSourceLevelForExperimentType implements DataSourceLevel {
 		return new ArrayList<NavigationButton>();
 	}
 	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+		return new ArrayList<NavigationButton>();
+	}
+	
 	public void addExperiment(ExperimentHeader newestExp) {
 		String user = newestExp.getCoordinator();
 		if (user == null || user.isEmpty())
