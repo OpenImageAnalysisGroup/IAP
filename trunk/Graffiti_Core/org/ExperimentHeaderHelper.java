@@ -6,7 +6,7 @@ public interface ExperimentHeaderHelper {
 	
 	public Long getLastModified() throws Exception;
 	
-	public Long saveUpdatedProperties() throws Exception;
+	public Long saveUpdatedProperties(BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception;
 	
 	public boolean isAbleToSaveData();
 	
