@@ -96,6 +96,11 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 		return new ArrayList<NavigationButton>();
 	}
 	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+		return new ArrayList<NavigationButton>();
+	}
+	
 	public void addExperiment(ExperimentHeaderInterface newestExp) {
 		String user = newestExp.getCoordinator();
 		if (user == null || user.isEmpty())
