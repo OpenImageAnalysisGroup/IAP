@@ -100,6 +100,12 @@ public class VANTEDdataSource extends HTTPfolderSource {
 			public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 				return new ArrayList<NavigationButton>();
 			}
+			
+			@Override
+			public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+				return new ArrayList<NavigationButton>();
+			}
+			
 		});
 		return res;
 	}
