@@ -408,12 +408,25 @@ public class MyExperimentInfoPanel extends JPanel {
 							saveAction.run(experimentHeader);
 					} else {
 						if (editPossibleBBB) {
+							// Changing the experiment header is currently not
+							// supported for VFS locations
+							// the problem is, that a changed experiment name
+							// or coordinator, etc. causes a problem in finding
+							// the data file
+							// if (experimentHeader.getExperimentHeaderHelper() != null) {
+							// if (experimentHeader.getExperimentHeaderHelper().saveUpdatedProperties(
+							// BackgroundTaskHelper.getStatusHelperFor(saveB)) > 0)
+							// saveB.setText("Updated (saved)");
+							// else
+							// saveB.setText("Updated (in memory)");
+							// } else {
 							if (m != null)
 								m.saveExperimentHeader(experimentHeader);
 							if (m != null)
-								saveB.setText("Updated in database");
+								saveB.setText("Updated (in database)");
 							else
 								saveB.setText("Updated (in memory)");
+							// }
 						} else {
 							Experiment exp = new Experiment();
 							exp.setHeader(experimentHeader);
