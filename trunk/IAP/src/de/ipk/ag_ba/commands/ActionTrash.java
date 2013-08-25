@@ -14,7 +14,6 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.ExperimentInfo;
-import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -110,32 +109,19 @@ public class ActionTrash extends AbstractNavigationAction {
 		experimentName = hhh.getExperimentName();
 		message += "<li>Process Experiment " + experimentName + ": ";
 		if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
-			if (getHeader() != null) {
+			if (m != null && getHeader() != null) {
 				m.deleteExperiment(hhh.getDatabaseId());
 				message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
-			} else {
-				Object[] res = MyInputHelper.getInput("<html>"
-						+ "You are about to delete a dataset from the database.<br>"
-						+ "This action can not be undone.<br>"
-						+ "Connected binary files are not immediately removed, but only<br>"
-						+ "during the process of database maintanance procedures.",
-						"Confirm final deletion operation", new Object[] {
-								"Remove experiment " + ei.experimentName + " from database?", false });
-				if (res != null && (Boolean) res[0]) {
-					// CallDBE2WebService.setDeleteExperiment(login, pass,
-					// experimentName);
-					// message = "<html><b>" + "Experiment " +
-					// experimentName +
-					// " has been removed from the database.";
-					message += " Internal Error";
-				} else {
-					message += " has NOT been deleted.";
-				}
 			}
 		}
 		if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {
 			try {
-				m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+				if (m != null)
+					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+				else {
+					hhh.setExperimenttype("Trash" + ";" + hhh.getExperimentType());
+					hhh.getExperimentHeaderHelper().saveUpdatedProperties(null);
+				}
 				message += "has been marked as trashed!";
 			} catch (Exception e) {
 				message += "Error: " + e.getMessage();
@@ -144,11 +130,16 @@ public class ActionTrash extends AbstractNavigationAction {
 		if (cmd == DeletionCommand.UNTRASH || cmd == DeletionCommand.UNTRASH_ALL) {
 			try {
 				String type = hhh.getExperimentType();
-				if (type.contains("Trash;"))
+				while (type.contains("Trash;"))
 					type = StringManipulationTools.stringReplace(type, "Trash;", "");
-				if (type.contains("Trash"))
+				while (type.contains("Trash"))
 					type = StringManipulationTools.stringReplace(type, "Trash", "");
-				m.setExperimentType(hhh, type);
+				if (m != null)
+					m.setExperimentType(hhh, type);
+				else {
+					hhh.setExperimenttype(type);
+					hhh.getExperimentHeaderHelper().saveUpdatedProperties(null);
+				}
 				message += "Experiment " + experimentName + " has been put out of trash!";
 			} catch (Exception e) {
 				message += "Error: " + e.getMessage();
