@@ -382,17 +382,20 @@ public class SystemOptions {
 	protected synchronized void store(String srcSection, String srcSetting) {
 		try {
 			if (iniIO != null) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Updated setting: " + srcSection + "//" + srcSetting);
 				Long saveTime = iniIO.setString(getIniValue());
 				if (saveTime != null) {
 					iniIO.setStoredLastUpdateTime(saveTime);
 				} else {
-					System.err.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes could not be saved by the INI-Provider.");
+					System.err.println(SystemAnalysis.getCurrentTime() + ">" +
+							"INFO: Changes could not be saved by the INI-Provider. " +
+							"Tried to update: " + srcSection + "//" + srcSetting);
 				}
 				return;
 			}
 			ini.store();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
-					+ " have been saved.");
+					+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
 			lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
 					new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
@@ -408,7 +411,7 @@ public class SystemOptions {
 	
 	public synchronized void setString(String group, String setting, String value) {
 		if (ini == null) {
-			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
 			value = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, value);
@@ -419,7 +422,7 @@ public class SystemOptions {
 	
 	public synchronized String[] getStringAll(String group, String setting, String[] defaultValue) {
 		if (ini == null) {
-			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
 			Ini.Section section = ini.get(group);
@@ -447,7 +450,7 @@ public class SystemOptions {
 	public synchronized ArrayList<String> getSectionTitles() {
 		ArrayList<String> res = new ArrayList<String>();
 		if (ini == null) {
-			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return res;
 		} else {
 			for (String s : ini.keySet())
@@ -459,7 +462,7 @@ public class SystemOptions {
 	public synchronized ArrayList<String> getSectionSettings(String section) {
 		ArrayList<String> res = new ArrayList<String>();
 		if (ini == null) {
-			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return res;
 		} else {
 			if (ini.get(section) != null)
