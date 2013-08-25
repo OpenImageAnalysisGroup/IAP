@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -92,9 +93,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		if (!new File(res).exists())
 			new File(res).mkdirs();
 		if (zefn.contains("#"))
-			return res + File.separator + filterBadChars(zefn.split("#", 2)[0]) + "#" + zefn.split("#", 2)[1];
+			return res + File.separator + filterBadChars(zefn.split("#", 2)[0], true) + "#" + zefn.split("#", 2)[1];
 		else
-			return res + File.separator + filterBadChars(zefn);
+			return res + File.separator + filterBadChars(zefn, true);
 	}
 	
 	public String prepareAndGetPreviewFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
@@ -105,10 +106,10 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		String res = path + File.separator + "icons" + File.separator + subPath;
 		if (!new File(res).exists())
 			new File(res).mkdirs();
-		return res + File.separator + filterBadChars(zefn);
+		return res + File.separator + filterBadChars(zefn, true);
 	}
 	
-	public static String filterBadChars(String string) {
+	public static String filterBadChars(String string, boolean isFinalFileName) {
 		String s = StringManipulationTools.UnicodeToURLsyntax(string);
 		s = StringManipulationTools.stringReplace(s, "-", "%45");
 		s = StringManipulationTools.stringReplace(s, "%167", "§");
@@ -116,7 +117,10 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 		s = StringManipulationTools.stringReplace(s, "%95", "_");
 		s = StringManipulationTools.stringReplace(s, "%40", "(");
 		s = StringManipulationTools.stringReplace(s, "%41", ")");
-		s = StringManipulationTools.stringReplace(s, "%44", "_"); // ,
+		if (isFinalFileName)
+			s = StringManipulationTools.stringReplace(s, "%44", "_"); // ,
+		else
+			s = StringManipulationTools.stringReplace(s, "%44", ","); // ,
 		s = StringManipulationTools.stringReplace(s, "%45", "-");
 		s = StringManipulationTools.stringReplace(s, "%46", ".");
 		s = StringManipulationTools.stringReplace(s, "..", "%46%46");
@@ -138,17 +142,31 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			subDir = headerToTargetPath.get(experimentHeader);
 			if (subDir == null) {
 				String pre = "";
-				if (experimentHeader.getExperimentType() != null && experimentHeader.getExperimentType().length() > 0)
-					pre = experimentHeader.getExperimentType() + File.separator;
+				if (filterTrash(experimentHeader.getExperimentType()) != null &&
+						filterTrash(experimentHeader.getExperimentType()).length() > 0)
+					pre = filterTrash(experimentHeader.getExperimentType()) + File.separator;
 				subDir = pre +
-						filterBadChars(experimentHeader.getCoordinator()) + File.separator +
-						filterBadChars(experimentHeader.getExperimentName());
+						filterBadChars(experimentHeader.getCoordinator(), false) + File.separator +
+						filterBadChars(experimentHeader.getExperimentName(), true);
 				headerToTargetPath.put(experimentHeader, subDir);
 			}
 		}
 		return subDir +
 				(optSnapshotTime == null ? "" : File.separator +
 						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
+	}
+	
+	private String filterTrash(String experimentType) {
+		if (experimentType == null || !experimentType.contains(";"))
+			return experimentType;
+		else {
+			ArrayList<String> res = new ArrayList<String>();
+			for (String s : StringManipulationTools.splitSafe(experimentType, ";")) {
+				if (s != null && !s.equals("Trash"))
+					res.add(s);
+			}
+			return StringManipulationTools.getStringList(res, ";");
+		}
 	}
 	
 	public static String digit2(int i) {
@@ -322,5 +340,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	public void saveVolume(LoadedVolume volume, Sample3D s3d, MongoDB m, InputStream threeDvolumePreviewIcon,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
 		throw new UnsupportedOperationException("Saving volumes using this method is not yet supported!");
+	}
+	
+	public static void clearPathCache() {
+		headerToTargetPath.clear();
 	}
 }
