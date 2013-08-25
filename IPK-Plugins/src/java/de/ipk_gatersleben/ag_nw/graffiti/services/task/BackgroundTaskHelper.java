@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import org.BackgroundTaskStatusProvider;
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.HelperClass;
 import org.ObjectRef;
 import org.StringManipulationTools;
@@ -320,6 +322,23 @@ public class BackgroundTaskHelper implements HelperClass {
 				jc.validate();
 			}
 		});
+	}
+	
+	public static BackgroundTaskStatusProviderSupportingExternalCall getStatusHelperFor(final JButton saveB) {
+		BackgroundTaskStatusProviderSupportingExternalCall res =
+				new BackgroundTaskStatusProviderSupportingExternalCallImpl(saveB.getText(), "") {
+					@Override
+					public void setCurrentStatusText1(final String status) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								saveB.setText(status);
+							}
+						});
+					}
+					
+				};
+		return res;
 	}
 }
 
