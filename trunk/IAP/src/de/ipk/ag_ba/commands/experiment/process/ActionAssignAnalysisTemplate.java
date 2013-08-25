@@ -54,7 +54,7 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 			}
 		} else {
 			if (exp.getHeader().getExperimentHeaderHelper() != null) {
-				exp.getHeader().getExperimentHeaderHelper().saveUpdatedProperties();
+				exp.getHeader().getExperimentHeaderHelper().saveUpdatedProperties(status);
 			}
 		}
 	}
