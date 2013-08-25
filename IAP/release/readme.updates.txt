@@ -2,6 +2,16 @@ See end of file for upgrade procedure.
 
 V1.0.3 (August 24, 2013)
 --------------------------------------------------------------------------------
+* New (change 14):
+  Experiments, saved in VFS can be put in a virtual Trash. Trash operation and
+  undo operation is implemented. Emptying (deleting data) within VFS is not yet
+  implemented.
+* New (change 13):
+  The Experiment-header properties can be updated and saved for experiments
+  loaded from VFS.
+* New (change 12):
+  The 'Save Annotations Change' command has been implemented for VFS storage
+  locations.
 * Fix (change 11):
   Corrected the problem, that two of the same analysis-submit buttons where 
   shown, in case two mongodb databases have been configured. Now only one
