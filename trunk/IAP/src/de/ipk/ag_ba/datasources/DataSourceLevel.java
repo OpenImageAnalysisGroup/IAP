@@ -40,4 +40,6 @@ public interface DataSourceLevel {
 	public String getDescription();
 	
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) throws Exception;
+	
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) throws Exception;
 }
