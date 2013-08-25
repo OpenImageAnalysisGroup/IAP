@@ -37,6 +37,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
@@ -78,22 +79,27 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private final VirtualFileSystemVFS2 vfs;
 	private boolean skipClone;
 	private final boolean ignoreOutliers;
+	public String postResult = null;
+	private final VfsFileSystemSource optFileSystemSource;
+	private boolean skipCreateNewDBid;
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers) {
+			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
+		this.optFileSystemSource = optFileSystemSource;
 		this.experimentReferences = new ArrayList<ExperimentReference>();
 		this.experimentReferences.add(experimentReference);
 		this.vfs = vfs;
 	}
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers) {
+			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
+		this.optFileSystemSource = optFileSystemSource;
 		this.experimentReferences = new ArrayList<ExperimentReference>();
 		this.experimentReferences.addAll(experimentReference);
 		this.vfs = vfs;
@@ -178,8 +184,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				if (!skipClone)
 					experiment.setHeader(experimentReference.getHeader().clone());
 				
-				if (experimentReference.getHeader().getDatabaseId() != null && !experimentReference.getHeader().getDatabaseId().isEmpty())
-					experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
+				if (skipCreateNewDBid)
+					if (experimentReference.getHeader().getDatabaseId() != null && !experimentReference.getHeader().getDatabaseId().isEmpty())
+						experiment.getHeader().setOriginDbId(experimentReference.getHeader().getDatabaseId());
 				final ThreadSafeOptions written = new ThreadSafeOptions();
 				final ThreadSafeOptions skipped = new ThreadSafeOptions();
 				
@@ -228,6 +235,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							+ SystemAnalysis.getCurrentTime());
 					status.setCurrentStatusText1("Finalize storage");
 					status.setCurrentStatusText2("Index Created");
+					postResult = "Saved Changes (" + SystemAnalysis.getCurrentTime() + ")";
 				} else {
 					status.setCurrentStatusText1("Data Transfer Incomplete");
 					status.setCurrentStatusText2("Could not save valid dataset");
@@ -235,10 +243,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							+ experimentReference.getExperimentName()
 							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " incomplete (" + errorCount + " errors). // "
 							+ SystemAnalysis.getCurrentTime());
+					postResult = "Saved Incomplete (" + errorCount + " errors)<br>(" + SystemAnalysis.getCurrentTime() + ")";
 				}
-				experiment.getHeader().setRemark(
-						(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
-								experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
+				if (errorCount > 0)
+					experiment.getHeader().setRemark(
+							(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
+									experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
 				experiment.getHeader().setStorageTime(new Date());
 				long kb = (written.getLong() + skipped.getLong()) / 1024;
 				experiment.getHeader().setSizekb(kb);
@@ -246,6 +256,10 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				experiment.getHeader().setNumberOfFiles(files);
 				
 				String indexFileName = createIndexFiles(experiment, hsmManager, status, experimentReference.getExperimentName());
+				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
+				if (optFileSystemSource != null)
+					experimentReference.getHeader().setExperimentHeaderHelper(
+							optFileSystemSource.getExperimentHeaderHelper(vfs, indexFileName, experimentReference.getHeader()));
 				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
 				status.setCurrentStatusValueFine(100d);
 				this.mb = ((written.getLong() + skipped.getLong()) / 1024 / 1024) + "";
@@ -259,6 +273,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			// if (fn != null && fn.trim().length() > 0 && new VfsFilesystemFile(fn).exists())
 			// new VfsFilesystemFile(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
+			postResult = e.getMessage() + "<br>(" + SystemAnalysis.getCurrentTime() + ")";;
 		}
 	}
 	
@@ -663,6 +678,15 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, String experimentSourceName) {
 		try {
 			long tsave = System.currentTimeMillis();
+			if (skipCreateNewDBid) {
+				try {
+					String fn = experiment.getHeader().getExperimentHeaderHelper().getFileName();
+					tsave = Long.parseLong(fn.substring(0, fn.indexOf("_")));
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not in-place-update data structures. " +
+							"Experiment actions may not use fully update data set information.");
+				}
+			}
 			int eidx = 0;
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName = new LinkedHashMap<VfsFileObject, String>();
 			
@@ -876,8 +900,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		String conditionIndexFileName =
 				
 				tsave + "_" + eidx + "_"
-						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_"
-						+ HSMfolderTargetDataManager.filterBadChars(ei.getName())
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername(), true) + "_"
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getName(), true)
 						+ ".iap.index.csv";
 		
 		VfsFileObject conditionFile = vfs.newVfsFile(
@@ -947,8 +971,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		String indexFileName =
 				
 				tsave + "_" + eidx + "_"
-						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_" +
-						HSMfolderTargetDataManager.filterBadChars(ei.getName())
+						+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername(), true) + "_" +
+						HSMfolderTargetDataManager.filterBadChars(ei.getName(), true)
 						+ ".iap.index.csv";
 		indexFileName = StringManipulationTools.stringReplace(indexFileName,
 				":", "-");
@@ -963,7 +987,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				ei.getNumberOfMeasurementValues());
 		String experimentName = ei.getName();
 		for (String key : header.keySet()) {
-			indexFileContent.add(HSMfolderTargetDataManager.filterBadChars(experimentName) + "," + key + ","
+			indexFileContent.add(HSMfolderTargetDataManager.filterBadChars(experimentName, true) + "," + key + ","
 					+ header.get(key));
 		}
 		indexFileContent.write(indexFile.getOutputStream());
@@ -996,8 +1020,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		if (ei.getStartDate() != null)
 			f.setLastModified(ei.getStartDate().getTime());
 		String xmlFileName = tsave + "_" + eidx + "_"
-				+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername()) + "_"
-				+ HSMfolderTargetDataManager.filterBadChars(ei.getName())
+				+ HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername(), true) + "_"
+				+ HSMfolderTargetDataManager.filterBadChars(ei.getName(), true)
 				+ ".iap.vanted.bin";
 		xmlFileName = StringManipulationTools.stringReplace(xmlFileName, ":",
 				"-");
@@ -1030,5 +1054,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public void setSkipClone(boolean skipClone) {
 		this.skipClone = skipClone;
+	}
+	
+	public void setSkipUpdateDBid(boolean skipCreateNewDBid) {
+		this.skipCreateNewDBid = skipCreateNewDBid;
 	}
 }

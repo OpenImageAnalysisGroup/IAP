@@ -439,7 +439,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		String res = ICON_FOLDER_NAME + File.separator + subPath;
 		// if (!new File(res).exists())
 		// new File(res).mkdirs();
-		return res + File.separator + filterBadChars(zefn);
+		return res + File.separator + filterBadChars(zefn, true);
 	}
 	
 	public String prepareAndGetDataFileNameAndPath(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime, String zefn) {
@@ -451,9 +451,9 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		// if (!new File(res).exists())
 		// new File(res).mkdirs();
 		if (zefn.contains("#"))
-			return res + File.separator + filterBadChars(zefn.split("#", 2)[0]) + "#" + zefn.split("#", 2)[1];
+			return res + File.separator + filterBadChars(zefn.split("#", 2)[0], true) + "#" + zefn.split("#", 2)[1];
 		else
-			return res + File.separator + filterBadChars(zefn);
+			return res + File.separator + filterBadChars(zefn, true);
 	}
 	
 	public String getTargetDirectory(ExperimentHeaderInterface experimentHeader, Long optSnapshotTime) {
@@ -464,14 +464,14 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		if (experimentHeader.getExperimentType() != null && experimentHeader.getExperimentType().length() > 0)
 			pre = experimentHeader.getExperimentType() + File.separator;
 		return pre +
-				filterBadChars(experimentHeader.getCoordinator()) + File.separator +
-				filterBadChars(experimentHeader.getExperimentName()) +
+				filterBadChars(experimentHeader.getCoordinator(), false) + File.separator +
+				filterBadChars(experimentHeader.getExperimentName(), true) +
 				(optSnapshotTime == null ? "" : File.separator +
 						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
 	}
 	
-	private String filterBadChars(String string) {
-		return HSMfolderTargetDataManager.filterBadChars(string);
+	private String filterBadChars(String string, boolean isFinalFileName) {
+		return HSMfolderTargetDataManager.filterBadChars(string, isFinalFileName);
 	}
 	
 	public static String digit2(int i) {
