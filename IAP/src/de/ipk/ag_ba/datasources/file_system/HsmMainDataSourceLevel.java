@@ -36,6 +36,8 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 			TreeMap<Long, ExperimentHeaderInterface> time2exp = experimentName2saveTime2data.get(expName);
 			ExperimentHeaderInterface newestExp = time2exp.lastEntry().getValue();
 			String type = newestExp.getExperimentType();
+			if (newestExp.inTrash())
+				continue;
 			if (type == null || type.length() == 0)
 				type = "[Unknown Experimenttype]";
 			if (!type2level.containsKey(type))
@@ -92,6 +94,11 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
 		ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 		return result;
+	}
+	
+	@Override
+	public Collection<NavigationButton> getAdditionalEntitiesShownAtEndOfList(NavigationButton src) {
+		return new ArrayList<NavigationButton>();
 	}
 	
 	public void setHsmFileSystemSource(HsmFileSystemSource hsmFileSystemSource) {
