@@ -230,7 +230,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					
 					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experiment.getHeader().getDatabaseId());
 					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
-						ActionDataExportToVfs ac = new ActionDataExportToVfs(m, new ExperimentReference(statisticsResult), vfs, false);
+						ActionDataExportToVfs ac = new ActionDataExportToVfs(m,
+								new ExperimentReference(statisticsResult), vfs, false, null);
 						ac.setSkipClone(true);
 						ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
 						if (status != null)
