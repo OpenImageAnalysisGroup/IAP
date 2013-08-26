@@ -2019,8 +2019,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * ImagePlus subclasses.
 	 */
 	public void mouseMoved(int x, int y) {
-		if (ij != null)
-			ij.showStatus(getLocationAsString(x, y) + getValueAsString(x, y));
+		try {
+			if (ij != null)
+				ij.showStatus(getLocationAsString(x, y) + getValueAsString(x, y));
+		} catch (Exception e) {
+			ij.showStatus("ERROR: " + e.getMessage());
+		}
 		savex = x;
 		savey = y;
 	}
