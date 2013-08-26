@@ -33,6 +33,8 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 				input()
 						.setMasks(new ImageSet(input().masks()));
 			
+			boolean loadMasks = getBoolean("Load Reference Images", true);
+			
 			if (input().images().vis() == null
 					&& input().images().getVisInfo() != null && getBoolean("Load VIS", true)) {
 				IOurl url = input().images().getVisInfo().getURL();
@@ -50,7 +52,7 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: VIS-MAIN: " + e.getMessage() + " // " + url);
 				}
-				if (input().masks() != null) {
+				if (input().masks() != null && loadMasks) {
 					url = input().images().getVisInfo().getLabelURL();
 					if (url != null) {
 						try {
@@ -82,7 +84,7 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: EXCEPTION FLUO-MAIN: " + e.getMessage() + " // " + url);
 				}
-				if (input().masks() != null) {
+				if (input().masks() != null && loadMasks) {
 					url = input().images().getFluoInfo().getLabelURL();
 					if (url != null) {
 						try {
@@ -114,7 +116,7 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">ERROR: NIR-MAIN: " + e.getMessage() + " // " + url);
 				}
-				if (input().masks() != null) {
+				if (input().masks() != null && loadMasks) {
 					url = input().images().getNirInfo().getLabelURL();
 					if (url != null) {
 						try {
@@ -131,35 +133,35 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 			}
-		}
-		
-		if (input().images().ir() == null
-				&& input().images().getIrInfo() != null && getBoolean("Load IR", true)) {
-			IOurl url = input().images().getIrInfo().getURL();
-			try {
-				Image fi = new Image(url);
-				if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-					input().images().setIr(fi);
-			} catch (Error e) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
-			} catch (Exception e) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
-			}
-			if (input().masks() != null) {
-				url = input().images().getIrInfo().getLabelURL();
-				if (url != null) {
-					try {
-						Image fi = new Image(url);
-						if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
-							input().masks().setIr(fi);
-					} catch (Error e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
-					} catch (Exception e) {
-						System.out.println(SystemAnalysis.getCurrentTime()
-								+ ">ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
+			
+			if (input().images().ir() == null
+					&& input().images().getIrInfo() != null && getBoolean("Load IR", true)) {
+				IOurl url = input().images().getIrInfo().getURL();
+				try {
+					Image fi = new Image(url);
+					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
+						input().images().setIr(fi);
+				} catch (Error e) {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">ERROR: ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime()
+							+ ">ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
+				}
+				if (input().masks() != null && loadMasks) {
+					url = input().images().getIrInfo().getLabelURL();
+					if (url != null) {
+						try {
+							Image fi = new Image(url);
+							if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
+								input().masks().setIr(fi);
+						} catch (Error e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime()
+									+ ">ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
+						}
 					}
 				}
 			}
