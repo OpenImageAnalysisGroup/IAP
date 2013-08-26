@@ -48,37 +48,37 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
 		
 		if (gridHn != 1 || gridVn != 1) {
 			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100;
+			int well_border = getInt("Additional Well Border", 0);
 			// 3x2
 			Image vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, CameraType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(vis, CameraType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
 			// processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
 			Image fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, CameraType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(fluo, CameraType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
 			
 			Image nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, CameraType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(nir, CameraType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
 			
 			Image ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().getImage();
-				processCuttingOfImage(ir, CameraType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn);
+				processCuttingOfImage(ir, CameraType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
 			}
 		}
 	}
 	
-	private void processCuttingOfImage(Image img, CameraType type, double offY, double vertFillGrade, int cols, int rows) {
+	private void processCuttingOfImage(Image img, CameraType type, double offY, double vertFillGrade, int cols, int rows, int well_border) {
 		Rectangle2D.Double r = getGridPos(options.getTrayIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
 				img.getWidth() / 2,
 				img.getHeight() / 2);
-		// r.y = r.y + offY;
 		
-		int le = (int) r.getMinX();
-		int to = (int) r.getMinY();
-		int ri = (int) r.getMaxX();
-		int bo = (int) r.getMaxY();
+		int le = (int) r.getMinX() + well_border;
+		int to = (int) r.getMinY() + well_border;
+		int ri = (int) r.getMaxX() - well_border;
+		int bo = (int) r.getMaxY() - well_border;
 		Image res = img.io().clearOutsideRectangle(le, to, ri, bo).getImage();
 		res.setCameraType(type);
 		input().images().set(res);
