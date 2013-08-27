@@ -49,14 +49,22 @@ public class IOmodule {
 		BufferedImage image = null;
 		if (loadImage) {
 			MyByteArrayInputStream isMain = ResourceIOManager.getInputStreamMemoryCached(id.getURL());
-			image = ImageIO.read(isMain);
+			try {
+				image = ImageIO.read(isMain);
+			} finally {
+				isMain.close();
+			}
 		}
 		BufferedImage imageNULL = null;
 		try {
 			if (loadLabelField)
 				if (id.getLabelURL() != null) {
 					InputStream isLabel = ResourceIOManager.getInputStreamMemoryCached(id.getLabelURL());
-					imageNULL = ImageIO.read(isLabel);
+					try {
+						imageNULL = ImageIO.read(isLabel);
+					} finally {
+						isLabel.close();
+					}
 				}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
@@ -86,7 +94,7 @@ public class IOmodule {
 	}
 	
 	public static InputStream getThreeDvolumePreviewIcon(LoadedVolumeExtension volume,
-						BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws FileNotFoundException, URISyntaxException {
 		try {
 			// return
 			// MyImageIOhelper.getPreviewImageStream(MyImageIOhelper.getPreviewImage(volume
@@ -95,7 +103,7 @@ public class IOmodule {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return new FileInputStream(new File(new URI(GravistoService.getResource(IOmodule.class,
-								"img/RotationReconstruction.png").toString())));
+					"img/RotationReconstruction.png").toString())));
 		}
 	}
 	
