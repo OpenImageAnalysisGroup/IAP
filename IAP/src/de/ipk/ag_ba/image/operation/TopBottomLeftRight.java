@@ -45,4 +45,12 @@ public class TopBottomLeftRight {
 	public void setLeft(int left) {
 		this.left = left;
 	}
+	
+	public double getHeight() {
+		return this.bottom - this.top;
+	}
+	
+	public double getWidth() {
+		return this.right - this.left;
+	}
 }
