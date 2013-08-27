@@ -76,8 +76,11 @@ public class Bookmark {
 		// save icon
 		OutputStream fos = new FileOutputStream(getFileName(".png"));
 		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(fos);
-		ImageIO.write(icon, "png", ios);
-		fos.close();
+		try {
+			ImageIO.write(icon, "png", ios);
+		} finally {
+			fos.close();
+		}
 		
 		// save link info
 		TextFile tf = new TextFile();
