@@ -70,7 +70,11 @@ public class Image {
 			InputStream is = url.getInputStream();
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
-			img = ImageIO.read(is);
+			try {
+				img = ImageIO.read(is);
+			} finally {
+				is.close();
+			}
 			url2image.put(url + "", img);
 		}
 		// }
@@ -141,7 +145,16 @@ public class Image {
 	}
 	
 	public Image(InputStream is) throws IOException {
-		this(ImageIO.read(is));
+		BufferedImage img;
+		try {
+			img = ImageIO.read(is);
+		} finally {
+			is.close();
+		}
+		this.image = ImageConverter.convertBItoIJ(img);
+		this.w = image.getWidth();
+		this.h = image.getHeight();
+		
 	}
 	
 	private static int[] getImgFromRGB(Image grayR, Image grayG, Image grayB) {
