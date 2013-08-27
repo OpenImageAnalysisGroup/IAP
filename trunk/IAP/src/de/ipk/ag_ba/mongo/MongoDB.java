@@ -1515,7 +1515,14 @@ public class MongoDB {
 			GridFSDBFile f = gridfs_webcam_files.findOne(filename);
 			status.setCurrentStatusText1(""
 					+ f.getUploadDate());
-			return ImageIO.read(f.getInputStream());
+			InputStream is = f.getInputStream();
+			BufferedImage img;
+			try {
+				img = ImageIO.read(is);
+			} finally {
+				is.close();
+			}
+			return img;
 		} catch (Exception e) {
 			status.setCurrentStatusText1(" // ERROR: " + e.getMessage());
 			return ImageConverter.convertImage2BufferedImage(IAPimages.getImage(IAPimages.getComputerOffline()));
