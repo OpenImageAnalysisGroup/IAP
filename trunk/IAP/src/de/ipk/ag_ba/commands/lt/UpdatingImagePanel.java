@@ -2,6 +2,7 @@ package de.ipk.ag_ba.commands.lt;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -13,7 +14,7 @@ public class UpdatingImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image;
 	private final BackgroundTaskStatusProviderSupportingExternalCall status;
-	private IOurl url;
+	private final IOurl url;
 	
 	public UpdatingImagePanel(IOurl url,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
@@ -49,7 +50,12 @@ public class UpdatingImagePanel extends JPanel {
 			boolean doIt = false;
 			if (doIt)
 				status.setCurrentStatusText1(s + "");
-			img = ImageIO.read(url.getInputStream());
+			InputStream is = url.getInputStream();
+			try {
+				img = ImageIO.read(is);
+			} finally {
+				is.close();
+			}
 			if (doIt)
 				status.setCurrentStatusText1(s.substring(0, s.length() - 1) + "#");
 			
