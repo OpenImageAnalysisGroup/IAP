@@ -223,7 +223,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public void readSourceForUpdate() throws Exception {
-				synchronized (vfs) {
+				synchronized (VfsFileSystemSource.class) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Get current header from file (" + fileName + ")");
 					HashMap<String, String> properties = new HashMap<String, String>();
 					InputStream is = indexFile.getInputStream();
@@ -255,7 +255,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public Long saveUpdatedProperties(BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
-				synchronized (vfs) {
+				synchronized (VfsFileSystemSource.class) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
 					DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);
 					return indexFile.getLastModified();
