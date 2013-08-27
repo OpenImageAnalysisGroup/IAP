@@ -30,7 +30,11 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 		}
 		BufferedImage i = null;
 		InputStream is = new MyByteArrayInputStream(ResourceIOManager.getPreviewImageContent(url));
-		i = ImageIO.read(is);
+		try {
+			i = ImageIO.read(is);
+		} finally {
+			is.close();
+		}
 		if (i == null) {
 			return null;
 		}
