@@ -1323,8 +1323,14 @@ public class LTdataExchange implements ExperimentLoader {
 							if (currentVal == null || currentVal.trim().isEmpty())
 								res.get(plantID).setField(ciSel, metaValue);
 							else
-								if (!currentVal.contains(metaValue))
-									res.get(plantID).setField(ciSel, currentVal.trim() + " // " + metaValue);
+								if (!currentVal.contains(metaValue)) {
+									String newVal = currentVal.trim() + " // " + metaValue;
+									TreeSet<String> elements = new TreeSet<String>();
+									for (String s : newVal.split(" // "))
+										elements.add(s);
+									newVal = StringManipulationTools.getStringListMerge(elements, " // ");
+									res.get(plantID).setField(ciSel, newVal);
+								}
 						}
 					}
 				}
