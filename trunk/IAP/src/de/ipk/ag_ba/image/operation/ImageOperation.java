@@ -662,6 +662,8 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation erode(int[][] mask) {
+		if (mask.length == 0 || mask[0].length == 0)
+			return this;
 		int jM = (mask.length - 1) / 2;
 		int iM = (mask[0].length - 1) / 2;
 		
@@ -703,6 +705,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Enlarge area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
@@ -737,6 +740,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Enlarge area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
@@ -749,6 +753,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Reduce area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
@@ -759,12 +764,11 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * WARNING: WORKS PROBABLY ONLY ON BINARY IMAGES
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Enlarge area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	@Deprecated
 	public ImageOperation dilate(int[][] mask) {
 		return dilate(image.getProcessor(), mask);
 	}
@@ -776,6 +780,7 @@ public class ImageOperation implements MemoryHogInterface {
 	// }
 	
 	/**
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Reduce area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
@@ -785,6 +790,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
+	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Reduce area of mask.
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
@@ -5222,5 +5228,19 @@ public class ImageOperation implements MemoryHogInterface {
 	@Override
 	public void freeMemory() {
 		ImageOperation.setLabCubeInstanceToNull();
+	}
+	
+	/**
+	 * @return Calculated binary mask, ready for ImageJ operations, which require binary images.
+	 */
+	public ImageOperation getBinaryMask() {
+		int[] px = getImageAs1dArray();
+		int[] res = new int[px.length];
+		for (int i = 0; i < px.length; i++)
+			if (px[i] == BACKGROUND_COLORint)
+				res[i] = 0xffffffff; // imageJ background
+			else
+				res[i] = 1;
+		return new ImageOperation(res, getWidth(), getHeight());
 	}
 }
