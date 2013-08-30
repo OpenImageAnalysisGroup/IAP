@@ -266,7 +266,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				tso.setParam(2, true);
 			}
 		} catch (Exception e) {
-			
+			ErrorMsg.addErrorMessage(e);
 			errorCount++;
 			tso.setParam(2, true);
 			
@@ -292,7 +292,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				Long ttt = nm.getParentSample().getSampleFineTimeOrRowId();
 				// assign exact sample time, if available
 				final Long sampleFineTime = ttt == null ? 0l : ttt;
-				final String tZero = ttt <= 0 ? nm.getParentSample().getSampleTime() : null;
 				
 				if (dontStoreIfAlreadyInSameStorageLocationAvailable && unchangedURL != null && unchangedURL.getPrefix() != null
 						&& unchangedURL.getPrefix().equals(hsmManager.getPrefix())) {
