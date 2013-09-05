@@ -546,7 +546,8 @@ public class IAPservice {
 				String annotation = idMod.getAnnotation();
 				if (annotation != null && annotation.length() > 0 && id.getAnnotationField("oldreference") != null) {
 					idMod.setLabelURL(new IOurl(idMod.getAnnotationField("oldreference")));
-				}
+				} else
+					idMod.setLabelURL(null);
 				result.add(idMod);
 			}
 		}
