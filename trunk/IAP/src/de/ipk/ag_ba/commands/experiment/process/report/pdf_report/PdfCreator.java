@@ -64,11 +64,12 @@ public class PdfCreator {
 		output.put(System.nanoTime(), "INFO: Temp directory existing?: " + tempDirectory.canRead());
 	}
 	
-	public void saveReportToFile(byte[] result, boolean xlsx, ExperimentHeaderInterface optEH) throws IOException {
+	public File saveReportToFile(byte[] result, boolean xlsx, ExperimentHeaderInterface optEH) throws IOException {
 		File report = getTargetFile(xlsx, optEH);
 		FileOutputStream fos = new FileOutputStream(report);
 		fos.write(result);
 		fos.close();
+		return report;
 	}
 	
 	public void saveClusterDataToFile(byte[] result, boolean xlsx) throws IOException {
