@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc" name="Graffiti_Editor">
+
+    <target name="timestamp">
+		<tstamp>
+            <format property="time" pattern="yyyy-MM-dd hh:mm:ss aa z"/>
+		</tstamp>
+    </target>
+
+    <target name="javadoc" depends="timestamp">
+        <javadoc access="package" author="true"
+            classpath="../Graffiti_lib/jlex_java_cup.jar:../Graffiti_lib/scrollabledesktop.jar:../Graffiti_lib/commons-beanutils.jar:../Graffiti_lib/commons-collections.jar:../Graffiti_lib/commons-digester.jar:../Graffiti_lib/commons-logging.jar:../Graffiti_lib/junit.jar"
+            destdir="javadoc" doctitle="Graffiti_Editor"
+            nodeprecated="false" nodeprecatedlist="false"
+            noindex="false" nonavbar="false" notree="false"
+            packagenames="
+            	org.graffiti.editor,
+            	org.graffiti.editor.actions,
+            	org.graffiti.plugin.algorithm,
+            	org.graffiti.plugin.actions,
+            	org.graffiti.plugin.editcomponent,
+            	org.graffiti.editor.dialog,
+            	org.graffiti.plugin.inspector,
+            	org.graffiti.editor.options,
+            	org.graffiti.plugin.attributecomponent,
+            	org.graffiti.plugin.gui,
+            	org.graffiti.graphics,
+            	org.graffiti.managers,
+            	org.graffiti.session,
+            	org.graffiti.util,
+            	org.graffiti.plugin.tool,
+            	org.graffiti.plugin,
+            	org.graffiti.plugin.view,
+            	org.graffiti.plugin.mode"
+            source="1.4" sourcepath=".:../Graffiti_Core" splitindex="true" use="true" version="true"
+            stylesheetfile="../Graffiti_Core/style.css"
+        >
+			<tag name="clientCardinality" description="Client Cardinality:"
+				enabled="false"/>
+			<link offline="true" href="http://www.infosun.fmi.uni-passau.de/br/projects/Graffiti/doc/api/Graffiti_Core/"   packagelistLoc="../Graffiti_Core/javadoc"/>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+			<bottom>Generated at ${time}</bottom>
+        </javadoc>
+    </target>
+</project>
