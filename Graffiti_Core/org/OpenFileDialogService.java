@@ -185,14 +185,14 @@ public class OpenFileDialogService implements HelperClass {
 		}
 		openDialog.setMultiSelectionEnabled(false);
 		openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		if (startDir != null) {
-			try {
+		try {
+			if (startDir != null && !startDir.trim().isEmpty()) {
 				File f = new File(startDir);
 				if (f.exists())
 					openDialog.setCurrentDirectory(f);
-			} catch (Exception e) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 		}
 		// openDialog.resetChoosableFileFilters();
 		// openDialog.setFileFilter(new FileFilter() {
