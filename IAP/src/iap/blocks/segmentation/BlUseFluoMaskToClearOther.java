@@ -34,11 +34,11 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 				processedMasks.setVis(
 						processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 								processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on vis", 10)).getImage(),
-								back).show("FILTERED VIS IMAGE", debug).getImage());
+								back).getImage());
 				processedMasks.setFluo(
 						processedMasks.fluo().io().copy().applyMask(
 								processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(getDouble("blur vis mask on fluo", 40d)).getImage(),
-								back).show("FILTERED FLUO IMAGE", debug).getImage());
+								back).getImage());
 			}
 		}
 		if (getBoolean("process NIR", true) && processedMasks.fluo() != null) {
@@ -47,7 +47,7 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 				processedMasks.setNir(
 						processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
 								processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on nir", 10)).getImage(),
-								back).show("FILTERED NIR IMAGE", debug).getImage());
+								back).getImage());
 			}
 		}
 	}
