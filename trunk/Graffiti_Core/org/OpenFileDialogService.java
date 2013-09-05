@@ -30,7 +30,7 @@ public class OpenFileDialogService implements HelperClass {
 			@Override
 			public boolean accept(File f) {
 				return (f.isDirectory()) ||
-									((f.canRead() && extensionOK(f.getName(), valid_extensions)));
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
 			
 			private boolean extensionOK(String fileName, String[] valid_extensions) {
@@ -63,7 +63,7 @@ public class OpenFileDialogService implements HelperClass {
 			@Override
 			public boolean accept(File f) {
 				return (f.isDirectory()) ||
-									((f.canRead() && extensionOK(f.getName(), valid_extensions)));
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
 			
 			private boolean extensionOK(String fileName, String[] valid_extensions) {
@@ -97,7 +97,7 @@ public class OpenFileDialogService implements HelperClass {
 			@Override
 			public boolean accept(File f) {
 				return (f.isDirectory()) ||
-									((f.canRead() && extensionOK(f.getName(), valid_extensions)));
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
 			
 			private boolean extensionOK(String fileName, String[] valid_extensions) {
@@ -133,7 +133,7 @@ public class OpenFileDialogService implements HelperClass {
 			@Override
 			public boolean accept(File f) {
 				return (f.isDirectory()) ||
-									((f.canRead() && extensionOK(f.getName(), valid_extensions)));
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
 			
 			private boolean extensionOK(String fileName, String[] valid_extensions) {
@@ -176,12 +176,24 @@ public class OpenFileDialogService implements HelperClass {
 	}
 	
 	public static File getDirectoryFromUser(String okButtonText) {
+		return getDirectoryFromUser(okButtonText, null);
+	}
+	
+	public static File getDirectoryFromUser(String okButtonText, String startDir) {
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
 		openDialog.setMultiSelectionEnabled(false);
 		openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		
+		if (startDir != null) {
+			try {
+				File f = new File(startDir);
+				if (f.exists())
+					openDialog.setCurrentDirectory(f);
+			} catch (Exception e) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
+			}
+		}
 		// openDialog.resetChoosableFileFilters();
 		// openDialog.setFileFilter(new FileFilter() {
 		// public boolean accept(File f) {
