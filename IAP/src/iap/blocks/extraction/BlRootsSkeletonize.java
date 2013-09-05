@@ -119,13 +119,14 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		for (RunnableOnImage roi : postProcessing) {
 			getProperties().addImagePostProcessor(ImageConfiguration.RgbTop, roi, null);
 		}
+		ress.show("res", debug);
 		return ress;
 	}
 	
 	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix,
 			boolean isThinnedImage, int[][] optDistanceMap, ArrayList<RunnableOnImage> postProcessing)
 			throws Exception {
-		boolean graphAnalysis = getBoolean("graqh-based analysis", true);
+		boolean graphAnalysis = getBoolean("Calculate Graph Diameters", true);
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
@@ -202,10 +203,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			int background, ImageOperation img, ImageOperation nonBinaryImage,
 			ResultsTableWithUnits rt, ArrayList<RunnableOnImage> postProcessing) {
 		ImageOperation inp = img;
+		int n = inp.countFilledPixels();
+		double sumGray = 0;
+		
 		if (rt != null) {
-			int n = inp.countFilledPixels();
+			
 			rt.addValue(pre + "roots.filled.pixels", n);
-			double sumGray = 0;
+			
 			for (int p : nonBinaryImage.getImageAs1dArray()) {
 				if (p == ImageOperation.BACKGROUND_COLORint)
 					continue;
@@ -227,8 +231,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		
 		inp = binary.skeletonize(true).show("INPUT FOR BRANCH DETECTION", debug);
 		
+		int len = inp.countFilledPixels();
+		
 		if (rt != null)
-			rt.addValue(pre + "roots.skeleton.length", inp.countFilledPixels());
+			rt.addValue(pre + "roots.skeleton.length", len);
 		
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).getImage()); // getInvert(
 		skel.findEndpointsAndBranches(postProcessing);
@@ -241,7 +247,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			rt.addValue(pre + "roots.skeleton.branchpoints", branchPoints.size());
 		if (rt != null)
 			rt.addValue(pre + "roots.skeleton.endpoints", eps.size());
-		
+		if (rt != null && len > 0)
+			rt.addValue(pre + "roots.width.area_based.average", n / (double) len);
+		if (rt != null)
+			rt.addValue(pre + "roots.width.fractional.average", sumGray / len);
 		return img;
 	}
 	
@@ -264,7 +273,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 					String prefix = "";
 					if (width > 1)
 						prefix = ".thinned" + StringManipulationTools.formatNumber(width - 1, "00");
-					if (getBoolean("Calculate Graph Diameters", true)) {
+					if (getBoolean("Calculate Width-Histogram", true) || getBoolean("Calculate Graph Diameters", false)) {
+						
 						try {
 							ImageOperation tobeSkeletonized = image.copy().dilate();
 							int[][] distanceMap = null;
@@ -283,11 +293,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 								int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
 								rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
 										* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
-								
-								graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
-										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
-												skeletonImage.getImageAs1dArray())
-												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+								rt.addValue("roots.width.skeleton_based.average", (1 + skelStat.getMean()));
+								if (getBoolean("Calculate Graph Diameters", true)) {
+									graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
+											new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
+													skeletonImage.getImageAs1dArray())
+													.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+								}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -324,7 +336,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				int displayLen = realLen / 2 + (realLen >= w ? w - 1 : 0);
 				if (displayLen == 1)
 					displayLen = 0;
-				rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(www, "00") + ".length", displayLen);
+				if (getBoolean("Calculate Width-Histogram", true))
+					rt.addValue("roots.skeleton.width." + StringManipulationTools.formatNumber(www, "00") + ".length", displayLen);
 				// Volume = Length*Pi*(D/2)^2
 				if (displayLen > 0 && www > 0)
 					volume += displayLen * Math.PI * www * www;
@@ -332,7 +345,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			nextLengthThinner += currentLengthWider;
 		}
 		if (over19 > 0) {
-			rt.addValue("roots.skeleton.width.20.length", over19 / 2 + 20);
+			if (getBoolean("Calculate Width-Histogram", true))
+				rt.addValue("roots.skeleton.width.20.length", over19 / 2 + 20);
 			volume = Double.NaN;
 		}
 		if (!Double.isNaN(volume))
