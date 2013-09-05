@@ -1,62 +1,79 @@
-See end of file for upgrade procedure.
+-- See end of file for help on upgrade procedure --
 
 V1.0.3 (August 24, 2013)
 --------------------------------------------------------------------------------
-* New (change 14):
+- New Features -
+* New (change 16)
+  Added directory-chooser button to input fields, which ask for a directory.
+  (Useful for local directory input. It is also shown for remote locations,
+  case by case decision will be added, later, as it helps in most cases and 
+  makes no problem in the remaining cases.)
+* New (change 15):
   Experiments, saved in VFS can be put in a virtual Trash. Trash operation and
   undo operation is implemented. Emptying (deleting data) within VFS is not yet
   implemented.
-* New (change 13):
+* New (change 14):
   The Experiment-header properties can be updated and saved for experiments
   loaded from VFS.
-* New (change 12):
+* New (change 13):
   The 'Save Annotations Change' command has been implemented for VFS storage
   locations.
-* Fix (change 11):
+* New (change 12):
+  Added hints on next workflow steps, after clicking the 'Load > DB-Imp.-Exp. 
+  Dataset' command.
+* New (change 11):
+  Update output counter, when saving analysis output to local disk. Status 
+  is shown during analysis.   
+
+- Bug Fixes -
+* Fix (change 10):
+  When clicking View/Export Data, Create CSV File, the output file is located
+  and shown in the default file manager.
+* Fix (change 9):
   Corrected the problem, that two of the same analysis-submit buttons where 
   shown, in case two mongodb databases have been configured. Now only one
   button is shown.
-* Fix (change 10):
+* Fix (change 8):
   There was a performance degradation/error (new in V1.0.2) when moving the 
   mouse over the image display. When using the 'Show Image' context 
   menu command in the image grid view and the Analysis test-command.
-* Fix (change 9):
+* Fix (change 7):
   When using the 'Load > DB-DB-Imp.-Exp. Dataset' command, the meta data 
   file was not allowed to be open at the same time in Excel. IAP now handles
   this situation without an error. In case of other loading errors a error 
   message is shown. 
-* Fix (change 8):
+* Fix (change 6):
   When saving experiments or performing an analysis on local disc, the special
   characters '[', ':' and ']' caused problems. These characters, if included 
   in the experiment name, are handled now correctly.  
-* New (change 7):
-  Added hints on next workflow steps, after clicking the 'Load > DB-Imp.-Exp. 
-  Dataset' command.
-* New (change 6):
-  Update output counter, when saving analysis output to local disk. Status 
-  is shown during analysis.   
   
 V1.0.2b (August 12, 2013)
 --------------------------------------------------------------------------------
-* Fix (change 5):
-  Experiment header information about used storage space when saving to disk 
-  (VFS) has been corrected
-* New (change 4):
+- New Features -
+* New (change 5):
   Reduced memory usage during loading of data sets from MongoDB databases and
   from VFS
-* New (change 3):
+* New (change 4):
   Reduced memory usage during data analysis
+
+- Bug Fixes -
+* Fix (change 3):
+  Experiment header information about used storage space when saving to disk 
+  (VFS) has been corrected
 
 
 V1.0.1 (July 26, 2013)
 --------------------------------------------------------------------------------
-* Fix (change 2):
+- New Features -
+* New (change 2):
+  Analysis blocks, used for Barley and Arabidopsis analysis have been moved to 
+  their proper package locations (similar to the Maize analysis blocks).
+
+- Bug Fixes -
+* Fix (change 1):
   A problem has been fixed, which prevented the proper analysis of data sets, 
   loaded from a temporary VFS location (e.g. using the data set-loading command, 
   to access a local file system folder).
-* New (change 1):
-  Analysis blocks, used for Barley and Arabidopsis analysis have been moved to 
-  their proper package locations (similar to the Maize analysis blocks).
 
 
 Upgrade procedure
