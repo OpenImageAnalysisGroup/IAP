@@ -26,6 +26,10 @@ V1.0.3 (August 24, 2013)
   is shown during analysis.   
 
 - Bug Fixes -
+* Fix (change 11):
+  Test re-analysis by right-clicking in the result image button list and 
+  choosing '[Analysis Name] (Reference+Old Reference)' now works also for
+  cases where the input data set has no reference images.
 * Fix (change 10):
   When clicking View/Export Data, Create CSV File, the output file is located
   and shown in the default file manager.
