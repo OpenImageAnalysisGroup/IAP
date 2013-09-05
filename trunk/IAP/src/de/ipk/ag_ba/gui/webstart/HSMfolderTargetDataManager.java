@@ -265,7 +265,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			String[] optFileNameMainAndLabelPrefix,
 			LoadedImage limg, boolean keepRemoteURLs_safe_space, boolean ignoreLabelURL) throws Exception {
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
-		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
+		Long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
+		if (snapshotTime == null)
+			snapshotTime = (ehi.getStartdate() != null ? ehi.getStartdate().getTime() : 0) + limg.getParentSample().getTime() * 24 * 60 * 60 * 60 * 1000;
 		String pre = "";
 		String finalMainName = null;
 		{ // save main
