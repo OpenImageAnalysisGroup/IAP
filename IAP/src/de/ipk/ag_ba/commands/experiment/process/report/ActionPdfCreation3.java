@@ -506,7 +506,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						status.setCurrentStatusText2("Save CSV file");
 					if (p.getTempDirectory() == null)
 						p.prepareTempDirectory();
-					p.saveReportToFile(csvFileContent, xlsx, experimentReference.getHeader());
+					if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
+						File f = p.saveReportToFile(csvFileContent, xlsx, experimentReference.getHeader());
+						String tempDirectory = f.getParent();
+						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
+					}
 				}
 				if (clustering) {
 					DatasetFormatForClustering transform = new DatasetFormatForClustering();
