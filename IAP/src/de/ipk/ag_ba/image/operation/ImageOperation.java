@@ -2652,20 +2652,14 @@ public class ImageOperation implements MemoryHogInterface {
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		
 		MaximumFinder find = new MaximumFinder();
-		ResultsTable rt = ResultsTable.getResultsTable();
-		synchronized (rt) {
-			rt.reset();
-			ByteProcessor p = find.findMaxima(image.getProcessor(), tolerance,
-					threshold, outputType, excludeOnEdges, isEDM);
-			
-			if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-				// p.getBufferedImage() ==> image (ck, 25.6.11)
-				return new ImageOperation(image, (ResultsTableWithUnits) rt.clone());
-			} else {
-				setResultsTable((ResultsTableWithUnits) rt.clone());
-				return this;
-			}
-			
+		ResultsTable rt = new ResultsTableWithUnits();
+		find.findMaxima(image.getProcessor(), tolerance,
+				threshold, outputType, excludeOnEdges, isEDM);
+		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
+			return new ImageOperation(image, (ResultsTableWithUnits) rt);
+		} else {
+			setResultsTable((ResultsTableWithUnits) rt);
+			return this;
 		}
 	}
 	
