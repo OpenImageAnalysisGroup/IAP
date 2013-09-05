@@ -76,8 +76,14 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		Collection<String> help = IAPpluginManager.getInstance().getSettingHelp(iniFileName, section, "Settings-Group");
-		if (help != null && !help.isEmpty())
+		Collection<String> ht = IAPpluginManager.getInstance().getSettingHelp(iniFileName, section, "Settings-Group");
+		Collection<String> help = new ArrayList<String>();
+		if (ht != null) {
+			for (String s : ht)
+				if (s != null && !s.isEmpty())
+					help.add(s);
+		}
+		if (ht != null && !help.isEmpty())
 			return new MainPanelComponent(help);
 		else
 			return super.getResultMainPanel();
