@@ -11,6 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -989,7 +990,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			indexFileContent.add(HSMfolderTargetDataManager.filterBadChars(experimentName, true) + "," + key + ","
 					+ header.get(key));
 		}
-		indexFileContent.write(indexFile.getOutputStream());
+		OutputStream os = indexFile.getOutputStream();
+		indexFileContent.write(os);
 		String resName = hsmManager.prepareAndGetTargetFileForContentIndex(indexFileName);
 		tempFile2fileName.put(indexFile, resName);
 		if (resName.startsWith(vfs.getTargetPathName()))
