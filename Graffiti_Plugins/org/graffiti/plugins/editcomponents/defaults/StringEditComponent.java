@@ -15,9 +15,12 @@ import info.clearthought.layout.TableLayoutConstants;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -28,6 +31,7 @@ import javax.swing.text.JTextComponent;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
+import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.graffiti.attributes.Attribute;
 import org.graffiti.editor.MainFrame;
@@ -35,6 +39,8 @@ import org.graffiti.editor.MessageType;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.Displayable;
 import org.graffiti.plugin.editcomponent.AbstractValueEditComponent;
+import org.graffiti.plugins.editcomponents.ComponentBorder;
+import org.graffiti.plugins.editcomponents.ComponentBorder.Edge;
 
 /**
  * <code>StringEditComponent</code> provides an edit component for editing
@@ -101,6 +107,25 @@ public class StringEditComponent
 				try {
 					if (getDisplayable().getName().toUpperCase().contains("PASSWORD")) {
 						textComp = new JPasswordField(getDisplayable().getValue().toString());
+					}
+				} catch (Exception e) {
+					// empty
+				}
+				try {
+					if (getDisplayable().getName().toUpperCase().contains("DIRECTORY")) {
+						Action ba = new AbstractAction("...") {
+							private static final long serialVersionUID = 1L;
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								File f = OpenFileDialogService.getDirectoryFromUser("Select Folder");
+								if (f != null)
+									textComp.setText(f.getAbsolutePath());
+							}
+						};
+						JButton selButton = new JButton(ba);
+						ComponentBorder cb = new ComponentBorder(selButton, Edge.RIGHT);
+						cb.install(textComp);
 					}
 				} catch (Exception e) {
 					// empty
