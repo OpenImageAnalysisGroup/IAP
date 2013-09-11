@@ -603,6 +603,8 @@ public class ResultsTable implements Cloneable {
 	 * or Analyzer.getResultsTable .
 	 */
 	public void show(String windowTitle) {
+		if (true)
+			return;
 		if (!windowTitle.equals("Results") && this == Analyzer.getResultsTable())
 			IJ.log("ResultsTable.show(): the system ResultTable should only be displayed in the \"Results\" window.");
 		String tableHeadings = getColumnHeadings();
