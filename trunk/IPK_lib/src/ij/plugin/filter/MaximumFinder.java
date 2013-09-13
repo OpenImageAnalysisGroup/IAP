@@ -73,7 +73,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 	private static int dialogOutputType = POINT_SELECTION;
 	/** output type names */
 	final static String[] outputTypeNames = new String[]
-			{ "Single Points", "Maxima Within Tolerance", "Segmented Particles", "Point Selection", "List", "Count" };
+	{ "Single Points", "Maxima Within Tolerance", "Segmented Particles", "Point Selection", "List", "Count" };
 	/** whether to exclude maxima at the edge of the image */
 	private static boolean excludeOnEdges;
 	/** whether to accept maxima only in the thresholded height range */
@@ -177,11 +177,11 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 		if (useMinThreshold && ((invertedLut && !lightBackground) || (!invertedLut && lightBackground))) {
 			if (!thresholdWarningShown)
 				if (!IJ.showMessageWithCancel(
-							"Find Maxima",
-							"\"Above Lower Threshold\" option cannot be used\n" +
-									"when finding minima (image with light background\n" +
-									"or image with dark background and inverting LUT).")
-							&& !previewing)
+						"Find Maxima",
+						"\"Above Lower Threshold\" option cannot be used\n" +
+								"when finding minima (image with light background\n" +
+								"or image with dark background and inverting LUT).")
+						&& !previewing)
 					return false; // if faulty input is not detected during preview, "cancel" quits
 			thresholdWarningShown = true;
 			useMinThreshold = false;
@@ -281,13 +281,18 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 	 *         Returns null if outputType does not require an output or if cancelled by escape
 	 */
 	public ByteProcessor findMaxima(ImageProcessor ip, double tolerance, double threshold,
-				int outputType, boolean excludeOnEdges, boolean isEDM) {
+			int outputType, boolean excludeOnEdges, boolean isEDM) {
+		return findMaxima(ip, tolerance, threshold, outputType, excludeOnEdges, isEDM, null);
+	}
+	
+	public ByteProcessor findMaxima(ImageProcessor ip, double tolerance, double threshold,
+			int outputType, boolean excludeOnEdges, boolean isEDM, ResultsTable opt_rt) {
 		if (dirOffset == null)
 			makeDirectionOffsets(ip);
 		Rectangle roi = ip.getRoi();
 		byte[] mask = ip.getMaskArray();
 		if (threshold != ImageProcessor.NO_THRESHOLD && ip.getCalibrationTable() != null &&
-						threshold > 0 && threshold < ip.getCalibrationTable().length)
+				threshold > 0 && threshold < ip.getCalibrationTable().length)
 			threshold = ip.getCalibrationTable()[(int) threshold]; // convert threshold to calibrated
 		ByteProcessor typeP = new ByteProcessor(width, height); // will be a notepad for pixel types
 		byte[] types = (byte[]) typeP.getPixels();
@@ -314,7 +319,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 		if (Thread.currentThread().isInterrupted())
 			return null;
 		IJ.showStatus("Analyzing  maxima...");
-		analyzeAndMarkMaxima(ip, typeP, maxPoints, excludeEdgesNow, isEDM, globalMin, tolerance, outputType);
+		analyzeAndMarkMaxima(ip, typeP, maxPoints, excludeEdgesNow, isEDM, globalMin, tolerance, outputType, opt_rt);
 		// new ImagePlus("Pixel types",typeP.duplicate()).show();
 		if (outputType == POINT_SELECTION || outputType == LIST || outputType == COUNT)
 			return null;
@@ -381,7 +386,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 	 *         Note: Do not use the positions of the points marked as MAXIMUM in typeP, they are invalid for images with a roi.
 	 */
 	long[] getSortedMaxPoints(ImageProcessor ip, ByteProcessor typeP, boolean excludeEdgesNow,
-				boolean isEDM, float globalMin, float globalMax, double threshold) {
+			boolean isEDM, float globalMin, float globalMax, double threshold) {
 		Rectangle roi = ip.getRoi();
 		byte[] types = (byte[]) typeP.getPixels();
 		int nMax = 0; // counts local maxima
@@ -467,6 +472,11 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 	 */
 	void analyzeAndMarkMaxima(ImageProcessor ip, ByteProcessor typeP, long[] maxPoints, boolean excludeEdgesNow, boolean isEDM, float globalMin,
 			double tolerance, int outputType) {
+		analyzeAndMarkMaxima(ip, typeP, maxPoints, excludeEdgesNow, isEDM, globalMin, tolerance, outputType, null);
+	}
+	
+	void analyzeAndMarkMaxima(ImageProcessor ip, ByteProcessor typeP, long[] maxPoints, boolean excludeEdgesNow, boolean isEDM, float globalMin,
+			double tolerance, int outputType, ResultsTable opt_rt) {
 		byte[] types = (byte[]) typeP.getPixels();
 		int nMax = maxPoints.length;
 		int[] pList = new int[width * height]; // here we enter points starting from a maximum
@@ -594,7 +604,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 			} else
 				if (outputType == LIST) {
 					Analyzer.resetCounter();
-					ResultsTable rt = ResultsTable.getResultsTable();
+					ResultsTable rt = opt_rt != null ? opt_rt : ResultsTable.getResultsTable();
 					for (int i = 0; i < npoints; i++) {
 						int[] xy = (int[]) xyVector.elementAt(i);
 						rt.incrementCounter();
@@ -604,7 +614,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 					rt.show("Results");
 				} else
 					if (outputType == COUNT) {
-						ResultsTable rt = ResultsTable.getResultsTable();
+						ResultsTable rt = opt_rt != null ? opt_rt : ResultsTable.getResultsTable();
 						rt.incrementCounter();
 						rt.setValue("Count", rt.getCounter() - 1, npoints);
 						rt.show("Results");
@@ -1017,7 +1027,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 				int dIndex = 0;
 				do { // expand each level in 8 directions
 					int n = processLevel(directionSequence[dIndex % 8], ip, table,
-										levelStart[level], remaining, coordinates, setPointList);
+							levelStart[level], remaining, coordinates, setPointList);
 					// IJ.log("level="+level+" direction="+directionSequence[dIndex%8]+" remain="+remaining+"-"+n);
 					remaining -= n; // number of points processed
 					sumN += n;
@@ -1096,7 +1106,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 	 * @return number of pixels that have been changed
 	 */
 	private int processLevel(int pass, ImageProcessor ip, int[] fateTable,
-				int levelStart, int levelNPoints, int[] coordinates, int[] setPointList) {
+			int levelStart, int levelNPoints, int[] coordinates, int[] setPointList) {
 		int xmax = width - 1;
 		int ymax = height - 1;
 		byte[] pixels = (byte[]) ip.getPixels();
