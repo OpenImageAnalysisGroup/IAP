@@ -109,7 +109,16 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 		try {
 			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
 			return new MainPanelComponent("<html><b>" + inst.getName() + "</b><br><br>" +
-					StringManipulationTools.getWordWrap(inst.getDescription(), 80));
+					"Description:" +
+					"<ul><li>" +
+					StringManipulationTools.getWordWrap(inst.getDescription(), 80) + "</ul>" +
+					"Annotation:<ul><li>" + inst.getBlockType().getName() + "<br><br>" +
+					"<li>Input/Output:<code><ul><li>In:&nbsp;&nbsp;" +
+					StringManipulationTools.getStringList(inst.getCameraInputTypes(), ", ")
+					+ "<br>" +
+					"<li>Out:&nbsp;" +
+					StringManipulationTools.getStringList(inst.getCameraOutputTypes(), ", ")
+					+ "<br></ul></code></ul>");
 		} catch (Exception e) {
 			return super.getResultMainPanel();
 		}
