@@ -2,21 +2,34 @@ package de.ipk.ag_ba.commands.settings;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.GuiRow;
+import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
+import org.graffiti.plugins.editcomponents.ComponentBorder;
+import org.graffiti.plugins.editcomponents.ComponentBorder.Edge;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -198,6 +211,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 								ArrayList<Object> entries = new ArrayList<Object>();
 								int line = 1;
 								for (String sl : ss) {
+									String blockName = null;
+									String blockDesc = null;
 									if (!setting.equals("block"))
 										entries.add("Item " + (line++));
 									else {
@@ -217,6 +232,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										String type = "";
 										try {
 											ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl).newInstance();
+											blockName = inst.getName();
+											blockDesc = inst.getDescription();
 											switch (inst.getBlockType()) {
 												case ACQUISITION:
 													type = "<span style=\"background-color:#DDFFDD\">";
@@ -272,7 +289,71 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										entries.add(inf);
 									}
 									// JComboBox dropDown = new JComboBox(new String[] { "Load Images", "Segmentation" });
-									JTextField textField = new JTextField(sl + "");
+									final ObjectRef inFocus = new ObjectRef();
+									inFocus.setObject(false);
+									final String blockNameF = blockName;
+									final JTextField textField = new JTextField(sl + "") {
+										
+										@Override
+										public void paint(Graphics g) {
+											if (!(Boolean) inFocus.getObject() && blockNameF != null) {
+												g.setColor(new JDialog().getBackground());
+												g.fillRect(0, 0, getWidth(), getHeight());
+												g.setColor(Color.GRAY);
+												g.drawRoundRect(2, 4, getWidth() - 4, getHeight() - 8, 5, 5);
+												g.setColor(Color.BLACK);
+												g.drawString(blockNameF, 8, getHeight() / 2 + 4);
+											} else
+												super.paint(g);
+										}
+										
+									};
+									Action ba = new AbstractAction("...") {
+										private static final long serialVersionUID = 1L;
+										
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											String blockSelection = new BlockSelector(true, "Select Analysis Block",
+													"Select the block type. [TODO NOT YET IMPLEMENTED!]").getBlockSelection();
+											if (blockSelection != null) {
+												textField.setText(blockSelection);
+											}
+										}
+									};
+									final JButton selButton = new JButton(ba);
+									selButton.setVisible(false);
+									if (blockDesc != null)
+										textField.setToolTipText("<html>" +
+												StringManipulationTools.getWordWrap(blockDesc, 60));
+									
+									if (blockName != null) {
+										textField.addFocusListener(new FocusListener() {
+											@Override
+											public void focusLost(FocusEvent e) {
+												inFocus.setObject(false);
+												selButton.setVisible(false);
+												textField.repaint();
+											}
+											
+											@Override
+											public void focusGained(FocusEvent e) {
+												inFocus.setObject(true);
+												selButton.setVisible(true);
+												textField.repaint();
+											}
+										});
+									}
+									
+									selButton.setToolTipText("Select Block");
+									ComponentBorder cb = new ComponentBorder(selButton, Edge.RIGHT) {
+										
+										@Override
+										public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+											if ((Boolean) inFocus.getObject())
+												super.paintBorder(c, g, x, y, width, height);
+										}
+									};
+									cb.install(textField);
 									GuiRow gr = new GuiRow(new JLabel(), textField);
 									entries.add(gr.getRowGui());// + "");
 								}
