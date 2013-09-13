@@ -127,4 +127,14 @@ public class BlockRemoveCameraLineArtifacts extends AbstractBlock {
 		return BlockType.PREPROCESSING;
 	}
 	
+	@Override
+	public String getName() {
+		return "Remove Camera Artifacts (thin lines)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Experimental / test function to remove camera artifacts, thin horizontal constant lines within the VIS images.";
+	}
+	
 }

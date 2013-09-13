@@ -40,4 +40,14 @@ public class BlMoveMasksToImageSet extends AbstractImageAnalysisBlockFIS {
 	public BlockType getBlockType() {
 		return BlockType.POSTPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Move Mask Set to Image Set";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Replaces the main image set with the mask images.";
+	}
 }

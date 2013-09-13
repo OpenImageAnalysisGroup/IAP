@@ -51,4 +51,14 @@ public class BlockRemoveSmallVerySmallClustersForFluo extends AbstractBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Remove small noise objects";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Small parts of the image are removed (noise), using the PixelSegmentation algorithm.";
+	}
+	
 }

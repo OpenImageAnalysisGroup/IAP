@@ -61,4 +61,14 @@ public class BlockClearSmallBorderAroundImagesAndMasks extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Add Border Around Image";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Add one border with width of one percent of image width around the image.";
+	}
 }

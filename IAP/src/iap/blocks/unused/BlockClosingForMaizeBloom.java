@@ -205,4 +205,14 @@ public class BlockClosingForMaizeBloom extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Improve maize flower visibility";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Improve flower visibility within visible mask.";
+	}
 }

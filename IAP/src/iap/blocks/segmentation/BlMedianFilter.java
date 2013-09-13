@@ -57,4 +57,14 @@ public class BlMedianFilter extends AbstractBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Median Filter";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove 'peper and salt' noise from selected mask images.";
+	}
+	
 }

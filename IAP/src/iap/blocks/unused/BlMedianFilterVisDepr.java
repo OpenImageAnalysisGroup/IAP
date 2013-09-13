@@ -48,4 +48,13 @@ public class BlMedianFilterVisDepr extends AbstractSnapshotAnalysisBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Median Filter (VIS) (depricated)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove 'peper and salt' noise from selected mask images.";
+	}
 }

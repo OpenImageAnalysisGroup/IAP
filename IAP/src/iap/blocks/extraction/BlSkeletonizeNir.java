@@ -64,4 +64,14 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Skeletonize NIR";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Skeletonize NIR images and extract according skeleton features.";
+	}
 }

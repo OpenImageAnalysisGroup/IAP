@@ -51,4 +51,13 @@ public class BlMedianFilterFluo extends AbstractBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Median Filter (Fluo)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove 'peper and salt' noise from fluo mask.";
+	}
 }

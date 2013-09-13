@@ -145,4 +145,14 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 		return BlockType.PREPROCESSING;
 	}
 	
+	@Override
+	public String getName() {
+		return "Color Balancing";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Recolor pictures according to white point (or black point for fluo).";
+	}
+	
 }

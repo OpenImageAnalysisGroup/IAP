@@ -121,4 +121,14 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Remove Levitating Objects";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove levitating objects (disconnected image parts from the top) from side VIS and FLUO images.";
+	}
+	
 }

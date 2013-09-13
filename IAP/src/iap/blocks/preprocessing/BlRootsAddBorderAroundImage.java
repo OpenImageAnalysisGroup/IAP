@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Add border of N pixels around the images (visible)
+ * Add border of N pixels around the images (visible).
  * 
  * @author klukas
  */
@@ -48,6 +48,16 @@ public class BlRootsAddBorderAroundImage extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
+	}
+	
+	@Override
+	public String getName() {
+		return "Add Border Around Image";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Add border of N pixels around the images (visible).";
 	}
 	
 }

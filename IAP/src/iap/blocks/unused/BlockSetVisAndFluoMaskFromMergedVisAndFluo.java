@@ -10,14 +10,6 @@ import de.ipk.ag_ba.image.operation.MaskOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-/**
- * Merges the given masks. Only parts which are confirmed as non-background
- * in all input images are retained in the result 1/0 mask.
- * 
- * @param mask
- *           The input masks (should contain cleared background).
- * @return A single 1/0 mask.
- */
 public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
@@ -81,6 +73,17 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Merge VIS and FLUO masks";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Overlays the VIS and FLUO masks, the overlay is applied to the VIS and FLUO images. Only " +
+				"parts where both camera types confirm plant areas are retained.";
 	}
 	
 }

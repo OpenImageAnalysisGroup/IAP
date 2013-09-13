@@ -75,4 +75,13 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Apply FLUO mask to other images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Use FLUO mask to clear VIS/NIR/IR.";
+	}
 }

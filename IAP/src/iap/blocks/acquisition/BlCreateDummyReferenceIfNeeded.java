@@ -94,4 +94,14 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	public BlockType getBlockType() {
 		return BlockType.ACQUISITION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Create Reference Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Create a simulated, dummy reference image (in case the reference image is NULL).";
+	}
 }

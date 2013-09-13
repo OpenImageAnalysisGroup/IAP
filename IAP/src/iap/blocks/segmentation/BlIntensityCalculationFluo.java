@@ -82,4 +82,14 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Fluo Intensity";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Fluorescence intensity conversion and threshold-based filtering of background.";
+	}
 }

@@ -78,4 +78,14 @@ public class BlockResizeMasksToLargest extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Resize Masks to Largest Dimension";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Resize mask images according to the size of the largest width and height of the mask image set. Normally not needed.";
+	}
 }

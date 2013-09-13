@@ -66,4 +66,18 @@ public class BlMorphologicalOperations extends AbstractBlock {
 			}
 		return kernel;
 	}
+	
+	@Override
+	public String getName() {
+		return "Morphological Operations";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Analysis block for morphological image operations. 3 Steps are performed, first erode, then dilate, " +
+				"and then erode again. " +
+				"Each step can be performed multiple times, according to user preference. " +
+				"This way this block can perform the Opening or Closing operation, depending on its settings, " +
+				"or only Erode or only Dilate.";
+	}
 }

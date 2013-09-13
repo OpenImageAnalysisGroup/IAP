@@ -11,9 +11,9 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * Clears the background by comparison of foreground and background.
@@ -267,5 +267,16 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Compare Images and Reference Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return " Clears the background by comparison of foreground and background. " +
+				"Additionally the border around the masks is cleared (width 2 pixels).";
 	}
 }

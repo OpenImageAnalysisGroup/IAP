@@ -89,4 +89,14 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Segment roots from box";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detect root pixels by removing the larger root plastic box border, background and noise from the image.";
+	}
+	
 }

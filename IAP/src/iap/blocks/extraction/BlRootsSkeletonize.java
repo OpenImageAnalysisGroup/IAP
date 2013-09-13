@@ -428,4 +428,14 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		return BlockType.FEATURE_EXTRACTION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Root Skeletonization";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Skeletonize the roots and store root lengths, and other parameters.";
+	}
+	
 }
