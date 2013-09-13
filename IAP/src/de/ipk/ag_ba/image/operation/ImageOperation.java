@@ -12,11 +12,14 @@ import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.filter.MaximumFinder;
 import ij.plugin.filter.UnsharpMask;
+import ij.process.AutoThresholder.Method;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
+import ij.process.TypeConverter;
 import info.StopWatch;
 
 import java.awt.BasicStroke;
@@ -347,7 +350,7 @@ public class ImageOperation implements MemoryHogInterface {
 			else
 				switch (type) {
 					case CLASSIC:
-						intensity = intensity / 0.825f;
+						// intensity = intensity / 0.825f;
 						break;
 					case CHLOROPHYL:
 						Color.RGBtoHSB(rf, gf, 0, hsb);
@@ -358,8 +361,6 @@ public class ImageOperation implements MemoryHogInterface {
 						Color.RGBtoHSB(rf, gf, 0, hsb);
 						hsb[2] = rf / 255f;
 						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
-						if (intensity > 170f / 255f)
-							intensity = 1;
 						break;
 					default:
 						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
@@ -2654,7 +2655,7 @@ public class ImageOperation implements MemoryHogInterface {
 		MaximumFinder find = new MaximumFinder();
 		ResultsTable rt = new ResultsTableWithUnits();
 		find.findMaxima(image.getProcessor(), tolerance,
-				threshold, outputType, excludeOnEdges, isEDM);
+				threshold, outputType, excludeOnEdges, isEDM, rt);
 		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
 			return new ImageOperation(image, (ResultsTableWithUnits) rt);
 		} else {
@@ -2710,6 +2711,33 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		// image ==> byteProcessor.getBufferedImage() (ck, 26.6.11)
 		return new ImageOperation(image);
+	}
+	
+	/**
+	 * Maximum entropy thresholding on Lab (brightness). Uses ImageJ functions.
+	 */
+	public ImageOperation autoThresholdingColorImageByUsingBrightnessMaxEntropy(boolean darkBackground, boolean debug) {
+		
+		byte[] hue, s, b;
+		ColorProcessor cp = (ColorProcessor) image.getProcessor();
+		int w = getWidth();
+		int h = getHeight();
+		hue = new byte[w * h];
+		s = new byte[w * h];
+		b = new byte[w * h];
+		cp.getHSB(hue, s, b);
+		
+		ByteProcessor pr = new ByteProcessor(w, h, b, null);
+		pr.setAutoThreshold(Method.MaxEntropy, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
+		ImageOperation ioRED = new ImageOperation(new TypeConverter(pr, false).convertToRGB().getBufferedImage()).show("Auto-Threshold Mask Result", debug);
+		int[] res = getImageAs1dArray();
+		int idx = 0;
+		for (int i : ioRED.getImageAs1dArray()) {
+			if (i == BACKGROUND_COLORint)
+				res[idx] = BACKGROUND_COLORint;
+			idx++;
+		}
+		return new ImageOperation(res, getWidth(), getHeight());
 	}
 	
 	public ImageOperation thresholdBlueHigherThan(int threshold) {
