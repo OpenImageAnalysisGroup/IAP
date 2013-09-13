@@ -79,7 +79,7 @@ public class BlCalcConvexHull extends AbstractBlock {
 	
 	@Override
 	public String getName() {
-		return "Calculate Convex HulL";
+		return "Calculate Convex Hull";
 	}
 	
 	@Override
