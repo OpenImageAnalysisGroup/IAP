@@ -360,9 +360,11 @@ public class Image {
 	 * 
 	 * @param fileName
 	 * @return
+	 * @return
 	 */
-	public void saveToFile(String fileName) {
+	public Image saveToFile(String fileName) {
 		io().saveImage(fileName);
+		return this;
 	}
 	
 	public MyByteArrayInputStream getAsPNGstream() throws IOException {
