@@ -2,6 +2,7 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
+import iap.blocks.auto.BlAutoSegmentationFluo;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -26,7 +27,6 @@ import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
-import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
@@ -44,7 +44,7 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
-		return "Maize Analysis";
+		return "Dynamic Maize Pipeline";
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlIntensityCalculationFluo(),
+				new BlAutoSegmentationFluo(),
 				new BlLabFilter(),
 				new BlAdaptiveThresholdNir(),
 				new BlClosing(),
