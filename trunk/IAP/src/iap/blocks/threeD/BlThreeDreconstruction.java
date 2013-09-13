@@ -428,4 +428,14 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "3D-Volume-Generation";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Perform space carving operation on visible light side images.";
+	}
 }

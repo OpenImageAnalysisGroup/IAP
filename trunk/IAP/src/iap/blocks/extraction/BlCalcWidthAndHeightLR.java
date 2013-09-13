@@ -269,4 +269,15 @@ public class BlCalcWidthAndHeightLR extends
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Width and Height (Side Left and Right)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates the plant width and height (in the left and " +
+				"right part of the image separately) properties from the visible light image mask.";
+	}
 }

@@ -53,4 +53,14 @@ public class BlFluoMaskIsRequired extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.ACQUISITION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Fluo Required";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Optionally removes VIS,NIR,IR if no FLUO image can be found.";
+	}
 }

@@ -238,4 +238,15 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		else
 			return null;
 	}
+	
+	@Override
+	public String getName() {
+		return "Detect Blue Side Markers";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detects blue side markers and uses the provided real-world distance to calculate a conversion factor from px to mm. " +
+				"Optionally a fixed objects distance can be entered and used, instead.";
+	}
 }

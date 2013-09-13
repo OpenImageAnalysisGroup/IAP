@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Resize masks images to largest width and height.
+ * Apply mask to main images and use result to set mask image set.
  * 
  * @author klukas
  */
@@ -50,5 +50,15 @@ public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Apply Mask";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Apply mask to main images and use result to set mask image set.";
 	}
 }

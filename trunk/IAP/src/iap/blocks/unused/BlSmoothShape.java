@@ -38,4 +38,14 @@ public class BlSmoothShape extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Smooth Shape";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Smooth borders of visible light mask.";
+	}
 }

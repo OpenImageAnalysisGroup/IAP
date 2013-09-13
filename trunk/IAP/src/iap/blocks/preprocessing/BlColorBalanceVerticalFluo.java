@@ -274,4 +274,15 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Background Correction Fluo";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detect background intensity at the top " +
+				"and bottom and correct the overal image intensity according the background black point.";
+	}
 }

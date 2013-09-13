@@ -47,4 +47,14 @@ public class BlOpeningTopVis extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Opening";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Perform opening operation.";
+	}
 }

@@ -21,7 +21,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * Calculates volume estimation values from the side and top areas. Processes by default vis and fluo data. Optionally also nir and ir data.
+ * Calculates volume estimation values from the side and top areas.
+ * Processes by default vis and fluo data. Optionally also nir and ir data.
  * 
  * @author klukas
  */
@@ -336,5 +337,16 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Volume Estimations";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates volume estimation values from the side and top areas. " +
+				"Processes by default vis and fluo data. Optionally also nir and ir data.";
 	}
 }

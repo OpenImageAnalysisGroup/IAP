@@ -128,4 +128,14 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Leaf Curling Analysis";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Analyzes the leaf curling structure.";
+	}
 }

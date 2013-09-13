@@ -98,4 +98,15 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Circular Color Balancing";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detect background pixels from bottom left to the center of the image and " +
+				"correct for gradual circular changes in the intensity.";
+	}
 }

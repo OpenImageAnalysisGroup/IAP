@@ -156,4 +156,15 @@ public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Background Correction NIR (side, vertical)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detect background intensity at the top " +
+				"and bottom and correct the overal image intensity according the provided background intensity.";
+	}
 }

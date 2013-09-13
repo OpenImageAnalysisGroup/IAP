@@ -78,4 +78,14 @@ public class BlRotate extends AbstractBlock {
 		return BlockType.PREPROCESSING;
 	}
 	
+	@Override
+	public String getName() {
+		return "Rotate Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Rotates the images and masks according to the provided rotation angles.";
+	}
+	
 }

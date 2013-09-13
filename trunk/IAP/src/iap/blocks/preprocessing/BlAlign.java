@@ -227,4 +227,14 @@ public class BlAlign extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Align Camera Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Moves and resizes camera images, so that they can be used for overlaying each other.";
+	}
 }

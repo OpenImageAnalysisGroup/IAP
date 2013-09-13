@@ -269,4 +269,14 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Color and Intensity Histograms";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.";
+	}
 }

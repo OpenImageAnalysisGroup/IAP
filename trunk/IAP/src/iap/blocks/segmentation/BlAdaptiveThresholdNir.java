@@ -66,4 +66,14 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Adaptive NIR Foreground Background Separation";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Separates the plant pixels from the background, by using a adaptive thresholding algorithm.";
+	}
 }

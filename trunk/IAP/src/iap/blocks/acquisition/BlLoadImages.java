@@ -284,4 +284,14 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.ACQUISITION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Load Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Loads images and reference images from the source URLs.";
+	}
 }

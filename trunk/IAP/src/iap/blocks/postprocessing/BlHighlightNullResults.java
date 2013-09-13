@@ -96,4 +96,15 @@ public class BlHighlightNullResults extends AbstractBlock {
 		return BlockType.POSTPROCESSING;
 	}
 	
+	@Override
+	public String getName() {
+		return "Highlight Null Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "If no image result is available, the source image is " +
+				"loaded and marked with a red border, to indicate a NULL processing result.";
+	}
+	
 }
