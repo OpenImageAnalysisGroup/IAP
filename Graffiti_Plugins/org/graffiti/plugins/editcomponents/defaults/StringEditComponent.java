@@ -124,6 +124,7 @@ public class StringEditComponent
 							}
 						};
 						JButton selButton = new JButton(ba);
+						selButton.setToolTipText("Browse for local folder");
 						ComponentBorder cb = new ComponentBorder(selButton, Edge.RIGHT);
 						cb.install(textComp);
 					}
