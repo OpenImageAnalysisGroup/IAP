@@ -30,13 +30,25 @@ public class BlAutoSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			return null;
 		}
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(), options.getBackground());
-		double min = 220;
-		double p1 = getDouble("minimum-intensity-classic", min);
-		double p2 = getDouble("minimum-intensity-chloro", min);
-		double p3 = getDouble("minimum-intensity-phenol", 240);
-		Image resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage();
-		Image resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
-		Image resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage();
+		
+		Image resClassic, resChlorophyll, resPhenol;
+		if (!auto_tune) {
+			double min = 220;
+			double p1 = getDouble("minimum-intensity-classic", min);
+			double p2 = getDouble("minimum-intensity-chloro", min);
+			double p3 = getDouble("minimum-intensity-phenol", 170);
+			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage();
+			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
+			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage();
+		} else {
+			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
+			Image filter = resClassic.show("Input For Auto-Threshold", debugValues);
+			filter = filter.io().autoThresholdingColorImageByUsingBrightnessMaxEntropy(false, debugValues).getImage().show("Result Filter", debugValues);
+			io = io.applyMask(filter).show("USED FOR CALC", debugValues);
+			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
+			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 255).getImage();
+			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 255).getImage();
+		}
 		return new Image(resClassic, resChlorophyll, resPhenol);
 	}
 	
@@ -72,6 +84,6 @@ public class BlAutoSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Detects the noise level, background and foreground levels for segmentation.";
+		return "Detects the noise level, background and foreground levels to segment the plant from the background (FLUO).";
 	}
 }
