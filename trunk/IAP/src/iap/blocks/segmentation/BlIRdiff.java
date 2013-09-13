@@ -99,4 +99,16 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Relative IR-Temperatures";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates the relative temperature (as a gray image) from the IR image " +
+				"(difference of plant temperature and background temperature). " +
+				"The location and properties for the background identification can be parameterized.";
+	}
 }

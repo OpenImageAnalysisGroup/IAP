@@ -57,4 +57,14 @@ public class BlockCropMasks extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.POSTPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Crop Masks";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Crops available images (based on rectangular crop area, using comparison to background image).";
+	}
 }

@@ -47,4 +47,14 @@ public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBl
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Remove small artifacts";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove small sized artifacts from the FLUO images.";
+	}
 }

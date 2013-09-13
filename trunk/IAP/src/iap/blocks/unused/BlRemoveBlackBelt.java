@@ -117,4 +117,14 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Remove black transport belts (top images)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Uses color filtering to detect black belts and removes these areas from VIS/FLUO/NIR images.";
+	}
 }

@@ -67,4 +67,15 @@ public class BlUseFluoMaskToClearNir extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Apply FLUO mask to NIR";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Clears the NIR image, based on the FLUO mask.";
+	}
+	
 }

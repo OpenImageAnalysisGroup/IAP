@@ -346,4 +346,14 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Detect Maize Stem (experimental)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Experimental function, which later aims in detecting the maize stem from the images.";
+	}
 }

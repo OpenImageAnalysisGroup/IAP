@@ -101,4 +101,14 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Remove black pot soil (top)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Uses a LAB color filter to detect dark soil in the pot.";
+	}
 }

@@ -116,4 +116,14 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Color Segmentation (HSV)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Uses a HSV-based pixel filter(s) for the vis/fluo/nir images.";
+	}
 }

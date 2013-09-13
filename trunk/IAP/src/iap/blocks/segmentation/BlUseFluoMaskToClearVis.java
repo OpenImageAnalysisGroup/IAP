@@ -81,4 +81,14 @@ public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Apply FLUO mask to VIS";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Clears the VIS image, based on the FLUO mask.";
+	}
+	
 }

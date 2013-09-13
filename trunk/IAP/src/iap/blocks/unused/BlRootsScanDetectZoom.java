@@ -59,4 +59,17 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlock {
 		return BlockType.PREPROCESSING;
 	}
 	
+	@Override
+	public String getName() {
+		return "Detect white area around box";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Detect the zoom level of the scanned image. If there is a lot of white area around " +
+				"the gray area, then the normal wide zoom is detected. If nearly all is gray, then " +
+				"the image zoom is too big, this is the zoom level which should have been avoided. " +
+				"If such image is processed, the setting 'options.isHighResVisCamera()' is set to TRUE.";
+	}
+	
 }

@@ -15,7 +15,6 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
@@ -544,4 +543,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Skeletonize VIS and FLUO";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Skeletonize VIS and FLUO images and extract according skeleton features.";
+	}
+	
 }

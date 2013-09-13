@@ -68,4 +68,15 @@ public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Apply FLUO mask to IR";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Clears the IR image, based on the FLUO mask.";
+	}
+	
 }

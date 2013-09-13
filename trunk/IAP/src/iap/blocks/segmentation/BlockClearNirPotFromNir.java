@@ -92,4 +92,14 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Remove Pot from NIR";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Remove black pot from NIR image (scanns for continues large region).";
+	}
 }

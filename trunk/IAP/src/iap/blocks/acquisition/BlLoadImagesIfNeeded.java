@@ -211,4 +211,14 @@ public class BlLoadImagesIfNeeded extends
 	public BlockType getBlockType() {
 		return BlockType.ACQUISITION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Load Images (without reference)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Load images, but not the reference images.";
+	}
 }

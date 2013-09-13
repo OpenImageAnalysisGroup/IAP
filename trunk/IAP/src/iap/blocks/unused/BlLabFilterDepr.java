@@ -113,4 +113,14 @@ public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Color Segmentation (LAB) (depricated)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return " Uses a lab-based pixel filter for the vis images.";
+	}
 }
