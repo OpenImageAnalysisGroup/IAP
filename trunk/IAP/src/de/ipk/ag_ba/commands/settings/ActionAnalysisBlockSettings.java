@@ -1,12 +1,16 @@
 package de.ipk.ag_ba.commands.settings;
 
+import iap.blocks.data_structures.ImageAnalysisBlock;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.IniIoProvider;
+import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -36,20 +40,25 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		String g = group;
-		if (g != null && g.indexOf(".Block") > 0)
-			g = g.substring(g.lastIndexOf(".Block") + ".Block".length());
-		else
-			if (g != null && g.indexOf(".Bl") > 0)
-				g = g.substring(g.lastIndexOf(".Bl") + ".Bl".length());
+		try {
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			return inst.getName();
+		} catch (Exception e) {
+			String g = group;
+			if (g != null && g.indexOf(".Block") > 0)
+				g = g.substring(g.lastIndexOf(".Block") + ".Block".length());
 			else
-				if (g != null && g.indexOf(".") > 0)
-					g = g.substring(g.lastIndexOf(".") + ".".length());
-		if (g != null && g.startsWith("_"))
-			g = g.substring("_".length());
-		if (g != null)
-			g = g.replace('_', ' ');
-		return g;
+				if (g != null && g.indexOf(".Bl") > 0)
+					g = g.substring(g.lastIndexOf(".Bl") + ".Bl".length());
+				else
+					if (g != null && g.indexOf(".") > 0)
+						g = g.substring(g.lastIndexOf(".") + ".".length());
+			if (g != null && g.startsWith("_"))
+				g = g.substring("_".length());
+			if (g != null)
+				g = g.replace('_', ' ');
+			return g;
+		}
 	}
 	
 	@Override
@@ -93,5 +102,16 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 		restSettingsButton.setRightAligned(true);
 		res.add(0, restSettingsButton);
 		return res;
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		try {
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			return new MainPanelComponent("<html><b>" + inst.getName() + "</b><br><br>" +
+					StringManipulationTools.getWordWrap(inst.getDescription(), 80));
+		} catch (Exception e) {
+			return super.getResultMainPanel();
+		}
 	}
 }
