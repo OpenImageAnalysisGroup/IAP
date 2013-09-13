@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
 /**
- * Runs stored postprocessor code stored and created by previous analysis blocks.
+ * Runs stored post-processor code stored and created by previous analysis blocks.
  * 
  * @author klukas
  */
@@ -179,6 +179,16 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.POSTPROCESSING;
+	}
+	
+	@Override
+	public String getName() {
+		return "Run Post-Processors";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Runs stored post-processor code stored and created by previous analysis blocks.";
 	}
 	
 }

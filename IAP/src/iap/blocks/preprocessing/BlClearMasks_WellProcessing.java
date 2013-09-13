@@ -11,8 +11,7 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Clears all images around a circle in the middle
- * Create a simulated, dummy reference image (in case the reference image is NULL).
+ * Processes individual well parts from top images (removes other parts).
  * 
  * @author pape, klukas
  */
@@ -186,5 +185,15 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Cut Well Parts";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Processes individual well parts from top images (removes other parts).";
 	}
 }

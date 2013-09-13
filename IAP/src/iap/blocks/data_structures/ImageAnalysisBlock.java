@@ -22,12 +22,8 @@ public interface ImageAnalysisBlock {
 	
 	public MaskAndImageSet process() throws InterruptedException;
 	
-	public HashSet<CameraType> getCameraInputTypes();
-	
-	public HashSet<CameraType> getCameraOutputTypes();
-	
 	public void postProcessResultsForAllTimesAndAngles(
-			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			TreeMap<String, TreeMap<Long, Double>> plandId2time2waterData,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> allResultsForSnapshot,
@@ -35,7 +31,30 @@ public interface ImageAnalysisBlock {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
 	
+	public void setPreventDebugValues(boolean preventSecondShowingOfDebugWindows);
+	
+	/**
+	 * @return List of (possible) input camera types the block will process and (possibly) change.
+	 */
+	public HashSet<CameraType> getCameraInputTypes();
+	
+	/**
+	 * @return List of (possible) output camera types the block will process and (possibly) change.
+	 */
+	public HashSet<CameraType> getCameraOutputTypes();
+	
+	/**
+	 * @return Block processing type for categorization.
+	 */
 	public BlockType getBlockType();
 	
-	public void setPreventDebugValues(boolean b);
+	/**
+	 * @return User friendly block name.
+	 */
+	public String getName();
+	
+	/**
+	 * @return Extended block description.
+	 */
+	public String getDescription();
 }

@@ -114,4 +114,15 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Areas";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates the top and side area values for visible and florescence images (by default) " +
+				"and if enabled, from NIR and IR images as well.";
+	}
 }

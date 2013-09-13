@@ -225,4 +225,15 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Color Balancing Vis (side, vertical)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Recolor pictures according to white point (or black point for fluo). " +
+				"May adjust the top-right-half brightness with the remark setting 'top.right.half.brightness'.";
+	}
 }

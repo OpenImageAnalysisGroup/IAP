@@ -94,4 +94,14 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.SEGMENTATION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Closing Operation";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Performs closing operations on the visible light image.";
+	}
 }

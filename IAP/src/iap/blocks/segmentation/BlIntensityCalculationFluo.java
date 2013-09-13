@@ -46,7 +46,7 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 			/**
 			 * @see IntensityAnalysis: r_intensityClassic, g_.., b_...
 			 */
-			fis.show("HHH");
+			fis.show("Fluorescence Segmentation Results");
 			// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		}
 		

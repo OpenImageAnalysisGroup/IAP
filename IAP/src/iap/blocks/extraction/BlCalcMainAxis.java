@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Calculates the main axis rotation for visible top images. All other image
- * types and configs are ignored.
+ * types and configurations are ignored.
  * Does not need any parameters.
  * 
  * @author pape, klukas
@@ -91,5 +91,16 @@ public class BlCalcMainAxis extends
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
+	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Main Orientation (Top)";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates the main axis rotation for visible top images. All other image " +
+				"types and configurations are ignored.";
 	}
 }

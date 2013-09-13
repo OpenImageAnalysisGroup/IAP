@@ -54,4 +54,14 @@ public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.POSTPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Draw Skeleton";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Draws stored skeleton image on result images.";
+	}
 }

@@ -40,4 +40,14 @@ public class BlRootsSharpenImage extends AbstractSnapshotAnalysisBlock {
 		return BlockType.SEGMENTATION;
 	}
 	
+	@Override
+	public String getName() {
+		return "Blur and Sharpen Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Performs blur and sharpen operation according to provided factors. " +
+				"Works on input images, not on mask images.";
+	}
 }

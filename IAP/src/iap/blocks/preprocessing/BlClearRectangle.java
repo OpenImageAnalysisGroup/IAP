@@ -81,4 +81,14 @@ public class BlClearRectangle extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Clear Rectangle";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Clear a rectangle inside of the image (only masks) from top, bottom, left and right sides.";
+	}
 }

@@ -76,4 +76,17 @@ public class BlCalcConvexHull extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
+	
+	@Override
+	public String getName() {
+		return "Calculate Convex HulL";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Calculates the convex hull for the visible light and fluorescence images and stores according data " +
+				"results as numeric values (size of hull, centroid). The complex hull, the image borders and the " +
+				"centroid are drawn on the result (input and result is the mask). If enabled from the settings " +
+				"also the NIR and IR masks are processed.";
+	}
 }

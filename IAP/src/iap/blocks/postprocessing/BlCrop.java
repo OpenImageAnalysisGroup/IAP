@@ -124,4 +124,14 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	public BlockType getBlockType() {
 		return BlockType.POSTPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Crop Result Images";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Crops images. Does process the images, NOT the masks.";
+	}
 }

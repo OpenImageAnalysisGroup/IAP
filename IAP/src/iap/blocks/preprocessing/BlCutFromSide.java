@@ -137,4 +137,14 @@ public class BlCutFromSide extends AbstractBlock {
 	public BlockType getBlockType() {
 		return BlockType.PREPROCESSING;
 	}
+	
+	@Override
+	public String getName() {
+		return "Crop Sides";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Clear the image (only masks) from top, bottom, left and right sides.";
+	}
 }
