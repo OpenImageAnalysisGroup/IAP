@@ -53,7 +53,7 @@ public class BlueMarkerFinder {
 		io1.show("Input für Marker Search", debug);
 		
 		resultTable = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).show("MARKIERT GROESSER (a)", debug).opening(10, 0).show("MARKIERT GROESSER", debug)
+				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).opening(10, 0).show("Markers enlarged (b)", debug)
 				.getResultsTable();
 		
 	}
