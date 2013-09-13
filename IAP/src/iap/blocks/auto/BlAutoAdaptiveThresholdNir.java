@@ -1,4 +1,4 @@
-package iap.blocks.segmentation;
+package iap.blocks.auto;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -7,6 +7,7 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.awt.Color;
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -15,7 +16,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
+public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {
@@ -25,18 +26,34 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 		if (!getBoolean("enabled", true)) {
 			return nirMask;
 		}
-		
+		boolean autoTune = getBoolean("Auto-tune", true);
 		Image origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
-		int average = 180;
+		int average = autoTune ? 180 : getInt("Replace color value", 180);
 		if (nirMask != null) {
 			double f;
 			int regionSize;
 			f = getDouble("Adaptive_Threshold_F", 0.08);
 			if (getBoolean("Replace Background with Gray", true)) {
-				int gl = getInt("Replace color value", 180);
-				nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(gl, gl, gl).getRGB()).getImage().show("Background replace with gray", debug);
+				nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(average, average, average).getRGB()).getImage()
+						.show("Background replace with gray", debug);
 			}
-			regionSize = getInt("Adaptive_Threshold_Region_Size", 50);
+			if (!autoTune)
+				regionSize = getInt("Adaptive_Threshold_Region_Size", 50);
+			else {
+				Image ref = input().masks().vis();
+				if (ref == null)
+					ref = input().masks().fluo();
+				if (ref == null)
+					regionSize = getInt("Adaptive_Threshold_Region_Size", 50);
+				else {
+					ref = ref.copy();
+					double averageLeafWidthEstimation = ref.io().countFilledPixels() /
+							(double) ref.io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
+					regionSize = (int) (averageLeafWidthEstimation * 15);
+					if (regionSize < 10)
+						regionSize = 10;
+				}
+			}
 			nirMask = nirMask.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(regionSize, average,
 							options.getBackground(), f).getImage().show("ADAPT OUT", debug);
@@ -69,11 +86,13 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Adaptive NIR Segmentation";
+		return "Auto-tuning NIR Segmentation";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Separates the plant pixels from the background, by using a adaptive thresholding algorithm.";
+		return "Separates the plant pixels from the background, by using a adaptive thresholding algorithm. " +
+				"The region size for the auto-tuning thresholding block is varies, depending on the estimated " +
+				"average leaf width.";
 	}
 }

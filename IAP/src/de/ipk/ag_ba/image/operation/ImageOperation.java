@@ -2728,7 +2728,7 @@ public class ImageOperation implements MemoryHogInterface {
 		cp.getHSB(hue, s, b);
 		
 		ByteProcessor pr = new ByteProcessor(w, h, b, null);
-		pr.setAutoThreshold(Method.MaxEntropy, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
+		pr.setAutoThreshold(Method.Yen, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		ImageOperation ioRED = new ImageOperation(new TypeConverter(pr, false).convertToRGB().getBufferedImage()).show("Auto-Threshold Mask Result", debug);
 		int[] res = getImageAs1dArray();
 		int idx = 0;
