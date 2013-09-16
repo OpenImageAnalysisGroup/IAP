@@ -37,6 +37,11 @@ public interface IAPplugin extends GenericPlugin {
 	 * of known ImageAnalysisBlocks. While arbitrary blocks may be specified by the user,
 	 * the blocks should also be made available to the IAP tool using this methods.
 	 * The information will is used to provide the user with a list of known analysis blocks.
+	 * The default abstract plugin base class will use the information from the defined
+	 * templates (if available) to create this list from the template pipeline definition.
+	 * If you provide additional blocks, or custom blocks, not included in a template,
+	 * implement this method accordingly, so that users may more easily select this block
+	 * from the GUI, instead of requiring the user to enter the package and class name.
 	 * 
 	 * @return A list of image analysis blocks.
 	 */

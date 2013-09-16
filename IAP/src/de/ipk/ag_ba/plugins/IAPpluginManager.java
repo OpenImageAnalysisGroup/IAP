@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.plugins;
 
+import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.pipelines.ImageProcessorOptions;
 
 import java.util.ArrayList;
@@ -148,5 +149,21 @@ public class IAPpluginManager {
 			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
 			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions()));
 		}
+	}
+	
+	public Collection<ImageAnalysisBlock> getKnownAnalysisBlocks() {
+		final Collection<ImageAnalysisBlock> blocks = new ArrayList<ImageAnalysisBlock>();
+		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
+			public void processPlugin(IAPplugin p) {
+				ImageAnalysisBlock[] bla = p.getImageAnalysisBlocks();
+				if (bla != null)
+					for (ImageAnalysisBlock bl : bla) {
+						blocks.add(bl);
+					}
+			}
+		};
+		processPlugins(r);
+		return blocks;
 	}
 }

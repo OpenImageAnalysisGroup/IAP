@@ -3,6 +3,7 @@ package de.ipk.ag_ba.plugins;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.Collection;
+import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
 
@@ -34,7 +35,19 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 	
 	@Override
 	public ImageAnalysisBlock[] getImageAnalysisBlocks() {
-		return new ImageAnalysisBlock[] {};
+		if (getAnalysisTemplates() == null || getAnalysisTemplates().length == 0)
+			return new ImageAnalysisBlock[] {};
+		else {
+			TreeSet<ImageAnalysisBlock> res = new TreeSet<ImageAnalysisBlock>();
+			for (AnalysisPipelineTemplate t : getAnalysisTemplates()) {
+				ImageAnalysisBlock[] bl = t.getBlockList();
+				if (bl != null)
+					for (ImageAnalysisBlock b : bl) {
+						res.add(b);
+					}
+			}
+			return res.toArray(new ImageAnalysisBlock[] {});
+		}
 	}
 	
 	@Override
