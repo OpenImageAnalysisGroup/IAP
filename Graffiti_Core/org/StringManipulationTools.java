@@ -469,7 +469,27 @@ public class StringManipulationTools implements HelperClass {
 		return tu;
 	}
 	
+	/**
+	 * Supports html break-tags, br, li, p
+	 */
 	public static String getWordWrap(String desc, int width) {
+		StringBuilder res = new StringBuilder();
+		for (String splitter : new String[] { "<li>" }) {
+			int n = 0;
+			for (String w : desc.split(splitter)) {
+				if (n > 0)
+					res.append(splitter);
+				res.append(getWordWrapString(w, width));
+				n++;
+			}
+		}
+		return res.toString();
+	}
+	
+	/**
+	 * Assumes pure text string with no html tags.
+	 */
+	public static String getWordWrapString(String desc, int width) {
 		String[] words = desc.split(" ");
 		String result = "";
 		int column = 0;
