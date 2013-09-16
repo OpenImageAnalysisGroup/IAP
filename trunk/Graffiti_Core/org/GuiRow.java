@@ -27,12 +27,26 @@ public class GuiRow {
 		this.left = left;
 		this.right = right;
 	}
-
+	
+	boolean secondComponentVerticalAlignedMiddle = false;
+	
+	public boolean isSecondComponentVerticalAlignedMiddle() {
+		return secondComponentVerticalAlignedMiddle;
+	}
+	
+	public void setSecondComponentVerticalAlignedMiddle(boolean secondComponentVerticalAlignedMiddle) {
+		this.secondComponentVerticalAlignedMiddle = secondComponentVerticalAlignedMiddle;
+	}
+	
 	/**
-	 * @return JComponent shopwing the two fields. The GuiRow object is saved in a client property of the returned object.
+	 * @return JComponent showing the two fields. The GuiRow object is saved in a client property of the returned object.
 	 */
 	public JComponent getRowGui() {
-		JComponent res = TableLayout.getSplit(left, right, TableLayout.PREFERRED, TableLayout.FILL);
+		JComponent res;
+		if (secondComponentVerticalAlignedMiddle)
+			res = TableLayout.getSplitSecondVerticalAlignmentMiddle(left, right, TableLayout.PREFERRED, TableLayout.FILL);
+		else
+			res = TableLayout.getSplit(left, right, TableLayout.PREFERRED, TableLayout.FILL);
 		res.putClientProperty("guiRow", this);
 		return res;
 	}
