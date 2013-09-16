@@ -25,5 +25,4 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new RootScannPipeline()
 		};
 	}
-	
 }
