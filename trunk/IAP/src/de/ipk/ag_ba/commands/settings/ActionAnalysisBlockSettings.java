@@ -112,6 +112,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 					"Description:" +
 					"<ul><li>" +
 					StringManipulationTools.getWordWrap(inst.getDescription(), 80) + "</ul>" +
+					"Parameter:" + StringManipulationTools.getWordWrap(inst.getDescriptionForParameters(), 80) + "" +
 					"Annotation:<ul><li>" + inst.getBlockType().getName() + "<br><br>" +
 					"<li>Input/Output:<code><ul><li>In:&nbsp;&nbsp;" +
 					StringManipulationTools.getStringList(inst.getCameraInputTypes(), ", ")
