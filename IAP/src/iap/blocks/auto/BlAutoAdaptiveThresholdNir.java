@@ -49,7 +49,7 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 					ref = ref.copy();
 					double averageLeafWidthEstimation = ref.io().countFilledPixels() /
 							(double) ref.io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
-					regionSize = (int) (averageLeafWidthEstimation * 15);
+					regionSize = (int) (averageLeafWidthEstimation * 5);
 					if (regionSize < 10)
 						regionSize = 10;
 				}
