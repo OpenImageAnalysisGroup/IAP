@@ -4,6 +4,7 @@ import iap.pipelines.ImageProcessorOptions;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -68,6 +69,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public String getString(String setting, String defaultValue) {
 		return options.getStringSetting(this, setting, defaultValue);
+	}
+	
+	public Color getColor(String setting, Color defaultValue) {
+		return options.getColorSetting(this, setting, defaultValue);
 	}
 	
 	public Integer[] getIntArray(String setting, Integer[] defaultValue) {
