@@ -2,24 +2,29 @@ package de.ipk.ag_ba.commands.settings;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import org.AttributeHelper;
 import org.GuiRow;
 import org.MarkComponent;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -155,6 +160,25 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 						boolean isString = ss.length == 1;
 						boolean isStringArray = ss.length > 1;
 						if (isString) {
+							String possiblyColorValue = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+									this.actionSettingsEditor.iniIO)
+									.getString(this.actionSettingsEditor.section, setting, null, false);
+							try {
+								if (setting.toLowerCase().contains("color") && possiblyColorValue != null && possiblyColorValue.startsWith("#")
+										&& possiblyColorValue.length() == 7) {
+									Color c = StringManipulationTools.getColorFromHTMLdef(possiblyColorValue);
+									JColorChooser colorChooser = new JColorChooser(c);
+									c = colorChooser.showDialog(MainFrame.getInstance(), "Change Color Value", c);
+									if (c != null) {
+										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+												this.actionSettingsEditor.iniIO)
+												.setColor(this.actionSettingsEditor.section, setting, c);
+									}
+									return;
+								}
+							} catch (Exception e) {
+								// no color value
+							}
 							if (setting.toLowerCase().contains("password")) {
 								if (!SystemOptions.getInstance("secret", null).getBoolean("Information for user",
 										"Warning about symmetric encryption and secret file displayed", false)) {
@@ -334,11 +358,27 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				SystemOptions o = SystemOptions.getInstance(
 						this.actionSettingsEditor.iniFileName,
 						this.actionSettingsEditor.iniIO);
-				if (o != null && this.actionSettingsEditor != null && this.actionSettingsEditor.section != null)
+				if (o != null && this.actionSettingsEditor != null && this.actionSettingsEditor.section != null) {
+					String val = o.getObject(this.actionSettingsEditor.section, setting, 2);
+					try {
+						if (setting.toLowerCase().contains("color") && val != null && val.startsWith("#")
+								&& val.length() == 7) {
+							Color c = StringManipulationTools.getColorFromHTMLdef(val);
+							return "<html><center>" +
+									"<table><tr><td>" +
+									"<font color='" + val + "' size='+2'><b>" + Unicode.PEN + "</b></font>&nbsp;" +
+									"</td><td><b>" + s + "</b><br>" +
+									AttributeHelper.getColorName(c) + " (" + val + ")" +
+									""
+									+ "&nbsp;" + "</td></tr></table></center>";
+						}
+					} catch (Exception e) {
+						// empty
+					}
 					return "<html><center><b>" + s + "</b><br>" +
 							"&nbsp;" + o.getObject(this.actionSettingsEditor.section, setting, 2)
 							+ "&nbsp;" + "</center>";
-				else {
+				} else {
 					return "(not available)";
 				}
 			}
@@ -372,8 +412,16 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					} else {
 						if (setting.equalsIgnoreCase("password"))
 							return "img/ext/gpl2/Gnome-Emblem-Readonly-64.png";
-						else
-							return "img/ext/gpl2/Gnome-Insert-Text-64.png";// Gnome-Accessories-Character-Map-64.png";
+						else {
+							String possiblyColorValue = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+									this.actionSettingsEditor.iniIO)
+									.getString(this.actionSettingsEditor.section, setting, null, false);
+							if (setting.toLowerCase().contains("color") && possiblyColorValue != null && possiblyColorValue.startsWith("#")
+									&& possiblyColorValue.length() == 7)
+								return "img/ext/gpl2/Gnome-Applications-Graphics-64.png";// Gnome-Accessories-Character-Map-64.png";
+							else
+								return "img/ext/gpl2/Gnome-Insert-Text-64.png";// Gnome-Accessories-Character-Map-64.png";
+						}
 					}
 		// Gnome-Applications-Accessories-64.png";
 	}
