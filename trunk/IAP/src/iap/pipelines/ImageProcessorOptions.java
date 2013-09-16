@@ -185,6 +185,14 @@ public class ImageProcessorOptions {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
+	public Color getColorSetting(ImageAnalysisBlock block, String title, Color defaultValue) {
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getColor(
+					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
+	}
+	
 	public Integer[] getIntArraySetting(ImageAnalysisBlock block, String title, Integer[] defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
