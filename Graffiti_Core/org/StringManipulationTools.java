@@ -7,6 +7,7 @@
 
 package org;
 
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -900,5 +901,23 @@ public class StringManipulationTools implements HelperClass {
 	public static String txt2html(String txt) {
 		txt = stringReplace(txt, "\n", "<br>");
 		return "<html><code>" + txt + "</code>";
+	}
+	
+	public static Color getColorFromHTMLdef(String colDef) {
+		return new Color(
+				Integer.valueOf(colDef.substring(1, 3), 16),
+				Integer.valueOf(colDef.substring(3, 5), 16),
+				Integer.valueOf(colDef.substring(5, 7), 16));
+	}
+	
+	public static String getColorHTMLdef(Color color) {
+		String red = Integer.toHexString(color.getRed());
+		String green = Integer.toHexString(color.getGreen());
+		String blue = Integer.toHexString(color.getBlue());
+		
+		return "#" +
+				(red.length() == 1 ? "0" + red : red) +
+				(green.length() == 1 ? "0" + green : green) +
+				(blue.length() == 1 ? "0" + blue : blue);
 	}
 }
