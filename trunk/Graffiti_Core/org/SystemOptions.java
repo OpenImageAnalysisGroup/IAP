@@ -1,5 +1,6 @@
 package org;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -359,6 +360,36 @@ public class SystemOptions {
 					return null;
 				else
 					return ExternalPasswordStorage.decryptValueIfNeeded(group, setting, r);
+			}
+		}
+	}
+	
+	public synchronized Color getColor(String group, String setting, Color defaultValue) {
+		return getColor(group, setting, defaultValue, true);
+	}
+	
+	public synchronized Color getColor(String group, String setting, Color defaultValue, boolean addDefaultIfNeeded) {
+		if (ini == null) {
+			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
+			return defaultValue;
+		} else {
+			String r = ini.get(group, setting, String.class);
+			if (r == null) {
+				String storeValue = StringManipulationTools.getColorHTMLdef(defaultValue);
+				ini.put(group, setting, storeValue);
+				store(group, setting);
+				return defaultValue;
+			}
+			if (r.equals("null"))
+				return null;
+			try {
+				Color c = StringManipulationTools.getColorFromHTMLdef(r);
+				return c;
+			} catch (NumberFormatException e) {
+				String storeValue = StringManipulationTools.getColorHTMLdef(defaultValue);
+				ini.put(group, setting, storeValue);
+				store(group, setting);
+				return defaultValue;
 			}
 		}
 	}
