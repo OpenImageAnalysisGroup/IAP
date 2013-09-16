@@ -241,10 +241,10 @@ public class BlAlign extends AbstractBlock {
 	@Override
 	public String getDescriptionForParameters() {
 		return "<ul>" +
-				"<li>Increase X values, to move an image to the right." +
-				"<li>Increase Y values, to move an image down." +
-				"<li>Increase Zoom-X values, to make an image wider." +
-				"<li>Increase Zoom-Y values, to make an image taler." +
+				"<li>Increase X values to move an image to the right." +
+				"<li>Increase Y values to move an image down." +
+				"<li>Increase Zoom-X values to increase horizontal size." +
+				"<li>Increase Zoom-Y values to increase vertical size." +
 				"</ul>";
 	}
 }
