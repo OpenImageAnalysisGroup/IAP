@@ -352,4 +352,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
+	@Override
+	public String getDescriptionForParameters() {
+		return null;
+	}
 }

@@ -237,4 +237,14 @@ public class BlAlign extends AbstractBlock {
 	public String getDescription() {
 		return "Moves and resizes camera images, so that they can be used for overlaying each other.";
 	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return "<ul>" +
+				"<li>Increase X values, to move an image to the right." +
+				"<li>Increase Y values, to move an image down." +
+				"<li>Increase Zoom-X values, to make an image wider." +
+				"<li>Increase Zoom-Y values, to make an image taler." +
+				"</ul>";
+	}
 }
