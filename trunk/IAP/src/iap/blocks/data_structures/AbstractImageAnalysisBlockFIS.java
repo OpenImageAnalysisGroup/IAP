@@ -337,4 +337,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		timer.start();
 	}
 	
+	@Override
+	public int compareTo(ImageAnalysisBlock o) {
+		int res = getBlockType().compareTo(o.getBlockType());
+		if (res != 0)
+			return res;
+		else {
+			return getName().compareToIgnoreCase(o.getName());
+		}
+	}
+	
 }
