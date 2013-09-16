@@ -53,16 +53,28 @@ public class MarkComponent extends JComponent {
 	}
 	
 	public MarkComponent(JComponent comp, boolean marked, double width, boolean requestFocus) {
+		this(comp, marked, width, requestFocus, 0);
+	}
+	
+	public MarkComponent(JComponent comp, boolean marked, double width, boolean requestFocus, int markLowerMargin) {
 		
 		this.comp = comp;
 		this.requestFocus = requestFocus;
 		
 		setLayout(TableLayout.getLayout(new double[] { 5, 1, width, 1, 5 }, TableLayoutConstants.PREFERRED));
-		add(b1, "0,0");
-		add(bb1, "1,0");
-		add(comp, "2,0");
-		add(bb2, "3,0");
-		add(b2, "4,0");
+		if (markLowerMargin == 0) {
+			add(b1, "0,0");
+			add(bb1, "1,0");
+			add(comp, "2,0");
+			add(bb2, "3,0");
+			add(b2, "4,0");
+		} else {
+			add(TableLayout.getSplitVertical(b1, null, TableLayout.FILL, markLowerMargin), "0,0");
+			add(TableLayout.getSplitVertical(bb1, null, TableLayout.FILL, markLowerMargin), "1,0");
+			add(comp, "2,0");
+			add(TableLayout.getSplitVertical(bb2, null, TableLayout.FILL, markLowerMargin), "3,0");
+			add(TableLayout.getSplitVertical(b2, null, TableLayout.FILL, markLowerMargin), "4,0");
+		}
 		this.marked = marked;
 		updateMarked();
 	}
