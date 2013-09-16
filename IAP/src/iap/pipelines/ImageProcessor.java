@@ -20,6 +20,9 @@ public interface ImageProcessor {
 			HashMap<Integer, ImageStack> debugStack)
 			throws Exception;
 	
+	/**
+	 * @return mapping from tray to analysis results
+	 */
 	public abstract HashMap<Integer, BlockResultSet> getNumericResults();
 	
 	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);

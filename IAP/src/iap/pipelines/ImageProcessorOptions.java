@@ -10,10 +10,15 @@ package iap.pipelines;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 
 /**
@@ -36,8 +41,11 @@ public class ImageProcessorOptions {
 	
 	private String customNullBlockPrefix;
 	
-	public ImageProcessorOptions(SystemOptions options) {
+	private final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
+	
+	public ImageProcessorOptions(SystemOptions options, TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint) {
 		this.optSystemOptionStorage = options;
+		this.previousResultsForThisTimePoint = previousResultsForThisTimePoint;
 	}
 	
 	public enum CameraPosition {
@@ -219,4 +227,23 @@ public class ImageProcessorOptions {
 			return realDist;
 	}
 	
+	/**
+	 * @return config -> well -> result list
+	 */
+	public HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot(String string) {
+		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> res = new HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>>();
+		if (previousResultsForThisTimePoint != null) {
+			synchronized (previousResultsForThisTimePoint) {
+				for (String config : previousResultsForThisTimePoint.keySet()) {
+					HashMap<Integer, BlockResultSet> rs = previousResultsForThisTimePoint.get(config);
+					if (rs != null && !rs.isEmpty()) {
+						for (Integer well : rs.keySet()) {
+							res.get(config).put(well, rs.get(well).getPropertiesExactMatch(string));
+						}
+					}
+				}
+			}
+		}
+		return res;
+	}
 }

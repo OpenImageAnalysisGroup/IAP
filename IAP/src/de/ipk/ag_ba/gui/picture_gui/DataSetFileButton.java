@@ -880,7 +880,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			// if (user.equals(Consts.ROOTUSERNAME.toString())) { 
+			// if (user.equals(Consts.ROOTUSERNAME.toString())) {
 			Thread t = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -1208,7 +1208,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									.getFileNameMain(),
 									targetTreeNode.getExperiment().getExperiment());
 					System.out.println("BLOCKS: " + iat.getImageProcessor().getPipeline(
-							new ImageProcessorOptions(iat.getSystemOptions())).getSize() + ", Image Set Hits: " + match.size());
+							new ImageProcessorOptions(iat.getSystemOptions(), null)).getSize() + ", Image Set Hits: " + match.size());
 					for (NumericMeasurementInterface nmi : match)
 						System.out.println("Image Set Match: " + nmi + " // Subtance: " + nmi.getParentSample().getParentCondition().getParentSubstance().getName());
 					BlockPipeline.debugTryAnalysis(

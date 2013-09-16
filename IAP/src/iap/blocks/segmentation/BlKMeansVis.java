@@ -27,6 +27,8 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		boolean debug = debugValues;
 		
 		// getProperties().getPropertiesExactMatch(false, true, "top.main.axis");
+		// HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
+		// .getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("top.main.axis");
 		
 		if (input().masks().vis() != null) {
 			Image inp = input().masks().vis();

@@ -24,7 +24,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
-	private final HashMap<Integer, BlockResultSet> settings;
+	private final HashMap<Integer, BlockResultSet> blockResults;
 	private int[] debugValidTrays;
 	protected BackgroundTaskStatusProviderSupportingExternalCall status;
 	
@@ -32,8 +32,8 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		this(new HashMap<Integer, BlockResultSet>());
 	}
 	
-	public AbstractImageProcessor(HashMap<Integer, BlockResultSet> settings) {
-		this.settings = settings;
+	public AbstractImageProcessor(HashMap<Integer, BlockResultSet> blockResults) {
+		this.blockResults = blockResults;
 	}
 	
 	/*
@@ -53,7 +53,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		pipeline.setValidTrays(debugValidTrays);
 		MaskAndImageSet workset = new MaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		
-		HashMap<Integer, StringAndFlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, settings, getStatus());
+		HashMap<Integer, StringAndFlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, blockResults, getStatus());
 		
 		if (debugStack != null)
 			for (Integer key : debugStack.keySet()) {
@@ -65,13 +65,9 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		return result;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.image.analysis.maize.ImageProcessor#getSettings()
-	 */
 	@Override
 	public HashMap<Integer, BlockResultSet> getNumericResults() {
-		return settings;
+		return blockResults;
 	}
 	
 	@Override

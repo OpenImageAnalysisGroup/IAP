@@ -147,7 +147,7 @@ public class IAPpluginManager {
 					template.getTitle(),
 					template.getDescription());
 			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
-			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions()));
+			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions(), null));
 		}
 	}
 	

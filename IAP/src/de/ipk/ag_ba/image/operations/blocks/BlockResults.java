@@ -27,6 +27,10 @@ public class BlockResults implements BlockResultSet {
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
 	
+	public BlockResults() {
+		// empty
+	}
+	
 	@Override
 	public synchronized BlockProperty getNumericProperty(
 			int currentPositionInPipeline, int searchIndex, String pName) {
