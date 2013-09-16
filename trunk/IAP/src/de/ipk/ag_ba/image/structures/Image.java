@@ -157,6 +157,17 @@ public class Image {
 		
 	}
 	
+	public Image(int w, int h, int rgb) {
+		int[] img1d = new int[w * h];
+		
+		for (int k = 0; k < w * h; k++)
+			img1d[k] = rgb;
+		
+		this.w = w;
+		this.h = h;
+		this.image = ImageConverter.convert1AtoIJ(w, h, img1d);
+	}
+	
 	private static int[] getImgFromRGB(Image grayR, Image grayG, Image grayB) {
 		int[] r = grayR.getAs1A();
 		int[] g = grayG.getAs1A();
