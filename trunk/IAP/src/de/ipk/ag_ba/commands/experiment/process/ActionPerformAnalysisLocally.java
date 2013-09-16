@@ -36,7 +36,7 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Perform " + StringManipulationTools
+		return "Process " + StringManipulationTools
 				.removeHTMLtags(so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true));
 	}
 	
