@@ -367,7 +367,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 							return "<html><center>" +
 									"<table><tr><td>" +
 									"<font color='" + val + "' size='+2'><b>" + Unicode.PEN + "</b></font>&nbsp;" +
-									"</td><td><b>" + s + "</b><br>" +
+									"</td><td><center><b>" + s + "</b><br>" +
 									AttributeHelper.getColorName(c) + " (" + val + ")" +
 									""
 									+ "&nbsp;" + "</td></tr></table></center>";
