@@ -27,16 +27,16 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
 		int gridHn;
 		int gridVn;
 		multiTray = false;
-		if (options.getTrayCnt() == 1) {
+		if (options.getWellCnt() == 1) {
 			gridHn = getInt("Well Grid Horizontal", 1);
 			gridVn = getInt("Well Grid Vertical", 1);
 		} else
-			if (options.getTrayCnt() == 6) {
+			if (options.getWellCnt() == 6) {
 				gridHn = getInt("Well Grid Horizontal", 3);
 				gridVn = getInt("Well Grid Vertical", 2);
 				multiTray = true;
 			} else
-				if (options.getTrayCnt() == 12) {
+				if (options.getWellCnt() == 12) {
 					gridHn = getInt("Well Grid Horizontal", 4);
 					gridVn = getInt("Well Grid Vertical", 3);
 					multiTray = true;

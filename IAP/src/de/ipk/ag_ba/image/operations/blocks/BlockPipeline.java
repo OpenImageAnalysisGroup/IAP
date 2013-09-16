@@ -195,7 +195,7 @@ public class BlockPipeline {
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			status.setCurrentStatusValueFine(100d * (options.getTrayIdx() + 1) / options.getTrayCnt());
+			status.setCurrentStatusValueFine(100d * (options.getTrayIdx() + 1) / options.getWellCnt());
 			
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));

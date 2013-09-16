@@ -1008,8 +1008,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					input, inputMasks, maximumThreadCountOnImageLevel,
 					debugImageStack);
 			
-			for (Integer key : ret.keySet()) {
-				ImageSet pipelineResult = ret != null ? ret.get(key).getMaskAndImageSet().images() : null;
+			for (Integer wellIdx : ret.keySet()) {
+				ImageSet pipelineResult = ret != null ? ret.get(wellIdx).getMaskAndImageSet().images() : null;
 				if (pipelineResult != null) {
 					Image resVis = null, resFluo = null, resNir = null, resIr = null;
 					resVis = pipelineResult.vis();
@@ -1017,22 +1017,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					resNir = pipelineResult.nir();
 					resIr = pipelineResult.ir();
 					
-					boolean multiTray = options.getTrayCnt() > 1;
+					boolean manyWells = options.getWellCnt() > 1;
 					ImageData inVis2 = inVis == null ? null : (ImageData) inVis.clone(inVis.getParentSample());
 					ImageData inFluo2 = inFluo == null ? null : (ImageData) inFluo.clone(inFluo.getParentSample());
 					ImageData inNir2 = inNir == null ? null : (ImageData) inNir.clone(inNir.getParentSample());
 					ImageData inIr2 = inIr == null ? null : (ImageData) inIr.clone(inIr.getParentSample());
-					if (multiTray) {
+					if (manyWells) {
 						for (ImageData img : new ImageData[] { inVis2, inFluo2, inNir2, inIr2 })
 							if (img != null)
-								img.setQualityAnnotation(img.getQualityAnnotation() + "_" + key);
+								img.setQualityAnnotation(img.getQualityAnnotation() + "_" + wellIdx);
 					}
 					
 					analysisResults = imageProcessor.getNumericResults();
 					waitThreads.addAll(processAndOrSaveResultImages(
-							key, options.getTrayCnt(),
+							wellIdx, options.getWellCnt(),
 							id, inVis2, inFluo2, inNir2, inIr2,
-							debugImageStack != null ? debugImageStack.get(key) : null, resVis, resFluo, resNir, resIr, parentPriority));
+							debugImageStack != null ? debugImageStack.get(wellIdx) : null, resVis, resFluo, resNir, resIr, parentPriority));
 				}
 			}
 		}

@@ -4,8 +4,6 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Color;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -25,6 +23,8 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		Image res = null;
 		boolean debug = getBoolean("debug", false);
 		
+		getProperties().getPropertiesExactMatch(false, true, "top.main.axis");
+		
 		if (input().masks().vis() != null) {
 			Image inp = input().masks().vis();
 			
@@ -32,34 +32,29 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			ArrayList<Color> clusterColors = new ArrayList<Color>();
 			ArrayList<Vector2f> seedPositions = new ArrayList<Vector2f>();
 			
-			seedPositions.add(new Vector2f(0.5f, 0.5f));
-			seedPositions.add(new Vector2f(0.5f, 0.5f));
-			seedPositions.add(new Vector2f(0.5f, 0.5f));
-			seedPositions.add(new Vector2f(0.5f, 0.5f));
+			Color[] initColor = new Color[] {
+					Color.GREEN,
+					Color.WHITE,
+					Color.BLUE,
+					Color.BLACK
+			};
+			int n = getInt("Color Classes", 4);
+			for (int i = 0; i < n; i++) {
+				int idx = i + 1;
+				Color col = getColor("Cluster " + idx + " Seed Color", idx < 5 ? initColor[i] : Color.BLACK);
+				seedColors.add(col);
+				seedPositions.add(new Vector2f(0.5f, 0.5f));
+				boolean foreground = getBoolean("Cluster " + idx + " Foreground", idx < 1);
+				seedColors.add(foreground ? col : Color.WHITE);
+			}
 			
-			Integer[] back = getIntArray("color 1 (background)", new Integer[] { 255, 255, 255 });
-			Integer[] plant = getIntArray("color 1 (plant)", new Integer[] { 0, 255, 0 });
-			Integer[] blue = getIntArray("color 1 (blue)", new Integer[] { 0, 0, 255 });
-			Integer[] carrier = getIntArray("color 1 (carrier)", new Integer[] { 0, 0, 0 });
-			
-			seedColors.add(new Color(back[0], back[1], back[2]));
-			seedColors.add(new Color(plant[0], plant[1], plant[2]));
-			seedColors.add(new Color(blue[0], blue[1], blue[2]));
-			seedColors.add(new Color(carrier[0], carrier[1], carrier[2]));
-			
-			clusterColors.add(Color.WHITE);
-			clusterColors.add(Color.GREEN);
 			clusterColors.add(Color.WHITE);
 			clusterColors.add(Color.WHITE);
 			
 			double epsilon = getDouble("epsilon", 0.01);
 			
-			try {
-				res = KMEans(inp, seedColors, seedPositions, clusterColors, epsilon);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | IntrospectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			res = KMEans(inp, seedColors, seedPositions, clusterColors, epsilon);
+			
 			res.show("segres", debug);
 			
 			res = inp.io().applyMask(res).getImage();
@@ -67,8 +62,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		return res;
 	}
 	
-	private Image KMEans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
+	private Image KMEans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon) {
 		// get feature vector (norm everything between 0 -1)
 		int[] img1d = img.copy().getAs1A();
 		int w = img.getWidth();
@@ -121,12 +115,13 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			for (int i = 0; i < newCenterPoints.size(); i++) {
 				double dist = newCenterPoints.get(i).euclidianDistance(centerPoints.get(i));
-				System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
+				if (debugValues)
+					System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
 				if (dist > epsilon)
 					run = true;
 			}
-			
-			System.out.println();
+			if (debugValues)
+				System.out.println();
 			if (run)
 				centerPoints = newCenterPoints;
 		}
@@ -162,20 +157,19 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		return res;
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCameraInputTypes();
 	}
 	
 	@Override
 	public BlockType getBlockType() {
-		// TODO Auto-generated method stub
-		return null;
+		return BlockType.SEGMENTATION;
 	}
 	
 	@Override
