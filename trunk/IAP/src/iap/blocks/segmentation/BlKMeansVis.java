@@ -16,12 +16,15 @@ import de.ipk.ag_ba.image.operation.SumFeatures;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
+/**
+ * @author pape, klukas
+ */
 public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected synchronized Image processVISmask() {
 		Image res = null;
-		boolean debug = getBoolean("debug", false);
+		boolean debug = debugValues;
 		
 		// getProperties().getPropertiesExactMatch(false, true, "top.main.axis");
 		
@@ -41,11 +44,11 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			int n = getInt("Color Classes", 4);
 			for (int i = 0; i < n; i++) {
 				int idx = i + 1;
-				Color col = getColor("Cluster " + idx + " Seed Color", idx < 5 ? initColor[i] : Color.BLACK);
+				Color col = getColor("Seed Color " + idx, idx < 5 ? initColor[i] : Color.BLACK);
 				seedColors.add(col);
 				seedPositions.add(new Vector2f(0.5f, 0.5f));
-				boolean foreground = getBoolean("Cluster " + idx + " Foreground", idx < 1);
-				seedColors.add(foreground ? col : Color.WHITE);
+				boolean foreground = getBoolean("Foreground " + idx, idx < 2);
+				clusterColors.add(foreground ? col : Color.WHITE);
 			}
 			
 			clusterColors.add(Color.WHITE);
