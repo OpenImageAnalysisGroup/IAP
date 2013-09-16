@@ -2330,7 +2330,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return false;
 	}
 	
-	public static float[][][] getLabCube() {
+	private static float[][][] getLabCube() {
 		if (IAPservice.getCurrentTimeAsNiceString() == null)
 			System.out.println();
 		StopWatch s = new StopWatch("lab_cube", false);
@@ -2659,7 +2659,7 @@ public class ImageOperation implements MemoryHogInterface {
 		MaximumFinder find = new MaximumFinder();
 		ResultsTable rt = new ResultsTableWithUnits();
 		find.findMaxima(image.getProcessor(), tolerance,
-				threshold, outputType, excludeOnEdges, isEDM);
+				threshold, outputType, excludeOnEdges, isEDM, rt);
 		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
 			return new ImageOperation(image, (ResultsTableWithUnits) rt);
 		} else {
@@ -5268,5 +5268,9 @@ public class ImageOperation implements MemoryHogInterface {
 			else
 				res[i] = 1;
 		return new ImageOperation(res, getWidth(), getHeight());
+	}
+	
+	public ChannelProcessing channels() {
+		return new ChannelProcessing(getImageAs1dArray(), getWidth(), getHeight());
 	}
 }
