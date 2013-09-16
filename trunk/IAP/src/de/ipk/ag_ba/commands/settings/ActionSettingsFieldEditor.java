@@ -216,7 +216,10 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 											blockDesc = inst.getDescription();
 											inf = "<html>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
 										} catch (Exception e) {
-											inf = "<html>" + inf + "<br>[Unknown Block]";
+											if (sl != null && sl.startsWith("#"))
+												inf = "<html>" + inf + "<br>[Disabled Block]";
+											else
+												inf = "<html>" + inf + "<br>[Unknown Block]";
 										}
 										leftEntryDesc = inf;
 										

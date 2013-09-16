@@ -12,6 +12,8 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.font.TextAttribute;
+import java.text.AttributedString;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
@@ -51,6 +53,7 @@ public class BlockListEditHelper {
 		final JTextField textField = new JTextField(sl + "") {
 			String lastText = "-1";
 			String blockName = null;
+			boolean err = false;
 			
 			@Override
 			public void paint(Graphics g) {
@@ -66,8 +69,25 @@ public class BlockListEditHelper {
 						String blockDesc = inst.getDescription();
 						setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
 						inf = "<html>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
+						err = false;
 					} catch (Exception e) {
-						inf = "<html>" + inf + "<br>[Unknown Block]";
+						blockName = sl;
+						if (sl != null && sl.startsWith("#")) {
+							try {
+								String s = sl.substring(1);
+								ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(s).newInstance();
+								blockName = inst.getName();
+								String blockDesc = inst.getDescription();
+								setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
+								inf = "<html><font color='gray'>" + inf + "<br><small>disabled</small></font>";
+								inf = "<html><font color='gray'>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
+								err = false;
+							} catch (Exception err) {
+								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
+							}
+						} else
+							inf = "<html>" + inf + "<br>[Unknown Block]";
+						err = true;
 					}
 					leftLabel.setText(inf);
 					leftLabel.repaint();
@@ -83,8 +103,13 @@ public class BlockListEditHelper {
 					g.setColor(Color.BLACK);
 					g.drawRoundRect(2, 0, getWidth() - 4, getHeight() - 4, 0, 0);// 5, 5);
 					g.setColor(Color.BLACK);
-					g.setFont(font);
-					g.drawString(blockName, 8, getHeight() / 2 + 2);
+					if (blockName != null && !blockName.isEmpty()) {
+						AttributedString str_attribut = new AttributedString(blockName);
+						str_attribut.addAttribute(TextAttribute.FONT, font);
+						if (err)
+							str_attribut.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, blockName.length());
+						g.drawString(str_attribut.getIterator(), 8, getHeight() / 2 + 2);
+					}
 				} else
 					super.paint(g);
 			}
