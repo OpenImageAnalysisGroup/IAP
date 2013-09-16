@@ -66,12 +66,10 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 				}
 			}
 		}
-		int cnt = 0;
+		
 		ImageOperation op = new ImageOperation(image);
-		while (cnt < closingRepeat) {
-			op.closing();
-			cnt++;
-		}
+		
+		op.closing(closingRepeat, closingRepeat);
 		
 		return flImage.io().and(op.getImage()).getImage();
 	}
