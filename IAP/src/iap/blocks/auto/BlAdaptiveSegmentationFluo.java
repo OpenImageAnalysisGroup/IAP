@@ -14,7 +14,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author klukas
  */
-public class BlAutoSegmentationFluo extends AbstractSnapshotAnalysisBlock {
+public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean auto_tune;
 	
