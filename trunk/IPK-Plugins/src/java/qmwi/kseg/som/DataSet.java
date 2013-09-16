@@ -74,7 +74,11 @@ public class DataSet {
 			if ((groups.elementAt(i)).equalsIgnoreCase(group)) {
 				for (int j = 0; j < thedata.size(); j++) {
 					try {
-						double dummy = (new Double(thedata.elementAt(j).getColumnData(i))).doubleValue();
+						double dummy;
+						if (thedata.elementAt(j).getColumnData(i) instanceof Double)
+							dummy = (double) thedata.elementAt(j).getColumnData(i);
+						else
+							dummy = (new Double((String) thedata.elementAt(j).getColumnData(i))).doubleValue();
 						summe += dummy;
 						count++;
 					} catch (NumberFormatException e) {
@@ -90,8 +94,8 @@ public class DataSet {
 	
 	/**
 	 * Zuordnung der input-Daten in Ergebnisgruppen cols muss mit den Spalten die
-	 * beim Training verwendet wurden, �bereinstimmen
-	 * Z�hlt alle Eintr�ge die innerhalb der Spalte "group" den Wert "entry"
+	 * beim Training verwendet wurden, übereinstimmen
+	 * Zählt alle Einträge die innerhalb der Spalte "group" den Wert "entry"
 	 * haben
 	 */
 	public int count(String group, String entry) {
@@ -100,7 +104,7 @@ public class DataSet {
 			if ((groups.elementAt(i)).equalsIgnoreCase(group)) {
 				// System.out.println("GRUPPE "+((String)groups.elementAt(i)));
 				for (int j = 0; j < data.size(); j++) {
-					if ((data.elementAt(j)).getColumnData(i).equalsIgnoreCase(entry))
+					if (((String) (data.elementAt(j)).getColumnData(i)).equalsIgnoreCase(entry))
 						result++;
 				}
 			}
@@ -136,7 +140,8 @@ public class DataSet {
 				// Skalierung der Eingabewerte auf den Bereich von -1..1
 				for (int j = 0; j < thedata.size(); j++) {
 					try {
-						(new Double((thedata.elementAt(j)).getColumnData(i))).doubleValue();
+						if (!(thedata.elementAt(j).getColumnData(i) instanceof Double))
+							new Double((String) (thedata.elementAt(j)).getColumnData(i)).doubleValue();
 						zahlenEintraege++;
 					} catch (NumberFormatException e) {
 					}
@@ -147,8 +152,8 @@ public class DataSet {
 				// ausschliesslich Zahlenwerten auf _ein_ Inputneuron!
 				
 				for (int j = 0; j < thedata.size(); j++) {
-					if (max < GlobalLookUp.getEntry(i, (thedata.elementAt(j)).getColumnData(i)))
-						max = GlobalLookUp.getEntry(i, (thedata.elementAt(j)).getColumnData(i));
+					if (max < GlobalLookUp.getEntry(i, (String) thedata.elementAt(j).getColumnData(i)))
+						max = GlobalLookUp.getEntry(i, (String) thedata.elementAt(j).getColumnData(i));
 				}
 			}
 		}
@@ -174,19 +179,25 @@ public class DataSet {
 		return groups.elementAt(i).toString();
 	}
 	
-	public String[][] getData() {
-		Vector<String[]> myData = new Vector<String[]>();
+	public Object[][] getData() {
+		Vector<Object[]> myData = new Vector<Object[]>();
 		for (int i = 0; i < data.size(); i++) {
 			SOMdataEntry de = data.elementAt(i);
 			myData.add(de.getColumnData());
 		}
-		return myData.toArray(new String[][] {});
+		return myData.toArray(new Object[][] {});
 	}
 	
 	public void initSOM(int gruppen, int kartenbreite, double maxNachb, int decN, int inputSize,
-						boolean trainedWithReturnNaN) {
+			boolean trainedWithReturnNaN) {
+		initSOM(gruppen, kartenbreite, maxNachb, decN, inputSize, trainedWithReturnNaN, null);
+		
+	}
+	
+	public void initSOM(int gruppen, int kartenbreite, double maxNachb, int decN, int inputSize,
+			boolean trainedWithReturnNaN, float[][] initSOMdata) {
 		som = new Map(gruppen, kartenbreite, inputSize);
-		som.randomize();
+		som.randomize(initSOMdata);
 		somNodes = gruppen;
 		inputs = inputSize;
 		maxNachbar = maxNachb;
@@ -234,7 +245,11 @@ public class DataSet {
 				max = 0;
 				for (int j = 0; j < thedata.size(); j++) {
 					try {
-						double dummy = (new Double((thedata.elementAt(j)).getColumnData(i))).doubleValue();
+						double dummy;
+						if (thedata.elementAt(j).getColumnData(i) instanceof Double)
+							dummy = (Double) thedata.elementAt(j).getColumnData(i);
+						else
+							dummy = new Double(((String) thedata.elementAt(j).getColumnData(i))).doubleValue();
 						if (!Double.isNaN(dummy) && dummy > max)
 							max = dummy;
 					} catch (NumberFormatException e) {
@@ -255,7 +270,11 @@ public class DataSet {
 			if ((groups.elementAt(i)).equalsIgnoreCase(group)) {
 				for (int j = 0; j < thedata.size(); j++) {
 					try {
-						double dummy = (new Double((thedata.elementAt(j)).getColumnData(i))).doubleValue();
+						double dummy;
+						if (thedata.elementAt(j).getColumnData(i) instanceof Double)
+							dummy = (Double) thedata.elementAt(j).getColumnData(i);
+						else
+							dummy = (new Double((String) thedata.elementAt(j).getColumnData(i))).doubleValue();
 						if (!Double.isNaN(dummy) && dummy < min)
 							min = dummy;
 					} catch (NumberFormatException e) {
@@ -295,7 +314,7 @@ public class DataSet {
 	 */
 	@SuppressWarnings("unchecked")
 	public Vector<SOMdataEntry>[] trainOrUseSOM(boolean learn, int nachbarF, String cols[], int anzWdh,
-						BackgroundTaskStatusProviderSupportingExternalCall somservice, int maxTrainInput) {
+			BackgroundTaskStatusProviderSupportingExternalCall somservice, int maxTrainInput) {
 		
 		Vector<SOMdataEntry> thedata = data;
 		
@@ -344,7 +363,7 @@ public class DataSet {
 				
 			} else {
 				String ts = "Spalte " + cols[ic] + " wird Bitweise bearbeitet (" + anzAuspr[ic] + " Ausprägungen --> "
-									+ inputNeuronsNeededFor(anzAuspr[ic]) + " bits)";
+						+ inputNeuronsNeededFor(anzAuspr[ic]) + " bits)";
 				
 				for (int i = 0; i < inputNeuronsNeededFor(anzAuspr[ic]); i++)
 					bitSpaltenNamen.add(new String(cols[ic] + " (Bit" + (i + 1) + ")"));
@@ -466,9 +485,9 @@ public class DataSet {
 						// if ((wh==0) && learn) System.out.print(inpW+"; ");
 					} else
 						if (binColumn) { // Binäre Spalte (ja/nein)
-							currentInput.setInput(iCols[ic], thedata.elementAt(j).getColumnData(iCols[ic]));
+							currentInput.setInput(iCols[ic], (String) thedata.elementAt(j).getColumnData(iCols[ic]));
 							
-							if (GlobalLookUp.getEntry(ic, currentInput.currentValue) > 0)
+							if (GlobalLookUp.getEntry(ic, (String) currentInput.currentValue) > 0)
 								data[currentBit] = 1;
 							else
 								data[currentBit] = -1;
@@ -477,13 +496,13 @@ public class DataSet {
 						} else { // Bit Stalte (001, 010, 100, bzw. 01, 10, 11 bei
 							// CompactBits)
 							
-							currentInput.setInput(iCols[ic], thedata.elementAt(j).getColumnData(iCols[ic]));
+							currentInput.setInput(iCols[ic], (String) thedata.elementAt(j).getColumnData(iCols[ic]));
 							
 							if (compactBits) {
 								java.math.BigInteger dummy = new java.math.BigInteger(new Integer(anzAuspr[ic]).toString());
 								neuronsNeeded = dummy.bitLength();
-								dummy = new java.math.BigInteger(new Integer(GlobalLookUp.getEntry(ic, currentInput.currentValue))
-													.toString());
+								dummy = new java.math.BigInteger(new Integer(GlobalLookUp.getEntry(ic, (String) currentInput.currentValue))
+										.toString());
 								for (int z = currentBit; z < currentBit + neuronsNeeded; z++) { // für
 									// alle
 									// benötigten
@@ -496,7 +515,7 @@ public class DataSet {
 								}
 							} else { // falls keine "compactBits"
 								neuronsNeeded = inputNeuronsNeededFor(anzAuspr[ic]);
-								int bitSetzen = GlobalLookUp.getEntry(ic, currentInput.currentValue);
+								int bitSetzen = GlobalLookUp.getEntry(ic, (String) currentInput.currentValue);
 								for (int z = currentBit; z < currentBit + neuronsNeeded; z++) { // für
 									// alle
 									// benötigten

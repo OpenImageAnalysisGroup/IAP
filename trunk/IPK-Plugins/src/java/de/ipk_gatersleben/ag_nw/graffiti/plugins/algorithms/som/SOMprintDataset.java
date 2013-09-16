@@ -34,6 +34,7 @@ public class SOMprintDataset extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.DEBUG)
 			return "Print Dataset as CSV to Console";
@@ -66,10 +67,10 @@ public class SOMprintDataset extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] {
-							new BooleanParameter(returnNaN, "Disable Interpolation",
-												"If selected, missing time points are not filled with the value from the previous time point."),
-							new BooleanParameter(SOMplugin.getLastUseAverageSetting(), "Use Sample Average Values",
-												"If selected, the sample average values will be used, otherwise the replicate values will be used.") };
+				new BooleanParameter(returnNaN, "Disable Interpolation",
+						"If selected, missing time points are not filled with the value from the previous time point."),
+				new BooleanParameter(SOMplugin.getLastUseAverageSetting(), "Use Sample Average Values",
+						"If selected, the sample average values will be used, otherwise the replicate values will be used.") };
 	}
 	
 	@Override
@@ -82,6 +83,7 @@ public class SOMprintDataset extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		SOMplugin.initDataSetWithSelection(SOMplugin.getDataSet(false), getSelectedOrAllGraphElements(), returnNaN, useSampleAverage);
 		DataSet ds = SOMplugin.getDataSet(false);
@@ -90,7 +92,7 @@ public class SOMprintDataset extends AbstractAlgorithm {
 			System.out.print(ds.getColumnNameAt(i) + ";");
 		}
 		System.out.println();
-		String[][] data = ds.getData();
+		Object[][] data = ds.getData();
 		for (int r = 0; r < data.length; r++) {
 			for (int c = 0; c < data[r].length; c++)
 				System.out.print(data[r][c] + ";");

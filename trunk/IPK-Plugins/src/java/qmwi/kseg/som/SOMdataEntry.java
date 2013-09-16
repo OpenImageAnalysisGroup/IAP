@@ -8,7 +8,7 @@ import java.util.ArrayList;
 // Hilfsklasse zum vereinfachten Einlesen von Excel-Dateien im CSV-Format
 // Eingabezeile wird mit Hilfe des Trennzeichens ";" in einzelne Strings zerlegt
 public interface SOMdataEntry {
-	public String[] getColumnData();
+	public Object[] getColumnData();
 	
 	public SOMdataEntry addValues(String inputLine, boolean normalized);
 	
@@ -18,7 +18,7 @@ public interface SOMdataEntry {
 	
 	public void setUserData(Object data);
 	
-	public String getColumnData(int i);
+	public Object getColumnData(int i);
 	
 	/**
 	 * @return True, if the supplied data is already normalized in the range of -1..1. If this value is False,

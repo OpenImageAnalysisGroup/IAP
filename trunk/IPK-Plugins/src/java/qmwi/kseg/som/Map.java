@@ -224,9 +224,13 @@ public class Map {
 	
 	// Zufallsinitialisierung der Gewichte innerhalb der Matrix
 	void randomize() {
+		randomize(null);
+	}
+	
+	void randomize(float[][] initSOMdata) {
 		for (int j = 0; j < eudist.length; j++) {
 			for (int inpL = 0; inpL < inputv.length; inpL++) {
-				weights[inpL][j] = Math.random() * 2 - 1; // zwischen -1 und 1
+				weights[inpL][j] = initSOMdata != null ? initSOMdata[j][inpL] : Math.random() * 2 - 1; // zwischen -1 und 1
 			}
 			
 			gewinnFrequenz[j] = 1d / nodes;

@@ -14,7 +14,7 @@ import org.color.ColorUtil;
 public class SOM_ColorReduce {
 	
 	public static ArrayList<Color> findCommonColors(ArrayList<Color> inputColors, int maxColors,
-						BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		System.out.println("Color data points: " + inputColors.size());
 		System.out.println("Maximum number of colors: " + maxColors);
@@ -61,7 +61,7 @@ public class SOM_ColorReduce {
 		
 		// System.out.print("Typ der Nachbarschaftsfunktion (1=Zylinder, 2=Kegel, 3=Gauss, 4=Mexican Hat, 5=Cosinus)?: ");
 		int nachbarF = 1;
-		double betaInit = -0.1;
+		double betaInit = 0.1;
 		double gammaInit = 2;
 		
 		mydataset.setBetaAndGamma(betaInit, gammaInit);
@@ -75,7 +75,7 @@ public class SOM_ColorReduce {
 		System.out.println("Categorize input data...");
 		
 		Vector<SOMdataEntry> klassen[] = mydataset.trainOrUseSOM(false, nachbarF, gr, 1, status, mydataset
-							.getDataSetSize());
+				.getDataSetSize());
 		
 		System.out.print("Number of entries in each group:");
 		for (int i = 0; i < klassen.length; i++) {
