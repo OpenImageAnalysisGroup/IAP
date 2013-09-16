@@ -94,7 +94,7 @@ public class BorderImageOperation {
 				tempOut[x][y] = backgroundColor;
 				if (in[x][y] != backgroundColor) {
 					// pixels at the border of the image are ignored
-					if (x < w - 1 && y < h - 1) {
+					if (x < w - 1 && y < h - 1 && x > 0 && y > 0) {
 						int above = in[x][y - 1];
 						int left = in[x - 1][y];
 						int right = in[x + 1][y];
