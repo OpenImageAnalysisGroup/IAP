@@ -1,10 +1,14 @@
 package de.ipk.ag_ba.commands.settings;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -23,6 +27,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.GuiRow;
+import org.MarkComponent;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -33,9 +38,9 @@ import org.graffiti.plugins.editcomponents.ComponentBorder.Edge;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	private final ActionSettingsEditor actionSettingsEditor;
@@ -229,60 +234,11 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										if (line <= 10)
 											inf = "Step 0" + (line - 1);
 										
-										String type = "";
 										try {
 											ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl).newInstance();
 											blockName = inst.getName();
 											blockDesc = inst.getDescription();
-											switch (inst.getBlockType()) {
-												case ACQUISITION:
-													type = "<span style=\"background-color:#DDFFDD\">";
-													break;
-												case FEATURE_EXTRACTION:
-													type = "<span style=\"background-color:#DDDDFF\">";
-													break;
-												case POSTPROCESSING:
-													type = "<span style=\"background-color:#DDFFFF\">";
-													break;
-												case PREPROCESSING:
-													type = "<span style=\"background-color:#FFFFDD\">";
-													break;
-												case SEGMENTATION:
-													type = "<span style=\"background-color:#FFDDDD\">";
-													break;
-												default:
-													break;
-											}
-											if (!type.isEmpty())
-												type += "<font color='gray' size='-4'>" +
-														"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
-														"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></span>";
-											String gs = "<font color='green'>";
-											String ge = "</font>";
-											String rs = "<font color='red'>";
-											String re = "</font>";
-											String ns = "<font color='gray'>";
-											String ne = "</font>";
-											String is = "<font color='blue'>";
-											String ie = "</font>";
-											
-											String vi = gs + (inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-											String fi = rs + (inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-											String ni = ns + (inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-											String ii = is + (inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
-											
-											String vo = gs + (inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-											String fo = rs + (inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-											String no = ns + (inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-											String io = is + (inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
-											
-											inf = "<html>" +
-													"<table border='0'><tr>" +
-													"<td>" + type + "</td>" +
-													"<td>" + inf
-													+ "</td><td><font color='gray' size='-2'><code>"
-													+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""
-													+ "<br> OUT&#9656; " + vo + " " + fo + " " + no + " " + io + "</code></font></td></tr></table>";
+											inf = "<html>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
 										} catch (Exception e) {
 											inf = "<html>" + inf + "<br>[" + e.getMessage() + "]";
 										}
@@ -292,17 +248,24 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 									final ObjectRef inFocus = new ObjectRef();
 									inFocus.setObject(false);
 									final String blockNameF = blockName;
+									final Font font = new JButton().getFont().deriveFont(Font.BOLD);
 									final JTextField textField = new JTextField(sl + "") {
 										
 										@Override
 										public void paint(Graphics g) {
 											if (!(Boolean) inFocus.getObject() && blockNameF != null) {
+												Graphics2D graphics2d = (Graphics2D) g;
+												graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+														RenderingHints.VALUE_ANTIALIAS_ON);
 												g.setColor(new JDialog().getBackground());
 												g.fillRect(0, 0, getWidth(), getHeight());
-												g.setColor(Color.GRAY);
-												g.drawRoundRect(2, 4, getWidth() - 4, getHeight() - 8, 5, 5);
+												g.setColor(Color.WHITE);// new JDialog().getBackground());
+												g.fillRect(2, 0, getWidth() - 4, getHeight() - 4);
 												g.setColor(Color.BLACK);
-												g.drawString(blockNameF, 8, getHeight() / 2 + 4);
+												g.drawRoundRect(2, 0, getWidth() - 4, getHeight() - 4, 0, 0);// 5, 5);
+												g.setColor(Color.BLACK);
+												g.setFont(font);
+												g.drawString(blockNameF, 8, getHeight() / 2 + 2);
 											} else
 												super.paint(g);
 										}
@@ -313,11 +276,46 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										
 										@Override
 										public void actionPerformed(ActionEvent e) {
-											String blockSelection = new BlockSelector(true, "Select Analysis Block",
-													"Select the block type. [TODO NOT YET IMPLEMENTED!]").getBlockSelection();
-											if (blockSelection != null) {
-												textField.setText(blockSelection);
+											final MarkComponent mc = (MarkComponent) textField.getClientProperty("markComponent");
+											if (mc != null)
+												mc.setMark(true);
+											TextReceiver resultReceiver = new TextReceiver() {
+												@Override
+												public void setText(String result) {
+													if (result != null) {
+														textField.setText(result);
+														BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
+															@Override
+															public void run() {
+																mc.setMark(false);
+															}
+														});
+														BackgroundTaskHelper.executeLaterOnSwingTask(200, new Runnable() {
+															@Override
+															public void run() {
+																mc.setMark(false);
+															}
+														});
+														BackgroundTaskHelper.executeLaterOnSwingTask(300, new Runnable() {
+															@Override
+															public void run() {
+																mc.setMark(false);
+															}
+														});
+													}
+												}
+											};
+											ImageAnalysisBlock currentSelection;
+											try {
+												currentSelection = (ImageAnalysisBlock) Class.forName(textField.getText()).newInstance();
+											} catch (Exception err) {
+												currentSelection = null;
 											}
+											new BlockTypeSelector(
+													"Select Analysis Block",
+													"Select the block type:",
+													resultReceiver, currentSelection).showDialog();
+											mc.setMark(false);
 										}
 									};
 									final JButton selButton = new JButton(ba);
@@ -354,7 +352,9 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										}
 									};
 									cb.install(textField);
-									GuiRow gr = new GuiRow(new JLabel(), textField);
+									MarkComponent mc = new MarkComponent(textField, false, TableLayout.FILL, false, 3);
+									textField.putClientProperty("markComponent", mc);
+									GuiRow gr = new GuiRow(new JLabel(), mc);
 									entries.add(gr.getRowGui());// + "");
 								}
 								Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
