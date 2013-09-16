@@ -1,8 +1,6 @@
 package de.ipk.ag_ba.image.operation;
 
 import java.awt.Color;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class FeatureVector {
@@ -71,7 +69,7 @@ public class FeatureVector {
 		this.numFeatures = new ArrayList<Float>();
 	}
 	
-	public double euclidianDistance(FeatureVector inp) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
+	public double euclidianDistance(FeatureVector inp) {
 		double dist = 0.0;
 		
 		for (int i = 0; i < this.numFeatures.size(); i++) {
