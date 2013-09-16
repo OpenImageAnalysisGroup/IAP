@@ -144,6 +144,10 @@ public class ImageOperation implements MemoryHogInterface {
 		return cameraType;
 	}
 	
+	public MorphologicalOperation mo() {
+		return new MorphologicalOperation(this);
+	}
+	
 	/**
 	 * Moves the image content. New clear regions are recolored to the
 	 * background color.
