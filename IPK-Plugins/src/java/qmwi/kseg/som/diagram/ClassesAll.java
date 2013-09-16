@@ -162,7 +162,7 @@ public class ClassesAll {
 			
 			qmwi.kseg.som.CSV_SOM_dataEntry dataEntry = (qmwi.kseg.som.CSV_SOM_dataEntry) classData.elementAt(i);
 			
-			o.setAttributs(dataEntry.getColumnData());
+			o.setAttributs((String[]) dataEntry.getColumnData());
 			
 			o.setSkalar(this);
 			
