@@ -451,6 +451,17 @@ public class SystemOptions {
 		}
 	}
 	
+	public synchronized void setColor(String group, String setting, Color value) {
+		if (ini == null) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, setting value is not stored!");
+			return;
+		} else {
+			String svalue = StringManipulationTools.getColorHTMLdef(value);
+			ini.put(group, setting, svalue + "");
+			store(group, setting);
+		}
+	}
+	
 	public synchronized String[] getStringAll(String group, String setting, String[] defaultValue) {
 		if (ini == null) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
