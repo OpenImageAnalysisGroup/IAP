@@ -211,12 +211,12 @@ public class Image {
 	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			debugOutputview = ImageDisplay.show(
-					copy().io().replaceColor(ImageOperation.BACKGROUND_COLORint,
-							new Color(
-									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Red)", 115))),
-									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Green)", 115))),
-									Math.max(0, Math.min(255, SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Background Color (Blue)", 145))))
-									.getRGB()).getImage(),
+					copy().io()
+							.replaceColor(
+									ImageOperation.BACKGROUND_COLORint,
+									SystemOptions.getInstance().getColor("Pipeline-Debugging", "Replacement-Color for Pure White Background", new Color(115, 115, 145))
+											.getRGB())
+							.getImage(),
 					title);
 			IAPservice.showImageJ();
 		}
