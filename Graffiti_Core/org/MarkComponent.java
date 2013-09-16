@@ -248,6 +248,10 @@ public class MarkComponent extends JComponent {
 		};
 	}
 	
+	public JComponent getMarkedComponent() {
+		return comp;
+	}
+	
 	protected static void markComponent(
 			MarkComponent markThis,
 			MarkComponent... allMarks) {

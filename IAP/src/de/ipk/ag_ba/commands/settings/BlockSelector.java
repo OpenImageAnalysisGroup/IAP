@@ -86,7 +86,7 @@ public class BlockSelector {
 				// + getBlockDescriptionAnnotation("", inst)
 				// + "</td>"
 				+ "<td><b>" + inst.getName() + "</b><br>" +
-				"<font color='gray' size=0>" + StringManipulationTools.getWordWrap(inst.getDescription(), 60) + "</font>"
+				"<font color='gray' size=-2>" + StringManipulationTools.getWordWrap(inst.getDescription(), 60) + "</font>"
 				+ "</td></table>");
 		res.addActionListener(new ActionListener() {
 			@Override
