@@ -61,6 +61,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -1429,12 +1430,22 @@ public class MongoDB {
 		}
 	}
 	
-	public static void saveSystemMessage(MongoDB m, String msg) {
+	public static void saveSystemMessage(final MongoDB m, final String msg) {
 		try {
-			m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
-					"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
-		} catch (Exception e1) {
-			e1.printStackTrace();
+			BackgroundThreadDispatcher.addTask(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
+								"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			}, "Save msg to DB (" + msg + ")");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	
