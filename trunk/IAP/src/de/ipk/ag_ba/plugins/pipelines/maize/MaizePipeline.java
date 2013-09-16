@@ -2,8 +2,7 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
-import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
-import iap.blocks.auto.BlAutoSegmentationFluo;
+import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -26,6 +25,7 @@ import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
+import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlMedianFilterFluo;
@@ -72,9 +72,9 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlAutoSegmentationFluo(),
+				new BlAdaptiveSegmentationFluo(),
 				new BlLabFilter(),
-				new BlAutoAdaptiveThresholdNir(),
+				new BlAdaptiveThresholdNir(),
 				new BlClosing(),
 				new BlMedianFilterFluo(),
 				new BlRemoveSmallObjectsVisFluo(),
