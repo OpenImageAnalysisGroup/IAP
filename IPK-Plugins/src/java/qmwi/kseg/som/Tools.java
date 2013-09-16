@@ -12,14 +12,14 @@ import java.util.Vector;
 @SuppressWarnings("unused")
 public class Tools {
 	
-	// Liefert alle Einträge des Datenbestandes data zur�ck, die in der Spalte "column"
+	// Liefert alle Einträge des Datenbestandes data zurück, die in der Spalte "column"
 	// dem Wert "entry" entsprechen
 	@SuppressWarnings("unchecked")
 	public static Vector<?> getAllWhere(Vector data, int column, String entry) {
 		Vector result = new Vector<Object>();
 		
 		for (int j = 0; j < data.size(); j++) {
-			if (((SOMdataEntry) data.elementAt(j)).getColumnData(column).equalsIgnoreCase(entry))
+			if (((String) (((SOMdataEntry) data.elementAt(j)).getColumnData(column))).equalsIgnoreCase(entry))
 				result.add(data.elementAt(j));
 		}
 		return result;
