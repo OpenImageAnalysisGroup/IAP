@@ -100,7 +100,7 @@ public class ImageProcessorOptions {
 		this.tray_cnt = tray_cnt;
 	}
 	
-	public int getTrayCnt() {
+	public int getWellCnt() {
 		return tray_cnt;
 	}
 	
