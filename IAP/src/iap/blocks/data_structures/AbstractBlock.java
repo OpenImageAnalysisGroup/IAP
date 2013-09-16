@@ -73,4 +73,9 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 		else
 			return null;
 	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return null;
+	}
 }

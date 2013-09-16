@@ -57,4 +57,9 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	 * @return Extended block description.
 	 */
 	public String getDescription();
+	
+	/**
+	 * @return Extended parameter description help.
+	 */
+	public String getDescriptionForParameters();
 }

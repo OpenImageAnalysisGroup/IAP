@@ -194,4 +194,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		// empty
 	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return null;
+	}
 }
