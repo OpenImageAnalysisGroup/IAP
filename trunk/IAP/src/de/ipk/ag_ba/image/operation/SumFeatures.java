@@ -8,11 +8,10 @@ public class SumFeatures {
 		this.sumarray = new float[n];
 	}
 	
-	public void sumUp(FeatureVector in) {
+	public synchronized void sumUp(FeatureVector in) {
 		for (int i = 0; i < in.numFeatures.size(); i++) {
 			sumarray[i] += in.numFeatures.get(i);
 		}
 		n++;
-		
 	}
 }
