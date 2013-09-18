@@ -596,6 +596,11 @@ public class ResultsTable implements Cloneable {
 		}
 	}
 	
+	public void show(String windowTitle, boolean debug) {
+		if (debug)
+			show(windowTitle);
+	}
+	
 	/**
 	 * Displays the contents of this ResultsTable in a window with the specified title.
 	 * Opens a new window if there is no open text window with this title. The title must
