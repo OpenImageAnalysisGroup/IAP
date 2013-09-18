@@ -391,7 +391,7 @@ public class ColorUtil {
 		return deltaE2000(a.getL(), a.getA(), a.getB(), l2, a2, b2);
 	}
 	
-	private static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
+	public static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2,
 			double CIE_b2) {
 		double WHT_L = 1;
 		double WHT_C = 1;

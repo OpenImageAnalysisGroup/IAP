@@ -2,7 +2,10 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
+import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
+import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
+import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -25,13 +28,11 @@ import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
-import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
-import iap.blocks.segmentation.BlKMeansVis;
+import iap.blocks.segmentation.BlClosingForMaizeBloom;
+import iap.blocks.segmentation.BlKMeans2;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
-import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
-import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -73,13 +74,13 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 				// segmentation
 				new BlRemoveBackground(),
 				new BlAdaptiveSegmentationFluo(),
-				new BlKMeansVis(),
-				// new BlLabFilter(),
-				new BlAdaptiveThresholdNir(),
+				new BlKMeans2(), // new BlLabFilter(),
+				new BlAdaptiveRemoveSmallObjectsVisFluo(), // new BlRemoveSmallObjectsVisFluo(),
+				new BlAutoAdaptiveThresholdNir(), // new BlAdaptiveThresholdNir(),
 				new BlClosing(),
+				new BlClosingForMaizeBloom(),
 				new BlMedianFilterFluo(),
-				new BlRemoveSmallObjectsVisFluo(),
-				new BlUseFluoMaskToClearOther(),
+				new BlAdaptiveUseFluoMaskToClearOther(), // new BlUseFluoMaskToClearOther(),
 				
 				// feature extraction
 				new BlSkeletonizeVisFluo(),

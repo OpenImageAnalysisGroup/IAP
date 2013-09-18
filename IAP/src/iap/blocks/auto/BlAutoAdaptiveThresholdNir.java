@@ -48,8 +48,14 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 				else {
 					ref = ref.copy();
 					double averageLeafWidthEstimation = ref.io().countFilledPixels() /
-							(double) ref.io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
-					regionSize = (int) (averageLeafWidthEstimation * 5);
+							(double)
+							ref.show("INPUT", false).copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).show("SKELETON", false).countFilledPixels();
+					// percentage of whole area
+					averageLeafWidthEstimation = averageLeafWidthEstimation / ref.getWidth() + 0.00001;
+					// average width when looking at the NIR
+					averageLeafWidthEstimation = averageLeafWidthEstimation * nirMask.getWidth();
+					regionSize = (int) (averageLeafWidthEstimation * 10);
+					// System.out.println("DEBUG: Calculated NIR leaf width derived region size: " + regionSize);
 					if (regionSize < 10)
 						regionSize = 10;
 				}
