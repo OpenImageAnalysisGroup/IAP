@@ -62,7 +62,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			double epsilon = getDouble("epsilon", 0.01);
 			
-			res = KMEans(inp, seedColors, seedPositions, clusterColors, epsilon);
+			res = kMeans(inp, seedColors, seedPositions, clusterColors, epsilon);
 			
 			res.show("segres", debug);
 			
@@ -71,7 +71,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		return res;
 	}
 	
-	private Image KMEans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon) {
+	private Image kMeans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon) {
 		// get feature vector (norm everything between 0 -1)
 		int[] img1d = img.copy().getAs1A();
 		int w = img.getWidth();

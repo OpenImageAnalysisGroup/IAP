@@ -348,7 +348,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		if (res != 0)
 			return res;
 		else {
-			return getName().compareToIgnoreCase(o.getName());
+			return (getName() + " ").compareToIgnoreCase(o.getName() + "");
 		}
 	}
 	
