@@ -479,7 +479,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										+ ">ERROR: INVALID (UNKNOWN) IMAGE CONFIGURATION FOR IMAGE: "
 										+ id.getURL());
 					} else {
-						String imageConfigurationName = imageConfiguration.isSide() ? "side" : "top";
+						String imageConfigurationName = imageConfiguration.isSide() ? "2nd_side" : "1st_top";
 						
 						String imageConfigurationAndRotationAngle = id.getPosition() != null ? imageConfigurationName + ";"
 								+ id.getPosition() : imageConfigurationName + ";" + 0d;

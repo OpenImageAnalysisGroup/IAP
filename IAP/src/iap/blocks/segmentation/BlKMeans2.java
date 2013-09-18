@@ -10,7 +10,10 @@ import java.util.HashSet;
 import javax.vecmath.Vector2f;
 
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.operation.FeatureVector;
 import de.ipk.ag_ba.image.operation.SumFeatures;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -76,7 +79,7 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		int w = img.getWidth();
 		int h = img.getHeight();
 		
-		FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h);
+		final FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h);
 		
 		// create initials center
 		ArrayList<FeatureVector> centerPoints = new ArrayList<FeatureVector>();
@@ -86,7 +89,7 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		// run optimization
-		ArrayList<SumFeatures> distclasses = new ArrayList<SumFeatures>();
+		final ArrayList<SumFeatures> distclasses = new ArrayList<SumFeatures>();
 		
 		for (int i = 0; i < centerPoints.size(); i++) {
 			distclasses.add(new SumFeatures(centerPoints.get(0).numFeatures.size()));
@@ -97,23 +100,41 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		boolean autoTune = getBoolean("Auto-tune", true);
 		
 		while (run) {
-			for (int aa = 0; aa < measurements.length; aa++) {
-				FeatureVector i = measurements[aa];
-				double mindist = Double.MAX_VALUE;
-				
-				int minidx = -1;
-				int idx = 0;
-				for (FeatureVector cp : centerPoints) {
-					double tempdist = i.colorDistance(cp);
-					
-					if (tempdist < mindist) {
-						mindist = tempdist;
-						minidx = idx;
-					}
-					idx++;
+			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
+			final ArrayList<FeatureVector> centerPointsF = centerPoints;
+			try {
+				for (int threadN = 0; threadN < SystemAnalysis.getNumberOfCPUs(); threadN++) {
+					final int threadNf = threadN;
+					Runnable r = new Runnable() {
+						@Override
+						public void run() {
+							for (int aa = 0; aa < measurements.length; aa++) {
+								if (aa % threadNf != 0)
+									continue;
+								FeatureVector i = measurements[aa];
+								double mindist = Double.MAX_VALUE;
+								
+								int minidx = -1;
+								int idx = 0;
+								for (FeatureVector cp : centerPointsF) {
+									double tempdist = i.colorDistance(cp);
+									
+									if (tempdist < mindist) {
+										mindist = tempdist;
+										minidx = idx;
+									}
+									idx++;
+								}
+								i.acCluster = minidx;
+								distclasses.get(minidx).sumUp(i);
+							}
+						}
+					};
+					wait.add(BackgroundThreadDispatcher.addTask(r, "Color Distance Calculation " + threadNf));
 				}
-				i.acCluster = minidx;
-				distclasses.get(minidx).sumUp(i);
+				BackgroundThreadDispatcher.waitFor(wait);
+			} catch (InterruptedException e) {
+				throw new UnsupportedOperationException(e);
 			}
 			
 			ArrayList<FeatureVector> newCenterPoints = new ArrayList<FeatureVector>();
