@@ -103,13 +103,14 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 			final ArrayList<FeatureVector> centerPointsF = centerPoints;
 			try {
-				for (int threadN = 0; threadN < SystemAnalysis.getNumberOfCPUs(); threadN++) {
+				final int tc = SystemAnalysis.getNumberOfCPUs(); // threadcount
+				for (int threadN = 0; threadN < tc; threadN++) {
 					final int threadNf = threadN;
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {
 							for (int aa = 0; aa < measurements.length; aa++) {
-								if (aa % threadNf != 0)
+								if (aa % tc != threadNf)
 									continue;
 								FeatureVector i = measurements[aa];
 								double mindist = Double.MAX_VALUE;
