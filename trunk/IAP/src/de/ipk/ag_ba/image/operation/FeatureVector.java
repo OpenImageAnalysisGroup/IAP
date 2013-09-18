@@ -3,6 +3,8 @@ package de.ipk.ag_ba.image.operation;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.image.color.ColorUtil;
+
 public class FeatureVector {
 	public ArrayList<Float> numFeatures;
 	
@@ -76,6 +78,12 @@ public class FeatureVector {
 			dist += (this.numFeatures.get(i) - inp.numFeatures.get(i)) * (this.numFeatures.get(i) - inp.numFeatures.get(i));
 		}
 		return dist;
+	}
+	
+	public double colorDistance(FeatureVector inp) {
+		return ColorUtil.deltaE2000(
+				numFeatures.get(0), numFeatures.get(1), numFeatures.get(2),
+				inp.numFeatures.get(0), inp.numFeatures.get(1), inp.numFeatures.get(2));
 	}
 	
 	public int getAcCluster() {

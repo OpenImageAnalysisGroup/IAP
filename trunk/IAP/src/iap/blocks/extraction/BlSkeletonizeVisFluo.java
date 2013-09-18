@@ -67,9 +67,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
 					if (sk != null)
 						getProperties().setImage("skeleton", sk);
-					Image rrr = getProperties().getImage("beforeBloomEnhancement");
-					if (rrr != null)
-						res = rrr;
+					// Image rrr = getProperties().getImage("beforeBloomEnhancement");
+					// if (rrr != null)
+					// res = rrr;
 				}
 		}
 		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
@@ -422,7 +422,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
-		for (Long time : time2inSamples.keySet()) {
+		for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
 			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (!time2summaryResult.containsKey(time))
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());

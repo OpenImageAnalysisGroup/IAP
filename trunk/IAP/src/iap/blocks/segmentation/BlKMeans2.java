@@ -19,7 +19,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author pape, klukas
  */
-public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
+public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected synchronized Image processVISmask() {
@@ -39,13 +39,12 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			Color[] initColor = new Color[] {
 					new Color(78, 117, 41),// plant leaf green
-					new Color(65, 56, 41),// dark green
+					new Color(65, 86, 41),// dark green
 					new Color(255, 255, 160),// bright yellow (flower)
 					new Color(154, 116, 88),// maize stem
 					Color.WHITE, // white background wall
 					new Color(77, 108, 157), // from blue plant support
-					new Color(41, 37, 42), // dark foil
-					new Color(50, 50, 50) // pot / soil / foil color
+					new Color(47, 44, 38), // dark foil
 			};
 			int n = getInt("Color Classes", initColor.length);
 			for (int i = 0; i < n; i++) {
@@ -95,6 +94,8 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		
 		boolean run = true;
 		
+		boolean autoTune = getBoolean("Auto-tune", true);
+		
 		while (run) {
 			for (int aa = 0; aa < measurements.length; aa++) {
 				FeatureVector i = measurements[aa];
@@ -103,7 +104,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				int minidx = -1;
 				int idx = 0;
 				for (FeatureVector cp : centerPoints) {
-					double tempdist = i.euclidianDistance(cp);
+					double tempdist = i.colorDistance(cp);
 					
 					if (tempdist < mindist) {
 						mindist = tempdist;
@@ -122,12 +123,14 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			run = false;
 			
-			for (int i = 0; i < newCenterPoints.size(); i++) {
-				double dist = newCenterPoints.get(i).euclidianDistance(centerPoints.get(i));
-				if (debugValues)
-					System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
-				if (dist > epsilon)
-					run = true;
+			if (autoTune) {
+				for (int i = 0; i < newCenterPoints.size(); i++) {
+					double dist = newCenterPoints.get(i).colorDistance(centerPoints.get(i));
+					if (debugValues)
+						System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
+					if (dist > epsilon)
+						run = true;
+				}
 			}
 			if (debugValues)
 				System.out.println();

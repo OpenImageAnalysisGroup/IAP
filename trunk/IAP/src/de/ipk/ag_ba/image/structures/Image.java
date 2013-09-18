@@ -395,4 +395,8 @@ public class Image {
 			debugOutputview.setProcessor(update.getAsImagePlus().getProcessor());
 		this.image = update.getAsImagePlus();
 	}
+	
+	public int getNumberOfPixels() {
+		return getWidth() * getHeight();
+	}
 }
