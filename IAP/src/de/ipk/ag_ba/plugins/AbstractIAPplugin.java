@@ -43,7 +43,8 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 				ImageAnalysisBlock[] bl = t.getBlockList();
 				if (bl != null)
 					for (ImageAnalysisBlock b : bl) {
-						res.add(b);
+						if (b != null)
+							res.add(b);
 					}
 			}
 			return res.toArray(new ImageAnalysisBlock[] {});

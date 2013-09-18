@@ -238,7 +238,12 @@ public class ImageProcessorOptions {
 					HashMap<Integer, BlockResultSet> rs = previousResultsForThisTimePoint.get(config);
 					if (rs != null && !rs.isEmpty()) {
 						for (Integer well : rs.keySet()) {
-							res.get(config).put(well, rs.get(well).getPropertiesExactMatch(string));
+							if (res.get(config) == null) {
+								res.put(config, new HashMap<Integer, ArrayList<BlockPropertyValue>>());
+							}
+							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesExactMatch(string);
+							if (v != null)
+								res.get(config).put(well, v);
 						}
 					}
 				}
