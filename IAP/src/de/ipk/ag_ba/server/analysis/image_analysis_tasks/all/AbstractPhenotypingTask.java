@@ -345,6 +345,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										maximumThreadCountOnImageLevel, status,
 										workloadEqualAngleSnapshotSets,
 										getParentPriority(), previousResultsForThisTimePoint);
+								
 								synchronized (waitThreads) {
 									waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
 								}
@@ -367,7 +368,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										}
 									}
 								};
-								waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis"));
+								BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis").getResult();
+								// waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis"));
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
 							}
