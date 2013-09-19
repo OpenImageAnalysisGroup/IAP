@@ -2659,7 +2659,7 @@ public class ImageOperation implements MemoryHogInterface {
 		MaximumFinder find = new MaximumFinder();
 		ResultsTable rt = new ResultsTableWithUnits();
 		find.findMaxima(image.getProcessor(), tolerance,
-				threshold, outputType, excludeOnEdges, isEDM);
+				threshold, outputType, excludeOnEdges, isEDM, rt);
 		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
 			return new ImageOperation(image, (ResultsTableWithUnits) rt);
 		} else {
