@@ -41,6 +41,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		
 		boolean debug = getBoolean("debug", false);
+		int numofblur = getInt("number of blur runs", 1);
+		boolean optimize = getBoolean("optimize parameter", false);
+		
+		int circlediameter = 0;
+		int geometricThresh = 0;
+		
+		if (!optimize) {
+			circlediameter = getInt("search diameter", 35);
+			geometricThresh = getInt("geometric threshold", (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
+		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && input().masks().fluo() != null) {
 			HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
@@ -95,8 +105,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			fluo_mask.show("fluo_mask", debug);
 			
-			int numofblur = getInt("number of blur runs", 1);
-			
 			// blur
 			fluo_mask = fluo_mask.io().blur(numofblur).getImage();
 			
@@ -139,19 +147,17 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			int avg_width = area / leaflength;
 			
-			boolean optimize = getBoolean("optimize parameter", false);
-			
 			if (optimize) {
 				// optimize
 				// old: cd = 35, gt = k/4 + 42
 				
 				for (int cd = avg_width; cd <= avg_width * 2; cd++)
 					gt: for (int i = 20; i < 36; i++) {
-						int circlediameter = cd;
-						int geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * ((double) i / 100));
 						
-						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, circlediameter,
-								geometricThresh, 26, false);
+						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
+						
+						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, cd,
+								gt, 20, false);
 						ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 						
 						int num_leafs = filteredList.size();
@@ -183,8 +189,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				// save results in rt
 				// ResultsTableWithUnits rt = FeatureExtraction(vis_mask, imgorig, filteredList, circlediameter, background, debug);
 			} else {
-				int circlediameter = getInt("searchdiameter", 35);
-				int geometricThresh = getInt("geometric threshold", (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
 				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, circlediameter,
 						geometricThresh, 26, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
@@ -194,7 +198,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				rt = (ResultsTableWithUnits) res[1];
 				resultimg = (Image) res[0];
 			}
-			rt.show("rt", debug);
+			// rt.show("rt", true);
 			getProperties().storeResults("RESULT_", rt, getBlockPosition());
 			return resultimg;
 		}
@@ -282,22 +286,22 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
 			Lab regionColorLabAvg = getAverageRegionColorLab(region);
 			
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".position.x", xtemp);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".position.y", ytemp);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".omega", omega);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".gamma", gamma);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".direction", direction);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".CoG.x", centerOfGravity.x + dim[0]);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".CoG.y", centerOfGravity.y + dim[2]);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".distanceBetweenCoGandMidPoint", distCoGToMid);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".area", region.size());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".eccentricity", eccentricity);
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.lab.l", regionColorLabAvg.getAverageL());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.lab.a", regionColorLabAvg.getAverageA());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.lab.b", regionColorLabAvg.getAverageB());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.hsv.h", regionColorHsvAvg.getRed());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.hsv.s", regionColorHsvAvg.getGreen());
-			rt.addValue("flower." + StringManipulationTools.formatNumber(index) + ".color.hsv.v", regionColorHsvAvg.getBlue());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xtemp);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", ytemp);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".omega", omega);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".gamma", gamma);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".direction", direction);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.x", centerOfGravity.x + dim[0]);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.y", centerOfGravity.y + dim[2]);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".distanceBetweenCoGandMidPoint", distCoGToMid);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".area", region.size());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".eccentricity", eccentricity);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.l", regionColorLabAvg.getAverageL());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.a", regionColorLabAvg.getAverageA());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.b", regionColorLabAvg.getAverageB());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.h", regionColorHsvAvg.getRed());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.s", regionColorHsvAvg.getGreen());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.v", regionColorHsvAvg.getBlue());
 			
 			final int off = i == 4 ? 40 : 0;
 			
