@@ -226,9 +226,11 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 									String blockName = null;
 									String blockDesc = null;
 									final int startLine = line;
-									if (!setting.equals("block"))
+									if (!setting.equals("block")) {
 										leftEntryDesc = "Item " + (line++);
-									else {
+										entries.add(leftEntryDesc);
+										entries.add("" + sl);
+									} else {
 										specialHelp = BlockListEditHelper.getHelpText();
 										String inf = "Step " + (line++);
 										if (line <= 10)
