@@ -76,7 +76,7 @@ public class DataSet {
 					try {
 						double dummy;
 						if (thedata.elementAt(j).getColumnData(i) instanceof Double)
-							dummy = (double) thedata.elementAt(j).getColumnData(i);
+							dummy = (Double) thedata.elementAt(j).getColumnData(i);
 						else
 							dummy = (new Double((String) thedata.elementAt(j).getColumnData(i))).doubleValue();
 						summe += dummy;
