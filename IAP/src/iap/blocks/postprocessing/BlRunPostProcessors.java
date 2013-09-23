@@ -31,6 +31,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 				fi = roi.postProcessMask(fi);
 			}
 		}
+		fi.show("postres vis", debugValues);
 		return fi;
 	}
 	
@@ -68,6 +69,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 				fi = roi.postProcessMask(fi);
 			}
 		}
+		fi.show("postres fluo", debugValues);
 		return fi;
 	}
 	

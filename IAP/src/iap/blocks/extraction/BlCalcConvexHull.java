@@ -54,6 +54,9 @@ public class BlCalcConvexHull extends AbstractBlock {
 		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getProperties().storeResults(
 					"RESULT_top." + prefix, numericResults, getBlockPosition());
+		
+		res.getImage().show("output image", debug);
+		
 		return res.getImage();
 	}
 	
