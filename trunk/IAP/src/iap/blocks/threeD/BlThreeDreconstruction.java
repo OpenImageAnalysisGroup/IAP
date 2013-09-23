@@ -129,6 +129,9 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							int[][][] cube = mg.getRGBcubeResult();
 							
 							int solidVoxels = 0;
+							long cogX = 0;
+							long cogY = 0;
+							long cogZ = 0;
 							for (int x = 0; x < voxelresolution; x++) {
 								int[][] cubeYZ = cube[x];
 								for (int y = 0; y < voxelresolution; y++) {
@@ -138,19 +141,24 @@ public class BlThreeDreconstruction extends AbstractBlock {
 										// if voxel can be considered not transparent (solid)
 										// add voxel volume to the result
 										boolean solid = c != ImageOperation.BACKGROUND_COLORint;
-										if (solid)
+										if (solid) {
 											solidVoxels++;
+											cogX += x;
+											cogY += y;
+											cogZ += z;
+										}
 									}
 								}
 							}
 							double vv = 1;
 							double plantVolume = vv * solidVoxels;
-							summaryResult.setNumericProperty(0,
-									"RESULT_volume.plant3d.volume", plantVolume, "voxel");
+							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel");
+							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel");
+							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel");
+							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel");
 							if (distHorizontal != null) {
 								double corr = realMarkerDistHorizontal / distHorizontal;
-								summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.volume.norm",
-										plantVolume * corr * corr * corr, "mm^3");
+								summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3");
 							}
 							
 							boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
@@ -275,6 +283,9 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			}
 		} while (foundBorderVoxel);
 		long skeletonLength = 0;
+		long skeletonX = 0;
+		long skeletonY = 0;
+		long skeletonZ = 0;
 		for (int x = 1; x < voxelresolution - 1; x++) {
 			if (x2y2z2colorSkeleton.containsKey(x)) {
 				HashMap<Integer, HashMap<Integer, Integer>> y2z = x2y2z2colorSkeleton.get(x);
@@ -285,6 +296,9 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							Integer c = z2c.get(z);
 							cube[x][y][z] = c;
 							skeletonLength++;
+							skeletonX += x;
+							skeletonY += y;
+							skeletonZ += z;
 						}
 					}
 				}
@@ -298,6 +312,9 @@ public class BlThreeDreconstruction extends AbstractBlock {
 					"RESULT_volume.plant3d.skeleton.length.norm",
 					skeletonLength * corr, "mm");
 		}
+		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel");
+		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel");
+		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel");
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
