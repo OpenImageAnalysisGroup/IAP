@@ -226,8 +226,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
 				int hf = inpFLUOunchanged.getHeight();
-				for (int x = 0; x < tempImage.length; x++)
-					for (int y = 0; y < tempImage[x].length; y++) {
+				for (int x = 0; x < ttt.length; x++)
+					for (int y = 0; y < ttt[0].length; y++) { // [x]
 						if (tempImage[x][y] != black)
 							ttt[x][y] = clear;
 					}

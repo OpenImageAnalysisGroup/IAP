@@ -43,6 +43,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		boolean debug = getBoolean("debug", false);
 		int numofblur = getInt("number of blur runs", 1);
 		boolean optimize = getBoolean("optimize parameter", false);
+		boolean useMainAxes = getBoolean("Use Main Axes From Top", true);
 		
 		int circlediameter = 0;
 		int geometricThresh = 0;
@@ -53,50 +54,53 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && input().masks().fluo() != null) {
-			HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
-					.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.main.axis.rotation");
 			
-			double sum = 0;
-			int count = 0;
-			
-			for (HashMap<Integer, ArrayList<BlockPropertyValue>> a : previousResults.values()) {
-				for (ArrayList<BlockPropertyValue> b : a.values()) {
-					for (BlockPropertyValue c : b) {
-						count++;
-						sum += c.getValue();
+			if (useMainAxes) {
+				HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
+						.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.main.axis.rotation");
+				
+				double sum = 0;
+				int count = 0;
+				
+				for (HashMap<Integer, ArrayList<BlockPropertyValue>> a : previousResults.values()) {
+					for (ArrayList<BlockPropertyValue> b : a.values()) {
+						for (BlockPropertyValue c : b) {
+							count++;
+							sum += c.getValue();
+						}
 					}
 				}
-			}
-			
-			if (count == 0) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can´t calculate leaf tips, no main axis calculation available!");
-				return input().masks().fluo();
-			}
-			
-			ImageData currentImage = input().images().getFluoInfo();
-			
-			double mainRotationFromTopView = sum / count;
-			double mindist = Double.MAX_VALUE;
-			boolean currentImageIsBest = false;
-			
-			for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
-				if (nmi instanceof ImageData) {
-					Double r = ((ImageData) nmi).getPosition();
-					if (r == null)
-						r = 0d;
-					double dist = Math.abs(mainRotationFromTopView - r);
-					if (dist < mindist) {
-						mindist = dist;
-						if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
-							currentImageIsBest = true;
-						else
-							currentImageIsBest = false;
+				
+				if (count == 0) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can´t calculate leaf tips, no main axis calculation available!");
+					return input().masks().fluo();
+				}
+				
+				ImageData currentImage = input().images().getFluoInfo();
+				
+				double mainRotationFromTopView = sum / count;
+				double mindist = Double.MAX_VALUE;
+				boolean currentImageIsBest = false;
+				
+				for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
+					if (nmi instanceof ImageData) {
+						Double r = ((ImageData) nmi).getPosition();
+						if (r == null)
+							r = 0d;
+						double dist = Math.abs(mainRotationFromTopView - r);
+						if (dist < mindist) {
+							mindist = dist;
+							if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
+								currentImageIsBest = true;
+							else
+								currentImageIsBest = false;
+						}
 					}
 				}
+				
+				if (!currentImageIsBest)
+					return input().masks().fluo();
 			}
-			
-			if (!currentImageIsBest)
-				return input().masks().fluo();
 			
 			Image fluo_mask = input().masks().fluo();
 			Image imgorig = fluo_mask.copy();
@@ -307,6 +311,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			final int directionF = direction;
 			final int iF = i;
+			
 			getProperties().addImagePostProcessor(new RunnableOnImageSet() {
 				
 				@Override

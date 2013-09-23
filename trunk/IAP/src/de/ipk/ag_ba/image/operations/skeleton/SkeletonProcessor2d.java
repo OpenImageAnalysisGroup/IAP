@@ -637,7 +637,7 @@ public class SkeletonProcessor2d {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				
-				if (input[x][y] == background || input[x][y] == -1)
+				if (input[x][y] == background)// || input[x][y] == -1)
 					res[x][y] = 0;
 				else {
 					res[x][y] = 1;
