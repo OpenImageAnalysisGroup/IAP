@@ -45,7 +45,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	protected Image processVISmask() {
 		Image fi = input().masks() != null ? input().masks().vis() : null;
-		if (!getBoolean("Process Fluo Instead of Vis", false)) {
+		if (!getBoolean("Process Fluo Instead of Vis", true)) {
 			if (fi != null) {
 				getProperties().setImage("img.3D", fi);
 			}
@@ -56,7 +56,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	protected Image processFLUOmask() {
 		Image fi = input().masks() != null ? input().masks().fluo() : null;
-		if (getBoolean("Process Fluo Instead of Vis", false)) {
+		if (getBoolean("Process Fluo Instead of Vis", true)) {
 			if (fi != null) {
 				getProperties().setImage("img.3D", fi);
 			}
