@@ -45,8 +45,21 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	protected Image processVISmask() {
 		Image fi = input().masks() != null ? input().masks().vis() : null;
-		if (fi != null) {
-			getProperties().setImage("img.vis.3D", fi);
+		if (!getBoolean("Process Fluo Instead of Vis", false)) {
+			if (fi != null) {
+				getProperties().setImage("img.3D", fi);
+			}
+		}
+		return fi;
+	}
+	
+	@Override
+	protected Image processFLUOmask() {
+		Image fi = input().masks() != null ? input().masks().fluo() : null;
+		if (getBoolean("Process Fluo Instead of Vis", false)) {
+			if (fi != null) {
+				getProperties().setImage("img.3D", fi);
+			}
 		}
 		return fi;
 	}
@@ -108,8 +121,8 @@ public class BlThreeDreconstruction extends AbstractBlock {
 											distHorizontal = val.getValue();
 									}
 								realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-								Image vis = bp.getImage("img.vis.3D");
-								bp.setImage("img.vis.3D", null);
+								Image vis = bp.getImage("img.3D");
+								bp.setImage("img.3D", null);
 								if (angle.startsWith("side"))
 									if (vis != null) {
 										MyPicture p = new MyPicture();
