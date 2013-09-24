@@ -5,6 +5,7 @@ import iap.pipelines.ImageProcessorOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -156,10 +157,15 @@ public class IAPpluginManager {
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
 			@Override
 			public void processPlugin(IAPplugin p) {
+				HashSet<String> known = new HashSet<String>();
 				ImageAnalysisBlock[] bla = p.getImageAnalysisBlocks();
 				if (bla != null)
 					for (ImageAnalysisBlock bl : bla) {
-						blocks.add(bl);
+						String className = bl.getClass().getCanonicalName();
+						if (!known.contains(className)) {
+							blocks.add(bl);
+							known.add(className);
+						}
 					}
 			}
 		};
