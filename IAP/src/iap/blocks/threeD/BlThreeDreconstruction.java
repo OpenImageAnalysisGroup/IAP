@@ -4,6 +4,8 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import info.StopWatch;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,9 +13,13 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
@@ -115,7 +121,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 									distHorizontal = options.getCalculatedBlueMarkerDistance();
 								
 								if (distHorizontal == null)
-									if (angle.startsWith("side")) {
+									if (angle.startsWith("2nd_side")) {
 										BlockProperty val = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance");
 										if (val != null)
 											distHorizontal = val.getValue();
@@ -123,7 +129,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 								realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
 								Image vis = bp.getImage("img.3D");
 								bp.setImage("img.3D", null);
-								if (angle.startsWith("side"))
+								if (angle.startsWith("2nd_side"))
 									if (vis != null) {
 										MyPicture p = new MyPicture();
 										double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
@@ -217,6 +223,15 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							volume.setColorDepth(VolumeColorDepth.RGBA.toString());
 							if (saveVolumeDataset) {
 								summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
+							}
+							if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
+								try {
+									File f = new File(ReleaseInfo.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
+									MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
+									ResourceIOManager.copyContent(cnt, new FileOutputStream(f));
+								} catch (Exception e) {
+									ErrorMsg.addErrorMessage(e);
+								}
 							}
 							boolean create3Dskeleton = getBoolean("Calculate 3D Skeleton", true);
 							boolean save3Dskeleton = getBoolean("Save 3D Skeleton", false);
