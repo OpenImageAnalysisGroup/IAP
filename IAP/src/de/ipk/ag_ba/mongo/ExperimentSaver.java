@@ -955,9 +955,14 @@ public class ExperimentSaver implements RunnableOnDB {
 				if (processLabelData(keepRemoteURLs_safe_space, image.getLabelURL())) {
 					// if (savedUrls.contains(skipLabelUrl))
 					// skipLabelSaving = true;
-					isLabel = !skipProcessingOfLabel && image.getLabelURL() != null // && !skipLabelSaving
-					? ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL()).getBuffTrimmed()
-							: null;
+					isLabel = null;
+					if (!skipProcessingOfLabel && image.getLabelURL() != null) {
+						MyByteArrayInputStream content = ResourceIOManager.getInputStreamMemoryCached(image.getLabelURL());
+						if (content != null)
+							isLabel = content.getBuffTrimmed();
+						else
+							MongoDB.saveSystemErrorMessage("Error: No Inputstream for " + image.getLabelURL() + ". // " + SystemAnalysis.getCurrentTime(), null);
+					}
 				}
 			} catch (Exception e) {
 				MongoDB.saveSystemErrorMessage("Error: No Inputstream for " + image.getLabelURL() + ". " + e.getMessage() + " // "
