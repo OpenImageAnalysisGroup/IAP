@@ -186,9 +186,9 @@ public class ThreeDmodelGenerator {
 	private void colorModelRGB(final ArrayList<MyPicture> pictures, final ArrayList<Color> palette,
 			BackgroundTaskStatusProviderSupportingExternalCall status, final boolean rgb) throws InterruptedException {
 		if (rgb)
-			System.out.println("Recolor Cube... (using true color RGBA generation mode)");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Recolor Cube... (using true color RGBA generation mode)");
 		else
-			System.out.println("Recolor Cube... (using palette with " + palette.size() + " colors)");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Recolor Cube... (using palette with " + palette.size() + " colors)");
 		
 		double voxelSizeX = cubeSideLengthX / maxVoxelPerSide;
 		final double voxelSizeY = cubeSideLengthY / maxVoxelPerSide;
