@@ -78,7 +78,12 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
+		if (optStatus != null)
+			optStatus.setCurrentStatusText1("3D-Genetation in progress, waiting");
 		synchronized (this.getClass()) {
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Generate 3D-Model");
+			
 			for (Long time : time2inSamples.keySet()) {
 				Sample3D inSample = time2inSamples.get(time);
 				TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
@@ -459,6 +464,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
+		res.add(CameraType.VIS);
 		return res;
 	}
 	
@@ -466,6 +472,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	public HashSet<CameraType> getCameraOutputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -481,6 +488,6 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Perform space carving operation on visible light side images.";
+		return "Perform space carving operation on fluo (default) or visible light side images.";
 	}
 }
