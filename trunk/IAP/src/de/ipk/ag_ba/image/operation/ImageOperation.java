@@ -5273,4 +5273,8 @@ public class ImageOperation implements MemoryHogInterface {
 	public ChannelProcessing channels() {
 		return new ChannelProcessing(getImageAs1dArray(), getWidth(), getHeight());
 	}
+	
+	public ImageCalculation stat() {
+		return new ImageCalculation(this);
+	}
 }
