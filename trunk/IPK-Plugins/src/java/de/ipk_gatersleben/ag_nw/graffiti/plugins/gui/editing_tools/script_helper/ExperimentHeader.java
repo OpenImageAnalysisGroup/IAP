@@ -29,7 +29,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private String experimentType, sequence, files;
 	private long sizekb;
 	private int experimentID = -1;
-	private String database, originDatabaseId, globalOutliers, settings;
+	private String database, originDatabaseId, globalOutliers, settings, annotation;
 	
 	public ExperimentHeader() {
 		//
@@ -54,6 +54,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		originDatabaseId = copyFrom.getExperimentOriginDbId();
 		globalOutliers = copyFrom.getExperimentGlobalOutlierInfo();
 		settings = copyFrom.getExperimentSettings();
+		annotation = copyFrom.getExperimentAnnotation();
 	}
 	
 	@Override
@@ -84,6 +85,16 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public String getSettings() {
 		return settings;
+	}
+	
+	@Override
+	public void setAnnotation(String annotation) {
+		this.annotation = annotation;
+	}
+	
+	@Override
+	public String getAnnotation() {
+		return annotation;
 	}
 	
 	@Override
@@ -199,12 +210,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		Substance.getAttributeString(r, new String[] {
 				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
 				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
-				"origin", "outlier", "files", "settings"
+				"origin", "outlier", "files", "settings", "annotation"
 		}, new Object[] {
 				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
 				measurementcount, (imageFiles == null ? 0 : imageFiles), sizekb,
-				originDatabaseId, globalOutliers, files, settings
+				originDatabaseId, globalOutliers, files, settings, annotation
 		}, true);
 		r.append("</experiment>");
 	}
@@ -233,6 +244,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
 		setSettings((String) map.get("settings"));
+		setAnnotation((String) map.get("annotation"));
 		if (map.containsKey("_id"))
 			setDatabaseId(map.get("_id") + "");
 		else
@@ -331,6 +343,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("origin", originDatabaseId);
 		attributeValueMap.put("outliers", globalOutliers);
 		attributeValueMap.put("settings", settings);
+		attributeValueMap.put("annotation", annotation);
 	}
 	
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {

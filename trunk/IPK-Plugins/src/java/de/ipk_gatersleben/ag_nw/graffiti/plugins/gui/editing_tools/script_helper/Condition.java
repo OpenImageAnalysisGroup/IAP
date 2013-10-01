@@ -526,8 +526,11 @@ public class Condition implements ConditionInterface {
 																										if (attr.getName().equals("settings"))
 																											setExperimentSettings(attr.getValue());
 																										else
-																											System.err.println("Internal Error: Unknown Condition Attribute: "
-																													+ attr.getName());
+																											if (attr.getName().equals("annotation"))
+																												setExperimentAnnotation(attr.getValue());
+																											else
+																												System.err.println("Internal Error: Unknown Condition Attribute: "
+																														+ attr.getName());
 	}
 	
 	@Override
@@ -594,6 +597,16 @@ public class Condition implements ConditionInterface {
 	@Override
 	public void setExperimentSettings(String settings) {
 		header.setSettings(settings);
+	}
+	
+	@Override
+	public void setExperimentAnnotation(String annotation) {
+		header.setAnnotation(annotation);
+	}
+	
+	@Override
+	public String getExperimentAnnotation() {
+		return header.getAnnotation();
 	}
 	
 	@Override
