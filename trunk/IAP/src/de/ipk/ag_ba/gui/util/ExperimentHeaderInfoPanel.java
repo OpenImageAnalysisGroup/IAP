@@ -81,6 +81,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	JTextField remark;
 	JTextField outliers;
 	JLabel annotation;
+	JButton annotationB;
 	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
@@ -172,7 +173,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	@SuppressWarnings({ "rawtypes" })
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
-			JTextField outliers, JLabel annotation,
+			JTextField outliers, JButton annotationB,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
@@ -194,7 +195,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		sequence.setEnabled(enabled);
 		remark.setEnabled(enabled);
 		outliers.setEnabled(enabled);
-		annotation.setEnabled(enabled);
+		annotationB.setEnabled(enabled);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -248,10 +249,14 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	}
 	
 	private JComponent disable(JComponent jTextField) {
-		if (jTextField instanceof JTextField)
-			((JTextField) jTextField).setEditable(false);
-		jTextField.setBorder(null);
-		jTextField.setBackground(Color.WHITE);
+		if (jTextField instanceof JButton) {
+			jTextField.setEnabled(false);
+		} else {
+			if (jTextField instanceof JTextField)
+				((JTextField) jTextField).setEditable(false);
+			jTextField.setBorder(null);
+			jTextField.setBackground(Color.WHITE);
+		}
 		return style(jTextField);
 	}
 	
@@ -310,7 +315,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
-		annotation = new JLabel(new DCexperimentHeader(experimentHeader).getHTMLoverview());
+		annotation = new JLabel(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
+		annotation.putClientProperty("fulltext", experimentHeader.getAnnotation());
 		sequence = new JTextField(experimentHeader.getSequence());
 		{
 			String to = "<html>The name given to the resource.<br>" +
@@ -344,13 +350,14 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
 		}
 		{
+			annotationB = new DCexperimentHeader(experimentHeader).getEditButton(annotation, "Add/Edit");
 			String to = "<html>" +
 					"Use ' // ' to split annotation values.";
 			fp.addGuiComponentRow(tooltip(new JLabel("Annotation"), to),
 					TableLayout.getSplit(
 							tooltip(annotation, to),
 							TableLayout.getSplitVertical(
-									new DCexperimentHeader(experimentHeader).getEditButton(annotation, "Detailed Annotion"),
+									annotationB,
 									null, TableLayout.PREFERRED, TableLayout.FILL),
 							TableLayout.FILL, TableLayout.PREFERRED), false);
 		}
@@ -405,7 +412,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd,
-						sequence, remark, outliers, annotation, editB,
+						sequence, remark, outliers, annotationB, editB,
 						saveB, editPossible, true);
 				
 				saveB.setText("Save Changes");
@@ -424,7 +431,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					sequence.setText(experimentHeader.getSequence());
 					remark.setText(experimentHeader.getRemark());
 					outliers.setText(experimentHeader.getGlobalOutlierInfo());
-					annotation.setText(experimentHeader.getAnnotation());
+					annotation.setText(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
 				}
 			}
 		});
@@ -444,7 +451,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					experimentHeader.setSequence(sequence.getText());
 					experimentHeader.setRemark(remark.getText());
 					experimentHeader.setGlobalOutlierInfo(outliers.getText());
-					experimentHeader.setAnnotation(annotation.getText());
+					experimentHeader.setAnnotation((String) annotation.getClientProperty("fulltext"));
 					experimentHeader.setCoordinator(coordinator.getText());
 					if (saveAction != null) {
 						if (saveAction != null)
@@ -496,7 +503,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 															sequence.setText(experimentHeader.getSequence());
 															remark.setText(experimentHeader.getRemark());
 															outliers.setText(experimentHeader.getGlobalOutlierInfo());
-															annotation.setText(experimentHeader.getAnnotation());
+															annotation.putClientProperty("fulltext", experimentHeader.getAnnotation());
+															annotation.setText(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
 															saveB.setText(acc.postResult);
 														}
 													});
@@ -538,13 +546,13 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				b = !b;
 				tso.setBval(0, b);
 				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark,
-						outliers, annotation, editB,
+						outliers, annotationB, editB,
 						saveB, editPossibleBBB, false);
 			}
 		});
 		
 		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd,
-				sequence, remark, outliers, annotation,
+				sequence, remark, outliers, annotationB,
 				editB, saveB, editPossible, true);
 		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(
