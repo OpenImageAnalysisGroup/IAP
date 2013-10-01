@@ -69,7 +69,7 @@ public class StringAnnotationProcessor {
 		String a = getAnnotation();
 		if (value.contains(";"))
 			throw new UnsupportedOperationException(
-					"annotation field value must not contain a commata character");
+					"annotation field value must not contain a semicolon character");
 		if (a != null) {
 			String anno = a;
 			String[] fields = anno.split(";");
