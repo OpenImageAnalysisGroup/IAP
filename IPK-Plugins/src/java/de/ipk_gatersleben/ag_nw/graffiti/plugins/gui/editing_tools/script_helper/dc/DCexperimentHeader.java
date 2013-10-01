@@ -5,15 +5,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.ReleaseInfo;
+import org.StringAnnotationProcessor;
 import org.StringManipulationTools;
 
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -27,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class DCexperimentHeader {
 	private final ExperimentHeaderInterface ehi;
 	
-	public Collection<String> getDCfield(DCelements field) {
+	public Collection<String> getDCfield(DCelements field, String optProvidedValueIfFieldShouldNotBeUsed) {
 		switch (field) {
 			case date:
 				ArrayList<String> dateList = new ArrayList<String>();
@@ -50,7 +51,8 @@ public class DCexperimentHeader {
 			default:
 				return StringManipulationTools.getStringListFromArray(
 						split(StringManipulationTools.getAnnotationProcessor(
-								ehi.getAnnotation()).getAnnotationField(field.name())));
+								optProvidedValueIfFieldShouldNotBeUsed == null ? ehi.getAnnotation() : optProvidedValueIfFieldShouldNotBeUsed).getAnnotationField(
+								field.name())));
 		}
 	}
 	
@@ -61,20 +63,23 @@ public class DCexperimentHeader {
 			return val.split("\\|");
 	}
 	
-	public void setDCfield(DCelements field, Collection<String> newValues) {
-		StringManipulationTools.getAnnotationProcessor(ehi.getAnnotation())
-				.replaceAnnotationField(field.name(), StringManipulationTools.getStringList(newValues, "|"));
+	public String setDCfield(DCelements field, Collection<String> newValues, boolean useField, String invalue) {
+		StringAnnotationProcessor ap = StringManipulationTools.getAnnotationProcessor(useField ? ehi.getAnnotation() : invalue);
+		ap.replaceAnnotationField(field.name(), StringManipulationTools.getStringList(newValues, "|"));
+		if (useField)
+			ehi.setAnnotation(ap.getValue());
+		return ap.getValue();
 	}
 	
 	public void addDCfieldValue(DCelements field, Collection<String> newValues) {
-		Collection<String> currentValues = getDCfield(field);
+		Collection<String> currentValues = getDCfield(field, null);
 		if (currentValues == null || currentValues.isEmpty())
 			currentValues = newValues;
 		else
 			currentValues.addAll(newValues);
-		
-		StringManipulationTools.getAnnotationProcessor(ehi.getAnnotation())
-				.replaceAnnotationField(field.name(), StringManipulationTools.getStringList(currentValues, "|"));
+		StringAnnotationProcessor ap = StringManipulationTools.getAnnotationProcessor(ehi.getAnnotation());
+		ap.replaceAnnotationField(field.name(), StringManipulationTools.getStringList(currentValues, "|"));
+		ehi.setAnnotation(ap.getValue());
 	}
 	
 	public DCexperimentHeader(ExperimentHeaderInterface ehi) {
@@ -144,18 +149,21 @@ public class DCexperimentHeader {
 		return ehi.getDatabaseId();
 	}
 	
-	public String getHTMLoverview() {
+	public String getHTMLoverview(String optProvidedValueIfFieldShouldNotBeUsed) {
 		int rows = 0;
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><table><tr><th>Field</th><th>Value</th></tr>");
+		sb.append("<html><table>");
 		for (DCelements field : DCelements.values()) {
-			Collection<String> valueList = getDCfield(field);
+			if (field.isNativeField())
+				continue;
+			Collection<String> valueList = getDCfield(field, optProvidedValueIfFieldShouldNotBeUsed);
 			if (valueList != null) {
 				for (String value : valueList) {
 					if (value != null && !value.isEmpty()) {
-						if (value.length() > 80)
-							value = value.substring(0, 77) + "...";
-						sb.append("<tr><td>" + field.getLabel() + "</td><td>" + value + "</td></tr>");
+						if (value.length() > 40)
+							value = value.substring(0, 37) + "...";
+						sb.append("<tr><td><small>" + field.getLabel() + ":</small></td><td><small>" + value + "</small></td></tr>");
+						rows++;
 					}
 				}
 			}
@@ -167,17 +175,18 @@ public class DCexperimentHeader {
 			return "<html>(no additional meta data information defined)";
 	}
 	
-	public JComponent getEditButton(JLabel display, final String title) {
+	public JButton getEditButton(final JLabel display, final String title) {
 		Action action = new AbstractAction(title) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<Object> descAndValue = new ArrayList<Object>();
+				ArrayList<DCelements> row2type = new ArrayList<DCelements>();
 				for (DCelements elem : DCelements.values()) {
 					if (elem.isNativeField())
 						continue;
-					Collection<String> value = getDCfield(elem);
+					Collection<String> value = getDCfield(elem, (String) display.getClientProperty("fulltext"));
 					if (value == null || value.isEmpty()) {
 						value = new ArrayList<String>();
 						value.add("");
@@ -189,22 +198,50 @@ public class DCexperimentHeader {
 						desc.setText(desc.getText() + " (...)@@<html>" + StringManipulationTools.getWordWrap(comment, 60));
 					else
 						desc.setText(desc.getText() + "@@");
-					descAndValue.add(desc);
-					descAndValue.add(StringManipulationTools.getStringList(value, " | "));
+					for (String val : value) {
+						descAndValue.add(desc);
+						descAndValue.add(val);
+						row2type.add(elem);
+					}
 				}
-				MyInputHelper
+				Object[] res = MyInputHelper
 						.getInput(
 								"Listed are additional annotation fields as defined by the Dublin Core (R) Metadata Initiative.<br>"
 										+
 										"Some of the default experiment header fields are automatically mapped to DCMI-terms, these are not included in this list.<br><br>"
-										+ "Important: At the moment the following characters can't be used in any field text: <b>;</b>, <b>#</b>.<br>" +
-										"These characters are automatically replaced by <b>_</b>.<br><br>" +
+										+ "Important: At the moment the following character can't be used in any field text: <b>;</b>.<br>" +
+										"Invalid characters are automatically replaced by <b>_</b>.<br><br>" +
 										"Fields with a description, ending with (...), provide additional documentation, move the mouse over the according label<br>" +
 										"in order to display the field definition comments." +
 										"<br><br>" +
 										"Edit meta data (use '|' to split multiple items):<br><br>",
 								"Annotation",
 								descAndValue.toArray());
+				if (res != null) {
+					HashMap<DCelements, ArrayList<String>> field2values = new HashMap<DCelements, ArrayList<String>>();
+					for (int i = 0; i < res.length; i++) {
+						Object val = res[i];
+						if (val instanceof String) {
+							for (String v : ((String) val).split("\\|")) {
+								if (v != null && !v.trim().isEmpty()) {
+									if (!field2values.containsKey(row2type.get(i)))
+										field2values.put(row2type.get(i), new ArrayList<String>());
+									v = StringManipulationTools.stringReplace(v, ";", "_");
+									v = StringManipulationTools.stringReplace(v, "#", "_");
+									field2values.get(row2type.get(i)).add(v.trim());
+								}
+							}
+						}
+					}
+					String newVal = "";
+					for (DCelements dc : field2values.keySet()) {
+						setDCfield(dc, field2values.get(dc), false, newVal);
+					}
+					display.putClientProperty("fulltext", newVal);
+					display.setText(getHTMLoverview(newVal));
+					display.validate();
+					display.repaint();
+				}
 			}
 		};
 		JButton res = new JButton(action);
