@@ -12,7 +12,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
@@ -109,7 +109,7 @@ public class ActionPerformanceTest extends AbstractNavigationAction implements A
 				if (status != null)
 					status.setCurrentStatusText1("Ready");
 				
-				MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+				ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 				info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 				mpc = new MainPanelComponent(info, true);
 			} else {

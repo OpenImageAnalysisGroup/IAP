@@ -20,7 +20,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -243,7 +243,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						}
 					}
 					
-					MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+					ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 					info.setExperimentInfo(m, statisticsResult.getHeader(), false, statisticsResult);
 					mpc = new MainPanelComponent(info, true);
 				} else {

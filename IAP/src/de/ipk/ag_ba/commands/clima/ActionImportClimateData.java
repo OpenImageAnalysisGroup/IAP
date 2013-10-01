@@ -16,7 +16,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.DataMappingTypeManagerInterface;
@@ -194,7 +194,7 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 				for (ConditionInterface ci : si)
 					ci.setExperimentHeader(ehi);
 			e.numberConditions();
-			MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+			ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 			info.setExperimentInfo(null, ehi, true, e);
 			mpc = new MainPanelComponent(info, true);
 			
