@@ -432,6 +432,10 @@ public class StringManipulationTools implements HelperClass {
 		return textWithHtmlTags;
 	}
 	
+	public static StringAnnotationProcessor getAnnotationProcessor(String value) {
+		return new StringAnnotationProcessor(value);
+	}
+	
 	/**
 	 * Removes the tags from a html-text and gives back the striped text.
 	 * 
