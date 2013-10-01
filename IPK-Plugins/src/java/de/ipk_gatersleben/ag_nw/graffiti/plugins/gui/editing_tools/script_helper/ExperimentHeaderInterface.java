@@ -26,6 +26,10 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	
 	public String getSettings();
 	
+	public void setAnnotation(String annotation);
+	
+	public String getAnnotation();
+	
 	public void setCoordinator(String coordinator);
 	
 	public String getCoordinator();

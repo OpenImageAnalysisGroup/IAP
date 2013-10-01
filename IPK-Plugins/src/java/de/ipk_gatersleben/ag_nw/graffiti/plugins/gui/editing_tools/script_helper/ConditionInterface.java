@@ -109,6 +109,10 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public void setExperimentSettings(String settings);
 	
+	public void setExperimentAnnotation(String annotation);
+	
+	public String getExperimentAnnotation();
+	
 	public void setVariety(String variety);
 	
 	public String getVariety();
