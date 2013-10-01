@@ -59,6 +59,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.dc.DCexperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataInfoPane;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
@@ -79,7 +80,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	JDateChooser expEnd;
 	JTextField remark;
 	JTextField outliers;
-	JTextField annotation;
+	JLabel annotation;
 	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
@@ -171,7 +172,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	@SuppressWarnings({ "rawtypes" })
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
-			JTextField outliers, JTextField annotation,
+			JTextField outliers, JLabel annotation,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
@@ -309,7 +310,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
-		annotation = new JTextField(experimentHeader.getAnnotation());
+		annotation = new JLabel(new DCexperimentHeader(experimentHeader).getHTMLoverview());
 		sequence = new JTextField(experimentHeader.getSequence());
 		{
 			String to = "<html>The name given to the resource.<br>" +
@@ -345,7 +346,13 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		{
 			String to = "<html>" +
 					"Use ' // ' to split annotation values.";
-			fp.addGuiComponentRow(tooltip(new JLabel("Annotation"), to), tooltip(annotation, to), false);
+			fp.addGuiComponentRow(tooltip(new JLabel("Annotation"), to),
+					TableLayout.getSplit(
+							tooltip(annotation, to),
+							TableLayout.getSplitVertical(
+									new DCexperimentHeader(experimentHeader).getEditButton(annotation, "Detailed Annotion"),
+									null, TableLayout.PREFERRED, TableLayout.FILL),
+							TableLayout.FILL, TableLayout.PREFERRED), false);
 		}
 		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(
 				niceValue(experimentHeader.getNumberOfFiles(), null)
