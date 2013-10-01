@@ -22,7 +22,7 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -228,7 +228,7 @@ public class ActionMongoOrLTexperimentNavigation extends
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		MyExperimentInfoPanel ip = new MyExperimentInfoPanel(true, experimentReference);
+		ExperimentHeaderInfoPanel ip = new ExperimentHeaderInfoPanel(true, experimentReference);
 		return new MainPanelComponent(ip, true);
 	}
 	

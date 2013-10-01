@@ -40,7 +40,7 @@ import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -181,7 +181,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 								ei.setImportusername(SystemAnalysis.getUserName());
 								ei.setStartdate(new Date());
 								ei.setImportdate(new Date());
-								final MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+								final ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 								info.setExperimentInfo(m, ei, true, null);
 								
 								Substance md = new Substance();

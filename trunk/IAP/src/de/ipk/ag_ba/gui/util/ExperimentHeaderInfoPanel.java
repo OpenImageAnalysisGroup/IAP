@@ -65,7 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 /**
  * @author klukas
  */
-public class MyExperimentInfoPanel extends JPanel {
+public class ExperimentHeaderInfoPanel extends JPanel {
 	private static String CANCEL = "Cancel";
 	
 	private static final long serialVersionUID = 1L;
@@ -79,24 +79,25 @@ public class MyExperimentInfoPanel extends JPanel {
 	JDateChooser expEnd;
 	JTextField remark;
 	JTextField outliers;
+	JTextField annotation;
 	JTextField sequence;
 	
 	private RunnableWithExperimentInfo saveAction;
 	
 	private ExperimentReference experimentReference;
 	
-	public MyExperimentInfoPanel() {
+	public ExperimentHeaderInfoPanel() {
 		// empty
 	}
 	
-	public MyExperimentInfoPanel(final boolean startEnabled, final ExperimentReference experimentReference) {
+	public ExperimentHeaderInfoPanel(final boolean startEnabled, final ExperimentReference experimentReference) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
 				BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
 					@Override
 					public void run() {
-						if (MyExperimentInfoPanel.this.isVisible())
+						if (ExperimentHeaderInfoPanel.this.isVisible())
 							setExperimentInfo(
 									experimentReference.m,
 									experimentReference.getHeader(),
@@ -170,7 +171,7 @@ public class MyExperimentInfoPanel extends JPanel {
 	@SuppressWarnings({ "rawtypes" })
 	private void styles(boolean enabled, JTextField editName, JTextField coordinator, JTextField groupVisibility,
 			JComboBox experimentTypeSelection, JDateChooser expStart, JDateChooser expEnd, JTextField sequence, JTextField remark,
-			JTextField outliers,
+			JTextField outliers, JTextField annotation,
 			JButton editB, JButton saveB, boolean editPossible, boolean savePossible) {
 		
 		editB.setEnabled(editPossible);
@@ -192,6 +193,7 @@ public class MyExperimentInfoPanel extends JPanel {
 		sequence.setEnabled(enabled);
 		remark.setEnabled(enabled);
 		outliers.setEnabled(enabled);
+		annotation.setEnabled(enabled);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -307,28 +309,44 @@ public class MyExperimentInfoPanel extends JPanel {
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
 		remark = new JTextField(experimentHeader.getRemark());
 		outliers = new JTextField(experimentHeader.getGlobalOutlierInfo());
+		annotation = new JTextField(experimentHeader.getAnnotation());
 		sequence = new JTextField(experimentHeader.getSequence());
-		
-		fp.addGuiComponentRow(new JLabel("Name"), editName, false);
-		
+		{
+			String to = "<html>The name given to the resource.<br>" +
+					"Typically, a Title will be a name by which the resource is formally known.";
+			fp.addGuiComponentRow(tooltip(new JLabel("Name/Title"), to), tooltip(editName, to), false);
+		}
 		fp.addGuiComponentRow(new JLabel("ID"), disable(editDBid), false);
 		fp.addGuiComponentRow(new JLabel("Import by"), disable(new JTextField(experimentHeader.getImportusername())),
 				false);
 		fp.addGuiComponentRow(new JLabel("Origin"), disable(new JTextField(experimentHeader.getOriginDbId() + "")), false);
 		fp.addGuiComponentRow(new JLabel("Database"), disable(new JTextField(experimentHeader.getDatabase() + "")), false);
-		
-		fp.addGuiComponentRow(new JLabel("Coordinator"), coordinator, false);
+		{
+			String to = "<html>An entity primarily responsible for making the content of the resource.";
+			fp.addGuiComponentRow(
+					tooltip(new JLabel("Coordinator/Creator"), to),
+					tooltip(coordinator, to), false);
+		}
 		fp.addGuiComponentRow(new JLabel("Access Group"), groupVisibility, false);
 		fp.addGuiComponentRow(new JLabel("Experiment-Type"), experimentTypeSelection, false);
 		fp.addGuiComponentRow(new JLabel("Start-Time"), expStart, false);
 		fp.addGuiComponentRow(new JLabel("End-Time"), expEnd, false);
-		String ts = "Use ' // ' to split information. Specify stress as follows (examples): 'Stress:4;5;d;drought stress' or (two periods) 'Stress:4$10;5$13;d$n;drought stress$handling'.";
-		fp.addGuiComponentRow(tooltip(new JLabel("Sequence/Stress"), ts), tooltip(sequence, ts), false);
+		{
+			String ts = "Use ' // ' to split information. Specify stress as follows (examples): 'Stress:4;5;d;drought stress' or (two periods) 'Stress:4$10;5$13;d$n;drought stress$handling'.";
+			fp.addGuiComponentRow(tooltip(new JLabel("Sequence/Stress"), ts), tooltip(sequence, ts), false);
+		}
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
-		String to = "<html>" +
-				"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or " +
-				"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
-		fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
+		{
+			String to = "<html>" +
+					"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or " +
+					"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
+			fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
+		}
+		{
+			String to = "<html>" +
+					"Use ' // ' to split annotation values.";
+			fp.addGuiComponentRow(tooltip(new JLabel("Annotation"), to), tooltip(annotation, to), false);
+		}
 		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(
 				niceValue(experimentHeader.getNumberOfFiles(), null)
 						+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
@@ -379,7 +397,8 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd,
+						sequence, remark, outliers, annotation, editB,
 						saveB, editPossible, true);
 				
 				saveB.setText("Save Changes");
@@ -398,6 +417,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					sequence.setText(experimentHeader.getSequence());
 					remark.setText(experimentHeader.getRemark());
 					outliers.setText(experimentHeader.getGlobalOutlierInfo());
+					annotation.setText(experimentHeader.getAnnotation());
 				}
 			}
 		});
@@ -417,6 +437,7 @@ public class MyExperimentInfoPanel extends JPanel {
 					experimentHeader.setSequence(sequence.getText());
 					experimentHeader.setRemark(remark.getText());
 					experimentHeader.setGlobalOutlierInfo(outliers.getText());
+					experimentHeader.setAnnotation(annotation.getText());
 					experimentHeader.setCoordinator(coordinator.getText());
 					if (saveAction != null) {
 						if (saveAction != null)
@@ -468,6 +489,7 @@ public class MyExperimentInfoPanel extends JPanel {
 															sequence.setText(experimentHeader.getSequence());
 															remark.setText(experimentHeader.getRemark());
 															outliers.setText(experimentHeader.getGlobalOutlierInfo());
+															annotation.setText(experimentHeader.getAnnotation());
 															saveB.setText(acc.postResult);
 														}
 													});
@@ -508,12 +530,14 @@ public class MyExperimentInfoPanel extends JPanel {
 				boolean b = tso.getBval(0, false);
 				b = !b;
 				tso.setBval(0, b);
-				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers, editB,
+				styles(b, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark,
+						outliers, annotation, editB,
 						saveB, editPossibleBBB, false);
 			}
 		});
 		
-		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd, sequence, remark, outliers,
+		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd,
+				sequence, remark, outliers, annotation,
 				editB, saveB, editPossible, true);
 		
 		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(

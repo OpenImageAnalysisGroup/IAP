@@ -26,7 +26,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.DateUtils;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -175,7 +175,7 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 				ei.setImportusername(SystemAnalysis.getUserName());
 				ei.setStartdate(new Date());
 				ei.setImportdate(new Date());
-				final MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+				final ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 				info.setExperimentInfo(m, ei, true, null);
 				
 				Substance md = new Substance();

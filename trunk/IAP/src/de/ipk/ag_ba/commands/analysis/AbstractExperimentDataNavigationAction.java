@@ -21,7 +21,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -57,7 +57,7 @@ public abstract class AbstractExperimentDataNavigationAction extends AbstractNav
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		try {
-			MyExperimentInfoPanel info = new MyExperimentInfoPanel();
+			ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 			ExperimentInterface ex = experiment.getData();
 			info.setExperimentInfo(experiment.m, ex.getHeader(), true, ex);
 			JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);

@@ -10,7 +10,7 @@ import org.graffiti.plugin.view.View;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.gui.util.MyExperimentInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.postgresql.CommandLineBackgroundTaskStatusProvider;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -32,7 +32,7 @@ public class SaveInDatabaseDataProcessor extends AbstractExperimentDataProcessor
 	@Override
 	protected void processData() {
 		try {
-			MyExperimentInfoPanel panel = new MyExperimentInfoPanel();
+			ExperimentHeaderInfoPanel panel = new ExperimentHeaderInfoPanel();
 			MongoDB m = null;
 			
 			mappingData = mappingData.clone();
