@@ -723,6 +723,14 @@ public class StringManipulationTools implements HelperClass {
 		}
 	}
 	
+	public static ArrayList<String> getStringListFromArray(String[] elements) {
+		ArrayList<String> al = new ArrayList<String>();
+		if (elements != null)
+			for (String o : elements)
+				al.add(o);
+		return al;
+	}
+	
 	/**
 	 * @return An empty string, if no value is added to the result.
 	 */
@@ -742,8 +750,9 @@ public class StringManipulationTools implements HelperClass {
 			int i = 0;
 			for (Object e : elements) {
 				sb.append(e + "");
-				if (i < elements.size() - 1)
-					sb.append(div);
+				if (div != null)
+					if (i < elements.size() - 1)
+						sb.append(div);
 				i++;
 			}
 			return sb.toString();
