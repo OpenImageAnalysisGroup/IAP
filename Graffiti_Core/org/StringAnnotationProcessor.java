@@ -87,7 +87,19 @@ public class StringAnnotationProcessor {
 					res.append("#" + nn[1]);
 			}
 		}
-		setAnnotation(res.toString());
+		if (value != null && !found && !value.isEmpty()) {
+			if (res.length() > 0)
+				res.append(";");
+			res.append(key + "#" + value);
+		}
+		if (res.length() > 0)
+			setAnnotation(res.toString());
+		else
+			setAnnotation(null);
 		return found;
+	}
+	
+	public String getValue() {
+		return value;
 	}
 }
