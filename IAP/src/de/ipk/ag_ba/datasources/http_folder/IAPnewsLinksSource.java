@@ -15,7 +15,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.EmptyNavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
@@ -42,23 +41,26 @@ public class IAPnewsLinksSource extends HTTPfolderSource {
 	
 	@Override
 	public Collection<NavigationButton> getAdditionalEntities(NavigationButton src) {
-		EmptyNavigationAction ipkBioInf = new EmptyNavigationAction(
-				"Sino/German Network",
-				"Sino/German Network of Computational & Integrative Biology",
-				"img/CIB_logo.png", "img/CIB_logo.png");
-		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
-				"Website",
-				new IOurl("http://www.imbio.de/forschung2/"),
-				"img/browser.png", src != null ? src.getGUIsetting() : null));
+		// EmptyNavigationAction ipkBioInf = new EmptyNavigationAction(
+		// "Sino/German Network",
+		// "Sino/German Network of Computational & Integrative Biology",
+		// "img/CIB_logo.png", "img/CIB_logo.png");
+		// ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
+		// "Website",
+		// new IOurl("http://www.imbio.de/forschung2/"),
+		// "img/browser.png", src != null ? src.getGUIsetting() : null));
+		//
+		// ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
+		// "MyBioNet",
+		// new IOurl("http://bis.zju.edu.cn/mybionet/"),
+		// "img/ext/MyBioNet48.png", src != null ? src.getGUIsetting() : null));
 		
-		ipkBioInf.addAdditionalEntity(WebFolder.getURLactionButtton(
+		Collection<NavigationButton> nbl = new ArrayList<NavigationButton>();
+		// nbl.add(new NavigationButton(ipkBioInf, src.getGUIsetting()));
+		nbl.add(WebFolder.getURLactionButtton(
 				"MyBioNet",
 				new IOurl("http://bis.zju.edu.cn/mybionet/"),
 				"img/ext/MyBioNet48.png", src != null ? src.getGUIsetting() : null));
-		
-		Collection<NavigationButton> nbl = new ArrayList<NavigationButton>();
-		nbl.add(new NavigationButton(ipkBioInf, src.getGUIsetting()));
-		
 		return nbl;
 	}
 }

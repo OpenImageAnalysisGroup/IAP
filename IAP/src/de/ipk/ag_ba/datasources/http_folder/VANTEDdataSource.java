@@ -26,17 +26,17 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  * @author klukas
  */
 public class VANTEDdataSource extends HTTPfolderSource {
-	private static final String VANTED = "VANTED Resources";
+	private static final String VANTED = "IAP-Data-Navigator Resources";
 	
 	public VANTEDdataSource(DataSourceGroup dsg) {
 		super(dsg, getLibrary(),
 				VANTED,
-				"http://vanted.ipk-gatersleben.de/examplefiles/",
+				"http://iap.ipk-gatersleben.de/examplefiles/",
 				new String[] { ".gml", ".graphml" },
 				IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
-		setDescription("<h2>Welcome to VANTED - Visualization and Analysis of Networks containing Experimental Data</h2>"
-				+ "This system makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
+		setDescription("<h2>Welcome to the IAP-Data-Navigator component</h2>"
+				+ "This system is derived from previous work on the VANTED system and makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
 				+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
 				+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
 				+ "functions allow a fast evaluation of the data (e.g. t-Test or correlation analysis).");
@@ -112,10 +112,10 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	
 	private static Library getLibrary() {
 		Library liblVANTED = new Library();
-		liblVANTED.add(new Book(VANTED, "Website", new IOurl("http://vanted.ipk-gatersleben.de/", "img/browser.png")));
-		liblVANTED.add(new Book(VANTED, "Source Code", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-9")));
-		liblVANTED.add(new Book(VANTED, "Add-ons", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-11")));
-		liblVANTED.add(new Book(VANTED, "Lit. References", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-13")));
+		liblVANTED.add(new Book(VANTED, "Website", new IOurl("http://iap.ipk-gatersleben.de/")));
+		liblVANTED.add(new Book(VANTED, "Source Code", new IOurl("http://iap.ipk-gatersleben.de/#development")));
+		// liblVANTED.add(new Book(VANTED, "Add-ons", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-11")));
+		liblVANTED.add(new Book(VANTED, "Lit. References", new IOurl("http://iap.ipk-gatersleben.de/#about")));
 		return liblVANTED;
 	}
 	

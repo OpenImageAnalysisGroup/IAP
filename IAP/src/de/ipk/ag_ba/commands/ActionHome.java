@@ -76,7 +76,7 @@ public final class ActionHome extends AbstractNavigationAction {
 			else
 				dsgList.add(ds.getDataSourceGroup());
 		}
-		for (DataSourceGroup dsg : dsgList) {
+		for (final DataSourceGroup dsg : dsgList) {
 			EmptyNavigationAction ipkBioInf = new EmptyNavigationAction(dsg.getTitle(), dsg.getTooltip(),
 					dsg.getImage(), dsg.getNavigationImage()) {
 				@Override
@@ -84,6 +84,15 @@ public final class ActionHome extends AbstractNavigationAction {
 					IAPmain.prepareVantedPlugins();
 					super.performActionCalculateResults(src);
 				}
+				
+				@Override
+				public MainPanelComponent getResultMainPanel() {
+					if (dsg.getIntroductionText() != null)
+						return new MainPanelComponent(dsg.getIntroductionText());
+					else
+						return null;
+				}
+				
 			};
 			for (NavigationAction na : dsg.getAdditionalActions())
 				ipkBioInf.addAdditionalEntity(new NavigationButton(na, guiSetting));
