@@ -37,7 +37,7 @@ public class ActionAboutPlugins extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "System Plugins";
+		return "Loaded Plugins";
 	}
 	
 	@Override

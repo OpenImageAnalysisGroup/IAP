@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.about;
 
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -10,6 +12,7 @@ import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.WorkflowHelper;
 
 /**
  * @author Christian Klukas
@@ -94,6 +97,9 @@ public class ActionAbout extends AbstractNavigationAction {
 				"img/browser.png");
 		rr.add(webUrl3.getNavigationButton(src));
 		
+		JButton b = WorkflowHelper.getAddOnManagerButton();
+		if (b.isEnabled())
+			rr.add(new NavigationButton(new ActionAddOnManager("Install/configure Add-ons", b), guiSetting));
 		rr.add(new NavigationButton(new ActionAboutPlugins("List of system plugins"), guiSetting));
 		rr.add(new NavigationButton(new ActionAboutLicense("List of external library licenses"), guiSetting));
 		
