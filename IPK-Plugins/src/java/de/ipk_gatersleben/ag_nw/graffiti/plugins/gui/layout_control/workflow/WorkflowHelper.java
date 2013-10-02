@@ -388,7 +388,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		return settings;
 	}
 	
-	private JButton getAddOnManagerButton() {
+	public static JButton getAddOnManagerButton() {
 		final JButton result = new JMButton("<html>Install / Configure Add-ons");
 		result.setIcon(GenericPluginAdapter.getAddonIcon());
 		if (AddonManagerPlugin.getInstance() == null) {
