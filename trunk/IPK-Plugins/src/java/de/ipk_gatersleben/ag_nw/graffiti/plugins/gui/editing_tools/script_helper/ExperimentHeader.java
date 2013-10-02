@@ -13,7 +13,10 @@ import java.util.TreeMap;
 
 import org.AttributeHelper;
 import org.ExperimentHeaderHelper;
+import org.StringAnnotationProcessor;
 import org.SystemAnalysis;
+
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.dc.DCelement;
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
@@ -244,7 +247,20 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		setDatabase((String) map.get("database"));
 		setRemark((String) map.get("remark"));
 		setSettings((String) map.get("settings"));
-		setAnnotation((String) map.get("annotation"));
+		{ // map individual annotation fields to single combined annotation field
+			StringAnnotationProcessor anno = new StringAnnotationProcessor("");
+			for (DCelement dc : DCelement.values()) {
+				if (dc.isNativeField())
+					continue;
+				String dcValue = (String) map.get(DCelement.getTermPrefix() + dc.getTermName());
+				if (dcValue != null && !dcValue.trim().isEmpty())
+					anno.addAnnotationField(dc.getTermName(), dcValue);
+			}
+			if (!anno.getValue().isEmpty())
+				setAnnotation(anno.getValue());
+			else
+				setAnnotation(null);
+		}
 		if (map.containsKey("_id"))
 			setDatabaseId(map.get("_id") + "");
 		else
@@ -343,13 +359,24 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		attributeValueMap.put("origin", originDatabaseId);
 		attributeValueMap.put("outliers", globalOutliers);
 		attributeValueMap.put("settings", settings);
-		attributeValueMap.put("annotation", annotation);
+		
+		{ // map single combined annotation field to individual annotation fields
+			StringAnnotationProcessor anno = new StringAnnotationProcessor(annotation);
+			for (DCelement dc : DCelement.values()) {
+				if (dc.isNativeField())
+					continue;
+				String dcValue = anno.getAnnotationField(dc.getTermName());
+				if (dcValue != null && !dcValue.trim().isEmpty())
+					attributeValueMap.put(DCelement.getTermPrefix() + dc.getTermName(), dcValue);
+			}
+		}
 	}
 	
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {
 		HashMap<String, String> res = new HashMap<String, String>();
 		
-		res.put("experimenttype", "<!-- A -->Type of Experiment");
+		res.put("experimentname", "<!-- AA -->Name of Experiment");
+		res.put("experimenttype", "<!-- AB -->Type of Experiment");
 		res.put("startdate", "<!-- C BR -->Experiment Start");
 		
 		res.put("database", "<!-- D-->Database");
@@ -367,7 +394,18 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		
 		res.put("measurements", "<!-- M -->Numeric Measurements");
 		res.put("imagefiles", "<!-- N BR -->Binary Files");
-		res.put("outliers", "<!-- O -->Binary Files");
+		res.put("outliers", "<!-- O -->Outliers");
+		res.put("sizekb", "<!-- P -->Storage Requirements (KB)");
+		
+		{ // add nice names for individual annotation field names
+			for (DCelement dc : DCelement.values()) {
+				if (dc.isNativeField())
+					continue;
+				String key = DCelement.getTermPrefix() + dc.getTermName();
+				res.put(key, "<!-- Q:" + key + " -->" + dc.getLabel());
+			}
+		}
+		
 		return res;
 	}
 	
@@ -437,12 +475,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					+ importUserGroup + ";" + imageFiles + ";" + sizekb + ";" + experimentType + ";" + sequence + ";"
 					+ experimentID + ";" + database + ";" + (importDate != null ? importDate.getTime() : "") + ";"
 					+ (startDate != null ? startDate.getTime() : "")
-					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + files;
+					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + files + ";" + annotation;
 			String s2 = e.getExperimentName() + ";" + e.remark + ";" + e.coordinator + ";" + e.databaseId + ";"
 					+ e.importUserName + ";" + e.importUserGroup + ";" + e.imageFiles + ";" + e.sizekb + ";"
 					+ e.experimentType + ";" + e.sequence + ";" + e.experimentID + ";" + e.database + ";"
 					+ (e.importDate != null ? e.importDate.getTime() : "") + ";" + (e.startDate != null ? e.startDate.getTime() : "")
-					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + e.files;
+					+ ";" + originDatabaseId + ";" + globalOutliers + ";" + e.files + ";" + e.annotation;
 			return s1.equals(s2);
 		}
 	}

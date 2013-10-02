@@ -5,7 +5,7 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
  *         Field names, definition and comment text taken from DC definition documentation.
  *         Information based on DCMI Metadata Terms (2012-06-14): http://dublincore.org/documents/dcmi-terms/#H5
  */
-public enum DCelements {
+public enum DCelement {
 	abstract_("Abstract",
 			"A summary of the resource.", null),
 	accessRights("Access Rights",
@@ -156,7 +156,7 @@ public enum DCelements {
 	private String definition;
 	private String comment;
 	
-	private DCelements(String label, String definition, String comment) {
+	private DCelement(String label, String definition, String comment) {
 		this.label = label;
 		this.definition = definition;
 		this.comment = comment;
@@ -200,5 +200,4 @@ public enum DCelements {
 				return false;
 		}
 	}
-	
 }
