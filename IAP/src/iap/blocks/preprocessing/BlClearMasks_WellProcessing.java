@@ -2,6 +2,7 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.geom.Rectangle2D;
@@ -15,7 +16,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
+public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock implements WellProcessor {
 	
 	boolean multiTray = false;
 	
@@ -195,5 +196,14 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Processes individual well parts from top images (removes other parts).";
+	}
+	
+	@Override
+	public int getDefinedWellCount(ImageProcessorOptions options) {
+		int hg = options.getIntSetting(this, "Well Grid Horizontal", 1);
+		int wg = options.getIntSetting(this, "Well Grid Vertical", 1);
+		int n = hg * wg;
+		
+		return n;
 	}
 }
