@@ -9,8 +9,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 public class TabExampleFiles extends PathwayWebLinkTab {
 	
 	public TabExampleFiles() {
-		super("Examples", "http://vanted.ipk-gatersleben.de/examplefiles/",
-							"example files", "example file", "http://vanted.ipk-gatersleben.de/", true);
+		super("Examples", "http://iap.ipk-gatersleben.de/examplefiles/",
+				"example files", "example file", "http://iap.ipk-gatersleben.de/", true);
 	}
 	
 	private static final long serialVersionUID = 1L;
