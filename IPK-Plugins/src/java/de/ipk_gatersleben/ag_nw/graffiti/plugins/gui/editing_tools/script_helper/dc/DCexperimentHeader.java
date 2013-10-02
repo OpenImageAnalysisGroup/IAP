@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class DCexperimentHeader {
 	private final ExperimentHeaderInterface ehi;
 	
-	public Collection<String> getDCfield(DCelements field, String optProvidedValueIfFieldShouldNotBeUsed) {
+	public Collection<String> getDCfield(DCelement field, String optProvidedValueIfFieldShouldNotBeUsed) {
 		switch (field) {
 			case date:
 				ArrayList<String> dateList = new ArrayList<String>();
@@ -63,7 +63,7 @@ public class DCexperimentHeader {
 			return val.split("\\|");
 	}
 	
-	public String setDCfield(DCelements field, Collection<String> newValues, boolean useField, String invalue) {
+	public String setDCfield(DCelement field, Collection<String> newValues, boolean useField, String invalue) {
 		StringAnnotationProcessor ap = StringManipulationTools.getAnnotationProcessor(useField ? ehi.getAnnotation() : invalue);
 		ap.replaceAnnotationField(field.name(), StringManipulationTools.getStringList(newValues, "|"));
 		if (useField)
@@ -71,7 +71,7 @@ public class DCexperimentHeader {
 		return ap.getValue();
 	}
 	
-	public void addDCfieldValue(DCelements field, Collection<String> newValues) {
+	public void addDCfieldValue(DCelement field, Collection<String> newValues) {
 		Collection<String> currentValues = getDCfield(field, null);
 		if (currentValues == null || currentValues.isEmpty())
 			currentValues = newValues;
@@ -153,7 +153,7 @@ public class DCexperimentHeader {
 		int rows = 0;
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><table>");
-		for (DCelements field : DCelements.values()) {
+		for (DCelement field : DCelement.values()) {
 			if (field.isNativeField())
 				continue;
 			Collection<String> valueList = getDCfield(field, optProvidedValueIfFieldShouldNotBeUsed);
@@ -182,8 +182,8 @@ public class DCexperimentHeader {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<Object> descAndValue = new ArrayList<Object>();
-				ArrayList<DCelements> row2type = new ArrayList<DCelements>();
-				for (DCelements elem : DCelements.values()) {
+				ArrayList<DCelement> row2type = new ArrayList<DCelement>();
+				for (DCelement elem : DCelement.values()) {
 					if (elem.isNativeField())
 						continue;
 					Collection<String> value = getDCfield(elem, (String) display.getClientProperty("fulltext"));
@@ -218,7 +218,7 @@ public class DCexperimentHeader {
 								"Annotation",
 								descAndValue.toArray());
 				if (res != null) {
-					HashMap<DCelements, ArrayList<String>> field2values = new HashMap<DCelements, ArrayList<String>>();
+					HashMap<DCelement, ArrayList<String>> field2values = new HashMap<DCelement, ArrayList<String>>();
 					for (int i = 0; i < res.length; i++) {
 						Object val = res[i];
 						if (val instanceof String) {
@@ -234,8 +234,8 @@ public class DCexperimentHeader {
 						}
 					}
 					String newVal = "";
-					for (DCelements dc : field2values.keySet()) {
-						setDCfield(dc, field2values.get(dc), false, newVal);
+					for (DCelement dc : field2values.keySet()) {
+						newVal = setDCfield(dc, field2values.get(dc), false, newVal);
 					}
 					display.putClientProperty("fulltext", newVal);
 					display.setText(getHTMLoverview(newVal));
