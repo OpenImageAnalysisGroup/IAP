@@ -368,7 +368,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										}
 									}
 								};
-								BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis").getResult();
+								waitResults.run();
+								// BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis").getResult();
 								// waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis"));
 							} catch (Exception e) {
 								ErrorMsg.addErrorMessage(e);
@@ -672,7 +673,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		};
-		return new LocalComputeJob(r, "Save Image");
+		r.run();
+		return null;
+		// return new LocalComputeJob(r, "Save Image");
 	}
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
