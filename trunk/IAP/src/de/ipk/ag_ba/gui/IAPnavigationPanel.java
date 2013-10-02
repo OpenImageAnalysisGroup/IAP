@@ -44,6 +44,7 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.ActionShowVANTED;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionClearClipboard;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionMergeClipboard;
@@ -85,11 +86,12 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		this.actionPanelRight = actionPanelRight;
 		
 		JPopupMenu popup = new JPopupMenu("Button Style");
-		
-		JMenuItem menuItem = new JMenuItem("New Window");
-		menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/new_frame.png"));
-		menuItem.addActionListener(getNewWindowListener());
-		popup.add(menuItem);
+		{
+			JMenuItem menuItem = new JMenuItem("New Window");
+			menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/new_frame.png"));
+			menuItem.addActionListener(getNewWindowListener());
+			popup.add(menuItem);
+		}
 		
 		popup.addSeparator();
 		
@@ -118,7 +120,20 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		// menuItem.putClientProperty("style", ButtonDrawStyle.TEXT);
 		// menuItem.addActionListener(this);
 		// popup.add(menuItem);
-		
+		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", false);
+		if (vanted) {
+			popup.addSeparator();
+			ActionShowVANTED cmd = new ActionShowVANTED();
+			JMenuItem menuItem = new JMenuItem(cmd.getDefaultTitle());
+			menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, cmd.getDefaultImage(), 16, 16, false));
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					IAPmain.showVANTED(false);
+				}
+			});
+			popup.add(menuItem);
+		}
 		addMouseListener(new PopupListener(popup));
 	}
 	
