@@ -432,6 +432,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					remark.setText(experimentHeader.getRemark());
 					outliers.setText(experimentHeader.getGlobalOutlierInfo());
 					annotation.setText(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
+					annotation.putClientProperty("fulltext", experimentHeader.getAnnotation());
 				}
 			}
 		});
