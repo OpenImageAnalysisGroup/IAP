@@ -955,4 +955,13 @@ public class StringManipulationTools implements HelperClass {
 				(green.length() == 1 ? "0" + green : green) +
 				(blue.length() == 1 ? "0" + blue : blue);
 	}
+	
+	public static String trimString(String value, int maxLength) {
+		if (value == null || maxLength < 3)
+			return value;
+		if (value.length() >= maxLength - 3)
+			return value.substring(0, maxLength - 3) + "...";
+		else
+			return value;
+	}
 }
