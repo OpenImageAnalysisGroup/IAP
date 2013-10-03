@@ -42,7 +42,7 @@ public class ClassPathAttributeCollector {
 	 */
 	public List<String> collectAttributes() {
 		return collectFilesInRoots(splitClassPath(System.getProperty(
-							"java.class.path"), System.getProperty("path.separator")));
+				"java.class.path"), System.getProperty("path.separator")));
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class ClassPathAttributeCollector {
 	 */
 	protected String isAttribute(String fileName) {
 		if (fileName.endsWith("Attribute.class") &&
-							(fileName.indexOf('$') == -1)) {
+				(fileName.indexOf('$') == -1)) {
 			try {
 				// TODO: remove unique label hack
 				// if (fileName.indexOf(System.getProperty("file.separator")) != -1) {
@@ -67,10 +67,10 @@ public class ClassPathAttributeCollector {
 				fileName = fileName.substring(0, fileName.lastIndexOf(".class"));
 				
 				// }
-				Attribute _ = (Attribute) InstanceLoader.createInstance(fileName,
-									"unique$&%%$%$%");
+				Attribute a = (Attribute) InstanceLoader.createInstance(fileName,
+						"unique$&%%$%$%");
 				
-				if (_ == null)
+				if (a == null)
 					throw new Exception("Could not create instance.");
 				
 				return fileName;
@@ -131,7 +131,7 @@ public class ClassPathAttributeCollector {
 		List<String> acc = new LinkedList<String>();
 		
 		for (Iterator<String> i = roots.iterator(); i.hasNext();) {
-			String next = (String) i.next();
+			String next = i.next();
 			System.out.println("searching " + next);
 			gatherFiles(new File(next), "", next, acc);
 		}
@@ -152,7 +152,7 @@ public class ClassPathAttributeCollector {
 	 *           DOCUMENT ME!
 	 */
 	private void gatherFiles(File classRoot, String fileName, String path,
-						List<String> acc) {
+			List<String> acc) {
 		File root = new File(classRoot, fileName);
 		
 		if (root.isFile()) {
@@ -174,7 +174,7 @@ public class ClassPathAttributeCollector {
 				String name = new String();
 				
 				while (entries.hasMoreElements()) {
-					JarEntry jarEntry = (JarEntry) entries.nextElement();
+					JarEntry jarEntry = entries.nextElement();
 					
 					// name = classRoot.getAbsolutePath()+"/"+jarEntry.getName();
 					name = isAttribute(jarEntry.getName());
@@ -190,7 +190,7 @@ public class ClassPathAttributeCollector {
 			} else {
 				String absPath = root.getAbsolutePath();
 				String nearlyClassName = absPath.substring(absPath.lastIndexOf(
-									path) + path.length() + 1);
+						path) + path.length() + 1);
 				String name = isAttribute(nearlyClassName);
 				
 				if (!"".equals(name)) {
@@ -207,7 +207,7 @@ public class ClassPathAttributeCollector {
 				for (int i = 0; i < contents.length; i++) {
 					// System.out.println("  descending: " + contents[i]);
 					gatherFiles(classRoot,
-										fileName + File.separatorChar + contents[i], path, acc);
+							fileName + File.separatorChar + contents[i], path, acc);
 				}
 			}
 		}
