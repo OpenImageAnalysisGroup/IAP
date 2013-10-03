@@ -25,6 +25,7 @@ import org.FolderPanel;
 import org.HelperClass;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MemoryHog;
@@ -117,7 +118,7 @@ public class BriteService extends MemoryHog
 		}
 		BufferedReader input = getFileReader("brite");
 		if (input == null) {
-			ErrorMsg.addErrorMessage("Info: 'brite'-file could not be loaded!");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: 'brite'-file could not be loaded!");
 		} else {
 			String line = null;
 			try {
