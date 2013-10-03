@@ -231,10 +231,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
-			int nn = 2;// SystemAnalysis.getNumberOfCPUs();
+			int nn = SystemAnalysis.getNumberOfCPUs();
 			// nn = modifyConcurrencyDependingOnMemoryStatus(nn);
 			
-			final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
+			// final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
@@ -245,7 +245,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 				final String plantIDf = plantID;
-				maxCon.acquire(1);
+				// maxCon.acquire(1);
 				try {
 					progress++;
 					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID + ")";
@@ -260,31 +260,31 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										maximumThreadCountOnImageLevel,
 										status, tso, workloadSnapshots,
 										workloadEqualAngleSnapshotSets,
-										imageSetWithSpecificAngle_f, maxCon);
+										imageSetWithSpecificAngle_f);// , maxCon);
 							} catch (Exception err) {
 								printError(imageSetWithSpecificAngle_f, err);
 							} finally {
-								maxCon.release(1);
+								// maxCon.release(1);
 								freed.setBval(0, true);
 							}
 						}
 					};
-					if (imageSetWithSpecificAngle_f.keySet().size() > SystemAnalysis.getNumberOfCPUs()
-							&& SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
-						t.run();
-					else {
-						BackgroundThreadDispatcher.addTask(t, preThreadName, true);
-						// Thread.sleep(100);
-					}
+					// if (imageSetWithSpecificAngle_f.keySet().size() > SystemAnalysis.getNumberOfCPUs()
+					// && SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
+					// t.run();
+					// else {
+					BackgroundThreadDispatcher.addTask(t, preThreadName, true);
+					Thread.sleep(50);
+					// }
 					
 				} catch (Exception eeee) {
-					if (!freed.getBval(0, false))
-						maxCon.release(1);
+					// if (!freed.getBval(0, false))
+					// maxCon.release(1);
 					throw new RuntimeException(eeee);
 				}
 			}
-			maxCon.acquire(nn);
-			maxCon.release(nn);
+			// maxCon.acquire(nn);
+			// maxCon.release(nn);
 		} finally {
 			maxInst.release();
 		}
@@ -310,7 +310,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
-			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle, final Semaphore optMaxCon)
+			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle) // , final Semaphore optMaxCon)
 			throws InterruptedException {
 		
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
@@ -346,29 +346,29 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										workloadEqualAngleSnapshotSets,
 										getParentPriority(), previousResultsForThisTimePoint);
 								
-								synchronized (waitThreads) {
-									waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
-								}
-								Runnable waitResults = new Runnable() {
-									@Override
-									public void run() {
-										HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
-										processVolumeOutput(inSamples.get(time), results);
-										if (results != null) {
-											synchronized (analysisInput) {
-												if (!analysisInput.containsKey(time))
-													analysisInput.put(time, new TreeMap<String, ImageData>());
-												synchronized (plantResults) {
-													if (!plantResults.containsKey(time))
-														plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-													analysisInput.get(time).put(configAndAngle, inImage);
-													plantResults.get(time).put(configAndAngle, results);
-												}
-											}
+								// synchronized (waitThreads) {
+								// waitThreads.addAll(resultsAndWaitThreads.getWaitThreads());
+								// }
+								// Runnable waitResults = new Runnable() {
+								// @Override
+								// public void run() {
+								HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
+								processVolumeOutput(inSamples.get(time), results);
+								if (results != null) {
+									synchronized (analysisInput) {
+										if (!analysisInput.containsKey(time))
+											analysisInput.put(time, new TreeMap<String, ImageData>());
+										synchronized (plantResults) {
+											if (!plantResults.containsKey(time))
+												plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+											analysisInput.get(time).put(configAndAngle, inImage);
+											plantResults.get(time).put(configAndAngle, results);
 										}
 									}
-								};
-								waitResults.run();
+								}
+								// }
+								// };
+								// waitResults.run();
 								// BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis").getResult();
 								// waitThreads.add(BackgroundThreadDispatcher.addTask(waitResults, "process results of specific angle analysis"));
 							} catch (Exception e) {
@@ -868,7 +868,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			throws InterruptedException {
 		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
 		// ">SAVE IMAGE RESULTS", false);
-		ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
+		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		if (forceDebugStack) {
 			while (forcedDebugStacks.size() < tray_cnt)
 				forcedDebugStacks.add(null);
@@ -927,20 +927,20 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						tray, tray_cnt,
 						inIr, resIr, buf, "." + IAPservice.getTargetFileExtension(false, null));
 			
-			if (ra != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(ra));
-			}
-			if (rb != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rb));
-			}
-			if (rc != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rc));
-			}
-			if (rd != null) {
-				waitThreads.add(BackgroundThreadDispatcher.addTask(rd));
-			}
+			// if (ra != null) {
+			// waitThreads.add(BackgroundThreadDispatcher.addTask(ra));
+			// }
+			// if (rb != null) {
+			// waitThreads.add(BackgroundThreadDispatcher.addTask(rb));
+			// }
+			// if (rc != null) {
+			// waitThreads.add(BackgroundThreadDispatcher.addTask(rc));
+			// }
+			// if (rd != null) {
+			// waitThreads.add(BackgroundThreadDispatcher.addTask(rd));
+			// }
 		}
-		return waitThreads;
+		return null;// waitThreads;
 	}
 	
 	@Override
@@ -955,7 +955,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final int workloadSnapshotAngles, int parentPriority,
 			TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint)
 			throws Exception {
-		ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
+		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
 		ImageData inFluo = id.getFluoInfo() != null ? id.getFluoInfo().copy() : null;
 		ImageData inNir = id.getNirInfo() != null ? id.getNirInfo().copy() : null;
@@ -1039,14 +1039,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 					
 					well2analysisResults = imageProcessor.getNumericResults();
-					waitThreads.addAll(processAndOrSaveResultImages(
+					// waitThreads.addAll(
+					processAndOrSaveResultImages(
 							wellIdx, options.getWellCnt(),
 							id, inVis2, inFluo2, inNir2, inIr2,
-							debugImageStack != null ? debugImageStack.get(wellIdx) : null, resVis, resFluo, resNir, resIr, parentPriority));
+							debugImageStack != null ? debugImageStack.get(wellIdx) : null, resVis, resFluo, resNir, resIr, parentPriority);
+					// );
 				}
 			}
 		}
-		BackgroundThreadDispatcher.waitFor(waitThreads);
+		// BackgroundThreadDispatcher.waitFor(waitThreads);
 		if (well2analysisResults != null) {
 			ImageData copyFrom = inVis;
 			if (copyFrom == null)

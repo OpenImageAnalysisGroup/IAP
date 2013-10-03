@@ -22,7 +22,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
-	protected synchronized Image processVISmask() {
+	protected Image processVISmask() {
 		Image res = null;
 		boolean debug = debugValues;
 		

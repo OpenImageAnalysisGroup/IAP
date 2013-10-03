@@ -149,7 +149,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 				}
 			}
 		};
-		BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
+		r.run();// BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
 		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
