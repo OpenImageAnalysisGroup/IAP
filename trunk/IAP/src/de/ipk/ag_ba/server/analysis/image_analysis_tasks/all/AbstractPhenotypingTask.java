@@ -239,7 +239,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 			int progress = 0;
-			
+			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
@@ -273,7 +273,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					// && SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
 					// t.run();
 					// else {
-					BackgroundThreadDispatcher.addTask(t, preThreadName, true);
+					wait.add(BackgroundThreadDispatcher.addTask(t, preThreadName, true));
 					Thread.sleep(50);
 					// }
 					
@@ -283,6 +283,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					throw new RuntimeException(eeee);
 				}
 			}
+			BackgroundThreadDispatcher.waitFor(wait);
 			// maxCon.acquire(nn);
 			// maxCon.release(nn);
 		} finally {
@@ -769,6 +770,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				
 				if (output != null)
 					outputAdd(m);
+				else
+					System.err.println("Internal Error: Output is NULL!!");
 			}
 		}
 	}
