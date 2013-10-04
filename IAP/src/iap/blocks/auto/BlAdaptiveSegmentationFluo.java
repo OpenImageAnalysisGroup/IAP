@@ -29,6 +29,10 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null) {
 			return null;
 		}
+		
+		if (debugValues) {
+			input().masks().fluo().show("inp fluo");
+		}
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(), options.getBackground());
 		
 		Image resClassic, resChlorophyll, resPhenol;

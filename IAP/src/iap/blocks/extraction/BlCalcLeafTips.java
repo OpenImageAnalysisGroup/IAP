@@ -49,10 +49,13 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int geometricThresh = 0;
 		
 		if (!optimize) {
-			circlediameter = getInt("search diameter", 35);
-			geometricThresh = getInt("geometric threshold", (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
+			circlediameter = getInt("search diameter", 30); // 35
+			int parm = getInt("geometric threshold", 24);
+			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * (parm / 100.));
+			// (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
 		}
 		
+		// search for best side image
 		if (options.getCameraPosition() == CameraPosition.SIDE && input().masks().fluo() != null) {
 			
 			if (useMainAxes) {

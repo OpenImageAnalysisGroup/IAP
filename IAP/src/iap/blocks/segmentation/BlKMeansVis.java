@@ -33,6 +33,8 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().vis() != null) {
 			Image inp = input().masks().vis();
 			
+			inp.show("inp", debug);
+			
 			ArrayList<Color> seedColors = new ArrayList<Color>();
 			ArrayList<Color> clusterColors = new ArrayList<Color>();
 			ArrayList<Vector2f> seedPositions = new ArrayList<Vector2f>();
@@ -59,6 +61,10 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			clusterColors.add(Color.WHITE);
 			clusterColors.add(Color.WHITE);
+			
+			if (debugValues) {
+				clusterColors = seedColors;
+			}
 			
 			double epsilon = getDouble("epsilon", 0.01);
 			
