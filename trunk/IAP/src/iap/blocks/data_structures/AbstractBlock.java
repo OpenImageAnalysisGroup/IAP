@@ -12,7 +12,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISimage() {
-		if (input().images().vis() != null)
+		if (input().images() != null && input().images().vis() != null)
 			return processImage(input().images().vis());
 		else
 			return null;
@@ -20,7 +20,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOimage() {
-		if (input().images().fluo() != null)
+		if (input().images() != null && input().images().fluo() != null)
 			return processImage(input().images().fluo());
 		else
 			return null;
@@ -28,7 +28,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRimage() {
-		if (input().images().nir() != null)
+		if (input().images() != null && input().images().nir() != null)
 			return processImage(input().images().nir());
 		else
 			return null;
@@ -36,7 +36,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processIRimage() {
-		if (input().images().ir() != null)
+		if (input().images() != null && input().images().ir() != null)
 			return processImage(input().images().ir());
 		else
 			return null;
@@ -44,7 +44,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {
-		if (input().masks().vis() != null)
+		if (input().masks() != null && input().masks().vis() != null)
 			return processMask(input().masks().vis());
 		else
 			return null;
@@ -52,7 +52,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
-		if (input().masks().fluo() != null)
+		if (input().masks() != null && input().masks().fluo() != null)
 			return processMask(input().masks().fluo());
 		else
 			return null;
@@ -60,7 +60,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {
-		if (input().masks().nir() != null)
+		if (input().masks() != null && input().masks().nir() != null)
 			return processMask(input().masks().nir());
 		else
 			return null;
@@ -68,7 +68,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processIRmask() {
-		if (input().masks().ir() != null)
+		if (input().masks() != null && input().masks().ir() != null)
 			return processMask(input().masks().ir());
 		else
 			return null;

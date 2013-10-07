@@ -2783,7 +2783,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
-	public ImageOperation thresholdLabBrightnessClearLowerThan(int threshold, int back) {
+	public ImageOperation thresholdLabBrightness(int threshold, int back, boolean lowerThanThreshold) {
 		int[] res = getImageAs1dArray();
 		int idx = 0;
 		float[][][] lab = ImageOperation.getLabCubeInstance();
@@ -2799,8 +2799,13 @@ public class ImageOperation implements MemoryHogInterface {
 			int Li = (int) lab[r][g][b];
 			// ai = (int) ImageOperation.labCube[r][g][b + 256];
 			// bi = (int) ImageOperation.labCube[r][g][b + 512];
-			if (Li < threshold)
-				res[idx] = back;
+			if (lowerThanThreshold) {
+				if (Li < threshold)
+					res[idx] = back;
+			} else {
+				if (Li > threshold)
+					res[idx] = back;
+			}
 			idx++;
 		}
 		return new ImageOperation(res, image.getWidth(), image.getHeight());

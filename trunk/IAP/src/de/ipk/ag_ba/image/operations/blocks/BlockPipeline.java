@@ -109,7 +109,7 @@ public class BlockPipeline {
 				continue;
 			ImageStack ds = debugStack != null ? new ImageStack() : null;
 			BlockResultSet results = new BlockResults();
-			options.setTrayCnt(idx, executionTrayCount);
+			options.setWellCnt(idx, executionTrayCount);
 			res.put(idx, executeInnerCall(options, new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status));
 			if (debugStack != null)
 				debugStack.put(idx, ds);
@@ -193,7 +193,7 @@ public class BlockPipeline {
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			status.setCurrentStatusValueFine(100d * (options.getTrayIdx() + 1) / options.getWellCnt());
+			status.setCurrentStatusValueFine(100d * (options.getWellIdx() + 1) / options.getWellCnt());
 			
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));
