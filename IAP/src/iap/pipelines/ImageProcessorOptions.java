@@ -31,8 +31,8 @@ public class ImageProcessorOptions {
 	private CameraPosition cameraPosition = CameraPosition.UNKNOWN;
 	private NeighbourhoodSetting neighbourhood = NeighbourhoodSetting.NB4;
 	private final int nirBackground = new Color(180, 180, 180).getRGB();
-	private int tray_idx;
-	private int tray_cnt;
+	private int well_idx;
+	private int well_cnt;
 	private int unit_test_idx;
 	private int unit_test_steps;
 	private SystemOptions optSystemOptionStorage;
@@ -103,17 +103,17 @@ public class ImageProcessorOptions {
 		return nirBackground;
 	}
 	
-	public void setTrayCnt(int tray_idx, int tray_cnt) {
-		this.tray_idx = tray_idx;
-		this.tray_cnt = tray_cnt;
+	public void setWellCnt(int tray_idx, int tray_cnt) {
+		this.well_idx = tray_idx;
+		this.well_cnt = tray_cnt;
 	}
 	
 	public int getWellCnt() {
-		return tray_cnt;
+		return well_cnt;
 	}
 	
-	public int getTrayIdx() {
-		return tray_idx;
+	public int getWellIdx() {
+		return well_idx;
 	}
 	
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
