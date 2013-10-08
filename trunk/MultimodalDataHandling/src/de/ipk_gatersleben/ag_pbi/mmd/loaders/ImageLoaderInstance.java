@@ -27,6 +27,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataAnnotation;
+import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInstance;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -52,7 +53,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 			return;
 		
 		if (ed.getSubstances() != null && ed.getSubstances().size() > 0)
-			substancename.setText(ed.getSubstances().iterator().next());
+			substancename.setSelectedItem(ed.getSubstances().iterator().next());
 		if (ed.getReplicateIDs() != null && ed.getReplicateIDs().size() > 0)
 			replicate.setValue(ed.getReplicateIDs().iterator().next());
 		if (ed.getPositions() != null && ed.getPositions().size() > 0)
@@ -83,29 +84,36 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	public JPanel getAttributeDialog(int filenumber) throws Exception {
 		JPanel pan = new JPanel();
 		pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-		substancename = new JTextField();
+		
+		substancename = new JComboBoxAutoCompleteAndSelectOnTab();
+		substancename.setEditable(true);
+		
+		for (String s : new String[] { "vis.top", "vis.side", "fluo.top", "flip.side", "nir.top", "nir.side", "ir.top", "ir.side" })
+			substancename.addItem(s);
+		substancename.addSelectionOnTab();
+		
 		pan.add(TableLayout.getSplit(new JLabel("Substance*"), substancename, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		replicate = new JSpinnerSelectOnTab(new SpinnerNumberModel(filenumber, 0, 100000, 1));
 		pan.add(TableLayout.getSplit(new JLabel("Replicate ID"), replicate, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		unit = new JTextField();
 		pan.add(TableLayout.getSplit(new JLabel("Unit*"), unit, ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
 		position = new JSpinnerSelectOnTab(new SpinnerNumberModel(0d, 0d, 100000d, 0.01d));
 		pan.add(TableLayout.getSplit(new JLabel("Position"), position, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		positionunit = new JTextField();
 		pan.add(TableLayout.getSplit(new JLabel("Position Unit*"), positionunit, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		imagepixelwidth = new JSpinnerSelectOnTab(new SpinnerNumberModel(5d, 0d, 100d, 0.01d));
 		pan.add(TableLayout.getSplit(new JLabel("Pixel Width*"), imagepixelwidth, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		imagepixelheight = new JSpinnerSelectOnTab(new SpinnerNumberModel(5d, 0d, 100d, 0.01d));
 		pan.add(TableLayout.getSplit(new JLabel("Pixel Height*"), imagepixelheight, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		imagethickness = new JSpinnerSelectOnTab(new SpinnerNumberModel(0d, 0d, 100d, 0.01d));
 		pan.add(TableLayout.getSplit(new JLabel("Thickness*"), imagethickness, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		return pan;
 	}
 	
@@ -142,7 +150,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	}
 	
 	public void setSubstance(String val) {
-		substancename.setText(val);
+		substancename.setSelectedItem(val);
 	}
 	
 	public void setUnit(String val) {
@@ -172,7 +180,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	@Override
 	public Object[] getFormData() {
 		return new Object[] { getSubstance(), getUnit(), getPositionUnit(), getPixelsizeX(), getPixelsizeY(),
-							getImageThickness() };
+				getImageThickness() };
 	}
 	
 	@Override

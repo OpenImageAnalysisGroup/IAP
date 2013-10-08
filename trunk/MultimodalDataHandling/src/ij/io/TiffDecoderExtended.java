@@ -21,7 +21,7 @@ import java.util.Vector;
  * Decodes single and multi-image TIFF files. The LZW decompression
  * code was contributed by Curtis Rueden.
  */
-public class TiffDecoder {
+public class TiffDecoderExtended {
 	
 	// tags
 	public static final int NEW_SUBFILE_TYPE = 254;
@@ -77,8 +77,8 @@ public class TiffDecoder {
 	static final int ROI = 0x726f6920; // "roi " (ROI)
 	static final int OVERLAY = 0x6f766572; // "over" (overlay)
 	
-	private String directory;
-	private String name;
+	private final String directory;
+	private final String name;
 	private String url;
 	protected RandomAccessStream in;
 	protected boolean debugMode;
@@ -88,12 +88,12 @@ public class TiffDecoder {
 	private int[] metaDataCounts;
 	private String tiffMetadata;
 	
-	public TiffDecoder(String directory, String name) {
+	public TiffDecoderExtended(String directory, String name) {
 		this.directory = directory;
 		this.name = name;
 	}
 	
-	public TiffDecoder(InputStream in, String name) {
+	public TiffDecoderExtended(InputStream in, String name) {
 		directory = "";
 		this.name = name;
 		url = "";
@@ -162,7 +162,7 @@ public class TiffDecoder {
 		return value;
 	}
 	
-	void getColorMap(long offset, FileInfo fi) throws IOException {
+	void getColorMap(long offset, FileInfoXYZ fi) throws IOException {
 		byte[] colorTable16 = new byte[768 * 2];
 		long saveLoc = in.getLongFilePointer();
 		in.seek(offset);
@@ -207,7 +207,7 @@ public class TiffDecoder {
 	 * stacks, it also saves the number of images to avoid having to
 	 * decode an IFD for each image.
 	 */
-	public void saveImageDescription(byte[] description, FileInfo fi) {
+	public void saveImageDescription(byte[] description, FileInfoXYZ fi) {
 		String id = new String(description);
 		if (!id.startsWith("ImageJ"))
 			saveMetadata(getName(IMAGE_DESCRIPTION), id);
@@ -238,7 +238,7 @@ public class TiffDecoder {
 			tiffMetadata += str;
 	}
 	
-	void decodeNIHImageHeader(int offset, FileInfo fi) throws IOException {
+	void decodeNIHImageHeader(int offset, FileInfoXYZ fi) throws IOException {
 		long saveLoc = in.getLongFilePointer();
 		
 		in.seek(offset + 12);
@@ -355,7 +355,7 @@ public class TiffDecoder {
 		in.seek(saveLoc);
 	}
 	
-	void dumpTag(int tag, int count, int value, FileInfo fi) {
+	void dumpTag(int tag, int count, int value, FileInfoXYZ fi) {
 		String name = getName(tag);
 		String cs = (count == 1) ? "" : ", count=" + count;
 		dInfo += "    " + tag + ", \"" + name + "\", value=" + value + cs + "\n";
@@ -467,7 +467,7 @@ public class TiffDecoder {
 			return 0.0;
 	}
 	
-	FileInfo OpenIFD() throws IOException {
+	FileInfoXYZ OpenIFD() throws IOException {
 		// Get Image File Directory data
 		int tag, fieldType, count, value;
 		int nEntries = getShort();
@@ -476,7 +476,7 @@ public class TiffDecoder {
 		ifdCount++;
 		// if ((ifdCount%100)==0 && ifdCount>0)
 		// ij.IJ.showStatus(""+ifdCount);
-		FileInfo fi = new FileInfo();
+		FileInfoXYZ fi = new FileInfoXYZ();
 		for (int i = 0; i < nEntries; i++) {
 			tag = getShort();
 			fieldType = getShort();
@@ -623,7 +623,7 @@ public class TiffDecoder {
 								// otherwise, this is an unknown compression type
 								fi.compression = FileInfo.COMPRESSION_UNKNOWN;
 								error("ImageJ cannot open TIFF files " +
-													"compressed in this fashion (" + value + ")");
+										"compressed in this fashion (" + value + ")");
 							}
 					break;
 				case SOFTWARE:
@@ -712,7 +712,7 @@ public class TiffDecoder {
 		return fi;
 	}
 	
-	void getMetaData(int loc, FileInfo fi) throws IOException {
+	void getMetaData(int loc, FileInfoXYZ fi) throws IOException {
 		if (metaDataCounts == null || metaDataCounts.length == 0)
 			return;
 		long saveLoc = in.getLongFilePointer();
@@ -795,7 +795,7 @@ public class TiffDecoder {
 		in.seek(saveLoc);
 	}
 	
-	void getInfoProperty(int first, FileInfo fi) throws IOException {
+	void getInfoProperty(int first, FileInfoXYZ fi) throws IOException {
 		int len = metaDataCounts[first];
 		byte[] buffer = new byte[len];
 		in.readFully(buffer, len);
@@ -811,7 +811,7 @@ public class TiffDecoder {
 		fi.info = new String(chars);
 	}
 	
-	void getSliceLabels(int first, int last, FileInfo fi) throws IOException {
+	void getSliceLabels(int first, int last, FileInfoXYZ fi) throws IOException {
 		fi.sliceLabels = new String[last - first + 1];
 		int index = 0;
 		byte[] buffer = new byte[metaDataCounts[first]];
@@ -837,14 +837,14 @@ public class TiffDecoder {
 		}
 	}
 	
-	void getDisplayRanges(int first, FileInfo fi) throws IOException {
+	void getDisplayRanges(int first, FileInfoXYZ fi) throws IOException {
 		int n = metaDataCounts[first] / 8;
 		fi.displayRanges = new double[n];
 		for (int i = 0; i < n; i++)
 			fi.displayRanges[i] = readDouble();
 	}
 	
-	void getLuts(int first, int last, FileInfo fi) throws IOException {
+	void getLuts(int first, int last, FileInfoXYZ fi) throws IOException {
 		fi.channelLuts = new byte[last - first + 1][];
 		int index = 0;
 		for (int i = first; i <= last; i++) {
@@ -855,13 +855,13 @@ public class TiffDecoder {
 		}
 	}
 	
-	void getRoi(int first, FileInfo fi) throws IOException {
+	void getRoi(int first, FileInfoXYZ fi) throws IOException {
 		int len = metaDataCounts[first];
 		fi.roi = new byte[len];
 		in.readFully(fi.roi, len);
 	}
 	
-	void getOverlay(int first, int last, FileInfo fi) throws IOException {
+	void getOverlay(int first, int last, FileInfoXYZ fi) throws IOException {
 		fi.overlay = new byte[last - first + 1][];
 		int index = 0;
 		for (int i = first; i <= last; i++) {
@@ -892,13 +892,13 @@ public class TiffDecoder {
 		debugMode = true;
 	}
 	
-	public FileInfo[] getTiffInfo() throws IOException {
+	public FileInfoXYZ[] getTiffInfo() throws IOException {
 		long ifdOffset;
-		Vector<FileInfo> info;
+		Vector<FileInfoXYZ> info;
 		
 		if (in == null)
 			in = new RandomAccessStream(new RandomAccessFile(new File(directory, name), "r"));
-		info = new Vector<FileInfo>();
+		info = new Vector<FileInfoXYZ>();
 		ifdOffset = OpenImageFileHeader();
 		if (ifdOffset < 0L) {
 			in.close();
@@ -908,7 +908,7 @@ public class TiffDecoder {
 			dInfo = "\n  " + name + ": opening\n";
 		while (ifdOffset > 0L) {
 			in.seek(ifdOffset);
-			FileInfo fi = OpenIFD();
+			FileInfoXYZ fi = OpenIFD();
 			if (fi != null) {
 				info.addElement(fi);
 				ifdOffset = (getInt()) & 0xffffffffL;
@@ -926,7 +926,7 @@ public class TiffDecoder {
 			in.close();
 			return null;
 		} else {
-			FileInfo[] fi = new FileInfo[info.size()];
+			FileInfoXYZ[] fi = new FileInfoXYZ[info.size()];
 			info.copyInto(fi);
 			if (debugMode)
 				fi[0].debugInfo = dInfo;
@@ -948,7 +948,7 @@ public class TiffDecoder {
 		}
 	}
 	
-	String getGapInfo(FileInfo[] fi) {
+	String getGapInfo(FileInfoXYZ[] fi) {
 		if (fi.length < 2)
 			return "0";
 		long minGap = Long.MAX_VALUE;

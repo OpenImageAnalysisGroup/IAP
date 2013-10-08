@@ -38,8 +38,8 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInstance;
-import de.ipk_gatersleben.ag_pbi.mmd.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
@@ -85,12 +85,12 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 	public JPanel getAttributeDialog(int filenumber) throws Exception {
 		JPanel pan = new JPanel();
 		pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-		substancename = new JTextField();
+		substancename = new JComboBoxAutoCompleteAndSelectOnTab();
 		pan.add(TableLayout.getSplit(new JLabel("Substance*"), substancename, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		replicate = new JSpinnerSelectOnTab(new SpinnerNumberModel(filenumber, 0, 100000, 1));
 		pan.add(TableLayout.getSplit(new JLabel("Replicate ID"), replicate, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		unit = new JTextField();
 		pan.add(TableLayout.getSplit(new JLabel("Unit*"), unit, ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
 		
@@ -107,6 +107,7 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 		boolean validvoxelnumberdepth = (hdr.voxelnbrz > 0 && hdr.voxelnbrz < 100000);
 		
 		final Runnable calculateVolumeBitSize = new Runnable() {
+			@Override
 			public void run() {
 				long bits = -1l;
 				String text = "";
@@ -114,40 +115,41 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 				
 				switch (hdr.checkFileSize) {
 					case APPROXIMATE:
-							bits = (Integer) voxelnbrx.getValue() * (Integer) voxelnbry.getValue() * ((VolumeColorDepth) colordepth.getSelectedItem()).getBytes();
-							if (Math.abs(bits - volumesize) < 5000) {
-								text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.blue)
-													+ "\">" + bits / 1024 + " kb match (header tolerance)";
-								tooltiptext = "Size of volume file and input attributes match approximately (depending on header size)";
-							} else {
-								text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.red)
-													+ "\">Attribute Size " + bits / 1024 + " kb, File Size " + volumesize / 1024 + " kb";
-								tooltiptext = "<html>Size of file and input attributes do not match!<br>Choose another colordepth or voxelnumbers!";
-							}
-							break;
-						case EXACT:
-							bits = (Integer) voxelnbrx.getValue() * (Integer) voxelnbry.getValue() * (Integer) voxelnbrz.getValue()
-												* ((VolumeColorDepth) colordepth.getSelectedItem()).getBytes();
-							if (bits == volumesize) {
-								text = bits / 1024 + " kb match";
-								tooltiptext = "Sizes seem to be OK";
-							} else {
-								text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.red)
-													+ "\">Attribute Size " + bits / 1024 + " kb, File Size " + volumesize / 1024 + " kb";
-								tooltiptext = "<html>Size of file and input attributes do not match!<br>Choose another colordepth or voxelnumbers!";
-							}
-							break;
-						case NONE:
-							text = "filesizes not checked";
-							tooltiptext = "filesizes are not checked and should work";
-							break;
-					}
-					
-					showVolumeBitSize.setText(text);
-					showVolumeBitSize.setToolTipText(tooltiptext);
+						bits = (Integer) voxelnbrx.getValue() * (Integer) voxelnbry.getValue() * ((VolumeColorDepth) colordepth.getSelectedItem()).getBytes();
+						if (Math.abs(bits - volumesize) < 5000) {
+							text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.blue)
+									+ "\">" + bits / 1024 + " kb match (header tolerance)";
+							tooltiptext = "Size of volume file and input attributes match approximately (depending on header size)";
+						} else {
+							text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.red)
+									+ "\">Attribute Size " + bits / 1024 + " kb, File Size " + volumesize / 1024 + " kb";
+							tooltiptext = "<html>Size of file and input attributes do not match!<br>Choose another colordepth or voxelnumbers!";
+						}
+						break;
+					case EXACT:
+						bits = (Integer) voxelnbrx.getValue() * (Integer) voxelnbry.getValue() * (Integer) voxelnbrz.getValue()
+								* ((VolumeColorDepth) colordepth.getSelectedItem()).getBytes();
+						if (bits == volumesize) {
+							text = bits / 1024 + " kb match";
+							tooltiptext = "Sizes seem to be OK";
+						} else {
+							text = "<html><font color=\"" + ColorUtil.getHexFromColor(Color.red)
+									+ "\">Attribute Size " + bits / 1024 + " kb, File Size " + volumesize / 1024 + " kb";
+							tooltiptext = "<html>Size of file and input attributes do not match!<br>Choose another colordepth or voxelnumbers!";
+						}
+						break;
+					case NONE:
+						text = "filesizes not checked";
+						tooltiptext = "filesizes are not checked and should work";
+						break;
 				}
+				
+				showVolumeBitSize.setText(text);
+				showVolumeBitSize.setToolTipText(tooltiptext);
+			}
 		};
 		ChangeListener reactOnSizeInput = new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
 				calculateVolumeBitSize.run();
 			}
@@ -156,50 +158,53 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 		voxelnbrx = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxelwidth ? hdr.voxelnbrx : 100, 0, 1000000, 1));
 		voxelnbrx.addChangeListener(reactOnSizeInput);
 		pan.add(TableLayout.getSplit(new JLabel("# Voxel X"), voxelnbrx, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		voxelnbry = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxelheight ? hdr.voxelnbry : 100, 0, 1000000, 1));
 		voxelnbry.addChangeListener(reactOnSizeInput);
 		pan.add(TableLayout.getSplit(new JLabel("# Voxel Y"), voxelnbry, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		voxelnbrz = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxeldepth ? hdr.voxelnbrz : 100, 0, 1000000, 1));
 		voxelnbrz.addChangeListener(reactOnSizeInput);
 		pan.add(TableLayout.getSplit(new JLabel("# Voxel Z"), voxelnbrz, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		
 		voxeldimx = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxelnumberwidth ? hdr.voxeldimx : 30d, 0d,
-							1000000d, 0.1d));
+				1000000d, 0.1d));
 		pan.add(TableLayout.getSplit(new JLabel("Voxeldim X*"), voxeldimx, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		voxeldimy = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxelnumberheight ? hdr.voxeldimy : 15d, 0d,
-							1000000d, 0.1d));
+				1000000d, 0.1d));
 		voxeldimy.addChangeListener(reactOnSizeInput);
 		pan.add(TableLayout.getSplit(new JLabel("Voxeldim Y*"), voxeldimy, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		voxeldimz = new JSpinnerSelectOnTab(new SpinnerNumberModel(validvoxelnumberdepth ? hdr.voxeldimz : 15d, 0d,
-							1000000d, 0.1d));
+				1000000d, 0.1d));
 		voxeldimz.addChangeListener(reactOnSizeInput);
 		pan.add(TableLayout.getSplit(new JLabel("Voxeldim Z*"), voxeldimz, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		colordepth = new JComboBoxAutoCompleteAndSelectOnTab(VolumeColorDepth.values());
 		colordepth.setOpaque(false);
 		colordepth.setSelectedItem(hdr.fileType);
 		colordepth.addPopupMenuListener(new PopupMenuListener() {
+			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 			}
 			
+			@Override
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
 				calculateVolumeBitSize.run();
 			}
 			
+			@Override
 			public void popupMenuCanceled(PopupMenuEvent e) {
 				calculateVolumeBitSize.run();
 			}
 		});
 		pan.add(TableLayout.getSplit(new JLabel("Color Depth*"), colordepth, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		showVolumeBitSize = new JLabel("no size available");
 		pan.add(TableLayout.getSplit(new JLabel("File Size (in kb)"), showVolumeBitSize, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		calculateVolumeBitSize.run();
 		return pan;
 	}
@@ -253,7 +258,7 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 	}
 	
 	public void setSubstance(String val) {
-		substancename.setText(val);
+		substancename.setSelectedItem(val);
 	}
 	
 	public void setUnit(String val) {
@@ -515,7 +520,7 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 			in.readInt(); // smin
 			
 			switch (datatype) {
-				
+			
 				case 2:
 					hdr.fileType = VolumeColorDepth.BIT8;
 					break;
@@ -570,7 +575,7 @@ public class VolumeLoaderInstance extends TemplateLoaderInstance {
 	@Override
 	public Object[] getFormData() {
 		return new Object[] { getSubstance(), getUnit(), getVoxelsizeX(), getVoxelsizeY(), getVoxelsizeZ(),
-							getColorDepth() };
+				getColorDepth() };
 	}
 	
 	@Override

@@ -11,9 +11,9 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd.loaders;
 
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.ImageReader;
-import ij.io.TiffDecoder;
+import ij.io.TiffDecoderExtended;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -46,8 +46,8 @@ public class TIFFImageLoaderInstance extends ImageLoaderInstance {
 			ImageData id = ((ImageData) list.get(0));
 			
 			// taken from ImageJ v1.44
-			TiffDecoder dec = new TiffDecoder(id.getURL().getInputStream(), id.getURL().getFileName());
-			FileInfo[] infos = dec.getTiffInfo();
+			TiffDecoderExtended dec = new TiffDecoderExtended(id.getURL().getInputStream(), id.getURL().getFileName());
+			FileInfoXYZ[] infos = dec.getTiffInfo();
 			ImageReader ir = new ImageReader(infos[0]);
 			
 			Object result = ir.readPixels(id.getURL().getInputStream());

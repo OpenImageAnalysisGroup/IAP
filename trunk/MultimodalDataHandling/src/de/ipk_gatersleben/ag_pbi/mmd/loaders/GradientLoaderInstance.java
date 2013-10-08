@@ -30,6 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataFileReader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
+import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInstance;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -51,9 +52,9 @@ public class GradientLoaderInstance extends TemplateLoaderInstance {
 	public JPanel getAttributeDialog(int filenumber) throws Exception {
 		JPanel pan = new JPanel();
 		pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
-		substancename = new JTextField();
+		substancename = new JComboBoxAutoCompleteAndSelectOnTab();
 		pan.add(TableLayout.getSplit(new JLabel("Substance"), substancename, ImportDialogFile.LEFTSIZE,
-							ImportDialogFile.RIGHTSIZE));
+				ImportDialogFile.RIGHTSIZE));
 		pan.add(new JPanel());
 		FolderPanel omics = new FolderPanel("Gradient values");
 		omics.enableSearch(false);
