@@ -476,4 +476,8 @@ public class ImportDialogFile extends JPanel {
 		if (loader != null)
 			loader.setAnnotation(ed);
 	}
+	
+	public Long getFineTime() {
+		return loader.getFile().lastModified();
+	}
 }

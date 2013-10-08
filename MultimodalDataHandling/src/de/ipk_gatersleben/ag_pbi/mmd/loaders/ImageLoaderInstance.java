@@ -42,6 +42,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	private JSpinnerSelectOnTab imagepixelheight;
 	private JSpinnerSelectOnTab imagethickness;
 	private boolean preventBinaryFileCopy;
+	private ExperimentDataAnnotation expAnno;
 	
 	public ImageLoaderInstance(File f, ImageLoader parent) {
 		super(f, parent);
@@ -51,7 +52,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	public void setAnnotation(ExperimentDataAnnotation ed) {
 		if (ed == null)
 			return;
-		
+		this.expAnno = ed;
 		if (ed.getSubstances() != null && ed.getSubstances().size() > 0)
 			substancename.setSelectedItem(ed.getSubstances().iterator().next());
 		if (ed.getReplicateIDs() != null && ed.getReplicateIDs().size() > 0)

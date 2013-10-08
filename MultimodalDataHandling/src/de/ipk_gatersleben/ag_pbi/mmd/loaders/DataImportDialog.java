@@ -176,6 +176,7 @@ public class DataImportDialog {
 			Sample3D sample = (Sample3D) Experiment.getTypeManager().getNewSample(series);
 			sample.setTime(idf.getTime());
 			sample.setTimeUnit(idf.getTimeUnit());
+			sample.setSampleFineTimeOrRowId(idf.getFineTime());
 			sample.setComponent(idf.getComponent());
 			sample.setMeasurementtool(idf.getMeasurementtool());
 			series.add(sample);
