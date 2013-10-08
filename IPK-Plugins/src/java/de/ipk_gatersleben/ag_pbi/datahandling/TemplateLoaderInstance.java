@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -29,7 +28,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	}
 	
 	protected File file;
-	protected JTextField substancename;
+	protected JComboBoxAutoCompleteAndSelectOnTab substancename;
 	private final TemplateLoader parent;
 	
 	public TemplateLoaderInstance(File f, TemplateLoader parent) {
@@ -43,6 +42,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * @seede.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface#
 	 * getAttributeDialog(int)
 	 */
+	@Override
 	public abstract JPanel getAttributeDialog(int filenumber) throws Exception;
 	
 	/*
@@ -52,8 +52,9 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * (de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools
 	 * .script_helper.Sample, java.lang.String)
 	 */
+	@Override
 	public abstract List<NumericMeasurementInterface> addMeasurementsToHierarchy(SampleInterface sample,
-						String experimentname);
+			String experimentname);
 	
 	/*
 	 * (non-Javadoc)
@@ -61,11 +62,12 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface#getSubstance
 	 * ()
 	 */
+	@Override
 	public String getSubstance() {
-		if (substancename == null || substancename.getText().equals(""))
+		if (substancename == null || (substancename.getSelectedItem() + "").equals(""))
 			return "dummy substance";
 		else
-			return substancename.getText();
+			return substancename.getSelectedItem() + "";
 	}
 	
 	/*
@@ -75,6 +77,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * (de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface,
 	 * java.lang.Object[])
 	 */
+	@Override
 	public void setFormularData(TemplateLoaderInterface loader, Object[] formularData) {
 		// we will only transfer the form data to forms, which are loaded by the
 		// same type of loader(== data of same type)
@@ -88,6 +91,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * @see
 	 * de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface#getFile()
 	 */
+	@Override
 	public File getFile() {
 		return file;
 	}
@@ -98,6 +102,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	 * de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface#getFormData
 	 * ()
 	 */
+	@Override
 	public abstract Object[] getFormData();
 	
 	protected abstract void setFormData(Object[] formularData);
@@ -112,6 +117,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 		return parent.toString();
 	}
 	
+	@Override
 	public void setAnnotation(ExperimentDataAnnotation ed) {
 		//
 	}
