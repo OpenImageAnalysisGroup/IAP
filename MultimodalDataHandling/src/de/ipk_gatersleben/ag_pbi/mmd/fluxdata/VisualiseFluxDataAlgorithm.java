@@ -58,7 +58,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.circle.DotLayoutAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.svg_exporter.PngJpegAlgorithm;
-import de.ipk_gatersleben.ag_pbi.mmd.JComboBoxAutoCompleteAndSelectOnTab;
+import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTab;
 
 public class VisualiseFluxDataAlgorithm extends AbstractEditorAlgorithm {
 	private ConditionInterface selectedCondition;

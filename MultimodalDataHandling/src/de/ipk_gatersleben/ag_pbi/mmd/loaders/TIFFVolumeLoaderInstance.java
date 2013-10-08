@@ -12,9 +12,9 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd.loaders;
 
-import ij.io.FileInfo;
+import ij.io.FileInfoXYZ;
 import ij.io.ImageReader;
-import ij.io.TiffDecoder;
+import ij.io.TiffDecoderExtended;
 
 import java.io.EOFException;
 import java.io.File;
@@ -42,8 +42,8 @@ public class TIFFVolumeLoaderInstance extends VolumeLoaderInstance {
 	@Override
 	protected VolumeHeader getHeaderInformation() throws Exception {
 		
-		TiffDecoder dec = new TiffDecoder(file.getParent(), file.getName());
-		FileInfo[] infos = dec.getTiffInfo();
+		TiffDecoderExtended dec = new TiffDecoderExtended(file.getParent(), file.getName());
+		FileInfoXYZ[] infos = dec.getTiffInfo();
 		
 		VolumeHeader hdr = new VolumeHeader();
 		hdr.voxelnbrx = infos[0].width;
@@ -83,8 +83,8 @@ public class TIFFVolumeLoaderInstance extends VolumeLoaderInstance {
 			VolumeData vd = ((VolumeData) list.get(0));
 			
 			// taken from ImageJ v1.44
-			TiffDecoder dec = new TiffDecoder(vd.getURL().getInputStream(), vd.getURL().getFileName());
-			FileInfo[] infos = dec.getTiffInfo();
+			TiffDecoderExtended dec = new TiffDecoderExtended(vd.getURL().getInputStream(), vd.getURL().getFileName());
+			FileInfoXYZ[] infos = dec.getTiffInfo();
 			
 			int bpp = infos[0].getBytesPerPixel();
 			

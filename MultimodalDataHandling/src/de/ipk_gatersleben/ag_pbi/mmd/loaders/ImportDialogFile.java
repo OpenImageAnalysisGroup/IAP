@@ -36,8 +36,8 @@ import org.graffiti.editor.MainFrame;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataAnnotation;
+import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.JComboBoxAutoCompleteAndSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })

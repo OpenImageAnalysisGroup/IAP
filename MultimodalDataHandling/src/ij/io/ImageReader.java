@@ -32,8 +32,8 @@ public class ImageReader {
 	private static final int CLEAR_CODE = 256;
 	private static final int EOI_CODE = 257;
 	
-	private FileInfo fi;
-	private int width, height;
+	private final FileInfoXYZ fi;
+	private final int width, height;
 	private long skipCount;
 	private int bytesPerPixel, bufferSize, byteCount, nPixels;
 	private int eofErrorCount;
@@ -45,7 +45,7 @@ public class ImageReader {
 	 * 
 	 * @see ij.io.FileInfo
 	 */
-	public ImageReader(FileInfo fi) {
+	public ImageReader(FileInfoXYZ fi) {
 		this.fi = fi;
 		width = fi.width;
 		height = fi.height;

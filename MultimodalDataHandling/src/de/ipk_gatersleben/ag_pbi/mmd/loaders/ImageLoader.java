@@ -39,7 +39,8 @@ public class ImageLoader extends TemplateLoaderMMD {
 		List<ExperimentDataProcessor> myAnnotationFromFileProviders = new ArrayList<ExperimentDataProcessor>();
 		if (annotationProvider != null)
 			myAnnotationFromFileProviders.add(annotationProvider);
-		Collection<ExperimentInterface> c = did.getExperimentMetadataFromUserByDialog(files, this, myAnnotationFromFileProviders);
+		Collection<ExperimentInterface> c = did.getExperimentMetadataFromUserByDialog(files, this,
+				myAnnotationFromFileProviders.isEmpty() ? null : myAnnotationFromFileProviders);
 		if (c == null)
 			return new ArrayList<ExperimentInterface>();
 		else
@@ -65,9 +66,9 @@ public class ImageLoader extends TemplateLoaderMMD {
 		if (f.getAbsolutePath().toLowerCase().endsWith(".dcm"))
 			return new DICOMImageLoaderInstance(f, this);
 		else
-			if (f.getAbsolutePath().toLowerCase().endsWith(".tif") || f.getAbsolutePath().toLowerCase().endsWith(".tiff"))
-				return new TIFFImageLoaderInstance(f, this);
-			else
-				return new ImageLoaderInstance(f, this);
+			// if (f.getAbsolutePath().toLowerCase().endsWith(".tif") || f.getAbsolutePath().toLowerCase().endsWith(".tiff"))
+			// return new TIFFImageLoaderInstance(f, this);
+			// else
+			return new ImageLoaderInstance(f, this);
 	}
 }
