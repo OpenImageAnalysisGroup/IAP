@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
+import ij.io.Opener;
 import ij.process.ColorProcessor;
 
 import java.awt.Color;
@@ -71,7 +72,10 @@ public class Image {
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			try {
-				img = ImageIO.read(is);
+				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
+					img = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
+				} else
+					img = ImageIO.read(is);
 			} finally {
 				is.close();
 			}

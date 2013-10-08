@@ -169,35 +169,37 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			}
 		});
 		final File parentFolder = fileList.iterator().next().getParentFile();
-		final HashMap<String, Condition> metaInfo = scanForMetadata(parentFolder);
 		AnnotationFromGraphFileNameProvider provider = null;
-		if (metaInfo != null)
-			provider = new AnnotationFromGraphFileNameProvider(null, null) {
-				
-				@Override
-				public HashMap<File, ExperimentDataAnnotation> getAnnotations(Collection<File> files) {
+		provider = new AnnotationFromGraphFileNameProvider(null, null) {
+			
+			@Override
+			public HashMap<File, ExperimentDataAnnotation> getAnnotations(Collection<File> files) {
+				HashMap<String, Condition> metaInfo;
+				HashMap<File, ExperimentDataAnnotation> anno = new HashMap<File, ExperimentDataAnnotation>();
+				try {
+					metaInfo = scanForMetadata(parentFolder);
+					HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
 					GregorianCalendar first = null;
 					GregorianCalendar last = null;
-					HashMap<File, ExperimentDataAnnotation> anno = new HashMap<File, ExperimentDataAnnotation>();
 					for (File f : files) {
-						Condition c = metaInfo.get(f.getName());
+						Condition c = metaInfo != null ? metaInfo.get(f.getName()) : null;
 						if (c == null) {
 							c = new Condition(null);
 							c.setGenotype(f.getName());
 						}
 						ExperimentDataAnnotation eda = new ExperimentDataAnnotation();
-						eda.setExpname(hs(parentFolder.getName()));
 						
+						anno.put(f, eda);
+						eda.setExpname(hs(parentFolder.getName()));
 						eda.setCondspecies(hs(c.getSpecies()));
 						eda.setCondgenotype(hs(c.getGenotype()));
 						eda.setCondtreatment(hs(c.getTreatment()));
 						eda.setCondvariety(hs(c.getVariety()));
-						
 						eda.setReplicateIDs(hi(c.getConditionId()));
-						
 						long creationTime = f.lastModified();
 						GregorianCalendar gc = new GregorianCalendar();
 						gc.setTimeInMillis(creationTime);
+						eda2day.put(eda, gc);
 						if (first == null)
 							first = gc;
 						if (last == null)
@@ -207,7 +209,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						if (gc.before(first))
 							first = gc;
 					}
-					HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
 					final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 					int fD = first.get(GregorianCalendar.DAY_OF_MONTH);
 					int fM = first.get(GregorianCalendar.MONTH);
@@ -219,7 +220,17 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 					for (ExperimentDataAnnotation eda : anno.values()) {
 						if (last == null || first == null || !eda2day.containsKey(eda))
 							continue;
+						LinkedHashSet<String> substances = new LinkedHashSet<String>();
+						substances.add("vis.top");
+						substances.add("vis.side");
+						substances.add("fluo.top");
+						substances.add("fluo.side");
+						substances.add("nir.top");
+						substances.add("nir.side");
+						substances.add("ir.top");
+						substances.add("ir.side");
 						
+						eda.setSubstances(substances);
 						eda.setExpname(hs(parentFolder.getName()));
 						eda.setExpcoord(hs(SystemAnalysis.getUserName()));
 						try {
@@ -240,29 +251,33 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						eda.setSamptimeunit(hs("day"));
 						
 					}
-					return anno;
+				} catch (IOException e1) {
+					ErrorMsg.addErrorMessage(e1);
 				}
 				
-				private LinkedHashSet<String> hs(String string) {
-					LinkedHashSet<String> res = new LinkedHashSet<String>();
-					res.add(string);
+				return anno;
+			}
+			
+			private LinkedHashSet<String> hs(String string) {
+				LinkedHashSet<String> res = new LinkedHashSet<String>();
+				res.add(string);
+				return res;
+			}
+			
+			private LinkedHashSet<Integer> hi(Integer i) {
+				LinkedHashSet<Integer> res = new LinkedHashSet<Integer>();
+				res.add(i);
+				return res;
+			}
+			
+			private String nn(int n) {
+				String res = n + "";
+				if (res.length() < 2)
+					return "0" + res;
+				else
 					return res;
-				}
-				
-				private LinkedHashSet<Integer> hi(Integer i) {
-					LinkedHashSet<Integer> res = new LinkedHashSet<Integer>();
-					res.add(i);
-					return res;
-				}
-				
-				private String nn(int n) {
-					String res = n + "";
-					if (res.length() < 2)
-						return "0" + res;
-					else
-						return res;
-				}
-			};
+			}
+		};
 		processData(resultProcessor, il, fileList, provider);
 	}
 	
