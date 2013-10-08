@@ -277,6 +277,10 @@ public class IAPmain extends JApplet {
 		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos())
 			ResourceIOManager.registerIOHandler(m.getHandler());
+		
+		// IIORegistry registry = IIORegistry.getDefaultInstance();
+		// registry.registerServiceProvider(new com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi());
+		// registry.registerServiceProvider(new com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi());
 	}
 	
 	public void myAppletLoad(

@@ -39,8 +39,8 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -110,7 +110,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 							"Show database statistics", m, new BasicDBObject("dbstats", 1), "Database Statistics"), src.getGUIsetting()));
 				}
 				
-				if (SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", false)) {
+				if (SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon (for Grid Storage)", false)) {
 					SaveExperimentInCloud saveInCloudAction = new SaveExperimentInCloud(true);
 					saveInCloudAction.setMongoDB(m);
 					NavigationButton uploadFilesEntity = new NavigationButton(saveInCloudAction, "Load Files", "img/ext/user-desktop.png",

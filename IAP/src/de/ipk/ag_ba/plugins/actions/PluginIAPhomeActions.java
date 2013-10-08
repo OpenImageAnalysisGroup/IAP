@@ -27,7 +27,7 @@ public class PluginIAPhomeActions extends AbstractIAPplugin {
 	public NavigationAction[] getHomeNavigationActions() {
 		ArrayList<NavigationAction> result = new ArrayList<NavigationAction>();
 		
-		boolean addLoadFilesIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", false);
+		boolean addLoadFilesIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", true);
 		boolean addLoadExportedIcons = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
 		boolean showLoadLocalOrRemote = SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true);
 		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);

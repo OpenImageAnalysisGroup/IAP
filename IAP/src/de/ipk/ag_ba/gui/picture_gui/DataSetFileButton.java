@@ -4,7 +4,7 @@ import iap.pipelines.ImageProcessorOptions;
 import ij.ImagePlus;
 import ij.io.FileInfoXYZ;
 import ij.io.Opener;
-import ij.io.TiffDecoder;
+import ij.io.TiffDecoderExtended;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.HomeFolder;
+import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -311,7 +312,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 					
 					jp.add(debugPipelineTestShowMainImage);
-					jp.add(debugPipelineTestShowReferenceImage);
+					if (imageResult.getBinaryFileInfo().getFileNameLabel() != null)
+						jp.add(debugPipelineTestShowReferenceImage);
 					jp.add(debugPipelineTestShowImage);
 					
 					JMenu sn = new JMenu("Show Complete Snapshot Set");
@@ -338,16 +340,25 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
 						try {
-							PipelineDesc pd = new PipelineDesc(null, targetTreeNode.getExperiment().getIniIoProvider(), null, null);
-							UserDefinedImageAnalysisPipelineTask iat =
-									new UserDefinedImageAnalysisPipelineTask(pd);
-							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-							jp.add(debugPipelineTest0a);
-							jp.add(debugPipelineTest00a);
+							IniIoProvider iop = targetTreeNode.getExperiment().getIniIoProvider();
+							if (iop != null) {
+								PipelineDesc pd = new PipelineDesc(null, iop, null, null);
+								UserDefinedImageAnalysisPipelineTask iat =
+										new UserDefinedImageAnalysisPipelineTask(pd);
+								if (iop != null) {
+									JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+									JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+									jp.add(debugPipelineTest0a);
+									jp.add(debugPipelineTest00a);
+								}
+							}
 						} catch (Exception err) {
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">ERROR: Could not analyze assigned pipeline info. Debug menu item is not added to menu list. Error: " + err.getMessage());
+							if (err.getCause() != null && err.getCause() instanceof NullPointerException)
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">INFO: No analysis pipeline assigned. Debug menu items are not added to menu list.");
+							else
+								System.out.println(SystemAnalysis.getCurrentTime()
+										+ ">ERROR: Could not analyze assigned pipeline info. Debug menu items are not added to menu list. Error: " + err.getMessage());
 						}
 					}
 					
@@ -791,7 +802,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 				if (fi == null || fi.getWidth() == 0) {
 					try {
-						TiffDecoder tid = new TiffDecoder(
+						TiffDecoderExtended tid = new TiffDecoderExtended(
 								myImage.fileURLlabel.getInputStream(),
 								myImage.fileURLlabel.getFileName());
 						FileInfoXYZ[] info = tid.getTiffInfo();

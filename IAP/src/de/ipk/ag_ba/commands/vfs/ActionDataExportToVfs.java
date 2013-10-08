@@ -46,6 +46,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.vanted.plugin.VfsFileObject;
@@ -735,6 +736,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return files;
 	}
 	
+	@SuppressWarnings("resource")
 	private void copyBinaryFileContentToTarget(
 			final ExperimentInterface experiment,
 			final ThreadSafeOptions written,
@@ -763,7 +765,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						String targetFileExtension = IAPservice.getTargetFileExtension(isIconStorage, sourceFileExtension);
 						if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
 							// convert from PNG to JPG, if needed
-							BufferedImage img = ImageIO.read(in);
+							BufferedImage img = new Image(url).getAsBufferedImage();
 							MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
 							ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
 							in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());
