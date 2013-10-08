@@ -91,6 +91,8 @@ public class OpenFileDialogService implements HelperClass {
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
+		openDialog.setMultiSelectionEnabled(true);
+		openDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		openDialog.resetChoosableFileFilters();
 		openDialog.setMultiSelectionEnabled(false);
 		openDialog.setFileFilter(new FileFilter() {
