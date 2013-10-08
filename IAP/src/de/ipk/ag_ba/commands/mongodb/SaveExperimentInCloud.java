@@ -181,6 +181,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 					HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
 					GregorianCalendar first = null;
 					GregorianCalendar last = null;
+					int fileIDX = 0;
 					for (File f : files) {
 						Condition c = metaInfo != null ? metaInfo.get(f.getName()) : null;
 						if (c == null) {
@@ -196,7 +197,12 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						eda.setCondtreatment(hs(c.getTreatment()));
 						eda.setCondvariety(hs(c.getVariety()));
 						eda.setReplicateIDs(hi(c.getConditionId()));
+						LinkedHashSet<Integer> replIDs = new LinkedHashSet<Integer>();
+						fileIDX++;
+						replIDs.add(fileIDX);
+						eda.setReplicateIDs(replIDs);
 						long creationTime = f.lastModified();
+						// eda.setSampleFineTimepoint(creationTime);
 						GregorianCalendar gc = new GregorianCalendar();
 						gc.setTimeInMillis(creationTime);
 						eda2day.put(eda, gc);

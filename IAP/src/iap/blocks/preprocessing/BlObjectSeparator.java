@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import org.Vector2i;
+
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -43,6 +45,11 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			ClusterDetection cd = new ClusterDetection(mask, options.getBackground());
 			cd.detectClusters();
 			
+			boolean sortBySize = getBoolean("Sort By Size (off for sort by position)", false);
+			boolean sortByX = getBoolean("Left to Right (X)", true);
+			boolean sortByY = getBoolean("Top to Bottom (Y)", false);
+			
+			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
 			int[] clusterSize = cd.getClusterSize();
 			int[] clusteredPixels = cd.getImageClusterIdMask();
 			
@@ -60,23 +67,23 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			if (nValidClusters > maxN)
 				nValidClusters = maxN;
 			
-			ArrayList<Integer> sortedClusterSizes = new ArrayList<Integer>();
+			ArrayList<Integer> sortedClusterProperties = new ArrayList<Integer>();
 			for (Integer cs : clusterSize)
-				sortedClusterSizes.add(cs);
-			sortedClusterSizes.remove(0); // remove background ID (0)
-			Collections.sort(sortedClusterSizes);
-			while (sortedClusterSizes.size() > nValidClusters)
-				sortedClusterSizes.remove(0);
-			Collections.reverse(sortedClusterSizes);
+				sortedClusterProperties.add(cs);
+			sortedClusterProperties.remove(0); // remove background ID (0)
+			Collections.sort(sortedClusterProperties);
+			while (sortedClusterProperties.size() > nValidClusters)
+				sortedClusterProperties.remove(0);
+			Collections.reverse(sortedClusterProperties);
 			
 			ArrayList<Integer> orderOfIds = new ArrayList<Integer>(nValidClusters);
-			ArrayList<Integer> clusterIDs = new ArrayList<Integer>(clusterSize.length);
+			ArrayList<Integer> targetIdxList = new ArrayList<Integer>(clusterSize.length);
 			for (int id = 0; id < clusterSize.length; id++)
-				clusterIDs.add(id);
+				targetIdxList.add(id);
 			
-			for (Integer sortedSize : sortedClusterSizes) {
-				for (Integer clusterID : clusterIDs) {
-					if (clusterSize[clusterID] == sortedSize.intValue()) {
+			for (Integer sortedClusterProperty : sortedClusterProperties) {
+				for (Integer clusterID : targetIdxList) {
+					if (clusterSize[clusterID] == sortedClusterProperty.intValue()) {
 						orderOfIds.add(clusterID);
 					}
 				}
@@ -89,14 +96,19 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			int[] pixels = mask.getAs1A();
 			int[] result = new int[pixels.length];
 			int back = options.getBackground();
+			int filled = 0;
 			for (int i = 0; i < pixels.length; i++) {
 				int cluster = clusteredPixels[i];
-				if (cluster == validClusterID)
+				if (cluster == validClusterID) {
 					result[i] = pixels[i];
-				else
+					filled++;
+				} else
 					result[i] = back;
 			}
-			return new Image(mask.getWidth(), mask.getHeight(), result);
+			if (filled == 0)
+				return null;
+			else
+				return new Image(mask.getWidth(), mask.getHeight(), result);
 		}
 	}
 	
