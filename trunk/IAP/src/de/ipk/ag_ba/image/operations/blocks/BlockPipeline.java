@@ -95,7 +95,7 @@ public class BlockPipeline {
 		// and place the section in the middle of the image for further processing
 		int executionTrayCount = 1;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
-			if (blockClass != null && (blockClass.isAssignableFrom(WellProcessor.class))) {
+			if (blockClass != null && (WellProcessor.class.isAssignableFrom(blockClass))) {
 				WellProcessor inst = (WellProcessor) blockClass.newInstance();
 				int n = inst.getDefinedWellCount(options);
 				if (n > 0)
