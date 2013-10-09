@@ -29,6 +29,7 @@ public abstract class TemplateLoaderInstance implements TemplateLoaderInterface 
 	
 	protected File file;
 	protected JComboBoxAutoCompleteAndSelectOnTab substancename;
+	protected JComboBoxAutoCompleteAndSelectOnTab quality;
 	private final TemplateLoader parent;
 	
 	public TemplateLoaderInstance(File f, TemplateLoader parent) {
