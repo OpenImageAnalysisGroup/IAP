@@ -6,6 +6,7 @@ import iap.pipelines.ImageProcessorOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 
 import org.Vector2i;
@@ -32,9 +33,9 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 	protected void prepare() {
 		super.prepare();
 		maxN = getDefinedWellCount(options);
-		minimumSize = getDouble("Minimum Object Size (percent)", 5) / 100;
-		this.sortBySize = getBoolean("Sort By Size (off for sort by position)", true);
-		this.sortByX = getBoolean("Left to Right (X)", false);
+		minimumSize = getDouble("Minimum Object Size (percent)", 1) / 100;
+		this.sortBySize = getBoolean("Sort By Size (off for sort by position)", false);
+		this.sortByX = getBoolean("Left to Right (X)", true);
 		this.sortByY = getBoolean("Top to Bottom (Y)", false);
 		
 	}
@@ -55,7 +56,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
 			int[] clusterSize = cd.getClusterSize();
 			
-			int[] sortCriteria;
+			final int[] sortCriteria;
 			if (sortBySize) {
 				sortCriteria = clusterSize;
 			} else {
@@ -78,7 +79,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			int minimumPixelCount = (int) (clusteredPixels.length * minimumSize);
 			int nValidClusters = 0;
 			boolean first = true;
-			for (int cs : sortCriteria) {
+			for (int cs : clusterSize) {
 				if (first) {
 					first = false;
 					continue;
@@ -90,7 +91,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 				nValidClusters = maxN;
 			
 			ArrayList<Integer> sortedClusterProperties = new ArrayList<Integer>();
-			for (Integer cs : sortCriteria)
+			for (Integer cs : clusterSize)
 				sortedClusterProperties.add(cs);
 			sortedClusterProperties.remove(0); // remove background ID (0)
 			Collections.sort(sortedClusterProperties);
@@ -100,16 +101,26 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			
 			ArrayList<Integer> orderOfIds = new ArrayList<Integer>(nValidClusters);
 			ArrayList<Integer> targetIdxList = new ArrayList<Integer>(sortCriteria.length);
-			for (int id = 0; id < sortCriteria.length; id++)
+			for (int id = 0; id < clusterSize.length; id++)
 				targetIdxList.add(id);
 			
 			for (Integer sortedClusterProperty : sortedClusterProperties) {
 				for (Integer clusterID : targetIdxList) {
-					if (sortCriteria[clusterID] == sortedClusterProperty.intValue()) {
+					if (clusterSize[clusterID] == sortedClusterProperty.intValue()) {
 						orderOfIds.add(clusterID);
 					}
 				}
 			}
+			
+			if (!sortBySize)
+				Collections.sort(orderOfIds, new Comparator<Integer>() {
+					@Override
+					public int compare(Integer o1, Integer o2) {
+						Integer s1 = sortCriteria[o1];
+						Integer s2 = sortCriteria[o2];
+						return s1.compareTo(s2);
+					}
+				});
 			
 			int wellIdx = options.getWellIdx();
 			int validClusterID = -1;

@@ -1,6 +1,8 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.pipelines.ImageProcessorOptions;
+import de.ipk.ag_ba.gui.PipelineDesc;
 
 /**
  * @author Christian Klukas
@@ -18,11 +20,15 @@ public interface AnalysisPipelineTemplate {
 	public String getDescription();
 	
 	/**
+	 * @param options
+	 *           The template may initialize the settings, if needed.
 	 * @return The ordered list of analysis blocks.
 	 */
-	public ImageAnalysisBlock[] getBlockList();
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options);
 	
 	public boolean analyzeTopImages();
 	
 	public boolean analyzeSideImages();
+	
+	public PipelineDesc getDefaultPipelineDesc();
 }

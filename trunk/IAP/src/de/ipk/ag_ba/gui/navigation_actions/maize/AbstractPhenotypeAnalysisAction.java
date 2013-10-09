@@ -19,8 +19,8 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -162,11 +162,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			task = null;
 			
-			if (statisticsResult == null) {
+			if (statisticsResult == null || statisticsResult.getNumberOfMeasurementValues() <= 0) {
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
 				this.experimentResult = null;
 				if (getResultReceiver() == null)
-					mpc = new MainPanelComponent("Stop requested, processing aborted, output set to NULL.");
+					mpc = new MainPanelComponent("No analysis results or analysis stop requested.");
 				else {
 					getResultReceiver().setExperimenData(null);
 					getResultReceiver().run();

@@ -26,7 +26,8 @@ import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
 import iap.blocks.segmentation.BlUseFluoMaskToClearVis;
-import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
+import iap.pipelines.ImageProcessorOptions;
+import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 
 /**
  * A workflow for analyzing Arabidopsis plants. Top-Images may be split into several peaces,
@@ -35,7 +36,7 @@ import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
  * 
  * @author Christian Klukas
  */
-public class ArabidopsisPipeline implements AnalysisPipelineTemplate {
+public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
@@ -48,7 +49,7 @@ public class ArabidopsisPipeline implements AnalysisPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList() {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
 		return new ImageAnalysisBlock[] {
 				new BlLoadImagesIfNeeded(),
 				new BlColorBalanceVerticalFluo(),

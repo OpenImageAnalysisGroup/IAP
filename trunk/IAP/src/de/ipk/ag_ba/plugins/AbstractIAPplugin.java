@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.plugins;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.pipelines.ImageProcessorOptions;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -8,6 +9,7 @@ import java.util.TreeSet;
 import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
+import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.GenericPluginAdapter;
 
@@ -40,7 +42,9 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 		else {
 			TreeSet<ImageAnalysisBlock> res = new TreeSet<ImageAnalysisBlock>();
 			for (AnalysisPipelineTemplate t : getAnalysisTemplates()) {
-				ImageAnalysisBlock[] bl = t.getBlockList();
+				SystemOptions options = null;
+				ImageProcessorOptions ipo = new ImageProcessorOptions(options, null);
+				ImageAnalysisBlock[] bl = t.getBlockList(ipo);
 				if (bl != null)
 					for (ImageAnalysisBlock b : bl) {
 						if (b != null)

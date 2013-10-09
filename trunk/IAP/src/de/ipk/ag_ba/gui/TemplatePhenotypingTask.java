@@ -35,7 +35,7 @@ public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 			@Override
 			public BlockPipeline getPipeline(ImageProcessorOptions options) {
 				ArrayList<String> defaultBlockList = new ArrayList<String>();
-				for (ImageAnalysisBlock b : template.getBlockList())
+				for (ImageAnalysisBlock b : template.getBlockList(options))
 					defaultBlockList.add(b.getClass().getCanonicalName());
 				
 				return getPipelineFromBlockList(options.getOptSystemOptions(), defaultBlockList.toArray(new String[] {}));

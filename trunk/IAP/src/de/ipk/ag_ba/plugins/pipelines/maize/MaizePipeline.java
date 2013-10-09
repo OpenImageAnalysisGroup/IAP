@@ -33,7 +33,8 @@ import iap.blocks.segmentation.BlClosingForMaizeBloom;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
-import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
+import iap.pipelines.ImageProcessorOptions;
+import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 
 /**
  * Analysis workflow for analyzing maize plant images.
@@ -41,11 +42,11 @@ import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
  * 
  * @author Christian Klukas
  */
-public class MaizePipeline implements AnalysisPipelineTemplate {
+public class MaizePipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
-		return "Maize Pipeline";
+		return "Maize Analysis";
 	}
 	
 	@Override
@@ -54,7 +55,7 @@ public class MaizePipeline implements AnalysisPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList() {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
 		return new ImageAnalysisBlock[] {
 				// acquisition
 				new BlLoadImages(),

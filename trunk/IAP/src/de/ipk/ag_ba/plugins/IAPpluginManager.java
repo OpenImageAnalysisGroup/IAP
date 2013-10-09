@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.ErrorMsg;
-import org.StringManipulationTools;
 import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 
@@ -142,11 +141,7 @@ public class IAPpluginManager {
 	
 	public void writePipelineInis() throws Exception {
 		for (final AnalysisPipelineTemplate template : getAnalysisTemplates()) {
-			PipelineDesc pd = new PipelineDesc(
-					StringManipulationTools.getFileSystemName(template.getTitle()) + ".pipeline.ini",
-					null,
-					template.getTitle(),
-					template.getDescription());
+			PipelineDesc pd = template.getDefaultPipelineDesc();
 			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
 			pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions(), null));
 		}
