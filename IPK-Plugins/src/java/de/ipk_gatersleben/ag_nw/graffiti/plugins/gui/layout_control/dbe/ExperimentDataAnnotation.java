@@ -21,6 +21,7 @@ public class ExperimentDataAnnotation {
 	private LinkedHashSet<String> sampcomp;
 	private LinkedHashSet<String> sampmeas;
 	private LinkedHashSet<Integer> replIDs;
+	private LinkedHashSet<String> qualityIDs;
 	private LinkedHashSet<String> substances;
 	private LinkedHashSet<Double> positions;
 	private LinkedHashSet<String> positionUnits;
@@ -42,6 +43,7 @@ public class ExperimentDataAnnotation {
 		sampcomp = new LinkedHashSet<String>();
 		sampmeas = new LinkedHashSet<String>();
 		replIDs = new LinkedHashSet<Integer>();
+		qualityIDs = new LinkedHashSet<String>();
 		substances = new LinkedHashSet<String>();
 		positions = new LinkedHashSet<Double>();
 		positionUnits = new LinkedHashSet<String>();
@@ -64,6 +66,7 @@ public class ExperimentDataAnnotation {
 			sampcomp.addAll(annotations.getSampcomp());
 			sampmeas.addAll(annotations.getSampmeas());
 			replIDs.addAll(annotations.getReplicateIDs());
+			qualityIDs.addAll(annotations.getQualityIDs());
 			substances.addAll(annotations.getSubstances());
 			positions.addAll(annotations.getPositions());
 			positionUnits.addAll(annotations.getPositionUnits());
@@ -182,6 +185,14 @@ public class ExperimentDataAnnotation {
 		return replIDs;
 	}
 	
+	public void setQualityIDs(LinkedHashSet<String> qualityIDs) {
+		this.qualityIDs = qualityIDs;
+	}
+	
+	public LinkedHashSet<String> getQualityIDs() {
+		return qualityIDs;
+	}
+	
 	public void setSubstances(LinkedHashSet<String> substances) {
 		this.substances = substances;
 	}
@@ -230,6 +241,7 @@ public class ExperimentDataAnnotation {
 		ea.sampcomp = null;
 		ea.sampmeas = null;
 		ea.replIDs = null;
+		ea.qualityIDs = null;
 		ea.substances = null;
 		ea.positions = null;
 		ea.positionUnits = null;
