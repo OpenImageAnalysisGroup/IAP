@@ -575,6 +575,8 @@ public class StringManipulationTools implements HelperClass {
 	}
 	
 	public static String UnicodeToURLsyntax(String unicodeText) {
+		if (unicodeText == null)
+			return null;
 		StringBuffer result = new StringBuffer();
 		char[] characters = unicodeText.toCharArray();
 		for (int i = 0; i < characters.length; i++) {
