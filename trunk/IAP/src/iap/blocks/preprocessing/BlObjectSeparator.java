@@ -24,12 +24,19 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 	int maxN;
 	double minimumSize;
+	private boolean sortBySize;
+	private boolean sortByX;
+	private boolean sortByY;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		maxN = getDefinedWellCount(options);
 		minimumSize = getDouble("Minimum Object Size (percent)", 5) / 100;
+		this.sortBySize = getBoolean("Sort By Size (off for sort by position)", true);
+		this.sortByX = getBoolean("Left to Right (X)", false);
+		this.sortByY = getBoolean("Top to Bottom (Y)", false);
+		
 	}
 	
 	@Override
@@ -45,18 +52,33 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			ClusterDetection cd = new ClusterDetection(mask, options.getBackground());
 			cd.detectClusters();
 			
-			boolean sortBySize = getBoolean("Sort By Size (off for sort by position)", false);
-			boolean sortByX = getBoolean("Left to Right (X)", true);
-			boolean sortByY = getBoolean("Top to Bottom (Y)", false);
-			
 			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
 			int[] clusterSize = cd.getClusterSize();
+			
+			int[] sortCriteria;
+			if (sortBySize) {
+				sortCriteria = clusterSize;
+			} else {
+				sortCriteria = new int[clusterPositions.length];
+				int idx = 0;
+				for (Vector2i p : clusterPositions) {
+					if (sortByX && sortByY) {
+						sortCriteria[idx++] = p.x + p.y;
+					} else
+						if (sortByX) {
+							sortCriteria[idx++] = p.x;
+						} else {
+							sortCriteria[idx++] = p.y;
+						}
+				}
+			}
+			
 			int[] clusteredPixels = cd.getImageClusterIdMask();
 			
 			int minimumPixelCount = (int) (clusteredPixels.length * minimumSize);
 			int nValidClusters = 0;
 			boolean first = true;
-			for (int cs : clusterSize) {
+			for (int cs : sortCriteria) {
 				if (first) {
 					first = false;
 					continue;
@@ -68,7 +90,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 				nValidClusters = maxN;
 			
 			ArrayList<Integer> sortedClusterProperties = new ArrayList<Integer>();
-			for (Integer cs : clusterSize)
+			for (Integer cs : sortCriteria)
 				sortedClusterProperties.add(cs);
 			sortedClusterProperties.remove(0); // remove background ID (0)
 			Collections.sort(sortedClusterProperties);
@@ -77,13 +99,13 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			Collections.reverse(sortedClusterProperties);
 			
 			ArrayList<Integer> orderOfIds = new ArrayList<Integer>(nValidClusters);
-			ArrayList<Integer> targetIdxList = new ArrayList<Integer>(clusterSize.length);
-			for (int id = 0; id < clusterSize.length; id++)
+			ArrayList<Integer> targetIdxList = new ArrayList<Integer>(sortCriteria.length);
+			for (int id = 0; id < sortCriteria.length; id++)
 				targetIdxList.add(id);
 			
 			for (Integer sortedClusterProperty : sortedClusterProperties) {
 				for (Integer clusterID : targetIdxList) {
-					if (clusterSize[clusterID] == sortedClusterProperty.intValue()) {
+					if (sortCriteria[clusterID] == sortedClusterProperty.intValue()) {
 						orderOfIds.add(clusterID);
 					}
 				}
