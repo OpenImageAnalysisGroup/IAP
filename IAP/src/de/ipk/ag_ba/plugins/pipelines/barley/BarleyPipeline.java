@@ -33,6 +33,8 @@ import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.blocks.segmentation.BlockClearNirPotFromNir;
+import iap.pipelines.ImageProcessorOptions;
+import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -41,7 +43,7 @@ import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
  * 
  * @author Christian Klukas
  */
-public class BarleyPipeline implements AnalysisPipelineTemplate {
+public class BarleyPipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
@@ -54,7 +56,7 @@ public class BarleyPipeline implements AnalysisPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList() {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
 		return new ImageAnalysisBlock[] {
 				// acquisition
 				new BlLoadImages(),

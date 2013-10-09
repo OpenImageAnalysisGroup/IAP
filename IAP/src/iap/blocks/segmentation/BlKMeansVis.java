@@ -49,13 +49,13 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 					new Color(41, 37, 42), // dark foil
 					new Color(50, 50, 50) // pot / soil / foil color
 			};
-			int n = getInt("Color Classes", initColor.length);
+			
+			int n = getInt(getSettingsNameForSeedColorCount(), initColor.length);
 			for (int i = 0; i < n; i++) {
-				int idx = i + 1;
-				Color col = getColor("Seed Color " + idx, idx < initColor.length ? initColor[i] : Color.BLACK);
+				Color col = getColor(getSettingsNameForSeedColor(i), (i + 1) < initColor.length ? initColor[i] : Color.BLACK);
+				boolean foreground = getBoolean(getSettingsNameForForeground(i), (i + 1) < 5);
 				seedColors.add(col);
 				seedPositions.add(new Vector2f(0.5f, 0.5f));
-				boolean foreground = getBoolean("Foreground " + idx, idx < 5);
 				clusterColors.add(foreground ? col : Color.WHITE);
 			}
 			
@@ -75,6 +75,18 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			res = inp.io().applyMask(res).getImage();
 		}
 		return res;
+	}
+	
+	public String getSettingsNameForSeedColor(int i) {
+		return "Seed Color " + (i + 1);
+	}
+	
+	public String getSettingsNameForForeground(int i) {
+		return "Foreground " + (i + 1);
+	}
+	
+	public String getSettingsNameForSeedColorCount() {
+		return "Color Classes";
 	}
 	
 	private Image kMeans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon) {

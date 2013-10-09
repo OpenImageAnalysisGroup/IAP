@@ -46,7 +46,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 		
 		debug = getBoolean("debug", false);
 		debugRegionParts = getBoolean("Debug-Show-Region-Images", false);
-		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", true);
+		calculateValuesAlsoForDifferentRegions = getBoolean("Calculate_Values_For_Different_Regions", false);
 		addHistogramValues = getBoolean("Add_Histogram_Values", false);
 		addHistogramValuesForSections = getBoolean("Histogram for Regions", false);
 		

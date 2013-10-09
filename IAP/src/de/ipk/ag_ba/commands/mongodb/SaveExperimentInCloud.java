@@ -197,6 +197,10 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 						eda.setCondtreatment(hs(c.getTreatment()));
 						eda.setCondvariety(hs(c.getVariety()));
 						eda.setReplicateIDs(hi(c.getConditionId()));
+						String fn = f.getName();
+						if (fn.contains("."))
+							fn = fn.substring(0, fn.lastIndexOf("."));
+						eda.setQualityIDs(hs(fn));
 						LinkedHashSet<Integer> replIDs = new LinkedHashSet<Integer>();
 						fileIDX++;
 						replIDs.add(fileIDX);

@@ -9,7 +9,8 @@ import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRootsAddBorderAroundImage;
 import iap.blocks.segmentation.BlRootsRemoveBoxAndNoise;
 import iap.blocks.segmentation.BlRootsSharpenImage;
-import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
+import iap.pipelines.ImageProcessorOptions;
+import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 
 /**
  * A template for analyzing washed barley roots, scanned using a scanner.
@@ -17,7 +18,7 @@ import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
  * 
  * @author Christian Klukas
  */
-public class RootScannPipeline implements AnalysisPipelineTemplate {
+public class RootScannPipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
@@ -30,7 +31,7 @@ public class RootScannPipeline implements AnalysisPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList() {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
 		return new ImageAnalysisBlock[] {
 				new BlLoadImagesIfNeeded(),
 				new BlRootsAddBorderAroundImage(),
