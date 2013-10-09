@@ -57,6 +57,8 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 			substancename.setSelectedItem(ed.getSubstances().iterator().next());
 		if (ed.getReplicateIDs() != null && ed.getReplicateIDs().size() > 0)
 			replicate.setValue(ed.getReplicateIDs().iterator().next());
+		if (ed.getQualityIDs() != null && ed.getQualityIDs().size() > 0)
+			quality.setSelectedItem(ed.getQualityIDs().iterator().next());
 		if (ed.getPositions() != null && ed.getPositions().size() > 0)
 			position.setValue(ed.getPositions().iterator().next());
 		if (ed.getPositionUnits() != null && ed.getPositions().size() > 0)
@@ -71,6 +73,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 		if (labelfield.canRead())
 			id.setLabelURL(FileSystemHandler.getURL(labelfield));
 		id.setReplicateID(getReplicate());
+		id.setQualityAnnotation(getQuality());
 		id.setUnit(getUnit());
 		id.setPosition(getPosition());
 		id.setPositionUnit(getPositionUnit());
@@ -98,6 +101,10 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 		replicate = new JSpinnerSelectOnTab(new SpinnerNumberModel(filenumber, 0, 100000, 1));
 		pan.add(TableLayout.getSplit(new JLabel("Replicate ID"), replicate, ImportDialogFile.LEFTSIZE,
 				ImportDialogFile.RIGHTSIZE));
+		quality = new JComboBoxAutoCompleteAndSelectOnTab();
+		quality.setEditable(true);
+		pan.add(TableLayout.getSplit(new JLabel("Object ID"), quality, ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
+		
 		unit = new JTextField();
 		pan.add(TableLayout.getSplit(new JLabel("Unit*"), unit, ImportDialogFile.LEFTSIZE, ImportDialogFile.RIGHTSIZE));
 		position = new JSpinnerSelectOnTab(new SpinnerNumberModel(0d, 0d, 100000d, 0.01d));
@@ -120,6 +127,10 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	
 	public int getReplicate() {
 		return (Integer) replicate.getValue();
+	}
+	
+	public String getQuality() {
+		return (String) quality.getSelectedItem();
 	}
 	
 	public String getUnit() {
@@ -148,6 +159,10 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	
 	public void setReplicate(int val) {
 		replicate.setValue(val);
+	}
+	
+	public void setQuality(String val) {
+		quality.setSelectedItem(val);
 	}
 	
 	public void setSubstance(String val) {
@@ -181,7 +196,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 	@Override
 	public Object[] getFormData() {
 		return new Object[] { getSubstance(), getUnit(), getPositionUnit(), getPixelsizeX(), getPixelsizeY(),
-				getImageThickness() };
+				getImageThickness(), getQuality() };
 	}
 	
 	@Override
@@ -193,6 +208,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 		setPixelsizeX((Double) formularData[idx++]);
 		setPixelsizeY((Double) formularData[idx++]);
 		setImageThickness((Double) formularData[idx++]);
+		setQuality((String) formularData[idx++]);
 	}
 	
 	public void setPreventBinaryFileCopy(boolean preventBinaryFileCopy) {
