@@ -23,11 +23,16 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
+	private Color targetBackgroundColor;
+	private int percent;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
+		
+		targetBackgroundColor = getColor("Calibration Target Background Color", Color.WHITE);
+		percent = getInt("Size of Scan-Result (Percent)", 10);
 	}
 	
 	@Override
@@ -42,8 +47,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true,
-					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
+			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true);
 		} else {
 			boolean adjustLeftRight = getBoolean("Adjust Left and Right Separately", false);
 			boolean adjustAuto = getBoolean("Automatic Adjustment Left and Right", false);
@@ -51,12 +55,10 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 			if (adjustLeftRight || adjustAuto) {
 				if (adjustAuto) {
 					double[] pixLeft, pixRight;
-					pixRight = getProbablyWhitePixels(vis.io().mirrorLeftToRight().getImage().show("left part", debug),
-							!getBoolean("Adjust to Center Brightness", true),
-							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
-					pixLeft = getProbablyWhitePixels(vis.io().flipHor().mirrorLeftToRight().getImage().show("right part", debug),
-							!getBoolean("Adjust to Center Brightness", true),
-							getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 10));
+					pixRight = getPixelsSimilarToReferenceColor(vis.io().mirrorLeftToRight().getImage().show("left part", debug),
+							!getBoolean("Adjust to Center Brightness", true));
+					pixLeft = getPixelsSimilarToReferenceColor(vis.io().flipHor().mirrorLeftToRight().getImage().show("right part", debug),
+							!getBoolean("Adjust to Center Brightness", true));
 					return io.imageBalancing(255, pixLeft, pixRight).getImage().show("after", false);
 				} else {
 					io = io.adjustPixelValues(new PixelProcessor() {
@@ -79,8 +81,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 					});
 				}
 			}
-			pix = getProbablyWhitePixels(vis, !getBoolean("Adjust to Center Brightness", true),
-					getInt("vis-balance-l-threshold", -10), getInt("vis-top-balance-ab-threshold", 10));
+			pix = getPixelsSimilarToReferenceColor(vis, !getBoolean("Adjust to Center Brightness", true));
 		}
 		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
@@ -95,11 +96,10 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (options.getCameraPosition() == CameraPosition.SIDE)
-			pix = getProbablyWhitePixels(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), !getBoolean("Adjust to Center Brightness", true),
-					getInt("vis-balance-l-threshold", -10), getInt("vis-balance-ab-threshold", 50));
+			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(),
+					!getBoolean("Adjust to Center Brightness", true));
 		else
-			pix = getProbablyWhitePixels(vis, !getBoolean("Adjust to Center Brightness", true), getInt("vis-balance-l-threshold", -10),
-					getInt("vis-balance-ab-threshold", 10));
+			pix = getPixelsSimilarToReferenceColor(vis, !getBoolean("Adjust to Center Brightness", true));
 		return io.imageBalancing(255, pix).getImage().show("after", false);
 	}
 	
@@ -108,7 +108,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 	 * 
 	 * @author pape
 	 */
-	private double[] getProbablyWhitePixels(Image image, boolean verticalGradientSideView, int lThres, int abThres) {
+	private double[] getPixelsSimilarToReferenceColor(Image image, boolean verticalGradientSideView) {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
@@ -126,7 +126,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 				int scanHeight = (right - left) / 4;
 				int scanWidth = right - left;
 				
-				values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true, debug);
+				values = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, height / 2 - scanHeight / 2, scanWidth, scanHeight, percent, debug);
 			} else {
 				int left = (int) (0.3 * width);
 				int right = (int) (width - 0.3 * width);
@@ -142,8 +142,9 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 				}
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesTop = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, startHTop, scanWidth, scanHeight, percent, debug);
+				valuesBottom = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, height - (startHTop + scanHeight), scanWidth, scanHeight, percent,
+						debug);
 				
 				values = new float[6];
 				int i = 0;
@@ -168,8 +169,8 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.1 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesTop = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, startHTop, scanWidth, scanHeight, percent, debug);
+				valuesBottom = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, height - startHTop, scanWidth, scanHeight, percent, debug);
 			} else {
 				int left = (int) ((0.3 - 0.25) * width);
 				int right = (int) (left + 0.25 * width);
@@ -177,8 +178,9 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.05 - scanHeight / 2);
 				
-				valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
-				valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, abThres, true, debug);
+				valuesTop = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, startHTop, scanWidth, scanHeight, percent, debug);
+				valuesBottom = io.getRGBAverageMostSimilarToColor(targetBackgroundColor, left, height - (startHTop + scanHeight), scanWidth, scanHeight, percent,
+						debug);
 			}
 			values = new float[6];
 			int i = 0;
@@ -233,7 +235,6 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Recolor pictures according to white point (or black point for fluo). " +
-				"May adjust the top-right-half brightness with the remark setting 'top.right.half.brightness'.";
+		return "Recolor pictures according to white point (or other target color).";
 	}
 }
