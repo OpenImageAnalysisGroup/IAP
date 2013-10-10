@@ -40,6 +40,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.ErrorMsg;
@@ -3665,6 +3666,97 @@ public class ImageOperation implements MemoryHogInterface {
 			return new float[] { 1, 1, 1 };
 	}
 	
+	/**
+	 * @author klukas
+	 * @param topPercent
+	 *           E.g. '10', to process the 10% best matching pixels.
+	 */
+	public float[] getRGBAverageMostSimilarToColor(Color targetColor, int x1, int y1, int w, int h, int topPercent, boolean debug) {
+		int r, g, b, c;
+		float Li, ai, bi;
+		float[] p;
+		
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		
+		// sums of RGB
+		int sumR = 0;
+		int sumG = 0;
+		int sumB = 0;
+		
+		c = targetColor.getRGB();
+		int targetR = (c & 0xff0000) >> 16;
+		int targetG = (c & 0x00ff00) >> 8;
+		int targetB = c & 0x0000ff;
+		p = lab[targetR][targetG];
+		float targetLi = p[targetB];
+		float targetAi = p[targetB + 256];
+		float targetBi = p[targetB + 512];
+		
+		int count = 0;
+		Image marked = null;
+		ImageCanvas canvas = null;
+		if (debug) {
+			canvas = new ImageOperation(image).copy().canvas();
+			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
+		}
+		int imgw = getImage().getWidth();
+		int imgh = getImage().getHeight();
+		
+		int[][] img2d = getImageAs2dArray();
+		TreeSet<DistanceAndColor> result = new TreeSet<DistanceAndColor>();
+		for (int x = x1; x < x1 + w; x++) {
+			for (int y = y1; y < y1 + h; y++) {
+				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
+					continue;
+				c = img2d[x][y];
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				p = lab[r][g];
+				Li = p[b];
+				ai = p[b + 256];
+				bi = p[b + 512];
+				
+				float dist = Math.abs(Li - targetLi) + Math.abs(ai - targetAi) + Math.abs(bi - targetBi);
+				
+				DistanceAndColor d = new DistanceAndColor(x, y, r, g, b, dist);
+				result.add(d);
+			}
+		}
+		int n = (int) (result.size() * topPercent / 100d);
+		while (n > 0) {
+			DistanceAndColor d = result.pollFirst();
+			r = d.r;
+			g = d.g;
+			b = d.b;
+			sumR += r;
+			sumG += g;
+			sumB += b;
+			count++;
+			
+			if (debug && marked != null) {
+				int x = d.x;
+				int y = d.y;
+				canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.6);
+			}
+			n--;
+		}
+		if (debug)
+			canvas.getImage().show("region scan for target color balance", debug);
+		img2d = null;
+		p = null;
+		lab = null;
+		canvas = null;
+		
+		if (count > 0) {
+			float tR = targetR;
+			float tG = targetG;
+			float tB = targetB;
+			return new float[] { sumR / tR / count, sumG / tG / count, sumB / tB / count };
+		} else
+			return new float[] { 1, 1, 1 };
+	}
+	
 	public ImageOperation drawMarkers(ArrayList<MarkerPair> numericResult) {
 		ImageOperation a = new ImageOperation(this.getImage());
 		int s = 5;
@@ -3688,48 +3780,42 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @author pape
 	 */
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
+		return imageBalancing(brightness, brightness, brightness, rgbInfo);
+	}
+	
+	public ImageOperation imageBalancing(int brightnessR, int brightnessG, int brightnessB, double[] rgbInfo) {
 		if (image == null)
 			return null;
 		if (rgbInfo.length == 0)
 			return this;
 		ImageOperation res = null;
 		if (rgbInfo.length > 3 && rgbInfo.length <= 6) {
-			double r1 = brightness / rgbInfo[0];
-			double g1 = brightness / rgbInfo[1];
-			double b1 = brightness / rgbInfo[2];
-			double r2 = brightness / rgbInfo[3];
-			double g2 = brightness / rgbInfo[4];
-			double b2 = brightness / rgbInfo[5];
+			double r1 = brightnessR / rgbInfo[0];
+			double g1 = brightnessR / rgbInfo[1];
+			double b1 = brightnessB / rgbInfo[2];
+			double r2 = brightnessR / rgbInfo[3];
+			double g2 = brightnessG / rgbInfo[4];
+			double b2 = brightnessB / rgbInfo[5];
 			double[] factorsTop = { r1, g1, b1 };
 			double[] factorsBottom = { r2, g2, b2 };
-			// System.out.println("balance factors: " + r + " " + g + " " + b);
 			ImageOperation io = new ImageOperation(image);
 			res = io.multiplicateImageChannelsWithFactors(factorsTop, factorsBottom);
-			if (r1 + g1 + b1 + r2 + g2 + b2 > 120) {
-				res = res.blur(10);
-				res = res.multiplyHSV(2, 1.4, 0.9);
-			}
 		}
 		if (rgbInfo.length > 6) {
-			double[] factorsTopRight = { brightness / rgbInfo[0] * 1.2 * 180 / 140 };
-			double[] factorsBottomLeft = { brightness / rgbInfo[3] * 1.2 * 180 / 140 };
-			double[] factorsCenter = { brightness / rgbInfo[6] * 0.8 * 180 / 140 };
+			double[] factorsTopRight = { brightnessR / rgbInfo[0] * 1.2 * 180 / 140 };
+			double[] factorsBottomLeft = { brightnessR / rgbInfo[3] * 1.2 * 180 / 140 };
+			double[] factorsCenter = { brightnessR / rgbInfo[6] * 0.8 * 180 / 140 };
 			
 			ImageOperation io = new ImageOperation(image);
 			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
 		}
 		if (rgbInfo.length <= 3) {
-			double r = brightness / rgbInfo[0];
-			double g = brightness / rgbInfo[1];
-			double b = brightness / rgbInfo[2];
+			double r = brightnessR / rgbInfo[0];
+			double g = brightnessG / rgbInfo[1];
+			double b = brightnessB / rgbInfo[2];
 			double[] factors = { r, g, b };
-			// System.out.println("balance factors: " + r + " " + g + " " + b);
 			ImageOperation io = new ImageOperation(image);
 			res = io.multiplicateImageChannelsWithFactors(factors);
-			if (r + g + b > 60) {
-				res = res.blur(10);
-				res = res.multiplyHSV(2, 1.4, 0.9);
-			}
 		}
 		return res;
 	}
