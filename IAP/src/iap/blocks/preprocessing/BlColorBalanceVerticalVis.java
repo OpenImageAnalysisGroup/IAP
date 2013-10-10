@@ -130,15 +130,14 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 			} else {
 				int left = (int) (0.3 * width);
 				int right = (int) (width - 0.3 * width);
-				int scanHeight = (right - left) / 4;
+				int scanHeight = (int) (height * getDouble("Scan Bar Height (percent)", 25) / 100d);
 				int scanWidth = right - left;
 				int startHTop = (int) (height * 0.01); // - scanHeight / 2
 				
-				boolean useOnlyRightSide = true;
-				if (useOnlyRightSide) {
-					scanWidth /= 2;
-					left += scanWidth * 2.5;
-					scanWidth /= 2;
+				boolean useOnlyLeftSide = getBoolean("Scan Only The Left Top and Bottom Regions", false);
+				if (useOnlyLeftSide) {
+					scanWidth /= 4;
+					left = 0;
 				}
 				
 				// values = io.getRGBAverage(left, height / 2 - scanHeight / 2, scanWidth, scanHeight, 150, 50, true);
@@ -230,7 +229,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Color Balancing Vis (side, vertical)";
+		return "Color Balancing Vis";
 	}
 	
 	@Override
