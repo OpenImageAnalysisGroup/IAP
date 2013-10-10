@@ -22,6 +22,7 @@ import org.graffiti.managers.pluginmgr.RSSfeedDefinition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.Addon;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.AddonManagerPlugin;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 public class RSSFeedManager implements HelperClass {
 	
@@ -203,7 +204,7 @@ public class RSSFeedManager implements HelperClass {
 		try {
 			TextFile.writeE(getFeedtextfile(), text, System.getProperty("file.encoding"));
 		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
+			System.out.println(SystemAnalysis.getCurrentTime()+">ERROR: Could not save RSS feed text file. Exception: "+e.getMessage());
 		}
 	}
 	
