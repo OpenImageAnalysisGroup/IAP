@@ -596,11 +596,6 @@ public class ResultsTable implements Cloneable {
 		}
 	}
 	
-	public void show(String windowTitle, boolean debug) {
-		if (debug)
-			show(windowTitle);
-	}
-	
 	/**
 	 * Displays the contents of this ResultsTable in a window with the specified title.
 	 * Opens a new window if there is no open text window with this title. The title must
@@ -608,7 +603,11 @@ public class ResultsTable implements Cloneable {
 	 * or Analyzer.getResultsTable .
 	 */
 	public void show(String windowTitle) {
-		if (true)
+		show(windowTitle, false);
+	}
+	
+	public void show(String windowTitle, boolean debug) {
+		if (!debug)
 			return;
 		if (!windowTitle.equals("Results") && this == Analyzer.getResultsTable())
 			IJ.log("ResultsTable.show(): the system ResultTable should only be displayed in the \"Results\" window.");
