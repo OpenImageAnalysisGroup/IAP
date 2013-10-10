@@ -3693,11 +3693,10 @@ public class ImageOperation implements MemoryHogInterface {
 		float targetBi = p[targetB + 512];
 		
 		int count = 0;
-		Image marked = null;
 		ImageCanvas canvas = null;
 		if (debug) {
 			canvas = new ImageOperation(image).copy().canvas();
-			marked = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7).getImage();
+			canvas = canvas.fillRect(x1, y1, w, h, Color.RED.getRGB(), 0.7);
 		}
 		int imgw = getImage().getWidth();
 		int imgh = getImage().getHeight();
@@ -3717,13 +3716,14 @@ public class ImageOperation implements MemoryHogInterface {
 				ai = p[b + 256];
 				bi = p[b + 512];
 				
-				float dist = Math.abs(Li - targetLi) + Math.abs(ai - targetAi) + Math.abs(bi - targetBi);
+				float dist = Math.abs(ai - targetAi) + Math.abs(bi - targetBi);
 				
 				DistanceAndColor d = new DistanceAndColor(x, y, r, g, b, dist);
 				result.add(d);
 			}
 		}
-		int n = (int) (result.size() * topPercent / 100d);
+		int pxc = result.size();
+		int n = (int) (pxc * topPercent / 100d);
 		while (n > 0) {
 			DistanceAndColor d = result.pollFirst();
 			r = d.r;
@@ -3734,7 +3734,7 @@ public class ImageOperation implements MemoryHogInterface {
 			sumB += b;
 			count++;
 			
-			if (debug && marked != null) {
+			if (debug && canvas != null) {
 				int x = d.x;
 				int y = d.y;
 				canvas = canvas.fillRect(x, y, 1, 1, Color.BLUE.getRGB(), 0.6);

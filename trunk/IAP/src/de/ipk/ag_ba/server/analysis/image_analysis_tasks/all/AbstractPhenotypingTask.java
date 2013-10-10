@@ -326,10 +326,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 							if (status.wantsToStop())
 								continue;
-							if (imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
+							if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
+									imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
 								Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
 										.getParentSample();
-								inSamples.put(time, inSample);
+								if (inSample != null)
+									inSamples.put(time, inSample);
 							} else
 								continue;
 							final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();

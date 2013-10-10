@@ -54,8 +54,6 @@ public class ImageCanvas {
 	 *           - opacity of the filled rectangle, Wikipedia: Alpha_Blending C = αAA + (1 − αA)B
 	 */
 	public ImageCanvas fillRect(int x, int y, int w, int h, int color, double alpha) {
-		if (h <= 1)
-			return this;
 		int wi = image.getWidth();
 		int hi = image.getHeight();
 		if (hi <= 1)

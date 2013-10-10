@@ -25,6 +25,11 @@ public class DistanceAndColor implements Comparable<DistanceAndColor> {
 	}
 	
 	@Override
+	public String toString() {
+		return "dist: " + distance + " (X=" + x + "; Y=" + y + ")";
+	}
+	
+	@Override
 	public int compareTo(DistanceAndColor o) {
 		return distance < o.distance ? -1 : 1;
 	}
