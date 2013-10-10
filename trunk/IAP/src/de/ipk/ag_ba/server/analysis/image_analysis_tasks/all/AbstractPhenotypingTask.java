@@ -330,8 +330,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
 								Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
 										.getParentSample();
-								if (inSample != null)
-									inSamples.put(time, inSample);
+								if (inSample != null) {
+									synchronized (inSamples) {
+										inSamples.put(time, inSample);
+									}
+								}
 							} else
 								continue;
 							final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
@@ -356,7 +359,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								// @Override
 								// public void run() {
 								HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
-								processVolumeOutput(inSamples.get(time), results);
+								synchronized (inSamples) {
+									processVolumeOutput(inSamples.get(time), results);
+								}
 								if (results != null) {
 									synchronized (analysisInput) {
 										if (!analysisInput.containsKey(time))
