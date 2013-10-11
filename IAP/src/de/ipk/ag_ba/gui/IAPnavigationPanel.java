@@ -426,6 +426,12 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public static String replaceBadChars(String title) {
+		if (title.indexOf("<font color='gray'>") > 0)
+			title = title.substring(0, title.indexOf("<font color='gray'>")).trim();
+		
+		if (title.indexOf("(") > 0)
+			title = title.substring(0, title.indexOf("(")).trim();
+		
 		title = StringManipulationTools.removeHTMLtags(title).trim();
 		return StringManipulationTools.stringReplace(title, ".", "_");
 	}
