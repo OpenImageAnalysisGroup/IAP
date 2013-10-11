@@ -48,6 +48,9 @@ public class Bookmark {
 			TextFile tf = new TextFile(getFileName());
 			title = tf.get(0);
 			try {
+				// gray text should be removed
+				if (title.indexOf("<font color='gray'>") > 0)
+					title = title.substring(0, title.indexOf("<font color='gray'>"));
 				// scan for titles such as "test (3)", which should be displayed as "test"
 				if (title != null && title.contains("(")) {
 					String titleNo = title.substring(title.lastIndexOf("(") + "(".length());
@@ -60,6 +63,7 @@ public class Bookmark {
 						}
 					}
 				}
+				title = StringManipulationTools.removeHTMLtags(title);
 			} catch (Exception e) {
 				
 			}

@@ -220,8 +220,9 @@ public class IAPgui {
 		}
 		String thisTarget = target.split("\\.", 2)[0];
 		if (thisTarget != null && thisTarget.length() > 0) {
-			final String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
+			String nextTarget = target.length() - thisTarget.length() > 1 ? target.substring(thisTarget.length()
 					+ ".".length()) : "";
+			// nextTarget = IAPnavigationPanel.replaceBadChars(nextTarget);
 			NavigationButton button = knownEntities.get(thisTarget);
 			if (button == null && thisTarget.contains("(")) {
 				button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
@@ -229,11 +230,12 @@ public class IAPgui {
 			if (button == null)
 				System.out.println("Upcoming problem...");
 			if (button != null) {
+				final String nt = nextTarget;
 				Runnable rrr = new Runnable() {
 					@Override
 					public void run() {
-						if (nextTarget.length() > 0) {
-							navigateTo(nextTarget, navigationPanel, actionPanel, graphPanel);
+						if (nt.length() > 0) {
+							navigateTo(nt, navigationPanel, actionPanel, graphPanel);
 						}
 					}
 				};
