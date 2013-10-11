@@ -644,7 +644,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						if (id != null && id.getParentSample() != null) {
 							LoadedImage loadedImage = new LoadedImage(id,
 									image.getAsBufferedImage());
-							loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+							// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 							ImageData imageRef = saveImageAndUpdateURL(
 									loadedImage, databaseTarget, false,
 									tray, tray_cnt);
