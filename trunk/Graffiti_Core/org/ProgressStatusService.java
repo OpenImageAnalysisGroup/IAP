@@ -77,7 +77,7 @@ public class ProgressStatusService implements HelperClass {
 	public String getRemainTimeString(double averageSpeed, double remainTimeSeconds, int nn) {
 		String result = "";
 		if (remainTimeSeconds < 1)
-			return "less than 1 second";
+			return "&lt;1 sec";
 		
 		double remainTimeYears = remainTimeSeconds / 365 / 24 / 60 / 60;
 		int numberResults = 0;
