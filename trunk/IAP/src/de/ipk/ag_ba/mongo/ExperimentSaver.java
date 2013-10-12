@@ -116,9 +116,9 @@ public class ExperimentSaver implements RunnableOnDB {
 			ArrayList<ExperimentHeaderInterface> experimentList) throws InterruptedException, ExecutionException {
 		
 		for (ExperimentHeaderInterface ehi : experimentList) {
-			// preserve outlier info (add values, available at destination)
 			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
 					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				// preserve outlier info (add values, available at destination)
 				if (ehi.getGlobalOutlierInfo() != null && !ehi.getGlobalOutlierInfo().isEmpty()) {
 					String outliers = StringManipulationTools.getMergedStringItems(
 							experiment.getHeader().getGlobalOutlierInfo(),
@@ -126,11 +126,7 @@ public class ExperimentSaver implements RunnableOnDB {
 							"//");
 					experiment.getHeader().setGlobalOutlierInfo(outliers);
 				}
-				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
-			}
-			// preserve sequence/stress info (add values, available at destination)
-			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
-					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				// preserve sequence/stress info (add values, available at destination)
 				if (ehi.getSequence() != null && !ehi.getSequence().isEmpty()) {
 					String sequence = StringManipulationTools.getMergedStringItems(
 							experiment.getHeader().getSequence(),
@@ -138,17 +134,18 @@ public class ExperimentSaver implements RunnableOnDB {
 							"//");
 					experiment.getHeader().setSequence(sequence);
 				}
-				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
-			}
-			// preserve remark info (add values, available at destination)
-			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
-					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+				// preserve remark info (add values, available at destination)
 				if (ehi.getRemark() != null && !ehi.getRemark().isEmpty()) {
 					String remark = StringManipulationTools.getMergedStringItems(
 							experiment.getHeader().getRemark(),
 							ehi.getRemark(),
 							"//");
 					experiment.getHeader().setRemark(remark);
+				}
+				// preserve analysis settings
+				if (ehi.getRemark() != null && !ehi.getRemark().isEmpty()) {
+					String settings = experiment.getHeader().getSettings();
+					experiment.getHeader().setSettings(settings);
 				}
 				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
 			}
@@ -685,14 +682,16 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		if (lastTime.getLong() > 0) {
 			String mbs = "";
-			if (overallFileSize != null)
-				mbs = ", copied " + overallFileSize.getLong() / 1024 / 1024 + " MB";
+			// if (overallFileSize != null)
+			// mbs = ", copied " + overallFileSize.getLong() / 1024 / 1024 + " MB";
 			long transfered = overallFileSize.getLong() - lastTransferSum.getLong();
-			String lastSpeed = SystemAnalysis.getDataTransferSpeedString(transfered, lastTime.getLong(), currentTime);
-			String overallSpeed = SystemAnalysis.getDataTransferSpeedString(overallFileSize.getLong(), startTime.getLong(), currentTime);
-			status.setCurrentStatusText2("last " + lastSpeed +
-					" (" + SystemAnalysis.getWaitTime(currentTime - lastTime.getLong()) + "), overall " + overallSpeed
-					+ mbs);
+			if (transfered > 0) {
+				String lastSpeed = SystemAnalysis.getDataTransferSpeedString(transfered, lastTime.getLong(), currentTime);
+				String overallSpeed = SystemAnalysis.getDataTransferSpeedString(overallFileSize.getLong(), startTime.getLong(), currentTime);
+				status.setCurrentStatusText2("last " + lastSpeed +
+						" (" + SystemAnalysis.getWaitTime(currentTime - lastTime.getLong()) + ")<br>overall " + overallSpeed
+						+ mbs);
+			}
 		}
 		
 		lastTransferSum.setLong(overallFileSize.getLong());

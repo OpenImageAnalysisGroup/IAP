@@ -21,10 +21,16 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.database_tools.ActionDeleteHistoryOfAllExperiments;
+import de.ipk.ag_ba.commands.experiment.process.ActionPerformAnalysisLocally;
+import de.ipk.ag_ba.commands.experiment.process.ActionPerformGridAnalysis;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoDbCompact;
+import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
@@ -214,8 +220,6 @@ public class MassCopySupport {
 		final ArrayList<IdTime> toSave = new ArrayList<IdTime>();
 		
 		for (String db : lt.getDatabases()) {
-			if (db.endsWith("11"))
-				continue;
 			try {
 				for (ExperimentHeaderInterface ltExp : lt.getExperimentsInDatabase(null, db)) {
 					ltIdArr.add(new IdTime(null, ltExp.getDatabaseId(),
@@ -251,7 +255,7 @@ public class MassCopySupport {
 		
 		for (IdTime it : ltIdArr) {
 			String db = it.getExperimentHeader().getDatabase();
-			if (db == null || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
+			if (db == null) {// || (!db.startsWith("CGH_") && !db.startsWith("APH_") && !db.startsWith("BGH_"))) {
 				// print("DATASET IGNORED (INVALID DB): " + it.Id + " (DB: " + it.getExperimentHeader().getDatabase() + ")");
 				continue;
 			} else
@@ -291,12 +295,12 @@ public class MassCopySupport {
 		print("START MASS COPY OF " + toSave.size() + " EXPERIMENTS!");
 		status.setCurrentStatusText1("Start copy of " + toSave.size() + " experiments...");
 		int done = 0;
-		for (final IdTime it : toSave) {
+		for (final IdTime toBeSaved : toSave) {
 			boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");
 			if (!en)
 				continue;
 			status.setCurrentStatusText1("Copy " + toSave.size() + " experiments (" + done + " finished)");
-			MongoDB m = it.getMongoDB();
+			MongoDB m = toBeSaved.getMongoDB();
 			if (m == null) {
 				// new data set, copy to last mongo instance
 				if (useOnlyMainDatabase)
@@ -304,19 +308,39 @@ public class MassCopySupport {
 				else
 					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
 			}
-			ExperimentHeaderInterface src = it.getExperimentHeader();
-			print("Copy " + it.Id + " to " + m.getDatabaseName());
+			ExperimentHeaderInterface src = toBeSaved.getExperimentHeader();
+			print("Copy " + toBeSaved.Id + " to " + m.getDatabaseName());
 			ExperimentReference er = new ExperimentReference(src);
 			ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + it.Id + ") to " + m.getDatabaseName() + "<br>");
+			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + toBeSaved.Id + ") to " + m.getDatabaseName() + "<br>");
 			copyAction.setStatusProvider(status);
 			boolean simulate = false;
 			if (!simulate)
 				copyAction.performActionCalculateResults(null);
-			print("Copied " + it.Id + " to " + m.getDatabaseName());
-			MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + it.Id + " to " + m.getDatabaseName());
+			print("Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
+			MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
 			done++;
 			status.setCurrentStatusValueFine(100d * done / toSave.size());
+			
+			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
+			if (analyzeEachCopiedExperiment) {
+				String settings = er.getHeader().getSettings();
+				if (settings != null && !settings.trim().isEmpty()) {
+					PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null);
+					if (enableRemoteTaskExecution) {
+						ActionPerformGridAnalysis ga = new ActionPerformGridAnalysis(pd, m, er);
+						RemoteExecutionWrapperAction ra = new RemoteExecutionWrapperAction(ga, null);
+						Date newestImportDate = null;
+						String databaseIdOfNewestResultData = null;
+						ra.setNewestAvailableData(newestImportDate, databaseIdOfNewestResultData);
+						ra.performActionCalculateResults(null);
+					} else {
+						ActionPerformAnalysisLocally la = new ActionPerformAnalysisLocally(er.getIniIoProvider(), er, m);
+						la.setStatusProvider(getStatusProvider());
+						la.performActionCalculateResults(null);
+					}
+				}
+			}
 			
 			Thread.sleep(1000);
 		}
