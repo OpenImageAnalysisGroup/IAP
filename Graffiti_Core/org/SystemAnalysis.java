@@ -278,7 +278,7 @@ public class SystemAnalysis {
 	 */
 	public static String getDataTransferSpeedString(long transfered, long start, long end) {
 		if (transfered <= 0)
-			return "- MB/s";
+			return "- transfer skipped -";
 		double kiloBytesPerSecond = transfered / 1024d / ((end - start) / 1000d);
 		double megaBytesPerSecond = transfered / 1024d / 1024d / ((end - start) / 1000d);
 		double megaBytesPerMinute = megaBytesPerSecond * 60d;
@@ -286,17 +286,18 @@ public class SystemAnalysis {
 		double megaBytesPerDay = megaBytesPerHour * 24d;
 		String fS = "#.#";
 		String fL = "#";
+		String pre = getDataAmountString(transfered) + ", ";
 		if (kiloBytesPerSecond < 1024)
-			return StringManipulationTools.formatNumber(kiloBytesPerSecond, kiloBytesPerSecond > 10 ? fL : fS) + " KB/s";
+			return pre + StringManipulationTools.formatNumber(kiloBytesPerSecond, kiloBytesPerSecond > 10 ? fL : fS) + " KB/s";
 		if (megaBytesPerSecond > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerSecond, megaBytesPerSecond > 10 ? fL : fS) + " MB/s";
+			return pre + StringManipulationTools.formatNumber(megaBytesPerSecond, megaBytesPerSecond > 10 ? fL : fS) + " MB/s";
 		else
 			if (megaBytesPerMinute > 1)
-				return StringManipulationTools.formatNumber(megaBytesPerMinute, megaBytesPerMinute > 10 ? fL : fS) + " MB/m";
+				return pre + StringManipulationTools.formatNumber(megaBytesPerMinute, megaBytesPerMinute > 10 ? fL : fS) + " MB/m";
 		if (megaBytesPerHour > 1)
-			return StringManipulationTools.formatNumber(megaBytesPerHour, megaBytesPerHour > 10 ? fL : fS) + " MB/h";
+			return pre + StringManipulationTools.formatNumber(megaBytesPerHour, megaBytesPerHour > 10 ? fL : fS) + " MB/h";
 		else
-			return StringManipulationTools.formatNumber(megaBytesPerDay, megaBytesPerDay > 10 ? fL : fS) + " MB/d";
+			return pre + StringManipulationTools.formatNumber(megaBytesPerDay, megaBytesPerDay > 10 ? fL : fS) + " MB/d";
 	}
 	
 	public static boolean isMacRunning() {
