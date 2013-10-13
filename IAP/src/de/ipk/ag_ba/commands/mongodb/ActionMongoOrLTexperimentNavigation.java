@@ -20,9 +20,9 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -210,8 +210,11 @@ public class ActionMongoOrLTexperimentNavigation extends
 		if (header.getStorageTime() != null &&
 				(header.getExperimentType() != null &&
 				header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString()))) {
-			add = "input age " + SystemAnalysis.getWaitTime(
-					System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>saved";
+			if (header.getImportdate() != null)
+				add = "input age " + SystemAnalysis.getWaitTime(
+						System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>saved";
+			else
+				add = "storage time<br>undefined";
 			t = header.getStorageTime().getTime();
 		}
 		String time = SystemAnalysis.getWaitTime(System.currentTimeMillis() - t, 1);

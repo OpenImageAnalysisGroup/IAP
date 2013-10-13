@@ -216,7 +216,7 @@ public class CleanupHelper implements RunnableOnDB {
 					long a = System.currentTimeMillis();
 					CleanupHelper.this.mongoDB.visitExperiment(
 							ehii,
-							ss, visitSubstance, visitCondition, visitBinaryMeasurement,
+							ss, null, true, visitSubstance, visitCondition, visitBinaryMeasurement,
 							invalid);
 					long b = System.currentTimeMillis();
 					fc.addInt(1);

@@ -677,9 +677,11 @@ public class MongoDB {
 		return experiment;
 	}
 	
-	protected void visitExperiment(
+	public void visitExperiment(
 			final ExperimentHeaderInterface header,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider,
+			final RunnableProcessingSubstance visitSubstanceObject,
+			final boolean processConditions,
 			final RunnableProcessingDBid visitSubstance,
 			final RunnableProcessingDBid visitCondition,
 			final RunnableProcessingBinaryMeasurement visitBinaryMeasurement,
@@ -709,6 +711,8 @@ public class MongoDB {
 										db, substance,
 										collCond,
 										optStatusProvider, 100d / subList.size(),
+										visitSubstanceObject,
+										processConditions,
 										visitCondition,
 										visitBinaryMeasurement,
 										invalid);
@@ -724,15 +728,18 @@ public class MongoDB {
 								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
 								if (subr != null) {
 									DBObject substance = subr.fetch();
-									if (visitSubstance != null) {
+									if (visitSubstance != null || visitSubstanceObject != null) {
 										if (substance != null) {
-											synchronized (visitSubstance) {
-												visitSubstance.processDBid(substance.get("_id") + "");
+											if (visitSubstance != null) {
+												synchronized (visitSubstance) {
+													visitSubstance.processDBid(substance.get("_id") + "");
+												}
 											}
 											visitSubstance(header,
 													db, substance,
 													collCond,
 													optStatusProvider, 100d / l.size(),
+													visitSubstanceObject, processConditions,
 													visitCondition, visitBinaryMeasurement,
 													invalid);
 										} else
@@ -946,6 +953,8 @@ public class MongoDB {
 			DB db, DBObject substance,
 			DBCollection collCond,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
+			RunnableProcessingSubstance visitSubstance,
+			boolean processConditions,
 			RunnableProcessingDBid visitCondition,
 			RunnableProcessingBinaryMeasurement visitBinary,
 			ThreadSafeOptions invalid) {
@@ -953,29 +962,34 @@ public class MongoDB {
 			return;
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(substance.toMap());
-		// if (optStatusProvider!=null)
-		// optStatusProvider.setCurrentStatusText1("Process "+s3d.getName());
-		BasicDBList condList = (BasicDBList) substance.get("conditions");
-		if (condList != null)
-			for (Object co : condList) {
-				DBObject cond = (DBObject) co;
-				visitCondition(s3d, cond, visitBinary);
-				
+		if (visitSubstance != null) {
+			visitSubstance.visit(s3d);
+		}
+		if (processConditions) {
+			// if (optStatusProvider!=null)
+			// optStatusProvider.setCurrentStatusText1("Process "+s3d.getName());
+			BasicDBList condList = (BasicDBList) substance.get("conditions");
+			if (condList != null)
+				for (Object co : condList) {
+					DBObject cond = (DBObject) co;
+					visitCondition(s3d, cond, visitBinary);
+					
+				}
+			BasicDBList l = (BasicDBList) substance.get("condition_ids");
+			if (l != null) {
+				double max = l.size();
+				boolean printed = false;
+				boolean singleFetch = false;
+				if (collCond != null)
+					if (singleFetch)
+						printed = processConditionBySingleFetch(header, db, collCond,
+								optStatusProvider, smallProgressStep, visitCondition,
+								visitBinary, invalid, s3d, l, max, printed);
+					else
+						printed = processConditionByMultiFetch(header, db, collCond,
+								optStatusProvider, smallProgressStep, visitCondition,
+								visitBinary, invalid, s3d, l, max, printed);
 			}
-		BasicDBList l = (BasicDBList) substance.get("condition_ids");
-		if (l != null) {
-			double max = l.size();
-			boolean printed = false;
-			boolean singleFetch = false;
-			if (collCond != null)
-				if (singleFetch)
-					printed = processConditionBySingleFetch(header, db, collCond,
-							optStatusProvider, smallProgressStep, visitCondition,
-							visitBinary, invalid, s3d, l, max, printed);
-				else
-					printed = processConditionByMultiFetch(header, db, collCond,
-							optStatusProvider, smallProgressStep, visitCondition,
-							visitBinary, invalid, s3d, l, max, printed);
 		}
 	}
 	
