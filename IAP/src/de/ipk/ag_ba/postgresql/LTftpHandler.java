@@ -63,7 +63,7 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "");
 		
 		boolean useLocalCopyIfAvail = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use local file access if available", false);
-		String localCopyPath = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//Local copy or mount point", "Z:\\");
+		String localCopyPathList = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//Local copy or mount point", "Z:\\");
 		
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
@@ -71,15 +71,19 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 		
 		try {
 			if (useLocalCopyIfAvail) {
-				String detail = url.getDetail();
-				detail = detail.split("/", 2)[1];
-				String dir = detail.substring(0, detail.lastIndexOf("/"));
-				if (!localCopyPath.endsWith(File.separator) && !localCopyPath.endsWith("/"))
-					localCopyPath = localCopyPath + File.separator;
-				String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
-				File f = new File(localCopyPath + dir + File.separator + fn);
-				if (f.exists())
-					return new FileInputStream(f);
+				for (String localCopyPath : localCopyPathList.split(";")) {
+					if (localCopyPath.trim().isEmpty())
+						continue;
+					String detail = url.getDetail();
+					detail = detail.split("/", 2)[1];
+					String dir = detail.substring(0, detail.lastIndexOf("/"));
+					if (!localCopyPath.endsWith(File.separator) && !localCopyPath.endsWith("/"))
+						localCopyPath = localCopyPath + File.separator;
+					String fn = detail.substring(detail.lastIndexOf("/") + "/".length());
+					File f = new File(localCopyPath + dir + File.separator + fn);
+					if (f.exists())
+						return new FileInputStream(f);
+				}
 			}
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not access local file copy for LT file transfer. Error: " + e.getMessage());
