@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.SystemAnalysis;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -31,7 +32,7 @@ public class MyAdvancedFTP {
 	private static int runIdx = 0;
 	
 	public static boolean processFTPdownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-						String downloadURL, MyByteArrayOutputStream target) {
+			String downloadURL, MyByteArrayOutputStream target) {
 		runIdx++;
 		final int thisRun = runIdx;
 		status.setCurrentStatusText1(downloadURL);
@@ -67,8 +68,8 @@ public class MyAdvancedFTP {
 	}
 	
 	private synchronized static boolean processDownload(final BackgroundTaskStatusProviderSupportingExternalCallImpl status,
-						String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
-						final FTPClient ftp) {
+			String downloadURL, MyByteArrayOutputStream target, final int thisRun, final String server, String remote,
+			final FTPClient ftp) {
 		String username;
 		String password;
 		username = "anonymous@" + server;
@@ -102,11 +103,11 @@ public class MyAdvancedFTP {
 			if (ftp.isConnected()) {
 				status.setCurrentStatusText2("Using open FTP connection");
 			} else {
-				System.out.println("Connecting to FTP server: " + server);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">Connecting to FTP server: " + server);
 				ftp.connect(server);
 				int reply = ftp.getReplyCode();
 				if (!FTPReply.isPositiveCompletion(reply)) {
-					System.out.println("Non-Positivy Completion Result -> Disconnecting from FTP server: " + server);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Non-Positivy Completion Result -> Disconnecting from FTP server: " + server);
 					ftp.disconnect();
 					status.setCurrentStatusText1("Can't connect to FTP server");
 					status.setCurrentStatusText2("ERROR");
@@ -114,7 +115,7 @@ public class MyAdvancedFTP {
 				}
 				// if (!ftp.login("anonymous", "anonymous")) {
 				if (!ftp.login(username, password)) {
-					System.out.println("Login not successful -> Disconnecting from FTP server: " + server);
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Login not successful -> Disconnecting from FTP server: " + server);
 					ftp.disconnect();
 					status.setCurrentStatusText1("Can't login to FTP server");
 					status.setCurrentStatusText2("ERROR");
@@ -140,12 +141,13 @@ public class MyAdvancedFTP {
 			}
 			boolean autoClose = true;
 			if (autoClose)
-				BackgroundTaskHelper.executeLaterOnSwingTask(5*6*10000, new Runnable() {
+				BackgroundTaskHelper.executeLaterOnSwingTask(5 * 6 * 10000, new Runnable() {
+					@Override
 					public void run() {
 						try {
 							synchronized (GUIhelper.class) {
 								if (runIdx == thisRun) {
-									System.out.println("Disconnecting from FTP server: " + server);
+									System.out.println(SystemAnalysis.getCurrentTime() + ">Disconnecting from FTP server: " + server);
 									ftp.disconnect();
 								}
 							}
@@ -159,7 +161,7 @@ public class MyAdvancedFTP {
 			ErrorMsg.addErrorMessage(err);
 			if (ftp != null && ftp.isConnected()) {
 				try {
-					System.out.println("Disconnect FTP connection");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Disconnect FTP connection");
 					ftp.disconnect();
 				} catch (Exception err2) {
 					ErrorMsg.addErrorMessage(err2);
