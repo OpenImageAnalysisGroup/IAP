@@ -82,6 +82,8 @@ public class BlockListEditHelper {
 								inf = "<html><font color='gray'>" + inf + "<br><small>disabled</small></font>";
 								inf = "<html><font color='gray'>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
 								err = false;
+							} catch (Error err) {
+								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
 							} catch (Exception err) {
 								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
 							}
@@ -100,6 +102,8 @@ public class BlockListEditHelper {
 								inf = "<html><font color='gray'>" + inf + "<br><small>disabled</small></font>";
 								inf = "<html><font color='gray'>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
 								err = false;
+							} catch (Error err) {
+								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
 							} catch (Exception err) {
 								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
 							}
@@ -153,6 +157,8 @@ public class BlockListEditHelper {
 				ImageAnalysisBlock currentSelection;
 				try {
 					currentSelection = (ImageAnalysisBlock) Class.forName(textField.getText()).newInstance();
+				} catch (Error err) {
+					currentSelection = null;
 				} catch (Exception err) {
 					currentSelection = null;
 				}
