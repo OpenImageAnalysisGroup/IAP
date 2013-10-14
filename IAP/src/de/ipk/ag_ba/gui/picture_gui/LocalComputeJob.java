@@ -56,6 +56,7 @@ public class LocalComputeJob implements Runnable {
 				if (r instanceof RunnableForResult)
 					runableResult = ((RunnableForResult) r).getResult();
 			} catch (Error err1) {
+				err1.printStackTrace();
 				ErrorMsg.addErrorMessage(err1.getMessage());
 			} catch (Exception err2) {
 				ErrorMsg.addErrorMessage(err2);

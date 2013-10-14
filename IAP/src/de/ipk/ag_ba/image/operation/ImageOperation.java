@@ -3826,12 +3826,10 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @author pape
 	 */
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
-		return imageBalancing(brightness, brightness, brightness, rgbInfo);
+		return imageBalancing(brightness, rgbInfo, rgbInfo);
 	}
 	
-	public ImageOperation imageBalancing(int brightnessR, int brightnessG, int brightnessB, double[] rgbInfo) {
-		return imageBalancing(brightnessR, brightnessG, brightnessB, rgbInfo);
-	}
+	
 	
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfoLEFT, double[] rgbInfoRIGHT) {
 		ImageOperation left = copy().imageBalancing(brightness, rgbInfoLEFT);
