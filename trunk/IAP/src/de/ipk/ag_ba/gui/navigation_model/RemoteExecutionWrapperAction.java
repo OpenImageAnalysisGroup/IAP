@@ -72,7 +72,8 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 			if (m == null)
 				m = MongoDB.getDefaultCloud();
 			BatchCmd.enqueueBatchCmd(m, cmd);
-			cm.getAction().performActionCalculateResults(src);
+			if (cm != null)
+				cm.getAction().performActionCalculateResults(src);
 		}
 		System.out.println("Enqueued " + jobIDs.size() + " new jobs!");
 		// }

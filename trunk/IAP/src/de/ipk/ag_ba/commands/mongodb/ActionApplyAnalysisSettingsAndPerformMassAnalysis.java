@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -19,8 +20,14 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.process.ActionPerformGridAnalysis;
+import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableProcessingSubstance;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
@@ -61,67 +68,9 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 				"<title>" + getDefaultTitle() + " - Command Results</title><body>" +
 				"<h1>" + getDefaultTitle() + " - Command Results</h1>");
 		try {
-			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> config2headers = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
-			for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
-				if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")) {
-					try {
-						status.setCurrentStatusText1("Process experiment info");
-						status.setCurrentStatusText2(eh.getExperimentName());
-						final TreeSet<String> vis = new TreeSet<String>();
-						final TreeSet<String> flu = new TreeSet<String>();
-						final TreeSet<String> nir = new TreeSet<String>();
-						final TreeSet<String> ir = new TreeSet<String>();
-						final TreeSet<String> other = new TreeSet<String>();
-						ThreadSafeOptions invalid = new ThreadSafeOptions();
-						RunnableProcessingSubstance visitSubstanceObject = new RunnableProcessingSubstance() {
-							@Override
-							public void visit(SubstanceInterface substance) {
-								if (substance.getInfo() == null || substance.getInfo().trim().isEmpty())
-									return;
-								ImageConfiguration conf = ImageConfiguration.get(substance.getName());
-								switch (conf) {
-									case FluoSide:
-									case FluoTop:
-										flu.add(substance.getInfo());
-										break;
-									case IrSide:
-									case IrTop:
-										ir.add(substance.getInfo());
-										break;
-									case NirSide:
-									case NirTop:
-										nir.add(substance.getInfo());
-										break;
-									case RgbSide:
-									case RgbTop:
-										vis.add(substance.getInfo());
-										break;
-									case Unknown:
-										other.add(substance.getInfo());
-										break;
-								}
-							}
-						};
-						m.visitExperiment(eh, status, visitSubstanceObject, false, null, null, null, invalid);
-						StringBuilder config = new StringBuilder();
-						config.append("<td>" + StringManipulationTools.getStringList(vis, ", ") + "</td>");
-						config.append("<td>" + StringManipulationTools.getStringList(flu, ", ") + "</td>");
-						config.append("<td>" + StringManipulationTools.getStringList(nir, ", ") + "</td>");
-						config.append("<td>" + StringManipulationTools.getStringList(ir, ", ") + "</td>");
-						config.append("<td>" + StringManipulationTools.getStringList(other, ", ") + "</td>");
-						if (vis.size() + flu.size() + nir.size() + ir.size() + other.size() > 0) {
-							String s = config.toString();
-							if (!config2headers.containsKey(s)) {
-								config2headers.put(s, new ArrayList<ExperimentHeaderInterface>());
-							}
-							config2headers.get(s).add(eh);
-						}
-					} catch (Exception err) {
-						errors.add("Could not process " + eh.getExperimentName() + ": " + err.getMessage());
-						err.printStackTrace();
-					}
-				}
-			}
+			final boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
+			TreeMap<String, ArrayList<ExperimentHeaderInterface>> config2headers = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
+			getConfigSets(config2headers);
 			for (String conf : config2headers.keySet()) {
 				ArrayList<ExperimentHeaderInterface> experimentHeaders = config2headers.get(conf);
 				Collections.sort(experimentHeaders, new Comparator<ExperimentHeaderInterface>() {
@@ -142,16 +91,17 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 					// chance to add settings to newer or older datasets without settings
 					ArrayList<Object> params = new ArrayList<Object>();
 					
-					JComboBox<String> hasSettings = new JComboBox<String>();
+					JComboBox<ExperimentHeaderWithCustomToString> hasSettings = new JComboBox<ExperimentHeaderWithCustomToString>();
 					for (ExperimentHeaderInterface withS : withSettingList)
-						hasSettings.addItem("<html><b>" + withS.getExperimentName() + "</b> (source: " + withS.getOriginDbId() + ")");
+						hasSettings.addItem(new ExperimentHeaderWithCustomToString(withS));
 					
 					params.add("Copy Source (select 1 of " + withSettingList.size() + ")");
 					params.add(hasSettings);
 					final HashSet<ExperimentHeaderInterface> assignList = new HashSet<ExperimentHeaderInterface>();
 					final HashSet<ExperimentHeaderInterface> analyzeList = new HashSet<ExperimentHeaderInterface>();
 					for (final ExperimentHeaderInterface noS : noSettingList) {
-						final JCheckBox analyzeExperiment = new JCheckBox(new AbstractAction("Analyze experiment") {
+						final JCheckBox analyzeExperiment = new JCheckBox(new AbstractAction("Analyze experiment"
+								+ (enableRemoteTaskExecution ? "" : " (submission of analysis jobs disabled)")) {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								if (analyzeList.contains(noS)) {
@@ -171,7 +121,8 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 									analyzeList.remove(noS);
 								} else {
 									assignList.add(noS);
-									analyzeExperiment.setEnabled(true);
+									if (enableRemoteTaskExecution)
+										analyzeExperiment.setEnabled(true);
 								}
 							}
 						});
@@ -224,14 +175,55 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 							"Experiments with no settings: " + StringManipulationTools.getStringList(noSettingsNames, ", ") + "<br><br>");
 					if (userInp != null) {
 						res.append("<br><b>According to user-action these experiments have been processed as following:</b><br><br>");
-						res.append("(TODO)");
+						ExperimentHeaderWithCustomToString copySource = (ExperimentHeaderWithCustomToString) hasSettings.getSelectedItem();
+						for (ExperimentHeaderInterface noS : noSettingList) {
+							res.append("Experiment " + noS.getExperimentName() + ":<br>");
+							if (assignList.contains(noS)) {
+								try {
+									// apply
+									String template = copySource.getHeader().getSettings();
+									if (template == null || template.isEmpty())
+										throw new Exception("Internal Error: tried to use empty source-settings.");
+									else {
+										noS.setSettings(template);
+										m.saveExperimentHeader(noS);
+									}
+									res.append("&nbsp;&nbsp;&nbsp;Applied settings from " + copySource + ".<br>");
+									if (!enableRemoteTaskExecution) {
+										res.append("&nbsp;&nbsp;&nbsp;(submission of analysis jobs is disabled within the application settings)<br>");
+									} else {
+										try {
+											// submit
+											ExperimentReference er = new ExperimentReference(noS, m);
+											String settings = noS.getSettings();
+											if (settings != null && !settings.trim().isEmpty()) {
+												PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null);
+												ActionPerformGridAnalysis ga = new ActionPerformGridAnalysis(pd, m, er);
+												RemoteExecutionWrapperAction ra = new RemoteExecutionWrapperAction(ga, null);
+												Date newestImportDate = null;
+												String databaseIdOfNewestResultData = null;
+												ra.setNewestAvailableData(newestImportDate, databaseIdOfNewestResultData);
+												ra.performActionCalculateResults(null);
+												res.append("&nbsp;&nbsp;&nbsp;Submitted analysis jobs.<br>");
+											} else {
+												res.append("&nbsp;&nbsp;&nbsp;Internal error: analysis settings are empty!<br>");
+											}
+										} catch (Exception e2) {
+											e2.printStackTrace();
+											res.append("&nbsp;&nbsp;&nbsp;Tried to submitt analysis jobs. Error: " + e2.getMessage() + "<br>");
+										}
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+									res.append("&nbsp;&nbsp;&nbsp;Tried to apply settings from " + copySource + ". Error: " + e.getMessage() + "<br>");
+								}
+							}
+							res.append("<br>");
+						}
 						res.append("<br><br><hr>");
 					} else {
 						res.append("<br><b>According to user-action these experiments have not been further processed.</b><br><br><hr>");
 					}
-					// TODO output user choice...
-					// res.append("<tr><td>" + StringManipulationTools.getStringList(experimentHeaders, "<br>") + "</td>" + conf +
-					// "</tr>");
 				}
 			}
 		} finally {
@@ -241,6 +233,69 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 		}
 		status.setCurrentStatusText1("Processing finished");
 		status.setCurrentStatusText2("");
+	}
+	
+	private void getConfigSets(final TreeMap<String, ArrayList<ExperimentHeaderInterface>> config2headers) {
+		for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
+			if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")) {
+				try {
+					status.setCurrentStatusText1("Process experiment info");
+					status.setCurrentStatusText2(eh.getExperimentName());
+					final TreeSet<String> vis = new TreeSet<String>();
+					final TreeSet<String> flu = new TreeSet<String>();
+					final TreeSet<String> nir = new TreeSet<String>();
+					final TreeSet<String> ir = new TreeSet<String>();
+					final TreeSet<String> other = new TreeSet<String>();
+					ThreadSafeOptions invalid = new ThreadSafeOptions();
+					RunnableProcessingSubstance visitSubstanceObject = new RunnableProcessingSubstance() {
+						@Override
+						public void visit(SubstanceInterface substance) {
+							if (substance.getInfo() == null || substance.getInfo().trim().isEmpty())
+								return;
+							ImageConfiguration conf = ImageConfiguration.get(substance.getName());
+							switch (conf) {
+								case FluoSide:
+								case FluoTop:
+									flu.add(substance.getInfo());
+									break;
+								case IrSide:
+								case IrTop:
+									ir.add(substance.getInfo());
+									break;
+								case NirSide:
+								case NirTop:
+									nir.add(substance.getInfo());
+									break;
+								case RgbSide:
+								case RgbTop:
+									vis.add(substance.getInfo());
+									break;
+								case Unknown:
+									other.add(substance.getInfo());
+									break;
+							}
+						}
+					};
+					m.visitExperiment(eh, status, visitSubstanceObject, false, null, null, null, invalid);
+					StringBuilder config = new StringBuilder();
+					config.append("<td>" + StringManipulationTools.getStringList(vis, ", ") + "</td>");
+					config.append("<td>" + StringManipulationTools.getStringList(flu, ", ") + "</td>");
+					config.append("<td>" + StringManipulationTools.getStringList(nir, ", ") + "</td>");
+					config.append("<td>" + StringManipulationTools.getStringList(ir, ", ") + "</td>");
+					config.append("<td>" + StringManipulationTools.getStringList(other, ", ") + "</td>");
+					if (vis.size() + flu.size() + nir.size() + ir.size() + other.size() > 0) {
+						String s = config.toString();
+						if (!config2headers.containsKey(s)) {
+							config2headers.put(s, new ArrayList<ExperimentHeaderInterface>());
+						}
+						config2headers.get(s).add(eh);
+					}
+				} catch (Exception err) {
+					errors.add("Could not process " + eh.getExperimentName() + ": " + err.getMessage());
+					err.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	@Override
