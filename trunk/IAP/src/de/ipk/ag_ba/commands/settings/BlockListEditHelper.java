@@ -70,6 +70,24 @@ public class BlockListEditHelper {
 						setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
 						inf = "<html>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
 						err = false;
+					} catch (NoClassDefFoundError e2) {
+						blockName = sl;
+						if (sl != null && sl.startsWith("#")) {
+							try {
+								String s = sl.substring(1);
+								ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(s).newInstance();
+								blockName = inst.getName();
+								String blockDesc = inst.getDescription();
+								setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
+								inf = "<html><font color='gray'>" + inf + "<br><small>disabled</small></font>";
+								inf = "<html><font color='gray'>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);
+								err = false;
+							} catch (Exception err) {
+								inf = "<html>" + inf + "<br>[Unknown Disabled Block]";
+							}
+						} else
+							inf = "<html>" + inf + "<br>[Unknown Block]";
+						err = true;
 					} catch (Exception e) {
 						blockName = sl;
 						if (sl != null && sl.startsWith("#")) {
