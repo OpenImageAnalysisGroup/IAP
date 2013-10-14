@@ -6,13 +6,14 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 
 import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -57,18 +58,8 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 		errors.clear();
 		res = new StringBuilder();
 		res.append("<html><head>" +
-				"<title>Experiment overview (list of imported image unit configurations)</title><body>" +
-				"<h1>Experiment overview (list of imported image unit configurations)</h1>" +
-				"<table border='1'>");
-		res.append("<tr>" +
-				"<th>Experiments</th>" +
-				// "<th>Database ID</th>" +
-				// "<th>Source</th>" +
-				"<th>VIS</th>" +
-				"<th>FLUO</th>" +
-				"<th>NIR</th>" +
-				"<th>IR</th>" +
-				"<th>Other</th></tr>");
+				"<title>" + getDefaultTitle() + " - Command Results</title><body>" +
+				"<h1>" + getDefaultTitle() + " - Command Results</h1>");
 		try {
 			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> config2headers = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 			for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
@@ -132,8 +123,8 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 				}
 			}
 			for (String conf : config2headers.keySet()) {
-				ArrayList<ExperimentHeaderInterface> experimentNames = config2headers.get(conf);
-				Collections.sort(experimentNames, new Comparator<ExperimentHeaderInterface>() {
+				ArrayList<ExperimentHeaderInterface> experimentHeaders = config2headers.get(conf);
+				Collections.sort(experimentHeaders, new Comparator<ExperimentHeaderInterface>() {
 					@Override
 					public int compare(ExperimentHeaderInterface o1, ExperimentHeaderInterface o2) {
 						return o1.getExperimentName().compareTo(o2.getExperimentName());
@@ -141,7 +132,7 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 				});
 				ArrayList<ExperimentHeaderInterface> withSettingList = new ArrayList<ExperimentHeaderInterface>();
 				ArrayList<ExperimentHeaderInterface> noSettingList = new ArrayList<ExperimentHeaderInterface>();
-				for (ExperimentHeaderInterface eh : experimentNames) {
+				for (ExperimentHeaderInterface eh : experimentHeaders) {
 					if (eh.getImportdate() != null && eh.getSettings() != null && !eh.getSettings().isEmpty())
 						withSettingList.add(eh);
 					if (eh.getSettings() == null || eh.getSettings().isEmpty())
@@ -149,51 +140,103 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 				}
 				if (!withSettingList.isEmpty() && !noSettingList.isEmpty()) {
 					// chance to add settings to newer or older datasets without settings
-					ArrayList<Object> params = new ArrayList<Object>;
-
-					JComboBox<ExperimentHeaderInterface> hasSettings = new JComboBox<ExperimentHeaderInterface>();
+					ArrayList<Object> params = new ArrayList<Object>();
+					
+					JComboBox<String> hasSettings = new JComboBox<String>();
 					for (ExperimentHeaderInterface withS : withSettingList)
-						hasSettings.addItem(withS);
+						hasSettings.addItem("<html><b>" + withS.getExperimentName() + "</b> (source: " + withS.getOriginDbId() + ")");
 					
-					params.add("Select settings to be copied:");
+					params.add("Copy Source (select 1 of " + withSettingList.size() + ")");
 					params.add(hasSettings);
-					
-					for (ExperimentHeaderInterface noS : noSettingList) {
-						final	JCheckBox analyzeExperiment = new JCheckBox(new AbstractAction("Analyze Experiment") {
+					final HashSet<ExperimentHeaderInterface> assignList = new HashSet<ExperimentHeaderInterface>();
+					final HashSet<ExperimentHeaderInterface> analyzeList = new HashSet<ExperimentHeaderInterface>();
+					for (final ExperimentHeaderInterface noS : noSettingList) {
+						final JCheckBox analyzeExperiment = new JCheckBox(new AbstractAction("Analyze experiment") {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								// TODO Auto-generated method stub
-								  
+								if (analyzeList.contains(noS)) {
+									analyzeList.remove(noS);
+								} else
+									analyzeList.add(noS);
 							}
 						});
-						JCheckBox applySettings = new JCheckBox(new AbstractAction("Assign settings") {
+						analyzeExperiment.setEnabled(false);
+						JCheckBox applySettings = new JCheckBox(new AbstractAction("Assign settings from source") {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								analyzeExperiment.setEnabled(true); 
+								if (assignList.contains(noS)) {
+									assignList.remove(noS);
+									analyzeExperiment.setSelected(false);
+									analyzeExperiment.setEnabled(false);
+									analyzeList.remove(noS);
+								} else {
+									assignList.add(noS);
+									analyzeExperiment.setEnabled(true);
+								}
 							}
 						});
-						params.add(TableLayout.getSplitVertical(applySettings, analyzeExperiment, TableLayout.PREFERRED, TableLayout.PREFERRED));
+						params.add("<html><b>" + noS.getExperimentName() + "</b><br><small>(source: " + noS.getOriginDbId() + ")");
+						params.add(
+								TableLayout.getSplit(
+										TableLayout.getSplitVertical(applySettings, analyzeExperiment, TableLayout.PREFERRED, TableLayout.PREFERRED),
+										new JLabel(""), TableLayout.PREFERRED, TableLayout.PREFERRED));
 					}
-					MyInputHelper res = MyInputHelper.getInput(
-							"<html>" + noSettingList.size()+" experiments have no analysis settings applied.<br>" +
-								"But there are "+withSettingList.size()+" experiments with the same list of<br>" +
-										"imaging configuration settings names which have analysis settings applied.<br>" +
-										"<br>" +
-										"You may now choose to apply the analysis settings from the selected experiment<br>" +
-										"to the experiments with no settings, listed below.", 
+					Object[] userInp = MyInputHelper.getInput(
+							"<html>" +
+									"A set of experiments (" + (withSettingList.size() + noSettingList.size()) +
+									") with common configuration names<br>" +
+									"and at least one configuration source has been found.<br>" +
+									"(this dialog will pop-up for each identified configuration-set)<br>" +
+									"<br>" +
+									"The current set of equal setting names is listed here:<br>" +
+									"<br>" +
+									"<table border='1'><tr>" +
+									"<th>VIS</th>" +
+									"<th>FLUO</th>" +
+									"<th>NIR</th>" +
+									"<th>IR</th>" +
+									"<th>Other</th></tr>" +
+									"<tr>" + StringManipulationTools.stringReplace(conf, ", ", "<br>") + "</tr></table>" +
+									"<br><br>" +
+									"There is the chance to apply the settings from any of the " + withSettingList.size() + " experiments,<br>" +
+									"which have analysis settings applied to " + noSettingList.size() + " experiments with no settings:<br><br>",
 							"Apply settings to similar experiments?",
-							parameters)
-					res.append("<tr><td>" + StringManipulationTools.getStringList(experimentNames, "<br>") + "</td>" + conf + "</tr>");
+							params.toArray());
+					
+					ArrayList<String> withSettingsNames = new ArrayList<String>();
+					for (ExperimentHeaderInterface withS : withSettingList)
+						withSettingsNames.add(withS.getExperimentName());
+					ArrayList<String> noSettingsNames = new ArrayList<String>();
+					for (ExperimentHeaderInterface noS : noSettingList)
+						noSettingsNames.add(noS.getExperimentName());
+					res.append("<br>A set of experiments (" + (withSettingList.size() + noSettingList.size()) +
+							") with common configuration names and at least one possible configuration source has been found:" +
+							"<br>" +
+							"<table border='1'><tr>" +
+							"<th>VIS</th>" +
+							"<th>FLUO</th>" +
+							"<th>NIR</th>" +
+							"<th>IR</th>" +
+							"<th>Other</th></tr>" +
+							"<tr>" + StringManipulationTools.stringReplace(conf, ", ", "<br>") + "</tr></table><br>" +
+							"Experiments with applied analysis settings: " +
+							StringManipulationTools.getStringList(withSettingsNames, ", ") + "<br><br>" +
+							"Experiments with no settings: " + StringManipulationTools.getStringList(noSettingsNames, ", ") + "<br><br>");
+					if (userInp != null) {
+						res.append("<br><b>According to user-action these experiments have been processed as following:</b><br><br>");
+						res.append("(TODO)");
+						res.append("<br><br><hr>");
+					} else {
+						res.append("<br><b>According to user-action these experiments have not been further processed.</b><br><br><hr>");
+					}
+					// TODO output user choice...
+					// res.append("<tr><td>" + StringManipulationTools.getStringList(experimentHeaders, "<br>") + "</td>" + conf +
+					// "</tr>");
 				}
 			}
 		} finally {
-			res.append("</table></body></html>");
 			if (!errors.isEmpty()) {
-				String r = res.toString();
-				res = new StringBuilder();
-				r = r.replaceFirst("table border", "h2>Processing Errors (" + errors.size() + ")</h2>" + StringManipulationTools.getStringList(errors, "<br>")
-						+ "<br><br><table border");
-				res.append(r);
+				res.append("<h2>Processing Errors (" + errors.size() + ")</h2>" + StringManipulationTools.getStringList(errors, "<br>"));
 			}
 		}
 		status.setCurrentStatusText1("Processing finished");
