@@ -55,7 +55,7 @@ public class SplitResult {
 				if (!processedSubmissionTimes.contains(submTime)) {
 					availableTempDatasets.add(new TempDataSetDescription(
 							className, partCnt, submTime, i.getOriginDbId(), mergeWithDBid));
-					System.out.println(SystemAnalysis.getCurrentTime() + "INFO: Found temp dataset: " + i.getExperimentName());
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Found temp dataset: " + i.getExperimentName());
 				}
 				processedSubmissionTimes.add(submTime);
 			}
