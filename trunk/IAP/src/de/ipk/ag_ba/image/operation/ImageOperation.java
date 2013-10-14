@@ -3826,10 +3826,45 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @author pape
 	 */
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfo) {
-		return imageBalancing(brightness, rgbInfo, rgbInfo);
+		return imageBalancing(brightness, brightness, brightness, rgbInfo);
 	}
 	
-	
+	public ImageOperation imageBalancing(int brightnessR, int brightnessG, int brightnessB, double[] rgbInfo) {
+		if (image == null)
+			return null;
+		if (rgbInfo.length == 0)
+			return this;
+		ImageOperation res = null;
+		if (rgbInfo.length > 3 && rgbInfo.length <= 6) {
+			double r1 = brightnessR / rgbInfo[0];
+			double g1 = brightnessR / rgbInfo[1];
+			double b1 = brightnessB / rgbInfo[2];
+			double r2 = brightnessR / rgbInfo[3];
+			double g2 = brightnessG / rgbInfo[4];
+			double b2 = brightnessB / rgbInfo[5];
+			double[] factorsTop = { r1, g1, b1 };
+			double[] factorsBottom = { r2, g2, b2 };
+			ImageOperation io = new ImageOperation(image);
+			res = io.multiplicateImageChannelsWithFactors(factorsTop, factorsBottom);
+		}
+		if (rgbInfo.length > 6) {
+			double[] factorsTopRight = { brightnessR / rgbInfo[0] * 1.2 * 180 / 140 };
+			double[] factorsBottomLeft = { brightnessR / rgbInfo[3] * 1.2 * 180 / 140 };
+			double[] factorsCenter = { brightnessR / rgbInfo[6] * 0.8 * 180 / 140 };
+			
+			ImageOperation io = new ImageOperation(image);
+			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
+		}
+		if (rgbInfo.length <= 3) {
+			double r = brightnessR / rgbInfo[0];
+			double g = brightnessG / rgbInfo[1];
+			double b = brightnessB / rgbInfo[2];
+			double[] factors = { r, g, b };
+			ImageOperation io = new ImageOperation(image);
+			res = io.multiplicateImageChannelsWithFactors(factors);
+		}
+		return res;
+	}
 	
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfoLEFT, double[] rgbInfoRIGHT) {
 		ImageOperation left = copy().imageBalancing(brightness, rgbInfoLEFT);
