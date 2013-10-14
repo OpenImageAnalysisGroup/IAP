@@ -52,6 +52,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	public boolean getBoolean(String setting, boolean defaultValue) {
+		if (IAPmain.getRunMode()!=IAPrunMode.SWING_MAIN && setting!=null && setting.equals("debug")) {
+			return false;
+		}
+
 		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
