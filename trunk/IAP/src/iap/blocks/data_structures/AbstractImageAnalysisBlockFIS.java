@@ -53,6 +53,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public boolean getBoolean(String setting, boolean defaultValue) {
 		if (IAPmain.getRunMode()!=IAPrunMode.SWING_MAIN && setting!=null && setting.equals("debug")) {
+			boolean ret = options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
+			if (ret)
+				System.out.println(SystemAnalysis.getCurrentTime()+">INFO: Enabled debug setting is ignored, as IAP is not running in Swing GUI mode.");
 			return false;
 		}
 
