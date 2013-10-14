@@ -10,10 +10,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.AttributeHelper;
 import org.ExperimentHeaderHelper;
 import org.StringAnnotationProcessor;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.dc.DCelement;
@@ -589,5 +591,36 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public ExperimentHeaderHelper getExperimentHeaderHelper() {
 		return ehh;
+	}
+	
+	@Override
+	public String toHtmlString() {
+		StringBuilder s = new StringBuilder();
+		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+		HashMap<String, String> field2niceName = ExperimentHeader.getNiceHTMLfieldNameMapping();
+		TreeSet<String> resultRows = new TreeSet<String>();
+		Map<String, Object> am = getAttributeMap();
+		for (String id : am.keySet()) {
+			String idC = id;
+			if (field2niceName.containsKey(idC))
+				idC = field2niceName.get(idC);
+			String v = "" + am.get(id);
+			if (v != null && !v.trim().isEmpty() && !v.equalsIgnoreCase("NULL"))
+				if (id.equals("settings"))
+					resultRows.add("<tr><td>" + idC + "</td><td>"
+							+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")
+							+ "</td></tr>");
+				else {
+					if (v.contains("|")) {
+						for (String vv : v.split("\\|"))
+							resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(vv, 40) + "</td></tr>");
+					} else
+						resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(v, 40) + "</td></tr>");
+				}
+		}
+		for (String r : resultRows)
+			s.append(r);
+		s.append("</table></html>");
+		return s.toString();
 	}
 }
