@@ -91,7 +91,7 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 					// chance to add settings to newer or older datasets without settings
 					ArrayList<Object> params = new ArrayList<Object>();
 					
-					JComboBox<ExperimentHeaderWithCustomToString> hasSettings = new JComboBox<ExperimentHeaderWithCustomToString>();
+					JComboBox hasSettings = new JComboBox();
 					for (ExperimentHeaderInterface withS : withSettingList)
 						hasSettings.addItem(new ExperimentHeaderWithCustomToString(withS));
 					
