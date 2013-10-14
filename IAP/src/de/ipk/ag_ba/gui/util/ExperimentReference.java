@@ -203,7 +203,7 @@ public class ExperimentReference {
 				// weakId2exp.put(databaseId, res);
 				this.experiment = res;
 				if (res == null)
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded.");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded. DB ID: " + header.getDatabaseId());
 				// else
 				// System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " +
 				// experiment.size() + " substances (DB ID " + res.getHeader().getDatabaseId() + ").");
