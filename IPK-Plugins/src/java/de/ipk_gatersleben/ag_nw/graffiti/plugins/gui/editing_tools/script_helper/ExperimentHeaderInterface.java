@@ -152,4 +152,6 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public ExperimentHeaderHelper getExperimentHeaderHelper();
 	
 	public void setExperimentHeaderHelper(ExperimentHeaderHelper ehh);
+	
+	public String toHtmlString();
 }
