@@ -162,7 +162,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			task = null;
 			
-			if (statisticsResult == null || statisticsResult.getNumberOfMeasurementValues() <= 0) {
+			if (statisticsResult == null) { //  || statisticsResult.getNumberOfMeasurementValues() <= 0
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
 				this.experimentResult = null;
 				if (getResultReceiver() == null)
