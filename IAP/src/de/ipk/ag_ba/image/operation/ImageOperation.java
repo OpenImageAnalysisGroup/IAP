@@ -2632,6 +2632,52 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
+	 * Conversion to grayscale image done by differnt methods used by gimp (explaination on http://home.arcor.de/ulile/node54.html).
+	 * 
+	 * @param mode
+	 *           0 - hsv, saturation to zero l = [h, 0, v]
+	 *           1 - use this formula l = 0.3 * r + 0.59 * g + 0.11 * b
+	 *           2 - l = max(r, g, b)
+	 * @return
+	 */
+	public ImageOperation convertRGB2Grayscale(GrayscaleMode mode) {
+		int[] img1d = getImageAs1dArray().clone();
+		int[] res = new int[img1d.length];
+		int c, r, g, b, y;
+		float[] hsv = new float[3];
+		
+		for (int idx = 0; idx < img1d.length; idx++) {
+			c = img1d[idx];
+			
+			r = ((c & 0xff0000) >> 16);
+			g = ((c & 0x00ff00) >> 8);
+			b = (c & 0x0000ff);
+			
+			// use hsv, saturation to zero
+			if (mode == GrayscaleMode.MODE_1) {
+				Color.RGBtoHSB(r, g, b, hsv);
+				
+				hsv[1] = 0;
+				res[idx] = Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]);
+			}
+			
+			// use common formula (here from gimp), y is here luminosity
+			if (mode == GrayscaleMode.MODE_2) {
+				y = (int) (0.3 * r + 0.59 * g + 0.11 * b);
+				res[idx] = new Color(y, y, y).getRGB();
+			}
+			
+			// use max value of RGB
+			if (mode == GrayscaleMode.MODE_3) {
+				y = Math.max(r, Math.max(g, b));
+				res[idx] = new Color(y, y, y).getRGB();
+			}
+		}
+		
+		return new ImageOperation(res, getWidth(), getHeight());
+	}
+	
+	/**
 	 * (Source of javadoc: ImageJ java doc)
 	 * Here the processing is done: Find the maxima of an image (does not find minima).
 	 * 
@@ -2930,7 +2976,7 @@ public class ImageOperation implements MemoryHogInterface {
 						centroid.x + 1, centroid.y + m);
 			else
 				line = new Line2D.Double(centroid.x, centroid.y, centroid.x,
-						centroid.y + m);
+						centroid.y + 1);
 			DistanceSumAndPixelCount r = distancePointsToLine(img, line, background);
 			r.setAngle(angle);
 			if (r.getDistanceSum() < minResult.getDistanceSum())
@@ -2998,7 +3044,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public MainAxisCalculationResult calculateTopMainAxis(int background) {
 		Vector2d r = getCentroid(background);
 		if (r != null)
-			return calculateTopMainAxis(r, 20, background);
+			return calculateTopMainAxis(r, 10, background);
 		else
 			return null;
 	}
@@ -3784,40 +3830,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation imageBalancing(int brightnessR, int brightnessG, int brightnessB, double[] rgbInfo) {
-		if (image == null)
-			return null;
-		if (rgbInfo.length == 0)
-			return this;
-		ImageOperation res = null;
-		if (rgbInfo.length > 3 && rgbInfo.length <= 6) {
-			double r1 = brightnessR / rgbInfo[0];
-			double g1 = brightnessR / rgbInfo[1];
-			double b1 = brightnessB / rgbInfo[2];
-			double r2 = brightnessR / rgbInfo[3];
-			double g2 = brightnessG / rgbInfo[4];
-			double b2 = brightnessB / rgbInfo[5];
-			double[] factorsTop = { r1, g1, b1 };
-			double[] factorsBottom = { r2, g2, b2 };
-			ImageOperation io = new ImageOperation(image);
-			res = io.multiplicateImageChannelsWithFactors(factorsTop, factorsBottom);
-		}
-		if (rgbInfo.length > 6) {
-			double[] factorsTopRight = { brightnessR / rgbInfo[0] * 1.2 * 180 / 140 };
-			double[] factorsBottomLeft = { brightnessR / rgbInfo[3] * 1.2 * 180 / 140 };
-			double[] factorsCenter = { brightnessR / rgbInfo[6] * 0.8 * 180 / 140 };
-			
-			ImageOperation io = new ImageOperation(image);
-			res = io.rmCircleShade(factorsTopRight, factorsBottomLeft, factorsCenter);
-		}
-		if (rgbInfo.length <= 3) {
-			double r = brightnessR / rgbInfo[0];
-			double g = brightnessG / rgbInfo[1];
-			double b = brightnessB / rgbInfo[2];
-			double[] factors = { r, g, b };
-			ImageOperation io = new ImageOperation(image);
-			res = io.multiplicateImageChannelsWithFactors(factors);
-		}
-		return res;
+		return imageBalancing(brightnessR, brightnessG, brightnessB, rgbInfo);
 	}
 	
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfoLEFT, double[] rgbInfoRIGHT) {

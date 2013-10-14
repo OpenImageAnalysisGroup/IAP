@@ -11,8 +11,6 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MainAxisCalculationResult;
-import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -32,15 +30,18 @@ public class BlCalcMainAxis extends
 	}
 	
 	@Override
-	protected Image processVISmask() {
+	protected Image processFLUOmask() {
 		if (options.getCameraPosition() == CameraPosition.TOP
-				&& input().masks().vis() != null) {
+				&& input().masks().fluo() != null) {
 			MainAxisCalculationResult macr = getAngle(input().masks()
-					.vis());
+					.fluo());
 			if (macr != null) {
 				double angle = macr.getMinResult().getAngle();
 				
-				double imageRotationAngle = getDouble("OFFSET_VIS_IMAGE_ROTATION_ANGLE", 0);
+				Double imageRotationAngle = input().masks().getFluoInfo().getPosition();
+				
+				if (imageRotationAngle == null)
+					imageRotationAngle = 0d;
 				
 				angle = angle - imageRotationAngle;
 				
@@ -53,22 +54,16 @@ public class BlCalcMainAxis extends
 				// getProperties().setNumericProperty(0,
 				// PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE,
 				// normalizedDistanceToMainAxis);
-				getProperties().setNumericProperty(0, PropertyNames.CENTROID_X.getName(),
-						macr.getCentroid().x);
-				getProperties().setNumericProperty(0, PropertyNames.CENTROID_Y.getName(),
-						macr.getCentroid().y);
+				getProperties().setNumericProperty(0, "RESULT_top.fluo.centroid.x",
+						macr.getCentroid().x, "px");
+				getProperties().setNumericProperty(0, "RESULT_top.fluo.centroid.y",
+						macr.getCentroid().y, "px");
 				
-				ResultsTableWithUnits rt = new ResultsTableWithUnits();
-				rt.incrementCounter();
-				rt.addValue("main.axis.rotation", angle);
-				rt.addValue("main.axis.normalized.distance.avg",
-						normalizedDistanceToMainAxis);
-				
-				getProperties().storeResults("RESULT_top.", rt,
-						getBlockPosition());
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree");
+				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis);
 			}
 		}
-		return input().masks().vis();
+		return input().masks().fluo();
 	}
 	
 	private MainAxisCalculationResult getAngle(Image image) {
@@ -79,7 +74,7 @@ public class BlCalcMainAxis extends
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
-		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -100,7 +95,7 @@ public class BlCalcMainAxis extends
 	
 	@Override
 	public String getDescription() {
-		return "Calculates the main axis rotation for visible top images. All other image " +
+		return "Calculates the main axis rotation for fluo top images. All other image " +
 				"types and configurations are ignored.";
 	}
 }

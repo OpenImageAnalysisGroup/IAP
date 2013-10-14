@@ -335,8 +335,6 @@ public class BlockResults implements BlockResultSet {
 		res.put("RESULT_VIS_MARKER_POS_3_LEFT_X", "null");
 		res.put("", "");
 		res.put("RESULT_VIS_MARKER_POS_3_RIGHT_X", "null");
-		res.put("top.main.axis.normalized.distance.avg", "mm");
-		res.put("top.main.axis.rotation", "degree");
 		res.put("top.area", "px");
 		res.put("top.border.length", "px");
 		res.put("top.compactness.01", "relative");
