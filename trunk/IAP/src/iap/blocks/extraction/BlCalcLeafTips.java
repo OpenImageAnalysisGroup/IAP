@@ -49,9 +49,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int geometricThresh = 0;
 		
 		if (!optimize) {
-			circlediameter = getInt("search diameter", 30); // 35
-			int parm = getInt("geometric threshold", 24);
-			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * (parm / 100.));
+			circlediameter = getInt("search diameter", 24); // 35
+			int parm = getInt("geometric threshold", 30);
+			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * (parm / 100d));
 			// (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
 		}
 		
@@ -60,7 +60,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			if (useMainAxes) {
 				HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
-						.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.main.axis.rotation");
+						.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation");
 				
 				double sum = 0;
 				int count = 0;
@@ -142,6 +142,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				borderList = new int[0];
 				e.printStackTrace();
 			}
+			
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			
@@ -154,17 +155,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			int avg_width = area / leaflength;
 			
+			// stepsize for border scan
+			int stepsize = 1;
+			
 			if (optimize) {
 				// optimize
 				// old: cd = 35, gt = k/4 + 42
 				
 				for (int cd = avg_width; cd <= avg_width * 2; cd++)
-					gt: for (int i = 20; i < 36; i++) {
+					gt: for (int i = 20; i < 40; i++) {
 						
 						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
 						
 						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, cd,
-								gt, 20, false);
+								gt, stepsize, false);
 						ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 						
 						int num_leafs = filteredList.size();
@@ -197,7 +201,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				// ResultsTableWithUnits rt = FeatureExtraction(vis_mask, imgorig, filteredList, circlediameter, background, debug);
 			} else {
 				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, circlediameter,
-						geometricThresh, 26, false);
+						geometricThresh, stepsize, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 				
 				Object[] res = FeatureExtraction(fluo_mask, imgorig, filteredList, circlediameter, background, debug);
@@ -373,6 +377,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				int idx = 1;
 				PositionAndColor tempMax = cornerlist.get(i);
 				while (temp > 0) {
+					if (((i + idx) % listsize) < 0)
+						continue;
 					temp = cornerlist.get((i + idx) % listsize).colorInt;
 					if (temp > tempMax.colorInt)
 						tempMax = cornerlist.get((i + idx) % listsize);
