@@ -9,5 +9,6 @@ package de.ipk.ag_ba.image.operation;
 public enum GrayscaleMode {
 	MODE_1,
 	MODE_2,
-	MODE_3;
+	MODE_3,
+	MODE_4;
 }

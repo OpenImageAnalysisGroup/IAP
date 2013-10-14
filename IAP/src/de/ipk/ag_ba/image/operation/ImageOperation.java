@@ -2633,18 +2633,47 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	/**
 	 * Conversion to grayscale image done by differnt methods used by gimp (explaination on http://home.arcor.de/ulile/node54.html).
+	 * formulas:
+	 * BT709 Greyscale: Red: 0.2125 Green: 0.7154 Blue: 0.0721
+	 * RMY Greyscale: Red: 0.5 Green: 0.419 Blue: 0.081
+	 * Y-Greyscale (YIQ/NTSC): Red: 0.299 Green: 0.587 Blue: 0.114
 	 * 
 	 * @param mode
 	 *           0 - hsv, saturation to zero l = [h, 0, v]
 	 *           1 - use this formula l = 0.3 * r + 0.59 * g + 0.11 * b
 	 *           2 - l = max(r, g, b)
+	 * @param scale
+	 *           scale from min-max to 0-255
 	 * @return
 	 */
-	public ImageOperation convertRGB2Grayscale(GrayscaleMode mode) {
+	public ImageOperation convertRGB2Grayscale(GrayscaleMode mode, boolean scale) {
 		int[] img1d = getImageAs1dArray().clone();
-		int[] res = new int[img1d.length];
-		int c, r, g, b, y;
+		int c, r, g, b, y, min = 0, max = 0;
 		float[] hsv = new float[3];
+		
+		if (scale) {
+			min = Integer.MAX_VALUE;
+			max = Integer.MIN_VALUE;
+			
+			for (int idx = 0; idx < img1d.length; idx++) {
+				c = img1d[idx];
+				
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = (c & 0x0000ff);
+				
+				Color.RGBtoHSB(r, g, b, hsv);
+				hsv[2] = hsv[2] * 255;
+				
+				if (hsv[2] < min)
+					min = (int) hsv[2];
+				
+				if (hsv[2] > max)
+					max = (int) hsv[2];
+			}
+		}
+		
+		int[] res = new int[img1d.length];
 		
 		for (int idx = 0; idx < img1d.length; idx++) {
 			c = img1d[idx];
@@ -2656,7 +2685,6 @@ public class ImageOperation implements MemoryHogInterface {
 			// use hsv, saturation to zero
 			if (mode == GrayscaleMode.MODE_1) {
 				Color.RGBtoHSB(r, g, b, hsv);
-				
 				hsv[1] = 0;
 				res[idx] = Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]);
 			}
@@ -2670,6 +2698,23 @@ public class ImageOperation implements MemoryHogInterface {
 			// use max value of RGB
 			if (mode == GrayscaleMode.MODE_3) {
 				y = Math.max(r, Math.max(g, b));
+				res[idx] = new Color(y, y, y).getRGB();
+			}
+			
+			// lightness http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
+			if (mode == GrayscaleMode.MODE_4) {
+				y = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 2;
+				res[idx] = new Color(y, y, y).getRGB();
+			}
+			
+			if (scale) {
+				int cc = res[idx];
+				r = ((cc & 0xff0000) >> 16);
+				y = (int) (255 * (r - min) / (double) (max - min));
+				if (y > 255)
+					y = 255;
+				if (y < 0)
+					y = 0;
 				res[idx] = new Color(y, y, y).getRGB();
 			}
 		}
