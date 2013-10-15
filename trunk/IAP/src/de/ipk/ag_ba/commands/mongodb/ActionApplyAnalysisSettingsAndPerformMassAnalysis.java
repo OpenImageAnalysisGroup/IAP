@@ -237,7 +237,8 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 	
 	private void getConfigSets(final TreeMap<String, ArrayList<ExperimentHeaderInterface>> config2headers) {
 		for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
-			if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")) {
+			if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")
+					&& !eh.getImportusergroup().equalsIgnoreCase("TEMP")) {
 				try {
 					status.setCurrentStatusText1("Process experiment info");
 					status.setCurrentStatusText2(eh.getExperimentName());
