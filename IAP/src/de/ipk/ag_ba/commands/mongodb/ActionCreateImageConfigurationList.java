@@ -63,7 +63,8 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 		try {
 			final TreeMap<String, ArrayList<String>> config2names = new TreeMap<String, ArrayList<String>>();
 			for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
-				if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")) {
+				if (eh.getImportusergroup() != null && !eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")
+						&& !eh.getImportusergroup().equalsIgnoreCase("TEMP")) {
 					try {
 						status.setCurrentStatusText1("Process experiment info");
 						status.setCurrentStatusText2(eh.getExperimentName());
