@@ -10,6 +10,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableProcessingSubstance;
@@ -17,6 +18,7 @@ import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author Christian Klukas
@@ -28,6 +30,7 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 	
 	private final ArrayList<String> errors = new ArrayList<String>();
 	private StringBuilder res;
+	private NavigationButton src;
 	
 	public ActionCreateImageConfigurationList(String tooltip) {
 		super(tooltip);
@@ -43,6 +46,7 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		this.src = src;
 		status.setCurrentStatusText1("");
 		status.setCurrentStatusText2("");
 		errors.clear();
@@ -150,17 +154,25 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		ArrayList<NavigationButton> r = new ArrayList<NavigationButton>();
+		NavigationAction action = new ActionSaveHTMLfile("Save Results in HTML file",
+				"image unit configuration overview " + StringManipulationTools.getFileSystemName(SystemAnalysis.getCurrentTimeInclSec()) + ".html",
+				res.toString());
+		r.add(new NavigationButton(action, src.getGUIsetting()));
+		return r;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		return currentSet;
+		ArrayList<NavigationButton> r = new ArrayList<NavigationButton>();
+		r.addAll(currentSet);
+		r.add(src);
+		return r;
 	}
 	
 	@Override
 	public boolean isProvidingActions() {
-		return false;
+		return true;
 	}
 	
 	@Override
