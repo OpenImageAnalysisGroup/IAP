@@ -20,7 +20,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
  *         Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class DBEgravistoHelper implements HelperClass {
-	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 1 // 07.2013"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 2 // 10.2013"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION_CODE = "2013"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2013"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_NAME = "DBE-Gravisto";
