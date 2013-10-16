@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Christian Klukas</author>
+	<description>VANTED Hierarchy Commands(break)(work with experiment-data related hierarchy information,(break)includes several commands, to be found in the hierarchy menu,(break)and additional node selection commands in the edit menu)</description>
+
+	<plugindesc>
+	     <name>Hierarchy commands</name>
+         <main>vanted_feature.PluginFeatureHierarchyCommands</main>
+         <version>n/a</version>
+         <optional>true</optional>
+         <available>http://vanted.ipk-gatersleben.de</available>
+    </plugindesc>
+</plugin>

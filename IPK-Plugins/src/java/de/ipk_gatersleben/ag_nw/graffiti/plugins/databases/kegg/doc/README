@@ -1,0 +1,98 @@
+README:
+  LIGAND - Database of Chemical Compounds and Reactions in Biological Pathways
+
+This directory contains the following files of the LIGAND database, Release
+29.0. For more detailed information on each file, see the ligand.txt file.
+
+File		Contents
+
+ligand.txt	User manual of the LIGAND database.
+
+compound	COMPOUND section of the LIGAND database.
+
+mol.tar.Z	MDL mol file format compound structure data.
+		By uncompress and tar xvf commands, the files C?????.mol
+		are created in the mol directory. C????? is the compound ID.
+
+gif.tar.Z	GIF format compound structure data.
+		By uncompress and tar xvf commands, the files C?????.gif
+		are created in the gif directory. C????? is the compound ID.
+
+kcf.tar.Z	KCF format compound structure data.
+		By uncompress and tar xvf commands, the files C?????.kcf
+		are created in the kcf directory. C????? is the compound ID.
+
+merged_compound.lst
+		List of merged compounds with the first column for the obsolete
+		compound ID and the second coloumn for the currently used
+		compound ID.
+
+glycan		GLYCAN section of the LIGAND database.
+
+glycan_gif.tar.Z
+		GIF format glycan structure data.
+		By uncompress and tar xvf commands, the files G?????.gif
+		are created in the glycan_gif directory.
+		G????? is the glycan ID.
+
+glycan_kcf.tar.Z
+		KCF format glycan structure data.
+		By uncompress and tar xvf commands, the files G?????.kcf
+		are created in the glycan_kcf directory.
+		G????? is the glycan ID.
+
+reaction	REACTION section of the LIGAND database.
+
+reaction_gif.tar.Z
+		GIF format reaction structure data.
+		By uncompress and tar xvf commands, the files R?????.gif
+		are created in the reaction_gif directory.
+		R????? is the reaciton ID.
+
+reaction_name.lst
+		List of reactions extracted from the DEFINITION field of
+		the REACTION section.
+
+reaction.lst	List of reactions extracted from the EQUATION field of
+		the REACTION section.
+
+reaction_main.lst
+		Almost the same as reaction.lst except that the compounds
+		in each reaction are limited to the chemical compounds shown
+		in the KEGG pathway diagrams, i.e. possibly main reactants.
+
+reaction_mapformula.lst
+		This file is a reformatting of the reaction_main.lst and
+		includes links to pathway map IDs and direction information
+		of each reaction. The arrow of each reaction is either =>,
+		<=, or <=>.
+		Please use this file instead of reaction_main.lst.
+		reaction_main.lst will be obsolete or replaced with another
+		information in near future.
+
+enzyme		Enzyme section of the LIGAND database.
+
+ECtable		Enzyme EC number classification table.
+
+
+*******************************************************************************
+* Important Notice:                                                           *
+* Redistribution of the data in this directory, or use in any purpose other   *
+* than strictly academic research requires KEGG license agreement.  Please    *
+* contact the licensor, Pathway Solutions, Inc. (http://www.pathway.jp/).     *
+*******************************************************************************
+
+
+Please cite the following paper when making use of the LIGAND database:
+
+    Goto, S., Nishioka, T., and Kanehisa, M., "LIGAND: Chemical Database for
+    Enzyme Reactions", Bioinformatics, 14:591-599 (1998).
+
+
+Susumu Goto
+Bioinformatics Center
+Institute for Chemical Research
+Kyoto University
+Uji 611-0011, Japan
+
+goto@kuicr.kyoto-u.ac.jp
