@@ -1,5 +1,38 @@
 -- See end of file for help on upgrade procedure --
 
+V1.1.0 (October 16, 2013)
+--------------------------------------------------------------------------------
+- Outlook -
+* More information on improvements and fixes of V1.1 will be added here, later.
+* Future versions will be even more streamlined according to received user-
+  feedback (initial feedback has been already incorporated). 
+  Further performance improvements are planned.
+
+- Bug Fixes -
+* Fix (change 21):
+  Bug fixes related to the separation of analysis settings, based on the
+  image unit configuration name.
+
+- New Features -
+* New (change 20)
+  New commands to detect and view sets of experiments with common camera 
+  configurations (based on imported image unit configuration names).
+  The two button commands are available from the MongoDB > Database Tools
+  section. The second command allows copying analysis settings from a previous
+  experiment, to experiments which used the same image unit configurations. 
+  This way it is very quickly possible to analyze all experiments with a common
+  experiment setup, based on a selected experiment analysis pipeline.
+* New (change 19)
+  Maize default pipeline uses various blocks, which are "auto-tuning" its 
+  parameters. The standard pipeline requires thus much less initial 
+  parameterization.
+* New (change 18)
+  Block selection dialog improved (allows selecting analysis blocks using graphical
+  GUI).
+* New (change 17)
+  Add-on manager button command (from IAP > About > Add-on Manager) more easily
+  accessible.
+
 V1.0.3 (August 24, 2013)
 --------------------------------------------------------------------------------
 - New Features -
