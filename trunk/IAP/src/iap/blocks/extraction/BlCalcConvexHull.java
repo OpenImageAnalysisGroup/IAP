@@ -40,7 +40,7 @@ public class BlCalcConvexHull extends AbstractBlock {
 		if (distHorizontal == null)
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);
-		boolean drawPCLine = getBoolean("draw_PC_line", true);
+		boolean drawPCLine = getBoolean("draw_caliper_length", true);
 		ImageOperation res = new ImageOperation(image).show(prefix + " input image", debug).hull()
 				.find(true, false, drawHull, drawPCLine, drawHull, Color.RED.getRGB(),
 						Color.CYAN.getRGB(),
