@@ -390,9 +390,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				long currTime = System.currentTimeMillis();
 				
-				status.setCurrentStatusText2((written.getLong() / 1024 / 1024)
-						+ " MB, "
-						+ SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) +
+				status.setCurrentStatusText2(SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) +
 						", skipped " + (skipped.getLong() / 1024 / 1024)
 						+ " MB");
 				
