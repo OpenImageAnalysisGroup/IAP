@@ -32,6 +32,8 @@ public class ConvexHullCalculator {
 	
 	private Image customImage;
 	
+	private double hullLength;
+	
 	/**
 	 * The imageOperation - ResultTable is retained and extended (if available)
 	 * during calculation.
@@ -74,6 +76,7 @@ public class ConvexHullCalculator {
 		
 		Point[] points = new Point[n];
 		n = 0;
+		this.hullLength = Double.NaN;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
 				if (borderImage[x][y] == b)
@@ -85,12 +88,23 @@ public class ConvexHullCalculator {
 			numberOfHullPoints = qh.computeHull(points);
 			
 			Point[] resultPoints = new Point[numberOfHullPoints];
-			for (int i = 0; i < numberOfHullPoints; i++)
+			for (int i = 0; i < numberOfHullPoints; i++) {
+				if (i == 0)
+					hullLength = 0;
+				else {
+					double dist = dist(points[i], points[i - 1]);
+					hullLength += dist;
+				}
 				resultPoints[i] = points[i];
+			}
 			
 			this.polygon = new Polygon(resultPoints);
 		} else
 			polygon = null;
+	}
+	
+	private double dist(Point a, Point b) {
+		return Math.sqrt((b.x - a.x) * (b.y - a.y) + (b.y - a.y) * (b.y - a.y));
 	}
 	
 	public ConvexHullCalculator setCustomBackgroundImageForDrawing(Image customImage) {
@@ -159,15 +173,22 @@ public class ConvexHullCalculator {
 			double normFactor = distHorizontal != null && realMarkerDist != null ? realMarkerDist / distHorizontal : 1;
 			
 			rt.addValue("hull.points", numberOfHullPoints);
+			rt.addValue("hull.length", hullLength);
 			int filledArea = io.countFilledPixels();
-			if (filledArea > 0)
+			if (filledArea > 0) {
 				rt.addValue("compactness.01", 4 * Math.PI
 						/ (borderPixels * borderPixels / filledArea));
-			rt.addValue("compactness.16",
-					(borderPixels * borderPixels / filledArea));
+				rt.addValue("compactness.16",
+						(borderPixels * borderPixels / filledArea));
+				rt.addValue("hull.compactness.01", 4 * Math.PI
+						/ (hullLength * hullLength / filledArea));
+				rt.addValue("hull.compactness.16",
+						(hullLength * hullLength / filledArea));
+			}
 			if (distHorizontal != null) {
 				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
 				rt.addValue("border.length.norm", borderPixels * normFactor);
+				rt.addValue("hull.length.norm", hullLength * normFactor);
 			}
 			rt.addValue("hull.area", polygon.area());
 			rt.addValue("border.length", borderPixels);
