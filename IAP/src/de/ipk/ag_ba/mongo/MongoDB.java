@@ -891,7 +891,7 @@ public class MongoDB {
 					List<NumericMeasurementInterface> fl = Substance3D.getAllFiles(experiment, MeasurementNodeType.IMAGE);
 					n = fl.size();
 					max = n;
-					Long size = Substance3D.getFileSize(fl);
+					Long size = Substance3D.getFileSize(fl, optStatusProvider);
 					newSize.addLong(size);
 				} else {
 					List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
