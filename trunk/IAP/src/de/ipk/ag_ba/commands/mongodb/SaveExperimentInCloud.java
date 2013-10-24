@@ -347,7 +347,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (storeInMongo)
 			return "Add files";
 		else
-			return "Load Files";
+			return "Create IAP Dataset from Files";
 	}
 	
 	@Override

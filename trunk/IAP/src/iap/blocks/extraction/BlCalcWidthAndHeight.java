@@ -168,7 +168,7 @@ public class BlCalcWidthAndHeight extends
 									
 									@Override
 									public ImageConfiguration getConfig() {
-										return ImageConfiguration.RgbSide;
+										return ImageConfiguration.VisSide;
 									}
 									
 									@Override

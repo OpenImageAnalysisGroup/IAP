@@ -186,10 +186,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 									case NirTop:
 										tsoLoadDataOkNIRtop.addInt(1);
 										break;
-									case RgbSide:
+									case VisSide:
 										tsoLoadDataOkVISside.addInt(1);
 										break;
-									case RgbTop:
+									case VisTop:
 										tsoLoadDataOkVIStop.addInt(1);
 										break;
 									case Unknown:
@@ -210,10 +210,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 									case NirTop:
 										tsoLoadDataErrorsNIRtop.addInt(1);
 										break;
-									case RgbSide:
+									case VisSide:
 										tsoLoadDataErrorsVISside.addInt(1);
 										break;
-									case RgbTop:
+									case VisTop:
 										tsoLoadDataErrorsVIStop.addInt(1);
 										break;
 									case Unknown:
@@ -404,10 +404,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			case NirTop:
 				tsoLoadDataErrorsNIRtop.addLong(1);
 				break;
-			case RgbSide:
+			case VisSide:
 				tsoLoadDataErrorsVISside.addLong(1);
 				break;
-			case RgbTop:
+			case VisTop:
 				tsoLoadDataErrorsVIStop.addLong(1);
 				break;
 			case Unknown:
@@ -431,10 +431,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 			case NirTop:
 				tsoLoadDataOkNIRtop.addLong(1);
 				break;
-			case RgbSide:
+			case VisSide:
 				tsoLoadDataOkVISside.addLong(1);
 				break;
-			case RgbTop:
+			case VisTop:
 				tsoLoadDataOkVIStop.addLong(1);
 				break;
 			case Unknown:

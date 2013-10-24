@@ -35,8 +35,11 @@ public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlock {
 		Image plantImg = input().masks().fluo();
 		boolean drawSkeleton = getBoolean("draw_skeleton", true);
 		Image skel = getProperties().getImage("skeleton_fluo");
+		
 		if (skel != null && plantImg != null)
-			return plantImg.io().drawSkeleton(skel, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
+			return plantImg.io()
+					.drawSkeleton(skel.show("skeleton", debugValues), drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage()
+					.show("skeleton overlayed", debugValues);
 		else
 			return plantImg;
 	}

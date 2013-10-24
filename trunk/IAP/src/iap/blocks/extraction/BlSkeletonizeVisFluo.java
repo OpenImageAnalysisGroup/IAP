@@ -100,15 +100,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			return fluo;
 		Image res = fluo.copy();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
-			Image viswork = fluo.copy().io()// .medianFilter32Bit()
+			Image fluowork = fluo.copy().io()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 1))
 					.dilate(getInt("Dilate-Cnt-Fluo", 1))
 					.blur(getDouble("Blur-Fluo", 4))
 					.getImage().show("fluo", debug);
 			
-			if (viswork != null)
+			if (fluowork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(fluowork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean(new BlDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -350,11 +350,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		
 		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getProperties().storeResults(
-					"RESULT_side.", rt,
+					"RESULT_side.", "|skeleton", rt,
 					getBlockPosition());
 		if (options.getCameraPosition() == CameraPosition.TOP && rt != null)
 			getProperties().storeResults(
-					"RESULT_top.", rt,
+					"RESULT_top.", "|skeleton", rt,
 					getBlockPosition());
 		
 		return skel2d.getAsFlexibleImage();

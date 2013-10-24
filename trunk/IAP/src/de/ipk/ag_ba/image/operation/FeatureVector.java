@@ -15,6 +15,10 @@ public class FeatureVector {
 		this.numFeatures = new ArrayList<Float>();
 	}
 	
+	public FeatureVector(Color c) {
+		new FeatureVector(c, 0f, 0f);
+	}
+	
 	public FeatureVector(Color c, float xr, float yr) {
 		float L;
 		float a;

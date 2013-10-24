@@ -933,7 +933,7 @@ public class IAPservice {
 								if (ic == ImageConfiguration.Unknown) {
 									sn.addUnknown(urlId, p);
 								} else {
-									if (ic == ImageConfiguration.RgbSide)
+									if (ic == ImageConfiguration.VisSide)
 										sn.addRgb(urlId, p);
 									if (ic == ImageConfiguration.FluoSide)
 										sn.addFluo(urlId, p);
@@ -942,7 +942,7 @@ public class IAPservice {
 									if (ic == ImageConfiguration.IrSide)
 										sn.addIr(urlId, p);
 									
-									if (ic == ImageConfiguration.RgbTop)
+									if (ic == ImageConfiguration.VisTop)
 										sn.addRgb(urlId, p < 1 ? -1 : -p);
 									if (ic == ImageConfiguration.FluoTop)
 										sn.addFluo(urlId, p < 1 ? -1 : -p);
@@ -966,14 +966,14 @@ public class IAPservice {
 								if (ic == ImageConfiguration.Unknown) {
 									sn.addUnknown(urlId, p);
 								} else {
-									if (ic == ImageConfiguration.RgbSide)
+									if (ic == ImageConfiguration.VisSide)
 										sn.addRgb(urlId, p);
 									if (ic == ImageConfiguration.FluoSide)
 										sn.addFluo(urlId, p);
 									if (ic == ImageConfiguration.NirSide)
 										sn.addNir(urlId, p);
 									
-									if (ic == ImageConfiguration.RgbTop)
+									if (ic == ImageConfiguration.VisTop)
 										sn.addRgb(urlId, p < 1 ? -1 : -p);
 									if (ic == ImageConfiguration.FluoTop)
 										sn.addFluo(urlId, p < 1 ? -1 : -p);

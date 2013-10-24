@@ -775,6 +775,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
+	@Deprecated
 	public ImageOperation dilate(int[][] mask) {
 		return dilate(image.getProcessor(), mask);
 	}
@@ -1093,9 +1094,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return new SkeletonizeProcessor(this);
 	}
 	
-	public void outline(int[][] mask) { // starke Farbübergänge werden als
-		// Kante
-		// erkannt
+	public void outline(int[][] mask) { // strong color gradients will be recognized as edge
 		ImageProcessor tempImage = image.getProcessor().duplicate();
 		dilate(tempImage, mask);
 		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
@@ -2637,6 +2636,9 @@ public class ImageOperation implements MemoryHogInterface {
 	 * BT709 Greyscale: Red: 0.2125 Green: 0.7154 Blue: 0.0721
 	 * RMY Greyscale: Red: 0.5 Green: 0.419 Blue: 0.081
 	 * Y-Greyscale (YIQ/NTSC): Red: 0.299 Green: 0.587 Blue: 0.114
+	 * +++
+	 * 1. for every pixel I first check if blue component is greater than green and red
+	 * 2. if it IS I use Lightness method (or Average – both are good) … if NOT I use Luminosity method for current pixel.
 	 * 
 	 * @param mode
 	 *           0 - hsv, saturation to zero l = [h, 0, v]
@@ -3807,7 +3809,7 @@ public class ImageOperation implements MemoryHogInterface {
 				ai = p[b + 256];
 				bi = p[b + 512];
 				
-				float dist = Math.abs(ai - targetAi) + Math.abs(bi - targetBi);
+				float dist = Math.abs(Li - targetLi) / 2.0f + Math.abs(ai - targetAi) + Math.abs(bi - targetBi);
 				
 				DistanceAndColor d = new DistanceAndColor(x, y, r, g, b, dist);
 				result.add(d);

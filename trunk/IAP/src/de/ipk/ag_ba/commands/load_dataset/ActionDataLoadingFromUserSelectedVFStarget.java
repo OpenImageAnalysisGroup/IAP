@@ -25,7 +25,7 @@ public class ActionDataLoadingFromUserSelectedVFStarget extends AbstractNavigati
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Remote Storage Location";
+		return "Add Remote Storage Location";
 	}
 	
 	@Override

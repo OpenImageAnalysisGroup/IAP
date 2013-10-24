@@ -97,8 +97,8 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 									case NirTop:
 										nir.add(substance.getInfo());
 										break;
-									case RgbSide:
-									case RgbTop:
+									case VisSide:
+									case VisTop:
 										vis.add(substance.getInfo());
 										break;
 									case Unknown:

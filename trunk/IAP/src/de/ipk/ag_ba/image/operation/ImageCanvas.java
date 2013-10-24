@@ -66,18 +66,20 @@ public class ImageCanvas {
 		
 		for (int xi = x; xi <= x + w; xi++)
 			for (int yi = y; yi <= y + h; yi++) {
-				int i = xi + yi * wi;
-				if (i >= 0 && i < img.length) {
-					c = img[i];
-					r = (c & 0xff0000) >> 16;
-					g = (c & 0x00ff00) >> 8;
-					b = (c & 0x0000ff);
-					
-					red = (int) (alpha * r + (1 - alpha) * colorRedRect);
-					green = (int) (alpha * g + (1 - alpha) * colorGreenRect);
-					blue = (int) (alpha * b + (1 - alpha) * colorBlueRect);
-					
-					img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
+				if (xi >= 0 && xi < wi) {
+					int i = xi + yi * wi;
+					if (i >= 0 && i < img.length) {
+						c = img[i];
+						r = (c & 0xff0000) >> 16;
+						g = (c & 0x00ff00) >> 8;
+						b = (c & 0x0000ff);
+						
+						red = (int) (alpha * r + (1 - alpha) * colorRedRect);
+						green = (int) (alpha * g + (1 - alpha) * colorGreenRect);
+						blue = (int) (alpha * b + (1 - alpha) * colorBlueRect);
+						
+						img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
+					}
 				}
 			}
 		image = new Image(wi, hi, img);

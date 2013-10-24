@@ -33,15 +33,34 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * Block is used for parm tuning.
+ * This Block can used for parameter tuning.
  **/
 public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
+	boolean calcOnVis = false;
+	
+	@Override
+	protected Image processVISmask() {
+		calcOnVis = getBoolean("Calculate on Vis Image", false);
+		Image img = input().masks().vis();
+		if (calcOnVis)
+			return doLeafTipAnalysis(img);
+		else
+			return img;
+	}
 	
 	@Override
 	protected Image processFLUOmask() {
-		
+		calcOnVis = getBoolean("Calculate on Vis Image", false);
+		Image img = input().masks().fluo();
+		if (!calcOnVis)
+			return doLeafTipAnalysis(img);
+		else
+			return img;
+	}
+	
+	private Image doLeafTipAnalysis(Image inputImage) {
 		boolean debug = getBoolean("debug", false);
-		int numofblur = getInt("number of blur runs", 1);
+		double numofblur = getDouble("number of blur runs", 1);
 		boolean optimize = getBoolean("optimize parameter", false);
 		boolean useMainAxes = getBoolean("Use Main Axes From Top", true);
 		
@@ -49,79 +68,52 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int geometricThresh = 0;
 		
 		if (!optimize) {
-			circlediameter = getInt("search diameter", 24); // 35
-			int parm = getInt("geometric threshold", 30);
-			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * (parm / 100d));
+			circlediameter = getInt("search diameter", 27); // 35
+			int parm = getInt("geometric threshold", 32);
+			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * ((double) parm / 100));
 			// (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
 		}
 		
-		// search for best side image
-		if (options.getCameraPosition() == CameraPosition.SIDE && input().masks().fluo() != null) {
+		if (options.getCameraPosition() == CameraPosition.SIDE && inputImage != null) {
 			
+			// search for best side image
 			if (useMainAxes) {
-				HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
-						.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation");
+				boolean isBestAngle = isBestAngle();
 				
-				double sum = 0;
-				int count = 0;
-				
-				for (HashMap<Integer, ArrayList<BlockPropertyValue>> a : previousResults.values()) {
-					for (ArrayList<BlockPropertyValue> b : a.values()) {
-						for (BlockPropertyValue c : b) {
-							count++;
-							sum += c.getValue();
-						}
-					}
-				}
-				
-				if (count == 0) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can´t calculate leaf tips, no main axis calculation available!");
-					return input().masks().fluo();
-				}
-				
-				ImageData currentImage = input().images().getFluoInfo();
-				
-				double mainRotationFromTopView = sum / count;
-				double mindist = Double.MAX_VALUE;
-				boolean currentImageIsBest = false;
-				
-				for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
-					if (nmi instanceof ImageData) {
-						Double r = ((ImageData) nmi).getPosition();
-						if (r == null)
-							r = 0d;
-						double dist = Math.abs(mainRotationFromTopView - r);
-						if (dist < mindist) {
-							mindist = dist;
-							if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
-								currentImageIsBest = true;
-							else
-								currentImageIsBest = false;
-						}
-					}
-				}
-				
-				if (!currentImageIsBest)
-					return input().masks().fluo();
+				if (!isBestAngle)
+					return inputImage;
 			}
 			
-			Image fluo_mask = input().masks().fluo();
-			Image imgorig = fluo_mask.copy();
-			Image resultimg = imgorig;
+			Image mask = inputImage;
+			Image imgorig = inputImage.copy();
 			int background = ImageOperation.BACKGROUND_COLORint;
 			
-			fluo_mask.show("fluo_mask", debug);
+			mask.show("mask", debug);
 			
 			// blur
-			fluo_mask = fluo_mask.io().blur(numofblur).getImage();
+			mask = mask.io().blur(numofblur).getImage();
+			
+			double averageLeafWidthEstimation = inputImage.io().countFilledPixels() /
+					(double) inputImage.copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
+			
+			boolean ngUse = true;
+			boolean autoTune = true;
+			double f = getDouble("object removal multiplier", 2.0);
+			averageLeafWidthEstimation *= f;
+			
+			mask = mask.io().removeSmallClusters(ngUse,
+					autoTune ? (int) (averageLeafWidthEstimation * averageLeafWidthEstimation) : getInt("Noise-Size-Fluo-Area", 10 * 10),
+					autoTune ? (int) averageLeafWidthEstimation : getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
+					options.getNeighbourhood(), options.getCameraPosition(), null,
+					autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues).getImage();
 			
 			// dilate
 			// vis_mask = vis_mask.io().mo().erode_or_dilate(10, false).getImage();
 			
-			fluo_mask.show("after blur and dilate", debug);
+			mask.show("after blur and dilate", debug);
 			
 			// detect borders
-			ImageOperation io = new ImageOperation(fluo_mask.getAs2A()).border()
+			ImageOperation io = new ImageOperation(mask.getAs2A()).border()
 					.borderDetection(background, Color.CYAN.getRGB(),
 							false);
 			
@@ -147,7 +139,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			rt.incrementCounter();
 			
 			// get avg leaf width
-			SkeletonProcessor2d skel2d = new SkeletonProcessor2d(fluo_mask.io().skeletonize(true).getImage());
+			SkeletonProcessor2d skel2d = new SkeletonProcessor2d(mask.io().skeletonize(true).getImage());
 			
 			Image skelimg = skel2d.getAsFlexibleImage();
 			int leaflength = skelimg.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
@@ -162,12 +154,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				// optimize
 				// old: cd = 35, gt = k/4 + 42
 				
-				for (int cd = avg_width; cd <= avg_width * 2; cd++)
+				for (int cd = avg_width; cd <= avg_width * 2; cd++) {
 					gt: for (int i = 20; i < 40; i++) {
 						
 						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
 						
-						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, cd,
+						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(mask, borderList, cd,
 								gt, stepsize, false);
 						ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 						
@@ -183,37 +175,71 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						if (num_leafs > 15)
 							break gt;
 					}
-				// // parameter definition
-				// int diameter = getInt("leaf tip search diameter", 35);
-				// double percentofcircle = 100 / getDouble("filled percent of circle", 29.5);
-				//
-				// int circlediameter = diameter;
-				// int geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) / percentofcircle);
-				
-				// calculate tip candidates based on SUSAN algorithm
-				// ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(vis_mask, borderList, circlediameter,
-				// geometricThresh, 20, false);
-				//
-				// // filter candidate list
-				// ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
-				
-				// save results in rt
-				// ResultsTableWithUnits rt = FeatureExtraction(vis_mask, imgorig, filteredList, circlediameter, background, debug);
+				}
 			} else {
-				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(fluo_mask, borderList, circlediameter,
+				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(mask, borderList, circlediameter,
 						geometricThresh, stepsize, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 				
-				Object[] res = FeatureExtraction(fluo_mask, imgorig, filteredList, circlediameter, background, debug);
+				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, background, debug);
 				
 				rt = (ResultsTableWithUnits) res[1];
-				resultimg = (Image) res[0];
+				// num of leafs
+				rt.addValue("leaf.count", filteredList.size());
 			}
 			// rt.show("rt", true);
-			getProperties().storeResults("RESULT_", rt, getBlockPosition());
-			return resultimg;
+			getProperties().storeResults("RESULT_", "|SUSAN_corner_detection", rt, getBlockPosition());
 		}
-		return input().masks().fluo();
+		return inputImage;
+	}
+	
+	private boolean isBestAngle() {
+		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
+				.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation");
+		
+		double sum = 0;
+		int count = 0;
+		
+		for (HashMap<Integer, ArrayList<BlockPropertyValue>> a : previousResults.values()) {
+			for (ArrayList<BlockPropertyValue> b : a.values()) {
+				for (BlockPropertyValue c : b) {
+					count++;
+					sum += c.getValue();
+				}
+			}
+		}
+		
+		if (count == 0) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can´t calculate leaf tips, no main axis calculation available!");
+			return false;
+		}
+		
+		ImageData currentImage = input().images().getFluoInfo();
+		
+		double mainRotationFromTopView = sum / count;
+		double mindist = Double.MAX_VALUE;
+		boolean currentImageIsBest = false;
+		
+		for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
+			if (nmi instanceof ImageData) {
+				Double r = ((ImageData) nmi).getPosition();
+				if (r == null)
+					r = 0d;
+				double dist = Math.abs(mainRotationFromTopView - r);
+				if (dist < mindist) {
+					mindist = dist;
+					if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
+						currentImageIsBest = true;
+					else
+						currentImageIsBest = false;
+				}
+			}
+		}
+		
+		if (!currentImageIsBest)
+			return false;
+		
+		return true;
 	}
 	
 	public Object[] FeatureExtraction(Image img, Image imgorig, ArrayList<PositionAndColor> borderlistPlusCornerestimation,
@@ -242,7 +268,32 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		// gamma image
 		Image imgGamma = img.copy().io().gamma(7.0).getImage();
 		
+		int up = 0;
+		int down = 0;
 		int index = 1;
+		getProperties().addImagePostProcessor(new RunnableOnImageSet() {
+			
+			@Override
+			public Image postProcessMask(Image imgGamma) {
+				imgGamma = imgGamma
+						.io().clearImageLeft(imgGamma.getWidth(), ImageOperation.BACKGROUND_COLORint)
+						.getImage();
+				return imgGamma;
+			}
+			
+			@Override
+			public Image postProcessImage(Image image) {
+				return image;
+			}
+			
+			@Override
+			public ImageConfiguration getConfig() {
+				if (!calcOnVis)
+					return ImageConfiguration.FluoSide;
+				else
+					return ImageConfiguration.VisSide;
+			}
+		});
 		for (int i = 0; i < size; i++) {
 			final int xtemp = borderlistPlusCornerestimation.get(i).x;
 			final int ytemp = borderlistPlusCornerestimation.get(i).y;
@@ -279,11 +330,14 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// calc direction of leaftip
 			int direction = 0;
 			
-			if (centerOfGravity.y + dim[2] > ytemp)
+			if (centerOfGravity.y + dim[2] > ytemp) {
 				direction = -1; // up
-			else
+				up++;
+			} else {
 				direction = 1; // down
-				
+				down++;
+			}
+			
 			Vector2d midPoint = new Vector2d(Math.abs(regionImage.getWidth() / 2), Math.abs(regionImage.getHeight() / 2));
 			
 			double distCoGToMid = centerOfGravity.distance(midPoint.x, midPoint.y);
@@ -347,13 +401,18 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				@Override
 				public ImageConfiguration getConfig() {
-					return ImageConfiguration.FluoSide;
+					if (!calcOnVis)
+						return ImageConfiguration.FluoSide;
+					else
+						return ImageConfiguration.VisSide;
 				}
 			});
 			
 			index++;
 		}
 		
+		rt.addValue("leaf.count.up", up);
+		rt.addValue("leaf.count.down", down);
 		imgGamma.show("marked", debug);
 		rt.show("resultstable", debug);
 		
@@ -880,7 +939,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Calculates leaf tips of a plant.";
+		return "Calculates leaf tips of a plant. (number of leafs)";
 	}
 	
 	@Override

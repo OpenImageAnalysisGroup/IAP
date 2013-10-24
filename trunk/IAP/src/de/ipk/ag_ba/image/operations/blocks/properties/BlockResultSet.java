@@ -52,6 +52,10 @@ public interface BlockResultSet {
 			ResultsTableWithUnits numericResults,
 			int position);
 	
+	void storeResults(String id_prefix, String id_postfix,
+			ResultsTableWithUnits numericResults,
+			int position);
+	
 	public void printAnalysisResults();
 	
 	public void setImage(String id, Image image);
