@@ -12,7 +12,7 @@ package de.ipk.ag_ba.server.analysis;
  */
 public enum ImageConfiguration {
 	FluoSide, FluoTop,
-	RgbSide, RgbTop,
+	VisSide, VisTop,
 	NirTop, NirSide,
 	IrSide, IrTop,
 	Unknown;
@@ -22,20 +22,20 @@ public enum ImageConfiguration {
 			return Unknown;
 		name = name.toUpperCase();
 		if (name.equals("DUMMY SUBSTANCE"))
-			return ImageConfiguration.RgbTop;
+			return ImageConfiguration.VisTop;
 		if (name.contains("FLU") && name.contains("TOP"))
 			return ImageConfiguration.FluoTop;
 		if (name.contains("FLU"))
 			return ImageConfiguration.FluoSide;
 		
 		if (name.contains("VIS") && name.contains("TOP"))
-			return ImageConfiguration.RgbTop;
+			return ImageConfiguration.VisTop;
 		if (name.contains("VIS"))
-			return ImageConfiguration.RgbSide;
+			return ImageConfiguration.VisSide;
 		if (name.contains("RGB") && name.contains("TOP"))
-			return ImageConfiguration.RgbTop;
+			return ImageConfiguration.VisTop;
 		if (name.contains("RGB"))
-			return ImageConfiguration.RgbSide;
+			return ImageConfiguration.VisSide;
 		
 		if (name.contains("NIR") && name.contains("TOP"))
 			return ImageConfiguration.NirTop;
@@ -52,12 +52,12 @@ public enum ImageConfiguration {
 	
 	public boolean isSide() {
 		switch (this) {
-			case RgbSide:
+			case VisSide:
 			case FluoSide:
 			case NirSide:
 			case IrSide:
 				return true;
-			case RgbTop:
+			case VisTop:
 			case FluoTop:
 			case NirTop:
 			case IrTop:

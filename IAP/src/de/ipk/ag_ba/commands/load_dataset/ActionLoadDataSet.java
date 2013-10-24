@@ -54,7 +54,7 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Load Dataset";
+		return "Load or Create Dataset";
 	}
 	
 	@Override

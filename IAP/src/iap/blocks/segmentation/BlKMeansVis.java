@@ -140,17 +140,19 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			run = false;
 			
-			for (int i = 0; i < newCenterPoints.size(); i++) {
-				double dist = newCenterPoints.get(i).euclidianDistance(centerPoints.get(i));
+			if (getBoolean(getSettingsNameForLoop(), false)) {
+				for (int i = 0; i < newCenterPoints.size(); i++) {
+					double dist = newCenterPoints.get(i).euclidianDistance(centerPoints.get(i));
+					if (debugValues)
+						System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
+					if (dist > epsilon)
+						run = true;
+				}
 				if (debugValues)
-					System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
-				if (dist > epsilon)
-					run = true;
+					System.out.println();
+				if (run)
+					centerPoints = newCenterPoints;
 			}
-			if (debugValues)
-				System.out.println();
-			if (run)
-				centerPoints = newCenterPoints;
 		}
 		
 		int[] result = new int[w * h];
@@ -207,6 +209,10 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Segmentation based on the k-means clustering.";
+	}
+	
+	public String getSettingsNameForLoop() {
+		return "k-Means optimization loop";
 	}
 	
 }

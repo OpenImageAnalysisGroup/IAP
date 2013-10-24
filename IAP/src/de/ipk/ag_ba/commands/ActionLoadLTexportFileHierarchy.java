@@ -310,7 +310,7 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		if (getInput)
 			return "Select Input Folder...";
 		else
-			return "DB-Imp.-Exp. Dataset";
+			return "Create IAP Dataset(s) from LT Dump";
 	}
 	
 	@Override

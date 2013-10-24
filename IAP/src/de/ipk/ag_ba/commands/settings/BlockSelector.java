@@ -121,15 +121,15 @@ public class BlockSelector {
 		String is = "<font color='blue'>";
 		String ie = "</font>";
 		
-		String vi = gs + (inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-		String fi = rs + (inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-		String ni = ns + (inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-		String ii = is + (inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
+		String vi = gs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+		String fi = rs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+		String ni = ns + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+		String ii = is + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
 		
-		String vo = gs + (inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-		String fo = rs + (inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-		String no = ns + (inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-		String io = is + (inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
+		String vo = gs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+		String fo = rs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+		String no = ns + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+		String io = is + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
 		
 		inf = "" +
 				"<table border='0'><tr>" +

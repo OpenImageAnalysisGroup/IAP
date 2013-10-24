@@ -117,7 +117,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
-			getProperties().addImagePostProcessor(ImageConfiguration.RgbTop, roi, null);
+			getProperties().addImagePostProcessor(ImageConfiguration.VisTop, roi, null);
 		}
 		ress.show("res", debug);
 		return ress;
@@ -126,7 +126,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix,
 			boolean isThinnedImage, int[][] optDistanceMap, ArrayList<RunnableOnImage> postProcessing)
 			throws Exception {
-		boolean graphAnalysis = getBoolean("Calculate Graph Diameters", true);
+		boolean graphAnalysis = getBoolean("Calculate Graph Diameters", false);
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();

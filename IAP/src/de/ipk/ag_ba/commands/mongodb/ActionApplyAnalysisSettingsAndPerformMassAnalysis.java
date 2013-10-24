@@ -267,8 +267,8 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 								case NirTop:
 									nir.add(substance.getInfo());
 									break;
-								case RgbSide:
-								case RgbTop:
+								case VisSide:
+								case VisTop:
 									vis.add(substance.getInfo());
 									break;
 								case Unknown:
