@@ -71,7 +71,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	}
 	
 	private void processCuttingOfImage(Image img, CameraType type, double offY, double vertFillGrade, int cols, int rows, int well_border) {
-		Rectangle2D.Double r = getGridPos(options.getWellIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
+		Rectangle2D.Double r = getGridPos(getWellIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
 				img.getWidth() / 2,
 				img.getHeight() / 2);
 		

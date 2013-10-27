@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import javax.swing.JButton;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -32,6 +33,8 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -83,10 +86,10 @@ public class BlockPipeline {
 	
 	private static long lastOutput = 0;
 	
-	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(ImageProcessorOptions options,
-			MaskAndImageSet input, HashMap<Integer, ImageStack> debugStack,
-			HashMap<Integer, BlockResultSet> blockResults,
-			BackgroundTaskStatusProviderSupportingExternalCall status)
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(final ImageProcessorOptions options,
+			final MaskAndImageSet input, final HashMap<Integer, ImageStack> debugStack,
+			final HashMap<Integer, BlockResultSet> blockResults,
+			final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		// normally each image is analyzed once (i.e. one plant per image)
 		// for arabidopsis trays with 2x3 or 2x4 sections the
@@ -102,23 +105,47 @@ public class BlockPipeline {
 					executionTrayCount = n;
 			}
 		}
-		
-		HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = new HashMap<Integer, StringAndFlexibleMaskAndImageSet>();
+		options.setWellCnt(executionTrayCount);
+		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
+		final ObjectRef exception = new ObjectRef();
+		final HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = new HashMap<Integer, StringAndFlexibleMaskAndImageSet>();
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
-			ImageStack ds = debugStack != null ? new ImageStack() : null;
-			BlockResultSet results = new BlockResults();
-			options.setWellCnt(idx, executionTrayCount);
-			res.put(idx, executeInnerCall(options, new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status));
-			if (debugStack != null)
-				debugStack.put(idx, ds);
-			blockResults.put(idx, results);
+			final int well = idx;
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					ImageStack ds = debugStack != null ? new ImageStack() : null;
+					BlockResultSet results = new BlockResults();
+					StringAndFlexibleMaskAndImageSet rr;
+					try {
+						rr = executeInnerCall(well, options,
+								new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status);
+						synchronized (res) {
+							res.put(well, rr);
+							if (debugStack != null)
+								debugStack.put(well, ds);
+							blockResults.put(well, results);
+						}
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+						exception.setObject(e);
+					}
+				}
+			};
+			if (executionTrayCount > 1)
+				wait.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + well + "_" + executionTrayCount));
+			else
+				r.run();
 		}
+		BackgroundThreadDispatcher.waitFor(wait);
+		if (exception.getObject() != null)
+			throw ((Exception) exception.getObject());
 		return res;
 	}
 	
-	private StringAndFlexibleMaskAndImageSet executeInnerCall(ImageProcessorOptions options,
+	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, ImageProcessorOptions options,
 			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
 			BlockResultSet results,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -162,7 +189,7 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(input.getMaskAndImageSet(), options, results, index++,
+			block.setInputAndOptions(well, input.getMaskAndImageSet(), options, results, index++,
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
@@ -193,7 +220,7 @@ public class BlockPipeline {
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			status.setCurrentStatusValueFine(100d * (options.getWellIdx() + 1) / options.getWellCnt());
+			status.setCurrentStatusValueFine(100d * (well + 1) / options.getWellCnt());
 			
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));
@@ -411,7 +438,7 @@ public class BlockPipeline {
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			ImageAnalysisBlock block = blockClass.newInstance();
-			block.setInputAndOptions(null, options, null, index++, null);
+			block.setInputAndOptions(-1, null, options, null, index++, null);
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,
 					inSample, inImages,

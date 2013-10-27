@@ -17,7 +17,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
-	public void setInputAndOptions(MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet settings, int blockPositionInPipeline,
+	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet settings, int blockPositionInPipeline,
 			ImageStack debugStack);
 	
 	public MaskAndImageSet process() throws InterruptedException;

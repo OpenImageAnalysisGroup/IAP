@@ -122,10 +122,10 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 					}
 				});
 			
-			int wellIdx = options.getWellIdx();
+			int wellIdx = getWellIdx();
 			int validClusterID = -1;
 			if (wellIdx < orderOfIds.size())
-				validClusterID = orderOfIds.get(options.getWellIdx());
+				validClusterID = orderOfIds.get(getWellIdx());
 			int[] pixels = mask.getAs1A();
 			int[] result = new int[pixels.length];
 			int back = options.getBackground();

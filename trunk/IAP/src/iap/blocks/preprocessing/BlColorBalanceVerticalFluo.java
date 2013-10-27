@@ -36,9 +36,10 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image input = input().images().fluo();
 		Image res;
 		boolean invert = true;
-		if (input != null)
+		if (input != null) {
+			input = input.copy();
 			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
-		else
+		} else
 			res = input;
 		return res;
 	}
@@ -48,9 +49,10 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image input = input().masks().fluo();
 		Image res;
 		boolean invert = true;
-		if (input != null)
+		if (input != null) {
+			input = input.copy();
 			res = balance(input, input.io().medianFilter32Bit().getImage(), 255, invert);
-		else
+		} else
 			res = input;
 		return res;
 	}
