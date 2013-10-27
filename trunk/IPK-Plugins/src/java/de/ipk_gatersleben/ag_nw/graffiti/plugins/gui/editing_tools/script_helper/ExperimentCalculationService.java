@@ -38,7 +38,7 @@ public class ExperimentCalculationService {
 			// only bins < 11 are OK
 			try {
 				if (si.getName().contains(".histogram."))
-						continue;
+					continue;
 				if (si.getName().contains(".vis.hue.histogram.ratio.bin.") || si.getName().contains(".vis.hue.histogram.bin.")
 						|| si.getName().contains(".vis.normalized.histogram.ratio.bin.")) {
 					String b = si.getName().substring(si.getName().indexOf(".bin.") + ".bin.".length());
@@ -56,7 +56,7 @@ public class ExperimentCalculationService {
 					continue;
 				boolean reference = false;
 				for (String t : treatmentReference) {
-					boolean v = ci.getTreatment() != null && ci.getTreatment().contains(t);
+					boolean v = ci.getTreatment() != null && ci.getTreatment().toUpperCase().contains(t.toUpperCase());
 					if (v)
 						reference = true;
 				}
@@ -68,7 +68,7 @@ public class ExperimentCalculationService {
 					for (ConditionInterface ciPotentialRef : si) {
 						boolean ref = false;
 						for (String t : treatmentReference) {
-							boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().contains(t);
+							boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().toUpperCase().contains(t.toUpperCase());
 							if (v)
 								ref = true;
 						}
@@ -76,7 +76,7 @@ public class ExperimentCalculationService {
 							boolean speciesOK = (ci.getSpecies() + "").equals(ciPotentialRef.getSpecies() + "");
 							boolean genotypeOK = (ci.getGenotype() + "").equals(ciPotentialRef.getGenotype() + "");
 							boolean varietyOK = (ci.getVariety() + "").equals(ciPotentialRef.getVariety() + "");
-							boolean growthConditionsOK = (ci.getGrowthconditions() + "").equals(ciPotentialRef.getGrowthconditions() + "");
+							boolean growthConditionsOK = true;// (ci.getGrowthconditions() + "").equals(ciPotentialRef.getGrowthconditions() + "");
 							boolean sequenceOK = (ci.getSequence() + "").equals(ciPotentialRef.getSequence() + "");
 							boolean allOK = speciesOK && genotypeOK && varietyOK && growthConditionsOK && sequenceOK;
 							if (allOK)
