@@ -17,7 +17,6 @@ import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlCalcWidthAndHeightLR;
 import iap.blocks.extraction.BlLeafCurlingAnalysis;
-import iap.blocks.extraction.BlRootsSkeletonize;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.extraction.BlSkeletonize_Arabidopsis;
@@ -38,7 +37,6 @@ import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlObjectSeparator;
-import iap.blocks.preprocessing.BlRootsAddBorderAroundImage;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlCopyImagesApplyMask;
@@ -51,8 +49,6 @@ import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlMedianFilter;
 import iap.blocks.segmentation.BlRemoveMaizeBambooStick;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
-import iap.blocks.segmentation.BlRootsRemoveBoxAndNoise;
-import iap.blocks.segmentation.BlRootsSharpenImage;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
@@ -62,9 +58,7 @@ import iap.blocks.unused.BlSmoothShape;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk.ag_ba.plugins.pipelines.arabidopsis.ArabidopsisPipeline;
 import de.ipk.ag_ba.plugins.pipelines.barley.BarleyPipeline;
-import de.ipk.ag_ba.plugins.pipelines.detached_leafs.DetachedLeafsPipeline;
 import de.ipk.ag_ba.plugins.pipelines.maize.MaizePipeline;
-import de.ipk.ag_ba.plugins.pipelines.roots.RootPipeline;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -81,9 +75,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 		return new AnalysisPipelineTemplate[] {
 				new MaizePipeline(),
 				new BarleyPipeline(),
-				new ArabidopsisPipeline(),
-				new RootPipeline(),
-				new DetachedLeafsPipeline()
+				new ArabidopsisPipeline()
 		};
 	}
 	
@@ -128,10 +120,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlLoadImagesIfNeeded(),
 				new BlRemoveMaizeBambooStick(),
 				new BlRemoveSmallObjectsVisFluo(),
-				new BlRootsAddBorderAroundImage(),
-				new BlRootsRemoveBoxAndNoise(),
-				new BlRootsSharpenImage(),
-				new BlRootsSkeletonize(),
 				new BlRunPostProcessors(),
 				new BlSkeletonize_Arabidopsis(),
 				new BlSkeletonizeNir(),
@@ -148,7 +136,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlHighlightNullResults(),
 				new BlMedianFilter(),
 				new BlObjectSeparator(),
-				new BlRootsAddBorderAroundImage(),
 				new BlSmoothShape(),
 				new BlThreeDreconstruction(),
 		};
