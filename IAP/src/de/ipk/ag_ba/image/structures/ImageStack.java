@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.FolderPanel;
@@ -73,13 +74,24 @@ public class ImageStack {
 		new MyFileSaver(image).saveAsTiffStack(os);
 	}
 	
-	public void show(String title) {
+	public void show(final String title) {
 		if (SystemAnalysis.isHeadless())
 			return;
-		ImagePlus image = new ImagePlus();
+		final ImagePlus image = new ImagePlus();
 		image.setStack(stack);
-		image.show(title + " (" + stack.getSize() + ")");
-		IAPservice.showImageJ();
+		if (!SwingUtilities.isEventDispatchThread()) {
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					image.show(title + " (" + stack.getSize() + ")");
+					IAPservice.showImageJ();
+				}
+			};
+			SwingUtilities.invokeLater(r);
+		} else {
+			image.show(title + " (" + stack.getSize() + ")");
+			IAPservice.showImageJ();
+		}
 	}
 	
 	public void print(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {

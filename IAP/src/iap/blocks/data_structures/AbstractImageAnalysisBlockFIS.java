@@ -46,19 +46,24 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private MaskAndImageSet input;
 	private BlockResultSet properties;
 	private int blockPositionInPipeline;
+	private int well;
 	
 	public AbstractImageAnalysisBlockFIS() {
 		// empty
 	}
 	
+	protected int getWellIdx() {
+		return well;
+	}
+	
 	public boolean getBoolean(String setting, boolean defaultValue) {
-		if (IAPmain.getRunMode()!=IAPrunMode.SWING_MAIN && setting!=null && setting.equals("debug")) {
+		if (IAPmain.getRunMode() != IAPrunMode.SWING_MAIN && setting != null && setting.equals("debug")) {
 			boolean ret = options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 			if (ret)
-				System.out.println(SystemAnalysis.getCurrentTime()+">INFO: Enabled debug setting is ignored, as IAP is not running in Swing GUI mode.");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Enabled debug setting is ignored, as IAP is not running in Swing GUI mode.");
 			return false;
 		}
-
+		
 		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
@@ -87,10 +92,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void setInputAndOptions(MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
+	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
 			int blockPositionInPipeline,
 			ImageStack debugStack) {
 		this.input = input;
+		this.well = well;
 		this.options = options;
 		this.properties = properties;
 		this.blockPositionInPipeline = blockPositionInPipeline;
@@ -292,7 +298,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					inst.setPreventDebugValues(true);
-					inst.setInputAndOptions(ab, options, brs, blockPos, null);
+					inst.setInputAndOptions(well, ab, options, brs, blockPos, null);
 					ab = inst.process();
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();

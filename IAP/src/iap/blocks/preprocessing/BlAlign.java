@@ -64,7 +64,7 @@ public class BlAlign extends AbstractBlock {
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					((BlAlign) inst).preventDebugValues = true;
-					inst.setInputAndOptions(ab, options, brs, blockPos, null);
+					inst.setInputAndOptions(getWellIdx(), ab, options, brs, blockPos, null);
 					ab = inst.process();
 					ImageSet in = ab.images();
 					
