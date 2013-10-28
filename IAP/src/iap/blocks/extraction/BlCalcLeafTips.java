@@ -33,7 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * This Block can used for parameter tuning.
+ * This Block calculates leaf tips and some features related to the leaf tips. (It can also used for parameter tuning.)
  **/
 public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	boolean calcOnVis = false;
@@ -67,13 +67,15 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int circlediameter = 0;
 		int geometricThresh = 0;
 		
+		// set parameters
 		if (!optimize) {
 			circlediameter = getInt("search diameter", 27); // 35
 			int parm = getInt("geometric threshold", 32);
 			geometricThresh = (int) ((circlediameter / 2 * circlediameter / 2 * Math.PI) * ((double) parm / 100));
-			// (int) (((circlediameter / 2 * circlediameter / 2 * Math.PI) / 4) + 42));
+			// old: cd = 35, gt = k/4 + 42
 		}
 		
+		// only for side image
 		if (options.getCameraPosition() == CameraPosition.SIDE && inputImage != null) {
 			
 			// search for best side image
@@ -93,24 +95,28 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// blur
 			mask = mask.io().blur(numofblur).getImage();
 			
-			double averageLeafWidthEstimation = inputImage.io().countFilledPixels() /
-					(double) inputImage.copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
-			
-			boolean ngUse = true;
-			boolean autoTune = true;
 			double f = getDouble("object removal multiplier", 2.0);
-			averageLeafWidthEstimation *= f;
 			
-			mask = mask.io().removeSmallClusters(ngUse,
-					autoTune ? (int) (averageLeafWidthEstimation * averageLeafWidthEstimation) : getInt("Noise-Size-Fluo-Area", 10 * 10),
-					autoTune ? (int) averageLeafWidthEstimation : getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
-					options.getNeighbourhood(), options.getCameraPosition(), null,
-					autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues).getImage();
+			if (f > 0.0) {
+				double averageLeafWidthEstimation = inputImage.io().countFilledPixels() /
+						(double) inputImage.copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
+				
+				boolean ngUse = true;
+				boolean autoTune = true;
+				
+				averageLeafWidthEstimation *= f;
+				
+				mask = mask.io().removeSmallClusters(ngUse,
+						autoTune ? (int) (averageLeafWidthEstimation * averageLeafWidthEstimation) : getInt("Noise-Size-Fluo-Area", 10 * 10),
+						autoTune ? (int) averageLeafWidthEstimation : getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
+						options.getNeighbourhood(), options.getCameraPosition(), null,
+						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues).getImage();
+			}
 			
 			// dilate
 			// vis_mask = vis_mask.io().mo().erode_or_dilate(10, false).getImage();
 			
-			mask.show("after blur and dilate", debug);
+			mask.show("after blur, noise rm and dilate", debug);
 			
 			// detect borders
 			ImageOperation io = new ImageOperation(mask.getAs2A()).border()
@@ -138,22 +144,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			
-			// get avg leaf width
-			SkeletonProcessor2d skel2d = new SkeletonProcessor2d(mask.io().skeletonize(true).getImage());
-			
-			Image skelimg = skel2d.getAsFlexibleImage();
-			int leaflength = skelimg.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
-			int area = imgorig.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
-			
-			int avg_width = area / leaflength;
-			
 			// stepsize for border scan
 			int stepsize = 1;
 			
 			if (optimize) {
-				// optimize
-				// old: cd = 35, gt = k/4 + 42
+				// get average leaf width, used to estimate initial parameters
+				SkeletonProcessor2d skel2d = new SkeletonProcessor2d(mask.io().skeletonize(true).getImage());
 				
+				Image skelimg = skel2d.getAsFlexibleImage();
+				int leaflength = skelimg.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
+				int area = imgorig.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
+				
+				int avg_width = area / leaflength;
+				
+				// optimize loop
 				for (int cd = avg_width; cd <= avg_width * 2; cd++) {
 					gt: for (int i = 20; i < 40; i++) {
 						
@@ -164,8 +168,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 						
 						int num_leafs = filteredList.size();
-						
-						// System.out.println("numleafs: " + num_leafs + " gt: " + i + " cd: " + circlediameter);
 						
 						if (num_leafs > 0)
 							rt.addValue("leaf." + StringManipulationTools.formatNumber(cd) + "." + StringManipulationTools.formatNumber(i), num_leafs);
@@ -184,11 +186,11 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, background, debug);
 				
 				rt = (ResultsTableWithUnits) res[1];
-				// num of leafs
+				
+				// number of leafs
 				rt.addValue("leaf.count", filteredList.size());
 			}
-			// rt.show("rt", true);
-			getProperties().storeResults("RESULT_", "|SUSAN_corner_detection", rt, getBlockPosition());
+			getProperties().storeResults("RESULT_side", "|SUSAN_corner_detection", rt, getBlockPosition());
 		}
 		return inputImage;
 	}
@@ -242,6 +244,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return true;
 	}
 	
+	/**
+	 * @return Object[image gamma, results table]
+	 */
 	public Object[] FeatureExtraction(Image img, Image imgorig, ArrayList<PositionAndColor> borderlistPlusCornerestimation,
 			final int circlediameter,
 			int background, boolean debug) {
@@ -271,29 +276,31 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int up = 0;
 		int down = 0;
 		int index = 1;
-		getProperties().addImagePostProcessor(new RunnableOnImageSet() {
-			
-			@Override
-			public Image postProcessMask(Image imgGamma) {
-				imgGamma = imgGamma
-						.io().clearImageLeft(imgGamma.getWidth(), ImageOperation.BACKGROUND_COLORint)
-						.getImage();
-				return imgGamma;
-			}
-			
-			@Override
-			public Image postProcessImage(Image image) {
-				return image;
-			}
-			
-			@Override
-			public ImageConfiguration getConfig() {
-				if (!calcOnVis)
-					return ImageConfiguration.FluoSide;
-				else
-					return ImageConfiguration.VisSide;
-			}
-		});
+		
+		// getProperties().addImagePostProcessor(new RunnableOnImageSet() {
+		//
+		// @Override
+		// public Image postProcessMask(Image imgGamma) {
+		// imgGamma = imgGamma
+		// .io().clearImageLeft(imgGamma.getWidth(), ImageOperation.BACKGROUND_COLORint)
+		// .getImage();
+		// return imgGamma;
+		// }
+		//
+		// @Override
+		// public Image postProcessImage(Image image) {
+		// return image;
+		// }
+		//
+		// @Override
+		// public ImageConfiguration getConfig() {
+		// if (!calcOnVis)
+		// return ImageConfiguration.FluoSide;
+		// else
+		// return ImageConfiguration.VisSide;
+		// }
+		// });
+		
 		for (int i = 0; i < size; i++) {
 			final int xtemp = borderlistPlusCornerestimation.get(i).x;
 			final int ytemp = borderlistPlusCornerestimation.get(i).y;
@@ -327,7 +334,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			imgGamma = copyResultIntoImage(imgGamma, regionImage.copy(), dim);
 			
-			// calc direction of leaftip
+			// calculate direction of leaftip
 			int direction = 0;
 			
 			if (centerOfGravity.y + dim[2] > ytemp) {
