@@ -4,7 +4,7 @@ cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$
 
 
 ############## Flags for debugging ####################
-DEBUG <- FALSE
+DEBUG <- TRUE
 CATCH.ERROR <- FALSE
 
 calculateNothing <- FALSE
@@ -6428,8 +6428,10 @@ checkOfTryError <- function(error, overallList = NULL, imagesIndex = NULL, typOf
 		} else if (!is.null(typ) && typ == LIB) {
 			return(TRUE)
 		} else {
-			ckeckIfReportTexIsThere(errorText = geterrmessage())		############# DEBUG
-			write(x = "no Output! The whole script stops!", append = FALSE, file = ERROR.TOTAL.FILE)
+			errorText <- geterrmessage()
+			ckeckIfReportTexIsThere(errorText)		############# DEBUG
+			write(x = "No output! Diagram creation and report generation needs to stop. Please check the console output and error logs for error details.", append = TRUE, file = ERROR.TOTAL.FILE)
+			write(x = c("Error Message: ", errorText), append = TRUE, file = ERROR.TOTAL.FILE)
 		}
 	}
 	

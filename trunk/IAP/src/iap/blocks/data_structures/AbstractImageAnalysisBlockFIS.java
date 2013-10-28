@@ -248,6 +248,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					for (String property : desiredProperties) {
 						ArrayList<BlockPropertyValue> sr = rt.getPropertiesExactMatch(property);
+						if (sr.isEmpty())
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
 						for (BlockPropertyValue v : sr) {
 							if (v.getValue() != null) {
 								if (!prop2config2lastHeightAndWidth.containsKey(property))

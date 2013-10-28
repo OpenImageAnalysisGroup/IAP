@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.intensity;
 
 import java.awt.Color;
 
+import org.StringManipulationTools;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -161,49 +162,64 @@ public class IntensityAnalysis {
 				if (optDistHorizontal != null && optRealMarkerDistance != null && addNormalizedHistogramValues) {
 					double normalize = optRealMarkerDistance / optDistHorizontal;
 					for (int i = 0; i < this.n; i++) {
-						result.addValue("hsv.normalized.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+						result.addValue(
+								"hsv.normalized.h.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histHue.getBorderLeft(i, 255)
+										+ "_" + histHue.getBorderRight(i, 255),
 								histHue.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+						result.addValue(
+								"hsv.normalized.s.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histSat.getBorderLeft(i, 255)
+										+ "_" + histSat.getBorderRight(i, 255),
 								histSat.getFreqAt(i) * normalize);
-						result.addValue("hsv.normalized.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+						result.addValue(
+								"hsv.normalized.v.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histVal.getBorderLeft(i, 255)
+										+ "_" + histVal.getBorderRight(i, 255),
 								histVal.getFreqAt(i) * normalize);
 					}
 				} else {
 					for (int i = 0; i < this.n; i++) {
-						result.addValue("hsv.h.histogram.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+						result.addValue("hsv.h.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histHue.getBorderLeft(i, 255)
+								+ "_" + histHue.getBorderRight(i, 255),
 								histHue.getFreqAt(i));
-						result.addValue("hsv.s.histogram.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+						result.addValue("hsv.s.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histSat.getBorderLeft(i, 255)
+								+ "_" + histSat.getBorderRight(i, 255),
 								histSat.getFreqAt(i));
-						result.addValue("hsv.v.histogram.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+						result.addValue("hsv.v.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histVal.getBorderLeft(i, 255)
+								+ "_" + histVal.getBorderRight(i, 255),
 								histVal.getFreqAt(i));
 					}
 				}
 				for (int i = 0; i < this.n; i++) {
 					if (histHue.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.h.histogram.s_avg.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+								"hsv.normalized.h.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getOther1avg(i));
 					if (histHue.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.h.histogram.v_avg.bin." + (i + 1) + "." + histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
+								"hsv.normalized.h.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getOther2avg(i));
 					
 					if (histSat.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.s.histogram.h_avg.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+								"hsv.normalized.s.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 								histSat.getOther1avg(i));
 					if (histSat.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.s.histogram.v_avg.bin." + (i + 1) + "." + histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
+								"hsv.normalized.s.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 								histSat.getOther2avg(i));
 					
 					if (histVal.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.v.histogram.h_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+								"hsv.normalized.v.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 								histVal.getOther1avg(i));
 					if (histVal.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.v.histogram.s_avg.bin." + (i + 1) + "." + histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
+								"hsv.normalized.v.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+										+ histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 								histVal.getOther2avg(i));
 				}
 			}
@@ -303,13 +319,15 @@ public class IntensityAnalysis {
 					double normalize = optRealMarkerDistance / optDistHorizontal;
 					for (int i = 0; i < this.n; i++) {
 						result.addValue(
-								"normalized.histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+								"normalized.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histChlorophyl.getBorderLeft(i, 255)
+										+ "_" + histChlorophyl.getBorderRight(i, 255),
 								histChlorophyl.getFreqAt(i) * normalize);
 					}
 				} else
 					for (int i = 0; i < this.n; i++) {
 						result.addValue(
-								"histogram.bin." + (i + 1) + "." + histChlorophyl.getBorderLeft(i, 255) + "_" + histChlorophyl.getBorderRight(i, 255),
+								"histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histChlorophyl.getBorderLeft(i, 255) + "_"
+										+ histChlorophyl.getBorderRight(i, 255),
 								histChlorophyl.getFreqAt(i));
 					}
 			
@@ -319,13 +337,15 @@ public class IntensityAnalysis {
 						double normalize = optRealMarkerDistance / optDistHorizontal;
 						for (int i = 0; i < this.n; i++) {
 							result.addValue(
-									"normalized.histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+									"normalized.histogram.phenol.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
 									histPhenol.getFreqAt(i) * normalize);
 						}
 					} else
 						for (int i = 0; i < this.n; i++) {
 							result.addValue(
-									"histogram.phenol.bin." + (i + 1) + "." + histPhenol.getBorderLeft(i, 255) + "_" + histPhenol.getBorderRight(i, 255),
+									"histogram.phenol.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "." + histPhenol.getBorderLeft(i, 255)
+											+ "_" + histPhenol.getBorderRight(i, 255),
 									histPhenol.getFreqAt(i));
 						}
 				}
