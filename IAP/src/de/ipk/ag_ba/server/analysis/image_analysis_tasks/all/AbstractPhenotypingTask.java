@@ -1095,7 +1095,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			public synchronized void setCurrentStatusValueFineAdd(double smallProgressStep) {
 				super.setCurrentStatusValueFineAdd(smallProgressStep);
 				if (smallProgressStep > 0) {
-					double add = smallProgressStep / workloadSnapshotAngles;
+					double add = 100d * smallProgressStep / workloadSnapshotAngles;
 					status.setCurrentStatusValueFineAdd(add - lastAddAdd);
 					lastAddAdd = add;
 				}
