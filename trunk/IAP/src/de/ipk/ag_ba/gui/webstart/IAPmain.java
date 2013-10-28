@@ -289,7 +289,7 @@ public class IAPmain extends JApplet {
 			final String[] addons) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
-		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP-Data-Navigator";
+		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP";
 		String name = stS + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + stE + " - " + stS + "V" + stE + "isualization and " + stS + "A" + stE
 				+ "nalysis of " + stS + "N" + stE + "e" + stS + "t" + stE + "works <br>containing " + stS + "E" + stE
 				+ "xperimental " + stS + "D" + stE + "ata";
