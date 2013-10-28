@@ -115,6 +115,7 @@ public class BlockPipeline {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
 			final int well = idx;
+			final int wellCnt = executionTrayCount;
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
@@ -122,7 +123,7 @@ public class BlockPipeline {
 					BlockResultSet results = new BlockResults();
 					StringAndFlexibleMaskAndImageSet rr;
 					try {
-						rr = executeInnerCall(well, options,
+						rr = executeInnerCall(well, wellCnt, options,
 								new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status);
 						synchronized (res) {
 							res.put(well, rr);
@@ -147,7 +148,7 @@ public class BlockPipeline {
 		return res;
 	}
 	
-	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, ImageProcessorOptions options,
+	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, int executionWellCount, ImageProcessorOptions options,
 			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
 			BlockResultSet results,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -174,7 +175,7 @@ public class BlockPipeline {
 			System.out.println("##Output##");
 		}
 		
-		double progressOfThisWell = 100d / options.getWellCnt();
+		double progressOfThisWell = 100d / executionWellCount;
 		int nBlocks = blocks.size();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
@@ -215,7 +216,7 @@ public class BlockPipeline {
 			
 			updateBlockStatistics(1);
 			if (status != null)
-				status.setCurrentStatusValueFineAdd(1d / nBlocks * progressOfThisWell);
+				status.setCurrentStatusValueFineAdd(progressOfThisWell / nBlocks);
 		}
 		
 		// results.clearStore();
