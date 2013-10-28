@@ -109,6 +109,8 @@ public class BlockPipeline {
 		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		final ObjectRef exception = new ObjectRef();
 		final HashMap<Integer, StringAndFlexibleMaskAndImageSet> res = new HashMap<Integer, StringAndFlexibleMaskAndImageSet>();
+		if (status != null)
+			status.setCurrentStatusValue(0);
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
@@ -158,9 +160,6 @@ public class BlockPipeline {
 		int index = 0;
 		boolean blockProgressOutput = true;
 		
-		if (status != null)
-			status.setCurrentStatusValueFine(0);
-		
 		boolean debug = SystemOptions.getInstance().getBoolean("IAP", "Debug-Pipeline-Execution", false);
 		int tPrintBlockTime = SystemOptions.getInstance().getInteger("IAP", "Info-Print-Block-Execution-Time", 30);
 		
@@ -175,6 +174,8 @@ public class BlockPipeline {
 			System.out.println("##Output##");
 		}
 		
+		double progressOfThisWell = 100d / options.getWellCnt();
+		int nBlocks = blocks.size();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop())
 				break;
@@ -213,6 +214,8 @@ public class BlockPipeline {
 							+ block.getClass().getSimpleName() + ")");
 			
 			updateBlockStatistics(1);
+			if (status != null)
+				status.setCurrentStatusValueFineAdd(1d / nBlocks * progressOfThisWell);
 		}
 		
 		// results.clearStore();
@@ -220,8 +223,6 @@ public class BlockPipeline {
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			status.setCurrentStatusValueFine(100d * (well + 1) / options.getWellCnt());
-			
 			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
 			// .size()));
 			// status.setCurrentStatusText1("Pipeline finished");

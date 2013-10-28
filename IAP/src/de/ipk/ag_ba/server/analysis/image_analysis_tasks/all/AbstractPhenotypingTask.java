@@ -1079,6 +1079,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "") {
 			double lastAdd = 0;
+			double lastAddAdd = 0;
 			
 			@Override
 			public synchronized void setCurrentStatusValueFine(double value) {
@@ -1087,6 +1088,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					double add = value / workloadSnapshotAngles;
 					status.setCurrentStatusValueFineAdd(add - lastAdd);
 					lastAdd = add;
+				}
+			}
+			
+			@Override
+			public synchronized void setCurrentStatusValueFineAdd(double smallProgressStep) {
+				super.setCurrentStatusValueFineAdd(smallProgressStep);
+				if (smallProgressStep > 0) {
+					double add = smallProgressStep / workloadSnapshotAngles;
+					status.setCurrentStatusValueFineAdd(add - lastAddAdd);
+					lastAddAdd = add;
 				}
 			}
 			
