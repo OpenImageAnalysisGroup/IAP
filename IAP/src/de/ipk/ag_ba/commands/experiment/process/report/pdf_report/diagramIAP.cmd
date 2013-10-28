@@ -22,31 +22,31 @@ echo "Debug? : ${16}"
 echo "Catch error? : ${17}"
 
 if [ -f report.aux ]; then
-	rm /s report.aux
+	rm -f report.aux
 fi
 
 if [ -f report.out ]; then
-	rm /s report.out
+	rm -f report.out
 fi
 
 if [ -f report.tex ]; then
-	rm /s report.tex
+	rm -f report.tex
 fi
 
 if [ -f report.pdf ]; then
-	rm /s report.pdf
+	rm -f report.pdf
 fi
 
 if [ -d plots ]; then
-	rd /s /q plots
+	rm -rf plots
 fi
 
 if [ -d plotTex ]; then
-	rd /s /q plotTex
+	rm -rf plotTex
 fi
 
 if [ -d section ]; then
-	rd /s /q section
+	rm -rf section
 fi
 
 

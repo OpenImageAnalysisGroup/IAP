@@ -7,23 +7,23 @@
 stackedBarOptions = list(typOfGeomBar=c("fill", "stack")) #, "dodge"
 
 stackedPlotList <- list(
-		"side.vis.hsv.h.normalized.histogram.bin." = list(plotName = "side visible light colors (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 1, paragraph = 1),
+		"side.vis.hsv.normalized.h.histogram.bin." = list(plotName = "side visible light colors (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 1, paragraph = 1),
 		"side.vis.hsv.h.histogram.bin." = list(plotName = "side visible light colors (%)", section = 60, subsection = 1, subsubsection = 1, paragraph = 2),  
 		
-		"side.vis.hsv.s.normalized.histogram.bin." = list(plotName = "side visible light color saturations (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 2, paragraph = 1),
+		"side.vis.hsv.normalized.s.histogram.bin." = list(plotName = "side visible light color saturations (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 2, paragraph = 1),
 		"side.vis.hsv.s.histogram.bin." = list(plotName = "side visible light color saturations (%)", section = 60, subsection = 1, subsubsection = 2, paragraph = 2),  
 		
-		"side.vis.hsv.v.normalized.histogram.bin." = list(plotName = "side visible light brightnesses (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 3, paragraph = 1),
+		"side.vis.hsv.normalized.v.histogram.bin." = list(plotName = "side visible light brightnesses (zoom corrected) (%)", section = 60, subsection = 1, subsubsection = 3, paragraph = 1),
 		"side.vis.hsv.v.histogram.bin." = list(plotName = "side visible light brightnesses (%)", section = 60, subsection = 1, subsubsection = 3, paragraph = 2),
 		
 		
-		"top.vis.hsv.h.normalized.histogram.bin." = list(plotName = "top visible light colors (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 1, paragraph = 1),
+		"top.vis.hsv.normalized.h.histogram.bin." = list(plotName = "top visible light colors (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 1, paragraph = 1),
 		"top.vis.hsv.h.histogram.bin." = list(plotName = "top visible light colors (%)", section = 60, subsection = 2, subsubsection = 1, paragraph = 2),  
 		
-		"top.vis.hsv.s.normalized.histogram.bin." = list(plotName = "top visible light color saturations (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 2, paragraph = 1),
+		"top.vis.hsv.normalized.s.histogram.bin." = list(plotName = "top visible light color saturations (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 2, paragraph = 1),
 		"top.vis.hsv.s.histogram.bin." = list(plotName = "top visible light color saturations (%)", section = 60, subsection = 2, subsubsection = 2, paragraph = 2),  
 		
-		"top.vis.hsv.v.normalized.histogram.bin." = list(plotName = "top visible light brightnesses (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 3, paragraph = 1),
+		"top.vis.hsv.normalized.v.histogram.bin." = list(plotName = "top visible light brightnesses (zoom corrected) (%)", section = 60, subsection = 2, subsubsection = 3, paragraph = 1),
 		"top.vis.hsv.v.histogram.bin." = list(plotName = "top visible light brightnesses (%)", section = 60, subsection = 2, subsubsection = 3, paragraph = 2),
 		
 		
