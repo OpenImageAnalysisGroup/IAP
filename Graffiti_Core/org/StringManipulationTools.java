@@ -889,6 +889,13 @@ public class StringManipulationTools implements HelperClass {
 		return f.format(l);
 	}
 	
+	public static String formatNumberAddZeroInFront(int n, int minLen) {
+		String s = n + "";
+		while (s.length() < minLen)
+			s = "0" + s;
+		return s;
+	}
+	
 	public static int count(String s, String find) {
 		if (s == null || s.isEmpty())
 			return 0;
