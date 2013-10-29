@@ -80,7 +80,8 @@ public class Image {
 				is.close();
 			}
 			url2image.put(url + "", img);
-		}
+		} else
+			img = new Image(img).copy().getAsBufferedImage();
 		// }
 		
 		if (img == null)
