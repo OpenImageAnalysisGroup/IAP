@@ -2,6 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.util.HashSet;
 
@@ -37,6 +38,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
 				getInt("Noise-Size-Vis-Area", 20 * 20),
 				getInt("Noise-Size-Vis-Dimension-Absolute", 20),
+				options.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 				options.getNeighbourhood(), options.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null)
 			res.show("vis result", debug);
@@ -53,6 +55,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 				removeSmallClusters(ngUse,
 						getInt("Noise-Size-Fluo-Area", 10 * 10),
 						getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
+						options.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 						options.getNeighbourhood(), options.getCameraPosition(), null,
 						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
 				.getImage();

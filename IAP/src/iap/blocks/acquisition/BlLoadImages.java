@@ -262,6 +262,8 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (IR)");
 			processedMasks.setNir(null);
 		}
+		processedImages = processedImages.copy();
+		processedMasks = processedMasks.copy();
 	}
 	
 	@Override

@@ -1337,14 +1337,14 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(workImage);
 	}
 	
-	public ImageOperation removeSmallClusters(boolean nextGeneration, int cutOffAreaSizeOfImage, int cutOffVertHorOfImage,
+	public ImageOperation removeSmallClusters(boolean nextGeneration, int cutOffAreaSizeOfImage, int cutOffVertHorOfImage, double boundingBoxIncreaseFactor_top,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
 		Image workImage = new Image(image);
 		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
-				optClusterSizeReturn, considerArea);
+				optClusterSizeReturn, considerArea, null, boundingBoxIncreaseFactor_top);
 		return new ImageOperation(workImage);
 	}
 	
@@ -1592,7 +1592,7 @@ public class ImageOperation implements MemoryHogInterface {
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
 		return removeSmallPartsOfImage(nextGeneration, workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
-				considerArea, null);
+				considerArea, null, -1);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -1601,7 +1601,7 @@ public class ImageOperation implements MemoryHogInterface {
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
-			boolean considerArea, RunnableWithVetoRight veto) {
+			boolean considerArea, RunnableWithVetoRight veto, double boundingBoxIncreaseFactor_top) {
 		
 		if (cutOffMinimumArea < 1) {
 			// System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
@@ -1648,20 +1648,44 @@ public class ImageOperation implements MemoryHogInterface {
 		boolean[] toBeDeletedClusterIDs = new boolean[clusterCenter.length];
 		
 		// HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
-		if (typ == CameraPosition.TOP) {
+		if (typ == CameraPosition.TOP && boundingBoxIncreaseFactor_top > 0) {
 			List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
-			if (clusterSizes != null)
-				for (int index = 0; index < clusterSizes.length; index++) {
+			if (clusterSizes != null) {
+				boolean preferHighHue = true;
+				int[] clusterMap = ps.getImageClusterIdMask();
+				int[] inpImage = ps.getImage1A();
+				for (int index = 1; index < clusterSizes.length; index++) {
 					if (clusterDimensionMinWH[index] >= cutOffMinimumDimension) {
+						int pxCnt = 0;
+						int idx = 0;
+						double hueSum = 0;
+						float[] compArray = new float[3];
+						for (int c : clusterMap) {
+							if (c == index) {
+								int rgb = inpImage[idx];
+								int r = ((rgb >> 16) & 0xff);
+								int g = ((rgb >> 8) & 0xff);
+								int b = (rgb & 0xff);
+								Color.RGBtoHSB(r, g, b, compArray);
+								hueSum += compArray[0];
+								pxCnt++;
+							}
+							idx++;
+						}
 						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
+						if (pxCnt > 0)
+							if (preferHighHue)
+								lc.scaleSizeBy(hueSum / pxCnt);
+							else
+								lc.scaleSizeBy((1 - hueSum) / pxCnt);
 						largeClusters.add(lc);
 					}
 				}
-			
+			}
 			Collections.sort(largeClusters);
 			if (largeClusters.size() > 1) {
-				final LargeCluster largest = largeClusters.get(0);
-				Rectangle2D largestBounding = largest.getBoundingBox(cutOffMinimumDimension * 5);
+				final LargeCluster largest = largeClusters.remove(0);
+				Rectangle2D largestBounding = largest.getBoundingBox(boundingBoxIncreaseFactor_top);
 				Collections.sort(largeClusters, new Comparator<LargeCluster>() {
 					
 					@Override
@@ -1672,14 +1696,13 @@ public class ImageOperation implements MemoryHogInterface {
 					}
 				});
 				for (LargeCluster lc : largeClusters) {
-					if (lc != largeClusters) {
-						if (!lc.intersects(largestBounding)) {
-							toBeDeletedClusterIDs[lc.getIndex()] = true;
-							// toBeDeletedClusterIDs.add(lc.getIndex());
-						} else {
-							largestBounding.add(lc.getBoundingBox(cutOffMinimumDimension * 5));
-						}
+					if (!lc.intersects(largestBounding)) {
+						toBeDeletedClusterIDs[lc.getIndex()] = true;
+						// toBeDeletedClusterIDs.add(lc.getIndex());
+					} else {
+						largestBounding.add(lc.getBoundingBox(boundingBoxIncreaseFactor_top));
 					}
+					
 				}
 			}
 		}

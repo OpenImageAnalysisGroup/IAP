@@ -604,10 +604,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			info = readSpeed;
 			
 			String writeSpeed = SystemAnalysis.getDataTransferSpeedString(write, 0, time);
-			info = "in " + info + ", out " + writeSpeed + " ("
-					+ SystemAnalysis.getDataAmountString(readCounter.getLong())
-					+ ", "
-					+ SystemAnalysis.getDataAmountString(writeCounter.getLong()) + ")";
+			info = "in " + info + ", out " + writeSpeed;
 		}
 		lastSpeedInfoRequest = currentSpeedInfoRequest;
 		lastRead = readCounter.getLong();

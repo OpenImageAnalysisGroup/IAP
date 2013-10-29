@@ -6,7 +6,7 @@ import org.Vector2i;
 
 public class LargeCluster implements Comparable<LargeCluster> {
 	
-	private final Vector2i dimension;
+	private Vector2i dimension;
 	private final Vector2i center;
 	private final int size;
 	private final int index;
@@ -33,13 +33,19 @@ public class LargeCluster implements Comparable<LargeCluster> {
 		return lc.intersects(center.x - dimension.x / 2, center.y - dimension.y / 2, dimension.x, dimension.y);
 	}
 	
-	public Rectangle2D getBoundingBox(int increaseSizeBy) {
-		return new Rectangle2D.Double(center.x - dimension.x / 2 - increaseSizeBy / 2, center.y - dimension.y / 2 - increaseSizeBy / 2,
-				dimension.x + increaseSizeBy, dimension.y + increaseSizeBy);
+	public Rectangle2D getBoundingBox(double multiplySizeBy) {
+		double increaseSizeXby = dimension.x * multiplySizeBy - dimension.x;
+		double increaseSizeYby = dimension.y * multiplySizeBy - dimension.y;
+		return new Rectangle2D.Double(center.x - dimension.x / 2 - increaseSizeXby / 2, center.y - dimension.y / 2 - increaseSizeYby / 2,
+				dimension.x + increaseSizeXby, dimension.y + increaseSizeYby);
 	}
 	
 	public double distanceTo(LargeCluster o1) {
 		return center.distance(o1.center);
+	}
+	
+	public void scaleSizeBy(double factor) {
+		dimension = dimension.scale(factor);
 	}
 	
 }
