@@ -182,6 +182,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(mask, borderList, circlediameter,
 						geometricThresh, stepsize, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
+				filteredList = filterCornerCandidates2(filteredList, mask.getWidth(), mask.getHeight());
 				
 				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, background, debug);
 				
@@ -190,9 +191,18 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				// number of leafs
 				rt.addValue("leaf.count", filteredList.size());
 			}
-			getProperties().storeResults("RESULT_side", "|SUSAN_corner_detection", rt, getBlockPosition());
+			getProperties().storeResults("RESULT_side.", "|SUSAN_corner_detection", rt, getBlockPosition());
 		}
 		return inputImage;
+	}
+	
+	private ArrayList<PositionAndColor> filterCornerCandidates2(ArrayList<PositionAndColor> filteredList, int width, int height) {
+		int listsize = filteredList.size();
+		for (int i = 0; i < listsize; i++) {
+			if (filteredList.get(i).y > height * 0.96)
+				filteredList.remove(i);
+		}
+		return filteredList;
 	}
 	
 	private boolean isBestAngle() {
@@ -435,10 +445,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int start = 0;
 		int temp = 0;
 		
+		// for (int i = 0; i < listsize; i++) {
+		// System.out.println(cornerlist.get(i).colorInt);
+		// }
+		
 		for (int i = 0; i < listsize; i++) {
 			temp = cornerlist.get(i).colorInt;
 			// found peak
 			if (start == 0 && temp > 0) {
+				// System.out.println("x " + cornerlist.get(i).x + " y " + cornerlist.get(i).y);
+				// break;
 				start = temp;
 				int idx = 1;
 				PositionAndColor tempMax = cornerlist.get(i);
@@ -450,7 +466,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						tempMax = cornerlist.get((i + idx) % listsize);
 					idx++;
 				}
-				results.add(tempMax);
+				
+				if (idx > 5)
+					results.add(tempMax);
 				// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
 				if (i + idx >= listsize)
 					results.remove(0);
@@ -646,7 +664,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param background
 	 *           - background color
 	 * @param radius
-	 *           - max search distance/deep (euclidian) for Region Growing from start point, for classic Region Growing, set this value to max value
+	 *           - max search distance/deep (euclidean) for Region Growing from start point, for classic Region Growing, set this value to max value
 	 * @return HashSet which includes Vector3d of all point coordinates plus color-values
 	 * @throws InterruptedException
 	 */
