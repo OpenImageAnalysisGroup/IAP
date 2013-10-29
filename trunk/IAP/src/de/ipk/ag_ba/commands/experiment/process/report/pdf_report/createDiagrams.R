@@ -1988,6 +1988,8 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 						newDataSet <- newDataSetKK
 						firstnewDataSet <- FALSE
 					} else {
+						print(head(newDataSet))
+						print(head(newDataSetKK))
 						newDataSet <- cbind(newDataSet, newDataSetKK)
 					}
 				}
@@ -2037,7 +2039,7 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 		}
 		overallResult = temp
 #		print(overallResult)
-#		print(head(overallResult))
+		print(head(overallResult))
 	}
 	
 	return(overallResult)	
