@@ -47,7 +47,7 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-						throws Exception {
+			throws Exception {
 		return null;
 	}
 	
