@@ -57,37 +57,35 @@ public class Image {
 		this.cameraType = type;
 	}
 	
-	private static WeakHashMap<String, BufferedImage> url2image = new WeakHashMap<String, BufferedImage>();
+	private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
 	
 	public Image(IOurl url) throws IOException, Exception {
-		BufferedImage img = null;
+		Image img = null;
 		// synchronized (url2image) {
 		img = url2image.get(url + "");
-		// if (img != null)
-		// System.out.print("~o~" + url);
-		// else
-		// System.out.println("- ~ "+url);
+		
 		if (img == null) {
+			BufferedImage inpimg;
 			InputStream is = url.getInputStream();
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			try {
 				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
-					img = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
+					inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
 				} else
-					img = ImageIO.read(is);
+					inpimg = ImageIO.read(is);
 			} finally {
 				is.close();
 			}
-			url2image.put(url + "", img);
-		} else
-			img = new Image(img).copy().getAsBufferedImage();
-		// }
+			if (inpimg == null)
+				throw new Exception("Image could not be read: " + url);
+			image = new ImagePlus(url.getFileName(),
+					new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
+			url2image.put(url + "", this);
+		} else {
+			image = img.getAsImagePlus();
+		}
 		
-		if (img == null)
-			throw new Exception("Image could not be read: " + url);
-		image = new ImagePlus(url.getFileName(),
-				new ColorProcessor(img.getWidth(), img.getHeight(), ImageConverter.convertBIto1A(img)));
 		w = image.getWidth();
 		h = image.getHeight();
 		
