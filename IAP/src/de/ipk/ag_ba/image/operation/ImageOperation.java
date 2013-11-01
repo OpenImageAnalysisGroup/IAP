@@ -2542,22 +2542,19 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation medianFilter32Bit(boolean performanceOptimized) {
 		if (performanceOptimized) {
 			int[] img = getImageAs1dArray();
-			int w = image.getWidth();
-			int h = image.getHeight();
+			int w = getWidth();
+			int h = getHeight();
 			int[] out = new int[img.length];
 			int last = img.length - w;
-			boolean jmp = true;
+			int[] medianValues = new int[5];
 			for (int i = 0; i < img.length; i++) {
 				if (i > w && i < last) {
-					int center = img[i];
-					int above = img[i - w];
-					int left = img[i - 1];
-					int right = img[i + 1];
-					int below = img[i + w];
-					if (jmp)
-						out[i] = median(center, above, left, right, below);
-					else
-						out[i] = findMedianOf9(new int[] { center, above, left, right, below });
+					medianValues[0] = img[i];
+					medianValues[1] = img[i - w];
+					medianValues[2] = img[i - 1];
+					medianValues[3] = img[i + 1];
+					medianValues[4] = img[i + w];
+					out[i] = median5(medianValues);
 				} else
 					out[i] = img[i];
 			}
@@ -2566,6 +2563,46 @@ public class ImageOperation implements MemoryHogInterface {
 			image.getProcessor().medianFilter();
 			return new ImageOperation(getImage());
 		}
+	}
+	
+	private int median5(int[] p) {
+		int t;
+		if (p[0] > p[1]) {
+			t = p[0];
+			p[0] = p[1];
+			p[1] = t;
+		}
+		if (p[3] > p[4]) {
+			t = p[3];
+			p[3] = p[4];
+			p[4] = t;
+		}
+		if (p[0] > p[3]) {
+			t = p[0];
+			p[0] = p[3];
+			p[3] = t;
+		}
+		if (p[1] > p[4]) {
+			t = p[1];
+			p[1] = p[4];
+			p[4] = t;
+		}
+		if (p[1] > p[2]) {
+			t = p[1];
+			p[1] = p[2];
+			p[2] = t;
+		}
+		if (p[2] > p[3]) {
+			t = p[2];
+			p[2] = p[3];
+			p[3] = t;
+		}
+		if (p[1] > p[2]) {
+			t = p[1];
+			p[1] = p[2];
+			p[2] = t;
+		}
+		return p[2];
 	}
 	
 	public ImageOperation medianFilter32BitvariableMask(int n) {
