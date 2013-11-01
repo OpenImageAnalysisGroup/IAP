@@ -61,6 +61,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlLabFilter(),
 				new BlIntensityCalculationFluo(),
 				new BlMedianFilter(),
+				new BlUseFluoMaskToClearVis(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlUseFluoMaskToClearVis(),
 				new BlUseFluoMaskToClearNir(),

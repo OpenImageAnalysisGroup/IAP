@@ -384,15 +384,15 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return 0 ==> Yellow, 1 ==> Red, 0.5 ==> Orange
 	 */
 	public static float distanceToRed(float f) {
-		float red = 0;
+		float d = 0;
 		float yellow = 60f / 360f;
 		if (f < yellow) { // 0 - 0.16)
-			red = f / yellow;
+			d = f / yellow;
 		} else { // 0.16 - 1
 			f -= yellow;
-			red = 1 - (f / (1 - yellow));
+			d = 1 - (f / (1 - yellow));
 		}
-		return red;
+		return d;
 	}
 	
 	public ImageOperation convertFluo2intensityOldRGBbased() {

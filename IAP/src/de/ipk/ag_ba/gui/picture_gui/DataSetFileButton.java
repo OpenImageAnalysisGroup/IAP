@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.Stack;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -41,6 +43,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
 import org.AttributeHelper;
@@ -54,7 +57,11 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.commands.ActionSettings;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
+import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -340,17 +347,26 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
 						try {
-							IniIoProvider iop = targetTreeNode.getExperiment().getIniIoProvider();
+							final IniIoProvider iop = targetTreeNode.getExperiment().getIniIoProvider();
 							if (iop != null) {
+								Action action = new AbstractAction("Change Analysis Settings") {
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
+										NavigationAction ac = new ActionSettings(null, iop, "Change analysis settings", "Modify settings");
+										mnp.getNewWindowListener(ac).actionPerformed(null);
+									}
+								};
+								jp.add(new JSeparator());
+								jp.add(new JMenuItem(action));
 								PipelineDesc pd = new PipelineDesc(null, iop, null, null);
 								UserDefinedImageAnalysisPipelineTask iat =
 										new UserDefinedImageAnalysisPipelineTask(pd);
-								if (iop != null) {
-									JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-									JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-									jp.add(debugPipelineTest0a);
-									jp.add(debugPipelineTest00a);
-								}
+								JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+								JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+								jp.add(debugPipelineTest0a);
+								jp.add(debugPipelineTest00a);
+								jp.add(new JSeparator());
 							}
 						} catch (Exception err) {
 							if (err.getCause() != null && err.getCause() instanceof NullPointerException)
