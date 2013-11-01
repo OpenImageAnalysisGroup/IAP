@@ -3377,20 +3377,27 @@ public class ImageOperation implements MemoryHogInterface {
 		for (int c : img2d) {
 			if (c != background) {
 				int cg = grayScaledIfNeeded[idx];
-				double vR = java.lang.Double.NaN;
-				double vG = java.lang.Double.NaN;
-				double vB = java.lang.Double.NaN;
+				boolean rS = false;
+				boolean gS = false;
+				boolean bS = false;
+				double vR = 0;
+				double vG = 0;
+				double vB = 0;
 				if (red) {
 					double rf = ((cg & 0xff0000) >> 16) / 255.0; // B 0..1
 					vR = rf;
-				}
+					rS = true;
+				} else
+					vR = 0;
 				if (green) {
 					double gf = ((cg & 0x00ff00) >> 8) / 255.0; // B 0..1
 					vG = gf;
+					gS = true;
 				}
 				if (blue) {
 					double bf = ((cg & 0x0000ff)) / 255.0; // B 0..1
 					vB = bf;
+					bS = true;
 				}
 				if (!red && !green && !blue) {
 					// 7-edge-color-cube calcutation
@@ -3398,13 +3405,22 @@ public class ImageOperation implements MemoryHogInterface {
 					int gf = ((cg & 0x00ff00) >> 8);
 					int bf = ((cg & 0x0000ff));
 					vR = IAPservice.getIRintenstityFromRGB(rf, gf, bf);
+					rS = true;
 				}
-				for (double v : new double[] { vR, vG, vB }) {
-					if (!java.lang.Double.isNaN(v)) {
-						res += v;
-						if (optValues != null)
-							optValues.add(v);
-					}
+				if (rS) {
+					res += vR;
+					if (optValues != null)
+						optValues.add(vR);
+				}
+				if (gS) {
+					res += vG;
+					if (optValues != null)
+						optValues.add(vG);
+				}
+				if (bS) {
+					res += vB;
+					if (optValues != null)
+						optValues.add(vB);
 				}
 			}
 			idx++;
@@ -3717,7 +3733,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int imgw = getImage().getWidth();
 			int imgh = getImage().getHeight();
 			
-			int[][] img2d = getImageAs2dArray();
+			int[] img2d = getImageAs1dArray();
 			float[] p;
 			float[][][] lab = ImageOperation.getLabCubeInstance();
 			if (LThresh < 0) {
@@ -3727,7 +3743,7 @@ public class ImageOperation implements MemoryHogInterface {
 					for (int y = y1; y < y1 + h; y++) {
 						if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 							continue;
-						c = img2d[x][y];
+						c = img2d[x + y * w];
 						r = (c & 0xff0000) >> 16;
 						g = (c & 0x00ff00) >> 8;
 						b = c & 0x0000ff;
@@ -3765,7 +3781,7 @@ public class ImageOperation implements MemoryHogInterface {
 				for (int y = y1; y < y1 + h; y++) {
 					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 						continue;
-					c = img2d[x][y];
+					c = img2d[x + y * w];
 					r = (c & 0xff0000) >> 16;
 					g = (c & 0x00ff00) >> 8;
 					b = c & 0x0000ff;
@@ -3854,13 +3870,17 @@ public class ImageOperation implements MemoryHogInterface {
 		int imgw = getImage().getWidth();
 		int imgh = getImage().getHeight();
 		
-		int[][] img2d = getImageAs2dArray();
+		int[] img1d = getImageAs1dArray();
 		TreeSet<DistanceAndColor> result = new TreeSet<DistanceAndColor>();
 		for (int x = x1; x < x1 + w; x++) {
 			for (int y = y1; y < y1 + h; y++) {
 				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 					continue;
-				c = img2d[x][y];
+				if (w > 10 && ((w % 2) == 0))
+					continue;
+				if (h > 10 && ((h % 2) == 0))
+					continue;
+				c = img1d[x + y * w];
 				r = (c & 0xff0000) >> 16;
 				g = (c & 0x00ff00) >> 8;
 				b = c & 0x0000ff;
@@ -3896,7 +3916,7 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		if (debug)
 			canvas.getImage().show("region scan for target color balance", debug);
-		img2d = null;
+		img1d = null;
 		p = null;
 		lab = null;
 		canvas = null;
@@ -4074,9 +4094,9 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug,
 			double s0, double ss) {
 		
-		int[][] img = getImageAs2dArray();
-		int w = img.length;
-		int h = img[0].length;
+		int[] img = getImageAs1dArray();
+		int w = getWidth();
+		int h = getHeight();
 		int cx = w / 2;
 		int cy = h / 2;
 		int maxDistToCenter = (int) Math.sqrt(cx * cx + cy * cy);
@@ -4099,13 +4119,14 @@ public class ImageOperation implements MemoryHogInterface {
 		SplineInterpolator spline = new SplineInterpolator();
 		PolynomialSplineFunction func = spline.interpolate(indexArray, calibrationCurveFromTopLeftToCenter);
 		
-		int[][] res = new int[w][h];
+		int[] res = new int[w * h];
 		try {
-			for (int x = 0; x < w; x++) {
-				for (int y = 0; y < h; y++) {
-					pix = img[x][y];
+			int i = 0;
+			for (int y = 0; y < h; y++) {
+				for (int x = 0; x < w; x++) {
+					pix = img[i];
 					if (pix == BACKGROUND_COLORint)
-						res[x][y] = pix;
+						res[i] = pix;
 					else {
 						pix = pix & 0x0000ff;
 						distToCenter = (int) Math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y));
@@ -4127,14 +4148,15 @@ public class ImageOperation implements MemoryHogInterface {
 							if (pix < 0)
 								pix = 0;
 						
-						res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
+						res[i] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 					}
+					i++;
 				}
 			}
 		} catch (Exception e) {
 			throw new UnsupportedOperationException(e);
 		}
-		return new ImageOperation(res);
+		return new ImageOperation(res, w, h);
 	}
 	
 	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
@@ -5105,8 +5127,10 @@ public class ImageOperation implements MemoryHogInterface {
 		int to = from + pixels / parts;
 		int i = 0;
 		// enumerate from bottom to top (and left to right)
-		for (int y = getHeight() - 1; y >= 0; y--) {
-			for (int x = 0; x < getWidth(); x++) {
+		int w = getWidth();
+		int h = getHeight();
+		for (int y = h - 1; y >= 0; y--) {
+			for (int x = 0; x < w; x++) {
 				int c = pix[x][y];
 				if (c != BACKGROUND_COLORint) {
 					if (i < from || i >= to)
@@ -5127,17 +5151,19 @@ public class ImageOperation implements MemoryHogInterface {
 	 *           n
 	 * @return inner part of an image (pixels outside the current "ring" are cleared)
 	 */
-	public ImageOperation getInnerCircle(int idx, int parts) {
+	public ImageOperation getInnerCircle(int idx_res, int parts) {
 		// make list of foreground pixels and their distances to the center
 		ArrayList<DoublePixel> distances = new ArrayList<DoublePixel>();
-		int[][] pix = getImageAs2dArray();
+		int[] pix = getImageAs1dArray();
 		
 		int n = 0;
 		long wSum = 0, hSum = 0;
-		
-		for (int x = 0; x < getWidth(); x++) {
-			for (int y = 0; y < getHeight(); y++) {
-				int c = pix[x][y];
+		int w = getWidth();
+		int h = getHeight();
+		int idx = 0;
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				int c = pix[idx++];
 				if (c != BACKGROUND_COLORint) {
 					wSum += x;
 					hSum += y;
@@ -5152,10 +5178,11 @@ public class ImageOperation implements MemoryHogInterface {
 			cx = wSum / (double) n;
 			cy = hSum / (double) n;
 		}
-		for (int x = 0; x < getWidth(); x++) {
-			for (int y = 0; y < getHeight(); y++) {
-				int c = pix[x][y];
-				pix[x][y] = BACKGROUND_COLORint; // prepare for result
+		idx = 0;
+		for (int y = 0; y < y; y++) {
+			for (int x = 0; x < w; x++) {
+				int c = pix[idx];
+				pix[idx++] = BACKGROUND_COLORint; // prepare for result
 				if (c != BACKGROUND_COLORint) {
 					double distanceToCenter = getDistancePlantToCenter(x, y, cx, cy);
 					distances.add(new DoublePixel(distanceToCenter, x, y, c));
@@ -5171,15 +5198,15 @@ public class ImageOperation implements MemoryHogInterface {
 		});
 		// "draw" result image, with only the proper distance part
 		int pixels = countFilledPixels();
-		int from = (idx * pixels) / parts;
+		int from = (idx_res * pixels) / parts;
 		int to = from + pixels / parts;
 		int i = 0;
 		for (DoublePixel dp : distances) {
 			if (i >= from && i < to)
-				pix[dp.x][dp.y] = dp.c;
+				pix[dp.x + dp.y * w] = dp.c;
 			i++;
 		}
-		return new ImageOperation(pix);
+		return new ImageOperation(pix, w, h);
 	}
 	
 	private static double getDistancePlantToCenter(double x, double y, double cx, double cy) {

@@ -170,11 +170,10 @@ public class ImageConverter {
 	public static int[][] convert1Ato2A(int w, int h, int[] img) {
 		
 		int[][] image = new int[w][h];
-		
+		int idx = 0;
 		for (int y = 0; y < h; y++) {
-			int off = y * w;
 			for (int x = 0; x < w; x++) {
-				image[x][y] = img[off++];
+				image[x][y] = img[idx++];
 			}
 		}
 		return image;

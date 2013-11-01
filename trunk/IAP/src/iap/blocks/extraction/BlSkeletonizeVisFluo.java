@@ -64,7 +64,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
+							getBoolean("Leat Width Calculation Type A (VIS)", false),
+							getBoolean("Leat Width Calculation Type B (VIS)", false));
 					if (sk != null)
 						getProperties().setImage("skeleton", sk);
 					// Image rrr = getProperties().getImage("beforeBloomEnhancement");
@@ -80,7 +82,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
+							getBoolean("Leat Width Calculation Type A (VIS)", false),
+							getBoolean("Leat Width Calculation Type B (VIS)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -108,7 +112,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			
 			if (fluowork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(fluowork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(fluowork, vis, fluo, fluo.copy(),
+							getBoolean("Leat Width Calculation Type A (FLUO)", false),
+							getBoolean("Leat Width Calculation Type B (FLUO)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean(new BlDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -126,7 +132,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
+							getBoolean("Leat Width Calculation Type A (FLUO)", false),
+							getBoolean("Leat Width Calculation Type B (FLUO)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -138,7 +146,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		return input().masks().fluo();
 	}
 	
-	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged) {
+	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
+			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).getImage()));
 		skel2d.findEndpointsAndBranches2();
@@ -203,7 +212,6 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().show("BLOOM AREA", debug2).countFilledPixels());
 		}
 		skel2d.deleteShortEndLimbs(getInt("delete limbs threshold", 20), true, new HashSet<Point>());
-		boolean specialLeafWidthCalculations = true;
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {
 			ArrayList<Point> branchPoints = skel2d.getBranches();
@@ -265,7 +273,6 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
 		double normFactor = distHorizontal != null && options.getREAL_MARKER_DISTANCE() != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
 		
-		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
 			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
