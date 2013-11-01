@@ -1,6 +1,5 @@
-# TODO: Add comment
 # 
-# Author: Entzian
+# Author: Entzian, Klukas (bug fixing)
 ###############################################################################
 ### section start with: 01
 
@@ -273,7 +272,7 @@ nBoxPlotList <- list(
 				subsection = 12,
 				subsubsection = 1),
 		 
-		 "side.area.relative" = list(
+		 "side.vis.area.relative" = list(
 				 plotName = "side area growth rate (%/day)", 
 				 section = 6,
 				 subsection = 1), 	
@@ -285,7 +284,7 @@ nBoxPlotList <- list(
 				 plotName = "plant width growth rate (%/day)", 
 				 section = 6,
 				 subsection = 7), 
-		 "top.area.relative" = list(
+		 "top.vis.area.relative" = list(
 				 plotName = "top area growth rate (%/day)", 
 				 section = 6,
 				 subsection = 4), 
@@ -562,11 +561,11 @@ nBoxPlotList <- list(
 		
 		
 		
-		"side.nir.wetness.plant_weight_drought_loss" = list(plotName = "weighted loss through drought stress (side)", section = 12, subsection = 1), 
-		"top.nir.wetness.plant_weight_drought_loss" = list(plotName = "weighted loss through drought stress (top)",section = 12, subsection = 2),
+		"side.nir.intensity.plant_weight_drought_loss" = list(plotName = "weighted loss through drought stress (side)", section = 12, subsection = 1), 
+		"top.nir.intensity.plant_weight_drought_loss" = list(plotName = "weighted loss through drought stress (top)",section = 12, subsection = 2),
 		
-		"side.nir.wetness.average (percent)" = list(plotName = "Average wetness of side image", section = 12, subsection = 3), 
-		"top.nir.wetness.average (percent)" = list(plotName = "Average wetness of top image", section = 12, subsection = 4), 
+		"side.nir.intensity.average (percent)" = list(plotName = "Average intensity of side image", section = 12, subsection = 3), 
+		"top.nir.intensity.average (percent)" = list(plotName = "Average intensity of top image", section = 12, subsection = 4), 
 	
 
 ####### start convex hull #######

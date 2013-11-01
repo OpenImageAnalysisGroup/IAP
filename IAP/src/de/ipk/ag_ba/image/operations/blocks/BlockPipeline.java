@@ -120,16 +120,16 @@ public class BlockPipeline {
 				@Override
 				public void run() {
 					ImageStack ds = debugStack != null ? new ImageStack() : null;
-					BlockResultSet results = new BlockResults();
+					ObjectRef resultRef = new ObjectRef();
 					StringAndFlexibleMaskAndImageSet rr;
 					try {
 						rr = executeInnerCall(well, wellCnt, options,
-								new StringAndFlexibleMaskAndImageSet(null, input), ds, results, status);
+								new StringAndFlexibleMaskAndImageSet(null, input), ds, resultRef, status);
 						synchronized (res) {
 							res.put(well, rr);
 							if (debugStack != null)
 								debugStack.put(well, ds);
-							blockResults.put(well, results);
+							blockResults.put(well, (BlockResultSet) resultRef.getObject());
 						}
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
@@ -150,10 +150,11 @@ public class BlockPipeline {
 	
 	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, int executionWellCount, ImageProcessorOptions options,
 			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
-			BlockResultSet results,
+			ObjectRef resultRef,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		
+		BlockResultSet results = new BlockResults();
+		resultRef.setObject(results);
 		long a = System.currentTimeMillis();
 		
 		int id = pipelineID.addInt(1);

@@ -3,6 +3,8 @@ package de.ipk.ag_ba.image.operation;
 import java.awt.Color;
 import java.util.Stack;
 
+import org.Vector2i;
+
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -138,36 +140,31 @@ public class BorderImageOperation {
 			throw new UnsupportedOperationException("Fill-color needs to differ from background-color.");
 		int res = 0;
 		if (image[startX][startY] == background) {
-			Stack<Integer> xToDo = new Stack<Integer>();
-			Stack<Integer> yToDo = new Stack<Integer>();
-			xToDo.add(startX);
-			yToDo.add(startX);
-			Integer x, y;
-			while (!xToDo.isEmpty()) {
-				x = xToDo.pop();
-				y = yToDo.pop();
+			Stack<Vector2i> toDo = new Stack<Vector2i>();
+			toDo.add(new Vector2i(startX, startY));
+			int x, y;
+			while (!toDo.isEmpty()) {
+				Vector2i p = toDo.pop();
+				x = p.x;
+				y = p.y;
 				image[x][y] = fill;
 				res++;
 				
 				// check right
 				if (x < w - 1 && image[x + 1][y] == background) {
-					xToDo.push(x + 1);
-					yToDo.push(y);
+					toDo.push(new Vector2i(x + 1, y));
 				}
 				// check above
 				if (y > 0 && image[x][y - 1] == background) {
-					xToDo.add(x);
-					yToDo.add(y - 1);
+					toDo.add(new Vector2i(x, y - 1));
 				}
 				// check left
 				if (x > 0 && image[x - 1][y] == background) {
-					xToDo.push(x - 1);
-					yToDo.push(y);
+					toDo.push(new Vector2i(x - 1, y));
 				}
 				// check below
 				if (y < h - 1 && image[x][y + 1] == background) {
-					xToDo.push(x);
-					yToDo.push(y + 1);
+					toDo.push(new Vector2i(x, y + 1));
 				}
 			}
 		}

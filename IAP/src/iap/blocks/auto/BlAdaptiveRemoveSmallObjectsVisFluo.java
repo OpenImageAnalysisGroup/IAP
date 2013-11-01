@@ -61,7 +61,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		
 		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
 				autoTune ? (int) (averageLeafWidthEstimationVIS * averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Area", 20 * 20),
-				autoTune ? (int) (averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Dimension-Absolute", 20),
+				autoTune ? (int) (averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Dimension-Absolute", 20), -1,
 				options.getNeighbourhood(), options.getCameraPosition(), null,
 				autoTune ? true : getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null)
@@ -77,7 +77,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		return new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().
 				removeSmallClusters(ngUse,
 						autoTune ? (int) (averageLeafWidthEstimationFluo * averageLeafWidthEstimationFluo) : getInt("Noise-Size-Fluo-Area", 10 * 10),
-						autoTune ? (int) averageLeafWidthEstimationFluo : getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
+						autoTune ? (int) averageLeafWidthEstimationFluo : getInt("Noise-Size-Fluo-Dimension-Absolute", 10), -1,
 						options.getNeighbourhood(), options.getCameraPosition(), null,
 						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues)
 				.getImage();
