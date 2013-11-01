@@ -16,14 +16,14 @@ public class FeatureVector {
 	}
 	
 	public FeatureVector(Color c) {
-		new FeatureVector(c, 0f, 0f);
+		new FeatureVector(c.getRGB(), 0f, 0f);
 	}
 	
-	public FeatureVector(Color c, float xr, float yr) {
+	public FeatureVector(int c, float xr, float yr) {
 		float L;
 		float a;
 		float b;
-		int rgb = c.getRGB();
+		int rgb = c;
 		this.numFeatures = new ArrayList<Float>();
 		
 		int red = ((rgb >> 16) & 0xff);
@@ -75,11 +75,12 @@ public class FeatureVector {
 		this.numFeatures = new ArrayList<Float>();
 	}
 	
-	public double euclidianDistance(FeatureVector inp) {
-		double dist = 0.0;
+	public float euclidianDistance(FeatureVector inp) {
+		float dist = 0.0f;
 		
 		for (int i = 0; i < this.numFeatures.size(); i++) {
-			dist += (this.numFeatures.get(i) - inp.numFeatures.get(i)) * (this.numFeatures.get(i) - inp.numFeatures.get(i));
+			float a = this.numFeatures.get(i) - inp.numFeatures.get(i);
+			dist += a * a;
 		}
 		return dist;
 	}

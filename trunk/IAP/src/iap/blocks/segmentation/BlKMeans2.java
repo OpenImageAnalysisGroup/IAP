@@ -85,7 +85,7 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		ArrayList<FeatureVector> centerPoints = new ArrayList<FeatureVector>();
 		
 		for (int i = 0; i < seedColors.size(); i++) {
-			centerPoints.add(new FeatureVector(seedColors.get(i), seedPositions.get(i).x, seedPositions.get(i).y));
+			centerPoints.add(new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y));
 		}
 		
 		// run optimization
@@ -177,7 +177,7 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 			
 			int rgb = img1d[k];
 			
-			FeatureVector temp = new FeatureVector(new Color(rgb), x / (float) w, y / (float) h);
+			FeatureVector temp = new FeatureVector(rgb, x / (float) w, y / (float) h);
 			
 			measurements[k] = temp;
 			x++;
