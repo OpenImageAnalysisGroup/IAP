@@ -311,11 +311,7 @@ public class Image {
 	}
 	
 	public Image copy() {
-		int[] px = getAs1A();
-		int[] copy = new int[px.length];
-		for (int i = 0; i < px.length; i++)
-			copy[i] = px[i];
-		return new Image(getWidth(), getHeight(), copy);
+		return new Image(getWidth(), getHeight(), getAs1A().clone());
 	}
 	
 	public void setCameraType(CameraType type) {
