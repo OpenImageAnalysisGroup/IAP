@@ -2546,15 +2546,51 @@ public class ImageOperation implements MemoryHogInterface {
 			int h = getHeight();
 			int[] out = new int[img.length];
 			int last = img.length - w;
-			int[] medianValues = new int[5];
+			int[] p = new int[5];
 			for (int i = 0; i < img.length; i++) {
 				if (i > w && i < last) {
-					medianValues[0] = img[i];
-					medianValues[1] = img[i - w];
-					medianValues[2] = img[i - 1];
-					medianValues[3] = img[i + 1];
-					medianValues[4] = img[i + w];
-					out[i] = median5(medianValues);
+					p[0] = img[i];
+					p[1] = img[i - w];
+					p[2] = img[i - 1];
+					p[3] = img[i + 1];
+					p[4] = img[i + w];
+					int t;
+					if (p[0] > p[1]) {
+						t = p[0];
+						p[0] = p[1];
+						p[1] = t;
+					}
+					if (p[3] > p[4]) {
+						t = p[3];
+						p[3] = p[4];
+						p[4] = t;
+					}
+					if (p[0] > p[3]) {
+						t = p[0];
+						p[0] = p[3];
+						p[3] = t;
+					}
+					if (p[1] > p[4]) {
+						t = p[1];
+						p[1] = p[4];
+						p[4] = t;
+					}
+					if (p[1] > p[2]) {
+						t = p[1];
+						p[1] = p[2];
+						p[2] = t;
+					}
+					if (p[2] > p[3]) {
+						t = p[2];
+						p[2] = p[3];
+						p[3] = t;
+					}
+					if (p[1] > p[2]) {
+						t = p[1];
+						p[1] = p[2];
+						p[2] = t;
+					}
+					out[i] = p[2];
 				} else
 					out[i] = img[i];
 			}
@@ -3460,11 +3496,11 @@ public class ImageOperation implements MemoryHogInterface {
 		int[] img2d = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		for (int y = 0; y < image.getHeight(); y++) {
+		if (threshold < 0)
+			threshold = 0;
+		for (int y = 0; y < h; y++) {
 			int yw = y * w;
-			if (threshold < 0)
-				threshold = 0;
-			for (int x = (int) threshold; x < image.getWidth(); x++) {
+			for (int x = (int) threshold; x < w; x++) {
 				img2d[x + yw] = background;
 			}
 		}
