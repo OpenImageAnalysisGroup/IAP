@@ -43,20 +43,21 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 		if (image == null || mask == null || !getBoolean("process " + optics, optics.equals("VIS")))
 			return mask;
 		else {
-			ImageOperation processedMask = input().masks().vis().io().copy();
+			ImageOperation processedMask = mask.io().copy();
 			ImageStack fis = debug ? new ImageStack() : null;
 			if (fis != null)
 				fis.addImage(optics + " start", processedMask.getImage(), null);
-			
+			boolean isVis = optics.equals("VIS");
+			String add = isVis ? "" : " (" + optics + ")";
 			if (getBoolean("process " + optics, true)) {
 				String pf = "";
 				processedMask = processedMask.filterRemoveLAB(
-						getInt("min L", options.getCameraPosition() == CameraPosition.TOP ? 120 : 120),
-						getInt("max L", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
-						getInt("min A", options.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
-						getInt("max A", options.getCameraPosition() == CameraPosition.TOP ? 138 : 138),
-						getInt("min B", options.getCameraPosition() == CameraPosition.TOP ? 125 : 125),
-						getInt("max B", options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
+						getInt("min L" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 120 : 120),
+						getInt("max L" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
+						getInt("min A" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
+						getInt("max A" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 138 : 138),
+						getInt("min B" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 125 : 125),
+						getInt("max B" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
 						options.getBackground(),
 						getBoolean(pf + "invert", false));
 				
