@@ -168,13 +168,9 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h) {
 		FeatureVector[] measurements = new FeatureVector[w * h];
 		int x = 0, y = 0;
-		for (int k = 0; k < img1d.length; k++) {
-			
-			int rgb = img1d[k];
-			
-			FeatureVector temp = new FeatureVector(rgb, x / (float) w, y / (float) h);
-			
-			measurements[k] = temp;
+		int idx = 0;
+		for (int rgb : img1d) {
+			measurements[idx++] = new FeatureVector(rgb, x / (float) w, y / (float) h);
 			x++;
 			if (x == w) {
 				x = 0;

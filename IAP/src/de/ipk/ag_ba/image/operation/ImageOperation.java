@@ -1747,41 +1747,41 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation crop() {
 		int w = image.getWidth();
-		int h = image.getHeight();
 		
 		int smallestX = Integer.MAX_VALUE;
 		int largestX = 0;
 		int smallestY = Integer.MAX_VALUE;
 		int largestY = 0;
 		
-		int[][] img = getImageAs2dArray();
-		
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				if (img[x][y] != ImageOperation.BACKGROUND_COLORint) {
-					if (x < smallestX)
-						smallestX = x;
-					if (x > largestX)
-						largestX = x;
-					if (y < smallestY)
-						smallestY = y;
-					if (y > largestY)
-						largestY = y;
-				}
+		int[] img = getImageAs1dArray();
+		int x = 0;
+		int y = 0;
+		for (int c : img) {
+			if (c != ImageOperation.BACKGROUND_COLORint) {
+				if (x < smallestX)
+					smallestX = x;
+				if (x > largestX)
+					largestX = x;
+				if (y < smallestY)
+					smallestY = y;
+				if (y > largestY)
+					largestY = y;
+			}
+			x++;
+			if (x == w) {
+				x = 0;
+				y++;
 			}
 		}
 		if (largestX > 0) {
 			int[][] res = new int[largestX - smallestX + 1][largestY
 					- smallestY + 1];
-			for (int x = smallestX; x <= largestX; x++) {
-				for (int y = smallestY; y <= largestY; y++) {
-					res[x - smallestX][y - smallestY] = img[x][y];
+			for (y = smallestY; y <= largestY; y++) {
+				int off = y * w;
+				for (x = smallestX; x <= largestX; x++) {
+					res[x - smallestX][y - smallestY] = img[off + x];
 				}
 			}
-			// FlexibleImage a = new FlexibleImage(image);
-			// FlexibleImage b = new FlexibleImage(res);
-			// a.print("A");
-			// b.print("B");
 			return new ImageOperation(new Image(res));
 		} else
 			return this;
