@@ -320,7 +320,7 @@ public class ImageCanvas {
 		int ci = c.getRGB();
 		return drawLine(x, y, x + w, y, ci, 0, thickness)
 				.drawLine(x + w, y, x + w, y + h, ci, 0, thickness)
-				.drawLine(x + w, y + w, x, y + h, ci, 0, thickness)
+				.drawLine(x + w, y + h, x, y + h, ci, 0, thickness)
 				.drawLine(x, y + h, x, y, ci, 0, thickness);
 	}
 	
