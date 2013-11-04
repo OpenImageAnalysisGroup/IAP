@@ -12,6 +12,7 @@ import javax.vecmath.Vector2f;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.operation.FeatureVector;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.SumFeatures;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -66,7 +67,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				clusterColors = seedColors;
 			}
 			
-			double epsilon = getDouble("epsilon", 0.01);
+			float epsilon = (float) getDouble("epsilon", 0.01);
 			
 			res = kMeans(inp, seedColors, seedPositions, clusterColors, epsilon);
 			
@@ -89,30 +90,31 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		return "Color Classes";
 	}
 	
-	private Image kMeans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, double epsilon) {
+	private Image kMeans(Image img, ArrayList<Color> seedColors, ArrayList<Vector2f> seedPositions, ArrayList<Color> clusterColors, float epsilon) {
 		// get feature vector (norm everything between 0 -1)
 		int[] img1d = img.copy().getAs1A();
 		int w = img.getWidth();
 		int h = img.getHeight();
 		
-		FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h);
+		float[][][] lc = ImageOperation.getLabCubeInstance();
+		
+		FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h, lc);
 		
 		// create initials center
-		ArrayList<FeatureVector> centerPoints = new ArrayList<FeatureVector>();
+		FeatureVector[] centerPoints = new FeatureVector[seedColors.size()];
 		
 		for (int i = 0; i < seedColors.size(); i++) {
-			centerPoints.add(new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y));
+			centerPoints[i] = new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y, lc);
 		}
 		
 		// run optimization
 		ArrayList<SumFeatures> distclasses = new ArrayList<SumFeatures>();
 		
-		for (int i = 0; i < centerPoints.size(); i++) {
-			distclasses.add(new SumFeatures(centerPoints.get(0).numFeatures.size()));
+		for (int i = 0; i < centerPoints.length; i++) {
+			distclasses.add(new SumFeatures(centerPoints[0].numFeatures.length));
 		}
 		
 		boolean run = true;
-		
 		while (run) {
 			for (int aa = 0; aa < measurements.length; aa++) {
 				FeatureVector i = measurements[aa];
@@ -133,16 +135,17 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				distclasses.get(minidx).sumUp(i);
 			}
 			
-			ArrayList<FeatureVector> newCenterPoints = new ArrayList<FeatureVector>();
+			FeatureVector[] newCenterPoints = new FeatureVector[centerPoints.length];
+			int idx = 0;
 			for (SumFeatures so : distclasses) {
-				newCenterPoints.add(new FeatureVector(so));
+				newCenterPoints[idx++] = new FeatureVector(so);
 			}
 			
 			run = false;
 			
 			if (getBoolean(getSettingsNameForLoop(), false)) {
-				for (int i = 0; i < newCenterPoints.size(); i++) {
-					double dist = newCenterPoints.get(i).euclidianDistance(centerPoints.get(i));
+				for (int i = 0; i < newCenterPoints.length; i++) {
+					float dist = newCenterPoints[i].euclidianDistance(centerPoints[i]);
 					if (debugValues)
 						System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
 					if (dist > epsilon)
@@ -165,12 +168,12 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		return new Image(w, h, result);
 	}
 	
-	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h) {
+	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h, float[][][] lc) {
 		FeatureVector[] measurements = new FeatureVector[w * h];
 		int x = 0, y = 0;
 		int idx = 0;
 		for (int rgb : img1d) {
-			measurements[idx++] = new FeatureVector(rgb, x / (float) w, y / (float) h);
+			measurements[idx++] = new FeatureVector(rgb, x / (float) w, y / (float) h, lc);
 			x++;
 			if (x == w) {
 				x = 0;

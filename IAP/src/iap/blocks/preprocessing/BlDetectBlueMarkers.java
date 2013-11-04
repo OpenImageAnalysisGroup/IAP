@@ -50,7 +50,8 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			vis = input().images().vis();
 		
 		if (vis != null) {
-			markerMask = getMarkers(vis.copy(), numericResult);
+			if (!getBoolean("Use fixed marker distance", options.getCameraPosition() == CameraPosition.TOP))
+				markerMask = getMarkers(vis.copy(), numericResult);
 			
 			int w = vis.getWidth();
 			int h = vis.getHeight();
@@ -59,21 +60,22 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			int i = 1;
 			if (getProperties() == null)
 				reportError((Exception) null, "getProperties returns NULL");
-			for (MarkerPair mp : numericResult) {
-				if (mp.getLeft() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getLeft().x / w);
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getLeft().y / h);
+			if (!getBoolean("Use fixed marker distance", options.getCameraPosition() == CameraPosition.TOP))
+				for (MarkerPair mp : numericResult) {
+					if (mp.getLeft() != null) {
+						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getLeft().x / w);
+						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getLeft().y / h);
+					}
+					i += 2;
+					if (mp.getRight() != null) {
+						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getRight().x / w);
+						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getRight().y / h);
+					}
+					i += 2;
+					n++;
+					if (n >= 3)
+						break;
 				}
-				i += 2;
-				if (mp.getRight() != null) {
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(), mp.getRight().x / w);
-					getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(), mp.getRight().y / h);
-				}
-				i += 2;
-				n++;
-				if (n >= 3)
-					break;
-			}
 			calculateDistanceBetweenMarkers(numericResult, w, input().masks().getVisInfo().getParentSample().getParentCondition().getParentSubstance().getInfo());
 		}
 		if (input().masks().vis() != null)
@@ -241,7 +243,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Detect Blue Side Markers";
+		return "Detect Blue Markers";
 	}
 	
 	@Override
