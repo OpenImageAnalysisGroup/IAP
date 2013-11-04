@@ -279,9 +279,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
-			final MaskAndImageSet inputSet,
+			final MaskAndImageSet in,
 			final BlockResultSet brs, final ImageProcessorOptions options,
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
+		
+		final MaskAndImageSet inputSet = in.copy();
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
