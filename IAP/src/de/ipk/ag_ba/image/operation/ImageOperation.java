@@ -453,14 +453,27 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		if (image.getWidth() != mask.getWidth()
 				|| image.getHeight() != mask.getHeight()) {
-			mask = new ImageOperation(mask).resize(image.getWidth(),
-					image.getHeight()).getImage();
+			double aspectThisImage = image.getWidth() / (double) image.getHeight();
+			double aspectMaskImage = mask.getWidth() / (double) mask.getHeight();
+			if (Math.abs(aspectThisImage - aspectMaskImage) > 0.0001) {
+				// fix aspect ratio difference first
+				if (aspectMaskImage < aspectThisImage) {
+					// mask too thin --> add content left and right
+					double missingPixels = mask.getHeight() * aspectThisImage - mask.getWidth();
+					int b = (int) (missingPixels / 2d);
+					mask = mask.io().addBorder(b, 0, 0, 0, BACKGROUND_COLORint).getImage();
+				} else {
+					// mask not tall enough --> add content at top and bottom
+					double missingPixels = mask.getWidth() / aspectThisImage - mask.getHeight();
+					int b = (int) (missingPixels / 2d);
+					mask = mask.io().addBorder(0, b, 0, 0, BACKGROUND_COLORint).getImage();
+				}
+			}
+			mask = mask.io().resize(image.getWidth(), image.getHeight()).getImage();
 		}
 		
-		// copy().crossfade(mask.copy(), 0.5d).print("OVERLAY");
-		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = ImageConverter.convertIJto1A(image);
+		int[] originalImage = getImageAs1dArray();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
