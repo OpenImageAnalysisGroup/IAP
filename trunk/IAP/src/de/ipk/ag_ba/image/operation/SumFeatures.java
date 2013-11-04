@@ -9,8 +9,8 @@ public class SumFeatures {
 	}
 	
 	public synchronized void sumUp(FeatureVector in) {
-		for (int i = 0; i < in.numFeatures.size(); i++) {
-			sumarray[i] += in.numFeatures.get(i);
+		for (int i = 0; i < in.numFeatures.length; i++) {
+			sumarray[i] += in.numFeatures[i];
 		}
 		n++;
 	}

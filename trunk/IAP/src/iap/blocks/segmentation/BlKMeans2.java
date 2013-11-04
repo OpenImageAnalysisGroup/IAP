@@ -15,6 +15,7 @@ import org.SystemAnalysis;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.operation.FeatureVector;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.SumFeatures;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -79,20 +80,22 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		int w = img.getWidth();
 		int h = img.getHeight();
 		
-		final FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h);
+		float[][][] lc = ImageOperation.getLabCubeInstance();
+		
+		final FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h, lc);
 		
 		// create initials center
 		ArrayList<FeatureVector> centerPoints = new ArrayList<FeatureVector>();
 		
 		for (int i = 0; i < seedColors.size(); i++) {
-			centerPoints.add(new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y));
+			centerPoints.add(new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y, lc));
 		}
 		
 		// run optimization
 		final ArrayList<SumFeatures> distclasses = new ArrayList<SumFeatures>();
 		
 		for (int i = 0; i < centerPoints.size(); i++) {
-			distclasses.add(new SumFeatures(centerPoints.get(0).numFeatures.size()));
+			distclasses.add(new SumFeatures(centerPoints.get(0).numFeatures.length));
 		}
 		
 		boolean run = true;
@@ -170,14 +173,14 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 		return new Image(w, h, result);
 	}
 	
-	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h) {
+	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h, float[][][] lc) {
 		FeatureVector[] measurements = new FeatureVector[w * h];
 		int x = 0, y = 0;
 		for (int k = 0; k < img1d.length; k++) {
 			
 			int rgb = img1d[k];
 			
-			FeatureVector temp = new FeatureVector(rgb, x / (float) w, y / (float) h);
+			FeatureVector temp = new FeatureVector(rgb, x / (float) w, y / (float) h, lc);
 			
 			measurements[k] = temp;
 			x++;
@@ -208,12 +211,13 @@ public class BlKMeans2 extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Auto-tuning VIS-Segmentation (K-Means)";
+		return "Auto-tuning VIS-Segmentation (K-Means, deltaE2000)";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Segmentation based on the k-means clustering.";
+		return "Segmentation based on the k-means clustering.<br>"
+				+ "Uses more accurate but much slower deltaE2000 color-difference calculation approach.";
 	}
 	
 }
