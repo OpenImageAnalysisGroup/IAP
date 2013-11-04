@@ -5,9 +5,11 @@ import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -47,39 +49,55 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 				}
 		
 		if (gridHn != 1 || gridVn != 1) {
-			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100;
-			int well_border = getInt("Additional Well Border", 0);
+			double horFillGrade = getDouble("Horizontal Grid Extend Percent", 100) / 100d;
+			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100d;
+			double well_border = getDouble("Additional Well Border Percent", 0) / 100d;
 			// 3x2
 			Image vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, CameraType.VIS, vertFillGrade * vis.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
+				processCuttingOfImage(vis, CameraType.VIS, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
 			// processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
 			Image fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, CameraType.FLUO, vertFillGrade * fluo.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
+				processCuttingOfImage(fluo, CameraType.FLUO, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
 			
 			Image nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, CameraType.NIR, vertFillGrade * nir.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
+				processCuttingOfImage(nir, CameraType.NIR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
 			
 			Image ir = input().images().ir();
 			if (ir != null) {
 				ir = ir.io().getImage();
-				processCuttingOfImage(ir, CameraType.IR, vertFillGrade * ir.getHeight() / 2d, vertFillGrade, gridHn, gridVn, well_border);
+				processCuttingOfImage(ir, CameraType.IR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
 			}
 		}
 	}
 	
-	private void processCuttingOfImage(Image img, CameraType type, double offY, double vertFillGrade, int cols, int rows, int well_border) {
-		Rectangle2D.Double r = getGridPos(getWellIdx(), cols, rows, img.getWidth(), (int) (img.getHeight() * vertFillGrade),
-				img.getWidth() / 2,
-				img.getHeight() / 2);
+	private void processCuttingOfImage(Image img, CameraType type, double horFillGrade, double vertFillGrade, int cols, int rows, double well_border) {
+		int offX = getInt("Offset X (" + type + ")", 0);
+		int offY = getInt("Offset Y (" + type + ")", 0);
+		Rectangle2D.Double r = getGridPos(getWellIdx(), cols, rows, (int) (img.getWidth() * horFillGrade), (int) (img.getHeight() * vertFillGrade),
+				img.getWidth() / 2 + offX,
+				img.getHeight() / 2 + offY);
 		
-		int le = (int) r.getMinX() + well_border;
-		int to = (int) r.getMinY() + well_border;
-		int ri = (int) r.getMaxX() - well_border;
-		int bo = (int) r.getMaxY() - well_border;
+		int le = (int) ((int) r.getMinX() + well_border * r.getWidth());
+		int to = (int) ((int) r.getMinY() + well_border * r.getHeight());
+		int ri = (int) ((int) r.getMaxX() - well_border * r.getWidth());
+		int bo = (int) ((int) r.getMaxY() - well_border * r.getHeight());
+		Image oimg = getBoolean("debug", false) ? img.copy() : null;
 		Image res = img.io().clearOutsideRectangle(le, to, ri, bo).getImage();
+		if (getBoolean("debug", false)) {
+			Image ic = res.io().or(oimg.io().gamma(2).getImage()).getImage();
+			ImageCanvas icc = ic.io().canvas();
+			for (int wellIDX = 0; wellIDX < cols * rows; wellIDX++) {
+				r = getGridPos(wellIDX, cols, rows, (int) (img.getWidth() * horFillGrade), (int) (img.getHeight() * vertFillGrade),
+						img.getWidth() / 2 + offX,
+						img.getHeight() / 2 + offY);
+				icc = icc.drawRectangle((int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight(), Color.YELLOW, 2);
+			}
+			res = icc.getImage();
+		}
+		
 		res.setCameraType(type);
 		input().images().set(res);
 	}
