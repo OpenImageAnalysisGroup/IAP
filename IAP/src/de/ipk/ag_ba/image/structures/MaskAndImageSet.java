@@ -219,4 +219,8 @@ public class MaskAndImageSet {
 	public ImageSetDescription getImageSetDescription() {
 		return new ImageSetDescription(this);
 	}
+	
+	public MaskAndImageSet copy() {
+		return new MaskAndImageSet(imageset != null ? imageset.copy() : null, maskset != null ? maskset.copy() : null);
+	}
 }
