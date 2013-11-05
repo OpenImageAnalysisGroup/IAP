@@ -474,6 +474,7 @@ public class MongoDB {
 			inputFile.save();
 			result = 1;// inputFile.getLength();
 			is.close();
+			VirtualFileSystemVFS2.writeCounter.addLong(((MyByteArrayInputStream) is).getCount());
 		}
 		return result;
 	}
