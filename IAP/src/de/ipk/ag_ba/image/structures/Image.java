@@ -60,10 +60,13 @@ public class Image {
 	private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
 	
 	public Image(IOurl url) throws IOException, Exception {
-		Image img = null;
-		// synchronized (url2image) {
-		img = url2image.get(url + "");
+		if (url != null && url.getFileName() != null)
+			this.fileName = url.getFileName();
 		
+		Image img = null;
+		synchronized (url2image) {
+			img = url2image.get(url + "");
+		}
 		if (img == null) {
 			BufferedImage inpimg;
 			InputStream is = url.getInputStream();
@@ -81,16 +84,17 @@ public class Image {
 				throw new Exception("Image could not be read: " + url);
 			image = new ImagePlus(url.getFileName(),
 					new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
-			url2image.put(url + "", this);
+			synchronized (url2image) {
+				w = image.getWidth();
+				h = image.getHeight();
+				url2image.put(url + "", this.copy());
+			}
 		} else {
 			image = img.copy().getAsImagePlus();
+			w = image.getWidth();
+			h = image.getHeight();
 		}
 		
-		w = image.getWidth();
-		h = image.getHeight();
-		
-		if (url != null && url.getFileName() != null)
-			this.fileName = url.getFileName();
 	}
 	
 	public Image(ImagePlus image) {
