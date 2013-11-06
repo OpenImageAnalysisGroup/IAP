@@ -513,6 +513,10 @@ public class PdfCreator {
 		return new File(tempDirectory.getAbsolutePath() + File.separator + "report.pdf").getAbsolutePath();
 	}
 	
+	public IOurl getPdfIOurl() {
+		return FileSystemHandler.getURL(new File(tempDirectory.getAbsolutePath() + File.separator + "report.pdf"));
+	}
+	
 	public void openTargetDirectory() {
 		AttributeHelper.showInBrowser(tempDirectory + "");
 	}
@@ -523,6 +527,10 @@ public class PdfCreator {
 	
 	public File getTempDirectory() {
 		return tempDirectory;
+	}
+	
+	public IOurl getTempDirectoryIOurl() {
+		return FileSystemHandler.getURL(tempDirectory);
 	}
 	
 	public void setUseIndividualReportNames(boolean useIndividualReportNames) {
