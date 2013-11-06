@@ -14,6 +14,7 @@ import java.util.Date;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -152,6 +153,11 @@ public class TaskDescription {
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
 							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has completed analysis and saving of " + experiment.getName());
+							
+							boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
+							if (saveOverallDatasetIfPossible)
+								m.processSplitResults().merge(false, statusProvider);
+							
 							m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED, false);
 							boolean deleteCompletedJobs = true;
 							if (deleteCompletedJobs)

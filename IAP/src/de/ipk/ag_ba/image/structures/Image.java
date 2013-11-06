@@ -15,7 +15,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.WeakHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -57,43 +56,44 @@ public class Image {
 		this.cameraType = type;
 	}
 	
-	private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
+	// private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
 	
 	public Image(IOurl url) throws IOException, Exception {
 		if (url != null && url.getFileName() != null)
 			this.fileName = url.getFileName();
 		
-		Image img = null;
-		synchronized (url2image) {
-			img = url2image.get(url + "");
+		// Image img = null;
+		// synchronized (url2image) {
+		// img = url2image.get(url + "");
+		// }
+		// if (img == null) {
+		BufferedImage inpimg;
+		InputStream is = url.getInputStream();
+		if (is == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
+		try {
+			if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
+				inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
+			} else
+				inpimg = ImageIO.read(is);
+		} finally {
+			is.close();
 		}
-		if (img == null) {
-			BufferedImage inpimg;
-			InputStream is = url.getInputStream();
-			if (is == null)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
-			try {
-				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
-					inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
-				} else
-					inpimg = ImageIO.read(is);
-			} finally {
-				is.close();
-			}
-			if (inpimg == null)
-				throw new Exception("Image could not be read: " + url);
-			image = new ImagePlus(url.getFileName(),
-					new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
-			synchronized (url2image) {
-				w = image.getWidth();
-				h = image.getHeight();
-				url2image.put(url + "", this.copy());
-			}
-		} else {
-			image = img.copy().getAsImagePlus();
-			w = image.getWidth();
-			h = image.getHeight();
-		}
+		if (inpimg == null)
+			throw new Exception("Image could not be read: " + url);
+		image = new ImagePlus(url.getFileName(),
+				new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
+		// }
+		// synchronized (url2image) {
+		w = image.getWidth();
+		h = image.getHeight();
+		// url2image.put(url + "", this.copy());
+		// }
+		// } else {
+		// image = img.copy().getAsImagePlus();
+		// w = image.getWidth();
+		// h = image.getHeight();
+		// }
 		
 	}
 	
