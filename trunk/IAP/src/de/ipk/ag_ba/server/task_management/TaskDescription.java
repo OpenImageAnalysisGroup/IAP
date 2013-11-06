@@ -175,9 +175,21 @@ public class TaskDescription {
 				}
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 					System.out.println(">Cluster Execution Mode is active // FINISHED COMPUTE TASK");
-					System.out.println(">SYSTEM.EXIT(0)");
-					MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-							+ " finished compute task - SYSTEM.EXIT(0)");
+					try {
+						if (m.batch().getAll().size() > 0) {
+							System.out.println(">SYSTEM.EXIT(1) (batch queue not empty)");
+							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
+									+ " finished compute task - SYSTEM.EXIT(1)");
+							System.exit(1);
+						} else {
+							System.out.println(">SYSTEM.EXIT(0) (batch queue is empty)");
+							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
+									+ " finished compute task - SYSTEM.EXIT(0)");
+							System.exit(0);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					System.exit(0);
 				}
 			}
