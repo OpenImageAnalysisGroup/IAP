@@ -228,7 +228,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				
 				if (errorCount == 0) {
 					status.setCurrentStatusText1("Finalize storage");
-					status.setCurrentStatusText1("Write Index...");
+					status.setCurrentStatusText2("Write Index...");
 					// save XML and header
 					System.out.println("OK: VfsFile transfer of experiment "
 							+ experimentReference.getExperimentName()
@@ -691,8 +691,14 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				optStatus.setCurrentStatusText1("Create Condition File");
 			storeConditionIndexFile(hsmManager, tsave, eidx,
 					tempFile2fileName, ei);
+			// if (SystemOptions.getInstance().getBoolean("VFS", "Create HTML Overview Pages", true)) {
+			// if (optStatus != null)
+			// optStatus.setCurrentStatusText1("Create HTML Overview Pages");
+			// storeHTMLfile(hsmManager, tsave, eidx, tempFile2fileName, ei);
+			// }
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create Index File");
+			
 			String resName = storeIndexFile(hsmManager, tsave, eidx, tempFile2fileName, ei);
 			
 			renameTempInProgressFilesToFinalFileNames(tempFile2fileName, experimentSourceName);
@@ -990,6 +996,36 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		if (resName.startsWith(vfs.getTargetPathName()))
 			resName = resName.substring(vfs.getTargetPathName().length() + "/".length());
 		return resName;
+	}
+	
+	private String storeHTMLfile(final HSMfolderTargetDataManager hsmManager,
+			long tsave, int eidx, HashMap<VfsFileObject, String> tempFile2fileName,
+			ExperimentInterface ei) throws Exception {
+		return null;
+		// String indexFileName = tsave + "_" + eidx + "_"
+		// + HSMfolderTargetDataManager.filterBadChars(ei.getHeader().getImportusername(), true) + "_" +
+		// HSMfolderTargetDataManager.filterBadChars(ei.getName(), true)
+		// + ".iap.index.html";
+		// indexFileName = StringManipulationTools.stringReplace(indexFileName,
+		// ":", "-");
+		//
+		// VfsFileObject indexFile = vfs.newVfsFile(
+		// hsmManager
+		// .prepareAndGetTargetFileForContentIndex("in_progress_"
+		// + UUID.randomUUID().toString()), true);
+		// TextFile htmlFileContent = new TextFile();
+		// LinkedHashMap<String, Object> header = new LinkedHashMap<String, Object>();
+		// ei.getHeader().fillAttributeMap(header,
+		// ei.getNumberOfMeasurementValues());
+		// String experimentName = ei.getName();
+		//
+		// OutputStream os = indexFile.getOutputStream();
+		// htmlFileContent.write(os);
+		// String resName = hsmManager.prepareAndGetTargetFileForHTML(indexFileName);
+		// tempFile2fileName.put(indexFile, resName);
+		// if (resName.startsWith(vfs.getTargetPathName()))
+		// resName = resName.substring(vfs.getTargetPathName().length() + "/".length());
+		// return resName;
 	}
 	
 	private void storeXMLdataset(final ExperimentInterface experiment,
