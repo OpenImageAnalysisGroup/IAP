@@ -137,10 +137,10 @@ public class BlockPipeline {
 					}
 				}
 			};
-			if (executionTrayCount > 1)
-				wait.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + well + "_" + executionTrayCount));
-			else
-				r.run();
+			// if (executionTrayCount > 1)
+			// wait.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + well + "_" + executionTrayCount));
+			// else
+			r.run();
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
 		if (exception.getObject() != null)
