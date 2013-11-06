@@ -55,6 +55,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
  */
 public class HSMfolderTargetDataManager implements DatabaseTarget {
 	public static final String DIRECTORY_FOLDER_NAME = "index";
+	public static final String HTML_FOLDER_NAME = "html";
 	public static final String DATA_FOLDER_NAME = "data";
 	private static final String CONDITION_FOLDER_NAME = "conditions";
 	
@@ -72,6 +73,13 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 	
 	public String prepareAndGetTargetFileForContentIndex(String zefn) {
 		String res = path + File.separator + DIRECTORY_FOLDER_NAME;
+		if (!new File(res).exists())
+			new File(res).mkdirs();
+		return res + File.separator + zefn;
+	}
+	
+	public String prepareAndGetTargetFileForHTML(String zefn) {
+		String res = path + File.separator + HTML_FOLDER_NAME;
 		if (!new File(res).exists())
 			new File(res).mkdirs();
 		return res + File.separator + zefn;
