@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
@@ -61,6 +62,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	public static final String separator = ";";// "\t";// ";";// "\t";
 	private final boolean exportIndividualAngles;
 	private final boolean xlsx;
+	
+	private String finalResultFileLocation = "";
 	
 	private File targetDirectoryOrTargetFile = null;
 	private ArrayList<ThreadSafeOptions> togglesFiltering;
@@ -326,6 +329,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		finalResultFileLocation = "";
 		ExperimentInterface experiment = experimentReference.getData(false, getStatusProvider());
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
@@ -495,6 +499,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						File f = targetDirectoryOrTargetFile;
 						if (f == null)
 							f = p.getTargetFile(xlsx, experimentReference.getHeader());
+						
+						finalResultFileLocation = FileSystemHandler.getURL(f).toString();
+						
 						String tempDirectory = f.getParent();
 						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
 					}
@@ -508,6 +515,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						p.prepareTempDirectory();
 					if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
 						File f = p.saveReportToFile(csvFileContent, xlsx, experimentReference.getHeader());
+						
+						finalResultFileLocation = FileSystemHandler.getURL(f).toString();
+						
 						String tempDirectory = f.getParent();
 						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
 					}
@@ -604,10 +614,13 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							lastOutput, timeoutMinutes);
 					p.getOutput();
 					boolean ok = p.hasPDFcontent();
-					if (ok)
+					if (ok) {
 						AttributeHelper.showInBrowser(p.getPDFurl());
-					else
+						finalResultFileLocation = p.getPdfIOurl().toString();
+					} else {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: No output file available");
+						finalResultFileLocation = p.getTempDirectory().toString();
+					}
 					if (status != null)
 						status.setCurrentStatusText2("Processing finished");
 					
@@ -620,6 +633,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					
 				} else {
 					p.openTargetDirectory();
+					finalResultFileLocation = p.getTempDirectory().toString();
 				}
 		}
 		if (status != null)
@@ -861,7 +875,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		if (SystemAnalysis.isHeadless())
 			return new MainPanelComponent(new JLabel());
 		else
-			return new MainPanelComponent("The generated file will be shown or opened automatically in a moment.");
+			return new MainPanelComponent("The generated file will be shown or opened automatically in a moment.<br><br>File or folder location: <a href='"
+					+ finalResultFileLocation + "'>" + finalResultFileLocation + "</a>");
 	}
 	
 	public ExperimentReference getExperimentReference() {
