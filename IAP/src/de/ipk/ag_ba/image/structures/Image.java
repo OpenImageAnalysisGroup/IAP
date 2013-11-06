@@ -83,7 +83,7 @@ public class Image {
 					new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
 			url2image.put(url + "", this);
 		} else {
-			image = img.getAsImagePlus();
+			image = img.copy().getAsImagePlus();
 		}
 		
 		w = image.getWidth();
