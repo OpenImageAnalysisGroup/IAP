@@ -15,11 +15,11 @@ violinPlotList <- list(
 									plotName = "width (zoom corrected)", 
 									section = 40,
 									subsection = 1),
-		"side.area.norm (mm^2)" = list(
+		"side.vis.area.norm (mm^2)" = list(
 									plotName = "side area (zoom corrected)", 
 									section = 40,
 									subsection = 1),
-		"top.area.norm (mm^2)" = list(
+		"top.vis.area.norm (mm^2)" = list(
 									plotName = "top area (zoom corrected)", 
 									section = 40,
 									subsection = 1),
