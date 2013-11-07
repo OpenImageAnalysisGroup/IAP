@@ -3925,11 +3925,11 @@ public class ImageOperation implements MemoryHogInterface {
 			for (int y = y1; y < y1 + h; y++) {
 				if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 					continue;
-				if (w > 10 && ((x % 2) == 0))
+				if (w > 10 && ((x % 5) != 0))
 					continue;
-				if (h > 10 && ((y % 2) == 0))
+				if (h > 10 && ((y % 5) != 0))
 					continue;
-				c = img1d[x + y * w];
+				c = img1d[x + y * imgw];
 				r = (c & 0xff0000) >> 16;
 				g = (c & 0x00ff00) >> 8;
 				b = c & 0x0000ff;

@@ -82,7 +82,7 @@ public class ImageCanvas {
 					}
 				}
 			}
-		image = new Image(wi, hi, img);
+		// image = new Image(wi, hi, img);
 		return this;
 	}
 	
