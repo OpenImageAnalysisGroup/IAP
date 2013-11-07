@@ -44,7 +44,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 						SplitResult sr = m.processSplitResults();
 						Collection<BatchCmd> availableJobs = m.batch().getAll();
 						ActionDeleteAnalysisJobs.this.nJobs = availableJobs.size();
-						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets();
+						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets(null);
 						ActionDeleteAnalysisJobs.this.nSplit = availableTempResultSets.size();
 						ArrayList<ExperimentHeaderInterface> availTempDatasets = sr.getAvailableTempDatasets();
 						ActionDeleteAnalysisJobs.this.nTemps = availTempDatasets.size();

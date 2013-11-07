@@ -38,7 +38,7 @@ public class SplitResult {
 		el = m.getExperimentList(null);
 	}
 	
-	public HashSet<TempDataSetDescription> getSplitResultExperimentSets() {
+	public HashSet<TempDataSetDescription> getSplitResultExperimentSets(BatchCmd optRefCmd) {
 		HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 		HashSet<String> processedSubmissionTimes = new HashSet<String>();
 		for (ExperimentHeaderInterface i : el) {
@@ -51,6 +51,8 @@ public class SplitResult {
 				String idxCnt = cc[1];
 				String partCnt = cc[2];
 				String submTime = cc[3];
+				if (optRefCmd != null && !(optRefCmd.getSubmissionTime() + "").equals(submTime))
+					continue;
 				String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 				if (!processedSubmissionTimes.contains(submTime)) {
 					availableTempDatasets.add(new TempDataSetDescription(
@@ -245,9 +247,13 @@ public class SplitResult {
 	}
 	
 	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+		merge(interactive, optStatus, null);
+	}
+	
+	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, BatchCmd optRefCmd) throws Exception {
 		DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 		
-		HashSet<TempDataSetDescription> availableTempDatasets = getSplitResultExperimentSets();
+		HashSet<TempDataSetDescription> availableTempDatasets = getSplitResultExperimentSets(optRefCmd);
 		for (TempDataSetDescription tempDataSetDescription : availableTempDatasets) {
 			ArrayList<ExperimentHeaderInterface> knownResults = new ArrayList<ExperimentHeaderInterface>();
 			HashSet<String> added = new HashSet<String>();
