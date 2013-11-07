@@ -116,31 +116,31 @@ public class BlockPipeline {
 				continue;
 			final int well = idx;
 			final int wellCnt = executionTrayCount;
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					ImageStack ds = debugStack != null ? new ImageStack() : null;
-					ObjectRef resultRef = new ObjectRef();
-					StringAndFlexibleMaskAndImageSet rr;
-					try {
-						rr = executeInnerCall(well, wellCnt, options,
-								new StringAndFlexibleMaskAndImageSet(null, input), ds, resultRef, status);
-						synchronized (res) {
-							res.put(well, rr);
-							if (debugStack != null)
-								debugStack.put(well, ds);
-							blockResults.put(well, (BlockResultSet) resultRef.getObject());
-						}
-					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
-						exception.setObject(e);
-					}
+			// Runnable r = new Runnable() {
+			// @Override
+			// public void run() {
+			ImageStack ds = debugStack != null ? new ImageStack() : null;
+			ObjectRef resultRef = new ObjectRef();
+			StringAndFlexibleMaskAndImageSet rr;
+			try {
+				rr = executeInnerCall(well, wellCnt, options,
+						new StringAndFlexibleMaskAndImageSet(null, input), ds, resultRef, status);
+				synchronized (res) {
+					res.put(well, rr);
+					if (debugStack != null)
+						debugStack.put(well, ds);
+					blockResults.put(well, (BlockResultSet) resultRef.getObject());
 				}
-			};
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				exception.setObject(e);
+			}
+			// }
+			// };
 			// if (executionTrayCount > 1)
 			// wait.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + well + "_" + executionTrayCount));
 			// else
-			r.run();
+			// r.run();
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
 		if (exception.getObject() != null)
