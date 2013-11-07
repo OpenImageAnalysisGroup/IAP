@@ -43,7 +43,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 					@Override
 					public void run() {
 						SplitResult sr = m.processSplitResults();
-						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets();
+						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets(null);
 						ActionMergeAnalysisResults.this.nSplit = availableTempResultSets.size();
 						ArrayList<ExperimentHeaderInterface> availTempDatasets = sr.getAvailableTempDatasets();
 						ActionMergeAnalysisResults.this.nTemps = availTempDatasets.size();
@@ -79,7 +79,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return status;
 	}
-
+	
 	@Override
 	public boolean isProvidingActions() {
 		return true;

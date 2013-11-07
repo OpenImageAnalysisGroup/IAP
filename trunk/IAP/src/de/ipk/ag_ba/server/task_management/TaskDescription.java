@@ -156,7 +156,7 @@ public class TaskDescription {
 							
 							boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
 							if (saveOverallDatasetIfPossible)
-								m.processSplitResults().merge(false, statusProvider);
+								m.processSplitResults().merge(false, statusProvider, bcmd);
 							
 							m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED, false);
 							boolean deleteCompletedJobs = true;
