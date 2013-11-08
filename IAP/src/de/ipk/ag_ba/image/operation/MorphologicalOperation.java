@@ -2,6 +2,11 @@ package de.ipk.ag_ba.image.operation;
 
 import de.ipk.ag_ba.image.structures.Image;
 
+/**
+ * Morphological operations supporting round mask.
+ * 
+ * @author pape
+ */
 public class MorphologicalOperation {
 	
 	private final Image image;

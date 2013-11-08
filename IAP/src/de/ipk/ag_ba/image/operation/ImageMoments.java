@@ -69,7 +69,7 @@ public class ImageMoments {
 	 *           - input image
 	 * @param background
 	 *           - background color
-	 * @return 2nd order moment weighted by the area (first order moment)
+	 * @return n-nd order moment weighted by the area (first order moment)
 	 */
 	public double calcCentralMoment(double i, double j, Vector2d centerOfGravity, Image img, int background) {
 		double cogX = centerOfGravity.x;
