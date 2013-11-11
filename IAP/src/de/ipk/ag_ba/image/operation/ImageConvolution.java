@@ -26,9 +26,9 @@ public class ImageConvolution {
 	}
 	
 	/**
-	 * Fills 1 px lines.
+	 * Enlarge 1 px lines of foreground objects.
 	 */
-	public ImageConvolution fillLines() {
+	public ImageConvolution enlargeLines() {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] img2d = image.getAs2A();
