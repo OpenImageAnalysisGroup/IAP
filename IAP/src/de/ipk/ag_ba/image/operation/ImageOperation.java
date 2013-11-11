@@ -1871,6 +1871,29 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(new Image(res));
 	}
 	
+	public ImageOperation crop2(double pLeft, double pRight, double pTop,
+			double pBottom) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		int smallestX = (int) (w * pLeft);
+		int largestX = (int) (w * (1 - pRight)) - 1;
+		int smallestY = (int) (h * pTop);
+		int largestY = (int) (h * (1 - pBottom)) - 1;
+		
+		int[] img = getImageAs1dArray();
+		
+		int[][] res = new int[largestX - smallestX + 1][largestY - smallestY + 1];
+		for (int y = smallestY; y <= largestY; y++) {
+			int off = y * w;
+			for (int x = smallestX; x <= largestX; x++) {
+				res[x - smallestX][y - smallestY] = img[off + x];
+			}
+		}
+		
+		return new ImageOperation(new Image(res));
+	}
+	
 	public ImageOperation filterByHSV_value(double t, int clearColor) {
 		int[] pixels = getImageAs1dArray();
 		float[] hsb = new float[3];
