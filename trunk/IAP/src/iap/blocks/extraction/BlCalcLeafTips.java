@@ -17,6 +17,7 @@ import java.util.Stack;
 import org.StringManipulationTools;
 import org.Vector2d;
 
+import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.Lab;
@@ -75,7 +76,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// old: cd = 35, gt = k/4 + 42
 		}
 		
-		// only for side image
+		// Calculation only for side image
 		if (options.getCameraPosition() == CameraPosition.SIDE && inputImage != null) {
 			
 			// search for best side image
@@ -87,36 +88,35 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			}
 			
 			Image mask = inputImage;
+			
 			Image imgorig = inputImage.copy();
 			int background = ImageOperation.BACKGROUND_COLORint;
 			
-			mask.show("mask", debug);
+			mask.show("mask", debugValues);
+			
+			Image skel = getProperties().getImage("skeleton_fluo");
+			
+			if (skel != null)
+				mask = mask.io().or(skel.copy().io().replaceColor(-16777216, background).getImage()).getImage().show("skel on mask", debugValues);
 			
 			// blur
 			mask = mask.io().blur(numofblur).getImage();
 			
-			double f = getDouble("object removal multiplier", 2.0);
-			
-			if (f > 0.0) {
-				double averageLeafWidthEstimation = inputImage.io().countFilledPixels() /
-						(double) inputImage.copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
-				
-				boolean ngUse = true;
-				boolean autoTune = true;
-				
-				averageLeafWidthEstimation *= f;
-				
-				mask = mask.io().removeSmallClusters(ngUse,
-						autoTune ? (int) (averageLeafWidthEstimation * averageLeafWidthEstimation) : getInt("Noise-Size-Fluo-Area", 10 * 10),
-						autoTune ? (int) averageLeafWidthEstimation : getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
-						options.getNeighbourhood(), options.getCameraPosition(), null,
-						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues).getImage();
-			}
+			// median
+			mask = mask.io().medianFilter32Bit(true).getImage();
 			
 			// dilate
 			// vis_mask = vis_mask.io().mo().erode_or_dilate(10, false).getImage();
 			
-			mask.show("after blur, noise rm and dilate", debug);
+			ImageConvolution ic = new ImageConvolution(mask);
+			// enlarge 1 px lines
+			mask = ic.enlargeLines().getImage();
+			
+			mask.show("after blur, noise rm and dilate and ...", true);
+			
+			mask.io().replaceColor(background, Color.gray.getRGB()).getImage().show("thresh");
+			
+			// mask = mask.io().resize(2.0).getImage();
 			
 			// detect borders
 			ImageOperation io = new ImageOperation(mask.getAs2A()).border()
@@ -127,19 +127,24 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int borderLength = (int) io.getResultsTable().getValue("border", 0);
 			Image borderimg = io.copy().getImage();
 			
-			borderimg.show("border_img", debug);
+			borderimg.show("border_img", true);
+			System.out.println("bl: " + borderLength);
 			
 			// get border list
 			int[][] borderMap = io.getImageAs2dArray();
-			int[] borderList;
+			ArrayList<int[]> borderListList;
 			
 			try {
-				borderList = getBorderListSorted(borderMap, borderLength);
+				borderListList = getBorderListSorted(borderMap, borderLength);
 			} catch (InterruptedException e) {
 				// no border
-				borderList = new int[0];
-				e.printStackTrace();
+				System.err.print("no borderlist calculated" + "\n");
+				return inputImage;
 			}
+			
+			// for (int i = 0; i < borderList.length; i++) {
+			// System.out.println(borderList[i]);
+			// }
 			
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
@@ -163,11 +168,11 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						
 						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
 						
-						ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(mask, borderList, cd,
+						ArrayList<ArrayList<PositionAndColor>> borderlistsPlusCornerestimation = CornerCandidates(mask, borderListList, cd,
 								gt, stepsize, false);
-						ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
+						ArrayList<PositionAndColor> filteredLists = filterCornerCandidates(borderlistsPlusCornerestimation);
 						
-						int num_leafs = filteredList.size();
+						int num_leafs = filteredLists.size();
 						
 						if (num_leafs > 0)
 							rt.addValue("leaf." + StringManipulationTools.formatNumber(cd) + "." + StringManipulationTools.formatNumber(i), num_leafs);
@@ -179,10 +184,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 			} else {
-				ArrayList<PositionAndColor> borderlistPlusCornerestimation = CornerCandidates(mask, borderList, circlediameter,
+				ArrayList<ArrayList<PositionAndColor>> borderlistPlusCornerestimation = CornerCandidates(mask, borderListList, circlediameter,
 						geometricThresh, stepsize, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
-				filteredList = filterCornerCandidates2(filteredList, mask.getWidth(), mask.getHeight());
+				// filteredList = filterCornerCandidates2(filteredList, mask.getWidth(), mask.getHeight());
 				
 				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, background, debug);
 				
@@ -194,15 +199,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			getProperties().storeResults("RESULT_side.", "|SUSAN_corner_detection", rt, getBlockPosition());
 		}
 		return inputImage;
-	}
-	
-	private ArrayList<PositionAndColor> filterCornerCandidates2(ArrayList<PositionAndColor> filteredList, int width, int height) {
-		int listsize = filteredList.size();
-		for (int i = 0; i < listsize; i++) {
-			if (filteredList.get(i).y > height * 0.96)
-				filteredList.remove(i);
-		}
-		return filteredList;
 	}
 	
 	private boolean isBestAngle() {
@@ -286,30 +282,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int up = 0;
 		int down = 0;
 		int index = 1;
-		
-		// getProperties().addImagePostProcessor(new RunnableOnImageSet() {
-		//
-		// @Override
-		// public Image postProcessMask(Image imgGamma) {
-		// imgGamma = imgGamma
-		// .io().clearImageLeft(imgGamma.getWidth(), ImageOperation.BACKGROUND_COLORint)
-		// .getImage();
-		// return imgGamma;
-		// }
-		//
-		// @Override
-		// public Image postProcessImage(Image image) {
-		// return image;
-		// }
-		//
-		// @Override
-		// public ImageConfiguration getConfig() {
-		// if (!calcOnVis)
-		// return ImageConfiguration.FluoSide;
-		// else
-		// return ImageConfiguration.VisSide;
-		// }
-		// });
 		
 		for (int i = 0; i < size; i++) {
 			final int xtemp = borderlistPlusCornerestimation.get(i).x;
@@ -438,45 +410,70 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return res;
 	}
 	
-	private ArrayList<PositionAndColor> filterCornerCandidates(ArrayList<PositionAndColor> cornerlist) {
-		int listsize = cornerlist.size();
-		// get middle of peaks
+	private ArrayList<PositionAndColor> filterCornerCandidates(ArrayList<ArrayList<PositionAndColor>> cornerlistlist) {
+		int listsize = cornerlistlist.size();
 		ArrayList<PositionAndColor> results = new ArrayList<PositionAndColor>();
-		int start = 0;
-		int temp = 0;
 		
-		// for (int i = 0; i < listsize; i++) {
-		// System.out.println(cornerlist.get(i).colorInt);
-		// }
-		
-		for (int i = 0; i < listsize; i++) {
-			temp = cornerlist.get(i).colorInt;
-			// found peak
-			if (start == 0 && temp > 0) {
-				// System.out.println("x " + cornerlist.get(i).x + " y " + cornerlist.get(i).y);
-				// break;
-				start = temp;
-				int idx = 1;
-				PositionAndColor tempMax = cornerlist.get(i);
-				while (temp > 0) {
-					if (((i + idx) % listsize) < 0)
-						continue;
-					temp = cornerlist.get((i + idx) % listsize).colorInt;
-					if (temp > tempMax.colorInt)
-						tempMax = cornerlist.get((i + idx) % listsize);
-					idx++;
+		for (int list = 0; list < listsize; list++) {
+			ArrayList<PositionAndColor> cornerlist = cornerlistlist.get(list);
+			// get middle of peaks
+			int start = 0;
+			int temp = 0;
+			
+			// for (int i = 0; i < listsize; i++) {
+			// System.out.println(cornerlist.get(i).colorInt);
+			// }
+			//
+			// System.out.println("++++++++++++++");
+			//
+			// for (int i = 0; i < listsize; i++) {
+			// System.out.println(cornerlist.get(i).x);
+			// }
+			//
+			// System.out.println("++++++++++++++");
+			//
+			// for (int i = 0; i < listsize; i++) {
+			// System.out.println(cornerlist.get(i).y);
+			// }
+			
+			for (int i = 0; i < listsize; i++) {
+				temp = cornerlist.get(i).colorInt;
+				// found peak
+				if (start == 0 && temp > 0) {
+					// System.out.println("x " + cornerlist.get(i).x + " y " + cornerlist.get(i).y);
+					// break;
+					start = temp;
+					int idx = 1;
+					PositionAndColor tempMax = cornerlist.get(i);
+					while (temp > 0) {
+						if (((i + idx) % listsize) < 0)
+							continue;
+						temp = cornerlist.get((i + idx) % listsize).colorInt;
+						if (temp > tempMax.colorInt)
+							tempMax = cornerlist.get((i + idx) % listsize);
+						idx++;
+					}
+					
+					if (idx > 5)
+						results.add(tempMax);
+					// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
+					if (i + idx >= listsize)
+						results.remove(0);
+					start = 0;
+					i = i + idx;
 				}
-				
-				if (idx > 5)
-					results.add(tempMax);
-				// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
-				if (i + idx >= listsize)
-					results.remove(0);
-				start = 0;
-				i = i + idx;
 			}
 		}
 		return results;
+	}
+	
+	private ArrayList<PositionAndColor> filterCornerCandidates2(ArrayList<PositionAndColor> filteredList, int width, int height) {
+		int listsize = filteredList.size();
+		for (int i = 0; i < listsize; i++) {
+			if (filteredList.get(i).y > height * 0.96)
+				filteredList.remove(i);
+		}
+		return filteredList;
 	}
 	
 	private static HashSet<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int diameter) {
@@ -501,9 +498,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 *           (common = 6)
 	 * @return list of corner-candidates above threshold.
 	 */
-	static public ArrayList<PositionAndColor> CornerCandidates(Image img, int[] borderlist, int circlediameter, int geometricThresh, int stepsize,
+	static public ArrayList<ArrayList<PositionAndColor>> CornerCandidates(Image img, ArrayList<int[]> borderListList, int circlediameter, int geometricThresh,
+			int stepsize,
 			boolean inverse) {
-		ArrayList<PositionAndColor> resultlist = new ArrayList<PositionAndColor>();
+		ArrayList<ArrayList<PositionAndColor>> resultListList = new ArrayList<ArrayList<PositionAndColor>>();
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int xtemp;
 		int ytemp;
@@ -513,29 +511,44 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			stepsize++;
 		
 		// double a = 100 / (double) borderlist.length;
-		// iterate borderlist
-		for (int idxborderlist = 0; idxborderlist < borderlist.length; idxborderlist += stepsize) {
-			xtemp = borderlist[idxborderlist];
-			ytemp = borderlist[idxborderlist + 1];
-			// System.out.println("x: " + xtemp + " y: " + ytemp);
+		
+		// iterate list of border-lists
+		for (int idxborderlists = 0; idxborderlists < borderListList.size(); idxborderlists++) {
+			ArrayList<PositionAndColor> resultlist = new ArrayList<PositionAndColor>();
+			int[] borderlist = borderListList.get(idxborderlists);
 			
-			// System.out.println(idxborderlist * a + "|" + borderlist.length * a);
-			// do region-growing
-			HashSet<PositionAndColor> region = regionGrowing(xtemp, ytemp, img.copy().getAs2A(), background, circlediameter);
+			// if to small -> skip
+			if (borderlist.length < 20)
+				continue;
 			
-			// check area
-			if (!inverse)
-				if (region.size() < geometricThresh)
-					resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
+			// iterate borderlist
+			for (int idx = 0; idx < borderlist.length; idx += stepsize) {
+				xtemp = borderlist[idx];
+				ytemp = borderlist[idx + 1];
+				
+				if (xtemp == -1 || ytemp == -1)
+					break;
+				
+				// System.out.println("x: " + xtemp + " y: " + ytemp);
+				// System.out.println(idxborderlist * a + "|" + borderlist.length * a);
+				// do region-growing
+				HashSet<PositionAndColor> region = regionGrowing(xtemp, ytemp, img.getAs2A(), background, circlediameter);
+				
+				// check area
+				if (!inverse)
+					if (region.size() < geometricThresh)
+						resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
+					else
+						resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
 				else
-					resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
-			else
-				if (region.size() > geometricThresh)
-					resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
-				else
-					resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
+					if (region.size() > geometricThresh)
+						resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
+					else
+						resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
+			}
+			resultListList.add(resultlist);
 		}
-		return resultlist;
+		return resultListList;
 	}
 	
 	/**
@@ -550,24 +563,31 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @throws InterruptedException
 	 */
 	// TODO adaption for disconnected border has to be checked
-	public static int[] getBorderListSorted(int[][] borderMap, int borderLength) throws InterruptedException {
+	public static ArrayList<int[]> getBorderListSorted(int[][] borderMap, int borderLength) throws InterruptedException {
 		int w = borderMap.length;
 		int h = borderMap[0].length;
 		int[] borderList = new int[borderLength * 2];
-		int i = 0;
+		java.util.Arrays.fill(borderList, -1);
+		
 		boolean find = false;
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int rx;
 		int ry;
+		ArrayList<int[]> borderListList = new ArrayList<>();
 		
 		boolean debug = false;
+		int debugSpeed = 10;
 		Image show = new Image(borderMap);
-		if (debug)
+		if (debug) {
 			show.show("bordermap");
+			// Thread.sleep(500000);
+		}
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				if (borderMap[x][y] != background) {
+					int i = 0;
+					
 					find = true;
 					rx = x;
 					ry = y;
@@ -585,7 +605,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						
 						if (debug) {
 							show.update(new Image(borderMap));
-							Thread.sleep(25);
+							Thread.sleep(debugSpeed);
 						}
 						
 						inside = ry - 1 >= 0;
@@ -648,10 +668,15 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 								ry = ry - 1;
 							}
 					}
+					
+					// min 1 elment in list
+					if (borderList[0] != -1) {
+						borderListList.add(borderList.clone());
+					}
 				}
 			}
 		}
-		return borderList;
+		return borderListList;
 	}
 	
 	/**
@@ -682,9 +707,11 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		boolean find;
 		boolean inside = false;
 		double dist = 0.0;
-		Image show = new Image(imgTemp);
-		if (debug)
+		Image show = null;
+		if (debug) {
+			show = new Image(imgTemp);
 			show.show("debug");
+		}
 		
 		// test if new pixel is in image space
 		if (rx >= 0 && ry >= 0 && rx < w && ry < h)
@@ -763,7 +790,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						ry = ry + 1;
 					}
 				
-				// find new pixel?
+				// Found new pixel?
 				if (find) {
 					PositionAndColor temp = new PositionAndColor(rx, ry, img2d[rx][ry]);
 					// count++;
@@ -964,7 +991,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Calculates leaf tips of a plant. (number of leafs)";
+		return "Calculates leaf tips of a plant. (number of leafs) <br><br> If skeleton (fluo) is calculated within the pipeline in a previous step, all plant objects are connected.";
 	}
 	
 	@Override
