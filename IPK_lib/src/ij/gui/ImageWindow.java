@@ -719,7 +719,10 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	
 	@Override
 	public String toString() {
-		return imp.getTitle();
+		if (imp != null)
+			return imp.getTitle();
+		else
+			return "";
 	}
 	
 	/**
