@@ -128,7 +128,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int borderLength = (int) io.getResultsTable().getValue("border", 0);
 			Image borderimg = io.copy().getImage();
 			
-			borderimg.show("border_img", debugValues);
+			borderimg.show("border_img", false);
 			
 			// get border list
 			int[][] borderMap = io.getImageAs2dArray();
@@ -450,7 +450,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						idx++;
 					}
 					
-					if (idx > 5)
+					if (idx > 4)
 						results.add(tempMax);
 					// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
 					if (i + idx >= listsize) {
