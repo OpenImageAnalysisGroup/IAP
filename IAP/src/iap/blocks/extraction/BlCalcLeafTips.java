@@ -7,13 +7,16 @@ import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.TreeMap;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.Vector2d;
 
@@ -24,6 +27,7 @@ import de.ipk.ag_ba.image.operation.Lab;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -31,6 +35,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -88,16 +93,18 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			}
 			
 			Image mask = inputImage;
-			
 			Image imgorig = inputImage.copy();
 			int background = ImageOperation.BACKGROUND_COLORint;
 			
 			mask.show("mask", debugValues);
 			
-			Image skel = getProperties().getImage("skeleton_fluo");
-			
-			if (skel != null)
-				mask = mask.io().or(skel.copy().io().replaceColor(-16777216, background).getImage()).getImage().show("skel on mask", debugValues);
+			// get skeleton-image to connect lose leafs
+			if (getBoolean("connect leafs (based on skeleton)", true)) {
+				Image skel = getProperties().getImage("skeleton_fluo");
+				
+				if (skel != null)
+					mask = mask.io().or(skel.copy().io().replaceColor(-16777216, background).getImage()).getImage().show("skel on mask", debugValues);
+			}
 			
 			// blur
 			mask = mask.io().blur(numofblur).getImage();
@@ -105,18 +112,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// median
 			mask = mask.io().medianFilter32Bit(true).getImage();
 			
-			// dilate
-			// vis_mask = vis_mask.io().mo().erode_or_dilate(10, false).getImage();
-			
-			ImageConvolution ic = new ImageConvolution(mask);
 			// enlarge 1 px lines
+			ImageConvolution ic = new ImageConvolution(mask);
 			mask = ic.enlargeLines().getImage();
 			
-			mask.show("after blur, noise rm and dilate and ...", true);
-			
-			mask.io().replaceColor(background, Color.gray.getRGB()).getImage().show("thresh");
-			
-			// mask = mask.io().resize(2.0).getImage();
+			mask.show("after blur, noise rm and dilate and ...", debugValues);
+			mask.io().replaceColor(background, Color.gray.getRGB()).getImage().show("thresh", debugValues);
 			
 			// detect borders
 			ImageOperation io = new ImageOperation(mask.getAs2A()).border()
@@ -127,8 +128,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int borderLength = (int) io.getResultsTable().getValue("border", 0);
 			Image borderimg = io.copy().getImage();
 			
-			borderimg.show("border_img", true);
-			System.out.println("bl: " + borderLength);
+			borderimg.show("border_img", debugValues);
 			
 			// get border list
 			int[][] borderMap = io.getImageAs2dArray();
@@ -142,14 +142,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				return inputImage;
 			}
 			
-			// for (int i = 0; i < borderList.length; i++) {
-			// System.out.println(borderList[i]);
-			// }
-			
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			
-			// stepsize for border scan
+			// stepsize for border scan (commonly 1, other values have to be tested)
 			int stepsize = 1;
 			
 			if (optimize) {
@@ -168,7 +164,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						
 						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
 						
-						ArrayList<ArrayList<PositionAndColor>> borderlistsPlusCornerestimation = CornerCandidates(mask, borderListList, cd,
+						ArrayList<ArrayList<PositionAndColor>> borderlistsPlusCornerestimation = getCornerCandidates(mask, borderListList, cd,
 								gt, stepsize, false);
 						ArrayList<PositionAndColor> filteredLists = filterCornerCandidates(borderlistsPlusCornerestimation);
 						
@@ -184,12 +180,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 			} else {
-				ArrayList<ArrayList<PositionAndColor>> borderlistPlusCornerestimation = CornerCandidates(mask, borderListList, circlediameter,
+				ArrayList<ArrayList<PositionAndColor>> borderlistPlusCornerestimation = getCornerCandidates(mask, borderListList, circlediameter,
 						geometricThresh, stepsize, false);
 				ArrayList<PositionAndColor> filteredList = filterCornerCandidates(borderlistPlusCornerestimation);
 				// filteredList = filterCornerCandidates2(filteredList, mask.getWidth(), mask.getHeight());
 				
-				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, background, debug);
+				Object[] res = FeatureExtraction(mask, imgorig, filteredList, circlediameter, geometricThresh, background, debug);
 				
 				rt = (ResultsTableWithUnits) res[1];
 				
@@ -254,7 +250,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @return Object[image gamma, results table]
 	 */
 	public Object[] FeatureExtraction(Image img, Image imgorig, ArrayList<PositionAndColor> borderlistPlusCornerestimation,
-			final int circlediameter,
+			final int circlediameter, int geometricThresh,
 			int background, boolean debug) {
 		
 		Object[] res = new Object[2];
@@ -289,8 +285,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			// get regionlist
 			int[][] img2d = img.copy().getAs2A();
-			HashSet<PositionAndColor> region = regionGrowing(xtemp, ytemp, img2d, background, circlediameter);
-			// ImageCanvas can = markimg.io().canvas();
+			ArrayList<PositionAndColor> region = regionGrowing(xtemp, ytemp, img2d, background, circlediameter / 2, geometricThresh);
+			
+			if (region == null)
+				continue;
 			
 			final int[] dim = findDimensions(region);
 			
@@ -411,15 +409,17 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private ArrayList<PositionAndColor> filterCornerCandidates(ArrayList<ArrayList<PositionAndColor>> cornerlistlist) {
-		int listsize = cornerlistlist.size();
+		int listlistsize = cornerlistlist.size();
 		ArrayList<PositionAndColor> results = new ArrayList<PositionAndColor>();
 		
-		for (int list = 0; list < listsize; list++) {
-			ArrayList<PositionAndColor> cornerlist = cornerlistlist.get(list);
+		for (int listidx = 0; listidx < listlistsize; listidx++) {
+			ArrayList<PositionAndColor> cornerlist = cornerlistlist.get(listidx);
+			int listsize = cornerlist.size();
 			// get middle of peaks
 			int start = 0;
 			int temp = 0;
 			
+			// System.out.println();
 			// for (int i = 0; i < listsize; i++) {
 			// System.out.println(cornerlist.get(i).colorInt);
 			// }
@@ -440,14 +440,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				temp = cornerlist.get(i).colorInt;
 				// found peak
 				if (start == 0 && temp > 0) {
-					// System.out.println("x " + cornerlist.get(i).x + " y " + cornerlist.get(i).y);
-					// break;
 					start = temp;
 					int idx = 1;
 					PositionAndColor tempMax = cornerlist.get(i);
 					while (temp > 0) {
-						if (((i + idx) % listsize) < 0)
-							continue;
 						temp = cornerlist.get((i + idx) % listsize).colorInt;
 						if (temp > tempMax.colorInt)
 							tempMax = cornerlist.get((i + idx) % listsize);
@@ -457,8 +453,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					if (idx > 5)
 						results.add(tempMax);
 					// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
-					if (i + idx >= listsize)
+					if (i + idx >= listsize) {
 						results.remove(0);
+						break;
+					}
 					start = 0;
 					i = i + idx;
 				}
@@ -476,12 +474,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return filteredList;
 	}
 	
-	private static HashSet<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int diameter) {
-		HashSet<PositionAndColor> region = null;
+	private static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int rad, int geometricThresh) {
+		ArrayList<PositionAndColor> region = null;
 		try {
-			region = regionGrowing(img2d, x, y, background, diameter / 2, false);
+			region = regionGrowing(img2d, x, y, background, rad, geometricThresh, false);
 		} catch (InterruptedException e) {
-			region = new HashSet<PositionAndColor>();
+			region = new ArrayList<PositionAndColor>();
 			e.printStackTrace();
 		}
 		return region;
@@ -498,19 +496,23 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 *           (common = 6)
 	 * @return list of corner-candidates above threshold.
 	 */
-	static public ArrayList<ArrayList<PositionAndColor>> CornerCandidates(Image img, ArrayList<int[]> borderListList, int circlediameter, int geometricThresh,
+	static public ArrayList<ArrayList<PositionAndColor>> getCornerCandidates(Image img, ArrayList<int[]> borderListList, int circlediameter,
+			int geometricThresh,
 			int stepsize,
 			boolean inverse) {
 		ArrayList<ArrayList<PositionAndColor>> resultListList = new ArrayList<ArrayList<PositionAndColor>>();
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int xtemp;
 		int ytemp;
+		// int[] img1d = img.getAs1A();
+		int[][] img2d = img.getAs2A();
+		int w = img.getWidth();
+		int h = img.getHeight();
+		int radius = circlediameter / 2;
 		
 		// check if stepsize is odd
 		if (stepsize % 2 != 0)
 			stepsize++;
-		
-		// double a = 100 / (double) borderlist.length;
 		
 		// iterate list of border-lists
 		for (int idxborderlists = 0; idxborderlists < borderListList.size(); idxborderlists++) {
@@ -518,10 +520,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int[] borderlist = borderListList.get(idxborderlists);
 			
 			// if to small -> skip
-			if (borderlist.length < 20)
+			if (borderlist[20] == -1)
 				continue;
 			
-			// iterate borderlist
+			// iterate border-list
 			for (int idx = 0; idx < borderlist.length; idx += stepsize) {
 				xtemp = borderlist[idx];
 				ytemp = borderlist[idx + 1];
@@ -529,19 +531,21 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				if (xtemp == -1 || ytemp == -1)
 					break;
 				
-				// System.out.println("x: " + xtemp + " y: " + ytemp);
-				// System.out.println(idxborderlist * a + "|" + borderlist.length * a);
+				// get region (boundingbox) in size of circle-diameter
+				// int[][] predefinedRegion = crop2(img1d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+				int[][] predefinedRegion = crop3(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+				
 				// do region-growing
-				HashSet<PositionAndColor> region = regionGrowing(xtemp, ytemp, img.getAs2A(), background, circlediameter);
+				ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh);
 				
 				// check area
 				if (!inverse)
-					if (region.size() < geometricThresh)
+					if (region != null)
 						resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
 					else
 						resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
 				else
-					if (region.size() > geometricThresh)
+					if (region != null)
 						resultlist.add(new PositionAndColor(xtemp, ytemp, geometricThresh - region.size()));
 					else
 						resultlist.add(new PositionAndColor(xtemp, ytemp, 0));
@@ -576,7 +580,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		ArrayList<int[]> borderListList = new ArrayList<>();
 		
 		boolean debug = false;
-		int debugSpeed = 10;
+		int debugSpeed = 5;
 		Image show = new Image(borderMap);
 		if (debug) {
 			show.show("bordermap");
@@ -672,6 +676,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					// min 1 elment in list
 					if (borderList[0] != -1) {
 						borderListList.add(borderList.clone());
+						java.util.Arrays.fill(borderList, -1);
 					}
 				}
 			}
@@ -693,12 +698,14 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @return HashSet which includes Vector3d of all point coordinates plus color-values
 	 * @throws InterruptedException
 	 */
-	static HashSet<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, boolean debug) throws InterruptedException {
+	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, int geometricThresh, boolean debug)
+			throws InterruptedException {
+		radius = radius * radius;
 		int[][] imgTemp = img2d.clone();
 		int w = img2d.length;
 		int h = img2d[1].length;
 		Stack<PositionAndColor> visited = new Stack<PositionAndColor>();
-		HashSet<PositionAndColor> resultRegion = new HashSet<PositionAndColor>();
+		ArrayList<PositionAndColor> resultRegion = new ArrayList<PositionAndColor>();
 		int rx = x;
 		int ry = y;
 		PositionAndColor start = new PositionAndColor(x, y, img2d[x][y]);
@@ -795,8 +802,11 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					PositionAndColor temp = new PositionAndColor(rx, ry, img2d[rx][ry]);
 					// count++;
 					resultRegion.add(temp);
+					// current region bigger than geometricThresh
+					if (resultRegion.size() > geometricThresh + 1)
+						return resultRegion;
 					visited.push(temp);
-					dist = Math.sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry));
+					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
 					// no pixel found -> go back
 				} else {
 					if (!visited.empty())
@@ -804,7 +814,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					if (!visited.empty()) {
 						rx = visited.peek().x;
 						ry = visited.peek().y;
-						dist = Math.sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry));
+						dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
 					}
 				}
 				// new pixel is not in radius -> go back
@@ -814,7 +824,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				if (!visited.empty()) {
 					rx = visited.peek().x;
 					ry = visited.peek().y;
-					dist = Math.sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry));
+					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
 				}
 				inside = true;
 			}
@@ -823,14 +833,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	/**
-	 * Find maximal dimensions of a region (hashset).
+	 * Find maximal dimensions of a region.
 	 * 
-	 * @param hashSet
+	 * @param list
 	 * @return int[] = {left, right, top, bottom}
 	 */
-	private static int[] findDimensions(HashSet<PositionAndColor> hashSet) {
+	private static int[] findDimensions(ArrayList<PositionAndColor> list) {
 		int[] dim = { Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE };
-		for (Iterator<PositionAndColor> i = hashSet.iterator(); i.hasNext();) {
+		if (list == null)
+			return null;
+		for (Iterator<PositionAndColor> i = list.iterator(); i.hasNext();) {
 			PositionAndColor temp = i.next();
 			if (temp.x < dim[0])
 				dim[0] = temp.x;
@@ -851,7 +863,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param region
 	 * @return
 	 */
-	private static int[][] copyRegiontoImage(int[] dim, HashSet<PositionAndColor> region) {
+	private static int[][] copyRegiontoImage(int[] dim, ArrayList<PositionAndColor> region) {
 		int[][] res = new int[(dim[1] - dim[0]) + 1][(dim[3] - dim[2]) + 1];
 		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
 		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
@@ -922,7 +934,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param region
 	 * @return
 	 */
-	private static Color getAverageRegionColorHSV(HashSet<PositionAndColor> region) {
+	private static Color getAverageRegionColorHSV(ArrayList<PositionAndColor> region) {
 		int c = 0, r = 0, g = 0, b = 0;
 		float[] hsbvals = new float[3];
 		float[] hsbvalssum = new float[3];
@@ -947,7 +959,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param region
 	 * @return
 	 */
-	private static Lab getAverageRegionColorLab(HashSet<PositionAndColor> region) {
+	private static Lab getAverageRegionColorLab(ArrayList<PositionAndColor> region) {
 		int c = 0;
 		int r, g, b;
 		int Li, ai, bi;
@@ -979,6 +991,53 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return new Lab(sumL / count, sumA / count, sumB / count);
 	}
 	
+	public static int[][] crop2(int[] img, int w, int h, double pLeft, double pRight, double pTop,
+			double pBottom) {
+		
+		int smallestX = (int) (w * pLeft);
+		int largestX = (int) (w * (1 - pRight)) - 1;
+		int smallestY = (int) (h * pTop);
+		int largestY = (int) (h * (1 - pBottom)) - 1;
+		
+		if (smallestX < 0)
+			smallestX = 0;
+		if (largestX > w * h)
+			largestX = w;
+		if (smallestY < 0)
+			smallestY = 0;
+		if (largestY > w * h)
+			largestY = h;
+		
+		largestX = -largestX;
+		largestY = -largestY;
+		
+		int[][] res = new int[largestX - smallestX + 1][largestY - smallestY + 1];
+		for (int y = smallestY; y <= largestY; y++) {
+			int off = y * w;
+			for (int x = smallestX; x <= largestX; x++) {
+				res[x - smallestX][y - smallestY] = img[off + x];
+			}
+		}
+		
+		return res;
+	}
+	
+	public static int[][] crop3(int[][] img, int w, int h, int pLeft, int pRight, int pTop,
+			int pBottom) {
+		int[][] res = new int[pRight - pLeft][pBottom - pTop];
+		pLeft = Math.max(pLeft, 0);
+		pRight = Math.min(pRight, w);
+		pTop = Math.max(pTop, 0);
+		pBottom = Math.min(pBottom, h);
+		
+		for (int x = pLeft; x < pRight; x++) {
+			for (int y = pTop; y < pBottom; y++) {
+				res[x - pLeft][y - pTop] = img[x][y];
+			}
+		}
+		return res;
+	}
+	
 	@Override
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
@@ -1004,5 +1063,92 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	public HashSet<CameraType> getCameraOutputTypes() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public synchronized void postProcessResultsForAllTimesAndAngles(
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			TreeMap<Long, Sample3D> time2inSamples,
+			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		
+		for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
+			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+			if (!time2summaryResult.containsKey(time))
+				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+			for (Integer tray : time2summaryResult.get(time).keySet()) {
+				BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
+				Double maxLeafcount = -1d;
+				ArrayList<Double> lc = new ArrayList<Double>();
+				
+				Integer a = null;
+				searchLoop: for (String key : allResultsForSnapshot.keySet()) {
+					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+					for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
+						if (v.getValue() != null) {
+							a = v.getValue().intValue();
+							// System.out.println("main.axis.rotation: " + a);
+							break searchLoop;
+						}
+					}
+				}
+				
+				String bestAngle = null;
+				if (a != null) {
+					a = a % 180;
+					Double bestDiff = Double.MAX_VALUE;
+					for (String dc : allResultsForSnapshot.keySet()) {
+						double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
+						if (d >= 0) {
+							double dist = Math.abs(a - d);
+							if (dist < bestDiff) {
+								bestAngle = dc;
+								bestDiff = dist;
+							}
+						}
+					}
+				}
+				// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
+				for (String keyC : allResultsForSnapshot.keySet()) {
+					HashMap<Integer, BlockResultSet> rt = allResultsForSnapshot.get(keyC);
+					
+					if (bestAngle != null && keyC.equals(bestAngle)) {
+						// System.out.println("Best side angle: " + bestAngle);
+						Double cnt = null;
+						for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.count|SUSAN_corner_detection")) {
+							if (v.getValue() != null)
+								cnt = v.getValue();
+						}
+						if (cnt != null && summaryResult != null) {
+							summaryResult.setNumericProperty(getBlockPosition(),
+									"RESULT_side.leaf.count.best|SUSAN_corner_detection", cnt, null);
+							// System.out.println("Leaf count for best side image: " + cnt);
+						}
+					}
+					
+					for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.count|SUSAN_corner_detection")) {
+						if (v.getValue() != null) {
+							if (v.getValue() > maxLeafcount)
+								maxLeafcount = v.getValue();
+							lc.add(v.getValue());
+						}
+					}
+				}
+				
+				if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
+					summaryResult.setNumericProperty(getBlockPosition(),
+							"RESULT_side.leaf.count.max|SUSAN_corner_detection", maxLeafcount, null);
+					// System.out.println("MAX leaf count: " + maxLeafcount);
+					Double[] lca = lc.toArray(new Double[] {});
+					Arrays.sort(lca);
+					Double median = lca[lca.length / 2];
+					summaryResult.setNumericProperty(getBlockPosition(),
+							"RESULT_side.leaf.count.median|SUSAN_corner_detection", median, null);
+				}
+				
+			}
+		}
 	}
 }

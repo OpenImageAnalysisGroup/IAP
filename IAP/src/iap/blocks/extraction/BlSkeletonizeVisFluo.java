@@ -65,8 +65,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			if (viswork != null)
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
-							getBoolean("Leat Width Calculation Type A (VIS)", false),
-							getBoolean("Leat Width Calculation Type B (VIS)", false));
+							getBoolean("Leaf Width Calculation Type A (VIS)", false),
+							getBoolean("Leaf Width Calculation Type B (VIS)", false));
 					if (sk != null)
 						getProperties().setImage("skeleton", sk);
 					// Image rrr = getProperties().getImage("beforeBloomEnhancement");
@@ -83,8 +83,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			if (viswork != null)
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
-							getBoolean("Leat Width Calculation Type A (VIS)", false),
-							getBoolean("Leat Width Calculation Type B (VIS)", false));
+							getBoolean("Leaf Width Calculation Type A (VIS)", false),
+							getBoolean("Leaf Width Calculation Type B (VIS)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -113,8 +113,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			if (fluowork != null)
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(fluowork, vis, fluo, fluo.copy(),
-							getBoolean("Leat Width Calculation Type A (FLUO)", false),
-							getBoolean("Leat Width Calculation Type B (FLUO)", false));
+							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
+							getBoolean("Leaf Width Calculation Type B (FLUO)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean(new BlDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -133,8 +133,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			if (viswork != null)
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy(),
-							getBoolean("Leat Width Calculation Type A (FLUO)", false),
-							getBoolean("Leat Width Calculation Type B (FLUO)", false));
+							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
+							getBoolean("Leaf Width Calculation Type B (FLUO)", false));
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
