@@ -12,6 +12,7 @@ import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
+import iap.blocks.extraction.BlCalcLeafTips;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -43,7 +44,6 @@ import iap.blocks.segmentation.BlCopyImagesApplyMask;
 import iap.blocks.segmentation.BlFilterByHSV;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
-import iap.blocks.segmentation.BlKMeans2;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlMedianFilter;
@@ -112,7 +112,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterByHSV(),
 				new BlIntensityCalculationFluo(),
 				new BlIRdiff(),
-				new BlKMeans2(),
+				// new BlKMeans2(),
 				new BlKMeansVis(),
 				new BlLabFilter(),
 				new BlLeafCurlingAnalysis(),
@@ -138,6 +138,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlObjectSeparator(),
 				new BlSmoothShape(),
 				new BlThreeDreconstruction(),
+				new BlCalcLeafTips()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];

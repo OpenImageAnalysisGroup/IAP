@@ -55,13 +55,11 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			for (int i = 0; i < n; i++) {
 				Color col = getColor(getSettingsNameForSeedColor(i), (i + 1) < initColor.length ? initColor[i] : Color.BLACK);
 				boolean foreground = getBoolean(getSettingsNameForForeground(i), (i + 1) < 5);
+			//	System.out.println("N=" + i + ", FG?=" + foreground);
 				seedColors.add(col);
 				seedPositions.add(new Vector2f(0.5f, 0.5f));
-				clusterColors.add(foreground ? col : Color.WHITE);
+				clusterColors.add(foreground ? col : ImageOperation.BACKGROUND_COLOR);
 			}
-			
-			clusterColors.add(Color.WHITE);
-			clusterColors.add(Color.WHITE);
 			
 			if (debugValues) {
 				clusterColors = seedColors;
@@ -147,7 +145,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				for (int i = 0; i < newCenterPoints.length; i++) {
 					float dist = newCenterPoints[i].euclidianDistance(centerPoints[i]);
 					if (debugValues)
-						System.out.print(StringManipulationTools.formatNumber(dist, "###.##") + " ");
+						System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
 					if (dist > epsilon)
 						run = true;
 				}
