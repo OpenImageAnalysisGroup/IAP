@@ -397,7 +397,6 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public Image getImage(String id) {
 		Image res = storedImages.get(id);
-		storedImages.remove(id);
 		return res;
 	}
 	
@@ -436,14 +435,8 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public void clearStore() {
-		if (storedImages.size() > 0)
-			System.out.println("WARNING: Stored images size > 0");
 		storedImages.clear();
-		if (storedVolumes.size() > 0)
-			System.out.println("WARNING: Stored volumes size > 0");
 		storedVolumes.clear();
-		if (storedPostProcessors.size() > 0)
-			System.out.println("WARNING: Stored postprocessors size > 0");
 		storedPostProcessors.clear();
 	}
 	
