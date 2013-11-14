@@ -16,12 +16,13 @@ import de.ipk.ag_ba.image.structures.ImageSet;
  */
 public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	
-	private boolean auto_tune;
+	private boolean auto_tune, auto_tune_process_red_by_green;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		this.auto_tune = getBoolean("Auto-Tune", true);
+		this.auto_tune_process_red_by_green = getBoolean("Auto-Tune - Process Mostly Red", false);
 	}
 	
 	@Override
@@ -45,17 +46,28 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
 			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage();
 		} else {
-			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
-			Image filter = resClassic.show("Input For Auto-Threshold", debugValues);
-			filter = filter.io().autoThresholdingColorImageByUsingBrightnessMaxEntropy(false, debugValues).getImage().show("Result Filter", debugValues);
-			io = io.applyMask(filter).show("USED FOR CALC", debugValues);
+			ImageOperation filterInp = io.copy();
+			if (auto_tune_process_red_by_green)
+				filterInp = filterInp.getR();
+			else
+				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
+			ImageOperation filter = filterInp.show("Input For Auto-Threshold", false);
+			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, debugValues).getImage()
+					.show("Result Filter", debugValues).io();
+			
+			io = io.applyMask(filter.getImage()).show("USED FOR CALC", debugValues);
 			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
 			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 255).getImage();
 			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 255).getImage();
 			Image res = new Image(resClassic, resChlorophyll, resPhenol);
 			res.show("res", debugValues);
 		}
-		return new Image(resClassic, resChlorophyll, resPhenol);
+		Image r = new Image(resClassic, resChlorophyll, resPhenol);
+		if (auto_tune && auto_tune_process_red_by_green) {
+			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), options.getBackground())
+					.show("AFTER HUE", false).getImage();
+		}
+		return r;
 	}
 	
 	@Override
