@@ -388,6 +388,8 @@ public class MongoDB {
 	}
 	
 	public void deleteExperiment(final String experimentID) throws Exception {
+		addNewsItem("Experiment " + experimentID + " is removed by user " + SystemAnalysis.getUserName() + " (" + SystemAnalysis.getCurrentTime()
+				+ "), working at PC " + SystemAnalysis.getLocalHost().getCanonicalHostName(), SystemAnalysis.getUserName());
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
