@@ -55,7 +55,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			for (int i = 0; i < n; i++) {
 				Color col = getColor(getSettingsNameForSeedColor(i), (i + 1) < initColor.length ? initColor[i] : Color.BLACK);
 				boolean foreground = getBoolean(getSettingsNameForForeground(i), (i + 1) < 5);
-			//	System.out.println("N=" + i + ", FG?=" + foreground);
+				// System.out.println("N=" + i + ", FG?=" + foreground);
 				seedColors.add(col);
 				seedPositions.add(new Vector2f(0.5f, 0.5f));
 				clusterColors.add(foreground ? col : ImageOperation.BACKGROUND_COLOR);
@@ -67,7 +67,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			float epsilon = (float) getDouble("epsilon", 0.01);
 			
-			res = kMeans(inp, seedColors, seedPositions, clusterColors, epsilon);
+			res = kMeans(inp.copy().io().blur(getDouble("Blur", 0)).getImage(), seedColors, seedPositions, clusterColors, epsilon);
 			
 			res.show("segres", debug);
 			

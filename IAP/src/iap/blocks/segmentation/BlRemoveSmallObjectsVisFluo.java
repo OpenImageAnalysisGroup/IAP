@@ -33,7 +33,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		Image res, mask = input().masks().vis().show("vis input", debug);
+		Image res, mask = input().masks().vis().show("vis input", debugValues);
 		
 		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
 				getInt("Noise-Size-Vis-Area", 20 * 20),
@@ -43,7 +43,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
 				res = input().images().vis().io().applyMask(res.io().erode(getInt("dilation vis", 0)).getImage()).getImage();
-			res.show("vis result", debug);
+			res.show("vis result", debugValues);
 		}
 		return res;
 	}
@@ -53,14 +53,14 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null)
 			return null;
 		
-		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debug)).copy().
+		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().
 				dilate(getInt("dilation fluo", 0)).
 				removeSmallClusters(ngUse,
 						getInt("Noise-Size-Fluo-Area", 10 * 10),
 						getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
 						options.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 						options.getNeighbourhood(), options.getCameraPosition(), null,
-						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debug)
+						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debugValues)
 				.getImage();
 		if (getInt("dilation fluo", 0) > 0)
 			res = input().images().fluo().io().applyMask(res.io().erode(getInt("dilation fluo", 0)).getImage()).getImage();
