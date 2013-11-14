@@ -27,4 +27,9 @@ public class PositionAndColor {
 		} else
 			return false;
 	}
+	
+	public int distQ(PositionAndColor a) {
+		
+		return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y);
+	}
 }
