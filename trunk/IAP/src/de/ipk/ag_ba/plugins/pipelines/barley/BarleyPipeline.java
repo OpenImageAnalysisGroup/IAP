@@ -35,7 +35,6 @@ import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.blocks.segmentation.BlockClearNirPotFromNir;
 import iap.pipelines.ImageProcessorOptions;
 import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
-import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
  * A workflow for analyzing barley images.
@@ -94,8 +93,8 @@ public class BarleyPipeline extends AbstractPipelineTemplate {
 				new BlCalcConvexHull(),
 				
 				// postprocessing
-				new BlRunPostProcessors(),
 				new BlDrawSkeleton(),
+				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),
 				new BlHighlightNullResults()
