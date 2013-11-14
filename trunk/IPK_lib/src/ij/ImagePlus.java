@@ -443,6 +443,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				win = new StackWindow(this);
 			else
 				win = new ImageWindow(this);
+			setTitle(statusMessage);
 			win.setTitle(statusMessage);
 			if (roi != null)
 				roi.setImage(this);
@@ -941,8 +942,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (win != null) {
 			if (ij != null)
 				Menus.updateWindowMenuItem(this.title, title);
-			String virtual = stack != null && stack.isVirtual() ? " (V)" : "";
-			String global = getGlobalCalibration() != null ? " (G)" : "";
+			String virtual = stack != null && stack.isVirtual() ? " (Virtual)" : "";
+			String global = getGlobalCalibration() != null ? " (Global Cal.)" : "";
 			
 			String scale = "";
 			double magnification = win.getCanvas().getMagnification();
@@ -2113,18 +2114,29 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				int r = v[0];
 				int g = v[1];
 				int b = v[2];
-				int Li = (int) ImageOperationLabCube.labCube()[r][g][b];
-				int ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
-				int bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
-				
-				float[] hsv = new float[3];
-				Color.RGBtoHSB(r, g, b, hsv);
-				
-				return ("/" + v[0] + "," + v[1] + "," + v[2] + "/L" + Li + ",a" + ai + ",b" + bi + "/H"
-						+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ",S"
-						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V"
-						+ StringManipulationTools.formatNumber(hsv[2], "#.###") + ": "
-						+ AttributeHelper.getColorName(new Color(r, g, b)));
+				if (ImageOperationLabCube.labCube() == null) {
+					float[] hsv = new float[3];
+					Color.RGBtoHSB(r, g, b, hsv);
+					
+					return ("/" + v[0] + "," + v[1] + "," + v[2] + "/no Lab avail/H"
+							+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ",S"
+							+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V"
+							+ StringManipulationTools.formatNumber(hsv[2], "#.###") + ": "
+							+ AttributeHelper.getColorName(new Color(r, g, b)));
+				} else {
+					int Li = (int) ImageOperationLabCube.labCube()[r][g][b];
+					int ai = (int) ImageOperationLabCube.labCube()[r][g][b + 256];
+					int bi = (int) ImageOperationLabCube.labCube()[r][g][b + 512];
+					
+					float[] hsv = new float[3];
+					Color.RGBtoHSB(r, g, b, hsv);
+					
+					return ("/" + v[0] + "," + v[1] + "," + v[2] + "/L" + Li + ",a" + ai + ",b" + bi + "/H"
+							+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ",S"
+							+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V"
+							+ StringManipulationTools.formatNumber(hsv[2], "#.###") + ": "
+							+ AttributeHelper.getColorName(new Color(r, g, b)));
+				}
 			default:
 				return ("");
 		}

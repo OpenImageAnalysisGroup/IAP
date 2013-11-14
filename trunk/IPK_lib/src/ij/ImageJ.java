@@ -180,7 +180,7 @@ public class ImageJ extends Frame implements ActionListener,
 		
 		// Tool bar
 		toolbar = new Toolbar();
-		toolbar.addKeyListener(this);
+		// toolbar.addKeyListener(this);
 		add(toolbar);
 		
 		// Status bar
@@ -190,18 +190,18 @@ public class ImageJ extends Frame implements ActionListener,
 		statusBar.setBackground(backgroundColor);
 		statusLine = new Label();
 		statusLine.setFont(SansSerif12);
-		statusLine.addKeyListener(this);
+		// statusLine.addKeyListener(this);
 		statusLine.addMouseListener(this);
 		statusBar.add("Center", statusLine);
 		progressBar = new ProgressBar(120, 20);
-		progressBar.addKeyListener(this);
+		// progressBar.addKeyListener(this);
 		progressBar.addMouseListener(this);
 		statusBar.add("East", progressBar);
 		statusBar.setSize(toolbar.getPreferredSize());
 		add(statusBar);
 		
 		IJ.init(this, applet);
-		addKeyListener(this);
+		// addKeyListener(this);
 		addWindowListener(this);
 		setFocusTraversalKeysEnabled(false);
 		
@@ -331,6 +331,7 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	/** Handle menu events. */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ((e.getSource() instanceof MenuItem)) {
 			MenuItem item = (MenuItem) e.getSource();
@@ -358,6 +359,7 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	/** Handles CheckboxMenuItem state changes. */
+	@Override
 	public void itemStateChanged(ItemEvent e) {
 		MenuItem item = (MenuItem) e.getSource();
 		MenuComponent parent = (MenuComponent) item.getParent();
@@ -368,6 +370,7 @@ public class ImageJ extends Frame implements ActionListener,
 			doCommand(cmd);
 	}
 	
+	@Override
 	public void mousePressed(MouseEvent e) {
 		Undo.reset();
 		if (!Prefs.noClickToGC)
@@ -381,18 +384,23 @@ public class ImageJ extends Frame implements ActionListener,
 		return "ImageJ " + VERSION + BUILD + "; " + "Java " + System.getProperty("java.version") + (IJ.is64Bit() ? " [64-bit]; " : " [32-bit]; ");
 	}
 	
+	@Override
 	public void mouseReleased(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseExited(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 	
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 	
+	@Override
 	public void keyPressed(KeyEvent e) {
 		// if (e.isConsumed()) return;
 		int keyCode = e.getKeyCode();
@@ -582,6 +590,7 @@ public class ImageJ extends Frame implements ActionListener,
 		return false;
 	}
 	
+	@Override
 	public void keyTyped(KeyEvent e) {
 		char keyChar = e.getKeyChar();
 		int flags = e.getModifiers();
@@ -596,6 +605,7 @@ public class ImageJ extends Frame implements ActionListener,
 		}
 	}
 	
+	@Override
 	public void keyReleased(KeyEvent e) {
 		IJ.setKeyUp(e.getKeyCode());
 	}
@@ -614,11 +624,13 @@ public class ImageJ extends Frame implements ActionListener,
 			IJ.beep();
 	}
 	
+	@Override
 	public void windowClosing(WindowEvent e) {
 		doCommand("Quit");
 		windowClosed = true;
 	}
 	
+	@Override
 	public void windowActivated(WindowEvent e) {
 		if (IJ.isMacintosh() && !quitting) {
 			IJ.wait(10); // may be needed for Java 1.4 on OS X
@@ -626,18 +638,23 @@ public class ImageJ extends Frame implements ActionListener,
 		}
 	}
 	
+	@Override
 	public void windowClosed(WindowEvent e) {
 	}
 	
+	@Override
 	public void windowDeactivated(WindowEvent e) {
 	}
 	
+	@Override
 	public void windowDeiconified(WindowEvent e) {
 	}
 	
+	@Override
 	public void windowIconified(WindowEvent e) {
 	}
 	
+	@Override
 	public void windowOpened(WindowEvent e) {
 	}
 	
@@ -838,6 +855,7 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	/** Quit using a separate thread, hopefully avoiding thread deadlocks. */
+	@Override
 	public void run() {
 		quitting = true;
 		boolean changes = false;
