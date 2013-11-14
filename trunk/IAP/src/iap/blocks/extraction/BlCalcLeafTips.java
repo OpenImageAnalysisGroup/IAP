@@ -105,6 +105,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				if (skel != null)
 					mask = mask.io().or(skel.copy().io().replaceColor(-16777216, background).getImage()).getImage().show("skel on mask", debugValues);
+				else
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No skeleton image available, can't process it within leaf-tip detection!");
 			}
 			
 			// blur

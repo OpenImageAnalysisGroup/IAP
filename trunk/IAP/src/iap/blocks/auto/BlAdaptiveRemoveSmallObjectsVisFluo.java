@@ -48,7 +48,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		Image res, mask = input().masks().vis().show("vis input", debug);
+		Image res, mask = input().masks().vis().show("vis input", debugValues);
 		
 		double averageLeafWidthEstimationVIS = Double.NaN;
 		if (autoTune)
@@ -67,7 +67,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
 				res = input().images().vis().io().applyMask(res.io().erode(getInt("dilation vis", 0)).getImage()).getImage();
-			res.show("vis result", debug);
+			res.show("vis result", debugValues);
 		}
 		return res;
 	}
