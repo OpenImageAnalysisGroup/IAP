@@ -2,6 +2,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import iap.pipelines.ImageProcessorOptions;
 import ij.ImagePlus;
+import ij.WindowManager;
 import ij.io.FileInfoXYZ;
 import ij.io.Opener;
 import ij.io.TiffDecoderExtended;
@@ -366,6 +367,20 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
 								jp.add(debugPipelineTest0a);
 								jp.add(debugPipelineTest00a);
+								jp.add(new JSeparator());
+								Action action2 = new AbstractAction("Close All Image Windows") {
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										WindowManager.closeAllWindows();
+									}
+									
+									@Override
+									public boolean isEnabled() {
+										return WindowManager.getImageCount() > 0;
+									}
+									
+								};
+								jp.add(new JMenuItem(action2));
 								jp.add(new JSeparator());
 							}
 						} catch (Exception err) {
