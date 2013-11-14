@@ -4594,18 +4594,18 @@ public class ImageOperation implements MemoryHogInterface {
 						int v = skelImg[x][y];
 						int r = size;
 						if (v == SkeletonProcessor2d.colorEndpoints)
-							r = 16;
+							r = 10;
 						if (v == SkeletonProcessor2d.colorBranches)
-							r = 2;
+							r = 7;
 						if (v == SkeletonProcessor2d.colorBloomEndpoint)
-							r = 18;
+							r = 12;
 						for (int diffX = -r; diffX < r; diffX++)
 							for (int diffY = -r; diffY < r; diffY++) {
 								if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))
 									continue;
 								if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
-										((diffX * diffX + diffY * diffY) <= 10 * 10)) // ||
-									// (diffX * diffX + diffY * diffY) >= 20 * 20)
+										((diffX * diffX + diffY * diffY) <= 6 * 6) ||
+										(diffX * diffX + diffY * diffY) >= r * r)
 									continue;
 								res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
 							}
