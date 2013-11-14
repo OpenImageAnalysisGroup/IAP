@@ -84,7 +84,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		this(imp, null);
 	}
 	
-	public ImageWindow(ImagePlus imp, ImageCanvas ic) {
+	public ImageWindow(final ImagePlus imp, ImageCanvas ic) {
 		super(imp.getTitle());
 		if (Prefs.blackCanvas && getClass().getName().equals("ij.gui.ImageWindow")) {
 			setForeground(Color.white);
@@ -120,6 +120,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				else
 					ImageWindow.this.ic.unzoom();
 				zoomed = !zoomed;
+				e.consume();
 			}
 			
 			@Override
@@ -127,16 +128,22 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				String title = " [Press Shift and close this window, to close ALL image windows]";
 				if (e.isShiftDown()) {
 					ImageWindow.this.isShiftKeyDown = true;
-					String s = getTitle();
+					String s = imp.getTitle();
 					if (!s.endsWith(title))
-						setTitle(getTitle() + title);
+						imp.setTitle(imp.getTitle() + title);
 				} else {
 					ImageWindow.this.isShiftKeyDown = false;
-					String s = getTitle();
+					String s = imp.getTitle();
 					if (s.endsWith(title))
 						s = s.substring(0, s.indexOf(title));
-					setTitle(s);
+					imp.setTitle(s);
 				}
+				e.consume();
+			}
+			
+			@Override
+			public String toString() {
+				return "Shift-Key Title Update";
 			}
 			
 			@Override
@@ -144,21 +151,22 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				String title = " [Press Shift and close this window, to close ALL image windows]";
 				if (e.isShiftDown()) {
 					ImageWindow.this.isShiftKeyDown = true;
-					String s = getTitle();
+					String s = imp.getTitle();
 					if (!s.endsWith(title))
-						setTitle(getTitle() + title);
+						imp.setTitle(imp.getTitle() + title);
 				} else {
 					ImageWindow.this.isShiftKeyDown = false;
-					String s = getTitle();
+					String s = imp.getTitle();
 					if (s.endsWith(title))
 						s = s.substring(0, s.indexOf(title));
-					setTitle(s);
+					imp.setTitle(s);
 				}
+				e.consume();
 			}
 		});
 		
-		addKeyListener(ij);
-		setFocusTraversalKeysEnabled(false);
+		// addKeyListener(ij);
+		// setFocusTraversalKeysEnabled(false);
 		if (!(this instanceof StackWindow))
 			addMouseWheelListener(this);
 		setResizable(true);
@@ -207,6 +215,23 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			} else
 				show();
 		}
+	}
+	
+	@Override
+	public synchronized void addKeyListener(KeyListener arg0) {
+		super.addKeyListener(arg0);
+		System.out.println("Adding Key L:" + arg0);
+	}
+	
+	@Override
+	public synchronized void removeKeyListener(KeyListener arg0) {
+		super.removeKeyListener(arg0);
+		System.out.println("Removing Key L:" + arg0);
+	}
+	
+	@Override
+	public void setTitle(String title) {
+		super.setTitle(title);
 	}
 	
 	private void setLocationAndSize(boolean updating) {
