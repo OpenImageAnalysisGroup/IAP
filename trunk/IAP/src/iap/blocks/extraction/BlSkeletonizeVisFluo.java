@@ -48,7 +48,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processVISmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize VIS", true))
+		if (!getBoolean("skeletonize VIS", false))
 			return vis;
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMaskBeforSkeleton.png");
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
@@ -97,7 +97,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processFLUOmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize FLUO", false))
+		if (!getBoolean("skeletonize FLUO", true))
 			return input().masks().fluo();
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
@@ -105,9 +105,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		Image res = fluo.copy();
 		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 			Image fluowork = fluo.copy().io()// .medianFilter32Bit()
-					.erode(getInt("Erode-Cnt-Fluo", 1))
-					.dilate(getInt("Dilate-Cnt-Fluo", 1))
-					.blur(getDouble("Blur-Fluo", 4))
+					.erode(getInt("Erode-Cnt-Fluo", 0))
+					.dilate(getInt("Dilate-Cnt-Fluo", 0))
+					.blur(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
 			if (fluowork != null)
