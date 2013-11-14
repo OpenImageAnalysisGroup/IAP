@@ -74,6 +74,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	 * window, presses the escape key, or closes the window.
 	 */
 	public boolean running2;
+	private boolean isShiftKeyDown;
 	
 	public ImageWindow(String title) {
 		super(title);
@@ -123,11 +124,36 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				
+				String title = " [Press Shift and close this window, to close ALL image windows]";
+				if (e.isShiftDown()) {
+					ImageWindow.this.isShiftKeyDown = true;
+					String s = getTitle();
+					if (!s.endsWith(title))
+						setTitle(getTitle() + title);
+				} else {
+					ImageWindow.this.isShiftKeyDown = false;
+					String s = getTitle();
+					if (s.endsWith(title))
+						s = s.substring(0, s.indexOf(title));
+					setTitle(s);
+				}
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
+				String title = " [Press Shift and close this window, to close ALL image windows]";
+				if (e.isShiftDown()) {
+					ImageWindow.this.isShiftKeyDown = true;
+					String s = getTitle();
+					if (!s.endsWith(title))
+						setTitle(getTitle() + title);
+				} else {
+					ImageWindow.this.isShiftKeyDown = false;
+					String s = getTitle();
+					if (s.endsWith(title))
+						s = s.substring(0, s.indexOf(title));
+					setTitle(s);
+				}
 			}
 		});
 		
@@ -623,6 +649,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	@Override
 	public void windowClosing(WindowEvent e) {
 		// IJ.log("windowClosing: "+imp.getTitle()+" "+closed);
+		if (isShiftKeyDown)
+			WindowManager.closeAllWindows();
 		if (closed)
 			return;
 		if (ij != null) {
