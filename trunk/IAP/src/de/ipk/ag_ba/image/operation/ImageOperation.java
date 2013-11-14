@@ -2968,7 +2968,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, getWidth(), getHeight());
 	}
 	
-	private Rectangle getCropRectangle() {
+	public Rectangle getCropRectangle() {
 		int w = image.getWidth();
 		
 		int smallestX = Integer.MAX_VALUE;

@@ -47,7 +47,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 			return fluo;
 		Image res = fluo.copy();
 		
-		boolean analyzeSide = false;
+		boolean analyzeSide = getBoolean("Analyze Side Images", false);
 		if (analyzeSide)
 			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
 				Image viswork = fluo.copy().show("fluo", debug);
