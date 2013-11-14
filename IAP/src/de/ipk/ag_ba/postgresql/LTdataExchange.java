@@ -1290,8 +1290,11 @@ public class LTdataExchange implements ExperimentLoader {
 					String plantID = rs.getString(1);
 					String metaName = rs.getString(2);
 					String metaValue = rs.getString(3);
-					if (metaValue != null)
-						metaValue = metaValue.trim();
+					if (metaValue == null)
+						continue;
+					metaValue = metaValue.trim();
+					if (metaValue.isEmpty())
+						continue;
 					String o = plantID + " / " + metaName + " / " + metaValue;
 					if (!printedMetaData.contains(o))
 						System.out.println(o);
