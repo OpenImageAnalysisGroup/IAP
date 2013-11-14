@@ -49,6 +49,7 @@ import java.awt.image.PixelGrabber;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.AttributeHelper;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
@@ -2121,7 +2122,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				
 				return ("/" + v[0] + "," + v[1] + "," + v[2] + "/L" + Li + ",a" + ai + ",b" + bi + "/H"
 						+ StringManipulationTools.formatNumber(hsv[0], "#.###") + ",S"
-						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V" + StringManipulationTools.formatNumber(hsv[2], "#.###"));
+						+ StringManipulationTools.formatNumber(hsv[1], "#.###") + ",V"
+						+ StringManipulationTools.formatNumber(hsv[2], "#.###") + ": "
+						+ AttributeHelper.getColorName(new Color(r, g, b)));
 			default:
 				return ("");
 		}
