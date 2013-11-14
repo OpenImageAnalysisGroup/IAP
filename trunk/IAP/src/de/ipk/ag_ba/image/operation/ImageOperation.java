@@ -25,6 +25,7 @@ import info.StopWatch;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Line2D.Double;
 import java.awt.geom.Rectangle2D;
@@ -1871,6 +1872,25 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(new Image(res));
 	}
 	
+	public ImageOperation filterByHSV_hue(double minHue, int clearColor) {
+		int[] pixels = getImageAs1dArray();
+		float[] hsb = new float[3];
+		for (int index = 0; index < pixels.length; index++) {
+			int rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			int r = ((rgb >> 16) & 0xff);
+			int g = ((rgb >> 8) & 0xff);
+			int b = (rgb & 0xff);
+			
+			Color.RGBtoHSB(r, g, b, hsb);
+			
+			if (hsb[0] < minHue)
+				pixels[index] = clearColor;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
 	public ImageOperation filterByHSV_value(double t, int clearColor) {
 		int[] pixels = getImageAs1dArray();
 		float[] hsb = new float[3];
@@ -2935,6 +2955,7 @@ public class ImageOperation implements MemoryHogInterface {
 		cp.getHSB(hue, s, b);
 		
 		ByteProcessor pr = new ByteProcessor(w, h, b, null);
+		pr.setRoi(getCropRectangle());
 		pr.setAutoThreshold(Method.Yen, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		ImageOperation ioRED = new ImageOperation(new TypeConverter(pr, false).convertToRGB().getBufferedImage()).show("Auto-Threshold Mask Result", debug);
 		int[] res = getImageAs1dArray();
@@ -2945,6 +2966,40 @@ public class ImageOperation implements MemoryHogInterface {
 			idx++;
 		}
 		return new ImageOperation(res, getWidth(), getHeight());
+	}
+	
+	private Rectangle getCropRectangle() {
+		int w = image.getWidth();
+		
+		int smallestX = Integer.MAX_VALUE;
+		int largestX = 0;
+		int smallestY = Integer.MAX_VALUE;
+		int largestY = 0;
+		
+		int[] img = getImageAs1dArray();
+		int x = 0;
+		int y = 0;
+		for (int c : img) {
+			if (c != ImageOperation.BACKGROUND_COLORint) {
+				if (x < smallestX)
+					smallestX = x;
+				if (x > largestX)
+					largestX = x;
+				if (y < smallestY)
+					smallestY = y;
+				if (y > largestY)
+					largestY = y;
+			}
+			x++;
+			if (x == w) {
+				x = 0;
+				y++;
+			}
+		}
+		if (smallestY == Integer.MAX_VALUE)
+			return null;
+		Rectangle res = new Rectangle(smallestX, smallestY, largestX - smallestX, largestY - smallestY);
+		return res;
 	}
 	
 	public ImageOperation thresholdBlueHigherThan(int threshold) {
@@ -5596,5 +5651,9 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageCalculation stat() {
 		return new ImageCalculation(this);
+	}
+	
+	public ChannelCalculation calc() {
+		return new ChannelCalculation(this);
 	}
 }
