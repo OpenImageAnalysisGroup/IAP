@@ -10,6 +10,7 @@ import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
+import iap.blocks.extraction.BlCalcLeafTips;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -88,14 +89,15 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlSkeletonizeNir(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcMainAxis(),
+				new BlCalcLeafTips(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
 				new BlCalcAreas(),
 				new BlCalcVolumes(),
 				
 				// postprocessing
-				new BlRunPostProcessors(),
 				new BlDrawSkeleton(),
+				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),
 				new BlHighlightNullResults()
