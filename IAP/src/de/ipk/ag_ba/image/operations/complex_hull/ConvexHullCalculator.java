@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import org.Vector2i;
+
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -220,7 +222,7 @@ public class ConvexHullCalculator {
 					rt.addValue("hull.pc2.norm", span2.getLengthPC2() * normFactor);
 				}
 				
-				if (drawPCLine) {
+				if (drawPCLine && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)) {
 					Image inDrawing = res.getImage();
 					ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
 					if (span2.getP1() != null && span2.getP1l() != null) {
@@ -242,7 +244,7 @@ public class ConvexHullCalculator {
 		}
 		res.setResultsTable(rt);
 		
-		if (drawHull || drawCentroid)
+		if ((drawHull || drawCentroid) && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50))
 			res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon,
 					hullLineColor, centroid, centroidColor);
 		
