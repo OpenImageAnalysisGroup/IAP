@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.plugins.pipelines.arabidopsis;
 
 import iap.blocks.acquisition.BlLoadImagesIfNeeded;
+import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -19,8 +20,7 @@ import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIRdiff;
-import iap.blocks.segmentation.BlIntensityCalculationFluo;
-import iap.blocks.segmentation.BlLabFilter;
+import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilter;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
@@ -58,8 +58,9 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlAlign(),
 				new BlClearMasks_WellProcessing(),
 				new BlMoveImagesToMasks(),
-				new BlLabFilter(),
-				new BlIntensityCalculationFluo(),
+				
+				new BlKMeansVis(),
+				new BlAdaptiveSegmentationFluo(),
 				new BlMedianFilter(),
 				new BlUseFluoMaskToClearVis(),
 				new BlRemoveSmallObjectsVisFluo(),
@@ -67,6 +68,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlUseFluoMaskToClearNir(),
 				new BlIRdiff(),
 				new BlUseFluoMaskToClearIr(),
+				
 				new BlSkeletonize_Arabidopsis(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcAreas(),
