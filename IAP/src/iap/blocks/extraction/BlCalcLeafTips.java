@@ -111,7 +111,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			// blur
 			mask = mask.io().blur(numofblur).getImage();
-			
+			// mask = mask.io().dilate((int) numofblur).getImage();
 			// median
 			mask = mask.io().medianFilter32Bit(true).getImage();
 			
@@ -356,8 +356,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
 			// origColorRegionImage.show("orig");
 			regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
-			final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
-			Lab regionColorLabAvg = getAverageRegionColorLab(region);
+			// final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
+			// Lab regionColorLabAvg = getAverageRegionColorLab(region);
+			final Color regionColorRGBAvg = getAverageRegionColorRGB(region, ColorMode.RGB);
 			
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xPosition);
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", yPosition);
@@ -369,12 +370,15 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".distanceBetweenCoGandMidPoint", distCoGToMid);
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".area", region.size());
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".eccentricity", eccentricity);
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.l", regionColorLabAvg.getAverageL());
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.a", regionColorLabAvg.getAverageA());
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.b", regionColorLabAvg.getAverageB());
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.h", regionColorHsvAvg.getRed());
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.s", regionColorHsvAvg.getGreen());
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.v", regionColorHsvAvg.getBlue());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.l", regionColorRGBAvg.getRed());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.a", regionColorRGBAvg.getGreen());
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.b", regionColorRGBAvg.getBlue());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.l", regionColorLabAvg.getAverageL());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.a", regionColorLabAvg.getAverageA());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.lab.b", regionColorLabAvg.getAverageB());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.h", regionColorHsvAvg.getRed());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.s", regionColorHsvAvg.getGreen());
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.hsv.v", regionColorHsvAvg.getBlue());
 			
 			final int off = i == 4 ? 40 : 0;
 			
@@ -397,8 +401,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 									"DIRECTION: " + (directionF > 0 ? "DOWN" : "UP"),
 									Color.BLACK)
 							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 20 + off,
-									"HUE: " + regionColorHsvAvg.getRed() + ", SAT: " + regionColorHsvAvg.getGreen() + ", VAL: " + regionColorHsvAvg.getBlue(),
-									Color.BLACK)
+									"CHLO: " + regionColorRGBAvg.getRed() + ", PHEN: " + regionColorRGBAvg.getGreen() + ", CLAS: " + regionColorRGBAvg.getBlue()
+									, Color.BLACK)
 							.getImage();
 					return imgGamma;
 				}
@@ -489,6 +493,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// System.out.println(cornerlist.get(i).y);
 			// }
 			
+			int distToBefore = Integer.MAX_VALUE;
+			int listIndexBefore = -1;
+			
 			for (int i = 0; i < listsize; i++) {
 				temp = cornerlist.get(i).colorInt;
 				// found peak
@@ -512,7 +519,15 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					// veryNear = distQ > radius;
 					// }
 					// if (!veryNear)
-					results.add(tempMax);
+					// min size of a peak
+					if (idx > 2) {
+						if (listIndexBefore != -1)
+							distToBefore = (i + idx) - listIndexBefore;
+						if (distToBefore > 7) {
+							results.add(tempMax);
+							listIndexBefore = i + idx;
+						}
+					}
 					// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
 					if (i + idx >= listsize) {
 						results.remove(0);
@@ -989,6 +1004,49 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return new Image(img2d);
 	}
 	
+	private Color getAverageRegionColorRGB(ArrayList<PositionAndColor> region, ColorMode type) {
+		float[] hsbvals = new float[3];
+		float[] valssum = new float[3];
+		
+		int c = 0;
+		int r = 0, g = 0, b = 0;
+		int Li, ai, bi;
+		
+		int count = 0;
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		
+		for (PositionAndColor v : region) {
+			c = v.colorInt;
+			r = ((c & 0xff0000) >> 16);
+			g = ((c & 0x00ff00) >> 8);
+			b = (c & 0x0000ff);
+			
+			switch (type) {
+				case HSV:
+					Color.RGBtoHSB(r, g, b, hsbvals);
+					valssum[0] += hsbvals[0];
+					valssum[1] += hsbvals[1];
+					valssum[2] += hsbvals[2];
+					break;
+				case LAB:
+					Li = (int) lab[r][g][b];
+					ai = (int) lab[r][g][b + 256];
+					bi = (int) lab[r][g][b + 512];
+					valssum[0] += Li;
+					valssum[1] += ai;
+					valssum[2] += bi;
+					break;
+				case RGB:
+					valssum[0] += r;
+					valssum[1] += g;
+					valssum[2] += b;
+					break;
+			}
+			count++;
+		}
+		return new Color((int) (valssum[0] / count), (int) (valssum[1] / count), (int) (valssum[2] / count));
+	}
+	
 	/**
 	 * Get average region color HSV.
 	 * 
@@ -1228,5 +1286,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 			}
 		}
+	}
+	
+	private enum ColorMode {
+		HSV, LAB, RGB
 	}
 }
