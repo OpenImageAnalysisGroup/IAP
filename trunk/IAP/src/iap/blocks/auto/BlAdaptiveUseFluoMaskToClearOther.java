@@ -38,7 +38,9 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 			if (processedMasks.vis() != null) {
 				double fW = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
 				double fH = (double) processedMasks.vis().getHeight() / (double) processedMasks.fluo().getHeight();
-				double fluoBlur = autoTune ? averageLeafWidthEstimation : getDouble("blur fluo mask on vis", 10);
+				double fluoBlur = autoTune ? getDouble("Blur Leaf-width Factor Fluo on Vis", 2) * averageLeafWidthEstimation : getDouble(
+						"blur fluo mask on vis",
+						10);
 				// System.out.println("DEBUG: FOR MASKING VIS BLUR FLUO: " + fluoBlur);
 				processedMasks.setVis(
 						processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
@@ -46,7 +48,9 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 								back).getImage());
 				
 				double corr = processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
-				double visBlur = autoTune ? averageLeafWidthEstimation * corr : getDouble("blur vis mask on fluo", 40d);
+				double visBlur = autoTune ? getDouble("Blur Leaf-width Factor Vis on Fluo", 3) * averageLeafWidthEstimation * corr : getDouble(
+						"blur vis mask on fluo",
+						40d);
 				// System.out.println("DEBUG: FOR MASKING FLUO BLUR VIS: " + visBlur);
 				processedMasks.setFluo(
 						processedMasks.fluo().io().copy().applyMask(
@@ -97,7 +101,10 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 	
 	@Override
 	public String getDescription() {
-		return "Use FLUO mask to clear VIS/NIR/IR. " +
-				"The blur-factor is derived from the average width of the plant elements in the FLUO image.";
+		return "Use FLUO mask to clear VIS/NIR/IR. "
+				+
+				"The blur-factor is derived from the average width of the plant elements in the FLUO image. "
+				+
+				"The parameters &quot;Blur Leaf-width Factor Fluo on Vis&quot; and &quot;Blur Leaf-width Factor Vis on Fluo&quot; are used to modify the mask size if auto-tune is enabled";
 	}
 }
