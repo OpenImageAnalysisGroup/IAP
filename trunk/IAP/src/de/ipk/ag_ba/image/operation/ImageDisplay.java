@@ -44,9 +44,7 @@ public class ImageDisplay {
 				break;
 			
 			default:
-				printImagej(image, text);
-				break;
-		
+				return printImagej(image, text);
 		}
 		return null;
 	}

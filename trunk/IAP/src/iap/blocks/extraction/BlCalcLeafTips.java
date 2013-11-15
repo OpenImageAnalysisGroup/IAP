@@ -122,6 +122,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			mask.show("after blur, noise rm and dilate and ...", debugValues);
 			mask.io().replaceColor(background, Color.gray.getRGB()).getImage().show("thresh", false);
 			
+			// add border around image
+			mask = mask.io().addBorder(circlediameter / 2, 0, 0, background).getImage();
+			
 			// detect borders
 			ImageOperation io = new ImageOperation(mask.getAs2A()).border()
 					.borderDetection(background, Color.CYAN.getRGB(),
@@ -254,17 +257,19 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	/**
 	 * @return Object[image gamma, results table]
 	 */
-	public Object[] FeatureExtraction(Image img, Image imgorig, ArrayList<PositionAndColor> borderlistPlusCornerestimation,
+	public Object[] FeatureExtraction(Image mask, Image imgorig, ArrayList<PositionAndColor> borderlistPlusCornerestimation,
 			final int circlediameter, int geometricThresh,
 			int background, boolean debug) {
 		
 		Object[] res = new Object[2];
+		final int radius = circlediameter / 2;
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		
 		// further calculation result leaf tip regions, cog, principal axes
 		int size = borderlistPlusCornerestimation.size();
+		// System.out.println("s: " + size);
 		
 		// sort in y direction
 		Collections.sort(borderlistPlusCornerestimation, new Comparator<PositionAndColor>() {
@@ -278,20 +283,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		});
 		
 		// gamma image
-		Image imgGamma = img.copy().io().gamma(7.0).getImage();
+		mask = crop4(mask, radius, mask.getWidth() - radius, radius, mask.getHeight() - radius);
+		Image imgGamma = mask.copy().io().gamma(7.0).getImage();
 		
 		int up = 0;
 		int down = 0;
 		int index = 1;
 		
 		for (int i = 0; i < size; i++) {
-			final int xtemp = borderlistPlusCornerestimation.get(i).x;
-			final int ytemp = borderlistPlusCornerestimation.get(i).y;
+			final int xPosition = borderlistPlusCornerestimation.get(i).x - radius;
+			final int yPosition = borderlistPlusCornerestimation.get(i).y - radius;
 			
 			// get regionlist
-			int[][] img2d = img.copy().getAs2A();
-			int radius = circlediameter / 2;
-			ArrayList<PositionAndColor> region = regionGrowing(xtemp, ytemp, img2d, background, radius, geometricThresh);
+			int[][] img2d = mask.copy().getAs2A();
+			ArrayList<PositionAndColor> region = regionGrowing(xPosition, yPosition, img2d, background, radius, geometricThresh);
 			
 			if (region == null)
 				continue;
@@ -301,8 +306,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int regionHeight = dim[3] - dim[2];
 			int regionWidth = dim[1] - dim[0];
 			
-			// if (regionHeight > radius * 1.5 || regionWidth > radius * 1.5)
-			// continue;
+			if (regionHeight > radius * 1.5 || regionWidth > radius * 1.5)
+				continue;
 			
 			Image regionImage = new Image(copyRegiontoImage(dim, region));
 			
@@ -329,7 +334,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// calculate direction of leaftip
 			int direction = 0;
 			
-			if (centerOfGravity.y + dim[2] > ytemp) {
+			if (centerOfGravity.y + dim[2] > yPosition) {
 				direction = -1; // up
 				up++;
 			} else {
@@ -347,11 +352,15 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			double eccentricity = 0.0;
 			eccentricity = Math.sqrt(1 - lambdas[1] / lambdas[0]);
 			
+			// apply mask on original image to preserve colors
+			Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
+			// origColorRegionImage.show("orig");
+			regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
 			final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
 			Lab regionColorLabAvg = getAverageRegionColorLab(region);
 			
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xtemp);
-			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", ytemp);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xPosition);
+			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", yPosition);
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".omega", omega);
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".gamma", gamma);
 			rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".direction", direction);
@@ -380,14 +389,14 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					imgGamma = imgGamma
 							.io()
 							.canvas()
-							.drawLine(xtemp, ytemp, centerOfGravity.x + dim[0], centerOfGravity.y + dim[2], Color.ORANGE.getRGB(), 0.2, 1)
-							.drawCircle(xtemp, ytemp, radiusfin + 4, Color.BLUE.getRGB(), 0.5, 1)
-							.text(centerOfGravity.x + xtemp + 20, centerOfGravity.y + ytemp - 20 + off, "LEAF: " + (iF + 1),
+							.drawLine(xPosition, yPosition, centerOfGravity.x + dim[0], centerOfGravity.y + dim[2], Color.ORANGE.getRGB(), 0.2, 1)
+							.drawCircle(xPosition, yPosition, radiusfin + 4, Color.BLUE.getRGB(), 0.5, 1)
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition - 20 + off, "LEAF: " + (iF + 1),
 									Color.BLACK)
-							.text(centerOfGravity.x + xtemp + 20, centerOfGravity.y + ytemp + 0 + off,
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 0 + off,
 									"DIRECTION: " + (directionF > 0 ? "DOWN" : "UP"),
 									Color.BLACK)
-							.text(centerOfGravity.x + xtemp + 20, centerOfGravity.y + ytemp + 20 + off,
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 20 + off,
 									"HUE: " + regionColorHsvAvg.getRed() + ", SAT: " + regionColorHsvAvg.getGreen() + ", VAL: " + regionColorHsvAvg.getBlue(),
 									Color.BLACK)
 							.getImage();
@@ -407,7 +416,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						return ImageConfiguration.VisSide;
 				}
 			};
-			if (getBoolean("debug_paint_results", false))
+			if (getBoolean("debug_paint_results", false) && debug)
 				imgGamma = ri.postProcessMask(imgGamma);
 			else
 				getProperties().addImagePostProcessor(ri);
@@ -416,17 +425,28 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		rt.addValue("leaf.count.up", up);
 		rt.addValue("leaf.count.down", down);
-		imgGamma.show("marked", debug);
-		rt.show("resultstable", debug);
+		imgGamma.show("marked", debugValues);
 		
 		res[0] = imgGamma;
 		res[1] = rt;
 		return res;
 	}
 	
+	private Image cutFromImage(Image img, int xPosition, int yPosition, int radius) {
+		int[][] img2d = img.getAs2A();
+		int[][] res = new int[2 * radius][2 * radius];
+		for (int x = -radius; x < radius; x++) {
+			for (int y = -radius; y < radius; y++) {
+				if (xPosition + x >= 0 && xPosition + x < img.getWidth() && yPosition + y >= 0 && yPosition + y < img.getHeight())
+					res[radius + x][radius + y] = img2d[xPosition + x][yPosition + y];
+			}
+		}
+		return new Image(res);
+	}
+	
 	private ArrayList<PositionAndColor> filterCornerCandidates(ArrayList<ArrayList<PositionAndColor>> cornerlistlist, int radius) {
 		
-		boolean processOnlyTheLargest = false;
+		boolean processOnlyTheLargest = true;
 		
 		if (processOnlyTheLargest)
 			Collections.sort(cornerlistlist, new Comparator<ArrayList<PositionAndColor>>() {
@@ -453,9 +473,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			int temp = 0;
 			
 			// System.out.println();
-			for (int i = 0; i < listsize; i++) {
-				System.out.println(cornerlist.get(i).colorInt);
-			}
+			// for (int i = 0; i < listsize; i++) {
+			// System.out.println(cornerlist.get(i).colorInt);
+			// }
 			//
 			// System.out.println("++++++++++++++");
 			//
@@ -503,6 +523,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				}
 			}
 		}
+		// System.out.println("#leafs: " + results.size());
 		return results;
 	}
 	
@@ -1076,6 +1097,23 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			}
 		}
 		return res;
+	}
+	
+	public static Image crop4(Image img, int pLeft, int pRight, int pTop,
+			int pBottom) {
+		int[][] img2d = img.getAs2A();
+		int[][] res = new int[pRight - pLeft][pBottom - pTop];
+		pLeft = Math.max(pLeft, 0);
+		pRight = Math.min(pRight, img.getWidth());
+		pTop = Math.max(pTop, 0);
+		pBottom = Math.min(pBottom, img.getHeight());
+		
+		for (int x = pLeft; x < pRight; x++) {
+			for (int y = pTop; y < pBottom; y++) {
+				res[x - pLeft][y - pTop] = img2d[x][y];
+			}
+		}
+		return new Image(res);
 	}
 	
 	@Override
