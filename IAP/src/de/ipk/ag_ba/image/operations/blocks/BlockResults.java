@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 public class BlockResults implements BlockResultSet {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
-	private final HashMap<String, Image> storedImages = new HashMap<String, Image>();
+	private HashMap<String, Image> storedImages = new HashMap<String, Image>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
 	
@@ -478,5 +478,15 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public void clearStoredPostprocessors() {
 		storedPostProcessors.clear();
+	}
+	
+	@Override
+	public HashMap<String, Image> getImages() {
+		return storedImages;
+	}
+	
+	@Override
+	public void setImages(HashMap<String, Image> storedImages) {
+		this.storedImages = storedImages;
 	}
 }

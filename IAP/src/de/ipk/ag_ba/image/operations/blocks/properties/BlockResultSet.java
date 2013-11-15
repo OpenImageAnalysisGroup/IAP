@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operations.blocks.properties;
 import iap.blocks.unused.RunnableOnImage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
@@ -82,4 +83,8 @@ public interface BlockResultSet {
 	public void addImagePostProcessor(ImageConfiguration imageType, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask);
 	
 	public void clearStoredPostprocessors();
+	
+	public HashMap<String, Image> getImages();
+	
+	public void setImages(HashMap<String, Image> storedImages);
 }

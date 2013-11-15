@@ -284,6 +284,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();
+		final HashMap<String, Image> storedImages = new HashMap<String, Image>(brs.getImages());
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
@@ -301,6 +302,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					ImageSet a = inputSet.images().copy();
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
+					brs.setImages(storedImages);
 					inst.setPreventDebugValues(true);
 					inst.setInputAndOptions(well, ab, options, brs, blockPos, null);
 					ab = inst.process();
