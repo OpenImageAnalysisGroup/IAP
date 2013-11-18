@@ -744,6 +744,29 @@ public class StringManipulationTools implements HelperClass {
 		return getStringList(al, div);
 	}
 	
+	public static String getMaxStringList(Collection<?> elements, String div, int max, String maxElemString) {
+		if (elements == null || elements.size() <= 0)
+			return "";
+		else {
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			boolean maxReached = elements.size() > max;
+			for (Object e : elements) {
+				if (maxReached && i == max)
+					sb.append(maxElemString);
+				else
+					sb.append(e + "");
+				if (div != null)
+					if (i < elements.size() - 1 && !(maxReached && i == max))
+						sb.append(div);
+				i++;
+				if (maxReached && i == max + 1)
+					break;
+			}
+			return sb.toString();
+		}
+	}
+	
 	public static String getStringList(Collection<?> elements, String div) {
 		if (elements == null || elements.size() <= 0)
 			return "";
