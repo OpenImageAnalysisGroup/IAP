@@ -27,12 +27,12 @@ public class DetachedLeafsPipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public String getTitle() {
-		return "Detached Leafs Analysis";
+		return "Detached Leaves Analysis";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Analyse Detached Leafs Images";
+		return "Analyse Detached Leaves Images";
 	}
 	
 	@Override
@@ -73,6 +73,6 @@ public class DetachedLeafsPipeline extends AbstractPipelineTemplate {
 	
 	@Override
 	public boolean analyzeSideImages() {
-		return false;
+		return true;
 	}
 }
