@@ -2813,29 +2813,31 @@ public class ImageOperation implements MemoryHogInterface {
 			g = ((c & 0x00ff00) >> 8);
 			b = (c & 0x0000ff);
 			
+			switch (mode) {
 			// use hsv, saturation to zero
-			if (mode == GrayscaleMode.MODE_1) {
-				Color.RGBtoHSB(r, g, b, hsv);
-				hsv[1] = 0;
-				res[idx] = Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]);
-			}
-			
-			// use common formula (here from gimp), y is here luminosity
-			if (mode == GrayscaleMode.MODE_2) {
-				y = (int) (0.3 * r + 0.59 * g + 0.11 * b);
-				res[idx] = new Color(y, y, y).getRGB();
-			}
-			
-			// use max value of RGB
-			if (mode == GrayscaleMode.MODE_3) {
-				y = Math.max(r, Math.max(g, b));
-				res[idx] = new Color(y, y, y).getRGB();
-			}
-			
-			// lightness http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
-			if (mode == GrayscaleMode.MODE_4) {
-				y = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 2;
-				res[idx] = new Color(y, y, y).getRGB();
+				case MODE_1:
+					Color.RGBtoHSB(r, g, b, hsv);
+					hsv[1] = 0;
+					res[idx] = Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]);
+					break;
+				
+				// use common formula (here from gimp), y is here luminosity
+				case MODE_2:
+					y = (int) (0.3 * r + 0.59 * g + 0.11 * b);
+					res[idx] = new Color(y, y, y).getRGB();
+					break;
+				
+				// use max value of RGB
+				case MODE_3:
+					y = Math.max(r, Math.max(g, b));
+					res[idx] = new Color(y, y, y).getRGB();
+					break;
+				
+				// lightness http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
+				case MODE_4:
+					y = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 2;
+					res[idx] = new Color(y, y, y).getRGB();
+					break;
 			}
 			
 			if (scale) {
