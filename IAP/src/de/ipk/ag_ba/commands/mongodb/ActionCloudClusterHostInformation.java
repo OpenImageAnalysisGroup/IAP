@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ObjectRef;
+import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -25,6 +27,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private BackgroundTaskStatusProviderSupportingExternalCall hostStatus;
 	private NavigationButton src;
 	private MongoDB m;
+	private final ObjectRef postFix = new ObjectRef("", "");
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
 		super("Compute Cluster");
@@ -76,6 +79,13 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 						}
 					}
 					hostInfo = hl_filtered.size() + " nodes, " + procCnt + " instances";
+					if (hl_filtered.size() > 0 && hl_filtered.size() < 4)
+						hostInfo = hostInfo + "<br><small><font color='gray'>[" + StringManipulationTools.getMaxStringList(hl_filtered.keySet(), ", ", 2, "...")
+								+ "]</font></small>";
+					if (hl_filtered.size() > 0)
+						postFix.setString(":<br><small>" + StringManipulationTools.getStringList("- ", hl_filtered.keySet(), "<br>", 1, "") + "</small>");
+					else
+						postFix.setString("");
 					
 					for (ArrayList<CloudHost> al : hl_filtered.values()) {
 						for (CloudHost ch : al) {
@@ -197,6 +207,11 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
 		res.add(src);
 		return res;
+	}
+	
+	@Override
+	public String getDefaultTooltip() {
+		return "<html>" + super.getDefaultTooltip() + postFix;
 	}
 	
 	@Override
