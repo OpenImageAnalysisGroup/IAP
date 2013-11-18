@@ -135,6 +135,26 @@ public class Image {
 		image = ImageConverter.convert1AtoIJ(w, h, img);
 	}
 	
+	public Image(int w, int h, int[] channelR, int[] channelG, int[] channelB) {
+		this.w = w;
+		this.h = h;
+		int a = 255;
+		@SuppressWarnings("unused")
+		int alpha = ((a & 0xFF) << 24);
+		int[] img = new int[w * h];
+		for (int idx = 0; idx < img.length; idx++) {
+			int r = (int) (channelR[idx] * 255d + 0.5d);
+			int g = (int) (channelG[idx] * 255d + 0.5d);
+			int b = (int) (channelB[idx] * 255d + 0.5d);
+			int c = // alpha |
+			((r & 0xFF) << 16) |
+					((g & 0xFF) << 8) |
+					((b & 0xFF) << 0);
+			img[idx] = c;
+		}
+		image = ImageConverter.convert1AtoIJ(w, h, img);
+	}
+	
 	public Image(int w, int h, double[][] labImage) {
 		this(w, h, ImageConverter.convertLABto1A(labImage));
 	}

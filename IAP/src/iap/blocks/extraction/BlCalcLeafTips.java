@@ -162,6 +162,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				int leaflength = skelimg.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
 				int area = imgorig.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
 				
+				if (leaflength <= 0 || area <= 0)
+					return inputImage;
+				
 				int avg_width = area / leaflength;
 				
 				// optimize loop
@@ -1181,12 +1184,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Detect Leaf Tips";
+		return "Detect Leaf-Tips";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Detect leaf tips of a plant. (number of leafs) <br><br>If skeleton (fluo) is calculated within the pipeline in a previous step, all plant objects are connected.";
+		return "Detect leaf-tips of a plant. (number of leaves) <br><br>If skeleton (fluo) is calculated within the pipeline in a previous step, all plant objects are connected.";
 	}
 	
 	@Override
