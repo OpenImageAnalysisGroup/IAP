@@ -1223,21 +1223,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				Double maxLeafcount = -1d;
 				ArrayList<Double> lc = new ArrayList<Double>();
 				
-				Integer a = null;
-				searchLoop: for (String key : allResultsForSnapshot.keySet()) {
+				ArrayList<Double> topAngles = new ArrayList<Double>();
+				for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
 						if (v.getValue() != null) {
-							a = v.getValue().intValue();
-							// System.out.println("main.axis.rotation: " + a);
-							break searchLoop;
+							Double a = v.getValue();
+							topAngles.add(a);
 						}
 					}
 				}
 				
 				String bestAngle = null;
-				if (a != null) {
-					a = a % 180;
+				if (topAngles.size() > 0) {
+					double a = getAverage(topAngles);
 					Double bestDiff = Double.MAX_VALUE;
 					for (String dc : allResultsForSnapshot.keySet()) {
 						double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
@@ -1290,6 +1289,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 			}
 		}
+	}
+	
+	private double getAverage(ArrayList<Double> topAngles) {
+		int n = 0;
+		double sum = 0;
+		for (Double d : topAngles) {
+			n++;
+			sum += d;
+		}
+		return sum / n;
 	}
 	
 	private enum ColorMode {

@@ -45,6 +45,11 @@ public class BlCalcMainAxis extends
 				
 				angle = angle - imageRotationAngle;
 				
+				if (angle < 0)
+					angle = angle + 360;
+				if (angle > 180)
+					angle = angle - 180;
+				
 				// getProperties().setNumericProperty(0,
 				// PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
 				double normalizedDistanceToMainAxis = macr.getMinResult()
