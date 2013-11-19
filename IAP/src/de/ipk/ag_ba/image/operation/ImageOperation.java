@@ -693,7 +693,8 @@ public class ImageOperation implements MemoryHogInterface {
 		ImageProcessor p = image.getProcessor();
 		for (int j = 0; j < mask.length; j++)
 			for (int i = 0; i < mask[j].length; i++)
-				tempImage.copyBits(p, i - iM, j - jM, Blitter.MAX);
+				if (mask[j][i] != -1)
+					tempImage.copyBits(p, i - iM, j - jM, Blitter.MAX);
 		
 		// for (int i = 0; i < mask.length; i++)
 		// for (int j = 0; j < mask[i].length; j++)
@@ -766,9 +767,13 @@ public class ImageOperation implements MemoryHogInterface {
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
 	public ImageOperation dilate(ImageProcessor temp, int[][] mask) {
+		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "orig");
 		temp.invert();
+		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "inv");
 		erode(mask);
+		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "erode");
 		temp.invert();
+		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "inv2");
 		return this;
 	}
 	
@@ -789,7 +794,6 @@ public class ImageOperation implements MemoryHogInterface {
 	 * <p>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
 	 */
-	@Deprecated
 	public ImageOperation dilate(int[][] mask) {
 		return dilate(image.getProcessor(), mask);
 	}
@@ -5643,7 +5647,7 @@ public class ImageOperation implements MemoryHogInterface {
 			if (px[i] == BACKGROUND_COLORint)
 				res[i] = 0xffffffff; // imageJ background
 			else
-				res[i] = 1;
+				res[i] = 0x00000000;
 		return new ImageOperation(res, getWidth(), getHeight());
 	}
 	

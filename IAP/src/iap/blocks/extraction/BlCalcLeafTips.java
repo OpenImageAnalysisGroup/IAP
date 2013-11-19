@@ -533,7 +533,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					}
 					// If over i > listsize, delete first one because it is maybe no maxima otherwise it is re-added.
 					if (i + idx >= listsize) {
-						results.remove(0);
+						if (!results.isEmpty())
+							results.remove(0);
 						break;
 					}
 					start = 0;
