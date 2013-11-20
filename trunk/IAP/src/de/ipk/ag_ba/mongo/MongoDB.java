@@ -1055,7 +1055,8 @@ public class MongoDB {
 			double max, boolean printed) {
 		BasicDBList ll = new BasicDBList();
 		for (Object o : l)
-			ll.add(new ObjectId(o + ""));
+			if (o != null)
+				ll.add(new ObjectId(o + ""));
 		DBCursor condL = null;
 		try {
 			condL = collCond.find(
