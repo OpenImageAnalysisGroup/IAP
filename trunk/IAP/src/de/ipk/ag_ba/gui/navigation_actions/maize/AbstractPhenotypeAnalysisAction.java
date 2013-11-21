@@ -24,6 +24,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -33,6 +34,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -158,11 +160,11 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			if (status != null)
 				status.setCurrentStatusText1("Analysis finished");
 			
-			final ExperimentInterface statisticsResult = task.getOutput();
+			ExperimentInterface statisticsResult = task.getOutput();
 			
 			task = null;
 			
-			if (statisticsResult == null) { //  || statisticsResult.getNumberOfMeasurementValues() <= 0
+			if (statisticsResult == null) { // || statisticsResult.getNumberOfMeasurementValues() <= 0
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
 				this.experimentResult = null;
 				if (getResultReceiver() == null)
@@ -202,6 +204,24 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				// statisticsResult.getHeader().setStartdate(new Date(startTime));
 				statisticsResult.getHeader().setStorageTime(new Date());
 				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+				
+				boolean removeCameraInfosAndReMerge = false; // normaly not needed and requires high memory and compute time
+				if (removeCameraInfosAndReMerge) {
+					for (SubstanceInterface si : statisticsResult) {
+						String name = si.getName();
+						boolean clear = true;
+						if (name != null && StringManipulationTools.count(name, ".") == 1) {
+							name = name.toUpperCase();
+							if (name.endsWith("top") || name.endsWith("side")) {
+								clear = false;
+							}
+						}
+						if (clear)
+							ImageConfiguration.get(si.getName());
+						si.setInfo(null);
+					}
+					statisticsResult = MappingData3DPath.merge(MappingData3DPath.get(statisticsResult, false), false, getStatusProvider());
+				}
 				
 				if (getResultReceiver() == null) {
 					if (status != null) {
