@@ -363,10 +363,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								PipelineDesc pd = new PipelineDesc(null, iop, null, null);
 								UserDefinedImageAnalysisPipelineTask iat =
 										new UserDefinedImageAnalysisPipelineTask(pd);
-								JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-								JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-								jp.add(debugPipelineTest0a);
-								jp.add(debugPipelineTest00a);
+								if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {
+									JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+									jp.add(debugPipelineTest0a);
+								} else {
+									JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+									jp.add(debugPipelineTest00a);
+								}
 								jp.add(new JSeparator());
 								Action action2 = new AbstractAction("Close All Image Windows") {
 									@Override
