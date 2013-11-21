@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.unused.RunnableOnImage;
+import iap.pipelines.ImageProcessorOptions;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -167,7 +168,7 @@ public class BlockResults implements BlockResultSet {
 								}
 							} else {
 								BlockPropertyValue p = new BlockPropertyValue(
-										pn.getName(), pn.getUnit(), tm.get(key), cameraAngle);
+										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
 						}
@@ -211,7 +212,7 @@ public class BlockResults implements BlockResultSet {
 								}
 							} else {
 								BlockPropertyValue p = new BlockPropertyValue(
-										pn.getName(), pn.getUnit(), tm.get(key), cameraAngle);
+										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
 						}
@@ -453,8 +454,8 @@ public class BlockResults implements BlockResultSet {
 		return storedNumerics.isEmpty();
 	}
 	
-	public Rectangle2D.Double getRelativeBlueMarkerRectangle() {
-		return BlDetectBlueMarkers.getRelativeBlueMarkerRectangle(this);
+	public Rectangle2D.Double getRelativeBlueMarkerRectangle(ImageProcessorOptions options) {
+		return BlDetectBlueMarkers.getRelativeBlueMarkerRectangle(this, options);
 	}
 	
 	@Override

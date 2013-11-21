@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
+import iap.pipelines.ImageProcessorOptions.CameraPosition;
+
 import java.util.HashMap;
 
 public enum PropertyNames {
@@ -59,22 +61,34 @@ public enum PropertyNames {
 		
 	}
 	
-	public String getName() {
+	public String getName(CameraPosition pos) {
 		switch (this) {
 			case RESULT_MAXIMUM_SEARCH_COUNT:
 				return "pollen count";
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return "mark1.y";
+				return "RESULT_" + pos + ".vis.marker.1.y";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return "mark2.y";
+				return "RESULT_" + pos + ".vis.marker.2.y";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return "mark3.y";
+				return "RESULT_" + pos + ".vis.marker.3.y";
+				
+			case RESULT_VIS_MARKER_POS_1_LEFT_X:
+			case RESULT_VIS_MARKER_POS_1_RIGHT_X:
+				return "RESULT_" + pos + ".vis.marker.1.x";
+				
+			case RESULT_VIS_MARKER_POS_2_LEFT_X:
+			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
+				return "RESULT_" + pos + ".vis.marker.2.x";
+				
+			case RESULT_VIS_MARKER_POS_3_LEFT_X:
+			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
+				return "RESULT_" + pos + ".vis.marker.3.x";
 		}
 		return toString();
 	}
@@ -86,16 +100,16 @@ public enum PropertyNames {
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return "percent";
-				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return "percent";
-				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return "percent";
-				
+			case RESULT_VIS_MARKER_POS_1_LEFT_X:
+			case RESULT_VIS_MARKER_POS_1_RIGHT_X:
+			case RESULT_VIS_MARKER_POS_2_LEFT_X:
+			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
+			case RESULT_VIS_MARKER_POS_3_LEFT_X:
+			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
 			case RESULT_SIDE_WIDTH:
 			case RESULT_SIDE_HEIGHT:
 				return "percent";
