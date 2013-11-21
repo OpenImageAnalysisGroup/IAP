@@ -142,10 +142,12 @@ public class ExperimentSaver implements RunnableOnDB {
 							"//");
 					experiment.getHeader().setRemark(remark);
 				}
-				// preserve analysis settings
-				if (ehi.getRemark() != null && !ehi.getRemark().isEmpty()) {
-					String settings = experiment.getHeader().getSettings();
-					experiment.getHeader().setSettings(settings);
+				// preserve analysis settings (if actual settings are empty)
+				if (ehi.getSettings() != null && !ehi.getSettings().isEmpty()) {
+					if (experiment.getHeader().getSettings() == null || experiment.getHeader().getSettings().isEmpty()) {
+						String settings = ehi.getSettings();
+						experiment.getHeader().setSettings(settings);
+					}
 				}
 				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
 			}
