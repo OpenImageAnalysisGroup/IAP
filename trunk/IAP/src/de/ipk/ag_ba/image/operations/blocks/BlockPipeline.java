@@ -153,7 +153,7 @@ public class BlockPipeline {
 			ObjectRef resultRef,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		BlockResultSet results = new BlockResults();
+		BlockResultSet results = new BlockResults(options.getCameraAngle());
 		resultRef.setObject(results);
 		long a = System.currentTimeMillis();
 		

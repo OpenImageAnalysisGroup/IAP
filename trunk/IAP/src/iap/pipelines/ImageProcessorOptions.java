@@ -42,6 +42,8 @@ public class ImageProcessorOptions {
 	
 	private final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
 	
+	private Double cameraAngle;
+	
 	public ImageProcessorOptions(SystemOptions options, TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint) {
 		this.optSystemOptionStorage = options;
 		this.previousResultsForThisTimePoint = previousResultsForThisTimePoint;
@@ -62,8 +64,9 @@ public class ImageProcessorOptions {
 		}
 	}
 	
-	public void setCameraInfos(CameraPosition cameraTyp, String cameraConfig, String lateOrEarly) {
+	public void setCameraInfos(CameraPosition cameraTyp, String cameraConfig, String lateOrEarly, Double cameraAngle) {
 		this.cameraPosition = cameraTyp;
+		this.cameraAngle = cameraAngle;
 		
 		if (lateOrEarly == null && cameraConfig == null)
 			inf = null;
@@ -244,5 +247,9 @@ public class ImageProcessorOptions {
 			}
 		}
 		return res;
+	}
+	
+	public Double getCameraAngle() {
+		return cameraAngle;
 	}
 }

@@ -26,9 +26,10 @@ public class BlockResults implements BlockResultSet {
 	private HashMap<String, Image> storedImages = new HashMap<String, Image>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
+	private final Double cameraAngle;
 	
-	public BlockResults() {
-		// empty
+	public BlockResults(Double cameraAngle) {
+		this.cameraAngle = cameraAngle;
 	}
 	
 	@Override
@@ -161,12 +162,12 @@ public class BlockResults implements BlockResultSet {
 											.substring(search.length());
 									BlockPropertyValue p = new BlockPropertyValue(
 											name, getUnitFromName(name),
-											tm.get(key));
+											tm.get(key), cameraAngle);
 									result.add(p);
 								}
 							} else {
 								BlockPropertyValue p = new BlockPropertyValue(
-										pn.getName(), pn.getUnit(), tm.get(key));
+										pn.getName(), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
 						}
@@ -205,12 +206,12 @@ public class BlockResults implements BlockResultSet {
 											.substring(match.length());
 									BlockPropertyValue p = new BlockPropertyValue(
 											name, getUnitFromName(name),
-											tm.get(key));
+											tm.get(key), cameraAngle);
 									result.add(p);
 								}
 							} else {
 								BlockPropertyValue p = new BlockPropertyValue(
-										pn.getName(), pn.getUnit(), tm.get(key));
+										pn.getName(), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
 						}

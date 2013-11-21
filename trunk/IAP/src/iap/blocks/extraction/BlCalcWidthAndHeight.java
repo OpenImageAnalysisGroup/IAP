@@ -226,7 +226,7 @@ public class BlCalcWidthAndHeight extends
 				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
-				new String[] { "RESULT_side.width", "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" });
+				new String[] { "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" });
 	}
 	
 	@Override

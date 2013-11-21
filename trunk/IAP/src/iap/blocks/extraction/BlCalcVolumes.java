@@ -92,7 +92,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			}
 			if (time2summaryResult.get(time).isEmpty())
 				for (Integer knownTray : allTrays)
-					time2summaryResult.get(time).put(knownTray, new BlockResults());
+					time2summaryResult.get(time).put(knownTray, new BlockResults(null));
 			for (Integer tray : time2summaryResult.get(time).keySet()) {
 				double areaSum = 0;
 				double areaCnt = 0;

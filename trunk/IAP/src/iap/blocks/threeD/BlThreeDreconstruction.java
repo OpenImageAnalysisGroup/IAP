@@ -96,7 +96,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 				}
 				if (time2summaryResult.get(time).isEmpty())
 					for (Integer knownTray : allTrays)
-						time2summaryResult.get(time).put(knownTray, new BlockResults());
+						time2summaryResult.get(time).put(knownTray, new BlockResults(null));
 				for (Integer tray : time2summaryResult.get(time).keySet()) {
 					for (String key : allResultsForSnapshot.keySet()) {
 						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);

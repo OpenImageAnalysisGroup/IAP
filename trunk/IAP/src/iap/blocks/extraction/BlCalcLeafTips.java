@@ -169,8 +169,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				int avg_width = area / leaflength;
 				
 				// optimize loop
-				for (int cd = avg_width; cd <= avg_width * 2; cd++) {
-					gt: for (int i = 20; i < 40; i++) {
+				// for (int cd = avg_width; cd <= avg_width * 2; cd++) {
+				for (int cd = 25; cd <= 26; cd++) {
+					// gt: for (int i = 20; i < 40; i++) {
+					gt: for (int i = 30; i < 31; i++) {
 						
 						int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
 						
@@ -1224,6 +1226,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 				
+				Double bestAngleValue = null;
 				String bestAngle = null;
 				if (topAngles.size() > 0) {
 					double a = getAverage(topAngles);
@@ -1233,6 +1236,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 						if (dist < bestDiff) {
 							bestAngle = cn.name;
 							bestDiff = dist;
+							bestAngleValue = cn.angle;
 						}
 					}
 				}
@@ -1242,35 +1246,45 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				for (BlockPropertyValue bpv : getCalculatedValues("RESULT_side.leaf.tuning.", false, time, tray)) {
 					String name = bpv.getName();
-					name = name.substring("RESULT_side.leaf.tuning.".length());
-					name = name.substring(0, name.length() - ".count".length());
+					name = name.substring(0, name.length() - "count|SUSAN_corner_detection".length());
+					name = "tuning." + name;
 					prefixList.add(name);
 				}
 				
 				Double maxLeafcount = -1d;
-				ArrayList<Double> lc = new ArrayList<Double>();
+				ArrayList<BlockPropertyValue> lc = new ArrayList<BlockPropertyValue>();
 				
 				ArrayList<BlockPropertyValue> res = new ArrayList<BlockPropertyValue>();
 				
 				for (String prefix : prefixList) {
 					if (bestAngle != null) {
 						for (BlockPropertyValue v : getCalculatedValues("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection", true, time, tray, bestAngle)) {
-							res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.best|SUSAN_corner_detection", null, v.getValue()));
+							res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.best|SUSAN_corner_detection", null, v.getValue(), bestAngleValue));
 						}
 					}
-					
-					for (BlockPropertyValue v : getCalculatedValues("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection", true, time, tray, bestAngle)) {
-						if (v.getValue() > maxLeafcount)
+					Double maxAngle = null;
+					for (BlockPropertyValue v : getCalculatedValues("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection", true, time, tray)) {
+						if (v.getValue() > maxLeafcount) {
 							maxLeafcount = v.getValue();
-						lc.add(v.getValue());
+							maxAngle = v.getPosition();
+						}
+						lc.add(v);
 					}
 					
 					if (maxLeafcount != null && maxLeafcount > 0) {
-						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.max|SUSAN_corner_detection", null, maxLeafcount));
-						Double[] lca = lc.toArray(new Double[] {});
-						Arrays.sort(lca);
-						Double median = lca[lca.length / 2];
-						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.median|SUSAN_corner_detection", null, median));
+						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.max|SUSAN_corner_detection", null, maxLeafcount, maxAngle));
+						BlockPropertyValue[] lca = lc.toArray(new BlockPropertyValue[] {});
+						Arrays.sort(lca, new Comparator<BlockPropertyValue>() {
+							
+							@Override
+							public int compare(BlockPropertyValue o1, BlockPropertyValue o2) {
+								return o1.getValue().compareTo(o2.getValue());
+							}
+						});
+						
+						BlockPropertyValue median = lca[lca.length / 2];
+						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.median|SUSAN_corner_detection", null, median.getValue(), median
+								.getPosition()));
 					}
 				}
 				
