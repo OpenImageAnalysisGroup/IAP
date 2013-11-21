@@ -7,6 +7,8 @@ import iap.pipelines.ImageProcessorOptions;
 
 import java.util.ArrayList;
 
+import org.ErrorMsg;
+
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
@@ -35,10 +37,16 @@ public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 			@Override
 			public BlockPipeline getPipeline(ImageProcessorOptions options) {
 				ArrayList<String> defaultBlockList = new ArrayList<String>();
-				for (ImageAnalysisBlock b : template.getBlockList(options))
-					defaultBlockList.add(b.getClass().getCanonicalName());
-				
-				return getPipelineFromBlockList(options.getOptSystemOptions(), defaultBlockList.toArray(new String[] {}));
+				try {
+					ImageAnalysisBlock[] bl = template.getBlockList(options);
+					for (ImageAnalysisBlock b : bl)
+						defaultBlockList.add(b.getClass().getCanonicalName());
+					
+					return getPipelineFromBlockList(options.getOptSystemOptions(), defaultBlockList.toArray(new String[] {}));
+				} catch (Error e) {
+					ErrorMsg.addErrorMessage("Could not process template " + getName() + ": " + e.getMessage());
+					return null;
+				}
 			}
 		};
 	}
