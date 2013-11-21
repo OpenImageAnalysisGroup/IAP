@@ -44,8 +44,8 @@ public class BlueMarkerFinder {
 		
 		markerPositionsImage = io1
 				.thresholdLAB(0, 255, 110, 140, 0, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).show("nach lab", debug)
-				.opening((int) (0 * scaleFactor), (int) (1 * scaleFactor))
-				.opening((int) (8 * scaleFactor), (int) (2 * scaleFactor))
+				.border((int) (8 * scaleFactor + 1))
+				.opening((int) (8 * scaleFactor), (int) (4 * scaleFactor))
 				.show("nach opening", debug)
 				.grayscale().show("nach gray", debug)
 				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", debug);
