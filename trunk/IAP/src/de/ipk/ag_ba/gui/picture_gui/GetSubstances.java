@@ -84,7 +84,10 @@ public class GetSubstances implements Runnable {
 					continue;
 				String title = substanceName;
 				if (validPrefix != null && title.contains("."))
-					title = title.substring(title.lastIndexOf(".") + ".".length());
+					title = title.substring(projectNode.getTooltipInfo().length() + ".".length());
+				if (substance.getName() != null && substance.getName().contains("|"))
+					title = "<html>" + title.substring(0, title.lastIndexOf("|")) + " <font color='gray'><small>["
+							+ title.substring(title.lastIndexOf("|") + "|".length()) + "]";
 				if (substance.getInfo() != null && !substance.getInfo().isEmpty())
 					title = "<html>" + title + " <font color='gray'><small>(" + substance.getInfo() + ")";
 				MongoTreeNode substNode = new MongoTreeNode(projectNode, dataChangedListener, experiment,
