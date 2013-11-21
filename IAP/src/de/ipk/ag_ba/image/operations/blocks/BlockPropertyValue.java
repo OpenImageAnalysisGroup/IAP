@@ -5,6 +5,7 @@ public class BlockPropertyValue {
 	private final String name;
 	private final String unit;
 	private final Double value;
+	private Double position;
 	
 	public BlockPropertyValue(String name, String unit, Double value) {
 		this.name = name;
@@ -17,6 +18,11 @@ public class BlockPropertyValue {
 				fromString.split("|", 3)[0],
 				fromString.split("|", 3)[1],
 				Double.parseDouble(fromString.split("|", 3)[2]));
+	}
+	
+	public BlockPropertyValue(String name, String unit, Double value, Double position) {
+		this(name, unit, value);
+		setPosition(position);
 	}
 	
 	public String getName() {
@@ -38,5 +44,13 @@ public class BlockPropertyValue {
 	@Override
 	public String toString() {
 		return getString();
+	}
+	
+	public Double getPosition() {
+		return position;
+	}
+	
+	public void setPosition(Double d) {
+		position = d;
 	}
 }

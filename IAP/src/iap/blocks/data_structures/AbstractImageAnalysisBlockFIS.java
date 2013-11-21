@@ -196,7 +196,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				for (HashMap<Integer, BlockResultSet> trayWithResult : allResultsForSnapshot.values()) {
 					for (Integer tray : trayWithResult.keySet()) {
 						if (!time2summaryResult.get(time).containsKey(tray))
-							time2summaryResult.get(time).put(tray, new BlockResults());
+							time2summaryResult.get(time).put(tray, new BlockResults(null));
 						BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 						if (pp != null) {
 							ArrayList<BlockPropertyValue> rl = pp.postProcessCalculatedProperties(time, tray);

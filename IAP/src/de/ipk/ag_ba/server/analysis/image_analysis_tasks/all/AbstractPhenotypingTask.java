@@ -862,7 +862,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								m.setReplicateID(m.getReplicateID() * 100 + tray);
 							}
 							m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
-							m.setPosition(template.getPosition());
+							if (bpv.getPosition() != null)
+								m.setPosition(bpv.getPosition());
+							else
+								m.setPosition(template.getPosition());
 							m.setPositionUnit(template.getPositionUnit());
 						}
 						outputAdd(m);
@@ -1005,10 +1008,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			String info = id.getAnyInfo().getParentSample().getParentCondition().getParentSubstance().getInfo();
 			if (id.isSideImage())
 				options.setCameraInfos(CameraPosition.SIDE,
-						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo);
+						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo().getPosition());
 			else
 				options.setCameraInfos(CameraPosition.TOP,
-						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo);
+						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo().getPosition());
 			options.setCustomNullBlockPrefix(null);
 		}
 		
