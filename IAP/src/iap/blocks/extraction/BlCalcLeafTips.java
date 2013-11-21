@@ -663,7 +663,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int rx;
 		int ry;
-		ArrayList<int[]> borderListList = new ArrayList<>();
+		ArrayList<int[]> borderListList = new ArrayList<int[]>();
 		
 		boolean debug = false;
 		int debugSpeed = 5;
