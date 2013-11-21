@@ -277,7 +277,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
 			HashMap<Integer, BlockResultSet> summaryResultArray = time2summaryResult.get(time);
 			for (String key : allResultsForSnapshot.keySet()) {
-				for (Integer tray : summaryResultArray.keySet()) {
+				for (Integer tray : allResultsForSnapshot.get(key).keySet()) {
+					if (!summaryResultArray.containsKey(tray))
+						summaryResultArray.put(tray, new BlockResults(null));
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					for (String property : desiredProperties) {
