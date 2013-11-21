@@ -66,7 +66,7 @@ public class BlCutFromSide extends AbstractBlock {
 		boolean cropMarker = true;
 		if (!cropMarker)
 			if (doCutMarker) {
-				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
+				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle(options);
 				if (r != null) {
 					double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
 					double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
@@ -100,7 +100,7 @@ public class BlCutFromSide extends AbstractBlock {
 		
 		if (cropMarker)
 			if (doCutMarker) {
-				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle();
+				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle(options);
 				
 				if (r != null) {
 					// crop according to markers

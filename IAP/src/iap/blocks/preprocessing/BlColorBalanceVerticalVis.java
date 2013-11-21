@@ -114,8 +114,8 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		BlockProperty bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName());
-		BlockProperty bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName());
+		BlockProperty bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
+		BlockProperty bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
 		
 		float[] values;
 		if (!verticalGradientSideView) {

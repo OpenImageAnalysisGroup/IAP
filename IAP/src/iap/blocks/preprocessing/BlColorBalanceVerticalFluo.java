@@ -27,8 +27,8 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName());
-		bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName());
+		bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
+		bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
 	}
 	
 	@Override
@@ -124,11 +124,15 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	 */
 	public Image balance(Image input, Image inputUsedForColorAnalysis,
 			int whitePoint, boolean invert) {
-		BlockProperty markerPosLeftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName());
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName());
+		BlockProperty markerPosLeftY = getProperties()
+				.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
+		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1,
+				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
 		
-		BlockProperty markerPosLeftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName());
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName());
+		BlockProperty markerPosLeftX = getProperties()
+				.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
+		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1,
+				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
 		if (inputUsedForColorAnalysis == input)
 			inputUsedForColorAnalysis = input.copy();
 		
@@ -204,14 +208,14 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		
 		int minL = getInt("balance-l-min", -10);// 150;
 		
-		BlockProperty bmpYl1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName());
-		BlockProperty bmpYr1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName());
+		BlockProperty bmpYl1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
+		BlockProperty bmpYr1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
 		
-		BlockProperty bmpYl2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName());
-		BlockProperty bmpYr2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName());
+		BlockProperty bmpYl2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName(options.getCameraPosition()));
+		BlockProperty bmpYr2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName(options.getCameraPosition()));
 		
-		BlockProperty bmpXl = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName());
-		BlockProperty bmpXr = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName());
+		BlockProperty bmpXl = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
+		BlockProperty bmpXr = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
 		
 		if (bmpXl != null && bmpXr != null && bmpYl1 != null && bmpYr1 != null && bmpYl2 != null && bmpYr2 != null) {
 			
