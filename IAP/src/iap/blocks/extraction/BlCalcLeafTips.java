@@ -1,7 +1,9 @@
 package iap.blocks.extraction;
 
+import iap.blocks.data_structures.AbstractPostProcessor;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.PostProcessor;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -17,7 +19,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.StringManipulationTools;
 import org.Vector2d;
 
@@ -27,7 +28,6 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.Lab;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
-import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
@@ -37,7 +37,6 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -1211,105 +1210,74 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
-	public synchronized void postProcessResultsForAllTimesAndAngles(
-			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
-		
-		for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
-			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
-			if (!time2summaryResult.containsKey(time))
-				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
-			for (HashMap<Integer, BlockResultSet> trayWithResult : allResultsForSnapshot.values()) {
-				for (Integer tray : trayWithResult.keySet()) {
-					if (!time2summaryResult.get(time).containsKey(tray))
-						time2summaryResult.get(time).put(tray, new BlockResults());
-					BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
-					Double maxLeafcount = -1d;
-					ArrayList<Double> lc = new ArrayList<Double>();
-					
-					ArrayList<Double> topAngles = new ArrayList<Double>();
-					for (String key : allResultsForSnapshot.keySet()) {
-						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.fluo.main.axis.rotation")) {
-							if (v.getValue() != null) {
-								Double a = v.getValue();
-								topAngles.add(a);
-							}
-						}
+	protected PostProcessor getPostProcessor(TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot) {
+		return new AbstractPostProcessor(time2allResultsForSnapshot) {
+			
+			@Override
+			public ArrayList<BlockPropertyValue> postProcessCalculatedProperties(long time, int tray) {
+				
+				ArrayList<Double> topAngles = new ArrayList<Double>();
+				for (BlockPropertyValue v : getCalculatedValues("RESULT_top.fluo.main.axis.rotation", true, time, tray)) {
+					if (v.getValue() != null) {
+						Double a = v.getValue();
+						topAngles.add(a);
 					}
-					
-					String bestAngle = null;
-					if (topAngles.size() > 0) {
-						double a = getAverage(topAngles);
-						Double bestDiff = Double.MAX_VALUE;
-						for (String dc : allResultsForSnapshot.keySet()) {
-							double d = Double.parseDouble(dc.substring(dc.indexOf(";") + ";".length()));
-							if (d >= 0) {
-								double dist = Math.abs(a - d);
-								if (dist < bestDiff) {
-									bestAngle = dc;
-									bestDiff = dist;
-								}
-							}
-						}
-					}
-					TreeSet<String> prefixList = new TreeSet<String>();
-					prefixList.add("");
-					for (String key : allResultsForSnapshot.keySet()) {
-						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-						for (BlockPropertyValue bpv : rt.getPropertiesSearch("RESULT_side.leaf.tuning.")) {
-							String name = bpv.getName();
-							name = name.substring("RESULT_side.leaf.tuning.".length());
-							name = name.substring(0, name.length() - ".count".length());
-							prefixList.add(name);
-						}
-					}
-					// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
-					for (String prefix : prefixList) {
-						for (String keyC : allResultsForSnapshot.keySet()) {
-							BlockResultSet rt = allResultsForSnapshot.get(keyC).get(tray);
-							
-							if (bestAngle != null && keyC.equals(bestAngle)) {
-								// System.out.println("Best side angle: " + bestAngle);
-								Double cnt = null;
-								for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection")) {
-									if (v.getValue() != null)
-										cnt = v.getValue();
-								}
-								if (cnt != null && summaryResult != null) {
-									summaryResult.setNumericProperty(getBlockPosition(),
-											"RESULT_side.leaf." + prefix + "count.best|SUSAN_corner_detection", cnt, null);
-									// System.out.println("Leaf count for best side image: " + cnt);
-								}
-							}
-							
-							for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection")) {
-								if (v.getValue() != null) {
-									if (v.getValue() > maxLeafcount)
-										maxLeafcount = v.getValue();
-									lc.add(v.getValue());
-								}
-							}
-						}
-						
-						if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
-							summaryResult.setNumericProperty(getBlockPosition(),
-									"RESULT_side.leaf." + prefix + "count.max|SUSAN_corner_detection", maxLeafcount, null);
-							// System.out.println("MAX leaf count: " + maxLeafcount);
-							Double[] lca = lc.toArray(new Double[] {});
-							Arrays.sort(lca);
-							Double median = lca[lca.length / 2];
-							summaryResult.setNumericProperty(getBlockPosition(),
-									"RESULT_side.leaf." + prefix + "count.median|SUSAN_corner_detection", median, null);
+				}
+				
+				String bestAngle = null;
+				if (topAngles.size() > 0) {
+					double a = getAverage(topAngles);
+					Double bestDiff = Double.MAX_VALUE;
+					for (ConfigNameAndAngle cn : getSideAngles(time, tray)) {
+						double dist = Math.abs(a - cn.angle);
+						if (dist < bestDiff) {
+							bestAngle = cn.name;
+							bestDiff = dist;
 						}
 					}
 				}
+				
+				TreeSet<String> prefixList = new TreeSet<String>();
+				prefixList.add("");
+				
+				for (BlockPropertyValue bpv : getCalculatedValues("RESULT_side.leaf.tuning.", false, time, tray)) {
+					String name = bpv.getName();
+					name = name.substring("RESULT_side.leaf.tuning.".length());
+					name = name.substring(0, name.length() - ".count".length());
+					prefixList.add(name);
+				}
+				
+				Double maxLeafcount = -1d;
+				ArrayList<Double> lc = new ArrayList<Double>();
+				
+				ArrayList<BlockPropertyValue> res = new ArrayList<BlockPropertyValue>();
+				
+				for (String prefix : prefixList) {
+					if (bestAngle != null) {
+						for (BlockPropertyValue v : getCalculatedValues("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection", true, time, tray, bestAngle)) {
+							res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.best|SUSAN_corner_detection", null, v.getValue()));
+						}
+					}
+					
+					for (BlockPropertyValue v : getCalculatedValues("RESULT_side.leaf." + prefix + "count|SUSAN_corner_detection", true, time, tray, bestAngle)) {
+						if (v.getValue() > maxLeafcount)
+							maxLeafcount = v.getValue();
+						lc.add(v.getValue());
+					}
+					
+					if (maxLeafcount != null && maxLeafcount > 0) {
+						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.max|SUSAN_corner_detection", null, maxLeafcount));
+						Double[] lca = lc.toArray(new Double[] {});
+						Arrays.sort(lca);
+						Double median = lca[lca.length / 2];
+						res.add(new BlockPropertyValue("RESULT_side.leaf." + prefix + "count.median|SUSAN_corner_detection", null, median));
+					}
+				}
+				
+				return res;
 			}
-		}
+			
+		};
 	}
 	
 	private double getAverage(ArrayList<Double> topAngles) {

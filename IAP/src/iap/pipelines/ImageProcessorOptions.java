@@ -235,7 +235,7 @@ public class ImageProcessorOptions {
 							if (res.get(config) == null) {
 								res.put(config, new HashMap<Integer, ArrayList<BlockPropertyValue>>());
 							}
-							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesExactMatch(string);
+							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesSearch(true, string);
 							if (v != null)
 								res.get(config).put(well, v);
 						}

@@ -135,8 +135,11 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(
+	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(boolean exact,
 			String search) {
+		if (exact)
+			return getPropertiesExactMatch(search);
+		
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 		if (sv != null)
@@ -173,7 +176,11 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized ArrayList<BlockPropertyValue> getPropertiesExactMatch(
+	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(String search) {
+		return getPropertiesSearch(false, search);
+	}
+	
+	private synchronized ArrayList<BlockPropertyValue> getPropertiesExactMatch(
 			String match) {
 		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
 		if (match == null || match.isEmpty())
