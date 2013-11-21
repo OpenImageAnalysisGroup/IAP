@@ -43,7 +43,7 @@ public class RootPipeline extends AbstractPipelineTemplate {
 			for (CameraPosition cp : CameraPosition.values()) {
 				if (cp != CameraPosition.TOP)
 					continue;
-				options.setCameraInfos(cp, null, null);
+				options.setCameraInfos(cp, null, null, null);
 				
 				options.getIntSetting(km, km.getSettingsNameForSeedColorCount(), 2);
 				
