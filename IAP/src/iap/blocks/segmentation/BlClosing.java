@@ -69,7 +69,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 		
 		ImageOperation op = new ImageOperation(image);
 		
-		op.closing(closingRepeat, closingRepeat);
+		op.closing(BlMorphologicalOperations.getRoundMask(closingRepeat));
 		
 		return flImage.io().and(op.getImage()).getImage();
 	}

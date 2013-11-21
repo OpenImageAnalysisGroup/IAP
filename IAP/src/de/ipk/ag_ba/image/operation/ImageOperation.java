@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operation;
 
+import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 import ij.ImagePlus;
 import ij.Prefs;
@@ -891,9 +892,16 @@ public class ImageOperation implements MemoryHogInterface {
 	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
 	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
 	 */
-	public void opening(int[][] mask) {
+	public ImageOperation opening(int[][] mask) {
 		erode(mask);
 		dilate(mask);
+		return this;
+	}
+	
+	public ImageOperation opening(int[][] mask1, int[][] mask2) {
+		erode(mask1);
+		dilate(mask2);
+		return this;
 	}
 	
 	public ImageOperation opening(int[][] mask, int n) {
@@ -940,18 +948,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation opening(int n1, int n2) {
-		boolean fast_but_incorrect = false;
-		if (fast_but_incorrect) {
-			ImageOperation io = erodeNG(n1);
-			io = io.dilateNG(n2);
-			return io;
-		} else {
-			for (int i = 0; i < n1; i++)
-				image.getProcessor().erode();
-			for (int i = 0; i < n2; i++)
-				image.getProcessor().dilate();
-			return this;
-		}
+		return opening(BlMorphologicalOperations.getRoundMask(n1), BlMorphologicalOperations.getRoundMask(n2));
 	}
 	
 	/**
