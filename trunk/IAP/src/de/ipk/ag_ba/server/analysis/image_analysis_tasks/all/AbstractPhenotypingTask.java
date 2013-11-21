@@ -70,6 +70,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
+	public static final String _1ST_TOP = "1st_top";
+	public static final String _2ND_SIDE = "2nd_side";
 	private Collection<Sample3D> input = new ArrayList<Sample3D>();
 	private ExperimentInterface output = new Experiment();
 	
@@ -490,7 +492,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										+ ">ERROR: INVALID (UNKNOWN) IMAGE CONFIGURATION FOR IMAGE: "
 										+ id.getURL());
 					} else {
-						String imageConfigurationName = imageConfiguration.isSide() ? "2nd_side" : "1st_top";
+						String imageConfigurationName = imageConfiguration.isSide() ? _2ND_SIDE : _1ST_TOP;
 						
 						String imageConfigurationAndRotationAngle = id.getPosition() != null ? imageConfigurationName + ";"
 								+ id.getPosition() : imageConfigurationName + ";" + 0d;

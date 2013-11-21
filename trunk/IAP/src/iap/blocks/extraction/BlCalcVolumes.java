@@ -113,7 +113,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 					}
 					if (rt == null || rt.isNumericStoreEmpty())
 						continue;
-					for (BlockPropertyValue v : rt.getPropertiesExactMatch(sideVisAreaTraitName)) {
+					for (BlockPropertyValue v : rt.getPropertiesSearch(true, sideVisAreaTraitName)) {
 						if (v.getValue() != null) {
 							double area = v.getValue().doubleValue();
 							areaStat.addValue(area);
@@ -176,7 +176,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 							rt = allResultsForSnapshot.get(key).get(tray);
 						}
 						if (rt != null)
-							for (BlockPropertyValue v : rt.getPropertiesExactMatch("RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
+							for (BlockPropertyValue v : rt.getPropertiesSearch(true, "RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""))) {
 								if (v.getValue() != null) {
 									topAreaSum += v.getValue().doubleValue();
 									topAreaCnt += 1;

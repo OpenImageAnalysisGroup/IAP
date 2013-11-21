@@ -30,6 +30,7 @@ import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -174,6 +175,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return blockPositionInPipeline;
 	}
 	
+	/**
+	 * If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
+	 */
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
@@ -182,7 +186,37 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
-		// If needed, process the results in allResultsForSnapshot, and add the new data to summaryResult
+		
+		PostProcessor pp = getPostProcessor(time2allResultsForSnapshot);
+		if (pp != null)
+			for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
+				TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+				if (!time2summaryResult.containsKey(time))
+					time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+				for (HashMap<Integer, BlockResultSet> trayWithResult : allResultsForSnapshot.values()) {
+					for (Integer tray : trayWithResult.keySet()) {
+						if (!time2summaryResult.get(time).containsKey(tray))
+							time2summaryResult.get(time).put(tray, new BlockResults());
+						BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
+						if (pp != null) {
+							ArrayList<BlockPropertyValue> rl = pp.postProcessCalculatedProperties(time, tray);
+							if (rl != null)
+								for (BlockPropertyValue bpv : rl) {
+									summaryResult.setNumericProperty(getBlockPosition(), bpv.getName(), bpv.getValue(), bpv.getUnit());
+								}
+						}
+					}
+				}
+			}
+	}
+	
+	/**
+	 * Override this method to post-process results more easily from specific time-points and tray analysis.
+	 * 
+	 * @return PostProcessor, which processes previously calculated properties.
+	 */
+	protected PostProcessor getPostProcessor(TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot) {
+		return null;
 	}
 	
 	protected void reportError(Error error, String errorMessage) {
@@ -247,7 +281,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					for (String property : desiredProperties) {
-						ArrayList<BlockPropertyValue> sr = rt.getPropertiesExactMatch(property);
+						ArrayList<BlockPropertyValue> sr = rt.getPropertiesSearch(true, property);
 						if (sr.isEmpty())
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
 						for (BlockPropertyValue v : sr) {

@@ -45,7 +45,7 @@ public interface BlockResultSet {
 	 */
 	public ArrayList<BlockPropertyValue> getPropertiesSearch(String search);
 	
-	public ArrayList<BlockPropertyValue> getPropertiesExactMatch(String search);
+	public ArrayList<BlockPropertyValue> getPropertiesSearch(boolean exact, String search);
 	
 	void setNumericProperty(int position, String name, double value, String unit);
 	
@@ -87,4 +87,5 @@ public interface BlockResultSet {
 	public HashMap<String, Image> getImages();
 	
 	public void setImages(HashMap<String, Image> storedImages);
+	
 }
