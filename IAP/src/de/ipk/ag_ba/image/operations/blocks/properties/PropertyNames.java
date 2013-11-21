@@ -67,33 +67,34 @@ public enum PropertyNames {
 				return "pollen count";
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.left.1.y";
+				return "RESULT_" + pos + ".vis.marker.1.left.y";
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.right.1.y";
+				return "RESULT_" + pos + ".vis.marker.1.right.y";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.left.2.y";
+				return "RESULT_" + pos + ".vis.marker.2.left.y";
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.right.2.y";
+				return "RESULT_" + pos + ".vis.marker.2.right.y";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.left.3.y";
+				return "RESULT_" + pos + ".vis.marker.3.left.y";
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.right.3.y";
+				return "RESULT_" + pos + ".vis.marker.3.right.y";
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_X:
-				return "RESULT_" + pos + ".vis.marker.left.1.x";
+				return "RESULT_" + pos + ".vis.marker.1.left.x";
 			case RESULT_VIS_MARKER_POS_1_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.right.1.x";
+				return "RESULT_" + pos + ".vis.marker.1.right.x";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_X:
+				return "RESULT_" + pos + ".vis.marker.2.left.x";
 			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.2.x";
+				return "RESULT_" + pos + ".vis.marker.2.right.x";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_X:
-				return "RESULT_" + pos + ".vis.marker.left.3.x";
+				return "RESULT_" + pos + ".vis.marker.3.left.x";
 			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.right.3.x";
+				return "RESULT_" + pos + ".vis.marker.3.right.x";
 		}
 		return toString();
 	}
