@@ -201,14 +201,26 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	public static void addAndMerge(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
+		addAndMerge(result, newMeasurement, ignoreSnapshotFineTime, false);
+	}
+	
+	public static void addAndMerge(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime,
+			boolean ignoreSubstanceInfo) {
 		SubstanceInterface targetSubstance = null;
 		SubstanceInterface substanceWithNewData;
 		synchronized (result) {
 			substanceWithNewData = newMeasurement.getParentSample().getParentCondition().getParentSubstance();
 			for (SubstanceInterface m : result)
-				if (substanceWithNewData.equals(m)) {
-					targetSubstance = m;
-					break;
+				if (ignoreSubstanceInfo) {
+					if (substanceWithNewData.getName().equals(m.getName())) {
+						targetSubstance = m;
+						break;
+					}
+				} else {
+					if (substanceWithNewData.equals(m)) {
+						targetSubstance = m;
+						break;
+					}
 				}
 			
 			if (targetSubstance == null) {
