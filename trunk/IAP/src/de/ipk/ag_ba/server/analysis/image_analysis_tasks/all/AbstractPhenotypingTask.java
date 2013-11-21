@@ -59,6 +59,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -690,7 +691,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
 		// MappingData3DPath mp = new MappingData3DPath(meas, true);
-		Substance3D.addAndMerge(output, meas, false);
+		Substance3D.addAndMerge(output, meas, false, !(meas instanceof BinaryMeasurement));
 		// Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
 	
@@ -770,7 +771,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				
 				NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
-				m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+				// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 				m.setAnnotation(null);
 				m.setValue(bpv.getValue());
 				m.setUnit(bpv.getUnit());
@@ -861,6 +862,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							if (multipleTrays) {
 								m.setReplicateID(m.getReplicateID() * 100 + tray);
 							}
+							m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 							m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
 							if (bpv.getPosition() != null)
 								m.setPosition(bpv.getPosition());

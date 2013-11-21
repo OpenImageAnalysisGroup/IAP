@@ -51,7 +51,7 @@ public class BlMorphologicalOperations extends AbstractBlock {
 			return mask;
 	}
 	
-	private int[][] getRoundMask(int size) {
+	public static int[][] getRoundMask(int size) {
 		int[][] kernel = new int[size][size];
 		if (size == 0)
 			return kernel;
