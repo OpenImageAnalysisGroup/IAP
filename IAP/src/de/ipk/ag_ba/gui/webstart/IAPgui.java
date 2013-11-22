@@ -23,6 +23,7 @@ import netscape.javascript.JSObject;
 
 import org.ErrorMsg;
 import org.ReleaseInfo;
+import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.ActionHome;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
@@ -224,9 +225,14 @@ public class IAPgui {
 					+ ".".length()) : "";
 			// nextTarget = IAPnavigationPanel.replaceBadChars(nextTarget);
 			NavigationButton button = knownEntities.get(thisTarget);
-			if (button == null && thisTarget.contains("(")) {
-				button = knownEntities.get(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim());
+			if (button == null && (thisTarget.contains("_") || thisTarget.contains("("))) {
+				String tt = thisTarget.substring(0, thisTarget.indexOf("(")).trim();
+				button = knownEntities.get(tt);
+				tt = StringManipulationTools.stringReplace(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim(), "_", ".");
+				if (button == null)
+					button = knownEntities.get(tt);
 			}
+			
 			if (button == null)
 				System.out.println("Upcoming problem...");
 			if (button != null) {
