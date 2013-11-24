@@ -52,6 +52,16 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 			double horFillGrade = getDouble("Horizontal Grid Extend Percent", 100) / 100d;
 			double vertFillGrade = getDouble("Vertical Grid Extend Percent", 95) / 100d;
 			double well_border = getDouble("Additional Well Border Percent", 0) / 100d;
+			if (well_border < 0) {
+				well_border = -well_border;
+				double daysUntilZero = (well_border * 100d - Math.floor(well_border * 100d)) * 100d;
+				well_border = Math.floor(well_border * 100d);
+				if (input().images().getAnyInfo().getParentSample().getTime() != 0 && daysUntilZero > 0.000001)
+					well_border = well_border - well_border * input().images().getAnyInfo().getParentSample().getTime() / daysUntilZero;
+				well_border = well_border / 100d;
+				if (well_border < 0)
+					well_border = 0d;
+			}
 			// 3x2
 			Image vis = input().images().vis();
 			if (vis != null)
@@ -209,6 +219,14 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	@Override
 	public String getName() {
 		return "Cut Well Parts";
+	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return "<ul><li>Additional Well Border Percent - if negaive values are specified, the actual number is processed specially. "
+				+ "In this case the whole number specifies the cutting percent at day 0 and the next two digits of the fractional part "
+				+ "specify the day at which the border falls to 0, "
+				+ "days inbetween are linearily interpolated according to these two cut-off values.</ul>";
 	}
 	
 	@Override
