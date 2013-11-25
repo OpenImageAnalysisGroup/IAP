@@ -3192,6 +3192,7 @@ public class ImageOperation implements MemoryHogInterface {
 				line = new Line2D.Double(centroid.x, centroid.y, centroid.x,
 						centroid.y + 1);
 			DistanceSumAndPixelCount r = distancePointsToLine(img, line, background);
+			System.out.println(angle + "\t" + r.getDistanceSum());
 			r.setAngle(angle);
 			if (r.getDistanceSum() < minResult.getDistanceSum())
 				minResult = r;

@@ -1234,9 +1234,13 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				String bestAngle = null;
 				if (topAngles.size() > 0) {
 					double a = getAverage(topAngles);
+					if (a < 0)
+						a = 360 - a;
+					if (a >= 180)
+						a = a - 180;
 					Double bestDiff = Double.MAX_VALUE;
 					for (ConfigNameAndAngle cn : getSideAngles(time, tray)) {
-						double dist = Math.abs(a - cn.angle);
+						double dist = Math.abs(a - cn.correctedAngle);
 						if (dist < bestDiff) {
 							bestAngle = cn.name;
 							bestDiff = dist;
