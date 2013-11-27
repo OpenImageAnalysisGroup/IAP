@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="src" path="/Graffiti_Core"/>
+	<classpathentry exported="true" kind="src" path="/Graffiti_Editor"/>
+	<classpathentry excluding="build/|javadoc/|.classpath|.project|create_javadoc.xml" kind="src" path=""/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="src" path="/Graffiti_lib"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jlex_java_cup.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
