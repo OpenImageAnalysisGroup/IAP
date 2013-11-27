@@ -1,0 +1,22 @@
+<body>
+
+<p>
+Provides classes for integrating the remote stream implementations into any
+RPC framework, not just RMI.
+</p>
+
+<h2>Package Specification</h2>
+
+<h3>RemoteStreamExporter</h3>
+
+<p>
+This class provides the base for integrating the remote streams into any RPC
+framework.  The remote stream implementations utilize an instance of the
+{@link com.healthmarketscience.rmiio.exporter.RemoteStreamExporter} to tie
+them to the desired communication channel.  There are a variety of mechanisms
+(explicit and implicit) for choosing which RemoteStreamExporter implementation
+is used to tie a remote stream to an RPC framework.  The {@link com.healthmarketscience.rmiio.exporter.DefaultRemoteStreamExporter default}
+implementation uitilizes RMI.
+</p>
+
+</body>
