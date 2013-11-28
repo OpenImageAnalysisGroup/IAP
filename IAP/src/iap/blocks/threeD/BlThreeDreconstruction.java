@@ -79,7 +79,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("3D-Genetation in progress, waiting");
+			optStatus.setCurrentStatusText1("3D-Generation in progress, waiting");
 		synchronized (this.getClass()) {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Generate 3D-Model");
