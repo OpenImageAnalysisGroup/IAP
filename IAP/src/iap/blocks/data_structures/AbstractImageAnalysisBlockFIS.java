@@ -267,8 +267,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, int blockPosition,
 			String[] desiredProperties) {
 		final double timeForOneDayD = 1000 * 60 * 60 * 24d;
-		HashMap<String, TreeMap<String, Long>> prop2config2lastHeightAndWidthTime = new HashMap<String, TreeMap<String, Long>>();
-		HashMap<String, TreeMap<String, Double>> prop2config2lastHeightAndWidth = new HashMap<String, TreeMap<String, Double>>();
+		
+		HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime = new HashMap<String, TreeMap<String, TreeMap<Integer, Long>>>();
+		HashMap<String, TreeMap<String, TreeMap<Integer, Double>>> prop2config2tray2lastValue = new HashMap<String, TreeMap<String, TreeMap<Integer, Double>>>();
+		
 		for (Long time : time2inSamples.keySet()) {
 			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (allResultsForSnapshot == null || allResultsForSnapshot.keySet() == null)
@@ -276,42 +278,54 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			if (!time2summaryResult.containsKey(time))
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
 			HashMap<Integer, BlockResultSet> summaryResultArray = time2summaryResult.get(time);
-			for (String key : allResultsForSnapshot.keySet()) {
-				for (Integer tray : allResultsForSnapshot.get(key).keySet()) {
+			for (String configName : allResultsForSnapshot.keySet()) {
+				for (Integer tray : allResultsForSnapshot.get(configName).keySet()) {
 					if (!summaryResultArray.containsKey(tray))
 						summaryResultArray.put(tray, new BlockResults(null));
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
-					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+					BlockResultSet rt = allResultsForSnapshot.get(configName).get(tray);
 					for (String property : desiredProperties) {
-						ArrayList<BlockPropertyValue> sr = rt.getPropertiesSearch(true, property);
-						if (sr.isEmpty())
+						ArrayList<BlockPropertyValue> calculationResults = rt.getPropertiesSearch(true, property);
+						if (calculationResults.isEmpty())
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
-						for (BlockPropertyValue v : sr) {
+						for (BlockPropertyValue v : calculationResults) {
 							if (v.getValue() != null) {
-								if (!prop2config2lastHeightAndWidth.containsKey(property))
-									prop2config2lastHeightAndWidth.put(property, new TreeMap<String, Double>());
-								if (!prop2config2lastHeightAndWidthTime.containsKey(property))
-									prop2config2lastHeightAndWidthTime.put(property, new TreeMap<String, Long>());
+								initMaps(prop2config2tray2lastTime, prop2config2tray2lastValue, configName, property);
 								
-								Double lastPropertyValue = prop2config2lastHeightAndWidth.get(property).get(key);
-								if (lastPropertyValue != null && lastPropertyValue > 0 && prop2config2lastHeightAndWidth.get(property).containsKey(key) &&
-										time - prop2config2lastHeightAndWidthTime.get(property).get(key) > 0) {
-									double currentPropertyValue = v.getValue().doubleValue();
-									double ratio = currentPropertyValue / lastPropertyValue;
-									double days = (time - prop2config2lastHeightAndWidthTime.get(property).get(key)) / timeForOneDayD;
-									double ratioPerDay = Math.pow(ratio, 1d / days);
-									summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+								if (prop2config2tray2lastValue.containsKey(property) && prop2config2tray2lastValue.get(property).containsKey(configName)
+										&& prop2config2tray2lastValue.get(property).get(configName).containsKey(tray)) {
+									Double lastPropertyValue = prop2config2tray2lastValue.get(property).get(configName).get(tray);
+									if (lastPropertyValue != null && lastPropertyValue > 0 &&
+											time - prop2config2tray2lastTime.get(property).get(configName).get(tray) > 0) {
+										double currentPropertyValue = v.getValue().doubleValue();
+										double ratio = currentPropertyValue / lastPropertyValue;
+										double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
+										double ratioPerDay = Math.pow(ratio, 1d / days);
+										summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+									}
 								}
-								
-								double width = v.getValue().doubleValue();
-								prop2config2lastHeightAndWidthTime.get(property).put(key, time);
-								prop2config2lastHeightAndWidth.get(property).put(key, width);
+								double value = v.getValue().doubleValue();
+								prop2config2tray2lastTime.get(property).get(configName).put(tray, time);
+								prop2config2tray2lastValue.get(property).get(configName).put(tray, value);
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+	
+	private void initMaps(HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime,
+			HashMap<String, TreeMap<String, TreeMap<Integer, Double>>> prop2config2tray2lastValue,
+			String config, String property) {
+		if (!prop2config2tray2lastValue.containsKey(property))
+			prop2config2tray2lastValue.put(property, new TreeMap<String, TreeMap<Integer, Double>>());
+		if (!prop2config2tray2lastTime.containsKey(property))
+			prop2config2tray2lastTime.put(property, new TreeMap<String, TreeMap<Integer, Long>>());
+		if (!prop2config2tray2lastValue.get(property).containsKey(config))
+			prop2config2tray2lastValue.get(property).put(config, new TreeMap<Integer, Double>());
+		if (!prop2config2tray2lastTime.get(property).containsKey(config))
+			prop2config2tray2lastTime.get(property).put(config, new TreeMap<Integer, Long>());
 	}
 	
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
