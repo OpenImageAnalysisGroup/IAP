@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create every Vanted version" name="Create Runnable Jar for Project IPK-Plugins">
+<project default="Create IAP JAR" name="Create Runnable Jar for IAP">
     <!--ANT 1.7 is required -->
-    <target name="create every Vanted version">
+    <target name="Create IAP JAR">
     	<ant antfile="ant-scripts/createIAPquick.xml"/>
     </target>
 </project>
