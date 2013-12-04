@@ -19,6 +19,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockResults implements BlockResultSet {
@@ -497,5 +498,10 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public void setImages(HashMap<String, Image> storedImages) {
 		this.storedImages = storedImages;
+	}
+	
+	@Override
+	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask) {
+		addImagePostProcessor(imgConfig.getCameraType(), runnableOnImage, runnableOnMask);
 	}
 }
