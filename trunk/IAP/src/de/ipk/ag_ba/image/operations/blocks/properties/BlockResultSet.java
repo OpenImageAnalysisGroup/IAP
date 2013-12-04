@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
-import iap.blocks.unused.RunnableOnImage;
+import iap.blocks.data_structures.RunnableOnImage;
+import iap.blocks.data_structures.RunnableOnImageSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,8 +9,8 @@ import java.util.Set;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public interface BlockResultSet {
@@ -74,13 +75,17 @@ public interface BlockResultSet {
 	/**
 	 * Returns the relevant list of post processors.
 	 */
-	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(ImageConfiguration imageConfig);
+	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(CameraType imageConfig);
 	
 	public void clearStore();
 	
 	public boolean isNumericStoreEmpty();
 	
-	public void addImagePostProcessor(ImageConfiguration imageType, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask);
+	/**
+	 * @param imageType
+	 *           Camera type (vis/fluo/nir/ir).
+	 */
+	public void addImagePostProcessor(CameraType cameraType, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask);
 	
 	public void clearStoredPostprocessors();
 	

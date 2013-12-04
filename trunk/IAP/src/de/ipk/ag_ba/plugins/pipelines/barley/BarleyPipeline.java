@@ -3,6 +3,7 @@ package de.ipk.ag_ba.plugins.pipelines.barley;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
@@ -88,6 +89,7 @@ public class BarleyPipeline extends AbstractPipelineTemplate {
 				// feature extraction
 				new BlLeafCurlingAnalysis(),
 				new BlCalcMainAxis(),
+				new BlCalcCOG(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),

@@ -2,14 +2,13 @@ package iap.blocks.postprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.RunnableOnImageSet;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 
 /**
  * Runs stored post-processor code stored and created by previous analysis blocks.
@@ -23,11 +22,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().masks().vis();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.VisSide)) {
-				fi = roi.postProcessMask(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.VisTop)) {
+					.getStoredPostProcessors(CameraType.VIS)) {
 				fi = roi.postProcessMask(fi);
 			}
 		}
@@ -47,11 +42,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().images().vis();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.VisSide)) {
-				fi = roi.postProcessImage(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.VisTop)) {
+					.getStoredPostProcessors(CameraType.VIS)) {
 				fi = roi.postProcessImage(fi);
 			}
 		}
@@ -63,11 +54,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().masks().fluo();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
-				fi = roi.postProcessMask(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.FluoTop)) {
+					.getStoredPostProcessors(CameraType.FLUO)) {
 				fi = roi.postProcessMask(fi);
 			}
 		}
@@ -81,11 +68,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().images().fluo();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.FluoSide)) {
-				fi = roi.postProcessImage(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.FluoTop)) {
+					.getStoredPostProcessors(CameraType.FLUO)) {
 				fi = roi.postProcessImage(fi);
 			}
 		}
@@ -97,11 +80,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().masks().nir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
-				fi = roi.postProcessMask(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.NirTop)) {
+					.getStoredPostProcessors(CameraType.NIR)) {
 				fi = roi.postProcessMask(fi);
 			}
 		}
@@ -113,11 +92,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().images().nir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.NirSide)) {
-				fi = roi.postProcessImage(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.NirTop)) {
+					.getStoredPostProcessors(CameraType.NIR)) {
 				fi = roi.postProcessImage(fi);
 			}
 		}
@@ -129,11 +104,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().masks().ir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
-				fi = roi.postProcessMask(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.IrTop)) {
+					.getStoredPostProcessors(CameraType.IR)) {
 				fi = roi.postProcessMask(fi);
 			}
 		}
@@ -145,11 +116,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		Image fi = input().images().ir();
 		if (fi != null) {
 			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.IrSide)) {
-				fi = roi.postProcessImage(fi);
-			}
-			for (RunnableOnImageSet roi : getProperties()
-					.getStoredPostProcessors(ImageConfiguration.IrTop)) {
+					.getStoredPostProcessors(CameraType.IR)) {
 				fi = roi.postProcessImage(fi);
 			}
 		}

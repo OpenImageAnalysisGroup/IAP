@@ -363,6 +363,12 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 						processingResultImage = ab.images().getImage(inpImageType);
 					if (processingResultImage == null)
 						throw new Exception("Processed image not available");
+					else {
+						for (RunnableOnImageSet roi : brs.getStoredPostProcessors(inpImageType)) {
+							processingResultImage = roi.postProcessMask(processingResultImage);
+						}
+						brs.clearStoredPostprocessors();
+					}
 					
 					ic.setImage(processingResultImage.getAsBufferedImage());
 					jsp.setViewportView(ic);

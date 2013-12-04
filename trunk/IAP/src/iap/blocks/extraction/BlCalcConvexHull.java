@@ -41,10 +41,18 @@ public class BlCalcConvexHull extends AbstractBlock {
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);
 		boolean drawPCLine = getBoolean("draw_caliper_length", true);
+		boolean drawMinRect = getBoolean("draw_retangle", true);
+		boolean drawCircle = getBoolean("draw_circle", true);
+		
 		ImageOperation res = new ImageOperation(image).show(prefix + " input image", debug).hull()
-				.find(true, false, drawHull, drawPCLine, drawHull, Color.RED.getRGB(),
+				.find(getProperties(), true, false,
+						drawHull, drawPCLine, drawHull, drawMinRect, drawCircle,
+						Color.RED.getRGB(),
 						Color.CYAN.getRGB(),
-						Color.RED.getRGB(), distHorizontal, realDist);
+						Color.RED.getRGB(),
+						Color.YELLOW.getRGB(),
+						Color.PINK.getRGB(),
+						distHorizontal, realDist);
 		
 		numericResults = res.getResultsTable();
 		if (options.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
