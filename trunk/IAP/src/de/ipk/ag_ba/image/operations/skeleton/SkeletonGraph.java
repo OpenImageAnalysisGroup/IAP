@@ -64,7 +64,7 @@ public class SkeletonGraph {
 	}
 	
 	public void createGraph(int[] optClusterIDsPixels, final int[][] optDistanceMap, int minimumNodeDistance,
-			ArrayList<RunnableOnImage> postProcessing, int delteShortEndLimbsMinimumLength) {
+			ArrayList postProcessing, int delteShortEndLimbsMinimumLength) {
 		this.graph = new AdjListGraph();
 		HashSet<Integer> knownColors = new HashSet<Integer>();
 		HashMap<String, Node> position2node = new HashMap<String, Node>();
@@ -508,7 +508,8 @@ public class SkeletonGraph {
 	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
-	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList<RunnableOnImage> postProcessing, boolean thinned) throws Exception {
+	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList postProcessing, boolean thinned)
+			throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
 		System.out.println("Skeleton graph created. Number of components: " + gl.size());
@@ -586,7 +587,7 @@ public class SkeletonGraph {
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
 	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles,
-			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt, final boolean VETO_SUPPORT)
+			boolean isThinned, ArrayList postProcessing, ResultsTableWithUnits rt, final boolean VETO_SUPPORT)
 			throws Exception {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
