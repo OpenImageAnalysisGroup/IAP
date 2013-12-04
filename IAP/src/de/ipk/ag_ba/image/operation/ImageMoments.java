@@ -2,8 +2,6 @@ package de.ipk.ag_ba.image.operation;
 
 import java.awt.Point;
 
-import org.Vector2d;
-
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -15,6 +13,12 @@ public class ImageMoments {
 	static double my02;
 	static double my11;
 	
+	static Image img;
+	
+	public ImageMoments(Image img) {
+		this.img = img;
+	}
+	
 	/**
 	 * Calculation of the normalized n-nd order central image moments mu_ij (greek).
 	 * This moments are invariant between translation and scaling.
@@ -25,13 +29,11 @@ public class ImageMoments {
 	 * @param j
 	 *           - exponent j
 	 * @param centerOfGravity
-	 * @param img
-	 *           - input image
 	 * @param background
 	 *           - background color
 	 * @return 2nd order moment weighted by the area (first order moment)
 	 */
-	public static double calcNormalizedCentralMoment(double i, double j, Image img, int background) {
+	public static double calcNormalizedCentralMoment(double i, double j, int background) {
 		Point centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
@@ -57,8 +59,8 @@ public class ImageMoments {
 	
 	/**
 	 * Calculation of the n-nd order central image moments mu_ij (greek).
-	 * This moments are invariant between translation and scaling.
-	 * Formula from wikipedia http://en.wikipedia.org/wiki/Image_moment (normalized by area).
+	 * This moments are invariant between translation.
+	 * Formula from wikipedia http://en.wikipedia.org/wiki/Image_moment.
 	 * 
 	 * @param i
 	 *           - exponent i
@@ -69,9 +71,10 @@ public class ImageMoments {
 	 *           - input image
 	 * @param background
 	 *           - background color
-	 * @return n-nd order moment weighted by the area (first order moment)
+	 * @return n-nd order central moment
 	 */
-	public double calcCentralMoment(double i, double j, Vector2d centerOfGravity, Image img, int background) {
+	public double calcCentralMoment(double i, double j, int background) {
+		Point centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
 		
@@ -100,7 +103,7 @@ public class ImageMoments {
 	 * @param background
 	 * @return
 	 */
-	public double calcRawMoment(double i, double j, Image img, int background) {
+	public double calcRawMoment(double i, double j, int background) {
 		
 		double tempSum = 0;
 		
@@ -154,22 +157,22 @@ public class ImageMoments {
 	 * @param background
 	 * @return
 	 */
-	public static double calcOmega(Image regionImage, int background) {
+	public static double calcOmega(int background) {
 		
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, regionImage, background);
-		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, regionImage, background);
-		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, regionImage, background);
+		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
+		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
+		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
 		
 		// use atan2 for case differentiation, see polar-coordinates
 		return Math.atan2((2.0) * my11, my20 - my02) / 2;
 	}
 	
-	public static double[] eigenValues(Image regionImage, int background) {
+	public static double[] eigenValues(int background) {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, regionImage, background);
-		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, regionImage, background);
-		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, regionImage, background);
+		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
+		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
+		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
 		
 		double lambda1 = 0.0;
 		double lambda2 = 0.0;
