@@ -328,7 +328,7 @@ public class SkeletonProcessor2d {
 	 * 
 	 * @param postProcessing
 	 */
-	public void findEndpointsAndBranches(ArrayList<RunnableOnImage> postProcessing) {
+	public void findEndpointsAndBranches(ArrayList postProcessing) {
 		int[][][] listEndpointMasks = new int[13][3][3];
 		int[][][] listBranchMasks = new int[18][3][3];
 		
