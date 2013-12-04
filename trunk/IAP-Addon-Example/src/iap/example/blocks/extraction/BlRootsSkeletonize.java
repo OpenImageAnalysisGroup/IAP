@@ -2,8 +2,8 @@ package iap.example.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.unused.ClusterSizeAndClusterId;
-import iap.blocks.unused.RunnableOnImage;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -28,7 +28,6 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonGraph;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
 
 /**
@@ -117,7 +116,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
-			getProperties().addImagePostProcessor(ImageConfiguration.VisTop, roi, null);
+			getProperties().addImagePostProcessor(CameraType.VIS, roi, null);
 		}
 		ress.show("res", debug);
 		return ress;
