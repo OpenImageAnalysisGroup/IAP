@@ -7,6 +7,8 @@
 
 package de.ipk.ag_ba.server.analysis;
 
+import de.ipk.ag_ba.image.structures.CameraType;
+
 /**
  * @author klukas
  */
@@ -72,5 +74,26 @@ public enum ImageConfiguration {
 	
 	public static ImageConfiguration get(String substanceName) {
 		return guess(substanceName);
+	}
+	
+	public CameraType getCameraType() {
+		switch (this) {
+			case FluoSide:
+			case FluoTop:
+				return CameraType.FLUO;
+			case IrSide:
+			case IrTop:
+				return CameraType.IR;
+			case NirSide:
+			case NirTop:
+				return CameraType.NIR;
+			case VisSide:
+			case VisTop:
+				return CameraType.VIS;
+			case Unknown:
+			default:
+				return CameraType.UNKNOWN;
+				
+		}
 	}
 }

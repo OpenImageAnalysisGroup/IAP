@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public interface BlockResultSet {
@@ -92,5 +93,7 @@ public interface BlockResultSet {
 	public HashMap<String, Image> getImages();
 	
 	public void setImages(HashMap<String, Image> storedImages);
+	
+	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage roi, RunnableOnImage runnableOnMask);
 	
 }
