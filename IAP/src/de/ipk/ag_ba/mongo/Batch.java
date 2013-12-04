@@ -343,7 +343,7 @@ public class Batch {
 								if (!added && batch.getCpuTargetUtilization() <= maxTasks)
 									if (batch.get("lastupdate") == null || (System.currentTimeMillis() - batch.getLastUpdateTime() > 5 * 60000)) {
 										// after 5 minutes tasks are taken away from other systems
-										if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED) {
+										if (batch.getRunStatus() != CloudAnalysisStatus.FINISHED && batch.getRunStatus() != CloudAnalysisStatus.ARCHIVED) {
 											if (batch.getExperimentHeader() == null) {
 												System.out.println(SystemAnalysis.getCurrentTime() + ">Remove batch with NULL experiment ref: " + batch);
 												collection.remove(batch);

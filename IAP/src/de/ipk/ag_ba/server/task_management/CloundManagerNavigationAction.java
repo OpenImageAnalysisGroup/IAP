@@ -14,6 +14,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.cloud_computing.ActionEnableOrDisableGridComuputation;
+import de.ipk.ag_ba.commands.database_tools.ActionArchiveAnalysisJobs;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudClusterHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionJobStatus;
@@ -67,6 +68,13 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+		
+		NavigationButton archiveJobs = new NavigationButton(
+				new ActionArchiveAnalysisJobs(m, true), guiSetting);
+		NavigationButton unArchiveJobs = new NavigationButton(
+				new ActionArchiveAnalysisJobs(m, false), guiSetting);
+		res.add(archiveJobs);
+		res.add(unArchiveJobs);
 		
 		try {
 			ArrayList<CloudHost> hl = m.batch().getAvailableHosts(3 * 60 * 1000);

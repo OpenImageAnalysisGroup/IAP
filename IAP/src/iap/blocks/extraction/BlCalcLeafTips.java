@@ -4,6 +4,7 @@ import iap.blocks.data_structures.AbstractPostProcessor;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.PostProcessor;
+import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -30,11 +31,9 @@ import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -424,11 +423,11 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				}
 				
 				@Override
-				public ImageConfiguration getConfig() {
+				public CameraType getConfig() {
 					if (!calcOnVis)
-						return ImageConfiguration.FluoSide;
+						return CameraType.FLUO;
 					else
-						return ImageConfiguration.VisSide;
+						return CameraType.VIS;
 				}
 			};
 			if (getBoolean("debug_paint_results", false) && debug)

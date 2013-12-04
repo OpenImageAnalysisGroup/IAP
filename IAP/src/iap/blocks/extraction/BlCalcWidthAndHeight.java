@@ -2,6 +2,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.pipelines.ImageProcessorOptions.CameraPosition;
 
 import java.awt.Color;
@@ -16,10 +17,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -167,8 +166,8 @@ public class BlCalcWidthAndHeight extends
 									}
 									
 									@Override
-									public ImageConfiguration getConfig() {
-										return ImageConfiguration.VisSide;
+									public CameraType getConfig() {
+										return CameraType.VIS;
 									}
 									
 									@Override

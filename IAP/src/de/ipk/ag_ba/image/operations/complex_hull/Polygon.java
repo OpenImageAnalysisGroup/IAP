@@ -2,6 +2,8 @@ package de.ipk.ag_ba.image.operations.complex_hull;
 
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /*************************************************************************
  * Compilation: javac Polygon.java
@@ -263,5 +265,12 @@ class Polygon {
 		}
 		// (res
 		return new Span2result(l.getP1().distance(l.getP2()), p1, p2, p1l, p2l, distP1, distP2);
+	}
+	
+	public List<java.awt.Point> getPoints() {
+		List<java.awt.Point> res = new ArrayList<java.awt.Point>();
+		for (Point p : points)
+			res.add(new java.awt.Point((int) p.x, (int) p.y));
+		return res;
 	}
 }

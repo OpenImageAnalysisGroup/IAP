@@ -1,7 +1,8 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import iap.blocks.data_structures.RunnableOnImage;
+import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
-import iap.blocks.unused.RunnableOnImage;
 import iap.pipelines.ImageProcessorOptions;
 
 import java.awt.geom.Rectangle2D;
@@ -16,9 +17,8 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
-import de.ipk.ag_ba.image.operations.blocks.properties.RunnableOnImageSet;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockResults implements BlockResultSet {
@@ -432,7 +432,7 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized ArrayList<RunnableOnImageSet> getStoredPostProcessors(
-			ImageConfiguration conf) {
+			CameraType conf) {
 		ArrayList<RunnableOnImageSet> res = new ArrayList<RunnableOnImageSet>();
 		for (RunnableOnImageSet ros : storedPostProcessors) {
 			if (ros.getConfig() == conf) {
@@ -459,7 +459,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void addImagePostProcessor(final ImageConfiguration imageType, final RunnableOnImage runnableOnImage, final RunnableOnImage runnableOnMask) {
+	public void addImagePostProcessor(final CameraType imageType, final RunnableOnImage runnableOnImage, final RunnableOnImage runnableOnMask) {
 		addImagePostProcessor(new RunnableOnImageSet() {
 			@Override
 			public Image postProcessImage(Image image) {
@@ -470,7 +470,7 @@ public class BlockResults implements BlockResultSet {
 			}
 			
 			@Override
-			public ImageConfiguration getConfig() {
+			public CameraType getConfig() {
 				return imageType;
 			}
 			

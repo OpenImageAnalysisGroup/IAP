@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
-import iap.blocks.unused.RunnableOnImage;
+import iap.blocks.data_structures.RunnableOnImage;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;

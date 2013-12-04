@@ -8,6 +8,7 @@ import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
+import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcLeafTips;
@@ -88,6 +89,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlSkeletonizeVisFluo(),
 				new BlSkeletonizeNir(),
 				new BlCalcWidthAndHeight(),
+				new BlCalcCOG(),
 				new BlCalcMainAxis(),
 				new BlCalcLeafTips(),
 				new BlCalcColorHistograms(),

@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
+import iap.blocks.data_structures.RunnableOnImage;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,6 +13,7 @@ import org.Vector2i;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -131,18 +134,23 @@ public class ConvexHullCalculator {
 	 * @param realDist
 	 */
 	
-	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
+	public ImageOperation find(boolean drawInputimage, boolean drawBorder, boolean drawMinRect,
 			boolean drawHull, boolean drawCentroid, int borderColor,
-			int hullLineColor, int centroidColor, Double distHorizontal,
+			int hullLineColor, int centroidColor, int minRectColor, Double distHorizontal,
 			Double realMarkerDist) {
 		
-		return find(drawInputimage, drawBorder, drawHull, drawInputimage, drawCentroid, borderColor,
-				hullLineColor, centroidColor, distHorizontal, realMarkerDist);
+		return find(null, drawInputimage, drawBorder, drawHull, drawInputimage, drawCentroid, drawMinRect, false,
+				borderColor, hullLineColor, centroidColor, minRectColor, Color.BLACK.getRGB(), distHorizontal, realMarkerDist);
 	}
 	
-	public ImageOperation find(boolean drawInputimage, boolean drawBorder,
-			boolean drawHull, boolean drawPCLine, boolean drawCentroid, int borderColor,
-			int hullLineColor, int centroidColor, Double distHorizontal,
+	public ImageOperation find(BlockResultSet br, boolean drawInputimage, boolean drawBorder,
+			final boolean drawHull, boolean drawPCLine, final boolean drawCentroid, boolean drawMinRect, boolean drawCircle,
+			int borderColor,
+			final int hullLineColor,
+			final int centroidColor,
+			final int circleColor,
+			final int minRectColor,
+			Double distHorizontal,
 			Double realMarkerDist) {
 		
 		calculate(borderColor);
@@ -160,13 +168,12 @@ public class ConvexHullCalculator {
 			overDrawBorderImage(w, h, inDrawing.getImageAs2dArray(), borderImage,
 					borderColor, drawBorder);
 		}
-		Point centroid = null;
-		
 		ImageOperation res = new ImageOperation(borderImage);
 		ResultsTableWithUnits rt = io.getResultsTable();
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
 		
+		Point centroid = null;
 		if (polygon != null) {
 			rt.incrementCounter();
 			double normFactorArea = distHorizontal != null && realMarkerDist != null ? (realMarkerDist * realMarkerDist)
@@ -197,7 +204,7 @@ public class ConvexHullCalculator {
 			
 			rt.addValue("hull.circularity", circularity());
 			
-			Circle circumcircle = polygon.calculateminimalcircumcircle();
+			final Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
 				if (distHorizontal != null) {
@@ -205,17 +212,58 @@ public class ConvexHullCalculator {
 							* normFactor);
 				}
 				rt.addValue("hull.circumcircle.d", circumcircle.d);
+				if (drawCircle) {
+					RunnableOnImage runnableOnMask = new RunnableOnImage() {
+						@Override
+						public Image postProcess(Image in) {
+							return in.io().canvas().drawCircle((int) circumcircle.x, (int) circumcircle.y, (int) (circumcircle.d / 2d), circleColor, 0.5, 1)
+									.getImage();
+						}
+					};
+					br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+				}
+			}
+			
+			java.awt.geom.Point2D.Double[] mr = RotatingCalipers.getMinimumBoundingRectangle(polygon.getPoints());
+			if (mr != null) {
+				final Point[] pl = new Point[mr.length];
+				int idx = 0;
+				for (java.awt.geom.Point2D.Double p : mr)
+					pl[idx++] = new Point(p.x, p.y);
+				Polygon p = new Polygon(pl);
+				rt.addValue("hull.minrectangle.area", p.area(), "px");
+				rt.addValue("hull.minrectangle.length.a", pl[0].distEuclid(pl[1]), "px");
+				rt.addValue("hull.minrectangle.length.b", pl[1].distEuclid(pl[2]), "px");
+				if (distHorizontal != null) {
+					rt.addValue("hull.minrectangle.area.norm", p.area() * normFactorArea, "mm^2");
+					rt.addValue("hull.minrectangle.length.a.norm", pl[0].distEuclid(pl[1]) * normFactor, "mm");
+					rt.addValue("hull.minrectangle.length.b.norm", pl[1].distEuclid(pl[2]) * normFactor, "mm");
+				}
+				if (drawMinRect && pl.length == 4) {
+					RunnableOnImage runnableOnMask = new RunnableOnImage() {
+						@Override
+						public Image postProcess(Image in) {
+							return in.io().canvas()
+									.drawLine(pl[0], pl[1], minRectColor, 0.5, 1)
+									.drawLine(pl[1], pl[2], minRectColor, 0.5, 1)
+									.drawLine(pl[2], pl[3], minRectColor, 0.5, 1)
+									.drawLine(pl[3], pl[0], minRectColor, 0.5, 1)
+									.getImage();
+						}
+					};
+					br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+				}
 			}
 			
 			rt.addValue("hull.fillgrade", filledArea / polygon.area());
 			
 			centroid = polygon.centroid();
 			
-			Line sp = polygon.getMaxSpan();
+			final Line sp = polygon.getMaxSpan();
 			if (sp != null) {
 				double span = sp.getlength();
 				rt.addValue("hull.pc1", span);
-				Span2result span2 = polygon.getMaxSpan2len(sp);
+				final Span2result span2 = polygon.getMaxSpan2len(sp);
 				rt.addValue("hull.pc2", span2.getLengthPC2());
 				if (distHorizontal != null) {
 					rt.addValue("hull.pc1.norm", span * normFactor);
@@ -223,30 +271,39 @@ public class ConvexHullCalculator {
 				}
 				
 				if (drawPCLine && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)) {
-					Image inDrawing = res.getImage();
-					ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
-					if (span2.getP1() != null && span2.getP1l() != null) {
-						a = a.drawLine(span2.getP1(), span2.getP1l(), Color.ORANGE.getRGB(), 0.5, 1);
-						// a = a.drawCircle((int) span2.getP1().x, (int) span2.getP1().y, 25, Color.RED.getRGB(), 0, 2);
-					}
-					
-					if (span2.getP2() != null && span2.getP2l() != null) {
-						a = a.drawLine(span2.getP2(), span2.getP2l(), Color.ORANGE.getRGB(), 0.5, 1);
-						// a = a.drawCircle((int) span2.getP2().x, (int) span2.getP2().y, 25, Color.ORANGE.getRGB(), 0, 2);
-					}
-					res = new ImageOperation(a.getImage(),
-							res.getResultsTable());
+					RunnableOnImage roi = new RunnableOnImage() {
+						@Override
+						public Image postProcess(Image inDrawing) {
+							ImageCanvas a = inDrawing.io().canvas().drawLine(sp, Color.BLUE.getRGB(), 0.5, 1);
+							if (span2.getP1() != null && span2.getP1l() != null)
+								a = a.drawLine(span2.getP1(), span2.getP1l(), Color.ORANGE.getRGB(), 0.5, 1);
+							
+							if (span2.getP2() != null && span2.getP2l() != null)
+								a = a.drawLine(span2.getP2(), span2.getP2l(), Color.ORANGE.getRGB(), 0.5, 1);
+							return a.getImage();
+						}
+					};
+					br.addImagePostProcessor(res.getCameraType(), null, roi);
 				}
 			}
 			
-			// rt.addValue("hull.centroid.x", centroid.x);
-			// rt.addValue("hull.centroid.y", centroid.y);
+			rt.addValue("hull.centroid.x", centroid.x);
+			rt.addValue("hull.centroid.y", centroid.y);
 		}
 		res.setResultsTable(rt);
 		
-		if ((drawHull || drawCentroid) && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50))
-			res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon,
-					hullLineColor, centroid, centroidColor);
+		final Point centroidF = centroid;
+		if ((drawHull || drawCentroid) && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)) {
+			RunnableOnImage roi = new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image res) {
+					return drawHullAndCentroid(drawHull, drawCentroid, res.io(), polygon,
+							hullLineColor, centroidF, centroidColor).getImage();
+				}
+				
+			};
+			br.addImagePostProcessor(res.getCameraType(), null, roi);
+		}
 		
 		return res;
 	}
@@ -294,6 +351,9 @@ public class ConvexHullCalculator {
 			int lineWidth, int centroidColor) {
 		g2d.setStroke(new BasicStroke(lineWidth));
 		g2d.setPaint(new Color(centroidColor));
+		float opacity = 0.5f;
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+				opacity));
 		g2d.drawLine((int) (pos.x - lineLength / 2), (int) pos.y,
 				(int) (pos.x + lineLength / 2), (int) pos.y);
 		g2d.drawLine((int) pos.x, (int) (pos.y - lineLength / 2), (int) pos.x,

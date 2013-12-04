@@ -10,7 +10,7 @@ package de.ipk.ag_ba.server.task_management;
  * @author klukas
  */
 public enum CloudAnalysisStatus {
-	SCHEDULED, STARTING, IN_PROGRESS, FINISHED, FINISHED_INCOMPLETE;
+	SCHEDULED, STARTING, IN_PROGRESS, FINISHED, FINISHED_INCOMPLETE, ARCHIVED;
 	
 	public String toNiceString() {
 		switch (this) {
@@ -24,6 +24,8 @@ public enum CloudAnalysisStatus {
 				return "scheduled";
 			case STARTING:
 				return "starting";
+			case ARCHIVED:
+				return "deactivated";
 		}
 		return "unknown";
 	}

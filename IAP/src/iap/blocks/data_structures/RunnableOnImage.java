@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.data_structures;
 
 import de.ipk.ag_ba.image.structures.Image;
 
