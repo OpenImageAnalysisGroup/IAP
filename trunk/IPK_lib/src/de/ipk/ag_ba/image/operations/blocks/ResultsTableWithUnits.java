@@ -15,23 +15,18 @@ public class ResultsTableWithUnits extends ResultsTable implements Cloneable {
 		return rt2;
 	}
 	
-	public String getColumnHeadingUnit(int col) {
-		synchronized (col2unit) {
-			if (col2unit == null)
-				return null;
-			else
-				return col2unit.get(col);
-		}
+	public synchronized String getColumnHeadingUnit(int col) {
+		if (col2unit == null)
+			return null;
+		return col2unit.get(col);
 	}
 	
-	public void addValue(String column, double value, String unit) {
+	public synchronized void addValue(String column, double value, String unit) {
 		addValue(column, value);
-		synchronized (col2unit) {
-			if (col2unit == null)
-				col2unit = new HashMap<Integer, String>();
-			Integer colIdx = getColumnIndex(column);
-			if (!col2unit.containsKey(colIdx))
-				col2unit.put(colIdx, unit);
-		}
+		if (col2unit == null)
+			col2unit = new HashMap<Integer, String>();
+		Integer colIdx = getColumnIndex(column);
+		if (!col2unit.containsKey(colIdx))
+			col2unit.put(colIdx, unit);
 	}
 }
