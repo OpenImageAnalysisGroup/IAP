@@ -15,8 +15,13 @@ public class ImageMoments {
 	
 	static Image img;
 	
+	static Point centerOfGravity;
+	static int background;
+	
 	public ImageMoments(Image img) {
 		this.img = img;
+		this.background = ImageOperation.BACKGROUND_COLORint;
+		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 	}
 	
 	/**
@@ -34,7 +39,6 @@ public class ImageMoments {
 	 * @return 2nd order moment weighted by the area (first order moment)
 	 */
 	public static double calcNormalizedCentralMoment(double i, double j, int background) {
-		Point centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
 		
@@ -74,7 +78,6 @@ public class ImageMoments {
 	 * @return n-nd order central moment
 	 */
 	public double calcCentralMoment(double i, double j, int background) {
-		Point centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
 		
@@ -184,5 +187,9 @@ public class ImageMoments {
 		lambda2 = f1 - f2;
 		
 		return new double[] { lambda1, lambda2 };
+	}
+	
+	public static Point getCenterOfGravity() {
+		return centerOfGravity;
 	}
 }
