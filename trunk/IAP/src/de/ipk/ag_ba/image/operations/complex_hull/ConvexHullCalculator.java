@@ -207,11 +207,11 @@ public class ConvexHullCalculator {
 			final Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
+				rt.addValue("hull.circumcircle.d", circumcircle.d);
 				if (distHorizontal != null) {
 					rt.addValue("hull.circumcircle.d.norm", circumcircle.d
 							* normFactor);
 				}
-				rt.addValue("hull.circumcircle.d", circumcircle.d);
 				if (drawCircle) {
 					RunnableOnImage runnableOnMask = new RunnableOnImage() {
 						@Override
