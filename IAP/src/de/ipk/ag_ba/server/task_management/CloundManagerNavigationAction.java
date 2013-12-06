@@ -69,13 +69,6 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			ErrorMsg.addErrorMessage(e);
 		}
 		
-		NavigationButton archiveJobs = new NavigationButton(
-				new ActionArchiveAnalysisJobs(m, true), guiSetting);
-		NavigationButton unArchiveJobs = new NavigationButton(
-				new ActionArchiveAnalysisJobs(m, false), guiSetting);
-		res.add(archiveJobs);
-		res.add(unArchiveJobs);
-		
 		try {
 			ArrayList<CloudHost> hl = m.batch().getAvailableHosts(3 * 60 * 1000);
 			boolean clusterAvailable = false;
@@ -93,6 +86,10 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 				} else
 					clusterAvailable = true;
 			}
+			NavigationButton archiveJobs = new NavigationButton(
+					new ActionArchiveAnalysisJobs(m), guiSetting);
+			res.add(archiveJobs);
+			
 			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
 					"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4");
 			if (clusterAvailable) {
