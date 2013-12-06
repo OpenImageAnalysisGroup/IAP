@@ -35,7 +35,7 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		if (doArchive())
+		if (!doArchive())
 			return "img/ext/gpl2/Gnome-Utilities-System-Monitor-64-still.png";
 		else
 			return "img/ext/gpl2/Gnome-Utilities-System-Monitor-64.png";
@@ -105,7 +105,6 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 					}, new Runnable() {
 						@Override
 						public void run() {
-							doArchiveLastResult = false;
 							doArchiveCheckRunning = false;
 							doArchiveLastCountCheck = System.currentTimeMillis();
 						}
