@@ -24,6 +24,8 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	
 	private final MongoDB m;
 	protected int nJobs = -1;
+	protected int nJobsArchived = -1;
+	
 	private String commandResult = "";
 	
 	public ActionArchiveAnalysisJobs(final MongoDB m) {
@@ -47,7 +49,8 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		if (doArchive())
-			return "Archive " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks";
+			return "<html><center>Archive " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks<br>" +
+					"<small>(" + ActionArchiveAnalysisJobs.this.nJobsArchived + " already archived)</small></center>";
 		else
 			return "Reactivate " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks";
 	}
@@ -90,6 +93,7 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 									if (c.getRunStatus() == CloudAnalysisStatus.ARCHIVED)
 										nArchived++;
 							}
+							ActionArchiveAnalysisJobs.this.nJobsArchived = nArchived;
 							if (nScheduled > 0) {
 								ActionArchiveAnalysisJobs.this.nJobs = nScheduled;
 								ActionArchiveAnalysisJobs.this.doArchiveLastResult = true;
