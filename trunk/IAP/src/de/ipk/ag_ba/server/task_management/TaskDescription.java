@@ -86,10 +86,9 @@ public class TaskDescription {
 			timeInfo = " Partial calculation will be performed on data newer than " + batch.getAvailableResultImportDate()
 					+ ". Available partial result data set: " + batch.getAvailableResultDatabaseId() + ".";
 		
-		MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
+		MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime() + ": Host " + SystemAnalysisExt.getHostNameNiceNoError()
 				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
-				+ " (part index " + batch.getPartIdx() + " of " + batch.getPartCnt() + ")"
-				+ " with " + action.getDefaultTitle() + "." + timeInfo);
+				+ " (task " + (batch.getPartIdx() + 1) + "/" + batch.getPartCnt() + ").");
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
