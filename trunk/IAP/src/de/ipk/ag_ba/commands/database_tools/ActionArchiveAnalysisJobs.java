@@ -138,6 +138,6 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 			commandResult = "Archived " + n + " compute tasks!";
 		else
 			commandResult = "Reactivated " + n + " compute tasks!";
-		
+		doArchiveLastCountCheck = 0;
 	}
 }
