@@ -388,8 +388,6 @@ public class MongoDB {
 	}
 	
 	public void deleteExperiment(final String experimentID) throws Exception {
-		addNewsItem("Experiment " + experimentID + " is removed by user " + SystemAnalysis.getUserName() + " (" + SystemAnalysis.getCurrentTime()
-				+ "), working at PC " + SystemAnalysis.getLocalHost().getCanonicalHostName(), SystemAnalysis.getUserName());
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
@@ -407,6 +405,13 @@ public class MongoDB {
 				if (db.collectionExists(MongoExperimentCollections.EXPERIMENTS.toString())) {
 					DBObject expRef = collExps.findOne(obj);
 					if (expRef != null) {
+						try {
+							addNewsItem("Experiment " + experimentID + " (" + expRef.get("experimentname") + ") is removed by user " + SystemAnalysis.getUserName()
+									+ " (" + SystemAnalysis.getCurrentTime()
+									+ "), working at PC " + SystemAnalysis.getLocalHost().getCanonicalHostName(), SystemAnalysis.getUserName());
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
 						BasicDBList sl = (BasicDBList) expRef.get("substance_ids");
 						if (sl != null) {
 							for (Object so : sl) {
