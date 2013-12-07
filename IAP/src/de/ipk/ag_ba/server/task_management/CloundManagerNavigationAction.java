@@ -14,7 +14,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.cloud_computing.ActionEnableOrDisableGridComuputation;
-import de.ipk.ag_ba.commands.database_tools.ActionArchiveAnalysisJobs;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudClusterHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionCloudHostInformation;
 import de.ipk.ag_ba.commands.mongodb.ActionJobStatus;
@@ -86,9 +85,6 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 				} else
 					clusterAvailable = true;
 			}
-			NavigationButton archiveJobs = new NavigationButton(
-					new ActionArchiveAnalysisJobs(m), guiSetting);
-			res.add(archiveJobs);
 			
 			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
 					"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4");
