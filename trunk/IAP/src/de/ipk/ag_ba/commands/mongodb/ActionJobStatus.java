@@ -12,6 +12,7 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.database_tools.ActionArchiveAnalysisJobs;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -245,6 +246,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		try {
 			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
 			final HashMap<String, ArrayList<NavigationButton>> set = new HashMap<String, ArrayList<NavigationButton>>();
+			final HashMap<String, ArrayList<BatchCmd>> setBatchCmds = new HashMap<String, ArrayList<BatchCmd>>();
 			final HashMap<String, Integer> setMaxSize = new HashMap<String, Integer>();
 			for (BatchCmd b : m.batch().getAll()) {
 				if (!dbId2header.containsKey(b.getExperimentDatabaseId()))
@@ -257,11 +259,14 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						+ " Job submission " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
 						+ "(" + b.getRunStatus() + ")";
 				
-				if (!set.containsKey(desc))
+				if (!set.containsKey(desc)) {
 					set.put(desc, new ArrayList<NavigationButton>());
+					setBatchCmds.put(desc, new ArrayList<BatchCmd>());
+				}
 				set.get(desc).add(n);
 				setMaxSize.put(desc, b.getPartCnt());
 			}
+			
 			for (String desc : set.keySet()) {
 				final String fd = desc;
 				NavigationAction setCmd = new AbstractNavigationAction(desc) {
@@ -282,7 +287,28 @@ public class ActionJobStatus extends AbstractNavigationAction {
 					
 					@Override
 					public ArrayList<NavigationButton> getResultNewActionSet() {
-						return set.get(fd);
+						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+						res.addAll(set.get(fd));
+						if (res.size() > 0 &&
+								(
+								((BatchInformationAction) res.iterator().next().getAction()).getCmd()
+										.getRunStatus() == CloudAnalysisStatus.SCHEDULED) ||
+								((BatchInformationAction) res.iterator().next().getAction()).getCmd()
+										.getRunStatus() == CloudAnalysisStatus.ARCHIVED) {
+							ArrayList<BatchCmd> commandList = new ArrayList<BatchCmd>();
+							for (NavigationButton nb : res) {
+								if (((BatchInformationAction) nb.getAction()).getCmd()
+										.getRunStatus() == CloudAnalysisStatus.SCHEDULED ||
+										((BatchInformationAction) nb.getAction()).getCmd()
+												.getRunStatus() == CloudAnalysisStatus.ARCHIVED) {
+									commandList.add(((BatchInformationAction) nb.getAction()).getCmd());
+								}
+							}
+							NavigationButton archiveJobs = new NavigationButton(
+									new ActionArchiveAnalysisJobs(m, commandList), guiSetting);
+							res.add(archiveJobs);
+						}
+						return res;
 					}
 				};
 				res.add(new NavigationButton(setCmd, guiSetting));
