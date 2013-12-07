@@ -306,7 +306,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							}
 							NavigationButton archiveJobs = new NavigationButton(
 									new ActionArchiveAnalysisJobs(m, commandList), guiSetting);
-							res.add(archiveJobs);
+							archiveJobs.setRightAligned(true);
+							res.add(0, archiveJobs);
 						}
 						return res;
 					}
