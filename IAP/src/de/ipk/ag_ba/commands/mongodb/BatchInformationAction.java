@@ -49,8 +49,8 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		try {
 			if (actionProxy != null)
-				return actionProxy.getDefaultTitle() + " " + (cmd.getPartIdx() + 1) + "/"
-						+ cmd.getPartCnt() + "<br><small>(for " + experimentName + ")</small>";
+				return actionProxy.getDefaultTitle() + " " + (getCmd().getPartIdx() + 1) + "/"
+						+ getCmd().getPartCnt() + "<br><small>(for " + experimentName + ")</small>";
 			else
 				return "ActionProxy is NULL";
 		} catch (Exception e) {
@@ -62,11 +62,11 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	public String getDefaultTooltip() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
-		String time = new Date(cmd.getSubmissionTime()).toString();
+		String time = new Date(getCmd().getSubmissionTime()).toString();
 		sb.append("Compute job start time: " + time + "<br>");
-		sb.append("Target IPs: " + cmd.getTargetIPs() + "<br>");
-		sb.append("Partial Dataset: " + cmd.getAvailableResultDatabaseId() + "<br>");
-		sb.append("Newest available data from: " + cmd.getAvailableResultImportDate() + "<br>");
+		sb.append("Target IPs: " + getCmd().getTargetIPs() + "<br>");
+		sb.append("Partial Dataset: " + getCmd().getAvailableResultDatabaseId() + "<br>");
+		sb.append("Newest available data from: " + getCmd().getAvailableResultImportDate() + "<br>");
 		sb.append("Processing Experiment: " + experimentName);
 		return sb.toString();
 	}
@@ -99,6 +99,10 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	@Override
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return jobStatus;
+	}
+
+	public BatchCmd getCmd() {
+		return cmd;
 	}
 	
 }

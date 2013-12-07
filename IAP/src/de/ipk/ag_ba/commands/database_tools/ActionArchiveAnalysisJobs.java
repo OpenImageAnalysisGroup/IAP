@@ -27,10 +27,17 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	protected int nJobsArchived = -1;
 	
 	private String commandResult = "";
+	private ArrayList<BatchCmd> commandList;
 	
 	public ActionArchiveAnalysisJobs(final MongoDB m) {
-		super("Deletes running and scheduled compute tasks");
+		super("(De)aktivates scheduled compute tasks");
 		this.m = m;
+	}
+	
+	public ActionArchiveAnalysisJobs(MongoDB m, ArrayList<BatchCmd> commandList) {
+		super("(De)aktivates scheduled compute tasks");
+		this.m = m;
+		this.commandList = commandList;
 	}
 	
 	@Override
@@ -48,10 +55,13 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		if (doArchive())
-			return "<html><center>Archive " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks<br>" +
-					"<small>(" + ActionArchiveAnalysisJobs.this.nJobsArchived + " already archived)</small></center>";
-		else
+		if (doArchive()) {
+			if (ActionArchiveAnalysisJobs.this.nJobsArchived > 0)
+				return "<html><center>Archive " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks<br>" +
+						"<small>(" + ActionArchiveAnalysisJobs.this.nJobsArchived + " already archived)</small></center>";
+			else
+				return "Archive " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks";
+		} else
 			return "Reactivate " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks";
 	}
 	
@@ -83,7 +93,11 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 					new Runnable() {
 						@Override
 						public void run() {
-							Collection<BatchCmd> availableJobs = m.batch().getAll();
+							Collection<BatchCmd> availableJobs;
+							if (commandList == null)
+								availableJobs = m.batch().getAll();
+							else
+								availableJobs = commandList;
 							int nScheduled = 0;
 							int nArchived = 0;
 							for (BatchCmd c : availableJobs) {
@@ -122,7 +136,12 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		boolean doArchive = doArchiveLastResult;
 		int n = 0;
-		Collection<BatchCmd> availableJobs = m.batch().getAll();
+		Collection<BatchCmd> availableJobs;
+		if (commandList == null)
+			availableJobs = m.batch().getAll();
+		else
+			availableJobs = commandList;
+		
 		for (BatchCmd c : availableJobs) {
 			if (doArchive) {
 				if (c.getRunStatus() == CloudAnalysisStatus.SCHEDULED)
