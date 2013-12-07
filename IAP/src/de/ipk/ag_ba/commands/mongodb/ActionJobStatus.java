@@ -28,7 +28,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	private BackgroundTaskStatusProviderSupportingExternalCall jobStatus;
 	
 	public ActionJobStatus(MongoDB m) {
-		super("Analyze Workload");
+		super("Analyze or Modify Workload");
 		this.m = m;
 		
 		this.jobStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
@@ -243,6 +243,11 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		
+		NavigationButton archiveJobs = new NavigationButton(
+				new ActionArchiveAnalysisJobs(m), guiSetting);
+		res.add(archiveJobs);
+		
 		try {
 			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
 			final HashMap<String, ArrayList<NavigationButton>> set = new HashMap<String, ArrayList<NavigationButton>>();
