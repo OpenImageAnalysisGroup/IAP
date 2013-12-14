@@ -184,7 +184,7 @@ public class CleanupHelper implements RunnableOnDB {
 			}
 		};
 		
-		int nThreads = 10;
+		int nThreads = 4;
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 		final ThreadSafeOptions fc = new ThreadSafeOptions();
 		final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
