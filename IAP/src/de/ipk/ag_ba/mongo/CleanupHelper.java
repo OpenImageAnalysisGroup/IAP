@@ -184,7 +184,7 @@ public class CleanupHelper implements RunnableOnDB {
 			}
 		};
 		
-		int nThreads = 4;
+		int nThreads = 2;
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 		final ThreadSafeOptions fc = new ThreadSafeOptions();
 		final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
@@ -358,7 +358,7 @@ public class CleanupHelper implements RunnableOnDB {
 				if (cnt == fs2cnt.get(mgfs)) {
 					ArrayList<GridFSDBFile> toBeRemoved = new ArrayList<GridFSDBFile>();
 					// no changes in between
-					DBCursor fl = gridfs.getFileList();
+					DBCursor fl = gridfs.getFileList(new BasicDBObject(), new BasicDBObject());
 					while (fl.hasNext()) {
 						DBObject dbo = fl.next();
 						GridFSDBFile f = (GridFSDBFile) dbo;

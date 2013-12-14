@@ -234,6 +234,12 @@ public class MongoDB {
 	
 	private void processDB(String database, String optHosts, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
+		int repeats = 5;// SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry count in case of error", 3) + 1;
+		processDB(database, optHosts, optLogin, optPass, runnableOnDB, repeats);
+	}
+	
+	private void processDB(String database, String optHosts, String optLogin, String optPass,
+			RunnableOnDB runnableOnDB, int repeats) throws Exception {
 		Exception e = null;
 		String key = optHosts + ";" + database;
 		// int maxS = SystemOptions.getInstance().getInteger("GRID-STORAGE", "idle reconnect time_s", 30);
@@ -257,7 +263,6 @@ public class MongoDB {
 		// }
 		boolean ok = false;
 		int nrep = 0;
-		int repeats = 5;// SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry count in case of error", 3) + 1;
 		do {
 			try {
 				DB db;
@@ -374,6 +379,10 @@ public class MongoDB {
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
 		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB);
+	}
+	
+	public void processDB(RunnableOnDB runnableOnDB, int repeats) throws Exception {
+		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB, repeats);
 	}
 	
 	public void deleteUnusedBinaryFiles() {
@@ -1425,7 +1434,7 @@ public class MongoDB {
 			final boolean compact_warningLongExecutionTime)
 			throws Exception {
 		final StringBuilder res = new StringBuilder();
-		processDB(new CleanupHelper(this, status, res));
+		processDB(new CleanupHelper(this, status, res), 1);
 		return res.toString();
 	}
 	
