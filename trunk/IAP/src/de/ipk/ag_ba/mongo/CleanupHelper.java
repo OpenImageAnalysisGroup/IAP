@@ -49,7 +49,7 @@ public class CleanupHelper implements RunnableOnDB {
 		MongoDB.saveSystemMessage(msg);
 		res.append("Clean-up: Create inventory... // " + SystemAnalysis.getCurrentTime() + "<br>");
 		status.setCurrentStatusText1("Create inventory");
-		status.setCurrentStatusValueFine(100d / 5 * 0);
+		status.setCurrentStatusValueFine(-1);
 		long numberOfBinaryFilesInDatabaseOrExtern = 0;
 		long numberOfBinaryFilesExternalyStored = 0;
 		HashMap<String, Integer> fs2cnt = new HashMap<String, Integer>();
@@ -87,11 +87,10 @@ public class CleanupHelper implements RunnableOnDB {
 				(numberOfBinaryFilesInDatabaseOrExtern - numberOfBinaryFilesExternalyStored)
 						+ " files in DB, "
 						+ numberOfBinaryFilesInDatabaseOrExtern + " in VFS");
-		status.setCurrentStatusValueFine(100d / 5 * 1);
 		
 		ArrayList<ExperimentHeaderInterface> el = mongoDB.getExperimentList(null);
 		final HashSet<String> linkedHashes = new HashSet<String>();
-		final double smallStep = 1 / el.size();
+		final double smallStep = 100d / el.size();
 		final HashSet<String> dbIdsOfSubstances = new HashSet<String>();
 		final HashSet<String> dbIdsOfConditions = new HashSet<String>();
 		status.setCurrentStatusText2("Read list of substances");
@@ -184,10 +183,11 @@ public class CleanupHelper implements RunnableOnDB {
 			}
 		};
 		
-		int nThreads = 2;
+		int nThreads = 3;
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 		final ThreadSafeOptions fc = new ThreadSafeOptions();
 		final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
+		status.setCurrentStatusValueFine(0);
 		for (final ExperimentHeaderInterface ehii : todo) {
 			executor.submit(new Runnable() {
 				@Override
@@ -350,7 +350,7 @@ public class CleanupHelper implements RunnableOnDB {
 			res.append("Clean-up: Linked binary files: " + linkedHashes.size() + " // " + SystemAnalysis.getCurrentTime() + "<br>");
 			status.setCurrentStatusText1("Linked files: " + linkedHashes.size());
 			status.setCurrentStatusText2("");
-			status.setCurrentStatusValueFine(100d / 5 * 2);
+			status.setCurrentStatusValueFine(0);
 			
 			for (String mgfs : MongoGridFS.getFileCollectionsInclPreview()) {
 				final GridFS gridfs = new GridFS(db, mgfs);
@@ -397,7 +397,7 @@ public class CleanupHelper implements RunnableOnDB {
 			res.append("Clean-up: Overall deleted MB: " + freeAll / 1024 / 1024 + " // "
 					+ SystemAnalysis.getCurrentTime() + "<br>");
 			status.setCurrentStatusText1("Deleted MB: " + (freeAll / 1024 / 1024));
-			status.setCurrentStatusValueFine(100d / 5 * 5);
+			status.setCurrentStatusValueFine(100d);
 		}
 	}
 	

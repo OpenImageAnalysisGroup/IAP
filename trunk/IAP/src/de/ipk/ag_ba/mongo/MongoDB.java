@@ -1068,9 +1068,12 @@ public class MongoDB {
 			ThreadSafeOptions invalid, Substance3D s3d, BasicDBList l,
 			double max, boolean printed) {
 		BasicDBList ll = new BasicDBList();
-		for (Object o : l)
+		int lsize = 0;
+		for (Object o : l) {
+			lsize++;
 			if (o != null)
 				ll.add(new ObjectId(o + ""));
+		}
 		DBCursor condL = null;
 		try {
 			condL = collCond.find(
@@ -1080,8 +1083,10 @@ public class MongoDB {
 							.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
 							.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
 							.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
-					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 1000);
+					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 200);
+			int condLsize = 0;
 			for (DBObject cond : condL) {
+				condLsize++;
 				// find objects in "condition" collection, but only fields images, volumes, networks
 				synchronized (visitCondition) {
 					visitCondition.processDBid(cond.get("_id") + "");
@@ -1090,10 +1095,10 @@ public class MongoDB {
 				if (optStatusProvider != null)
 					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 			}
-			if (l.size() != condL.size()) {
+			if (lsize != condLsize) {
 				if (!printed) {
-					String msg = "WARNING: " + (l.size() - condL.size()) + " condition could not be retrieved for experiment " + header.getExperimentName();
-					System.out.println(msg);
+					String msg = "WARNING: " + (l.size() - condL.size()) + " condition(s) could not be retrieved for experiment " + header.getExperimentName();
+					System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
 					saveSystemMessage(msg);
 					printed = true;
 					invalid.setBval(0, true);
@@ -1603,11 +1608,11 @@ public class MongoDB {
 				gridfs.remove(f.getFilename());
 			else
 				rList.add((ObjectId) f.getId());
-			if (rmList && rList.size() > 200) {
+			if (rmList && rList.size() > 10) {
 				colFE.remove(
-						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
 				colFC.remove(
-						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
 				rList.clear();
 			}
 			deleted++;
@@ -1618,9 +1623,9 @@ public class MongoDB {
 		}
 		if (rmList && rList.size() > 0) {
 			colFE.remove(
-					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
 			colFC.remove(
-					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.NONE);
+					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
 			rList.clear();
 		}
 	}
