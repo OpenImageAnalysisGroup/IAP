@@ -289,7 +289,7 @@ public class ConvexHullCalculator {
 							return a.getImage();
 						}
 					};
-					br.addImagePostProcessor(res.getCameraType(), null, roi);
+					br.addImagePostProcessor(io.getCameraType(), null, roi);
 				}
 			}
 			
@@ -308,7 +308,7 @@ public class ConvexHullCalculator {
 				}
 				
 			};
-			br.addImagePostProcessor(res.getCameraType(), null, roi);
+			br.addImagePostProcessor(io.getCameraType(), null, roi);
 		}
 		
 		return res;
