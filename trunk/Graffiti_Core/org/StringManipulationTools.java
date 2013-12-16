@@ -817,12 +817,19 @@ public class StringManipulationTools implements HelperClass {
 	}
 	
 	public static String getStringList(String pre, Collection<?> elements, String div) {
+		return getStringList(pre, elements, div, false);
+	}
+	
+	public static String getStringList(String pre, Collection<?> elements, String div, boolean trim) {
 		if (elements == null || elements.size() <= 0)
 			return "";
 		else {
 			StringBuilder sb = new StringBuilder();
 			int i = 0;
 			for (Object e : elements) {
+				if (trim) {
+					e = ("" + e).trim();
+				}
 				sb.append(pre + e + "");
 				if (i < elements.size() - 1)
 					sb.append(div);
@@ -934,10 +941,10 @@ public class StringManipulationTools implements HelperClass {
 		TreeSet<String> res = new TreeSet<String>();
 		if (list1 != null)
 			for (String s : list1.split(split))
-				res.add(s);
+				res.add(s.trim());
 		if (list2 != null)
 			for (String s : list2.split(split))
-				res.add(s);
+				res.add(s.trim());
 		return getStringList(res, " " + split + " ");
 	}
 	
