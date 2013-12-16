@@ -17,6 +17,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SplitResult;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
+import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.server.task_management.TempDataSetDescription;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -42,7 +43,11 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 					@Override
 					public void run() {
 						SplitResult sr = m.processSplitResults();
-						Collection<BatchCmd> availableJobs = m.batch().getAll();
+						Collection<BatchCmd> jl = m.batch().getAll();
+						Collection<BatchCmd> availableJobs = new ArrayList<BatchCmd>();
+						for (BatchCmd c : jl)
+							if (c.getRunStatus() != CloudAnalysisStatus.ARCHIVED)
+								availableJobs.add(c);
 						ActionDeleteAnalysisJobs.this.nJobs = availableJobs.size();
 						HashSet<TempDataSetDescription> availableTempResultSets = sr.getSplitResultExperimentSets(null);
 						ActionDeleteAnalysisJobs.this.nSplit = availableTempResultSets.size();
@@ -88,7 +93,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		deleted = 0;
 		deletedTempDatasets = 0;
-		deleted = m.batch().deleteAll();
+		deleted = m.batch().deleteAll(false);
 		
 		for (ExperimentHeaderInterface ei : m.getExperimentList(null)) {
 			if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {

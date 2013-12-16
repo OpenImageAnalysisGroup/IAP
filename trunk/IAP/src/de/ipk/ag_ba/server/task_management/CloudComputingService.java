@@ -130,7 +130,7 @@ public class CloudComputingService {
 									if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
 										try {
 											for (MongoDB m : MongoDB.getMongos()) {
-												m.batch().deleteAll();
+												m.batch().deleteAll(false);
 												System.out.println(":clear - cleared scheduled jobs in database " + m.getDatabaseName());
 											}
 											return;
