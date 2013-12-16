@@ -76,32 +76,38 @@ public class BlCalcMoments extends AbstractBlock {
 		
 		final double omega = im.calcOmega(background);
 		
-		ArrayList<BlockPropertyValue> a = getProperties().getPropertiesSearch(".hull.circumcircle.d");
+		ArrayList<BlockPropertyValue> a = getProperties().getPropertiesSearch("RESULT_side." + imageModality + "hull.circumcircle.d");
 		
 		if (a.isEmpty())
 			return;
 		
 		double circumcircle_d = a.get(0).getValue();
 		
-		final double amount_m1 = secondMoment_1_norm / (secondMoment_1_norm + secondMoment_2_norm) * circumcircle_d;
-		final double amount_m2 = secondMoment_2_norm / (secondMoment_1_norm + secondMoment_2_norm) * circumcircle_d;
+		// moments are < 1.0
+		double m1 = secondMoment_1_norm + 1.;
+		double m2 = secondMoment_2_norm + 1.;
+		
+		final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
+		final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
 		
 		RunnableOnImageSet ri = new RunnableOnImageSet() {
 			
 			@Override
 			public Image postProcessMask(Image img) {
-				
 				Point2d p1_start = new Point2d((centerOfGravity.x + amount_m1 * Math.cos(omega)), (centerOfGravity.y + amount_m1 * Math.sin(omega)));
-				Point2d p2_start = new Point2d((centerOfGravity.x + amount_m2 * Math.sin(omega)), (centerOfGravity.y + amount_m1 * -Math.cos(omega)));
+				Point2d p2_start = new Point2d((centerOfGravity.x + amount_m2 * -Math.sin(omega)), (centerOfGravity.y + amount_m2 * Math.cos(omega)));
 				
 				Point2d p1_end = new Point2d((centerOfGravity.x - amount_m1 * Math.cos(omega)), (centerOfGravity.y - amount_m1 * Math.sin(omega)));
-				Point2d p2_end = new Point2d((centerOfGravity.x - amount_m2 * Math.sin(omega)), (centerOfGravity.y - amount_m1 * -Math.cos(omega)));
+				Point2d p2_end = new Point2d((centerOfGravity.x - amount_m2 * -Math.sin(omega)), (centerOfGravity.y - amount_m2 * Math.cos(omega)));
 				
 				img = img
 						.io()
 						.canvas()
-						.drawLine((int) p1_start.x, (int) p1_start.y, (int) p1_end.x, (int) p1_end.y, Color.ORANGE.getRGB(), 0.2, 1)
-						.drawLine((int) p2_start.x, (int) p2_start.y, (int) p2_end.x, (int) p2_end.y, Color.BLUE.getRGB(), 0.2, 1)
+						.drawCircle(centerOfGravity.x, centerOfGravity.y, 10, Color.CYAN.getRGB(), 0.0, 5)
+						.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0.2, 1)
+						.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p1_end.x, (int) p1_end.y, Color.PINK.getRGB(), 0.2, 1)
+						.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0.2, 1)
+						.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
 						.getImage();
 				return img;
 			}
@@ -125,20 +131,22 @@ public class BlCalcMoments extends AbstractBlock {
 	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		HashSet<CameraType> res = new HashSet<CameraType>();
+		if (calcOnVis)
+			res.add(CameraType.VIS);
+		else
+			res.add(CameraType.FLUO);
+		return res;
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCameraInputTypes();
 	}
 	
 	@Override
 	public BlockType getBlockType() {
-		// TODO Auto-generated method stub
-		return null;
+		return BlockType.FEATURE_EXTRACTION;
 	}
 	
 	@Override
