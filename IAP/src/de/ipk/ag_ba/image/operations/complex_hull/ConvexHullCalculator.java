@@ -229,7 +229,7 @@ public class ConvexHullCalculator {
 				mr = RotatingCalipers.getMinimumBoundingRectangle(polygon.getPoints());
 			} catch (IllegalArgumentException iae) {
 				// too few pixels for convex hull calculation
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could calculate bounding box: " + iae.getMessage());
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate bounding box: " + iae.getMessage());
 			}
 			if (mr != null) {
 				final Point[] pl = new Point[mr.length];
