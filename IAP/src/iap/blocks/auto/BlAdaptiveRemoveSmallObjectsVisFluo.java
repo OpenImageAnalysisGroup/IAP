@@ -20,8 +20,6 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 	public static boolean ngUse = true;
 	
-	private boolean debug = false;
-	
 	private boolean autoTune;
 	
 	private double averageLeafWidthEstimationFluo;
@@ -30,7 +28,6 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 	protected void prepare() {
 		super.prepare();
 		this.autoTune = getBoolean("Auto-tune", true);
-		debug = getBoolean("debug", false);
 		
 		if (!autoTune)
 			averageLeafWidthEstimationFluo = Double.NaN;
