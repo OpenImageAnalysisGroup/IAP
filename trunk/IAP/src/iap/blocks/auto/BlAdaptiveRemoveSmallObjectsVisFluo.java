@@ -75,6 +75,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 			return null;
 		
 		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().
+				dilate(getInt("dilation fluo", 0)).
 				removeSmallClusters(ngUse,
 						autoTune ? (int) (averageLeafWidthEstimationFluo * averageLeafWidthEstimationFluo) : getInt("Noise-Size-Fluo-Area", 10 * 10),
 						autoTune ? (int) averageLeafWidthEstimationFluo : getInt("Noise-Size-Fluo-Dimension-Absolute", 10), -1,
