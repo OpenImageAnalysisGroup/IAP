@@ -61,7 +61,7 @@ public class ActionExperimentHistory extends AbstractNavigationAction {
 		for (Long time : history.keySet()) {
 			ExperimentHeaderInterface ei = history.get(time);
 			String t = SystemAnalysis.getCurrentTime(time);
-			ExperimentReference exp = new ExperimentReference(ei);
+			ExperimentReference exp = new ExperimentReference(ei, m);
 			exp.m = m;
 			res.add(0, new NavigationButton(t, new ActionMongoOrLTexperimentNavigation(exp), src.getGUIsetting()));
 		}
