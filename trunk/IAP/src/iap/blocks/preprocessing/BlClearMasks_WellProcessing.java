@@ -213,7 +213,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.SEGMENTATION;
+		return BlockType.PREPROCESSING;
 	}
 	
 	@Override
