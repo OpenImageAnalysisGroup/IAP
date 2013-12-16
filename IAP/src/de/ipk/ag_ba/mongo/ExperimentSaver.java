@@ -153,6 +153,11 @@ public class ExperimentSaver implements RunnableOnDB {
 			}
 		}
 		
+		String rem = experiment.getHeader().getRemark();
+		if (rem != null && rem.contains("//")) {
+			rem = StringManipulationTools.getMergedStringItems(experiment.getHeader().getRemark(), "", "//");
+		}
+		
 		System.out.println(">>> " + SystemAnalysis.getCurrentTime());
 		System.out.println("STORE EXPERIMENT: " + experiment.getName());
 		System.out.println("DB-ORIGIN       : " + experiment.getHeader().getOriginDbId());
