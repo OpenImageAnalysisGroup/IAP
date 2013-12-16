@@ -128,18 +128,27 @@ public class Batch {
 	}
 	
 	/**
+	 * @param includeArchived
 	 * @return Number of deleted compute jobs.
 	 * @throws Exception
 	 */
-	public long deleteAll() throws Exception {
+	public long deleteAll(final boolean includeArchived) throws Exception {
 		final ThreadSafeOptions res = new ThreadSafeOptions();
 		mongoDB.processDB(new RunnableOnDB() {
 			private DB db;
 			
 			@Override
 			public void run() {
-				res.setLong(db.getCollection("schedule").count());
-				db.getCollection("schedule").drop();
+				if (!includeArchived) {
+					Collection<BatchCmd> jl = getAll();
+					for (BatchCmd c : jl)
+						if (c.getRunStatus() != CloudAnalysisStatus.ARCHIVED)
+							delete(c);
+					
+				} else {
+					res.setLong(db.getCollection("schedule").count());
+					db.getCollection("schedule").drop();
+				}
 			}
 			
 			@Override

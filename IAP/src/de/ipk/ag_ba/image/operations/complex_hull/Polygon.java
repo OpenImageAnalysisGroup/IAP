@@ -99,8 +99,8 @@ class Polygon {
 	}
 	
 	public Circle calculateminimalcircumcircle() {
-		if (true)
-			return bruteForceMcc();
+		// if (true)
+		// return bruteForceMcc();
 		
 		if (points != null) {
 			Line maxSpan = getMaxSpan();
