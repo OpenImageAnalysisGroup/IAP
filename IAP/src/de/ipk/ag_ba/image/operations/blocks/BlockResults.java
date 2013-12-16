@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -461,6 +462,8 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public void addImagePostProcessor(final CameraType imageType, final RunnableOnImage runnableOnImage, final RunnableOnImage runnableOnMask) {
+		if (imageType == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Internal error: Defined CameraType is NULL for given Image-Postprocessor!");
 		addImagePostProcessor(new RunnableOnImageSet() {
 			@Override
 			public Image postProcessImage(Image image) {
