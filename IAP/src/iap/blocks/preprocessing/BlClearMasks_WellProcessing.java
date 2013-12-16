@@ -62,28 +62,44 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 				if (well_border < 0)
 					well_border = 0d;
 			}
-			// 3x2
+			
 			Image vis = input().images().vis();
 			if (vis != null)
-				processCuttingOfImage(vis, CameraType.VIS, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
-			// processCuttingOfImage(vis, FlexibleImageType.VIS, 10, vertFillGrade, 4, 3);
+				input().images().set(processCuttingOfImage(vis, CameraType.VIS, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
+			
 			Image fluo = input().images().fluo();
 			if (fluo != null)
-				processCuttingOfImage(fluo, CameraType.FLUO, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
+				input().images().set(processCuttingOfImage(fluo, CameraType.FLUO, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
 			
 			Image nir = input().images().nir();
 			if (nir != null)
-				processCuttingOfImage(nir, CameraType.NIR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
+				input().images().set(processCuttingOfImage(nir, CameraType.NIR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
 			
 			Image ir = input().images().ir();
-			if (ir != null) {
-				ir = ir.io().getImage();
-				processCuttingOfImage(ir, CameraType.IR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border);
+			if (ir != null)
+				input().images().set(processCuttingOfImage(ir, CameraType.IR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
+			
+			if (getBoolean("Cut Masks", false)) {
+				vis = input().masks().vis();
+				if (vis != null)
+					input().masks().set(processCuttingOfImage(vis, CameraType.VIS, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
+				
+				fluo = input().masks().fluo();
+				if (fluo != null)
+					input().masks().set(processCuttingOfImage(fluo, CameraType.FLUO, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
+				
+				nir = input().masks().nir();
+				if (nir != null)
+					input().masks().set(processCuttingOfImage(nir, CameraType.NIR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
+				
+				ir = input().masks().ir();
+				if (ir != null)
+					input().masks().set(processCuttingOfImage(ir, CameraType.IR, horFillGrade, vertFillGrade, gridHn, gridVn, well_border));
 			}
 		}
 	}
 	
-	private void processCuttingOfImage(Image img, CameraType type, double horFillGrade, double vertFillGrade, int cols, int rows, double well_border) {
+	private Image processCuttingOfImage(Image img, CameraType type, double horFillGrade, double vertFillGrade, int cols, int rows, double well_border) {
 		int offX = getInt("Offset X (" + type + ")", 0);
 		int offY = getInt("Offset Y (" + type + ")", 0);
 		Rectangle2D.Double r = getGridPos(getWellIdx(), cols, rows, (int) (img.getWidth() * horFillGrade), (int) (img.getHeight() * vertFillGrade),
@@ -109,7 +125,8 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		}
 		
 		res.setCameraType(type);
-		input().images().set(res);
+		
+		return res;
 	}
 	
 	private Rectangle2D.Double getGridPos(int trayIdx, int columns, int rows, int w, int h, int centerX, int centerY) {
