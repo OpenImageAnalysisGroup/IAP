@@ -5026,6 +5026,8 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation clearOutsideCircle(int cx, int cy, int radius) {
+		if (radius <= 0)
+			return this;
 		int[][] res = getImageAs2dArray();
 		int w = getWidth();
 		int h = getHeight();
