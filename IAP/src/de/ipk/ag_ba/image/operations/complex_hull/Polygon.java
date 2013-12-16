@@ -98,63 +98,48 @@ class Polygon {
 		return res;
 	}
 	
+	// Reference: E. Welzl, "Smallest enclosing disks (balls and ellipsoids)",Lecture Notes in Computer Science, Vol. 555, 1991, pp. 359-370.
+	// code based on http://web.nmsu.edu/~xiumin/project/smallest_enclosing_circle/
+	// Compute the Smallest Enclosing Circle of the n points in p,
+	// such that the m points in B lie on the boundary of the circle.
+	public Circle findSec(int n, Point[] p, int m, Point[] b)
+	{
+		Circle sec = new Circle();
+		
+		// Compute the Smallest Enclosing Circle defined by B
+		if (m == 1)
+		{
+			sec = new Circle(b[0]);
+		}
+		else
+			if (m == 2)
+			{
+				sec = new Circle(b[0], b[1]);
+			}
+			else
+				if (m == 3)
+				{
+					return new Circle(b[0], b[1], b[2]);
+				}
+		
+		// Check if all the points in p are enclosed
+		for (int i = 0; i < n; i++)
+		{
+			if (sec.contain(p[i]) == false)
+			{
+				// Compute B <--- B union P[i].
+				b[m] = new Point(p[i]);
+				// Recurse
+				sec = findSec(i, p, m + 1, b);
+			}
+		}
+		
+		return sec;
+	}
+	
 	public Circle calculateminimalcircumcircle() {
-		// if (true)
-		// return bruteForceMcc();
-		
-		if (points != null) {
-			Line maxSpan = getMaxSpan();
-			double maxDist = 0;
-			Circle result = null;
-			
-			for (int index = 0; index < points.length; index++) {
-				double ptDistToCenterOfLine = ptDistToCenterOfLine(maxSpan, points[index]);
-				if (maxDist < ptDistToCenterOfLine && maxSpan.getlength() / 2 < ptDistToCenterOfLine) {
-					maxDist = ptDistToCenterOfLine(maxSpan, points[index]);
-					Circle temp = new Circle(maxSpan.p0, maxSpan.p1, points[index]);
-					result = temp;
-				}
-			}
-			if (containAllPoints(result)) {
-				return result;
-			} else {
-				return bruteForceMcc();
-				// return null;
-			}
-		} else {
-			return null;
-		}
-	}
-	
-	private Circle bruteForceMcc() {
-		Circle result = new Circle(0, 0, Integer.MAX_VALUE);
-		
-		for (int i = 0; i < points.length; i++) {
-			for (int j = i; j < points.length; j++) {
-				for (int k = j; k < points.length; k++) {
-					Circle temp = new Circle(points[i], points[j], points[k]);
-					if (containAllPoints(temp) && temp.d < result.d)
-						result = temp;
-				}
-			}
-		}
-		return result;
-	}
-	
-	private boolean containAllPoints(Circle input) {
-		if (input != null) {
-			Point center = new Point(input.x, input.y);
-			
-			for (int i = 0; i < points.length; i++) {
-				double distance = center.distEuclid(points[i]);
-				if (distance - input.d / 2 > 1) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
+		Point[] temp = new Point[3];
+		return findSec(N, points, 0, temp);
 	}
 	
 	@Override
@@ -166,14 +151,6 @@ class Polygon {
 		}
 		sb.append("]");
 		return sb.toString();
-	}
-	
-	private double ptDistToCenterOfLine(Line maxSpan, Point point) {
-		double midX = (maxSpan.p0.x + maxSpan.p1.x) / 2;
-		double midY = (maxSpan.p0.y + maxSpan.p1.y) / 2;
-		Point temp = new Point(midX, midY);
-		
-		return temp.distEuclid(point);
 	}
 	
 	public Line getMaxSpan() {

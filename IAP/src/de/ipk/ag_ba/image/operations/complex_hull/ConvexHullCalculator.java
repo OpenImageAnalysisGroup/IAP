@@ -140,7 +140,7 @@ public class ConvexHullCalculator {
 			int hullLineColor, int centroidColor, int minRectColor, Double distHorizontal,
 			Double realMarkerDist) {
 		
-		return find(null, drawInputimage, drawBorder, drawHull, drawInputimage, drawCentroid, drawMinRect, false,
+		return find(null, drawInputimage, drawBorder, drawHull, drawInputimage, drawCentroid, drawMinRect, true,
 				borderColor, hullLineColor, centroidColor, minRectColor, Color.BLACK.getRGB(), distHorizontal, realMarkerDist);
 	}
 	

@@ -24,6 +24,10 @@ public class Point {
 		return new Point(x - p.x, y - p.y);
 	}
 	
+	public Point midPoint(Point p) {
+		return new Point((x + p.x) / 2, (y + p.y) / 2);
+	}
+	
 	public void makeRelTo(Point p) {
 		x -= p.x;
 		y -= p.y;
