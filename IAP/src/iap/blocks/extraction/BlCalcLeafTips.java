@@ -200,8 +200,10 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			avg_width = 10;
 		
 		// optimize loop
-		for (int cd = avg_width; cd <= avg_width * 2; cd++) {
+		cd: for (int cd = avg_width; cd <= avg_width * 2; cd++) {
 			// for (int cd = 25; cd <= 26; cd++) {
+			if (cd == 0)
+				continue cd;
 			gt: for (int i = 20; i < 40; i++) {
 				// gt: for (int i = 30; i < 31; i++) {
 				
