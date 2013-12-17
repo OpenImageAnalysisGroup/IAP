@@ -62,6 +62,7 @@ import de.ipk.ag_ba.commands.ActionSettings;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -154,6 +155,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					JMenuItem debugPipelineTestShowMainImage = new JMenuItem(
 							"Show Image");
+					
+					debugPipelineTestShowMainImage.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
+							java.awt.Image.SCALE_SMOOTH)));
+					
 					debugPipelineTestShowMainImage
 							.addActionListener(new ActionListener() {
 								@Override
@@ -244,6 +249,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					JMenuItem debugShowSnapshot = new JMenuItem(
 							"Main, Reference, Annotation (Stack)");
+					
 					debugShowSnapshot.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -325,6 +331,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					jp.add(debugPipelineTestShowImage);
 					
 					JMenu sn = new JMenu("Show Complete Snapshot Set");
+					sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
+							java.awt.Image.SCALE_SMOOTH)));
+					
 					JMenuItem a = new JMenuItem("Main");
 					a.addActionListener(getListener(targetTreeNode, true,
 							false, false));
@@ -359,15 +368,24 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									}
 								};
 								jp.add(new JSeparator());
-								jp.add(new JMenuItem(action));
+								JMenuItem mi = new JMenuItem(action);
+								mi.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(16, 16,
+										java.awt.Image.SCALE_SMOOTH)));
+								jp.add(mi);
 								PipelineDesc pd = new PipelineDesc(null, iop, null, null);
 								UserDefinedImageAnalysisPipelineTask iat =
 										new UserDefinedImageAnalysisPipelineTask(pd);
 								if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {
 									JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+									debugPipelineTest0a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
+											.getScaledInstance(16, 16,
+													java.awt.Image.SCALE_SMOOTH)));
 									jp.add(debugPipelineTest0a);
 								} else {
 									JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+									debugPipelineTest00a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
+											.getScaledInstance(16, 16,
+													java.awt.Image.SCALE_SMOOTH)));
 									jp.add(debugPipelineTest00a);
 								}
 								jp.add(new JSeparator());
@@ -383,7 +401,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									}
 									
 								};
-								jp.add(new JMenuItem(action2));
+								JMenuItem jmc = new JMenuItem(action2);
+								jmc.setIcon(new ImageIcon(IAPimages.getImage("img/close_frame.png")));
+								jp.add(jmc);
+								
 								jp.add(new JSeparator());
 							}
 						} catch (Exception err) {
@@ -397,6 +418,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					}
 					
 					JMenu ta = new JMenu("Analysis Templates");
+					ta.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/book_object2.png")
+							.getScaledInstance(16, 16,
+									java.awt.Image.SCALE_SMOOTH)));
 					
 					ArrayList<AbstractPhenotypingTask> pl = new ArrayList<AbstractPhenotypingTask>();
 					try {
@@ -557,6 +581,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			if (downloadNeeded) {
 				JMenuItem tempItem = new JMenuItem("Download file...");
+				
+				tempItem.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Downloads-64.png").getScaledInstance(16, 16,
+						java.awt.Image.SCALE_SMOOTH)));
+				
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
 				myPopup.show(this, 5, 5);
@@ -943,12 +971,21 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	void addDefaultCommands(final JPopupMenu myPopup) {
 		showImageCmdMain = new JMenuItem("Show Image");
-		showImageCmdLabel = new JMenuItem("Show Image (Reference)");
+		showImageCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
+				java.awt.Image.SCALE_SMOOTH)));
+		
+		showImageCmdLabel = new JMenuItem("Show Reference Image");
 		showVolumeCmd = new JMenuItem("Show 3D-Volume");
 		saveFileCmdMain = new JMenuItem("Save File As...");
+		saveFileCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Document-Save-64.png").getScaledInstance(16, 16,
+				java.awt.Image.SCALE_SMOOTH)));
+		
 		saveFileCmdLabel = new JMenuItem("Save Reference File As...");
 		openFileCmdMain = new JMenuItem(
 				"View/Open with system default application");
+		openFileCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-System-Run-64.png").getScaledInstance(16, 16,
+				java.awt.Image.SCALE_SMOOTH)));
+		
 		openFileCmdLabel = new JMenuItem(
 				"View/Open Reference file with system default application");
 		removeOneFromDatabaseCmd = new JMenuItem("! Delete this item !");
@@ -971,16 +1008,16 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						imageResult.getFileNameMain() != null &&
 				imageResult.getFileNameMain().contains(File.separator)))
 			myPopup.add(showImageCmdMain);
+		if (imageResult != null && imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
+			myPopup.add(showVolumeCmd);
+		myPopup.add(openFileCmdMain);
+		myPopup.add(saveFileCmdMain);
 		if ((getIsJavaImage() > 0 && imageResult != null && imageResult.getFileNameLabel() != null)
 				|| (imageResult != null && imageResult.getFileNameLabel() != null && imageResult
 						.getFileNameLabel().contains(File.separator)))
 			myPopup.add(showImageCmdLabel);
-		if (imageResult != null && imageResult.getBinaryFileInfo().getEntity() instanceof VolumeData)
-			myPopup.add(showVolumeCmd);
-		myPopup.add(openFileCmdMain);
 		if (imageResult != null && imageResult.getBinaryFileInfo().getHashLabel() != null)
 			myPopup.add(openFileCmdLabel);
-		myPopup.add(saveFileCmdMain);
 		if (imageResult != null && imageResult.getBinaryFileInfo().getHashLabel() != null)
 			myPopup.add(saveFileCmdLabel);
 		if (!readOnly) {

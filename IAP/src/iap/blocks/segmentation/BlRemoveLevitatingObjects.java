@@ -1,4 +1,4 @@
-package iap.blocks.unused;
+package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -10,17 +10,17 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAnalysisBlock {
+public class BlRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {
-		if (input().masks().vis() == null || input().masks().vis() == null)
+		if (input().masks() == null || input().masks().vis() == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Vis", true)) {
 			Image input = input().masks().vis();
 			int background = options.getBackground();
-			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < input().masks().vis().getHeight() * 0.5)
+			int cut = searchSplitObjectsInYDirection(input, getInt("Cut-Off Tolerance (vis)", 5), background);
+			if (cut > 0 && cut < input().masks().vis().getHeight() * getDouble("Maximum Cut-Off Amount (percent)", 0.98 * 100d) / 100d)
 				return new ImageOperation(input().masks().vis()).clearImageAbove(cut, background).getImage();
 			else
 				return input().masks().vis();
@@ -30,13 +30,13 @@ public class BlockRemoveLevitatingObjectsFromVisFluo extends AbstractSnapshotAna
 	
 	@Override
 	protected Image processFLUOmask() {
-		if (input().masks().fluo() == null || input().masks().fluo() == null)
+		if (input().masks() == null || input().masks().fluo() == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Fluo", true)) {
 			Image input = input().masks().fluo();
 			int background = options.getBackground();
-			int cut = searchSplitObjectsInYDirection(input, 20, background);
-			if (cut > 0 && cut < input().masks().fluo().getHeight() * 0.5)
+			int cut = searchSplitObjectsInYDirection(input, getInt("Cut-Off Tolerance (fluo)", 5), background);
+			if (cut > 0 && cut < input().masks().fluo().getHeight() * getDouble("Maximum Cut-Off Amount (percent)", 0.98 * 100d) / 100d)
 				return new ImageOperation(input().masks().fluo()).clearImageAbove(cut, background).getImage();
 			else
 				return input().masks().fluo();
