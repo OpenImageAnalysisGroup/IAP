@@ -6,6 +6,7 @@ import iap.pipelines.ImageProcessorOptions;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -32,6 +34,7 @@ import de.ipk.ag_ba.commands.ActionSettings;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
@@ -385,6 +388,8 @@ public class BlockPipeline {
 					JButton openSettingsButton = null;
 					if (er.getIniIoProvider() != null) {
 						openSettingsButton = new JButton("Change analysis settings");
+						openSettingsButton.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(24, 24,
+								Image.SCALE_SMOOTH)));
 						openSettingsButton.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent arg0) {

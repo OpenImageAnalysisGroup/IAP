@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -20,6 +21,7 @@ import org.ErrorMsg;
 import org.FolderPanel;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.utils.MyFileSaver;
 
@@ -103,6 +105,9 @@ public class ImageStack {
 			image.show(title + " (" + stack.getSize() + ")");
 			ImageWindow win = image.getWindow();
 			JButton jb = new JButton(buttonTitle);
+			jb.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png").getScaledInstance(24, 24,
+					java.awt.Image.SCALE_SMOOTH)));
+			
 			jb.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
