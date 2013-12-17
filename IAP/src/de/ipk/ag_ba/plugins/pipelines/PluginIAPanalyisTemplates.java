@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
+import iap.blocks.acquisition.BlFilterImagesByAngle;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
@@ -141,6 +142,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlThreeDreconstruction(),
 				new BlCalcLeafTips(),
 				new BlRemoveLevitatingObjects(),
+				new BlFilterImagesByAngle()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
