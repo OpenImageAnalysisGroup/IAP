@@ -83,14 +83,12 @@ public class BlCalcMoments extends AbstractBlock {
 		
 		double circumcircle_d = a.get(0).getValue();
 		
-		// moments are < 1.0, add 1
+		// use lambdas for weighting the lines in the result image
 		double m1 = lambdas[1] > lambdas[0] ? lambdas[1] : lambdas[0];
 		double m2 = lambdas[1] > lambdas[0] ? lambdas[0] : lambdas[1];
 		
 		final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
 		final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
-		
-		final int circumcircle_d_fin = (int) (circumcircle_d / 2);
 		
 		if (getBoolean("Mark in Result Image", false)) {
 			RunnableOnImageSet ri = new RunnableOnImageSet() {
