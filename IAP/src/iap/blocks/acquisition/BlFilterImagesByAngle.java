@@ -27,7 +27,15 @@ public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		boolean process = getBoolean("Process " + processedImages.getAnyInfo().getRotation(), true);
+		Double p = processedImages.getAnyInfo().getPosition();
+		if (p == null)
+			p = 0d;
+		String u = processedImages.getAnyInfo().getPositionUnit();
+		if (u == null)
+			u = "";
+		else
+			u = " " + u;
+		boolean process = getBoolean("Process " + p.intValue() + u, true);
 		if (!process) {
 			processedImages.setVis(null);
 			processedImages.setFluo(null);
