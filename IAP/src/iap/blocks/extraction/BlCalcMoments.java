@@ -83,50 +83,53 @@ public class BlCalcMoments extends AbstractBlock {
 		
 		double circumcircle_d = a.get(0).getValue();
 		
-		// moments are < 1.0
-		double m1 = secondMoment_1_norm + 1.;
-		double m2 = secondMoment_2_norm + 1.;
+		// moments are < 1.0, add 1
+		double m1 = lambdas[1] > lambdas[0] ? lambdas[1] : lambdas[0];
+		double m2 = lambdas[1] > lambdas[0] ? lambdas[0] : lambdas[1];
 		
 		final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
 		final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
 		
-		RunnableOnImageSet ri = new RunnableOnImageSet() {
-			
-			@Override
-			public Image postProcessMask(Image img) {
-				Point2d p1_start = new Point2d((centerOfGravity.x + amount_m1 * Math.cos(omega)), (centerOfGravity.y + amount_m1 * Math.sin(omega)));
-				Point2d p2_start = new Point2d((centerOfGravity.x + amount_m2 * -Math.sin(omega)), (centerOfGravity.y + amount_m2 * Math.cos(omega)));
-				
-				Point2d p1_end = new Point2d((centerOfGravity.x - amount_m1 * Math.cos(omega)), (centerOfGravity.y - amount_m1 * Math.sin(omega)));
-				Point2d p2_end = new Point2d((centerOfGravity.x - amount_m2 * -Math.sin(omega)), (centerOfGravity.y - amount_m2 * Math.cos(omega)));
-				
-				img = img
-						.io()
-						.canvas()
-						.drawCircle(centerOfGravity.x, centerOfGravity.y, 10, Color.CYAN.getRGB(), 0.0, 5)
-						.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0.2, 1)
-						.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p1_end.x, (int) p1_end.y, Color.PINK.getRGB(), 0.2, 1)
-						.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0.2, 1)
-						.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
-						.getImage();
-				return img;
-			}
-			
-			@Override
-			public Image postProcessImage(Image image) {
-				return image;
-			}
-			
-			@Override
-			public CameraType getConfig() {
-				if (!calcOnVis)
-					return CameraType.FLUO;
-				else
-					return CameraType.VIS;
-			}
-		};
+		final int circumcircle_d_fin = (int) (circumcircle_d / 2);
 		
-		getProperties().addImagePostProcessor(ri);
+		if (getBoolean("Mark in Result Image", false)) {
+			RunnableOnImageSet ri = new RunnableOnImageSet() {
+				
+				@Override
+				public Image postProcessMask(Image img) {
+					Point2d p1_start = new Point2d((centerOfGravity.x + amount_m1 * Math.cos(omega)), (centerOfGravity.y + amount_m1 * Math.sin(omega)));
+					Point2d p2_start = new Point2d((centerOfGravity.x + amount_m2 * -Math.sin(omega)), (centerOfGravity.y + amount_m2 * Math.cos(omega)));
+					
+					Point2d p1_end = new Point2d((centerOfGravity.x - amount_m1 * Math.cos(omega)), (centerOfGravity.y - amount_m1 * Math.sin(omega)));
+					Point2d p2_end = new Point2d((centerOfGravity.x - amount_m2 * -Math.sin(omega)), (centerOfGravity.y - amount_m2 * Math.cos(omega)));
+					
+					img = img
+							.io()
+							.canvas()
+							.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0.2, 1)
+							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p1_end.x, (int) p1_end.y, Color.PINK.getRGB(), 0.2, 1)
+							.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0.2, 1)
+							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
+							.getImage();
+					return img;
+				}
+				
+				@Override
+				public Image postProcessImage(Image image) {
+					return image;
+				}
+				
+				@Override
+				public CameraType getConfig() {
+					if (!calcOnVis)
+						return CameraType.FLUO;
+					else
+						return CameraType.VIS;
+				}
+			};
+			
+			getProperties().addImagePostProcessor(ri);
+		}
 	}
 	
 	@Override
