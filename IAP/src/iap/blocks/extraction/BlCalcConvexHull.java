@@ -50,7 +50,7 @@ public class BlCalcConvexHull extends AbstractBlock {
 						Color.RED.getRGB(),
 						Color.CYAN.getRGB(),
 						Color.RED.getRGB(),
-						Color.YELLOW.getRGB(),
+						Color.YELLOW.darker().getRGB(),
 						Color.PINK.getRGB(),
 						distHorizontal, realDist);
 		

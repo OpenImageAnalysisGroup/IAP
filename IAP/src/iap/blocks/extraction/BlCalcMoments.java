@@ -4,13 +4,16 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.vecmath.Point2d;
 
+import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
@@ -109,6 +112,16 @@ public class BlCalcMoments extends AbstractBlock {
 							.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0.2, 1)
 							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
 							.getImage();
+					
+					ImageCanvas canvas = img.io().canvas();
+					Graphics2D g = (Graphics2D) canvas.getGraphics();
+					g.setColor(Color.GRAY);
+					g.rotate(omega, centerOfGravity.x, centerOfGravity.y);
+					g.setStroke(new BasicStroke(2f));;
+					g.drawOval(centerOfGravity.x - (int) amount_m1, centerOfGravity.y - (int) amount_m2, (int) (1 + amount_m1) * 2, (int) (1 + amount_m2) * 2);
+					canvas.updateFromGraphics();
+					img = canvas.getImage();
+					
 					return img;
 				}
 				
