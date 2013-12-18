@@ -48,8 +48,12 @@ public class BlCalcMoments extends AbstractBlock {
 	private void calcMoments(Image img) {
 		int background = ImageOperation.BACKGROUND_COLORint;
 		ImageMoments im = new ImageMoments(img);
-		double secondMoment_1_abs = im.calcCentralMoment(2.0, 0.0, background);
-		double secondMoment_2_abs = im.calcCentralMoment(0.0, 2.0, background);
+		double my20 = im.calcCentralMoment(2.0, 0.0, background);
+		double my02 = im.calcCentralMoment(0.0, 2.0, background);
+		double my11 = im.calcCentralMoment(1, 1, background);
+		double my00 = im.calcCentralMoment(0, 0, background);
+		double my10 = im.calcCentralMoment(1, 0, background);
+		double my01 = im.calcCentralMoment(0, 1, background);
 		double secondMoment_1_norm = im.calcNormalizedCentralMoment(2.0, 0.0, background);
 		double secondMoment_2_norm = im.calcNormalizedCentralMoment(0.0, 2.0, background);
 		double[] lambdas = ImageMoments.eigenValues(background);
@@ -62,47 +66,56 @@ public class BlCalcMoments extends AbstractBlock {
 		String imageModality = calcOnVis == true ? "vis." : "fluo.";
 		
 		if (lambdas[1] > lambdas[0]) {
-			double temp1 = secondMoment_1_abs;
-			secondMoment_1_abs = secondMoment_2_abs;
-			secondMoment_2_abs = temp1;
+			double temp1 = my20;
+			my20 = my02;
+			my02 = temp1;
 			
 			double temp2 = secondMoment_1_norm;
 			secondMoment_1_norm = secondMoment_2_norm;
 			secondMoment_2_norm = temp2;
 		}
 		
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major", secondMoment_1_abs);
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor", secondMoment_2_abs);
+		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major", my20);
+		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor", my02);
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major.norm", secondMoment_1_norm);
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor.norm", secondMoment_2_norm);
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "eccentricity", eccentricity);
 		
 		final double omega = im.calcOmega(background);
 		
-		ArrayList<BlockPropertyValue> a = getProperties().getPropertiesSearch("RESULT_side." + imageModality + "hull.circumcircle.d");
+		ArrayList<BlockPropertyValue> bpvl = getProperties().getPropertiesSearch("RESULT_side." + imageModality + "hull.circumcircle.d");
 		
-		if (a.isEmpty())
+		if (bpvl.isEmpty())
 			return;
 		
-		double circumcircle_d = a.get(0).getValue();
+		double circumcircle_d = bpvl.get(0).getValue();
 		
 		// use lambdas for weighting the lines in the result image
-		double m1 = lambdas[1] > lambdas[0] ? lambdas[1] : lambdas[0];
-		double m2 = lambdas[1] > lambdas[0] ? lambdas[0] : lambdas[1];
+		// double m1 = lambdas[1] > lambdas[0] ? lambdas[1] : lambdas[0];
+		// double m2 = lambdas[1] > lambdas[0] ? lambdas[0] : lambdas[1];
 		
-		final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
-		final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
+		// final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
+		// final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
+		
+		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
+		double xc = my10 / my00;
+		double yc = my01 / my00;
+		double a = my20 / my00 - xc * xc;
+		double b = 2 * (my11 / my00 - xc * yc);
+		double c = my02 / my00 - yc * yc;
+		final double length_major = Math.sqrt(4 * (a + c + Math.sqrt(b * b + (a - c) * (a - c))));
+		final double length_minor = Math.sqrt(4 * (a + c - Math.sqrt(b * b + (a - c) * (a - c))));
 		
 		if (getBoolean("Mark in Result Image", false)) {
 			RunnableOnImageSet ri = new RunnableOnImageSet() {
 				
 				@Override
 				public Image postProcessMask(Image img) {
-					Point2d p1_start = new Point2d((centerOfGravity.x + amount_m1 * Math.cos(omega)), (centerOfGravity.y + amount_m1 * Math.sin(omega)));
-					Point2d p2_start = new Point2d((centerOfGravity.x + amount_m2 * -Math.sin(omega)), (centerOfGravity.y + amount_m2 * Math.cos(omega)));
+					Point2d p1_start = new Point2d((centerOfGravity.x + length_major * Math.cos(omega)), (centerOfGravity.y + length_major * Math.sin(omega)));
+					Point2d p2_start = new Point2d((centerOfGravity.x + length_minor * -Math.sin(omega)), (centerOfGravity.y + length_minor * Math.cos(omega)));
 					
-					Point2d p1_end = new Point2d((centerOfGravity.x - amount_m1 * Math.cos(omega)), (centerOfGravity.y - amount_m1 * Math.sin(omega)));
-					Point2d p2_end = new Point2d((centerOfGravity.x - amount_m2 * -Math.sin(omega)), (centerOfGravity.y - amount_m2 * Math.cos(omega)));
+					Point2d p1_end = new Point2d((centerOfGravity.x - length_major * Math.cos(omega)), (centerOfGravity.y - length_major * Math.sin(omega)));
+					Point2d p2_end = new Point2d((centerOfGravity.x - length_minor * -Math.sin(omega)), (centerOfGravity.y - length_minor * Math.cos(omega)));
 					
 					img = img
 							.io()
@@ -118,7 +131,8 @@ public class BlCalcMoments extends AbstractBlock {
 					g.setColor(Color.GRAY);
 					g.rotate(omega, centerOfGravity.x, centerOfGravity.y);
 					g.setStroke(new BasicStroke(2f));;
-					g.drawOval(centerOfGravity.x - (int) amount_m1, centerOfGravity.y - (int) amount_m2, (int) (1 + amount_m1) * 2, (int) (1 + amount_m2) * 2);
+					g.drawOval(centerOfGravity.x - (int) length_major, centerOfGravity.y - (int) length_minor, (int) (1 + length_major) * 2,
+							(int) (1 + length_minor) * 2);
 					canvas.updateFromGraphics();
 					img = canvas.getImage();
 					
