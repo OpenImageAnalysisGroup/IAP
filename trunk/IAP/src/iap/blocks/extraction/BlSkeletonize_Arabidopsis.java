@@ -114,6 +114,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 				for (Point p : branchPoints)
 					tempImage[p.x][p.y] = black;
 				Image temp = new Image(tempImage);
+				temp.setCameraType(CameraType.FLUO);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
 						find(true, false, false, true, false, black, black, black, black, null, 0d).getImage();
 				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
