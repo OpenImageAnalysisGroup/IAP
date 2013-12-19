@@ -723,7 +723,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	private ArrayList<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
-			if (si.getName().startsWith(match[0]) &&
+			if (si.getName()!=null && si.getName().startsWith(match[0]) &&
 					(
 					(!inverseSecond && si.getName().endsWith(match[1])) ||
 					(inverseSecond && !si.getName().endsWith(match[1]))
