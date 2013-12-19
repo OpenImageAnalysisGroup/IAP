@@ -221,7 +221,8 @@ public class ConvexHullCalculator {
 									.getImage();
 						}
 					};
-					br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+					if (br!=null)
+						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
 				}
 			}
 			java.awt.geom.Point2D.Double[] mr = null;
