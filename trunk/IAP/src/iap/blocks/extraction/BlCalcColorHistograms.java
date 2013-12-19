@@ -96,6 +96,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	protected void processVisibleImage(ImageOperation io, String resultPrefix, boolean isSection) {
 		int visibleFilledPixels = io.countFilledPixels();
 		
+		
 		double visibleIntensitySumR = io.intensitySumOfChannel(false, true, false, false);
 		double visibleIntensitySumG = io.intensitySumOfChannel(false, false, true, false);
 		double visibleIntensitySumB = io.intensitySumOfChannel(false, false, false, true);
@@ -130,7 +131,19 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
+		
+		
 		if (input().masks().fluo() != null) {
+			Image of = getProperties().getImage("inp_fluo");
+			if (of!=null) {
+				of = of.io().applyMask(input().masks().fluo()).getImage();
+				ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
+						options.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
+						getBoolean("Add Fluo Color Bins",false)); 
+				if (rt != null)
+					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+			}
+			
 			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).
 					erode(getInt("Erode-Cnt-Fluo", 2));
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
