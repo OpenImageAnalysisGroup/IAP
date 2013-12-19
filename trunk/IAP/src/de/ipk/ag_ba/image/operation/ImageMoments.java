@@ -161,7 +161,6 @@ public class ImageMoments {
 	 * @return
 	 */
 	public static double calcOmega(int background) {
-		
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
 		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
 		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
@@ -173,6 +172,7 @@ public class ImageMoments {
 	
 	public static double[] eigenValues(int background) {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
+		
 		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
 		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
 		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);

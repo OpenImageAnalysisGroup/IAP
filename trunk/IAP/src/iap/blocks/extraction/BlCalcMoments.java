@@ -8,7 +8,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.vecmath.Point2d;
@@ -16,7 +15,6 @@ import javax.vecmath.Point2d;
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -83,28 +81,14 @@ public class BlCalcMoments extends AbstractBlock {
 		
 		final double omega = im.calcOmega(background);
 		
-		ArrayList<BlockPropertyValue> bpvl = getProperties().getPropertiesSearch("RESULT_side." + imageModality + "hull.circumcircle.d");
-		
-		if (bpvl.isEmpty())
-			return;
-		
-		double circumcircle_d = bpvl.get(0).getValue();
-		
-		// use lambdas for weighting the lines in the result image
-		// double m1 = lambdas[1] > lambdas[0] ? lambdas[1] : lambdas[0];
-		// double m2 = lambdas[1] > lambdas[0] ? lambdas[0] : lambdas[1];
-		
-		// final double amount_m1 = m1 / (m1 + m2) * (circumcircle_d / 2);
-		// final double amount_m2 = m2 / (m1 + m2) * (circumcircle_d / 2);
-		
 		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
 		double xc = my10 / my00;
 		double yc = my01 / my00;
 		double a = my20 / my00 - xc * xc;
 		double b = 2 * (my11 / my00 - xc * yc);
 		double c = my02 / my00 - yc * yc;
-		final double length_major = Math.sqrt(4 * (a + c + Math.sqrt(b * b + (a - c) * (a - c))));
-		final double length_minor = Math.sqrt(4 * (a + c - Math.sqrt(b * b + (a - c) * (a - c))));
+		final double length_major = Math.sqrt(1 * (a + c + Math.sqrt(b * b + (a - c) * (a - c)))); // orig 1 = 3
+		final double length_minor = Math.sqrt(1 * (a + c - Math.sqrt(b * b + (a - c) * (a - c))));
 		
 		if (getBoolean("Mark in Result Image", false)) {
 			RunnableOnImageSet ri = new RunnableOnImageSet() {
@@ -117,6 +101,7 @@ public class BlCalcMoments extends AbstractBlock {
 					Point2d p1_end = new Point2d((centerOfGravity.x - length_major * Math.cos(omega)), (centerOfGravity.y - length_major * Math.sin(omega)));
 					Point2d p2_end = new Point2d((centerOfGravity.x - length_minor * -Math.sin(omega)), (centerOfGravity.y - length_minor * Math.cos(omega)));
 					
+					// draw moments
 					img = img
 							.io()
 							.canvas()
@@ -126,6 +111,7 @@ public class BlCalcMoments extends AbstractBlock {
 							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
 							.getImage();
 					
+					// draw MEE
 					ImageCanvas canvas = img.io().canvas();
 					Graphics2D g = (Graphics2D) canvas.getGraphics();
 					g.setColor(Color.GRAY);
