@@ -709,10 +709,12 @@ public class LTdataExchange implements ExperimentLoader {
 				topFound = true;
 				break;
 			}
-		if (!topFound)
+		if (!topFound) {
+			boolean sideFound=false;
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
 				if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
+					sideFound= true;
 					if (positionFirst) {
 						res = "side." + res;
 						if (res.endsWith("."))
@@ -722,6 +724,19 @@ public class LTdataExchange implements ExperimentLoader {
 					}
 					break;
 				}
+			if (!sideFound) {
+			boolean t =	SystemOptions.getInstance().getBoolean(
+						"Import", "Use Top-Config, if position can not be determined", true);
+				String sideOrTop = t  ? "top" : "side";
+				if (positionFirst) {
+					res = sideOrTop +"." + res;
+					if (res.endsWith("."))
+						res = res.substring(0, res.length() - 1);
+				} else {
+					res += sideOrTop;
+				}
+			}
+		}
 		return res;
 	}
 	
