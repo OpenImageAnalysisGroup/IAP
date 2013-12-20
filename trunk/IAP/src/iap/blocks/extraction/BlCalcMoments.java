@@ -57,6 +57,7 @@ public class BlCalcMoments extends AbstractBlock {
 		double[] lambdas = ImageMoments.eigenValues(background);
 		double eccentricity = Math.sqrt(1 - lambdas[1] / lambdas[0]);
 		final Point centerOfGravity = im.getCenterOfGravity();
+		final double omega = im.calcOmega(background);
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
@@ -78,8 +79,6 @@ public class BlCalcMoments extends AbstractBlock {
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major.norm", secondMoment_1_norm);
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor.norm", secondMoment_2_norm);
 		rt.addValue("Result." + options.getCameraPosition() + imageModality + "eccentricity", eccentricity);
-		
-		final double omega = im.calcOmega(background);
 		
 		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
 		double xc = my10 / my00;

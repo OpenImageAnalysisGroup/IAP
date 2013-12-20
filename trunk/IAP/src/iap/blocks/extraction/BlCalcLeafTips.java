@@ -455,11 +455,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			else
 				getProperties().addImagePostProcessor(ri);
 			
-			// if (getLeafTipsFromVis)
-			// searchTips(xPosition, yPosition, radius);
+			// if (!calcOnVis) {
+			// if (getBoolean("Get Leaf Tips Info From Vis", false)) {
+			// ArrayList<PositionAndColor> visList = searchTips(input().masks().vis(), xPosition, yPosition, radius);
+			// Color regionColorHsvAvg = getAverageRegionColorHSV(visList);
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.resClassic", regionColorRGBAvg.getRed());
+			// }
 			//
-			// if (getLeafTipsFromNir)
-			// searchTips(xPosition, yPosition, radius);
+			// if (getBoolean("Get Leaf Tips From Nir", false)) {
+			// ArrayList<PositionAndColor> nirList = searchTips(input().masks().nir(), xPosition, yPosition, radius);
+			// final Color regionColorHsvAvg = getAverageRegionColorHSV(nirList);
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.resClassic", regionColorRGBAvg.getRed());
+			// }
+			// }
+			
 			index++;
 		}
 		
@@ -474,20 +483,25 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return res;
 	}
 	
-	private void searchTips(int xPosition, int yPosition, int radius, Image img) {
+	private ArrayList<PositionAndColor> searchTips(Image img, int xPosition, int yPosition, int radius) {
 		int[][] img2d = img.getAs2A();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		int[] res;
+		ArrayList<PositionAndColor> res = new ArrayList<>();
+		
+		// adapt radius to new resolution
+		double fac_x = input().masks().fluo().getWidth() / w;
+		double fac_y = input().masks().fluo().getHeight() / h;
+		radius = (int) (radius * (1 + 1 - (fac_x + fac_y) / 2));
 		
 		for (int x = xPosition - radius; x < xPosition + radius; x++) {
 			for (int y = yPosition - radius; y < yPosition + radius; y++) {
 				if (x >= 0 && x < w && y >= 0 && y < h) {
-					
+					res.add(new PositionAndColor(x, y, img2d[x][y]));
 				}
 			}
 		}
-		
+		return res;
 	}
 	
 	private Image cutFromImage(Image img, int xPosition, int yPosition, int radius) {

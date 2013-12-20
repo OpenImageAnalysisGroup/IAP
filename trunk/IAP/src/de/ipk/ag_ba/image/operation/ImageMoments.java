@@ -9,10 +9,6 @@ import de.ipk.ag_ba.image.structures.Image;
  */
 public class ImageMoments {
 	
-	static double my20;
-	static double my02;
-	static double my11;
-	
 	static Image img;
 	
 	static Point centerOfGravity;
@@ -46,8 +42,8 @@ public class ImageMoments {
 		double area = 0;
 		
 		int[][] img2d = img.getAs2A();
-		int w = img.getWidth();
-		int h = img.getHeight();
+		int w = img2d.length; // img.getWidth();
+		int h = img2d[0].length; // img.getHeight();
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -162,9 +158,9 @@ public class ImageMoments {
 	 */
 	public static double calcOmega(int background) {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
-		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
-		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
+		double my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
+		double my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
+		double my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
 		
 		// use atan2 for case differentiation, see polar-coordinates
 		return Math.atan2((2.0) * my11, my20 - my02) / 2;
@@ -172,10 +168,9 @@ public class ImageMoments {
 	
 	public static double[] eigenValues(int background) {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		
-		my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
-		my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
-		my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
+		double my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
+		double my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
+		double my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
 		
 		double lambda1 = 0.0;
 		double lambda2 = 0.0;
