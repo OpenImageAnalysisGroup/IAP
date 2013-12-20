@@ -60,15 +60,16 @@ public class BlCalcCOG extends AbstractBlock {
 							pos + "fluo.cog.x", cog.x, "px");
 					getProperties().setNumericProperty(getBlockPosition(),
 							pos + "fluo.cog.y", cog.y, "px");
+					
+					RunnableOnImage runnableOnMask = new RunnableOnImage() {
+						@Override
+						public Image postProcess(Image in) {
+							return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
+						}
+					};
+					getProperties().addImagePostProcessor(CameraType.FLUO, null, runnableOnMask);
+					
 				}
-				RunnableOnImage runnableOnMask = new RunnableOnImage() {
-					@Override
-					public Image postProcess(Image in) {
-						return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
-					}
-				};
-				getProperties().addImagePostProcessor(CameraType.FLUO, null, runnableOnMask);
-				
 			}
 		}
 		return fi;
