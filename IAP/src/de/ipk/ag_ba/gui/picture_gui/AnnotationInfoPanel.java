@@ -46,6 +46,8 @@ public class AnnotationInfoPanel extends JPanel {
 	
 	public void addGui(boolean onlyChecked) {
 		removeAll();
+		cbO = null;
+		cbF = null;
 		ArrayList<JComponent> anno = getAnnotationElements(onlyChecked);
 		setLayout(TableLayout.getLayout(TableLayout.PREFERRED,
 				TableLayout.PREFERRED, 1, anno.size()));
@@ -92,13 +94,18 @@ public class AnnotationInfoPanel extends JPanel {
 			final JCheckBox cb) {
 		boolean isGlobalOutlier = mf.filterOut(id.getQualityAnnotation(), id.getParentSample().getTime());
 		String f = id.getAnnotationField(key);
-		if (f != null && f.equals("1"))
+		if (f != null && f.equals("1")) {
 			cb.setSelected(true);
+		}
 		if (key.equals("outlier") && isGlobalOutlier) {
 			cb.setSelected(true);
 			cb.setEnabled(false);
 			cb.setText("Defined Outlier");
-		} else
+		} else {
+			ActionListener[] al = cb.getActionListeners();
+			if (al != null)
+				for (ActionListener l : al)
+					cb.removeActionListener(l);
 			cb.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -118,6 +125,7 @@ public class AnnotationInfoPanel extends JPanel {
 					// System.out.println("ANNO: " + id.getAnnotation());
 				}
 			});
+		}
 	}
 	
 	private void modifyFlagGui(final ImageData id, final String keySearch,

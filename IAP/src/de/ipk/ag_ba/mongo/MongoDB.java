@@ -702,83 +702,81 @@ public class MongoDB {
 			final RunnableProcessingDBid visitSubstance,
 			final RunnableProcessingDBid visitCondition,
 			final RunnableProcessingBinaryMeasurement visitBinaryMeasurement,
-			final ThreadSafeOptions invalid) {
+			final ThreadSafeOptions invalid) throws Exception {
 		
 		if (optStatusProvider != null)
 			optStatusProvider.setCurrentStatusValue(0);
-		try {
-			processDB(new RunnableOnDB() {
-				private DB db;
-				
-				@Override
-				public void run() {
-					DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
-					DBObject expref = dbr.fetch();
-					if (expref != null) {
-						BasicDBList subList = (BasicDBList) expref.get("substances");
-						DBCollection collCond = db.getCollection("conditions");
-						if (getEnsureIndex())
-							collCond.ensureIndex("_id");
-						
-						if (subList != null)
-							for (Object co : subList) {
-								DBObject substance = (DBObject) co;
-								visitSubstance(
-										header,
-										db, substance,
-										collCond,
-										optStatusProvider, 100d / subList.size(),
-										visitSubstanceObject,
-										processConditions,
-										visitCondition,
-										visitBinaryMeasurement,
-										invalid);
-							}
-						boolean printed = false;
-						if (getEnsureIndex())
-							db.getCollection("substances").ensureIndex("_id");
-						BasicDBList l = (BasicDBList) expref.get("substance_ids");
-						if (l != null)
-							for (Object o : l) {
-								if (o == null)
-									continue;
-								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-								if (subr != null) {
-									DBObject substance = subr.fetch();
-									if (visitSubstance != null || visitSubstanceObject != null) {
-										if (substance != null) {
-											if (visitSubstance != null) {
-												synchronized (visitSubstance) {
-													visitSubstance.processDBid(substance.get("_id") + "");
-												}
+		
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
+				DBObject expref = dbr.fetch();
+				if (expref != null) {
+					BasicDBList subList = (BasicDBList) expref.get("substances");
+					DBCollection collCond = db.getCollection("conditions");
+					if (getEnsureIndex())
+						collCond.ensureIndex("_id");
+					
+					if (subList != null)
+						for (Object co : subList) {
+							DBObject substance = (DBObject) co;
+							visitSubstance(
+									header,
+									db, substance,
+									collCond,
+									optStatusProvider, 100d / subList.size(),
+									visitSubstanceObject,
+									processConditions,
+									visitCondition,
+									visitBinaryMeasurement,
+									invalid);
+						}
+					boolean printed = false;
+					if (getEnsureIndex())
+						db.getCollection("substances").ensureIndex("_id");
+					BasicDBList l = (BasicDBList) expref.get("substance_ids");
+					if (l != null)
+						for (Object o : l) {
+							if (o == null)
+								continue;
+							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
+							if (subr != null) {
+								DBObject substance = subr.fetch();
+								if (visitSubstance != null || visitSubstanceObject != null) {
+									if (substance != null) {
+										if (visitSubstance != null) {
+											synchronized (visitSubstance) {
+												visitSubstance.processDBid(substance.get("_id") + "");
 											}
-											visitSubstance(header,
-													db, substance,
-													collCond,
-													optStatusProvider, 100d / l.size(),
-													visitSubstanceObject, processConditions,
-													visitCondition, visitBinaryMeasurement,
-													invalid);
-										} else
-											if (!printed) {
-												System.out.println("WARNING: Missing substance(s) in experiment " + header.getExperimentName());
-												printed = true;
-												invalid.setBval(0, true);
-											}
-									}
+										}
+										visitSubstance(header,
+												db, substance,
+												collCond,
+												optStatusProvider, 100d / l.size(),
+												visitSubstanceObject, processConditions,
+												visitCondition, visitBinaryMeasurement,
+												invalid);
+									} else
+										if (!printed) {
+											System.out.println("WARNING: Missing substance(s) in experiment " + header.getExperimentName());
+											printed = true;
+											invalid.setBval(0, true);
+										}
 								}
 							}
-					}
+						}
 				}
-				
-				@Override
-				public void setDB(DB db) {
-					this.db = db;
-				}
-			});
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
+		
 	}
 	
 	public void setExperimentType(final ExperimentHeaderInterface header, final String experimentType) throws Exception {
@@ -996,7 +994,7 @@ public class MongoDB {
 			if (l != null) {
 				double max = l.size();
 				boolean printed = false;
-				boolean singleFetch = false;
+				boolean singleFetch = true;
 				if (collCond != null)
 					if (singleFetch)
 						printed = processConditionBySingleFetch(header, db, collCond,
@@ -1076,32 +1074,32 @@ public class MongoDB {
 		}
 		DBCursor condL = null;
 		try {
-			condL = collCond.find(
-					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					, new BasicDBObject()
-							.append("_id", new Integer(1))
-							.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
-							.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
-							.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
-					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 200);
-			int condLsize = 0;
-			for (DBObject cond : condL) {
-				condLsize++;
-				// find objects in "condition" collection, but only fields images, volumes, networks
-				synchronized (visitCondition) {
+			synchronized (visitCondition) {
+				condL = collCond.find(
+						new BasicDBObject("_id", new BasicDBObject("$in", ll))
+						, new BasicDBObject()
+								.append("_id", new Integer(1))
+								.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
+								.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
+								.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+						).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 200);
+				int condLsize = 0;
+				for (DBObject cond : condL) {
+					condLsize++;
+					// find objects in "condition" collection, but only fields images, volumes, networks
 					visitCondition.processDBid(cond.get("_id") + "");
+					visitCondition(s3d, cond, visitBinary);
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
 				}
-				visitCondition(s3d, cond, visitBinary);
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
-			}
-			if (lsize != condLsize) {
-				if (!printed) {
-					String msg = "WARNING: " + (l.size() - condL.size()) + " condition(s) could not be retrieved for experiment " + header.getExperimentName();
-					System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
-					saveSystemMessage(msg);
-					printed = true;
-					invalid.setBval(0, true);
+				if (lsize != condLsize) {
+					if (!printed) {
+						String msg = "WARNING: " + (l.size() - condL.size()) + " condition(s) could not be retrieved for experiment " + header.getExperimentName();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
+						saveSystemMessage(msg);
+						printed = true;
+						invalid.setBval(0, true);
+					}
 				}
 			}
 		} finally {

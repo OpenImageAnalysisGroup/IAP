@@ -183,7 +183,7 @@ public class CleanupHelper implements RunnableOnDB {
 			}
 		};
 		
-		int nThreads = 3;
+		int nThreads = 2;
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);
 		final ThreadSafeOptions fc = new ThreadSafeOptions();
 		final ArrayList<ThreadSafeOptions> invalids = new ArrayList<ThreadSafeOptions>();
@@ -192,42 +192,59 @@ public class CleanupHelper implements RunnableOnDB {
 			executor.submit(new Runnable() {
 				@Override
 				public void run() {
+					boolean error = false;
+					synchronized (invalids) {
+						error = invalids.size() > 0;
+					}
+					if (error)
+						return;
 					ThreadSafeOptions invalid = new ThreadSafeOptions();
-					invalid.setBval(0, false);
-					final int r = ii.addInt(1);
-					status.setCurrentStatusText1("Analyze " + ehii.getExperimentName()
-							+ " (" + r + "/" + nn + ")");
-					BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger() {
-						
-						@Override
-						public void setCurrentStatusText1(String st) {
-							status.setCurrentStatusText1("<html>" +
-									"Analyze " + ehii.getExperimentName()
-									+ " (" + r + "/" + nn + "):<br>" + st);
+					try {
+						invalid.setBval(0, false);
+						final int r = ii.addInt(1);
+						status.setCurrentStatusText1("Analyze " + ehii.getExperimentName()
+								+ " (" + r + "/" + nn + ")");
+						BackgroundTaskConsoleLogger ss = new BackgroundTaskConsoleLogger() {
+							
+							@Override
+							public void setCurrentStatusText1(String st) {
+								status.setCurrentStatusText1("<html>" +
+										"Analyze " + ehii.getExperimentName()
+										+ " (" + r + "/" + nn + "):<br>" + st);
+							}
+							
+							@Override
+							public void setCurrentStatusText2(String st) {
+								status.setCurrentStatusText2(st);
+							}
+							
+						};
+						ss.setEnabled(false);
+						long a = System.currentTimeMillis();
+						CleanupHelper.this.mongoDB.visitExperiment(
+								ehii,
+								ss, null, true, visitSubstance, visitCondition, visitBinaryMeasurement,
+								invalid);
+						long b = System.currentTimeMillis();
+						fc.addInt(1);
+						String msg = "Visiting " + ehii.getExperimentname() + " (" + fc.getInt() + " finished) took " +
+								SystemAnalysis.getWaitTime(b - a);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
+						status.setCurrentStatusText2(msg);
+						status.setCurrentStatusValueFineAdd(smallStep);
+						if (invalid.getBval(0, false)) {
+							invalid.setParam(0,
+									ehii.getDatabaseId() + ": " + ehii.getExperimentName() + " // " + ehii.getCoordinator() + " // " + ehii.getExperimentType());
+							synchronized (invalids) {
+								invalids.add(invalid);
+							}
 						}
-						
-						@Override
-						public void setCurrentStatusText2(String st) {
-							status.setCurrentStatusText2(st);
-						}
-						
-					};
-					ss.setEnabled(false);
-					long a = System.currentTimeMillis();
-					CleanupHelper.this.mongoDB.visitExperiment(
-							ehii,
-							ss, null, true, visitSubstance, visitCondition, visitBinaryMeasurement,
-							invalid);
-					long b = System.currentTimeMillis();
-					fc.addInt(1);
-					String msg = "Visiting " + ehii.getExperimentname() + " (" + fc.getInt() + " finished) took " +
-							SystemAnalysis.getWaitTime(b - a);
-					System.out.println(SystemAnalysis.getCurrentTime() + ">" + msg);
-					status.setCurrentStatusText2(msg);
-					status.setCurrentStatusValueFineAdd(smallStep);
-					if (invalid.getBval(0, false)) {
+					} catch (Exception e) {
+						invalid.setBval(1, true);
 						invalid.setParam(0, ehii.getDatabaseId());
-						invalids.add(invalid);
+						synchronized (invalids) {
+							invalids.add(invalid);
+						}
 					}
 				}
 			});
@@ -244,13 +261,27 @@ public class CleanupHelper implements RunnableOnDB {
 		for (ThreadSafeOptions inv : invalids) {
 			String id = (String) inv.getParam(0, "");
 			try {
-				System.out.println(SystemAnalysis.getCurrentTime() + "Clean-up: delete invalid experiment " + id);
+				System.out.println(SystemAnalysis.getCurrentTime() + "Clean-up: detected incorrectly read experiment " + id);
 				MongoDB.saveSystemMessage(SystemAnalysis.getCurrentTime()
-						+ ">Clean-up: About to delete an invalid experiment (some sub-documents could not be loaded): " + id);
-				MongoDB.getDefaultCloud().deleteExperiment(id);
+						+ ">Clean-up: Detected invalid experiment (some sub-documents could not be loaded, further processing has been stopped): " + id);
+				// MongoDB.getDefaultCloud().deleteExperiment(id);
 			} catch (Exception e) {
-				MongoDB.saveSystemErrorMessage("Could not delete an invalid experiment " + id, e);
+				// MongoDB.saveSystemErrorMessage("Could not delete an invalid experiment " + id, e);
 			}
+		}
+		
+		if (invalids.size() > 0)
+		{
+			msg = "Clean-up: Interrupted processing, as at least 1 experiment could not be processed correctly. " + " // "
+					+ SystemAnalysis.getCurrentTime();
+			System.out.println(msg);
+			MongoDB.saveSystemMessage(msg);
+			
+			res.append(msg);
+			status.setCurrentStatusText1("Processing Interrupted");
+			status.setCurrentStatusText2("(" + invalids.size() + " experiment(s) could not be processed)");
+			status.setCurrentStatusValueFine(100d);
+			return;
 		}
 		
 		{
