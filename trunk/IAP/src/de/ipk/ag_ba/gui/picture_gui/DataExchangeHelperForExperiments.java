@@ -18,9 +18,11 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -341,6 +343,7 @@ public class DataExchangeHelperForExperiments {
 			BinaryFileInfo lastBBB = null;
 			if (bbb.size() > 0)
 				lastBBB = bbb.get(bbb.size() - 1);
+			Collection<DataSetFileButton> buttonsInThisView = new LinkedList<DataSetFileButton>();
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				if (mt != expTree.getSelectionPath().getLastPathComponent())
 					break;
@@ -365,7 +368,10 @@ public class DataExchangeHelperForExperiments {
 					previewLoadAndConstructNeeded = true;
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(
-						mt, imageResult, previewImage, mt.isReadOnly(), false, null);
+						mt, imageResult, previewImage, mt.isReadOnly(), false, null, buttonsInThisView);
+				synchronized (buttonsInThisView) {
+					buttonsInThisView.add(imageButton);
+				}
 				if (binaryFileInfo.isPrimary())
 					imageButton.setIsPrimaryDatabaseEntity();
 				if (binaryFileInfo.isAttachment())
@@ -404,7 +410,7 @@ public class DataExchangeHelperForExperiments {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, "Create Data Chart");
+					mt, null, previewImage, mt.isReadOnly(), true, "Create Data Chart", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -437,7 +443,7 @@ public class DataExchangeHelperForExperiments {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, "Export Data (XLSX)");
+					mt, null, previewImage, mt.isReadOnly(), true, "Export Data (XLSX)", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -492,6 +498,7 @@ public class DataExchangeHelperForExperiments {
 					MeasurementFilter mf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), mt.getExperiment().getHeader().getGlobalOutlierInfo());
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(
 							imageButton, mt, mf);
+					imageButton.setAnnotationInfoPanel(aip);
 					JComponent buttonAndInfo = binaryFileInfo == null || !binaryFileInfo.isPrimary() ? imageButton
 							: TableLayout.getSplitVertical(imageButton, aip,
 									TableLayout.PREFERRED,

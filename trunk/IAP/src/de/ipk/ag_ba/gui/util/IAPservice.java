@@ -555,6 +555,10 @@ public class IAPservice {
 		return result;
 	}
 	
+	public static Match matchHelper(ExperimentInterface experiment) {
+		return new Match(experiment);
+	}
+	
 	public final static float[] cubeRoots = getCubeRoots(0f, 1.1f, 1100);
 	private static HashMap<String, String> niceNames = initNiceNames();
 	

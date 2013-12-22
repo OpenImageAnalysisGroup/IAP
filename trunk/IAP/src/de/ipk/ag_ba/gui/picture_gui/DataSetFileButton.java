@@ -107,6 +107,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	volatile boolean downloadInProgress = false;
 	boolean downloadNeeded = false;
 	private ActionListener sizeChangedListener;
+	private Collection<DataSetFileButton> buttonsInThisView;
 	
 	public int getIsJavaImage() {
 		if (myImage == null)
@@ -116,8 +117,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public DataSetFileButton(
 			final MongoTreeNode targetTreeNode, String label, MyImageIcon icon,
-			ImageIcon previewImage, boolean isNoImageButton) {
+			ImageIcon previewImage, boolean isNoImageButton, Collection<DataSetFileButton> buttonsInThisView) {
 		super();
+		this.buttonsInThisView = buttonsInThisView;
 		
 		progress = new JProgressBar(0, 100);
 		progress.setValue(-1);
@@ -443,6 +445,11 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					if (added)
 						jp.add(ta);
+					jp.addSeparator();
+					
+					JMenu fm = getAnnotationChangerSubmenu();
+					
+					jp.add(fm);
 					
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -455,6 +462,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private String additionalFileNameInfo;
 	private boolean attachment;
 	private ActionListener additionalActionListener;
+	private AnnotationInfoPanel aip;
 	
 	public void updateLayout(String label, MyImageIcon icon,
 			ImageIcon previewImage, boolean isNoImageButton) {
@@ -497,7 +505,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	public DataSetFileButton(MongoTreeNode projectNode,
-			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle) {
+			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle,
+			Collection<DataSetFileButton> buttonsInThisView) {
 		this(projectNode,
 				"<html><body><b>" +
 						(imageResult == null ? "<center>" + customNonImageTitle :
@@ -515,7 +524,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 																.getBinaryFileInfo().entity)
 																.getPosition().intValue()
 																+ ")" : "0)")))))
-						+ "</b></body></html>", null, previewImage, isNoImageButton);
+						+ "</b></body></html>", null, previewImage, isNoImageButton, buttonsInThisView);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
 		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
@@ -1348,5 +1357,106 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public ActionListener getAdditionalActionListener() {
 		return additionalActionListener;
+	}
+	
+	private JMenu getAnnotationChangerSubmenu() {
+		JMenu fm = new JMenu("Modify Annotation (Outlier/Flag)");
+		fm.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Bookmark-New-64.png").getScaledInstance(16, 16,
+				java.awt.Image.SCALE_SMOOTH)));
+		fm.add(getCameraSelectionMenu(CameraSelection.THIS_CAMERA));
+		fm.add(getCameraSelectionMenu(CameraSelection.ALL_CAMERAS_AND_MEASURMENT_TYPES));
+		
+		return fm;
+	}
+	
+	private JMenu getCameraSelectionMenu(CameraSelection cs) {
+		JMenu cm = new JMenu(cs + "");
+		cm.add(getDaySelectionMenu(cs, DaySelection.THIS_SNAPSHOT));
+		cm.add(getDaySelectionMenu(cs, DaySelection.THIS_DAY));
+		cm.add(getDaySelectionMenu(cs, DaySelection.ALL_DAYS));
+		cm.add(getDaySelectionMenu(cs, DaySelection.FROM_THIS_DAY));
+		cm.add(getDaySelectionMenu(cs, DaySelection.UNTIL_THIS_DAY));
+		
+		return cm;
+	}
+	
+	private JMenu getDaySelectionMenu(CameraSelection cs, DaySelection ds) {
+		JMenu dm = new JMenu(ds + "");
+		
+		dm.add(getPlantSelectionMenu(cs, ds, PlantSelection.THIS_PLANT));
+		dm.add(getPlantSelectionMenu(cs, ds, PlantSelection.ALL_PLANTS));
+		
+		return dm;
+	}
+	
+	private JMenu getPlantSelectionMenu(CameraSelection cs, DaySelection ds, PlantSelection ps) {
+		JMenu pm = new JMenu(ps + "");
+		
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.MARK_AS_OUTLIER));
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.REMOVE_OUTLIER_MARK));
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.TOGGLE_OUTLIER_MARK));
+		pm.addSeparator();
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.FLAG));
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.UNFLAG));
+		pm.add(getAnnotationChangeMenuItem(cs, ds, ps, AnnotionChangeCommand.TOGGLE_FLAG));
+		
+		return pm;
+	}
+	
+	private JMenuItem getAnnotationChangeMenuItem(CameraSelection cs, DaySelection ds, PlantSelection ps, AnnotionChangeCommand mode) {
+		JMenuItem cmd = new JMenuItem(mode + "");
+		cmd.setAction(getAnnotionChangeAction(cs, ds, ps, mode));
+		return cmd;
+	}
+	
+	private Action getAnnotionChangeAction(final CameraSelection cs, final DaySelection ds, final PlantSelection ps, final AnnotionChangeCommand mode) {
+		Action res = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String annotation = mode.getAnnotation();
+					SetMode sm = mode.getSetMode();
+					Collection<NumericMeasurementInterface> match = IAPservice.matchHelper(targetTreeNode.getExperiment().getExperiment())
+							.getMatchForReference(cs, ds, ps, (NumericMeasurementInterface) imageResult.getBinaryFileInfo().getEntity());
+					for (NumericMeasurementInterface nm : match) {
+						NumericMeasurement3D nmi = (NumericMeasurement3D) nm;
+						if (sm == SetMode.SET_VALUE)
+							nmi.setAnnotationField(annotation, "1");
+						else
+							if (sm == SetMode.REMOVE_VALUE)
+								nmi.removeAnnotationField(annotation);
+							else
+								if (sm == SetMode.TOGGLE) {
+									String v = nmi.getAnnotationField(annotation);
+									if (v == null || v.equals("0"))
+										nmi.setAnnotationField(annotation, "1");
+									else
+										nmi.removeAnnotationField(annotation);
+								}
+					}
+					if (buttonsInThisView != null) {
+						synchronized (buttonsInThisView) {
+							for (DataSetFileButton dsfb : buttonsInThisView)
+								dsfb.updateAnnotationCheckboxValueView();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					MainFrame.showMessageDialog("Error: " + e.getMessage(), "Error");
+				}
+			}
+		};
+		return res;
+	}
+	
+	protected void updateAnnotationCheckboxValueView() {
+		if (aip != null) {
+			aip.removeGui();
+			aip.addGui(true);
+		}
+	}
+	
+	public void setAnnotationInfoPanel(AnnotationInfoPanel aip) {
+		this.aip = aip;
 	}
 }

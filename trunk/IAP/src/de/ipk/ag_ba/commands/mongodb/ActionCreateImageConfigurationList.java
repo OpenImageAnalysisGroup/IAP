@@ -118,9 +118,13 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 							String s = config.toString();
 							if (!config2names.containsKey(s))
 								config2names.put(s, new ArrayList<String>());
-							config2names.get(s).add(eh.getExperimentName() +
+							config2names.get(s).add("<font color='gray'><small>" +
+									eh.getExperimentType() + " &gt; " + eh.getCoordinator() + " &gt;</small></font><br>" +
+									eh.getExperimentName()
+									+
 									(
-									eh.getSettings() != null && !eh.getSettings().isEmpty() ? "&nbsp;(settings)" : ""));
+									eh.getSettings() != null && !eh.getSettings().isEmpty() ? "&nbsp;(with analysis settings)"
+											: ""));
 						}
 					} catch (Exception err) {
 						errors.add("Could not process " + eh.getExperimentName() + ": " + err.getMessage());
