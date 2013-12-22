@@ -307,7 +307,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return m;
 	}
 	
-	public String getAnnotationField(String key) {
+	public synchronized String getAnnotationField(String key) {
 		String a = getAnnotation();
 		if (a != null) {
 			String anno = a;
@@ -321,7 +321,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return null;
 	}
 	
-	public ArrayList<String> getAnnotationKeys(String search) {
+	public synchronized ArrayList<String> getAnnotationKeys(String search) {
 		ArrayList<String> result = new ArrayList<String>();
 		String a = getAnnotation();
 		if (a != null) {
@@ -336,21 +336,32 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return result;
 	}
 	
-	public synchronized void addAnnotationField(String key, String value) {
+	public synchronized boolean addAnnotationField(String key, String value) {
 		if (key == null || value == null)
-			return;
+			return false;
 		if (value.contains(";"))
 			throw new UnsupportedOperationException(
-					"annotation field value must not contain the ;-character");
+					"Annotation field value must not contain the ;-character!");
 		String a = getAnnotation();
 		if (a == null)
 			a = key + "#" + value;
 		else
 			a += ";" + key + "#" + value;
 		setAnnotation(a);
+		return true;
 	}
 	
-	public boolean replaceAnnotationField(String key, String value) {
+	public synchronized boolean setAnnotationField(String key, String value) {
+		if (key == null || value == null)
+			return false;
+		if (getAnnotationField(key) != null) {
+			return replaceAnnotationField(key, value);
+		} else {
+			return addAnnotationField(key, value);
+		}
+	}
+	
+	public synchronized boolean replaceAnnotationField(String key, String value) {
 		if (key == null || value == null)
 			return false;
 		boolean found = false;
@@ -358,7 +369,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		String a = getAnnotation();
 		if (value.contains(";"))
 			throw new UnsupportedOperationException(
-					"annotation field value must not contain a commata character");
+					"Annotation field value must not contain a commata character!");
 		if (a != null) {
 			String anno = a;
 			String[] fields = anno.split(";");
@@ -378,5 +389,27 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		}
 		setAnnotation(res.toString());
 		return found;
+	}
+	
+	public boolean removeAnnotationField(String key) {
+		String a = getAnnotation();
+		if (a == null)
+			return false;
+		else {
+			boolean found = false;
+			StringBuilder res = new StringBuilder();
+			String anno = a;
+			String[] fields = anno.split(";");
+			for (String f : fields) {
+				String[] nn = f.split("#", 2);
+				if (!nn[0].equals(key)) {
+					if (res.length() > 0)
+						res.append(";");
+					res.append(f);
+				} else
+					found = true;
+			}
+			return found;
+		}
 	}
 }
