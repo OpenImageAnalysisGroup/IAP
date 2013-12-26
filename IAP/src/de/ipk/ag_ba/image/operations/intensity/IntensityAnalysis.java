@@ -35,7 +35,6 @@ public class IntensityAnalysis {
 		double sumOfSat = 0;
 		double sumOfVal = 0;
 		
-		double sumOfDGCIs = 0;
 		double sumOfDGCIs2 = 0;
 		
 		DescriptiveStatistics statsHueValuesOverall = new DescriptiveStatistics();
@@ -100,11 +99,8 @@ public class IntensityAnalysis {
 								if (hLimit > 120d / 360d)
 									hLimit = 120d / 360d;
 							
-							double p1 = (hLimit - 60d / 360d) / (60d / 360d);
-							double p2 = s;
-							double p3 = 1 - v;
-							sumOfDGCIs += (p1 + p2 + p3) / 3d;
-							sumOfDGCIs2 += (p1 + (1 - p2) + p3) / 3d;
+							double pH1 = (hLimit - 60d / 360d) / (60d / 360d);
+							sumOfDGCIs2 += (pH1 + (1 - s) + (1 - v)) / 3d;
 							
 							statsHueValuesOverall.addValue(h);
 						}
@@ -233,8 +229,7 @@ public class IntensityAnalysis {
 				result.addValue("hsv.v.average", vavg);
 				
 				if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
-					result.addValue("hsv.dgci.average", sumOfDGCIs / plantImagePixelCntVgreater0);
-					result.addValue("hsv.dgci_orig.average", sumOfDGCIs2 / plantImagePixelCntVgreater0);
+					result.addValue("hsv.dgci.average", sumOfDGCIs2 / plantImagePixelCntVgreater0);
 				}
 			}
 			
