@@ -20,4 +20,8 @@ public interface ActionScriptBasedDataProcessing {
 	
 	String getTooltip();
 	
+	String[] getWebURLs();
+	
+	String[] getWebUrlTitles();
+	
 }
