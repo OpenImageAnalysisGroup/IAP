@@ -437,8 +437,9 @@ public class ThreadSafeOptions implements HelperClass {
 		this.l = l;
 	}
 	
-	public synchronized void addLong(long l) {
+	public synchronized long addLong(long l) {
 		this.l += l;
+		return this.l;
 	}
 	
 	public synchronized long getLong() {

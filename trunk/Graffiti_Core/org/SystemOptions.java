@@ -555,6 +555,10 @@ public class SystemOptions {
 	}
 	
 	public synchronized void setStringArray(String section, String setting, ArrayList<String> newValues) {
+		if (ini == null) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
+			return;
+		}
 		Ini.Section sec = ini.get(section);
 		sec.remove(setting);
 		for (String nv : newValues)
