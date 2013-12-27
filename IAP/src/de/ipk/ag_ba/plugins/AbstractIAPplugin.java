@@ -14,6 +14,7 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.GenericPluginAdapter;
 
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -87,5 +88,10 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 	@Override
 	public AnalysisPipelineTemplate[] getAnalysisTemplates() {
 		return new AnalysisPipelineTemplate[] {};
+	}
+	
+	@Override
+	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReference experimentReference) {
+		return new ActionScriptBasedDataProcessing[] {};
 	}
 }

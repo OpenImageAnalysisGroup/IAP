@@ -12,6 +12,7 @@ import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.TemplatePhenotypingTask;
@@ -107,6 +108,21 @@ public class IAPpluginManager {
 		};
 		processPlugins(r);
 		return dataProcessingActions;
+	}
+	
+	public Collection<ActionScriptBasedDataProcessing> getExperimentScriptActions(
+			final ExperimentReference experimentReference) {
+		final Collection<ActionScriptBasedDataProcessing> scriptBasedProcessingActions = new ArrayList<ActionScriptBasedDataProcessing>();
+		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
+			@Override
+			public void processPlugin(IAPplugin p) {
+				for (ActionScriptBasedDataProcessing dp : p.getScriptBasedDataProcessingTools(experimentReference)) {
+					scriptBasedProcessingActions.add(dp);
+				}
+			}
+		};
+		processPlugins(r);
+		return scriptBasedProcessingActions;
 	}
 	
 	public Collection<String> getSettingHelp(final String iniFileName, final String section, final String setting) {

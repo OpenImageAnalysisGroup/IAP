@@ -3,6 +3,7 @@ package de.ipk.ag_ba.plugins.actions;
 import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
+import de.ipk.ag_ba.commands.experiment.ActionCmdLineTools;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
 import de.ipk.ag_ba.commands.experiment.ActionPdfReport;
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
@@ -44,7 +45,8 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		}
 		
 		actions.add(new ActionCopyExperiment());
-		actions.add(new ActionToolList("Performance test and sort substances tool commands"));
+		actions.add(new ActionToolList("Various tools and less-often used data manipulation commands"));
+		actions.add(new ActionCmdLineTools("Script-commands for data evaluation and filtering"));
 		actions.add(new ActionCopyToClipboard());
 		
 		ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
