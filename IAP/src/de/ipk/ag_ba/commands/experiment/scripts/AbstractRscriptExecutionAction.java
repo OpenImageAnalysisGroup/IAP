@@ -16,8 +16,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	
 	private final String scriptIniLocation;
 	private final ArrayList<String> res = new ArrayList<String>();
-	private final ArrayList<String> urls = new ArrayList<String>();
-	private final ArrayList<String> urlDescriptions = new ArrayList<String>();
+	private ArrayList<String> urls = new ArrayList<String>();
+	private ArrayList<String> urlDescriptions = new ArrayList<String>();
 	private String title;
 	private String iconDef;
 	String cmd;
@@ -35,6 +35,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		iconDef = sh.getIcon();
 		cmd = sh.getCommand();
 		params = sh.getParams();
+		urls = StringManipulationTools.getStringListFromArray(sh.getWebURLs());
+		urlDescriptions = StringManipulationTools.getStringListFromArray(sh.getWebUrlTitles());
 	}
 	
 	@Override
@@ -49,6 +51,10 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> ra = new ArrayList<NavigationButton>();
 		for (int i = 0; i < urls.size(); i++) {
+			if (urls.get(i) == null || urls.get(i).isEmpty())
+				continue;
+			if (urlDescriptions.get(i) == null || urlDescriptions.get(i).isEmpty())
+				continue;
 			ra.add(
 					new NavigationButton(urlDescriptions.get(i),
 							new WebUrlAction(new IOurl(urls.get(i)), "Show " + urlDescriptions.get(i)), guiSetting));

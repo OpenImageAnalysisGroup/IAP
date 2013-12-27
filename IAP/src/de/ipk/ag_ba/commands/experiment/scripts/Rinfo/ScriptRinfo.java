@@ -34,4 +34,13 @@ public class ScriptRinfo implements ActionScriptBasedDataProcessing {
 		return "Check R stat installation";
 	}
 	
+	@Override
+	public String[] getWebURLs() {
+		return new String[] { "http://www.r-project.org" };
+	}
+	
+	@Override
+	public String[] getWebUrlTitles() {
+		return new String[] { "R Project Website" };
+	}
 }

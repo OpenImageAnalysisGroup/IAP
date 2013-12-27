@@ -31,7 +31,18 @@ public class ScriptHelper {
 			so.setString("Icon Display", "icon", adp.getImage());
 			so.setString("Script", "exec", adp.getCommand());
 			so.setStringArray("Script", "params", StringManipulationTools.getStringListFromArray(adp.getParams()));
-		}
+			so.setStringArray("Reference Infos", "urls", StringManipulationTools.getStringListFromArray(adp.getWebURLs()));
+			so.setStringArray("Reference Infos", "url titles", StringManipulationTools.getStringListFromArray(adp.getWebUrlTitles()));
+		} else
+			if (adp != null) {
+				so.getString("Icon Display", "title", adp.getTitle());
+				so.getString("Icon Display", "tooltip", adp.getTooltip());
+				so.getString("Icon Display", "icon", adp.getImage());
+				so.getString("Script", "exec", adp.getCommand());
+				so.getStringAll("Script", "params", adp.getParams());
+				so.getStringAll("Reference Infos", "urls", adp.getWebURLs());
+				so.getStringAll("Reference Infos", "url titles", adp.getWebUrlTitles());
+			}
 	}
 	
 	public String getTitle() {
@@ -48,5 +59,13 @@ public class ScriptHelper {
 	
 	public String[] getParams() {
 		return so.getStringAll("Script", "params", new String[] { "--version" });
+	}
+	
+	public String[] getWebURLs() {
+		return so.getStringAll("Reference Infos", "urls", new String[] {});
+	}
+	
+	public String[] getWebUrlTitles() {
+		return so.getStringAll("Reference Infos", "url titles", new String[] {});
 	}
 }
