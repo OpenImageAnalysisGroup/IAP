@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.graffiti.plugin.GenericPlugin;
 
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -64,6 +65,17 @@ public interface IAPplugin extends GenericPlugin {
 	 *         dataset. The commands are shown after the user clicks the Tool command when a experiment is loaded.
 	 */
 	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference experimentReference);
+	
+	/**
+	 * @param experimentReference
+	 *           Experiment data set (reference), the particular command will
+	 *           work on the given data.
+	 * @return A list of NavigationAction commands, which may process the particular experiment
+	 *         dataset. The commands are shown after the user clicks the Scripts command when a experiment is loaded.
+	 *         These commands normally work by extending the abstract class XYZ (TODO ADD NAME HERE), and process
+	 *         a given CSV export.
+	 */
+	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReference experimentReference);
 	
 	/**
 	 * Override this method to provide help text(s), displayed by the settings editor for a specific

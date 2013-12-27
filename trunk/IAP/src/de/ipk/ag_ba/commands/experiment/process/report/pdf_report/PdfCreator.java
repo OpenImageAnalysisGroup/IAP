@@ -231,7 +231,7 @@ public class PdfCreator {
 				if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
 					output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
 							"Report generation took more than " +
-							"30 minutes and has therefore been canceled.");
+							timeoutMinutes + " minutes and has therefore been cancelled.");
 					tso.setBval(1, true);
 					if (myRef.getObject() != null) {
 						Process ls_proc = (Process) myRef.getObject();
