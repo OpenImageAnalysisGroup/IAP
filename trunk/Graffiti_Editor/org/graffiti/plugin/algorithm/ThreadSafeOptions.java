@@ -225,15 +225,15 @@ public class ThreadSafeOptions implements HelperClass {
 	}
 	
 	/**
-	 * DOCUMENT ME!
+	 * Save an object value.
 	 * 
 	 * @param index
-	 *           DOCUMENT ME!
+	 *           ID of property.
 	 * @param setValue
-	 *           DOCUMENT ME!
-	 * @return DOCUMENT ME!
+	 *           Property value
+	 * @return ThreadSafeObject, so that multiple values can be set more easily.
 	 */
-	public synchronized Object setParam(int index, Object setValue) {
+	public synchronized ThreadSafeOptions setParam(int index, Object setValue) {
 		if (paramObjects == null) {
 			paramObjects = new Vector<Object>();
 		}
@@ -246,7 +246,7 @@ public class ThreadSafeOptions implements HelperClass {
 		
 		paramObjects.setElementAt(setValue, index);
 		
-		return setValue;
+		return this;
 	}
 	
 	/**
@@ -314,7 +314,7 @@ public class ThreadSafeOptions implements HelperClass {
 	 * @param value
 	 *           The new setting stored at index <code>index</code>.
 	 */
-	public void setBval(int index, boolean value) {
+	public ThreadSafeOptions setBval(int index, boolean value) {
 		synchronized (bValues) {
 			if (index >= bValues.length) {
 				Boolean[] newBvalues = new Boolean[index + 1];
@@ -325,6 +325,7 @@ public class ThreadSafeOptions implements HelperClass {
 			
 			bValues[index] = new Boolean(value);
 		}
+		return this;
 	}
 	
 	/**
