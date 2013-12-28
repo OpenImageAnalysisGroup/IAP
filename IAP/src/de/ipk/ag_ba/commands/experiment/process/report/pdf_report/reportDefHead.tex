@@ -163,7 +163,7 @@ urlcolor=black
 \newcommand{\loadImage}[1]{\IfFileExists{#1}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{#1} \end{OwnLoadImage}}{\begin{OwnLoadImage} \includegraphics[height=\ScaleIfNeededHeight,width=\ConstForImageWidth, keepaspectratio]{noValues.pdf} \end{OwnLoadImage}}}
 \newcommand{\loadImageCap}[2]{\IfFileExists{#1}
 	{\begin{OwnLoadImageVSpace}
-			\includegraphics[width=\ScaleIfNeededWidth,keepaspectratio]{#1} \caption{#2} \label{fig:#1}
+			\includegraphics[width=\ScaleIfNeededWidth,keepaspectratio]{#1} \label{fig:#1} % \caption{#2} \label{fig:#1}
 			%[height=\ScaleIfNeededHeight,width=\ScaleIfNeededWidth,keepaspectratio]
 	 \end{OwnLoadImageVSpace}
 	}{\begin{OwnLoadImage}

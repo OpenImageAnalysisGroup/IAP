@@ -580,19 +580,19 @@ public class IAPservice {
 		res.put("water_weight (g)", "Water weight");
 		res.put("side.height.norm (mm)", "Height (normalized)");
 		res.put("side.height (px)", "Height");
-		res.put("side.area.norm (mm^2)", "Side Area (normalized)");
-		res.put("side.area (px)", "Side Area");
+		res.put("side.vis.area.norm (mm^2)", "Side Vis Area (normalized)");
+		res.put("side.vis.area (px)", "Side Vis Area");
 		res.put("side.fluo.intensity.average (relative)", "Fluo intensity (side)");
 		res.put("side.nir.intensity.average (relative)", "NIR intensity (side)");
 		res.put("top.fluo.intensity.average (relative)", "Fluo intensity (top)");
 		res.put("top.nir.intensity.average (relative)", "NIR intensity (top)");
-		res.put("side.vis.hue.average (relative)", "Average hue (side)");
-		res.put("top.vis.hue.average (relative)", "Average hue (top)");
+		res.put("side.vis.hsv.h.average", "Average hue (side)");
+		res.put("top.vis.hsv.h.average", "Average hue (top)");
 		res.put("side.width.norm (mm)", "Width (normalized)");
 		res.put("side.width (px)", "Width");
-		res.put("top.area.norm", "Top area (normalized)");
-		res.put("top.area (px)", "Top area");
-		res.put("volume.fluo.iap (px^3)", "Digital biomass (fluo)");
+		res.put("top.vis.area.norm", "Top Vis Area (normalized)");
+		res.put("top.vis.area (px)", "Top Vis Area");
+		res.put("volume.fluo.iap (px^3)", "Volume estimation (fluo)");
 		return res;
 	}
 	
@@ -1002,8 +1002,8 @@ public class IAPservice {
 							if (!optSnapshotFilter.filterOut(sn))
 								result.add(sn);
 							else {
-								System.out.println("About to filter out a snapshot: " + sn);
-								System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
+								// System.out.println("About to filter out a snapshot: " + sn);
+								// System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
 							}
 						if (optStatus != null)
 							optStatus.setCurrentStatusText2("Create Snapshots (" + result.size() + ")");

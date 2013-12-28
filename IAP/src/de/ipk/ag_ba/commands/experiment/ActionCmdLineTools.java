@@ -53,7 +53,7 @@ public class ActionCmdLineTools extends AbstractNavigationAction implements Acti
 			}
 		})) {
 			try {
-				res.add(new NavigationButton(new AbstractRscriptExecutionAction(iniFN, "scripts" + File.separator + iniFN), guiSetting));
+				res.add(new NavigationButton(new AbstractRscriptExecutionAction(null, iniFN, "scripts" + File.separator + iniFN, experimentReference), guiSetting));
 			} catch (IOException e) {
 				ErrorMsg.addErrorMessage(e);
 			}

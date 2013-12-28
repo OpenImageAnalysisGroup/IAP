@@ -79,7 +79,7 @@ public class ScriptExecutor {
 								String response;
 								try {
 									while ((response = ls_in2.readLine()) != null) {
-										output.put(System.nanoTime(), "<font color='red'>" + response + "</font>");
+										output.put(System.nanoTime() + tso.addLong(1), "<font color='red'>" + response + "</font>");
 										System.err.println(response);
 										if (optStatus != null && response != null && response.trim().length() > 0)
 											optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());

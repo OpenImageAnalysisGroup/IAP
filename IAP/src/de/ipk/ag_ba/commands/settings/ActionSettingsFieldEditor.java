@@ -29,7 +29,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
-class ActionSettingsFieldEditor extends AbstractNavigationAction {
+public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 	private final ActionSettingsEditor actionSettingsEditor;
 	private final String setting;
 	boolean isRadioSelection;
@@ -340,8 +340,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			String sel = SystemOptions.getInstance().getStringRadioSelection(
 					this.actionSettingsEditor.section, s2, null, null, false);
 			s = s.substring(0, s.length() - "-radio-selection".length());
-			return "<html><center><b>" + s + "</b><br>" +
-					"&nbsp;" + sel + "&nbsp;" + "</center>";
+			return "<html><center>" + s + "<br>" +
+					"<font color='gray'>" + sel + "</font>" + "</center>";
 		}
 		if (isBoolean)
 			return s;
@@ -354,8 +354,8 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 				StringBuilder sb = new StringBuilder();
 				while (sb.length() < sv.length())
 					sb.append("*");
-				return "<html><center><b>" + s + "</b><br>" +
-						"&nbsp;" + sb + "&nbsp;" + "</center>";
+				return "<html><center>" + s + "<br>" +
+						"<font color='gray'>" + sb + "</font>" + "</center>";
 			} else {
 				SystemOptions o = SystemOptions.getInstance(
 						this.actionSettingsEditor.iniFileName,
@@ -369,7 +369,7 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 							return "<html><center>" +
 									"<table><tr><td>" +
 									"<font color='" + val + "' size='+2'><b>" + Unicode.PEN + "</b></font>&nbsp;" +
-									"</td><td><center><b>" + s + "</b><br>" +
+									"</td><td><center>" + s + "<br>" +
 									AttributeHelper.getColorName(c) + " (" + val + ")" +
 									""
 									+ "&nbsp;" + "</td></tr></table></center>";
@@ -377,9 +377,9 @@ class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					} catch (Exception e) {
 						// empty
 					}
-					return "<html><center><b>" + s + "</b><br>" +
-							"&nbsp;" + o.getObject(this.actionSettingsEditor.section, setting, 2)
-							+ "&nbsp;" + "</center>";
+					return "<html><center>" + s + "<br>" +
+							"<font color='gray'>" + o.getObject(this.actionSettingsEditor.section, setting, 2)
+							+ "</font>";
 				} else {
 					return "(not available)";
 				}
