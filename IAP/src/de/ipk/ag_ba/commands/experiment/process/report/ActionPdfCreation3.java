@@ -533,9 +533,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						if (tso.getBval(0, true)) {
 							String colHeader = (String) tso.getParam(0, "");
 							String colNiceName = (String) tso.getParam(1, "");
-							if (colHeader.equals("water_weight (g)"))
+							if (colHeader.equals("water_weight"))
 								colHeader = "Water (weight-diff)";
-							if (colHeader.equals("weight_before (g)"))
+							if (colHeader.equals("weight_before"))
 								colHeader = "Weight A (g)";
 							clusteringProperties.add(colHeader);
 						}
@@ -676,10 +676,14 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		System.out.println(csvHeader);
 		HashSet<Integer> res = new HashSet<Integer>();
 		int col = 0;
-		for (String colValue : csvHeader.split(separator)) {
+		for (String columnName : csvHeader.split(separator)) {
 			for (String s : interestingValueColumns) {
-				if (!s.equals(colValue))
-					continue;
+				if (!s.equals(columnName)) {
+					if (columnName.contains("("))
+						columnName = columnName.substring(0, columnName.indexOf("(")).trim();
+					if (!s.equals(columnName))
+						continue;
+				}
 				res.add(col);
 			}
 			col++;
