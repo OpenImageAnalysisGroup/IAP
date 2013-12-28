@@ -1132,7 +1132,7 @@ sectionMappingList <- list(
 #				
 #				"4.1.1" = list(
 #						newSection = 1,
-#						title = "Development over the time",
+#						title = "Development over time",
 #						takeRestValuesFrom = "20.1.1"
 #				),
 				
@@ -1148,7 +1148,7 @@ sectionMappingList <- list(
 				"4.2.1" = list(
 #						takeRestValuesFrom = "4.1.1"
 						newSection = 1,
-						title = "Development over the time",
+						title = "Development over time",
 						takeRestValuesFrom = "20.2.1"
 				),
 				
@@ -2053,7 +2053,7 @@ sectionMappingList <- list(
 				
 				"4.1.1.1" = list(
 						newSection = 2,
-						title = "Value over the time",
+						title = "Development over time",
 						takeRestValuesFrom = "20.1.1.1"
 				),
 				
