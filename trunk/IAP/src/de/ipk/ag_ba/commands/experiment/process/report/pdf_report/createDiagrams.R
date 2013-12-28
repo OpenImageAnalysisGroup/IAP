@@ -1170,14 +1170,18 @@ getUnits <- function(overallList) {
 getUnitList <- function(column = NULL) {
 	unitList <- data.frame(
 			unitR = 
-					c(".percent.", 
+					c(".percent.",
+							".mm.3.",  
 							".mm.2.", 
 							".mm.", 
 							".g.", 
 							".relative...pix.", 
+							".relative...day.",
+							".px.3...ml...day.", 
 							".relative.", 
 							"sqrt.px.3.", 
-							".px.3.", 
+							".px.3.",
+							".px.2.", 
 							".px.", 
 							".tassel.", 
 							".sum.of.day.", 
@@ -1188,13 +1192,17 @@ getUnitList <- function(column = NULL) {
 					), 
 			unitTex = 
 					c("%", 
+							"mm^3", 
 							"mm^2", 
 							"mm", 
 							"g", 
-							"relative/px", 
+							"relative/px",
+							"relative/day",
+							"px^3/ml/day",  
 							"relative", 
 							"sqrt(px^3)", 
-							"px^3", 
+							"px^3",
+							"px^2",  
 							"px", 
 							"tassel", 
 							"g", 
@@ -1205,15 +1213,19 @@ getUnitList <- function(column = NULL) {
 					), 
 			unitExcel = 
 					c("(percent.", 
+							"(mm^3)",
 							"(mm^2)", 
 							"(mm)", 
 							"(g)", 
-							"(relative / pix)", 
+							"(relative / pix)",
+							"(relative / day)", 
+							"(px^3/ml/day)", 
 							"(relative)", 
 							"sqrt(px^3)", 
-							"(px^3)", 
+							"(px^3)",
+							"(px^2)", 
 							"(px)", 
-							".tassel)", 
+							"(tassel)", 
 							"(sum of day)", 
 							"(leafs)", 
 							"(%/day)", 
@@ -1733,7 +1745,7 @@ overallGetResultDataFrame <- function(overallList) {
 		
 		if ((!overallList$splitTreatmentFirst && !overallList$splitTreatmentSecond) && overallList$secondTreatment != NONE) {
 			contactTheValues <- TRUE
-			ownCat("... there should be no split, so the data have to be conected now!")
+			ownCat("... there should be no split, so the data needs to be conected now!")
 		}
 		
 		if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
