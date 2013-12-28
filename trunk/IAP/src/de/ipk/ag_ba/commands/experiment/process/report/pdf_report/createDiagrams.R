@@ -481,7 +481,8 @@ checkVersionsOfUsedPackages <- function(lib, outOfDateLib, debug = FALSE) {
 				fmsb = "0.3.4", 
 				snow = "0.3-10", 
 				snowfall = "1.84", 
-				stringr = "0.6.1")
+				stringr = "0.6.1",
+				pvclust ="0.0.0")
 		
 		if (localVersion >= minVersion) {
 			return(outOfDateLib)

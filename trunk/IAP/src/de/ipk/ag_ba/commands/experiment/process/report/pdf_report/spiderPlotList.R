@@ -14,7 +14,7 @@ spiderPlotList <- list(
 				subsection = 1)
 #	,
 #		
-#	"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hue.average$top.vis.hue.average" = list(
+#	"side.height (px)$side.width (px)$side.area (px)$top.area (px)$side.fluo.intensity.average (relative)$side.nir.intensity.average (relative)$side.vis.hsv.h.average$top.vis.hsv.h.average" = list(
 #			plotName =  "height (px)$width (px)$side area (px)$top area (px)$side fluo intensity$side nir intensity$side visible hue average value$top visible hue average value", 
 #			section = 30,
 #			subsection = 2)

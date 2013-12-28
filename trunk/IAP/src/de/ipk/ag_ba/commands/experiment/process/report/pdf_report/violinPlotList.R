@@ -31,11 +31,11 @@ violinPlotList <- list(
 													plotName = "side nir intensity", 
 													section = 40,
 													subsection = 1),
-		"side.vis.hue.average" = list(
+		"side.vis.hsv.h.average" = list(
 									plotName = "side visible hue average value", 
 									section = 40,
 									subsection = 1),
-		"top.vis.hue.average" = list(
+		"top.vis.hsv.h.average" = list(
 									plotName = "top visible hue average value", 
 									section = 40,
 									subsection = 1),

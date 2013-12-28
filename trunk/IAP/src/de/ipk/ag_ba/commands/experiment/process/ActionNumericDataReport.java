@@ -73,40 +73,7 @@ public class ActionNumericDataReport extends AbstractNavigationAction implements
 		ExperimentInterface experiment = experimentReference.getData();
 		ArrayList<ReportRow> rows = new ArrayList<ReportRow>();
 		if (SystemAnalysis.isHeadless()) {
-			// cols.add("Plant");
-			// cols.add("Carrier");
-			// cols.add("Experiment");
-			// cols.add("Time");
-			// cols.add("Weight (before watering)");
-			// cols.add("Weight (after watering)");
-			// cols.add("Water");
 			columns = cols.toArray();
-			//
-			// for (SubstanceInterface su : experiment) {
-			// if (su.getName() == null)
-			// continue;
-			//
-			// if (su.getName().equals("weight_before")) {
-			//
-			// }
-			// if (su.getName().equals("water_weight")) {
-			//
-			// }
-			// if (su.getName().equals("water_amount")) {
-			//
-			// }
-			// for (ConditionInterface c : su) {
-			// for (SampleInterface sa : c) {
-			// for (Measurement m : sa) {
-			// ReportRow r = new ReportRow();
-			// r.setPlant(c.getConditionId() + ": " + c.getConditionName());
-			// r.setCarrier(m.getReplicateID());
-			// r.setExperiment(experiment.getHeader().getExperimentname());
-			// r.setTime(sa.getSampleTime());
-			// }
-			// }
-			// }
-			// }
 		} else {
 			cols.add("Condition");
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;

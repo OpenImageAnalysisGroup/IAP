@@ -15,10 +15,8 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProc
 public class ScriptHelper {
 	
 	private final SystemOptions so;
-	private final ActionScriptBasedDataProcessing adp;
 	
 	public ScriptHelper(String fn, ActionScriptBasedDataProcessing adp) throws IOException {
-		this.adp = adp;
 		boolean addFields = false;
 		if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + fn).exists()) {
 			addFields = true;
@@ -33,6 +31,10 @@ public class ScriptHelper {
 			so.setStringArray("Script", "params", StringManipulationTools.getStringListFromArray(adp.getParams()));
 			so.setStringArray("Reference Infos", "urls", StringManipulationTools.getStringListFromArray(adp.getWebURLs()));
 			so.setStringArray("Reference Infos", "url titles", StringManipulationTools.getStringListFromArray(adp.getWebUrlTitles()));
+			so.setString("Parameter", "input file name", adp.getExportDataFileName());
+			so.setBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
+			so.setBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
+			so.setBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
 		} else
 			if (adp != null) {
 				so.getString("Icon Display", "title", adp.getTitle());
@@ -42,6 +44,10 @@ public class ScriptHelper {
 				so.getStringAll("Script", "params", adp.getParams());
 				so.getStringAll("Reference Infos", "urls", adp.getWebURLs());
 				so.getStringAll("Reference Infos", "url titles", adp.getWebUrlTitles());
+				so.getString("Parameter", "input file name", adp.getExportDataFileName());
+				so.getBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
+				so.getBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
+				so.getBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
 			}
 	}
 	
@@ -67,5 +73,25 @@ public class ScriptHelper {
 	
 	public String[] getWebUrlTitles() {
 		return so.getStringAll("Reference Infos", "url titles", new String[] {});
+	}
+	
+	public String getExportFileName() {
+		return so.getString("Parameter", "input file name", "");
+	}
+	
+	public boolean isAllowGroupColumnSelection() {
+		return so.getBoolean("Parameter", "allow group column selection", false);
+	}
+	
+	public boolean isAllowGroupFiltering() {
+		return so.getBoolean("Parameter", "allow group filtering", false);
+	}
+	
+	public boolean isAllowDataColumnSelection() {
+		return so.getBoolean("Parameter", "allow data column modification", false);
+	}
+	
+	public String getTooltip() {
+		return so.getString("Icon Display", "tooltip", "[No tooltip text defined]");
 	}
 }
