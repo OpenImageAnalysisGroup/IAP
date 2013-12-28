@@ -160,14 +160,14 @@ ERROR.TOTAL.FILE <- paste(ERROR, "Total.txt", sep = "")
 
 LIB.UPDATE <- paste(LIB, UPDATE, sep = "")
 
-getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
-	requestList = list(
-			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")), 
-							spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
-			)
-	)
-	return(requestList)
-}
+#getSpecialRequestDependentOfUserAndTypOfExperiment <- function() {
+#	requestList = list(
+#			KN = list(barley = list(boxplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")), 
+#							spiderplot = list(daysOfBoxplotNeedsReplace = c("27", "44", "45")))
+#			)
+#	)
+#	return(requestList)
+#}
 
 "%break%" <- function(typOfBreak, breakValue) {
 	# 0 %break% 1 --> stopp the code
@@ -844,26 +844,26 @@ setOptions <- function(overallList, typOfPlot, typOfOptions, listOfExtraOptions)
 setSomePrintingOptions <- function(overallList) {
 	overallList$debug %debug% "setSomePrintingOptions()"
 	
-	requestList = 	getSpecialRequestDependentOfUserAndTypOfExperiment()
+	#requestList = 	getSpecialRequestDependentOfUserAndTypOfExperiment()
 	if (!(overallList$user == NONE & overallList$typOfExperiment == NONE)) {
-		listOfExtraOptions = requestList[[overallList$user]][[overallList$typOfExperiment]]	
-		for (n in names(listOfExtraOptions)) {
-			if (n == BOX.PLOT) {
-				return(setOptions(overallList, BOX.PLOT, "boxOptions", listOfExtraOptions))				
-			} else if (n == NBOX.PLOT) {
-				return(setOptions(overallList, NBOX.PLOT, "nBoxOptions", listOfExtraOptions))
-			} else if (n == NBOX.MULTI.PLOT) {
-				return(setOptions(overallList, NBOX.MULTI.PLOT, "nBoxMultiOptions", listOfExtraOptions))
-			}else if (n == STACKBOX.PLOT) {
-				return(setOptions(overallList, STACKBOX.PLOT, "stackedBarOptions", listOfExtraOptions))
-			} else if (n == SPIDER.PLOT) {
-				return(setOptions(overallList, SPIDER.PLOT, "spiderOptions", listOfExtraOptions))
-			} else if (n == LINERANGE.PLOT) {
-				return(setOptions(overallList, LINERANGE.PLOT, "linerangeOptions", listOfExtraOptions))
-			}else if (n == VIOLIN.PLOT & overallList$isRatio) {
-				return(setOptions(overallList, VIOLIN.PLOT, "violinOptions", listOfExtraOptions))
-			}			
-		}		
+		#listOfExtraOptions = requestList[[overallList$user]][[overallList$typOfExperiment]]	
+		#for (n in names(listOfExtraOptions)) {
+		#	if (n == BOX.PLOT) {
+		#		return(setOptions(overallList, BOX.PLOT, "boxOptions", listOfExtraOptions))				
+		#	} else if (n == NBOX.PLOT) {
+		#		return(setOptions(overallList, NBOX.PLOT, "nBoxOptions", listOfExtraOptions))
+		#	} else if (n == NBOX.MULTI.PLOT) {
+		#		return(setOptions(overallList, NBOX.MULTI.PLOT, "nBoxMultiOptions", listOfExtraOptions))
+		#	}else if (n == STACKBOX.PLOT) {
+		#		return(setOptions(overallList, STACKBOX.PLOT, "stackedBarOptions", listOfExtraOptions))
+		#	} else if (n == SPIDER.PLOT) {
+		#		return(setOptions(overallList, SPIDER.PLOT, "spiderOptions", listOfExtraOptions))
+		#	} else if (n == LINERANGE.PLOT) {
+		#		return(setOptions(overallList, LINERANGE.PLOT, "linerangeOptions", listOfExtraOptions))
+		#	}else if (n == VIOLIN.PLOT & overallList$isRatio) {
+		#		return(setOptions(overallList, VIOLIN.PLOT, "violinOptions", listOfExtraOptions))
+		#	}			
+		#}		
 	}
 	
 	return(overallList)
