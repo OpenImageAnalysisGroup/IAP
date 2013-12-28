@@ -352,14 +352,14 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		TreeMap<String, NavigationButton> toBeAdded = new TreeMap<String, NavigationButton>();
 		ArrayList<String> normalized = new ArrayList<String>();
 		for (SubstanceInterface si : a) {
-			String setting = si.iterator().next().iterator().next().getSubstanceNameWithUnit();
+			String setting = si.getName();
 			String niceName = IAPservice.getNiceNameForPhenotypicProperty(setting);
 			if (niceName != null && niceName.contains("(normalized)")) {
 				normalized.add(niceName);
 			}
 		}
 		for (SubstanceInterface si : a) {
-			String setting = si.iterator().next().iterator().next().getSubstanceNameWithUnit();
+			String setting = si.getName();
 			String niceName = IAPservice.getNiceNameForPhenotypicProperty(setting);
 			if (niceName == null)
 				continue;
