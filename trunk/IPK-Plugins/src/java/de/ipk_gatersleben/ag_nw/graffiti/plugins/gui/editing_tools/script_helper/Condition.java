@@ -856,6 +856,7 @@ public class Condition implements ConditionInterface {
 		}
 	}
 	
+	@Override
 	public void setField(ConditionInfo field, String value) {
 		switch (field) {
 			case SPECIES:
@@ -885,6 +886,7 @@ public class Condition implements ConditionInterface {
 		}
 	}
 	
+	@Override
 	public String getField(ConditionInfo field) {
 		switch (field) {
 			case SPECIES:

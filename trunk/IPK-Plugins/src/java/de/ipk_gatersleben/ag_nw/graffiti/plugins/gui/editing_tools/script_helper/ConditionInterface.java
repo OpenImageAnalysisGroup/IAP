@@ -10,6 +10,7 @@ import java.util.Set;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent.MyComparableDataPoint;
 
 public interface ConditionInterface extends MappingDataEntity, Comparable<ConditionInterface>,
@@ -213,4 +214,8 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	public String getExperimentGlobalOutlierInfo();
 	
 	public String getHTMLdescription();
+	
+	void setField(ConditionInfo field, String value);
+	
+	String getField(ConditionInfo field);
 }
