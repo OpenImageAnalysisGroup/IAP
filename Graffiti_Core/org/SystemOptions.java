@@ -560,7 +560,8 @@ public class SystemOptions {
 			return;
 		}
 		Ini.Section sec = ini.get(section);
-		sec.remove(setting);
+		if (sec.containsKey(setting))
+			sec.remove(setting);
 		for (String nv : newValues)
 			sec.add(setting, nv);
 		if (newValues.size() == 0) {
