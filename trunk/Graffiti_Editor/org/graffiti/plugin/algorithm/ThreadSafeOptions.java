@@ -389,8 +389,9 @@ public class ThreadSafeOptions implements HelperClass {
 		return iv;
 	}
 	
-	public synchronized void setInt(int i) {
+	public synchronized ThreadSafeOptions setInt(int i) {
 		iv = i;
+		return this;
 	}
 	
 	public synchronized int getInt() {
