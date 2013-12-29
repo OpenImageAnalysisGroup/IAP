@@ -39,7 +39,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private String title;
 	private String iconDef;
 	String cmd;
-	String[] params;
+	String[] params = null;
 	boolean parameterDetermination = false;
 	IniIoProvider iniIO = null;
 	private boolean parameterRequested;
@@ -245,11 +245,11 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 									first = false;
 								}
 							}
-							if (params == null)
-								if (type.equalsIgnoreCase("int")) {
-									iniIO.getInstance().setInteger("Parameters", desc, Integer.parseInt(defaultValue));
-									knownSettings.put(paramSpec, desc);
-								}
+							if (type.equalsIgnoreCase("int")) {
+								iniIO.getInstance().setInteger("Parameters", desc,
+										iniIO.getInstance().getInteger("Parameters", desc, Integer.parseInt(defaultValue)));
+								knownSettings.put(paramSpec, desc);
+							}
 							
 						}
 					}
