@@ -14,7 +14,7 @@ public class ScriptRinfo implements ActionScriptBasedDataProcessing {
 	
 	@Override
 	public String getTitle() {
-		return "Check R installation";
+		return "Check R Installation";
 	}
 	
 	@Override
