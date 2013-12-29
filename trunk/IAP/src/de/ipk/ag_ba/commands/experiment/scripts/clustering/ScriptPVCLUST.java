@@ -29,7 +29,8 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 				"calcClusters.R",
 				"[int|bootstrap sample size|1000|"
 						+
-						"Computation of p-values via multiscale bootstrap resampling requires a comparatively large bootstrap sample size. "
+						"Computation of p-values via multiscale bootstrap resampling requires a " +
+						"comparatively large bootstrap sample size. "
 						+
 						"It is recommend to use 1000 for testing and 10000 for smaller errors.|" +
 						"If the bootstrap sample size is set to 0, hclust, a clustering approach which does not compute p-values, is performed.]" };
@@ -82,7 +83,19 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 	@Override
 	public String[] getDesiredDataColumns() {
 		return new String[] {
-				""
+				"weight_before:Weight before watering",
+				"water_weight:Water weight",
+				"side.height.norm:Height (normalized) // side.height:Height",
+				"side.vis.area.norm:Side Vis Area (normalized) // side.vis.area:Side Vis Area",
+				"side.fluo.intensity.average:Fluo intensity (side)",
+				"side.nir.intensity.average:NIR intensity (side)",
+				"top.fluo.intensity.average:Fluo intensity (top)",
+				"top.nir.intensity.average:NIR intensity (top)",
+				"side.vis.hsv.h.average:Average hue (side)",
+				"top.vis.hsv.h.average:Average hue (top)",
+				"side.width.norm:Width (normalized) // side.width:Width",
+				"top.vis.area.norm:Top Vis Area (normalized) // top.vis.area:Top Vis Area",
+				"volume.fluo.iap:Volume estimation (fluo)",
 		};
 	}
 }

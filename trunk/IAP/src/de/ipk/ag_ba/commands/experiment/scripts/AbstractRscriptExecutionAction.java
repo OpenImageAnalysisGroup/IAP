@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.ErrorMsg;
 import org.IniIoProvider;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.apache.commons.lang3.text.WordUtils;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -57,6 +58,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private final ActionScriptBasedDataProcessing adp;
 	private final boolean metaDataValuesEvaluated = false;
 	private HashMap<String, String> knownSettings = new HashMap<String, String>();
+	private long startTime;
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
 			throws IOException {
@@ -151,6 +153,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		this.startTime = System.currentTimeMillis();
 		res.clear();
 		resultActions.clear();
 		if (parameterDetermination) {
@@ -283,6 +286,10 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 			res.add(0, "<h3>Parameteriziation</h3>Click <i>Start Script</i> once parameters have been set according to your needs.");
 			return new MainPanelComponent(res);
 		} else {
+			long endTime = System.currentTimeMillis();
+			// res.add(0, "<code><font face='Arial' color='gray'>Started " + SystemAnalysis.getCurrentTime(startTime) + "</font></code>");
+			res.add("<code><font face='Arial' color='gray'>Run time " + SystemAnalysis.getWaitTime(endTime - startTime)
+					+ "</font></code>");
 			return new MainPanelComponent(res);
 		}
 	}
