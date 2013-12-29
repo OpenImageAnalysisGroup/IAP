@@ -140,8 +140,8 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 				f1 += "s";
 			actions.add(new NavigationButton(
 					new ActionToggle("Create individual diagrams for factor 1 " + f1 + "?",
-							"<html><center>Show " + f1 + " using<br>multiple diagrams</center>",
-							"<html><center>Show " + f1 + " in<br>a single diagram</center>", tsoSplitFirst),
+							"<html><center>Showing " + f1 + " in<br>multiple diagrams",
+							"<html><center>Showing " + f1 + " in<br>a single diagram", tsoSplitFirst),
 					src.getGUIsetting()));
 		}
 		if (factors.size() > 1) {
@@ -150,8 +150,8 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 				f2 += "s";
 			actions.add(new NavigationButton(
 					new ActionToggle("Create individual diagrams for factor 2" + f2 + "?",
-							"<html><center>Show " + f2 + " using<br>multiple diagrams</center>",
-							"<html><center>Show " + f2 + " in<br>a single diagram</center>", tsoSplitSecond),
+							"<html><center>Showing " + f2 + " in<br>multiple diagrams",
+							"<html><center>Showing " + f2 + " in<br>a single diagram", tsoSplitSecond),
 					src.getGUIsetting()));
 		}
 		

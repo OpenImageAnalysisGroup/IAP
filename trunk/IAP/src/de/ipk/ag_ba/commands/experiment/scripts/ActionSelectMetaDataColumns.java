@@ -6,6 +6,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 
 /**
  * @author klukas
@@ -14,19 +15,23 @@ public class ActionSelectMetaDataColumns extends AbstractNavigationAction {
 	
 	private ArrayList<ThreadSafeOptions> metaDataColumns;
 	private NavigationButton src;
+	private ExperimentReference experimentReference;
 	
 	public ActionSelectMetaDataColumns(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionSelectMetaDataColumns(ArrayList<ThreadSafeOptions> metaDataColumns) {
+	public ActionSelectMetaDataColumns(ArrayList<ThreadSafeOptions> metaDataColumns,
+			ExperimentReference experimentReference) {
 		this("Select metadata columns");
 		this.metaDataColumns = metaDataColumns;
+		this.experimentReference = experimentReference;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		experimentReference.getData(getStatusProvider());
 	}
 	
 	@Override
@@ -36,7 +41,10 @@ public class ActionSelectMetaDataColumns extends AbstractNavigationAction {
 			// String propertyName = (String) tso.getParam(0, "[Unknown Metadata Field Name]");
 			// ConditionInfo property = (ConditionInfo) tso.getParam(1, ConditionInfo.IGNORED_FIELD);
 			// boolean sel = tso.getBval(0, false);
-			res.add(new NavigationButton(new ActionThreadSafeOptionsBooleanEditor(tso), src.getGUIsetting()));
+			NavigationButton nb = new NavigationButton(new ActionThreadSafeOptionsBooleanEditor(tso), src.getGUIsetting());
+			if (tso.getInt() < 1)
+				nb.setEnabled(false);
+			res.add(nb);
 		}
 		return res;
 	}
@@ -44,7 +52,10 @@ public class ActionSelectMetaDataColumns extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		int n = countSelected();
-		return "<html><center>Metadata Columns<br><small><font color='gray'>" + n + " selected</font></small></center>";
+		if (experimentReference.getExperimentPeek() != null)
+			return "<html><center>Group Definition<br><small><font color='gray'>" + n + " field" + (n != 1 ? "s" : "") + " selected</font></small></center>";
+		else
+			return "<html><center>Group Definition<br><font color='gray'><small>(data is beeing loaded)</small></font>";
 	}
 	
 	@Override

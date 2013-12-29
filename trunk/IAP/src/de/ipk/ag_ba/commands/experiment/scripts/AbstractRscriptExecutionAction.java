@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.experiment.scripts;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
@@ -19,6 +21,11 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -48,6 +55,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private ActionSettingsEditor ase;
 	private ActionSelectDataColumns actionSelectDataColumns;
 	private final ActionScriptBasedDataProcessing adp;
+	private final boolean metaDataValuesEvaluated = false;
+	private HashMap<String, String> knownSettings = new HashMap<String, String>();
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
 			throws IOException {
@@ -57,6 +66,50 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		this.experimentReference = experimentReference;
 		readInfo();
 		initMetaDataColumnSelection();
+		experimentReference.runAsDataBecomesAvailable(new Runnable() {
+			@Override
+			public void run() {
+				HashMap<ConditionInfo, HashSet<String>> ci2vs = new HashMap<ConditionInfo, HashSet<String>>();
+				ExperimentInterface ei = AbstractRscriptExecutionAction.this.experimentReference.getExperimentPeek();
+				HashSet<String> plantIDs = new HashSet<String>();
+				for (SubstanceInterface si : ei) {
+					for (ConditionInterface c : si) {
+						for (SampleInterface sai : c) {
+							for (NumericMeasurementInterface nmi : sai) {
+								plantIDs.add(nmi.getQualityAnnotation());
+							}
+						}
+						for (ThreadSafeOptions tso : metaDataColumns) {
+							ConditionInfo ci = (ConditionInfo) tso.getParam(1, null);
+							if (ci == ConditionInfo.IGNORED_FIELD)
+								continue;
+							if (!ci2vs.containsKey(ci))
+								ci2vs.put(ci, new HashSet<String>());
+							String v = c.getField(ci);
+							if (v != null && !v.isEmpty()) {
+								ci2vs.get(ci).add(v);
+							}
+						}
+					}
+				}
+				ci2vs.put(ConditionInfo.IGNORED_FIELD, plantIDs);
+				int selCnt = 0;
+				for (ThreadSafeOptions tso : metaDataColumns) {
+					ConditionInfo ci = (ConditionInfo) tso.getParam(1, null);
+					int n = ci2vs.get(ci).size();
+					String os = (String) tso.getParam(0, "");
+					if (os.contains("("))
+						os = os.substring(0, os.indexOf("(")).trim();
+					tso.setParam(0, os + " (" + n + ")");
+					tso.setInt(n);
+					if (n < 2 || (ci == ConditionInfo.IGNORED_FIELD && selCnt > 0))
+						tso.setBval(0, false);
+					else
+						selCnt++;
+				}
+				
+			}
+		});
 	}
 	
 	private void initMetaDataColumnSelection() {
@@ -64,11 +117,12 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 			iniIO = new VirtualIoProvider();
 			
 			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Species").setParam(1, ConditionInfo.SPECIES).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Genotype").setParam(1, ConditionInfo.GENOTYPE).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Variety").setParam(1, ConditionInfo.VARIETY).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Sequence").setParam(1, ConditionInfo.SEQUENCE).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Treatment").setParam(1, ConditionInfo.TREATMENT).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Genotypes").setParam(1, ConditionInfo.GENOTYPE).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Varieties").setParam(1, ConditionInfo.VARIETY).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Sequences").setParam(1, ConditionInfo.SEQUENCE).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Treatments").setParam(1, ConditionInfo.TREATMENT).setBval(0, true));
 			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Growth Conditions").setParam(1, ConditionInfo.GROWTHCONDITIONS).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Plant-IDs").setParam(1, ConditionInfo.IGNORED_FIELD).setBval(0, true));
 		}
 	}
 	
@@ -102,7 +156,24 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		if (parameterDetermination) {
 			// empty
 		} else {
-			TreeMap<Long, String> ro = ScriptExecutor.start(getDefaultTitle(), cmd, params, getStatusProvider(), 1);
+			ArrayList<String> pl = new ArrayList<String>();
+			if (params != null) {
+				for (String s : params) {
+					if (s.contains("[") && s.contains("]") && s.length() > 2) {
+						String spec = s.substring(s.indexOf("[") + 1, s.indexOf("]")).trim();
+						String desc = knownSettings.get(spec);
+						int value = iniIO.getInstance().getInteger("Parameters", desc, -1);
+						String pre = s.substring(0, s.indexOf("["));
+						String post = s.substring(s.indexOf("]") + 1);
+						pl.add(pre + value + post);
+					} else
+						pl.add(s);
+				}
+			}
+			String[] params2 = pl.toArray(new String[] {});
+			if (params == null)
+				params2 = null;
+			TreeMap<Long, String> ro = ScriptExecutor.start(getDefaultTitle(), cmd, params2, getStatusProvider(), 1);
 			res.add("<code>" + StringManipulationTools.getStringList(ro.values(), "<br>")
 					+ "</code>");
 		}
@@ -116,6 +187,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				ta.parameterDetermination = false;
 				ta.iniIO = iniIO;
 				ta.metaDataColumns = metaDataColumns;
+				ta.knownSettings = knownSettings;
 				ra.add(new NavigationButton(ta, guiSetting));
 			} catch (IOException e) {
 				ErrorMsg.addErrorMessage(e);
@@ -124,7 +196,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		if (!parameterRequested) {
 			if (exportFileName != null && !exportFileName.isEmpty()) {
 				if (allowGroupColumnSelection)
-					ra.add(new NavigationButton(new ActionSelectMetaDataColumns(metaDataColumns), guiSetting));
+					ra.add(new NavigationButton(new ActionSelectMetaDataColumns(metaDataColumns, experimentReference), guiSetting));
 				if (allowGroupFiltering) {
 					if (actionGroupSelection == null)
 						actionGroupSelection = new ActionFilterConditions(metaDataColumns, groupSelection, experimentReference);
@@ -149,52 +221,52 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 			}
 		}
 		if (parameterDetermination) {
-			if (params != null) {
-				if (ase == null) {
-					ase = new ActionSettingsEditor(null, iniIO, null, "Parameters");
-					for (String s : params) {
-						try {
-							if (s.contains("[") && s.contains("]") && s.length() > 2) {
-								s = s.substring(s.indexOf("[") + 1, s.indexOf("]")).trim();
-								// [int|bootstrap sample size|1000]
-								String a[] = s.split("\\|", 3);
-								if (a.length == 3) {
-									String type = a[0];
-									String desc = a[1];
-									String defaultValue = a[2].split("\\|")[0];
-									if (a[2].split("\\|").length > 1) {
-										boolean first = true;
-										for (String help : a[2].split("\\|")) {
-											if (!first) {
-												desc = StringManipulationTools.stringReplace(desc, "_", "-");
-												desc = WordUtils.capitalizeFully(desc, '-', ' ');
-												res.add("<b>" + desc + "</b><br><br>" + StringManipulationTools.getWordWrap(help, 80));
-											}
-											first = false;
-										}
+			if (ase == null)
+				ase = new ActionSettingsEditor(null, iniIO, null, "Parameters");
+			for (String s : params) {
+				try {
+					if (s.contains("[") && s.contains("]") && s.length() > 2) {
+						s = s.substring(s.indexOf("[") + 1, s.indexOf("]")).trim();
+						String paramSpec = s;
+						// [int|bootstrap sample size|1000]
+						String a[] = s.split("\\|", 3);
+						if (a.length == 3) {
+							String type = a[0];
+							String desc = a[1];
+							String defaultValue = a[2].split("\\|")[0];
+							if (a[2].split("\\|").length > 1) {
+								boolean first = true;
+								for (String help : a[2].split("\\|")) {
+									if (!first) {
+										desc = StringManipulationTools.stringReplace(desc, "_", "-");
+										desc = WordUtils.capitalizeFully(desc, '-', ' ');
+										res.add("<b>" + desc + "</b><br><br>" + StringManipulationTools.getWordWrap(help, 80));
 									}
-									if (type.equalsIgnoreCase("int")) {
-										iniIO.getInstance().setInteger("Parameters", desc, Integer.parseInt(defaultValue));
-									}
-									
+									first = false;
 								}
 							}
-						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
+							if (params == null)
+								if (type.equalsIgnoreCase("int")) {
+									iniIO.getInstance().setInteger("Parameters", desc, Integer.parseInt(defaultValue));
+									knownSettings.put(paramSpec, desc);
+								}
+							
 						}
-					}
-				}
-				try {
-					ase.performActionCalculateResults(src);
-					for (NavigationButton r : ase.getResultNewActionSet()) {
-						if (!r.isRightAligned())
-							ra.add(r);
 					}
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 			}
 			
+			try {
+				ase.performActionCalculateResults(src);
+				for (NavigationButton r : ase.getResultNewActionSet()) {
+					if (!r.isRightAligned())
+						ra.add(r);
+				}
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+			}
 		}
 		
 		resultActions = ra;

@@ -22,7 +22,8 @@ public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationActi
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		tso.setBval(0, !tso.getBval(0, false));
+		if (tso.getInt() > 0)
+			tso.setBval(0, !tso.getBval(0, false));
 	}
 	
 	@Override
@@ -48,7 +49,7 @@ public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationActi
 	@Override
 	public String getDefaultImage() {
 		if (tso.getBval(0, false))
-			return "img/ext/gpl2/gtcf.png";
+			return "img/ext/gpl2/gtce.png";
 		else
 			return "img/ext/gpl2/gtcd.png";
 	}

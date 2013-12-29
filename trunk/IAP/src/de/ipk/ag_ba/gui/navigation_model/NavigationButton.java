@@ -82,6 +82,7 @@ public class NavigationButton implements StyleAware {
 	private String overrideTitle;
 	private boolean iconUpdated;
 	private Object validIconCheckObject;
+	private boolean enabled = true;
 	
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
@@ -730,6 +731,9 @@ public class NavigationButton implements StyleAware {
 		};
 		n1.setToolTipText(n.getToolTip());
 		
+		if (n.getAction() != null && !n.enabled)
+			n1.setEnabled(false);
+		
 		switch (style) {
 			case FLAT:
 			case COMPACT_LIST:
@@ -955,5 +959,9 @@ public class NavigationButton implements StyleAware {
 				!guiSetting.getNavigationPanel().getEntitySet(true).contains(this)
 				&& !guiSetting.getActionPanel().getEntitySet(true).contains(this));
 		return res;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }
