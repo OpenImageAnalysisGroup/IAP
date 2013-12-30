@@ -453,4 +453,14 @@ public class ThreadSafeOptions implements HelperClass {
 		return l;
 	}
 	
+	public void waitForBoolean(int i) {
+		try {
+			while (!getBval(i, false)) {
+				Thread.sleep(10);
+			}
+		} catch (InterruptedException e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
+	
 }
