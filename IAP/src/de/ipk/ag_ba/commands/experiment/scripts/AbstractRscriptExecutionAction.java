@@ -3,11 +3,11 @@ package de.ipk.ag_ba.commands.experiment.scripts;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
 import org.IniIoProvider;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.commons.lang3.text.WordUtils;
@@ -16,17 +16,14 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.datasource.WebUrlAction;
+import de.ipk.ag_ba.commands.experiment.ExportSetting;
+import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -45,13 +42,14 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	IniIoProvider iniIO = null;
 	private boolean parameterRequested;
 	private ArrayList<NavigationButton> resultActions = new ArrayList<NavigationButton>();
+	ThreadSafeOptions metaDataColumnsReady = new ThreadSafeOptions();
 	ArrayList<ThreadSafeOptions> metaDataColumns = new ArrayList<ThreadSafeOptions>();
 	ArrayList<ThreadSafeOptions> groupSelection = new ArrayList<ThreadSafeOptions>();
 	private String exportFileName;
 	private boolean allowGroupColumnSelection;
 	private boolean allowGroupFiltering;
 	private boolean allowDataColumnSelection;
-	private final ExperimentReference experimentReference;
+	final ExperimentReference experimentReference;
 	private ActionFilterConditions actionGroupSelection;
 	private ActionSettingsEditor ase;
 	private ActionSelectDataColumns actionSelectDataColumns;
@@ -59,7 +57,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private HashMap<String, String> knownSettings = new HashMap<String, String>();
 	private long startTime;
 	private ArrayList<String> desiredColumns;
-	private ArrayList<ThreadSafeOptions> listOfDataColumns = null;
+	private ArrayList<ThreadSafeOptions> listOfDataColumns = new ArrayList<ThreadSafeOptions>();
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
 			throws IOException {
@@ -69,62 +67,29 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		this.experimentReference = experimentReference;
 		readInfo();
 		initMetaDataColumnSelection();
-		experimentReference.runAsDataBecomesAvailable(new Runnable() {
-			@Override
-			public void run() {
-				HashMap<ConditionInfo, HashSet<String>> ci2vs = new HashMap<ConditionInfo, HashSet<String>>();
-				ExperimentInterface ei = AbstractRscriptExecutionAction.this.experimentReference.getExperimentPeek();
-				HashSet<String> plantIDs = new HashSet<String>();
-				for (SubstanceInterface si : ei) {
-					for (ConditionInterface c : si) {
-						for (SampleInterface sai : c) {
-							for (NumericMeasurementInterface nmi : sai) {
-								plantIDs.add(nmi.getQualityAnnotation());
-							}
-						}
-						for (ThreadSafeOptions tso : metaDataColumns) {
-							ConditionInfo ci = (ConditionInfo) tso.getParam(1, null);
-							if (ci == ConditionInfo.IGNORED_FIELD)
-								continue;
-							if (!ci2vs.containsKey(ci))
-								ci2vs.put(ci, new HashSet<String>());
-							String v = c.getField(ci);
-							if (v != null && !v.isEmpty()) {
-								ci2vs.get(ci).add(v);
-							}
-						}
-					}
-				}
-				ci2vs.put(ConditionInfo.IGNORED_FIELD, plantIDs);
-				int selCnt = 0;
-				for (ThreadSafeOptions tso : metaDataColumns) {
-					ConditionInfo ci = (ConditionInfo) tso.getParam(1, null);
-					int n = ci2vs.get(ci).size();
-					String os = (String) tso.getParam(0, "");
-					if (os.contains("("))
-						os = os.substring(0, os.indexOf("(")).trim();
-					tso.setParam(0, os + " (" + n + ")");
-					tso.setInt(n);
-					if (n < 2 || (ci == ConditionInfo.IGNORED_FIELD && selCnt > 0))
-						tso.setBval(0, false);
-					else
-						selCnt++;
-				}
-			}
-		});
+		experimentReference.runAsDataBecomesAvailable(new InitStructuresAsDataBecomesAvailable(this));
 	}
 	
 	private void initMetaDataColumnSelection() {
 		if (!parameterRequested) {
 			iniIO = new VirtualIoProvider();
 			
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Species").setParam(1, ConditionInfo.SPECIES).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Genotypes").setParam(1, ConditionInfo.GENOTYPE).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Varieties").setParam(1, ConditionInfo.VARIETY).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Sequences").setParam(1, ConditionInfo.SEQUENCE).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Treatments").setParam(1, ConditionInfo.TREATMENT).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Growth Conditions").setParam(1, ConditionInfo.GROWTHCONDITIONS).setBval(0, true));
-			metaDataColumns.add(new ThreadSafeOptions().setParam(0, "Plant-IDs").setParam(1, ConditionInfo.IGNORED_FIELD).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.SPECIES.toString()).setParam(10, ConditionInfo.SPECIES.toString())
+					.setParam(1, ConditionInfo.SPECIES).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.GENOTYPE.toString()).setParam(10, ConditionInfo.GENOTYPE.toString())
+					.setParam(1, ConditionInfo.GENOTYPE).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.VARIETY.toString()).setParam(10, ConditionInfo.VARIETY.toString())
+					.setParam(1, ConditionInfo.VARIETY).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.SEQUENCE.toString()).setParam(10, ConditionInfo.SEQUENCE.toString())
+					.setParam(1, ConditionInfo.SEQUENCE).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.TREATMENT.toString()).setParam(10, ConditionInfo.TREATMENT.toString())
+					.setParam(1, ConditionInfo.TREATMENT).setBval(0, true));
+			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.GROWTHCONDITIONS.toString())
+					.setParam(10, ConditionInfo.GROWTHCONDITIONS.toString()).setParam(1, ConditionInfo.GROWTHCONDITIONS)
+					.setBval(0, true));
+			metaDataColumns
+					.add(new ThreadSafeOptions().setParam(0, "Plant ID").setParam(10, "Plant ID").setParam(1, ConditionInfo.IGNORED_FIELD).setBval(0, true));
+			metaDataColumnsReady.setBval(0, true);
 		}
 	}
 	
@@ -160,6 +125,46 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		if (parameterDetermination) {
 			// empty
 		} else {
+			if (exportFileName != null) {
+				String expDir = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "script_call_" + System.currentTimeMillis());
+				ArrayList<ThreadSafeOptions> togglesDivideDataSetBy = new ArrayList<ThreadSafeOptions>(metaDataColumns);
+				togglesDivideDataSetBy.add(new ThreadSafeOptions().setParam(0, "Clustering").setBval(0, true));
+				ArrayList<ThreadSafeOptions> togglesMetaDataFiltering = groupSelection;
+				
+				/*
+				 * String field = (String) t.getParam(0, "");
+				 * String content = (String) t.getParam(1, "");
+				 * String value = null;
+				 * if (field.equals("Condition"))
+				 */
+				
+				ArrayList<ThreadSafeOptions> togglesDataColumns = listOfDataColumns;
+				ActionPdfCreation3 expCommand = new ActionPdfCreation3(
+						experimentReference,
+						togglesDivideDataSetBy,
+						false, // all side angles?
+						false, // xlsx?
+						togglesMetaDataFiltering,
+						togglesDataColumns,
+						null, null, null, "complete, high mem requ.", ExportSetting.ALL);
+				/*
+				 * ExperimentReference experimentReference,
+				 * ArrayList<ThreadSafeOptions> divideDatasetBy,
+				 * boolean exportIndividualAngles,
+				 * boolean xlsx,
+				 * ArrayList<ThreadSafeOptions> togglesFiltering,
+				 * ArrayList<ThreadSafeOptions> togglesInterestingProperties,
+				 * ThreadSafeOptions tsoBootstrapN,
+				 * ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond,
+				 * String optCustomSubset,
+				 * ExportSetting optCustomSubsetDef
+				 */
+				expCommand.setClustering(true);
+				expCommand.setCustomTargetFileName(expDir + exportFileName);
+				expCommand.setExperimentReference(experimentReference);
+				expCommand.setStatusProvider(getStatusProvider());
+				expCommand.performActionCalculateResults(src);
+			}
 			ArrayList<String> pl = new ArrayList<String>();
 			if (params != null) {
 				for (String s : params) {
@@ -191,6 +196,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				ta.parameterDetermination = false;
 				ta.iniIO = iniIO;
 				ta.metaDataColumns = metaDataColumns;
+				ta.groupSelection = groupSelection;
+				ta.listOfDataColumns = listOfDataColumns;
 				ta.knownSettings = knownSettings;
 				ra.add(new NavigationButton(ta, guiSetting));
 			} catch (IOException e) {
@@ -203,7 +210,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 					ra.add(new NavigationButton(new ActionSelectMetaDataColumns(metaDataColumns, experimentReference), guiSetting));
 				if (allowGroupFiltering) {
 					if (actionGroupSelection == null)
-						actionGroupSelection = new ActionFilterConditions(metaDataColumns, groupSelection, experimentReference);
+						actionGroupSelection = new ActionFilterConditions(metaDataColumnsReady, metaDataColumns, groupSelection, experimentReference);
 					ra.add(new NavigationButton(actionGroupSelection, guiSetting));
 				}
 				if (allowDataColumnSelection) {

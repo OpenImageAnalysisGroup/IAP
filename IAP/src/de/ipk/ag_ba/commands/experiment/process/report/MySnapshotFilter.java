@@ -6,6 +6,7 @@ import org.StringManipulationTools;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 
 public class MySnapshotFilter implements SnapshotFilter {
@@ -111,19 +112,19 @@ public class MySnapshotFilter implements SnapshotFilter {
 		if (field.equals("Condition"))
 			value = s.getCondition();
 		else
-			if (field.equals("Species"))
+			if (field.equals(ConditionInfo.SPECIES.toString()))
 				value = s.getSpecies();
 			else
-				if (field.equals("Genotype"))
+				if (field.equals(ConditionInfo.GENOTYPE.toString()))
 					value = s.getGenotype();
 				else
-					if (field.equals("Variety"))
+					if (field.equals(ConditionInfo.VARIETY.toString()))
 						value = s.getVariety();
 					else
-						if (field.equals("Growth condition"))
+						if (field.equals(ConditionInfo.GROWTHCONDITIONS.toString()))
 							value = s.getGrowthCondition();
 						else
-							if (field.equals("Treatment"))
+							if (field.equals(ConditionInfo.TREATMENT.toString()))
 								value = s.getTreatment();
 		if (value == null)
 			value = "(not specified)";
