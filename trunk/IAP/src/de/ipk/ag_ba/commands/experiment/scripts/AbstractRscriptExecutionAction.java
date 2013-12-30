@@ -56,9 +56,9 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private ActionSettingsEditor ase;
 	private ActionSelectDataColumns actionSelectDataColumns;
 	private final ActionScriptBasedDataProcessing adp;
-	private final boolean metaDataValuesEvaluated = false;
 	private HashMap<String, String> knownSettings = new HashMap<String, String>();
 	private long startTime;
+	private ArrayList<String> desiredColumns;
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
 			throws IOException {
@@ -141,6 +141,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		tooltip = sh.getTooltip();
 		urls = StringManipulationTools.getStringListFromArray(sh.getWebURLs());
 		urlDescriptions = StringManipulationTools.getStringListFromArray(sh.getWebUrlTitles());
+		desiredColumns = StringManipulationTools.getStringListFromArray(sh.getDesiredDataColumns());
 		if (params != null && !parameterRequested) {
 			for (String s : params) {
 				if (s.startsWith("[") && s.endsWith("]")) {
@@ -206,8 +207,9 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 					ra.add(new NavigationButton(actionGroupSelection, guiSetting));
 				}
 				if (allowDataColumnSelection) {
-					if (actionSelectDataColumns == null)
-						actionSelectDataColumns = new ActionSelectDataColumns("Select Relevant Data Columns");
+					if (actionSelectDataColumns == null) {
+						actionSelectDataColumns = new ActionSelectDataColumns("Select Relevant Data Columns", desiredColumns, experimentReference);
+					}
 					ra.add(new NavigationButton(actionSelectDataColumns, guiSetting));
 				}
 			}
