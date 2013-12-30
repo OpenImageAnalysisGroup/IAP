@@ -35,11 +35,7 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 		this.desiredDataColumns = desiredDataColumns;
 		this.experimentReference = experimentReference;
 		this.listOfColumns = listOfColumns;
-		boolean newInit = false;
-		if (this.listOfColumns == null) {
-			this.listOfColumns = new ArrayList<ThreadSafeOptions>();
-			newInit = true;
-		}
+		boolean newInit = true;
 		
 		final boolean fni = newInit;
 		
@@ -72,8 +68,8 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 							ThreadSafeOptions tso;
 							tso = new ThreadSafeOptions();
 							tso.setBval(0, true);
-							tso.setParam(0, descriptions.get(idx));
-							tso.setParam(1, colName);
+							tso.setParam(0, colName);
+							tso.setParam(10, descriptions.get(idx));
 							tso.setInt(Integer.MAX_VALUE);
 							ActionSelectDataColumns.this.listOfColumns.add(tso);
 							idx++;

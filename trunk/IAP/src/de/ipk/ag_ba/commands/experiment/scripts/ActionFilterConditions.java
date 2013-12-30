@@ -32,14 +32,17 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 	public ArrayList<ThreadSafeOptions> experimentFactorSelection;
 	private NavigationButton src;
 	private final HashSet<String> groupStrings = new HashSet<String>();
+	private ThreadSafeOptions metaDataColumnsReady;
 	
 	public ActionFilterConditions(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionFilterConditions(ArrayList<ThreadSafeOptions> metaDataColumns, ArrayList<ThreadSafeOptions> groupSelection,
+	public ActionFilterConditions(ThreadSafeOptions metaDataColumnsReady, ArrayList<ThreadSafeOptions> metaDataColumns,
+			ArrayList<ThreadSafeOptions> groupSelection,
 			ExperimentReference experimentReference) {
 		this("Filter experiment groups");
+		this.metaDataColumnsReady = metaDataColumnsReady;
 		this.metaDataColumns = metaDataColumns;
 		this.experimentFactorSelection = groupSelection;
 		this.experimentReference = experimentReference;
@@ -106,8 +109,8 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 		HashMap<ConditionInfo, HashSet<String>> invalidValues = new HashMap<ConditionInfo, HashSet<String>>();
 		for (ThreadSafeOptions tso : experimentFactorSelection) {
 			if (!tso.getBval(0, false)) {
-				ConditionInfo ci = (ConditionInfo) tso.getParam(1, null);
-				String val = (String) tso.getParam(2, null);
+				ConditionInfo ci = (ConditionInfo) tso.getParam(11, null);
+				String val = (String) tso.getParam(12, null);
 				if (!invalidValues.containsKey(ci))
 					invalidValues.put(ci, new HashSet<String>());
 				invalidValues.get(ci).add(val);
@@ -135,7 +138,7 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 						continue;
 					String v = c.getField(ciToBeChecked);
 					if (v == null || v.isEmpty())
-						v = "(not set)";
+						v = "(not specified)";
 					if (invalidValues.containsKey(ciToBeChecked) && invalidValues.get(ciToBeChecked).contains(v)) {
 						valid = false;
 						break;
@@ -166,8 +169,8 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 	}
 	
 	private int countAndInitGroups() throws Exception {
+		metaDataColumnsReady.waitForBoolean(0);
 		ExperimentInterface ei = experimentReference.getData();
-		
 		groupStrings.clear();
 		for (SubstanceInterface si : ei) {
 			for (ConditionInterface c : si) {
@@ -209,9 +212,13 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 		for (ConditionInfo ci : ci2vs.keySet()) {
 			for (String v : ci2vs.get(ci)) {
 				experimentFactorSelection.add(
-						new ThreadSafeOptions().setParam(0, ci + "<br>" +
-								"<small><font color='gray'>" + StringManipulationTools.getWordWrap(v, 25) + "</font></small>")
-								.setParam(1, ci).setParam(2, v)
+						new ThreadSafeOptions()
+								.setParam(0, ci.toString())
+								.setParam(1, v)
+								.setParam(10, ci + "<br>" +
+										"<small><font color='gray'>" + StringManipulationTools.getWordWrap(v, 25) + "</font></small>")
+								.setParam(11, ci)
+								.setParam(12, v)
 								.setInt(Integer.MAX_VALUE).setBval(0, true));
 			}
 		}

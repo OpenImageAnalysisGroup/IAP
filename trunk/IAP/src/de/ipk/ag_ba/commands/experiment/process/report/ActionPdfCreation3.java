@@ -47,6 +47,7 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -843,20 +844,23 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		if (field.equals("Condition"))
 			value = s.getConditionName();
 		else
-			if (field.equals("Species"))
+			if (field.equals(ConditionInfo.SPECIES.toString()))
 				value = s.getSpecies();
 			else
-				if (field.equals("Genotype"))
+				if (field.equals(ConditionInfo.GENOTYPE.toString()))
 					value = s.getGenotype();
 				else
-					if (field.equals("Variety"))
+					if (field.equals(ConditionInfo.VARIETY.toString()))
 						value = s.getVariety();
 					else
-						if (field.equals("Growth condition"))
-							value = s.getGrowthconditions();
+						if (field.equals(ConditionInfo.SEQUENCE.toString()))
+							value = s.getSequence();
 						else
-							if (field.equals("Treatment"))
-								value = s.getTreatment();
+							if (field.equals(ConditionInfo.GROWTHCONDITIONS.toString()))
+								value = s.getGrowthconditions();
+							else
+								if (field.equals(ConditionInfo.TREATMENT.toString()))
+									value = s.getTreatment();
 		if (value == null)
 			value = "(not specified)";
 		else
@@ -1028,6 +1032,10 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	public void setCustomTargetFileName(String customTargetFileName) {
 		this.customTargetFileName = customTargetFileName;
+	}
+	
+	public void setClustering(boolean c) {
+		clustering = c;
 	}
 	
 }

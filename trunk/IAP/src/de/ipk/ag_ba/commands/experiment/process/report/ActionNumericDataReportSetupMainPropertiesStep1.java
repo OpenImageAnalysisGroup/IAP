@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -229,7 +230,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
 							src.getGUIsetting()));
 				}
-			if (setting.equalsIgnoreCase("Species"))
+			if (setting.equalsIgnoreCase(ConditionInfo.SPECIES.toString()))
 				for (String c : ss) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
@@ -238,7 +239,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
 							src.getGUIsetting()));
 				}
-			if (setting.equalsIgnoreCase("Genotype"))
+			if (setting.equalsIgnoreCase(ConditionInfo.GENOTYPE.toString()))
 				for (String c : gs) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
@@ -247,7 +248,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
 							src.getGUIsetting()));
 				}
-			if (setting.equalsIgnoreCase("Variety"))
+			if (setting.equalsIgnoreCase(ConditionInfo.VARIETY.toString()))
 				for (String c : vs) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
@@ -256,7 +257,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
 							src.getGUIsetting()));
 				}
-			if (setting.equalsIgnoreCase("Growth condition"))
+			if (setting.equalsIgnoreCase(ConditionInfo.GROWTHCONDITIONS.toString()))
 				for (String c : gc) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);
@@ -265,7 +266,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 					settings.add(new NavigationButton(new ActionToggle("Include " + setting + " '" + c + "'?", "<html><center>" + setting + "<br>'" + c + "'", tso),
 							src.getGUIsetting()));
 				}
-			if (setting.equalsIgnoreCase("Treatment"))
+			if (setting.equalsIgnoreCase(ConditionInfo.TREATMENT.toString()))
 				for (String c : ts) {
 					ThreadSafeOptions tso = new ThreadSafeOptions();
 					tso.setParam(0, setting);

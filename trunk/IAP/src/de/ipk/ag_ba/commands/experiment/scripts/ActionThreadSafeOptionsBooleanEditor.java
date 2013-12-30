@@ -43,7 +43,11 @@ public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationActi
 	
 	@Override
 	public String getDefaultTitle() {
-		return (String) tso.getParam(0, "[Unknown Property]");
+		String v = (String) tso.getParam(10, null);
+		if (v != null && !v.isEmpty())
+			return v;
+		else
+			return (String) tso.getParam(0, "[Unknown Property]");
 	}
 	
 	@Override

@@ -53,7 +53,8 @@ public class ActionSelectMetaDataColumns extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		int n = countSelected();
 		if (experimentReference.getExperimentPeek() != null)
-			return "<html><center>Group Definition<br><small><font color='gray'>" + n + " field" + (n != 1 ? "s" : "") + " selected</font></small></center>";
+			return "<html><center>Group Definition<br><small><font color='gray'>"
+					+ n + " field" + (n != 1 ? "s" : "") + " selected</font></small></center>";
 		else
 			return "<html><center>Group Definition<br><font color='gray'><small>(data is beeing loaded)</small></font>";
 	}

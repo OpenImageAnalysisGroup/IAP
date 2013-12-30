@@ -13,6 +13,7 @@ import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -69,7 +70,7 @@ public class ActionPdfReport extends AbstractNavigationAction implements ActionD
 		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Species", ss));
 		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Genotypes", gs));
 		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Varieties", vs));
-		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Growth conditions", gc));
+		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Growth Conditions", gc));
 		htmlTextPanels.add(ImageAnalysisCommandManager.getList("Treatments", ts));
 		return new MainPanelComponent(htmlTextPanels);
 	}
@@ -138,17 +139,19 @@ public class ActionPdfReport extends AbstractNavigationAction implements ActionD
 				src.getGUIsetting()));
 		
 		for (String c : new String[] {
-				"Condition", "Species", "Genotype", "Variety",
-				"Growth condition", "Treatment", "Plant ID" }) {
-			if (c.equals("Species") && ss.size() <= 1)
+				"Condition", ConditionInfo.SPECIES.toString(), ConditionInfo.GENOTYPE.toString(),
+				ConditionInfo.VARIETY.toString(),
+				ConditionInfo.GROWTHCONDITIONS.toString(),
+				ConditionInfo.TREATMENT.toString(), "Plant ID" }) {
+			if (c.equals(ConditionInfo.SPECIES.toString()) && ss.size() <= 1)
 				continue;
-			if (c.equals("Genotype") && gs.size() <= 1)
+			if (c.equals(ConditionInfo.GENOTYPE.toString()) && gs.size() <= 1)
 				continue;
-			if (c.equals("Variety") && vs.size() <= 1)
+			if (c.equals(ConditionInfo.VARIETY.toString()) && vs.size() <= 1)
 				continue;
-			if (c.equals("Growth condition") && gc.size() <= 1)
+			if (c.equals(ConditionInfo.GROWTHCONDITIONS.toString()) && gc.size() <= 1)
 				continue;
-			if (c.equals("Treatment") && ts.size() <= 1)
+			if (c.equals(ConditionInfo.TREATMENT.toString()) && ts.size() <= 1)
 				continue;
 			ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setParam(0, c);
