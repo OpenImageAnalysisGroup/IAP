@@ -59,6 +59,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private HashMap<String, String> knownSettings = new HashMap<String, String>();
 	private long startTime;
 	private ArrayList<String> desiredColumns;
+	private ArrayList<ThreadSafeOptions> listOfDataColumns = null;
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
 			throws IOException {
@@ -109,7 +110,6 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 					else
 						selCnt++;
 				}
-				
 			}
 		});
 	}
@@ -208,7 +208,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				}
 				if (allowDataColumnSelection) {
 					if (actionSelectDataColumns == null) {
-						actionSelectDataColumns = new ActionSelectDataColumns("Select Relevant Data Columns", desiredColumns, experimentReference);
+						actionSelectDataColumns = new ActionSelectDataColumns("Select Relevant Data Columns", desiredColumns, experimentReference, listOfDataColumns);
+						listOfDataColumns = actionSelectDataColumns.getDataColumnList();
 					}
 					ra.add(new NavigationButton(actionSelectDataColumns, guiSetting));
 				}

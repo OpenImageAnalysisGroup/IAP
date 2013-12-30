@@ -85,7 +85,7 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 		return new String[] {
 				"weight_before:Weight before watering",
 				"water_weight:Water weight",
-				"side.height.norm:Height (normalized) // side.height:Height",
+				"side.height.norm:Height (zoom corrected) // side.height:Height",
 				"side.vis.area.norm:Side Vis Area (normalized) // side.vis.area:Side Vis Area",
 				"side.fluo.intensity.average:Fluo intensity (side)",
 				"side.nir.intensity.average:NIR intensity (side)",
@@ -93,8 +93,8 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 				"top.nir.intensity.average:NIR intensity (top)",
 				"side.vis.hsv.h.average:Average hue (side)",
 				"top.vis.hsv.h.average:Average hue (top)",
-				"side.width.norm:Width (normalized) // side.width:Width",
-				"top.vis.area.norm:Top Vis Area (normalized) // top.vis.area:Top Vis Area",
+				"side.width.norm:Width (zoom corrected) // side.width:Width",
+				"top.vis.area.norm:Top Vis Area (zoom corrected) // top.vis.area:Top Vis Area",
 				"volume.fluo.iap:Volume estimation (fluo)",
 		};
 	}

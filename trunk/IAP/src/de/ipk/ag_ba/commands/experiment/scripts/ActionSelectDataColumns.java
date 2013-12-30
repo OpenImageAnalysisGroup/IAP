@@ -21,17 +21,29 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 	private final ArrayList<String> descriptions = new ArrayList<String>();
 	private ExperimentReference experimentReference;
 	private NavigationButton src;
+	private ArrayList<ThreadSafeOptions> listOfColumns = null;
+	private final ThreadSafeOptions dataEvaluated = new ThreadSafeOptions();
 	
 	public ActionSelectDataColumns(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionSelectDataColumns(String tooltip, final Collection<String> desiredDataColumns, final ExperimentReference experimentReference) {
+	public ActionSelectDataColumns(String tooltip, final Collection<String> desiredDataColumns,
+			final ExperimentReference experimentReference, ArrayList<ThreadSafeOptions> listOfColumns) {
 		this(tooltip);
+		dataEvaluated.setBval(0, false);
 		this.desiredDataColumns = desiredDataColumns;
 		this.experimentReference = experimentReference;
+		this.listOfColumns = listOfColumns;
+		boolean newInit = false;
+		if (this.listOfColumns == null) {
+			this.listOfColumns = new ArrayList<ThreadSafeOptions>();
+			newInit = true;
+		}
+		
+		final boolean fni = newInit;
+		
 		experimentReference.runAsDataBecomesAvailable(new Runnable() {
-			
 			@Override
 			public void run() {
 				confirmedColumns.clear();
@@ -53,7 +65,23 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 							}
 						}
 					}
+					
+					if (fni) {
+						int idx = 0;
+						for (String colName : confirmedColumns) {
+							ThreadSafeOptions tso;
+							tso = new ThreadSafeOptions();
+							tso.setBval(0, true);
+							tso.setParam(0, descriptions.get(idx));
+							tso.setParam(1, colName);
+							tso.setInt(Integer.MAX_VALUE);
+							ActionSelectDataColumns.this.listOfColumns.add(tso);
+							idx++;
+						}
+					}
+					
 				}
+				dataEvaluated.setBval(0, true);
 			}
 		});
 	}
@@ -62,29 +90,29 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		experimentReference.getData();
+		dataEvaluated.waitForBoolean(0);
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		int idx = 0;
-		for (String colName : confirmedColumns) {
-			ThreadSafeOptions tso = new ThreadSafeOptions();
-			tso.setBval(0, true);
-			tso.setParam(0, descriptions.get(idx));
-			tso.setParam(1, colName);
+		for (ThreadSafeOptions tso : listOfColumns) {
 			ActionThreadSafeOptionsBooleanEditor action = new ActionThreadSafeOptionsBooleanEditor(tso);
 			res.add(new NavigationButton(action, src.getGUIsetting()));
-			idx++;
 		}
 		return res;
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		if (experimentReference.getExperimentPeek() != null)
-			return "Data Columns<br><font color='gray'><small>" + confirmedColumns.size() + " selected</small></font>";
-		else
+		if (experimentReference.getExperimentPeek() != null) {
+			int cnt = 0;
+			for (ThreadSafeOptions tso : listOfColumns) {
+				if (tso.getBval(0, false))
+					cnt++;
+			}
+			return "Data Columns<br><font color='gray'><small>" + cnt + "/" + listOfColumns.size() + " selected</small></font>";
+		} else
 			return "Data Columns<br><font color='gray'><small>(data is beeing loaded)</small></font>";
 		
 	}
@@ -92,6 +120,10 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		return "img/ext/gpl2/Gnome-Applications-Engineering-64.png";
+	}
+	
+	public ArrayList<ThreadSafeOptions> getDataColumnList() {
+		return listOfColumns;
 	}
 	
 }
