@@ -35,6 +35,7 @@ public class ScriptHelper {
 			so.setBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
 			so.setBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
 			so.setBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
+			so.setStringArray("Data Columns", "columns", StringManipulationTools.getStringListFromArray(adp.getDesiredDataColumns()));
 		} else
 			if (adp != null) {
 				so.getString("Icon Display", "title", adp.getTitle());
@@ -48,6 +49,7 @@ public class ScriptHelper {
 				so.getBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
 				so.getBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
 				so.getBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
+				so.getStringAll("Data Columns", "columns", adp.getDesiredDataColumns());
 			}
 	}
 	
@@ -93,5 +95,9 @@ public class ScriptHelper {
 	
 	public String getTooltip() {
 		return so.getString("Icon Display", "tooltip", "[No tooltip text defined]");
+	}
+	
+	public String[] getDesiredDataColumns() {
+		return so.getStringAll("Data Columns", "columns", new String[] {});
 	}
 }
