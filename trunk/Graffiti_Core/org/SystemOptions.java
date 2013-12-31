@@ -427,6 +427,10 @@ public class SystemOptions {
 			ini.store();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
 					+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
+			if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
+				new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
+			if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
+				lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
 			lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
 					new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
@@ -560,6 +564,8 @@ public class SystemOptions {
 			return;
 		}
 		Ini.Section sec = ini.get(section);
+		if (sec == null)
+			sec = ini.add(section);
 		if (sec.containsKey(setting))
 			sec.remove(setting);
 		for (String nv : newValues)

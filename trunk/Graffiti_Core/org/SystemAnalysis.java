@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -438,5 +439,16 @@ public class SystemAnalysis {
 		if (d < 1024l * 1024l * 1024l * 1024l)
 			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d, "#.#") + " GB";
 		return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d, "#.#") + " TB";
+	}
+	
+	public static String[] getEnvArray() {
+		String[] res = new String[System.getenv().size()];
+		Map<String, String> m = System.getenv();
+		int idx = 0;
+		for (String key : m.keySet()) {
+			res[idx] = key + "=" + m.get(key);
+			idx++;
+		}
+		return res;
 	}
 }
