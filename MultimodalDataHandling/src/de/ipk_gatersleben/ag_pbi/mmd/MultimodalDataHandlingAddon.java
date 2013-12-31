@@ -54,52 +54,52 @@ public class MultimodalDataHandlingAddon extends EditorPluginAdapter {
 		
 		// attributes for the gradient chart
 		this.attributeDescriptions = new AttributeDescription[] {
-							new AttributeDescription(
-												"useCustomDomainSteps", BooleanAttribute.class,
-												"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																	"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small><!--A-->Custom Step Size",
-												true, true, null),
-							new AttributeDescription(
-												"customDomainStepSize", DoubleAttribute.class,
-												"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																	"<html>Domain Axis:  <br>&nbsp;&nbsp;&nbsp;<small><!--A-->Step Size",
-												true, true, null),
-								new AttributeDescription(
-													"useCustomDomainBounds", BooleanAttribute.class,
-													"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																		"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small>Custom Min/Max",
-													true, true, null),
-										new AttributeDescription(
-															"minBoundDomain", DoubleAttribute.class,
-															"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																				"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small>Minimum",
-															true, true, null),
-												new AttributeDescription(
-																	"maxBoundDomain", DoubleAttribute.class,
-																	"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																						"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;Maximum",
-																	true, true, null),
-														new AttributeDescription(
-																			"diagramTransparency", DoubleAttribute.class,
-																			"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
-																								"Background Transparency",
-																			true, true, null),
-																new AttributeDescription(
-																					"chartresolution", DoubleAttribute.class,
-																					"Gradientchart:Resolution Factor",
-																					true, true, null),
-																		new AttributeDescription(
-																							"plotlinethickness", DoubleAttribute.class,
-																							"Gradientchart:Line Thickness",
-																							true, true, null),
-																							new AttributeDescription(
-																									FluxreactionAttribute.name, StringAttribute.class,
-																									"Flux:Size",
-																									true, true, null)
+				new AttributeDescription(
+						"useCustomDomainSteps", BooleanAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small><!--A-->Custom Step Size",
+						true, true, null),
+				new AttributeDescription(
+						"customDomainStepSize", DoubleAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"<html>Domain Axis:  <br>&nbsp;&nbsp;&nbsp;<small><!--A-->Step Size",
+						true, true, null),
+				new AttributeDescription(
+						"useCustomDomainBounds", BooleanAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small>Custom Min/Max",
+						true, true, null),
+				new AttributeDescription(
+						"minBoundDomain", DoubleAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;<small>Minimum",
+						true, true, null),
+				new AttributeDescription(
+						"maxBoundDomain", DoubleAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"<html>Domain Axis: <br>&nbsp;&nbsp;&nbsp;Maximum",
+						true, true, null),
+				new AttributeDescription(
+						"diagramTransparency", DoubleAttribute.class,
+						"<html><!--a-->Charting <small><font color=\"gray\">(selected elements)</font></small>:" +
+								"Background Transparency",
+						true, true, null),
+				new AttributeDescription(
+						"chartresolution", DoubleAttribute.class,
+						"Gradientchart:Resolution Factor",
+						true, true, null),
+				new AttributeDescription(
+						"plotlinethickness", DoubleAttribute.class,
+						"Gradientchart:Line Thickness",
+						true, true, null),
+				new AttributeDescription(
+						FluxreactionAttribute.name, StringAttribute.class,
+						"Flux:Size",
+						true, true, null)
 		};
 		
 		algorithms = new Algorithm[] {
-							new VisualiseFluxDataAlgorithm()
+				new VisualiseFluxDataAlgorithm()
 		};
 		
 		// does not work as intended
@@ -175,7 +175,7 @@ public class MultimodalDataHandlingAddon extends EditorPluginAdapter {
 		fluxtempalte.registerTemplate();
 		
 		algorithms = new Algorithm[] {
-							new VisualiseFluxDataAlgorithm()
+				new VisualiseFluxDataAlgorithm()
 		};
 		
 		// does not work as intended
@@ -192,10 +192,7 @@ public class MultimodalDataHandlingAddon extends EditorPluginAdapter {
 	public ImageIcon getIcon() {
 		try {
 			ImageIcon icon = new ImageIcon(GravistoService.getResource(this.getClass(), "icon", "png"));
-			if (icon != null)
-				return icon;
-			else
-				return super.getIcon();
+			return icon;
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 			return super.getIcon();
