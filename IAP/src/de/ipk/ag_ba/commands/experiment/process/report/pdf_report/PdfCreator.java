@@ -88,7 +88,11 @@ public class PdfCreator {
 			File report = new File(tempDirectory.getAbsoluteFile() + File.separator + en + "." + (xlsx ? "xlsx" : "csv"));
 			return report;
 		} else {
-			File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
+			File report;
+			if (tempDirectory.getName().endsWith(".csv"))
+				report = tempDirectory;
+			else
+				report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report." + (xlsx ? "xlsx" : "csv"));
 			return report;
 		}
 	}
@@ -388,6 +392,8 @@ public class PdfCreator {
 	}
 	
 	public void saveScripts(String[] files) throws Exception {
+		if (tempDirectory.getName().endsWith(".csv"))
+			return;
 		ClassLoader cl = PdfCreator.class.getClassLoader();
 		String path = PdfCreator.class.getPackage().getName().replace('.', '/');
 		

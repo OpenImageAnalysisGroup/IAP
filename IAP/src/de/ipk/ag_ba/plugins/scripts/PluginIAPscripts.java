@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.experiment.scripts.Rinfo.ScriptRinfo;
 import de.ipk.ag_ba.commands.experiment.scripts.clustering.ScriptPVCLUST;
+import de.ipk.ag_ba.commands.experiment.scripts.diagrams.ScriptPLOT;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
@@ -23,6 +24,7 @@ public class PluginIAPscripts extends AbstractIAPplugin {
 		// boolean addRIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", true);
 		result.add(new ScriptRinfo());
 		result.add(new ScriptPVCLUST());
+		result.add(new ScriptPLOT());
 		return result.toArray(new ActionScriptBasedDataProcessing[] {});
 	}
 }

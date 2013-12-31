@@ -57,6 +57,8 @@ public interface ActionScriptBasedDataProcessing {
 	 */
 	boolean allowSelectionOfDataColumns();
 	
+	boolean exportClusteringDataset();
+	
 	/**
 	 * @return Format: preferred column name (without unit) : Description (visible title in GUI) // optional column name : Description
 	 *         The '//' and the optional column name is normally omitted but can be used to utilize one of two or more columns. If the first

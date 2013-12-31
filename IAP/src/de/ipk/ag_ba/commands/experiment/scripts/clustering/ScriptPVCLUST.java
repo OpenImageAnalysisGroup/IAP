@@ -111,4 +111,9 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 	public int getTimeoutInMin() {
 		return -1;
 	}
+	
+	@Override
+	public boolean exportClusteringDataset() {
+		return true;
+	}
 }

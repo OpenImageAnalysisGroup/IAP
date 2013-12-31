@@ -44,6 +44,7 @@ public class ScriptHelper {
 			so.setBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
 			so.setBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
 			so.setBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
+			so.setBoolean("Parameter", "export clustering dataset", adp.exportClusteringDataset());
 			so.setStringArray("Data Columns", "columns", StringManipulationTools.getStringListFromArray(adp.getDesiredDataColumns()));
 		} else
 			if (adp != null) {
@@ -60,6 +61,7 @@ public class ScriptHelper {
 				so.getBoolean("Parameter", "allow group column selection", adp.allowGroupingColumnSelection());
 				so.getBoolean("Parameter", "allow group filtering", adp.allowGroupingFiltering());
 				so.getBoolean("Parameter", "allow data column modification", adp.allowSelectionOfDataColumns());
+				so.getBoolean("Parameter", "export clustering dataset", adp.exportClusteringDataset());
 				so.getStringAll("Data Columns", "columns", adp.getDesiredDataColumns());
 			}
 	}
@@ -104,6 +106,10 @@ public class ScriptHelper {
 		return so.getBoolean("Parameter", "allow data column modification", false);
 	}
 	
+	public boolean isCreateClusteringDataset() {
+		return so.getBoolean("Parameter", "export clustering dataset", false);
+	}
+	
 	public String getTooltip() {
 		return so.getString("Icon Display", "tooltip", "[No tooltip text defined]");
 	}
@@ -119,4 +125,5 @@ public class ScriptHelper {
 	public int getTimeoutInMinutes() {
 		return so.getInteger("Script", "timeout-min", -1);
 	}
+	
 }

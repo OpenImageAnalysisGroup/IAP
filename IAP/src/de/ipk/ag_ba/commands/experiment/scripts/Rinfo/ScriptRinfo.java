@@ -81,4 +81,9 @@ public class ScriptRinfo implements ActionScriptBasedDataProcessing {
 	public int getTimeoutInMin() {
 		return 1;
 	}
+	
+	@Override
+	public boolean exportClusteringDataset() {
+		return false;
+	}
 }
