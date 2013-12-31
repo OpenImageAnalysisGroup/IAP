@@ -27,14 +27,7 @@ public class ScriptPLOT implements ActionScriptBasedDataProcessing {
 		return new String[] {
 				"--vanilla",
 				"--encoding=UTF-8",
-				"plotdiagrams.R",
-		// "[int|bootstrap sample size|1000|"
-		// +
-		// "Computation of p-values via multiscale bootstrap resampling requires a " +
-		// "comparatively large bootstrap sample size. "
-		// +
-		// "It is recommend to use 1000 for testing and 10000 for smaller errors.|" +
-		// "If the bootstrap sample size is set to 0, hclust, a clustering approach which does not compute p-values, is performed.]"
+				"plotdiagrams.R"
 		};
 	}
 	
@@ -50,18 +43,12 @@ public class ScriptPLOT implements ActionScriptBasedDataProcessing {
 	
 	@Override
 	public String[] getWebURLs() {
-		return new String[] {
-		// "http://www.is.titech.ac.jp/~shimo/prog/pvclust/",
-		// "http://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html"
-		};
+		return new String[] {};
 	}
 	
 	@Override
 	public String[] getWebUrlTitles() {
-		return new String[] {
-		// "pvclust",
-		// "hclust"
-		};
+		return new String[] {};
 	}
 	
 	@Override
