@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.commands.experiment.scripts;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.datasource.WebUrlAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
+import de.ipk.ag_ba.commands.experiment.scripts.helperClasses.FileSaver;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -58,9 +60,11 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private long startTime;
 	private ArrayList<String> desiredColumns;
 	private ArrayList<ThreadSafeOptions> listOfDataColumns = new ArrayList<ThreadSafeOptions>();
+	private ArrayList<String> scriptFileNames;
+	private int timeoutInMinutes;
 	
 	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
-			throws IOException {
+			throws Exception {
 		super(tooltip);
 		this.adp = adp;
 		this.scriptIniLocation = scriptIniLocation;
@@ -93,7 +97,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		}
 	}
 	
-	private void readInfo() throws IOException {
+	private void readInfo() throws Exception {
 		ScriptHelper sh = new ScriptHelper(scriptIniLocation, adp);
 		title = sh.getTitle();
 		iconDef = sh.getIcon();
@@ -107,6 +111,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		urls = StringManipulationTools.getStringListFromArray(sh.getWebURLs());
 		urlDescriptions = StringManipulationTools.getStringListFromArray(sh.getWebUrlTitles());
 		desiredColumns = StringManipulationTools.getStringListFromArray(sh.getDesiredDataColumns());
+		scriptFileNames = StringManipulationTools.getStringListFromArray(sh.getExportScriptFileNames());
+		timeoutInMinutes = sh.getTimeoutInMinutes();
 		if (params != null && !parameterRequested) {
 			for (String s : params) {
 				if (s.startsWith("[") && s.endsWith("]")) {
@@ -125,8 +131,21 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		if (parameterDetermination) {
 			// empty
 		} else {
+			String expDir = null;
 			if (exportFileName != null) {
-				String expDir = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "script_call_" + System.currentTimeMillis());
+				expDir = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "script_call_" + System.currentTimeMillis());
+				
+				if (scriptFileNames != null && scriptFileNames.size() > 0) {
+					// copy files from script bundle to scratch file location (scriptIniLocation ==> expDir)
+					for (String sf : scriptFileNames) {
+						if (sf == null || sf.isEmpty())
+							continue;
+						FileSaver.copy(ReleaseInfo.getAppFolderWithFinalSep()
+								+ new File(scriptIniLocation).getParent()
+								+ File.separator + sf, expDir + sf);
+					}
+				}
+				
 				ArrayList<ThreadSafeOptions> togglesDivideDataSetBy = new ArrayList<ThreadSafeOptions>(metaDataColumns);
 				togglesDivideDataSetBy.add(new ThreadSafeOptions().setParam(0, "Clustering").setBval(0, true));
 				ArrayList<ThreadSafeOptions> togglesMetaDataFiltering = groupSelection;
@@ -160,7 +179,9 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				 * ExportSetting optCustomSubsetDef
 				 */
 				expCommand.setClustering(true);
-				expCommand.setCustomTargetFileName(expDir + exportFileName);
+				expCommand.setUseIndividualReportNames(true);
+				expCommand.setPreventMainCSVexport(true);
+				expCommand.setCustomClusterTargetFileName(expDir + exportFileName);
 				expCommand.setExperimentReference(experimentReference);
 				expCommand.setStatusProvider(getStatusProvider());
 				expCommand.performActionCalculateResults(src);
@@ -182,7 +203,10 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 			String[] params2 = pl.toArray(new String[] {});
 			if (params == null)
 				params2 = null;
-			TreeMap<Long, String> ro = ScriptExecutor.start(getDefaultTitle(), cmd, params2, getStatusProvider(), 1);
+			TreeMap<Long, String> ro = ScriptExecutor.start(
+					getDefaultTitle(), cmd, params2, getStatusProvider(), timeoutInMinutes,
+					expDir != null ? new File(expDir) : null
+					);
 			res.add("<code>" + StringManipulationTools.getStringList(ro.values(), "<br>")
 					+ "</code>");
 		}

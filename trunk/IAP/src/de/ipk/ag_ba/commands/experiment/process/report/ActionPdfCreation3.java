@@ -507,7 +507,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
 					}
 			} else {
-				{
+				if (!preventMainCSVexport) {
 					byte[] csvFileContent = csv.toString().getBytes();
 					csv = null;
 					if (status != null)
@@ -550,8 +550,13 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						HashMap<Integer, HashMap<Integer, Object>> transformed =
 								transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
 										otherFactorCols, valueCols);
+						p.setCustomClusterTargetFile(customClusterTargetFile);
 						p.saveClusterDataToFile(
 								de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering.print(transformed, separator), xlsx);
+						if (preventMainCSVexport) {
+							String tempDirectory = new File(customClusterTargetFile).getParent();
+							AttributeHelper.showInFileBrowser(tempDirectory + "", new File(customClusterTargetFile).getName());
+						}
 					}
 				}
 				if (status != null)
@@ -906,6 +911,10 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	File ff;
 	private String customTargetFileName;
 	
+	private String customClusterTargetFile;
+	
+	private boolean preventMainCSVexport;
+	
 	@Override
 	public boolean prepareCommandLineExecution() throws Exception {
 		targetDirectoryOrTargetFile = null;
@@ -1038,4 +1047,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		clustering = c;
 	}
 	
+	public void setCustomClusterTargetFileName(String customClusterTargetFile) {
+		this.customClusterTargetFile = customClusterTargetFile;
+	}
+	
+	public void setPreventMainCSVexport(boolean preventMainCSVexport) {
+		this.preventMainCSVexport = preventMainCSVexport;
+	}
 }

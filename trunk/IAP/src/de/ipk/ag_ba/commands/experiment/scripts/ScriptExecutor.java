@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.experiment.scripts;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -16,8 +17,9 @@ import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 
 public class ScriptExecutor {
 	
-	public static TreeMap<Long, String> start(String name, String cmd, String[] params, final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			int timeoutMinutes) {
+	public static TreeMap<Long, String> start(String name, final String cmd, String[] params,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			int timeoutMinutes, final File optCurrentDir) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final String nameF = cmd;
 		final ArrayList<String> lastOutput = new ArrayList<String>();
@@ -35,7 +37,7 @@ public class ScriptExecutor {
 					for (int i = 0; i < parameter.length; i++)
 						nameArray[i + 1] = parameter[i];
 					
-					ls_proc = Runtime.getRuntime().exec(nameArray, null, null);
+					ls_proc = Runtime.getRuntime().exec(nameArray, SystemAnalysis.getEnvArray(), optCurrentDir);
 					
 					myRef.setObject(ls_proc);
 					
@@ -131,17 +133,19 @@ public class ScriptExecutor {
 			long start = System.currentTimeMillis();
 			while (!tso.getBval(0, false)) {
 				Thread.sleep(20);
-				long now = System.currentTimeMillis();
-				if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
-					output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
-							"Command execution took more than " +
-							timeoutMinutes + " minutes and has therefore been cancelled.");
-					tso.setBval(1, true);
-					if (myRef.getObject() != null) {
-						Process ls_proc = (Process) myRef.getObject();
-						ls_proc.destroy();
+				if (timeoutMinutes > 0) {
+					long now = System.currentTimeMillis();
+					if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
+						output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
+								"Command execution took more than " +
+								timeoutMinutes + " minutes and has therefore been cancelled.");
+						tso.setBval(1, true);
+						if (myRef.getObject() != null) {
+							Process ls_proc = (Process) myRef.getObject();
+							ls_proc.destroy();
+						}
+						break;
 					}
-					break;
 				}
 			}
 		} catch (InterruptedException e) {

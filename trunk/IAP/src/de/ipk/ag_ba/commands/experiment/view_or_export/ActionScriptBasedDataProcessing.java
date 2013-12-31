@@ -63,4 +63,8 @@ public interface ActionScriptBasedDataProcessing {
 	 *         defined column can't be found, the second one in this single definition is used, and so on.
 	 */
 	String[] getDesiredDataColumns();
+	
+	String[] getScriptFileNames();
+	
+	int getTimeoutInMin();
 }

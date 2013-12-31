@@ -71,4 +71,14 @@ public class ScriptRinfo implements ActionScriptBasedDataProcessing {
 	public String[] getDesiredDataColumns() {
 		return null;
 	}
+	
+	@Override
+	public String[] getScriptFileNames() {
+		return null;
+	}
+	
+	@Override
+	public int getTimeoutInMin() {
+		return 1;
+	}
 }

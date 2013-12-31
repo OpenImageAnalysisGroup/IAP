@@ -193,11 +193,11 @@ public class LoadedVolumeExtension extends LoadedVolume {
 			FileInputStream file = new FileInputStream(
 					"/Users/klukas/Desktop/IAP_reconstruction_1284034033183.argb_volume");
 			
-			boolean high = false;
-			if (high) {
-				res = 400;
-				file = new FileInputStream("/Users/klukas/Desktop/IAP_reconstruction_1283948591567.argb_volume");
-			}
+			// boolean high = false;
+			// if (high) {
+			// res = 400;
+			// file = new FileInputStream("/Users/klukas/Desktop/IAP_reconstruction_1283948591567.argb_volume");
+			// }
 			
 			final DataInputStream in = new DataInputStream(file);
 			
