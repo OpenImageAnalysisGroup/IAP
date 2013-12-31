@@ -38,11 +38,17 @@ plot.trait<-function(Treatment, Genotype, Trait) {
   # number of lines
   nPlantIDs <- length(PlantIDsOfInterest)
   # get the range for the x and y axis
-  xrange <- range(data[which(data[which(data$Plant.ID %in% PlantIDsOfInterest),col.time]<2147483647),col.time])
-  yrange <- range(data[,Trait], na.rm=T)
+  xrange <- tryCatch(range(data[which(data[which(data$Plant.ID %in% PlantIDsOfInterest),col.time]<2147483647),col.time]), error=function(w) {print(c("CAN'T PROCESS ", Treatment, ", ", Genotype, ", ", Trait));return(NA)}) 
+  yrange <- tryCatch(range(data[,Trait], na.rm=T), error=function(w) {print(c("CAN'T PROCESS ", Treatment, ", ", Genotype, ", ", Trait));return(NA)}) 
+  if (is.na(xrange))
+    return;
+  if (is.na(yrange))
+    return;
   # set up the plot
-  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait, pch = 50, cex = .5)
   colors <- rainbow(nPlantIDs)
+  if (length(colors)==0)
+    return;
+  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait) #, pch = 50, cex = .5)
   linetype <- c(1:nPlantIDs)
   plotchar <- seq(10,10+nPlantIDs,1)
   # add lines
@@ -60,7 +66,7 @@ plot.trait<-function(Treatment, Genotype, Trait) {
           lwd=1.5, lty=linetype[i], col=colors[i], pch=plotchar[i])
   }
   # add a title and subtitle
-  title(Treatment)
+  title(c(Genotype, " ", Treatment))
 }
 
 genotypes <- unique(data$Genotype)
@@ -68,7 +74,7 @@ treatments <- unique(data$Treatment)
 
 pdf("plots.pdf")
 
-#par(mfrow = c(2,length(genotypes)))
+#par(mfrow = c(1,length(treatments)))
 
 for (Trait in TraitsOfInterest) {
   if (Trait=="Plant.ID" || Trait==col.time || Trait=="Day" || Trait=="vor" 
@@ -86,9 +92,11 @@ for (Trait in TraitsOfInterest) {
   cat("Plot", Trait, "...\n")
   for (g in genotypes) {
     for (t in treatments) {
-      plot.trait(t, g, Trait)
+      tryCatch(plot.trait(t, g, Trait), error=function(w) {print(c("CAN'T PLOT ", g, ", ", t, ", ", Trait));return(NA)})
     }
   }
 }
 
 dev.off()
+
+cat("Processing finished.\n")
