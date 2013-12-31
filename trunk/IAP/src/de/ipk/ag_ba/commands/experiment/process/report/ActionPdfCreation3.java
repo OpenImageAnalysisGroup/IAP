@@ -1054,4 +1054,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	public void setPreventMainCSVexport(boolean preventMainCSVexport) {
 		this.preventMainCSVexport = preventMainCSVexport;
 	}
+	
+	public void setCustomTargetFileName2(String fn) {
+		this.targetDirectoryOrTargetFile = new File(fn);
+	}
 }

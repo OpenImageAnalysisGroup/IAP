@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
+import org.AttributeHelper;
 import org.ErrorMsg;
 import org.IniIoProvider;
 import org.ReleaseInfo;
@@ -13,9 +15,11 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.commons.lang3.text.WordUtils;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.WebUrlAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
@@ -23,6 +27,7 @@ import de.ipk.ag_ba.commands.experiment.scripts.helperClasses.FileSaver;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
@@ -51,6 +56,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private boolean allowGroupColumnSelection;
 	private boolean allowGroupFiltering;
 	private boolean allowDataColumnSelection;
+	private boolean createClusteringDataset;
 	final ExperimentReference experimentReference;
 	private ActionFilterConditions actionGroupSelection;
 	private ActionSettingsEditor ase;
@@ -107,6 +113,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		allowGroupColumnSelection = sh.isAllowGroupColumnSelection();
 		allowGroupFiltering = sh.isAllowGroupFiltering();
 		allowDataColumnSelection = sh.isAllowDataColumnSelection();
+		createClusteringDataset = sh.isCreateClusteringDataset();
 		tooltip = sh.getTooltip();
 		urls = StringManipulationTools.getStringListFromArray(sh.getWebURLs());
 		urlDescriptions = StringManipulationTools.getStringListFromArray(sh.getWebUrlTitles());
@@ -128,6 +135,9 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		this.startTime = System.currentTimeMillis();
 		res.clear();
 		resultActions.clear();
+		
+		ArrayList<NavigationButton> ra = new ArrayList<NavigationButton>();
+		
 		if (parameterDetermination) {
 			// empty
 		} else {
@@ -178,10 +188,15 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				 * String optCustomSubset,
 				 * ExportSetting optCustomSubsetDef
 				 */
-				expCommand.setClustering(true);
-				expCommand.setUseIndividualReportNames(true);
-				expCommand.setPreventMainCSVexport(true);
-				expCommand.setCustomClusterTargetFileName(expDir + exportFileName);
+				expCommand.setClustering(createClusteringDataset);
+				expCommand.setPreventMainCSVexport(createClusteringDataset);
+				if (createClusteringDataset) {
+					expCommand.setCustomClusterTargetFileName(expDir + exportFileName);
+					expCommand.setUseIndividualReportNames(true);
+				} else {
+					expCommand.setCustomTargetFileName(expDir + exportFileName);
+					expCommand.setCustomTargetFileName2(expDir + exportFileName);
+				}
 				expCommand.setExperimentReference(experimentReference);
 				expCommand.setStatusProvider(getStatusProvider());
 				expCommand.performActionCalculateResults(src);
@@ -209,9 +224,68 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 					);
 			res.add("<code>" + StringManipulationTools.getStringList(ro.values(), "<br>")
 					+ "</code>");
+			
+			HashSet<String> knownInputFiles = new HashSet<String>();
+			if (exportFileName != null && !exportFileName.isEmpty())
+				knownInputFiles.add(exportFileName);
+			if (scriptFileNames != null && scriptFileNames.size() > 0)
+				for (String s : scriptFileNames)
+					if (s != null && !s.isEmpty())
+						knownInputFiles.add(s);
+			ArrayList<String> newFiles = new ArrayList<String>();
+			if (expDir != null)
+				for (String f : new File(expDir).list()) {
+					if (!knownInputFiles.contains(f))
+						newFiles.add(f);
+				}
+			if (expDir != null && new File(expDir).exists()) {
+				final String expDirF = expDir;
+				ra.add(new NavigationButton(new AbstractNavigationAction(
+						"Open file explorer") {
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						AttributeHelper.showInFileBrowser(expDirF, null);
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Show Output Folder";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/Gnome-Document-Open-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+						return currentSet;
+					}
+					
+					@Override
+					public boolean isProvidingActions() {
+						return false;
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return null;
+					}
+				}, src.getGUIsetting()));
+			}
+			for (String fn : newFiles) {
+				IOurl u = FileSystemHandler.getURL(new File(expDir + File.separator + fn));
+				String icon = null;
+				if (fn != null && fn.contains("."))
+					icon = IAPimages.getImageFromFileExtensionGenericIfNotKnown(fn.substring(fn.lastIndexOf(".")));
+				if (icon != null)
+					ra.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u, icon).getNavigationButton(src));
+				else
+					ra.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u).getNavigationButton(src));
+				
+			}
 		}
 		
-		ArrayList<NavigationButton> ra = new ArrayList<NavigationButton>();
 		if (parameterDetermination) {
 			AbstractRscriptExecutionAction ta;
 			try {

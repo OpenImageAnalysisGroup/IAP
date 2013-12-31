@@ -36,10 +36,11 @@ public class ActionCmdLineTools extends AbstractNavigationAction implements Acti
 		
 		for (ActionScriptBasedDataProcessing adp : IAPpluginManager.getInstance().getExperimentScriptActions(experimentReference)) {
 			try {
-				File td = new File(folder + File.separator + adp.getFileName() + ".bundle");
+				File td = new File(ReleaseInfo.getAppFolderWithFinalSep() + folder + File.separator + adp.getFileName() + ".bundle");
 				if (!td.isDirectory())
 					td.mkdirs();
-				new ScriptHelper(folder + File.separator + adp.getFileName() + ".bundle" + File.separator + adp.getFileName() + ".ini", adp);
+				new ScriptHelper(folder + File.separator + adp.getFileName() + ".bundle" + File.separator
+						+ adp.getFileName() + ".ini", adp);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}

@@ -221,7 +221,33 @@ public class IAPimages {
 		return "img/rapeseed.png";
 	}
 	
+	public static String getImageFromFileExtensionGenericIfNotKnown(String extension) {
+		String r = getImageFromFileExtension(extension);
+		if (r != null)
+			return r;
+		else
+			return "img/ext/gpl2/Gnome-Document-New-64.png";
+	}
+	
 	public static String getImageFromFileExtension(String extension) {
+		if (extension.equals(".zip") || extension.equals(".tar") || extension.equals(".gz"))
+			return "img/ext/gpl2/Gnome-Emblem-Package-64.png";
+		if (extension.equals(".tmp") || extension.equals(".temp"))
+			return "img/ext/gpl2/Gnome-Edit-Delete-64.png";
+		if (extension.equals(".png") || extension.equals(".bmp") || extension.equals(".jpg"))
+			return "img/ext/gpl2/Gnome-Image-X-Generic-64.png";
+		if (extension.equals(".eml"))
+			return "img/ext/gpl2/Gnome-Mail-Read-64.png";
+		if (extension.equals(".bat") || extension.equals(".cmd"))
+			return "img/ext/gpl2/Gnome-Text-X-Script-64.png";
+		if (extension.equals(".xlsx") || extension.equals(".xlsx"))
+			return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
+		if (extension.equals(".doc") || extension.equals(".docx"))
+			return "img/ext/gpl2/Gnome-X-Office-Document-64.png";
+		if (extension.equals(".txt"))
+			return "img/ext/gpl2/Gnome-Text-X-Generic-64.png";
+		if (extension.equals(".pdf"))
+			return "img/ext/gpl2/Gnome-Text-X-Generic-Template-64.png";
 		if (extension.equals(".url") || extension.equals(".webloc"))
 			return "img/ext/gpl2/Gnome-Emblem-Web-64.png";
 		if (extension.equals(".txt") || extension.equals(".doc") || extension.equals(".docx"))
