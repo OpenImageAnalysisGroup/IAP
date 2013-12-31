@@ -2,7 +2,6 @@ package de.ipk.ag_ba.commands.experiment;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
@@ -15,11 +14,9 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
-import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 
 public class ActionCmdLineTools extends AbstractNavigationAction implements ActionDataProcessing {
-	private MongoDB m;
 	private ExperimentReference experimentReference;
 	
 	public ActionCmdLineTools(String tooltip) {
@@ -39,24 +36,38 @@ public class ActionCmdLineTools extends AbstractNavigationAction implements Acti
 		
 		for (ActionScriptBasedDataProcessing adp : IAPpluginManager.getInstance().getExperimentScriptActions(experimentReference)) {
 			try {
-				new ScriptHelper(folder + File.separator + adp.getFileName() + ".ini", adp);
-			} catch (IOException e) {
+				File td = new File(folder + File.separator + adp.getFileName() + ".bundle");
+				if (!td.isDirectory())
+					td.mkdirs();
+				new ScriptHelper(folder + File.separator + adp.getFileName() + ".bundle" + File.separator + adp.getFileName() + ".ini", adp);
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		
-		File ff = new File(ReleaseInfo.getAppFolderWithFinalSep() + folder);
-		for (String iniFN : ff.list(new FilenameFilter() {
+		File scanDirectories = new File(ReleaseInfo.getAppFolderWithFinalSep() + folder);
+		for (String bundleDir : scanDirectories.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name != null && name.endsWith(".ini");
+				return name != null && name.endsWith(".bundle");
 			}
 		})) {
-			try {
-				res.add(new NavigationButton(new AbstractRscriptExecutionAction(null, iniFN, "scripts" + File.separator + iniFN, experimentReference), guiSetting));
-			} catch (IOException e) {
-				ErrorMsg.addErrorMessage(e);
-			}
+			File ff = new File(scanDirectories.getPath() + File.separator + bundleDir);
+			if (ff.exists())
+				for (String iniFN : ff.list(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name != null && name.endsWith(".ini");
+					}
+				})) {
+					try {
+						res.add(new NavigationButton(new AbstractRscriptExecutionAction(null, iniFN, "scripts" + File.separator +
+								bundleDir + File.separator + iniFN, experimentReference),
+								guiSetting));
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
 		}
 		
 		return res;
@@ -79,7 +90,6 @@ public class ActionCmdLineTools extends AbstractNavigationAction implements Acti
 	
 	@Override
 	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
 		this.experimentReference = experimentReference;
 	}
 }

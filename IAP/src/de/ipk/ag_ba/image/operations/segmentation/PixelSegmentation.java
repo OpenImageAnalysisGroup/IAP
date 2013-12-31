@@ -98,6 +98,7 @@ public class PixelSegmentation implements Segmentation {
 	
 	// ############### Public ####################
 	
+	@Override
 	public int[] getClusterSize() {
 		return imageClusterSize;
 	}
@@ -238,6 +239,7 @@ public class PixelSegmentation implements Segmentation {
 	
 	// ############### Print-Methoden ######################
 	
+	@Override
 	public void printOriginalImage() {
 		printOriginalImage(this.src_image);
 	}
@@ -806,6 +808,7 @@ public class PixelSegmentation implements Segmentation {
 		}
 	}
 	
+	@Override
 	public Vector2i[] getClusterCenterPoints() {
 		
 		Vector2i[] res = new Vector2i[clusterMinX.length];
@@ -824,6 +827,7 @@ public class PixelSegmentation implements Segmentation {
 		return res;
 	}
 	
+	@Override
 	public Vector2i[] getClusterDimension() {
 		
 		Vector2i[] res = new Vector2i[clusterMinX.length];
@@ -837,6 +841,7 @@ public class PixelSegmentation implements Segmentation {
 		return res;
 	}
 	
+	@SuppressWarnings("unused")
 	public int[] getClusterSizeNormalized(int w, int h) {
 		
 		Vector2i[] clusterCenters = getClusterCenterPoints();
@@ -885,6 +890,7 @@ public class PixelSegmentation implements Segmentation {
 		return normalizedClusterAreaSizes;
 	}
 	
+	@Override
 	public int[] getClusterDimensionMinWH() {
 		Vector2i[] vector2ds = getClusterDimension();
 		int[] res = new int[vector2ds.length];
@@ -899,10 +905,12 @@ public class PixelSegmentation implements Segmentation {
 		return res;
 	}
 	
+	@Override
 	public int[] getImage1A() {
 		return ImageConverter.convert2Ato1A(src_image);
 	}
 	
+	@Override
 	public int[] getImageClusterIdMask() {
 		return ImageConverter.convert2Ato1A(image_cluster_ids);
 	}

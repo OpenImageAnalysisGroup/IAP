@@ -1,12 +1,12 @@
 package de.ipk.ag_ba.commands.experiment.scripts;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
+import de.ipk.ag_ba.commands.experiment.scripts.helperClasses.FileSaver;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 
 /**
@@ -16,19 +16,28 @@ public class ScriptHelper {
 	
 	private final SystemOptions so;
 	
-	public ScriptHelper(String fn, ActionScriptBasedDataProcessing adp) throws IOException {
+	public ScriptHelper(String fn, ActionScriptBasedDataProcessing adp) throws Exception {
 		boolean addFields = false;
+		if (!new File(new File(ReleaseInfo.getAppFolderWithFinalSep() + fn).getParent()).exists()) {
+			new File(new File(ReleaseInfo.getAppFolderWithFinalSep() + fn).getParent()).mkdir();
+		}
 		if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + fn).exists()) {
 			addFields = true;
 		}
 		this.so = SystemOptions.getInstance(fn, null);
 		so.reload();
+		if (adp != null && adp.getScriptFileNames() != null && adp.getScriptFileNames().length > 0) {
+			File fileFolder = new File(ReleaseInfo.getAppFolderWithFinalSep() + fn).getParentFile();
+			FileSaver.saveScripts(adp, StringManipulationTools.getStringListFromArray(adp.getScriptFileNames()), fileFolder);
+		}
 		if (addFields && adp != null) {
 			so.setString("Icon Display", "title", adp.getTitle());
 			so.setString("Icon Display", "tooltip", adp.getTooltip());
 			so.setString("Icon Display", "icon", adp.getImage());
 			so.setString("Script", "exec", adp.getCommand());
+			so.setInteger("Script", "timeout-min", adp.getTimeoutInMin());
 			so.setStringArray("Script", "params", StringManipulationTools.getStringListFromArray(adp.getParams()));
+			so.setStringArray("Script", "files", StringManipulationTools.getStringListFromArray(adp.getScriptFileNames()));
 			so.setStringArray("Reference Infos", "urls", StringManipulationTools.getStringListFromArray(adp.getWebURLs()));
 			so.setStringArray("Reference Infos", "url titles", StringManipulationTools.getStringListFromArray(adp.getWebUrlTitles()));
 			so.setString("Parameter", "input file name", adp.getExportDataFileName());
@@ -42,6 +51,8 @@ public class ScriptHelper {
 				so.getString("Icon Display", "tooltip", adp.getTooltip());
 				so.getString("Icon Display", "icon", adp.getImage());
 				so.getString("Script", "exec", adp.getCommand());
+				so.getInteger("Script", "timeout-min", adp.getTimeoutInMin());
+				so.getStringAll("Script", "files", adp.getScriptFileNames());
 				so.getStringAll("Script", "params", adp.getParams());
 				so.getStringAll("Reference Infos", "urls", adp.getWebURLs());
 				so.getStringAll("Reference Infos", "url titles", adp.getWebUrlTitles());
@@ -99,5 +110,13 @@ public class ScriptHelper {
 	
 	public String[] getDesiredDataColumns() {
 		return so.getStringAll("Data Columns", "columns", new String[] {});
+	}
+	
+	public String[] getExportScriptFileNames() {
+		return so.getStringAll("Script", "files", new String[] {});
+	}
+	
+	public int getTimeoutInMinutes() {
+		return so.getInteger("Script", "timeout-min", -1);
 	}
 }

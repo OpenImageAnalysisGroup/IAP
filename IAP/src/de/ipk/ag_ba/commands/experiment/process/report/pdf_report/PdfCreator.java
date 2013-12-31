@@ -44,6 +44,8 @@ public class PdfCreator {
 	
 	private boolean useIndividualReportNames;
 	
+	private String customClusterTargetFile;
+	
 	public PdfCreator(File optTargetDirectoryOrTargetFile) {
 		this.optTargetDirectoryOrTargetFile = optTargetDirectoryOrTargetFile;
 		this.tempDirectory = optTargetDirectoryOrTargetFile;
@@ -92,7 +94,11 @@ public class PdfCreator {
 	}
 	
 	public File getTargetFileClustering(boolean xlsx) {
-		File report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report.clustering." + (xlsx ? "xlsx" : "csv"));
+		File report;
+		if (customClusterTargetFile != null)
+			report = new File(customClusterTargetFile);
+		else
+			report = new File(tempDirectory.getAbsoluteFile() + File.separator + "report.clustering." + (xlsx ? "xlsx" : "csv"));
 		return report;
 	}
 	
@@ -535,5 +541,9 @@ public class PdfCreator {
 	
 	public void setUseIndividualReportNames(boolean useIndividualReportNames) {
 		this.useIndividualReportNames = useIndividualReportNames;
+	}
+	
+	public void setCustomClusterTargetFile(String customClusterTargetFile) {
+		this.customClusterTargetFile = customClusterTargetFile;
 	}
 }

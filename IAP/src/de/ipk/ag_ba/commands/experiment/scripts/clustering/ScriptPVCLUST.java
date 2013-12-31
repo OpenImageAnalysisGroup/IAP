@@ -19,12 +19,13 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 	
 	@Override
 	public String getCommand() {
-		return "R";
+		return "Rscript";
 	}
 	
 	@Override
 	public String[] getParams() {
 		return new String[] {
+				"--vanilla",
 				"--encoding=UTF-8",
 				"calcClusters.R",
 				"[int|bootstrap sample size|1000|"
@@ -97,5 +98,17 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 				"top.vis.area.norm:Top Vis Area (zoom corrected) // top.vis.area:Top Vis Area",
 				"volume.fluo.iap:Volume estimation (fluo)",
 		};
+	}
+	
+	@Override
+	public String[] getScriptFileNames() {
+		return new String[] {
+				"calcClusters.R"
+		};
+	}
+	
+	@Override
+	public int getTimeoutInMin() {
+		return -1;
 	}
 }
