@@ -16,17 +16,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
 
 /**
  * @author Christian Klukas
- *         To change the template for this generated type comment go to
- *         Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class DBEgravistoHelper implements HelperClass {
-	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 3 // 11.2013"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 4 // 01.2014"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION_CODE = "1.1"; // "DBE-Visualisation and Analysis V1.1";
-	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2013"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2014"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_NAME = "DBE-Gravisto";
 	public static String DBE_INFORMATIONSYSTEM_NAME = "DBE Information System";
 	public static final String CLUSTER_ANALYSIS_NAME = "Cluster Visualisation";
-	public static final String CLUSTER_ANALYSIS_VERSION = "Cluster Visualisation V2013";
+	public static final String CLUSTER_ANALYSIS_VERSION = "Cluster Visualisation V2014";
 	public static String DBE_GRAVISTO_NAME_SHORT = "DBE-Gravisto";
 	public static String kgmlFileVersionHint = "<sub><small>v0.7.0</small></sub>";
 	

@@ -574,6 +574,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 						break;
 					}
 				}
+				jarFile.close();
 				
 				String text = "";
 				if (xmlString == null || xmlString.contains("/"))
