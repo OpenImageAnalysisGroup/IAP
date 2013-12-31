@@ -29,6 +29,8 @@ cat("Read input file", fileName, "...\n")
 #  data<-data[,TraitsOfInterest]
 #}
 
+TraitsOfInterest <- colnames(data)
+
 plot.trait<-function(Treatment, Genotype, Trait) {
   # define Plant ID
   PlantIDsOfInterest<-unique(
@@ -38,17 +40,13 @@ plot.trait<-function(Treatment, Genotype, Trait) {
   # number of lines
   nPlantIDs <- length(PlantIDsOfInterest)
   # get the range for the x and y axis
-  xrange <- tryCatch(range(data[which(data[which(data$Plant.ID %in% PlantIDsOfInterest),col.time]<2147483647),col.time]), error=function(w) {print(c("CAN'T PROCESS ", Treatment, ", ", Genotype, ", ", Trait));return(NA)}) 
-  yrange <- tryCatch(range(data[,Trait], na.rm=T), error=function(w) {print(c("CAN'T PROCESS ", Treatment, ", ", Genotype, ", ", Trait));return(NA)}) 
-  if (is.na(xrange))
-    return;
-  if (is.na(yrange))
-    return;
+  xrange <- range(data[which(data[which(data$Plant.ID %in% PlantIDsOfInterest),col.time]<2147483647),col.time]) 
+  yrange <- range(data[,Trait], na.rm=T) 
   # set up the plot
   colors <- rainbow(nPlantIDs)
   if (length(colors)==0)
     return;
-  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait) #, pch = 50, cex = .5)
+  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait)
   linetype <- c(1:nPlantIDs)
   plotchar <- seq(10,10+nPlantIDs,1)
   # add lines
@@ -92,7 +90,7 @@ for (Trait in TraitsOfInterest) {
   cat("Plot", Trait, "...\n")
   for (g in genotypes) {
     for (t in treatments) {
-      tryCatch(plot.trait(t, g, Trait), error=function(w) {print(c("CAN'T PLOT ", g, ", ", t, ", ", Trait));return(NA)})
+      tryCatch(plot.trait(t, g, Trait), error=function(w) {cat(c("CAN'T PLOT ", g, ", ", t, ", ", Trait,"\n"));return(NA)})
     }
   }
 }
@@ -100,3 +98,5 @@ for (Trait in TraitsOfInterest) {
 dev.off()
 
 cat("Processing finished.\n")
+
+warnings()
