@@ -137,9 +137,9 @@ public class MenuItemInfoDialog
 				}
 				
 				if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
-					copyR = "&copy; 2003-2013 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
+					copyR = "&copy; 2003-2014 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
 				else
-					copyR = "(c) 2003-2013 IPK-Gatersleben";
+					copyR = "(c) 2003-2014 IPK-Gatersleben";
 				
 				int num = 0;
 				num = MainFrame.getInstance().getPluginManager().getPluginEntries().size();
