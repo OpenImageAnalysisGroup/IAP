@@ -200,7 +200,10 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 										sb.append(v);
 									}
 								}
-								s.setCondition(sb.toString());
+								if (sb.length() > 0)
+									s.setCondition(sb.toString());
+								else
+									s.setCondition("(no annotation)");
 							}
 						};
 						expCommand.setSnapshotVisitor(sv);
