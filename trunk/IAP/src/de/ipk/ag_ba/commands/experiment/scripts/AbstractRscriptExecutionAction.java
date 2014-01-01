@@ -120,14 +120,17 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		desiredColumns = StringManipulationTools.getStringListFromArray(sh.getDesiredDataColumns());
 		scriptFileNames = StringManipulationTools.getStringListFromArray(sh.getExportScriptFileNames());
 		timeoutInMinutes = sh.getTimeoutInMinutes();
-		if (params != null && !parameterRequested) {
-			for (String s : params) {
-				if (s.startsWith("[") && s.endsWith("]")) {
-					parameterDetermination = true;
-					break;
+		if (allowGroupColumnSelection || allowGroupFiltering || allowDataColumnSelection)
+			parameterDetermination = true;
+		else
+			if (params != null && !parameterRequested) {
+				for (String s : params) {
+					if (s.startsWith("[") && s.endsWith("]")) {
+						parameterDetermination = true;
+						break;
+					}
 				}
 			}
-		}
 	}
 	
 	@Override

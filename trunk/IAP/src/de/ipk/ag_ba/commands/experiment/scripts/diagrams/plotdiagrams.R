@@ -23,19 +23,19 @@ TraitsOfInterest<-c(col.time,
                     "side.area..px.", "side.width.norm..mm.", "side.height.norm..mm.", "volume.fluo.iap")
 
 cat("Read input file", fileName, "...\n")
-#if (is.null(data)) {
-  data<-read.csv(fileName, header=TRUE, sep=";", fileEncoding="UTF-8")
-#  head(data)
-#  data<-data[,TraitsOfInterest]
-#}
+data<-read.csv(fileName, header=TRUE, sep=";", fileEncoding="UTF-8")
+
+#data[is.na(data$Genotype)] <- "(not defined)"
+#data[is.na(data$Treatment)] <- "(not defined)" 
+#data[is.na(data$Plant.ID)]<- "(not defined)"
 
 TraitsOfInterest <- colnames(data)
 
-plot.trait<-function(Treatment, Genotype, Trait) {
+plot.trait<-function(Condition, Trait) {
   # define Plant ID
   PlantIDsOfInterest<-unique(
                         data[
-                          which(data$Treatment==Treatment & data$Genotype==Genotype),
+                          which(data$Condition==Condition),
                           col.plantID])
   # number of lines
   nPlantIDs <- length(PlantIDsOfInterest)
@@ -46,7 +46,7 @@ plot.trait<-function(Treatment, Genotype, Trait) {
   colors <- rainbow(nPlantIDs)
   if (length(colors)==0)
     return;
-  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait)
+  plot(xrange, yrange, type="n", xlab="Days", ylab=gsub("\\.", " ", Trait))
   linetype <- c(1:nPlantIDs)
   plotchar <- seq(10,10+nPlantIDs,1)
   # add lines
@@ -57,22 +57,21 @@ plot.trait<-function(Treatment, Genotype, Trait) {
   }
   # add a legend
   legend(xrange[1], yrange[2], PlantIDsOfInterest[1:nPlantIDs], cex=0.8, col=colors, # pch=plotchar,
-         lty=linetype, title=Genotype)
+         lty=linetype, title=Condition)
   for (i in 1:nPlantIDs) {
     lines(data[which(data$Plant.ID == PlantIDsOfInterest[i]),col.time],
           data[which(data$Plant.ID == PlantIDsOfInterest[i]),Trait], type="b", 
           lwd=1.5, lty=linetype[i], col=colors[i], pch=plotchar[i])
   }
   # add a title and subtitle
-  title(c(Genotype, " ", Treatment))
+  title(Condition)
 }
 
-genotypes <- unique(data$Genotype)
-treatments <- unique(data$Treatment)
+conditions <- unique(data$Condition)
 
-pdf("plots.pdf")
+pdf("plots.pdf", height=10, width=10*length(conditions))
 
-#par(mfrow = c(1,length(treatments)))
+par(mfrow = c(1,length(conditions)))
 
 for (Trait in TraitsOfInterest) {
   if (Trait=="Plant.ID" || Trait==col.time || Trait=="Day" || Trait=="vor" 
@@ -88,10 +87,8 @@ for (Trait in TraitsOfInterest) {
     next
   
   cat("Plot", Trait, "...\n")
-  for (g in genotypes) {
-    for (t in treatments) {
-      tryCatch(plot.trait(t, g, Trait), error=function(w) {cat(c("CAN'T PLOT ", g, ", ", t, ", ", Trait,"\n"));return(NA)})
-    }
+  for (con in conditions) {
+    tryCatch(plot.trait(con, Trait), error=function(w) {cat(c("Can't plot condition ", c, ", trait ", Trait,"\n"));return(NA)})
   }
 }
 
