@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.experiment.process.report.DateDoubleString;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 
 public class SnapshotDataIAP {
 	private static final Double NO_ANGLE = -720d;
@@ -690,5 +691,29 @@ public class SnapshotDataIAP {
 			}
 		}
 		return result;
+	}
+	
+	public String getFieldValue(ConditionInfo param) {
+		switch (param) {
+			case FILES:
+				return null;
+			case GENOTYPE:
+				return genotype;
+			case GROWTHCONDITIONS:
+				return growthCondition;
+			case IGNORED_FIELD:
+				return null;
+			case SEQUENCE:
+				return sequence;
+			case SPECIES:
+				return species;
+			case TREATMENT:
+				return treatment;
+			case VARIETY:
+				return variety;
+			default:
+				break;
+		}
+		return null;
 	}
 }
