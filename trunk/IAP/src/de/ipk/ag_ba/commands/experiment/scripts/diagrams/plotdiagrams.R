@@ -34,7 +34,7 @@ plot.trait<-function(Condition, Trait) {
   colors <- rainbow(nPlantIDs)
   if (length(colors)==0)
     return;
-  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait) #gsub("\\.", " ", Trait)
+  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait)
   linetype <- c(1:nPlantIDs)
   plotchar <- seq(10,10+nPlantIDs,1)
   # add lines

@@ -383,6 +383,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
 						exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
+				if (snapshots != null && snaphotVisitor != null)
+					for (SnapshotDataIAP s : snapshots)
+						snaphotVisitor.visit(s);
 				TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 				for (String val : indexInfo.keySet())
 					cola.put(indexInfo.get(val), val);
@@ -915,6 +918,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	private boolean preventMainCSVexport;
 	
+	private SnapshotVisitor snaphotVisitor;
+	
 	@Override
 	public boolean prepareCommandLineExecution() throws Exception {
 		targetDirectoryOrTargetFile = null;
@@ -1057,5 +1062,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	public void setCustomTargetFileName2(String fn) {
 		this.targetDirectoryOrTargetFile = new File(fn);
+	}
+	
+	public void setSnapshotVisitor(SnapshotVisitor sv) {
+		this.snaphotVisitor = sv;
 	}
 }

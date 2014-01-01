@@ -23,6 +23,7 @@ import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.datasource.WebUrlAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
+import de.ipk.ag_ba.commands.experiment.process.report.SnapshotVisitor;
 import de.ipk.ag_ba.commands.experiment.scripts.helperClasses.FileSaver;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
@@ -30,6 +31,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 
 /**
@@ -97,8 +99,9 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 			metaDataColumns.add(new ThreadSafeOptions().setParam(0, ConditionInfo.GROWTHCONDITIONS.toString())
 					.setParam(10, ConditionInfo.GROWTHCONDITIONS.toString()).setParam(1, ConditionInfo.GROWTHCONDITIONS)
 					.setBval(0, true));
-			metaDataColumns
-					.add(new ThreadSafeOptions().setParam(0, "Plant ID").setParam(10, "Plant ID").setParam(1, ConditionInfo.IGNORED_FIELD).setBval(0, true));
+			if (createClusteringDataset)
+				metaDataColumns
+						.add(new ThreadSafeOptions().setParam(0, "Plant ID").setParam(10, "Plant ID").setParam(1, ConditionInfo.IGNORED_FIELD).setBval(0, true));
 			metaDataColumnsReady.setBval(0, true);
 		}
 	}
@@ -179,18 +182,30 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 						togglesMetaDataFiltering,
 						togglesDataColumns,
 						null, null, null, "complete, high mem requ.", ExportSetting.ALL);
-				/*
-				 * ExperimentReference experimentReference,
-				 * ArrayList<ThreadSafeOptions> divideDatasetBy,
-				 * boolean exportIndividualAngles,
-				 * boolean xlsx,
-				 * ArrayList<ThreadSafeOptions> togglesFiltering,
-				 * ArrayList<ThreadSafeOptions> togglesInterestingProperties,
-				 * ThreadSafeOptions tsoBootstrapN,
-				 * ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond,
-				 * String optCustomSubset,
-				 * ExportSetting optCustomSubsetDef
-				 */
+				
+				if (!createClusteringDataset) {
+					if (allowGroupColumnSelection) {
+						final ArrayList<ThreadSafeOptions> togglesDivideDataSetByF = togglesDivideDataSetBy;
+						SnapshotVisitor sv = new SnapshotVisitor() {
+							@Override
+							public void visit(SnapshotDataIAP s) {
+								StringBuilder sb = new StringBuilder();
+								for (ThreadSafeOptions tso : togglesDivideDataSetByF) {
+									if (!tso.getBval(0, false))
+										continue;
+									String v = s.getFieldValue((ConditionInfo) tso.getParam(1, ConditionInfo.IGNORED_FIELD));
+									if (v != null && !v.isEmpty()) {
+										if (sb.length() > 0)
+											sb.append("/");
+										sb.append(v);
+									}
+								}
+								s.setCondition(sb.toString());
+							}
+						};
+						expCommand.setSnapshotVisitor(sv);
+					}
+				}
 				expCommand.setClustering(createClusteringDataset);
 				expCommand.setPreventMainCSVexport(createClusteringDataset);
 				if (createClusteringDataset) {
