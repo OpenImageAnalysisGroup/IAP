@@ -325,7 +325,7 @@ public class MongoDB {
 			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
 			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
 			mob.socketKeepAlive(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true));
-			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
+			mob.writeConcern(WriteConcern.JOURNALED);
 			
 			MongoClientOptions mco = mob.build();
 			
