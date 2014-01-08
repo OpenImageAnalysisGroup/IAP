@@ -487,7 +487,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int[][] img2d = img.getAs2A();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		ArrayList<PositionAndColor> res = new ArrayList<>();
+		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
 		
 		// adapt radius to new resolution
 		double fac_x = input().masks().fluo().getWidth() / w;
