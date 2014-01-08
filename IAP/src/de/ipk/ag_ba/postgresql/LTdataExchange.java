@@ -710,11 +710,11 @@ public class LTdataExchange implements ExperimentLoader {
 				break;
 			}
 		if (!topFound) {
-			boolean sideFound=false;
+			boolean sideFound = false;
 			for (String id : SystemOptions.getInstance().getStringAll(
 					"Import", "Side-View-Camera-Config-Substrings", new String[] { "SIDE", " SV" }))
 				if (!id.isEmpty() && conf.toUpperCase().contains(id)) {
-					sideFound= true;
+					sideFound = true;
 					if (positionFirst) {
 						res = "side." + res;
 						if (res.endsWith("."))
@@ -725,11 +725,11 @@ public class LTdataExchange implements ExperimentLoader {
 					break;
 				}
 			if (!sideFound) {
-			boolean t =	SystemOptions.getInstance().getBoolean(
+				boolean t = SystemOptions.getInstance().getBoolean(
 						"Import", "Use Top-Config, if position can not be determined", true);
-				String sideOrTop = t  ? "top" : "side";
+				String sideOrTop = t ? "top" : "side";
 				if (positionFirst) {
-					res = sideOrTop +"." + res;
+					res = sideOrTop + "." + res;
 					if (res.endsWith("."))
 						res = res.substring(0, res.length() - 1);
 				} else {
@@ -1153,33 +1153,36 @@ public class LTdataExchange implements ExperimentLoader {
 			experiment.getHeader().setDatabaseId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 			experiment.getHeader().setOriginDbId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		}
-		
-		if (seq != null && StringManipulationTools.containsAny(seq, getMetaNamesSeedDates())) {
-			String[] values = seq.split("//");
-			seedDateLookupLoop: for (String v : values) {
-				v = v.trim();
-				if (StringManipulationTools.containsAny(v, getMetaNamesSeedDates()) && v.contains(":")) {
-					try {
-						String[] descAndVal = v.split(":", 2);
-						String seedDate = descAndVal[1];
-						String[] dayMonthYear = seedDate.split("\\.", 3);
-						int year = Integer.parseInt(dayMonthYear[2].trim());
-						int month = Integer.parseInt(dayMonthYear[1].trim());
-						int day = Integer.parseInt(dayMonthYear[0].trim());
-						GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
-						Date seedDateDate = cal.getTime();
-						Date startDate = experiment.getHeader().getStartdate();
-						int days = DateUtil.getElapsedDays(seedDateDate, startDate);
-						if (startDate.before(seedDateDate))
-							days = -days;
-						updateSnapshotTimes(experiment, days, "das");
-					} catch (Exception err) {
-						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+		for (SubstanceInterface si : experiment)
+			for (ConditionInterface ci : si) {
+				String sq = ci.getSequence();
+				if (sq != null && StringManipulationTools.containsAny(sq, getMetaNamesSeedDates())) {
+					String[] values = sq.split("//");
+					seedDateLookupLoop: for (String v : values) {
+						v = v.trim();
+						if (StringManipulationTools.containsAny(v, getMetaNamesSeedDates()) && v.contains(":")) {
+							try {
+								String[] descAndVal = v.split(":", 2);
+								String seedDate = descAndVal[1];
+								String[] dayMonthYear = seedDate.split("\\.", 3);
+								int year = Integer.parseInt(dayMonthYear[2].trim());
+								int month = Integer.parseInt(dayMonthYear[1].trim());
+								int day = Integer.parseInt(dayMonthYear[0].trim());
+								GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
+								Date seedDateDate = cal.getTime();
+								Date startDate = experiment.getHeader().getStartdate();
+								int days = DateUtil.getElapsedDays(seedDateDate, startDate);
+								if (startDate.before(seedDateDate))
+									days = -days;
+								updateSnapshotTimes(ci, days, "das");
+							} catch (Exception err) {
+								System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+							}
+							break seedDateLookupLoop;
+						}
 					}
-					break seedDateLookupLoop;
 				}
 			}
-		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
 		
@@ -1189,22 +1192,27 @@ public class LTdataExchange implements ExperimentLoader {
 	private HashSet<String> getMetaNamesSeedDates() {
 		HashSet<String> res = new HashSet<String>();
 		String[] seedDataIDs = SystemOptions.getInstance().getStringAll("Metadata",
-				"Seed Date IDs", new String[] { "SEEDDATE", "seed date", "Aussaat", "Sowing", "Seeddate" });
+				"Seed Date IDs", new String[] { "SEEDDATE", "seed date", "Aussaat", "Sowing", "Seeddate", "SeedDate" });
 		if (seedDataIDs != null)
 			for (String s : seedDataIDs)
-				res.add(s);
+				if (s != null && !s.isEmpty())
+					res.add(s);
 		return res;
 	}
 	
 	private void updateSnapshotTimes(ExperimentInterface experiment, int add, String newTimeUnit) {
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
-				for (SampleInterface s : ci) {
-					int day = s.getTime() - 1;
-					s.setTime(day + add);
-					s.setTimeUnit(newTimeUnit);
-				}
+				updateSnapshotTimes(ci, add, newTimeUnit);
 			}
+		}
+	}
+	
+	private void updateSnapshotTimes(ConditionInterface ci, int add, String newTimeUnit) {
+		for (SampleInterface s : ci) {
+			int day = s.getTime() - 1;
+			s.setTime(day + add);
+			s.setTimeUnit(newTimeUnit);
 		}
 	}
 	

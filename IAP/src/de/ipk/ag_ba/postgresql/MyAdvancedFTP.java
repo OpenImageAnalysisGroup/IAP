@@ -7,11 +7,13 @@
 package de.ipk.ag_ba.postgresql;
 
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.HashMap;
 
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -51,7 +53,20 @@ public class MyAdvancedFTP {
 		synchronized (host2ftp) {
 			if (!host2ftp.containsKey(server)) {
 				ThreadSafeOptions ttt = new ThreadSafeOptions();
-				ttt.setParam(0, new FTPClient());
+				FTPClient fc = new FTPClient();
+				fc.setConnectTimeout(SystemOptions.getInstance().getInteger("VFS", "ftp-connect-timeout", 10000));
+				fc.setDataTimeout(SystemOptions.getInstance().getInteger("VFS", "ftp-data-timeout", 10000));
+				try {
+					fc.setSoTimeout(SystemOptions.getInstance().getInteger("VFS", "ftp-socket-timeout", 10000));
+				} catch (SocketException e1) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Can't Set FTP socket timeout: " + e1.getMessage());
+				}
+				try {
+					fc.setTcpNoDelay(true);
+				} catch (SocketException e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Can't enable FTP TCP NO-DELAY OPTION: " + e.getMessage());
+				}
+				ttt.setParam(0, fc);
 				host2ftp.put(server, ttt);
 			}
 			tso = host2ftp.get(server);

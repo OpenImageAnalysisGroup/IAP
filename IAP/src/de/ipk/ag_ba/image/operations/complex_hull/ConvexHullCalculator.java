@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import org.SystemAnalysis;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
@@ -221,7 +220,7 @@ public class ConvexHullCalculator {
 									.getImage();
 						}
 					};
-					if (br!=null)
+					if (br != null)
 						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
 				}
 			}
@@ -230,7 +229,7 @@ public class ConvexHullCalculator {
 				mr = RotatingCalipers.getMinimumBoundingRectangle(polygon.getPoints());
 			} catch (IllegalArgumentException iae) {
 				// too few pixels for convex hull calculation
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate bounding box: " + iae.getMessage());
+				// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate bounding box: " + iae.getMessage());
 			}
 			if (mr != null) {
 				final Point[] pl = new Point[mr.length];
