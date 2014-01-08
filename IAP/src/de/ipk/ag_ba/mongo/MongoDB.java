@@ -1608,9 +1608,9 @@ public class MongoDB {
 				rList.add((ObjectId) f.getId());
 			if (rmList && rList.size() > 10) {
 				colFE.remove(
-						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
+						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
 				colFC.remove(
-						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
+						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
 				rList.clear();
 			}
 			deleted++;
@@ -1621,9 +1621,9 @@ public class MongoDB {
 		}
 		if (rmList && rList.size() > 0) {
 			colFE.remove(
-					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
+					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
 			colFC.remove(
-					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.ACKNOWLEDGED);
+					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
 			rList.clear();
 		}
 	}
