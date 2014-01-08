@@ -1155,7 +1155,7 @@ public class LTdataExchange implements ExperimentLoader {
 		}
 		for (SubstanceInterface si : experiment)
 			for (ConditionInterface ci : si) {
-				String sq = ci.getSequence();
+				String sq = ci.getSequence() + "//" + seq;
 				if (sq != null && StringManipulationTools.containsAny(sq, getMetaNamesSeedDates())) {
 					String[] values = sq.split("//");
 					seedDateLookupLoop: for (String v : values) {
