@@ -662,8 +662,8 @@ public class ExperimentSaver implements RunnableOnDB {
 			conditions.insert(condition);
 			conditionIDs.add(condition.getString("_id"));
 		} catch (Exception mie) {
-			System.out.println("Invalid condition: " + c + ", with " + c.size() + " samples");
-			mie.printStackTrace();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid condition: " + c + ", with " + c.size() + " samples (could not be saved): "
+					+ mie.getMessage());
 		}
 	}
 	
