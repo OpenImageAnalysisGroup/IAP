@@ -1,4 +1,4 @@
-# Author: Entzian, Klukas
+# Authors: Entzian, Klukas
 ###############################################################################
 cat(paste("used R-Version: ", sessionInfo()$R.version$major, ".", sessionInfo()$R.version$minor, "\n", sep = ""))
 
@@ -20,7 +20,7 @@ plotOnlyBoxplot <- FALSE
 plotOnlyStressValues <- FALSE
 
 
-############# Modelling ######################
+############# Modeling ######################
 
 DO.MODELLING.OF.STRESS <- FALSE
 STRESS.MODELL.INPUT <- "report_1121KN.csv"
@@ -46,23 +46,23 @@ UPDATE <- "update"
 ## long table name
 LONG.UNIT.TABLE <- "unitTable"
 
-## value typs
+## value types
 GET.OVERALL.FILE.NAME <- "overallFileName"
 GET.SECTION.VALUE <- "section"
 GET.OVERALL.RESULT.RESET <- "overallResultReset"
 
-## plot typs
-NBOX.PLOT <- "nboxplot"
-NBOX.MULTI.PLOT <- "nboxmultiplot"
-BOX.PLOT <- "boxplot"
-STACKBOX.PLOT <- "boxplotstacked"
-SPIDER.PLOT <- "spiderplot"
-VIOLIN.PLOT <- "violinplot"
-BAR.PLOT <- "barplot"
-LINERANGE.PLOT <- "lineRangePlot"
-STRESS.PLOT <- "stressplot"
+## plot types
+NBOX.PLOT <- "_line_plot"
+NBOX.MULTI.PLOT <- "_sections_line_plot"
+BOX.PLOT <- "_box_plot"
+STACKBOX.PLOT <- "_stacked_box_plot"
+SPIDER.PLOT <- "_spider_plot"
+VIOLIN.PLOT <- "_violin_plot"
+BAR.PLOT <- "_box_plot"
+LINERANGE.PLOT <- "_line_range_plot"
+STRESS.PLOT <- "_stress_plot"
 
-## colum names
+## column names
 NAME <- "name"
 PRIMAER.TREATMENT <- "primaerTreatment"
 X.AXIS <- "xAxis"
@@ -74,7 +74,7 @@ SE <- "se"
 COLUMN <- "column"
 
 
-## fail values
+## error values
 NONE <- "none"
 NONE.TREATMENT <- "noneTreatment"
 
@@ -614,7 +614,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 	overallList$debug %debug% "overallCheckIfDescriptorIsNaOrAllZero()"	
 	
 	if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
-		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "nBoxplots..."));}	## <--- debug %print% Text anpassen!!!
+		if (overallList$debug) {ownCat(paste(length(overallList$nBoxDes), "line plots..."));}	## <--- debug %print% Text anpassen!!!
 		for (n in seq(along = overallList$nBoxDes)) {
 			if (!is.na(overallList$nBoxDes[[n]][1])) {
 				overallList$nBoxDes[n] <- checkIfDescriptorIsNaOrAllZero(overallList$nBoxDes[[n]], overallList$iniDataSet, debug = overallList$debug)
@@ -622,7 +622,7 @@ overallCheckIfDescriptorIsNaOrAllZero <- function(overallList) {
 		}
 		names(overallList$nBoxDes) <- c(1:length(overallList$nBoxDes))
 	} else {
-		ownCat("All values for nBoxplot are 'NA'")
+		ownCat("All values for line plots are 'NA'")
 		
 	}
 	
@@ -1738,7 +1738,7 @@ overallGetResultDataFrame <- function(overallList) {
 	
 	if (!calculateNothing) {	
 		groupBy <- groupByFunction(list(overallList$treatment, overallList$secondTreatment))
-		colNames <- list(colOfXaxis = "xAxis", colOfMean = "mean", colOfSD = "se", colName = "name", xAxis = overallList$xAxis)
+		colNames <- try(list(colOfXaxis = "xAxis", colOfMean = "mean", colOfSD = "se", colName = "name", xAxis = overallList$xAxis))
 		booleanVectorList <- buildList(overallList, colNames$colOfXaxis)
 		columnsStandard <- c(check(overallList$xAxis), check(overallList$treatment), check(overallList$secondTreatment))
 		contactTheValues <- FALSE
@@ -1751,7 +1751,7 @@ overallGetResultDataFrame <- function(overallList) {
 		if (!is.null(overallList$nBoxDes) && sum(!is.na(overallList$nBoxDes)) > 0) {
 			if (overallList$debug) {ownCat(NBOX.PLOT)}
 			columns <- c(columnsStandard, check(getVector(overallList$nBoxDes)))
-			overallList$overallResult_nBoxDes <- getResultDataFrame(NBOX.PLOT, overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			try(overallList$overallResult_nBoxDes <- getResultDataFrame(NBOX.PLOT, overallList$nBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", NBOX.PLOT, " are 'NA'", sep = ""))
 		}
@@ -1759,7 +1759,7 @@ overallGetResultDataFrame <- function(overallList) {
 		if (!is.null(overallList$nBoxMultiDes) && sum(!is.na(overallList$nBoxMultiDes)) > 0) {
 			if (overallList$debug) {ownCat(NBOX.MULTI.PLOT)}
 			columns <- c(columnsStandard, check(getVector(overallList$nBoxMultiDes)))
-			overallList$overallResult_nBoxMultiDes <- getResultDataFrame(NBOX.MULTI.PLOT, overallList$nBoxMultiDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			try(overallList$overallResult_nBoxMultiDes <- getResultDataFrame(NBOX.MULTI.PLOT, overallList$nBoxMultiDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", NBOX.MULTI.PLOT, " are 'NA'", sep = ""))
 		}
@@ -1768,7 +1768,7 @@ overallGetResultDataFrame <- function(overallList) {
 			if (overallList$debug) {ownCat(BOX.PLOT)}
 			colNames$colOfMean = VALUES
 			columns = c(columnsStandard, check(getVector(overallList$boxDes)))
-			overallList$overallResult_boxDes <- getResultDataFrame(BOX.PLOT, overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			overallList$overallResult_boxDes <- try(getResultDataFrame(BOX.PLOT, overallList$boxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", BOX.PLOT, " are 'NA'", sep = ""))
 		}
@@ -1777,8 +1777,8 @@ overallGetResultDataFrame <- function(overallList) {
 			if (overallList$debug) {ownCat(STACKBOX.PLOT)}
 			colNames$colOfMean = check(getVector(overallList$boxStackDes))
 			colNames$colOfXaxis = overallList$xAxis
-			columns = c(columnsStandard, check(getVector(overallList$boxStackDes)))
-			overallList$overallResult_boxStackDes = getResultDataFrame(STACKBOX.PLOT, overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			columns <- c(columnsStandard, check(getVector(overallList$boxStackDes)))
+			overallList$overallResult_boxStackDes <- try(getResultDataFrame(STACKBOX.PLOT, overallList$boxStackDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", STACKBOX.PLOT, " are 'NA'", sep = ""))
 		}
@@ -1789,8 +1789,8 @@ overallGetResultDataFrame <- function(overallList) {
 			colNames$colOfMean = VALUES
 			colNames$colOfXaxis = overallList$xAxis
 			colNames$desNames = overallList$boxSpiderDesName
-			columns = c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
-			overallList$overallResult_boxSpiderDes = getResultDataFrame(SPIDER.PLOT, overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			columns <- c(columnsStandard, check(getVector(overallList$boxSpiderDes)))
+			overallList$overallResult_boxSpiderDes = try(getResultDataFrame(SPIDER.PLOT, overallList$boxSpiderDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", SPIDER.PLOT, " are 'NA'", sep = ""))
 		}
@@ -1801,8 +1801,8 @@ overallGetResultDataFrame <- function(overallList) {
 			colNames$colOfMean = VALUES
 			colNames$colOfXaxis = overallList$xAxis
 			colNames$desNames = overallList$linerangeDesName
-			columns = c(columnsStandard, check(getVector(overallList$linerangeDes)))
-			overallList$overallResult_linerangeDes = getResultDataFrame(LINERANGE.PLOT, overallList$linerangeDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			columns <- c(columnsStandard, check(getVector(overallList$linerangeDes)))
+			overallList$overallResult_linerangeDes <- try(getResultDataFrame(LINERANGE.PLOT, overallList$linerangeDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		} else {
 			ownCat(paste("All values for ", LINERANGE.PLOT , " are 'NA'", sep = ""))
 		}
@@ -1812,7 +1812,7 @@ overallGetResultDataFrame <- function(overallList) {
 			colNames$colOfMean = "mean"
 			colNames$colOfXaxis = "xAxis"
 			columns = c(columnsStandard, check(getVector(overallList$violinBoxDes)))
-			overallList$overallResult_violinBoxDes = getResultDataFrame(VIOLIN.PLOT, overallList$violinBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues)
+			overallList$overallResult_violinBoxDes <- try(getResultDataFrame(VIOLIN.PLOT, overallList$violinBoxDes, overallList$iniDataSet[columns], groupBy, colNames, booleanVectorList, overallList$debug, contactTheValues))
 		}
 		
 		
@@ -1850,41 +1850,6 @@ getPlotNumber <- function(colNameWichMustBind, descriptorList, diagramTyp) {
 
 
 getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, colNames, booleanVectorList, debug, contactTheValues) {	
-	#############################
-#	diagramTyp = "spiderplot"
-#	descriptorList = overallList$boxSpiderDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug
-	#########################	
-#	diagramTyp = "boxplotStacked"
-#	descriptorList = overallList$boxStackDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug	
-	#########################
-#	diagramTyp = "nboxplot"
-#	descriptorList = overallList$nBoxDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug
-	#########################
-#	diagramTyp = NBOX.MULTI.PLOT
-#	descriptorList = overallList$nBoxMultiDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug
-	#########################
-#	diagramTyp = "violinplot"
-#	descriptorList = overallList$violinBoxDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug
-	#########################	
-#	diagramTyp = "boxplot"
-#	descriptorList = overallList$boxDes
-#	iniDataSet = overallList$iniDataSet[columns]
-#	debug = overallList$debug	
-	#########################
-#splitTreatmentFirst <- overallList$splitTreatmentFirst
-#splitTreatmentSecond <- overallList$splitTreatmentSecond
-	#########################
-	
 	debug %debug% "getResultDataFrame()"
 	
 	#contactTheValues <- FALSE
@@ -1988,7 +1953,7 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 								newDataSetKK <- newDataSetTemp
 								firstNewDataSetTemp <- FALSE
 							} else {	
-								newDataSetKK <- rbind(newDataSetKK, newDataSetTemp)
+								tryCatch(newDataSetKK <- rbind(newDataSetKK, newDataSetTemp), error=function(w) {cat(c("\n", "Can't plot multi-plot line diagram ", nnn, "\n"));return(NA)})								
 							}
 						}
 					}
@@ -2001,8 +1966,9 @@ getResultDataFrame <- function(diagramTyp, descriptorList, iniDataSet, groupBy, 
 						newDataSet <- newDataSetKK
 						firstnewDataSet <- FALSE
 					} else {
-						print(head(newDataSet))
-						print(head(newDataSetKK))
+						#print(head(newDataSet))
+						#print(head(newDataSetKK))
+						
 						newDataSet <- cbind(newDataSet, newDataSetKK)
 					}
 				}
@@ -3291,12 +3257,6 @@ reduceOverallResult <- function(tempOverallList, imagesIndex) {
 
 
 reduceWholeOverallResultToOneValue <- function(tempOverallResult, imagesIndex, debug, diagramTyp = NBOX.PLOT) {
-	####################
-#debug <- overallList$debug
-#diagramTyp <- "nboxplot"
-	#####################
-	
-	
 	debug %debug% "reduceWholeOverallResultToOneValue()"
 	
 	if (diagramTyp == STRESS.PLOT) {
@@ -6325,11 +6285,6 @@ paralleliseDiagramming <- function(overallList, tempOverallResult, overallDescri
 			}
 		}
 	}
-	
-#	if (!(typOfPlot == NBOX.PLOT && !overallList$deleteNboxplot)) {
-#		overallList <- reduceOverallListForMemorySave(overallList, typOfPlot)
-#		gc()
-#	}
 }
 
 
@@ -6575,10 +6530,10 @@ makeDiagrams <- function(overallList) {
 								}
 								if (!plotOnlyStressValues) {
 									if (sum(!is.na(overallList$nBoxDes)) > 0) {
-										if (overallList$debug) {ownCat("nBoxplot...")}
+										if (overallList$debug) {ownCat("line plots...")}
 										startDiagramming(overallList, overallList$overallResult_nBoxDes, overallList$nBoxDes, overallList$nBoxDesName, NBOX.PLOT, catch = overallList$catch, debug = overallList$debug)
 									} else {
-										ownCat("All values for nBoxplot are 'NA'")
+										ownCat("All values for line plots are 'NA'")
 									}
 								}}
 							if (!plotOnlyNBox) {
