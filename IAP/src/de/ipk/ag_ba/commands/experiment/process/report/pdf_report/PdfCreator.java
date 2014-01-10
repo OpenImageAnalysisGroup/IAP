@@ -125,7 +125,7 @@ public class PdfCreator {
 			new File(name).setExecutable(true);
 		}
 		System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: " + name +
-				", WITH PARAMETERS: " + StringManipulationTools.getStringList(para, " / "));
+				" \"" + StringManipulationTools.getStringList(para, "\" \"") + "\"");
 		
 		final String nameF = name;
 		final ObjectRef myRef = new ObjectRef();
