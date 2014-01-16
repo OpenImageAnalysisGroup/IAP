@@ -7,7 +7,6 @@
 package de.ipk.ag_ba.postgresql;
 
 import java.io.OutputStream;
-import java.net.SocketException;
 import java.util.HashMap;
 
 import org.ErrorMsg;
@@ -58,12 +57,12 @@ public class MyAdvancedFTP {
 				fc.setDataTimeout(SystemOptions.getInstance().getInteger("VFS", "ftp-data-timeout", 10000));
 				try {
 					fc.setSoTimeout(SystemOptions.getInstance().getInteger("VFS", "ftp-socket-timeout", 10000));
-				} catch (SocketException e1) {
+				} catch (Exception e1) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Can't Set FTP socket timeout: " + e1.getMessage());
 				}
 				try {
 					fc.setTcpNoDelay(true);
-				} catch (SocketException e) {
+				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Can't enable FTP TCP NO-DELAY OPTION: " + e.getMessage());
 				}
 				ttt.setParam(0, fc);
