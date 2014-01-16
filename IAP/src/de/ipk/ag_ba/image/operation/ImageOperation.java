@@ -3739,21 +3739,25 @@ public class ImageOperation implements MemoryHogInterface {
 			double bfff = (factorsBottom[2] - factorsTop[2]) / height * y + factorsTop[2];
 			for (int x = 0; x < width; x++) {
 				int c = img2d[x][y];
-				rf = ((c & 0xff0000) >> 16);
-				gf = ((c & 0x00ff00) >> 8);
-				bf = (c & 0x0000ff);
-				
-				int r = (int) (rf * rfff);
-				int g = (int) (gf * gfff);
-				int b = (int) (bf * bfff);
-				
-				if (r > 255)
-					r = 255;
-				if (g > 255)
-					g = 255;
-				if (b > 255)
-					b = 255;
-				result[x][y] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+				if (c == BACKGROUND_COLORint) {
+					result[x][y] = c;
+				} else {
+					rf = ((c & 0xff0000) >> 16);
+					gf = ((c & 0x00ff00) >> 8);
+					bf = (c & 0x0000ff);
+					
+					int r = (int) (rf * rfff);
+					int g = (int) (gf * gfff);
+					int b = (int) (bf * bfff);
+					
+					if (r > 255)
+						r = 255;
+					if (g > 255)
+						g = 255;
+					if (b > 255)
+						b = 255;
+					result[x][y] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+				}
 			}
 		}
 		return new ImageOperation(result);
@@ -3777,23 +3781,26 @@ public class ImageOperation implements MemoryHogInterface {
 		double gfff = factors[1];
 		double bfff = factors[2];
 		for (int c : img2d) {
-			
-			rf = ((c & 0xff0000) >> 16);
-			gf = ((c & 0x00ff00) >> 8);
-			bf = (c & 0x0000ff);
-			
-			int r = (int) (rf * rfff);
-			int g = (int) (gf * gfff);
-			int b = (int) (bf * bfff);
-			
-			if (r > 255)
-				r = 255;
-			if (g > 255)
-				g = 255;
-			if (b > 255)
-				b = 255;
-			
-			result[idx++] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			if (c == BACKGROUND_COLORint) {
+				result[idx++] = BACKGROUND_COLORint;
+			} else {
+				rf = ((c & 0xff0000) >> 16);
+				gf = ((c & 0x00ff00) >> 8);
+				bf = (c & 0x0000ff);
+				
+				int r = (int) (rf * rfff);
+				int g = (int) (gf * gfff);
+				int b = (int) (bf * bfff);
+				
+				if (r > 255)
+					r = 255;
+				if (g > 255)
+					g = 255;
+				if (b > 255)
+					b = 255;
+				
+				result[idx++] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			}
 		}
 		return new ImageOperation(result, width, height);
 	}
@@ -3943,6 +3950,15 @@ public class ImageOperation implements MemoryHogInterface {
 			return new float[] { 1, 1, 1 };
 	}
 	
+	public double[] getRGBAverageMostSimilarToColorD(Color targetColor, int x1, int y1, int w, int h, int topPercent, boolean debug) {
+		float[] arr = getRGBAverageMostSimilarToColor(targetColor, x1, y1, w, h, topPercent, debug);
+		double[] ar = new double[arr.length];
+		int idx = 0;
+		for (float f : arr)
+			ar[idx++] = f;
+		return ar;
+	}
+	
 	/**
 	 * @author klukas
 	 * @param topPercent
@@ -3989,6 +4005,8 @@ public class ImageOperation implements MemoryHogInterface {
 				if (h > 10 && ((y % 5) != 0))
 					continue;
 				c = img1d[x + y * imgw];
+				if (c == BACKGROUND_COLORint)
+					continue;
 				r = (c & 0xff0000) >> 16;
 				g = (c & 0x00ff00) >> 8;
 				b = c & 0x0000ff;
