@@ -27,12 +27,14 @@ public class SnapshotCreator {
 	}
 	
 	public void saveNewSnapshot(String plantID, String measurementLabel, String fileExt) throws Exception {
+		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Wait for new image file to appear...");
 		String newImageFile = monitor.getNextAppearingFile(inputFileDir);
 		if (newImageFile == null) {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">WARNING: Detected plant ID " + plantID
 					+ ", but could not find a new image being created!");
 			return;
 		}
+		newImageFile = inputFileDir + File.separator + newImageFile;
 		while (SystemAnalysis.isFileOpen(newImageFile)) {
 			Thread.sleep(50);
 		}
@@ -78,9 +80,14 @@ public class SnapshotCreator {
 		writer.close();
 		
 		File outputfile = new File(imageDir.getAbsolutePath() + File.separator + "0_0." + fileExt);
-		new File(newImageFile).renameTo(outputfile);
-		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: " + plantID
-				+ ": Barcode detected, snapshot data saved and input file moved to target directory.");
+		boolean res = new File(newImageFile).renameTo(outputfile);
+		if (res)
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: " + plantID
+					+ ": Barcode detected, snapshot data saved and input file moved to target directory.");
+		else
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">ERROR: " + plantID
+					+ ": input file could not be moved to target directory: " + newImageFile);
+		
 	}
 	
 	private static int am_pm(int h) {
