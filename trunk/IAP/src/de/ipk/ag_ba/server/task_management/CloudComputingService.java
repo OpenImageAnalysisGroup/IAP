@@ -215,7 +215,7 @@ public class CloudComputingService {
 																			if (res != null && res.data != null && res.data.length > 0) {
 																				String msg = new String(res.data, StandardCharsets.UTF_8.name());
 																				if (msg.startsWith(id + ":")) {
-																					String msgContent = msg.substring((id + ":").length());
+																					String msgContent = msg.substring((id + ":").length()).trim();
 																					if (msgContent.length() > 0 && !msgContent.equals(lastMessage)) {
 																						lastMessage = msgContent;
 																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
