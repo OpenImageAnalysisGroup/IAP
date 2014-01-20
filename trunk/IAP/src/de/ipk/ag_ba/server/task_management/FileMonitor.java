@@ -38,11 +38,16 @@ public class FileMonitor {
 		path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
 		
 		BroadCastService bcs = new BroadCastService(udpPortStart, udpPortEnd, 100);
-		
+		long lastModify = 0;
 		for (;;) {
 			WatchKey key = watchService.take();
 			
 			for (WatchEvent<?> event : key.pollEvents()) {
+				long lm = f.lastModified();
+				if (lm > lastModify) {
+					lastModify = lm;
+				} else
+					continue;
 				System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">");
 				WatchEvent.Kind<?> kind = event.kind();
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Modified: " + event.context() + ", event type: " + kind.name() + " // "

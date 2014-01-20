@@ -203,15 +203,28 @@ public class CloudComputingService {
 															} else
 																if ((args[0] + "").toLowerCase().startsWith("broadcast-rs")) {
 																	try {
-																		Integer sta = Integer.parseInt(args[2]);
-																		Integer end = Integer.parseInt(args[3]);
-																		String id = args[4];
+																		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Start broadcast monitor");
+																		Integer sta = Integer.parseInt(args[1]);
+																		Integer end = Integer.parseInt(args[2]);
+																		final String id = args[3];
 																		BroadCastService bcs = new BroadCastService(sta, end, 100);
+																		String lastMessage = "";
+																		SnapshotCreator s = new SnapshotCreator(args[4], args[5]);
 																		do {
 																			UDPreceiveStructure res = bcs.receiveBroadcast(20);
 																			if (res != null && res.data != null && res.data.length > 0) {
 																				String msg = new String(res.data, StandardCharsets.UTF_8.name());
-																				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Received message: " + msg);
+																				if (msg.startsWith(id + ":")) {
+																					String msgContent = msg.substring((id + ":").length());
+																					if (msgContent.length() > 0 && !msgContent.equals(lastMessage)) {
+																						lastMessage = msgContent;
+																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
+																								+ ">INFO: Received new message content " + msgContent);
+																						String measurementLabel = args[6];
+																						String imageFileExt = args[7];
+																						s.saveNewSnapshot(msgContent, measurementLabel, imageFileExt);
+																					}
+																				}
 																			}
 																		} while (true);
 																	} catch (Exception e1) {
@@ -240,7 +253,7 @@ public class CloudComputingService {
 																	System.out
 																			.println("   'file-mon fileName udpPortStart udpPortEnd contentID contentFileLineNumber'  - Watch a file for modification and report changes by broadcast message");
 																	System.out
-																			.println("   'broardcast-rs udpPortStart udpPortEnd contentID'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
+																			.println("   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
 																}
 													}
 								}
