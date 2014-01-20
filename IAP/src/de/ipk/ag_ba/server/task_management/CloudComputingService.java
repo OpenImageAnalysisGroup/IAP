@@ -9,6 +9,7 @@ package de.ipk.ag_ba.server.task_management;
 import info.StopWatch;
 
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import org.ErrorMsg;
@@ -22,6 +23,8 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
+import de.ipk_gatersleben.ag_nw.graffiti.UDPreceiveStructure;
+import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
 
 /**
@@ -181,23 +184,64 @@ public class CloudComputingService {
 															}
 															
 															return;
-														} else {
-															System.out.println(": Valid command line parameters:");
-															System.out.println("   'half'    - use half of the CPUs");
-															System.out.println("   'full'    - use all of the CPUs");
-															System.out.println("   'nnn'     - use specified number of CPUs");
-															System.out.println("   'clear'   - clear scheduled tasks");
-															System.out.println("   'merge'   - in case of error (merge interrupted previously), merge temporary results");
-															System.out.println("   'close'   - close after task completion (cluster execution mode)");
-															System.out.println("   'info'    - Show CPU info");
-															System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
-															System.out.println("   'back'    - perform LT Imaging System to HSM backup now");
-															System.out.println("   'backup'  - perform LT Imaging System to HSM backup now, and then every midnight");
-															System.out
-																	.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
-															System.out
-																	.println("   'watch-cmd' - same as watch, but auto-closing at 2 AM in the morning (for scripted execution)");
-														}
+														} else
+															if ((args[0] + "").toLowerCase().startsWith("file-mon")) {
+																FileMonitor f = new FileMonitor(args[1]);
+																try {
+																	Integer sta = Integer.parseInt(args[2]);
+																	Integer end = Integer.parseInt(args[3]);
+																	String id = args[4];
+																	Integer contentLineIdex = Integer.parseInt(args[5]);
+																	f.startMonitoringAndSendMessageIfReceived(sta, end, id, contentLineIdex);
+																} catch (Exception e1) {
+																	e1.printStackTrace();
+																	System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Monitoring error: " + e1.getMessage());
+																	System.exit(1);
+																}
+																System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Monitoring finished");
+																System.exit(0);
+															} else
+																if ((args[0] + "").toLowerCase().startsWith("broadcast-rs")) {
+																	try {
+																		Integer sta = Integer.parseInt(args[2]);
+																		Integer end = Integer.parseInt(args[3]);
+																		String id = args[4];
+																		BroadCastService bcs = new BroadCastService(sta, end, 100);
+																		do {
+																			UDPreceiveStructure res = bcs.receiveBroadcast(20);
+																			if (res != null && res.data != null && res.data.length > 0) {
+																				String msg = new String(res.data, StandardCharsets.UTF_8.name());
+																				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Received message: " + msg);
+																			}
+																		} while (true);
+																	} catch (Exception e1) {
+																		e1.printStackTrace();
+																		System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Broadcast monitoring error: "
+																				+ e1.getMessage());
+																		System.exit(1);
+																	}
+																} else {
+																	System.out.println(": Valid command line parameters:");
+																	System.out.println("   'half'    - use half of the CPUs");
+																	System.out.println("   'full'    - use all of the CPUs");
+																	System.out.println("   'nnn'     - use specified number of CPUs");
+																	System.out.println("   'clear'   - clear scheduled tasks");
+																	System.out
+																			.println("   'merge'   - in case of error (merge interrupted previously), merge temporary results");
+																	System.out.println("   'close'   - close after task completion (cluster execution mode)");
+																	System.out.println("   'info'    - Show CPU info");
+																	System.out.println("   'monitor' - Report system info to cloud (join, but don't perform calculations)");
+																	System.out.println("   'back'    - perform LT Imaging System to HSM backup now");
+																	System.out.println("   'backup'  - perform LT Imaging System to HSM backup now, and then every midnight");
+																	System.out
+																			.println("   'watch'   - periodically check the weight data for new data and report missing data by mail");
+																	System.out
+																			.println("   'watch-cmd' - same as watch, but auto-closing at 2 AM in the morning (for scripted execution)");
+																	System.out
+																			.println("   'file-mon fileName udpPortStart udpPortEnd contentID contentFileLineNumber'  - Watch a file for modification and report changes by broadcast message");
+																	System.out
+																			.println("   'broardcast-rs udpPortStart udpPortEnd contentID'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
+																}
 													}
 								}
 							}
