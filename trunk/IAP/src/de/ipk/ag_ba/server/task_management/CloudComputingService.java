@@ -10,6 +10,7 @@ import info.StopWatch;
 
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.ErrorMsg;
@@ -223,6 +224,17 @@ public class CloudComputingService {
 																						String measurementLabel = args[6];
 																						String imageFileExt = args[7];
 																						s.saveNewSnapshot(msgContent, measurementLabel, imageFileExt);
+																						
+																						ArrayList<String> params = new ArrayList<String>();
+																						if (args.length > 8)
+																							for (int idx = 9; idx < args.length; idx++) {
+																								params.add(args[idx]);
+																							}
+																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
+																								+ ">INFO: Execute: " + args[8] + " "
+																								+ StringManipulationTools.getStringList(params, " "));
+																						params.add(0, args[8]);
+																						Process ls_proc = Runtime.getRuntime().exec(params.toArray(new String[] {}), null, null);
 																					}
 																				}
 																			}
@@ -253,7 +265,7 @@ public class CloudComputingService {
 																	System.out
 																			.println("   'file-mon fileName udpPortStart udpPortEnd contentID contentFileLineNumber'  - Watch a file for modification and report changes by broadcast message");
 																	System.out
-																			.println("   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
+																			.println("   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension execCommand [params]'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
 																}
 													}
 								}
