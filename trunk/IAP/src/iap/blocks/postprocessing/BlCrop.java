@@ -11,7 +11,7 @@ import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Crops available images (based on rectangular crop area, using comparison to background image).
- * Does process the images, NOT the masks.
+ * Does process the images, the mask only if the corresponding setting is enabled.
  * 
  * @author klukas
  */
@@ -24,16 +24,67 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 				return input().images().vis().io().crop().getImage();
 			} else {
 				int potCut = -1;
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) == null) {
-				// potCut = -1;
-				// } else {
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
-				// }
-				
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS) != null)
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS).getValue();
-				
 				return input().images().vis().io().cropAbs(-1, -1, -1, potCut).getImage();
+			}
+		} else
+			return null;
+	}
+	
+	@Override
+	protected Image processVISmask() {
+		if (input() != null && input().masks() != null && input().masks().vis() != null) {
+			if (!getBoolean("Process Masks", false))
+				return input().masks().vis();
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				return input().masks().vis().io().crop().getImage();
+			} else {
+				int potCut = -1;
+				return input().masks().vis().io().cropAbs(-1, -1, -1, potCut).getImage();
+			}
+		} else
+			return null;
+	}
+	
+	@Override
+	protected Image processFLUOmask() {
+		if (input() != null && input().masks() != null && input().masks().fluo() != null) {
+			if (!getBoolean("Process Masks", false))
+				return input().masks().fluo();
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				return input().masks().fluo().io().crop().getImage();
+			} else {
+				int potCut = -1;
+				return input().masks().fluo().io().cropAbs(-1, -1, -1, potCut).getImage();
+			}
+		} else
+			return null;
+	}
+	
+	@Override
+	protected Image processNIRmask() {
+		if (input() != null && input().masks() != null && input().masks().nir() != null) {
+			if (!getBoolean("Process Masks", false))
+				return input().masks().nir();
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				return input().masks().nir().io().crop().getImage();
+			} else {
+				int potCut = -1;
+				return input().masks().nir().io().cropAbs(-1, -1, -1, potCut).getImage();
+			}
+		} else
+			return null;
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		if (input() != null && input().masks() != null && input().masks().ir() != null) {
+			if (options.getCameraPosition() == CameraPosition.TOP) {
+				if (!getBoolean("Process Masks", false))
+					return input().masks().ir();
+				return input().masks().ir().io().crop().getImage();
+			} else {
+				int potCut = -1;
+				return input().masks().ir().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
 			return null;
@@ -42,20 +93,13 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processFLUOimage() {
 		if (input() != null && input().images() != null && input().images().fluo() != null) {
+			if (!getBoolean("Process Masks", false))
+				return input().masks().fluo();
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().fluo().io().crop().getImage();
 			} else {
 				int potCut = -1;
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) == null) {
-				// potCut = -1;
-				// } else {
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
-				// }
-				
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO) != null)
-				// potCut = (int) getProperties().getNumericProperty(0, 1,
-				// PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO).getValue();
-				return input().images().fluo().io().cropAbs(-1, -1, -1, -1).getImage();// potCut);
+				return input().images().fluo().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
 			return null;
@@ -68,15 +112,6 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 				return input().images().nir().io().crop().getImage();
 			} else {
 				int potCut = -1;
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
-				// potCut = -1;
-				// } else {
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
-				// }
-				
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
-				//
 				return input().images().nir().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
@@ -90,15 +125,6 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 				return input().images().ir().io().crop().getImage();
 			} else {
 				int potCut = -1;
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) == null) {
-				// potCut = -1;
-				// } else {
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
-				// }
-				
-				// if (getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR) != null)
-				// potCut = (int) getProperties().getNumericProperty(0, 1, PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_NIR).getValue();
-				//
 				return input().images().ir().io().cropAbs(-1, -1, -1, potCut).getImage();
 			}
 		} else
@@ -132,6 +158,6 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Crops images. Does process the images, NOT the masks.";
+		return "Crops images. Does process the images, the masks are cropped, if the corresponding setting is enabled.";
 	}
 }
