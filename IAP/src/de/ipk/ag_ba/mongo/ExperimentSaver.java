@@ -1031,7 +1031,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (hashLabel == null)
 				fffLabel = false;
 		
-		if (fffMain && fffLabel) {
+		if (fffMain != null && fffLabel != null && fffMain && fffLabel) {
 			return DatabaseStorageResult.EXISITING_NO_STORAGE_NEEDED;
 		} else {
 			boolean saved;
