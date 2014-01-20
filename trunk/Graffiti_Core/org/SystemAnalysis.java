@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
@@ -15,9 +14,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -461,25 +457,8 @@ public class SystemAnalysis {
 	
 	public static boolean isFileOpen(String fileName) throws IOException {
 		if (isWindowsRunning()) {
-			boolean open = true;
 			File file = new File(fileName);
-			RandomAccessFile raf = new RandomAccessFile(file, "rw");
-			FileChannel channel = raf.getChannel();
-			
-			FileLock lock = channel.lock();
-			try {
-				lock = channel.tryLock();
-				// Ok. You get the lock
-				open = false;
-			} catch (OverlappingFileLockException e) {
-				// File is open by someone else
-				open = true;
-			} finally {
-				lock.release();
-				channel.close();
-				raf.close();
-			}
-			return open;
+			return !(file.renameTo(new File(fileName + ".test_rename")) && new File(fileName + ".test_rename").renameTo(new File(fileName)));
 		} else {
 			File file = new File(fileName);
 			Process plsof = new ProcessBuilder(new String[] { "lsof", "|", "grep", file.getAbsolutePath() }).start();
