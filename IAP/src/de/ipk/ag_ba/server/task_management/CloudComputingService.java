@@ -230,6 +230,10 @@ public class CloudComputingService {
 																							for (int idx = 9; idx < args.length; idx++) {
 																								params.add(args[idx]);
 																							}
+																						if (msgContent.contains(" "))
+																							params.add("\'" + msgContent + "\'");
+																						else
+																							params.add(msgContent);
 																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
 																								+ ">INFO: Execute: " + args[8] + " "
 																								+ StringManipulationTools.getStringList(params, " "));
