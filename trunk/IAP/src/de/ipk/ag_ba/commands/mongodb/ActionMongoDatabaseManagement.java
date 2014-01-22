@@ -69,7 +69,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		boolean showDeleteCloudJobsIcon = SystemOptions.getInstance().getBoolean("IAP", "Show Delete Cloud Jobs Icon", true);
 		if (showDeleteCloudJobsIcon) {
 			NavigationButton deleteCloudJobs = new NavigationButton(
-					new ActionDeleteAnalysisJobs(m), guiSetting);
+					new ActionDeleteAnalysisJobs(m, true), guiSetting);
 			result.add(deleteCloudJobs);
 			// NavigationButton deleteTempDatasets = new NavigationButton(
 			// new ActionDeleteSelectedAnalysisSplitResults(m), guiSetting);

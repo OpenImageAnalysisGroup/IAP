@@ -13,6 +13,7 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.database_tools.ActionArchiveAnalysisJobs;
+import de.ipk.ag_ba.commands.database_tools.ActionDeleteAnalysisJobs;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -312,6 +313,10 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							NavigationButton archiveJobs = new NavigationButton(
 									new ActionArchiveAnalysisJobs(m, commandList), guiSetting);
 							archiveJobs.setRightAligned(true);
+							NavigationButton removeJobs = new NavigationButton(
+									new ActionDeleteAnalysisJobs(m, commandList), guiSetting);
+							removeJobs.setRightAligned(true);
+							res.add(0, removeJobs);
 							res.add(0, archiveJobs);
 						}
 						return res;
