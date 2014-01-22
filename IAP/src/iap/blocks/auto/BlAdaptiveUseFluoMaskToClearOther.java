@@ -47,15 +47,17 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 								processedMasks.fluo().io().copy().blur(fluoBlur).getImage(),
 								back).getImage());
 				
-				double corr = processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
-				double visBlur = autoTune ? getDouble("Blur Leaf-width Factor Vis on Fluo", 3) * averageLeafWidthEstimation * corr : getDouble(
-						"blur vis mask on fluo",
-						40d);
-				// System.out.println("DEBUG: FOR MASKING FLUO BLUR VIS: " + visBlur);
-				processedMasks.setFluo(
-						processedMasks.fluo().io().copy().applyMask(
-								processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(visBlur).getImage(),
-								back).getImage());
+				if (getDouble("Blur Leaf-width Factor Vis on Fluo", 3) > 0) {
+					double corr = processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
+					double visBlur = autoTune ? getDouble("Blur Leaf-width Factor Vis on Fluo", 3) * averageLeafWidthEstimation * corr : getDouble(
+							"blur vis mask on fluo",
+							40d);
+					// System.out.println("DEBUG: FOR MASKING FLUO BLUR VIS: " + visBlur);
+					processedMasks.setFluo(
+							processedMasks.fluo().io().copy().applyMask(
+									processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(visBlur).getImage(),
+									back).getImage());
+				}
 			}
 		}
 		if (getBoolean("process NIR", true) && processedMasks.fluo() != null) {

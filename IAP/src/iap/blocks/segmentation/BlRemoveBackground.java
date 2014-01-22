@@ -237,16 +237,17 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
-			Image i = processedImages.nir();
-			Image m = processedMasks.nir();
-			if (i != null && m != null) {
-				i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
-				i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
-				processedImages.setNir(i);
-				processedMasks.setNir(i.copy());
+		if (!getBoolean("copy only nir image to mask", false))
+			if (options.getCameraPosition() == CameraPosition.SIDE) {
+				Image i = processedImages.nir();
+				Image m = processedMasks.nir();
+				if (i != null && m != null) {
+					i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
+					i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
+					processedImages.setNir(i);
+					processedMasks.setNir(i.copy());
+				}
 			}
-		}
 	}
 	
 	@Override
