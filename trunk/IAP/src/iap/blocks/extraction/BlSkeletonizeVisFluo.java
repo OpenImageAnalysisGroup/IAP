@@ -86,8 +86,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false));
 					if (sk != null) {
-						boolean drawSkeleton = getBoolean("draw_skeleton", true);
-						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
+						if (sk != null)
+							getProperties().setImage("skeleton", sk);
 					}
 				}
 		}
