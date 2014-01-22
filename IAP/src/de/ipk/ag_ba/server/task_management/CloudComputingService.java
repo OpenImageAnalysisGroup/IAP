@@ -210,21 +210,33 @@ public class CloudComputingService {
 																		final String id = args[3];
 																		BroadCastService bcs = new BroadCastService(sta, end, 100);
 																		String lastMessage = "";
-																		SnapshotCreator s = new SnapshotCreator(args[4], args[5]);
+																		final SnapshotCreator s = new SnapshotCreator(args[4], args[5]);
 																		do {
 																			UDPreceiveStructure res = bcs.receiveBroadcast(20);
 																			if (res != null && res.data != null && res.data.length > 0) {
 																				String msg = new String(res.data, StandardCharsets.UTF_8.name());
 																				if (msg.startsWith(id + ":")) {
-																					String msgContent = msg.substring((id + ":").length()).trim();
+																					final String msgContent = msg.substring((id + ":").length()).trim();
 																					if (msgContent.length() > 0 && !msgContent.equals(lastMessage)) {
 																						lastMessage = msgContent;
 																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
 																								+ ">INFO: Received new message content " + msgContent);
-																						String measurementLabel = args[6];
-																						String imageFileExt = args[7];
-																						s.saveNewSnapshot(msgContent, measurementLabel, imageFileExt);
-																						
+																						final String measurementLabel = args[6];
+																						final String imageFileExt = args[7];
+																						Runnable r = new Runnable() {
+																							
+																							@Override
+																							public void run() {
+																								try {
+																									s.saveNewSnapshot(msgContent, measurementLabel, imageFileExt);
+																								} catch (Exception e) {
+																									e.printStackTrace();
+																								}
+																							}
+																						};
+																						Thread t = new Thread(r);
+																						t.start();
+																						Thread.sleep(10);
 																						ArrayList<String> params = new ArrayList<String>();
 																						if (args.length > 8)
 																							for (int idx = 9; idx < args.length; idx++) {
