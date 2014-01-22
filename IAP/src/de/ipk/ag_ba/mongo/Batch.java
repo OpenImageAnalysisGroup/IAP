@@ -19,6 +19,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -99,6 +100,12 @@ public class Batch {
 	}
 	
 	public BatchCmd delete(final BatchCmd batch) {
+		return delete(batch, null);
+	}
+	
+	public BatchCmd delete(final BatchCmd batch, final ThreadSafeOptions returnValueSuccess) {
+		if (returnValueSuccess != null)
+			returnValueSuccess.setBval(0, false);
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		// try to claim a batch cmd
 		try {
@@ -112,7 +119,10 @@ public class Batch {
 					DBObject dbo = new BasicDBObject();
 					dbo.put("_id", batch.get("_id"));
 					BatchCmd res = (BatchCmd) collection.findOne(dbo);
-					collection.remove(dbo);
+					WriteResult wr = collection.remove(dbo);
+					if (wr.getN() > 0)
+						if (returnValueSuccess != null)
+							returnValueSuccess.setBval(0, true);
 					tso.setParam(0, res);
 				}
 				
