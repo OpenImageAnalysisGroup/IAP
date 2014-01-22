@@ -35,10 +35,13 @@ public class DirectoryMonitor {
 				continue;
 			for (WatchEvent<?> event : key.pollEvents()) {
 				WatchEvent.Kind<?> kind = event.kind();
-				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Detected new file: " + event.context() + ", event type: " + kind.name() + " // "
-						+ SystemAnalysis.getCurrentTime());
-				watchService.close();
-				return "" + event.context();
+				String fn = event.context() + "";
+				if (fn.startsWith("capt")) {
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Detected new file: " + event.context() + ", event type: " + kind.name() + " // "
+							+ SystemAnalysis.getCurrentTime());
+					watchService.close();
+					return "" + event.context();
+				}
 			}
 			boolean valid = key.reset();
 			// If the key is invalid, just exit.
