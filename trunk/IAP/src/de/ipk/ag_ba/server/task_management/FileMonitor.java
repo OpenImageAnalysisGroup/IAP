@@ -38,7 +38,7 @@ public class FileMonitor {
 		path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
 		
 		BroadCastService bcs = new BroadCastService(udpPortStart, udpPortEnd, 100);
-		long lastModify = f.lastModified();
+		long lastModify = 0;
 		for (;;) {
 			WatchKey key = watchService.take();
 			
@@ -48,17 +48,20 @@ public class FileMonitor {
 					lastModify = lm;
 				} else
 					continue;
+				System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">");
 				WatchEvent.Kind<?> kind = event.kind();
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Modified: " + event.context() + ", event type: " + kind.name() + " // "
 						+ SystemAnalysis.getCurrentTime());
-				System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">");
-				
 				TextFile tf = new TextFile(f);
-				String msg = id + ":" + tf.get(contentLineIndex);
-				System.out.print("Sent message: " + msg + " // "
-						+ SystemAnalysis.getCurrentTime() + "...");
-				bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
-				System.out.println("OK");
+				if (tf.size() > contentLineIndex) {
+					String msg = id + ":" + tf.get(contentLineIndex);
+					System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + " // "
+							+ SystemAnalysis.getCurrentTime() + "...");
+					bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
+					System.out.println("OK!");
+				} else {
+					System.out.println("NOT OK! (MONITORED FILE CONTAINS TOO FEW LINES)");
+				}
 			}
 			boolean valid = key.reset();
 			// If the key is invalid, just exit.
