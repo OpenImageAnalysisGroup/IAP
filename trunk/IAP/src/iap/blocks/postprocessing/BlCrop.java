@@ -93,8 +93,6 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processFLUOimage() {
 		if (input() != null && input().images() != null && input().images().fluo() != null) {
-			if (!getBoolean("Process Masks", false))
-				return input().masks().fluo();
 			if (options.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().fluo().io().crop().getImage();
 			} else {
