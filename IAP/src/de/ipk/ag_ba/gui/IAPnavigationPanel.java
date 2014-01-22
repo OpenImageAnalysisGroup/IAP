@@ -238,7 +238,16 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			return false;
 	}
 	
-	private void updateGUI() {
+	public void updateGUI() {
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					updateGUI();
+				}
+			});
+			return;
+		}
 		transferFocusUpCycle();
 		removeAll();
 		if (set != null) {
@@ -263,6 +272,9 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			for (NavigationButton ne : set) {
 				if (ne == null)
 					continue;
+				String title = ne.getTitle();
+				if (title != null && title.contains("[REMOVE FROM UPDATE]"))
+					continue;
 				if (ne instanceof StyleAware) {
 					((StyleAware) ne).setButtonStyle(buttonStyleToUse);
 				}
@@ -281,7 +293,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 							
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
 							firstStar = false;
-							lbl.setToolTipText("Remove " + ne.getTitle() + " bookmark");
+							lbl.setToolTipText("Remove " + title + " bookmark");
 							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction(), buttonStyle));
 						} else {
 							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne, buttonStyle));
