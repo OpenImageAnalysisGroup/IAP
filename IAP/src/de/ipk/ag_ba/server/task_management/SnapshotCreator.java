@@ -56,35 +56,35 @@ public class SnapshotCreator {
 		if (!snapshotDir.exists())
 			snapshotDir.mkdir();
 		
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(snapshotDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
-		writer.write("IdTag: " + plantID + "\r\n");
-		// writer.write("Color: 0" + "\r\n");
-		writer.write("Creator: " + getUserName() + "\r\n");
-		writer.write("Comment: Camera Ad-hoc Phenotyping (c) 2013 C. Klukas" + "\r\n");
-		writer.write("Measurement: " + measurementLabel + "\r\n");
-		writer.write("Timestamp: " + m + "/" + d + "/" + y + " " + am_pm(h) + ":" + d2(min) + ":" + sec + " " + am_pm_s(h) + "\r\n");
-		// writer.write("Weight before [g]: -1" + "\r\n");
-		// writer.write("Weight after [g]: -1" + "\r\n");
-		// writer.write("Water amount [ml]: -1" + "\r\n");
-		writer.close();
-		
 		File imageDir = new File(snapshotDir.getAbsolutePath() + File.separator + "RgbSide");
 		if (!imageDir.exists())
 			imageDir.mkdir();
-		writer = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(imageDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
-		writer.write("Camera label: RgbSide" + "\r\n");
-		writer.write("MM pro pixel X: 0" + "\r\n");
-		writer.write("MM pro pixel Y: 0" + "\r\n");
-		writer.close();
-		
 		File outputfile = new File(imageDir.getAbsolutePath() + File.separator + "0_0." + fileExt);
 		boolean res = new File(newImageFile).renameTo(outputfile);
-		if (res)
+		
+		if (res) {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(snapshotDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
+			writer.write("IdTag: " + plantID + "\r\n");
+			// writer.write("Color: 0" + "\r\n");
+			writer.write("Creator: " + getUserName() + "\r\n");
+			writer.write("Comment: Camera Ad-hoc Phenotyping (c) 2013 C. Klukas" + "\r\n");
+			writer.write("Measurement: " + measurementLabel + "\r\n");
+			writer.write("Timestamp: " + m + "/" + d + "/" + y + " " + am_pm(h) + ":" + d2(min) + ":" + sec + " " + am_pm_s(h) + "\r\n");
+			// writer.write("Weight before [g]: -1" + "\r\n");
+			// writer.write("Weight after [g]: -1" + "\r\n");
+			// writer.write("Water amount [ml]: -1" + "\r\n");
+			writer.close();
+			writer = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(imageDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
+			writer.write("Camera label: RgbSide" + "\r\n");
+			writer.write("MM pro pixel X: 0" + "\r\n");
+			writer.write("MM pro pixel Y: 0" + "\r\n");
+			writer.close();
+			
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: " + plantID
 					+ ": Barcode detected, snapshot data saved and input file moved to target directory.");
-		else
+		} else
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">ERROR: " + plantID
 					+ ": input file could not be moved to target directory: " + newImageFile);
 		
