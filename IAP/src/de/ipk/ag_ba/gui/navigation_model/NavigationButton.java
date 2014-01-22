@@ -482,14 +482,17 @@ public class NavigationButton implements StyleAware {
 				if (n1 == null || n == null)
 					return;
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
-					n1.setText(n.getTitle());
+					String title = n.getTitle();
+					n1.setText(title);
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
 						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				} else {
-					if (n1.isVisible())
-						n1.setText(n.getTitle());
+					if (n1.isVisible()) {
+						String title = n.getTitle();
+						n1.setText(title);
+					}
 					BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
 				}
 			}
@@ -722,6 +725,19 @@ public class NavigationButton implements StyleAware {
 		
 		final JButton n1 = new JButton("" + n.getTitle()) {
 			private static final long serialVersionUID = 1L;
+			
+			boolean removeCalled = false;
+			
+			@Override
+			public void setText(String title) {
+				super.setText(title);
+				if (!removeCalled)
+					if (title != null && title.contains("[REMOVE FROM UPDATE]")) {
+						removeCalled = true;
+						if (n.getGUIsetting() != null && n.getGUIsetting().getActionPanel() != null)
+							n.getGUIsetting().getActionPanel().updateGUI();
+					}
+			}
 			
 			@Override
 			public String getToolTipText(MouseEvent e) {
