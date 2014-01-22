@@ -234,8 +234,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
 				int hf = inpFLUOunchanged.getHeight();
-				for (int x = 0; x < ttt.length; x++)
-					for (int y = 0; y < ttt[0].length; y++) { // [x]
+				for (int x = 0; x < ttt.length && x < tempImage.length; x++)
+					for (int y = 0; y < ttt[0].length && y < tempImage[0].length; y++) { // [x]
 						if (tempImage[x][y] != black)
 							ttt[x][y] = clear;
 					}
@@ -373,6 +373,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		int[] img = skeleton.getAs1A().clone();
 		int[] oi = original.getAs1A().clone();
 		int last = img.length - w;
+		int l2 = oi.length - w;
+		if (l2 < last)
+			last = l2;
 		for (int i = 0; i < img.length && i < oi.length; i++) {
 			if (i > w && i < last && img[i] != back) {
 				int center = oi[i];
