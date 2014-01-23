@@ -30,9 +30,9 @@ public class UtilText2Image {
 		for (int index = 0; index < n; index++) {
 			String fileName = inputFiles.get(index);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
-			String s;
+			String s = in.readLine(); // skip first line
 			while ((s = in.readLine()) != null) {
-				String[] columns = s.split("\t");
+				String[] columns = s.split(" ");
 				int x = Integer.parseInt(columns[0]);
 				int y = Integer.parseInt(columns[1]);
 				int real = Integer.parseInt(rq(columns[2]));
@@ -53,8 +53,8 @@ public class UtilText2Image {
 			if (imageSizeDef == null || imageSizeDef.equalsIgnoreCase("NULL")) {
 				imageSizeDef = detectImageSize(cm0, cm1, im0, im1);
 			}
-			int width = Integer.parseInt(imageSizeDef.split("x")[0]);
-			int height = Integer.parseInt(imageSizeDef.split("x")[1]);
+			int width = Integer.parseInt(imageSizeDef.split("x")[0]) + 1;
+			int height = Integer.parseInt(imageSizeDef.split("x")[1]) + 1;
 			int[] img = new int[width * height];
 			Arrays.fill(img, background);
 			for (Vector2i p : cm0)
@@ -74,7 +74,7 @@ public class UtilText2Image {
 	 */
 	private static String rq(String string) {
 		if (string != null && string.startsWith("\"") && string.endsWith("\""))
-			return string.substring(1, string.length() - 2);
+			return string.substring(1, string.length() - 1);
 		else
 			return string;
 	}
