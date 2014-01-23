@@ -24,6 +24,7 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
+import de.ipk.ag_ba.server.task_management.minitoring_and_networking.SnapshotCreator;
 import de.ipk_gatersleben.ag_nw.graffiti.UDPreceiveStructure;
 import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
@@ -76,12 +77,6 @@ public class CloudComputingService {
 			System.out.println(info);
 		SystemAnalysis.simulateHeadless = true;
 		IAPmain.setRunMode(IAPrunMode.CLOUD_HOST);
-		{
-			for (MongoDB m : MongoDB.getMongos()) {
-				CloudComputingService cc = CloudComputingService.getInstance(m);
-				cc.setEnableCalculations(true);
-			}
-		}
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());
@@ -282,10 +277,19 @@ public class CloudComputingService {
 																			.println("   'file-mon fileName udpPortStart udpPortEnd contentID contentFileLineNumber'  - Watch a file for modification and report changes by broadcast message");
 																	System.out
 																			.println("   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension execCommand [params]'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
+																	System.exit(1);
 																}
 													}
 								}
 							}
+		
+		{
+			for (MongoDB m : MongoDB.getMongos()) {
+				CloudComputingService cc = CloudComputingService.getInstance(m);
+				cc.setEnableCalculations(true);
+			}
+		}
+		
 		SystemInfoExt si = new SystemInfoExt();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SYSTEM CPUs (sockets,physical,logical): " +
 				si.getCpuSockets() + "," + si.getCpuPhysicalCores() + "," +
@@ -299,17 +303,6 @@ public class CloudComputingService {
 		if (io != null)
 			s.printTime();
 		
-		// String hsm = IAPmain.getHSMfolder();
-		// if (hsm != null && new File(hsm).exists()) {
-		// System.out.println(SystemAnalysis.getCurrentTime() + ">HSM Folder: " + hsm);
-		// Library lib = new Library();
-		// HsmFileSystemSource dataSourceHsm = new HsmFileSystemSource(lib,
-		// IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive"),
-		// hsm,
-		// IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-		// IAPmain.loadIcon("img/ext/gpl2/Gnome-Media-Tape-64.png"),
-		// IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
-		// }
 		// register extended hierarchy and loaded image loaders (and more)
 		new MultimodalDataHandlingAddon();
 		
