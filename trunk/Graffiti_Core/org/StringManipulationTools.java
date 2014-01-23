@@ -905,16 +905,15 @@ public class StringManipulationTools implements HelperClass {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
 	}
 	
+	private static Locale locale = Locale.getDefault();
+	private static NumberFormat f = NumberFormat.getNumberInstance(locale);
+	
 	public static String formatNumber(long l) {
-		Locale locale = Locale.getDefault();
-		NumberFormat f = NumberFormat.getNumberInstance(locale);
 		f.setMaximumFractionDigits(0);
 		return f.format(l);
 	}
 	
 	public static String formatNumber(double l, int fracDigits) {
-		Locale locale = Locale.getDefault();
-		NumberFormat f = NumberFormat.getNumberInstance(locale);
 		f.setMaximumFractionDigits(fracDigits);
 		return f.format(l);
 	}
