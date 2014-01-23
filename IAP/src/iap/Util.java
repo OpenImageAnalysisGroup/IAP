@@ -15,7 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  *         Special commands of IAP which can be executed from the command line.
  */
 public class Util {
-	public void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 		for (String info : IAPmain.getMainInfoLines())
 			System.out.println(info);
 		
@@ -41,10 +41,22 @@ public class Util {
 		
 	}
 	
-	private void convertStatisticsFilesToImages(String[] args) throws IOException {
+	private static void convertStatisticsFilesToImages(String[] args) throws IOException {
 		ArrayList<String> inputFiles = new ArrayList<String>();
 		ArrayList<String> outputFiles = new ArrayList<String>();
 		ArrayList<String> imageSizeDefinition = new ArrayList<String>();
+		int idx = -1;
+		for (String a : args) {
+			if (idx >= 0) {
+				if (idx % 3 == 0)
+					inputFiles.add(a);
+				if (idx % 3 == 1)
+					outputFiles.add(a);
+				if (idx % 3 == 2)
+					imageSizeDefinition.add(a);
+			}
+			idx++;
+		}
 		UtilText2Image.convertRstatFileToImage(inputFiles, outputFiles, imageSizeDefinition, ImageOperation.BACKGROUND_COLORint,
 				Color.GREEN.getRGB(), Color.YELLOW.getRGB(),
 				Color.PINK.getRGB(), Color.RED.getRGB());
