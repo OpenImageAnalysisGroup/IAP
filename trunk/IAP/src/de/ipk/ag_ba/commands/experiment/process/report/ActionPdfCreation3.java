@@ -6,6 +6,7 @@
  */
 package de.ipk.ag_ba.commands.experiment.process.report;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
@@ -439,6 +440,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				experiment = null;
 				
 				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status);
+				snapshots = null;
 			} else {
 				if (status != null)
 					status.setCurrentStatusText2("Create CSV file");
@@ -450,6 +452,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					csv.append(rowContent);
 					if (row2col2value != null)
 						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
+					if (status != null)
+						status.setCurrentStatusText2("Create in memory (" + csv.length() / 1024 / 1024 + " MB)");
 				}
 				
 				snapshots = null;
@@ -474,6 +478,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				}
 				if (status != null)
 					status.setCurrentStatusText1("Generate XSLX");
+				out = new BufferedOutputStream(out);
 				FilterOutputStream fos = new FilterOutputStream(out) {
 					@Override
 					public void write(int b) throws IOException {
@@ -511,20 +516,29 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					}
 			} else {
 				if (!preventMainCSVexport) {
-					byte[] csvFileContent = csv.toString().getBytes();
-					csv = null;
 					if (status != null)
 						status.setCurrentStatusText2("Save CSV file");
 					if (p.getTempDirectory() == null)
 						p.prepareTempDirectory();
 					if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
-						File f = p.saveReportToFile(csvFileContent, xlsx, experimentReference.getHeader());
+						ThreadSafeOptions written = new ThreadSafeOptions();
+						File f = p.saveReportToFile(csv, xlsx, experimentReference.getHeader(), status, written);
+						
+						if (status != null)
+							status.setCurrentStatusValueFine(100d);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved (" + written.getLong() / 1024 / 1024 + " MB)");
+						if (status != null)
+							status.setCurrentStatusText1("Output complete");
+						if (status != null)
+							status.setCurrentStatusText2("File saved (" + written.getLong() / 1024 / 1024 + " MB)");
 						
 						finalResultFileLocation = FileSystemHandler.getURL(f).toString();
 						
 						String tempDirectory = f.getParent();
 						AttributeHelper.showInFileBrowser(tempDirectory + "", f.getName());
 					}
+					csv = null;
+					
 				}
 				if (clustering) {
 					DatasetFormatForClustering transform = new DatasetFormatForClustering();
@@ -718,7 +732,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		Queue<SnapshotDataIAP> snapshotsToBeProcessed = new LinkedList<SnapshotDataIAP>(snapshots);
-		snapshots = null;
+		snapshots.clear();
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
 		
