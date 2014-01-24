@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class Sample3D extends Sample {
 	
-	private String component = "";
+	private String component = null;
 	
 	// private final ArrayList<NumericMeasurementInterface> binaryMeasurements;
 	
@@ -219,7 +219,8 @@ public class Sample3D extends Sample {
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		super.fillAttributeMap(attributeValueMap);
-		attributeValueMap.put("component", component);
+		if (component != null)
+			attributeValueMap.put("component", component);
 	}
 	
 	// @Override
