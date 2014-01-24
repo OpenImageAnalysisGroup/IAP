@@ -3,6 +3,7 @@ package de.ipk.ag_ba.mongo;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -195,7 +196,7 @@ public class ExperimentLoader implements RunnableOnDB {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
 			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
 		@SuppressWarnings("unchecked")
-		Substance3D s3d = new Substance3D(substance.toMap());
+		Substance3D s3d = new Substance3D(fv(substance.toMap()));
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		BasicDBList l = (BasicDBList) substance.get("condition_ids");
 		substance = null;
@@ -270,7 +271,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
 					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 100);
+					).hint(new BasicDBObject("_id", 1)).batchSize(Math.max(l.size(), 200));
 			for (DBObject cond : condL) {
 				try {
 					if (optDBObjectsConditions != null)
@@ -287,7 +288,7 @@ public class ExperimentLoader implements RunnableOnDB {
 	}
 	
 	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
-		Condition3D condition = new Condition3D(s3d, cond.toMap());
+		Condition3D condition = new Condition3D(s3d, fv(cond.toMap()));
 		condition.setExperimentHeader(header);
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
@@ -295,12 +296,12 @@ public class ExperimentLoader implements RunnableOnDB {
 		if (sampList != null) {
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
-				Sample3D sample = new Sample3D(condition, sam.toMap());
+				Sample3D sample = new Sample3D(condition, fv(sam.toMap()));
 				condition.add(sample);
 				// average
 				BasicDBObject avg = (BasicDBObject) sam.get("average");
 				if (avg != null) {
-					SampleAverage average = new SampleAverage(sample, avg.toMap());
+					SampleAverage average = new SampleAverage(sample, fv(avg.toMap()));
 					sample.setSampleAverage(average);
 				}
 				// measurements
@@ -308,7 +309,7 @@ public class ExperimentLoader implements RunnableOnDB {
 				if (measList != null) {
 					for (Object m : measList) {
 						DBObject meas = (DBObject) m;
-						NumericMeasurement3D nm = new NumericMeasurement3D(sample, meas.toMap());
+						NumericMeasurement3D nm = new NumericMeasurement3D(sample, fv(meas.toMap()));
 						sample.add(nm);
 					}
 				}
@@ -318,7 +319,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
 						@SuppressWarnings("unchecked")
-						ImageData image = new ImageData(sample, filter(img.toMap()));
+						ImageData image = new ImageData(sample, filter(fv(img.toMap())));
 						image.getURL().setPrefix(mh.getPrefix());
 						if (image.getLabelURL() != null)
 							image.getLabelURL().setPrefix(mh.getPrefix());
@@ -331,7 +332,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
 						@SuppressWarnings("unchecked")
-						VolumeData volume = new VolumeData(sample, vol.toMap());
+						VolumeData volume = new VolumeData(sample, fv(vol.toMap()));
 						if (volume.getURL() != null)
 							volume.getURL().setPrefix(mh.getPrefix());
 						if (volume.getLabelURL() != null)
@@ -345,7 +346,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object n : netList) {
 						DBObject net = (DBObject) n;
 						@SuppressWarnings("unchecked")
-						NetworkData network = new NetworkData(sample, net.toMap());
+						NetworkData network = new NetworkData(sample, fv(net.toMap()));
 						if (network.getURL() != null)
 							network.getURL().setPrefix(mh.getPrefix());
 						if (network.getLabelURL() != null)
@@ -355,6 +356,26 @@ public class ExperimentLoader implements RunnableOnDB {
 				}
 			}
 		}
+	}
+	
+	private static final WeakHashMap<String, String> known2sameValue = new WeakHashMap<String, String>();
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Map fv(Map map) {
+		synchronized (known2sameValue) {
+			if (map != null)
+				for (Object key : map.keySet()) {
+					Object v = map.get(key);
+					if (v instanceof String) {
+						if (known2sameValue.containsKey(v)) {
+							map.put(key, known2sameValue.get(v));
+						} else
+							known2sameValue.put((String) v, (String) v);
+					}
+				}
+		}
+		
+		return map;
 	}
 	
 	private Map<String, Object> filter(Map<String, Object> map) {
