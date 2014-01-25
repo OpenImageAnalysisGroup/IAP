@@ -435,16 +435,21 @@ public class MongoDB {
 										} else {
 											ArrayList<ObjectId> rList = new ArrayList<ObjectId>();
 											for (Object oo : cl)
-												rList.add(new ObjectId(oo.toString()));
-											collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
-										}
-										try {
-											collSubst.remove(substance);
-										} catch (Exception err) {
-											err.printStackTrace();
+												if (oo != null)
+													rList.add(new ObjectId(oo.toString()));
+											if (rList.size() > 0)
+												collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 										}
 									}
 								}
+							}
+							ArrayList<ObjectId> rList = new ArrayList<ObjectId>();
+							if (sl != null) {
+								for (Object oo : sl)
+									if (oo != null)
+										rList.add(new ObjectId(oo.toString()));
+								if (rList.size() > 0)
+									collSubst.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 							}
 						}
 						collExps.remove(expRef);
