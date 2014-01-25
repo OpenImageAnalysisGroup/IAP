@@ -325,7 +325,7 @@ public class MongoDB {
 			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
 			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
 			mob.socketKeepAlive(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true));
-			mob.writeConcern(WriteConcern.JOURNALED);
+			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
 			
 			MongoClientOptions mco = mob.build();
 			
@@ -429,22 +429,21 @@ public class MongoDB {
 									DBObject substance = subr.fetch();
 									if (substance != null) {
 										BasicDBList cl = (BasicDBList) substance.get("condition_ids");
-										if (cl != null) {
-											for (Object oo : cl) {
-												if (oo == null)
-													System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not get condition list for substance "
-															+ substance.get("name") + " (id " + so + ")");
-												else
-													collCond.remove(new BasicDBObject("_id", new ObjectId(oo.toString())));
-											}
+										if (cl == null) {
+											System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not get condition list for substance "
+													+ substance.get("name") + " (id " + so + ")");
+										} else {
+											ArrayList<ObjectId> rList = new ArrayList<ObjectId>();
+											for (Object oo : cl)
+												rList.add(new ObjectId(oo.toString()));
+											collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 										}
-									}
-									if (substance != null)
 										try {
 											collSubst.remove(substance);
 										} catch (Exception err) {
 											err.printStackTrace();
 										}
+									}
 								}
 							}
 						}
@@ -1608,9 +1607,9 @@ public class MongoDB {
 				rList.add((ObjectId) f.getId());
 			if (rmList && rList.size() > 10) {
 				colFE.remove(
-						new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
+						new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 				colFC.remove(
-						new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
+						new BasicDBObject("files_id", new BasicDBObject("$in", rList)));
 				rList.clear();
 			}
 			deleted++;
@@ -1621,9 +1620,9 @@ public class MongoDB {
 		}
 		if (rmList && rList.size() > 0) {
 			colFE.remove(
-					new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
+					new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 			colFC.remove(
-					new BasicDBObject("files_id", new BasicDBObject("$in", rList)), WriteConcern.JOURNALED);
+					new BasicDBObject("files_id", new BasicDBObject("$in", rList)));
 			rList.clear();
 		}
 	}
