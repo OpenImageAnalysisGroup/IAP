@@ -131,42 +131,43 @@ public class ExperimentLoader implements RunnableOnDB {
 				}
 				if (MongoDB.getEnsureIndex())
 					db.getCollection("substances").ensureIndex("_id");
-				BasicDBList l = (BasicDBList) expref.get("substance_ids");
+				final BasicDBList l = (BasicDBList) expref.get("substance_ids");
 				if (l != null) {
 					final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 					final int n = l.size();
-					for (final Object o : l) {
-						if (o == null)
-							continue;
-						Runnable r = new Runnable() {
-							@Override
-							public void run() {
-								DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-								if (subr != null) {
-									DBObject substance = subr.fetch();
-									subr = null;
-									if (substance != null) {
-										if (optDBPbjectsOfSubstances != null)
-											optDBPbjectsOfSubstances.add(substance);
-										tsoIdxS.addInt(1);
-										processSubstance(db, experiment, substance, collCond, optStatusProvider,
-												100d / n, optDBPbjectsOfConditions,
-												tsoIdxS.getInt(), n);
-										substance = null;
-									}
+					
+					Runnable r = new Runnable() {
+						@Override
+						public void run() {
+							BasicDBList ll = new BasicDBList();
+							for (Object o : l) {
+								if (o != null)
+									ll.add(new ObjectId(o + ""));
+							}
+							DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
+									.hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(200, ll.size()));
+							for (DBObject substance : subList) {
+								if (substance != null) {
+									if (optDBPbjectsOfSubstances != null)
+										optDBPbjectsOfSubstances.add(substance);
+									tsoIdxS.addInt(1);
+									processSubstance(db, experiment, substance, collCond, optStatusProvider,
+											100d / n, optDBPbjectsOfConditions,
+											tsoIdxS.getInt(), n);
+									substance = null;
 								}
 							}
-						};
-						try {
-							if (SystemAnalysis.getUsedMemoryInMB() * 2 > SystemAnalysis.getMemoryMB()) // more than 50% utilized?
-								r.run();
-							else
-								wait.add(BackgroundThreadDispatcher.addTask(r, "Load " + o));
-						} catch (InterruptedException e) {
-							ErrorMsg.addErrorMessage(e);
 						}
+					};
+					try {
+						if (SystemAnalysis.getUsedMemoryInMB() * 2 > SystemAnalysis.getMemoryMB()) // more than 50% utilized?
+							r.run();
+						else
+							wait.add(BackgroundThreadDispatcher.addTask(r, "Load Substances"));
+					} catch (InterruptedException e) {
+						ErrorMsg.addErrorMessage(e);
 					}
-					l = null;
+					
 				}
 			}
 			
@@ -198,8 +199,7 @@ public class ExperimentLoader implements RunnableOnDB {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(fv(substance.toMap()));
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
-		BasicDBList l = (BasicDBList) substance.get("condition_ids");
-		substance = null;
+		
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
@@ -262,16 +262,18 @@ public class ExperimentLoader implements RunnableOnDB {
 		}
 		if (ensureIndex)
 			collCond.ensureIndex("_id");
-		if (l != null) {
-			double max = l.size();
+		
+		BasicDBList condIdList = (BasicDBList) substance.get("condition_ids");
+		if (condIdList != null) {
+			double max = condIdList.size();
 			
 			BasicDBList ll = new BasicDBList();
-			for (Object o : l)
+			for (Object o : condIdList)
 				if (o != null)
 					ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
 					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					).hint(new BasicDBObject("_id", 1)).batchSize(Math.max(l.size(), 200));
+					).hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(l.size(), 200));
 			for (DBObject cond : condL) {
 				try {
 					if (optDBObjectsConditions != null)

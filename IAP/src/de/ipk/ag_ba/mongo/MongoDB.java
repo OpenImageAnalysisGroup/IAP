@@ -718,60 +718,64 @@ public class MongoDB {
 			public void run() {
 				DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
 				DBObject expref = dbr.fetch();
+				DBCollection collCond = db.getCollection("conditions");
 				if (expref != null) {
-					BasicDBList subList = (BasicDBList) expref.get("substances");
-					DBCollection collCond = db.getCollection("conditions");
-					if (getEnsureIndex())
-						collCond.ensureIndex("_id");
-					
-					if (subList != null)
-						for (Object co : subList) {
-							DBObject substance = (DBObject) co;
-							visitSubstance(
-									header,
-									db, substance,
-									collCond,
-									optStatusProvider, 100d / subList.size(),
-									visitSubstanceObject,
-									processConditions,
-									visitCondition,
-									visitBinaryMeasurement,
-									invalid);
-						}
+					{
+						BasicDBList subList = (BasicDBList) expref.get("substances");
+						if (getEnsureIndex())
+							collCond.ensureIndex("_id");
+						
+						if (subList != null)
+							for (Object co : subList) {
+								DBObject substance = (DBObject) co;
+								visitSubstance(
+										header,
+										db, substance,
+										collCond,
+										optStatusProvider, 100d / subList.size(),
+										visitSubstanceObject,
+										processConditions,
+										visitCondition,
+										visitBinaryMeasurement,
+										invalid);
+							}
+					}
 					boolean printed = false;
 					if (getEnsureIndex())
 						db.getCollection("substances").ensureIndex("_id");
+					
+					BasicDBList ll = new BasicDBList();
 					BasicDBList l = (BasicDBList) expref.get("substance_ids");
-					if (l != null)
-						for (Object o : l) {
-							if (o == null)
-								continue;
-							DBRef subr = new DBRef(db, "substances", new ObjectId(o.toString()));
-							if (subr != null) {
-								DBObject substance = subr.fetch();
-								if (visitSubstance != null || visitSubstanceObject != null) {
-									if (substance != null) {
-										if (visitSubstance != null) {
-											synchronized (visitSubstance) {
-												visitSubstance.processDBid(substance.get("_id") + "");
-											}
-										}
-										visitSubstance(header,
-												db, substance,
-												collCond,
-												optStatusProvider, 100d / l.size(),
-												visitSubstanceObject, processConditions,
-												visitCondition, visitBinaryMeasurement,
-												invalid);
-									} else
-										if (!printed) {
-											System.out.println("WARNING: Missing substance(s) in experiment " + header.getExperimentName());
-											printed = true;
-											invalid.setBval(0, true);
-										}
+					for (Object o : l) {
+						if (o != null)
+							ll.add(new ObjectId(o + ""));
+					}
+					DBCollection collSubst = db.getCollection("substances");
+					DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
+							.hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(200, ll.size()));
+					for (DBObject substance : subList) {
+						if (visitSubstance != null || visitSubstanceObject != null) {
+							if (substance != null) {
+								if (visitSubstance != null) {
+									synchronized (visitSubstance) {
+										visitSubstance.processDBid(substance.get("_id") + "");
+									}
 								}
-							}
+								visitSubstance(header,
+										db, substance,
+										collCond,
+										optStatusProvider, 100d / ll.size(),
+										visitSubstanceObject, processConditions,
+										visitCondition, visitBinaryMeasurement,
+										invalid);
+							} else
+								if (!printed) {
+									System.out.println("WARNING: Missing substance(s) in experiment " + header.getExperimentName());
+									printed = true;
+									invalid.setBval(0, true);
+								}
 						}
+					}
 				}
 			}
 			
@@ -998,7 +1002,7 @@ public class MongoDB {
 			if (l != null) {
 				double max = l.size();
 				boolean printed = false;
-				boolean singleFetch = true;
+				boolean singleFetch = false;
 				if (collCond != null)
 					if (singleFetch)
 						printed = processConditionBySingleFetch(header, db, collCond,
@@ -1086,7 +1090,7 @@ public class MongoDB {
 								.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
 								.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
 								.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
-						).hint(new BasicDBObject("_id", 1)).batchSize(l.size() % 200);
+						).hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(200, l.size()));
 				int condLsize = 0;
 				for (DBObject cond : condL) {
 					condLsize++;
