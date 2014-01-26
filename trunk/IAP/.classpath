@@ -20,8 +20,6 @@
 	<classpathentry kind="lib" path="lib/platform.jar"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-146.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IAP Transfer"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/flanagan.java6.jar"/>
@@ -29,5 +27,7 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/mail.jar"/>
 	<classpathentry kind="lib" path="/IAP Transfer/lib/commons-vfs2-2.0.jar"/>
 	<classpathentry kind="src" path="/IPK_lib"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.10-beta2-20130904.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.10-beta2-20130904.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
