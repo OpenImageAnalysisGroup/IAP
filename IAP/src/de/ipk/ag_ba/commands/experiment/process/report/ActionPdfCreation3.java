@@ -415,7 +415,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
 				csvHeader = getCSVheader();
-				csv.appendLine(csvHeader, written);
+				csv.appendLine(csvHeader + indexHeader.toString(), written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
@@ -432,7 +432,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				// create Header row
 				Row row = sheet.createRow(0);
 				int col = 0;
-				String c = csvHeader.trim();
+				String c = (csvHeader + indexHeader.toString()).trim();
 				c = StringManipulationTools.stringReplace(c, "\r\n", "");
 				c = StringManipulationTools.stringReplace(c, "\n", "");
 				for (String h : c.split(separator)) {
@@ -768,6 +768,10 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		boolean adjusted = false;
 		int scnt = snapshotsToBeProcessed.size();
 		int sidx = 0;
+		
+		for (Integer dateCol : dateColumns)
+			sheet.setColumnWidth(dateCol, 5000);
+		
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
@@ -809,8 +813,6 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			adjustColumnWidths(sheet, excelColumnHeaders, status);
 			adjusted = true;
 		}
-		for (Integer dateCol : dateColumns)
-			sheet.setColumnWidth(dateCol, 5000);
 		
 		if (status != null)
 			status.setCurrentStatusText1("Workbook is filled");
