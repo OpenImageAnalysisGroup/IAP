@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
@@ -31,8 +30,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
@@ -426,8 +424,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
-			Workbook wb = xlsx ? new XSSFWorkbook() : null;
+			SXSSFWorkbook wb = xlsx ? new SXSSFWorkbook() : null;
 			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
+			
 			ArrayList<String> excelColumnHeaders = new ArrayList<String>();
 			if (sheet != null) {
 				// create Header row
@@ -503,6 +502,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					
 				};
 				wb.write(fos);
+				wb.dispose();
 				if (status != null)
 					status.setCurrentStatusValueFine(100d);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved (" + written.getLong() / 1024 / 1024 + " MB)");
@@ -736,12 +736,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public static void setExcelSheetValues(
-			LinkedList<SnapshotDataIAP> snapshots,
+			LinkedList<SnapshotDataIAP> snapshotsToBeProcessed,
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
-		Queue<SnapshotDataIAP> snapshotsToBeProcessed = snapshots;
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
 		
@@ -772,16 +771,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
-			if (status != null) {
-				status.setCurrentStatusValueFine(100d * sidx / scnt);
-				status.setCurrentStatusText1("Filling worksheet, remaining rows: " + snapshotsToBeProcessed.size());
-				status.setCurrentStatusText2("<small><font color='gray'>Memory status: "
-						+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-						+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB</font></small>");
-			}
-			System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + snapshotsToBeProcessed.size() + " "
-					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
-					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
+			progressOutput(snapshotsToBeProcessed, status, r, scnt, sidx);
 			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
@@ -826,6 +816,20 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			status.setCurrentStatusText1("Workbook is filled");
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
+	}
+	
+	private static void progressOutput(LinkedList<SnapshotDataIAP> snapshotsToBeProcessed, BackgroundTaskStatusProviderSupportingExternalCall status, Runtime r,
+			int scnt, int sidx) {
+		if (status != null) {
+			status.setCurrentStatusValueFine(100d * sidx / scnt);
+			status.setCurrentStatusText1("Filling worksheet, remaining rows: " + snapshotsToBeProcessed.size());
+			status.setCurrentStatusText2("<small><font color='gray'>Memory status: "
+					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB</font></small>");
+		}
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Filling workbook, todo: " + snapshotsToBeProcessed.size() + " "
+				+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
+				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB");
 	}
 	
 	private static void adjustColumnWidths(Sheet sheet, ArrayList<String> excelColumnHeaders,
