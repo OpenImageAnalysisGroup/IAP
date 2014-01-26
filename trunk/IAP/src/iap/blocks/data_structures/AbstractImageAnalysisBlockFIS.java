@@ -278,6 +278,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			if (!time2summaryResult.containsKey(time))
 				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
 			HashMap<Integer, BlockResultSet> summaryResultArray = time2summaryResult.get(time);
+			boolean showWarning = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-WARN-MISSING-RESULTS", false); // process only top images?
 			for (String configName : allResultsForSnapshot.keySet()) {
 				for (Integer tray : allResultsForSnapshot.get(configName).keySet()) {
 					if (!summaryResultArray.containsKey(tray))
@@ -286,8 +287,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet rt = allResultsForSnapshot.get(configName).get(tray);
 					for (String property : desiredProperties) {
 						ArrayList<BlockPropertyValue> calculationResults = rt.getPropertiesSearch(true, property);
-						if (calculationResults.isEmpty())
-							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
+						if (calculationResults.isEmpty() && showWarning)
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found. Config=" + configName
+									+ ", Tray=" + tray + ", Time=" + time);
 						for (BlockPropertyValue v : calculationResults) {
 							if (v.getValue() != null) {
 								initMaps(prop2config2tray2lastTime, prop2config2tray2lastValue, configName, property);

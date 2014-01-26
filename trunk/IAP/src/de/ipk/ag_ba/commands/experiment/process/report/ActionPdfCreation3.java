@@ -368,8 +368,22 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					status.setCurrentStatusText2("Stress model calculated");
 			}
 			
-			ArrayList<SnapshotDataIAP> snapshots;
-			StringBuilder csv = new StringBuilder();
+			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
+			if (targetDirectoryOrTargetFile == null && useIndividualReportNames) {
+				p.prepareTempDirectory();
+				targetDirectoryOrTargetFile = p.getTempDirectory();
+			}
+			if (useIndividualReportNames)
+				p.setUseIndividualReportNames(true);
+			
+			LinkedList<SnapshotDataIAP> snapshots;
+			StringBuilderOrOutput csv = new StringBuilderOrOutput();
+			if (!xlsx && !preventMainCSVexport) {
+				if (p.getTempDirectory() == null)
+					p.prepareTempDirectory();
+				csv.setOutputFile(p.getTargetFile(xlsx, experimentReference.getHeader()));
+			}
+			
 			HashMap<Integer, HashMap<Integer, Object>> row2col2value = new HashMap<Integer, HashMap<Integer, Object>>();
 			if (!clustering)
 				row2col2value = null;
@@ -379,6 +393,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
 			StringBuilder indexHeader = new StringBuilder();
 			String csvHeader = "";
+			final ThreadSafeOptions written = new ThreadSafeOptions();
 			if (!water) {
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
@@ -395,14 +410,14 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				csvHeader = getCSVheader();
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
 				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
-				csv.append(csvHeader + indexHeader.toString() + "\r\n");
+				csv.appendLine(csvHeader + indexHeader.toString(), written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
 				csvHeader = getCSVheader();
-				csv.append(csvHeader);
+				csv.appendLine(csvHeader, written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
@@ -418,7 +433,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				// create Header row
 				Row row = sheet.createRow(0);
 				int col = 0;
-				String c = csv.toString().trim();
+				String c = csvHeader.trim();
 				c = StringManipulationTools.stringReplace(c, "\r\n", "");
 				c = StringManipulationTools.stringReplace(c, "\n", "");
 				for (String h : c.split(separator)) {
@@ -427,13 +442,6 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				}
 			}
 			
-			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
-			if (targetDirectoryOrTargetFile == null && useIndividualReportNames) {
-				p.prepareTempDirectory();
-				targetDirectoryOrTargetFile = p.getTempDirectory();
-			}
-			if (useIndividualReportNames)
-				p.setUseIndividualReportNames(true);
 			if (xlsx) {
 				if (status != null)
 					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
@@ -449,11 +457,16 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				int row = 1; // header is added before at row 0
 				for (SnapshotDataIAP s : snapshots) {
 					String rowContent = s.getCSVvalue(germanLanguage, separator);
-					csv.append(rowContent);
-					if (row2col2value != null)
+					csv.appendLine(rowContent, written);
+					if (row2col2value != null) {
 						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
-					if (status != null)
-						status.setCurrentStatusText2("Create in memory (" + csv.length() / 1024 / 1024 + " MB)");
+						status.setCurrentStatusText2("Fill table in memory (row " + (row - 1) + ")");
+					} else
+						if (status != null)
+							if (!csv.hasFileOutput())
+								status.setCurrentStatusText2("Created in memory (" + csv.length() / 1024 / 1024 + " MB)");
+							else
+								status.setCurrentStatusText2("Write to output (" + csv.length() / 1024 / 1024 + " MB)");
 				}
 				
 				snapshots = null;
@@ -465,7 +478,6 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				if (status != null)
 					status.setCurrentStatusText2("Prepare saving of file...");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Save to file");
-				final ThreadSafeOptions written = new ThreadSafeOptions();
 				OutputStream out;
 				if (customTargetFileName != null)
 					out = new FileOutputStream(customTargetFileName, xlsx);
@@ -518,10 +530,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				if (!preventMainCSVexport) {
 					if (status != null)
 						status.setCurrentStatusText2("Save CSV file");
-					if (p.getTempDirectory() == null)
-						p.prepareTempDirectory();
+					
 					if (IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET) {
-						ThreadSafeOptions written = new ThreadSafeOptions();
 						File f = p.saveReportToFile(csv, xlsx, experimentReference.getHeader(), status, written);
 						
 						if (status != null)
@@ -726,13 +736,12 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public static void setExcelSheetValues(
-			ArrayList<SnapshotDataIAP> snapshots,
+			LinkedList<SnapshotDataIAP> snapshots,
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
-		Queue<SnapshotDataIAP> snapshotsToBeProcessed = new LinkedList<SnapshotDataIAP>(snapshots);
-		snapshots.clear();
+		Queue<SnapshotDataIAP> snapshotsToBeProcessed = snapshots;
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
 		
