@@ -755,13 +755,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		ExperimentInterface result = output;
 		if (result != null) {
 			for (SubstanceInterface si : result) {
+				if (si == null)
+					continue;
 				boolean onlyImages = true;
 				for (ConditionInterface ci : si) {
 					for (SampleInterface sai : ci) {
-						for (NumericMeasurementInterface nmi : sai) {
-							if (!(nmi instanceof BinaryMeasurement))
-								onlyImages = false;
-						}
+						if (sai != null)
+							for (NumericMeasurementInterface nmi : sai) {
+								if (nmi != null)
+									if (!(nmi instanceof BinaryMeasurement))
+										onlyImages = false;
+							}
 					}
 				}
 				if (!onlyImages)

@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.commands.experiment.process.report.pdf_report;
 
 import java.io.BufferedOutputStream;
-import java.io.CharArrayReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +25,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.commands.experiment.process.report.StringBuilderOrOutput;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -75,34 +75,11 @@ public class PdfCreator {
 		return report;
 	}
 	
-	public File saveReportToFile(StringBuilder sb, boolean xlsx, ExperimentHeaderInterface optEH,
+	public File saveReportToFile(StringBuilderOrOutput sb, boolean xlsx, ExperimentHeaderInterface optEH,
 			BackgroundTaskStatusProviderSupportingExternalCall status, ThreadSafeOptions written) throws IOException {
-		File report = getTargetFile(xlsx, optEH);
-		FileOutputStream fos = new FileOutputStream(report);
-		BufferedOutputStream bos = new BufferedOutputStream(fos);
-		final int aLength = sb.length();
-		final int aChunk = 1024 * 512;
-		final char[] aChars = new char[aChunk];
 		
-		for (int aPosStart = 0; aPosStart < aLength; aPosStart += aChunk) {
-			final int aPosEnd = Math.min(aPosStart + aChunk, aLength);
-			sb.getChars(aPosStart, aPosEnd, aChars, 0); // Create no new buffer
-			final CharArrayReader aCARead = new CharArrayReader(aChars); // Create no new buffer
-			
-			// This may be slow but it will not create any more buffer (for bytes)
-			int aByte;
-			while ((aByte = aCARead.read()) != -1) {
-				bos.write(aByte);
-				written.addLong(1);
-				
-			}
-			if (status != null) {
-				status.setCurrentStatusText2("Stored on disk: " + written.getLong() / 1024 + " KB");
-				status.setCurrentStatusValueFine(aPosStart * 100d / aLength);
-			}
-		}
-		bos.close();
-		fos.close();
+		File report = sb.getTargetFile();;
+		sb.close();
 		if (status != null) {
 			status.setCurrentStatusText2("Stored on disk: " + written.getLong() / 1024 + " KB");
 			status.setCurrentStatusValueFine(100d);

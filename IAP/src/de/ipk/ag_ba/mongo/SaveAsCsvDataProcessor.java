@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
@@ -87,7 +88,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 		boolean xlsx = true;
 		HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 		boolean exportIndividualAngles = false;
-		ArrayList<SnapshotDataIAP> snapshots = IAPservice.getSnapshotsFromExperiment(
+		LinkedList<SnapshotDataIAP> snapshots = IAPservice.getSnapshotsFromExperiment(
 				null, mappingData, indexInfo, false,
 				exportIndividualAngles, xlsx, null, status, null);
 		

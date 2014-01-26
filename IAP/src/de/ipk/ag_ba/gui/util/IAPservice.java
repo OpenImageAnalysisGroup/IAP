@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -596,7 +597,7 @@ public class IAPservice {
 		return res;
 	}
 	
-	public static ArrayList<SnapshotDataIAP> getSnapshotsFromExperiment(
+	public static LinkedList<SnapshotDataIAP> getSnapshotsFromExperiment(
 			UrlCacheManager urlManager,
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
@@ -616,7 +617,7 @@ public class IAPservice {
 			optStatus.setCurrentStatusText1("Rename substances");
 		HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();
 		
-		ArrayList<SnapshotDataIAP> result = new ArrayList<SnapshotDataIAP>();
+		LinkedList<SnapshotDataIAP> result = new LinkedList<SnapshotDataIAP>();
 		
 		if (experiment != null) {
 			for (SubstanceInterface substance : experiment) {
@@ -776,7 +777,7 @@ public class IAPservice {
 	
 	private static void processConditions(UrlCacheManager urlManager, HashMap<String, Integer> optSubstanceIds, boolean storeAllAngleValues,
 			boolean storeAllReplicates, SnapshotFilter optSnapshotFilter, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, ArrayList<SnapshotDataIAP> result, SubstanceInterface substance) {
+			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, Collection<SnapshotDataIAP> result, SubstanceInterface substance) {
 		for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 			for (SampleInterface sample : c) {
 				TreeSet<String> qualities = new TreeSet<String>();
