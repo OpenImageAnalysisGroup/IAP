@@ -49,11 +49,9 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/poi-scratchpad-3.7-20101029.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.10-beta2-20130904.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.10-beta2-20130904.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
