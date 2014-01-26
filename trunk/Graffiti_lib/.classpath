@@ -46,9 +46,10 @@
 	<classpathentry kind="lib" path="junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="xbean.jar"/>
-	<classpathentry kind="lib" path="poi-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="poi-ooxml-3.8-beta5-20111217.jar"/>
-	<classpathentry kind="lib" path="poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
 	<classpathentry kind="lib" path="commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="poi-3.10-beta2-20130904.jar"/>
+	<classpathentry kind="lib" path="poi-ooxml-3.10-beta2-20130904.jar"/>
+	<classpathentry kind="lib" path="poi-ooxml-schemas-3.10-beta2-20130904.jar"/>
+	<classpathentry kind="lib" path="poi-scratchpad-3.10-beta2-20130904.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
