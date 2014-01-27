@@ -30,20 +30,22 @@ public class SampleAverage implements SampleAverageInterface {
 		for (Object key : map.keySet()) {
 			if (map.get(key) == null)
 				continue;
-			if (key instanceof String) {
-				if (key.equals("value")) {
-					setValue((Double) map.get("value"));
-				} else
-					if (map.get(key) != null) {
-						if (map.get(key) instanceof Double)
-							setValueFromAttribute((String) key, (Double) map.get(key));
+			if (key.equals("value")) {
+				setValue((Double) map.get("value"));
+			} else
+				if (map.get(key) != null) {
+					if (map.get(key) instanceof Double)
+						setValueFromAttribute((String) key, (Double) map.get(key), null);
+					else {
+						if (map.get(key) instanceof Integer)
+							setValueFromAttribute((String) key, null, (Integer) map.get(key));
 						else {
 							String ss = map.get(key).toString();
 							if (!ss.isEmpty())
 								setValueFromAttribute(new MyAttribute((String) key, ss));
 						}
 					}
-			}
+				}
 		}
 	}
 	
@@ -224,7 +226,7 @@ public class SampleAverage implements SampleAverageInterface {
 							System.err.println("Internal Error: Unknown Average Attribute: " + a.getName());
 	}
 	
-	private void setValueFromAttribute(String name, Double value) {
+	private void setValueFromAttribute(String name, Double value, Integer intValue) {
 		if (value == null)
 			return;
 		if (name.equals("max")) {
@@ -234,7 +236,7 @@ public class SampleAverage implements SampleAverageInterface {
 				setMin(value);
 			} else
 				if (name.equals("replicates")) {
-					setReplicateId(value.intValue());
+					setReplicateId(intValue);
 				} else
 					if (name.equals("stddev")) {
 						setStddev(value);
