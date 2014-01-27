@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
@@ -77,7 +76,7 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	public String getName();
 	
 	@Override
-	public void setAttribute(Attribute attr);
+	public void setAttribute(MyAttribute attr);
 	
 	@Override
 	public void setDataOfChildElement(Element childElement);

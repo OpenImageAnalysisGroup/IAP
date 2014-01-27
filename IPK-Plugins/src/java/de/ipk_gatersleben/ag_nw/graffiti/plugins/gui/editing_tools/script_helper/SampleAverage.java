@@ -40,7 +40,7 @@ public class SampleAverage implements SampleAverageInterface {
 						else {
 							String ss = map.get(key).toString();
 							if (!ss.isEmpty())
-								setValueFromAttribute(new Attribute((String) key, ss));
+								setValueFromAttribute(new MyAttribute((String) key, ss));
 						}
 					}
 			}
@@ -177,13 +177,13 @@ public class SampleAverage implements SampleAverageInterface {
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setValueFromAttribute(a);
+				setValueFromAttribute(new MyAttribute(a));
 			}
 		}
 		return true;
 	}
 	
-	private void setValueFromAttribute(Attribute a) {
+	private void setValueFromAttribute(MyAttribute a) {
 		if (a.getName().equals("max")) {
 			try {
 				if (a.getValue().length() > 0)
@@ -303,7 +303,7 @@ public class SampleAverage implements SampleAverageInterface {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		// ?
 	}
 	

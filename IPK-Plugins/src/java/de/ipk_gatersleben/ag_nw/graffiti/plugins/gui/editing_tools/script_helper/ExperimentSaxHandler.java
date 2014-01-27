@@ -11,7 +11,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -161,31 +160,31 @@ public class ExperimentSaxHandler extends DefaultHandler {
 		
 		if (qName.equals("substance")) {
 			currentSubstance = tm.getNewSubstance();
-			for (Attribute attr : getAttributes(attrs))
+			for (MyAttribute attr : getAttributes(attrs))
 				currentSubstance.setAttribute(attr);
 		}
 		
 		if (qName.equals("line")) {
 			currentCondition = tm.getNewCondition(currentSubstance);
-			for (Attribute attr : getAttributes(attrs))
+			for (MyAttribute attr : getAttributes(attrs))
 				currentCondition.setAttribute(attr);
 		}
 		
 		if (qName.equals("sample")) {
 			currentSample = tm.getNewSample(currentCondition);
-			for (Attribute attr : getAttributes(attrs))
+			for (MyAttribute attr : getAttributes(attrs))
 				currentSample.setAttribute(attr);
 		}
 		
 		if (qName.equals("average")) {
 			currentSampleAverage = tm.getNewSampleAverage(currentSample);
-			for (Attribute attr : getAttributes(attrs))
+			for (MyAttribute attr : getAttributes(attrs))
 				currentSampleAverage.setAttribute(attr);
 		}
 		
 		if (tm.isKnownMeasurementType(qName)) {
 			currentMeasurement = tm.getNewMeasurementOfType(qName, currentSample);
-			for (Attribute attr : getAttributes(attrs))
+			for (MyAttribute attr : getAttributes(attrs))
 				currentMeasurement.setAttribute(attr);
 		}
 		
@@ -193,12 +192,12 @@ public class ExperimentSaxHandler extends DefaultHandler {
 			processHeaderField(uri, localName, qName, attrs);
 	}
 	
-	ArrayList<Attribute> res = new ArrayList<Attribute>();
+	ArrayList<MyAttribute> res = new ArrayList<MyAttribute>();
 	
-	private ArrayList<Attribute> getAttributes(Attributes attrs) {
+	private ArrayList<MyAttribute> getAttributes(Attributes attrs) {
 		res.clear();
 		for (int i = 0; i < attrs.getLength(); i++)
-			res.add(new Attribute(attrs.getLocalName(i), attrs.getValue(i)));
+			res.add(new MyAttribute(attrs.getLocalName(i), attrs.getValue(i)));
 		return res;
 	}
 	

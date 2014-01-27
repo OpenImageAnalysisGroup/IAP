@@ -3,7 +3,6 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helpe
 import java.util.Map;
 
 import org.MeasurementFilter;
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 public interface SampleAverageInterface extends Measurement {
@@ -70,7 +69,7 @@ public interface SampleAverageInterface extends Measurement {
 	 * .MappingDataEntity#setAttribute(org.jdom.Attribute)
 	 */
 	@Override
-	public abstract void setAttribute(Attribute attr);
+	public abstract void setAttribute(MyAttribute attr);
 	
 	/*
 	 * (non-Javadoc)

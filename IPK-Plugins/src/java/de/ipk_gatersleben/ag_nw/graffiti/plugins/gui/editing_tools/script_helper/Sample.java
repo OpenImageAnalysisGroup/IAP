@@ -167,7 +167,7 @@ public class Sample implements SampleInterface {
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		List childrenList = sampleElement.getChildren();
@@ -186,7 +186,7 @@ public class Sample implements SampleInterface {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		String val = attr != null ? attr.getValue() : null;
 		if (val == null)
 			return;
@@ -253,7 +253,7 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public void setTimeUnit(String timeUnit) {
-		this.timeUnit = timeUnit != null ? timeUnit.intern() : null;
+		this.timeUnit = timeUnit;// != null ? timeUnit.intern() : null;
 	}
 	
 	@Override
