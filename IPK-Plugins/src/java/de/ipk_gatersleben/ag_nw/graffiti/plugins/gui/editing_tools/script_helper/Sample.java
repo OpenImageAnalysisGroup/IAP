@@ -1,8 +1,8 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class Sample implements SampleInterface {
 	private TtestInfo ttestInfo = TtestInfo.EMPTY;
 	String files;
 	
-	private final Collection<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
+	private final Collection<NumericMeasurementInterface> measurements = new LinkedList<NumericMeasurementInterface>();
 	
 	private SampleAverageInterface sampleAverage;
 	private ConditionInterface parent;

@@ -262,12 +262,12 @@ public class RatioViewAlgorithm extends AbstractAlgorithm {
 						for (ConditionInterface sd : nh.getMappedSeriesData()) {
 							if (sd.getConditionName().equals(selSeriesName1)) {
 								refDataSet = sd;
-								ArrayList<Integer> meanTimePoints = sd.getMeanTimePoints();
+								ArrayList<Integer> meanTimePoints = new ArrayList<Integer>(sd.getMeanTimePoints());
 								if (meanTimePoints.contains(selTimePoint)) {
 									int idx = meanTimePoints.indexOf(selTimePoint);
-									ArrayList<Double> meanValues = sd.getMeanValues();
+									ArrayList<Double> meanValues = new ArrayList<Double>(sd.getMeanValues());
 									refDataValue = meanValues.get(idx);
-									ArrayList<String> timeUnits = sd.getMeanTimeUnits();
+									Collection<String> timeUnits = sd.getMeanTimeUnits();
 									if (timeUnits != null && timeUnits.size() >= 1)
 										timeInfo = timeUnits.iterator().next() + " " + selTimePoint;
 								}
@@ -279,10 +279,10 @@ public class RatioViewAlgorithm extends AbstractAlgorithm {
 							for (ConditionInterface sd : nh.getMappedSeriesData()) {
 								if (!sd.getConditionName().equals(selSeriesName1)
 										&& sd.getConditionName().equals(selSeriesName2)) {
-									ArrayList<Integer> meanTimePoints = sd.getMeanTimePoints();
+									ArrayList<Integer> meanTimePoints = new ArrayList<Integer>(sd.getMeanTimePoints());
 									if (meanTimePoints.contains(selTimePoint)) {
-										ArrayList<String> meanTimeUnits = sd.getMeanTimeUnits();
-										ArrayList<Double> meanValues = sd.getMeanValues();
+										ArrayList<String> meanTimeUnits = new ArrayList<String>(sd.getMeanTimeUnits());
+										ArrayList<Double> meanValues = new ArrayList<Double>(sd.getMeanValues());
 										int idx = meanTimePoints.indexOf(selTimePoint);
 										int plantID = ratioNodeHelper.memGetPlantID(sd.getSpecies(), sd.getGenotype(), null,
 												null, sd.getTreatment());
