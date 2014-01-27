@@ -1067,7 +1067,7 @@ public class IAPservice {
 	}
 	
 	public static Collection<NumericMeasurementInterface> sortImages(Collection<NumericMeasurementInterface> measurements) {
-		ArrayList<NumericMeasurementInterface> ml = (ArrayList<NumericMeasurementInterface>) measurements;
+		ArrayList<NumericMeasurementInterface> ml = new ArrayList<NumericMeasurementInterface>(measurements);
 		Collections.sort(ml, new Comparator<NumericMeasurementInterface>() {
 			@Override
 			public int compare(NumericMeasurementInterface o1, NumericMeasurementInterface o2) {
