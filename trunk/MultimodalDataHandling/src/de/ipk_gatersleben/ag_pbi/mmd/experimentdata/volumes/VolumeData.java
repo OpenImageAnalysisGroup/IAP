@@ -18,6 +18,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
@@ -106,7 +107,7 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 				if (s.equals("filename"))
 					continue;
 				if (map.get(k) != null)
-					setAttribute(new Attribute(s, map.get(k) + ""));
+					setAttribute(new MyAttribute(s, map.get(k) + ""));
 				// else
 				// System.err.println("Error: Volume Attribute-Value is Null for '" + s + "'.");
 			}
@@ -157,7 +158,7 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
 		else
@@ -208,7 +209,7 @@ public class VolumeData extends NumericMeasurement3D implements BinaryMeasuremen
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		// setDataOfChildElement(..)

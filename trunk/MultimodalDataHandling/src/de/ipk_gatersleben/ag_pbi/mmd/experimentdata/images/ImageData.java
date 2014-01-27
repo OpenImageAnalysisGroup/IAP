@@ -20,6 +20,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Substance;
@@ -141,7 +142,7 @@ public class ImageData extends NumericMeasurement3D implements
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
 		if (attr.getName().equals(additionalAttributeNames[0]))
@@ -192,7 +193,7 @@ public class ImageData extends NumericMeasurement3D implements
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		// setDataOfChildElement(..)
