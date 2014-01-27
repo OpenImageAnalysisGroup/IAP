@@ -254,7 +254,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	public void setPositionUnit(String positionUnit) {
-		this.positionUnit = positionUnit != null ? positionUnit.intern() : null;
+		this.positionUnit = positionUnit;// != null ? positionUnit.intern() : null;
 	}
 	
 	public String getPositionUnit() {
