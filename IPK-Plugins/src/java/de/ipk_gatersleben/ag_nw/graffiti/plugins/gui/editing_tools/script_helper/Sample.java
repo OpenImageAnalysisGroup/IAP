@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -196,14 +195,17 @@ public class Sample implements SampleInterface {
 			attr.setValue(val);
 		
 		if (attr.getName().equals("id")) {
-			try {
-				if (attr.getValue().length() > 0)
+			// try {
+			if (attr.getValue().length() > 0 && !attr.getValue().equals("-1")) {
+				if (attr.getValue().length() > 9)
 					setSampleFineTimeOrRowId(Long.parseLong(attr.getValue()));
 				else
-					setSampleFineTimeOrRowId(-1l);
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-			}
+					setSampleFineTimeOrRowId((long) Integer.parseInt(attr.getValue()));
+			} else
+				setSampleFineTimeOrRowId(-1l);
+			// } catch (Exception e) {
+			// ErrorMsg.addErrorMessage(e);
+			// }
 		} else
 			if (attr.getName().equals("measurementtool"))
 				setMeasurementtool(attr.getValue());
@@ -218,11 +220,11 @@ public class Sample implements SampleInterface {
 							setTimeUnit(attr.getValue());
 						else
 							if (attr.getName().equals("time"))
-								try {
-									setTime(Integer.parseInt(attr.getValue()));
-								} catch (Exception e) {
-									ErrorMsg.addErrorMessage(e);
-								}
+								// try {
+								setTime(Integer.parseInt(attr.getValue()));
+							// } catch (Exception e) {
+							// ErrorMsg.addErrorMessage(e);
+							// }
 							else
 								System.err.println("Internal Error: Unknown Sample Attribute: " + attr.getName());
 	}

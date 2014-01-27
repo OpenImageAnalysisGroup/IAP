@@ -448,7 +448,8 @@ public class Condition implements ConditionInterface {
 	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
-		attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
+		if (attr.getValue().contains("~"))
+			attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
 		if (attr.getName().equals("id")) {
 			try {
 				setRowId(Integer.parseInt(attr.getValue()));
