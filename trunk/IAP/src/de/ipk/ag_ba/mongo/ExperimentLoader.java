@@ -197,7 +197,7 @@ public class ExperimentLoader implements RunnableOnDB {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
 			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
 		@SuppressWarnings("unchecked")
-		Substance3D s3d = new Substance3D(fv(substance.toMap()));
+		Substance3D s3d = new Substance3D(fv((Map) substance));
 		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
@@ -290,7 +290,7 @@ public class ExperimentLoader implements RunnableOnDB {
 	}
 	
 	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
-		Condition3D condition = new Condition3D(s3d, fv(cond.toMap()));
+		Condition3D condition = new Condition3D(s3d, fv((Map) cond));
 		condition.setExperimentHeader(header);
 		s3d.add(condition);
 		BasicDBList sampList = (BasicDBList) cond.get("samples");
@@ -298,12 +298,12 @@ public class ExperimentLoader implements RunnableOnDB {
 		if (sampList != null) {
 			for (Object so : sampList) {
 				DBObject sam = (DBObject) so;
-				Sample3D sample = new Sample3D(condition, fv(sam.toMap()));
+				Sample3D sample = new Sample3D(condition, fv((Map) sam));// .toMap()));
 				condition.add(sample);
 				// average
 				BasicDBObject avg = (BasicDBObject) sam.get("average");
 				if (avg != null) {
-					SampleAverage average = new SampleAverage(sample, fv(avg.toMap()));
+					SampleAverage average = new SampleAverage(sample, fv(avg));
 					sample.setSampleAverage(average);
 				}
 				// measurements
@@ -311,7 +311,7 @@ public class ExperimentLoader implements RunnableOnDB {
 				if (measList != null) {
 					for (Object m : measList) {
 						DBObject meas = (DBObject) m;
-						NumericMeasurement3D nm = new NumericMeasurement3D(sample, fv(meas.toMap()));
+						NumericMeasurement3D nm = new NumericMeasurement3D(sample, fv((Map) meas));
 						sample.add(nm);
 					}
 				}
@@ -321,7 +321,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object m : imgList) {
 						DBObject img = (DBObject) m;
 						@SuppressWarnings("unchecked")
-						ImageData image = new ImageData(sample, filter(fv(img.toMap())));
+						ImageData image = new ImageData(sample, filter(fv((Map) img)));
 						image.getURL().setPrefix(mh.getPrefix());
 						if (image.getLabelURL() != null)
 							image.getLabelURL().setPrefix(mh.getPrefix());
@@ -334,7 +334,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object v : volList) {
 						DBObject vol = (DBObject) v;
 						@SuppressWarnings("unchecked")
-						VolumeData volume = new VolumeData(sample, fv(vol.toMap()));
+						VolumeData volume = new VolumeData(sample, fv((Map) vol));
 						if (volume.getURL() != null)
 							volume.getURL().setPrefix(mh.getPrefix());
 						if (volume.getLabelURL() != null)
@@ -348,7 +348,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					for (Object n : netList) {
 						DBObject net = (DBObject) n;
 						@SuppressWarnings("unchecked")
-						NetworkData network = new NetworkData(sample, fv(net.toMap()));
+						NetworkData network = new NetworkData(sample, fv((Map) net));
 						if (network.getURL() != null)
 							network.getURL().setPrefix(mh.getPrefix());
 						if (network.getLabelURL() != null)
