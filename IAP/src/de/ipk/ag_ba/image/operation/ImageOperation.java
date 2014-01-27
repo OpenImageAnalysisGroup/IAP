@@ -1409,6 +1409,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * Saves the image as an PNG.
 	 * 
 	 * @param fileName
+	 *           (path)
 	 * @return
 	 */
 	public ImageOperation saveImage(String fileName) {
@@ -1850,6 +1851,14 @@ public class ImageOperation implements MemoryHogInterface {
 	// return this;
 	// }
 	//
+	/**
+	 * @param double: pLeft
+	 *        - percent leaft
+	 * @param pRight
+	 * @param pTop
+	 * @param pBottom
+	 * @return
+	 */
 	public ImageOperation crop(double pLeft, double pRight, double pTop,
 			double pBottom) {
 		int w = image.getWidth();

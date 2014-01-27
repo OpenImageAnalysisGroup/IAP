@@ -312,6 +312,7 @@ public class ImageCanvas {
 	
 	public ImageCanvas text(int x, int y, String text, Color color) {
 		image.io().image.getProcessor().setColor(color);
+		image.io().image.getProcessor().setLineWidth(10);
 		image.io().image.getProcessor().drawString(text, x, y);
 		return this;
 	}

@@ -393,6 +393,7 @@ public class Image {
 	 * Saves the image as an PNG.
 	 * 
 	 * @param fileName
+	 *           (path)
 	 * @return
 	 * @return
 	 */
