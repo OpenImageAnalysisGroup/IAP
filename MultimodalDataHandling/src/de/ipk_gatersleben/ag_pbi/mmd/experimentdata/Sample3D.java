@@ -11,8 +11,8 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +86,7 @@ public class Sample3D extends Sample {
 	 */
 	public Collection<NumericMeasurementInterface> getMeasurements(MeasurementNodeType... type) {
 		
-		ArrayList<NumericMeasurementInterface> list = new ArrayList<NumericMeasurementInterface>();
+		LinkedList<NumericMeasurementInterface> list = new LinkedList<NumericMeasurementInterface>();
 		if (type == null || type.length == 0 || (type.length == 1 && type[0] == null))
 			for (NumericMeasurementInterface m : this)
 				list.add(m);
