@@ -11,9 +11,12 @@ import java.util.HashSet;
 
 import org.Vector2i;
 
+import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
+import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 /**
  * Separate objects according to their size, up to the maximum object count,
@@ -182,4 +185,14 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		return options.getIntSetting(this, "Maximum Object Count", 10);
 	}
 	
+	public static Image getImage(Image inp, int idx, int maxN) throws InterruptedException {
+		BlObjectSeparator blSep = new BlObjectSeparator();
+		ImageSet masks = new ImageSet(inp, null, null, null);
+		MaskAndImageSet input = new MaskAndImageSet(null, masks);
+		ImageProcessorOptions options = new ImageProcessorOptions(null, null);
+		options.setWellCnt(maxN);
+		blSep.setInputAndOptions(idx, input, options, new BlockResults(options.getCameraAngle()), 0, null);
+		MaskAndImageSet res = blSep.process();
+		return res.masks().vis();
+	}
 }
