@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.StringManipulationTools;
@@ -29,7 +30,7 @@ public class SnapshotDataIAP {
 	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
 	public String dataTransport;
-	public TreeMap<Double, ArrayList<Double>> storeAngleToValues;
+	public TreeMap<Double, LinkedList<Double>> storeAngleToValues;
 	
 	public Long snapshotTime;
 	public int day;
@@ -366,12 +367,12 @@ public class SnapshotDataIAP {
 	}
 	
 	public void prepareStore() {
-		storeAngleToValues = new TreeMap<Double, ArrayList<Double>>();
+		storeAngleToValues = new TreeMap<Double, LinkedList<Double>>();
 		if (position2store != null && !position2store.isEmpty())
 			for (Double angle : position2store.keySet())
 				for (Integer i : position2store.get(angle).keySet()) {
 					if (!storeAngleToValues.containsKey(angle))
-						storeAngleToValues.put(angle, new ArrayList<Double>());
+						storeAngleToValues.put(angle, new LinkedList<Double>());
 					while (storeAngleToValues.get(angle).size() <= i)
 						storeAngleToValues.get(angle).add(null);
 					storeAngleToValues.get(angle).set(i, position2store.get(angle).get(i));
