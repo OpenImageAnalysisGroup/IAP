@@ -482,12 +482,15 @@ public class NodeHelper implements Node, HelperClass {
 	public ArrayList<Double> getMappedMeanValuesForTimePoint(int timeValue) {
 		ArrayList<Double> result = new ArrayList<Double>();
 		for (ConditionInterface sd : getMappedSeriesData()) {
-			ArrayList<Double> mv = sd.getMeanValues();
-			ArrayList<Integer> mvtimes = sd.getMeanTimePoints();
-			for (int i = 0; i < mvtimes.size(); i++) {
-				int time = mvtimes.get(i);
+			Collection<Double> mv = sd.getMeanValues();
+			Collection<Integer> mvtimes = sd.getMeanTimePoints();
+			Iterator<Integer> tI = mvtimes.iterator();
+			Iterator<Double> mI = mv.iterator();
+			while (tI.hasNext() && mI.hasNext()) {
+				int time = tI.next();
+				Double val = mI.next();
 				if (time == timeValue)
-					result.add(mv.get(i));
+					result.add(val);
 			}
 		}
 		return result;

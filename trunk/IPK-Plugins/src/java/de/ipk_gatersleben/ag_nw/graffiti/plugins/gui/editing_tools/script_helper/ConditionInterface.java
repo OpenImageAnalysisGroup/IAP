@@ -49,13 +49,13 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public Collection<MyComparableDataPoint> getMeanMCDPs();
 	
-	public ArrayList<MyComparableDataPoint> getMCDPs();
+	public Collection<MyComparableDataPoint> getMCDPs();
 	
-	public ArrayList<Double> getMeanValues();
+	public Collection<Double> getMeanValues();
 	
-	public ArrayList<Integer> getMeanTimePoints();
+	public Collection<Integer> getMeanTimePoints();
 	
-	public ArrayList<String> getMeanTimeUnits();
+	public Collection<String> getMeanTimeUnits();
 	
 	public double calcAlpha();
 	

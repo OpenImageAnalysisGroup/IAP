@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
@@ -685,13 +686,15 @@ public class AddInterestingAttributes extends AbstractAlgorithm {
 					isA = false;
 				if (!isA && !sd.toString().equals(seriesB))
 					continue;
-				ArrayList<Double> mv = sd.getMeanValues();
-				ArrayList<Integer> mvtimes = sd.getMeanTimePoints();
-				for (int i = 0; i < mvtimes.size(); i++) {
+				Collection<Double> mv = sd.getMeanValues();
+				Collection<Integer> mvtimes = sd.getMeanTimePoints();
+				Iterator<Integer> tI = mvtimes.iterator();
+				Iterator<Double> mI = mv.iterator();
+				while (tI.hasNext() && mI.hasNext()) {
 					if (isA)
-						timePoint2avgA.put(mvtimes.get(i), mv.get(i));
+						timePoint2avgA.put(tI.next(), mI.next());
 					else
-						timePoint2avgB.put(mvtimes.get(i), mv.get(i));
+						timePoint2avgB.put(tI.next(), mI.next());
 				}
 			}
 		}

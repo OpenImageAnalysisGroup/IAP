@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -248,7 +249,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public Collection<MyComparableDataPoint> getMeanMCDPs() {
-		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
+		LinkedList<MyComparableDataPoint> result = new LinkedList<MyComparableDataPoint>();
 		for (SampleInterface s : this) {
 			SampleAverageInterface m = s.getSampleAverage();
 			boolean ismean = false;
@@ -274,8 +275,8 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
-	public ArrayList<MyComparableDataPoint> getMCDPs() {
-		ArrayList<MyComparableDataPoint> result = new ArrayList<MyComparableDataPoint>();
+	public Collection<MyComparableDataPoint> getMCDPs() {
+		LinkedList<MyComparableDataPoint> result = new LinkedList<MyComparableDataPoint>();
 		for (SampleInterface s : this) {
 			for (NumericMeasurementInterface m : s) {
 				boolean ismean = false;
@@ -301,24 +302,24 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
-	public ArrayList<Double> getMeanValues() {
-		ArrayList<Double> result = new ArrayList<Double>();
+	public Collection<Double> getMeanValues() {
+		LinkedList<Double> result = new LinkedList<Double>();
 		for (SampleInterface s : this)
 			result.add(s.getSampleAverage().getValue());
 		return result;
 	}
 	
 	@Override
-	public ArrayList<Integer> getMeanTimePoints() {
-		ArrayList<Integer> result = new ArrayList<Integer>();
+	public Collection<Integer> getMeanTimePoints() {
+		LinkedList<Integer> result = new LinkedList<Integer>();
 		for (SampleInterface s : this)
 			result.add(s.getTime());
 		return result;
 	}
 	
 	@Override
-	public ArrayList<String> getMeanTimeUnits() {
-		ArrayList<String> result = new ArrayList<String>();
+	public Collection<String> getMeanTimeUnits() {
+		LinkedList<String> result = new LinkedList<String>();
 		for (SampleInterface s : this)
 			result.add(s.getTimeUnit());
 		return result;
@@ -336,8 +337,8 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public double calcBeta() {
-		ArrayList<Integer> x = getMeanTimePoints();
-		ArrayList<Double> y = getMeanValues();
+		Collection<Integer> x = getMeanTimePoints();
+		Collection<Double> y = getMeanValues();
 		double n = x.size();
 		if (x.size() != y.size())
 			ErrorMsg.addErrorMessage("Internal Error: Series Data Number Count <> Time Point Count");
@@ -348,33 +349,35 @@ public class Condition implements ConditionInterface {
 		y_ = getAvgD(y);
 		
 		sum_xi_yi = 0;
-		for (int i = 0; i < n; i++)
-			sum_xi_yi += x.get(i) * y.get(i);
-		
 		sum_xi2 = 0;
-		for (int i = 0; i < n; i++)
-			sum_xi2 += x.get(i) * x.get(i);
+		Iterator<Integer> xI = x.iterator();
+		Iterator<Double> yI = y.iterator();
+		while (xI.hasNext() && yI.hasNext()) {
+			double xx = xI.next();
+			sum_xi_yi += xx * yI.next();
+			sum_xi2 += xx * xx;
+		}
 		
 		beta = (sum_xi_yi - n * x_ * y_) / (sum_xi2 - n * x_ * x_);
 		
 		return beta;
 	}
 	
-	public static double getSum(ArrayList<Double> values) {
+	public static double getSum(Collection<Double> values) {
 		double sum = 0;
 		for (double n : values)
 			sum += n;
 		return sum;
 	}
 	
-	private double getAvgI(ArrayList<Integer> meanTimePoints) {
+	private double getAvgI(Collection<Integer> meanTimePoints) {
 		double sum = 0;
 		for (Integer i : meanTimePoints)
 			sum += i;
 		return sum / meanTimePoints.size();
 	}
 	
-	private double getAvgD(ArrayList<Double> values) {
+	private double getAvgD(Collection<Double> values) {
 		return getSum(values) / values.size();
 	}
 	
