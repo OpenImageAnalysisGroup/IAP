@@ -128,7 +128,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		// setDataOfChildElement(..)
@@ -137,7 +137,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
 		
@@ -204,7 +204,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void setQualityAnnotation(String quality) {
-		this.quality = quality != null ? quality.intern() : null;
+		this.quality = quality;
 	}
 	
 	@Override

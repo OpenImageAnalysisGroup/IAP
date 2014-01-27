@@ -38,7 +38,6 @@ import org.graffiti.plugin.XMLHelper;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -742,7 +741,7 @@ public class Experiment implements ExperimentInterface {
 	 * .MappingDataEntity#setAttribute(org.jdom.Attribute)
 	 */
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		// empty
 	}
 	

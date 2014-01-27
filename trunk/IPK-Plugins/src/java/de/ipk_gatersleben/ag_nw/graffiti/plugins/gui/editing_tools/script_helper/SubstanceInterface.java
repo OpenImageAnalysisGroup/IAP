@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.HelperClass;
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 import unit_test_support.TestValueRequired;
@@ -66,7 +65,7 @@ public interface SubstanceInterface extends MappingDataEntity, Comparable<Substa
 	public abstract double getAverage();
 	
 	@Override
-	public abstract void setAttribute(Attribute attr);
+	public abstract void setAttribute(MyAttribute attr);
 	
 	@Override
 	public abstract boolean setData(Element experimentElement);

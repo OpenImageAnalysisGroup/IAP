@@ -159,7 +159,7 @@ public class Substance implements SubstanceInterface {
 				if (o instanceof Attribute) {
 					Attribute a = (Attribute) o;
 					if (!a.getName().equalsIgnoreCase("new_blast"))
-						setAttribute(a);
+						setAttribute(new MyAttribute(a));
 				}
 			}
 			
@@ -623,7 +623,7 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null)
 			return;
 		if (attr.getValue() == null)
@@ -995,7 +995,7 @@ public class Substance implements SubstanceInterface {
 				if (v instanceof String) {
 					String s = (String) v;
 					// s = StringManipulationTools.UnicodeToHtml(s);
-					setAttribute(new Attribute(key, s));
+					setAttribute(new MyAttribute(key, s));
 				}
 			}
 		}

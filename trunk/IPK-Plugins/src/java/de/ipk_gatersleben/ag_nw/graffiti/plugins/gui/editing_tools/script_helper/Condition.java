@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ public class Condition implements ConditionInterface {
 	private String species, genotype, growthconditions, treatment, variety, sequence, files;
 	private int rowId;
 	
-	private final Set<SampleInterface> samples = new LinkedHashSet<SampleInterface>();
+	private final LinkedList<SampleInterface> samples = new LinkedList<SampleInterface>();
 	private SubstanceInterface parent;
 	private ExperimentHeaderInterface header;
 	
@@ -87,7 +86,7 @@ public class Condition implements ConditionInterface {
 			if (o instanceof String) {
 				String key = (String) o;
 				if (attributemap.get(key) != null && attributemap.get(key) instanceof String)
-					setAttribute(new Attribute(key, (String) attributemap.get(key)));
+					setAttribute(new MyAttribute(key, (String) attributemap.get(key)));
 			}
 		}
 	}
@@ -427,7 +426,7 @@ public class Condition implements ConditionInterface {
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		List childrenList = conditionElement.getChildren();
@@ -446,7 +445,7 @@ public class Condition implements ConditionInterface {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null)
 			return;
 		attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));

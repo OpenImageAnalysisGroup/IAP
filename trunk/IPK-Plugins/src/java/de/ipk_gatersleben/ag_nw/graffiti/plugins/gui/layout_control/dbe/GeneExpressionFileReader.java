@@ -18,13 +18,13 @@ import javax.swing.SwingUtilities;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.graffiti.editor.MainFrame;
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverageInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -183,7 +183,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 				 */
 				// add annotations as attributes
 				for (Annotation ann : anno) {
-					substanceEntry.setAttribute(new Attribute(ann.getTitle(), myData.getCellData(ann.getColumn(), row, "")
+					substanceEntry.setAttribute(new MyAttribute(ann.getTitle(), myData.getCellData(ann.getColumn(), row, "")
 							.toString()));
 				}
 				
@@ -254,7 +254,7 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 								mesEntry.setQualityAnnotation(rd.getOptionalQualityAnnotation());
 							mesEntry.setReplicateID(new Integer(rd.getReplicateNumber()));
 							if (rd.getOptionalPosition() != null)
-								mesEntry.setAttribute(new Attribute("position", rd.getOptionalPosition()));
+								mesEntry.setAttribute(new MyAttribute("position", rd.getOptionalPosition()));
 							mesEntry.setValue(value);
 							mesEntry.setParentSample(sampleEntry);
 							dataCount++;

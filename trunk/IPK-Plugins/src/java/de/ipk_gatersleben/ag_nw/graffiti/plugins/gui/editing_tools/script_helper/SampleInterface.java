@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 public interface SampleInterface extends MappingDataEntity, Comparable<SampleInterface>,
@@ -55,7 +54,7 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	public abstract double calcMean();
 	
 	@Override
-	public abstract void setAttribute(Attribute attr);
+	public abstract void setAttribute(MyAttribute attr);
 	
 	@Override
 	public abstract void setDataOfChildElement(Element childElement);
