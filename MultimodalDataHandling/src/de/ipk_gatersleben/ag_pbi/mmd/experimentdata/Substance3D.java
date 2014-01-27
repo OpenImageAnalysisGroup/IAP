@@ -21,12 +21,12 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
-import org.jdom.Attribute;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverageInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -235,10 +235,10 @@ public class Substance3D extends Substance {
 	
 	public static SubstanceInterface createnewSubstance(String substancename) {
 		SubstanceInterface md = Experiment.getTypeManager().getNewSubstance();
-		md.setAttribute(new Attribute("name",
+		md.setAttribute(new MyAttribute("name",
 				substancename != null ? substancename
 						: ExperimentInterface.UNSPECIFIED_SUBSTANCE));
-		md.setAttribute(new Attribute("id", "column 0"));
+		md.setAttribute(new MyAttribute("id", "column 0"));
 		return md;
 	}
 	

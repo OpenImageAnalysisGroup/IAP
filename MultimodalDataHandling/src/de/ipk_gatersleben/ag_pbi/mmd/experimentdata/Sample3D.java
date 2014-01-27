@@ -20,6 +20,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -60,9 +61,9 @@ public class Sample3D extends Sample {
 					continue;
 				if (o instanceof String) {
 					if (!((String) o).isEmpty())
-						setAttribute(new Attribute(key, (String) o));
+						setAttribute(new MyAttribute(key, (String) o));
 				} else
-					setAttribute(new Attribute(key, o + ""));
+					setAttribute(new MyAttribute(key, o + ""));
 			}
 		}
 	}
@@ -118,7 +119,7 @@ public class Sample3D extends Sample {
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;
-				setAttribute(a);
+				setAttribute(new MyAttribute(a));
 			}
 		}
 		List<?> childrenList = sampleElement.getChildren();
@@ -168,7 +169,7 @@ public class Sample3D extends Sample {
 	}
 	
 	@Override
-	public void setAttribute(Attribute attr) {
+	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null || attr.getValue().length() == 0)
 			return;
 		if (attr.getName().equals("component"))

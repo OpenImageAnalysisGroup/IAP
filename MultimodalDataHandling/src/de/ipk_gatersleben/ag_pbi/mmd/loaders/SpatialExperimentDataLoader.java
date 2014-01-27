@@ -24,11 +24,11 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
-import org.jdom.Attribute;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MyAttribute;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -342,11 +342,11 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 		Object timeObj = tabledata.getCellData(col("C"), row, null);
 		if (timeObj != null && timeObj instanceof Double)
 			if (((Double) timeObj).toString().endsWith(".0"))
-				sample.setAttribute(new Attribute("time", ((Double) timeObj).toString().replace(".0", "")));
+				sample.setAttribute(new MyAttribute("time", ((Double) timeObj).toString().replace(".0", "")));
 			else
-				sample.setAttribute(new Attribute("time", ((Double) timeObj).toString()));
+				sample.setAttribute(new MyAttribute("time", ((Double) timeObj).toString()));
 		else
-			sample.setAttribute(new Attribute("time", "-1"));
+			sample.setAttribute(new MyAttribute("time", "-1"));
 		// time unit
 		if (tabledata.getUnicodeStringCellData(col("D"), row) != null)
 			sample.setTimeUnit(tabledata.getUnicodeStringCellData(col("D"), row));
@@ -385,7 +385,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 		measurementdata.setValue(od.doubleValue());
 		// measurement unit
 		if (tabledata.getUnicodeStringCellData(columnMeasurement, 22) != null)
-			measurementdata.setAttribute(new Attribute("unit", tabledata.getUnicodeStringCellData(columnMeasurement, 22)));
+			measurementdata.setAttribute(new MyAttribute("unit", tabledata.getUnicodeStringCellData(columnMeasurement, 22)));
 		else {
 			// convert columnList (columns as integers) to columns (columns in
 			// Excel notation)
@@ -397,7 +397,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 					columns = columns + (transposed ? Integer.parseInt(column) + 19 : TableData.getExcelColumnName(Integer.parseInt(column)));
 			ErrorMsg.addErrorMessage("No measurement unit given for substance listed in " + (transposed ? "row" : "column") + "(s) "
 					+ columns + "!");
-			measurementdata.setAttribute(new Attribute("unit", "n/a"));
+			measurementdata.setAttribute(new MyAttribute("unit", "n/a"));
 		}
 		return measurementdata;
 		
