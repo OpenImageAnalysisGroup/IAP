@@ -387,28 +387,31 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			// Lab regionColorLabAvg = getAverageRegionColorLab(region);
 			final Color regionColorRGBAvg = getAverageRegionColorRGB(region, ColorMode.RGB);
 			
-			Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-			Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-			
-			double resf = !calcOnVis ? (double) input().masks().vis()
-					.getWidth()
-					/ (double) imgorig.getWidth()
-					* (input().images().fluo().getWidth() / (double) input()
-							.images().fluo().getHeight())
-					/ (input().images().vis().getWidth() / (double) input()
-							.images().vis().getHeight())
-					: 1.0;
+			// normalization of coordinates ??
+			// Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
+			// Double distHorizontal = options.getCalculatedBlueMarkerDistance();
+			//
+			// double resf = !calcOnVis ? (double) input().masks().vis()
+			// .getWidth()
+			// / (double) imgorig.getWidth()
+			// * (input().images().fluo().getWidth() / (double) input()
+			// .images().fluo().getHeight())
+			// / (input().images().vis().getWidth() / (double) input()
+			// .images().vis().getHeight())
+			// : 1.0;
 			
 			if (getBoolean("Add Leaf Tip Properties to Result", false)) {
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xPosition * (realMarkerDistHorizontal / distHorizontal) * resf);
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", yPosition * (realMarkerDistHorizontal / distHorizontal) * resf);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xPosition); // * (realMarkerDistHorizontal / distHorizontal) *
+																																				// resf);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", yPosition); // * (realMarkerDistHorizontal / distHorizontal) *
+																																				// resf);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".omega", omega);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".gamma", gamma);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".direction", direction);
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.x", (centerOfGravity.x + dim[0])
-						* (realMarkerDistHorizontal / distHorizontal) * resf);
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.y", (centerOfGravity.y + dim[2])
-						* (realMarkerDistHorizontal / distHorizontal) * resf);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.x", (centerOfGravity.x + dim[0]));
+				// * (realMarkerDistHorizontal / distHorizontal) * resf);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.y", (centerOfGravity.y + dim[2]));
+				// * (realMarkerDistHorizontal / distHorizontal) * resf);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".distanceBetweenCoGandMidPoint", distCoGToMid);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".area", region.size());
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".eccentricity", eccentricity);
