@@ -37,7 +37,7 @@ public class FileMonitor {
 		WatchService watchService = FileSystems.getDefault().newWatchService();
 		path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
 		
-		BroadCastService bcs = new BroadCastService(udpPortStart, udpPortEnd, 100);
+		BroadCastService bcs = new BroadCastService(udpPortStart, udpPortEnd, 1000);
 		long lastModify = 0;
 		for (;;) {
 			WatchKey key = watchService.take();
@@ -56,9 +56,13 @@ public class FileMonitor {
 							+ SystemAnalysis.getCurrentTime());
 					TextFile tf = new TextFile(f);
 					if (tf.size() > contentLineIndex) {
+						int availLines = Integer.parseInt(tf.get(0));
+						int lastContentLine = availLines + 2;
 						String msg = id + ":" + tf.get(contentLineIndex);
-						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + " // "
-								+ SystemAnalysis.getCurrentTime() + "...");
+						for (int lineIdx = contentLineIndex; lineIdx < lastContentLine && lineIdx < tf.size() && msg.length() < 500; lineIdx++) {
+							msg += "|" + tf.get(lineIdx);
+						}
+						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + "...");
 						for (int i = 0; i < 5; i++) {
 							bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
 							Thread.sleep(5);
