@@ -28,9 +28,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDat
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDataStringRow;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
-public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
+public class ActionLoadFileList extends AbstractNavigationAction {
 	
-	public ActionLoadLTexportFileHierarchy(String tooltip) {
+	public ActionLoadFileList(String tooltip) {
 		super(tooltip);
 	}
 	
@@ -310,11 +310,11 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 		if (getInput)
 			return "Select Input Folder...";
 		else
-			return "Create Dataset(s) from LT Dump";
+			return "Create Dataset from List of Image Files";
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-System-File-Manager-64.png";
+		return "img/ext/gpl2/Gnome-Emblem-Photos-64.png";
 	}
 }
