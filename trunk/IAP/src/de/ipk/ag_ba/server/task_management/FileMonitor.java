@@ -43,25 +43,34 @@ public class FileMonitor {
 			WatchKey key = watchService.take();
 			
 			for (WatchEvent<?> event : key.pollEvents()) {
-				long lm = f.lastModified();
-				if (lm > lastModify) {
-					lastModify = lm;
-				} else
-					continue;
-				System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">");
-				WatchEvent.Kind<?> kind = event.kind();
-				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Modified: " + event.context() + ", event type: " + kind.name() + " // "
-						+ SystemAnalysis.getCurrentTime());
-				TextFile tf = new TextFile(f);
-				if (tf.size() > contentLineIndex) {
-					String msg = id + ":" + tf.get(contentLineIndex);
-					System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + " // "
-							+ SystemAnalysis.getCurrentTime() + "...");
-					bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
-					System.out.println("OK!");
-				} else {
-					System.out.println("NOT OK! (MONITORED FILE CONTAINS TOO FEW LINES)");
-				}
+				boolean success = false;
+				do {
+					long lm = f.lastModified();
+					if (lm > lastModify) {
+						lastModify = lm;
+					} else
+						continue;
+					System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">");
+					WatchEvent.Kind<?> kind = event.kind();
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Modified: " + event.context() + ", event type: " + kind.name() + " // "
+							+ SystemAnalysis.getCurrentTime());
+					TextFile tf = new TextFile(f);
+					if (tf.size() > contentLineIndex) {
+						String msg = id + ":" + tf.get(contentLineIndex);
+						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + " // "
+								+ SystemAnalysis.getCurrentTime() + "...");
+						for (int i = 0; i < 5; i++) {
+							bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
+							Thread.sleep(5);
+						}
+						System.out.println("OK!");
+						success = true;
+					} else {
+						System.out.println("NOT OK! (MONITORED FILE CONTAINS TOO FEW LINES)");
+						Thread.sleep(10);
+						success = false;
+					}
+				} while (!success);
 			}
 			boolean valid = key.reset();
 			// If the key is invalid, just exit.
