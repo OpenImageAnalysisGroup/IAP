@@ -79,7 +79,7 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 	@Override
 	public String getDefaultTitle() {
 		if (currentDirectory == null)
-			return "Load IAP Dataset(s) from File System";
+			return "Load Dataset(s) from File System";
 		else
 			return "<html>Load IAP Dataset(s) from File System<br><small><font color='gray'>"
 					+ currentDirectory

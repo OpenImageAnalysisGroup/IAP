@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionLoadFileList;
 import de.ipk.ag_ba.commands.ActionLoadLTexportFileHierarchy;
 import de.ipk.ag_ba.commands.mongodb.SaveExperimentInCloud;
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -31,8 +32,13 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
 		boolean addLoadFilesIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", true);
 		
-		if (addLoadFilesIcon)
+		if (addLoadFilesIcon) {
 			res.add(new NavigationButton(new SaveExperimentInCloud(false), src != null ? src.getGUIsetting() : guiSetting));
+			NavigationButton loadFileList = new NavigationButton(
+					new ActionLoadFileList("Create dataset from image file list"),
+					src != null ? src.getGUIsetting() : guiSetting);
+			res.add(loadFileList);
+		}
 		
 		if (showLoadLTfileExport) {
 			NavigationButton ltl = new NavigationButton(
