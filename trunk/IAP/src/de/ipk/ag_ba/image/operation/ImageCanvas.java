@@ -187,6 +187,26 @@ public class ImageCanvas {
 		return this;
 	}
 	
+	/**
+	 * Draws a filled Circle.
+	 * 
+	 * @param mx
+	 * @param my
+	 * @param radius
+	 * @param color
+	 * @param alpha
+	 * @return
+	 */
+	public ImageCanvas fillCircle(int mx, int my, int innerRadius, int outerRadius, int color, double alpha) {
+		for (int x = mx - outerRadius; x < mx + outerRadius; x++)
+			for (int y = my - outerRadius; y < my + outerRadius; y++) {
+				double d = Math.sqrt((x - mx) * (x - mx) + (y - my) * (y - my));
+				if (d > innerRadius && d < outerRadius)
+					fillRect(x, y, 1, 1, color, alpha);
+			}
+		return this;
+	}
+	
 	public Image getImage() {
 		return image;
 	}
