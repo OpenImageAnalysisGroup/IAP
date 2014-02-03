@@ -12,9 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
@@ -207,9 +205,6 @@ public class ExperimentSaver implements RunnableOnDB {
 				}
 			}
 		}
-		
-		// List<DBObject> dbSubstances = new ArrayList<DBObject>();
-		// HashMap<DBObject, List<BasicDBObject>> substance2conditions = new HashMap<DBObject, List<BasicDBObject>>();
 		
 		final CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 		
@@ -495,8 +490,6 @@ public class ExperimentSaver implements RunnableOnDB {
 			ConditionInterface c,
 			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
 		
-		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
-		
 		BasicDBObject condition;
 		synchronized (attributes) {
 			attributes.clear();
@@ -546,9 +539,6 @@ public class ExperimentSaver implements RunnableOnDB {
 			final List<BasicDBObject> dbImages = new ArrayList<BasicDBObject>();
 			List<BasicDBObject> dbVolumes = new ArrayList<BasicDBObject>();
 			List<BasicDBObject> dbNetworks = new ArrayList<BasicDBObject>();
-			
-			final Queue<Future<DatabaseStorageResult>> storageResults = new LinkedList<Future<DatabaseStorageResult>>();
-			final Queue<ImageData> imageDataQueue = new LinkedList<ImageData>();
 			
 			if (sa instanceof Sample3D) {
 				Sample3D s3 = (Sample3D) sa;
@@ -612,60 +602,21 @@ public class ExperimentSaver implements RunnableOnDB {
 						ErrorMsg.addErrorMessage(e);
 						res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 					}
-					if (status != null && storageResults.size() == 0)
+					if (status != null)// && storageResults.size() == 0)
 						updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount, startTime);
 				} // binary measurement
 			}
 			if (dbMeasurements.size() > 0)
 				sample.put("measurements", dbMeasurements);
 			
-			{
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
-						while (!storageResults.isEmpty()) {
-							Future<DatabaseStorageResult> fres = storageResults.poll();
-							ImageData id = imageDataQueue.poll();
-							DatabaseStorageResult res;
-							try {
-								res = fres.get();
-								// if (res != null && status != null)
-								// status.setCurrentStatusText1(count + "/" + numberOfBinaryData + ": " + res);
-								if (res == DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG) {
-									errorCount.addLong(1);
-									errors.append("<li>" + id.getURL().getFileName());
-								} else {
-									synchronized (attributes) {
-										attributes.clear();
-										id.fillAttributeMap(attributes);
-										BasicDBObject dbo = new BasicDBObject(filter(attributes));
-										dbImages.add(dbo);
-									}
-								}
-								count.addLong(1);
-								if (status != null)
-									updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount,
-											startTime);
-							} catch (Exception e) {
-								MongoDB.saveSystemErrorMessage("Could save experiment image, experiment " + experiment.getName(), e);
-								ErrorMsg.addErrorMessage(e);
-								errorCount.addLong(1);
-								errors.append("<li>" + e.getMessage());
-							}
-						}
-						if (dbImages.size() > 0)
-							sample.put("images", dbImages);
-					}
-				};
-				wait.add(BackgroundThreadDispatcher.addTask(r, "Sample storage thread"));
-			}
+			if (dbImages.size() > 0)
+				sample.put("images", dbImages);
+			
 			if (dbVolumes.size() > 0)
 				sample.put("volumes", dbVolumes);
 			if (dbNetworks.size() > 0)
 				sample.put("networks", dbVolumes);
 		} // sample
-		
-		BackgroundThreadDispatcher.waitFor(wait);
 		
 		condition.put("samples", dbSamples);
 		return condition;
