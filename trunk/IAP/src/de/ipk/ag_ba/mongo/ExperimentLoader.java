@@ -25,8 +25,6 @@ import com.mongodb.gridfs.GridFSDBFile;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -145,7 +143,7 @@ public class ExperimentLoader implements RunnableOnDB {
 									ll.add(new ObjectId(o + ""));
 							}
 							DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
-									.hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(200, ll.size()));
+									.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(100, ll.size()));
 							for (DBObject substance : subList) {
 								if (substance != null) {
 									if (optDBPbjectsOfSubstances != null)
@@ -203,36 +201,6 @@ public class ExperimentLoader implements RunnableOnDB {
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
-		boolean speedupLoading = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
-		speedupLoading = false;
-		if (speedupLoading) {
-			if (s3d.getName().contains("histogram")) {
-				// System.out.println("Skip substance loading of substance " + s3d.getName());
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
-				return;
-			}
-			if (s3d.getName().contains("histogram.bin") && s3d.getName().contains("section")) {
-				// System.out.println("Skip substance loading of substance " + s3d.getName());
-				if (optStatusProvider != null)
-					optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
-				return;
-			}
-			if (experiment.getName().startsWith("Unit Test "))
-				if (s3d.getName().contains("histogram")
-						|| s3d.getName().contains(".angles")
-						// || s3d.getName().contains(".hsv.")
-						|| !s3d.getName().contains(".all.")
-						// || !s3d.getName().startsWith("corr.")
-						|| s3d.getName().contains(".lab.")
-						// || s3d.getName().contains(".percent.")
-						|| s3d.getName().contains("RESULT_")) {
-					// System.out.println("Skip substance loading of substance " + s3d.getName());
-					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep);
-					return;
-				}
-		}
 		
 		if (optStatusProvider != null) {
 			String memInfo = StringManipulationTools.formatNumber(SystemAnalysis.getUsedMemoryInMB() * 100d / SystemAnalysis.getMemoryMB(), 0) + "%";
@@ -273,7 +241,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					ll.add(new ObjectId(o + ""));
 			DBCursor condL = collCond.find(
 					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					).hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(l.size(), 200));
+					).hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 100));
 			for (DBObject cond : condL) {
 				try {
 					if (optDBObjectsConditions != null)

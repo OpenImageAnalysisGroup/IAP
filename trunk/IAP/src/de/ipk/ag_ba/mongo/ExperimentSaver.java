@@ -213,7 +213,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		final CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 		
-		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>(experiment);
+		LinkedList<SubstanceInterface> sl = new LinkedList<SubstanceInterface>(experiment);
 		Runtime r = Runtime.getRuntime();
 		final ArrayList<String> substanceIDs = new ArrayList<String>();
 		final ObjectRef errorCount = new ObjectRef();
@@ -222,7 +222,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		final int substanceCount = sl.size();
 		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 		while (!sl.isEmpty()) {
-			final SubstanceInterface s = sl.remove(0);
+			final SubstanceInterface s = sl.poll();
 			// if (status != null && status.wantsToStop())
 			// break;
 			Runnable rrr = new Runnable() {
@@ -235,8 +235,8 @@ public class ExperimentSaver implements RunnableOnDB {
 								lastTransferSum, lastTime, count, errors, numberOfBinaryData, substanceIDs,
 								errorCount, s, tsoIdxS.getInt(), substanceCount);
 					} catch (InterruptedException e) {
-						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ",experiment " + experiment.getName(), e);
-						e.printStackTrace();
+						MongoDB.saveSystemErrorMessage("Could save experiment substance " + s.getName() + ", experiment " + experiment.getName(), e);
+						ErrorMsg.addErrorMessage(e);
 						errorCount.addLong(1);
 						errors.append("<li>Error saving substance " + s.getName());
 					}
@@ -336,28 +336,36 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		final ArrayList<String> conditionIDs = new ArrayList<String>();
 		final HashSet<String> savedUrls = new HashSet<String>();
-		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
-		for (final ConditionInterface c : s) {
-			Runnable rr = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						processConditionSaving(cols, db, status,
-								keepDataLinksToDataSource_safe_space, attributes,
-								overallFileSize, startTime, conditions,
-								errorCount,
-								lastTransferSum, lastTime, count, errors,
-								numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
-					} catch (Exception e) {
-						e.printStackTrace();
-						errorCount.addLong(1);
-						errors.append("<li>" + e.getMessage());
-					}
+		ArrayList<DBObject> toBeSaved = new ArrayList<DBObject>();
+		try {
+			for (final ConditionInterface c : s) {
+				BasicDBObject condition = processConditionSaving(cols, db, status,
+						keepDataLinksToDataSource_safe_space, attributes,
+						overallFileSize, startTime, conditions,
+						errorCount,
+						lastTransferSum, lastTime, count, errors,
+						numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
+				
+				conditionIDs.add(condition.getString("_id"));
+				
+				toBeSaved.add(condition);
+				
+				if (toBeSaved.size() >= 100) {
+					conditions.insert(toBeSaved);
+					toBeSaved.clear();
 				}
-			};
-			wait.add(BackgroundThreadDispatcher.addTask(rr, "Process condition " + c.getName()));
-		} // condition
-		BackgroundThreadDispatcher.waitFor(wait);
+				
+			} // condition
+			if (toBeSaved.size() > 0) {
+				conditions.insert(toBeSaved);
+				toBeSaved.clear();
+			}
+		} catch (Exception e) {
+			MongoDB.saveSystemErrorMessage("Could save experiment conditions, experiment " + experiment.getName(), e);
+			ErrorMsg.addErrorMessage(e);
+			errorCount.addLong(1);
+			errors.append("<li>" + e.getMessage());
+		}
 		processSubstanceSaving(status, substances, substance, conditionIDs);
 		substanceIDs.add((substance).getString("_id"));
 	}
@@ -475,7 +483,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		return map;
 	}
 	
-	private void processConditionSaving(CollectionStorage cols, DB db,
+	private BasicDBObject processConditionSaving(CollectionStorage cols, DB db,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean keepDataLinksToDataSource_safe_space,
 			final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
@@ -600,6 +608,7 @@ public class ExperimentSaver implements RunnableOnDB {
 							}
 						}
 					} catch (Exception e) {
+						MongoDB.saveSystemErrorMessage("Could save file experiment " + experiment.getName(), e);
 						ErrorMsg.addErrorMessage(e);
 						res = DatabaseStorageResult.IO_ERROR_SEE_ERRORMSG;
 					}
@@ -638,7 +647,8 @@ public class ExperimentSaver implements RunnableOnDB {
 									updateStatusForFileStorage(status, overallFileSize, lastTransferSum, lastTime, count, numberOfBinaryData, res, errorCount,
 											startTime);
 							} catch (Exception e) {
-								e.printStackTrace();
+								MongoDB.saveSystemErrorMessage("Could save experiment image, experiment " + experiment.getName(), e);
+								ErrorMsg.addErrorMessage(e);
 								errorCount.addLong(1);
 								errors.append("<li>" + e.getMessage());
 							}
@@ -658,13 +668,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		BackgroundThreadDispatcher.waitFor(wait);
 		
 		condition.put("samples", dbSamples);
-		try {
-			conditions.insert(condition);
-			conditionIDs.add(condition.getString("_id"));
-		} catch (Exception mie) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid condition: " + c + ", with " + c.size() + " samples (could not be saved): "
-					+ mie.getMessage());
-		}
+		return condition;
 	}
 	
 	private long lastN = -1;
