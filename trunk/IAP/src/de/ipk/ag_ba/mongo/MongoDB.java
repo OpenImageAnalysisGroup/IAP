@@ -937,12 +937,12 @@ public class MongoDB {
 						DBCollection colFE = db.getCollection(mgfs + ".files");
 						DBObject groupFields = new BasicDBObject("_id", null);
 						groupFields.put("result_size", new BasicDBObject("$sum", "$length"));
-						DBObject group = new BasicDBObject("$group", groupFields);
 						
 						AggregationOutput out = colFE.aggregate(
 								new BasicDBObject("$match", new BasicDBObject("filename", new BasicDBObject("$in", currentList))),
-								group
+								new BasicDBObject("$group", groupFields)
 								);
+						
 						Iterator<DBObject> it = out.results().iterator();
 						if (it.hasNext()) {
 							newSize.addLong((Long) it.next().get("result_size"));
