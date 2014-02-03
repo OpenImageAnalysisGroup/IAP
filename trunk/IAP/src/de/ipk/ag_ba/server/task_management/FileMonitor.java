@@ -11,6 +11,8 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+import org.StringManipulationTools;
+
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
@@ -56,10 +58,10 @@ public class FileMonitor {
 							+ SystemAnalysis.getCurrentTime());
 					TextFile tf = new TextFile(f);
 					if (tf.size() > contentLineIndex) {
-						int availLines = Integer.parseInt(tf.get(0));
+						int availLines = Integer.parseInt(StringManipulationTools.getNumbersFromString((tf.get(0))));
 						int lastContentLine = availLines + 2;
 						String msg = id + ":" + tf.get(contentLineIndex);
-						for (int lineIdx = contentLineIndex; lineIdx < lastContentLine && lineIdx < tf.size() && msg.length() < 500; lineIdx++) {
+						for (int lineIdx = contentLineIndex + 1; lineIdx < lastContentLine && lineIdx < tf.size() && msg.length() < 500; lineIdx++) {
 							msg += "|" + tf.get(lineIdx);
 						}
 						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + "...");
