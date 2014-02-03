@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -906,47 +908,51 @@ public class MongoDB {
 					optStatusProvider.setCurrentStatusValueFine(0);
 					optStatusProvider.setCurrentStatusText1("Update Experiment Size Info");
 				}
-				
-				boolean ng = true;
 				int n = 0;
 				double max = 0;
-				if (ng) {
-					List<NumericMeasurementInterface> fl = Substance3D.getAllFiles(experiment, MeasurementNodeType.IMAGE);
-					n = fl.size();
-					max = n;
-					Long size = Substance3D.getFileSize(fl, optStatusProvider);
-					newSize.addLong(size);
-				} else {
-					List<NumericMeasurementInterface> abc = Substance3D.getAllFiles(experiment);
-					HashMap<Class, ArrayList<GridFS>> cachedFS = new HashMap<Class, ArrayList<GridFS>>();
-					for (NumericMeasurementInterface nmd : abc) {
-						if (nmd instanceof BinaryMeasurement) {
-							max++;
+				
+				LinkedList<NumericMeasurementInterface> fl = Substance3D.getAllFiles(experiment, MeasurementNodeType.IMAGE);
+				n = fl.size();
+				max = n;
+				LinkedList<LinkedList<String>> fl_ids = new LinkedList<LinkedList<String>>();
+				int added = 0;
+				{
+					LinkedList<String> currentList = null;
+					while (!fl.isEmpty()) {
+						if (currentList == null) {
+							currentList = new LinkedList<String>();
+							fl_ids.add(currentList);
 						}
-					}
-					for (NumericMeasurementInterface nmd : abc) {
-						if (nmd instanceof BinaryMeasurement) {
-							n++;
-							if (optStatusProvider != null && n % 100 == 0) {
-								optStatusProvider.setCurrentStatusValueFine(100d * n / max);
-								optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
-							}
-							IOurl url = ((BinaryMeasurement) nmd).getURL();
-							if (url != null) {
-								String hash = url.getDetail();
-								if (!cachedFS.containsKey(nmd.getClass()))
-									cachedFS.put(nmd.getClass(), MongoGridFS.getGridFsFileCollectionsFor(db, nmd));
-								ArrayList<GridFS> col = cachedFS.get(nmd.getClass());
-								for (GridFS gridfs : col) {
-									GridFSDBFile file = gridfs.findOne(hash);
-									if (file != null) {
-										newSize.addLong(file.getLength());
-									}
-								}
-							}
+						currentList.add(((BinaryMeasurement) fl.poll()).getURL().getDetail());
+						added++;
+						if (added >= 25000) {
+							added = 0;
+							currentList = null;
 						}
 					}
 				}
+				n = 0;
+				for (LinkedList<String> currentList : fl_ids) {
+					for (String mgfs : MongoGridFS.getFileCollections()) {
+						DBCollection colFE = db.getCollection(mgfs + ".files");
+						DBObject groupFields = new BasicDBObject("_id", null);
+						groupFields.put("result_size", new BasicDBObject("$sum", "$length"));
+						DBObject group = new BasicDBObject("$group", groupFields);
+						
+						AggregationOutput out = colFE.aggregate(
+								new BasicDBObject("$match", new BasicDBObject("filename", new BasicDBObject("$in", currentList))),
+								group
+								);
+						Iterator<DBObject> it = out.results().iterator();
+						if (it.hasNext()) {
+							newSize.addLong((Long) it.next().get("result_size"));
+						}
+					}
+					n += currentList.size();
+					optStatusProvider.setCurrentStatusValueFine(100d * n / max);
+					optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
+				}
+				
 				if (optStatusProvider != null) {
 					optStatusProvider.setCurrentStatusValueFine(100d * n / max);
 					optStatusProvider.setCurrentStatusText2("(" + n + "/" + (int) max + ", " + newSize.getLong() / 1024 / 1024 + " MB)");
