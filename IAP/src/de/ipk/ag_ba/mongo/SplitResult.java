@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.bson.types.ObjectId;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -215,25 +216,28 @@ public class SplitResult {
 				SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
 		// System.out.println("> DELETE TEMP DATA...");
-		// if (interactive)
-		System.out.println("> MARK TEMP DATA AS TRASHED...");
-		// else
-		// System.out.println("> DELETE TEMP DATA...");
+		boolean deleteAfterMerge = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_delete_temp_results", true);
+		if (!deleteAfterMerge)
+			System.out.println("> MARK TEMP DATA AS TRASHED...");
+		else
+			System.out.println("> DELETE TEMP DATA...");
+		
 		for (ExperimentHeaderInterface i : knownResults) {
 			try {
 				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
 					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
-					// if (interactive)
-					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-					
-					// else
-					// m.deleteExperiment(i.getDatabaseId());
+					if (!deleteAfterMerge)
+						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
+					else
+						m.deleteExperiment(i.getDatabaseId());
 				}
 			} catch (Exception err) {
-				MongoDB.saveSystemErrorMessage("Could not mark experiment " + i.getExperimentName() +
-						" as trashed", err);
-				// MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
-				System.out.println("Could not delete experiment " + i.getExperimentName() + " (" +
+				if (!deleteAfterMerge)
+					MongoDB.saveSystemErrorMessage("Could not mark experiment " + i.getExperimentName() +
+							" as trashed", err);
+				else
+					MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
+				System.out.println("Could not " + (deleteAfterMerge ? "delete" : "set delete-mark on") + " experiment " + i.getExperimentName() + " (" +
 						err.getMessage() + ")");
 			}
 		}
