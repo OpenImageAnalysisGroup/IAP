@@ -33,7 +33,7 @@ public enum MongoGridFS {
 	}
 	
 	public static ArrayList<String> getFileCollections() {
-		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res = new ArrayList<String>(MongoGridFS.values().length);
 		for (MongoGridFS fs : values()) {
 			if (fs != FIELD_FILENAME)
 				if (!fs.toString().contains("."))
@@ -44,7 +44,7 @@ public enum MongoGridFS {
 	}
 	
 	public static ArrayList<String> getFileCollectionsInclPreview() {
-		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res = new ArrayList<String>(MongoGridFS.values().length);
 		for (MongoGridFS fs : values()) {
 			if (fs != FIELD_FILENAME)
 				if (!fs.toString().contains("."))
@@ -54,7 +54,7 @@ public enum MongoGridFS {
 	}
 	
 	public static ArrayList<String> getFileCollectionsFor(NumericMeasurementInterface nmd) {
-		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res = new ArrayList<String>(MongoGridFS.values().length);
 		if (nmd == null) {
 			res.add(FS_ANNOTATION_FILES.toString());
 		} else
@@ -75,14 +75,14 @@ public enum MongoGridFS {
 	}
 	
 	public static ArrayList<GridFS> getGridFsFileCollectionsFor(DB db, NumericMeasurementInterface nmd) {
-		ArrayList<GridFS> res = new ArrayList<GridFS>();
+		ArrayList<GridFS> res = new ArrayList<GridFS>(MongoGridFS.values().length);
 		for (String s : getFileCollectionsFor(nmd))
 			res.add(new GridFS(db, s));
 		return res;
 	}
 	
 	public static ArrayList<String> getPreviewFileCollections() {
-		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res = new ArrayList<String>(MongoGridFS.values().length);
 		for (MongoGridFS fs : values()) {
 			if (fs != FIELD_FILENAME)
 				if (!fs.toString().contains("."))
