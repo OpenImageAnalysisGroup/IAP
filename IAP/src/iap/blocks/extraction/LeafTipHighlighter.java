@@ -52,38 +52,48 @@ final class LeafTipHighlighter implements RunnableOnImageSet {
 	
 	private Image highlightOnVIS(Image imgVisLTHighlighted) {
 		float ratio = (float) ((regionColorHsvAvg.getRed() / 255.) / (regionColorRGBAvg.getRed() / 255.));
+		float hue, sat;
+		int fontsizeVis = 24;
 		if (ratio > 1) {
-			float sat = -1f + ratio * 2f - 1;
+			hue = 0.7f;
+			sat = -1f + ratio * 2f - 1;
 			if (sat < 0)
 				sat = 0;
 			if (sat > 1)
 				sat = 1;
-			
-			imgVisLTHighlighted = imgVisLTHighlighted
-					.io()
-					.canvas()
-					.fillCircle(xPosition, yPosition, radiusfin * 2, radiusfin * 2 + 5, Color.HSBtoRGB((float) (0.7), sat, (float) 1.0),
-							0.8)
-					.fillCircle(xPosition, yPosition, radiusfin, radiusfin * 2,
-							Color.HSBtoRGB((float) (regionColorRGBAvg.getRed() / 255.), (float) 1.0, (float) 1.0),
-							0.8)
-					.fillCircle(xPosition, yPosition, radiusfin, Color.HSBtoRGB((float) (regionColorHsvAvg.getRed() / 255.), (float) 1.0, (float) 1.0), 0.5)
-					.getImage();
 		} else {
-			float sat = -1f + ratio * 2f;
+			hue = 0.0f;
+			sat = 1 - (-1f + ratio * 2f);
 			if (sat < 0)
-				sat = 0;
-			imgVisLTHighlighted = imgVisLTHighlighted
-					.io()
-					.canvas()
-					.fillCircle(xPosition, yPosition, radiusfin * 2, radiusfin * 2 + 5, Color.HSBtoRGB((float) (0.0), 1 - sat, (float) 1.0),
-							0.8)
-					.fillCircle(xPosition, yPosition, radiusfin, radiusfin * 2,
-							Color.HSBtoRGB((float) (regionColorRGBAvg.getRed() / 255.), (float) 1.0, (float) 1.0),
-							0.8)
-					.fillCircle(xPosition, yPosition, radiusfin, Color.HSBtoRGB((float) (regionColorHsvAvg.getRed() / 255.), (float) 1.0, (float) 1.0), 0.5)
-					.getImage();
+				sat = 1;
 		}
+		int rot = 315;
+		de.ipk.ag_ba.image.operations.complex_hull.Point p1 = new de.ipk.ag_ba.image.operations.complex_hull.Point((int) (radiusfin * 4
+				* Math.cos(rot * (Math.PI / 180))
+				+ xPosition), (int) (radiusfin * 3 * Math.sin(rot
+				* (Math.PI / 180)) + yPosition));
+		de.ipk.ag_ba.image.operations.complex_hull.Point p2 = new de.ipk.ag_ba.image.operations.complex_hull.Point((int) (radiusfin * 8
+				* Math.cos(rot * (Math.PI / 180))
+				+ xPosition), (int) (radiusfin * 6 * Math.sin(rot * (Math.PI / 180)) + yPosition));
+		imgVisLTHighlighted = imgVisLTHighlighted
+				.io()
+				.canvas()
+				.fillCircle(xPosition, yPosition, radiusfin * 4, radiusfin * 4 + 8, Color.HSBtoRGB(hue, sat, (float) 1.0),
+						0.8)
+				.fillCircle(xPosition, yPosition, radiusfin * 2, radiusfin * 4,
+						Color.HSBtoRGB((float) (regionColorRGBAvg.getRed() / 255.), (float) 1.0, (float) 1.0),
+						0.8)
+				.fillCircle(xPosition, yPosition, radiusfin * 2, Color.HSBtoRGB((float) (regionColorHsvAvg.getRed() / 255.), (float) 1.0, (float) 1.0), 0.5)
+				.drawLine(p1, p2, Color.BLACK.getRGB(), 0.5, 2)
+				.drawLine(p2, p2.moved(300.0, 0.0), Color.BLACK.getRGB(), 0.5, 2)
+				.text((int) p2.x, (int) p2.y - 3,
+						"HSV in: " + regionColorRGBAvg.getRed() + " | " + regionColorRGBAvg.getGreen() + " | " + regionColorRGBAvg.getBlue(), Color.BLACK,
+						fontsizeVis)
+				.text((int) p2.x, (int) p2.y - fontsizeVis - 8,
+						"HSV out: " + regionColorHsvAvg.getRed() + " | " + regionColorHsvAvg.getGreen() + " | " + regionColorHsvAvg.getBlue(), Color.BLACK,
+						fontsizeVis)
+				.getImage();
+		
 		return imgVisLTHighlighted;
 	}
 	
