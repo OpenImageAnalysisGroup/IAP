@@ -10,7 +10,6 @@ package de.ipk.ag_ba.gui.webstart;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.FlowLayout;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,8 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import netscape.javascript.JSObject;
 
 import org.ErrorMsg;
 import org.ReleaseInfo;
@@ -95,12 +92,12 @@ public class IAPgui {
 				// overView.setTitle("Overview");
 				// overView.setProcessing(false);
 				try {
-					JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
-					Object o = win.eval("s = window.location.hash;");
-					String h = o + "";
-					h = URLDecoder.decode(h, "UTF-8");
-					System.out.println("HASH: " + h);
-					navigateTo(h, navigationPanel, actionPanel, graphPanel);
+					// JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
+					// Object o = win.eval("s = window.location.hash;");
+					// String h = o + "";
+					// h = URLDecoder.decode(h, "UTF-8");
+					// System.out.println("HASH: " + h);
+					// navigateTo(h, navigationPanel, actionPanel, graphPanel);
 				} catch (Exception e) {
 					// System.out.println("JavaScript and Browser window not accessible.");
 					// navigateTo("Overview.MetaCrop.Carbohydrate Metabolism.Ascorbate biosynthesis",
