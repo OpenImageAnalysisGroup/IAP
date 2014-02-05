@@ -60,6 +60,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 		}
 		if (fi != null)
 			fi.show("postres fluo", debugValues);
+		
 		return fi;
 	}
 	
@@ -84,6 +85,8 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 				fi = roi.postProcessMask(fi);
 			}
 		}
+		if (fi != null)
+			fi.show("postres nir", true);
 		return fi;
 	}
 	
