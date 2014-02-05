@@ -45,12 +45,14 @@ final class LeafTipHighlighter implements RunnableOnImageSet {
 		if (camType == CameraType.FLUO)
 			img = highlightOnFluo(img);
 		if (camType == CameraType.VIS)
-			img = highlightOnVIS(img);
+			img = highlightOnVis(img);
+		if (camType == CameraType.NIR)
+			img = highlightOnNir(img);
 		
 		return img;
 	}
 	
-	private Image highlightOnVIS(Image imgVisLTHighlighted) {
+	private Image highlightOnVis(Image imgVisLTHighlighted) {
 		float ratio = (float) ((regionColorHsvAvg.getRed() / 255.) / (regionColorRGBAvg.getRed() / 255.));
 		float hue, sat;
 		int fontsizeVis = 24;
@@ -103,16 +105,27 @@ final class LeafTipHighlighter implements RunnableOnImageSet {
 				.canvas()
 				.drawLine(xPosition, yPosition, centerOfGravity.x + dim[0], centerOfGravity.y + dim[2], Color.ORANGE.getRGB(), 0.2, 1)
 				.drawCircle(xPosition, yPosition, radiusfin + 4, Color.BLUE.getRGB(), 0.5, 1)
-				.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition - 20 + off, "LEAF: " + (iF + 1),
+				.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition - 20 + off, "LEAF: " + iF,
 						Color.BLACK)
+				// .text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 0 + off,
+				// "DIRECTION: " + (directionF > 0 ? "DOWN" : "UP"),
+				// Color.BLACK)
 				.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 0 + off,
-						"DIRECTION: " + (directionF > 0 ? "DOWN" : "UP"),
-						Color.BLACK)
-				.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 20 + off,
 						"CHLO: " + regionColorRGBAvg.getRed() + ", PHEN: " + regionColorRGBAvg.getGreen() + ", CLAS: " + regionColorRGBAvg.getBlue()
 						, Color.BLACK)
 				.getImage();
 		return imgGamma;
+	}
+	
+	private Image highlightOnNir(Image img) {
+		img = img
+				.io()
+				.canvas()
+				.drawCircle(xPosition, yPosition, radiusfin,
+						new Color(regionColorRGBAvg.getBlue() - 50, regionColorRGBAvg.getBlue() - 50, regionColorRGBAvg.getBlue() - 50).getRGB(), 0.5, 2)
+				.text(xPosition + 6, yPosition - 6, "Avg Nir: " + (regionColorRGBAvg.getBlue() - 30), Color.BLACK, 7)
+				.getImage();
+		return img;
 	}
 	
 	@Override

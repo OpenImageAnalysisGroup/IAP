@@ -45,6 +45,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	Image changedVis;
 	Image changedVisMask;
 	boolean calcOnVis = false;
+	boolean calcOnFluo = false;
+	boolean calcOnNir = false;
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
@@ -66,9 +68,20 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
-		calcOnVis = getBoolean("Calculate on Vis Image", false);
+		calcOnFluo = getBoolean("Calculate on Fluo Image", true);
 		Image img = input().masks().fluo();
 		if (!calcOnVis && options.getCameraPosition() == CameraPosition.SIDE && img != null) {
+			img.show("input leaftips", false);
+			return doLeafTipAnalysis(img);
+		} else
+			return img;
+	}
+	
+	@Override
+	protected Image processNIRmask() {
+		calcOnNir = getBoolean("Calculate on Nir Image", false);
+		Image img = input().masks().nir();
+		if (calcOnNir && options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			img.show("input leaftips", false);
 			return doLeafTipAnalysis(img);
 		} else
@@ -291,8 +304,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		double norm1 = wf / wv;
 		
 		Image imgVisLTHighlighted = input().masks().vis().copy();
+		Image imgNirLTHighlighted = input().masks().nir().copy();
 		
-		if (!calcOnVis)
+		if (calcOnFluo)
 			imgVisLTHighlighted = imgVisLTHighlighted.io().scale(norm1, norm1)
 					.cropAbs((int) ((wv - wf) / 2.), (int) (wv - ((wv - wf) / 2.)), (int) ((hv - hf) / 2.), (int) (hv - ((hv - hf) / 2.)))
 					.getImage();
@@ -367,12 +381,13 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			eccentricity = Math.sqrt(1 - lambdas[1] / lambdas[0]);
 			
 			// apply mask on original image to preserve colors
-			Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
+			// Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
 			// origColorRegionImage.show("orig");
-			regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
-			final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
+			// regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
+			// regionImage.show("rg img");
+			final Color regionColorHsvAvg = getAverageRegionColor(region, ColorMode.HSV);
 			// Lab regionColorLabAvg = getAverageRegionColorLab(region);
-			final Color regionColorRGBAvg = getAverageRegionColorRGB(region, ColorMode.RGB);
+			final Color regionColorRGBAvg = getAverageRegionColor(region, ColorMode.RGB);
 			
 			// normalization of coordinates
 			Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
@@ -442,7 +457,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				int radiusL = radius * 3;
 				ArrayList<PositionAndColor> visList2 = searchTips(imgVisLTHighlighted, xPosition, yPosition, radiusL, radius);
 				regionColorHsvAvgVis_large = getAverageRegionColorHSV(visList2);
-			} else {
+			}
+			
+			if (calcOnFluo) {
 				RunnableOnImageSet riFluo = new LeafTipHighlighter(xPosition, regionColorRGBAvg, radiusfin, dim, yPosition, iF, regionColorHsvAvg, off,
 						centerOfGravity, directionF, CameraType.FLUO);
 				if (getBoolean("debug_paint_results", false) && debug) {
@@ -470,6 +487,14 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 				} else {
 					getProperties().addImagePostProcessor(riVis);
 				}
+			}
+			
+			if (calcOnNir) {
+				// ArrayList<PositionAndColor> visList2 = searchTips(imgNirLTHighlighted, xPosition, yPosition, radius, -1);
+				regionColorHsvAvgVis_large = regionColorHsvAvg; // getAverageRegionColorHSV(visList2);
+				RunnableOnImageSet riNir = new LeafTipHighlighter(xPosition, regionColorHsvAvgVis_large, radiusfin, dim, yPosition, iF, regionColorHsvAvgVis_small,
+						off, centerOfGravity, directionF, CameraType.NIR);
+				getProperties().addImagePostProcessor(riNir);
 			}
 			
 			// if (getBoolean("Get Leaf Tips From Nir", false)) {
@@ -718,7 +743,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	/**
-	 * Calculates sorted border list (depends on 8 neighborhood, border should be connected, given that there is one big segment), uses recursive border-search
+	 * Calculates sorted border list (depends on 8 neighborhood, border should be connected, assumed there is one big segment), uses recursive border-search
 	 * (implemented as loop).
 	 * 
 	 * @param borderMap
@@ -1090,7 +1115,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return new Image(img2d);
 	}
 	
-	private Color getAverageRegionColorRGB(ArrayList<PositionAndColor> region, ColorMode type) {
+	private Color getAverageRegionColor(ArrayList<PositionAndColor> region, ColorMode type) {
 		float[] hsbvals = new float[3];
 		float[] valssum = new float[3];
 		
@@ -1110,9 +1135,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			switch (type) {
 				case HSV:
 					Color.RGBtoHSB(r, g, b, hsbvals);
-					valssum[0] += hsbvals[0];
-					valssum[1] += hsbvals[1];
-					valssum[2] += hsbvals[2];
+					valssum[0] += hsbvals[0] * 255;
+					valssum[1] += hsbvals[1] * 255;
+					valssum[2] += hsbvals[2] * 255;
 					break;
 				case LAB:
 					Li = (int) lab[r][g][b];
