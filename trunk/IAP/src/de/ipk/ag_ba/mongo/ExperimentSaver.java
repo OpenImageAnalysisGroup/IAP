@@ -341,18 +341,22 @@ public class ExperimentSaver implements RunnableOnDB {
 						lastTransferSum, lastTime, count, errors,
 						numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
 				
-				conditionIDs.add(condition.getString("_id"));
-				
 				toBeSaved.add(condition);
 				
 				if (toBeSaved.size() >= 100) {
-					conditions.insert(toBeSaved);
+					conditions.insert(new ArrayList<DBObject>(toBeSaved));
+					for (DBObject ci : toBeSaved)
+						conditionIDs.add(((BasicDBObject) ci).getString("_id"));
+					
 					toBeSaved.clear();
 				}
 				
 			} // condition
 			if (toBeSaved.size() > 0) {
-				conditions.insert(toBeSaved);
+				conditions.insert(new ArrayList<DBObject>(toBeSaved));
+				for (DBObject ci : toBeSaved)
+					conditionIDs.add(((BasicDBObject) ci).getString("_id"));
+				
 				toBeSaved.clear();
 			}
 		} catch (Exception e) {
