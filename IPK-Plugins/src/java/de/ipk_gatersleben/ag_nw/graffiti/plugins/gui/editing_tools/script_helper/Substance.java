@@ -757,6 +757,8 @@ public class Substance implements SubstanceInterface {
 	
 	@Override
 	public void setInfo(String info) {
+		if (info != null)
+			info = info.trim();
 		this.info = info;
 	}
 	
