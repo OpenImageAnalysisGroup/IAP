@@ -61,9 +61,9 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-util.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-xml.jar"/>
         	
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-3.8-beta5-20111217.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-3.8-beta5-20111217.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-schemas-3.8-beta5-20111217.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-3.10-beta2-20130904.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-3.10-beta2-20130904.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-schemas-3.10-beta2-20130904.jar"/>
         	
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/bsh-2.0b4.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-cli-1.0.jar"/>
