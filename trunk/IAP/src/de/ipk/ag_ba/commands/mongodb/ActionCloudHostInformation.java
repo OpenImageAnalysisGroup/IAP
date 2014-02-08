@@ -93,14 +93,14 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						hostInfo = ch.getHostInfo();
 						status3 = ch.getStatus3();
 						if (System.currentTimeMillis() - ch.getLastUpdateTime() >= 60 * 1000) {
-							status3 += "<br>(finished, remove info in "
+							status3 += "<br>(finished, removing info in "
 									+ SystemAnalysis.getWaitTime(120 * 1000 - (System.currentTimeMillis() - ch.getLastUpdateTime())) + ")";
 						} else
 							if (System.currentTimeMillis() - ch.getLastUpdateTime() >= 30 * 1000) {
 								status3 += "<br>(no status update since " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - ch.getLastUpdateTime()) + ")";
 							}
-						if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
-							status3 += "<br>[REMOVE FROM UPDATE]";
+						// if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
+						// status3 += "<br>[REMOVE FROM UPDATE]";
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
