@@ -11,6 +11,7 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -754,18 +755,25 @@ public class NavigationButton implements StyleAware {
 			case FLAT:
 			case COMPACT_LIST:
 			case COMPACT_LIST_2:
-				n1.setBorderPainted(false);
-				n1.setContentAreaFilled(false);
 				int d = 1;
-				if (style == ButtonDrawStyle.COMPACT_LIST)
-					d = 2;
-				if (target == PanelTarget.NAVIGATION)
-					n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
-				else
-					if (style == ButtonDrawStyle.FLAT)
-						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
+				if (style == ButtonDrawStyle.COMPACT_LIST_2) {
+					n1.setMargin(new Insets(1, 1, 1, 1));
+				}
+				if (style == ButtonDrawStyle.COMPACT_LIST) {
+					d = Integer.MAX_VALUE;
+					icon = null;
+					n1.setMargin(new Insets(1, 1, 1, 1));
+				} else {
+					n1.setBorderPainted(false);
+					n1.setContentAreaFilled(false);
+					if (target == PanelTarget.NAVIGATION)
+						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
 					else
-						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
+						if (style == ButtonDrawStyle.FLAT)
+							n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
+						else
+							n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
+				}
 				break;
 			case TEXT:
 				icon = null;
@@ -809,7 +817,8 @@ public class NavigationButton implements StyleAware {
 		
 		if (n instanceof NavigationButtonCalendar2) {
 			if (style != ButtonDrawStyle.TEXT) {
-				icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
+				if (icon != null)
+					icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
 				((NavigationButtonCalendar2) n).setPostUpdateRunner(new Runnable() {
 					@Override
 					public void run() {

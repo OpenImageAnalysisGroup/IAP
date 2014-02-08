@@ -247,4 +247,8 @@ public class BatchCmd extends BasicDBObject {
 			return hostInfo;
 		}
 	}
+	
+	public void delete(MongoDB m) {
+		m.batch().delete(this);
+	}
 }
