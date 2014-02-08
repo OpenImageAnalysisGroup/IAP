@@ -92,17 +92,22 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						lastStatus = ch.getTaskProgress();
 						hostInfo = ch.getHostInfo();
 						status3 = ch.getStatus3();
-						if (System.currentTimeMillis() - ip.getLastUpdateTime() >= 30 * 1000) {
-							status3 += "<br>(no status update since " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - ip.getLastUpdateTime()) + ")";
-							if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
-								status3 += "<br>[REMOVE FROM UPDATE]";
-						}
+						if (System.currentTimeMillis() - ch.getLastUpdateTime() >= 60 * 1000) {
+							status3 += "<br>(finished, remove info in "
+									+ SystemAnalysis.getWaitTime(120 * 1000 - (System.currentTimeMillis() - ch.getLastUpdateTime())) + ")";
+						} else
+							if (System.currentTimeMillis() - ch.getLastUpdateTime() >= 30 * 1000) {
+								status3 += "<br>(no status update since " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - ch.getLastUpdateTime()) + ")";
+							}
+						if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
+							status3 += "<br>[REMOVE FROM UPDATE]";
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
 						else
 							return "";// "idle, ";
-						return ch.getPipelinesPerHour() + " p.e./h, " + rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
+						return (System.currentTimeMillis() - ch.getLastUpdateTime() >= 10 * 1000 ? "" : ch.getPipelinesPerHour() + " p.e./h, ") + rA + "t_p="
+								+ ch.getLastPipelineTime() + " s, " +
 								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 					} else
 						return "[REMOVE FROM UPDATE]";
