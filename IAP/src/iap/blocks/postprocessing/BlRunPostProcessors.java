@@ -86,7 +86,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 			}
 		}
 		if (fi != null)
-			fi.show("postres nir", true);
+			fi.show("postres nir", debugValues);
 		return fi;
 	}
 	
