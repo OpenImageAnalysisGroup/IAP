@@ -238,6 +238,13 @@ public class CloudTaskManager {
 				Thread.sleep(1000);
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
+						m.batch().pingHost(hostName,
+								BlockPipeline.getBlockExecutionsWithinLastMinute(),
+								BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
+								BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
+								100d,
+								"Completed job execution, <br>restarting.<br>"
+										+ "[REMOVE FROM UPDATE]");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 						Thread.sleep(9000);
