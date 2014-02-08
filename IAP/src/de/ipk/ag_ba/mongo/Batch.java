@@ -249,7 +249,7 @@ public class Batch {
 							res.add(h);
 						} else {
 							long age = curr - h.getLastUpdateTime();
-							if (age > 1000 * 60 * 15)
+							if (age > 1000 * 60 * 2)
 								del.add(h);
 						}
 					}

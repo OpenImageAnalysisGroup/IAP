@@ -92,6 +92,11 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						lastStatus = ch.getTaskProgress();
 						hostInfo = ch.getHostInfo();
 						status3 = ch.getStatus3();
+						if (System.currentTimeMillis() - ip.getLastUpdateTime() >= 30 * 1000) {
+							status3 += "<br>(no status update since " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - ip.getLastUpdateTime()) + ")";
+							if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
+								status3 += "<br>[REMOVE FROM UPDATE]";
+						}
 						String rA = "";
 						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
 							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
