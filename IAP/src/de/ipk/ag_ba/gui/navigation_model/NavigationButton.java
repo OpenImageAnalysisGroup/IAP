@@ -763,6 +763,9 @@ public class NavigationButton implements StyleAware {
 					d = Integer.MAX_VALUE;
 					icon = null;
 					n1.setMargin(new Insets(1, 1, 1, 1));
+					n1.setBorderPainted(false);
+					n1.setContentAreaFilled(true);
+					n1.setFont(Font.getFont(Font.SANS_SERIF));
 				} else {
 					n1.setBorderPainted(false);
 					n1.setContentAreaFilled(false);
@@ -856,13 +859,15 @@ public class NavigationButton implements StyleAware {
 		if (style != ButtonDrawStyle.COMPACT_LIST || target == PanelTarget.ACTION) {
 			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
+			if (style == ButtonDrawStyle.COMPACT_LIST)
+				n1.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
 		} else {
-			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 12));
+			n1.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
 		}
 		if (style == ButtonDrawStyle.COMPACT_LIST_2) {
 			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
-			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 11));
+			n1.setFont(new Font(n1.getFont().getName(), Font.PLAIN, 10));
 		}
 		n.setExecution(new Runnable() {
 			@Override

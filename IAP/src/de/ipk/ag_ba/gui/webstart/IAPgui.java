@@ -9,7 +9,6 @@ package de.ipk.ag_ba.gui.webstart;
 
 import info.clearthought.layout.TableLayout;
 
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,7 +29,6 @@ import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -58,18 +56,13 @@ public class IAPgui {
 		graphPanel.setOpaque(true);
 		graphPanel.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		
-		int vgap = 5;
-		int hgap = 10;
-		
 		final IAPnavigationPanel navigationPanel = new IAPnavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
 		navigationPanel.setOpaque(false);
-		navigationPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 		
 		JPanel actionPanelRight = new JPanel();
 		final IAPnavigationPanel actionPanel = new IAPnavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
 		actionPanel.setNavigationButtonFilter(optNavigationButtonFilter);
 		actionPanel.setOpaque(false);
-		actionPanel.setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 		
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
