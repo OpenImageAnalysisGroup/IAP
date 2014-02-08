@@ -11,6 +11,7 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -55,6 +56,7 @@ import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
@@ -135,6 +137,16 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			popup.add(menuItem);
 		}
 		addMouseListener(new PopupListener(popup));
+		updateLayout();
+	}
+	
+	private void updateLayout() {
+		int b = 5;
+		if (buttonStyle == ButtonDrawStyle.COMPACT_LIST)
+			b = 2;
+		int vgap = b;
+		int hgap = 2 * b;
+		setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 	}
 	
 	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
@@ -250,6 +262,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		}
 		transferFocusUpCycle();
 		removeAll();
+		updateLayout();
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
 			if (target == PanelTarget.ACTION) {
@@ -285,11 +298,14 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 							next.setObject(lbl);
 							next = new ObjectRef();
 						}
+						int b = 5;
+						if (buttonStyle == ButtonDrawStyle.COMPACT_LIST)
+							b = 1;
 						if (ne.getAction() instanceof BookmarkAction) {
 							if (firstStar)
-								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+								lbl.setBorder(BorderFactory.createEmptyBorder(0, b, 0, b));
 							else
-								lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+								lbl.setBorder(BorderFactory.createEmptyBorder(0, b, 0, b));
 							
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
 							firstStar = false;
@@ -326,10 +342,14 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			}
 			if (actionPanelRight != null) {
 				if (right.size() > 0) {
+					int b = 5;
+					if (buttonStyle == ButtonDrawStyle.COMPACT_LIST)
+						b = 1;
+					
 					actionPanelRight.setBackground(new Color(255, 220, 220));
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
-					actionPanelRight.add(TableLayout.getMultiSplit(right, TableLayout.PREFERRED, 6, 6, 5, 5), "0,0");
+					actionPanelRight.add(TableLayout.getMultiSplit(right, TableLayout.PREFERRED, b + 1, b + 1, b, b), "0,0");
 				} else {
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
