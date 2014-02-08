@@ -157,10 +157,11 @@ public class TaskDescription {
 							if (saveOverallDatasetIfPossible)
 								m.processSplitResults().merge(false, statusProvider, bcmd);
 							
+							m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED, false);
+							
 							boolean deleteCompletedJobs = true;
 							if (deleteCompletedJobs)
 								m.batch().delete(batch);
-							m.batch().claim(bcmd, CloudAnalysisStatus.FINISHED, false);
 						} else {
 							MongoDB.saveSystemMessage("INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has been claimed by " + bcmd.getOwner()

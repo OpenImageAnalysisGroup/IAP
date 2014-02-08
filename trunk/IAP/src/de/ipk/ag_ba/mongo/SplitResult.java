@@ -217,11 +217,18 @@ public class SplitResult {
 		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
 		// System.out.println("> DELETE TEMP DATA...");
 		boolean deleteAfterMerge = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_delete_temp_results", true);
-		if (!deleteAfterMerge)
+		if (!deleteAfterMerge) {
 			System.out.println("> MARK TEMP DATA AS TRASHED...");
-		else
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Mark temp data as trashed");
+		} else {
 			System.out.println("> DELETE TEMP DATA...");
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Delete temp data");
+		}
 		
+		int idx = 0;
+		int maxIdx = knownResults.size();
 		for (ExperimentHeaderInterface i : knownResults) {
 			try {
 				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
@@ -231,6 +238,9 @@ public class SplitResult {
 					else
 						m.deleteExperiment(i.getDatabaseId());
 				}
+				if (optStatus != null)
+					optStatus.setCurrentStatusValueFine(100d * (idx++) / maxIdx);
+				
 			} catch (Exception err) {
 				if (!deleteAfterMerge)
 					MongoDB.saveSystemErrorMessage("Could not mark experiment " + i.getExperimentName() +
@@ -247,6 +257,8 @@ public class SplitResult {
 			optStatus.setCurrentStatusText2("Time to completion: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		if (optStatus != null)
 			optStatus.setCurrentStatusValueFine(100d);
+		if (optStatus != null)
+			optStatus.setCurrentStatusText2("Completed in " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish) + "");
 		System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
 	}
 	
