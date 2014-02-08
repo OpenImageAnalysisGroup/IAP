@@ -1370,7 +1370,7 @@ public class MongoDB {
 				ni.put("date", new Date());
 				ni.put("text", text);
 				ni.put("user", user);
-				db.getCollection("news").insert(ni);
+				db.getCollection("news").insert(ni, WriteConcern.JOURNALED);
 			}
 			
 			@Override
@@ -1475,7 +1475,7 @@ public class MongoDB {
 		try {
 			saveSystemMessage(MongoDB.getDefaultCloud(), msg);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			ErrorMsg.addErrorMessage(e1);
 		}
 	}
 	
@@ -1489,12 +1489,12 @@ public class MongoDB {
 						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
 								"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						ErrorMsg.addErrorMessage(e1);
 					}
 				}
 			}, "Save msg to DB (" + msg + ")");
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			ErrorMsg.addErrorMessage(e);
 		}
 	}
 	

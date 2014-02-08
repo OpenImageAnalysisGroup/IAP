@@ -478,7 +478,7 @@ public class Batch {
 		return (CloudHost) r.getObject();
 	}
 	
-	public void pingHost(final String ip,
+	public static void pingHost(final MongoDB mongoDB, final String ip,
 			final int blocksExecutedWithinLastMinute,
 			final int pipelineExecutedWithinCurrentHour,
 			final int tasksExecutedWithinLastMinute,
