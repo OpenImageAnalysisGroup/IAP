@@ -19,6 +19,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
+import de.ipk.ag_ba.mongo.Batch;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
@@ -87,40 +88,41 @@ public class CloudTaskManager {
 			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
 			double progressSum = -1;
 			do {
+				ArrayList<String> names = new ArrayList<String>();
+				ArrayList<String> progress = new ArrayList<String>();
+				try {
+					for (TaskDescription td : runningTasks) {
+						String name;
+						if (td.getBatchCmd() == null) {
+							name = "[BatchCmd==null]";
+							progress.add("[batch command n/a]");
+						} else {
+							name = td.getBatchCmd().getExperimentHeader().getExperimentName() + " (" + (td.getBatchCmd().getPartIdx() + 1) + "/"
+									+ td.getBatchCmd().getPartCnt() + ")";
+							progress.add(td.getBatchCmd().getCurrentStatusMessage3());
+						}
+						names.add(name);
+					}
+				} catch (Exception e) {
+					MongoDB.saveSystemErrorMessage("Error processing running tasks.", e);
+				}
+				
+				Batch.pingHost(m, hostName,
+						BlockPipeline.getBlockExecutionsWithinLastMinute(),
+						BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
+						BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
+						progressSum,
+						(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
+								(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
+										"" + StringManipulationTools.getStringList(progress, ", ") +
+										(progress.size() > 1 ?
+												"<br>" +
+														status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+				
 				if (CloudTaskManager.this.process || fixedDisableProcess) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					
 					status3provider.setCurrentStatusValueFine(progressSum);
-					
-					ArrayList<String> names = new ArrayList<String>();
-					ArrayList<String> progress = new ArrayList<String>();
-					try {
-						for (TaskDescription td : runningTasks) {
-							String name;
-							if (td.getBatchCmd() == null) {
-								name = "[BatchCmd==null]";
-								progress.add("n/a");
-							} else {
-								name = td.getBatchCmd().getExperimentHeader().getExperimentName() + " (" + (td.getBatchCmd().getPartIdx() + 1) + "/"
-										+ td.getBatchCmd().getPartCnt() + ")";
-								progress.add(td.getBatchCmd().getCurrentStatusMessage3());
-							}
-							names.add(name);
-						}
-					} catch (Exception e) {
-						MongoDB.saveSystemErrorMessage("Error processing running tasks.", e);
-					}
-					
-					m.batch().pingHost(hostName,
-							BlockPipeline.getBlockExecutionsWithinLastMinute(),
-							BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
-							BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
-							progressSum,
-							(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
-									"" + StringManipulationTools.getStringList(progress, ", ") +
-									(progress.size() > 1 ?
-											"<br>" +
-													status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
 					
 					int maxTasks = SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1);
 					if (maxTasks < 1)
@@ -238,13 +240,12 @@ public class CloudTaskManager {
 				Thread.sleep(1000);
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
-						m.batch().pingHost(hostName,
+						Batch.pingHost(m, hostName,
 								BlockPipeline.getBlockExecutionsWithinLastMinute(),
 								BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 								BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 								100d,
-								"Completed job execution, <br>restarting.<br>"
-										+ "[REMOVE FROM UPDATE]");
+								"Completed job execution");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 						Thread.sleep(9000);
