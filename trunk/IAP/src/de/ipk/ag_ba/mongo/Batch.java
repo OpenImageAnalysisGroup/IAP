@@ -513,7 +513,6 @@ public class Batch {
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
 					res.setTaskProgress(progress);
 					res.setStatus3(status3);
-					double load = SystemAnalysisExt.getRealSystemCpuLoad();
 					boolean monitor = !CloudComputingService.getInstance(mongoDB).getIsCalculationPossible();
 					int wl = BackgroundThreadDispatcher.getWorkLoad();
 					StringBuilder diskHistory = new StringBuilder();
@@ -529,7 +528,8 @@ public class Batch {
 							diskHistory.append("<br>" + lfw.toString() + " -> " + free + " GB free (" + size + " GB, " + prc + "% used)");
 						}
 					}
-					if (monitor)
+					if (monitor) {
+						double load = SystemAnalysisExt.getRealSystemCpuLoad();
 						res.setHostInfo(
 								(monitor ? "monitoring:<br>" : "") +
 										SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB() + " MB, " +
@@ -538,6 +538,7 @@ public class Batch {
 										(load > 0 ? " load "
 												+ StringManipulationTools.formatNumber(load, "#.#") + "" : "") +
 										(wl > 0 ? ", active: " + wl : "") + diskHistory.toString());
+					}
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
 					if (add)
 						dbc.insert(res);
