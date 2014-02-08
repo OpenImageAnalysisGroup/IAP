@@ -188,8 +188,12 @@ public class CloudTaskManager {
 						progressSum += td.getBatchCmd().getCurrentStatusValueFine();
 						nn++;
 					}
-					if (del.size() > 0)
+					if (del.size() > 0) {
 						runningTasks.removeAll(del);
+						for (TaskDescription finished : del) {
+							finished.getBatchCmd().delete(m);
+						}
+					}
 					
 					if (!disallownewtasks)
 						for (TaskDescription td : commands_to_start) {

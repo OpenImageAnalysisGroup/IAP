@@ -100,10 +100,10 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						return ch.getPipelinesPerHour() + " p.e./h, " + rA + "t_p=" + ch.getLastPipelineTime() + " s, " +
 								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 					} else
-						return "N/A";
+						return "[REMOVE FROM UPDATE]";
 				} catch (Exception e) {
 					// empty
-					return "unavailable";
+					return "[REMOVE FROM UPDATE]";
 				}
 			}
 			
@@ -127,7 +127,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			
 			@Override
 			public void setCurrentStatusValueFine(double value) {
-				// 
+				//
 			}
 			
 			@Override
@@ -137,17 +137,17 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			
 			@Override
 			public void setCurrentStatusText1(String status) {
-				// 
+				//
 			}
 			
 			@Override
 			public void setCurrentStatusText2(String status) {
-				// 
+				//
 			}
 			
 			@Override
 			public void setCurrentStatusValueFineAdd(double smallProgressStep) {
-				// 
+				//
 			}
 			
 			@Override
@@ -157,7 +157,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 			
 			@Override
 			public void setPrefix1(String prefix1) {
-				// 	
+				//
 			}
 		};
 	}

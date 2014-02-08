@@ -95,13 +95,13 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		
 		popup.addSeparator();
 		
-		menuItemCompact = new JCheckBoxMenuItem("Compact", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+		menuItemCompact = new JCheckBoxMenuItem("Compact (text only)", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.addActionListener(this);
 		
 		popup.add(menuItemCompact);
 		
-		menuItemCompact2 = new JCheckBoxMenuItem("Compact (2)", buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
+		menuItemCompact2 = new JCheckBoxMenuItem("Compact (small icons)", buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 		menuItemCompact2.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST_2);
 		menuItemCompact2.addActionListener(this);
 		
