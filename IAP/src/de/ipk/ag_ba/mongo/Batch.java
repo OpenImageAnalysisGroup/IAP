@@ -508,6 +508,7 @@ public class Batch {
 				if (res != null) {
 					if (Double.isNaN(progress) && status3 != null && status3.equals("system.exit")) {
 						dbc.remove(res, WriteConcern.JOURNALED);
+						return;
 					}
 					res.updateTime();
 					res.setHostName(ip);
