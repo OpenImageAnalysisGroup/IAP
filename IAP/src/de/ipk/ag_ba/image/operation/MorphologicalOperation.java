@@ -1,9 +1,11 @@
 package de.ipk.ag_ba.image.operation;
 
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Morphological operations supporting round mask.
+ * Morphological operations supporting round mask (returns a mask image, it is recommend to apply it on the original image).
  * 
  * @author pape
  */
@@ -44,11 +46,12 @@ public class MorphologicalOperation {
 		boolean isfilled = erode;
 		
 		int background = ImageOperation.BACKGROUND_COLORint;
+		int foreground = Color.RED.getRGB();
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				
-				int foreground = img2d[x][y];
+				// int foreground = img2d[x][y];
 				
 				maskloop: for (int xMask = -halfmask; xMask < halfmask; xMask++) {
 					for (int yMask = -halfmask; yMask < halfmask; yMask++) {
