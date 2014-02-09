@@ -19,6 +19,7 @@ import org.SystemOptions;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.mongo.Batch;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
@@ -184,11 +185,13 @@ public class TaskDescription {
 					try {
 						if (m.batch().getAll().size() > 0) {
 							System.out.println(">SYSTEM.EXIT(1) (batch queue not empty)");
+							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
 							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " finished compute task - SYSTEM.EXIT(1)");
 							System.exit(1);
 						} else {
 							System.out.println(">SYSTEM.EXIT(0) (batch queue is empty)");
+							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
 							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " finished compute task - SYSTEM.EXIT(0)");
 							System.exit(0);
