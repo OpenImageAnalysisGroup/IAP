@@ -501,8 +501,14 @@ public class Batch {
 					// System.out.println("INSERT: " + query);
 					res = new CloudHost();
 					add = true;
+					if (Double.isNaN(progress) && status3 != null && status3.equals("system.exit")) {
+						return;
+					}
 				}
 				if (res != null) {
+					if (Double.isNaN(progress) && status3 != null && status3.equals("system.exit")) {
+						dbc.remove(res, WriteConcern.JOURNALED);
+					}
 					res.updateTime();
 					res.setHostName(ip);
 					res.setClusterExecutionMode(IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
