@@ -29,6 +29,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private MongoDB m;
 	private final ObjectRef postFix = new ObjectRef("", "");
 	private boolean requestRefresh = false;
+	boolean onceExecuted = false;
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
 		super("Compute Cluster");
@@ -87,7 +88,8 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 						initCnt = procCnt;
 					if (procCnt > initCnt) {
 						initCnt = procCnt;
-						ActionCloudClusterHostInformation.this.requestRefresh = true;
+						if (onceExecuted)
+							ActionCloudClusterHostInformation.this.requestRefresh = true;
 					}
 					hostInfo = hl_filtered.size() + " nodes, " + procCnt + " instances";
 					if (hl_filtered.size() > 0 && hl_filtered.size() < 4)
@@ -212,6 +214,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
 		requestRefresh = false;
+		onceExecuted = true;
 	}
 	
 	@Override
