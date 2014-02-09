@@ -58,6 +58,8 @@ public interface NavigationAction {
 	
 	public boolean requestTitleUpdates();
 	
+	public boolean requestRefresh();
+	
 	public ParameterOptions getParameters();
 	
 	public void setParameters(Object[] parameters);

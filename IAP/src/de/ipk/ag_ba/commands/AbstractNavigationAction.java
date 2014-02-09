@@ -57,6 +57,11 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	}
 	
 	@Override
+	public boolean requestRefresh() {
+		return false;
+	}
+	
+	@Override
 	public ParameterOptions getParameters() {
 		return null;
 	}

@@ -28,6 +28,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private NavigationButton src;
 	private MongoDB m;
 	private final ObjectRef postFix = new ObjectRef("", "");
+	private boolean requestRefresh = false;
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
 		super("Compute Cluster");
@@ -37,6 +38,8 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			@SuppressWarnings("unused")
 			private String hostInfo, status3;
 			private double lastStatus = -1;
+			
+			private int initCnt = -1;
 			
 			@Override
 			public int getCurrentStatusValue() {
@@ -77,6 +80,14 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 							hl_filtered.get(ip).add(ch);
 							procCnt++;
 						}
+					}
+					if (initCnt < 0)
+						initCnt = procCnt;
+					if (procCnt < initCnt)
+						initCnt = procCnt;
+					if (procCnt > initCnt) {
+						initCnt = procCnt;
+						ActionCloudClusterHostInformation.this.requestRefresh = true;
 					}
 					hostInfo = hl_filtered.size() + " nodes, " + procCnt + " instances";
 					if (hl_filtered.size() > 0 && hl_filtered.size() < 4)
@@ -200,6 +211,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
+		requestRefresh = false;
 	}
 	
 	@Override
@@ -222,6 +234,15 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	@Override
 	public boolean requestTitleUpdates() {
 		return true;
+	}
+	
+	@Override
+	public boolean requestRefresh() {
+		if (requestRefresh) {
+			requestRefresh = false;
+			return true;
+		} else
+			return false;
 	}
 	
 	@Override
