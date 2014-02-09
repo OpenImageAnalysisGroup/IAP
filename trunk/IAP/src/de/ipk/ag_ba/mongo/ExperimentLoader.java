@@ -2,6 +2,7 @@ package de.ipk.ag_ba.mongo;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -144,7 +145,12 @@ public class ExperimentLoader implements RunnableOnDB {
 							}
 							DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
 									.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(100, ll.size()));
+							LinkedList<DBObject> sl = new LinkedList<DBObject>();
 							for (DBObject substance : subList) {
+								sl.add(substance);
+							}
+							while (!sl.isEmpty()) {
+								DBObject substance = sl.poll();
 								if (substance != null) {
 									if (optDBPbjectsOfSubstances != null)
 										optDBPbjectsOfSubstances.add(substance);
