@@ -62,7 +62,6 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
-import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -264,7 +263,6 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		transferFocusUpCycle();
 		removeAll();
 		updateLayout();
-		boolean removedOneItem = false;
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
 			if (target == PanelTarget.ACTION) {
@@ -289,7 +287,6 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 					continue;
 				String title = ne.getTitle();
 				if (title != null && title.contains("[REMOVE FROM UPDATE]")) {
-					removedOneItem = true;
 					continue;
 				}
 				if (ne instanceof StyleAware) {
@@ -368,20 +365,6 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		revalidate();
 		repaint();
 		
-		if (removedOneItem) {
-			if (target == PanelTarget.ACTION) {
-				BackgroundTaskHelper.executeLaterOnSwingTask(1000, new Runnable() {
-					@Override
-					public void run() {
-						ArrayList<NavigationButton> es = theOther.getEntitySet(false);
-						if (es != null && es.size() > 0) {
-							NavigationButton nb = es.get(es.size() - 1);
-							nb.performAction();
-						}
-					}
-				});
-			}
-		}
 		// for (NavigationButton n : cachedButtons.keySet())
 		// if (n != null)
 		// if (n.isRemoved())

@@ -184,4 +184,9 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		this.databaseIdOfNewestResultData = databaseIdOfNewestResultData;
 	}
 	
+	@Override
+	public boolean requestRefresh() {
+		return false;
+	}
+	
 }

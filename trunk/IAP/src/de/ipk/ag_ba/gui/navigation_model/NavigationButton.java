@@ -413,7 +413,7 @@ public class NavigationButton implements StyleAware {
 			
 			@Override
 			public void run() {
-				NavigationButton n = r_n.get();
+				final NavigationButton n = r_n.get();
 				JButton n1 = r_n1.get();
 				boolean imageUpdated = false;
 				if (n == null)
@@ -421,6 +421,14 @@ public class NavigationButton implements StyleAware {
 				if (n1 == null)
 					return;
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && !n.isRemoved()) {
+					if (n.getAction() != null && n.getAction().requestRefresh()) {
+						BackgroundTaskHelper.executeLaterOnSwingTask(1000, new Runnable() {
+							@Override
+							public void run() {
+								n.performAction();
+							}
+						});
+					}
 					String ai = n.getNavigationImage();
 					if (lastImage == null)
 						lastImage = ai;
@@ -478,10 +486,18 @@ public class NavigationButton implements StyleAware {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				NavigationButton n = wn.get();
+				final NavigationButton n = wn.get();
 				JButton n1 = wn1.get();
 				if (n1 == null || n == null)
 					return;
+				if (n.getAction() != null && n.getAction().requestRefresh()) {
+					BackgroundTaskHelper.executeLaterOnSwingTask(1000, new Runnable() {
+						@Override
+						public void run() {
+							n.performAction();
+						}
+					});
+				}
 				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
 					String title = n.getTitle();
 					n1.setText(title);
