@@ -16,6 +16,7 @@ import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MeasurementFilter;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -1000,6 +1001,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (inVis == null && inFluo == null && inNir == null && inIr == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
 					+ ">ERROR: SNAPSHOT WITH NO VIS+FLUO+NIR+IR IMAGES");
+			return null;
+		}
+		
+		MeasurementFilter mf = IAPservice.getMeasurementFilter(id.getAnyInfo().getParentSample().getParentCondition().getExperimentHeader());
+		if (mf.isGlobalOutlierOrSpecificOutlier(inVis) || mf.isGlobalOutlierOrSpecificOutlier(inFluo) || mf.isGlobalOutlierOrSpecificOutlier(inNir) ||
+				mf.isGlobalOutlierOrSpecificOutlier(inIr)) {
+			// don't analyze snapshot if any input image type is marked as an outlier
 			return null;
 		}
 		
