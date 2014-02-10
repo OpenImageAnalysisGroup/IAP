@@ -246,6 +246,7 @@ public class CloudComputingService {
 																								+ StringManipulationTools.getStringList(params, " "));
 																						params.add(0, args[8]);
 																						Process ls_proc = Runtime.getRuntime().exec(params.toArray(new String[] {}), null, null);
+																						Thread.sleep(100);
 																					}
 																				}
 																			}
