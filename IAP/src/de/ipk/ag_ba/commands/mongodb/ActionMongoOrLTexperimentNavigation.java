@@ -210,11 +210,12 @@ public class ActionMongoOrLTexperimentNavigation extends
 		if (header.getStorageTime() != null &&
 				(header.getExperimentType() != null &&
 				header.getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString()))) {
-			if (header.getImportdate() != null)
-				add = "input age " + SystemAnalysis.getWaitTime(
-						System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>saved";
-			else
-				add = "storage time<br>undefined";
+			if (header.getImportusergroup() != null && !header.getImportusergroup().equalsIgnoreCase("temp"))
+				if (header.getImportdate() != null)
+					add = "input age " + SystemAnalysis.getWaitTime(
+							System.currentTimeMillis() - header.getImportdate().getTime(), 1) + "<br>saved";
+				else
+					add = "storage time<br>undefined";
 			t = header.getStorageTime().getTime();
 		}
 		String time = SystemAnalysis.getWaitTime(System.currentTimeMillis() - t, 1);
