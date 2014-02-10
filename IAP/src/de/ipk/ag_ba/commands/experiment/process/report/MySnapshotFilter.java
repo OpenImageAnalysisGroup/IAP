@@ -137,6 +137,8 @@ public class MySnapshotFilter implements SnapshotFilter {
 	
 	@Override
 	public boolean isGlobalOutlierOrSpecificOutlier(Object measurement) {
+		if (measurement == null)
+			return false;
 		NumericMeasurement3D nmi = (NumericMeasurement3D) measurement;
 		boolean isGlobalOutlier = filterOut(nmi.getQualityAnnotation(), nmi.getParentSample().getTime());
 		if (isGlobalOutlier)
