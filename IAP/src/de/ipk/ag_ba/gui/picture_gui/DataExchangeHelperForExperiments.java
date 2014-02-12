@@ -65,6 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
@@ -415,6 +416,10 @@ public class DataExchangeHelperForExperiments {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+					
+					Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+					exp = MappingData3DPath.merge(md, true);
+					
 					HashSet<String> speciesNames = new HashSet<String>();
 					for (SubstanceInterface si : exp)
 						for (ConditionInterface ci : si) {

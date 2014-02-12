@@ -47,15 +47,32 @@ public class GetMeasurements implements Runnable {
 					NumericMeasurementInterface nm = (NumericMeasurementInterface) meas;
 					Map<String, Object> attributes = new HashMap<String, Object>();
 					nm.fillAttributeMap(attributes);
+					
+					Map<String, Object> attributesOfSA = new HashMap<String, Object>();
+					nm.getParentSample().getSampleAverage().fillAttributeMap(attributesOfSA);
+					
+					for (String k : attributesOfSA.keySet()) {
+						if (!attributes.containsKey(k))
+							attributes.put(k, "<td/>");
+					}
+					
 					StringBuilder s = new StringBuilder();
-					s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+					s.append("<html><table border='1'><th>Property</th><th>Value</th><td>Sample Average</td></tr>");
 					if (sample.getSampleFineTimeOrRowId() != null)
 						s.append("<tr><td>Sample Time</td><td>" + sdf.format(new Date(sample.getSampleFineTimeOrRowId())) + "</td></tr>");
 					for (String id : attributes.keySet()) {
 						String idC = id;
 						if (idC != null && idC.equals("replicates"))
 							idC = "replicate ID";
-						s.append("<tr><td>" + idC + "</td><td>" + attributes.get(id) + "</td></tr>");
+						if (attributes.get(id) != null || attributesOfSA.get(id) != null) {
+							Object v = attributes.get(id);
+							if (v == null)
+								v = "</td>";
+							else
+								if (!(v + "").startsWith("<td/>"))
+									v = "<td>" + v + "</td>";
+							s.append("<tr><td>" + idC + "</td>" + v + "<td>" + attributesOfSA.get(id) + "</td></tr>");
+						}
 					}
 					s.append("</table></html>");
 					measNode.setTooltipInfo(s.toString());
