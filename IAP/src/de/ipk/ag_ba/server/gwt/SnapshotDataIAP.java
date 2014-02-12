@@ -644,7 +644,10 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getTreatment()));
 			row.add(new DateDoubleString(s.getSequence()));
 			row.add(new DateDoubleString(s.getTimePoint()));
-			row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
+			if (s.getSnapshotTime() != null)
+				row.add(new DateDoubleString(new Date(s.getSnapshotTime())));
+			else
+				row.add(new DateDoubleString(-1));
 			row.add(new DateDoubleString(Double.parseDouble(StringManipulationTools.getNumbersFromString(s.getTimePoint()))));
 			row.add(new DateDoubleString(fineTime));
 			row.add(new DateDoubleString(s.getWeightBefore()));
