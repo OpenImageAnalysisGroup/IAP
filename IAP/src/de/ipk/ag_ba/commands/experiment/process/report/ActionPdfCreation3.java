@@ -38,6 +38,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.PdfCreator;
 import de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -74,6 +75,12 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	private boolean useIndividualReportNames;
 	private String optCustomSubset;
 	private ExportSetting optCustomSubsetDef;
+	
+	private ExperimentInterface ratioExperiment;
+	
+	private boolean ratioCalc;
+	
+	private NavigationButton src;
 	
 	public ActionPdfCreation3(String tooltip,
 			boolean exportIndividualAngles,
@@ -235,13 +242,19 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;
+		if (ratioCalc && ratioExperiment != null) {
+			ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+			res.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(new ExperimentReference(ratioExperiment)), src.getGUIsetting()));
+			return res;
+		} else
+			return null;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		// res.add(src);
+		if (ratioCalc)
+			res.add(src);
 		return res;
 	}
 	
@@ -329,6 +342,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		this.src = src;
+		this.ratioCalc = false;
 		finalResultFileLocation = "";
 		ExperimentInterface experiment = experimentReference.getData(false, getStatusProvider());
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
@@ -348,6 +363,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						clustering = tso.getBval(0, false);
 				}
 			ConditionFilter cf = this;
+			this.ratioCalc = true;
 			if (ratio) {
 				if (status != null)
 					status.setCurrentStatusText2("Calculate stress-ratio");
@@ -364,7 +380,10 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				System.out.println("Substance-Count 3: " + experiment.size());
 				if (status != null)
 					status.setCurrentStatusText2("Stress model calculated");
-			}
+				
+				this.ratioExperiment = experiment;
+			} else
+				this.ratioExperiment = null;
 			
 			PdfCreator p = new PdfCreator(targetDirectoryOrTargetFile);
 			if (targetDirectoryOrTargetFile == null && useIndividualReportNames) {
