@@ -609,8 +609,8 @@ public class IAPservice {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
-		System.out.println("Store all angles? " + prepareTransportToBrowser);
-		System.out.println("Store all replicates? " + prepareTransportToBrowser);
+		System.out.println("Store all angles? " + storeAllAngleValues);
+		System.out.println("Store all replicates? " + storeAllReplicates);
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
 		if (optStatus != null)
@@ -858,7 +858,7 @@ public class IAPservice {
 									optSubstanceIds.put(sub, optSubstanceIds.size());
 								}
 								int idx = optSubstanceIds.get(sub);
-								sample.recalculateSampleAverage();
+								// sample.recalculateSampleAverage();
 								if (sample.getSampleAverage() != null && qualityFilter == null) {
 									double vvv = sample.calcMean();
 									sn.storeValue(idx, vvv);
