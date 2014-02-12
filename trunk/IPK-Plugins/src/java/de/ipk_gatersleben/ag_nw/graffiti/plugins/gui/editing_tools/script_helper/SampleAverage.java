@@ -24,6 +24,18 @@ public class SampleAverage implements SampleAverageInterface {
 		calculateValuesFromSampleData();
 	}
 	
+	@Override
+	public SampleAverage clone() {
+		SampleAverage sa = new SampleAverage(parentSample);
+		sa.max = max;
+		sa.min = min;
+		sa.stddev = stddev;
+		sa.value = value;
+		sa.replicates = replicates;
+		sa.ownUnit = ownUnit;
+		return sa;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public SampleAverage(SampleInterface sample, Map map) {
 		this(sample);
@@ -103,8 +115,7 @@ public class SampleAverage implements SampleAverageInterface {
 			setStddev(Double.NaN);
 			setValue(Double.NaN);
 		} else {
-			int n = parentSample.size();
-			n = 0;
+			int n = 0;
 			
 			setReplicateId(parentSample.size());
 			

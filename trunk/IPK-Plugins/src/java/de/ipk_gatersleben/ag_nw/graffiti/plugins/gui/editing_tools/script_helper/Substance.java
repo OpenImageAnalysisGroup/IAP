@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class Substance implements SubstanceInterface {
 	
 	HashMap<Integer, String> synonyms = null; // new HashMap<Integer, String>()
 	
-	private final ArrayList<ConditionInterface> conditions = new ArrayList<ConditionInterface>();
+	private final LinkedList<ConditionInterface> conditions = new LinkedList<ConditionInterface>();
 	
 	public Substance() {
 		// empty
@@ -302,6 +303,10 @@ public class Substance implements SubstanceInterface {
 			if (targetSample == null) {
 				// completely new substance with all new data
 				targetSample = sample.clone(targetCondition);
+				if (ignoreSnapshotFineTime) {
+					targetSample.setSampleFineTimeOrRowId(null);
+					targetSample.setSampleAverage(null);
+				}
 				synchronized (targetCondition) {
 					targetCondition.add(targetSample);
 				}

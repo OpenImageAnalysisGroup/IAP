@@ -251,19 +251,18 @@ public class Condition implements ConditionInterface {
 		LinkedList<MyComparableDataPoint> result = new LinkedList<MyComparableDataPoint>();
 		for (SampleInterface s : this) {
 			SampleAverageInterface m = s.getSampleAverage();
-			boolean ismean = false;
-			double mean = m.getParentSample().getSampleAverage().getValue();
-			double stddev = m.getParentSample().getSampleAverage().getStdDev();
-			String serie = m.getParentSample().getParentCondition().getConditionName();
-			String timeUnitAndTime = m.getParentSample().getSampleTime();
+			boolean ismean = true;
+			double mean = m.getValue();
+			double stddev = m.getStdDev();
+			String serie = s.getParentCondition().getConditionName();
+			String timeUnitAndTime = s.getSampleTime();
 			String measurementUnit = m.getUnit();
-			long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m
-					.getParentSample().getSampleFineTimeOrRowId() : m
-					.getParentSample().getTime();
-			TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
-			String timeUnit = m.getParentSample().getTimeUnit();
-			int seriesID = m.getParentSample().getParentCondition().getSeriesId();
-			int replicate = m.getParentSample().size();
+			long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null &&
+					s.getSampleFineTimeOrRowId() != null && s.getSampleFineTimeOrRowId() > 0 ? s.getSampleFineTimeOrRowId() : s.getTime();
+			TtestInfo ttestInfo = s.getTtestInfo();
+			String timeUnit = s.getTimeUnit();
+			int seriesID = s.getParentCondition().getSeriesId();
+			int replicate = s.size();
 			Measurement reference = m;
 			MyComparableDataPoint mcdp = new MyComparableDataPoint(ismean, mean, stddev, serie, timeUnitAndTime,
 					measurementUnit, timeValueForComparison, m.getParentSample().getTime(), ttestInfo == TtestInfo.REFERENCE, ttestInfo == TtestInfo.H1,

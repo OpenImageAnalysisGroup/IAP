@@ -65,8 +65,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	@Override
 	public boolean containsAll(Collection<?> arg0);
 	
-	public void ensureCapacity(int minCapacity);
-	
 	@Override
 	public int indexOf(Object o);
 	
@@ -107,8 +105,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public String toString();
 	
 	public String toStringWithErrorThrowing() throws IOException, TransformerException, JDOMException;
-	
-	public void trimToSize();
 	
 	@Override
 	public int size();
