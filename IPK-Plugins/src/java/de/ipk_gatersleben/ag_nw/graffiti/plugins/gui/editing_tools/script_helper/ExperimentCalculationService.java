@@ -50,6 +50,7 @@ public class ExperimentCalculationService {
 			} catch (Exception e) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: can't analyze substance " + si.getName() + " for histogram filtering!");
 			}
+			boolean varietyMatch = false;
 			for (ConditionInterface ci : si) {
 				ci.setExperimentHeader(res.getHeader());
 				if (cf.filterConditionOut(ci))
@@ -59,6 +60,13 @@ public class ExperimentCalculationService {
 					boolean v = ci.getTreatment() != null && ci.getTreatment().toUpperCase().contains(t.toUpperCase());
 					if (v)
 						reference = true;
+					else {
+						v = ci.getVariety() != null && ci.getVariety().toUpperCase().contains(t.toUpperCase());
+						if (v) {
+							reference = true;
+							varietyMatch = true;
+						}
+					}
 				}
 				if (reference) {
 					// nothing to do here
@@ -71,11 +79,18 @@ public class ExperimentCalculationService {
 							boolean v = ciPotentialRef.getTreatment() != null && ciPotentialRef.getTreatment().toUpperCase().contains(t.toUpperCase());
 							if (v)
 								ref = true;
+							else {
+								v = ciPotentialRef.getVariety() != null && ciPotentialRef.getVariety().toUpperCase().contains(t.toUpperCase());
+								if (v) {
+									ref = true;
+									varietyMatch = true;
+								}
+							}
 						}
 						if (ref) {
 							boolean speciesOK = (ci.getSpecies() + "").equals(ciPotentialRef.getSpecies() + "");
 							boolean genotypeOK = (ci.getGenotype() + "").equals(ciPotentialRef.getGenotype() + "");
-							boolean varietyOK = (ci.getVariety() + "").equals(ciPotentialRef.getVariety() + "");
+							boolean varietyOK = varietyMatch ? true : (ci.getVariety() + "").equals(ciPotentialRef.getVariety() + "");
 							boolean growthConditionsOK = true;// (ci.getGrowthconditions() + "").equals(ciPotentialRef.getGrowthconditions() + "");
 							boolean sequenceOK = (ci.getSequence() + "").equals(ciPotentialRef.getSequence() + "");
 							boolean allOK = speciesOK && genotypeOK && varietyOK && growthConditionsOK && sequenceOK;
@@ -87,19 +102,19 @@ public class ExperimentCalculationService {
 						}
 					}
 					if (ciRef != null)
-						processRef(ciRef, ci, res, si, pf, addedSubstances);
+						processRef(ciRef, ci, res, si, pf, addedSubstances, varietyMatch);
 				}
 			}
 		}
 		res.setHeader(experiment.getHeader().clone());
-		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + "\\ (analysis of stress impact)");
+		res.getHeader().setExperimentname(res.getHeader().getExperimentName() + " \\\\ (analysis of stress-impact)");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("");
 		return res;
 	}
 	
 	private void processRef(ConditionInterface ciRef, ConditionInterface ci, ExperimentInterface res,
-			SubstanceInterface si, MeasurementFilter pf, HashSet<String> addedSubstances) {
+			SubstanceInterface si, MeasurementFilter pf, HashSet<String> addedSubstances, boolean varietyMatch) {
 		// found reference for "ci"
 		TreeSet<Integer> timePointsAvailForBoth = new TreeSet<Integer>();
 		for (SampleInterface sample : ci)
@@ -212,17 +227,27 @@ public class ExperimentCalculationService {
 			// http://www.cartage.org.lb/en/themes/sciences/chemistry/miscellenous/helpfile/erroranalysis/multiplicationdivision/multiplicationdivision.htm
 			double a = (stdDev / ciAVG) * (stdDev / ciAVG);
 			double b = (stdDevRef / ciRefAVG) * (stdDevRef / ciRefAVG);
-			double ratioStdDev = Math.sqrt(a + b);
+			double ratioStdDev = Math.sqrt(a + b) * (ciAVG / ciRefAVG);
 			if (!Double.isNaN(ratio) && !Double.isInfinite(ratio)) {
-				String newTreatment = ci.getTreatment() + " / " + ciRef.getTreatment();
-				newC.setTreatment(newTreatment);
+				if (varietyMatch) {
+					String newVariety = ci.getVariety() + " / " + ciRef.getVariety();
+					newC.setVariety(newVariety);
+				} else {
+					String newTreatment = ci.getTreatment() + " / " + ciRef.getTreatment();
+					newC.setTreatment(newTreatment);
+				}
 				SampleInterface newSample = ciSampleExample.get(time).clone(newC);
-				newC.add(newSample);
 				NumericMeasurementInterface newValue = ciValueExample.get(time).clone(newSample);
-				newSample.add(newValue);
+				newSample = newValue.getParentSample();
 				newValue.setValue(ratio);
+				newValue.setUnit(null);
+				newValue.setQualityAnnotation(null);
+				newSample.setSampleFineTimeOrRowId(null);
+				newSample.add(newValue);
 				newSample.getSampleAverage().setValue(ratio);
 				newSample.getSampleAverage().setStddev(ratioStdDev);
+				newSample.getSampleAverage().setUnit(null);
+				newC.add(newSample);
 			}
 		}
 		if (newC.size() > 0) {

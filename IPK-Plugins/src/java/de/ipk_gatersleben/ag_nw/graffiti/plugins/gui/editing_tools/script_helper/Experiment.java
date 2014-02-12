@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -56,12 +57,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
  */
 public class Experiment implements ExperimentInterface {
 	
-	ArrayList<SubstanceInterface> md;
+	LinkedList<SubstanceInterface> md;
 	private ExperimentHeaderInterface header;
 	static DataMappingTypeManagerInterface typemanager = new DataMappingTypeManager();
 	
 	public Experiment() {
-		md = new ArrayList<SubstanceInterface>();
+		md = new LinkedList<SubstanceInterface>();
 		header = new ExperimentHeader();
 	}
 	
@@ -130,7 +131,7 @@ public class Experiment implements ExperimentInterface {
 		if (isEmpty())
 			return header.getExperimentName();
 		else
-			return findHeader(null, this).getExperimentName();
+			return findHeader(header, this).getExperimentName();
 	}
 	
 	@Override
@@ -243,6 +244,8 @@ public class Experiment implements ExperimentInterface {
 		if (isEmpty())
 			return header;
 		else {
+			if (header != null)
+				return header;
 			for (SubstanceInterface m : this)
 				for (ConditionInterface s : m)
 					return s.getExperimentHeader();
@@ -585,11 +588,6 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	@Override
-	public void ensureCapacity(int minCapacity) {
-		md.ensureCapacity(minCapacity);
-	}
-	
-	@Override
 	public int indexOf(Object o) {
 		return md.indexOf(o);
 	}
@@ -671,11 +669,6 @@ public class Experiment implements ExperimentInterface {
 	public String toStringWithErrorThrowing() throws IOException,
 			TransformerException, JDOMException {
 		return getString(this, null);
-	}
-	
-	@Override
-	public void trimToSize() {
-		md.trimToSize();
 	}
 	
 	@Override

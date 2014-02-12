@@ -47,7 +47,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.ExperimentDataDragAndDropHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	private static final long serialVersionUID = 1L;
@@ -394,9 +394,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	public synchronized static void addOrUpdateExperimentPane(ProjectEntity pe) {
 		for (ExperimentDataInfoPane expPane : shownExpPanes) {
-			if (
-			// expPane.getDocument()==pe.getDocument() ||
-			expPane.getExperimentName().equals(pe.getExperimentName())) {
+			if (expPane.getExperimentName().equals(pe.getExperimentName())) {
 				expPane.updateGUIforUpdatedExperimentData(pe.getExperimentName(), pe.getDocumentData(), pe.getGUI());
 				return;
 			}
@@ -406,9 +404,7 @@ public class TabDBE extends InspectorTab implements ExperimentDataPresenter {
 	
 	public synchronized static void addOrUpdateExperimentPane(MainFrame mainFrame, ProjectEntity pe) {
 		for (ExperimentDataInfoPane expPane : shownExpPanes) {
-			if (
-			// expPane.getDocument()==pe.getDocument() ||
-			expPane.getExperimentName().equals(pe.getExperimentName())) {
+			if (expPane.getExperimentName().equals(pe.getExperimentName())) {
 				expPane.updateGUIforUpdatedExperimentData(pe.getExperimentName(), pe.getDocumentData(), pe.getGUI());
 				return;
 			}

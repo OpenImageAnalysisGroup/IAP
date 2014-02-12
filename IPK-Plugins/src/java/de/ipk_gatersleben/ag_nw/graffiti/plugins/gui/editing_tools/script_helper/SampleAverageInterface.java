@@ -89,4 +89,6 @@ public interface SampleAverageInterface extends Measurement {
 	@Override
 	public abstract void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
+	public abstract SampleAverageInterface clone();
+	
 }

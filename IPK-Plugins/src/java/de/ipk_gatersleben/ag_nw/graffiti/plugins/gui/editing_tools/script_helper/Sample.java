@@ -453,6 +453,7 @@ public class Sample implements SampleInterface {
 		s.setTimeUnit(getTimeUnit());
 		s.setTtestInfo(getTtestInfo());
 		s.setFiles(getFiles());
+		s.setSampleAverage(getSampleAverage().clone());
 		return s;
 	}
 	
