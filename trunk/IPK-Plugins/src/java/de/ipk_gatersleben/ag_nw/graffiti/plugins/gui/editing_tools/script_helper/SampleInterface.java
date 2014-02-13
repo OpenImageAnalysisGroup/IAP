@@ -44,7 +44,7 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	
 	public abstract int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime);
 	
-	public abstract void recalculateSampleAverage();
+	public abstract void recalculateSampleAverage(boolean onlyIfNull);
 	
 	public abstract TtestInfo getTtestInfo();
 	

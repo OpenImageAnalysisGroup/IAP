@@ -244,6 +244,7 @@ public class ExperimentCalculationService {
 				newValue.setQualityAnnotation(null);
 				newSample.setSampleFineTimeOrRowId(null);
 				newSample.add(newValue);
+				newSample.setSampleAverage(null);
 				newSample.getSampleAverage().setValue(ratio);
 				newSample.getSampleAverage().setStddev(ratioStdDev);
 				newSample.getSampleAverage().setUnit(null);

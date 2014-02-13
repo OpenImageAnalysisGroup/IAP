@@ -305,18 +305,19 @@ public class Substance implements SubstanceInterface {
 				targetSample = sample.clone(targetCondition);
 				if (ignoreSnapshotFineTime) {
 					targetSample.setSampleFineTimeOrRowId(null);
-					targetSample.setSampleAverage(null);
 				}
 				synchronized (targetCondition) {
 					targetCondition.add(targetSample);
 				}
-				
-			}
+			} else
+				targetSample.setSampleAverage(null);
 		}
 		synchronized (targetSample) {
 			for (NumericMeasurementInterface newMeasurement : newMeasurementsOfSingleSample)
-				if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement)))
-					targetSample.add(newMeasurement);
+				if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement))) {
+					NumericMeasurementInterface nmn = newMeasurement.clone(targetSample);
+					targetSample.add(nmn);
+				}
 		}
 	}
 	
