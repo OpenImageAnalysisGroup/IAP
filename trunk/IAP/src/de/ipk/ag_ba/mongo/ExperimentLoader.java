@@ -2,6 +2,7 @@ package de.ipk.ag_ba.mongo;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -115,19 +116,6 @@ public class ExperimentLoader implements RunnableOnDB {
 		if (!quickLoaded) {
 			DBObject expref = dbr.fetch();
 			if (expref != null) {
-				BasicDBList subList = (BasicDBList) expref.get("substances");
-				if (subList != null) {
-					int n = subList.size();
-					int idxS = 0;
-					for (Object co : subList) {
-						DBObject substance = (DBObject) co;
-						if (optDBPbjectsOfSubstances != null)
-							optDBPbjectsOfSubstances.add(substance);
-						idxS++;
-						processSubstance(db, experiment, substance, collCond, optStatusProvider, 100d / subList.size(), optDBPbjectsOfConditions, idxS, n);
-					}
-					subList = null;
-				}
 				if (MongoDB.getEnsureIndex())
 					db.getCollection("substances").ensureIndex("_id");
 				final BasicDBList l = (BasicDBList) expref.get("substance_ids");
@@ -138,6 +126,8 @@ public class ExperimentLoader implements RunnableOnDB {
 					Runnable r = new Runnable() {
 						@Override
 						public void run() {
+							if (optStatusProvider != null)
+								optStatusProvider.setCurrentStatusText1("Load substance objects");
 							BasicDBList ll = new BasicDBList();
 							for (Object o : l) {
 								if (o != null)
@@ -149,18 +139,80 @@ public class ExperimentLoader implements RunnableOnDB {
 							for (DBObject substance : subList) {
 								sl.add(substance);
 							}
-							while (!sl.isEmpty()) {
-								DBObject substance = sl.poll();
+							subList.close();
+							
+							if (optStatusProvider != null)
+								optStatusProvider.setCurrentStatusText1("Enumerate conditions");
+							// load all conditions
+							HashMap<String, Substance3D> condId2substanceId = new HashMap<String, Substance3D>();
+							ll = new BasicDBList();
+							int idx = 0;
+							int max = subList.size();
+							for (DBObject s : subList) {
+								DBObject substance = s;
 								if (substance != null) {
 									if (optDBPbjectsOfSubstances != null)
 										optDBPbjectsOfSubstances.add(substance);
 									tsoIdxS.addInt(1);
-									processSubstance(db, experiment, substance, collCond, optStatusProvider,
-											100d / n, optDBPbjectsOfConditions,
-											tsoIdxS.getInt(), n);
-									substance = null;
+									Substance3D sub = processSubstance(db, experiment, substance);
+									
+									BasicDBList condIdList = (BasicDBList) s.get("condition_ids");
+									for (Object o : condIdList) {
+										if (o != null) {
+											String id = o + "";
+											ll.add(new ObjectId(id));
+											condId2substanceId.put(id, sub);
+										}
+										if (optStatusProvider != null)
+											optStatusProvider.setCurrentStatusText1("Enumerate conditions (" + condId2substanceId.size() + ")");
+									}
+									idx++;
+									if (optStatusProvider != null)
+										optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
 								}
 							}
+							
+							if (optStatusProvider != null)
+								optStatusProvider.setCurrentStatusText1("Load conditions (" + condId2substanceId.size() + ")");
+							
+							BasicDBObject fields = new BasicDBObject("settings", 0);
+							fields.put("remark", 0);
+							fields.put("startdate", 0);
+							fields.put("experimenttype", 0);
+							fields.put("importdate", 0);
+							fields.put("experimentname", 0);
+							fields.put("coordinator", 0);
+							fields.put("storagedate", 0);
+							
+							DBCursor condL = collCond.find(
+									new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields)
+									.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 200));
+							idx = 0;
+							max = condId2substanceId.size();
+							for (DBObject cond : condL) {
+								String id = cond.get("_id") + "";
+								Substance3D subID = condId2substanceId.get(id);
+								
+								processCondition(subID, cond, optStatusProvider, max);
+								
+								idx++;
+								if (optStatusProvider != null)
+									optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
+								if (optStatusProvider != null) {
+									long sysmem = SystemAnalysis.getMemoryMB();
+									long usedmem = SystemAnalysis.getUsedMemoryInMB();
+									String memInfo = StringManipulationTools.formatNumber(usedmem * 100d / sysmem, 0) + "%";
+									optStatusProvider.setCurrentStatusText1("Load condition data (" + idx + "/" + condId2substanceId.size() + ")");
+									optStatusProvider.setCurrentStatusText2("<font color='gray'><small>(" + usedmem + " / " + sysmem + " MB RAM used [" + memInfo
+											+ "])</small></font>");
+								}
+							}
+							condL.close();
+							
+							if (optStatusProvider != null) {
+								optStatusProvider.setCurrentStatusText1("Dataset loaded");
+							}
+							
 						}
 					};
 					try {
@@ -196,23 +248,14 @@ public class ExperimentLoader implements RunnableOnDB {
 		// }
 	}
 	
-	void processSubstance(DB db, ExperimentInterface experiment, DBObject substance,
-			DBCollection collCond,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double smallProgressStep,
-			ArrayList<DBObject> optDBObjectsConditions, int idxS, int n) {
+	Substance3D processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
 		@SuppressWarnings("unchecked")
 		Substance3D s3d = new Substance3D(fv((Map) substance));
-		BasicDBList condList = (BasicDBList) substance.get("conditions");
 		
 		if (s3d.getName() != null && s3d.getName().contains("..")) {
 			s3d.setName(StringManipulationTools.stringReplace(s3d.getName(), "..", "."));
 		}
 		
-		if (optStatusProvider != null) {
-			String memInfo = StringManipulationTools.formatNumber(SystemAnalysis.getUsedMemoryInMB() * 100d / SystemAnalysis.getMemoryMB(), 0) + "%";
-			optStatusProvider.setCurrentStatusText1("Load subset " + idxS + "/" + n + ", " + memInfo + " RAM used<br><font color='gray'><small>(" + s3d.getName()
-					+ ")</small></font>");
-		}
 		synchronized (experiment) {
 			boolean add = true;
 			for (SubstanceInterface so : experiment)
@@ -224,47 +267,8 @@ public class ExperimentLoader implements RunnableOnDB {
 			if (add)
 				experiment.add(s3d);
 		}
-		if (condList != null) {
-			int nc = condList.size();
-			for (Object co : condList) {
-				DBObject cond = (DBObject) co;
-				if (optDBObjectsConditions != null)
-					optDBObjectsConditions.add(cond);
-				processCondition(s3d, cond, optStatusProvider, nc);
-			}
-			condList = null;
-		}
-		if (ensureIndex)
-			collCond.ensureIndex("_id");
 		
-		BasicDBList condIdList = (BasicDBList) substance.get("condition_ids");
-		if (condIdList != null) {
-			double max = condIdList.size();
-			
-			BasicDBList ll = new BasicDBList();
-			for (Object o : condIdList)
-				if (o != null)
-					ll.add(new ObjectId(o + ""));
-			DBCursor condL = collCond.find(
-					new BasicDBObject("_id", new BasicDBObject("$in", ll))
-					).hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 100));
-			ArrayList<DBObject> cl = new ArrayList<DBObject>();
-			for (DBObject c : condL)
-				cl.add(c);
-			
-			for (DBObject cond : cl) {
-				try {
-					if (optDBObjectsConditions != null)
-						optDBObjectsConditions.add(cond);
-					processCondition(s3d, cond, optStatusProvider, max);
-					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusValueFineAdd(smallProgressStep * 1 / max);
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-				}
-			}
-			condL.close();
-		}
+		return s3d;
 	}
 	
 	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {

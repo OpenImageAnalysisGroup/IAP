@@ -499,6 +499,14 @@ public class ExperimentSaver implements RunnableOnDB {
 			attributes.clear();
 			c.fillAttributeMap(attributes);
 			condition = new BasicDBObject(filter(attributes));
+			condition.remove("settings");
+			condition.remove("remark");
+			condition.remove("startdate");
+			condition.remove("experimenttype");
+			condition.remove("importdate");
+			condition.remove("experimentname");
+			condition.remove("coordinator");
+			condition.remove("storagedate");
 		}
 		
 		List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
