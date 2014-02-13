@@ -114,14 +114,14 @@ public class MappingData3DPath {
 					if (optStatus != null)
 						optStatus.setCurrentStatusText2("Path Object " + idx.getInt() + "/" + max);
 				}
-				for (SubstanceInterface si : experiment)
-					for (ConditionInterface ci : si)
-						for (SampleInterface s : ci)
-							s.recalculateSampleAverage();
 			} finally {
 				// lock.release();
 			}
 		}
+		for (SubstanceInterface si : experiment)
+			for (ConditionInterface ci : si)
+				for (SampleInterface s : ci)
+					s.recalculateSampleAverage(true);
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Merged Mapping Paths");
 		return experiment;
