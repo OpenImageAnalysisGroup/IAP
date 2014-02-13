@@ -70,14 +70,18 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public String toString() {
 		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0) {
 			if (position != null && positionUnit != null)
-				return getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ", " + getQualityAnnotation() + ")";
+				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " (" + position
+						+ " " + positionUnit + ", "
+						+ getQualityAnnotation() + ")";
 			else
-				return getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
+				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " ("
+						+ getQualityAnnotation() + ")";
 		} else {
 			if (position != null && positionUnit != null)
-				return getValue() + " " + getUnit() + " (" + position + " " + positionUnit + ")";
+				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " (" + position
+						+ " " + positionUnit + ")";
 			else
-				return getValue() + " " + getUnit();
+				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "");
 		}
 	}
 	
