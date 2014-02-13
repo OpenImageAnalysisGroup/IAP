@@ -227,7 +227,7 @@ public class ExperimentCalculationService {
 			// http://www.cartage.org.lb/en/themes/sciences/chemistry/miscellenous/helpfile/erroranalysis/multiplicationdivision/multiplicationdivision.htm
 			double a = (stdDev / ciAVG) * (stdDev / ciAVG);
 			double b = (stdDevRef / ciRefAVG) * (stdDevRef / ciRefAVG);
-			double ratioStdDev = Math.sqrt(a + b) * (ciAVG / ciRefAVG);
+			double ratioStdDev = Math.sqrt(a + b) * ratio;
 			if (!Double.isNaN(ratio) && !Double.isInfinite(ratio)) {
 				if (varietyMatch) {
 					String newVariety = ci.getVariety() + " / " + ciRef.getVariety();
