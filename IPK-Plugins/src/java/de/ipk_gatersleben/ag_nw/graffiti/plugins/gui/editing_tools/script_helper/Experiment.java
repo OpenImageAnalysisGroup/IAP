@@ -1238,7 +1238,7 @@ public class Experiment implements ExperimentInterface {
 					}
 					
 					for (SampleInterface sam : firstcondition)
-						sam.recalculateSampleAverage();
+						sam.recalculateSampleAverage(false);
 					
 				}
 		}

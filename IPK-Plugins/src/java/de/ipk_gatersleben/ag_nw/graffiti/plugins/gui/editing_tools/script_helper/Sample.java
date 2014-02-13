@@ -47,7 +47,7 @@ public class Sample implements SampleInterface {
 		getXMLAttributeString(r);
 		r.append(">");
 		if (sampleAverage == null && size() > 0)
-			recalculateSampleAverage();
+			recalculateSampleAverage(false);
 		if (sampleAverage != null)
 			sampleAverage.getString(r);
 		getStringOfChildren(r);
@@ -97,7 +97,7 @@ public class Sample implements SampleInterface {
 	@Override
 	public SampleAverageInterface getSampleAverage() {
 		if (sampleAverage == null)
-			recalculateSampleAverage();
+			recalculateSampleAverage(false);
 		return sampleAverage;
 	}
 	
@@ -146,12 +146,14 @@ public class Sample implements SampleInterface {
 	}
 	
 	@Override
-	public void recalculateSampleAverage() {
+	public void recalculateSampleAverage(boolean onlyIfNull) {
 		if (sampleAverage == null) {
 			if (size() > 0)
 				sampleAverage = Experiment.getTypeManager().getNewSampleAverage(this);
-		} else
 			sampleAverage.calculateValuesFromSampleData();
+		} else
+			if (!onlyIfNull)
+				sampleAverage.calculateValuesFromSampleData();
 	}
 	
 	@Override

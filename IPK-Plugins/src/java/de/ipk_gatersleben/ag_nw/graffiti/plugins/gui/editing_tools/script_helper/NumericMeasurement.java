@@ -245,8 +245,9 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	@Override
 	public String toString() {
 		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0)
-			return getValue() + " " + getUnit() + " (" + getQualityAnnotation() + ")";
+			return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + " " + (getUnit() != null ? getUnit() : "") + " ("
+					+ getQualityAnnotation() + ")";
 		else
-			return getValue() + " " + getUnit();
+			return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + " " + (getUnit() != null ? getUnit() : "");
 	}
 }

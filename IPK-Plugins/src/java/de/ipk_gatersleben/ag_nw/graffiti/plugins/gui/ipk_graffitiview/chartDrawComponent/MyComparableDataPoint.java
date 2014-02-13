@@ -164,7 +164,7 @@ public class MyComparableDataPoint implements Comparable<Object> {
 		if (removeOutlierFromXMLreference) {
 			SampleInterface sampleNode = xmlReference.getParentSample();
 			if (sampleNode.remove(xmlReference))
-				sampleNode.recalculateSampleAverage();
+				sampleNode.recalculateSampleAverage(false);
 			else
 				ErrorMsg.addErrorMessage("Internal Error: Data point (outlier could not be removed from the dataset!");
 		}
