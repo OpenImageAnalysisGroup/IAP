@@ -1796,7 +1796,7 @@ public class IAPservice {
 			o.getParentSample().remove(o);
 		}
 		for (SampleInterface s : samplesWithOutliers2valueCnt.keySet()) {
-			s.recalculateSampleAverage();
+			s.recalculateSampleAverage(false);
 			if (s.size() == 0 && samplesWithOutliers2valueCnt.get(s) > 0)
 				s.getParentCondition().remove(s);
 		}
