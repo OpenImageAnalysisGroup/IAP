@@ -132,8 +132,8 @@ public class ExperimentCalculationService {
 		HashMap<Integer, NumericMeasurementInterface> ciValueExample = new HashMap<Integer, NumericMeasurementInterface>();
 		for (SampleInterface sample : ci) {
 			if (timePointsAvailForBoth.contains(sample.getTime())) {
-				Double sampleAverageValue = sample.getSampleAverage().getValue(pf);
-				if (sampleAverageValue == null || Double.isNaN(sampleAverageValue) || Double.isInfinite(sampleAverageValue))
+				Double sampleValue = sample.getSampleAverage().getValue(pf);
+				if (sampleValue == null || Double.isNaN(sampleValue) || Double.isInfinite(sampleValue))
 					continue;
 				if (!ciSampleExample.containsKey(sample.getTime()))
 					ciSampleExample.put(sample.getTime(), sample);
@@ -146,14 +146,14 @@ public class ExperimentCalculationService {
 				Double s = ciSum.get(sample.getTime());
 				if (s == null)
 					s = 0d;
-				s += sampleAverageValue;
+				s += sampleValue;
 				ciSum.put(sample.getTime(), s);
 				if (!ciN.containsKey(sample.getTime())) {
 					ciN.put(sample.getTime(), 1);
 					ciValues.put(sample.getTime(), new ArrayList<Double>());
 				} else
 					ciN.put(sample.getTime(), ciN.get(sample.getTime()) + 1);
-				ciValues.get(sample.getTime()).add(s);
+				ciValues.get(sample.getTime()).add(sampleValue);
 			}
 		}
 		
@@ -162,20 +162,20 @@ public class ExperimentCalculationService {
 		HashMap<Integer, Integer> ciRefN = new HashMap<Integer, Integer>();
 		for (SampleInterface sample : ciRef) {
 			if (timePointsAvailForBoth.contains(sample.getTime())) {
-				Double sampleAverageValue = sample.getSampleAverage().getValue(pf);
-				if (sampleAverageValue == null || Double.isNaN(sampleAverageValue) || Double.isInfinite(sampleAverageValue))
+				Double sampleValue = sample.getSampleAverage().getValue(pf);
+				if (sampleValue == null || Double.isNaN(sampleValue) || Double.isInfinite(sampleValue))
 					continue;
 				Double s = ciRefSum.get(sample.getTime());
 				if (s == null)
 					s = 0d;
-				s += sampleAverageValue;
+				s += sampleValue;
 				ciRefSum.put(sample.getTime(), s);
 				if (!ciRefN.containsKey(sample.getTime())) {
 					ciRefN.put(sample.getTime(), 1);
 					ciRefValues.put(sample.getTime(), new ArrayList<Double>());
 				} else
 					ciRefN.put(sample.getTime(), ciRefN.get(sample.getTime()) + 1);
-				ciRefValues.get(sample.getTime()).add(s);
+				ciRefValues.get(sample.getTime()).add(sampleValue);
 			}
 		}
 		SubstanceInterface newS = null;
