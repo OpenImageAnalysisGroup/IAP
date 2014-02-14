@@ -33,7 +33,6 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -42,19 +41,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * This Block calculates leaf tips and some features related to the leaf tips. (It can also used for parameter tuning.)
  **/
 public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
-	Image changedVis;
-	Image changedVisMask;
 	boolean calcOnVis = false;
-	boolean calcOnFluo = false;
-	boolean calcOnNir = false;
-	
-	@Override
-	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		if (!calcOnVis) {
-			processedImages.setVis(changedVis);
-			processedMasks.setVis(changedVisMask);
-		}
-	}
 	
 	@Override
 	protected Image processVISmask() {
@@ -68,20 +55,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
-		calcOnFluo = getBoolean("Calculate on Fluo Image", true);
+		calcOnVis = getBoolean("Calculate on Vis Image", false);
 		Image img = input().masks().fluo();
 		if (!calcOnVis && options.getCameraPosition() == CameraPosition.SIDE && img != null) {
-			img.show("input leaftips", false);
-			return doLeafTipAnalysis(img);
-		} else
-			return img;
-	}
-	
-	@Override
-	protected Image processNIRmask() {
-		calcOnNir = getBoolean("Calculate on Nir Image", false);
-		Image img = input().masks().nir();
-		if (calcOnNir && options.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			img.show("input leaftips", false);
 			return doLeafTipAnalysis(img);
 		} else
@@ -133,7 +109,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		// get skeleton-image to connect lose leaves and for optimization
 		Image skel = null;
-		if (getBoolean("connect leafs (based on skeleton)", true) && !calcOnVis) {
+		if (getBoolean("connect leafs (based on skeleton)", true)) {
 			skel = getProperties().getImage("skeleton_fluo");
 			
 			if (skel != null)
@@ -167,7 +143,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int borderLength = (int) io.getResultsTable().getValue("border", 0);
 		Image borderimg = io.copy().getImage();
 		
-		borderimg.show("border_img", false);
+		borderimg.show("border_img", debugValues);
 		
 		// get border list
 		int[][] borderMap = io.getImageAs2dArray();
@@ -206,6 +182,49 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		getProperties().storeResults("RESULT_side.", "|SUSAN_corner_detection", rt, getBlockPosition());
 		
 		return inputImage;
+	}
+	
+	private void runOptimization(Image inputImage, Image mask, Image imgorig, ArrayList<int[]> borderListList, ResultsTableWithUnits rt, int stepsize, Image skel) {
+		// get average leaf width, used to estimate initial parameters
+		int avg_width;
+		
+		if (skel != null) {
+			int leaflength = skel.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
+			int area = imgorig.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
+			
+			if (leaflength <= 0 || area <= 0)
+				return;
+			
+			avg_width = area / leaflength;
+		} else
+			avg_width = 10;
+		
+		// optimize loop
+		cd: for (int cd = avg_width; cd <= avg_width * 2; cd++) {
+			// for (int cd = 25; cd <= 26; cd++) {
+			if (cd == 0)
+				continue cd;
+			gt: for (int i = 20; i < 40; i++) {
+				// gt: for (int i = 30; i < 31; i++) {
+				
+				int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
+				
+				ArrayList<ArrayList<PositionAndColor>> borderlistsPlusCornerestimation = getCornerCandidates(mask, borderListList, cd,
+						gt, stepsize, false);
+				ArrayList<PositionAndColor> filteredLists = filterCornerCandidates(borderlistsPlusCornerestimation, cd);
+				
+				int num_leafs = filteredLists.size();
+				
+				if (num_leafs > 0)
+					rt.addValue("leaf.tuning." + StringManipulationTools.formatNumber(cd) + "." + StringManipulationTools.formatNumber(i) + ".count",
+							num_leafs);
+				
+				if (num_leafs < 5)
+					i += 4;
+				if (num_leafs > 15)
+					break gt;
+			}
+		}
 	}
 	
 	private boolean isBestAngle() {
@@ -296,26 +315,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		int down = 0;
 		int index = 1;
 		
-		// define Vis image (shrink to mark results)
-		double wf = input().images().fluo().getWidth();
-		double wv = input().images().vis().getWidth();
-		double hv = input().images().vis().getHeight();
-		double hf = input().images().fluo().getHeight();
-		double norm1 = wf / wv;
-		
-		Image imgVisLTHighlighted = input().masks().vis().copy();
-		Image imgNirLTHighlighted = input().masks().nir().copy();
-		
-		if (calcOnFluo)
-			imgVisLTHighlighted = imgVisLTHighlighted.io().scale(norm1, norm1)
-					.cropAbs((int) ((wv - wf) / 2.), (int) (wv - ((wv - wf) / 2.)), (int) ((hv - hf) / 2.), (int) (hv - ((hv - hf) / 2.)))
-					.getImage();
-		
-		input().images().setVis(imgVisLTHighlighted);
-		
-		changedVis = imgVisLTHighlighted;
-		changedVisMask = imgVisLTHighlighted;
-		
 		for (int i = 0; i < size; i++) {
 			final int xPosition = borderlistPlusCornerestimation.get(i).x - radius;
 			final int yPosition = borderlistPlusCornerestimation.get(i).y - radius;
@@ -381,53 +380,21 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			eccentricity = Math.sqrt(1 - lambdas[1] / lambdas[0]);
 			
 			// apply mask on original image to preserve colors
-			// Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
+			Image origColorRegionImage = cutFromImage(imgorig, xPosition, yPosition, radius);
 			// origColorRegionImage.show("orig");
-			// regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
-			// regionImage.show("rg img");
-			final Color regionColorHsvAvg = getAverageRegionColor(region, ColorMode.HSV);
+			regionImage = origColorRegionImage.io().applyMask(regionImage).getImage();
+			// final Color regionColorHsvAvg = getAverageRegionColorHSV(region);
 			// Lab regionColorLabAvg = getAverageRegionColorLab(region);
-			final Color regionColorRGBAvg = getAverageRegionColor(region, ColorMode.RGB);
-			
-			// normalization of coordinates
-			Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-			Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-			double normBasedOnMarker = (realMarkerDistHorizontal / distHorizontal);
-			
-			// double resf = !calcOnVis ? (double) input().masks().vis()
-			// .getWidth()
-			// / (double) imgorig.getWidth()
-			// * (input().images().fluo().getWidth() / (double) input()
-			// .images().fluo().getHeight())
-			// / (input().images().vis().getWidth() / (double) input()
-			// .images().vis().getHeight())
-			// : 1.0;
-			
-			int w = imgorig.getWidth();
-			int h = imgorig.getHeight();
-			
-			double normX = 1038.0 / w;
-			double normY = 1390.0 / h;
-			// if (h >= 1160)
-			// norm = 0.57;
-			// else
-			// norm = 1.0;
-			
-			// imgorig.show("orig");
-			// mask.show("mask");
+			final Color regionColorRGBAvg = getAverageRegionColorRGB(region, ColorMode.RGB);
 			
 			if (getBoolean("Add Leaf Tip Properties to Result", false)) {
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", ((xPosition - w / 2)
-						* normBasedOnMarker));
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", ((yPosition - h / 2)
-						* normBasedOnMarker));
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.x", xPosition);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".position.y", yPosition);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".omega", omega);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".gamma", gamma);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".direction", direction);
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.x", (centerOfGravity.x + dim[0] - w / 2)
-						* normBasedOnMarker);
-				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.y", (centerOfGravity.y + dim[2] - h / 2)
-						* normBasedOnMarker);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.x", centerOfGravity.x + dim[0]);
+				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".CoG.y", centerOfGravity.y + dim[2]);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".distanceBetweenCoGandMidPoint", distCoGToMid);
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".area", region.size());
 				rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".eccentricity", eccentricity);
@@ -448,59 +415,58 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			final int iF = index;
 			final int radiusfin = radius;
 			
-			Color regionColorHsvAvgVis_small = null, regionColorHsvAvgVis_large = null;
-			
-			boolean applyOnVis = getBoolean("Get Leaf Tips Info From Vis", false);
-			
-			if (calcOnVis) {
-				regionColorHsvAvgVis_small = regionColorHsvAvg;
-				int radiusL = radius * 3;
-				ArrayList<PositionAndColor> visList2 = searchTips(imgVisLTHighlighted, xPosition, yPosition, radiusL, radius);
-				regionColorHsvAvgVis_large = getAverageRegionColorHSV(visList2);
-			}
-			
-			if (calcOnFluo) {
-				RunnableOnImageSet riFluo = new LeafTipHighlighter(xPosition, regionColorRGBAvg, radiusfin, dim, yPosition, iF, regionColorHsvAvg, off,
-						centerOfGravity, directionF, CameraType.FLUO);
-				if (getBoolean("debug_paint_results", false) && debug) {
-					imgGamma = riFluo.postProcessMask(imgGamma);
-				} else {
-					getProperties().addImagePostProcessor(riFluo);
+			RunnableOnImageSet ri = new RunnableOnImageSet() {
+				
+				@Override
+				public Image postProcessMask(Image imgGamma) {
+					imgGamma = imgGamma
+							.io()
+							.canvas()
+							.drawLine(xPosition, yPosition, centerOfGravity.x + dim[0], centerOfGravity.y + dim[2], Color.ORANGE.getRGB(), 0.2, 1)
+							.drawCircle(xPosition, yPosition, radiusfin + 4, Color.BLUE.getRGB(), 0.5, 1)
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition - 20 + off, "LEAF: " + (iF + 1),
+									Color.BLACK)
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 0 + off,
+									"DIRECTION: " + (directionF > 0 ? "DOWN" : "UP"),
+									Color.BLACK)
+							.text(centerOfGravity.x + xPosition + 20, centerOfGravity.y + yPosition + 20 + off,
+									"CHLO: " + regionColorRGBAvg.getRed() + ", PHEN: " + regionColorRGBAvg.getGreen() + ", CLAS: " + regionColorRGBAvg.getBlue()
+									, Color.BLACK)
+							.getImage();
+					return imgGamma;
 				}
-			}
-			
-			if (applyOnVis) {
-				// small
-				ArrayList<PositionAndColor> visList1 = searchTips(imgVisLTHighlighted, xPosition, yPosition, radius, -1);
-				regionColorHsvAvgVis_small = getAverageRegionColorHSV(visList1);
-				// large
-				int radiusL = radius * 3;
-				ArrayList<PositionAndColor> visList2 = searchTips(imgVisLTHighlighted, xPosition, yPosition, radiusL, radius);
-				regionColorHsvAvgVis_large = getAverageRegionColorHSV(visList2);
-			}
-			
-			if (calcOnVis || applyOnVis) {
-				RunnableOnImageSet riVis = new LeafTipHighlighter(xPosition, regionColorHsvAvgVis_large, radiusfin, dim, yPosition, iF, regionColorHsvAvgVis_small,
-						off, centerOfGravity, directionF, CameraType.VIS);
-				if (getBoolean("debug_paint_results", false) && debug) {
-					imgVisLTHighlighted = riVis.postProcessMask(imgVisLTHighlighted);
-				} else {
-					getProperties().addImagePostProcessor(riVis);
+				
+				@Override
+				public Image postProcessImage(Image image) {
+					return image;
 				}
-			}
+				
+				@Override
+				public CameraType getConfig() {
+					if (!calcOnVis)
+						return CameraType.FLUO;
+					else
+						return CameraType.VIS;
+				}
+			};
 			
-			if (calcOnNir) {
-				// ArrayList<PositionAndColor> visList2 = searchTips(imgNirLTHighlighted, xPosition, yPosition, radius, -1);
-				regionColorHsvAvgVis_large = regionColorHsvAvg; // getAverageRegionColorHSV(visList2);
-				RunnableOnImageSet riNir = new LeafTipHighlighter(xPosition, regionColorHsvAvgVis_large, radiusfin, dim, yPosition, iF, regionColorHsvAvgVis_small,
-						off, centerOfGravity, directionF, CameraType.NIR);
-				getProperties().addImagePostProcessor(riNir);
-			}
+			if (getBoolean("debug_paint_results", false) && debug)
+				imgGamma = ri.postProcessMask(imgGamma);
+			else
+				getProperties().addImagePostProcessor(ri);
 			
+			// if (!calcOnVis) {
+			// if (getBoolean("Get Leaf Tips Info From Vis", false)) {
+			// ArrayList<PositionAndColor> visList = searchTips(input().masks().vis(), xPosition, yPosition, radius);
+			// Color regionColorHsvAvg = getAverageRegionColorHSV(visList);
+			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.resClassic", regionColorRGBAvg.getRed());
+			// }
+			//
 			// if (getBoolean("Get Leaf Tips From Nir", false)) {
 			// ArrayList<PositionAndColor> nirList = searchTips(input().masks().nir(), xPosition, yPosition, radius);
-			// final Color regionColorHsvAvgNir = getAverageRegionColorHSV(nirList);
+			// final Color regionColorHsvAvg = getAverageRegionColorHSV(nirList);
 			// rt.addValue("leaf." + StringManipulationTools.formatNumber(index) + ".color.resClassic", regionColorRGBAvg.getRed());
+			// }
 			// }
 			
 			index++;
@@ -512,19 +478,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		rt.addValue("leaf.count.down", down);
 		imgGamma.show("marked", debugValues);
 		
-		if (!calcOnVis)
-			res[0] = imgGamma;
-		else
-			res[0] = imgVisLTHighlighted;
+		res[0] = imgGamma;
 		res[1] = rt;
 		return res;
 	}
 	
-	public ArrayList<PositionAndColor> searchTips(Image img, int xPosition, int yPosition, int radius, int innerRadius) {
+	private ArrayList<PositionAndColor> searchTips(Image img, int xPosition, int yPosition, int radius) {
 		int[][] img2d = img.getAs2A();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
+		ArrayList<PositionAndColor> res = new ArrayList<>();
 		
 		// adapt radius to new resolution
 		double fac_x = input().masks().fluo().getWidth() / w;
@@ -533,13 +496,8 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		for (int x = xPosition - radius; x < xPosition + radius; x++) {
 			for (int y = yPosition - radius; y < yPosition + radius; y++) {
-				if (x >= 0 && x < w && y >= 0 && y < h && img2d[x][y] != ImageOperation.BACKGROUND_COLORint) {
-					if (innerRadius > 0) {
-						double dist = Math.sqrt(((xPosition - x) * (xPosition - x)) + ((yPosition - y) * (yPosition - y)));
-						if (dist > innerRadius)
-							res.add(new PositionAndColor(x, y, img2d[x][y]));
-					} else
-						res.add(new PositionAndColor(x, y, img2d[x][y]));
+				if (x >= 0 && x < w && y >= 0 && y < h) {
+					res.add(new PositionAndColor(x, y, img2d[x][y]));
 				}
 			}
 		}
@@ -743,7 +701,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	/**
-	 * Calculates sorted border list (depends on 8 neighborhood, border should be connected, assumed there is one big segment), uses recursive border-search
+	 * Calculates sorted border list (depends on 8 neighborhood, border should be connected, given that there is one big segment), uses recursive border-search
 	 * (implemented as loop).
 	 * 
 	 * @param borderMap
@@ -1115,7 +1073,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		return new Image(img2d);
 	}
 	
-	private Color getAverageRegionColor(ArrayList<PositionAndColor> region, ColorMode type) {
+	private Color getAverageRegionColorRGB(ArrayList<PositionAndColor> region, ColorMode type) {
 		float[] hsbvals = new float[3];
 		float[] valssum = new float[3];
 		
@@ -1135,9 +1093,9 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			switch (type) {
 				case HSV:
 					Color.RGBtoHSB(r, g, b, hsbvals);
-					valssum[0] += hsbvals[0] * 255;
-					valssum[1] += hsbvals[1] * 255;
-					valssum[2] += hsbvals[2] * 255;
+					valssum[0] += hsbvals[0];
+					valssum[1] += hsbvals[1];
+					valssum[2] += hsbvals[2];
 					break;
 				case LAB:
 					Li = (int) lab[r][g][b];
@@ -1171,16 +1129,16 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		for (PositionAndColor v : region) {
 			c = v.colorInt;
-			r = ((c & 0xff0000) >> 16);
-			g = ((c & 0x00ff00) >> 8);
-			b = (c & 0x0000ff);
+			r += ((c & 0xff0000) >> 16);
+			g += ((c & 0x00ff00) >> 8);
+			b += (c & 0x0000ff);
 			Color.RGBtoHSB(r, g, b, hsbvals);
 			hsbvalssum[0] += hsbvals[0];
 			hsbvalssum[1] += hsbvals[1];
 			hsbvalssum[2] += hsbvals[2];
 		}
 		double size = region.size();
-		return new Color((int) ((hsbvalssum[0] / size) * 255), (int) ((hsbvalssum[1] / size) * 255), (int) ((hsbvalssum[2] / size) * 255));
+		return new Color((int) (r / size), (int) (g / size), (int) (b / size));
 	}
 	
 	/**
@@ -1411,48 +1369,5 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private enum ColorMode {
 		HSV, LAB, RGB
-	}
-	
-	private void runOptimization(Image inputImage, Image mask, Image imgorig, ArrayList<int[]> borderListList, ResultsTableWithUnits rt, int stepsize, Image skel) {
-		// get average leaf width, used to estimate initial parameters
-		int avg_width;
-		
-		if (skel != null) {
-			int leaflength = skel.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
-			int area = imgorig.io().countFilledPixels(ImageOperation.BACKGROUND_COLORint);
-			
-			if (leaflength <= 0 || area <= 0)
-				return;
-			
-			avg_width = area / leaflength;
-		} else
-			avg_width = 10;
-		
-		// optimize loop
-		cd: for (int cd = avg_width; cd <= avg_width * 2; cd++) {
-			// for (int cd = 25; cd <= 26; cd++) {
-			if (cd == 0)
-				continue cd;
-			gt: for (int i = 20; i < 40; i++) {
-				// gt: for (int i = 30; i < 31; i++) {
-				
-				int gt = (int) ((cd / 2 * cd / 2 * Math.PI) * ((double) i / 100));
-				
-				ArrayList<ArrayList<PositionAndColor>> borderlistsPlusCornerestimation = getCornerCandidates(mask, borderListList, cd,
-						gt, stepsize, false);
-				ArrayList<PositionAndColor> filteredLists = filterCornerCandidates(borderlistsPlusCornerestimation, cd);
-				
-				int num_leafs = filteredLists.size();
-				
-				if (num_leafs > 0)
-					rt.addValue("leaf.tuning." + StringManipulationTools.formatNumber(cd) + "." + StringManipulationTools.formatNumber(i) + ".count",
-							num_leafs);
-				
-				if (num_leafs < 5)
-					i += 4;
-				if (num_leafs > 15)
-					break gt;
-			}
-		}
 	}
 }

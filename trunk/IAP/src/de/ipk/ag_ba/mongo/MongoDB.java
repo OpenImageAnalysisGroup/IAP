@@ -731,9 +731,13 @@ public class MongoDB {
 						if (getEnsureIndex())
 							collCond.ensureIndex("_id");
 						
-						if (subList != null)
+						if (subList != null) {
+							LinkedList<DBObject> list = new LinkedList<DBObject>();
 							for (Object co : subList) {
-								DBObject substance = (DBObject) co;
+								list.add((DBObject) co);
+							}
+							subList.clone();
+							for (DBObject substance : list) {
 								visitSubstance(
 										header,
 										db, substance,
@@ -745,6 +749,7 @@ public class MongoDB {
 										visitBinaryMeasurement,
 										invalid);
 							}
+						}
 					}
 					boolean printed = false;
 					if (getEnsureIndex())
@@ -1002,17 +1007,18 @@ public class MongoDB {
 			// if (optStatusProvider!=null)
 			// optStatusProvider.setCurrentStatusText1("Process "+s3d.getName());
 			BasicDBList condList = (BasicDBList) substance.get("conditions");
-			if (condList != null)
+			if (condList != null) {
 				for (Object co : condList) {
 					DBObject cond = (DBObject) co;
 					visitCondition(s3d, cond, visitBinary);
 					
 				}
+			}
 			BasicDBList l = (BasicDBList) substance.get("condition_ids");
 			if (l != null) {
 				double max = l.size();
 				boolean printed = false;
-				boolean singleFetch = false;
+				boolean singleFetch = true;
 				if (collCond != null)
 					if (singleFetch)
 						printed = processConditionBySingleFetch(header, db, collCond,
@@ -1093,6 +1099,15 @@ public class MongoDB {
 		DBCursor condL = null;
 		try {
 			synchronized (visitCondition) {
+				BasicDBObject fields = new BasicDBObject("settings", 0);
+				fields.put("remark", 0);
+				fields.put("startdate", 0);
+				fields.put("experimenttype", 0);
+				fields.put("importdate", 0);
+				fields.put("experimentname", 0);
+				fields.put("coordinator", 0);
+				fields.put("storagedate", 0);
+				
 				condL = collCond.find(
 						new BasicDBObject("_id", new BasicDBObject("$in", ll))
 						, new BasicDBObject()
@@ -1100,9 +1115,21 @@ public class MongoDB {
 								.append("samples." + MongoCollection.IMAGES.toString(), new Integer(1))
 								.append("samples." + MongoCollection.VOLUMES.toString(), new Integer(1))
 								.append("samples." + MongoCollection.NETWORKS.toString(), new Integer(1))
+						// .append("remark", new Integer(0))
+						// .append("startdate", new Integer(0))
+						// .append("experimenttype", new Integer(0))
+						// .append("importdate", new Integer(0))
+						// .append("experimentname", new Integer(0))
+						// .append("coordinator", new Integer(0))
+						// .append("storagedate", new Integer(0))
 						).hint(new BasicDBObject("_id", 1));// .batchSize(Math.max(200, l.size()));
 				int condLsize = 0;
+				LinkedList<DBObject> list = new LinkedList<DBObject>();
 				for (DBObject cond : condL) {
+					list.add(cond);
+				}
+				condL.close();
+				for (DBObject cond : list) {
 					condLsize++;
 					// find objects in "condition" collection, but only fields images, volumes, networks
 					visitCondition.processDBid(cond.get("_id") + "");
@@ -1120,6 +1147,9 @@ public class MongoDB {
 					}
 				}
 			}
+		} catch (Exception e) {
+			invalid.setBval(0, true);
+			e.printStackTrace();
 		} finally {
 			if (condL != null)
 				condL.close();
