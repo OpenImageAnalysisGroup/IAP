@@ -40,6 +40,7 @@ public class FileMonitor {
 		path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
 		
 		BroadCastService bcs = new BroadCastService(udpPortStart, udpPortEnd, 1000);
+		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: MESSAGES WILL BE SEND ON PORTS " + udpPortStart + "-" + udpPortEnd);
 		long lastModify = 0;
 		for (;;) {
 			WatchKey key = watchService.take();
@@ -64,7 +65,7 @@ public class FileMonitor {
 						for (int lineIdx = contentLineIndex + 1; lineIdx < lastContentLine && lineIdx < tf.size() && msg.length() < 500; lineIdx++) {
 							msg += "|" + tf.get(lineIdx);
 						}
-						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + "Sent message: " + msg + "...");
+						System.out.print(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Sent message: " + msg + "...");
 						for (int i = 0; i < 5; i++) {
 							bcs.sendBroadcast(msg.getBytes(StandardCharsets.UTF_8));
 							Thread.sleep(5);
