@@ -189,6 +189,12 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 									imageSnapshot.setUserDefinedCameraLabeL(imageSnapshot.getCamera_label());
 									imageSnapshot.setCamera_label(LTdataExchange.getIAPcameraNameFromConfigLabel(imageSnapshot.getCamera_label()));
 									String ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.png";
+									{
+										File ff = new File(ffn);
+										if (!ff.exists()) {
+											ffn = snapshotDirName + File.separator + cameraLabelSubDir + File.separator + "0_0.jpg";
+										}
+									}
 									if (storageCheck) {
 										File ff = new File(ffn);
 										if (ff.exists()) {

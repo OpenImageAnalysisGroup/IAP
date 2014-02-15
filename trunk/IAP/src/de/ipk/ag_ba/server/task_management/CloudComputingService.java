@@ -199,10 +199,12 @@ public class CloudComputingService {
 															} else
 																if ((args[0] + "").toLowerCase().startsWith("broadcast-rs")) {
 																	try {
-																		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Start broadcast monitor");
+																		System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Start broadcast monitor on ports ");
 																		Integer sta = Integer.parseInt(args[1]);
 																		Integer end = Integer.parseInt(args[2]);
+																		System.out.println(sta + "-" + end + "...");
 																		final String id = args[3];
+																		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Message filter ID='" + id + "'");
 																		BroadCastService bcs = new BroadCastService(sta, end, 100);
 																		String lastMessage = "";
 																		final SnapshotCreator s = new SnapshotCreator(args[4], args[5]);
@@ -211,19 +213,21 @@ public class CloudComputingService {
 																			if (res != null && res.data != null && res.data.length > 0) {
 																				String msg = new String(res.data, StandardCharsets.UTF_8.name());
 																				if (msg.startsWith(id + ":")) {
-																					final String msgContent = msg.substring((id + ":").length()).trim();
+																					String msgContent = msg.substring((id + ":").length()).trim();
+																					msgContent = msgContent.split("\\|")[0];
 																					if (msgContent.length() > 0 && !msgContent.equals(lastMessage)) {
 																						lastMessage = msgContent;
 																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
 																								+ ">INFO: Received new message content " + msgContent);
 																						final String measurementLabel = args[6];
 																						final String imageFileExt = args[7];
+																						final String mcF = msgContent;
 																						Runnable r = new Runnable() {
 																							
 																							@Override
 																							public void run() {
 																								try {
-																									s.saveNewSnapshot(msgContent, measurementLabel, imageFileExt);
+																									s.saveNewSnapshot(mcF, measurementLabel, imageFileExt);
 																								} catch (Exception e) {
 																									e.printStackTrace();
 																								}
