@@ -25,11 +25,14 @@ plot.trait<-function(Condition, Trait) {
                         data[
                           which(data$Condition==Condition),
                           col.plantID])
+                          
   # number of lines
   nPlantIDs <- length(PlantIDsOfInterest)
   # get the range for the x and y axis
-  xrange <- range(data[which(data[which(data$'Plant ID' %in% PlantIDsOfInterest),col.time]<2147483647),col.time]) 
-  yrange <- range(data[,Trait], na.rm=T) 
+  dataOfPlant <- data[data$'Plant ID' %in% PlantIDsOfInterest,c(Trait, col.time, 'Plant ID')]
+  dataOfPlant <- dataOfPlant[!is.na(dataOfPlant[,1]),]
+  xrange <- range(dataOfPlant[,col.time])
+  yrange <- range(dataOfPlant[,Trait], na.rm=T) 
   # set up the plot
   colors <- rainbow(nPlantIDs)
   if (length(colors)==0)
@@ -47,8 +50,8 @@ plot.trait<-function(Condition, Trait) {
   legend(xrange[1], yrange[2], PlantIDsOfInterest[1:nPlantIDs], cex=0.8, col=colors, pch=plotchar,
          lty=linetype, title=Condition)
   for (i in 1:nPlantIDs) {
-    lines(data[which(data$'Plant ID' == PlantIDsOfInterest[i]),col.time],
-          data[which(data$'Plant ID' == PlantIDsOfInterest[i]),Trait], type="b", 
+    lines(dataOfPlant[which(dataOfPlant$'Plant ID' == PlantIDsOfInterest[i]),col.time],
+          dataOfPlant[which(dataOfPlant$'Plant ID' == PlantIDsOfInterest[i]),Trait], type="b", 
           lwd=1.5, lty=linetype[i], col=colors[i], pch=plotchar[i])
   }
   # add a title and subtitle
