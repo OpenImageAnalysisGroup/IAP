@@ -931,6 +931,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		res = StringManipulationTools.stringReplace(res, "\\", "");
 		res = StringManipulationTools.stringReplace(res, "[", "|");
 		res = StringManipulationTools.stringReplace(res, "]", "|");
+		res = StringManipulationTools.stringReplace(res, "/", "_");
 		return res;
 	}
 	
