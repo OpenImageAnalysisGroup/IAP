@@ -45,6 +45,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
+import javax.vecmath.Point2d;
+
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
@@ -3263,6 +3265,10 @@ public class ImageOperation implements MemoryHogInterface {
 			return new Vector2d(positionx / (double) area, positiony / (double) area);
 		else
 			return null;
+	}
+	
+	public Point2d getCentroidAsPoint2d(int backgroundColor) {
+		return new Point2d(getCentroid(backgroundColor).x, getCentroid(backgroundColor).y);
 	}
 	
 	public MainAxisCalculationResult calculateTopMainAxis(int background) {
