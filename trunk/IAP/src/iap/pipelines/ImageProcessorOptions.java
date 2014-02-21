@@ -227,7 +227,8 @@ public class ImageProcessorOptions {
 	/**
 	 * @return config -> well -> result list
 	 */
-	public HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot(String string) {
+	public HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot(String string,
+			boolean exact) {
 		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> res = new HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>>();
 		if (previousResultsForThisTimePoint != null) {
 			synchronized (previousResultsForThisTimePoint) {
@@ -238,7 +239,7 @@ public class ImageProcessorOptions {
 							if (res.get(config) == null) {
 								res.put(config, new HashMap<Integer, ArrayList<BlockPropertyValue>>());
 							}
-							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesSearch(true, string);
+							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesSearch(exact, string);
 							if (v != null)
 								res.get(config).put(well, v);
 						}
