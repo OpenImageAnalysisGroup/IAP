@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
  */
 public class ThreeDmodelGenerator {
 	
-	private final int PROBABILITY_THRESHOLD = 50;// good for maize: 140;
+	private final int PROBABILITY_THRESHOLD;// 50 // good for maize: 140;
 	
 	private ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 	
@@ -51,10 +51,11 @@ public class ThreeDmodelGenerator {
 	public static final Color TRANSPARENT_COLOR = ImageOperation.BACKGROUND_COLOR;
 	public static final int TRANSPARENT_COLORint = ImageOperation.BACKGROUND_COLORint;
 	
-	public ThreeDmodelGenerator(int voxelresolution, int widthFactor) {
+	public ThreeDmodelGenerator(int voxelresolution, int widthFactor, int probability_threshold_about_50_to_140) {
 		this.maxVoxelPerSide = voxelresolution;
 		transparentVoxels = new byte[maxVoxelPerSide][maxVoxelPerSide][maxVoxelPerSide];
 		this.widthFactor = widthFactor;
+		this.PROBABILITY_THRESHOLD = probability_threshold_about_50_to_140;
 	}
 	
 	public void setRoundViewImages(ArrayList<MyPicture> pictures) {
