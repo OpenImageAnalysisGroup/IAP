@@ -11,11 +11,13 @@ import info.StopWatch;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -208,6 +210,8 @@ public class CloudComputingService {
 																		BroadCastService bcs = new BroadCastService(sta, end, 100);
 																		String lastMessage = "";
 																		final SnapshotCreator s = new SnapshotCreator(args[4], args[5]);
+																		final ThreadSafeOptions receiveCount = new ThreadSafeOptions();
+																		int discarded = 0;
 																		do {
 																			UDPreceiveStructure res = bcs.receiveBroadcast(20);
 																			if (res != null && res.data != null && res.data.length > 0) {
@@ -230,27 +234,64 @@ public class CloudComputingService {
 																									s.saveNewSnapshot(mcF, measurementLabel, imageFileExt);
 																								} catch (Exception e) {
 																									e.printStackTrace();
+																									System.out.println(SystemAnalysis.getCurrentTime()
+																											+ ">WARNING: Broadcast monitoring error: "
+																											+ e.getMessage());
+																									System.exit(1);
 																								}
+																								receiveCount.setBval(0, false);
 																							}
 																						};
-																						Thread t = new Thread(r);
-																						t.start();
-																						Thread.sleep(10);
-																						ArrayList<String> params = new ArrayList<String>();
-																						if (args.length > 8)
-																							for (int idx = 9; idx < args.length; idx++) {
-																								params.add(args[idx]);
+																						Calendar rightNow = Calendar.getInstance();
+																						int hour = rightNow.get(Calendar.HOUR_OF_DAY);
+																						if (receiveCount.getBval(0, false)) {
+																							discarded++;
+																							System.out
+																									.println(SystemAnalysis.getCurrentTimeInclSec()
+																											+ ">INFO: Received valid change message, but previous image has not been received yet! Message is discarded!");
+																							if (discarded >= 3) {
+																								System.out
+																										.println(SystemAnalysis.getCurrentTime()
+																												+ ">WARNING: Did not receive image data 6 times in a row. Exiting to allow restart!");
+																								System.exit(1);
 																							}
-																						if (msgContent.contains(" "))
-																							params.add("\'" + msgContent + "\'");
-																						else
-																							params.add(msgContent);
-																						System.out.println(SystemAnalysis.getCurrentTimeInclSec()
-																								+ ">INFO: Execute: " + args[8] + " "
-																								+ StringManipulationTools.getStringList(params, " "));
-																						params.add(0, args[8]);
-																						Process ls_proc = Runtime.getRuntime().exec(params.toArray(new String[] {}), null, null);
-																						Thread.sleep(100);
+																						} else {
+																							discarded = 0;
+																							// if (!(hour < 6 || hour >= 22)) {
+																							Thread t = new Thread(r);
+																							receiveCount.setBval(0, true);
+																							t.start();
+																							Thread.sleep(10);
+																							ArrayList<String> params = new ArrayList<String>();
+																							if (args.length > 8)
+																								for (int idx = 9; idx < args.length; idx++) {
+																									params.add(args[idx]);
+																								}
+																							if (msgContent.contains(" "))
+																								params.add("\'" + msgContent + "\'");
+																							else
+																								params.add(msgContent);
+																							System.out.println(SystemAnalysis.getCurrentTimeInclSec()
+																									+ ">INFO: Execute: " + args[8] + " "
+																									+ StringManipulationTools.getStringList(params, " "));
+																							params.add(0, args[8]);
+																							Process ls_proc = Runtime.getRuntime()
+																									.exec(params.toArray(new String[] {}), null, null);
+																							// } else {
+																							// System.out
+																							// .println(SystemAnalysis.getCurrentTimeInclSec()
+																							// +
+																							// ">INFO: Received valid change message, but current time (hour) is BLOCKED for further processing (DARK PERIOD).");
+																							// }
+																							Thread.sleep(100);
+																							receiveCount.addInt(1);
+																							if (receiveCount.getInt() >= 52) {
+																								System.out.println(SystemAnalysis.getCurrentTimeInclSec()
+																										+ ">INFO: Received 52 change notifications. Stop execution, to allow restart.");
+																								Thread.sleep(3000);
+																								System.exit(1);
+																							}
+																						}
 																					}
 																				}
 																			}
