@@ -93,9 +93,7 @@ public class MongoDB {
 		return SystemOptions.getInstance().getBoolean("GRID-STORAGE", "ensure Index", true);
 	}
 	
-	private static final ArrayList<MongoDB> mongos = initMongoList();
-	private static MongoDB defaultCloudInstance = null;
-	private static HashMap<String, MongoClient> m = new HashMap<String, MongoClient>();
+	private MongoClient m;
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
 	private boolean enabled;
@@ -113,7 +111,7 @@ public class MongoDB {
 	WeakHashMap<MongoClient, HashSet<String>> authenticatedDBs = new WeakHashMap<MongoClient, HashSet<String>>();
 	
 	public static ArrayList<MongoDB> getMongos() {
-		return mongos;
+		return initMongoList();
 	}
 	
 	@Override
@@ -155,19 +153,19 @@ public class MongoDB {
 				"login", null);
 		String password = IAPoptions.getInstance().getString(sec,
 				"password", null);
-		if (idx == 0) {
-			if (defaultCloudInstance == null) {
-				defaultCloudInstance = new MongoDB(displayName, databaseName, hostName,
-						login, password, HashType.MD5);
-			}
-			defaultCloudInstance.enabled = enabled;
-			return defaultCloudInstance;
-		} else {
-			MongoDB mm = new MongoDB(displayName, databaseName, hostName,
-					login, password, HashType.MD5);
-			mm.enabled = enabled;
-			return mm;
-		}
+		// if (idx == 0) {
+		// if (defaultCloudInstance == null) {
+		// defaultCloudInstance = new MongoDB(displayName, databaseName, hostName,
+		// login, password, HashType.MD5);
+		// }
+		// defaultCloudInstance.enabled = enabled;
+		// return defaultCloudInstance;
+		// } else {
+		MongoDB mm = new MongoDB(displayName, databaseName, hostName,
+				login, password, HashType.MD5);
+		mm.enabled = enabled;
+		return mm;
+		// }
 	}
 	
 	public MongoDBhandler getHandler() {
@@ -244,25 +242,7 @@ public class MongoDB {
 			RunnableOnDB runnableOnDB, int repeats) throws Exception {
 		Exception e = null;
 		String key = optHosts + ";" + database;
-		// int maxS = SystemOptions.getInstance().getInteger("GRID-STORAGE", "idle reconnect time_s", 30);
-		// if (maxS > 0 && true) {
-		// if (System.currentTimeMillis() - dbLastAccess.getLong() > maxS * 1000) {
-		// MongoClient mc = m.get(key);
-		// if (mc != null) {
-		// runningOps.acquire(dbMaxCon);
-		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Closing DB connection (" + key + ") (connection was previously idle for more than "
-		// +
-		// maxS + " sec., for " + ((System.currentTimeMillis() - dbLastAccess.getLong()) / 1000) + " sec.)");
-		// CommandResult err = mc.getDB(databaseName).getLastError(WriteConcern.SAFE);
-		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Get Last Error: " + err);
-		// mc.close();
-		// m.remove(key);
-		// authenticatedDBs.remove(mc);
-		// runningOps.release(dbMaxCon);
-		// }
-		// }
-		// dbLastAccess.setLong(System.currentTimeMillis());
-		// }
+		
 		boolean ok = false;
 		int nrep = 0;
 		do {
@@ -270,18 +250,18 @@ public class MongoDB {
 				DB db;
 				synchronized (this.getClass()) {
 					createMongoConnection(database, optHosts, optLogin, optPass, key);
-					db = m.get(key).getDB(database);
+					db = m.getDB(database);
 				}
-				if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains(database))
+				if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains(database))
 					if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
 						try {
 							boolean auth = db.authenticate(optLogin, optPass.toCharArray());
 							if (!auth) {
 								// throw new Exception("Invalid MongoDB login data provided!");
 							} else {
-								if (authenticatedDBs.get(m.get(key)) == null)
-									authenticatedDBs.put(m.get(key), new HashSet<String>());
-								authenticatedDBs.get(m.get(key)).add(database);
+								if (authenticatedDBs.get(m) == null)
+									authenticatedDBs.put(m, new HashSet<String>());
+								authenticatedDBs.get(m).add(database);
 							}
 						} catch (Exception err) {
 							System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: Authentication error: " + err.getMessage());
@@ -315,7 +295,7 @@ public class MongoDB {
 	}
 	
 	private void createMongoConnection(String database, String optHosts, String optLogin, String optPass, String key) throws UnknownHostException {
-		if (m.get(key) == null) {
+		if (m == null) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Establish DB connection (" + key + ")");
 			Builder mob = new MongoClientOptions.Builder();
 			mob.connectionsPerHost(SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5));
@@ -334,34 +314,34 @@ public class MongoDB {
 			StopWatch s = new StopWatch("INFO: new MongoClient(...)", false);
 			if (optHosts == null || optHosts.length() == 0) {
 				MongoClient mc = new MongoClient("localhost", mco);
-				m.put(key, mc);
+				m = mc;
 			} else {
 				List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 				for (String h : optHosts.split(","))
 					seeds.add(new ServerAddress(h));
 				MongoClient mc = new MongoClient(seeds, mco);
-				m.put(key, mc);
+				m = mc;
 			}
-			m.get(key).getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
-			m.get(key).getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000);
-			m.get(key).getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000);
-			m.get(key).getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
-			m.get(key).getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
+			m.getMongoOptions().connectionsPerHost = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
+			m.getMongoOptions().connectTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connect timeout", 5 * 60 * 1000);
+			m.getMongoOptions().maxWaitTime = SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000);
+			m.getMongoOptions().autoConnectRetry = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true);
+			m.getMongoOptions().threadsAllowedToBlockForConnectionMultiplier = SystemOptions.getInstance().getInteger("GRID-STORAGE",
 					"threads allowed to wait for connection",
 					1000);
-			m.get(key).getMongoOptions().socketTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000);
-			m.get(key).getMongoOptions().socketKeepAlive = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true);
+			m.getMongoOptions().socketTimeout = SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000);
+			m.getMongoOptions().socketKeepAlive = SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true);
 			
 			s.printTime(1000);
-			if (authenticatedDBs.get(m.get(key)) == null || !authenticatedDBs.get(m.get(key)).contains("admin")) {
-				DB dbAdmin = m.get(key).getDB("admin");
+			if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains("admin")) {
+				DB dbAdmin = m.getDB("admin");
 				try {
 					s = new StopWatch("INFO: dbAdmin.authenticate()");
 					dbAdmin.authenticate(optLogin, optPass.toCharArray());
 					s.printTime(1000);
-					if (authenticatedDBs.get(m.get(key)) == null)
-						authenticatedDBs.put(m.get(key), new HashSet<String>());
-					authenticatedDBs.get(m.get(key)).add(database);
+					if (authenticatedDBs.get(m) == null)
+						authenticatedDBs.put(m, new HashSet<String>());
+					authenticatedDBs.get(m).add(database);
 				} catch (Exception err) {
 					// System.err.println("ERROR: " + err.getMessage());
 				}
