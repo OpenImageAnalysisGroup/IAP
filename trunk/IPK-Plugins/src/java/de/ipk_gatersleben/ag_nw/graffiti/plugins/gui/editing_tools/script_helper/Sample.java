@@ -150,7 +150,8 @@ public class Sample implements SampleInterface {
 		if (sampleAverage == null) {
 			if (size() > 0)
 				sampleAverage = Experiment.getTypeManager().getNewSampleAverage(this);
-			sampleAverage.calculateValuesFromSampleData();
+			if (sampleAverage != null)
+				sampleAverage.calculateValuesFromSampleData();
 		} else
 			if (!onlyIfNull)
 				sampleAverage.calculateValuesFromSampleData();
@@ -455,7 +456,10 @@ public class Sample implements SampleInterface {
 		s.setTimeUnit(getTimeUnit());
 		s.setTtestInfo(getTtestInfo());
 		s.setFiles(getFiles());
-		s.setSampleAverage(getSampleAverage().clone());
+		if (getSampleAverage() != null)
+			s.setSampleAverage(getSampleAverage().clone());
+		else
+			s.setSampleAverage(null);
 		return s;
 	}
 	
