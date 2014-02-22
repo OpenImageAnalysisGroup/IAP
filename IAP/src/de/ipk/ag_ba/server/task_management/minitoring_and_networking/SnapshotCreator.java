@@ -23,16 +23,16 @@ public class SnapshotCreator {
 	public SnapshotCreator(String inputFileDir, String outputSnapshotDir) throws IOException {
 		this.inputFileDir = inputFileDir;
 		this.outputSnapshotDir = outputSnapshotDir;
-		this.monitor = new DirectoryMonitor(inputFileDir);
+		this.monitor = new DirectoryMonitor();
 	}
 	
 	public void saveNewSnapshot(String plantID, String measurementLabel, String fileExt) throws Exception {
 		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Wait for new image file to appear...");
-		String newImageFile = monitor.getNextAppearingFile(inputFileDir);
+		String newImageFile = monitor.getNextAppearingFile(inputFileDir, 5000);
 		if (newImageFile == null) {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">WARNING: Detected plant ID " + plantID
 					+ ", but could not find a new image being created!");
-			return;
+			throw new Exception("No valid file appeared within the expected time period of a maximum of 5 seconds!");
 		}
 		newImageFile = inputFileDir + File.separator + newImageFile;
 		while (SystemAnalysis.isFileOpen(newImageFile)) {
@@ -63,8 +63,8 @@ public class SnapshotCreator {
 		boolean res = new File(newImageFile).renameTo(outputfile);
 		
 		if (res) {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(snapshotDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
+			FileOutputStream fos = new FileOutputStream(snapshotDir.getAbsolutePath() + File.separator + "info.txt");
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, "utf-8"));
 			writer.write("IdTag: " + plantID + "\r\n");
 			// writer.write("Color: 0" + "\r\n");
 			writer.write("Creator: " + getUserName() + "\r\n");
@@ -75,13 +75,14 @@ public class SnapshotCreator {
 			// writer.write("Weight after [g]: -1" + "\r\n");
 			// writer.write("Water amount [ml]: -1" + "\r\n");
 			writer.close();
-			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(imageDir.getAbsolutePath() + File.separator + "info.txt"), "utf-8"));
+			fos.close();
+			fos = new FileOutputStream(imageDir.getAbsolutePath() + File.separator + "info.txt");
+			writer = new BufferedWriter(new OutputStreamWriter(fos, "utf-8"));
 			writer.write("Camera label: RgbSide" + "\r\n");
 			writer.write("MM pro pixel X: 0" + "\r\n");
 			writer.write("MM pro pixel Y: 0" + "\r\n");
 			writer.close();
-			
+			fos.close();
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: " + plantID
 					+ ": Barcode detected, snapshot data saved and input file moved to target directory.");
 		} else

@@ -17,18 +17,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
  */
 public class DirectoryMonitor {
 	
-	private final String inputFileDir;
-	
-	public DirectoryMonitor(String inputFileDir) throws IOException {
-		this.inputFileDir = inputFileDir;
-	}
-	
-	public String getNextAppearingFile(String inputFileDir) throws InterruptedException, IOException {
+	public String getNextAppearingFile(String inputFileDir, long timeout) throws InterruptedException, IOException {
 		WatchService watchService;
 		Path path;
 		watchService = FileSystems.getDefault().newWatchService();
 		path = Paths.get(inputFileDir);
 		path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
+		long start = System.currentTimeMillis();
 		for (;;) {
 			WatchKey key = watchService.poll(500, TimeUnit.MILLISECONDS);
 			if (key == null)
@@ -48,6 +43,9 @@ public class DirectoryMonitor {
 			if (!valid) {
 				break;
 			}
+			long curr = System.currentTimeMillis();
+			if (curr - start > timeout)
+				break;
 		}
 		watchService.close();
 		return null;
