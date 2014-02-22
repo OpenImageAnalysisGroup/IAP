@@ -104,11 +104,12 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							continue;
 						BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 						
-						int voxelresolution = getInt("Voxel Resolution", 300);
+						int voxelresolution = getInt("Voxel Resolution", 500);
 						int widthFactor = getInt("Content Width", 40);
 						GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
 						
-						ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor);
+						ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor,
+								getInt("Probability Threshold", 100));
 						mg.setCameraDistance(getInt("Camera Distance", 3200));
 						mg.setCubeSideLength(getInt("Visible Box Size X", 300), getInt("Visible Box Size Y", 300), getInt("Visible Box Size Z", 300));
 						
@@ -229,7 +230,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							if (saveVolumeDataset) {
 								summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
 							}
-							if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
+							if (getBoolean("Debug - Save 3D-Render to Desktop", true)) {
 								try {
 									File f = new File(ReleaseInfo.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
 									MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
