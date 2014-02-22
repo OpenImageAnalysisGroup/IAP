@@ -57,6 +57,7 @@ public class CleanupCompactHelper implements RunnableOnDB {
 			status.setCurrentStatusValueFine(100d);
 		} else {
 			Set<String> col = db.getCollectionNames();
+			WriteConcern wc = db.getWriteConcern();
 			int n = 0;
 			for (String mgfs : col) {
 				String msg = "Start compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime();
@@ -68,12 +69,9 @@ public class CleanupCompactHelper implements RunnableOnDB {
 				m.put("compact", mgfs);// + ".files");
 				m.put("force", true);
 				BasicDBObject cmd = new BasicDBObject(m);
-				WriteConcern wc = db.getWriteConcern();
-				db.setWriteConcern(WriteConcern.NONE);
+				db.setWriteConcern(WriteConcern.JOURNALED);
 				db.command(cmd);
-				db.setWriteConcern(wc);
 				SystemAnalysis.sleep(10000);
-				
 				msg = "Finished compact collection (" + mgfs + ") // " + SystemAnalysis.getCurrentTime();
 				System.out.println(msg);
 				MongoDB.saveSystemMessage(msg);
@@ -81,6 +79,7 @@ public class CleanupCompactHelper implements RunnableOnDB {
 				n++;
 				status.setCurrentStatusValueFine(100d * n / col.size());
 			}
+			db.setWriteConcern(wc);
 			String msg = "COMPACT DATABASE FINISHED // "
 					+ SystemAnalysis.getCurrentTime();
 			System.out.println(msg);
