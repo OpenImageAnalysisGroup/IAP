@@ -107,7 +107,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 					}
 				}
 				// check all gridFS file collections and look for matching hash value...
-				boolean ensureIndex = false;
+				boolean ensureIndex = MongoDB.getEnsureIndex();
 				if (ensureIndex)
 					for (String fs : MongoGridFS.getFileCollections()) {
 						DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
