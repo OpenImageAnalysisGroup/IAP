@@ -41,7 +41,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		debug = getBoolean("debug", false);
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		
 		ImageOperation img = null;
 		{
@@ -113,10 +113,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getProperties().storeResults("RESULT_", rt, getBlockPosition());
+		getResultSet().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
-			getProperties().addImagePostProcessor(CameraType.VIS, roi, null);
+			getResultSet().addImagePostProcessor(CameraType.VIS, roi, null);
 		}
 		ress.show("res", debug);
 		return ress;

@@ -36,8 +36,8 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 						getInt("Remove-Pure-White_Noise-Size-Area", 50),
 						getInt("Remove-Pure-White_Noise-Size-Dimension", 50))
 				.show("REMOVED WHITE AREA INSIDE THE BOX", debug);
-		io = io.replaceColor(options.getBackground(), blue);
-		io = io.threshold(getInt("minimum brightness", 10), options.getBackground(), blue)
+		io = io.replaceColor(optionsAndResults.getBackground(), blue);
+		io = io.threshold(getInt("minimum brightness", 10), optionsAndResults.getBackground(), blue)
 				.show("minimum brightness filtered", debug);
 		ImageOperation removeBlack = img.copy().io().blur(20).thresholdGrayClearLowerThan(150).show("large black area", debug);
 		io = io.erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 70))
@@ -46,7 +46,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 				getInt("Remove-All-Outside-Box_Noise-Size-Area", 800 * 800),
 				getInt("Remove-All-Outside-Box_Noise-Size-Dimension", 800))
 				.show("REMOVED NOISE OUTSIDE THE BOX ", debug);
-		ImageOperation r = input().images().vis().io().applyMask(io.getImage(), options.getBackground())
+		ImageOperation r = input().images().vis().io().applyMask(io.getImage(), optionsAndResults.getBackground())
 				.show("input for adaptive thresholding for edge detection", debug);
 		r = r.adaptiveThresholdForGrayscaleImage(
 				getInt("Adaptive_Thresholding_Region_Size", 5),
