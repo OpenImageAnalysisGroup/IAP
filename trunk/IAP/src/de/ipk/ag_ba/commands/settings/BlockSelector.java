@@ -142,26 +142,7 @@ public class BlockSelector {
 	}
 	
 	public static String getBlockTypeAnnotation(BlockType bt) {
-		String type = "";
-		switch (bt) {
-			case ACQUISITION:
-				type = "<span style=\"background-color:#DDFFDD\">";
-				break;
-			case FEATURE_EXTRACTION:
-				type = "<span style=\"background-color:#DDDDFF\">";
-				break;
-			case POSTPROCESSING:
-				type = "<span style=\"background-color:#DDFFFF\">";
-				break;
-			case PREPROCESSING:
-				type = "<span style=\"background-color:#FFFFDD\">";
-				break;
-			case SEGMENTATION:
-				type = "<span style=\"background-color:#FFDDDD\">";
-				break;
-			default:
-				break;
-		}
+		String type = "<span style=\"background-color:" + bt.getColor() + "\">";
 		if (!type.isEmpty())
 			type += "<font color='gray' size='-4'>" +
 					"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
