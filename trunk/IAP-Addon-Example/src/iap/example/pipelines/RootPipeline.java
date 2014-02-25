@@ -10,8 +10,8 @@ import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.example.blocks.extraction.BlRootsSkeletonize;
-import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 
@@ -36,7 +36,7 @@ public class RootPipeline extends AbstractPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		BlKMeansVis km = new BlKMeansVis();
 		{ // init settings
 		
