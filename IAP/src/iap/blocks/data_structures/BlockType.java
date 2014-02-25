@@ -19,4 +19,20 @@ public enum BlockType {
 				return "[Unknown BlockType]";
 		}
 	}
+	
+	public String getColor() {
+		switch (this) {
+			case ACQUISITION:
+				return "#DDFFDD";
+			case FEATURE_EXTRACTION:
+				return "#DDDDFF";
+			case POSTPROCESSING:
+				return "#DDFFFF";
+			case PREPROCESSING:
+				return "#FFFFDD";
+			case SEGMENTATION:
+				return "#FFDDDD";
+		}
+		return "";
+	}
 }
