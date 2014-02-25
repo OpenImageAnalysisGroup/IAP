@@ -36,7 +36,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 		if (mask == null || image == null || n == 0) {
 			return mask;
 		}
-		return closing(mask, image, options.getBackground(), n);
+		return closing(mask, image, optionsAndResults.getBackground(), n);
 	}
 	
 	private static Image closing(Image flMask, Image flImage, int iBackgroundFill, int closingRepeat) {

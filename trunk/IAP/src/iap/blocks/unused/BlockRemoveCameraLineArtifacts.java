@@ -38,7 +38,7 @@ public class BlockRemoveCameraLineArtifacts extends AbstractBlock {
 		int h = mask.getHeight();
 		int[] filledPixelsPerLine = new int[h];
 		int[] filledPixelsPerColumn = new int[w];
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		for (int y = 0; y < h; y++) {
 			int filled = 0;
 			int yw = y * w;

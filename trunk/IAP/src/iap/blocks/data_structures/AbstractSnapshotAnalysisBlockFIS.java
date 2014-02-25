@@ -7,7 +7,7 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
@@ -15,6 +15,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+@Deprecated
 public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnalysisBlockFIS {
 	
 	private int prio = 4;
@@ -219,18 +220,16 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	}
 	
 	public boolean isBestAngle() {
-		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
-				.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true);
+		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
+				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null);
 		
 		double sum = 0;
 		int count = 0;
 		
-		for (HashMap<Integer, ArrayList<BlockPropertyValue>> a : previousResults.values()) {
-			for (ArrayList<BlockPropertyValue> b : a.values()) {
-				for (BlockPropertyValue c : b) {
-					count++;
-					sum += c.getValue();
-				}
+		for (ArrayList<BlockResultValue> b : previousResults.values()) {
+			for (BlockResultValue c : b) {
+				count++;
+				sum += c.getValue();
 			}
 		}
 		

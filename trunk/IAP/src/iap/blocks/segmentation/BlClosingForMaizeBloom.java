@@ -38,7 +38,7 @@ public class BlClosingForMaizeBloom extends AbstractSnapshotAnalysisBlock {
 		// int h = mask.getHeight();
 		
 		// erodeRetainingLines()
-		Image workImage = closing(mask.io().getImage(), options.getBackground(), lThresh, bThresh, aDiffFromZero).show("DDDDDD", false);
+		Image workImage = closing(mask.io().getImage(), optionsAndResults.getBackground(), lThresh, bThresh, aDiffFromZero).show("DDDDDD", false);
 		// run twice, because on the input image above "erode" is called once
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);
 		// workImage = closing(workImage, options.getBackground(), lThresh, bThresh, aDiffFromZero);

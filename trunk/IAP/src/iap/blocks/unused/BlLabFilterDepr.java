@@ -5,7 +5,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -54,7 +54,7 @@ public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlock {
 						visMask.closing(
 								getInt("Closing-count-dilate", 2),
 								getInt("Closing-count-erode", 4)).getImage(),
-						options.getBackground());
+						optionsAndResults.getBackground());
 				
 				if (fis != null)
 					fis.addImage("blue filtered by HSV", visMask.getImage(), null);
@@ -70,7 +70,7 @@ public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlock {
 						LAB_MAX_A_VALUE_VIS,
 						LAB_MIN_B_VALUE_VIS,
 						LAB_MAX_B_VALUE_VIS,
-						options.getBackground(), false);
+						optionsAndResults.getBackground(), false);
 				
 				if (fis != null)
 					fis.addImage("main lab filter", visMask.getImage(), null);
@@ -80,7 +80,7 @@ public class BlLabFilterDepr extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private void initLABfilterValues() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			LAB_MIN_L_VALUE_VIS = getInt("LAB_L_MIN", 100);
 			LAB_MAX_L_VALUE_VIS = getInt("LAB_L_MAX", 255);
 			LAB_MIN_A_VALUE_VIS = getInt("LAB_A_MIN", 0);

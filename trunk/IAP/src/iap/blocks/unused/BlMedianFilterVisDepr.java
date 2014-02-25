@@ -28,7 +28,7 @@ public class BlMedianFilterVisDepr extends AbstractSnapshotAnalysisBlock {
 				.border(2).getImage();
 		
 		return new ImageOperation(input().images().vis())
-				.applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
+				.applyMask_ResizeSourceIfNeeded(medianMask, optionsAndResults.getBackground()).getImage();
 	}
 	
 	@Override

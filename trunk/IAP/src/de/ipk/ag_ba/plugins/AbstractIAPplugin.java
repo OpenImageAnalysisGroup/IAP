@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.plugins;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -44,7 +44,7 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 			TreeSet<ImageAnalysisBlock> res = new TreeSet<ImageAnalysisBlock>();
 			for (AnalysisPipelineTemplate t : getAnalysisTemplates()) {
 				SystemOptions options = null;
-				ImageProcessorOptions ipo = new ImageProcessorOptions(options, null);
+				ImageProcessorOptionsAndResults ipo = new ImageProcessorOptionsAndResults(options, null, null);
 				ImageAnalysisBlock[] bl = t.getBlockList(ipo);
 				if (bl != null)
 					for (ImageAnalysisBlock b : bl) {

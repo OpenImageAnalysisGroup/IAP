@@ -17,14 +17,14 @@ import java.util.TreeMap;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 
 /**
  * @author klukas
  */
-public class ImageProcessorOptions {
+public class ImageProcessorOptionsAndResults {
 	
 	public static final double DEFAULT_MARKER_DIST = 1150d;
 	
@@ -44,9 +44,13 @@ public class ImageProcessorOptions {
 	
 	private Double cameraAngle;
 	
-	public ImageProcessorOptions(SystemOptions options, TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint) {
+	private final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults;
+	
+	public ImageProcessorOptionsAndResults(SystemOptions options, TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults) {
 		this.optSystemOptionStorage = options;
 		this.previousResultsForThisTimePoint = previousResultsForThisTimePoint;
+		this.plantResults = plantResults;
 	}
 	
 	public enum CameraPosition {
@@ -208,6 +212,8 @@ public class ImageProcessorOptions {
 	
 	Double calculatedBlueMarkerDistance = null;
 	
+	private String configAndAngle;
+	
 	public Double getCalculatedBlueMarkerDistance() {
 		return calculatedBlueMarkerDistance;
 	}
@@ -224,24 +230,44 @@ public class ImageProcessorOptions {
 			return realDist;
 	}
 	
+	public HashMap<Long, ArrayList<BlockResultValue>> searchPreviousResults(String string,
+			boolean exact, int well, String valid_config) {
+		if (valid_config == null) {
+			throw new IllegalArgumentException("valid_config must not be null!");
+		}
+		HashMap<Long, ArrayList<BlockResultValue>> res = new HashMap<Long, ArrayList<BlockResultValue>>();
+		synchronized (plantResults) {
+			for (Long time : plantResults.keySet()) {
+				HashMap<String, ArrayList<BlockResultValue>> r = searchResultsOfCurrentSnapshot(string, exact, well, valid_config);
+				for (String k : r.keySet()) {
+					res.put(time, r.get(k));
+				}
+			}
+		}
+		return res;
+	}
+	
 	/**
-	 * @return config -> well -> result list
+	 * @param valid_config
+	 *           - can be null to get all results (all angles).
+	 * @return config -> result list
 	 */
-	public HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot(String string,
-			boolean exact) {
-		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> res = new HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>>();
+	public HashMap<String, ArrayList<BlockResultValue>> searchResultsOfCurrentSnapshot(String string,
+			boolean exact, int valid_well, String valid_config) {
+		HashMap<String, ArrayList<BlockResultValue>> res = new HashMap<String, ArrayList<BlockResultValue>>();
 		if (previousResultsForThisTimePoint != null) {
 			synchronized (previousResultsForThisTimePoint) {
 				for (String config : previousResultsForThisTimePoint.keySet()) {
+					if (valid_config != null && !valid_config.equals(config))
+						continue;
 					HashMap<Integer, BlockResultSet> rs = previousResultsForThisTimePoint.get(config);
 					if (rs != null && !rs.isEmpty()) {
 						for (Integer well : rs.keySet()) {
-							if (res.get(config) == null) {
-								res.put(config, new HashMap<Integer, ArrayList<BlockPropertyValue>>());
-							}
-							ArrayList<BlockPropertyValue> v = rs.get(well).getPropertiesSearch(exact, string);
+							if (well != valid_well)
+								continue;
+							ArrayList<BlockResultValue> v = rs.get(well).searchResults(exact, string);
 							if (v != null)
-								res.get(config).put(well, v);
+								res.put(config, v);
 						}
 					}
 				}
@@ -252,5 +278,14 @@ public class ImageProcessorOptions {
 	
 	public Double getCameraAngle() {
 		return cameraAngle;
+	}
+	
+	public void setConfigAndAngle(String configAndAngle) {
+		this.configAndAngle = configAndAngle;
+		
+	}
+	
+	public String getConfigAndAngle() {
+		return configAndAngle;
 	}
 }

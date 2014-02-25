@@ -2,7 +2,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,8 +59,8 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 		if (image == null)
 			return;
 		
-		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-		Double realMarkerDist = options.getREAL_MARKER_DISTANCE();
+		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+		Double realMarkerDist = optionsAndResults.getREAL_MARKER_DISTANCE();
 		if (distHorizontal == null)
 			realMarkerDist = null;
 		
@@ -68,12 +68,12 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 				/ (distHorizontal * distHorizontal)
 				: 1;
 		// double normFactor = distHorizontal != null && realMarkerDist != null ? realMarkerDist / distHorizontal : 1;
-		String pos = options.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+		String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 		int filledArea = image.io().countFilledPixels();
 		if (distHorizontal != null) {
-			getProperties().setNumericProperty(getBlockPosition(), pos + prefix + "area.norm", filledArea * normFactorArea, "mm^2");
+			getResultSet().setNumericResult(getBlockPosition(), pos + prefix + "area.norm", filledArea * normFactorArea, "mm^2");
 		}
-		getProperties().setNumericProperty(getBlockPosition(), pos + prefix + "area", filledArea, "px^2");
+		getResultSet().setNumericResult(getBlockPosition(), pos + prefix + "area", filledArea, "px^2");
 	}
 	
 	@Override

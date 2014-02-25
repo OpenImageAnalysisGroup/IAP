@@ -34,6 +34,11 @@ public class MorphologicalOperation {
 	}
 	
 	public MorphologicalOperation erode_or_dilate(int maskSize, boolean erode) {
+		int background = ImageOperation.BACKGROUND_COLORint;
+		return erode_or_dilate(maskSize, erode, background);
+	}
+	
+	public MorphologicalOperation erode_or_dilate(int maskSize, boolean erode, int background) {
 		int[][] roundmask = getRoundMask(maskSize);
 		
 		int[][] img2d = image.getAs2A();
@@ -45,7 +50,6 @@ public class MorphologicalOperation {
 		
 		boolean isfilled = erode;
 		
-		int background = ImageOperation.BACKGROUND_COLORint;
 		int foreground = Color.RED.getRGB();
 		
 		for (int x = 0; x < w; x++) {
@@ -77,7 +81,7 @@ public class MorphologicalOperation {
 				if (isfilled)
 					res[x][y] = foreground;
 				else
-					res[x][y] = background;
+					res[x][y] = ImageOperation.BACKGROUND_COLORint;
 				
 				isfilled = erode;
 			}

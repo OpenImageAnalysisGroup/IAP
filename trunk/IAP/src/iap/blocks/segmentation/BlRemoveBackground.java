@@ -5,7 +5,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -90,7 +90,7 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 							.filterRemainHSV(getDouble("Clear-background-vis-remain-distance", 0.02), getDouble("Clear-background-vis-remain-hue", 0.62))
 							.getImage())
 					.getImage();
-			return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, options.getBackground())
+			return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, optionsAndResults.getBackground())
 					.show("CLEAR RESULT", debug).getImage();
 		} else {
 			return null;
@@ -132,7 +132,7 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 						getIntArray("Clear-background-fluo-max-a-array", new Integer[] { 140 + 5, 104 + 15, 169 + 4, 250 }),
 						getIntArray("Clear-background-fluo-min-b-array", new Integer[] { 116 - 5, 206 - 20, 160 - 4, 0 }),
 						getIntArray("Clear-background-fluo-max-b-array", new Integer[] { 175 + 5, 206 + 20, 160 + 4, 250 }),
-						options.getBackground(), Integer.MAX_VALUE, false,
+						optionsAndResults.getBackground(), Integer.MAX_VALUE, false,
 						new Integer[] {}, new Integer[] {},
 						new Integer[] {}, new Integer[] {},
 						new Integer[] {}, new Integer[] {},
@@ -140,10 +140,10 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 						blueCurbHeightEndBarly0_8).
 						show("removed noise", debug).getImage();
 				
-				result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground()).getImage();
+				result = result.copy().io().applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, optionsAndResults.getBackground()).getImage();
 			}
 			if (debug)
-				result.copy().io().replaceColor(options.getBackground(), Color.YELLOW.getRGB()).show("Left-Over");
+				result.copy().io().replaceColor(optionsAndResults.getBackground(), Color.YELLOW.getRGB()).show("Left-Over");
 			
 			return result;
 		} else {
@@ -188,9 +188,9 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 				int blackDiff = getInt("Clear-background-nir-black-diff-top", 20);
 				int whiteDiff = getInt("Clear-background-nir-white-diff-top", 20);
 				Image msk = new ImageOperation(nir.show("NIR MSK", debug)).compare()
-						.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, options.getBackground())
+						.compareGrayImages(input().images().nir(), blackDiff, whiteDiff, optionsAndResults.getBackground())
 						.show("result nir", debug).getImage();
-				return input().images().nir().io().applyMask(msk, options.getBackground()).getImage();
+				return input().images().nir().io().applyMask(msk, optionsAndResults.getBackground()).getImage();
 			}
 			return nir;
 		} else {
@@ -238,11 +238,11 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		if (!getBoolean("copy only nir image to mask", false))
-			if (options.getCameraPosition() == CameraPosition.SIDE) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 				Image i = processedImages.nir();
 				Image m = processedMasks.nir();
 				if (i != null && m != null) {
-					i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), options.getBackground()).getImage();
+					i = i.io().applyMask_ResizeMaskIfNeeded(m.io().getImage(), optionsAndResults.getBackground()).getImage();
 					i = i.io().replaceColor(ImageOperation.BACKGROUND_COLORint, new Color(180, 180, 180).getRGB()).getImage();
 					processedImages.setNir(i);
 					processedMasks.setNir(i.copy());

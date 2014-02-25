@@ -2,7 +2,7 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessor;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
@@ -43,7 +43,7 @@ public class UserDefinedImageAnalysisPipelineTask extends AbstractPhenotypingTas
 			}
 			
 			@Override
-			public BlockPipeline getPipeline(ImageProcessorOptions options) {
+			public BlockPipeline getPipeline(ImageProcessorOptionsAndResults options) {
 				return getPipelineFromBlockList(getSystemOptions(), null);
 			}
 		};

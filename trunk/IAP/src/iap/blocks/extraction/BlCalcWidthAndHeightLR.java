@@ -3,7 +3,7 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -46,10 +46,10 @@ public class BlCalcWidthAndHeightLR extends
 	@Override
 	protected Image processVISmask() {
 		
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		
-		Double realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
-		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
+		Double realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
+		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
 		
 		boolean useFluo = false;// options.isMaize();
 		
@@ -59,24 +59,24 @@ public class BlCalcWidthAndHeightLR extends
 		
 		int vertYsoilLevel = -1;
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			if (useFluo) {
-				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(options.getCameraPosition())) != null)
-					vertYsoilLevel = (int) getProperties()
-							.getNumericProperty(
+				if (getResultSet().searchNumericResult(0, 1,
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(optionsAndResults.getCameraPosition())) != null)
+					vertYsoilLevel = (int) getResultSet()
+							.searchNumericResult(
 									0,
 									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(options.getCameraPosition()))
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(optionsAndResults.getCameraPosition()))
 							.getValue();
 			} else {
-				if (getProperties().getNumericProperty(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(options.getCameraPosition())) != null)
-					vertYsoilLevel = (int) getProperties()
-							.getNumericProperty(
+				if (getResultSet().searchNumericResult(0, 1,
+						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(optionsAndResults.getCameraPosition())) != null)
+					vertYsoilLevel = (int) getResultSet()
+							.searchNumericResult(
 									0,
 									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(options.getCameraPosition()))
+									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(optionsAndResults.getCameraPosition()))
 							.getValue();
 			}
 		}
@@ -86,7 +86,7 @@ public class BlCalcWidthAndHeightLR extends
 				: input().masks().vis();
 		int run = 0;
 		for (Image img : new Image[] { inImg, left(inImg), right(inImg) })
-			if (options.getCameraPosition() == CameraPosition.SIDE && img != null) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && img != null) {
 				run++;
 				final TopBottomLeftRight temp = getWidthAndHeightSide(img,
 						background, vertYsoilLevel);
@@ -108,7 +108,7 @@ public class BlCalcWidthAndHeightLR extends
 					boolean drawVerticalHeightBar = getBoolean("Draw Height Line", true);
 					if (drawVerticalHeightBar)
 						if (!useFluo) {
-							getProperties().addImagePostProcessor(
+							getResultSet().addImagePostProcessor(
 									new RunnableOnImageSet() {
 										@Override
 										public Image postProcessImage(
@@ -182,35 +182,35 @@ public class BlCalcWidthAndHeightLR extends
 					
 					if (distHorizontal != null && realMarkerDistHorizontal != null) {
 						if (run == 1)
-							getProperties()
-									.setNumericProperty(
+							getResultSet()
+									.setNumericResult(
 											getBlockPosition(),
 											"RESULT_side.width.norm",
 											values.x
 													* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
 						if (run == 1)
-							getProperties()
-									.setNumericProperty(
+							getResultSet()
+									.setNumericResult(
 											getBlockPosition(),
 											"RESULT_side.height.norm",
 											values.y
 													* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
 						else
-							getProperties()
-									.setNumericProperty(
+							getResultSet()
+									.setNumericResult(
 											getBlockPosition(),
 											"RESULT_side.height.norm_cut." + run,
 											values.y
 													* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
 					}
 					if (run == 1)
-						getProperties().setNumericProperty(getBlockPosition(),
+						getResultSet().setNumericResult(getBlockPosition(),
 								"RESULT_side.width", values.x, "px");
 					if (run == 1)
-						getProperties().setNumericProperty(getBlockPosition(),
+						getResultSet().setNumericResult(getBlockPosition(),
 								"RESULT_side.height", values.y, "px");
 					else
-						getProperties().setNumericProperty(getBlockPosition(),
+						getResultSet().setNumericResult(getBlockPosition(),
 								"RESULT_side.height_cut." + run, values.y, "px");
 				}
 			}
@@ -218,11 +218,11 @@ public class BlCalcWidthAndHeightLR extends
 	}
 	
 	private Image right(Image inImg) {
-		return inImg.io().clearImageLeft(0.5, options.getBackground()).getImage();
+		return inImg.io().clearImageLeft(0.5, optionsAndResults.getBackground()).getImage();
 	}
 	
 	private Image left(Image inImg) {
-		return inImg.io().clearImageRight(0.5, options.getBackground()).getImage();
+		return inImg.io().clearImageRight(0.5, optionsAndResults.getBackground()).getImage();
 	}
 	
 	private TopBottomLeftRight getWidthAndHeightSide(Image vis,

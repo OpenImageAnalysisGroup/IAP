@@ -5,7 +5,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -30,9 +30,9 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		boolean doBambooRemoval = getBoolean("REMOVE_BAMBOO_STICK", false);
 		if (!doBambooRemoval)
 			return;
-		if (options.getCameraPosition() == CameraPosition.SIDE)
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
 			if (processedMasks.vis() != null && processedMasks.fluo() != null) {
-				int background = options.getBackground();
+				int background = optionsAndResults.getBackground();
 				boolean show = false;
 				// visible search most high Y
 				TopBottomLeftRight extremePoints = new ImageOperation(processedMasks.vis().show("Mask Search For Maxima", show)).getExtremePoints(background);
@@ -52,7 +52,7 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		if (!doBambooRemoval)
 			return input().masks().vis();
 		if (input().masks().vis() != null) {
-			if (options.getCameraPosition() == CameraPosition.SIDE) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 				return clearBamboo(input().masks().vis());
 			}
 			return input().masks().vis();
@@ -64,13 +64,13 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		int widthQuarter = mask.getWidth() / 4;
 		int width = mask.getWidth();
 		int height = mask.getHeight();
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		
 		int pixelsInCluster = 0;
 		int numberOfClusterPerLine = 0;
 		boolean maize = true;
 		Image yellow = new ImageOperation(labFilter(mask, mask,
-				150, 255, 108, 165, 127, 255, options.getCameraPosition(), maize)).opening(1, 1).getImage();
+				150, 255, 108, 165, 127, 255, optionsAndResults.getCameraPosition(), maize)).opening(1, 1).getImage();
 		
 		int[] yellowarr = yellow.getAs1A();
 		int[] origarr = mask.getAs1A();
@@ -143,7 +143,7 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		int width = workMask.getWidth();
 		int height = workMask.getHeight();
 		
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		
 		ImageOperation.thresholdLAB(width, height, image, result,
 				lowerValueOfL, upperValueOfL,
@@ -153,7 +153,7 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		
 		Image mask = new Image(width, height, result);
 		
-		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, options.getBackground()).getImage();
+		return new ImageOperation(originalImage).applyMask_ResizeSourceIfNeeded(mask, optionsAndResults.getBackground()).getImage();
 	}
 	
 	@Override

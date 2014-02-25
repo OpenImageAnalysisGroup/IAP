@@ -5,7 +5,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -64,7 +64,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 						visMask.closing(
 								getInt("Closing-count-dilate", 2),
 								getInt("Closing-count-erode", 4)).getImage(),
-						options.getBackground());
+						optionsAndResults.getBackground());
 				
 				if (fis != null)
 					fis.addImage("blue filtered by HSV", visMask.getImage(), null);
@@ -79,7 +79,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 						LAB_MIN_L_VALUE_VIS, LAB_MAX_L_VALUE_VIS,
 						LAB_MIN_A_VALUE_VIS, LAB_MAX_A_VALUE_VIS,
 						LAB_MIN_B_VALUE_VIS, LAB_MAX_B_VALUE_VIS,
-						options.getBackground(),
+						optionsAndResults.getBackground(),
 						Integer.MAX_VALUE,
 						getBoolean("Return filtered image", true),
 						new Integer[] {}, new Integer[] {},
@@ -98,7 +98,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 				// LAB_MAX_B_VALUE_VIS,
 				// options.getBackground(), false);
 				
-				visMask = visMask.applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground());
+				visMask = visMask.applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, optionsAndResults.getBackground());
 				
 				if (fis != null)
 					fis.addImage("main lab filter", visMask.getImage(), null);
@@ -133,7 +133,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 						fluoMask.closing(
 								getInt("Closing-count-dilate", 2),
 								getInt("Closing-count-erode", 4)).getImage(),
-						options.getBackground());
+						optionsAndResults.getBackground());
 				
 				if (fis != null)
 					fis.addImage("blue filtered by HSV", fluoMask.getImage(), null);
@@ -148,7 +148,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 						LAB_MIN_L_VALUE_FLUO, LAB_MAX_L_VALUE_FLUO,
 						LAB_MIN_A_VALUE_FLUO, LAB_MAX_A_VALUE_FLUO,
 						LAB_MIN_B_VALUE_FLUO, LAB_MAX_B_VALUE_FLUO,
-						options.getBackground(),
+						optionsAndResults.getBackground(),
 						Integer.MAX_VALUE,
 						getBoolean("Return filtered image", true),
 						new Integer[] {}, new Integer[] {},
@@ -158,7 +158,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 						blueCurbHeightEndBarly0_8).
 						show("removed lab", debug).getImage();
 				
-				fluoMask = fluoMask.applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, options.getBackground());
+				fluoMask = fluoMask.applyMaskInversed_ResizeMaskIfNeeded(toBeFiltered, optionsAndResults.getBackground());
 				
 				if (fis != null)
 					fis.addImage("main lab filter", fluoMask.getImage(), null);
@@ -168,7 +168,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private void initLABfilterValuesVis() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			
 			LAB_MIN_L_VALUE_VIS = getIntArray("Lab-filter-vis-min-l-array", new Integer[] { 100, -1, -1, -1 });
 			LAB_MAX_L_VALUE_VIS = getIntArray("Lab-filter-vis-max-l-array", new Integer[] { 255, -1, -1, -1 });
@@ -188,7 +188,7 @@ public class BlLabFilterExt extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private void initLABfilterValuesFluo() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			LAB_MIN_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-l-array", new Integer[] { 100, -1, -1, -1 });
 			LAB_MAX_L_VALUE_FLUO = getIntArray("Lab-filter-fluo-max-l-array", new Integer[] { 255, -1, -1, -1 });
 			LAB_MIN_A_VALUE_FLUO = getIntArray("Lab-filter-fluo-min-a-array", new Integer[] { 0, -1, -1, -1 });

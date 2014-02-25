@@ -2,7 +2,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -35,8 +35,8 @@ public class BlCalcConvexHull extends AbstractBlock {
 		boolean debug = getBoolean("debug", false);
 		
 		ResultsTableWithUnits numericResults;
-		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-		Double realDist = options.getREAL_MARKER_DISTANCE();
+		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+		Double realDist = optionsAndResults.getREAL_MARKER_DISTANCE();
 		if (distHorizontal == null)
 			realDist = null;
 		boolean drawHull = getBoolean("draw_convex_hull", true);
@@ -45,7 +45,7 @@ public class BlCalcConvexHull extends AbstractBlock {
 		boolean drawCircle = getBoolean("draw_circle", true);
 		
 		ImageOperation res = new ImageOperation(image).show(prefix + " input image", debug).hull()
-				.find(getProperties(), true, false,
+				.find(getResultSet(), true, false,
 						drawHull, drawPCLine, drawHull, drawMinRect, drawCircle,
 						Color.RED.getRGB(),
 						Color.CYAN.getRGB(),
@@ -55,12 +55,12 @@ public class BlCalcConvexHull extends AbstractBlock {
 						distHorizontal, realDist);
 		
 		numericResults = res.getResultsTable();
-		if (options.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
+			getResultSet().storeResults(
 					"RESULT_side." + prefix, numericResults,
 					getBlockPosition());
-		if (options.getCameraPosition() == CameraPosition.TOP && numericResults != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && numericResults != null)
+			getResultSet().storeResults(
 					"RESULT_top." + prefix, numericResults, getBlockPosition());
 		
 		res.getImage().show("output image", debug);

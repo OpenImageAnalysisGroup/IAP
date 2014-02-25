@@ -51,7 +51,7 @@ public class BlCutFromSide extends AbstractBlock {
 		if (!doCutMarker && !doCutFixed)
 			return mask;
 		
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		
 		if (getBoolean("Use gray NIR background", false) && mask.getCameraType() == CameraType.NIR) {
 			int gray = new Color(180, 180, 180).getRGB();
@@ -66,7 +66,7 @@ public class BlCutFromSide extends AbstractBlock {
 		boolean cropMarker = true;
 		if (!cropMarker)
 			if (doCutMarker) {
-				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle(options);
+				Rectangle2D.Double r = ((BlockResults) getResultSet()).getRelativeBlueMarkerRectangle(optionsAndResults);
 				if (r != null) {
 					double cutoffMarkerSide = getDouble("Marker cut left and right offset (percent)", 10) / 100d;
 					double cutoffMarkerTop = getDouble("Marker cut top offset (percent)", 30) / 100d;
@@ -100,7 +100,7 @@ public class BlCutFromSide extends AbstractBlock {
 		
 		if (cropMarker)
 			if (doCutMarker) {
-				Rectangle2D.Double r = ((BlockResults) getProperties()).getRelativeBlueMarkerRectangle(options);
+				Rectangle2D.Double r = ((BlockResults) getResultSet()).getRelativeBlueMarkerRectangle(optionsAndResults);
 				
 				if (r != null) {
 					// crop according to markers

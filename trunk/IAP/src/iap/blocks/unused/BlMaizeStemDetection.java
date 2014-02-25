@@ -37,7 +37,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		debug = getBoolean("debug", false);
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		String prefix4 = "prefix4";
 		ImageOperation img = null;
 		{
@@ -107,7 +107,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getProperties().storeResults("RESULT_", rt, getBlockPosition());
+		getResultSet().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(20).getImage();
 		return ress;
 	}

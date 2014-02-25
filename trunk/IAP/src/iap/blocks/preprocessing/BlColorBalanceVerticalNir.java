@@ -6,7 +6,7 @@ import iap.blocks.data_structures.BlockType;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -66,11 +66,11 @@ public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 		
 		double[] pix;
 		
-		BlockProperty bpleftX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty bprightX = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult bpleftX = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bprightX = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 		
-		BlockProperty bpleftY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty bprightY = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult bpleftY = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bprightY = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
 		
 		ImageOperation io = new ImageOperation(image);
 		

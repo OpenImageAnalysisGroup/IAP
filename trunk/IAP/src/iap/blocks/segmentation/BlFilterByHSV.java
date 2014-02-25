@@ -87,13 +87,13 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 				processedMask = processedMask.and(mask);
 				image = image.io().applyMask(
 						processedMask.closing(getInt(pf + "dilate", 2), getInt(pf + "erode", 4)).getImage(),
-						options.getBackground()).getImage();
+						optionsAndResults.getBackground()).getImage();
 			}
 			if (st != null && st.size() > 0)
 				st.show("Debug mask");
 			// blur introduces new pixel areas, so the original mask is applied here, to shrink it down
 			// so that the result does not introduce new pixel areas, only less (filter operation)
-			processedMask = imageUnChanged.io().applyMask(processedMask.getImage(), options.getBackground());
+			processedMask = imageUnChanged.io().applyMask(processedMask.getImage(), optionsAndResults.getBackground());
 			return processedMask.getImage();
 		}
 	}

@@ -26,7 +26,7 @@ import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
 import iap.blocks.segmentation.BlUseFluoMaskToClearVis;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 
 /**
@@ -49,7 +49,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		return new ImageAnalysisBlock[] {
 				new BlLoadImagesIfNeeded(),
 				new BlColorBalanceVerticalFluo(),

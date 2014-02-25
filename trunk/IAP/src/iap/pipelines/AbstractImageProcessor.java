@@ -43,7 +43,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(
-			ImageProcessorOptions options,
+			ImageProcessorOptionsAndResults options,
 			ImageSet input,
 			ImageSet optInputMasks,
 			int maxThreadsPerImage,
@@ -71,7 +71,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	}
 	
 	@Override
-	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);
+	public abstract BlockPipeline getPipeline(ImageProcessorOptionsAndResults options);
 	
 	@Override
 	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPlantResults(
@@ -80,7 +80,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			ImageProcessorOptions options) throws InstantiationException,
+			ImageProcessorOptionsAndResults options) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(options);
 		return pipeline.postProcessPipelineResultsForAllAngles(

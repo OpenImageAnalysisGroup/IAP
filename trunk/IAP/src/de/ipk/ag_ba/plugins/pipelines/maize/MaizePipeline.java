@@ -35,7 +35,7 @@ import iap.blocks.segmentation.BlClosingForMaizeBloom;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
 
 /**
@@ -57,7 +57,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 	}
 	
 	@Override
-	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options) {
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		return new ImageAnalysisBlock[] {
 				// acquisition
 				new BlLoadImages(),

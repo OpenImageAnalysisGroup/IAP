@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.io.FileInfoXYZ;
@@ -1299,7 +1299,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									.getFileNameMain(),
 									targetTreeNode.getExperiment().getExperiment());
 					System.out.println("BLOCKS: " + iat.getImageProcessor().getPipeline(
-							new ImageProcessorOptions(iat.getSystemOptions(), null)).getSize() + ", Image Set Hits: " + match.size());
+							new ImageProcessorOptionsAndResults(iat.getSystemOptions(), null, null)).getSize() + ", Image Set Hits: " + match.size());
 					for (NumericMeasurementInterface nmi : match)
 						System.out.println("Image Set Match: " + nmi + " // Subtance: " + nmi.getParentSample().getParentCondition().getParentSubstance().getName());
 					BlockPipeline.debugTryAnalysis(

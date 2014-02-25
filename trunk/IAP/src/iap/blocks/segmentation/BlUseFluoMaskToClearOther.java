@@ -25,7 +25,7 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		if (getBoolean("process VIS and FLUO", true) && processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to VIS
 			if (processedMasks.vis() != null) {

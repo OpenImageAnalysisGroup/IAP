@@ -1,10 +1,10 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
-public class BlockProperty {
+public class BlockResult {
 	private final double value;
 	private final int blockPositionInPipeline;
 	
-	public BlockProperty(double value, int blockPositionInPipeline) {
+	public BlockResult(double value, int blockPositionInPipeline) {
 		this.value = value;
 		this.blockPositionInPipeline = blockPositionInPipeline;
 		

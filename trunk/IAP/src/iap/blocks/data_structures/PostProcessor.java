@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 
 /**
@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
  * @author Christian Klukas
  */
 public interface PostProcessor {
-	public ArrayList<BlockPropertyValue> postProcessCalculatedProperties(long time, int tray);
+	public ArrayList<BlockResultValue> postProcessCalculatedProperties(long time, int tray);
 	
 	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> getAllResults();
 }

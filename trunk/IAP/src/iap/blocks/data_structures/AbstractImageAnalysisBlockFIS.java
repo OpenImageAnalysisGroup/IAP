@@ -1,6 +1,6 @@
 package iap.blocks.data_structures;
 
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
@@ -29,7 +29,7 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -43,9 +43,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlock {
 	
 	private ImageStack debugStack;
-	protected ImageProcessorOptions options;
+	protected ImageProcessorOptionsAndResults optionsAndResults;
 	private MaskAndImageSet input;
-	private BlockResultSet properties;
+	private BlockResultSet resultSet;
 	private int blockPositionInPipeline;
 	private int well;
 	
@@ -59,47 +59,47 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public boolean getBoolean(String setting, boolean defaultValue) {
 		if (IAPmain.getRunMode() != IAPrunMode.SWING_MAIN && setting != null && setting.equals("debug")) {
-			boolean ret = options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
+			boolean ret = optionsAndResults != null ? optionsAndResults.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 			if (ret)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Enabled debug setting is ignored, as IAP is not running in Swing GUI mode.");
 			return false;
 		}
 		
-		return options != null ? options.getBooleanSetting(this, setting, defaultValue) : defaultValue;
+		return optionsAndResults != null ? optionsAndResults.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
 	public boolean getBoolean(ImageAnalysisBlock block, String setting, boolean defaultValue) {
-		return options.getBooleanSetting(block, setting, defaultValue);
+		return optionsAndResults.getBooleanSetting(block, setting, defaultValue);
 	}
 	
 	public int getInt(String setting, int defaultValue) {
-		return options.getIntSetting(this, setting, defaultValue);
+		return optionsAndResults.getIntSetting(this, setting, defaultValue);
 	}
 	
 	public double getDouble(String setting, double defaultValue) {
-		return options.getDoubleSetting(this, setting, defaultValue);
+		return optionsAndResults.getDoubleSetting(this, setting, defaultValue);
 	}
 	
 	public String getString(String setting, String defaultValue) {
-		return options.getStringSetting(this, setting, defaultValue);
+		return optionsAndResults.getStringSetting(this, setting, defaultValue);
 	}
 	
 	public Color getColor(String setting, Color defaultValue) {
-		return options.getColorSetting(this, setting, defaultValue);
+		return optionsAndResults.getColorSetting(this, setting, defaultValue);
 	}
 	
 	public Integer[] getIntArray(String setting, Integer[] defaultValue) {
-		return options.getIntArraySetting(this, setting, defaultValue);
+		return optionsAndResults.getIntArraySetting(this, setting, defaultValue);
 	}
 	
 	@Override
-	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptions options, BlockResultSet properties,
+	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet properties,
 			int blockPositionInPipeline,
 			ImageStack debugStack) {
 		this.input = input;
 		this.well = well;
-		this.options = options;
-		this.properties = properties;
+		this.optionsAndResults = options;
+		this.resultSet = properties;
 		this.blockPositionInPipeline = blockPositionInPipeline;
 		this.debugStack = debugStack;
 	}
@@ -116,13 +116,13 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
 			if (input().images().vis() != null || input().masks().vis() != null)
-				debugPipelineBlock(this.getClass(), CameraType.VIS, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.VIS, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
 			if (input().images().fluo() != null || input().masks().fluo() != null)
-				debugPipelineBlock(this.getClass(), CameraType.FLUO, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.FLUO, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
 			if (input().images().nir() != null || input().masks().nir() != null)
-				debugPipelineBlock(this.getClass(), CameraType.NIR, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.NIR, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
 			if (input().images().ir() != null || input().masks().ir() != null)
-				debugPipelineBlock(this.getClass(), CameraType.IR, input(), getProperties(), options, getBlockPosition(), this);
+				debugPipelineBlock(this.getClass(), CameraType.IR, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
 		}
 	}
 	
@@ -167,8 +167,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return input;
 	}
 	
-	protected BlockResultSet getProperties() {
-		return properties;
+	protected BlockResultSet getResultSet() {
+		return resultSet;
 	}
 	
 	protected int getBlockPosition() {
@@ -199,10 +199,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 							time2summaryResult.get(time).put(tray, new BlockResults(null));
 						BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
 						if (pp != null) {
-							ArrayList<BlockPropertyValue> rl = pp.postProcessCalculatedProperties(time, tray);
+							ArrayList<BlockResultValue> rl = pp.postProcessCalculatedProperties(time, tray);
 							if (rl != null)
-								for (BlockPropertyValue bpv : rl) {
-									summaryResult.setNumericProperty(getBlockPosition(), bpv.getName(), bpv.getValue(), bpv.getUnit());
+								for (BlockResultValue bpv : rl) {
+									summaryResult.setNumericResult(getBlockPosition(), bpv.getName(), bpv.getValue(), bpv.getUnit());
 								}
 						}
 					}
@@ -286,11 +286,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
 					BlockResultSet rt = allResultsForSnapshot.get(configName).get(tray);
 					for (String property : desiredProperties) {
-						ArrayList<BlockPropertyValue> calculationResults = rt.getPropertiesSearch(true, property);
+						ArrayList<BlockResultValue> calculationResults = rt.searchResults(true, property);
 						if (calculationResults.isEmpty() && showWarning)
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found. Config=" + configName
 									+ ", Tray=" + tray + ", Time=" + time);
-						for (BlockPropertyValue v : calculationResults) {
+						for (BlockResultValue v : calculationResults) {
 							if (v.getValue() != null) {
 								initMaps(prop2config2tray2lastTime, prop2config2tray2lastValue, configName, property);
 								
@@ -303,7 +303,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 										double ratio = currentPropertyValue / lastPropertyValue;
 										double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 										double ratioPerDay = Math.pow(ratio, 1d / days);
-										summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+										summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
 									}
 								}
 								double value = v.getValue().doubleValue();
@@ -332,7 +332,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
 			final MaskAndImageSet in,
-			final BlockResultSet brs, final ImageProcessorOptions options,
+			final BlockResultSet brs, final ImageProcessorOptionsAndResults options,
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();

@@ -41,7 +41,7 @@ public class BlClearRectangle extends AbstractBlock {
 			return null;
 		}
 		
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		
 		if (getBoolean("Use gray NIR background", false) && mask.getCameraType() == CameraType.NIR) {
 			int gray = new Color(180, 180, 180).getRGB();

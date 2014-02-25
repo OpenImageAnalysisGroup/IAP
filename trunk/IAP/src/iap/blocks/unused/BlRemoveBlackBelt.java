@@ -5,7 +5,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -32,19 +32,19 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().vis() != null && input().images().vis() != null) {
 			ImageOperation vis = input().masks().vis().copy().io();
 			
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				// detect black belt
 				vis = vis.show("Start image", debug).blur(getDouble("blur", 3)).show("blurred", debug)
 						.filterRemoveLAB(
 								getInt("belt-lab-l-min", 0), getInt("belt-lab-l-max", 130),
 								getInt("belt-lab-a-min", 110), getInt("belt-lab-a-max", 130),
 								getInt("belt-lab-b-min", 110), getInt("belt-lab-b-max", 140),
-								options.getBackground(),
+								optionsAndResults.getBackground(),
 								false).show("LAB filtered", debug)
 						.erode(getInt("erode-cnt", 10)).show("eroded", debug)
 						.dilate(getInt("dilate-cnt", 23)).show("dilated", debug)
 						.grayscale().show("Gray scale for threshold 100", debug)
-						.threshold(100, options.getBackground(), new Color(100, 100, 100).getRGB()); // filter out black belt
+						.threshold(100, optionsAndResults.getBackground(), new Color(100, 100, 100).getRGB()); // filter out black belt
 				
 				vis = vis.canvas()
 						.fillRect(
@@ -58,7 +58,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 								getInt("small-circle-x", 325),
 								getInt("small-circle-y", 703),
 								getInt("small-circle-d", 30),
-								options.getBackground(), 0d).io()
+								optionsAndResults.getBackground(), 0d).io()
 						.show("black belt region", debug);
 				
 				blackBeltMask = vis;
@@ -72,7 +72,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 		if (blackBeltMask == null || vis == null)
 			return vis;
 		vis = input().masks().vis().io().applyMask(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().show("Black belt removed from vis", debug);
+				optionsAndResults.getBackground()).getImage().show("Black belt removed from vis", debug);
 		return vis;
 	}
 	
@@ -82,7 +82,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 		if (blackBeltMask == null || fluo == null)
 			return fluo;
 		fluo = input().masks().fluo().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().show("Black belt removed from fluo", debug);
+				optionsAndResults.getBackground()).getImage().show("Black belt removed from fluo", debug);
 		return fluo;
 	}
 	
@@ -92,7 +92,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 		if (blackBeltMask == null || nir == null)
 			return nir;
 		nir = input().masks().nir().io().applyMask_ResizeMaskIfNeeded(blackBeltMask.getImage().copy(),
-				options.getBackground()).getImage().show("Black belt removed from nir", debug);
+				optionsAndResults.getBackground()).getImage().show("Black belt removed from nir", debug);
 		return nir;
 	}
 	

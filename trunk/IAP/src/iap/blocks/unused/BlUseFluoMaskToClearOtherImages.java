@@ -2,7 +2,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	protected void prepare() {
 		super.prepare();
 		if (input().masks().fluo() != null && input().masks().vis() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				Image fluoMask = clearImageSide(input().masks().fluo(), input().masks().vis(), 0.05d);
 				input().masks().setFluo(fluoMask);
 			} else {
@@ -40,23 +40,23 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		
 		Image visMask;
 		
-		if (options.getCameraPosition() == CameraPosition.TOP)
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
 			visMask = input.copy();
 		else
 			visMask = clearImageSide(input, input().masks().fluo(), 0.1).show("cleared", debug);
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			if (input().masks().fluo() != null) {
 				// apply enlarged fluo mask to vis
 				Image mask = input().masks().fluo().copy().io().
 						crop(0.06, 0.08, 0.04, 0.02).show("Cropped Fluo Mask", false).
 						blur(getDouble("blur VIS mask", 20)).
-						binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred fluo mask", debug).getImage();
+						binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred fluo mask", debug).getImage();
 				if (debug)
 					visMask.copy().io().or(mask.copy()).show("ORR");
 				visMask = visMask.io().applyMask_ResizeMaskIfNeeded(
 						mask,
-						options.getBackground()).show("FILTERED VIS", debug).getImage();
+						optionsAndResults.getBackground()).show("FILTERED VIS", debug).getImage();
 			}
 		}
 		
@@ -67,13 +67,13 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	protected Image processNIRmask() {
 		if (input().images().nir() == null || input().masks().fluo() == null)
 			return input().masks().nir();
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			Image input = input().masks().nir();
 			
 			return clearImageSide(input, input().masks().fluo().io().or(input().masks().vis()).getImage(), 0.01);
 		}
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			Image input = input().masks().nir();
 			
 			return clearImageTop(input, input().masks().fluo());
@@ -85,13 +85,13 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	protected Image processNIRimage() {
 		if (input().images().nir() == null || input().masks().fluo() == null)
 			return input().images().nir();
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			Image input = input().images().nir();
 			
 			return clearImageSide(input, input().masks().fluo(), 0.01);
 		}
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			Image input = input().images().nir();
 			
 			return clearImageTop(input, input().masks().fluo());
@@ -103,7 +103,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		if (inputToCut == null || imageSource == null)
 			return null;
 		ImageOperation ioInputForCut = new ImageOperation(inputToCut);
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		ImageOperation ioSource = new ImageOperation(imageSource);
 		TopBottomLeftRight positions = ioSource.getExtremePoints(background);
 		if (positions == null)
@@ -112,7 +112,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		double scaleFactor = inputToCut.getWidth() / (double) imageSource.getWidth();
 		
 		if (inputToCut.getCameraType() == CameraType.NIR)
-			background = options.getNirBackground();
+			background = optionsAndResults.getNirBackground();
 		
 		int bl = background; // Color.RED.getRGB();
 		int br = background; // Color.YELLOW.getRGB();
@@ -143,7 +143,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 	
 	private Image clearImageTop(Image input, Image fluo) {
 		ImageOperation ioInput = new ImageOperation(input);
-		int background = options.getBackground();
+		int background = optionsAndResults.getBackground();
 		ImageOperation ioFluo = new ImageOperation(fluo);
 		TopBottomLeftRight positions = ioFluo.getExtremePoints(background);
 		if (positions == null)
@@ -173,12 +173,12 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		}
 		// if (options.getCameraPosition() == CameraPosition.TOP) {
 		int gray = new Color(180, 180, 180).getRGB();
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		if (processedMasks.fluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
 			Image mask = processedMasks.fluo().copy().io().blur(3).
-					binary(Color.BLACK.getRGB(), options.getBackground()).show("blurred vis mask", debug).getImage();
+					binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred vis mask", debug).getImage();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,
 					back).show("FILTERED NIR MASK", debug).getImage());
@@ -193,7 +193,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 			return;
 		}
 		// }
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			Image input = processedMasks.nir();
 			
 			processedMasks.setNir(clearImageSide(input, processedMasks.fluo(), 0.01).io().
@@ -201,7 +201,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 			return;
 		}
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			Image input = processedMasks.nir();
 			
 			processedMasks.setNir(clearImageTop(input, processedMasks.fluo()));

@@ -15,7 +15,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public interface ImageProcessor {
 	
 	public abstract HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(
-			ImageProcessorOptions options,
+			ImageProcessorOptionsAndResults options,
 			ImageSet input, ImageSet optInputMasks, int maxThreadsPerImage,
 			HashMap<Integer, ImageStack> debugStack)
 			throws Exception;
@@ -25,7 +25,7 @@ public interface ImageProcessor {
 	 */
 	public abstract HashMap<Integer, BlockResultSet> getNumericResults();
 	
-	public abstract BlockPipeline getPipeline(ImageProcessorOptions options);
+	public abstract BlockPipeline getPipeline(ImageProcessorOptionsAndResults options);
 	
 	public abstract void setStatus(BackgroundTaskStatusProviderSupportingExternalCall status);
 	
@@ -37,7 +37,7 @@ public interface ImageProcessor {
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			ImageProcessorOptions options)
+			ImageProcessorOptionsAndResults options)
 			throws Exception;
 	
 	public abstract void setValidTrays(int[] debugValidTrays);

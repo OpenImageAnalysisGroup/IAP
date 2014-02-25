@@ -74,11 +74,11 @@ public class BlCalcMoments extends AbstractBlock {
 			secondMoment_2_norm = temp2;
 		}
 		
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major", my20);
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor", my02);
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_major.norm", secondMoment_1_norm);
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "2nd_moment_minor.norm", secondMoment_2_norm);
-		rt.addValue("Result." + options.getCameraPosition() + imageModality + "eccentricity", eccentricity);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_major", my20);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_minor", my02);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_major.norm", secondMoment_1_norm);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_minor.norm", secondMoment_2_norm);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "eccentricity", eccentricity);
 		
 		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
 		double xc = my10 / my00;
@@ -138,7 +138,7 @@ public class BlCalcMoments extends AbstractBlock {
 				}
 			};
 			
-			getProperties().addImagePostProcessor(ri);
+			getResultSet().addImagePostProcessor(ri);
 		}
 	}
 	

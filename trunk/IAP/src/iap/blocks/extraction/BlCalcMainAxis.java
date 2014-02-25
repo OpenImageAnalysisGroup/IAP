@@ -5,7 +5,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -31,7 +31,7 @@ public class BlCalcMainAxis extends
 	
 	@Override
 	protected Image processFLUOmask() {
-		if (options.getCameraPosition() == CameraPosition.TOP
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP
 				&& input().masks().fluo() != null) {
 			MainAxisCalculationResult macr = getAngle(input().masks()
 					.fluo());
@@ -59,20 +59,20 @@ public class BlCalcMainAxis extends
 				// getProperties().setNumericProperty(0,
 				// PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE,
 				// normalizedDistanceToMainAxis);
-				getProperties().setNumericProperty(0, "RESULT_top.fluo.centroid.x",
+				getResultSet().setNumericResult(0, "RESULT_top.fluo.centroid.x",
 						macr.getCentroid().x, "px");
-				getProperties().setNumericProperty(0, "RESULT_top.fluo.centroid.y",
+				getResultSet().setNumericResult(0, "RESULT_top.fluo.centroid.y",
 						macr.getCentroid().y, "px");
 				
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree");
-				getProperties().setNumericProperty(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis);
+				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree");
+				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis);
 			}
 		}
 		return input().masks().fluo();
 	}
 	
 	private MainAxisCalculationResult getAngle(Image image) {
-		return new ImageOperation(image).calculateTopMainAxis(options
+		return new ImageOperation(image).calculateTopMainAxis(optionsAndResults
 				.getBackground());
 	}
 	

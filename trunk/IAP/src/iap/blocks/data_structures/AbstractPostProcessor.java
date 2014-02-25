@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
@@ -31,22 +31,22 @@ public abstract class AbstractPostProcessor implements PostProcessor {
 		return time2allResultsForSnapshot.keySet();
 	}
 	
-	protected ArrayList<BlockPropertyValue> getCalculatedValues(String name, boolean exactSearch,
+	protected ArrayList<BlockResultValue> getCalculatedValues(String name, boolean exactSearch,
 			long time, Integer tray, String angleConfigName) {
-		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
 		TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 		for (String key : allResultsForSnapshot.keySet()) {
 			if (angleConfigName != null && !key.equals(angleConfigName))
 				continue;
 			BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-			for (BlockPropertyValue v : rt.getPropertiesSearch(exactSearch, name)) {
+			for (BlockResultValue v : rt.searchResults(exactSearch, name)) {
 				result.add(v);
 			}
 		}
 		return result;
 	}
 	
-	protected ArrayList<BlockPropertyValue> getCalculatedValues(String name, boolean exactSearch,
+	protected ArrayList<BlockResultValue> getCalculatedValues(String name, boolean exactSearch,
 			long time, Integer tray) {
 		return getCalculatedValues(name, exactSearch, time, tray, null);
 	}

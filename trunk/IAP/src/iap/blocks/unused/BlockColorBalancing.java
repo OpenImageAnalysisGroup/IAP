@@ -2,7 +2,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -26,7 +26,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 			return null;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			pix = getProbablyWhitePixels(vis, 0.3);
 		} else
 			pix = getProbablyWhitePixels(vis, 0.06);
@@ -40,7 +40,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 			return null;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
-		if (options.getCameraPosition() == CameraPosition.SIDE)
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
 			pix = getProbablyWhitePixels(vis, 0.3);
 		else
 			pix = getProbablyWhitePixels(vis, 0.06);
@@ -70,7 +70,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRimage() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			if (input().images().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
 				Image nir = input().images().nir();
@@ -84,7 +84,7 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			if (input().masks().nir() != null) {
 				double side = 0.3; // value for white balancing (side width)
 				Image nir = input().masks().nir();

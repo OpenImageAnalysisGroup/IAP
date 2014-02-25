@@ -2,7 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -26,11 +26,11 @@ public class BlUseFluoMaskToClearNir extends AbstractSnapshotAnalysisBlock {
 		if (processedMasks.fluo() == null) {
 			return;
 		}
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		if (processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to NIR
 			if (processedMasks.nir() != null) {
-				if (options.getCameraPosition() == CameraPosition.SIDE) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()
@@ -38,7 +38,7 @@ public class BlUseFluoMaskToClearNir extends AbstractSnapshotAnalysisBlock {
 											.getImage(),
 									back).show("FILTERED NIR IMAGE", debug).getImage());
 				}
-				if (options.getCameraPosition() == CameraPosition.TOP) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(processedMasks.fluo().io().copy()
 									.blur(getDouble("blur fluo mask", 0d)).getImage(),

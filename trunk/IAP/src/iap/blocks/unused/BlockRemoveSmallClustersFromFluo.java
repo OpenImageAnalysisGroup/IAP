@@ -26,7 +26,7 @@ public class BlockRemoveSmallClustersFromFluo extends AbstractSnapshotAnalysisBl
 		return new ImageOperation(input().masks().fluo()).removeSmallClusters(ngUse,
 				getDouble("Noise-Size-Fluo-Area", (0.001d) / 20),
 				getDouble("Noise-Size-Fluo-Dimension", (input().masks().fluo().getWidth() / 100) * 2),
-				options.getNeighbourhood(), options.getCameraPosition(), null).getImage();
+				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null).getImage();
 	}
 	
 	@Override

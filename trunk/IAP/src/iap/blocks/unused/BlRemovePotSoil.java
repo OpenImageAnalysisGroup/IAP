@@ -5,7 +5,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -27,7 +27,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 		super.prepare();
 		soilMask = null;
 		if (input().masks().vis() != null && input().images().vis() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				debug = getBoolean("debug", false);
 				
 				ImageOperation mask = input().masks().vis().copy().io();
@@ -37,12 +37,12 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 						getInt("soil-lab-l-min", 90), getInt("soil-lab-l-max", 145),
 						getInt("soil-lab-a-min", 120), getInt("soil-lab-a-max", 135),
 						getInt("soil-lab-b-min", 125), getInt("soil-lab-b-max", 155),
-						options.getBackground(),
+						optionsAndResults.getBackground(),
 						false)
 						.erode(getInt("erode-cnt", 2))
 						.dilate(getInt("dilate-cnt", 2))
 						.grayscale()
-						.threshold(100, options.getBackground(), new Color(100, 100, 100).getRGB())
+						.threshold(100, optionsAndResults.getBackground(), new Color(100, 100, 100).getRGB())
 						.show("soil region", debug);
 				soilMask = mask.removeSmallElements(
 						getInt("remove-noise-area", 10),
@@ -57,7 +57,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 		if (soilMask == null || vis == null)
 			return vis;
 		vis = input().masks().vis().io().applyMask(soilMask.getImage().copy(),
-				options.getBackground()).getImage().show("Soil removed from vis", debug);
+				optionsAndResults.getBackground()).getImage().show("Soil removed from vis", debug);
 		return vis;
 	}
 	
@@ -67,7 +67,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 		if (soilMask == null || fluo == null)
 			return fluo;
 		fluo = input().masks().fluo().io().applyMask_ResizeMaskIfNeeded(soilMask.getImage().copy(),
-				options.getBackground()).getImage().show("Soil removed from fluo", debug);
+				optionsAndResults.getBackground()).getImage().show("Soil removed from fluo", debug);
 		return fluo;
 	}
 	
@@ -77,7 +77,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 		if (soilMask == null || nir == null)
 			return nir;
 		nir = input().masks().nir().io().applyMask_ResizeMaskIfNeeded(soilMask.getImage().copy(),
-				options.getBackground()).getImage().show("Soil removed from nir", debug);
+				optionsAndResults.getBackground()).getImage().show("Soil removed from nir", debug);
 		return nir;
 	}
 	

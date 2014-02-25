@@ -23,7 +23,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -53,7 +53,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 		Image fi = input().masks() != null ? input().masks().vis() : null;
 		if (!getBoolean("Process Fluo Instead of Vis", true)) {
 			if (fi != null) {
-				getProperties().setImage("img.3D", fi);
+				getResultSet().setImage("img.3D", fi);
 			}
 		}
 		return fi;
@@ -64,7 +64,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 		Image fi = input().masks() != null ? input().masks().fluo() : null;
 		if (getBoolean("Process Fluo Instead of Vis", true)) {
 			if (fi != null) {
-				getProperties().setImage("img.3D", fi);
+				getResultSet().setImage("img.3D", fi);
 			}
 		}
 		return fi;
@@ -124,15 +124,15 @@ public class BlThreeDreconstruction extends AbstractBlock {
 								if (bp == null)
 									continue;
 								if (distHorizontal == null)
-									distHorizontal = options.getCalculatedBlueMarkerDistance();
+									distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
 								
 								if (distHorizontal == null)
 									if (angle.startsWith("2nd_side")) {
-										BlockProperty val = bp.getNumericProperty(0, 0, "side" + ".optics.blue_marker_distance");
+										BlockResult val = bp.searchNumericResult(0, 0, "side" + ".optics.blue_marker_distance");
 										if (val != null)
 											distHorizontal = val.getValue();
 									}
-								realMarkerDistHorizontal = options.getREAL_MARKER_DISTANCE();
+								realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
 								Image vis = bp.getImage("img.3D");
 								bp.setImage("img.3D", null);
 								if (angle.startsWith("2nd_side"))
@@ -177,13 +177,13 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							}
 							double vv = 1;
 							double plantVolume = vv * solidVoxels;
-							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel");
-							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel");
-							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel");
-							summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel");
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel");
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel");
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel");
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel");
 							if (distHorizontal != null) {
 								double corr = realMarkerDistHorizontal / distHorizontal;
-								summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3");
+								summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3");
 							}
 							
 							boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
@@ -230,7 +230,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							if (saveVolumeDataset) {
 								summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
 							}
-							if (getBoolean("Debug - Save 3D-Render to Desktop", true)) {
+							if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
 								try {
 									File f = new File(ReleaseInfo.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
 									MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
@@ -338,17 +338,17 @@ public class BlThreeDreconstruction extends AbstractBlock {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0,
+		summaryResult.setNumericResult(0,
 				"RESULT_volume.plant3d.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
-			summaryResult.setNumericProperty(0,
+			summaryResult.setNumericResult(0,
 					"RESULT_volume.plant3d.skeleton.length.norm",
 					skeletonLength * corr, "mm");
 		}
-		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel");
-		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel");
-		summaryResult.setNumericProperty(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel");
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel");
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel");
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel");
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
@@ -431,11 +431,11 @@ public class BlThreeDreconstruction extends AbstractBlock {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0,
+		summaryResult.setNumericResult(0,
 				"RESULT_volume.plant3d.probability.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
-			summaryResult.setNumericProperty(0,
+			summaryResult.setNumericResult(0,
 					"RESULT_volume.plant3d.probability.skeleton.length.norm",
 					skeletonLength * corr, "mm");
 		}
