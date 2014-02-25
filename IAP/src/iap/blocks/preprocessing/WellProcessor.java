@@ -1,6 +1,6 @@
 package iap.blocks.preprocessing;
 
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 /**
  * A well processor should remove parts, that do not correspond to the current
@@ -11,6 +11,6 @@ import iap.pipelines.ImageProcessorOptions;
  */
 public interface WellProcessor {
 	
-	public int getDefinedWellCount(ImageProcessorOptions options);
+	public int getDefinedWellCount(ImageProcessorOptionsAndResults options);
 	
 }

@@ -2,7 +2,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -16,7 +16,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
@@ -49,7 +49,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 		
 		boolean analyzeSide = getBoolean("Analyze Side Images", false);
 		if (analyzeSide)
-			if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
 				Image viswork = fluo.copy().show("fluo", debug);
 				
 				if (viswork != null)
@@ -59,11 +59,11 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 							boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 							res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 							if (res != null)
-								getProperties().setImage("skeleton_fluo", sk);
+								getResultSet().setImage("skeleton_fluo", sk);
 						}
 					}
 			}
-		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
 			ImageOperation in = fluo.copy().io();
 			Image viswork = in.blur(getDouble("blur fluo", 0d)).getImage().show("blur fluo res", debug);
 			
@@ -74,7 +74,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 						boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
-							getProperties().setImage("skeleton_fluo", sk);
+							getResultSet().setImage("skeleton_fluo", sk);
 					}
 				}
 		}
@@ -154,8 +154,8 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 		// result2.display("res2", false);
 		
 		// ***Saved***
-		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-		double normFactor = distHorizontal != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
+		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+		double normFactor = distHorizontal != null ? optionsAndResults.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
 		
 		boolean specialSkeletonBasedLeafWidthCalculation = true;
 		if (specialSkeletonBasedLeafWidthCalculation) {
@@ -236,12 +236,12 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 			// System.out.println(" // " + (int) (filled / leaflength));
 		}
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && rt != null)
+			getResultSet().storeResults(
 					"RESULT_side.", rt,
 					getBlockPosition());
-		if (options.getCameraPosition() == CameraPosition.TOP && rt != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && rt != null)
+			getResultSet().storeResults(
 					"RESULT_top.", rt,
 					getBlockPosition());
 		
@@ -327,7 +327,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 					Integer a = null;
 					searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
+						for (BlockResultValue v : rt.searchResults("RESULT_top.main.axis.rotation")) {
 							if (v.getValue() != null) {
 								a = v.getValue().intValue();
 								// System.out.println("main.axis.rotation: " + a);
@@ -358,31 +358,31 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 						if (bestAngle != null && keyC.equals(bestAngle)) {
 							// System.out.println("Best side angle: " + bestAngle);
 							Double cnt = null;
-							for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
+							for (BlockResultValue v : rt.searchResults("RESULT_side.leaf.count")) {
 								if (v.getValue() != null)
 									cnt = v.getValue();
 							}
 							if (cnt != null && summaryResult != null) {
-								summaryResult.setNumericProperty(getBlockPosition(),
+								summaryResult.setNumericResult(getBlockPosition(),
 										"RESULT_side.leaf.count.best", cnt, null);
 								// System.out.println("Leaf count for best side image: " + cnt);
 							}
 						}
 						
-						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.count")) {
+						for (BlockResultValue v : rt.searchResults("RESULT_side.leaf.count")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeafcount)
 									maxLeafcount = v.getValue();
 								lc.add(v.getValue());
 							}
 						}
-						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum")) {
+						for (BlockResultValue v : rt.searchResults("RESULT_side.leaf.length.sum")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeaflength)
 									maxLeaflength = v.getValue();
 							}
 						}
-						for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_side.leaf.length.sum.norm")) {
+						for (BlockResultValue v : rt.searchResults("RESULT_side.leaf.length.sum.norm")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeaflengthNorm)
 									maxLeaflengthNorm = v.getValue();
@@ -391,20 +391,20 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 					}
 					
 					if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
-						summaryResult.setNumericProperty(getBlockPosition(),
+						summaryResult.setNumericResult(getBlockPosition(),
 								"RESULT_side.leaf.count.max", maxLeafcount, null);
 						// System.out.println("MAX leaf count: " + maxLeafcount);
 						Double[] lca = lc.toArray(new Double[] {});
 						Arrays.sort(lca);
 						Double median = lca[lca.length / 2];
-						summaryResult.setNumericProperty(getBlockPosition(),
+						summaryResult.setNumericResult(getBlockPosition(),
 								"RESULT_side.leaf.count.median", median, null);
 					}
 					if (maxLeaflength != null && maxLeaflength > 0)
-						summaryResult.setNumericProperty(getBlockPosition(),
+						summaryResult.setNumericResult(getBlockPosition(),
 								"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
 					if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-						summaryResult.setNumericProperty(getBlockPosition(),
+						summaryResult.setNumericResult(getBlockPosition(),
 								"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
 				}
 		}

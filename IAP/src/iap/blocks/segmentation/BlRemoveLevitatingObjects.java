@@ -2,7 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -16,9 +16,9 @@ public class BlRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlock {
 	protected Image processVISmask() {
 		if (input().masks() == null || input().masks().vis() == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Vis", true)) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Vis", true)) {
 			Image input = input().masks().vis();
-			int background = options.getBackground();
+			int background = optionsAndResults.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, getInt("Cut-Off Tolerance (vis)", 5), background);
 			if (cut > 0 && cut < input().masks().vis().getHeight() * getDouble("Maximum Cut-Off Amount (percent)", 0.98 * 100d) / 100d)
 				return new ImageOperation(input().masks().vis()).clearImageAbove(cut, background).getImage();
@@ -32,9 +32,9 @@ public class BlRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		if (input().masks() == null || input().masks().fluo() == null)
 			return null;
-		if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Fluo", true)) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && getBoolean("Process Fluo", true)) {
 			Image input = input().masks().fluo();
-			int background = options.getBackground();
+			int background = optionsAndResults.getBackground();
 			int cut = searchSplitObjectsInYDirection(input, getInt("Cut-Off Tolerance (fluo)", 5), background);
 			if (cut > 0 && cut < input().masks().fluo().getHeight() * getDouble("Maximum Cut-Off Amount (percent)", 0.98 * 100d) / 100d)
 				return new ImageOperation(input().masks().fluo()).clearImageAbove(cut, background).getImage();

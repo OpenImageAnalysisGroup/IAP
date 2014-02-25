@@ -3,7 +3,7 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.postprocessing.BlDrawSkeleton;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -17,7 +17,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
@@ -53,7 +53,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		// getInput().getMasks().getVis().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeVISMaskBeforSkeleton.png");
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().show("orig", debug)// .medianFilter32Bit()
 					// .closing(3, 3)
 					// .erode()
@@ -68,13 +68,13 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false));
 					if (sk != null)
-						getProperties().setImage("skeleton", sk);
+						getResultSet().setImage("skeleton", sk);
 					// Image rrr = getProperties().getImage("beforeBloomEnhancement");
 					// if (rrr != null)
 					// res = rrr;
 				}
 		}
-		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
 			Image viswork = vis.copy().io()// .medianFilter32Bit()
 					.dilate(getInt("Dilate", 2))
 					.blur(getInt("Blur", 1))
@@ -87,7 +87,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 							getBoolean("Leaf Width Calculation Type B (VIS)", false));
 					if (sk != null) {
 						if (sk != null)
-							getProperties().setImage("skeleton", sk);
+							getResultSet().setImage("skeleton", sk);
 					}
 				}
 		}
@@ -103,7 +103,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (fluo == null)
 			return fluo;
 		Image res = fluo.copy();
-		if (options.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getProperties() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
 			Image fluowork = fluo.copy().io()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 0))
 					.dilate(getInt("Dilate-Cnt-Fluo", 0))
@@ -119,11 +119,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						boolean drawSkeleton = getBoolean(new BlDrawSkeleton(), "draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
-							getProperties().setImage("skeleton_fluo", sk);
+							getResultSet().setImage("skeleton_fluo", sk);
 					}
 				}
 		}
-		if (options.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getProperties() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
 			Image viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
 					// .erode(1)
 					.dilate(getInt("Dilate-Cnt-Fluo", 4))
@@ -139,7 +139,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						boolean drawSkeleton = getBoolean("draw_skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
-							getProperties().setImage("skeleton_fluo", sk);
+							getResultSet().setImage("skeleton_fluo", sk);
 					}
 				}
 		}
@@ -228,7 +228,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						tempImage[p.x][p.y] = black;
 				Image temp = new Image(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
-						find(getProperties(), true, false, false, false, false, false, false, black, black, black, black, black, null, 0d).getImage();
+						find(getResultSet(), true, false, false, false, false, false, false, black, black, black, black, black, null, 0d).getImage();
 				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
@@ -270,8 +270,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		result2.show("res2", false);
 		
 		// ***Saved***
-		Double distHorizontal = options.getCalculatedBlueMarkerDistance();
-		double normFactor = distHorizontal != null && options.getREAL_MARKER_DISTANCE() != null ? options.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
+		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+		double normFactor = distHorizontal != null && optionsAndResults.getREAL_MARKER_DISTANCE() != null ? optionsAndResults.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
 		
 		if (specialSkeletonBasedLeafWidthCalculation) {
 			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
@@ -355,12 +355,12 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			// System.out.println(" // " + (int) (filled / leaflength));
 		}
 		
-		if (options.getCameraPosition() == CameraPosition.SIDE && rt != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && rt != null)
+			getResultSet().storeResults(
 					"RESULT_side.", "|skeleton", rt,
 					getBlockPosition());
-		if (options.getCameraPosition() == CameraPosition.TOP && rt != null)
-			getProperties().storeResults(
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && rt != null)
+			getResultSet().storeResults(
 					"RESULT_top.", "|skeleton", rt,
 					getBlockPosition());
 		
@@ -446,7 +446,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				Integer a = null;
 				searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-					for (BlockPropertyValue v : rt.getPropertiesSearch("RESULT_top.main.axis.rotation")) {
+					for (BlockResultValue v : rt.searchResults("RESULT_top.main.axis.rotation")) {
 						if (v.getValue() != null) {
 							a = v.getValue().intValue();
 							// System.out.println("main.axis.rotation: " + a);
@@ -477,31 +477,31 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					if (bestAngle != null && keyC.equals(bestAngle)) {
 						// System.out.println("Best side angle: " + bestAngle);
 						Double cnt = null;
-						for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.count")) {
+						for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.count")) {
 							if (v.getValue() != null)
 								cnt = v.getValue();
 						}
 						if (cnt != null && summaryResult != null) {
-							summaryResult.setNumericProperty(getBlockPosition(),
+							summaryResult.setNumericResult(getBlockPosition(),
 									"RESULT_side.leaf.count.best", cnt, null);
 							// System.out.println("Leaf count for best side image: " + cnt);
 						}
 					}
 					
-					for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.count")) {
+					for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.count")) {
 						if (v.getValue() != null) {
 							if (v.getValue() > maxLeafcount)
 								maxLeafcount = v.getValue();
 							lc.add(v.getValue());
 						}
 					}
-					for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.length.sum")) {
+					for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.length.sum")) {
 						if (v.getValue() != null) {
 							if (v.getValue() > maxLeaflength)
 								maxLeaflength = v.getValue();
 						}
 					}
-					for (BlockPropertyValue v : rt.get(tray).getPropertiesSearch("RESULT_side.leaf.length.sum.norm")) {
+					for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.length.sum.norm")) {
 						if (v.getValue() != null) {
 							if (v.getValue() > maxLeaflengthNorm)
 								maxLeaflengthNorm = v.getValue();
@@ -510,20 +510,20 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				}
 				
 				if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
-					summaryResult.setNumericProperty(getBlockPosition(),
+					summaryResult.setNumericResult(getBlockPosition(),
 							"RESULT_side.leaf.count.max", maxLeafcount, null);
 					// System.out.println("MAX leaf count: " + maxLeafcount);
 					Double[] lca = lc.toArray(new Double[] {});
 					Arrays.sort(lca);
 					Double median = lca[lca.length / 2];
-					summaryResult.setNumericProperty(getBlockPosition(),
+					summaryResult.setNumericResult(getBlockPosition(),
 							"RESULT_side.leaf.count.median", median, null);
 				}
 				if (maxLeaflength != null && maxLeaflength > 0)
-					summaryResult.setNumericProperty(getBlockPosition(),
+					summaryResult.setNumericResult(getBlockPosition(),
 							"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
 				if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
-					summaryResult.setNumericProperty(getBlockPosition(),
+					summaryResult.setNumericResult(getBlockPosition(),
 							"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
 				
 			}

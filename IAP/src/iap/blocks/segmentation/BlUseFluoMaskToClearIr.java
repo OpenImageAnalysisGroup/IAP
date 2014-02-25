@@ -2,7 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -26,18 +26,18 @@ public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
 		if (processedMasks.fluo() == null) {
 			return;
 		}
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		if (processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to IR
 			if (processedMasks.ir() != null) {
-				if (options.getCameraPosition() == CameraPosition.SIDE && getBoolean("enabled", true)) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && getBoolean("enabled", true)) {
 					processedMasks.setIr(
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io().addBorder(0, 0, 0, 0, options.getBackground())
+									processedMasks.fluo().io().addBorder(0, 0, 0, 0, optionsAndResults.getBackground())
 											.blur(getDouble("mask blur", 2)).getImage(),
 									back).show("FILTERED IR IMAGE", debug).getImage());
 				}
-				if (options.getCameraPosition() == CameraPosition.TOP && getBoolean("enabled", true)) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && getBoolean("enabled", true)) {
 					processedMasks.setIr(
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()

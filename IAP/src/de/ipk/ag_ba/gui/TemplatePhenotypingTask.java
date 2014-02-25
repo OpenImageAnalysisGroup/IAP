@@ -3,7 +3,7 @@ package de.ipk.ag_ba.gui;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.pipelines.AbstractImageProcessor;
 import iap.pipelines.ImageProcessor;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,7 @@ public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 	public ImageProcessor getImageProcessor() throws Exception {
 		return new AbstractImageProcessor() {
 			@Override
-			public BlockPipeline getPipeline(ImageProcessorOptions options) {
+			public BlockPipeline getPipeline(ImageProcessorOptionsAndResults options) {
 				ArrayList<String> defaultBlockList = new ArrayList<String>();
 				try {
 					ImageAnalysisBlock[] bl = template.getBlockList(options);

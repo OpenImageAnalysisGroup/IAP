@@ -5,8 +5,8 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.MarkerPair;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -51,7 +51,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			vis = input().images().vis();
 		
 		if (vis != null) {
-			if (!getBoolean("Use fixed marker distance", options.getCameraPosition() == CameraPosition.TOP))
+			if (!getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP))
 				markerMask = getMarkers(vis.copy(), numericResult);
 			
 			int w = vis.getWidth();
@@ -59,21 +59,21 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			
 			int n = 0;
 			int i = 1;
-			if (getProperties() == null)
+			if (getResultSet() == null)
 				reportError((Exception) null, "getProperties returns NULL");
-			if (!getBoolean("Use fixed marker distance", options.getCameraPosition() == CameraPosition.TOP))
+			if (!getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP))
 				for (MarkerPair mp : numericResult) {
 					if (mp.getLeft() != null) {
-						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(options.getCameraPosition()),
+						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
 								mp.getLeft().x / w);
-						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(options.getCameraPosition()),
+						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
 								mp.getLeft().y / h);
 					}
 					i += 2;
 					if (mp.getRight() != null) {
-						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(options.getCameraPosition()),
+						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
 								mp.getRight().x / w);
-						getProperties().setNumericProperty(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(options.getCameraPosition()),
+						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
 								mp.getRight().y / h);
 					}
 					i += 2;
@@ -91,39 +91,39 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	
 	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult, int imageWidth, String cameraConfig) {
 		int maxDist = getInt("Fixed marker distance (px) (" + cameraConfig + ")", 1350);
-		if (getBoolean("Use fixed marker distance", options.getCameraPosition() == CameraPosition.TOP)) {
+		if (getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP)) {
 			if (cameraConfig == null || cameraConfig.trim().isEmpty())
 				cameraConfig = "unknown camera config";
-			getProperties().setNumericProperty(0, options.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
-			getProperties().setNumericProperty(0, options.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance.predefined", 1, "0/1");
-			options.setCalculatedBlueMarkerDistance(maxDist);
+			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
+			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance.predefined", 1, "0/1");
+			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
 		} else
 			if (!numericResult.isEmpty()) {
-				if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(options.getCameraPosition())) != null
-						&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition())) != null) {
-					double markerPosOneLeft = getProperties().getNumericProperty(0, 1,
-							PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(options.getCameraPosition())).getValue()
+				if (getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(optionsAndResults.getCameraPosition())) != null
+						&& getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition())) != null) {
+					double markerPosOneLeft = getResultSet().searchNumericResult(0, 1,
+							PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(optionsAndResults.getCameraPosition())).getValue()
 							* imageWidth;
-					double markerPosTwoLeft = getProperties().getNumericProperty(0, 1,
-							PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition())).getValue()
+					double markerPosTwoLeft = getResultSet().searchNumericResult(0, 1,
+							PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition())).getValue()
 							* imageWidth;
 					
-					getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(options.getCameraPosition()),
+					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(optionsAndResults.getCameraPosition()),
 							Math.abs(markerPosTwoLeft - markerPosOneLeft));
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoLeft - markerPosOneLeft));
 				}
 				
-				if (getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(options.getCameraPosition())) != null
-						&& getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition())) != null) {
-					double markerPosOneRight = getProperties().getNumericProperty(0, 1,
-							PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(options.getCameraPosition())).getValue()
+				if (getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(optionsAndResults.getCameraPosition())) != null
+						&& getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition())) != null) {
+					double markerPosOneRight = getResultSet().searchNumericResult(0, 1,
+							PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(optionsAndResults.getCameraPosition())).getValue()
 							* imageWidth;
-					double markerPosTwoRight = getProperties().getNumericProperty(0, 1,
-							PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition())).getValue()
+					double markerPosTwoRight = getResultSet().searchNumericResult(0, 1,
+							PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition())).getValue()
 							* imageWidth;
 					
-					getProperties().setNumericProperty(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(options.getCameraPosition()),
+					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(optionsAndResults.getCameraPosition()),
 							Math.abs(markerPosTwoRight - markerPosOneRight));
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
@@ -140,10 +140,10 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 				}
 				
 				maxDist = max(distances);
-				getProperties().setNumericProperty(0, options.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
+				getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
 				
 				if (maxDist > 0)
-					options.setCalculatedBlueMarkerDistance(maxDist);
+					optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
 				
 				if (debug)
 					System.out.println("maxDist_horizontal: " + maxDist + " " + (maxDist == 0 ? "NO MARKERS FOUND" : ""));
@@ -160,7 +160,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	
 	private Image getMarkers(Image image, ArrayList<MarkerPair> result) {
 		boolean clearBlueMarkers = getBoolean("Remove blue markers from image", true);
-		ImageOperation io = image.io().searchBlueMarkers(result, options.getCameraPosition(), true, clearBlueMarkers, debug);
+		ImageOperation io = image.io().searchBlueMarkers(result, optionsAndResults.getCameraPosition(), true, clearBlueMarkers, debug);
 		return io != null ? io.getImage() : null;
 	}
 	
@@ -192,22 +192,22 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		return BlockType.PREPROCESSING;
 	}
 	
-	public static java.awt.geom.Rectangle2D.Double getRelativeBlueMarkerRectangle(BlockResults res, ImageProcessorOptions options) {
-		BlockProperty leftX1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty leftX2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty leftX3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_X.getName(options.getCameraPosition()));
+	public static java.awt.geom.Rectangle2D.Double getRelativeBlueMarkerRectangle(BlockResults res, ImageProcessorOptionsAndResults options) {
+		BlockResult leftX1 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
+		BlockResult leftX2 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_X.getName(options.getCameraPosition()));
+		BlockResult leftX3 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_X.getName(options.getCameraPosition()));
 		
-		BlockProperty rightX1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
-		BlockProperty rightX2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_X.getName(options.getCameraPosition()));
-		BlockProperty rightX3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult rightX1 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult rightX2 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult rightX3 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_X.getName(options.getCameraPosition()));
 		
-		BlockProperty leftY1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty leftY2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty leftY3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName(options.getCameraPosition()));
+		BlockResult leftY1 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
+		BlockResult leftY2 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(options.getCameraPosition()));
+		BlockResult leftY3 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName(options.getCameraPosition()));
 		
-		BlockProperty rightY1 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
-		BlockProperty rightY2 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(options.getCameraPosition()));
-		BlockProperty rightY3 = res.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult rightY1 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult rightY2 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult rightY3 = res.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName(options.getCameraPosition()));
 		
 		Double mostLeftX = min(leftX1, leftX2, leftX3);
 		Double mostRightX = max(rightX1, rightX2, rightX3);
@@ -221,9 +221,9 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			return null;
 	}
 	
-	private static Double min(BlockProperty... bp) {
+	private static Double min(BlockResult... bp) {
 		double min = Double.MAX_VALUE;
-		for (BlockProperty b : bp) {
+		for (BlockResult b : bp) {
 			if (b != null) {
 				double v = b.getValue();
 				if (v < min)
@@ -237,9 +237,9 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		
 	}
 	
-	private static Double max(BlockProperty... bp) {
+	private static Double max(BlockResult... bp) {
 		double max = Double.MIN_VALUE;
-		for (BlockProperty b : bp) {
+		for (BlockResult b : bp) {
 			if (b != null) {
 				double v = b.getValue();
 				if (v > max)

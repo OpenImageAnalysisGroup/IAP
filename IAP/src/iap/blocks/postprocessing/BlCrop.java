@@ -2,7 +2,7 @@ package iap.blocks.postprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -20,7 +20,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISimage() {
 		if (input() != null && input().images() != null && input().images().vis() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().vis().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -35,7 +35,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 		if (input() != null && input().masks() != null && input().masks().vis() != null) {
 			if (!getBoolean("Process Masks", false))
 				return input().masks().vis();
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().masks().vis().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -50,7 +50,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 		if (input() != null && input().masks() != null && input().masks().fluo() != null) {
 			if (!getBoolean("Process Masks", false))
 				return input().masks().fluo();
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().masks().fluo().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -65,7 +65,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 		if (input() != null && input().masks() != null && input().masks().nir() != null) {
 			if (!getBoolean("Process Masks", false))
 				return input().masks().nir();
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().masks().nir().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -78,7 +78,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processIRmask() {
 		if (input() != null && input().masks() != null && input().masks().ir() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				if (!getBoolean("Process Masks", false))
 					return input().masks().ir();
 				return input().masks().ir().io().crop().getImage();
@@ -93,7 +93,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processFLUOimage() {
 		if (input() != null && input().images() != null && input().images().fluo() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().fluo().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -106,7 +106,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processNIRimage() {
 		if (input() != null && input().images() != null && input().images().nir() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().nir().io().crop().getImage();
 			} else {
 				int potCut = -1;
@@ -119,7 +119,7 @@ public class BlCrop extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processIRimage() {
 		if (input() != null && input().images() != null && input().images().ir() != null) {
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				return input().images().ir().io().crop().getImage();
 			} else {
 				int potCut = -1;

@@ -28,7 +28,7 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		double averageLeafWidthEstimation = processedMasks.fluo() == null ? Double.NaN :
 				processedMasks.fluo().io().countFilledPixels() /
 						(double) processedMasks.fluo().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();

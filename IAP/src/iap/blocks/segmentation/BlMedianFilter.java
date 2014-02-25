@@ -29,7 +29,7 @@ public class BlMedianFilter extends AbstractBlock {
 				.border(2)
 				.getImage();
 		
-		return new ImageOperation(mask).applyMask_ResizeSourceIfNeeded(medianMask, options.getBackground()).getImage();
+		return new ImageOperation(mask).applyMask_ResizeSourceIfNeeded(medianMask, optionsAndResults.getBackground()).getImage();
 	}
 	
 	@Override

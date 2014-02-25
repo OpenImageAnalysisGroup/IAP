@@ -2,12 +2,12 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -21,14 +21,14 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	
-	BlockProperty bpleft, bpright;
+	BlockResult bpleft, bpright;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		bpleft = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+		bpright = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	 * @author pape, klukas
 	 */
 	private double[] getProbablyWhitePixels(Image image, double size,
-			BlockProperty bpleft, BlockProperty bpright) {
+			BlockResult bpleft, BlockResult bpright) {
 		image = image.io().crop().getImage();
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -124,20 +124,20 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	 */
 	public Image balance(Image input, Image inputUsedForColorAnalysis,
 			int whitePoint, boolean invert) {
-		BlockProperty markerPosLeftY = getProperties()
-				.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty markerPosRightY = getProperties().getNumericProperty(0, 1,
-				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult markerPosLeftY = getResultSet()
+				.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
+		BlockResult markerPosRightY = getResultSet().searchNumericResult(0, 1,
+				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
 		
-		BlockProperty markerPosLeftX = getProperties()
-				.getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty markerPosRightX = getProperties().getNumericProperty(0, 1,
-				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult markerPosLeftX = getResultSet()
+				.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+		BlockResult markerPosRightX = getResultSet().searchNumericResult(0, 1,
+				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 		if (inputUsedForColorAnalysis == input)
 			inputUsedForColorAnalysis = input.copy();
 		
 		Image res = input;
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			if (input != null) {
 				Image nir = input;
 				// White Balancing
@@ -208,14 +208,14 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		
 		int minL = getInt("balance-l-min", -10);// 150;
 		
-		BlockProperty bmpYl1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty bmpYr1 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult bmpYl1 = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bmpYr1 = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
 		
-		BlockProperty bmpYl2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName(options.getCameraPosition()));
-		BlockProperty bmpYr2 = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName(options.getCameraPosition()));
+		BlockResult bmpYl2 = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bmpYr2 = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_3_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
 		
-		BlockProperty bmpXl = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty bmpXr = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult bmpXl = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bmpXr = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 		
 		if (bmpXl != null && bmpXr != null && bmpYl1 != null && bmpYr1 != null && bmpYl2 != null && bmpYr2 != null) {
 			

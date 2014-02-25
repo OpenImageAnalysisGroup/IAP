@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.preprocessing.WellProcessor;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
@@ -89,7 +89,7 @@ public class BlockPipeline {
 	
 	private static long lastOutput = 0;
 	
-	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(final ImageProcessorOptions options,
+	public HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(final ImageProcessorOptionsAndResults options,
 			final MaskAndImageSet input, final HashMap<Integer, ImageStack> debugStack,
 			final HashMap<Integer, BlockResultSet> blockResults,
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -151,7 +151,7 @@ public class BlockPipeline {
 		return res;
 	}
 	
-	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, int executionWellCount, ImageProcessorOptions options,
+	private StringAndFlexibleMaskAndImageSet executeInnerCall(int well, int executionWellCount, ImageProcessorOptionsAndResults options,
 			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
 			ObjectRef resultRef,
 			BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -439,7 +439,7 @@ public class BlockPipeline {
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ImageProcessorOptions options)
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ImageProcessorOptionsAndResults options)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
 		TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult = new TreeMap<Long, HashMap<Integer, BlockResultSet>>();

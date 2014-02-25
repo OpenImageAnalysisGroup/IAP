@@ -2,7 +2,7 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -50,7 +50,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 		addHistogramValues = getBoolean("Add_Histogram_Values", false);
 		addHistogramValuesForSections = getBoolean("Histogram for Regions", false);
 		
-		markerDistanceHorizontally = options.getCalculatedBlueMarkerDistance();
+		markerDistanceHorizontally = optionsAndResults.getCalculatedBlueMarkerDistance();
 	}
 	
 	@Override
@@ -61,28 +61,28 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			io = input().masks().vis().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.show("AFTER ERODE", debug);
 			
-			String pre = "RESULT_" + options.getCameraPosition();
+			String pre = "RESULT_" + optionsAndResults.getCameraPosition();
 			int regions = 5;
 			if (calculateValuesAlsoForDifferentRegions) {
-				if (options.getCameraPosition() == CameraPosition.SIDE) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getBottom(r, regions).show("Side Part " + r + "/" + regions, debugRegionParts),
 								pre + ".section_" + (r + 1) + "_" + regions + ".", true);
 				}
-				if (options.getCameraPosition() == CameraPosition.TOP) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getInnerCircle(r, regions).show("Top Part " + r + "/" + regions, debugRegionParts),
 								pre + ".section_" + (r + 1) + "_" + regions + ".", true);
 				}
 			}
 			
-			if (options.getCameraPosition() == CameraPosition.TOP) {
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				// calculate average distance to center
-				Vector2d gravityCenter = io.getCentroid(options.getBackground());
+				Vector2d gravityCenter = io.getCentroid(optionsAndResults.getBackground());
 				if (gravityCenter != null) {
 					double averageDistance = io.calculateAverageDistanceTo(gravityCenter);
 					if (!Double.isNaN(averageDistance))
-						getProperties().setNumericProperty(0, pre + ".avg_distance_to_center", averageDistance, "px");
+						getResultSet().setNumericResult(0, pre + ".avg_distance_to_center", averageDistance, "px");
 				}
 			}
 			
@@ -106,9 +106,9 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 		
 		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(
 				markerDistanceHorizontally,
-				options.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
+				optionsAndResults.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
 				isSection ? addHistogramValuesForSections : addHistogramValues);
-		getProperties().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
+		getResultSet().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
@@ -126,7 +126,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("ndvi", ndvi);
 		}
 		
-		getProperties().storeResults(resultPrefix, rt, getBlockPosition());
+		getResultSet().storeResults(resultPrefix, rt, getBlockPosition());
 	}
 	
 	@Override
@@ -134,14 +134,14 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 		
 		
 		if (input().masks().fluo() != null) {
-			Image of = getProperties().getImage("inp_fluo");
+			Image of = getResultSet().getImage("inp_fluo");
 			if (of!=null) {
 				of = of.io().applyMask(input().masks().fluo()).getImage();
 				ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-						options.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
+						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
 						getBoolean("Add Fluo Color Bins",false)); 
 				if (rt != null)
-					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			}
 			
 			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).
@@ -149,10 +149,10 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.show("AFTER ERODE", debug);
 			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-					options.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
+					optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
 					addHistogramValues); // markerDistanceHorizontally
 			if (rt != null)
-				getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+				getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			return input().masks().fluo();// io.getImage();
 		} else
 			return null;
@@ -160,13 +160,13 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRmask() {
-		Image nirSkel = getProperties().getImage("nir_skeleton");
+		Image nirSkel = getResultSet().getImage("nir_skeleton");
 		if (nirSkel != null) {
 			int nirSkeletonFilledPixels = nirSkel.io().countFilledPixels();
 			double nirSkeletonIntensitySum = nirSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
-			getProperties().setNumericProperty(getBlockPosition(),
-					"RESULT_" + options.getCameraPosition() + ".nir.skeleton.intensity.average", avgNirSkel,
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + optionsAndResults.getCameraPosition() + ".nir.skeleton.intensity.average", avgNirSkel,
 					null);
 		}
 		
@@ -176,8 +176,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 				int nirFilledPixels = input().masks().nir().io().countFilledPixels();
 				double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
-				getProperties().setNumericProperty(
-						getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.intensity.average",
+				getResultSet().setNumericResult(
+						getBlockPosition(), "RESULT_" + optionsAndResults.getCameraPosition() + ".nir.intensity.average",
 						avgNir, null);
 				boolean wetnessAnalysis = false;
 				if (wetnessAnalysis) {
@@ -202,24 +202,24 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 							weightOfPlant += dwf + (1 - dwf) * realF / 100d;
 						}
 					}
-					getProperties().setNumericProperty(getBlockPosition(),
-							"RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant,
+					getResultSet().setNumericResult(getBlockPosition(),
+							"RESULT_" + optionsAndResults.getCameraPosition() + ".nir.wetness.plant_weight", weightOfPlant,
 							null);
-					getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
+					getResultSet().setNumericResult(getBlockPosition(), "RESULT_" + optionsAndResults.getCameraPosition() + ".nir.wetness.plant_weight_drought_loss",
 							filled - weightOfPlant,
 							null);
 					if (filled > 0) {
-						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", fSum / filled, null);
+						getResultSet().setNumericResult(getBlockPosition(), "RESULT_" + optionsAndResults.getCameraPosition() + ".nir.wetness.average", fSum / filled, null);
 					} else
-						getProperties().setNumericProperty(getBlockPosition(), "RESULT_" + options.getCameraPosition() + ".nir.wetness.average", 0d, null);
+						getResultSet().setNumericResult(getBlockPosition(), "RESULT_" + optionsAndResults.getCameraPosition() + ".nir.wetness.average", 0d, null);
 				}
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20)).calculateHistorgram(markerDistanceHorizontally,
-						options.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
 				
-				if (options == null)
+				if (optionsAndResults == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
-					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".nir.",
+					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".nir.",
 							rt, getBlockPosition());
 			}
 			return io.getImage();
@@ -237,8 +237,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			int irSkeletonFilledPixels = irSkel.io().countFilledPixels();
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgIrSkel = 1 - irSkeletonIntensitySum / irSkeletonFilledPixels;
-			getProperties().setNumericProperty(getBlockPosition(),
-					"RESULT_" + options.getCameraPosition() + ".ir.skeleton.intensity.average", avgIrSkel, null);
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + optionsAndResults.getCameraPosition() + ".ir.skeleton.intensity.average", avgIrSkel, null);
 		}
 		
 		if (input().masks().ir() != null) {
@@ -247,15 +247,15 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 				int irFilledPixels = input().masks().ir().io().countFilledPixels();
 				double irIntensitySum = input().masks().ir().io().intensitySumOfChannel(false, true, false, false);
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
-				getProperties().setNumericProperty(getBlockPosition(),
-						"RESULT_" + options.getCameraPosition() + ".ir.intensity.average", avgIr, null);
+				getResultSet().setNumericResult(getBlockPosition(),
+						"RESULT_" + optionsAndResults.getCameraPosition() + ".ir.intensity.average", avgIr, null);
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-						options.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
 				
-				if (options == null)
+				if (optionsAndResults == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
-					getProperties().storeResults("RESULT_" + options.getCameraPosition() + ".ir.",
+					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".ir.",
 							rt, getBlockPosition());
 			}
 			return io.getImage();

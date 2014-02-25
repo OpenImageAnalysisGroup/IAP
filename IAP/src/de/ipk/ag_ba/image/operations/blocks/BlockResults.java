@@ -3,7 +3,7 @@ package de.ipk.ag_ba.image.operations.blocks;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -36,7 +36,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized BlockProperty getNumericProperty(
+	public synchronized BlockResult searchNumericResult(
 			int currentPositionInPipeline, int searchIndex, String pName) {
 		String name = pName;
 		if (searchIndex <= 0
@@ -53,7 +53,7 @@ public class BlockResults implements BlockResultSet {
 							foundCount++;
 							if (foundCount == searchIndex) {
 								Double d = storedNumerics.get(index).get(name);
-								return new BlockProperty(d, index);
+								return new BlockResult(d, index);
 							}
 						}
 					}
@@ -65,13 +65,13 @@ public class BlockResults implements BlockResultSet {
 				if (d == null)
 					return null;
 				else
-					return new BlockProperty(d, currentPositionInPipeline + searchIndex);
+					return new BlockResult(d, currentPositionInPipeline + searchIndex);
 			}
 		}
 	}
 	
 	@Override
-	public synchronized void setNumericProperty(int position, String name,
+	public synchronized void setNumericResult(int position, String name,
 			double value) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
@@ -80,7 +80,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized void setNumericProperty(int position, String name,
+	public synchronized void setNumericResult(int position, String name,
 			double value, String unit) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
@@ -120,12 +120,12 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized int getNumberOfBlocksWithPropertyResults() {
+	public synchronized int getNumberOfBlocksWithResults() {
 		return storedNumerics.size();
 	}
 	
 	@Override
-	public synchronized int getNumberOfBlocksWithThisProperty(String pName) {
+	public synchronized int getNumberOfBlocksWithGivenName(String pName) {
 		String name = pName;
 		int foundCount = 0;
 		for (int index = getBlockPosition(); index >= 0; index--) {
@@ -139,12 +139,12 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(boolean exact,
+	public synchronized ArrayList<BlockResultValue> searchResults(boolean exact,
 			String search) {
 		if (exact)
 			return getPropertiesExactMatch(search);
 		
-		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 		if (sv != null)
 			for (TreeMap<String, Double> tm : sv) {
@@ -163,13 +163,13 @@ public class BlockResults implements BlockResultSet {
 								if (tm.get(key) != null) {
 									String name = key
 											.substring(search.length());
-									BlockPropertyValue p = new BlockPropertyValue(
+									BlockResultValue p = new BlockResultValue(
 											name, getUnitFromName(name),
 											tm.get(key), cameraAngle);
 									result.add(p);
 								}
 							} else {
-								BlockPropertyValue p = new BlockPropertyValue(
+								BlockResultValue p = new BlockResultValue(
 										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
@@ -180,13 +180,13 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized ArrayList<BlockPropertyValue> getPropertiesSearch(String search) {
-		return getPropertiesSearch(false, search);
+	public synchronized ArrayList<BlockResultValue> searchResults(String search) {
+		return searchResults(false, search);
 	}
 	
-	private synchronized ArrayList<BlockPropertyValue> getPropertiesExactMatch(
+	private synchronized ArrayList<BlockResultValue> getPropertiesExactMatch(
 			String match) {
-		ArrayList<BlockPropertyValue> result = new ArrayList<BlockPropertyValue>();
+		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
 		if (match == null || match.isEmpty())
 			return result;
 		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
@@ -207,13 +207,13 @@ public class BlockResults implements BlockResultSet {
 								if (tm.get(key) != null) {
 									String name = key
 											.substring(match.length());
-									BlockPropertyValue p = new BlockPropertyValue(
+									BlockResultValue p = new BlockResultValue(
 											name, getUnitFromName(name),
 											tm.get(key), cameraAngle);
 									result.add(p);
 								}
 							} else {
-								BlockPropertyValue p = new BlockPropertyValue(
+								BlockResultValue p = new BlockResultValue(
 										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 								result.add(p);
 							}
@@ -382,14 +382,14 @@ public class BlockResults implements BlockResultSet {
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericProperty(position, id_prefix + id + (id_postfix != null ? id_postfix : ""), val, unit);
+					setNumericResult(position, id_prefix + id + (id_postfix != null ? id_postfix : ""), val, unit);
 			}
 		}
 	}
 	
 	@Override
 	public synchronized void printAnalysisResults() {
-		for (BlockPropertyValue bpv : getPropertiesSearch("RESULT_")) {
+		for (BlockResultValue bpv : searchResults("RESULT_")) {
 			if (bpv.getName() == null)
 				continue;
 			
@@ -456,7 +456,7 @@ public class BlockResults implements BlockResultSet {
 		return storedNumerics.isEmpty();
 	}
 	
-	public Rectangle2D.Double getRelativeBlueMarkerRectangle(ImageProcessorOptions options) {
+	public Rectangle2D.Double getRelativeBlueMarkerRectangle(ImageProcessorOptionsAndResults options) {
 		return BlDetectBlueMarkers.getRelativeBlueMarkerRectangle(this, options);
 	}
 	

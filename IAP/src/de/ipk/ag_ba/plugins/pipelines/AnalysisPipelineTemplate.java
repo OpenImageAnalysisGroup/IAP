@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import de.ipk.ag_ba.gui.PipelineDesc;
 
 /**
@@ -24,7 +24,7 @@ public interface AnalysisPipelineTemplate {
 	 *           The template may initialize the settings, if needed.
 	 * @return The ordered list of analysis blocks.
 	 */
-	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptions options);
+	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options);
 	
 	public boolean analyzeTopImages();
 	

@@ -14,13 +14,13 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	
 	@Override
 	protected Image processVISmask() {
-		MaskOperation o = new MaskOperation(input().masks().fluo(), input().masks().vis(), null, options.getBackground(), Color.GRAY.getRGB());
+		MaskOperation o = new MaskOperation(input().masks().fluo(), input().masks().vis(), null, optionsAndResults.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
 		Image result = new Image(input().masks().getLargestWidth(), input().masks().getLargestHeight(), o.getMask());
 		int[] resPixels = result.getAs1A();
 		{
 			int filled = 0;
-			int b = options.getBackground();
+			int b = optionsAndResults.getBackground();
 			for (int p : resPixels)
 				if (p != b)
 					filled++;
@@ -30,7 +30,7 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 		}
 		{
 			int[] srcPixels = input().masks().vis().getAs1A();
-			int b = options.getBackground();
+			int b = optionsAndResults.getBackground();
 			int filledSrc = 0;
 			for (int p : srcPixels)
 				if (p != b)
@@ -49,7 +49,7 @@ public class BlockSetVisAndFluoMaskFromMergedVisAndFluo extends AbstractSnapshot
 	
 	@Override
 	protected Image processFLUOmask() {
-		MaskOperation o = new MaskOperation(input().masks().vis(), input().masks().fluo(), null, options.getBackground(), Color.GRAY.getRGB());
+		MaskOperation o = new MaskOperation(input().masks().vis(), input().masks().fluo(), null, optionsAndResults.getBackground(), Color.GRAY.getRGB());
 		o.mergeMasks();
 		return new Image(input().masks().getLargestWidth(), input().masks().getLargestHeight(), o.getMask());
 	}

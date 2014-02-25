@@ -36,9 +36,9 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-			getProperties().setImage("inp_fluo", input().masks().fluo());
+			getResultSet().setImage("inp_fluo", input().masks().fluo());
 		
-		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(), options.getBackground());
+		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(), optionsAndResults.getBackground());
 		
 		Image resClassic, resChlorophyll, resPhenol;
 		if (!auto_tune) {
@@ -68,7 +68,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		Image r = new Image(resClassic, resChlorophyll, resPhenol);
 		if (auto_tune && auto_tune_process_red_by_green) {
-			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), options.getBackground())
+			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), optionsAndResults.getBackground())
 					.show("AFTER HUE", false).getImage();
 		}
 		return r;

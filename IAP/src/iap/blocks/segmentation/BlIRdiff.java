@@ -2,7 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("Use Center Bottom Position as Temperature Reference", false)) {
 			int bx = (int) (wb.getWidth() / 100d * getDouble("Pot Position X (percent)", 47.5));
 			int by = (int) (wb.getHeight() / 100d * getDouble("Pot Position Y (percent)",
-					options.getCameraPosition() == CameraPosition.SIDE ? 95 : 47.5));
+					optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? 95 : 47.5));
 			int bw = (int) (wb.getWidth() / 100d * getDouble("Pot Width (percent)", 5));
 			int bh = (int) (wb.getHeight() / 100d * getDouble("Pot Height (percent)", 5));
 			if (debug) {
@@ -62,7 +62,7 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 						.drawLine(bx + bw, by, bx, by + bh, Color.BLACK.getRGB(), 0, 2)
 						.io().show("REFRENCE AREA");
 			}
-			wb = wb.clearArea(bx, by, bw, bh, options.getBackground(), true);
+			wb = wb.clearArea(bx, by, bw, bh, optionsAndResults.getBackground(), true);
 		}
 		
 		wb.show("Reference Image for Warm Background Detection", debug)
@@ -79,15 +79,15 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 		int[] res = warmBack.copy().getAs1A();
 		for (int i = 0; i < res.length; i++)
 			res[i] = IAPservice.getIRintensityDifferenceColor(
-					IAPservice.getIRintenstityFromRGB(res[i], options.getBackground()) - warmBackground,
-					options.getBackground(), getDouble("temperature scaling", 10));
+					IAPservice.getIRintenstityFromRGB(res[i], optionsAndResults.getBackground()) - warmBackground,
+					optionsAndResults.getBackground(), getDouble("temperature scaling", 10));
 		Image gray = new Image(warmBack.getWidth(), warmBack.getHeight(), res);
 		if (getBoolean("Adaptive Thresholding", false))
 			gray = gray.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(
 							getInt("Adaptive_Threshold_Region_Size", 50),
 							getInt("Adaptive_Threshold_Assumed_Background_Value", 00),
-							options.getBackground(),
+							optionsAndResults.getBackground(),
 							getDouble("Adaptive_Threshold_K", 0.001)
 					).getImage().show("ADAPT OUT", debug);
 		return gray;

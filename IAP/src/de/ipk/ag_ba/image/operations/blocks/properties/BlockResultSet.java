@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import de.ipk.ag_ba.image.operations.blocks.BlockPropertyValue;
+import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -27,29 +27,29 @@ public interface BlockResultSet {
 	 * @return value NULL if no previous value is available, otherwise according
 	 *         value.
 	 */
-	public BlockProperty getNumericProperty(int currentPositionInPipeline,
+	public BlockResult searchNumericResult(int currentPositionInPipeline,
 			int searchIndex, String name);
 	
 	/**
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericProperty(int position, String name, double value);
+	public void setNumericResult(int position, String name, double value);
 	
 	public int getBlockPosition();
 	
-	public int getNumberOfBlocksWithPropertyResults();
+	public int getNumberOfBlocksWithResults();
 	
-	public int getNumberOfBlocksWithThisProperty(String pName);
+	public int getNumberOfBlocksWithGivenName(String pName);
 	
 	/**
 	 * @see PropertyNames
 	 */
-	public ArrayList<BlockPropertyValue> getPropertiesSearch(String search);
+	public ArrayList<BlockResultValue> searchResults(String search);
 	
-	public ArrayList<BlockPropertyValue> getPropertiesSearch(boolean exact, String search);
+	public ArrayList<BlockResultValue> searchResults(boolean exact, String search);
 	
-	void setNumericProperty(int position, String name, double value, String unit);
+	void setNumericResult(int position, String name, double value, String unit);
 	
 	void storeResults(String id_prefix,
 			ResultsTableWithUnits numericResults,

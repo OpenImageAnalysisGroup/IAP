@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.plugins;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -160,7 +160,7 @@ public class IAPpluginManager {
 			PipelineDesc pd = template.getDefaultPipelineDesc();
 			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
 			try {
-				pt.getImageProcessor().getPipeline(new ImageProcessorOptions(pd.getOptions(), null));
+				pt.getImageProcessor().getPipeline(new ImageProcessorOptionsAndResults(pd.getOptions(), null, null));
 			} catch (Error e) {
 				ErrorMsg.addErrorMessage("Could not process template " + pd.getName() + ": " + e.getMessage());
 			}

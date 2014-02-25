@@ -7,7 +7,7 @@ import java.util.HashMap;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
@@ -28,7 +28,7 @@ public class VolumeOperation {
 	 *         Warning: changes this VolumeOperation instance and modifes actual instance, and returns it.
 	 */
 	public VolumeOperation createSkeletonUsingUniformBurningSpeed(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg,
-			BlockProperty distHorizontal,
+			BlockResult distHorizontal,
 			double realMarkerDistHorizontal) {
 		return calculateThicknessSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, false);
 	}
@@ -42,7 +42,7 @@ public class VolumeOperation {
 	 *         particular part of the input voxel.
 	 */
 	public VolumeOperation calculateThicknessSkeleton(BlockResultSet summaryResult, int voxelresolution, ThreeDmodelGenerator mg,
-			BlockProperty distHorizontal,
+			BlockResult distHorizontal,
 			double realMarkerDistHorizontal, boolean calcDistanceTrueOrNormalColoredSkeletonFalse) {
 		
 		int[][][] cube = copy(volume.getLoadedVolume().getIntArray());
@@ -112,11 +112,11 @@ public class VolumeOperation {
 				}
 			}
 		}
-		summaryResult.setNumericProperty(0, 
+		summaryResult.setNumericResult(0, 
 				"RESULT_plant3d.skeleton.length", skeletonLength, "px");
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal.getValue();
-			summaryResult.setNumericProperty(0, "RESULT_plant3d.skeleton.length.norm",
+			summaryResult.setNumericResult(0, "RESULT_plant3d.skeleton.length.norm",
 					skeletonLength * corr, "mm");
 		}
 		

@@ -2,8 +2,8 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -30,16 +30,16 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		int gridHn;
 		int gridVn;
 		multiTray = false;
-		if (options.getWellCnt() == 1) {
+		if (optionsAndResults.getWellCnt() == 1) {
 			gridHn = getInt("Well Grid Horizontal", 1);
 			gridVn = getInt("Well Grid Vertical", 1);
 		} else
-			if (options.getWellCnt() == 6) {
+			if (optionsAndResults.getWellCnt() == 6) {
 				gridHn = getInt("Well Grid Horizontal", 3);
 				gridVn = getInt("Well Grid Vertical", 2);
 				multiTray = true;
 			} else
-				if (options.getWellCnt() == 12) {
+				if (optionsAndResults.getWellCnt() == 12) {
 					gridHn = getInt("Well Grid Horizontal", 4);
 					gridVn = getInt("Well Grid Vertical", 3);
 					multiTray = true;
@@ -153,7 +153,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	protected Image processVISimage() {
 		Image img = input().images().vis();
 		if (img != null && !multiTray) {
-			if (options.getCameraPosition() == CameraPosition.TOP)
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
 						clearOutsideCircle(
 								img.getWidth() / 2 - getInt("VIS Circle Center Shift X", 0),
@@ -169,7 +169,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	protected Image processFLUOimage() {
 		Image img = input().images().fluo();
 		if (img != null && !multiTray) {
-			if (options.getCameraPosition() == CameraPosition.TOP)
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
 						clearOutsideCircle(
 								img.getWidth() / 2 - getInt("FLUO Circle Center Shift X", 0),
@@ -185,7 +185,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	protected Image processNIRimage() {
 		Image img = input().images().nir();
 		if (img != null && !multiTray) {
-			if (options.getCameraPosition() == CameraPosition.TOP)
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io().
 						clearOutsideCircle(
 								img.getWidth() / 2 - getInt("NIR Circle Center Shift X", 0),
@@ -201,7 +201,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	protected Image processIRimage() {
 		Image img = input().images().ir();
 		if (img != null && !multiTray) {
-			if (options.getCameraPosition() == CameraPosition.TOP)
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
 				return img.copy().io()
 						.clearOutsideCircle(
 								img.getWidth() / 2 - getInt("IR Circle Center Shift X", 0),
@@ -252,7 +252,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	}
 	
 	@Override
-	public int getDefinedWellCount(ImageProcessorOptions options) {
+	public int getDefinedWellCount(ImageProcessorOptionsAndResults options) {
 		int hg = options.getIntSetting(this, "Well Grid Horizontal", 1);
 		int wg = options.getIntSetting(this, "Well Grid Vertical", 1);
 		int n = hg * wg;

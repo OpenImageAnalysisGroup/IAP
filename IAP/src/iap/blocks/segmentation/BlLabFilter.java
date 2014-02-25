@@ -5,7 +5,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -52,13 +52,13 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 			if (getBoolean("process " + optics, true)) {
 				String pf = "";
 				processedMask = processedMask.filterRemoveLAB(
-						getInt("min L" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 120 : 120),
-						getInt("max L" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
-						getInt("min A" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
-						getInt("max A" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 138 : 138),
-						getInt("min B" + add, !isVis ? 0 : options.getCameraPosition() == CameraPosition.TOP ? 125 : 125),
-						getInt("max B" + add, !isVis ? 255 : options.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
-						options.getBackground(),
+						getInt("min L" + add, !isVis ? 0 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 120 : 120),
+						getInt("max L" + add, !isVis ? 255 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
+						getInt("min A" + add, !isVis ? 0 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 0 : 0),
+						getInt("max A" + add, !isVis ? 255 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 138 : 138),
+						getInt("min B" + add, !isVis ? 0 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 125 : 125),
+						getInt("max B" + add, !isVis ? 255 : optionsAndResults.getCameraPosition() == CameraPosition.TOP ? 255 : 255),
+						optionsAndResults.getBackground(),
 						getBoolean(pf + "invert", false));
 				
 				if (fis != null)

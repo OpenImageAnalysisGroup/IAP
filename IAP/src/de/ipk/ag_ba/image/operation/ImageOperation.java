@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
 import iap.blocks.segmentation.BlMorphologicalOperations;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.ImagePlus;
 import ij.Prefs;
 import ij.gui.Roi;

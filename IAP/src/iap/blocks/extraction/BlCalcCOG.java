@@ -3,7 +3,7 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImage;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -30,10 +30,10 @@ public class BlCalcCOG extends AbstractBlock {
 			if (fi != null) {
 				final Vector2d cog = fi.io().stat().getCOG();
 				if (cog != null) {
-					String pos = options.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
-					getProperties().setNumericProperty(getBlockPosition(),
+					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+					getResultSet().setNumericResult(getBlockPosition(),
 							pos + "vis.cog.x", cog.x, "px");
-					getProperties().setNumericProperty(getBlockPosition(),
+					getResultSet().setNumericResult(getBlockPosition(),
 							pos + "vis.cog.y", cog.y, "px");
 				}
 				RunnableOnImage runnableOnMask = new RunnableOnImage() {
@@ -42,7 +42,7 @@ public class BlCalcCOG extends AbstractBlock {
 						return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
 					}
 				};
-				getProperties().addImagePostProcessor(CameraType.VIS, null, runnableOnMask);
+				getResultSet().addImagePostProcessor(CameraType.VIS, null, runnableOnMask);
 			}
 		}
 		return fi;
@@ -55,10 +55,10 @@ public class BlCalcCOG extends AbstractBlock {
 			if (fi != null) {
 				final Vector2d cog = fi.io().stat().getCOG();
 				if (cog != null) {
-					String pos = options.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
-					getProperties().setNumericProperty(getBlockPosition(),
+					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+					getResultSet().setNumericResult(getBlockPosition(),
 							pos + "fluo.cog.x", cog.x, "px");
-					getProperties().setNumericProperty(getBlockPosition(),
+					getResultSet().setNumericResult(getBlockPosition(),
 							pos + "fluo.cog.y", cog.y, "px");
 					
 					RunnableOnImage runnableOnMask = new RunnableOnImage() {
@@ -67,7 +67,7 @@ public class BlCalcCOG extends AbstractBlock {
 							return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
 						}
 					};
-					getProperties().addImagePostProcessor(CameraType.FLUO, null, runnableOnMask);
+					getResultSet().addImagePostProcessor(CameraType.FLUO, null, runnableOnMask);
 					
 				}
 			}

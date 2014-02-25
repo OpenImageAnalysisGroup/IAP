@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
 

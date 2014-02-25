@@ -18,7 +18,7 @@ public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlock {
 		Image plantImg = input().masks().vis();
 		boolean drawSkeleton = getBoolean("draw_skeleton", true);
 		boolean debug = getBoolean("debug", false);
-		Image skel = getProperties().getImage("skeleton");
+		Image skel = getResultSet().getImage("skeleton");
 		if (skel != null && plantImg != null && plantImg.getWidth() >= 50 && plantImg.getHeight() >= 50) {
 			skel.show("skel", debug);
 			Image temp = plantImg.io().drawSkeleton(skel, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -34,7 +34,7 @@ public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image plantImg = input().masks().fluo();
 		boolean drawSkeleton = getBoolean("draw_skeleton", true);
-		Image skel = getProperties().getImage("skeleton_fluo");
+		Image skel = getResultSet().getImage("skeleton_fluo");
 		
 		if (skel != null && plantImg != null && plantImg.getWidth() >= 50 && plantImg.getHeight() >= 50)
 			return plantImg.io()

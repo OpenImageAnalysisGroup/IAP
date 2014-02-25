@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.image.operation;
 
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.MaximumFinder;
 

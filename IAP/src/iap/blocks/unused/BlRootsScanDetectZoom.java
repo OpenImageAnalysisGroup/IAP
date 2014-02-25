@@ -36,7 +36,7 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlock {
 			} else
 				rt.addValue("zoom", 0);
 			
-			getProperties().storeResults("RESULT_", rt, getBlockPosition());
+			getResultSet().storeResults("RESULT_", rt, getBlockPosition());
 		}
 		
 		return super.processVISmask();

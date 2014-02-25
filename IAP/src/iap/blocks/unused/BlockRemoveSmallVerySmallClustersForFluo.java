@@ -27,7 +27,7 @@ public class BlockRemoveSmallVerySmallClustersForFluo extends AbstractBlock {
 		if (image.getCameraType() == CameraType.FLUO)
 			return new ImageOperation(image).removeSmallClusters(ngUse,
 					0.0001 * 0.2, 3,
-					options.getNeighbourhood(), options.getCameraPosition(), null, true).getImage();
+					optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, true).getImage();
 		else
 			return image;
 	}

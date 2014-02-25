@@ -2,14 +2,14 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PixelProcessor;
-import de.ipk.ag_ba.image.operations.blocks.properties.BlockProperty;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -42,11 +42,11 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		Image vis = input().images().vis();
 		if (vis == null)
 			return null;
-		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
+		if (!getBoolean("enabled", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
 			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
-		if (options.getCameraPosition() == CameraPosition.SIDE) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true);
 		} else {
 			boolean adjustLeftRight = getBoolean("Adjust Left and Right Separately", false);
@@ -91,11 +91,11 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		Image vis = input().masks().vis();
 		if (vis == null)
 			return null;
-		if (!getBoolean("enabled", options.getCameraPosition() == CameraPosition.SIDE))
+		if (!getBoolean("enabled", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
 			return vis;
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
-		if (options.getCameraPosition() == CameraPosition.SIDE)
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
 			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(),
 					!getBoolean("Adjust to Center Brightness", true));
 		else
@@ -114,8 +114,8 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		
 		ImageOperation io = new ImageOperation(image);
 		
-		BlockProperty bpleft = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(options.getCameraPosition()));
-		BlockProperty bpright = getProperties().getNumericProperty(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(options.getCameraPosition()));
+		BlockResult bpleft = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+		BlockResult bpright = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 		
 		float[] values;
 		if (!verticalGradientSideView) {

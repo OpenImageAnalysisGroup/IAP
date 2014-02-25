@@ -2,7 +2,7 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -17,9 +17,9 @@ public class BlOpeningTopVis extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().vis() == null)
 			return null;
 		
-		if (options.getCameraPosition() == CameraPosition.TOP) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			Image mask = new ImageOperation(input().masks().vis()).opening(1).getImage();
-			return new ImageOperation(input().masks().vis()).applyMask_ResizeMaskIfNeeded(mask, options.getBackground()).getImage();
+			return new ImageOperation(input().masks().vis()).applyMask_ResizeMaskIfNeeded(mask, optionsAndResults.getBackground()).getImage();
 		} else
 			return input().masks().vis();
 	}

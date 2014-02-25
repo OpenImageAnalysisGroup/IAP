@@ -2,7 +2,7 @@ package iap.blocks.auto;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -27,14 +27,14 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 			return nirMask;
 		}
 		boolean autoTune = getBoolean("Auto-tune", true);
-		Image origNirMask = options.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
+		Image origNirMask = optionsAndResults.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = autoTune ? 180 : getInt("Replace color value", 180);
 		if (nirMask != null) {
 			double f;
 			int regionSize;
 			f = getDouble("Adaptive_Threshold_F", 0.08);
 			if (getBoolean("Replace Background with Gray", true)) {
-				nirMask = nirMask.io().replaceColor(options.getBackground(), new Color(average, average, average).getRGB()).getImage()
+				nirMask = nirMask.io().replaceColor(optionsAndResults.getBackground(), new Color(average, average, average).getRGB()).getImage()
 						.show("Background replace with gray", debug);
 			}
 			if (!autoTune)
@@ -62,7 +62,7 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 			}
 			nirMask = nirMask.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(regionSize, average,
-							options.getBackground(), f).getImage().show("ADAPT OUT", debug);
+							optionsAndResults.getBackground(), f).getImage().show("ADAPT OUT", debug);
 			input().masks().setNir(nirMask);
 			if (origNirMask != null) {
 				nirMask = nirMask.io().and(origNirMask).getImage();

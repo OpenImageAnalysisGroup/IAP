@@ -20,7 +20,7 @@ public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlock {
 	protected Image processVISmask() {
 		Image visMask = input().masks().vis();
 		if (visMask != null) {
-			return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(visMask, options.getBackground()).getImage();
+			return new ImageOperation(input().images().vis()).applyMask_ResizeSourceIfNeeded(visMask, optionsAndResults.getBackground()).getImage();
 		} else
 			return null;
 	}
@@ -29,7 +29,7 @@ public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		Image fluoMask = input().masks().fluo();
 		if (fluoMask != null)
-			return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(fluoMask, options.getBackground()).getImage();
+			return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(fluoMask, optionsAndResults.getBackground()).getImage();
 		else
 			return fluoMask;
 	}

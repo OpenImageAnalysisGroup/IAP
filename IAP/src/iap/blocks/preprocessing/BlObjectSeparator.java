@@ -2,7 +2,7 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 	@Override
 	protected void prepare() {
 		super.prepare();
-		maxN = getDefinedWellCount(options);
+		maxN = getDefinedWellCount(optionsAndResults);
 		minimumSize = getDouble("Minimum Object Size (percent)", 1) / 100;
 		this.sortBySize = getBoolean("Sort By Size (off for sort by position)", false);
 		this.sortByX = getBoolean("Left to Right (X)", true);
@@ -53,7 +53,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			if (!process)
 				return mask;
 			
-			ClusterDetection cd = new ClusterDetection(mask, options.getBackground());
+			ClusterDetection cd = new ClusterDetection(mask, optionsAndResults.getBackground());
 			cd.detectClusters();
 			
 			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
@@ -131,7 +131,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 				validClusterID = orderOfIds.get(getWellIdx());
 			int[] pixels = mask.getAs1A();
 			int[] result = new int[pixels.length];
-			int back = options.getBackground();
+			int back = optionsAndResults.getBackground();
 			int filled = 0;
 			for (int i = 0; i < pixels.length; i++) {
 				int cluster = clusteredPixels[i];
@@ -181,7 +181,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 	}
 	
 	@Override
-	public int getDefinedWellCount(ImageProcessorOptions options) {
+	public int getDefinedWellCount(ImageProcessorOptionsAndResults options) {
 		return options.getIntSetting(this, "Maximum Object Count", 10);
 	}
 	
@@ -189,7 +189,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		BlObjectSeparator blSep = new BlObjectSeparator();
 		ImageSet masks = new ImageSet(inp, null, null, null);
 		MaskAndImageSet input = new MaskAndImageSet(null, masks);
-		ImageProcessorOptions options = new ImageProcessorOptions(null, null);
+		ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(null, null, null);
 		options.setWellCnt(maxN);
 		blSep.setInputAndOptions(idx, input, options, new BlockResults(options.getCameraAngle()), 0, null);
 		MaskAndImageSet res = blSep.process();

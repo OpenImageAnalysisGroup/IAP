@@ -4,7 +4,7 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.pipelines.ImageProcessorOptions;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionEvent;
@@ -43,7 +43,7 @@ public class BlAlign extends AbstractBlock {
 	@Override
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
 			final MaskAndImageSet in,
-			final BlockResultSet brs, final ImageProcessorOptions options,
+			final BlockResultSet brs, final ImageProcessorOptionsAndResults options,
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();

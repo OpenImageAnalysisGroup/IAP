@@ -2,7 +2,7 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptions.CameraPosition;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -27,18 +27,18 @@ public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 		if (processedMasks.fluo() == null) {
 			return;
 		}
-		int back = options.getBackground();
+		int back = optionsAndResults.getBackground();
 		if (processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to VIS
 			if (processedMasks.vis() != null) {
-				if (options.getCameraPosition() == CameraPosition.SIDE) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on vis", 2)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 				}
 				double f = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
-				if (options.getCameraPosition() == CameraPosition.TOP) {
+				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy().resize(f, f)

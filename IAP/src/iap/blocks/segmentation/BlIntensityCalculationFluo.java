@@ -26,11 +26,11 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-			getProperties().setImage("inp_fluo", input().masks().fluo());
+			getResultSet().setImage("inp_fluo", input().masks().fluo());
 		
 		boolean debug = getBoolean("debug", false);
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(),
-				options.getBackground());
+				optionsAndResults.getBackground());
 		ImageStack fis = debug ? new ImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage(), null);
