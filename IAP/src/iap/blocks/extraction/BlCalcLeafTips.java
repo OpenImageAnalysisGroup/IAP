@@ -229,7 +229,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean isBestAngle() {
 		HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
-				.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation");
+				.getPropertiesExactMatchForPreviousResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true);
 		
 		double sum = 0;
 		int count = 0;
