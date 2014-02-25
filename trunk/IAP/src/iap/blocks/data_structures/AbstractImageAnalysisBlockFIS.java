@@ -11,6 +11,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
@@ -25,6 +26,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -48,6 +50,24 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private BlockResultSet resultSet;
 	private int blockPositionInPipeline;
 	private int well;
+	
+	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
+	
+	public void addExecutionTime(ExecutionTimeStep step, long execTime) {
+		String stepName = step + "";
+		String blockName = getBlockType() + "//" + this.getClass().getCanonicalName() + "";
+		synchronized (id2time) {
+			if (!id2time.containsKey(stepName))
+				id2time.put(stepName, new ThreadSafeOptions());
+			id2time.get(stepName).addLong(execTime);
+			id2time.get(stepName).addInt(1);
+			
+			if (!id2time.containsKey(blockName))
+				id2time.put(blockName, new ThreadSafeOptions());
+			id2time.get(blockName).addLong(execTime);
+			id2time.get(blockName).addInt(1);
+		}
+	}
 	
 	public AbstractImageAnalysisBlockFIS() {
 		// empty
@@ -303,7 +323,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 										double ratio = currentPropertyValue / lastPropertyValue;
 										double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 										double ratioPerDay = Math.pow(ratio, 1d / days);
-										summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+										summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay, "relative/day");
 									}
 								}
 								double value = v.getValue().doubleValue();
@@ -432,5 +452,35 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	@Override
 	public String getDescriptionForParameters() {
 		return null;
+	}
+	
+	public static LinkedHashMap<String, ThreadSafeOptions> getBlockStatistics() {
+		LinkedHashMap<String, ThreadSafeOptions> res = new LinkedHashMap<String, ThreadSafeOptions>();
+		synchronized (id2time) {
+			for (String key : id2time.keySet()) {
+				ThreadSafeOptions v = id2time.get(key);
+				ThreadSafeOptions nv = new ThreadSafeOptions();
+				nv.setLong(v.getLong());
+				if (key.contains("/"))
+					nv.setInt(v.getInt() / 10);
+				else
+					if (key.toUpperCase().contains("PREPARE") || key.toUpperCase().contains("POST_PROCESS"))
+						nv.setInt(v.getInt());
+					else
+						nv.setInt(v.getInt() / 2);
+				
+				res.put(key, nv);
+			}
+		}
+		return res;
+	}
+	
+	public static void resetBlockStatistics() {
+		synchronized (id2time) {
+			for (String key : id2time.keySet()) {
+				id2time.get(key).setLong(0);
+				id2time.get(key).setInt(0);
+			}
+		}
 	}
 }

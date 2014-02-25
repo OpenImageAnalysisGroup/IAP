@@ -1,5 +1,7 @@
 package iap.blocks.data_structures;
 
+import info.StopWatch;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,7 +31,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		final ImageSet processedMasks = new ImageSet(input().images());
 		
 		try {
+			StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PREPARE + "");
 			prepare();
+			addExecutionTime(ExecutionTimeStep.BLOCK_PREPARE, pw.getTime());
 		} catch (Error err1) {
 			reportError(err1, "BLOCK PREPARE ERROR: " + err1.getMessage());
 		} catch (Exception err2) {
@@ -43,7 +47,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 							processedImages.setVis(processVISimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process VIS image - out of memory");
@@ -56,7 +62,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 							processedImages.setFluo(processFLUOimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process FLUO image - out of memory");
@@ -69,7 +77,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 							processedImages.setNir(processNIRimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process NIR image - out of memory");
@@ -82,7 +92,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 							processedImages.setIr(processIRimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process IR image - out of memory");
@@ -95,7 +107,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 							processedMasks.setVis(processVISmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process VIS mask - out of memory");
@@ -109,7 +123,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 							processedMasks.setFluo(processFLUOmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process FLUO mask - out of memory");
@@ -122,7 +138,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 							processedMasks.setNir(processNIRmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process NIR mask - out of memory");
@@ -135,7 +153,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					@Override
 					public void run() {
 						try {
+							StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 							processedMasks.setIr(processIRmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
 						} catch (OutOfMemoryError er) {
 							er.printStackTrace();
 							reportError(er, "could not process IR mask - out of memory");
@@ -150,7 +170,9 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 			public void run() {
 				try {
 					BackgroundThreadDispatcher.waitFor(work);
+					StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_POST_PROCESS + "");
 					postProcess(processedImages, processedMasks);
+					addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, pw.getTime());
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
