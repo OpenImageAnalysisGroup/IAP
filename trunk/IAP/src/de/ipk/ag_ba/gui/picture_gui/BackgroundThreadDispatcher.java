@@ -162,6 +162,29 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
+	public static void runWithTimeout(long timeout, Runnable runnable) {
+		runWithTimeout(timeout, runnable, "Background Task");
+	}
+	
+	public static void runWithTimeout(long timeout, Runnable runnable, String desc) {
+		Thread t = new Thread(runnable);
+		t.setName(desc + " // Timeout=" + timeout);
+		t.start();
+		long start = System.currentTimeMillis();
+		while (t.isAlive()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				t.interrupt();
+				return;
+			} else {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// empty
+				}
+			}
+		}
+	}
+	
 	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
 	//
 	// private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
