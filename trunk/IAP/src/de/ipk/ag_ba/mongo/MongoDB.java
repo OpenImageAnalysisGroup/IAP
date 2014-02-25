@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
@@ -228,13 +227,13 @@ public class MongoDB {
 			throw (Exception) err.getParam(0, null);
 	}
 	
-	private static ThreadSafeOptions dbLastAccess = new ThreadSafeOptions();
-	private static int dbMaxCon = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
-	private static Semaphore runningOps = new Semaphore(dbMaxCon, true);
+	// private static ThreadSafeOptions dbLastAccess = new ThreadSafeOptions();
+	// private static int dbMaxCon = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
+	// private static Semaphore runningOps = new Semaphore(dbMaxCon, true);
 	
 	private void processDB(String database, String optHosts, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
-		int repeats = 5;// SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry count in case of error", 3) + 1;
+		int repeats = SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry-count in case of error", 0) + 1;
 		processDB(database, optHosts, optLogin, optPass, runnableOnDB, repeats);
 	}
 	
@@ -365,6 +364,10 @@ public class MongoDB {
 	
 	public void processDB(RunnableOnDB runnableOnDB, int repeats) throws Exception {
 		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB, repeats);
+	}
+	
+	public void processDB(long timeout, RunnableOnDB runnableOnDB) throws Exception {
+		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB);
 	}
 	
 	public void deleteUnusedBinaryFiles() {
@@ -1494,22 +1497,18 @@ public class MongoDB {
 	}
 	
 	public static void saveSystemMessage(final MongoDB m, final String msg) {
-		try {
-			BackgroundThreadDispatcher.addTask(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
-								"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
-					} catch (Exception e1) {
-						ErrorMsg.addErrorMessage(e1);
-					}
+		BackgroundThreadDispatcher.runWithTimeout(500, new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
+							"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
+				} catch (Exception e1) {
+					ErrorMsg.addErrorMessage(e1);
 				}
-			}, "Save msg to DB (" + msg + ")");
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
+			}
+		}, "Save msg to DB (" + msg + ")");
 	}
 	
 	public static void saveSystemErrorMessage(String error, Exception e) {
