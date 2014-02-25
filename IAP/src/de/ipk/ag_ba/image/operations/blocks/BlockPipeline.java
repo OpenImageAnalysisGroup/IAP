@@ -119,9 +119,6 @@ public class BlockPipeline {
 				continue;
 			final int well = idx;
 			final int wellCnt = executionTrayCount;
-			// Runnable r = new Runnable() {
-			// @Override
-			// public void run() {
 			ImageStack ds = debugStack != null ? new ImageStack() : null;
 			ObjectRef resultRef = new ObjectRef();
 			StringAndFlexibleMaskAndImageSet rr;
@@ -138,12 +135,6 @@ public class BlockPipeline {
 				ErrorMsg.addErrorMessage(e);
 				exception.setObject(e);
 			}
-			// }
-			// };
-			// if (executionTrayCount > 1)
-			// wait.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + well + "_" + executionTrayCount));
-			// else
-			// r.run();
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
 		if (exception.getObject() != null)
@@ -209,7 +200,6 @@ public class BlockPipeline {
 			
 			int mseconds = (int) (tb - ta);
 			
-			// if (!options.getBooleanSetting(Setting.DEBUG_TAKE_TIMES))
 			if (blockProgressOutput)
 				if (seconds >= (debug ? 0 : tPrintBlockTime))
 					System.out.println("Pipeline " + id + ": finished block "
@@ -223,14 +213,9 @@ public class BlockPipeline {
 				status.setCurrentStatusValueFineAdd(progressOfThisWell / nBlocks);
 		}
 		
-		// results.clearStore();
-		
 		long b = System.currentTimeMillis();
 		
 		if (status != null) {
-			// status.setCurrentStatusValueFine(100d * (index / (double) blocks
-			// .size()));
-			// status.setCurrentStatusText1("Pipeline finished");
 			String s1 = status.getCurrentStatusMessage2();
 			String div = "<br>";
 			if (s1.contains(div))
@@ -243,7 +228,6 @@ public class BlockPipeline {
 			String vfsSpeed = VirtualFileSystemVFS2.getVFSspeedInfo(div, "");
 			status.setCurrentStatusText2(s1 + ((b - a) / 1000) + "s" + vfsSpeed);
 		}
-		// System.out.print("PET: " + (b - a) / 1000 + "s ");
 		if (pipelineExecutionsWithinCurrentHour % 5 == 0) {
 			String s5performance = "";
 			long now = System.currentTimeMillis();
