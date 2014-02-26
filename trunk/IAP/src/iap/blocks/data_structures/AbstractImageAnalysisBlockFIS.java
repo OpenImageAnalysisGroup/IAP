@@ -466,6 +466,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			for (String key : id2time.keySet()) {
 				ThreadSafeOptions v = id2time.get(key);
 				ThreadSafeOptions nv = new ThreadSafeOptions();
+				nv.setDouble(v.getDouble());
 				nv.setLong(v.getLong());
 				if (key.contains("/"))
 					nv.setInt(v.getInt() / 10);
