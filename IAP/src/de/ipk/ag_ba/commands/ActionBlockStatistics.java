@@ -44,15 +44,22 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 			public void update() {
 				LinkedHashMap<String, ThreadSafeOptions> property2exectime = AbstractImageAnalysisBlockFIS.getBlockStatistics();
 				StringBuilder t = new StringBuilder();
-				t.append("<html><center><h3>"
-						+ WordUtils.capitalize("block processing steps statistics")
-						+ "</h3></center><hr><table><tr><th>Property</th><th>Execution Time</th><th>Processed Blocks</th><th>Average</th></tr>");
+				t.append("<html><table>"
+						+ "<tr><th colspan=4 bgcolor='#EE9977'>" + WordUtils.capitalize("block processing function overview") + "</th></tr>"
+						+ "<tr>"
+						+ "<th bgcolor='#DDDDDD'>Block Process</th>"
+						+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
+						+ "<th bgcolor='#DDDDDD'>Processed Blocks</th>"
+						+ "<th bgcolor='#DDDDDD'>Average</th></tr>");
 				for (String key : property2exectime.keySet()) {
 					if (!key.contains("//")) {
 						// statistics within the blocks (prepare/vis/fluo/nir/ir/postprocess)
 						ThreadSafeOptions o = property2exectime.get(key);
-						t.append("<tr><td>" + key + "</td><td>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
-								+ "<td>" + o.getInt() + "</td><td>" + (o.getInt() > 0 ? (o.getLong() / o.getInt()) : "-") + " ms</td></tr>");
+						t.append("<tr>"
+								+ "<td bgcolor='#FFFFFF'>" + key + "</td>"
+								+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
+								+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
+								+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? (o.getLong() / o.getInt()) : "-") + " ms</td></tr>");
 						// type of stat | overall sum of execution time: x h y m (xx ms) | execution count: 5000 | average execution time: <1 s (200 ms)
 					}
 					
@@ -62,7 +69,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 				setText(txt);
 			}
 		};
-		r.setBorder(BorderFactory.createEtchedBorder());
+		r.setBorder(BorderFactory.createBevelBorder(1));
 		htmlTextPanels.add(r);
 		
 		LinkedHashMap<String, ThreadSafeOptions> property2exectime = AbstractImageAnalysisBlockFIS.getBlockStatistics();
