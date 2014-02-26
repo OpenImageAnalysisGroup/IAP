@@ -65,7 +65,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				clusterColors = seedColors;
 			}
 			
-			float epsilon = (float) getDouble("epsilon", 0.01);
+			float epsilon = (float) getDouble("epsilon", 0.001);
 			
 			res = kMeans(inp.copy().io().blur(getDouble("Blur", 0)).getImage(), seedColors, seedPositions, clusterColors, epsilon);
 			
@@ -141,7 +141,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			run = false;
 			
-			if (getBoolean(getSettingsNameForLoop(), false)) {
+			if (getBoolean(getSettingsNameForLoop(), true)) {
 				for (int i = 0; i < newCenterPoints.length; i++) {
 					float dist = newCenterPoints[i].euclidianDistance(centerPoints[i]);
 					if (debugValues)
