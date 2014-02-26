@@ -164,7 +164,7 @@ public class BlockResults implements BlockResultSet {
 									String name = key
 											.substring(search.length());
 									BlockResultValue p = new BlockResultValue(
-											name, getUnitFromName(name),
+											name, getUnitFromName(key),
 											tm.get(key), cameraAngle);
 									result.add(p);
 								}

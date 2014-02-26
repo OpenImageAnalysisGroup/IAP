@@ -5,7 +5,7 @@ import java.awt.Color;
 import de.ipk.ag_ba.image.color.ColorUtil;
 
 public class FeatureVector {
-	public float[] numFeatures = new float[3];
+	public float[] numFeatures = new float[2];
 	
 	public int acCluster;
 	
@@ -30,7 +30,7 @@ public class FeatureVector {
 		// float[] hsb = new float[3];
 		// Color.RGBtoHSB(red, green, blue, hsb);
 		
-		L = lc[red][green][blue];
+		// L = lc[red][green][blue];
 		a = lc[red][green][blue + 256];
 		b = lc[red][green][blue + 512];
 		
@@ -39,9 +39,9 @@ public class FeatureVector {
 		// addNumericFeature(hsb[0]);
 		// addNumericFeature(hsb[1]);
 		// addNumericFeature(hsb[2]);
-		numFeatures[0] = L / 255f;
-		numFeatures[1] = a / 255f;
-		numFeatures[2] = b / 255f;
+		// numFeatures[0] = L / 255f;
+		numFeatures[0] = a / 255f;
+		numFeatures[1] = b / 255f;
 	}
 	
 	public FeatureVector copy() {
