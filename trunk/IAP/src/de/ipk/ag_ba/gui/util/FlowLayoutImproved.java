@@ -19,6 +19,7 @@ import java.awt.Insets;
 public class FlowLayoutImproved extends FlowLayout {
 	
 	private static final long serialVersionUID = 1L;
+	private int lines;
 	
 	public FlowLayoutImproved(int left, int hgap, int vgap) {
 		super(left, hgap, vgap);
@@ -34,7 +35,7 @@ public class FlowLayoutImproved extends FlowLayout {
 		int curY = gapV;
 		int maxHeightInLine = 0;
 		int comps = 0;
-		int lines = 0;
+		lines = 0;
 		for (Component c : target.getComponents()) {
 			if (!c.isVisible())
 				continue;
@@ -60,4 +61,8 @@ public class FlowLayoutImproved extends FlowLayout {
 		return new Dimension(maxW, curY);
 	}
 	
+	public int getLines(Container target) {
+		preferredLayoutSize(target);
+		return lines;
+	}
 }
