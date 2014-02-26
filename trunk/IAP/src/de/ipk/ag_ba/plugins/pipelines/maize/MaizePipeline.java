@@ -31,7 +31,6 @@ import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlClosing;
-import iap.blocks.segmentation.BlClosingForMaizeBloom;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
@@ -81,7 +80,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlAdaptiveRemoveSmallObjectsVisFluo(), // new BlRemoveSmallObjectsVisFluo(),
 				new BlAutoAdaptiveThresholdNir(), // new BlAdaptiveThresholdNir(),
 				new BlClosing(),
-				new BlClosingForMaizeBloom(),
+				// new BlClosingForMaizeBloom(),
 				new BlMedianFilterFluo(),
 				new BlAdaptiveUseFluoMaskToClearOther(), // new BlUseFluoMaskToClearOther(),
 				
