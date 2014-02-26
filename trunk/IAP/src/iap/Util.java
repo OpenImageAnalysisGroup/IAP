@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -57,8 +56,8 @@ public class Util {
 			}
 			idx++;
 		}
-		UtilText2Image.convertRstatFileToImage(inputFiles, outputFiles, imageSizeDefinition, ImageOperation.BACKGROUND_COLORint,
-				Color.GREEN.getRGB(), Color.YELLOW.getRGB(),
-				Color.PINK.getRGB(), Color.RED.getRGB());
+		UtilText2Image.convertRstatFileToImage(inputFiles, outputFiles, imageSizeDefinition, Color.black.getRGB(),
+				Color.BLUE.getRGB(), Color.YELLOW.getRGB(),
+				Color.GREEN.getRGB(), Color.PINK.getRGB());
 	}
 }
