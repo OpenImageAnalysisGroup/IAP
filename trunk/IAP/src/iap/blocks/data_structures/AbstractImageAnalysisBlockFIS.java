@@ -54,6 +54,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
 	
 	public void addExecutionTime(ExecutionTimeStep step, long execTime) {
+		boolean error = execTime < 0;
+		if (error)
+			execTime = -execTime;
 		String stepName = step + "";
 		String blockName = getBlockType() + "//" + this.getClass().getCanonicalName() + "";
 		synchronized (id2time) {
@@ -61,11 +64,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				id2time.put(stepName, new ThreadSafeOptions());
 			id2time.get(stepName).addLong(execTime);
 			id2time.get(stepName).addInt(1);
-			
+			if (error)
+				id2time.get(stepName).addDouble(1);
 			if (!id2time.containsKey(blockName))
 				id2time.put(blockName, new ThreadSafeOptions());
 			id2time.get(blockName).addLong(execTime);
 			id2time.get(blockName).addInt(1);
+			if (error)
+				id2time.get(blockName).addDouble(1);
 		}
 	}
 	
@@ -475,11 +481,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return res;
 	}
 	
-	public static void resetBlockStatistics() {
+	public static void resetBlockStatistics(boolean fullReset) {
 		synchronized (id2time) {
-			for (String key : id2time.keySet()) {
-				id2time.get(key).setLong(0);
-				id2time.get(key).setInt(0);
+			if (fullReset)
+				id2time.clear();
+			else {
+				for (String key : id2time.keySet()) {
+					id2time.get(key).setLong(0);
+					id2time.get(key).setInt(0);
+				}
 			}
 		}
 	}

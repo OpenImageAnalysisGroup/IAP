@@ -11,13 +11,16 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
  */
 public class ActionResetBlockTimings extends AbstractNavigationAction {
 	
-	public ActionResetBlockTimings(String tooltip) {
+	private final boolean fullReset;
+	
+	public ActionResetBlockTimings(String tooltip, boolean fullReset) {
 		super(tooltip);
+		this.fullReset = fullReset;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		AbstractImageAnalysisBlockFIS.resetBlockStatistics();
+		AbstractImageAnalysisBlockFIS.resetBlockStatistics(fullReset);
 	}
 	
 	@Override
@@ -32,7 +35,10 @@ public class ActionResetBlockTimings extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Reset timing information";
+		if (fullReset)
+			return "Reset table list";
+		else
+			return "Set times to zero";
 	}
 	
 	@Override
