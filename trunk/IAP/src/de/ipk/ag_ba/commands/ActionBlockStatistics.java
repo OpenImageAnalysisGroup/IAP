@@ -45,35 +45,39 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 			@Override
 			public void update() {
 				LinkedHashMap<String, ThreadSafeOptions> property2exectime = AbstractImageAnalysisBlockFIS.getBlockStatistics();
-				StringBuilder t = new StringBuilder();
-				t.append("<html><table>"
-						+ "<tr><th colspan=5 bgcolor='#EE9977'>" + WordUtils.capitalize("block-Processing function overview") + "</th></tr>"
-						+ "<tr>"
-						+ "<th bgcolor='#DDDDDD'>Block Process</th>"
-						+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
-						+ "<th bgcolor='#DDDDDD'>Processed Blocks</th>"
-						+ "<th bgcolor='#DDDDDD'>Average</th>"
-						+ "<th bgcolor='#DDDDDD'>Errors</th>"
-						+ "</tr>");
-				for (String key : property2exectime.keySet()) {
-					if (!key.contains("//")) {
-						// statistics within the blocks (prepare/vis/fluo/nir/ir/postprocess)
-						ThreadSafeOptions o = property2exectime.get(key);
-						t.append("<tr>"
-								+ "<td bgcolor='#FFFFFF'>" + key + "</td>"
-								+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
-								+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
-								+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? (o.getLong() / o.getInt()) : "-") + " ms</td>"
-								+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
-								
-								+ "</tr>");
-						// type of stat | overall sum of execution time: x h y m (xx ms) | execution count: 5000 | average execution time: <1 s (200 ms)
+				if (property2exectime.keySet().isEmpty()) {
+					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>No analysis information available.</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
+				} else {
+					StringBuilder t = new StringBuilder();
+					t.append("<html><table>"
+							+ "<tr><th colspan=5 bgcolor='#EE9977'>" + WordUtils.capitalize("block-Processing function overview") + "</th></tr>"
+							+ "<tr>"
+							+ "<th bgcolor='#DDDDDD'>Block Process</th>"
+							+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
+							+ "<th bgcolor='#DDDDDD'>Processed Blocks</th>"
+							+ "<th bgcolor='#DDDDDD'>Average</th>"
+							+ "<th bgcolor='#DDDDDD'>Errors</th>"
+							+ "</tr>");
+					for (String key : property2exectime.keySet()) {
+						if (!key.contains("//")) {
+							// statistics within the blocks (prepare/vis/fluo/nir/ir/postprocess)
+							ThreadSafeOptions o = property2exectime.get(key);
+							t.append("<tr>"
+									+ "<td bgcolor='#FFFFFF'>" + key + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
+									+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? (o.getLong() / o.getInt()) : "-") + " ms</td>"
+									+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
+									
+									+ "</tr>");
+							// type of stat | overall sum of execution time: x h y m (xx ms) | execution count: 5000 | average execution time: <1 s (200 ms)
+						}
+						
 					}
-					
+					t.append("</table>");
+					String txt = t.toString();
+					setText(txt);
 				}
-				t.append("</table>");
-				String txt = t.toString();
-				setText(txt);
 			}
 		};
 		r.setBorder(BorderFactory.createBevelBorder(1));
@@ -94,7 +98,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 		
 		for (String type : types) {
 			
-			final BlockType valid_bt = BlockType.valueOf(type);
+			final BlockType valid_bt = type == null || type.equals("null") ? BlockType.UNDEFINED : BlockType.valueOf(type);
 			JLabelUpdateReady rr = new JLabelUpdateReady() {
 				@Override
 				public void update() {
@@ -110,7 +114,12 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 						String type = key.split("//")[0];
 						String block = key.split("//")[1];
 						
-						BlockType bt = BlockType.valueOf(type);
+						BlockType bt;
+						try {
+							bt = BlockType.valueOf(type);
+						} catch (Exception e) {
+							bt = BlockType.UNDEFINED;
+						}
 						if (!blockType2block.containsKey(bt))
 							blockType2block.put(bt, new LinkedHashMap<String, ThreadSafeOptions>());
 						
@@ -131,24 +140,25 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							+ "<th bgcolor='#DDDDDD'>Runs</th>"
 							+ "<th bgcolor='#DDDDDD'>Average</th>"
 							+ "<th bgcolor='#DDDDDD'>Errors</th></tr>");
-					for (String key : blockType2block.get(bt).keySet()) {
-						ThreadSafeOptions o = blockType2block.get(bt).get(key);
-						String title = key;
-						try {
-							Class c = Class.forName(title);
-							Object oo = c.newInstance();
-							ImageAnalysisBlock iab = (ImageAnalysisBlock) oo;
-							title = iab.getName();
-						} catch (Exception e) {
-							title = title + " (name could not be determined)";
+					if (blockType2block.get(bt) != null)
+						for (String key : blockType2block.get(bt).keySet()) {
+							ThreadSafeOptions o = blockType2block.get(bt).get(key);
+							String title = key;
+							try {
+								Class c = Class.forName(title);
+								Object oo = c.newInstance();
+								ImageAnalysisBlock iab = (ImageAnalysisBlock) oo;
+								title = iab.getName();
+							} catch (Exception e) {
+								title = title + " (name could not be determined)";
+							}
+							t.append("<tr><td bgcolor='#FFFFFF'>" + title + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
+									+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? o.getLong() / o.getInt() : "-") + " ms</td>"
+									+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
+									+ "</tr>");
 						}
-						t.append("<tr><td bgcolor='#FFFFFF'>" + title + "</td>"
-								+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
-								+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
-								+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? o.getLong() / o.getInt() : "-") + " ms</td>"
-								+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
-								+ "</tr>");
-					}
 					t.append("</table>");
 					String txt = t.toString();
 					setText(txt);
@@ -203,7 +213,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 					String type = key.split("//")[0];
 					String block = key.split("//")[1];
 					
-					BlockType bt = BlockType.valueOf(type);
+					BlockType bt = type == null || type.equals("null") ? BlockType.UNDEFINED : BlockType.valueOf(type);
 					if (!blockType2block.containsKey(bt))
 						blockType2block.put(bt, new LinkedHashMap<String, ThreadSafeOptions>());
 					
@@ -214,8 +224,10 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 				
 				n += 1;
 				
-				if (shown_groups != n)
+				if (shown_groups != n) {
+					htmlTextPanels.clear();
 					src.performAction();
+				}
 			}
 			
 			lastRequest = System.currentTimeMillis();
