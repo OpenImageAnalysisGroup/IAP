@@ -464,7 +464,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				if (key.contains("/"))
 					nv.setInt(v.getInt() / 10);
 				else
-					if (key.toUpperCase().contains("PREPARE") || key.toUpperCase().contains("POST_PROCESS"))
+					if (key.toUpperCase().contains("PREPARE") || key.toUpperCase().contains("POST-PROCESS"))
 						nv.setInt(v.getInt());
 					else
 						nv.setInt(v.getInt() / 2);
