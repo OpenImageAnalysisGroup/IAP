@@ -14,4 +14,10 @@ public class SumFeatures {
 		}
 		n++;
 	}
+	
+	public synchronized void sumUp(int in) {
+		sumarray[1] += in % 0xFFFF;
+		sumarray[0] += in >> 16;
+		n++;
+	}
 }

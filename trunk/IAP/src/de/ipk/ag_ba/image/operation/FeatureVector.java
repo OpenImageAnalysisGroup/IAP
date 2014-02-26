@@ -14,11 +14,11 @@ public class FeatureVector {
 	}
 	
 	public FeatureVector(Color c, float[][][] lc) {
-		this(c.getRGB(), 0f, 0f, lc);
+		this(c.getRGB(), lc);
 	}
 	
-	public FeatureVector(int c, float xr, float yr, float[][][] lc) {
-		float L;
+	public FeatureVector(int c, float[][][] lc) {
+		// float L;
 		float a;
 		float b;
 		int rgb = c;
@@ -42,6 +42,25 @@ public class FeatureVector {
 		// numFeatures[0] = L / 255f;
 		numFeatures[0] = a / 255f;
 		numFeatures[1] = b / 255f;
+	}
+	
+	public static int getInt(int c, float[][][] lc) {
+		float L;
+		float a;
+		float b;
+		int rgb = c;
+		
+		int red = ((rgb >> 16) & 0xff);
+		int green = ((rgb >> 8) & 0xff);
+		int blue = (rgb & 0xff);
+		
+		a = lc[red][green][blue + 256];
+		b = lc[red][green][blue + 512];
+		
+		int res = (int) a;
+		res = res << 16;
+		res = res + (int) b;
+		return res;
 	}
 	
 	public FeatureVector copy() {
@@ -73,6 +92,18 @@ public class FeatureVector {
 			dist += a * a;
 		}
 		return dist;
+	}
+	
+	public float euclidianDistance(int inp) {
+		float dist = 0.0f;
+		
+		int thisA = (int) numFeatures[0];
+		int thisB = (int) numFeatures[0];
+		
+		int otherB = inp % 0xFFFF;
+		int otherA = inp >> 16;
+		
+		return (thisA - otherA) * (thisA - otherA) + (thisB - otherB) * (thisB - otherB);
 	}
 	
 	public double colorDistance(FeatureVector inp) {

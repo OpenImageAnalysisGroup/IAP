@@ -96,13 +96,14 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		
 		float[][][] lc = ImageOperation.getLabCubeInstance();
 		
-		FeatureVector[] measurements = getFeaturesFromImage(img1d, w, h, lc);
+		int[] measurements = getFeaturesFromImage(img1d, w, h, lc);
+		int[] measurements_acCluster = new int[w * h];
 		
 		// create initials center
 		FeatureVector[] centerPoints = new FeatureVector[seedColors.size()];
 		
 		for (int i = 0; i < seedColors.size(); i++) {
-			centerPoints[i] = new FeatureVector(seedColors.get(i).getRGB(), seedPositions.get(i).x, seedPositions.get(i).y, lc);
+			centerPoints[i] = new FeatureVector(seedColors.get(i).getRGB(), lc); // seedPositions.get(i).x, seedPositions.get(i).y,
 		}
 		
 		// run optimization
@@ -115,13 +116,13 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		boolean run = true;
 		while (run) {
 			for (int aa = 0; aa < measurements.length; aa++) {
-				FeatureVector i = measurements[aa];
+				int i = measurements[aa];
 				float mindist = Float.MAX_VALUE;
 				
 				int minidx = -1;
 				int idx = 0;
 				for (FeatureVector cp : centerPoints) {
-					float tempdist = i.euclidianDistance(cp);
+					float tempdist = cp.euclidianDistance(i);
 					
 					if (tempdist < mindist) {
 						mindist = tempdist;
@@ -129,7 +130,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 					}
 					idx++;
 				}
-				i.acCluster = minidx;
+				measurements_acCluster[aa] = minidx;
 				distclasses.get(minidx).sumUp(i);
 			}
 			
@@ -160,28 +161,21 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		
 		int[] result = new int[w * h];
 		
-		int px = 0;
 		int[] cluCol = new int[clusterColors.size()];
 		for (int i = 0; i < clusterColors.size(); i++)
 			cluCol[i] = clusterColors.get(i).getRGB();
-		for (FeatureVector i : measurements) {
-			result[px++] = cluCol[i.acCluster];
+		for (int i = 0; i < measurements_acCluster.length; i++) {
+			result[i] = cluCol[measurements_acCluster[i]];
 		}
 		
 		return new Image(w, h, result);
 	}
 	
-	private FeatureVector[] getFeaturesFromImage(int[] img1d, int w, int h, float[][][] lc) {
-		FeatureVector[] measurements = new FeatureVector[w * h];
-		int x = 0, y = 0;
+	private int[] getFeaturesFromImage(int[] img1d, int w, int h, float[][][] lc) {
+		int[] measurements = new int[w * h];
 		int idx = 0;
 		for (int rgb : img1d) {
-			measurements[idx++] = new FeatureVector(rgb, x / (float) w, y / (float) h, lc);
-			x++;
-			if (x == w) {
-				x = 0;
-				y++;
-			}
+			measurements[idx++] = FeatureVector.getInt(rgb, lc);
 		}
 		return measurements;
 	}
