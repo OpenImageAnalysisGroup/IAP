@@ -146,8 +146,10 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 					float dist = newCenterPoints[i].euclidianDistance(centerPoints[i]);
 					if (debugValues)
 						System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
-					if (dist > epsilon)
+					if (dist > epsilon) {
 						run = true;
+						break;
+					}
 				}
 				if (debugValues)
 					System.out.println();
