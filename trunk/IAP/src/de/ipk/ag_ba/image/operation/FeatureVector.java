@@ -40,8 +40,8 @@ public class FeatureVector {
 		// addNumericFeature(hsb[1]);
 		// addNumericFeature(hsb[2]);
 		// numFeatures[0] = L / 255f;
-		numFeatures[0] = a / 255f;
-		numFeatures[1] = b / 255f;
+		numFeatures[0] = a;
+		numFeatures[1] = b;
 	}
 	
 	public static int getInt(int c, float[][][] lc) {
@@ -74,7 +74,7 @@ public class FeatureVector {
 	public FeatureVector(SumFeatures in) {
 		for (int idx = 0; idx < numFeatures.length; idx++) {
 			if (in.n > 0)
-				numFeatures[idx] = in.sumarray[idx] / in.n;
+				numFeatures[idx] = in.sumarray[idx] / in.n * 255f;
 			else
 				numFeatures[idx] = Float.NaN;
 		}
@@ -97,11 +97,11 @@ public class FeatureVector {
 	public float euclidianDistance(int inp) {
 		float dist = 0.0f;
 		
-		int thisA = (int) numFeatures[0];
-		int thisB = (int) numFeatures[0];
+		float thisA = numFeatures[0];
+		float thisB = numFeatures[1];
 		
-		int otherB = inp % 0xFFFF;
-		int otherA = inp >> 16;
+		float otherB = inp % 0xFFFF;
+		float otherA = (inp >> 16) & 0xffff;
 		
 		return (thisA - otherA) * (thisA - otherA) + (thisB - otherB) * (thisB - otherB);
 	}

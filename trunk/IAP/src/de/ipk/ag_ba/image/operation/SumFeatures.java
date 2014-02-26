@@ -16,8 +16,8 @@ public class SumFeatures {
 	}
 	
 	public synchronized void sumUp(int in) {
-		sumarray[1] += in % 0xFFFF;
-		sumarray[0] += in >> 16;
+		sumarray[1] += (in % 0xFFFF) / 255f;
+		sumarray[0] += ((in >> 16) & 0xffff) / 255f;
 		n++;
 	}
 }
