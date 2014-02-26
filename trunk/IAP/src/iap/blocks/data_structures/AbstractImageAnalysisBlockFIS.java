@@ -323,7 +323,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 										double ratio = currentPropertyValue / lastPropertyValue;
 										double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 										double ratioPerDay = Math.pow(ratio, 1d / days);
-										summaryResult.setNumericProperty(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+										summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
 									}
 								}
 								double value = v.getValue().doubleValue();
