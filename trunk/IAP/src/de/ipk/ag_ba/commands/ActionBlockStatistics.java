@@ -45,7 +45,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 				LinkedHashMap<String, ThreadSafeOptions> property2exectime = AbstractImageAnalysisBlockFIS.getBlockStatistics();
 				StringBuilder t = new StringBuilder();
 				t.append("<html><table>"
-						+ "<tr><th colspan=4 bgcolor='#EE9977'>" + WordUtils.capitalize("block processing function overview") + "</th></tr>"
+						+ "<tr><th colspan=4 bgcolor='#EE9977'>" + WordUtils.capitalize("block-Processing function overview") + "</th></tr>"
 						+ "<tr>"
 						+ "<th bgcolor='#DDDDDD'>Block Process</th>"
 						+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
