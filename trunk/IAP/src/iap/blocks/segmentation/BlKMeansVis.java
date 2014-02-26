@@ -161,8 +161,11 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		int[] result = new int[w * h];
 		
 		int px = 0;
+		int[] cluCol = new int[clusterColors.size()];
+		for (int i = 0; i < clusterColors.size(); i++)
+			cluCol[i] = clusterColors.get(i).getRGB();
 		for (FeatureVector i : measurements) {
-			result[px++] = clusterColors.get(i.acCluster).getRGB();
+			result[px++] = cluCol[i.acCluster];
 		}
 		
 		return new Image(w, h, result);
