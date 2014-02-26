@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
@@ -324,55 +325,31 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		if (imageSetWithSpecificAngle != null) {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
+				LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-					if (status.wantsToStop())
-						continue;
-					if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
-							imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
-						Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
-								.getParentSample();
-						if (inSample != null) {
-							synchronized (inSamples) {
-								inSamples.put(time, inSample);
+					if (configAndAngle.startsWith("1st_top"))
+						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+							@Override
+							public void run() {
+								processAngle(maximumThreadCountOnImageLevel, status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+										inSamples, plantResults, analysisInput, time, configAndAngle);
 							}
-						}
-					} else
-						continue;
-					final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
-					
-					try {
-						TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
-						synchronized (plantResults) {
-							if (!plantResults.containsKey(time))
-								plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-							previousResultsForThisTimePoint = plantResults.get(time);
-						}
-						final ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
-								imageSetWithSpecificAngle.get(time).get(configAndAngle),
-								maximumThreadCountOnImageLevel, status,
-								workloadEqualAngleSnapshotSets,
-								getParentPriority(), previousResultsForThisTimePoint, plantResults, configAndAngle);
-						
-						HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
-						synchronized (inSamples) {
-							processVolumeOutput(inSamples.get(time), results);
-						}
-						if (results != null) {
-							synchronized (analysisInput) {
-								if (!analysisInput.containsKey(time))
-									analysisInput.put(time, new TreeMap<String, ImageData>());
-								synchronized (plantResults) {
-									if (!plantResults.containsKey(time))
-										plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-									analysisInput.get(time).put(configAndAngle, inImage);
-									plantResults.get(time).put(configAndAngle, results);
-								}
+						}, "Analyze angle (top) " + configAndAngle));
+				} // for top angle
+				BackgroundThreadDispatcher.waitFor(wait);
+				wait.clear();
+				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+					if (!configAndAngle.startsWith("1st_top"))
+						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+							@Override
+							public void run() {
+								processAngle(maximumThreadCountOnImageLevel, status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+										inSamples, plantResults, analysisInput, time, configAndAngle);
 							}
-						}
-					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
-					}
+						}, "Analyze angle (side) " + configAndAngle));
 				} // for side angle
+				BackgroundThreadDispatcher.waitFor(wait);
+				wait.clear();
 			} // for each time point
 		} // if image data available
 		
@@ -397,6 +374,60 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		tso.addInt(1);
 		status.setCurrentStatusText1("Processing " + tso.getInt() + "/" + workloadSnapshots);
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ")");
+	}
+	
+	private void processAngle(final int maximumThreadCountOnImageLevel, final BackgroundTaskStatusProviderSupportingExternalCall status,
+			final int workloadEqualAngleSnapshotSets, final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle,
+			final TreeMap<Long, Sample3D> inSamples, final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults,
+			final TreeMap<Long, TreeMap<String, ImageData>> analysisInput, final Long time, final String configAndAngle) {
+		if (status.wantsToStop())
+			return;
+		if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
+				imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
+			Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
+					.getParentSample();
+			if (inSample != null) {
+				synchronized (inSamples) {
+					inSamples.put(time, inSample);
+				}
+			}
+		} else
+			return;
+		final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
+		
+		try {
+			TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
+			synchronized (plantResults) {
+				if (!plantResults.containsKey(time))
+					plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+				previousResultsForThisTimePoint = plantResults.get(time);
+			}
+			final ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
+					imageSetWithSpecificAngle.get(time).get(configAndAngle),
+					maximumThreadCountOnImageLevel, status,
+					workloadEqualAngleSnapshotSets,
+					getParentPriority(), previousResultsForThisTimePoint, plantResults, configAndAngle);
+			
+			HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
+			synchronized (inSamples) {
+				processVolumeOutput(inSamples.get(time), results);
+			}
+			if (results != null) {
+				synchronized (analysisInput) {
+					if (!analysisInput.containsKey(time))
+						analysisInput.put(time, new TreeMap<String, ImageData>());
+					synchronized (plantResults) {
+						if (!plantResults.containsKey(time))
+							plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+						analysisInput.get(time).put(configAndAngle, inImage);
+						plantResults.get(time).put(configAndAngle, results);
+					}
+				}
+			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
+		}
+		return;
 	}
 	
 	private void processVolumeOutput(Sample3D inSample, HashMap<Integer, BlockResultSet> analysisResultsArray) {
