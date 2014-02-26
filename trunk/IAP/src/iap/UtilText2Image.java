@@ -31,17 +31,17 @@ public class UtilText2Image {
 			String fileName = inputFiles.get(index);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
 			String s = in.readLine(); // skip first line
-			while ((s = in.readLine()) != null) {
+			while ((s = in.readLine()) != null && s.length() > 2) {
 				String[] columns = s.split(" ");
 				int x = Integer.parseInt(columns[0]);
 				int y = Integer.parseInt(columns[1]);
 				int real = Integer.parseInt(rq(columns[2]));
 				int pred = Integer.parseInt(rq(columns[3]));
-				if (real == 0 && real == pred)
+				if (real <= 0 && real == pred)
 					cm0.add(new Vector2i(x, y));
 				if (real == 1 && real == pred)
 					cm1.add(new Vector2i(x, y));
-				if (real == 0 && real != pred)
+				if (real <= 0 && real != pred)
 					im0.add(new Vector2i(x, y));
 				if (real == 1 && real != pred)
 					im1.add(new Vector2i(x, y));
