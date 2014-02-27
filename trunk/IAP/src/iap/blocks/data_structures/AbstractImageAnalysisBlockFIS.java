@@ -246,7 +246,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	protected void reportError(Error error, String errorMessage) {
-		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: ERROR IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
+		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: ERROR IN BLOCK " + getClass().getSimpleName() + ":" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of pipeline error",
@@ -256,7 +256,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	protected void reportError(Exception error, String errorMessage) {
-		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ">" + errorMessage);
+		System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: EXCEPTION IN BLOCK " + getClass().getSimpleName() + ":" + errorMessage);
 		if (error != null)
 			error.printStackTrace();
 		IAPmain.errorCheck(errorMessage);
