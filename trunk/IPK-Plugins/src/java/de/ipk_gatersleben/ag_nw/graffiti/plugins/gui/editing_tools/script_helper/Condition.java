@@ -283,7 +283,8 @@ public class Condition implements ConditionInterface {
 				String serie = m.getParentSample().getParentCondition().getConditionName();
 				String timeUnitAndTime = m.getParentSample().getSampleTime();
 				String measurementUnit = m.getUnit();
-				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m.getParentSample().getSampleFineTimeOrRowId() : m
+				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m
+						.getParentSample().getSampleFineTimeOrRowId() : m
 						.getParentSample().getTime();
 				TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 				String timeUnit = m.getParentSample().getTimeUnit();
