@@ -1871,17 +1871,18 @@ public class ImageOperation implements MemoryHogInterface {
 		int smallestY = (int) (h * pTop);
 		int largestY = (int) (h * (1 - pBottom)) - 1;
 		
-		int[][] img = getImageAs2dArray();
+		int[] img = getImageAs1dArray();
 		
-		int[][] res = new int[largestX - smallestX + 1][largestY - smallestY
-				+ 1];
+		int wn = largestX - smallestX + 1;
+		int hn = largestY - smallestY + 1;
+		int[] res = new int[wn * hn];
 		for (int x = smallestX; x <= largestX; x++) {
 			for (int y = smallestY; y <= largestY; y++) {
-				res[x - smallestX][y - smallestY] = img[x][y];
+				res[x - smallestX + wn * (y - smallestY)] = img[x + w * y];
 			}
 		}
 		
-		return new ImageOperation(new Image(res));
+		return new ImageOperation(new Image(wn, hn, res));
 	}
 	
 	public ImageOperation filterByHSV_hue(double minHue, int clearColor) {
@@ -4252,7 +4253,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int tx = (int) (i / (double) len * w / 2d);
 			int ty = h - (int) (i / (double) len * h / 2d);
 			float[] valuesCenter = getRGBAverage(tx - s, ty - s, 2 * s, 2 * s, -20, 500, true, debug);
-			calibrationCurveFromTopLeftToCenter[i] = valuesCenter[0] * 255;
+			calibrationCurveFromTopLeftToCenter[i] = valuesCenter[0] * 255f;
 			indexArray[i] = i + 1;
 		}
 		indexArray[0] = 0;
