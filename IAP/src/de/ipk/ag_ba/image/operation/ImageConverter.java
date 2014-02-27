@@ -14,10 +14,14 @@ import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.PixelGrabber;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -86,7 +90,14 @@ public class ImageConverter {
 		final int w = img.getWidth();
 		final int h = img.getHeight();
 		int image[] = new int[w * h];
-		img.getRGB(0, 0, w, h, image, 0, w);
+		try {
+			IntBuffer ib = ByteBuffer.wrap(((DataBufferByte) img.getRaster().getDataBuffer()).getData()).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+			ib.get(image);
+			for (int i = 0; i < image.length; i++)
+				image[i] = image[i] >> 8;
+		} catch (Exception e) {
+			img.getRGB(0, 0, w, h, image, 0, w);
+		}
 		return image;
 	}
 	

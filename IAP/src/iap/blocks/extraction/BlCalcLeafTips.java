@@ -57,7 +57,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		calcOnVis = getBoolean("Calculate on Vis Image", false);
 		Image img = input().masks().fluo();
-		if (!calcOnVis && optionsAndResults.getCameraPosition() == CameraPosition.SIDE && img != null) {
+		if (!calcOnVis && optionsAndResults.getCameraPosition() == CameraPosition.SIDE && img != null && input().masks().fluo() != null) {
 			img.show("input leaftips", false);
 			return doLeafTipAnalysis(img);
 		} else

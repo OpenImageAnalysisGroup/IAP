@@ -58,7 +58,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS image - exception");
 						}
 					}
-				}, name + " process VIS image", true),
+				}, name + " process VIS image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -74,7 +74,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO image - exception");
 						}
 					}
-				}, name + " process FLU image", true),
+				}, name + " process FLU image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -90,7 +90,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR image - exception");
 						}
 					}
-				}, name + " process NIR image", true),
+				}, name + " process NIR image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -106,7 +106,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR image - exception");
 						}
 					}
-				}, name + " process NIR image", true),
+				}, name + " process NIR image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -122,7 +122,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS mask - exception");
 						}
 					}
-				}, name + " process VIS mask", true),
+				}, name + " process VIS mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -138,7 +138,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO mask - exception");
 						}
 					}
-				}, name + " process FLU mask", true),
+				}, name + " process FLU mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -154,7 +154,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR mask - exception");
 						}
 					}
-				}, name + " process NIR mask", true),
+				}, name + " process NIR mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -170,26 +170,21 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR mask - exception");
 						}
 					}
-				}, name + " process IR mask", true) };
+				}, name + " process IR mask", false) };
 		
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_POST_PROCESS + "");
-				try {
-					BackgroundThreadDispatcher.waitFor(work);
-					postProcess(processedImages, processedMasks);
-					addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, pw.getTime());
-				} catch (Error e) {
-					addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
-					reportError(e, "Could not perform post-processing - error");
-				} catch (Exception e) {
-					addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
-					reportError(e, "Could not perform post-processing - exception");
-				}
-			}
-		};
-		r.run();// BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
+		BackgroundThreadDispatcher.waitFor(work);
+		
+		pw = new StopWatch(ExecutionTimeStep.BLOCK_POST_PROCESS + "");
+		try {
+			postProcess(processedImages, processedMasks);
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, pw.getTime());
+		} catch (Error e) {
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
+			reportError(e, "Could not perform post-processing - error");
+		} catch (Exception e) {
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
+			reportError(e, "Could not perform post-processing - exception");
+		}
 		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
