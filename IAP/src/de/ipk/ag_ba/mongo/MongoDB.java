@@ -247,10 +247,10 @@ public class MongoDB {
 		do {
 			try {
 				DB db;
-				synchronized (this.getClass()) {
-					createMongoConnection(database, optHosts, optLogin, optPass, key);
-					db = m.getDB(database);
-				}
+				// synchronized (this.getClass()) {
+				createMongoConnection(database, optHosts, optLogin, optPass, key);
+				db = m.getDB(database);
+				// }
 				if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains(database))
 					if (optLogin != null && optPass != null && optLogin.length() > 0 && optPass.length() > 0) {
 						try {
