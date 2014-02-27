@@ -10,6 +10,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
+@Deprecated
 public class BlClosing extends AbstractSnapshotAnalysisBlock {
 	
 	@Override

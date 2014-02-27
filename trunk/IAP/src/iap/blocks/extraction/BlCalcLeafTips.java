@@ -1019,7 +1019,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param list
 	 * @return int[] = {left, right, top, bottom}
 	 */
-	private static int[] findDimensions(ArrayList<PositionAndColor> list) {
+	public static int[] findDimensions(ArrayList<PositionAndColor> list) {
 		int[] dim = { Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE };
 		if (list == null)
 			return null;
@@ -1044,7 +1044,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 	 * @param region
 	 * @return
 	 */
-	private static int[][] copyRegiontoImage(int[] dim, ArrayList<PositionAndColor> region) {
+	public static int[][] copyRegiontoImage(int[] dim, ArrayList<PositionAndColor> region) {
 		int[][] res = new int[(dim[1] - dim[0]) + 1][(dim[3] - dim[2]) + 1];
 		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
 		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
