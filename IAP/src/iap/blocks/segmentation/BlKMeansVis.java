@@ -165,14 +165,14 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 					double ncpd_b = new_center_b[i] - centerPoints_b[i];
 					
 					double dist = ncpd_a * ncpd_a + ncpd_b * ncpd_b;
-					
-					System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
+					if (debugValues)
+						System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
 					if (dist > epsilon) {
 						run = true;
 						break;
 					}
 				}
-				if (true || debugValues)
+				if (debugValues)
 					System.out.println();
 				if (run) {
 					centerPoints_a = new_center_a;
