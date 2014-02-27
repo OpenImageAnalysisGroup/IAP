@@ -278,10 +278,14 @@ public class SystemAnalysis {
 		return day;
 	}
 	
+	public static String getDataTransferSpeedString(long transfered, long start, long end) {
+		return getDataTransferSpeedString(transfered, transfered, start, end);
+	}
+	
 	/**
 	 * @return Transfer speed string as in these examples: 2.4 MB/sec, 4.0 MB/min, 6 MB/hour or 0.8 MB/day.
 	 */
-	public static String getDataTransferSpeedString(long transfered, long start, long end) {
+	public static String getDataTransferSpeedString(long overallTransfered, long transfered, long start, long end) {
 		if (transfered <= 0)
 			return "- transfer skipped -";
 		double kiloBytesPerSecond = transfered / 1024d / ((end - start) / 1000d);
@@ -291,7 +295,7 @@ public class SystemAnalysis {
 		double megaBytesPerDay = megaBytesPerHour * 24d;
 		String fS = "#.#";
 		String fL = "#";
-		String pre = getDataAmountString(transfered) + ", ";
+		String pre = getDataAmountString(overallTransfered) + ", ";
 		if (kiloBytesPerSecond < 1024)
 			return pre + StringManipulationTools.formatNumber(kiloBytesPerSecond, kiloBytesPerSecond > 10 ? fL : fS) + " KB/s";
 		if (megaBytesPerSecond > 1)
