@@ -87,7 +87,7 @@ public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 255); // new Color(155, 155, 255, 255); //
+	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 0); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
@@ -524,7 +524,7 @@ public class ImageOperation implements MemoryHogInterface {
 					maskPixel = background;
 				
 				if (maskPixel == background) {
-					originalImage[x][y] = background;
+					originalImage[x][y] = ImageOperation.BACKGROUND_COLORint;
 				}
 			}
 		}
