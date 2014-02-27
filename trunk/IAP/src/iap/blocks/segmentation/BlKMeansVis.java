@@ -162,7 +162,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			if (getBoolean(getSettingsNameForLoop(), true)) {
 				for (int i = 0; i < new_center_a.length; i++) {
 					double ncpd_a = new_center_a[i] - centerPoints_a[i];
-					double ncpd_b = new_center_a[i] - centerPoints_a[i];
+					double ncpd_b = new_center_b[i] - centerPoints_b[i];
 					
 					double dist = ncpd_a * ncpd_a + ncpd_b * ncpd_b;
 					
