@@ -307,12 +307,19 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public boolean add(NumericMeasurementInterface e) {
-		return measurements.add(e);
+		if (e == null)
+			return false;
+		else
+			return measurements.add(e);
 	}
 	
 	@Override
 	public boolean addAll(Collection<? extends NumericMeasurementInterface> c) {
-		return measurements.addAll(c);
+		boolean allTrue = true;
+		for (NumericMeasurementInterface nme : c)
+			if (add(nme))
+				allTrue = false;
+		return allTrue;
 	}
 	
 	@Override
