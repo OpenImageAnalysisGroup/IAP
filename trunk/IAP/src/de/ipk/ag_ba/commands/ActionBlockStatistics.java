@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -53,7 +54,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							+ "<tr><th colspan=5 bgcolor='#EE9977'>" + WordUtils.capitalize("block-Processing function overview") + "</th></tr>"
 							+ "<tr>"
 							+ "<th bgcolor='#DDDDDD'>Block Process</th>"
-							+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
+							+ "<th bgcolor='#DDDDDD'>Execution Time&sup1;</th>"
 							+ "<th bgcolor='#DDDDDD'>Processed Blocks</th>"
 							+ "<th bgcolor='#DDDDDD'>Average</th>"
 							+ "<th bgcolor='#DDDDDD'>Errors</th>"
@@ -136,7 +137,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							+ bt.getColor()
 							+ "'><b>" + nn + "</b></th><tr>"
 							+ "<th bgcolor='#DDDDDD'>Property</th>"
-							+ "<th bgcolor='#DDDDDD'>Execution Time</th>"
+							+ "<th bgcolor='#DDDDDD'>Execution Time&sup1;</th>"
 							+ "<th bgcolor='#DDDDDD'>Runs</th>"
 							+ "<th bgcolor='#DDDDDD'>Average</th>"
 							+ "<th bgcolor='#DDDDDD'>Errors</th></tr>");
@@ -188,7 +189,10 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(htmlTextPanels, 15);
+		LinkedList<JComponent> res = new LinkedList<JComponent>(htmlTextPanels);
+		res.add(new JLabel(
+				"<html><hr><small><font color='gray'>&sup1; - due to multi-threaded calculations the CPU execution-<br>time may proceed quicker than realtime."));
+		return new MainPanelComponent(res, 15);
 	}
 	
 	long lastRequest = 0;
