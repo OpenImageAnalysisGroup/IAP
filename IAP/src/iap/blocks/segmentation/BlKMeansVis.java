@@ -9,6 +9,8 @@ import java.util.HashSet;
 
 import javax.vecmath.Vector2f;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -157,28 +159,31 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			run = false;
 			
-			if (false)
-				if (getBoolean(getSettingsNameForLoop(), true)) {
-					// for (int i = 0; i < newCenterPoints.length; i++) {
-					// float dist = newCenterPoints[i].euclidianDistance(centerPoints[i]);
-					// if (debugValues)
-					// System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
-					// if (dist > epsilon) {
-					// run = true;
-					// break;
-					// }
-					// }
+			if (getBoolean(getSettingsNameForLoop(), true)) {
+				for (int i = 0; i < new_center_a.length; i++) {
+					double ncpd_a = new_center_a[i] - centerPoints_a[i];
+					double ncpd_b = new_center_a[i] - centerPoints_a[i];
+					
+					double dist = ncpd_a * ncpd_a + ncpd_b * ncpd_b;
+					
 					if (debugValues)
-						System.out.println();
-					if (run) {
-						double[] t_a = centerPoints_a;
-						double[] t_b = centerPoints_b;
-						centerPoints_a = new_center_a;
-						centerPoints_b = new_center_b;
-						new_center_a = t_a;
-						new_center_b = t_b;
+						System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
+					if (dist > epsilon) {
+						run = true;
+						break;
 					}
 				}
+				if (debugValues)
+					System.out.println();
+				if (run) {
+					double[] t_a = centerPoints_a;
+					double[] t_b = centerPoints_b;
+					centerPoints_a = new_center_a;
+					centerPoints_b = new_center_b;
+					new_center_a = t_a;
+					new_center_b = t_b;
+				}
+			}
 		}
 		
 		int[] result = new int[w * h];
