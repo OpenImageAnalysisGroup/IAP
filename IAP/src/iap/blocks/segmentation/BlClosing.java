@@ -71,7 +71,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 		ImageOperation op = new ImageOperation(image);
 		
 		op.closing(BlMorphologicalOperations.getRoundMask(closingRepeat));
-		
+		op = op.replaceColor(-1, ImageOperation.BACKGROUND_COLORint);
 		return flImage.io().and(op.getImage()).getImage();
 	}
 	

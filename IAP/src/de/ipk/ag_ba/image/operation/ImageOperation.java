@@ -4945,21 +4945,21 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation and(Image b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2dArray();
+		int[] aa = getImageAs1dArray();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		int[][] ba = b.resize(w, h).getAs2A();
+		int[] ba = b.resize(w, h).getAs1A();
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
-				int apixel = aa[x][y];
-				int bpixel = ba[x][y];
+				int apixel = aa[x + w * y];
+				int bpixel = ba[x + w * y];
 				
 				if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
-					aa[x][y] = aa[x][y];
+					// empty
 				} else
-					aa[x][y] = BACKGROUND_COLORint;
+					aa[x + w * y] = BACKGROUND_COLORint;
 			}
-		return new Image(aa).io();
+		return new Image(w, h, aa).io();
 	}
 	
 	public ImageOperation xor(Image b) {
