@@ -65,7 +65,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							ThreadSafeOptions o = property2exectime.get(key);
 							t.append("<tr>"
 									+ "<td bgcolor='#FFFFFF'>" + key + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
+									+ "<td bgcolor='#FFFFFF'>" /* + o.getLong() + " ms (" */+ SystemAnalysis.getWaitTime(o.getLong()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? (o.getLong() / o.getInt()) : "-") + " ms</td>"
 									+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
@@ -154,7 +154,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 								title = title + " (name could not be determined)";
 							}
 							t.append("<tr><td bgcolor='#FFFFFF'>" + title + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" + o.getLong() + " ms (" + SystemAnalysis.getWaitTime(o.getLong()) + ")</td>"
+									+ "<td bgcolor='#FFFFFF'>" /* + o.getLong() + " ms (" */+ SystemAnalysis.getWaitTime(o.getLong()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? o.getLong() / o.getInt() : "-") + " ms</td>"
 									+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
