@@ -594,7 +594,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		long currentSpeedInfoRequest = System.currentTimeMillis();
 		String info = "";
 		if (lastSpeedInfoRequest > 0 && lastSpeedInfoRequest < currentSpeedInfoRequest) {
-			if (currentSpeedInfoRequest - lastSpeedInfoRequest < 5000)
+			if (currentSpeedInfoRequest - lastSpeedInfoRequest < 15000)
 				return lastSpeed;
 			long time = currentSpeedInfoRequest - lastSpeedInfoRequest;
 			long read = readCounter.getLong() - lastRead;
