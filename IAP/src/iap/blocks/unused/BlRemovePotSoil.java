@@ -39,8 +39,9 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 						getInt("soil-lab-b-min", 125), getInt("soil-lab-b-max", 155),
 						optionsAndResults.getBackground(),
 						false)
+						.ij()
 						.erode(getInt("erode-cnt", 2))
-						.dilate(getInt("dilate-cnt", 2))
+						.dilate(getInt("dilate-cnt", 2)).io()
 						.grayscale()
 						.threshold(100, optionsAndResults.getBackground(), new Color(100, 100, 100).getRGB())
 						.show("soil region", debug);

@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
+import de.ipk.ag_ba.image.operation.ImageJOperation;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -75,8 +76,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
-			Image viswork = vis.copy().io()// .medianFilter32Bit()
-					.dilate(getInt("Dilate", 2))
+			Image viswork = vis.copy().io().ij()// .medianFilter32Bit()
+					.dilate(getInt("Dilate", 2)).io()
 					.blur(getInt("Blur", 1))
 					.getImage().show("vis", debug);
 			
@@ -104,9 +105,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			return fluo;
 		Image res = fluo.copy();
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
-			Image fluowork = fluo.copy().io()// .medianFilter32Bit()
+			Image fluowork = fluo.copy().io().ij()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 0))
-					.dilate(getInt("Dilate-Cnt-Fluo", 0))
+					.dilate(getInt("Dilate-Cnt-Fluo", 0)).io()
 					.blur(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
@@ -124,7 +125,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
-			Image viswork = fluo.copy().io()// .filterRGB(150, 255, 255)
+			Image viswork = fluo.copy().io().ij()// .filterRGB(150, 255, 255)
 					// .erode(1)
 					.dilate(getInt("Dilate-Cnt-Fluo", 4))
 					// .blur(1)
@@ -180,7 +181,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						getDouble("bloom sat min", 0), getDouble("bloom sat max", 1),
 						getDouble("bloom val min", 0), getDouble("bloom val max", 1)
 						).show("bloom filtered by HSV", getBoolean("debug bloom detection HSV filter", false))
-						.medianFilter32Bit()
+						.medianFilter32Bit().ij()
 						.erode(getInt("bloom-erode-cnt", 0))
 						// .invert()
 						// .removeSmallClusters(true, null).invert().invert()
@@ -193,8 +194,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
 				
 				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).medianFilter32Bit().invert()
-						.removeSmallClusters(true, null).
-						erode(getInt("bloom-erode-cnt", 4)).invert().
+						.removeSmallClusters(true, null).ij().
+						erode(getInt("bloom-erode-cnt", 4)).io().invert().
 						getImage();
 			}
 			if (debug2) {
@@ -245,7 +246,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				temp = new Image(ttt).io().show("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int filled;
-				ImageOperation tio = temp.io();
+				ImageJOperation tio = temp.io().ij();
 				temp = null;
 				do {
 					filled = tio.countFilledPixels();
@@ -271,7 +272,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		
 		// ***Saved***
 		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
-		double normFactor = distHorizontal != null && optionsAndResults.getREAL_MARKER_DISTANCE() != null ? optionsAndResults.getREAL_MARKER_DISTANCE() / distHorizontal : 1;
+		double normFactor = distHorizontal != null && optionsAndResults.getREAL_MARKER_DISTANCE() != null ? optionsAndResults.getREAL_MARKER_DISTANCE()
+				/ distHorizontal : 1;
 		
 		if (specialSkeletonBasedLeafWidthCalculation) {
 			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
@@ -300,14 +302,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			Double leafWidthInPixels2 = 0d;
 			int filled;
 			ImageStack fis = debug ? new ImageStack() : null;
-			ImageOperation ioo = inputImage.io();
+			ImageJOperation ioo = inputImage.io().ij();
 			do {
 				filled = ioo.countFilledPixels();
 				if (filled > 0)
 					leafWidthInPixels2++;
 				if (fis != null)
 					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
-				ioo.erode();
+				ioo = ioo.erode();
 			} while (filled > 0);
 			if (fis != null) {
 				fis.addImage("LW=" + leafWidthInPixels, inputImage);

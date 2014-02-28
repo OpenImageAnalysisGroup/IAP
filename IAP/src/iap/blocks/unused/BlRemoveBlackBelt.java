@@ -41,8 +41,9 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 								getInt("belt-lab-b-min", 110), getInt("belt-lab-b-max", 140),
 								optionsAndResults.getBackground(),
 								false).show("LAB filtered", debug)
-						.erode(getInt("erode-cnt", 10)).show("eroded", debug)
-						.dilate(getInt("dilate-cnt", 23)).show("dilated", debug)
+						.ij()
+						.erode(getInt("erode-cnt", 10)).io().show("eroded", debug)
+						.ij().dilate(getInt("dilate-cnt", 23)).io().show("dilated", debug)
 						.grayscale().show("Gray scale for threshold 100", debug)
 						.threshold(100, optionsAndResults.getBackground(), new Color(100, 100, 100).getRGB()); // filter out black belt
 				

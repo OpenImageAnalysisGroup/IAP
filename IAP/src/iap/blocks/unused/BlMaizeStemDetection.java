@@ -51,7 +51,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		
 		img = img.binary(0, Color.WHITE.getRGB());
 		
-		ImageOperation inDilatedForSectionDetection = img.copy().dilate(10).show("Dilated image for section detection", debug);
+		ImageOperation inDilatedForSectionDetection = img.copy().ij().dilate(10).io().show("Dilated image for section detection", debug);
 		
 		ClusterDetection cd = new ClusterDetection(inDilatedForSectionDetection.getImage(), ImageOperation.BACKGROUND_COLORint);
 		cd.detectClusters();
@@ -108,7 +108,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
 		getResultSet().storeResults("RESULT_", rt, getBlockPosition());
-		Image ress = ioClusteredSkeltonImage.dilate(20).getImage();
+		Image ress = ioClusteredSkeltonImage.ij().dilate(20).getImage();
 		return ress;
 	}
 	
@@ -227,7 +227,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 					if (getBoolean("Calculate Graph Diameters", true) && !graphAnalysed) {
 						try {
 							graphAnalysed = true;
-							ImageOperation si = image.copy().dilate().skeletonize(true);// .resize(0.5d);
+							ImageOperation si = image.copy().ij().dilate().io().skeletonize(true);// .resize(0.5d);
 							graphAnalysis(getClusterIDarray(image),
 									new Image(si.getWidth(), si.getHeight(),
 											si.getImageAs1dArray())
@@ -238,7 +238,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 				width2len.put(width, pixelCnt);
-				image = image.erode();
+				image = image.ij().erode().io();
 				width += 1;
 			}
 		} while (pixelCnt > 0);

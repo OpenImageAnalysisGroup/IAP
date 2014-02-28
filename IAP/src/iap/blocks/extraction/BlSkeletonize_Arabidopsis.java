@@ -137,7 +137,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 					skeletonLength = temp.io().skeletonize(false).show("SKELETON", false).countFilledPixels();
 					if (skeletonLength > 0)
 						leafWidthInPixels++;
-					temp = temp.io().erode().getImage();
+					temp = temp.io().ij().erode().getImage();
 				} while (skeletonLength > 0);
 			}
 		}
@@ -193,7 +193,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 					leafWidthInPixels2++;
 				if (fis != null)
 					fis.addImage("Leaf width 1: " + leafWidthInPixels + ", Leaf width 2: " + leafWidthInPixels2, inputImage.copy());
-				ioo = ioo.erode();
+				ioo = ioo.ij().erode().io();
 			} while (skeletonLength > 0);
 			ioo = null;
 			if (fis != null) {
