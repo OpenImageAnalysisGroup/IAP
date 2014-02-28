@@ -35,14 +35,14 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image res, mask = input().masks().vis().show("vis input", debugValues);
 		
-		res = new ImageOperation(mask).copy().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).removeSmallClusters(ngUse,
+		res = new ImageOperation(mask).copy().ij().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).io().removeSmallClusters(ngUse,
 				getInt("Noise-Size-Vis-Area", 20 * 20),
 				getInt("Noise-Size-Vis-Dimension-Absolute", 20),
 				optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
-				res = input().images().vis().io().applyMask(res.io().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
+				res = input().images().vis().io().applyMask(res.io().ij().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
 						.getImage();
 			res.show("vis result", debugValues);
 		}
@@ -54,8 +54,8 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null)
 			return null;
 		
-		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().
-				dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).
+		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().ij().
+				dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).io().
 				removeSmallClusters(ngUse,
 						getInt("Noise-Size-Fluo-Area", 10 * 10),
 						getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
@@ -64,7 +64,8 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debugValues)
 				.getImage();
 		if (getInt("dilation fluo", 0) > 0)
-			res = input().images().fluo().io().applyMask(res.io().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).getImage()).getImage();
+			res = input().images().fluo().io().applyMask(res.io().ij().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).getImage())
+					.getImage();
 		
 		return res;
 	}

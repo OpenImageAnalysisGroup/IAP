@@ -45,7 +45,7 @@ public class BlueMarkerFinder {
 		markerPositionsImage = io1
 				.thresholdLAB(0, 255, 110, 140, 0, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).show("nach lab", debug)
 				.border((int) (8 * scaleFactor + 1))
-				.opening((int) (8 * scaleFactor), (int) (4 * scaleFactor))
+				.ij().opening((int) (8 * scaleFactor), (int) (4 * scaleFactor)).io()
 				.show("nach opening", debug)
 				.grayscale().show("nach gray", debug)
 				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", debug);
@@ -53,7 +53,7 @@ public class BlueMarkerFinder {
 		io1.show("Input für Marker Search", debug);
 		
 		resultTable = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).opening(10, 0).show("Markers enlarged (b)", debug)
+				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).ij().opening(10, 0).io().show("Markers enlarged (b)", debug)
 				.getResultsTable();
 		
 	}

@@ -72,11 +72,11 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 					if (st != null)
 						st.addImage("mask " + filter, filteredContent.getImage());
 					if (dilate > 0)
-						filteredContent = filteredContent.dilate(dilate);
+						filteredContent = filteredContent.ij().dilate(dilate).io();
 					if (erode > 0)
-						filteredContent = filteredContent.erode(erode);
+						filteredContent = filteredContent.ij().erode(erode).io();
 					if (dilate2 > 0)
-						filteredContent = filteredContent.dilate(dilate2);
+						filteredContent = filteredContent.ij().dilate(dilate2).io();
 					if (st != null)
 						st.addImage("mask " + filter + ", modified", filteredContent.getImage());
 					processedMask.show(pf + " processed mask", getBoolean("Debug Mask Manipulation", false));

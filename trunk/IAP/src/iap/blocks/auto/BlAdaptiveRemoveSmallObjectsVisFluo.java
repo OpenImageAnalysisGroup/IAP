@@ -56,14 +56,14 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 				averageLeafWidthEstimationVIS = input().masks().vis().io().countFilledPixels() /
 						(double) input().masks().vis().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
 		
-		res = new ImageOperation(mask).copy().dilate(getInt("dilation vis", 0)).removeSmallClusters(ngUse,
+		res = new ImageOperation(mask).copy().ij().dilate(getInt("dilation vis", 0)).io().removeSmallClusters(ngUse,
 				autoTune ? (int) (averageLeafWidthEstimationVIS * averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Area", 20 * 20),
 				autoTune ? (int) (averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Dimension-Absolute", 20), -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
 				autoTune ? true : getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
-				res = input().images().vis().io().applyMask(res.io().erode(getInt("dilation vis", 0)).getImage()).getImage();
+				res = input().images().vis().io().applyMask(res.io().ij().erode(getInt("dilation vis", 0)).getImage()).getImage();
 			res.show("vis result", debugValues);
 		}
 		return res;
@@ -75,7 +75,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 			return null;
 		
 		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().
-				dilate(getInt("dilation fluo", 0)).
+				ij().dilate(getInt("dilation fluo", 0)).io().
 				removeSmallClusters(ngUse,
 						autoTune ? (int) (averageLeafWidthEstimationFluo * averageLeafWidthEstimationFluo) : getInt("Noise-Size-Fluo-Area", 10 * 10),
 						autoTune ? (int) averageLeafWidthEstimationFluo : getInt("Noise-Size-Fluo-Dimension-Absolute", 10), -1,
@@ -83,7 +83,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues)
 				.getImage();
 		if (getInt("dilation fluo", 0) > 0)
-			res = input().images().fluo().io().applyMask(res.io().erode(getInt("dilation fluo", 0)).getImage()).getImage();
+			res = input().images().fluo().io().applyMask(res.io().ij().erode(getInt("dilation fluo", 0)).getImage()).getImage();
 		
 		return res;
 	}

@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operation;
 
-import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.ImagePlus;
 import ij.Prefs;
@@ -15,7 +14,6 @@ import ij.plugin.filter.MaximumFinder;
 import ij.plugin.filter.UnsharpMask;
 import ij.process.AutoThresholder.Method;
 import ij.process.BinaryProcessor;
-import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
@@ -378,7 +376,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int i = (int) (intensity * 255d);
 			if (i > minimumIntensity)
 				i = 255;
-			int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+			int val = i == 255 ? BACKGROUND_COLORint : (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			in[idx++] = val;
 		}
 		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
@@ -678,57 +676,6 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * Reduce area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
-	 * 
-	 * @return
-	 */
-	public ImageOperation erode(int[][] mask) {
-		if (mask.length == 0 || mask[0].length == 0)
-			return this;
-		int jM = (mask.length - 1) / 2;
-		int iM = (mask[0].length - 1) / 2;
-		
-		ImageProcessor tempImage = image.getProcessor().createProcessor(
-				image.getProcessor().getWidth(),
-				image.getProcessor().getHeight());
-		ImageProcessor p = image.getProcessor();
-		for (int j = 0; j < mask.length; j++)
-			for (int i = 0; i < mask[j].length; i++)
-				if (mask[j][i] != -1)
-					tempImage.copyBits(p, i - iM, j - jM, Blitter.MAX);
-		
-		// for (int i = 0; i < mask.length; i++)
-		// for (int j = 0; j < mask[i].length; j++)
-		// tempImage.copyBits(processor, j - jM, i - iM, Blitter.MAX);
-		
-		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.COPY);
-		return this;
-	}
-	
-	/**
-	 * Enlarge area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
-	 */
-	public ImageOperation dilate() {
-		image.getProcessor().dilate();
-		return this;
-	}
-	
-	/**
-	 * Enlarge area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
-	 */
-	public ImageOperation dilate(int n) {
-		for (int i = 1; i <= n; i++)
-			image.getProcessor().dilate();
-		return this;
-	}
-	
-	/**
 	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
 	 * Enlarge area of mask.
 	 * <p>
@@ -759,85 +706,8 @@ public class ImageOperation implements MemoryHogInterface {
 			int[][] mask = new int[1][n];
 			for (int i = 0; i < n; i++)
 				mask[0][i] = 1;
-			return dilate(mask);
+			return ij().dilate(mask).io();
 		}
-	}
-	
-	/**
-	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
-	 * Enlarge area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
-	 */
-	public ImageOperation dilate(ImageProcessor temp, int[][] mask) {
-		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "orig");
-		temp.invert();
-		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "inv");
-		erode(mask);
-		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "erode");
-		temp.invert();
-		// ImageDisplay.show(new ImagePlus("temp", temp.duplicate()), "inv2");
-		return this;
-	}
-	
-	/**
-	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
-	 * Reduce area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
-	 */
-	public ImageOperation erode(ImageProcessor temp) {
-		temp.erode();
-		return this;
-	}
-	
-	/**
-	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
-	 * Enlarge area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/8/8d/Dilation.png/220px-Dilation.png" >
-	 */
-	public ImageOperation dilate(int[][] mask) {
-		return dilate(image.getProcessor(), mask);
-	}
-	
-	// public void erode2(int [][] mask){
-	// image.getProcessor().invert();
-	// dilate(mask);
-	// image.getProcessor().invert();
-	// }
-	
-	/**
-	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
-	 * Reduce area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
-	 */
-	public ImageOperation erode() { // es wird der 3x3 Minimum-Filter genutzt
-		return erode(image.getProcessor());
-	}
-	
-	/**
-	 * Hint: Works only on binary images (use getBinaryMask and apply this to the color image after processing).
-	 * Reduce area of mask.
-	 * <p>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Erosion.png/220px-Erosion.png" >
-	 */
-	public ImageOperation erode(int n) { // es wird der 3x3 Minimum-Filter genutzt
-		for (int i = 0; i < n; i++)
-			image.getProcessor().erode();
-		return new ImageOperation(image);
-	}
-	
-	/**
-	 * Dilation, then erosion. Removes small holes in the image.
-	 * <p>
-	 * The closing of the dark-blue shape (union of two squares) by a disk, resulting in the union of the dark-blue shape and the light-blue areas.:<br>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Closing.png/220px-Closing.png" >
-	 */
-	public void closing(int[][] mask) {
-		dilate(mask);
-		erode(mask);
 	}
 	
 	/**
@@ -889,71 +759,6 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * Erosion, then dilation. Removes small objects in the mask.
-	 * <p>
-	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
-	 */
-	public ImageOperation opening(int[][] mask) {
-		erode(mask);
-		dilate(mask);
-		return this;
-	}
-	
-	public ImageOperation opening(int[][] mask1, int[][] mask2) {
-		erode(mask1);
-		dilate(mask2);
-		return this;
-	}
-	
-	public ImageOperation opening(int[][] mask, int n) {
-		for (int i = 0; i < n; i++)
-			erode(mask);
-		for (int i = 0; i < n; i++)
-			dilate(mask);
-		return this;
-	}
-	
-	public ImageOperation opening(int[][] mask, int n1, int n2) {
-		for (int i = 0; i < n1; i++)
-			erode(mask);
-		for (int i = 0; i < n2; i++)
-			dilate(mask);
-		return this;
-	}
-	
-	/**
-	 * Erosion, then dilation. Removes small objects in the mask. es wird der
-	 * 3x3 Minimum-Filter genutzt
-	 * <p>
-	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
-	 */
-	public void opening() {
-		image.getProcessor().erode();
-		image.getProcessor().dilate();
-	}
-	
-	/**
-	 * Erosion, then dilation. Removes small objects in the mask. es wird der
-	 * 3x3 Minimum-Filter genutzt
-	 * <p>
-	 * The erosion of the dark-blue square by a disk, resulting in the light-blue square:<br>
-	 * <img src= "http://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Opening.png/220px-Opening.png" >
-	 */
-	public ImageOperation opening(int n) {
-		for (int i = 0; i < n; i++)
-			image.getProcessor().erode();
-		for (int i = 0; i < n; i++)
-			image.getProcessor().dilate();
-		return this;
-	}
-	
-	public ImageOperation opening(int n1, int n2) {
-		return opening(BlMorphologicalOperations.getRoundMask(n1), BlMorphologicalOperations.getRoundMask(n2));
-	}
-	
-	/**
 	 * increase area of mask
 	 * 
 	 * @param n
@@ -995,101 +800,6 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(imagePixels, w, h);
 	}
 	
-	/**
-	 * increase area of mask
-	 * 
-	 * @param n
-	 *           number of times the code should be run
-	 */
-	@Deprecated
-	public ImageOperation dilateNG(int n, Image inputImageForNewPixels) {
-		int[] imagePixels = getImageAs1dArray();
-		int[] inputImagePixels = inputImageForNewPixels.getAs1A();
-		int back = ImageOperation.BACKGROUND_COLORint;
-		int w = image.getWidth();
-		int h = image.getHeight();
-		for (int i = 0; i < n; i++) {
-			int p;
-			// run through from left top to bottom right and
-			// add one pixel left to any non-background pixel and one pixel
-			// above any non-background pixel
-			// the first line of pixels may be omitted, as above there can't
-			// be pixels to be set
-			for (int idx = w + 1; idx < imagePixels.length; idx++) {
-				p = imagePixels[idx];
-				if (p != back) {
-					imagePixels[idx - w] = inputImagePixels[idx - w];;
-					if ((idx - 1) % w != 0)
-						imagePixels[idx - 1] = inputImagePixels[idx - 1];
-				}
-			}
-			// run through from bottom right to top left (reverse)
-			// add one pixel right to any non-background pixel and one pixel
-			// below any non-background pixel
-			for (int idx = imagePixels.length - 1 - w - 1; idx >= 0; idx--) {
-				p = imagePixels[idx];
-				if (p != back) {
-					imagePixels[idx + w] = inputImagePixels[idx + w];;
-					if (idx % w != 0)
-						imagePixels[idx + 1] = inputImagePixels[idx + 1];;
-				}
-			}
-		}
-		return new ImageOperation(imagePixels, w, h);
-	}
-	
-	/**
-	 * reduce area of mask
-	 * 
-	 * @param n
-	 *           number of times the code should be run
-	 */
-	private ImageOperation erodeNG(int n) {
-		// todo this command does not work correctly, yet
-		int[] imagePixels = getImageAs1dArray();
-		int back = ImageOperation.BACKGROUND_COLORint;
-		int w = image.getWidth();
-		int h = image.getHeight();
-		for (int i = 0; i < n; i++) {
-			// remove any pixel that has not 4 neighbors
-			
-			// set any pixel value to the number of neighbors
-			// later all pixels with less than 4 neighbors are set to background
-			int x = 0;
-			int y = 0;
-			for (int idx = w + 1; idx < imagePixels.length; idx++) {
-				if (x > 0 && x != w - 1 && y != 0 && y < h - 1) {
-					int p = imagePixels[idx];
-					if (p != back) {
-						int nc = 0;
-						if (imagePixels[idx - w] != back) // above
-							nc++;
-						if (imagePixels[idx - 1] != back) // left
-							nc++;
-						if (imagePixels[idx + 1] != back) // right
-							nc++;
-						if (imagePixels[idx + w] != back) // below
-							nc++;
-						imagePixels[idx] = nc;
-					}
-				}
-				x++;
-				if (x == w - 1) {
-					x = 0;
-					y++;
-				}
-			}
-			for (int idx = w + 1; idx < imagePixels.length; idx++) {
-				int p = imagePixels[idx];
-				if (p != back) {
-					if (p < 4)
-						imagePixels[idx] = back;
-				}
-			}
-		}
-		return new ImageOperation(imagePixels, w, h);
-	}
-	
 	public ImageOperation skeletonize(boolean fixBackgroundColor768) {
 		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
 		ByteProcessor byteProcessor = new BinaryProcessor(
@@ -1111,28 +821,28 @@ public class ImageOperation implements MemoryHogInterface {
 		return new SkeletonizeProcessor(this);
 	}
 	
-	public void outline(int[][] mask) { // strong color gradients will be recognized as edge
-		ImageProcessor tempImage = image.getProcessor().duplicate();
-		dilate(tempImage, mask);
-		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
-		image.getProcessor().invert();
-	}
-	
-	public void outline() {
-		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
-		ByteProcessor byteProcessor = new BinaryProcessor(
-				(ByteProcessor) processor2);
-		byteProcessor.outline();
-		image.setProcessor(processor2.convertToRGB());
-	}
-	
-	public void outline2() {
-		ImageProcessor tempImage = image.getProcessor().duplicate();
-		erode(tempImage);
-		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
-		image.getProcessor().invert();
-		
-	}
+	// public void outline(int[][] mask) { // strong color gradients will be recognized as edge
+	// ImageProcessor tempImage = image.getProcessor().duplicate();
+	// dilate(tempImage, mask);
+	// image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
+	// image.getProcessor().invert();
+	// }
+	//
+	// public void outline() {
+	// ImageProcessor processor2 = image.getProcessor().convertToByte(true);
+	// ByteProcessor byteProcessor = new BinaryProcessor(
+	// (ByteProcessor) processor2);
+	// byteProcessor.outline();
+	// image.setProcessor(processor2.convertToRGB());
+	// }
+	//
+	// public void outline2() {
+	// ImageProcessor tempImage = image.getProcessor().duplicate();
+	// erode(tempImage);
+	// image.getProcessor().copyBits(tempImage, 0, 0, Blitter.DIFFERENCE);
+	// image.getProcessor().invert();
+	//
+	// }
 	
 	public ImageOperation gamma(double gamma) {
 		int[] img2d = getImageAs1dArray();
@@ -2953,6 +2663,10 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		// image ==> byteProcessor.getBufferedImage() (ck, 26.6.11)
 		return new ImageOperation(image);
+	}
+	
+	public ImageJOperation ij() {
+		return new ImageJOperation(getImageAs1dArray(), getWidth(), getHeight());
 	}
 	
 	/**
