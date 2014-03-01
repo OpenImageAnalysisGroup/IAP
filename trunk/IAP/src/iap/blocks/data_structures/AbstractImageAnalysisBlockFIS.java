@@ -94,12 +94,23 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return optionsAndResults != null ? optionsAndResults.getBooleanSetting(this, setting, defaultValue) : defaultValue;
 	}
 	
+	public boolean setBoolean(String setting, boolean value) {
+		if (optionsAndResults != null)
+			return optionsAndResults.setBooleanSetting(this, setting, value);
+		else
+			return false;
+	}
+	
 	public boolean getBoolean(ImageAnalysisBlock block, String setting, boolean defaultValue) {
 		return optionsAndResults.getBooleanSetting(block, setting, defaultValue);
 	}
 	
 	public int getInt(String setting, int defaultValue) {
 		return optionsAndResults.getIntSetting(this, setting, defaultValue);
+	}
+	
+	public void setInt(String setting, int value) {
+		optionsAndResults.setIntSetting(this, setting, value);
 	}
 	
 	public double getDouble(String setting, double defaultValue) {
@@ -112,6 +123,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	public Color getColor(String setting, Color defaultValue) {
 		return optionsAndResults.getColorSetting(this, setting, defaultValue);
+	}
+	
+	public void setColor(String setting, Color value) {
+		optionsAndResults.setColorSetting(this, setting, value);
 	}
 	
 	public Integer[] getIntArray(String setting, Integer[] defaultValue) {

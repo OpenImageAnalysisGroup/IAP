@@ -164,6 +164,16 @@ public class ImageProcessorOptionsAndResults {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
+	public boolean setBooleanSetting(ImageAnalysisBlock block, String title, boolean value) {
+		if (optSystemOptionStorage == null)
+			return false;
+		else {
+			optSystemOptionStorage.setBoolean(
+					getSystemOptionStorageGroup(), getSettingName(block, title), value);
+			return true;
+		}
+	}
+	
 	private String getSettingName(ImageAnalysisBlock block, String title) {
 		return block != null ?
 				block.getClass().getCanonicalName() + "//" + title :
@@ -186,6 +196,14 @@ public class ImageProcessorOptionsAndResults {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
+	public void setIntSetting(ImageAnalysisBlock block, String title, int value) {
+		if (optSystemOptionStorage == null)
+			return;
+		else
+			optSystemOptionStorage.setInteger(
+					getSystemOptionStorageGroup(), getSettingName(block, title), value);
+	}
+	
 	public String getStringSetting(ImageAnalysisBlock block, String title, String defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;
@@ -200,6 +218,14 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getColor(
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
+	}
+	
+	public void setColorSetting(ImageAnalysisBlock block, String title, Color value) {
+		if (optSystemOptionStorage == null)
+			;
+		else
+			optSystemOptionStorage.setColor(
+					getSystemOptionStorageGroup(), getSettingName(block, title), value);
 	}
 	
 	public Integer[] getIntArraySetting(ImageAnalysisBlock block, String title, Integer[] defaultValue) {
