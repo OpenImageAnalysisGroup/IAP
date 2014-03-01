@@ -335,6 +335,11 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	public BlockType getBlockType() {
 		return BlockType.FEATURE_EXTRACTION;
 	}
