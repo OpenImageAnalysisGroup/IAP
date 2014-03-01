@@ -79,6 +79,11 @@ public class BlCalcConvexHull extends AbstractBlock {
 	}
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
 		return getCameraInputTypes();
 	}
