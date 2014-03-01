@@ -36,7 +36,7 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 				.calculateDistanceToBorder(true, ImageOperation.BACKGROUND_COLORint)
 				.show("Distance", debug);
 		
-		ImageOperation skel = img1.io().copy().skeletonize(true)
+		ImageOperation skel = img1.io().copy().skeletonize()
 				.show("Skeleton", debug);
 		
 		ImageOperation result = dist.applyMask(skel.getImage(), ImageOperation.BACKGROUND_COLORint).show("Result", debug);

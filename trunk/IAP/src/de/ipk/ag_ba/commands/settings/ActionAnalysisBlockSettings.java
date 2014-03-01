@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.commands.settings;
 
+import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.ArrayList;
@@ -24,13 +25,22 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	
 	ActionAnalysisBlockSettings(String tooltip, NavigationButton src, LinkedHashMap<String, ArrayList<NavigationButton>> group2button,
 			String iniFileName, IniIoProvider iniIO, String section, String group) {
-		super(tooltip);
+		super("<html>" + tooltip + getBlockDesc(group));
 		this.src = src;
 		this.group2button = group2button;
 		this.group = group;
 		this.section = section;
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
+	}
+	
+	private static String getBlockDesc(String group) {
+		try {
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			return "<br><br>" + StringManipulationTools.getWordWrap(inst.getDescription(), 60);
+		} catch (Exception e) {
+			return "";
+		}
 	}
 	
 	@Override
@@ -42,7 +52,11 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		try {
 			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
-			return inst.getName();
+			BlockType bt = inst.getBlockType();
+			String pre = "";
+			if (bt != null)
+				pre = "<html><font bgcolor='" + bt.getColor() + "'>&nbsp;";
+			return pre + inst.getName() + (pre.isEmpty() ? "" : "&nbsp;");
 		} catch (Exception e) {
 			String g = group;
 			if (g != null && g.indexOf(".Block") > 0)

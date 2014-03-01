@@ -810,21 +810,8 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(imagePixels, w, h);
 	}
 	
-	public ImageOperation skeletonize(boolean fixBackgroundColor768) {
-		ImageProcessor processor2 = image.getProcessor().convertToByte(true);
-		ByteProcessor byteProcessor = new BinaryProcessor(
-				(ByteProcessor) processor2);
-		byteProcessor.skeletonize();
-		
-		if (fixBackgroundColor768) {
-			int[][] res = new Image(byteProcessor.getBufferedImage()).getAs2A();
-			for (int x = 0; x < res.length; x++)
-				for (int y = 0; y < res[0].length; y++)
-					if (res[x][y] == -768)
-						res[x][y] = -1;
-			return new ImageOperation(res);
-		} else
-			return new ImageOperation(byteProcessor.getBufferedImage());
+	public ImageOperation skeletonize() {
+		return bm().skeletonize().io();
 	}
 	
 	public SkeletonizeProcessor skel() {
