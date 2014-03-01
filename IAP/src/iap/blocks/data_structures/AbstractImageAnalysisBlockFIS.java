@@ -154,26 +154,16 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	@Override
 	public final MaskAndImageSet process() throws InterruptedException {
-		StopWatch w = debugStart(this.getClass().getSimpleName());
+		StopWatch w = debugStart(getName()); // this.getClass().getSimpleName()
 		MaskAndImageSet res = run();
-		debugEnd(w);
+		debugEnd(w, getName(), res);
 		return res;
 	}
 	
 	protected abstract MaskAndImageSet run() throws InterruptedException;
 	
 	protected StopWatch debugStart(String task) {
-		if (debugStack != null && isChangingImages())
-			if (getBoolean("enabled", true))
-				debugStack.addImage("Input for " + task, input().getOverviewImage(
-						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
-						), task);
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", false)) {
-			if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
-				if (input().masks() != null)
-					input().masks().fluo().show("Mask-Input for step: " + task);
-				else
-					input().images().fluo().show("Image-Input for step: " + task);
 			return new StopWatch("phytochamberTopImageProcessor: " + task);
 		} else
 			return null;
@@ -183,10 +173,22 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return true;
 	}
 	
-	protected void debugEnd(StopWatch w) {
+	protected void debugEnd(StopWatch w, String task, MaskAndImageSet res) {
 		if (w != null) {
 			w.printTime(10);
 		}
+		
+		if (res != null)
+			if (debugStack != null && isChangingImages())
+				if (getBoolean("enabled", true))
+					debugStack.addImage("Result of " + task, res.getOverviewImage(
+							SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
+							), null);
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
+			if (res.masks() != null)
+				res.masks().fluo().show("Mask-Results for step: " + task);
+			else
+				res.images().fluo().show("Image-Results for step: " + task);
 	}
 	
 	public MaskAndImageSet input() {

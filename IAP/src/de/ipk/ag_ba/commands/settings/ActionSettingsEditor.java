@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.commands.settings;
 
+import iap.blocks.data_structures.ImageAnalysisBlock;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -15,6 +17,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 /**
  * @author klukas
@@ -28,6 +31,10 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	String iniFileName;
 	
 	IniIoProvider iniIO;
+	
+	private String debugDesiredSettingsBlock;
+	
+	private boolean clickedOnce = false;
 	
 	public ActionSettingsEditor(String tooltip) {
 		super(tooltip);
@@ -67,13 +74,29 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				for (NavigationButton r : group2button.get(group))
 					res.add(r);
 			} else {
-				res.add(new NavigationButton(new ActionAnalysisBlockSettings(
+				ActionAnalysisBlockSettings action = new ActionAnalysisBlockSettings(
 						"Change settings of block " + group,
 						src, group2button, iniFileName, iniIO, section,
-						group),
-						guiSetting));
+						group);
+				final NavigationButton nb = new NavigationButton(action, guiSetting);
+				res.add(nb);
+				String bln = "";
+				try {
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+					bln = inst.getName();
+				} catch (Exception e) {
+					// empty
+				}
+				if (debugDesiredSettingsBlock != null && !clickedOnce && group != null && bln.equals(debugDesiredSettingsBlock))
+					BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
+						@Override
+						public void run() {
+							nb.performAction();
+						}
+					});
 			}
 		}
+		clickedOnce = true;
 	}
 	
 	@Override
@@ -160,5 +183,9 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 	@Override
 	public boolean isProvidingActions() {
 		return true;
+	}
+	
+	public void setDesiredSettingsBlock(String debugDesiredSettingsBlock) {
+		this.debugDesiredSettingsBlock = debugDesiredSettingsBlock;
 	}
 }

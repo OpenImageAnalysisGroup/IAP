@@ -55,12 +55,12 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 		
 		HashMap<Integer, StringAndFlexibleMaskAndImageSet> result = pipeline.execute(options, workset, debugStack, blockResults, getStatus());
 		
-		if (debugStack != null)
-			for (Integer key : debugStack.keySet()) {
-				StringAndFlexibleMaskAndImageSet sai = result.get(key);
-				debugStack.get(key).addImage("RESULT", sai.getMaskAndImageSet().getOverviewImage(
-						SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)), sai.getSettings());
-			}
+		// if (debugStack != null)
+		// for (Integer key : debugStack.keySet()) {
+		// StringAndFlexibleMaskAndImageSet sai = result.get(key);
+		// debugStack.get(key).addImage("RESULT", sai.getMaskAndImageSet().getOverviewImage(
+		// SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)), sai.getSettings());
+		// }
 		
 		return result;
 	}

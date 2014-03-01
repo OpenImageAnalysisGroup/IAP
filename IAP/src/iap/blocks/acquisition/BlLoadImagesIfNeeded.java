@@ -21,7 +21,7 @@ public class BlLoadImagesIfNeeded extends
 	
 	@Override
 	protected boolean isChangingImages() {
-		return false;
+		return true;
 	}
 	
 	@Override

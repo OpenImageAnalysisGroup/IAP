@@ -20,7 +20,7 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected boolean isChangingImages() {
-		return false;
+		return true;
 	}
 	
 	@Override

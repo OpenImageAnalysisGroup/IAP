@@ -28,6 +28,7 @@ public class ActionSettings extends AbstractNavigationAction {
 	private String debugLastSystemOptionStorageGroup;
 	
 	private boolean clickedOnce = false;
+	private String debugDesiredSettingsBlock;
 	
 	public ActionSettings(String iniFileName, IniIoProvider iniIO, String tooltip, String title) {
 		super(tooltip);
@@ -78,15 +79,19 @@ public class ActionSettings extends AbstractNavigationAction {
 		ArrayList<String> ss = SystemOptions.getInstance(iniFileName, iniIO).getSectionTitles();
 		Collections.sort(ss);
 		for (String s : ss) {
-			final NavigationButton nb = new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
-					"Change settings of section " + s, s), src.getGUIsetting());
+			final ActionSettingsEditor ac = new ActionSettingsEditor(iniFileName, iniIO,
+					"Change settings of section " + s, s);
+			final NavigationButton nb = new NavigationButton(ac, src.getGUIsetting());
 			res.add(nb);
 			
 			if (!clickedOnce)
 				if (s != null && debugLastSystemOptionStorageGroup != null && !s.isEmpty() && s.equals(debugLastSystemOptionStorageGroup)) {
-					BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
+					BackgroundTaskHelper.executeLaterOnSwingTask(10, new Runnable() {
 						@Override
 						public void run() {
+							if (debugDesiredSettingsBlock != null && !debugDesiredSettingsBlock.isEmpty()) {
+								ac.setDesiredSettingsBlock(debugDesiredSettingsBlock);
+							}
 							nb.performAction();
 						}
 					});
@@ -141,5 +146,9 @@ public class ActionSettings extends AbstractNavigationAction {
 	
 	public void setInitialNavigationPath(String debugLastSystemOptionStorageGroup) {
 		this.debugLastSystemOptionStorageGroup = debugLastSystemOptionStorageGroup;
+	}
+	
+	public void setInitialNavigationSubPath(String debugDesiredSettingsBlock) {
+		this.debugDesiredSettingsBlock = debugDesiredSettingsBlock;
 	}
 }

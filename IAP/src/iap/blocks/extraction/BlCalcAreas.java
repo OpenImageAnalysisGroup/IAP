@@ -121,6 +121,11 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
+	protected boolean isChangingImages() {
+		return false;
+	}
+	
+	@Override
 	public String getDescription() {
 		return "Calculates the top and side area values for visible and florescence images (by default) " +
 				"and if enabled, from NIR and IR images as well.";
