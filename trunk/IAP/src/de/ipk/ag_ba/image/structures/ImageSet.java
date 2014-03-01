@@ -36,6 +36,12 @@ public class ImageSet {
 		// use setVis, ...
 	}
 	
+	@Override
+	public String toString() {
+		return (vis != null ? "V:" + vis : "V:n/a") + ";" + (vis != null ? "F:" + fluo : "F:n/a") + ";" + (nir != null ? "N:" + nir : "N:n/a") + ";"
+				+ (ir != null ? "I:" + ir : "I:n/a");
+	}
+	
 	public ImageSet(ImageSet copyImageInfoFromThisSet) {
 		if (copyImageInfoFromThisSet != null) {
 			visInfo = copyImageInfoFromThisSet.visInfo;

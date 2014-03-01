@@ -156,10 +156,10 @@ public class BlockPipeline {
 		int index = 0;
 		boolean blockProgressOutput = true;
 		
-		boolean debug = SystemOptions.getInstance().getBoolean("IAP", "Debug-Pipeline-Execution", false);
-		int tPrintBlockTime = SystemOptions.getInstance().getInteger("IAP", "Info-Print-Block-Execution-Time", 30);
+		boolean debug = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "Debug-Pipeline-Execution", false);
+		int tPrintBlockTime = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Info-Print-Block-Execution-Time", 30);
 		
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Print-Block-Analysis-Results", false)) {
+		if (SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "Print-Block-Analysis-Results", false)) {
 			int n = 0;
 			
 			System.out.println("\n##Blocks##");
@@ -394,7 +394,7 @@ public class BlockPipeline {
 						}
 						ImageStack fis = fisArr;
 						final int idxF = idx - 1;
-						fis.print(analysisTaskFinal.getName() + " // Result tray " + idx + "/" + nn, new Runnable() {
+						fis.show(analysisTaskFinal.getName() + " // Result tray " + idx + "/" + nn, new Runnable() {
 							@Override
 							public void run() {
 								analysisTaskFinal.debugSetValidTrays(new int[] { idxF });

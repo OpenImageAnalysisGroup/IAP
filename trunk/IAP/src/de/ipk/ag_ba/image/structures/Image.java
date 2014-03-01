@@ -9,6 +9,7 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 import ij.io.Opener;
+import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 
 import java.awt.Graphics;
@@ -113,7 +114,7 @@ public class Image {
 	
 	public Image(int[][] img) {
 		this(new ImagePlus("from 1d array",
-				new ColorProcessor(img[0].length, img.length, ArrayUtil.get1d(img))));
+				new ColorProcessor(img.length, img[0].length, ArrayUtil.get1d(img))));
 	}
 	
 	public Image(java.awt.Image image) {
@@ -257,7 +258,10 @@ public class Image {
 	}
 	
 	public int[] getAs1A() {
-		return (int[]) image.getProcessor().getPixels();
+		if (image.getProcessor().getPixels() instanceof int[])
+			return (int[]) image.getProcessor().getPixels();
+		else
+			return (int[]) ((ByteProcessor) image.getProcessor()).convertToRGB().getPixels();
 	}
 	
 	public int[] getAs1Ar() {
