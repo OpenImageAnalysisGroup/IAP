@@ -70,10 +70,10 @@ public class MaskAndImageSet {
 		
 		resizedImages = resizedImages.resize(s, s, s, s);
 		
-		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Visible-Light Image]");
-		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Fluorescence Image]");
-		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Near-Infrared Image]");
-		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Infrared Image]");
+		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Visible-Light Image]");
+		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Fluorescence Image]");
+		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Near-Infrared Image]");
+		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Infrared Image]");
 		
 		ImageOperation io = new ImageOperation(image);
 		
