@@ -368,9 +368,10 @@ public class BlockPipeline {
 							"No pipeline results available! (" + input.size()
 									+ " images input)", "Error");
 				} else {
+					final ThreadSafeOptions tsoCurrentImageDisplayPage = new ThreadSafeOptions();
 					JButton openSettingsButton = null;
 					if (er.getIniIoProvider() != null) {
-						openSettingsButton = new JButton("Change analysis settings");
+						openSettingsButton = new JButton("Change Analysis Settings");
 						openSettingsButton.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(24, 24,
 								Image.SCALE_SMOOTH)));
 						openSettingsButton.addActionListener(new ActionListener() {
@@ -381,6 +382,7 @@ public class BlockPipeline {
 										"Change analysis settings (experiment " + er.getExperimentName()
 												+ ")", "Modify settings");
 								ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
+								ac.setInitialNavigationSubPath((String) tsoCurrentImageDisplayPage.getParam(0, null)); // current image analysis step
 								mnp.getNewWindowListener(ac).actionPerformed(arg0);
 							}
 						});
@@ -405,7 +407,7 @@ public class BlockPipeline {
 										(Runnable) finishSwingTaskRef.getObject(), status, false,
 										true);
 							}
-						}, "Re-run Analysis (debug)", openSettingsButton);
+						}, "Repeat Analysis", openSettingsButton, tsoCurrentImageDisplayPage);
 						idx++;
 					}
 					idx++;

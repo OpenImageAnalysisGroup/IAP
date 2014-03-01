@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -57,7 +58,8 @@ public class ImageStack {
 				ErrorMsg.addErrorMessage("mismatching image size: " + h + " <!> " + image.getHeight());
 		}
 		try {
-			stack.addSlice(label + "//Settings: " + optSettingsPath + "//", image.getAsImagePlus().getProcessor());
+			stack.addSlice(label + (optSettingsPath != null ? "//Settings: " + optSettingsPath + "//" : ""),
+					image.getAsImagePlus().getProcessor());
 			settingsPaths.add(optSettingsPath);
 		} catch (Exception e) {
 			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT ADD IMAGE TO IMAGE-STACK: " +
@@ -97,9 +99,40 @@ public class ImageStack {
 	}
 	
 	public void show(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {
+		show(title, actionCmd, buttonTitle, optSideComponent, null);
+	}
+	
+	public void show(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent, final ThreadSafeOptions tsoCurrentImageDisplayPage) {
 		if (SystemAnalysis.isHeadless())
 			return;
-		ImagePlus image = new ImagePlus();
+		ImagePlus image = new ImagePlus() {
+			
+			@Override
+			public void updatePosition(int c, int z, int t) {
+				super.updatePosition(c, z, t);
+				if (tsoCurrentImageDisplayPage != null) {
+					try {
+						String tt = getStack().getSliceLabel(z);
+						if (tt != null && tt.startsWith("Result of ")) {
+							tt = tt.substring("Result of ".length());
+							// try {
+							// ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(tt).newInstance();
+							// String desc = inst.getDescription();
+							// tsoCurrentImageDisplayPage.setParam(1, desc);
+							// } catch (Exception ee) {
+							// // empty
+							// tsoCurrentImageDisplayPage.setParam(1, null);
+							// }
+						} else
+							tsoCurrentImageDisplayPage.setParam(1, null);
+						tsoCurrentImageDisplayPage.setParam(0, tt);
+					} catch (Exception e) {
+						// empty
+					}
+				}
+			}
+			
+		};
 		image.setStack(stack);
 		if (image.getWidth() > 0 && image.getHeight() > 0) {
 			image.show(title + " (" + stack.getSize() + ")");
