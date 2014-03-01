@@ -65,7 +65,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		ArrayList<RunnableOnImage> postProcessing = new ArrayList<RunnableOnImage>();
 		img = skeletonizeImage("", background, img, origImage, rt, postProcessing);
 		
-		int[] unchangedSkeletonPixels = img.getImageAs1dArray();
+		int[] unchangedSkeletonPixels = img.getAs1D();
 		
 		ImageOperation ioClusteredSkeltonImage = new Image(
 				inDilatedForSectionDetection.getWidth(),
@@ -77,7 +77,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			ioClusteredSkeltonImage = ioClusteredSkeltonImage.replaceColor(i, cols.get(i).getRGB());
 		}
 		
-		int[] clusterIDsPixels = ioClusteredSkeltonImage.getImageAs1dArray();
+		int[] clusterIDsPixels = ioClusteredSkeltonImage.getAs1D();
 		
 		boolean thinClusterSkel = true;
 		if (thinClusterSkel) {
@@ -209,7 +209,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			
 			rt.addValue(pre + "roots.filled.pixels", n);
 			
-			for (int p : nonBinaryImage.getImageAs1dArray()) {
+			for (int p : nonBinaryImage.getAs1D()) {
 				if (p == ImageOperation.BACKGROUND_COLORint)
 					continue;
 				int bf = (p & 0x0000ff);
@@ -281,7 +281,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 							if (width < 2) {
 								// first image, not thinned
 								
-								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, scale).getImageAs2dArray();
+								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, scale).getAs2D();
 								// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
 								// false);
 								
@@ -296,7 +296,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 								if (getBoolean("Calculate Graph Diameters", true)) {
 									graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 											new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
-													skeletonImage.getImageAs1dArray())
+													skeletonImage.getAs1D())
 													.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
 								}
 							}
@@ -362,7 +362,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				img.getHeight(),
 				cd.getImageClusterIdMask()).io();// .debugPrintValueSetToConsole();
 		
-		return ioClusteredSkeltonImage.getImageAs1dArray();
+		return ioClusteredSkeltonImage.getAs1D();
 	}
 	
 	// colorize cluster image:
