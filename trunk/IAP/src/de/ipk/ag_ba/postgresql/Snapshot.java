@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import org.StringManipulationTools;
 
 /**
- * @author entzian
+ * @author entzian, klukas
  */
 public class Snapshot {
 	

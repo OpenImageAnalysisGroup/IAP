@@ -39,7 +39,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 						getInt("soil-lab-b-min", 125), getInt("soil-lab-b-max", 155),
 						optionsAndResults.getBackground(),
 						false)
-						.ij()
+						.bm()
 						.erode(getInt("erode-cnt", 2))
 						.dilate(getInt("dilate-cnt", 2)).io()
 						.grayscale()

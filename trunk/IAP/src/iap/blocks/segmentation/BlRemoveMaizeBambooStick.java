@@ -70,7 +70,7 @@ public class BlRemoveMaizeBambooStick extends AbstractSnapshotAnalysisBlock {
 		int numberOfClusterPerLine = 0;
 		boolean maize = true;
 		Image yellow = new ImageOperation(labFilter(mask, mask,
-				150, 255, 108, 165, 127, 255, optionsAndResults.getCameraPosition(), maize)).ij().opening(1, 1).getImage();
+				150, 255, 108, 165, 127, 255, optionsAndResults.getCameraPosition(), maize)).bm().opening(1, 1).getImage();
 		
 		int[] yellowarr = yellow.getAs1A();
 		int[] origarr = mask.getAs1A();
