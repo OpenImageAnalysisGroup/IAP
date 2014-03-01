@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 
 public class MaskAndImageSet {
 	private ImageSet imageset;
@@ -69,10 +70,10 @@ public class MaskAndImageSet {
 		
 		resizedImages = resizedImages.resize(s, s, s, s);
 		
-		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : null;
-		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : null;
-		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : null;
-		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : null;
+		int[][] imgVis = resizedImages.vis() != null ? resizedImages.vis().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Visible-Light Image]");
+		int[][] imgFluo = resizedImages.fluo() != null ? resizedImages.fluo().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Fluorescence Image]");
+		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Near-Infrared Image]");
+		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : ImageCanvas.getTextImage(300, 100, "[No Infrared Image]");
 		
 		ImageOperation io = new ImageOperation(image);
 		
