@@ -96,7 +96,7 @@ public class ImageStack {
 		}
 	}
 	
-	public void print(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {
+	public void show(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {
 		if (SystemAnalysis.isHeadless())
 			return;
 		ImagePlus image = new ImagePlus();

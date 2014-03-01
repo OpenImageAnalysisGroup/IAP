@@ -103,6 +103,8 @@ public class ImageOperation implements MemoryHogInterface {
 	// private Roi boundingBox;
 	
 	public ImageOperation(ImagePlus image) {
+		if (image == null)
+			throw new IllegalArgumentException("Provided image can't be null!");
 		this.image = image;
 	}
 	
@@ -116,7 +118,9 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation(Image image) {
-		this(image.getAsImagePlus());
+		if (image == null)
+			throw new IllegalArgumentException("Provided image can't be null!");
+		this.image = image.getAsImagePlus();
 		setCameraType(image.getCameraType());
 	}
 	
@@ -134,8 +138,8 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	private static ImagePlus getIJ(int[][] img) {
-		int width = img[0].length;
-		int height = img.length;
+		int height = img[0].length;
+		int width = img.length;
 		return new ImagePlus("from 1d array", new ColorProcessor(width, height, ArrayUtil.get1d(img)));
 	}
 	
@@ -1089,7 +1093,10 @@ public class ImageOperation implements MemoryHogInterface {
 	// ################## get... ###################
 	
 	public int[] getAs1D() {
-		return (int[]) image.getProcessor().getPixels();
+		if (image.getProcessor().getPixels() instanceof int[])
+			return (int[]) image.getProcessor().getPixels();
+		else
+			return (int[]) ((ByteProcessor) image.getProcessor()).convertToRGB().getPixels();
 	}
 	
 	public int[][] getAs2D() {
@@ -2123,9 +2130,8 @@ public class ImageOperation implements MemoryHogInterface {
 					ama = af > ama ? af : ama;
 					bma = bf > bma ? bf : bma;
 				}
-		System.out.println("L:[" + lmi + "," + lma + "]");
-		System.out.println("A:[" + ami + "," + ama + "]");
-		System.out.println("B:[" + bmi + "," + bma + "]");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Calculated Lab-Cube. Value Ranges: L:[" + lmi + "," + lma + "], A:[" + ami + "," + ama + "], B:["
+				+ bmi + "," + bma + "]");
 	}
 	
 	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {

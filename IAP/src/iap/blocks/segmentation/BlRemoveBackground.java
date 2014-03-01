@@ -90,6 +90,7 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 							.filterRemainHSV(getDouble("Clear-background-vis-remain-distance", 0.02), getDouble("Clear-background-vis-remain-hue", 0.62))
 							.getImage())
 					.getImage();
+			
 			return input().images().vis().io().applyMask_ResizeMaskIfNeeded(cleared, optionsAndResults.getBackground())
 					.show("CLEAR RESULT", debug).getImage();
 		} else {

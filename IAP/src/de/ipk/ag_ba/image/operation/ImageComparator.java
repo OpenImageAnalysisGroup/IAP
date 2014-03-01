@@ -32,8 +32,8 @@ public class ImageComparator {
 		if (inputImage != null && referenceImage != null) {
 			if (inputImage.getWidth() != referenceImage.getWidth()
 					|| inputImage.getHeight() != referenceImage.getHeight()) {
-				inputImage.show("A");
-				referenceImage.show("A (ref)");
+				inputImage.show("detected size differences A");
+				referenceImage.show("detected size differences A (ref)");
 			}
 		}
 		
