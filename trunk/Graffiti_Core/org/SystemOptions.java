@@ -88,38 +88,38 @@ public class SystemOptions {
 			@Override
 			public void run() {
 				try {
-					synchronized (iniIO.getInstance()) {
-						IniIoProvider iniIO = iniIOref.get();
-						if (iniIO == null) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider is not available any more. Update-check stops for this object.");
-							updateCheckTasks.remove(this);
-							return;
-						}
-						Long mt;
-						try {
-							mt = iniIO.lastModified();
-						} catch (Exception e) {
-							e.printStackTrace();
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
-									+ e.getMessage());
-							updateCheckTasks.remove(this);
-							return;
-						}
-						if (mt != null && mt != iniIO.storedLastUpdateTime()) {
-							iniIO.setStoredLastUpdateTime(mt);
-							iniIO.getInstance().ini = readIniFileOrProvider();
-							ini = iniIO.getInstance().ini;
-							for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
-								for (Runnable r : rr) {
-									try {
-										r.run();
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
+					// synchronized (iniIO.getInstance()) {
+					IniIoProvider iniIO = iniIOref.get();
+					if (iniIO == null) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider is not available any more. Update-check stops for this object.");
+						updateCheckTasks.remove(this);
+						return;
+					}
+					Long mt;
+					try {
+						mt = iniIO.lastModified();
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
+								+ e.getMessage());
+						updateCheckTasks.remove(this);
+						return;
+					}
+					if (mt != null && mt != iniIO.storedLastUpdateTime()) {
+						iniIO.setStoredLastUpdateTime(mt);
+						iniIO.getInstance().ini = readIniFileOrProvider();
+						ini = iniIO.getInstance().ini;
+						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+							for (Runnable r : rr) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
 								}
 							}
 						}
 					}
+					// }
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
